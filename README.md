@@ -7,7 +7,7 @@
 5. Display colored sematic space
 6. Extract ontology with Wikontic
 
-## To try
+### To try
 
 1. Relate to common motif indexes
 2. Build exploratory UI
