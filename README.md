@@ -9,6 +9,8 @@
 
 ### To try
 
-1. Relate to common motif indexes
-2. Build exploratory UI
-3. ...
+1. Relate to common motif indexes (or query by them)
+2. Build exploratory UI with clusters visualization, adaptable threshold and freeform query
+3. Try AE / VAE / SAE?
+4. Try hierarchical chunking / embeddings?
+5. ...
