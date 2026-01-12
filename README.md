@@ -57,5 +57,7 @@
 7. Workshop: ACL SIG on Humanities (SIGHUM): https://sighum.wordpress.com
 8. Workshop: Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
 
-[Черновая структура статьи](DRAFT.rtf)
-[Список литературы](LITERATURE.md)
+### Documentation
+
+1. [Preliminary paper draft](DRAFT.rtf)
+2. [Bibliography](LITERATURE.md)
