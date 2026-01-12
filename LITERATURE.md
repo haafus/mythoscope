@@ -212,3 +212,6 @@ Zhiyuan Liu • Yankai Lin • Maosong Sun
 ### Text as Data: A New Framework for Machine Learning and the Social Sciences
 Justin Grimmer, Margaret E. Roberts, Brandon M. Stewart
 
+### Machine Learning for Ancient Languages: A Survey
+T. Sommerschield et. al. ACL 2023
+
