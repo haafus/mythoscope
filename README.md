@@ -19,7 +19,8 @@
 6. Try hierarchical chunking / embeddings?
 7. Research narrative and network extraction methods?
 8. Create and maintain **awesome-computational-mythology**?
-9. ...
+9. Setup community corpora project?
+10. ...
 
 ### Potential Data Sources
 
