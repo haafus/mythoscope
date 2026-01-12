@@ -1,4 +1,4 @@
-# World mythological traditions analysis with machine learning methods
+# Toward a Computational Framework for Comparative Mythology
 
 ### Basic Pipeline
 
