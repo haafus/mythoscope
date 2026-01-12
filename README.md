@@ -23,11 +23,25 @@
 2. The Database of Religious History (including corpora): https://religiondatabase.org/landing
 3. Seshat Global History Databank: https://seshatdatabank.info/
 4. Motif Indexes: https://ctsf.ru/ukazateli
+5. eHRAF World Cultures (proprietary): https://ehrafworldcultures.yale.edu
+
+### Potential Future Colabs & Benchmarks
+
+1. DeepMind, Aeneas / Ithaca: https://predictingthepast.com
+2. Max Planck Evo Anthro: https://www.eva.mpg.de/linguistic-and-cultural-evolution/index/
+3. Oxford - Institute of Cognitive & Evolutionary Anthropology (Harvey Whitehouse)
+4. Cambridge - DH / CST bridge
+5. Durham University - Cultural evolution & folklore tradition (Jamshid Tehrani)
+6. Stanford - Literary Lab (Franco Moretti)
+7. Ecole Normale Superieure / CNRS - Structural mythology (Julien d'Huy)
+8. IACM (Michael Witzel - Harvard, Natalya Yanchevskaya - Princeton, Steve Farmer): https://www.compmyth.org/
+9. Лаборатория Ненужных Вещей (Брагинская, Александрова, Чегодаев, Березкин и др.): https://7seminarov.com
 
 ### Probable Submitting Targets
 
-1. Computational Humanities Research (CHR) Conferece/Journal: https://computational-humanities-research.org/
-2. Digital Scholarship in the Humanities (DSH): https://academic.oup.com/dsh
-3. Journal of Cultural Analytics (CA): https://culturalanalytics.org/
-4. International Association for Comparative Mythology (IACM): https://www.compmyth.org/conferences/
+1. Workshop on Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
+2. Computational Humanities Research (CHR) Conferece/Journal: https://computational-humanities-research.org/
+3. Digital Scholarship in the Humanities (DSH): https://academic.oup.com/dsh
+4. Journal of Cultural Analytics (CA): https://culturalanalytics.org/
+5. International Association for Comparative Mythology Conference (IACM): https://www.compmyth.org/conferences/
 
