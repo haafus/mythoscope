@@ -207,7 +207,7 @@ Jesse Egbert, Douglas Biber, Bethany Gray
 Graeme Hirst, University of Toronto
 
 ### Representation Learning for Natural Language Processing, Second Edition
-Zhiyuan Liu • Yankai Lin • Maosong Sun
+Zhiyuan Liu, Yankai Lin, Maosong Sun
 
 ### Text as Data: A New Framework for Machine Learning and the Social Sciences
 Justin Grimmer, Margaret E. Roberts, Brandon M. Stewart
