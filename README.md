@@ -16,7 +16,7 @@
 3. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity/parallels query
 4. Try AE / VAE / SAE?
 5. Try hierarchical chunking / embeddings?
-6. Research narrative extraction methods?
+6. Research narrative and network extraction methods?
 7. Create and maintain **awesome-computational-mythology**?
 8. ...
 
