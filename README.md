@@ -9,20 +9,21 @@
 5. Display colored semantic space
 6. Extract ontology with Wikontic
 
-### Experiments / Roadmap
+### Experiments / Roadmap / Backlog
 
 1. Relate unsupervised results to traditional motif indexes
 2. Query index by traditional motives and freeform text
 3. Research traditional motives operationalization
 4. Research traditions proximity / compound metrics and tools
 5. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity / parallels query
-6. Integrate traditional indexes (ATU, Berezkin?) for interactive research and scaling
-7. Try AE / VAE / SAE?
-8. Try hierarchical chunking / embeddings?
-9. Research narrative and network extraction methods?
-10. Create and maintain **awesome-computational-mythology**?
-11. Initiate worldwide community corpora & methods project?
-12. ...
+6. Make the research UI publicly available online
+7. Integrate traditional indexes (ATU, Berezkin?) for interactive research and scaling
+8. Initiate worldwide community corpora & computational methods project?
+9. Create and maintain **awesome-computational-mythology**?
+10. Try AE / VAE / SAE?
+11. Try hierarchical chunking / embeddings?
+12. Research narrative and network extraction methods?
+13. ...
 
 ### Potential Data Sources
 
