@@ -194,3 +194,21 @@ Turchin et al.
 - интересно и DH, и CSR, и AI
 
 👉 ты уже **на переднем крае**, здесь ты не ученик, а соавтор поля
+
+# Дополнительно
+
+### Maths Meets Myths: Quantitative Approaches to Ancient Narratives
+Ralph Kenna, Máirín MacCarron, Pádraig MacCarron
+
+### Designing and Evaluating Language Corpora: A Practical Framework for Corpus Representativeness
+Jesse Egbert, Douglas Biber, Bethany Gray
+
+### Embeddings in Natural Language Processing: Theory and Advances in Vector Representations of Meaning
+Graeme Hirst, University of Toronto
+
+### Representation Learning for Natural Language Processing, Second Edition
+Zhiyuan Liu • Yankai Lin • Maosong Sun
+
+### Text as Data: A New Framework for Machine Learning and the Social Sciences
+Justin Grimmer, Margaret E. Roberts, Brandon M. Stewart
+
