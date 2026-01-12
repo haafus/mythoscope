@@ -42,7 +42,7 @@ https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/
 8. IACM (Michael Witzel - Harvard, Natalya Yanchevskaya - Princeton, Steve Farmer): https://www.compmyth.org
 9. Лаборатория Ненужных Вещей (Брагинская, Александрова, Чегодаев, Березкин и др.): https://7seminarov.com
 
-### Potential Submitting Targets
+### Potential Submission Targets
 
 1. Workshop on Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
 2. Computational Humanities Research (CHR) Conferece/Journal: https://computational-humanities-research.org/
