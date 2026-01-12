@@ -20,7 +20,7 @@
 7. Create and maintain **awesome-computational-mythology**?
 8. ...
 
-### Potential Sources
+### Potential Data Sources
 
 1. Internet Sacred Text Archive: https://sacred-texts.com/index.htm
 2. The Database of Religious History (including corpora): https://religiondatabase.org/landing
