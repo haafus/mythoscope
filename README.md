@@ -26,7 +26,8 @@
 2. The Database of Religious History (including corpora): https://religiondatabase.org/landing
 3. Seshat Global History Databank: https://seshatdatabank.info/
 4. Motif Indexes: https://ctsf.ru/ukazateli
-5. eHRAF World Cultures (proprietary): https://ehrafworldcultures.yale.edu
+5. Re3Data, Ancient Cultures: https://www.re3data.org/search?query=&subjects%5B%5D=111
+6. eHRAF World Cultures (proprietary): https://ehrafworldcultures.yale.edu
 
 ### Potential Future Colabs & Benchmarks
 
