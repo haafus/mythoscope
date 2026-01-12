@@ -13,7 +13,7 @@
 
 1. Relate to common motif indexes (or query by them)
 2. Research motives operationalization / scale via traditional / common indexes
-3. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity/parallels query
+3. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity / parallels query
 4. Research traditions proximity / compound metrics and tools
 5. Try AE / VAE / SAE?
 6. Try hierarchical chunking / embeddings?
