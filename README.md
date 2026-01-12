@@ -45,7 +45,8 @@ https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/
 ### Potential Submission Targets
 
 1. Workshop on Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
-2. Computational Humanities Research (CHR) Conferece/Journal: https://computational-humanities-research.org/
+2. Computational Humanities Research (CHR) Conferece/Journal:  
+https://computational-humanities-research.org/
 3. Digital Scholarship in the Humanities (DSH): https://academic.oup.com/dsh
 4. Journal of Cultural Analytics (CA): https://culturalanalytics.org/
 5. International Association for Comparative Mythology Conference (IACM): https://www.compmyth.org/conferences/
