@@ -11,7 +11,7 @@
 
 ### Experiments
 
-1. Relate unsupervised results to common motif indexes
+1. Relate unsupervised results to traditional motif indexes
 2. Query index by traditional motives and freeform text
 3. Research traditional motives operationalization
 4. Research traditions proximity / compound metrics and tools
