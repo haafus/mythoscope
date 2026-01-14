@@ -54,10 +54,11 @@
 4. Journal/Conference: Computational Literary Studies (JCLS): https://jcls.io
 5. Journal/Conference: International Association for Comparative Mythology (IACM): https://www.compmyth.org/conferences/
 6. Journal: Digital Humanities Quarterly (DHQ): https://dhq.digitalhumanities.org
-7. Workshop: ACL SIG on Humanities (SIGHUM): https://sighum.wordpress.com
-8. Workshop: Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
+7. Workshop: ACL Natural Language Processing for Digital Humanities (NLP4DH): https://www.nlp4dh.com
+8. Workshop: ACL SIG on Humanities (SIGHUM): https://sighum.wordpress.com
+9. Workshop: Digital Methods For Mythological Research (dm4myth): https://dm4myth.github.io
 
 ### Documentation
 
-1. [Preliminary paper draft](DRAFT.rtf)
+1. [Preliminary paper draft](DRAFT.rtf) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
 2. [Bibliography](LITERATURE.md)
