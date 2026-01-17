@@ -33,6 +33,8 @@
 4. Motif Indexes: https://ctsf.ru/ukazateli
 5. Re3Data, Ancient Cultures: https://www.re3data.org/search?query=&subjects%5B%5D=111
 6. eHRAF World Cultures (proprietary): https://ehrafworldcultures.yale.edu
+7. Multilingual Folk Tale Database: http://www.mftd.org
+8. Theoi Project: https://www.theoi.com/Library.html
 
 ### Potential Future Colabs & Benchmarks
 
