@@ -1,0 +1,3555 @@
+The Project Gutenberg eBook of Ars grammaticae Iaponicae linguae
+ 
+This ebook is for the use of anyone anywhere in the United States and
+most other parts of the world at no cost and with almost no restrictions
+whatsoever. You may copy it, give it away or re-use it under the terms
+of the Project Gutenberg License included with this ebook or online
+at www.gutenberg.org. If you are not located in the United States,
+you will have to check the laws of the country where you are located
+before using this eBook.
+
+Title: Ars grammaticae Iaponicae linguae
+
+Author: Diego Collado
+
+Release date: February 8, 2006 [eBook #17713]
+
+Language: Latin
+
+Credits: Produced by Louise Hope, David Starner and the Online
+ Distributed Proofreading Team at http://www.pgdp.net
+
+
+*** START OF THE PROJECT GUTENBERG EBOOK ARS GRAMMATICAE IAPONICAE LINGUAE ***
+
+
+
+
+Produced by Louise Hope, David Starner and the Online
+Distributed Proofreading Team at http://www.pgdp.net
+
+
+
+
+
+[Transcriber's Note:
+Characters that could not be fully rendered in the Latin-1 character set
+have been "unpacked" and shown within brackets:
+ [~e] [~i] [~u] (e, i, u with tilde: ã and õ should display normally)
+ [vo] [vu] (hacek / "caron")
+ [e,] ("e caudata" = æ)
+ [oe] (oe ligature)]
+
+
+ * * * * *
+
+ ARS
+ GRAMMATICAE
+ IAPONICAE
+ LINGVAE.
+
+
+ IN GRATIAM ET ADIVTORIVM
+ eorum, qui prædicandi Euangelij causa ad
+ Iaponiæ Regnum se voluerint conferre.
+
+
+Composita, & Sacræ de Propaganda Fide Congregationi
+ dicata à Fr. Didaco Collado Ordinis Prædicatorum
+ per aliquot annos in prædicto Regno
+ Fidei Catholicæ propagationis
+ Ministro.
+
+
+ [Illustration:
+ EVNTES IN VNIVERSVM MVNDVM
+ PRÆDICATE EVANGELIVM OMNI CREATVRÆ]
+
+
+ ROMÆ,
+ Typis & impensis Sac. Congr. de Propag. Fide.
+ MDCXXXII.
+ SVPERIORVM PERMISSV.
+
+
+
+
+Imprimatur si placet Reuerendiss. P. M. S.
+Pal. Apost. A. Episc. Vmbriaticen. Vicesg.
+
+Imprimatur
+
+Fr. Nicolaus Riccardius S. Pal. Apost. Magister,
+Ordinis Prædicatorum.
+
+
+ * * * * *
+
+[Transcriber's Note:
+The book contains no Contents or Index. Instead, the full chapter titles
+are listed here.]
+
+PROLOGVS AD LECTOREM.
+De nomine & eius declinatione, & genere.
+De pronomine.
+ De pronomine secundæ personæ scilicet ego &c.
+ De pronomine secundæ person[e,]: scilicet Tu, tui, tibi, &c.
+ De pronomine tertiæ personæ, scilicet ille, illa, illud.
+ De pronominibus relatiuis.
+De formatione verborum, & coniugationibus.
+ De Pr[e,]terito imperfecto, perfecto, & plusquam perfecto.
+ De futuro primæ coniugationis.
+ Imperatiuum primæ coniugationis.
+ Optatiuum primæ coniugationis.
+ Subiunctiuum primæ coniugationis affirmatiuæ.
+ Infinitiuum.
+ Prima coniugatio negatiua.
+ Secunda coniugatio affirmatiua.
+ Secunda coniugatio negatiua.
+ Tertia coniugatio affirmatiua.
+ Tertia coniugatio negatiua.
+ Coniugatio verbi substantiui negatiui.
+ De Particulis conditionalibus.
+ De verbo potentiali.
+ Verba irregularia quo ad coniugationes.
+ De verbo adhuc, & de eius formatione & differentijs.
+ De aliquibus verbis quæ de se habent honorem determinatum.
+ Aduertentiæ circa coniugationes verborum.
+De Adverbiis.
+ Caput primum.
+ De aduerbijs locorum.
+ Aduerbia ad causam interrogandum & responendum.
+ Aduerbia temporis.
+ Aduerbia negandi.
+ Aduerbia affirmandi.
+ Adverbia comparatiua.
+ Aduerbia superlatiua.
+ Aduerbia intensionis & exaggerationis.
+ Aduerbia congregandi.
+ Aduerbia concludendi, & aduertendi.
+De Præpositionibus casuum.
+De coniunctionibus & diuisionibus.
+De interiectione.
+De sintaxi, & casibus, quos regunt verba.
+De Arithmetica Iaponiæ & materia numerorum,
+ in quibus hoc opus hic labor.
+Aliquæ regulæ coniugationum in scriptura librorum.
+ERRATA SIC CORRIGE.
+
+
+ * * * * *
+
+PROLOGVS AD LECTOREM.
+
+Et aduertentiæ aliquæ pro Iaponicæ linguæ perfecta pronuntiatione.
+
+
+Etsi quondam à principio plantationis Orthodoxæ fidei nostræ in Regno
+Iaponico, composita fuerit quædam ars grãmaticæ linguæ prædictæ a
+P. Ioanne Rodriguez Societatis Iesu; quia tamen raro res in sua prima
+conditione perfectæ lumen aspiciunt, & aliàs, ob temporum diuturnitatem,
+vix aliquam copiam prædictæ artis est iam inuenire: Visum est mihi,
+aliquale Deo, & ministris fidei propagationis (quæ sine linguæ
+instrumento non potest esse) obsequium præstiturum, si extractis ab arte
+prædicta necessarijs (sunt enim multa) & relictis, quæ peritis in
+prædicta lingua talia non probantur; additis etiam ijs, quæ experientia,
+& vsu, lectioneque continua librorum, Deo largiente (qui dat verbum
+Euangelizantibus) sum adeptus, in compendium alarè, & sub breuitate
+redigerem præcepta omnia quæ ad eruditè vtendum lingua Iaponica,
+prædicatoribus (pro quibus labor est assumptus) sunt necessaria. Quia
+verò simul cum præceptis, & regulis, expedit exempla, in quibus prædicta
+regulæ verificantur ponere; libuit etiam ad maiorem discipulorum
+consolationem & iuuamen non solum hoc; sed etiam exemplorum omnium
+declarationem in lingua Latina (quæ inter Theologos est cõmunior)
+adiungere, quo nihil a magistro restet amplius desiderandum. Et si verò
+ea omnia, quæ tam in hac arte; quàm in Dictionario (quod, Deo dante,
+quanto citius in lucem edere gestio) continentur meo iuditio sint satis
+limata, & secura, quibus fiducialiter quiuis vti potest; Examini tamen,
+& iuditio melius sentientium subiecta esse volo, vt fidei prædicatio ab
+eruditiore lingua, fructuosior euadat.
+
+Quando duæ vocales immediate coniunguntur in aliquo vocabulo linguæ
+Iaponicæ; non pronunciantur sicut in Latina valeo, aut in Hispanica
+_vaca_, sed vtraque integra per se profertur, _v,a_; _v,o_; _v,i_.
+
+Litera, _s_, pronuntiatur sicut, _sç_, v.g. _susumùru_, _sçusçumùru_.
+
+Litera, _j_, pronunciatur blande, sicut in lingua Lusitanica _joaõ_, &,
+_judeo_.
+
+Litera _x_, pronunciatur etiam blande sicut in lingua Lusitanica
+_queixumes_.
+
+Quando supra literam, _o_, fuerit hoc signum _^_ pronunciatur, _ô_, ac
+si esset, _ou_, labijs quasi iunctis, & ore penè clauso: v.g. _búppô_.
+
+Quando verò supra _o_, fuerit hoc signum, _v_, vel, _ó_, pronunciatur
+ore aperto, & ac si essent duæ literae, _oo_, v.g. _tènxó_, vel
+_gacux[vo]_.
+
+Si vero prædicta signa, fuerint supra _ú_, pronuntiatur _[vu]_,
+detentum, ac si essent duo, v.g. _Tàifú_, _Aia[vu]_.
+
+Quando fuerit hoc signum _~_ super aliquã literam ex vocalibus debet
+proferri sicut, _n_; sed non in integrum, sed cursim & leniter v.g.
+_vãga_.
+
+_Qe_, &, _qi_, scribuntur absque, _u_, quia quando, _u_, sequitur post,
+_q_, vel post, _c_, utraque integrè pronunciatur absque sinalepha v.g.
+_quõdai_, _quàinìn_:
+
+Quando post, _g_, sequitur, _u_, & postea immediatè alia vocalis _e_,
+vel, _i_, pronunciatur sicut in lingua Hispanica, v.g. _guenin_; si vero
+litera, _i_, ponatur immediate post, _g_, absque, _v_, pronunciatur
+sicut Italicè, giorno, v.g. _Xitãgi_.
+
+Litera, _z_, pronunciatur ea vi, qua in lingua Hispaniæ, Zumbar, v.g.
+_mizu_.
+
+Si verò fuerint duo, _zz_, violentiùs feriuntur, v.g. _mizzu_.
+
+Quando fuerint duo, _tt_, _xx_, _zz_, _qq_, _cq_, _ij_, _pp_; vtrumque
+opportet ferire vt fit perfecta pronunciatio, & vis significationis
+percipiatur: nam v.g. _mizu_, significat mel; & _mizzu_, significat
+aquam: vnde si eadem, vel violentia, aut lenitate vtrumque pronunties
+vel aquam tantum, vel mel solùm tibi proferent.
+
+Quando, _ch_, anteponitur vocali, pronunciatur sicut Hispanice,
+chimenea: v.g. _fochó_.
+
+Si vero, _nh_, anteponatur vocali, pronunciatur sicut Hispanicè, maña,
+v.g. _nhuva_.
+
+Litera, _f_, in aliquibus Iaponiæ prouincijs pronunciatur sicut in
+lingua Latina; in alijs autem ac si esset, _h_, non perfectum: sed
+quodam medium inter, _f_, &, _h_, os & labia plicando, & claudendo, sed
+non integrum, quod vsu facilè compertum erit: v.g. _fito_.
+
+Quando, _tç_, in aliquo vocabulo fuerit (quod est valde frequens) orare
+debet discipulus Deum, vt ei venas pronuntiationis aperiat quia est
+difficilis, & in nulla lingua alia, est talem pronuntiationem inuenire:
+non enim pronunciatur vt _tç_, aut ut _t_, uel, _c_, solùm, sed
+uiolenter percutiendo lingua dentes, ita ut utraque litera, &, _t_, &,
+_ç_, & plus, _ç_, quàm, _t_, feriri uideantur: u.g. _tçùtçùmu_.
+
+Litera, _r_, pronunciatur blandè & leniter ubicumque inueniatur, siue
+sit in principio, siue in medio uocabuli; u.g., _ranguió_, _cutabirùru_.
+
+_Ya_, _ye_, _yo_, _yu_, pronunciantur sicut in lingua Hispanica.
+
+Quando à Iaponijs pronunciantur uocabula finita in, _i_, uel _v_, uix
+percipitur litera finalis a tyronibus: u.g. qui audit, _gozàru_, putat
+se audiuisse, _gozàr_, & qui audiuit _fitòtçu_, credit se solum
+audiuisse, _fitòtç_, & cum audit, _àxi no fàra_, percipit solum, _àx no
+fàra_.
+
+Quando uocabulo finito in uocali subsequitur incipiens in consonanti,
+præcipuè si sit, _b_, uel, _s_, inter ipsam uocalem, & consonantem,
+pronunciatur litera _n_, sed non perfecta; sed lenis: u.g. _sònõ
+gotòqu_.
+
+Circa uocabulorum accentus magnam adhibui curam, ut illos signis suis
+proprijs locis supra literas in quibus accentus fieri debent, adaptatis,
+sensus & sententia loquentis percipiatur: u.g. _qèi xèi_, habet accentum
+in utroque, _èè_. _fibicàxi_, habet in prima, _i_, & in, _a_, & idem in
+dictionario seruabitur ordo, notando accentus ea perfectione, qua summa
+cum diligentia potui percipere, si in aliquo sum deceptus, paratus sum
+corrigi; ea uerò quæ diminute fuerint dicta, uel desuerint, tam in arte;
+quàm in dictionario; cum facile sit addere; à doctiore supplebuntur, qui
+tertiam artem, & secundum dictionarium aggredietur: ego enim ne à patre
+familias & Domino Deo nostro reprehenderer, talentum nolui habere
+repositum in sudario, sed duobus, alia saltim duo superlucrari, &
+cooperari saluti Iaponiorum; non solùm prædicando, sed præhendo
+prædicatoribus, si possem instrumenta linguæ, & præcipuè modo ut possint
+illam extra Iaponiam addiscere: cum propter instantem persequutionem in
+Iaponia uix sit hoc possibile. Vale & uiue felix lector. Matriti die 30
+Aug. Ann. 1631.
+
+
+ * * * * *
+
+In hac arte Grammaticæ seruauimus ordinem, quem peritus Antonius
+Nebrissensis, & alij seruarunt in suis linguæ Latinæ, per partes,
+videlicet Orationis, nempe Nomen, Pronomen, &c.
+
+
+_De nomine & eius declinatione, & genere._
+
+In lingua Iaponica non sunt declinationes per casus sicut in Latina,
+sed sunt quædam particulæ, quæ postpositæ nominibus, casuum;
+differentias constituunt in omnibus nominibus, tam appellatiuis, quàm
+proprijs. Quæ constituunt nominatiu[~u], sunt quinque, _va_, _ga_,
+_càra_, _no_, _iòri_. Particula, _va_, postponitur quando quasi
+reduplicatiue, seu specificatiue volumus explicare rem vel personam
+significatam per tale nomen; siue sit primæ, siue secundaæ, vel tertiæ
+personæ: v.g. _Vàtacùxi và mairànu_, ego, vel, quod ad me attinet, non
+ibo. Particula, _no_, postponitur secundis & tertijs personis, &
+præcipuè si sint inferioris ordinis; & quando in oratione est aliquod
+relatiuum, quod non denotat actionem transitiuam: v.g. _Sònàta no
+m[vo]xita còto_, id quod tu dixisti. Postponitur etiam particula, _no_:
+quando aliquid indefinitum dicitur: v.g. _iiè no àrucà mìió_, vide si
+sint domus. Particula, _ga_, postponitur regulariter primis & tertijs
+personis inferioribus, & etiam secundis quando sunt etiam infimæ vel
+humiliantur: v.g. _Pedrõga qita_, Petrus venit. Solent etiã hanc
+particulam postponere quando aliquid indefinitè volunt dicere, sicut
+dictum est de particula, _no_: v.g. _còco nì và ii[~e]gà naicà?_ non
+sunt hic domus? & si in oratione sit relatiuum non dicens actionem
+transitiuam, si referat rem inferioris & humilis ordinis, postponitur
+etiam particula, _ga_: v.g. _sor[~e]gàx[~i] ga càita fumi_, Epistola,
+quam ego scripsi, _sòch[~i] ga iúta còto_, quod tu dixisti. Particulæ,
+_càra_, & _iòri_, postponuntur & faciunt nominatiuum quando oratio dicit
+actionem transitiuam, & præcipuè si est oratio relatiui. v.g. _Deus iòri
+cùdasàrèta gracia_, gratia, quam Deus dedit. _Tòno càra còre vo vôxe
+tçuqerarèta_, Dominus hoc præcepit. Aliquando etiam nomina sunt in casu
+Nominatiuo absque aliqua particula: v.g. _Pedro Ioaõ vo iòbarèta_,
+Petrus uocauit Ioannem. Genitiuo sunt duæ particulæ, videlicet _no_, &
+_ga_. Particula, _no_, seruit omnibus personis superioris ordinis: v.g.
+_Padre no võ qirumòno_, Patris vestis seu habitus: _ga_, postponitur
+omnibus personis inferioris ordinis: v.g. _Pedrõ ga fùmi_, Epistola
+Petri. _so ch[~i]ga mòno_, res tua, _àr[~e] ga càne_, argentum illius,
+_Tòno vàio c[~u] ga fucài fito già_, Dominus est magnæ cupiditatis,
+idest valde cupidus. Aliquando etiam prædictis particulis genitiuum
+constituentibus postponitur particula, _to_, v.g. _Pedro no to
+degozàru_, est Petri. Sed non est modus loquendi perfectus, unde melius
+est illo non uti; ponitur tamen ut auditus intelligatur. Quando uerò
+coniunguntur duo nomina substantiua ad faci[~e]dum unum quasi
+connotatiuum, non est necessaria particula genitiui, u.g. _còcuxu_,
+dominus regni. Secundum regulam tamen ordinariam deberemus dicere _còcu
+no xù_, & hic modus faciendi connotatiua absque particula genitiui, est
+regularis in lingua Iaponica: u.g. _Maria còto_, res Mariæ.
+
+Datiuum constituunt duæ particulæ scilicet, _ni_ & _ie_, u.g. _Pedro ni
+móxita_, dixi Petro. _Padre ie ãgue maraxita_, Patri dedi, uel obtuli.
+
+Accusatiuum constituunt quinque particulæ, _vo_, _võba_, _va_, _ie_,
+_ga_, Prima uidelicet, _vo_, est usitatior: u.g. _Pedro voiòbe_, uoca
+Petrum, _va_, utuntur quando uolunt in particulari explicare rem
+significatam per nomen in accusatiuo, u.g. _niffon guchi và Xiranu_,
+linguam Iaponicam nescio. Particula, _võba_, est idem quod, _vo va_,
+conuertendo secundam literam, _u_, in, _b_, ea uero utuntur sicut, _va_,
+u.g. _fune võba nòri sutète_; _cane bacàri tòri maràxità_, relinquens
+nauigium: argentum seu pecunias tantùm accepi; _ie_, utuntur ad
+significandum locum ad quem: u.g._ Roma ie mair[vo]_, ibo Romam, _ga_,
+postponitur nominibus significantibus res inanimatas, seu humiles: u.g.,
+_àre i[~e] gozàre, mònõ ga móxita[~i]_, accedas illuc, habeo enim tibi
+aliquid dicere, fit etiam accusatiuum absque aliqua particula ut in
+exemplo antepenultimo in quo secundum accusatiuum est sine particula.
+
+Vocatiuum constituit particula, _icàni_, sed non postposita nominibus
+sicut & reliquæ, sed anteposita: u.g. _icàni qimi còre vò gorònjerarei_,
+uideas hoc domine. Regularius uerò fit uocatiuum absque aliqua
+particula: u.g. _Padre sàma qicàxerarèio_, audias reuerende pater.
+
+Ablatiuo sunt tres particulæ, _iori_, _càra_, _ni_, tertia scilicet
+_ni_, facit locum in quo: v.g. _iglesia n[~i]gozaru_, est in ecclesia:
+aliquando vtuntur, _ni_, anteposito, _no_, v.g. _sònàtà nò nì Xiàru cà?_
+facis hoc tuum? vel accipis tibi? sed hic magis videtur datiuum, quam
+ablatiuum. Particulæ _càra_, &, _iòri_, sunt communiores ad ablatiuum
+constituendum: v.g. _Madrid càra màitta_, ex Matrito veni, _Pedro iòri
+coròsarèta_, occisus fuit à Petro.
+
+Ad constituenda pluralia sunt etiam quatuor particulæ, quæ postpositæ
+immediatè nominibus, illa pluralia constituunt, postea verò, sequuntur
+particulæ positæ casus constituentes. Prædictæ autem quatuor particulæ
+sunt, _tàchi_, _xu_, _dòmo_, _ra_. Prima particula scilicet, _tachi_,
+facit pluralia nomina significantia res nobilis ordinis, & quas volumus
+honore afficere; v.g. _Tòno tàchi_, domini. Particula, _xu_, constituit
+pluralia nomina significantia res nobiles quidem; sed non ita supremi
+ordinis: v.g. _samurài xu_, nobiles; qui non sunt domini. Particula,
+_dòmo_, postponitur nominibus significantibus res humiles, siue
+rationales siue viuentes sensibiles, siue inanimatas: v.g. _fiàcuxõ
+dòmo_, agricolæ, _ix[~i] dòmo_, petræ, _mmã dòmo_, equi. Particula,
+_ra_, facit pluralia nomina significantia res vilissimas, vel quæ
+despectui habentur: v.g. _Iudeora_, Iudæi. Pluralibus sic iam per istas
+particulas constitutis, postponuntur particulæ casus constituentes
+secundum orationum exigentiam: v.g. _tòno tàchi no còtõ dòmo vo varú
+iúnà_, ne maledicas res dominorum.
+
+Aliqua etiam sunt vocabula, quæ de se pluralitatem important: v.g. _tòmõ
+gàra_, significat homines, _Nàn bàn mòno_, res Europeas, _Nàn bàn mòno
+vo fomùru nà_, ne laudes res Europæ.
+
+Particula verò _icàni_, quæ, vt supra dictum est, facit uocatiu[~u] non
+postponitur pronominibus pluralibus iam factis; sed semper anteponitur,
+particulæ autem facientes plurale postponuntur: u.g. _icàni Padre tàchi
+vo qiqì nasarèio_, audite reuerendi patres.
+
+Duæ uerò particulæ ex quatuor suprapositis, quæ faciunt plurale,
+scilicet _domo_, & _rà_ aliquoties sunt singulari[~u] uerbi gratia.
+_vare rà_, uel, _midòmo_, ego: aliquando etiam utraque simul inuenitur
+in singulari: u.g. _midomo ra_, ego, _midomo rã ga_ meum vel mei:
+postponuntur etiam prædictæ particulæ, _domo_, vel, _ra_, singularibus,
+vel quando volumus humiliare res significatas aut de successu
+significati per orationem non sumus ita certi; sed quasi dubitamus: v.g.
+_sarã dòmõ ga itài_, dolet mihi venter, _às[~u] dòmó và àru mài_,
+crastina die non erit, _àsu rà và narõ mòde_, crastina die forsitan ita
+erit.
+
+Particula, _va_, postponitur nominibus tam singularibus; quàm pluralibus
+iam per particulas articulatis: v.g. _còcoie va mairànu_, huc non
+veniat, _còco càra va dènu_, hinc non exiuit, _còco ni và iru mài_, huc
+non intrabit: aliquando etiam particula, _va_, supplet particulas
+articulares: v.g. _funè de sàie ió[~i]ó tçùita ni, cachi va nàcanaca
+nàru mài_, si nauigio vix perueni; pedibus, vel pedes, absque dubio non
+peruenissem. Hic particula, _va_, supplet particulam, _càra_.
+
+In ista lingua Iaponica non sunt etiam genera, masculinum videlicet,
+femininum, & neutrum, sicut sunt in Latina; sunt tamen aliqua nomina,
+quæ ex se sunt, vel masculina, vel feminina, quia ex sua significatione
+dicunt vel masculum, vel feminam determinatè; sunt etiã aliqua nomina ex
+se cõmunia duobus. Particula, _vo_, ante posita nominibus significat
+masculum. Particula verò, _me_, ante posita significat feminam in rebus,
+quæ non habent genera propria: v.g. _vo ì vo_, significat piscem
+masculum, _mè i vo_ significat piscem feminam: _vojica_, significat
+caprum siluestrem, _mè lìca_, significat capream, _còma_, significat
+equum; _zoiacu_, equam; _xô_, significat accipitrem masculum; _dài_,
+feminam, _cotòi_, significat taurum, _meùxi_, vaccam. _votòco_,
+significat virum, _vonãgo_, vel _nhóbó_, vel, _vònna_, significat
+mulierem. In dictionario omnia expressè ponentur, quæ ad memoriam
+venerint.
+
+In nominibus etiam adiectiuis, non sunt genera, aut declinationes; sed
+eædem particulæ illa constituunt, quae substantiua. Sunt autem adiectiua
+multa, & diuersa. Aliqua enim finiuntur in, _ai_, alia in, _oi_, alia
+in, _ei_, alia in, _vi_, alia in, _ij_, alia verò, & quæ propriùs sunt
+adiectiua, fiunt postposita particula, _no_, substantiuis. Quando
+quinque prima genera adiectiuorum ante ponuntur substantiuis, tunc
+videntur propriè adiectiua, & nihil mutant ad orationem componendam;
+quando verò postponuntur substantiuis, potiùs sunt verba, & verborum
+coniungationes sequuntur: v.g. _tacài iàma_, mons altus, _x[~i] guei
+[~i]deiri_, frequens introitus & exitus, _caxicòi fito_, homo prudens,
+_càvaij mòno_, res miserabilis, _Aiaùi còto_, res periculosa, _Vmàre
+tçùqi nocùchi_, lingua naturalis seu materna. Sunt etiam alia adiectiua
+finita in _na_, quæ etiam ante posita substantiuis, nihil mutant: v.g.
+_q[~i]rèi na còto_, res munda. Omnia verò adiectiua præter finita in,
+_no_, quando verbis præponuntur, mutant aliquid: finita in, _ai_, illud
+mutant in, _ó_, v.g. _còno iàma và tacõ gozaru_, hic mons altus est, &
+excelsus: finita in, _ei_, illud mutant in, _eô_, v.g. _còno iama va
+x[~i]gueô gozàru_, hic mons est densus: finita in, _oi_, illud mutant
+in, _ô_, v.g. _caxicô gozàru_, est prudens: finita in, _vi_, illud
+mutant in, _ú_, v.g. _xei no ficú gozàru_, statura pusillus: finita in,
+_ii_, illud mutant in, _iú_, v.g. _cai[~u] gozaru_, est pruriens, uel
+prurit, inter ista uerò adiectiua finita in, _ij_, sunt multa quæ ex
+uerbis procedunt: u.g. _nozòmi_, _u_, significat desiderare: ex illo
+uerò exit, _nozòmaxij_, quod significat idem quod desiderabilis, e; alia
+etiam procedunt ex nominibus: u.g. _varàmbe_, significat puerum seu
+infantem: ex quo procedit _varàmberaxij_, quod significat id quod
+puerilis, e: alia reperiuntur in dictionario.
+
+Adiectiua uerò finita in, _na_, quando anteponuntur uerbis, mutant,
+_na_, in, _ni_, u.g. _fuxìn ni zònzuru_, dubium reputo uel pro dubio
+habeo. Adiectiua uero finita in, _no_, conuertunt aliquando, _no_, in,
+_na_, u.g. _bèchi no fito_, conuertitur in, _bechina fito_, differens
+homo: & tunc si uerbum subsequatur, mutat, _na_, in, _ni_, u.g.
+_bechin[~i] gozàru_, est differens. Sensus uero est idem siue finiatur
+in, _no_, siue in _na_, u.g. _bechi no fito no cùhi càra qijta_, est
+idem quod _bechina fito nocùchi càra qijta_, ex ore, uel ab ore
+distincti uel differentis hominis audiui. Et tantùm est differentia;
+quod finitum in, _no_, nihil mutat, quid quid illi subsequatur; finitum
+uerò in, _na_, mutat, _na_, in, _ni_, ut dictum est, si uerbum
+subsequitur. Si ad alia uero adiectiua sequatur uerbum substantiuum,
+oratio est elegans: u.g. _còno iàma và tacõ gozàru_, hic mons est altus;
+si uerò uerbum huiusmodi non sequatur, eundem facit sensum, quia
+adiectiuum includit in se uerbum substantiuum; sed illo non utemur coram
+superioribus, non enim illis audientibus, dicemus, _còno iàmà và tacài_,
+sed dicemus, _còno iamà và tacõ gozàru_. & sic in alijs adiectiuis.
+
+Adiectiua uerò finita in, _i_, aliquando; & si rarò, illud conuertunt
+in, _xi_, uel _qu_, u.g. _ioi_, quod significat, bonus, a, um: finitur
+in, _iòqu_, vel, _ioxi_, v.g. _iòqu_, _dancó xitè_, faciendo bonam
+consultationem. Aliqua, & non pauca, sunt nomina substantiua, quibus, si
+postponatur, _na_, fiunt adiectiua: v.g. _afó_, significat inscitiam, ex
+quo deducitur, _afóna_, quod significat id quod fatuus, a, um. _Iiiú_,
+significat libertatem: &, _Iiiuna_, significat id quod liber, a, um: quæ
+occurrerint alia in dictionario reperiuntur.
+
+Aliqua sunt nomina abstracta substantiua quæ anteposita vocabulis quæ ex
+se significant homines, fiunt adiectiua: v.g. _I[~i]fi_, significat
+misericordiam: si uerò illi _Iin_ postponatur, resultat, _Ii fi jin_,
+quod significat idem, quod misericors, dis, _fin_, significat
+paupertatem, & postposito _nin_, fit, _fin nin_, quod significat
+pauperem: idem est si postponatur, _ja_, fit enim, _finja_, quod etiam
+pauperem significat, _bàn_, significat vigiliam; & si postponatur, _xu_,
+fit, _banxu_, quod significat idem quod uigilans, tis: multa inuenientur
+in dictionario.
+
+Aliquando duo nomina substantiua, ex ijs, quæ remanserunt in lingua
+Iaponica ex Chinensi (& hæc, _cobita_, vel, _coie_, vocant) simul
+posita, faciunt adiectiuum, quod ex duobus substantiuis conflatur, seu
+resultat: v.g. _ten_, significat cælum: &, _xu_, significat dominum:
+_tèn xu_ verò, significat dominum cælestem, seu cælorum dominum.
+
+Præterita etiam verborum (de quibus suo loco) adiuncta substantiuis, vim
+& sensum videntur habere adiectiuorum: v.g. _iõgorèta tè_, manus
+sordida, _iõgorèta_, est præteritum verbi _iõgore vru_, quod significat
+idem quod sordesco, is, _càita qió_, liber scriptus, _càita_, est
+præteritum verbi _càqi_, _u_, quod significat idem quod scribo, is.
+Abstracta, seu radices ex quibus verba componuntur, sunt nomina quasi
+verbalia significantia actionem in abstracto: v.g. _facàri_, significat
+mensuram: ex quo resultat verbum, _facàri_, _u_, pro eo quo est metior,
+ris, _fajime_, significat principium, _fajime_, _uru_, est verbum, &
+significat id quod incipio, is: & sic in alijs de quibus in dictionario.
+Anteposita particula, _mòno_, prædictis abstractis seu nominibus
+verbalibus fiunt nomina significantia eum qui actionem verbi facit: v.g.
+ex, _càqi_, præposito, _monoi_, fit _mòno càqi_, quod significat idem
+quod scribens, tis: postposita vero eadem particula, _mòno_, eisdem
+radicibus, fiunt nomina significantia effectum actionis: v.g.
+_càqimono_, significat scripturam.
+
+Postposita verò particula, _gòto_, eisdem radicibus verbalibus fiunt
+nomina significantia res dignas actionibus quæ per verba, quorum sunt
+radices, significantur: v.g. _mi_, est radix, ex qua prodit verbum,
+_mi_, _iru_, pro eo quod video, es &, _m[~i]goto_, est res visibilis,
+seu digna visu, _qìqi_, est radix verbi, _qiq[~i]_, _u_, pro eo quod
+video, es: & _q[~i]qì gòto_, significat rem audibilem, seu dignam
+auditu.
+
+Postpositis aliquibus nominibus substantiuis nominibus verbalibus
+prædictis fit nomen iam inconcreto significans talem actionem: v.g.
+_foxi_, est radix verbi, _fòxi_, _u_, pro eo quod sole vel ad solem
+siccare: postposito verò, _ivo_, v.g. quod significat piscem: fiet,
+_foxiì vo_, quo significabit, pisces ad solem vel vi solis siccos &c.
+
+Postposita verò particula, _dõgu_, quæ instrument[~u] significat
+radicibus verborum, fiunt nomina significantia materiam seu instrumentum
+actionis per verbum significatæ: v.g. _varài dõgu_, materia seu
+instrumentum visus, _càqi dõgu_, instrumentum scribendi vel ad
+scribendum.
+
+Postposita autem particula, _me_, radicibus verbalibus fiunt nomina
+significantia terminum actionis: v.g. _a vàxe_, est radix verbi, _a
+vàxe_, _uru_, pro eo quod est aliqua iungere aut copulare, _a vàxe me_
+vero significat iuncturam: & sic in alijs.
+
+Ex adiectiuis suprapositis finitis in _i_, fiunt nomina abstracta
+mutato, _i_, in, _sa_, v.g. _nãgài_, significat id quod longus, a, um: &
+_nãgàsa_, significabit longitudin[~e]. Adiectiua finita in, _na_, mutant
+etiam, _na_, in, _sa_, ad abstracta nomina facienda: v.g. ex
+_àqiracàna_, quod significat id quod clarus, a, um: fiet, _àqiracàsa_,
+quod significabit claritatem.
+
+_Aliquando ex duobus substantiuis simul sumptis, & præcipuè si aliquod
+illorum aliquam literam in principio feu in fine in aliã mutet, resultat
+tertium nomen quasi connotatiuum, & quasi adiectiuum seu genitiu[~u]
+includens: v.g. ex, _qi_, quod significat, lignum, &, _fotoqe_, quod
+significat idolum: fit, _q[~i] botòqe_ mutato, _f_, in, _p_, quod
+significat idolum ligneum. Si verò nomina quæ præponuntur, finiuntur in,
+_e_, ipsum mutant in _a_, ad prædictam compositionem nominis
+connotatiui: v.g. _tçumà sàqi_, extremitates unguium, _càna c[~u]gui_,
+clauus ferreus. Si uerò nomina, quæ postponuntur ad eamdem formationem,
+primam literam debeant mutare, si sit, _f_, mutabunt in, _b_, uel, _p_,
+si, _s_, mutabunt in, _z_, si _c_, mutabunt in, _g_, si, _tç_, mutabunt
+in, _zz_, si, _x_, mutabunt in, _j_, u.g. _càri bunè_, _bùppô_,
+_n[~i]gori zàqe sorá goto_, _qizzumári_, _sòra jèi mòn_. Vide in
+dictionario._
+
+
+_De pronomine._
+
+Non sunt in lingua Iaponica pronomina deriuatiua u.g. meus, a, um. &c.
+sed utuntur primitiuis, scilicet mei, tui, &c. Hæc autem primitiua non
+habent declinationes per casus; sed hæ differentiæ casuum fiunt per
+particulas supra positas quæ omnibus sunt communes, tam nominibus; quàm
+pronominibus.
+
+Particulæ aliquæ (de quibus infra) quæ adiunctæ uocabulis honorem
+indicant, faciunt pronomen, uel illius uim habent secundum occasionem &
+circumstantias in quibus illis utuntur: si enim ego dicam, _von fùmi_;
+loquendo cum alio: ipso facto intelligitur me de eius epistola: & non de
+mea loqui: si enim de mea loquerer; non dicerem, _von fùmi_, sed, _fumi_
+tantum: unde, _von fumi_, ratione particulæ, _von_, quæ est honoris,
+significat uestram epistolam. Et idem est de particula, _mi_, & alijs
+quæ honorem indicant in significatis nominum quibus adijciuntur.
+
+
+_De pronomine secundæ personæ scilicet ego &c._
+
+Octo sunt particulæ significantes idem quod Ego, mei, mihi, &c.
+_vátacuxi_, _sòr[~e]gaxi_, _váre_, _mi_, _várerá_, _mìdòmo_, _midòmo
+rá_, _váre_. Quatuor primæ denotant aliquam superioritatem in eo qui
+illis utitur, reliquæ uero sunt humiliores. Mulieres utuntur tribus
+alijs particulis aliquando quaæ sunt, _m[~i]zzu cára_, _vãrauá vãgami_,
+& his non utuntur uiri: rustici solent uti duabus uidelicet, _vára
+vòrará_, religiosus uero quando de se loquitur solet dicere, _gusô_, ac
+si diceret: ego uilis religiosus; senex uerò de se loqu[~e]s: dicit,
+_gur[vo]_, ego uilis & despectibilis senex. Rex uerò, dicet, _chin_,
+uel, _máru_, quod significat: ego Rex.
+
+Ad facienda autem pluralia ista pronomina, postponuntur illis particulæ
+supra positæ constituentes pluralia, scilicet, _dòmo_, _ra_, v.g.
+_midòmõ ga máitta tòqi_, quando nos iuimus: ad casuum verò differentiã
+postponuntur illis iam formatis pluralibus, particulæ constituentes
+casus vt supra.
+
+
+_De pronomine secundæ person[e,]: scilicet Tu, tui, tibi, &c._
+
+Multæ sunt particulæ, quæ constituunt pronomen secundæ personæ secundum
+differentiam personarum, quæ vel nullum vel aliqualem, aut mediocrem,
+magnum, aut maximum merentur honorem & reuerentiam: ad loquendum enim
+cum inferiori, sunt tres particulæ quæ faciunt pronomen tu: scilicet,
+_váre_, _vonòre_, _sòchi_, si àutem illis superaddatur, _me_, vel,
+_m[~e]gá_, & dicatur, _váremè_, vel, _várem[~e]gá_, personam cum qua,
+loquimur ampliùs deijcimus. Si autem loquamur cum æqualibus vel
+aliquantulum inferioribus, vtemur vna ex tribus particulis videlicet,
+_sònata_, _sòno fò_, _váre sama_. Si verò sit persona superior vel
+omnino æqualis cum qua vrbanè debemus loqui vtemur vna ex septem
+particulis scilicet, _cònatá_, _qixò_, _qifó_, _gòfen_, _q[~i]den_,
+_cònatá sama_, _sònata sáma_. Si autem loquamur cum personis in
+dignitatibus constitutis, nomen dignitatis, si illi super addatur
+particula, _sama_, supplet vicem pronominis: v.g. _Padre samã gozare_,
+veniat vestra paternitas. Aliquando etiam particulæ quæ nomina honorant,
+supplent vicem pronominis: v.g. _vòn qirumòno_, vestræ dominationis
+vestis.
+
+_Cònata_, _cõchi_, _cõnofo_, significant idem quod ego, mei, &c. sed in
+modo loquendi quasi distributiuo: ex parte mea, vel quantum ad me
+attinet, quibus correspondent, _sõchi_, _sonofó_, _sõnatá_ quæ
+significant, tu &c. & ex parte tua, seu, quod ad te pertinet.
+
+Pluralia istorum pronominum fiunt per particulas supra positas secundum
+honoris differentiam, _võnór[~e] domo_, _váre ra_, _sóchi ra_,
+significant vos loquendo cum vilibus, _vare tachi_, _sonatà domo_,
+significat vos cum æqualibus, _qìfótachi_, _vócatãgata_, _vóno vóno_,
+significat vos cum honore: declinationes verò horum fiunt etiam per
+particulas communes declinationum.
+
+
+_De pronomine tertiæ personæ, scilicet ille, illa, illud._
+
+Duæ particulæ scilicet, _cáre cáre_, _are are_, significant ille, illa,
+illud, loquendo de rebus inferioribus: quatuor uerò uidelicet, _áitçu_,
+_áitçumè_, _áremè_, _cáitçume_, significant ille, illa, illud,
+humiliando & despiciendo res de quibus loquimur, & quæ præcipuæ
+finiuntur in, _me_, sunt deiectiuæ, maxime si illis superaddatur, _ga_,
+u.g. _áitç[~u]ga_, _áitçum[~e]gá_, ille uilis: _cóno_, significat hic,
+hæc, hoc, _sóno_ significat, iste, ista, istud, _áno_, significat ille,
+illa, illud; sed necessario requirunt post se substantiuum ut illis
+utamur: u.g. _cóno fito_, iste homo: idem significat, _cóno mono_, sed
+non est uerbum honorificum, _sóno cóto_, ista res, _ano fito_, ille
+homo, _cónátá_, uel _cónofó_, significant hic, _sónata_, vel, _sono fó_,
+isthic, _ánatá_, uel, _ánofó_, illic. _córe_, significat hoc, _sóre_,
+significat istud, _áre_ significat illud, sed neutraliter, ita quod
+substantiuis, seu suppositis non iunguntur: horum pluralia sunt,
+_córerá_, _sorerá_, _arerá_, cæterorum uerò pluralia sunt per regulas
+communes _cáno_, significat rem de qua facta fuit mentio: u.g. _cano
+fito_, ille homo &c. Pronomen quidam, facit particula, _àru_, u.g. _aru
+fito_, quidam homo, _áru tocóro ni_, in quodam loco.
+
+Pronomen unusquisque faciunt particulæ, _mèn mèn_, _sóre sóre_.
+
+Pronomen uniuersi & singuli &c. facit particula, _tare mo mina_.
+
+Pronomen quicumque &c faciunt particulæ, _Tare nite mõ_, _tare
+nitemoare_, _tare nari tómó_.
+
+Ante posita particula, _tare mo_, negatiuis facit pronomen nemo uel
+nullus: u.g. _tare mó mairananda_, nemo iuit. Particula _nani taru cóto
+nari tómo_, significat: quidquid sit, vel quæcumque res sit. Particula,
+_mèi mèi_, significat: singuli, uel unusquisque in particulari.
+
+Particula, _góto_, facit pronomen seu signum distributiuum omnis, e. Si
+postponatur substantiuis ex proprijs uocabulis linguæ Iaponicæ quæ
+uocantur, _iomis_: idem etiam facit particula, _mai_, anteposita
+substantiuis linguaæ Chinæ, quæ uocantur, _coies_, u.g. _fi_, significat
+diem: &, _f[~i]gótoni_, significat quotidie, seu omnibus diebus, _nen_,
+in lingua Iaponica mendicata à Chinensi, significat annum: &, _mainen_,
+significabit singulis annis uel omnibus annis; idem ferè facit
+reduplicatio aliquorum nominum, uel saltim facit illa pluralia: u.g.
+_fito_, significat hominem: &, _fitõbito_, significabit omnes homines,
+uel multos homines, _fi_, significat diem: & _f[~i]bi ni_, significabit,
+omnibus, uel multis diebus.
+
+Pronomen diuisiuum, aliqui &c. facit particula, _niiótte_, u.g. _tóqi
+niiotte_, aliquibus temporibus, _fito niiotte_, aliqui homines.
+
+Pronomen, idem &c. facit particula, _vonaji_, u.g. _vonaji tocóro cara_,
+ex eodem loco. Particula uerò, _dôjen_, significat idem, sed
+neutraliter: v.g., _dôjen degozàru_, idem est: & hoc uerbo respondent
+quando gratulantur; absque eo quod rem accipiant: ac si dicant, gratulor
+ac si accepissem: uel idem est, ac si accepissem.
+
+Pronomen ipse &c. faciunt particulæ, _nùxi_, _sóno mi_, _vãga_,
+particulæ uero, _vareto mi_, faciunt pronomen ipsemet &c. u.g. _vareto
+mi ni ata vo nasu_, ipsemet sibimet damnum infert, _mi vo vasurète; ta
+vo tasùqùru_, sui met oblitus, alios saluos facit. Particula,
+_vatacùxi_, significat rem propriam in particulari: u.g. _vatacuxi no
+còto_, res propria, _vatacùxi ni iuar[~e]ta_, pro se loquutus est.
+
+Pronomen aliquis &c. faciunt particulæ, _tare zo_, _taso_, u.g. _tare zo
+maittaraba_, si aliquis iuisset, _taso sacanãga aruca tói ni iqe_, eat
+aliquis interrogatum si sit aliquid cibi.
+
+Aliquid neutraliter faciunt particulæ, _nan zo_, _nanica_, u.g. _nanzõga
+arãba cùuózu_, comedam aliquid si sit, _ima faia t[~e] ga jiiú n[~i]
+gozaru fõdoni nanica caqi maraxô_, scribam aliquid, si quidem habeo
+manus iam solutas seu liberas.
+
+Quis? fit tribus particulis scilicet, _Tare_, _Tãga_ _Taso_, particulæ
+_tãga_, uel, _tare nõ_, utuntur etiam pro genitiuo cuius: u.g. _Tãga
+móno ca?_ cuius est res? Et quando aliquis ad ostium uocat, & pulsat
+dicit: _móno mó_, qui intus respondent, _taso_, uel, _tagá_, uel,
+_tare_, quis es? Particula _nani_, significat quid &c. u.g. _nani vo
+sùru cá_, uel, _nan[~i]goto vosùru ca?_ quid facis? _nani ni sòre vo
+tòtte [~i]quca?_ ad quid hoc portas tecum?
+
+
+_De pronominibus relatiuis._
+
+Pronomen relatiuum fit postpon[~e]do verbo nomen de quo fit relatio:
+v.g. _tèn ni màximàsu vàrerága vòn vòia_, Pater noster qui est in cælis,
+_dèta tocòro va_, locus ex quo exiuit, _tèni sùmi no tçuíta fito_, homo
+cuius manui adhæsit atramentum. Si oratio petit nominatiuum ante verbum,
+tale nominatiuum debet esse cum aliqua ex particulis nominatiui, _ga_,
+_no_, uel, _iòri_, v.g. _vatacùx[~i]ga càita fùmi_, epistola, quam ego
+scripsi, _cònàtà no vôxerarèta coto_, res quam uestra dominatio dixit.
+Tertia verò particula scilicet, _iori_, vtimur quando est actio in
+oratione, v.g. _Deus iòri atàie cudasarèta gracia_, gratia, quam Deus
+contulit seu donauit, _àno tocòro ni amàta no qió àtta vò torarèta_,
+tulit multos libros, qui erant in illo loco. Si concurrant verò duæ
+orationes relatiuum continentes, prima erit secundum positam regulam;
+secunda verò per participium præsens, præteritum, seu futurum,
+sec[~u]dum quod sensus orationis postulauerit: v.g. _qèsa Oracio vo
+móxita qióga tçucuie no vie ni àru vo mòtte coi_, affer librum illum qui
+est supra sedile, in quo isto mane recitaui vel dixi officium diuinum.
+In ista oratione _qióga_, quod est vnum relatiuum, est post verbum,
+_móxita_, & _vo_, quod agit vices secundi relatiui, est post verbum,
+_àru_. Quando verò volumus ampliùs specificare rem quæ refertur, ponimus
+inter rem ipsam & verbum, particulam _tocòro no_, v.g. _vàreto dôxin
+xìta tocòro no mònõ dòmo va mina buguèn ni nàtta_, omnes quotquot mecum
+consenserunt, diuites facti sunt. Aliquando oratio relatiui propter suam
+difficultatem explicatur per exponentes: v.g. loco huius, _ima
+còrosarèta Pedro nò cò và sonàta nó chijn gia_, quæ significat, filius
+Petri, qui modo fuit occisus, est tuus amicus: dicimus, _ìma Pedro
+corosarèta sonó co va sonatà no chijn de gozàru_.
+
+Aliquando solent simul poni duæ particulæ ex casus consitu[~e]tibus, &
+faciunt quasi relatiuum cui anteponuntur: v.g. _sòno_ _tocòró deno
+dancó_, istius locis consultatio. _Marsella ieno fùne_, nauigium quod
+tendit Marsiliam: _màire to no móxi gòtó dearu_ est dicere, quòd eam.
+
+_Màiru mai to no dancó ni qivamatta_, habita est resolutio quod non
+pergat, _màitte nòchi no dancó_, consultatio postea quam perrexit facta,
+_varambe càra no catãgui_, est consuetudo ab infantia, _xô tameno chôgui
+gia_, est ars ad illud faciendum: _àno fito no vo toró_, accipiam id,
+quod est illius hominis: nota hæc de relatiuo valde.
+
+
+_De formatione verborum, & coniugationibus._
+
+Verba in lingua Iaponica neque habent numeros, neque personas; faciunt
+tamen has differentias particulæ suprapositæ ad pluralia &
+declinationes. Coniugationes sunt tres affirmatiuæ, & totidem negatiuæ.
+
+Radices verborum, de se non dicunt tempus: vnde vt illud dicant debent
+formari verba & coniugari.
+
+Omnes radices verborum secundæ coniugationis finiuntur in _e_, _gi_,
+vel, _ji_, præter _xi_, &, _maraxì_, quæ etsi finiãtur in, _i_, sunt
+tamen primæ coniugationis. Si verò radices finiuntur in, _de_, vel,
+_gi_, fit verbum præsentis temporis conuertendo prædictas in, _zzuru_,
+v.g. _fãgi_, facit præsens, _fãzzuru_, & significat erubesco: _de
+zzuru_, quod significat exeo, is: si radices finiuntur in, _je_, vel,
+_ji_, mutantur ad præsens in, _zuru_, v.g. _màje_: _mãzuru_, idem quod
+misceo, es, _anji anzuru_, quod est considero, as, si finiuntur in,
+_xe_, illud mutant in, _suru_, v.g. _a vaxe: auasùru_, idem quod
+coniungo, is: _xi_, verò, & _maraxi_, quæ (vt dictum est) sunt secundæ
+coniugationis, etiam mutant, _xi_, in _suru_, v.g. _xi sùru_, idem quod
+facio, is, _maraxi marasuru_, etiam est, facio facis. Si radices
+finiuntur in, _te_, convertunt illud in _tçuru_, v.g. _sodàte;
+sodàtçùru_, idem quod alo, is, vel sustento, as: reliqua quæ tantum
+finiuntur in, _e_, alio modo; illud ad præsens conuertunt in, _uru_,
+v.g. _ãgue_: _ãgùru_, offero, rs, _n[~i]gue, n[~i]gùru_, fugio, is.
+
+Aliqua sunt præterita verborum, quæ faciunt sensum præsentis, & sunt
+illa quorum fieri consistit in facto esse: v.g. _cocòroièta_ intelligo,
+is, _qìcoieta_, audio, is, _voboièta_, recordor, aris, _qi qi ièta_,
+intelligo, is, _zonjita_, scio, is, & alia præter ista forsan erunt:
+verba quæ sequ[~u]tur sunt primæ cõiugationis etiam si eorum radices non
+finiantur modo antea dicto. Si præsens alicuius ex illis non fuerit
+mutato, _i_, in _uru_, explicabitur in particulari, _àbi_, _uru_, aquæ
+balneo se, abluo, is, _fotòbi_, _uru_, mollificor, aris: _focoròbi_,
+_uru_, dissuor, eris: _càbi_, fucore afficior, eris, _sàbi_, rubiginor,
+aris, _deqi_, finior, ris, vel perficior, ris: _cùchi_, _cutçuru_,
+putresco, is: _mìchi_, _mitçuru_, mare adimpleor, ris, _ini_, _uru_,
+abeo, is: _nòbi_, _nobiru_, vel _noburu_, dilator, aris, _tçuqi_, _uru_,
+consumor, eris, _vòri_, _uru_, ab alto descendo, is: _xij_, _xijru_, ad
+prandium vel cibum compellendo, inuito, as, _nì niru_, assimilor, aris:
+_mochij: mochi iùru_, æstimo, as:_ni_, _niru_, ad ignem coquo, is:
+_mi_,_miru_, aspicio, is: _còri_, _uru_, corrigor, eris, _vochi
+vòtçuru_, cado, is: _i_, _iru_ sum, es, fui: vel adsum, es, _f[~u]gui_,
+_uru_, transeo, is, sicut tempus transit: _vàbi_, _uru_, misericordiam
+peto, is, _carabi_,_uru_, siccor, aris, _iqi iqùru_, viuo, is, _fi
+firu_, aresco, is, _qi qùra_, venio, is, _qi qùru_, vestio, is, _vòqi
+uru_, è lecto surgo: quatuor verò verba quæ sequ[~u]tur habent præter
+præsentia ordinaria, alia etiam extraordinaria, _atàie_, habet _atóru_,
+pro dono, as: _vàqimaie_, _vaqimòru_, discerno, is, _tonàie tonóru_,
+benedico, is, _sonaie sonóru_ in loco sublimi colloco, as.
+
+
+_De Pr[e,]terito imperfecto, perfecto, & plusquam perfecto._
+
+Non est in lingua ista Iaponica præteritum imperfectum: Vnde loco illius
+vtuntur perfecto, quod fit duobus modis: prim[~u] est addendo, _ta_,
+radicibus verborum: v.g. _ãguèta_, est praeteritum verbi, _ãgue_, _uru_,
+quod est offero, rs; secundo modo fit præteritum perfectum postponendo,
+_te_, radicibus, & addendo postea verbum, _gozari_, _u_, vel _ari_, _u_,
+in præsenti vel in præterito de quo in secunda coniugatione, v.g.
+_ãguete gozàru_, vel _aguèt[~e] gozàtta_, vel _ãguete aru_, vel _ãguete
+atta_, obtuli, uel obtuleram, as, &c. si autem ad prædicta anteponatur
+particula _fãia_, explicatur magis: u.g. _faia ãguètè gozàtta_, iam
+obtulerã, quando postponitur uerbum, _ari_, _u_, ad præteritum, non est
+modus loquendi ita nobilis sicut quando postponitur, _gozari_, _u_, unde
+ad hoc debemus aduertere quando loquimur, ut notemus de quo loquimur, &
+coram quibus, ut cui honorem, honorem debitum in modo loquendi
+tribuamus.
+
+
+_De futuro primæ coniugationis._
+
+Si radix uerborum finitur in, _te_, fit futurum conuertendo istam
+syllabam in _teô_, uel _chô_: u.g. _tàte_, _uru_, eius futurum est
+_tàteô_, uel _tàchô_, erigam. Si radix finitur in, _ji_, fit futurum
+mutato in _jô_: u.g. _xenji_, _xenjô_, medicinas condiam uel coquam. Si
+radix finiatur in _xe_, mutatur in _xô_, u.g. _xi_, _xô_: _maraxi_,
+_maraxô_, faciam. Si finiatur in, _ie_, mutatur in, _io_ ut, _voxiie_,
+_vòxiio_, docebo. Reliquis uerò radicibus quæ finiuntur in _e_,
+postponuntur ad futurum faciendum, _ô ôzu_, uel _ôzuru_ u.g. _ãgueô_,
+uel, _ãgueôzu_, uel _ãgueôzurù_, offeram. Hæ etiam particulæ
+postponuntur ad facienda futura uerborum de quibus supra diximus esse
+secundæ coniugationis, etiam si eorum radices finiantur in, _i_, u.g.
+_dequiôzu_, finietur.
+
+Fit etiam futurum, tollendo à præsenti negatiuo (de quo infra) syllaba
+_nu_, in qua finitur, & loco eius ponendo particulam _bàià_, u.g.
+tollendo, _nu_, ab _ãguènu_, & loco eius addendo, _baià_, fit,
+_ãguèbaià_, offeram, _m[~i]nu_, si auferas, _nu_, & loco eius ponas,
+_baia_, fiet, _m[~i]baia_, uidebo uel aspiciam.
+
+Futurum perfectum fit postpositis particulis, _tearózu_, uel _tarózu_,
+eisdem: u.g. _ãguète arózu_, uel, _ãguetárózu_, iam obtulero. Etiam fit
+anteposito _fàia_, futuro ordinario: u.g. _fàia ãgueôzu_.
+
+
+_Imperatiuum primæ coniugationis._
+
+Imperatiuum primæ coniugationis est ipsa sola radix verbi, vel
+postposita particula _io_, v.g. _ãgue_, vel _ãgueio_, offer: futurum
+autem imperatiui est futurum absolutum, _ãgueô_, vel _ãgueôzu_, & est
+honoratior modus loquendi & vrbanior ad imperandum in omni coniugatione,
+quàm per imperatiuum absolutum. Fit etiam imperatiuum, si auferas, _nu_,
+à præsenti negatiuo (de quo postea) & loco eius ponas _sai_, v.g. si ab
+_ãgue nu_, tollas _nu_, & addas, _sai_, fit _ãgue sai_, quod est, offer:
+non tamen dicit tantum imperium sicut absolutum. Postposita etiam
+particula, _tai_, radicibus, fit quodã genus futuri seu optatiui quo
+desiderium loquentis explicatur, & est imperatiuum; vrbanum tamen,
+_mizzu fitòtçu nomi tai_, vellem parum aquæ bibere: est idem quod da
+mihi bibere. Quando verò fit relatio alicuius præcepti, legis, consilij,
+ordinis, aut prohibitionis, in omni verbo cuiuscumque coniugationis siue
+affirmatiuæ, siue negatiuæ: tale præceptum ponitur ad literam: v.g.
+_chr[~i]stiani naru nà to no xõgun no fattõga àru_, est lex Imperatoris,
+quòd non fiat quis Christianus, _Padre core vo còxiraièio to voxerarèta
+niiòtte_, quia pater præcipit mihi vt hoc componerem.
+
+
+_Optatiuum primæ coniugationis._
+
+Præsens & futurum optatiui est præsens imperatiui, antepositis
+particulis, _n[~e]gauacu uà_, vel, _auare_ & postposita, _gàna_, vel
+_cax[~i]_, fit etiam postposita particula, _gàna_, absque aliqua
+anteposita: v.g. _n[~e]gavàcu va ãgueio càxi?_ vel _auàre agueigàna_, si
+offeres? _auàre icanaru tèngu, bangue mòno nari tomò, vare vo tòtte,
+fiie no iama ni noboxèio caxi!_ o si esset aliquis vel diabolus vel
+aruspex qui me ascendere faceret ad montem qui vocatur, _fiie!_
+postposita particula _gana_, nominibus, significatur desiderium rei
+significatæ per nomen: v.g. _saq[~e] gana_, ò vinum! ac si diceret: quis
+illud haberet ad bibendum! _nan[~i] gana!_ si aliquid haberem!
+
+Præteritum optatiui est secunda vox futuri postposita particula _mono
+vo!_ v.g. _n[~i]gueo zu mono vo!_ o si fugissem! idem fit hoc modo
+_n[~i]gu[~e]ta raba iocaró mòno vo_, aliquando solum dicunt, _n[~i]guè
+taróni va!_ etiam dicunt, _n[~i]guete aró ni ua iocarómòno vo!_
+
+
+_Subiunctiuum primæ coniugationis affirmatiuæ._
+
+Præsens subiunctiui fit ex præsenti indicatiui mutato, _u_, in quo
+finitur in _[~e]ba_, v.g. ex, _ãguru_, fit _ãgur[~e]ba_ cum offerem: fit
+etiam ex præsenti addita particula, _tocoro_, super addita _ni_, _de_,
+_uo_, vel, _ua_, secundum exigentiam declinationis verbi quod sequitur;
+primum enim subit munus nominis: v.g. _arutoqi Pedro chinsui xitè
+iraruru tocoro ie fitõ gaqìte_, cum venisset quidã homo ad locum vbi
+erat Petrus quando erat ebrius _nhõbõ ni tachi vacarète iru tocòro ni_,
+cum essent divisi, & diuortium fecissent coniugati, _có aru tòcorõ de_,
+cum hæc ita sint, _iòto ie zzuru tocòrouà fito ni corosarèta_, occisus
+est a quodam homine cum exiret foras, _go misa vo asobasarùru tocò ro vo
+uchi coroita_, occidit ill[~u] cum actualiter missam celebraret, & est
+regula generalis in omni coniugatione.
+
+Præteritum perfectum & plusquam perfectum subiunctiui fit ex præterito
+perfecto indicatiui postposita particula, _r[~e]ba_, v.g. _ãguèta
+r[~e]ba_, cum obtulisset: fit etiam ablato verbo _gozaru_, à præterito
+plusquam perfecto; & posito loco eius, _attar[~e]ba_, vel _atta_, quando
+vero ponitur, _atta_, debet superaddi vel, _ni_, aut, _uo_, _ua_, vel,
+_ie_, secundum quòd petit subsequens verbum; ad modum supra positum de
+præsenti subiunctiui cum particula, _tocòro_, v.g. _ãguète atta
+r[~e]ba_, vel _ãguete atta_, _ni_, _uo_, _ua_, vel, _ie_, cum iam
+obtulisset.
+
+Futurum subiunctiui fit addendo futuro indicatiui particulã, _tòqi_,
+v.g. _ãgueô tòqi_, cum postea offerat.
+
+Præteritum plusquam perfectum subiunctiui, vel quomodocumque illud
+voces, denique ad significandum hoc quod est, postquam fecissem actionem
+verbi, fit postpositis particulis, _cara_, _nòchi_, vel _[~i]go_:
+præterito plusquam perfecto; ablato tamen verbo, _gozaru_, v.g. _aguète
+cara_, _nohi_, vel, _igo_, _mairó_, postquam obtulerit proficiscar: idem
+quasi est, _aguètar[vo] toqi mairó_, proficiscar quando iam obtulerit,
+_ãgueôzurù ni_, vel, _ãgueozuru tocoroni_, significat, cum iam esset
+paratus ad offerendum: vel vt offerret, _ãgueôzuru còto no saqini_,
+significat paululum antequam offeret.
+
+Præsens permissiuum subiunctiui fit duobus modis: primus est
+conuertendo, _v_, in quo finitur præsens indicatiui, in, _[~e]domo_,
+v.g. _ãgur[~e]dõmò_ etiam si offerat.
+
+Præteritum verò permissiui fit postposito, _redomo_, præterito
+indicatiui: v.g. _ãguetar[~e]domo_, quamuis obtulisset: futurum autem
+permissiuum est addendo, _redomo_ secundæ voci futuri indicatiui: v.g.
+_ãgueôzur[~e]domo_, quamuis offerat. Secundus modus subiunctiui
+permissiui est efficacior & fit præsens postposita particula, _tomo_,
+præsenti Indicatiui: v.g. _ãguru tomò_, quãuis offerat: solent etiam
+præsenti postponi particulæ, _mamaiò_, vel, _madeiò_, v.g. _soreuo
+voxiiùru mamaio_, vel, _sòre vo voxiiùru mãdeio_, etiam si hoc doceat.
+
+Præteritum autem huius secundi permissiui fit postposito, _rìtomò_,
+præterito indicatiui: v.g. _ãguèta ritomo_, quamuis obtulerit: fit etiam
+hoc præteritum postposito, _mamaiò_ vel _madeio_, præterito indicatiui:
+u.g. _ãgueta mamaio_, uel, _ãgueta madeio_ idem fit postposito, _tòte_,
+præterito subiunctiui: u.g. _ãguetar[~e]ba tòte_.
+
+Futurum permissiuum fit postposito, _tomo_, secundæ uoci futuri
+indicatiui: u.g. _ãgucozutomo_, fit etiam postpositis, _mamaio_, uel
+_madeio_ eidem futuro: si uerò prædicto permissiuo in omnibus temporibus
+anteponatur, _tatòi_, additur magna uis orationi: u.g. _tatoi vôxerarùru
+tomo_, quamuis hoc præcipias: eumdem sensum facit præteritum plusquam
+perfectum Indicatiui ablato uerbo, _gozaru_, &, _aru_, & constituendo
+loco eius particulam, _mo_, u.g. _ãguete mo_, quamuis offerat: eadem
+particula, _mo_, postposita præsenti indicatiui facit eumdem sensum:
+u.g. _dòcõ de qiqi marasùru mo, sòno sata va mõsanu_, quamuis audiatur
+de hoc ubicumque; nihil tale auditur: eumdem sensum solent facere modi
+loquendi, qui sequ[~u]tur, _ãguemo xèio caxi?_ _ãguetemo xô madeio_.
+_nanto mo ãgue caxi?_ quod fere significat, quamuis offerat: eundem
+etiam sensum faciunt prædicta, _ãguruni saxerarei ãgu etani saxerarei_,
+uel _ãgueò ni saxerarei_, etiam si offerat, obtulerit, uel etiam si
+offeret: ac si dicat: ponamus, uel demus quòd ita sit.
+
+
+_Infinitiuum._
+
+Præsens infinitiui fit ex præsenti indicatiui, postposito _còto_, uel,
+_to_, u.g. _ãgùru còto_, uel _ãguruto_, offerre.
+
+Præteritum infinitiui fit postpositis eisdem particulis præterito
+indicatiui, u.g. _ãgueta còto_, uel, _ãguetato_, obtulisse. Futurum
+infinitiui fit eisdem postpositis futuro indicatiui: u.g. _ãgueeô còto_,
+uel _ãgueôto_, oblaturum. Eundem sensum faciunt præsens, præteritum, &
+futurum indicatiui postposita illis particula, _ióni_, u.g. _nai nai
+guioi ni caqerareô ióni va vare mo zònzuru fitõ bìto mo zonjita_, sæpe
+credidi & alij etiam putarunt me à te beneficijs esse afficiendum,
+_qèccu vare ni voxiie marasùru ióni gozaru_, potius ille potest me
+docere, _ãgueta ióni gozaru_, dicitur illum obtulisse.
+
+Ad interrogandum & responendum utuntur sæpissime infinitiuo quod est
+suppositum uerbi quod subsequitur: u.g. _nhõbõgata ni vòchita cotó gaata
+ca?_ incidisti ne in peccatum luxuriæ cum muliere? fuit ne hoc quod est
+incidisse &c. & hoc modo loquendi utuntur in omni tempore infinitiui.
+
+Aliquando supplet infinitiuum præteritum plusquam perfect[~u] ablato
+uerbo, _gozaru_, & _aru_: u.g. _Deus no minòri vo firomète iòcaró_,
+bonum est legem Dei propagari: aliquando supplet præsens & præteritum
+infinitui, præsens & præteritum indicatiui postposita, _ga_, u.g. _sore
+vo vôxeraruru ga varú gozaró_, malum erit hoc dicere, _maittãgamaxi
+gia_, uenisse est melius, aut esset melius.
+
+Quando uerò infinitiuo subsequitur uerbum substantiuum, non indiget
+particula, _còto_, u.g. _còsacazzuq[~i] dè và sàqe vo nòmu deuanai_,
+bibere uinum calice paruo non est bibere, _còre còso caqu degozare_, hoc
+possumus dicere esse uerè scribere, _caqu de gozatte còso_, hoc nullo
+modo est scribere, _sòre ua ãgùru deuanai_, istud non est offerre:
+aliqua ex exemplis positis sunt ex uerbis aliarum coniugationum; sed
+regula est generalis in omnibus: facit etiam sensum quasi infinitiui
+modus hic loquendi, _ãgue va_, _ãgur[~e] domò_, quamuis offeram vel etsi
+faciam hoc, quod est offerre: est etiam regula generalis in omnibus
+coniugationibus: unde dicunt, _qìqi va tçucamatçure dòmò gàtten xenu_,
+quamuis audiam uel faciam hoc quod est audire; non intelligo: dicitur
+etiam, _ãgùru vomotte_, offerendo, uel cum hoc quod est offerre, _ãgùru
+iori_, ex hoc quod est offerre, _ãguru nitçuite_, circa hoc quod est
+offerre.
+
+Gerundium in, Di, es præsens uel futurum indicatiui, & præcipue si
+adiungatur, _jibùn_, aut aliqua particula significans tempus: u.g.
+_ãguru jibùn_, tempus offerendi, _ãgueô ni qiuamàtta_, accepit
+resolutionem offerendi, _n[~i]guru jibun gia_, tempus est fugiendi,
+_coròsa r[~e]ôzúru ni aisadamàtte arozu_, erit resolutus occisu, aut
+quod erit occidendus.
+
+Gerundi[~u] in, Do, fit duobus modis: primus, postponendo, præsenti
+indicatiui particulas, _ni_, uel, _tòte_, u.g. _ãguru ni_, uel,
+_ãgùrutote iurusareta_, offerendo fui solutus: secundus est auferendo
+uerbum, _gozàru_, præterito plusquam perfecto: u.g. _ãguète cutabireta_,
+offerendo, vel erigendo sum defessus: idest ex erectione uel actione
+offerendi, resultauit esse defessum: est etiam alius modus elegans
+gerundij in do, & ualde communis, anteponendo radices uerborum alijs
+uerbis compositis: u.g. _fiqi iosùru_, approximare trahendo; radices
+autem sic uerbis adiunctæ numquã mutãtur in passiuis, neutris, aut
+negatiuis. In isto sensu gerundij in do, uidentur vti his modis loquendi
+_taixõ to xite_, cum esset dux: uel ducis munus gerendo, _võn rei to
+xitè_, gratias agendo, _ròtai nòmi ni xitè_, cum sit senex, _tçùcài xite
+iuaruru_, dicit ut nuncius.
+
+Gerundium in dum, fit postpositis particulis, _tàme_, vel, _tòte_,
+præsenti vel futuro indicatiui: v.g. _ãgùru tàme_, vel, _ãgueo tòte_ ad
+offerendum, ad eundem sensum reducitur hic modus loqu[~e]di, _ãguru ni
+fàttõga àru_, est lex circa offerendum, nisi dicamus hoc vltimum esse
+gerundium in ni.
+
+Supinum in Tum, fit duobus modis, primus est postponendo _ni_,
+radicibus: secundus postposito, _tameni_, præsenti indicatiui: v.g.
+_tàzzunè ni maitta_, vel, _tàzzunùru tameni màittá_, veni oblatum.
+
+Supinum in Tu, est sola radix verbi. in hoc etiam sensu videntur vti
+isto modo loquendi, _mósu ni vòiobànu_, non est necessarium dictu.
+
+Participia præsentis, præteriti, & futuri sunt præsens præteritum, &
+futurum postpositis particulis, _fito_, vel, _mõno_, sed quando
+postponitur, _fito_, est modus loquendi honoratior: v.g. _ãgùru fito_,
+vel, _ãgùru mòno_, offer[~e]s, _ãgueta fito_, qui obtulit, _ãgueô mòno_,
+qui offeret, _Buppô gacu suru tòmõgara ni voite ua_, vacantes studio
+legis idolorum, _von vo xiru vo fito to va i[~u]zo_; _von vo xiranu võba
+chicuxõ to còso iie_, in ista oratione particula, _uo_, supplet vocem
+participij & dat suppositum verbo significatque: meritò vocant homines
+beneficium cognoscentes; ignorantes verò beneficia iure vocant belluas:
+est regula generalis in omni coniugatione, vnde exemplum est in verbo
+secundæ coniugationis: fit etiam participium postposita _te_, radicibus
+verborum: v.g. _ãguete_, offerens.
+
+
+_Prima coniugatio negatiua._
+
+Radices sunt postposita, _zu_, radicibus affirmatiuis: v.g. _ãguezu_.
+
+Præsens verò est constituendo, _nu_, loco, _zu_, v.g. _ãguènu_, non
+offerro, & est regula generalis quomodocumque finiantur eorum radices,
+sola, _xi_, &, _maraxi_, faciunt præsentia negatiua, _xènu maraxenu_,
+non facio, ea verò quorum radices finiuntur in _ji_, mutant _ji_, in
+_je_, & postponitur illis particula, _nu_, ad præsens: v.g. _zonji_, fit
+præsens negatiuum, _zoniènu_, nescio: alicubi in Iaponia faciunt
+negatiua auferendo vltimum, _v_, à radicibus negatiuis & superaddendo
+illis verbum, _ari_, _u_, coniugatum per secundam secundum tempus: v.g.
+_ãguezàru_, non offero, _ãgue zàtta_, non obtuli, _ãgue zatta r[~e]ba_,
+cum non obtulisset, etiam dicunt, _ãguezu xite_, non offerendo.
+
+Præteritum negatiuum fit ad modum præsentis ponendo loco, _nu_,
+particulam _nanda_, v.g. _ãguenànda_, non obtuli, _zonjenanda_, nesciui,
+_vori nànda_, non descendi.
+
+Præteritum plusquam perfectum fit mutando vltimam _a_, præteriti in,
+_e_, & postponendo verbum, _gozàru_, in præsenti, vel, _gozàtta_, in
+præterito: v.g. _ãguenand[~e] gozàru_, vel _ãguenànde_ _gozàtta_, non
+obtuleram: fit etiam ponendo, _[~i]d[~e] gozàru_, vel, _id[~e] gozatta_,
+loco _nand[~e] gozaru_, v.g. _ãguèi de gozaru_, vel, _ãgueid[~e]
+gozàtta_, non obtuleram, _zonze[~i]d[~e] gozaru_, nesciueram,
+_vochi[~i]d[~e] gozatta_, non cecideram.
+
+Futurum negatiuum est addendo, _mài_, vel, _màji_, radicibus, vel
+præsentibus affirmatiuis: v.g. _ãgue mai_, vel _ãgùru maji_, non
+offeres.
+
+Imperatiuum fit postposito, _na_, præsenti indicatiui: v.g. _ãgùruna_,
+ne offeras.
+
+Fit etiam anteposito, _na_, & postposito, _so_, radicibus affirmatiuis:
+v.g. _na ãgue so_, ne offeras.
+
+Fit etiam postposito, _na_, radicibus: v.g. _ãgue na_, ne offeras, _mixè
+na_, ne ostendas, _mesare na_, ne faciatis: radices, quæ finiuntur in,
+_xi_, vel, _ji_, & sunt secundæ coniugationis mutant illud in, _e_, ad
+istud imperatiuum: v.g. _so xè na_, vel _só maraxe na_, ne facias istud,
+_so zonzena_, ne istud cogites.
+
+Optatiuum fit anteponendo, _negauacùua_, vel _auare_, & postponendo,
+_caxi_, _gana_, imperatiuo negatiuo: v.g. _auare ãguru nacaxi_, o si non
+offerres: vel, _n[~e]gauacù ua na ãgue sõ gana_, idem.
+
+Præteritum optatiui fit postposito, _mòno vò_, futuro negatiuo: v.g.
+_ãguru mai mono vo!_ o si non obtulisset!
+
+Subiunctiuum verò negatiuum est conuertendo, _v_, in qua finitur præsens
+negatiuum in _[~e]ba_, v.g. _ãguen[~e]ba_, cum non offerret.
+
+Præteritum subiunctiui est postposito, _r[~e]ba_, præterito negatiuo
+indicatiui: v.g. _ãguenanda r[~e]ba_, cum non obtulisset.
+
+Futurum est postposito, _qer[~e]ba_, futuro negatiuo: v.g. _niguru mai
+qer[~e]ba_, cum non sit fugiturus.
+
+Subiunctiuum permissiuum fit postposita particula, _dòmò_, præsenti
+negatiuo, sed mutato _u_, in quo finitur in, _e_, v.g. _ãguen[~e] dòmò_,
+quamuis non offerat: dicunt etiam & melius _ãguena[~i]demo_, vel,
+_ãgue[~i]demo_.
+
+Præteritum permissiuum est postposito, _redomo_, præterito negatiuo:
+v.g. _ãguenanda r[~e]domò_, quamuis non obtulerat, dicunt etiam,
+_ãguena[~i]demo_, vel, _agùe[~i]demo_, & si non obtulerit.
+
+Futurum permissiuum est postposito, _qer[~e]dòmò_, futuro negatiuo: v.g.
+_ãgùru mai qer[~e]dòmò_, & si non offeret.
+
+Aliud autem permissiuum cum particula, _tomò_, fit postposita prædicta
+particula radicibus negatiuis: v.g. _ãguèzutomò_, & si non offert. Fit
+etiam postposito, _tote_, præsenti subiunctiui: v.g. _ãguen[~e]ba tote_,
+tertio modo etiam fit postposito, _mamaio_, vel, _madeiò_, præsenti
+negatiuo: v.g. _ãguènú mamaio_, vel, _ãguenu madeio_, quamuis non
+offerat.
+
+Præteritum fit postposito, _ritomò_, præterito negatiuo: v.g.
+_ãguenandari tomò_, & si non obtulerit. Fit etiam postposito, _tote_,
+præterito negatiuo subiunctiui: v.g. _aguenanda r[~e]ba tote_ & melius,
+_ãguena[~i]demo_, vel, _ãguè[~i]demo_, quamuis non offerat, vel
+obtulerit.
+
+_Futurum est postposito, _tomò_, futuro negatiuo: v.g. _ãgue mai tomò_,
+&si non sit oblaturus, _vochi[~i]demo_, &si non ceciderit._
+
+Infinitiuum præsens, præteritum, & futurum, est ipsum præsens,
+præteritum, & futurum negatiuum indicatiui, postpositis _còto_, vel,
+_to_, v.g. _ãguenu còto_, non offerre, _ãguenanda còto_ non obtulisse,
+_ãgùru mai còto_, non esse oblaturum.
+
+Aliquando vtuntur præsenti negatiuo pro præterito in omnibus
+coniugationibus: v.g. _mi maraxènu_, non vidi.
+
+Gerundium in, Di, negatiuum, est præsens vel futurum negatiuum,
+_ãguenu_, vel, _ãgùru mai_, non offerendi.
+
+Gerundium in, Do, fit postposito, _ni_, radicibus negatiuis vel
+præsentibus: v.g. _ãguèzuni_, vel, _ãguenuni_, non offerendo, idem quasi
+est: _ãgue[~i]de_, vel, _ãguena[~i]de_, vel, _ãguèzu xitè_.
+
+Gerundium in, Dum, est postposito, _tote_, vel _tame_, præsenti aut
+futuro negatiuo indicatiui: v.g. _ãguenu tame_, vel, _ãgùru mai tòte_,
+ad non offerendum.
+
+Participia negatiua præsentis, præteriti & futuri, sunt præsens
+præteritum, & futurum negatiuum postposito, _fito_, vel, _mòno_ v.g.
+_ãguenu fito_, non offerens, _ãguenanda mòno_, qui non obtulit, _ãguru
+mai mòno_, qui non offeret, _ãguena [~i]de cara_, vel, _ãgue[~i]de
+nòchi_, post non obtulisse: vel postquam non obtulerunt, aut postquam
+non est oblatum.
+
+
+_Secunda coniugatio affirmatiua._
+
+Omnes radices verborum secundæ coniugationis finiuntur in, _i_, fitque
+præsens mutato, _i_, in, _u_, v.g. _iòmi_: _iomu_, lego. Si radices
+finiuntur in, _chi_, mutant istam dictionem in, _tçu_ v.g. _machi_:
+_matçu_, expecto. Si finiuntur in, _xi_: mutatur in _su_: v.g. _coròxi_:
+_corosu_, occido.
+
+Præteritum fit. Si radices finiuntur in, _ami_, conuertitur in, _óda_,
+v.g. _cami_: _códa_, mandi vel masticaui. Si finiuntur in, _ebi_, vel,
+_emi_, mutantur in, _eôda_, v.g. _saqèbi_: _saqeôda_, vociferatus sum,
+_sonèmi, soneoda_, inuidi seu habui inuidiam. Si finiuntur in, _òbi_,
+vel, _òmi_, conuertuntur in, _ôda_, v.g. _coròbi: corôda_, cecidit:
+_còmi, côda_, se inclusit. Si finiuntur in _umi_, conuertitur in,
+_únda_, v.g. _casùmi_: _casunda_, obtenebratus est, in idem conuertuntur
+quæ finiuntur in, _imi_, v.g. _canaximi, canaxúnda_, tristatus est. Si
+finiuntur in, _gui_, illud conuertunt in, _[~i]da_, v.g. _f[~e]gui,
+fe[~i]da_, discissum est: _xini, uru_, facit præteritum, _xinda_,
+mortuus est: &, _ini, uru_, facit præteritum, _inda_, abiuit: & quantum
+ad hoc sunt sicut secundæ coniugationis; quo ad alia verò tempora sunt
+primæ. Radices quæ finiuntur in, _chi_, vel, _ri_, illud conuertunt ad
+præteritum in, _tta_, v.g. _mòchi_: _mòtçu_, facit præteritum, _mòtta_,
+accepit, _chiri, u: chitta_, sparsum est, quæ verò finiuntur in, _xi_,
+vel, _qi_, illud conuertunt in, _ita_, v.g. _coròxi, u_: _coròita_,
+occidit, _qiqi, u_, _qijta_, audiuit, _xiqi, u_, _xiita_, extendit.
+
+Futurum fit conuertendo, _i_, in quo radices finiuntur in, _ó_, _ozu_,
+vel _ózuru_, v.g. _iomó_, _iomozu_, vel, _iomózuru_, leges. Si verò
+radices finiuntur in, _chi_, mutatur ista dictio in, _tó_, v.g. _machi_:
+_mató_, expectabo, quæ finiuntur autem in, _xi_, illud conuertunt in,
+_só_, v.g. _móxi: u_: _mósó_, dicam, aut loquar.
+
+Imperatiuum fit conuertendo, _i_, in quo radices finiuntur in, _e_, v.g.
+_iomi_: _ióme_, lege vel legas. Si vero radices finiantur in, _chi_,
+conuertitur in, _te_, v.g. _machi_: _mate_, expecta. Fit etiam
+imperatiuum conuertendo, _nu_, in quo præsens negatiuum finitur in,
+_ai_, v.g. ex, _iomanu_, constituendo, _ai_, loco, _nu_, fit, _iomai_,
+lege, & est modus communis etiam tertiæ coniugationis; sed isto
+imperatiuo vtuntur solum loquendo cum inferioribus.
+
+Futurum imperatiui est futurum absolutum: v.g. _iòmõ_, leges, & illo
+vtuntur loquendo cum abiectis personis.
+
+Reliqua tempora optatiui, subiunctiui, gerundij, infinitiui &c. fiunt
+eodem modo & eisdem particulis quibus in prima coniugatione applicando
+singula singulis etiam in modis loquendi.
+
+
+_Secunda coniugatio negatiua._
+
+Radix negatiua secundæ coniugationis est conuerso, _i_, in quo radix
+absoluta finitur, in _azu_, v.g. _iòmi_: _iomazu_, radix, non legendi.
+
+Præsens fit, si radix affirmatiua finitur in, _chi_, illud conuertendo
+in, _tanu_, vt, _machi_: _matanu_, non expecto. Si finitur in, _xi_,
+mutatur in, _sanu_, vt _coròxi_: _corosanu_, non occido. Si alio quouis
+modo finiuntur in, _i_, illud conuertunt in, _anu_, v.g. _coròbi_:
+_corobanu_, non cado.
+
+Præteritum est conuertendo, _nu_, præsentis in, _nanda_, v.g.
+_corobanu_: _corobananda_, non cecidi, _iomananda_, non legi, reliqua
+verò tempora proportionaliter sicut in prima coniugatione negatiua.
+
+
+_Tertia coniugatio affirmatiua._
+
+Radices verborum tertiæ coniugationis finiuntur in, _ai_, _oi_, vel,
+_vi_, quæ finiuntur in, _ai_, conuertunt illud in, _ó_, ad faciendum
+præsens: v.g. _narai_: _naró_, disco: quæ finiuntur in, _oi_, vertunt
+illud in, _ô_, v.g. _vomoi_, _vomô_, cogito, quæ verò finiuntur in,
+_vi_, illud mutant in, _ú_, v.g. _cui_: _cú_, comedo.
+
+Præteritum fit postposito, _ta_, præsenti: v.g. _naróta_, didici,
+_vomôta_, cogitaui, _cúta_, manducaui.
+
+Præteritum plusquam perfectum fit conuertendo vltimum, _a_, præteriti
+perfecti in _e_, & addito verbo, _gozaru_, in præsenti vel, _gozatta_,
+in præterito, vt supra dictum est in prima coniugatione: v.g. _naró
+t[~e] gozaru_, vel, _narot[~e] gozatta_, iam didiceram.
+
+Futurum fit conuertendo, _i_, in quo radix finitur in, _vó_, _vózu_,
+vel: _vózuru_, v.g. _narauó narauozu_, vel, _narauózuru_ discam. Si verò
+radix finiatur in, _oi_: conuertitur in, _vô_, _vôzu_, vel, _vô_,
+_zuru_, v.g. _vomoi_, _vomouô_: _vomouozu_, vel, _vomouôzuru_ cogitabo.
+
+Imperatiuum fit postponendo radicibus, _e_, v.g. _naraie_, disce,
+_tòie_, interroga, _cùie_, comede. Fit etiam auferendo à præsenti
+negatiuo, de quo statim, dictionem, _nu_, & constituendo loco eius
+literam, _i_, v.g. _narauai_, disce, _touai_, interroga, _cuvai_,
+comede, hoc modo vtimur cum inferioribus, cætera sicut in alijs
+coniugationibus.
+
+
+_Tertia coniugatio negatiua._
+
+Radix negatiua tertiæ coniugationis est conuertendo, _i_, in quo radix
+affirmatiua finitur, in _vazu_, v.g. _narauazu_, _touazu_, _cuvazu_, fit
+vero præsens conuertendo, _i_, in, _vanu_: v.g. _narauanu_, non disco,
+_touanù_, non interrogo, _cuvanu_, non comedo.
+
+Præteritum fit conuertendo, _i_, radicis, in, _vananda_, v.g.
+_narauananda_, non didici, _tòuananda_, non interrogaui, _cuuananda_,
+non comedi.
+
+Præteritum plusquam perfectum est conuertendo, _a_, vltimum perfecti in,
+_e_, & addito verbo, _gozaru_, vel, _gozatta_, v.g. _cù uanand[~e]
+gozatta_, vel _narauana d[~e] gozaru_, non comederam, vel non didiceram,
+cætera vt in alijs coniugationibus.
+
+Postpositis verbis substantiuis gerundijs in, _Do_, omnium coniugationum
+tam affirmatiuarum; quam negatiuarum: fit sensus, est, vel non est
+factum, quod per gerundium significatur: v.g. _ãguete aró_, iam erit
+oblatum, _còno qiõga cait[~e] gozaranu_, hic liber non est scriptus,
+_ãgue[~i]de arõzu_, nondum obtulerit. Verba verò substantiua sunt,
+_gozaru_, _gozaranu_, _voru_, _uori nai_, _dea_ vel _gia_: _deuanai_,
+_aru_: _aranu_, vel, _gozaranu uoru ùòrinai_, & vnumquodque, ex illis
+sequitur regulas communes suæ coniugationis.
+
+Postpositis etiam verbis substantiuis infinitiuis omnium coniugationum
+fit sensus quòd est, fuit, erit; vel non, id quod per infinitiuum
+significatur: v.g. _ãguru còto arõ_, erit hoc quod est offerre: idest
+offeret, _naróta còto gozarumai_, non addiscet, & dicta verba
+substantiua habent omnia sua tempora iuxta secundam coniugationem ad
+quam pertinent, quia eorum radices finiuntur in _i_, _ari_, _u_:
+_gozari, u._
+
+
+_Coniugatio verbi substantiui negatiui._
+
+Verbum substantiuum negatiuum est, _nai_, vel, _gozanai_, vel,
+_uorinai_, quod significat non esse, eius radix est, _naqu_ vel,
+_gozanaqu_, aut, _uorinaqu._
+
+Præteritum est conuertendo, _i_, in quo præsens finitur, in, _c_, &
+postponendo illi præteritum, _ari_, _u_, quod est, _atta_, v.g.
+_nacatta_, vel, _gozanacatta_, non fuit, cætera tempora sunt coniugando,
+_ari_, _u_, per secundam secundum temporum exigentiam.
+
+Imperatiuum est, _nacare_, vel, _nanaiso_, vel, _naina_, ne sis.
+
+Subiunctiuum est conuertendo, _i_, præsentis in, _qer[~e]ba_, v.g.
+_naqer[~e]ba_, vel, _gozana qer[~e]ba_, cum non esset vel sit.
+
+Subiunctiuum permissiuum est conuertendo, _i_, præsens in,
+_qer[~e]dòmò_, v.g. _gozana qer[~e]dòmò_, etiam si non sit.
+
+Præteritum huius subiunctiui est postposito, _r[~e]domo_, præterito
+indicatiui: v.g. _nacatta r[~e]domo_, quamuis non fuit.
+
+Substantiuum cum particula, _tomo_, est illam potponendo radici: v.g.
+_naqutomo_, etiam si non sit. Gerundium est, _nó_, _nóte_, vel, _naqu
+xitè_, vel, _nacatte_, cum non sit. Cætera vt supra cum verbo, _ari_,
+_u_: superaddito, & coniugato per secundam.
+
+Nomina adiectiua quando non antecedunt verbis, coniugantur per se sicut
+verbum substantiuum negatiuum: illa inquam nomina adiectiua, quaæ supra
+dictum est finiri in, _ai_, _ei_, _oi_, _ui_, _ij_, eorum radices sunt
+conuersa, _i_, vltima in, _qu_, v.g. _fucacu_, radix profundi, æ,
+_iòqu_, radix boni, æ, _x[~i]guequ_: radix densi, æ, _uarùqu_, radix
+mali, æ, mali, _uonajiqu_: radix eiusdem &c.
+
+Præsens est ipsa vox adiectiui: v.g. _ioi_, bonus, a, um, _fucai_,
+profundus, a, um, _uarui_, malus, a, um, _uonaji_, idem, eadem, idem.
+
+Præteritum est conuertendo, _i_, adiectiui in, _c_, vel, _q_, &
+postposito verbo, _ari_, _u_, illud coniugando secundum exigentiam
+orationis in omnibus temporibus.
+
+Permissiuum cum, _tomò fucàqu tomò_, vel, _fucài tomò_, quamuis
+profundum.
+
+Gerundium in, do, _fucóte_, cum esset profundum, _ióte_, cum sit bonum,
+_varúte_, cum sit malum, _càna xiúte_, cum sit triste, _xingueo te_, cum
+sit densum. Sunt etiam, _fucó xite fucaqu xite_, vel, _fucacàtte_, & sic
+in alijs: v.g. _iôxite_, _iòqu xite_, _iocatte_.
+
+Adiectiua finita in na, non coniugantur; gerundia tamen in do, solent
+habere: v.g. _aqiracana_, pro gerundio, _aqirãcani xite_, cùm esset
+clarum; idem, _aqiraca de_, _arisóna_, habet _arisoni xite_, cum sit
+apparens vel verisimile, _iónà_, habet, _ìóni_, v.g. _iòi yóni xitè_,
+cum sit boni modi, vel habeat bonum modum, _càvãga fucóte vatarananda_,
+quia stauius erat profundus non transuadaui, _xebòte irarènu_, quia
+strictum, non est intrabile, _varúte cu varenu_, non est comestibile vel
+non potest comedi, quia malum. Cætera tempora adiectiuorum sunt vt
+dictum est, cum verbo, _ari_, _u_, coniugato secundum exigentiam
+orationis. Coniugatio etiam negatiua est cum eodem, _ari_, _u_, v.g.
+radix est, _fucàcaràzu_, præsens verò est, _fucàcarà nu_, non est
+profundum. Præteritum, _fucacarananda_, non fuit &c.
+
+
+_De Particulis conditionalibus._
+
+Quinque sunt particulæ facientes orationem conditionalem, _naraba_, _ni
+vòite va_, _ràba_, _va_, _ba_, duæ secundæ postponuntur omni verbo tam
+affirmatiuo, quàm negatiuo in præsenti, præterito, & futuro, & cum illis
+remanet verbum conditionale: v.g. _n[~i]gùru naraba_, si fugis, _iôda ni
+uòite va_, si legistis, _nara võ naraba_, si disces, _cu vazu ni vòite
+va_, si non comedis, aliquando tollitur _voi_, à, _ni voite_, v.g.
+_ãgueô ni va_, si offeres, _ãgueta ró ni va_, si obtuleris. Tollitur
+etiam aliquando, _voite_, & remanet solum, _ni_, v.g. _mairó ni còso_,
+_nèn gòrò ni mòsõzure_, si ibo vel ierim significabo illi amicabiliter,
+_xitaró ni còso_, _faisòcu tçùqu maji qerè_, si fecissem; non habuisset
+effectum, diligentia & persuasio.
+
+Particula, _raba_, postponitur præteritis: v.g. _nar[vo]ta raba_, si
+didicissem, _narauananda raba_, si non didicissem.
+
+Particula, _va_, postponitur radicibus negatiuis omnium trium
+coniugationum; v.g. _ãguèzu va_, si non offero, _iomazu va_, si non
+lego, _narauazu va_, si non disco, _naqu va_, si non est, _fucacarazu
+va_, si non esset profundum.
+
+Particula verò, _ba_, habet eumdem effectum & iungitur etiam radicibus,
+quibus, _va ãguez[~u]ba_, _iomaz[~u]ba_ _narauaz[~u]ba_, si vero dicta
+particula, _ba_, ponatur loco, _zu_, radicibus negatiuis, fit
+conditionalis affirmatiua oratio: v.g. _ãgu[~e]ba_, si offero, _iomãba_
+si lego, _narauãba_, si disco, _iocaraba_, si est bonum: particula verò,
+_ua_, non solum postponitur radicibus negatiuis adiectiuorum: sed etiam
+affirmatiuis: v.g. _fucaqu ua_, si es profundum, _uonajiqu ua_, si est
+idem: aliquando hoc verbo vtuntur ac si dicant: si non est valde
+molestum: facias hoc: dicunt etiam, _ãgue majiqù ua_, si non offeres.
+
+Particula, _ni uòite ua_, supra posita iungitur etiam aliquando
+nominibus, & quasi supplet verbum substantiuum: v.g. _jó jó nì uoite ua
+uqe toró_, accipiam si est valde bonum vel optimum, _curùxicarazaru guì
+ni uòite ua_, si non fuerit molestum vel res molesta.
+
+Particula, _saie_, posita in oratione, vbi est aliqua particula ex
+conditionalibus sensui orationis addit virtutem: v.g. _fune saie mairu
+naraba_, si venerit aliquod nauigium, _sonata saie uocutabire naqu ua_,
+si non est defessus, ac si diceret: ex mea parte, vel quod ad me attinet
+ego non sum defessus.
+
+Supplet etiam aliquando particula, _saie_, conditionalem: v.g. _Niffon
+no xôco cu ni saie caióna còtò gozaru fõdonì_, si ergo in regno paruo
+Iaponiæ inueniuntur & sunt res huiusmodi, ac si dicat; quanto magis
+erunt in magnis, _còco mòto no tocai nì saie mei uacu itasu ión[~i]
+gozaru fõdoni &c._ si ergo in nauigationibus, quæ hic fiunt, valde
+patior &c. _fito saie côquai suru mòno uò iurusu ni iuan ia, Deus ni
+uoite uoia?_ si ergo homo ingnoscit homini p[oe]nitenti, quanto magis
+Deus? _còre fõdo xei uo iru ru saie còto naricanùru ni; ucato xite ua,
+icãdeca banji canauozo?_ si tot adhibendo vires vix potui fieri; si
+leuiter fuisset factum quomodo potuisset fieri seu finiri? _còre saie
+xinicui ni_, si ergo hoc est difficile, _fune de saie ioio tçuita ni_,
+_cachi ua nananaca naru mai_, si nauigio vix perueni; pedes absque dubio
+non potuissem.
+
+
+_De verbo potentiali._
+
+Postposita particula, _ro_, præsentibus & futuris verborum illa facit
+potentialia: v.g. _ãguru ro_, forsan offert, _n[~i]gueozuru_, fortassis
+fugiet.
+
+Præterita fiunt conuertendo, _ta_, in, _tçu_, & addito, _ro_, v.g.
+_ãguetçuro_, fortassis obtulit. Si verò postponatur præteritis
+negatiuis, _da_, in quo finiuntur, debet mutari in, _zzu_, v.g.
+_ãguenanzzuro_, possibile est non obtulisse, vel quod non obtulerit, vel
+obtulit.
+
+Fit etiam potentiale præsens postposito, _arozu_, vel alio futuro,
+infinitiuo: v.g. _ãgùru còto mò aròzu_, vel, _ãgue mò xôzu_, forsan
+offert.
+
+Præteritum est postposito futuro præterito: v.g. _ãgueta còto mo arozu_,
+forsitan obtulit.
+
+Futurum, _ãgueô còto mo arozu_, forsan offeret, idem etiam est in
+negatiuis: v.g. _ãguenu_, vel, _ãguenanda_, vel, _ãguru mai còto mo
+arozu_, possibile est quod non offert, obtulit, vel offeret, & quando
+volumus dicere, ita erit: loco, _còto_, ponimus, _mono_, v.g. _noxenanda
+mono dearózu_, fortassis non introduxerunt in nauigium, _iqi ch[~i]gota
+mono dearozu_, non se obuiauerunt in via, _moreqicoieta mono de gozaro
+ca to zonzurù_, credo si forsan est diuulgatum.
+
+Ad significandum fieri significatum nominum adiectiuorum postponitur
+verbum, _nari_, _u_, coniugatum secundum exigentiam temporis ipsis
+adiectiuis aduerbialiter sumptis: v.g. _fuco naru_, fit profundum, _uaru
+natta_, factum est malum: dicitur etiam _fuco aru_, est profundum,
+aliquando etiam dicunt, _fuco nai_, non est profundum, & hoc modo
+loquendi vtuntur etiam coniugando _nai_, modo supra dicto secundum
+exigentiam temporis, iuxta sensum orationis: etiam dicunt potentialiter,
+_fuco nai coto mo arozu_, forsan erit hoc, quod est, non esse profundum.
+
+
+_Verba irregularia quo ad coniugationes._
+
+Verbum, _qi_, _uru_, quod est venio, is: habet præsens, _qùru_, venio,
+_qita_, veni, _côzu_, veniam, _coi_, vel, _coio_, veni, _qitar[~e]ba_,
+cum venerit, vel si venisset, _qitar[~e]domo_, quãuis venit, & radicem
+negatiuam, _côzu_, & præsens negatiuum, _conu_, non venio, _mède_ radix
+verbi delector, aris, habet præsens _m[~e]zzùru_, & gerundium in do,
+_medete_, delectando se, _cui_, radix verbi p[oe]niteo, es, vel tristor,
+aris, habet præsens, _cuiuru_, & gerundium in do, _cuite_, p[oe]nitendo,
+& radicem negatiuam, _cuizu_, & præsens negatiuum, _cuinu_, non
+p[oe]nitet, _araie_, radix verbi sum, est, fui: habet præsens,
+_araiùru_, siue, _aroru_, est: _furi_ radix verbi veterasco: habet
+præteritum, _furita_, inueteratus est, & gerundium in do, _fùrite_,
+inueterando, _fe_, radix verbi transeo, is, habet præsens, _furu_,
+transit; & præteritum, _feta_, transit, _Tari_, _u_, est verbum
+significans rem esse completam & integram: habet præsens, _taru_,
+sufficit, præteritum, _tatta_, completum fuit, & futurum, _tari maraxo_,
+erit perfectum vel sufficiet: & radicem negatiuam, _tarazu_, præsens
+negatiuum, _taranu_, præteritum, _tarananda_, non fuit sufficiens,
+futurum, _taru mai_, non erit sufficiens, imperfectum subiunctiui
+_taran[~e]ba_, cum non sufficeret.
+
+Permissiuum, _taran[~e] domo_, infinitiuum negatiuum, _taranu coto_,
+gerundium verò in do, _tara[~i]de_, vel, _Tarazu xite_, verbum _taxi_,
+_tasu_, quod significat adimplere, seu perficere, habet futurum, _taxi
+marãxô_, perficiam, _tasanu_, vero est eius præsens negatiuum. _Tari_,
+autem radix verbi, _taro_, quod significat esse perfectum, habet
+præteritum negatiuum, _tara uananda_, non fuit perfectum, &
+subi[~u]ctiuum, _tara uan[~e]ba_, cum non esset perfectum, &
+permissiuum, _tara uan[~e] domo_, & infinitiuum, _tarauanu còto_, &
+gerundium in do, _Taraua[~i]de_, vel _Tarauaxu xitè_: _uocotari_, vero
+est radix verbi, _uocotaru_, pro eo quod est deficere: habet
+infinitiuum, _uòcotaru coto_, & radicem negatiuam, _uocotarazu_, &
+præsens negatiuum, _vo cotaranu_, _voi_, est radix verbi quod habet
+præteritum, _uoita_, inueteratus est: &, _uoitaru_, quod est idem. Et
+præsens negatiuum quod est, _uoinu_, & gerundium in do, _uoite_: _urei_,
+radix verbi tristor, aris, habet præsens, _vreô_, & imperatiuum,
+_vreio_, & infinitiuum, _vreoru coto_, & gerundium in do, _vreite_:
+_Tomi_, radix verbi, _tomu_, vel, _tomeru_ quod est ditor, aris, vel
+diues fieri, habet præteritum, _tonda_, gerundium in do, _tonde_, &
+radicem negatiuam, _tomàzú_, _sa[~i] guiri_, _u_, significat idem quod
+præeo, is, vel anticipor, aris, habet præteritum, _sa[~i] guitta_, &
+gerundium in do, _sa[~i] guitte_.
+
+
+_De verbo adhuc, & de eius formatione & differentijs._
+
+In ista lingua sunt verba actiua simplicia; & actiua etiam faciendi
+facere, passiua etiam, neutra, & impersonalia. Omnia verò coniugantur
+per tres coniugationes supra positas secundum quod eorum radices iam
+dispositæ & ex illis verba formata, terminantur.
+
+Ex aliquibus nominibus adiectiuis aliqua procedunt verba: v.g. _catài_,
+est durus, a, um, ex quo exeunt, _catàme_, _uru_, induro, as, actiuum,
+_catamari_, _u_, induresco, is, neutrum, & _catameràre_, _uru_, induror,
+aris, passiuum, ex _canaxij_, adiectiuo quod est tristis, e, exit,
+_canaximi_, _u_, quod est tristor, aris.
+
+Verba faciendi facere, formantur istis particulis, _sàxe_, vel, _xe_,
+prima postponitur radicibus secundæ coniugationis; secunda verò
+radicibus secundæ, & tertiæ, fiunt autem postpositis præsentibus
+negatiuis, auferendo _nu_, in quo finiuntur & ponendo loco eius
+prædictas particulas: v.g. _ãguesaxe_, _uru_, offere facio, is,
+_iomaxe_, _uru_, legere facio, is: _narauàxe_, _uru_, discere facio, is,
+& omnia remanent secundæ cõiugationis quia particulæ finiuntur in, _e_;
+aliquando etiam, &si raro, solet postponi particula, _saxe_, verbis
+secundæ, & tertiæ coniugationis, sed tunc ornantur seu honorantur
+prædicta verba cum particula, _rare_, v.g. _iomasàxe rare_, _uru_,
+_Padre ua dòjucùni cathecismo vo narauasaxeraruru_, Pater iubet suo
+ministro vt discat catechismum, _mòno no fòn vo fito ni iòmasaxerarùru_,
+facit legere originale.
+
+Verba passiua fiunt particulis, _rare_, & _re_, particula, _rare_,
+iungitur actiuis secundæ coniugationis modo iam dicto tollendo scilicet,
+_nu_, a negatiuo: v.g. _ãguerare_, _uru_, offeror, eris, _iomare_,
+_uru_, legor, eris, _naravare_, _uru_, discor, eris, his vtuntur in
+sensu passiuo legi ab alio, vel esse, aut non esse legibile: v.g. sunt
+etiam alia passiua quæ procedunt ex neutris vel ex habentibus
+significationem neutralem, quæ quidem formantur cum particulis, _rare_,
+&, _re_, formata tamen non regunt casus cõmunes passiuorum (de quibus
+infra) sed verborum ex quibus procedunt: v.g. ex, _ãgari_, _u_,
+procedit, _ãgarare_, _uru_, & quia, _ãgari_, _u_, quod significat
+ascendo, is, regit accusatiuum, etiam illum regit, _ãgarare_, _uru_,
+v.g. _còno iamaie ãgararenu_, non potest ascendi ad istum montem vel
+iste mons non est ascendibilis, _xiròcara derarenu_, non potest exiri ex
+castello, _Xebóte irarènu_, nõ potest intrari quia strictum seu
+angustum, _còno michi va arucarenu_, non potest ambulari hæc via, _natçu
+vacòco ni irare mai_, non erit hoc habitabile tempore veris, _còno
+f[~u]d[~e] de va cacarenu_, non potest scribi isto calamo, _fimãga nóte
+cacarenanda_, non potuit scribi ex defectu temporis, _cònobùn ni còso
+cacaruru mòno de gozare_, hoc sane modo bene scribitur, _ax[~i]ga itóte
+aru carenu_, non potest ambulari dolentibus pedibus: omnia ergo verba
+passiua sunt secundæ: verba neutra sunt quæ habent significationem
+neutralem: v.g. aperiri per se & non ab alio: v.g. _ivõgatoruru_, pisces
+capiuntur, _caj[~e]ga torùru_, ventus cessat, _itõga qiruru_, filum
+rumpitur, _j[~i]ga iomùru_, litera benè legitur, _aqi_, _u_, aperior,
+iris, _qiri_, _u_, est scindo, is, actiuum, _qirare_, _uru_, est
+scindor, eris, passiuum, _qire_, _uru_, est scindor, eris, neutraliter
+est etiam quando gladius bene scindit quia est acutus, _qiraxe_, _uru_,
+est verbum faciendi facere quod significat scindere facio, is, _ãgue_,
+_uru_, est leuo, as, _ãguerare_, _uru_, leuor, aris, passiuum, _ãgue
+saxe_, _uru_, leuare facio, is, _ãgari_, _u_, leuor, aris, neutrum,
+_ãgarare_, _uru_, esse ascendibile, _ãgaraxe_, _uru_, leuari facio, is,
+vel quod se leuet facio, facis: si verò illis adiungantur particulæ
+honoris (de quibus infra) faciunt alias combinationes: adiectiua verò
+quando coniungantur habent significationem neutralem: v.g. _fidarui_,
+esurio, is, _fucacatta_, fuit profundum.
+
+Verba impersonalia non nominant, neque exprimunt personam: v.g. _mi uo
+fatasu tomò itçuvari vo iuanu mono gia_, etiam si quis moriatur non
+debet mendacium dicere, _mòno mò tabezu saqe mo noma[~i]de ichinichi
+fataraqu mòno ca?_ potest ne laborari per totum diem integrum nihil
+comedendo & non bibendo vinum? _Xujin nò mai[~e] de sòno ióna còto vò iú
+mono ca?_ possunt ne dici huiusmodi coram Domino? Quoad coniugationes
+verò sequuntur regulas radicum quibus efficiuntur.
+
+Radices omnium verborum cuiuscumque sint coniugationis, possunt adhuc
+extrahi & deduci ad alias coniugationes si illis superaddantur particulæ
+honoris, secundum literas, in quibus prædictæ particulæ honoris
+finiuntur, particulæ verò sunt _maraxi_, _uru ari_, _u saxerare uru_,
+_xerare uru_, _nasare uru_, _saxemaxi u_, _tamai ó_, _rare_, _re_.
+
+Particula, _maraxi_, non addit honorem rei de qua loquimur; sed loquimur
+honorate attendendo ad personam coram qua loquimur: v.g. _cui_ _ú_,
+significat id quod comedo, is, seruus autem coram Domino non dicet,
+_nèzumi gacúta_, mures comederunt caseum: v.g. sed, _nèzum[~i]ga cùi
+maraxita_, notandum etiam quod _cui_ _ú_, secundum se est tertiæ
+coniugationis quia finitur radix in, _vi_, addito verò, _maraxi_,
+redditur primæ: quando referimus aliquid de aliqua natione verbum non
+honoramus; sed solùm attendimus ad personam cum qua loquimur ad addendum
+illi vel non particulam seu verbum, _maraxi_, _uru_, v.g. coram
+inferiori dicemus, _Nan ban jin va còre vo cuvanu_, coram persona verò
+nobili dicemus, _Nan ban jin va core vo cui maraxenu_, Europei hoc non
+manducant, _Ari_, _u_, postponitur radicibus omnium verborum; & illa
+honore afficit mediocri: v.g. _mõdorarió ca?_ reuerteris ne? Si verò
+anteponatur illis sic constitutis, _vo_, honorantur verba satis: v.g.
+_vomõdori arõca?_ reuertetur ne vestra dominatio? _Tono sama vo xini
+atta toqi_, quando dominus mortuus est, _Deus cono xecai uo gosacu
+atta_, Deus creauit hunc mundum, his particulis vtimur loquendo cum
+personis honoratis quas diligimus, & cum quibus habemus amicitiam.
+
+Particula, _nasare uru_, honorem supremum, aut satis magn[~u] dat
+verbis; postponitur verò eorum radicibus: v.g. _Deus cono xecai uo go
+sacu nasareta_, Deus creauit hunc mundum.
+
+Particulæ, _rare_, & _re_, honorem quidem præstant significatis,
+verborum, quibus adduntur; sed mediocrem; & non magnum: postponitur
+autem, _rare_, & præcipuè si loquamur de absentibus, præsentibus
+negatiuis ablato, _nu_, & constituendo particulam prædictam eius loco:
+v.g. _ãgue rare_, _uru_, est offero, rs, quando offerens est persona
+mediocris honoris & reuerentiæ coincid[~u]t cum passiuis in literis; sed
+casibus quos regunt, distinguuntur: particula, _re_, postponitur verbis
+secundæ & tertiæ eodem modo: v.g. _iomàre_, _uru_, _naravàre_, _uru_,
+legere & discere personam boni nominis, hoc modo loquimur de æqualibus &
+seruus etiam de domino suo, non cum conseruis; sed cum gente nobili.
+
+Particulæ, _sàxe maxi_, &, _xemaxi_, eundem tribuunt honorem quem,
+_àri_, _u_, & quem, _rare_, & _re_, postponitur, _saxe màxi_, _u_,
+radicibus secundæ, vel præsenti negatiuo, ablato _nu_, & constituto,
+_saxe màxi_, _u_, loco eius: v.g. _ãguesaxe màsu_, offert, _maxi_, _u_,
+vero postponitur negatiuis secundæ & tertiæ, ablato, _nu_, v.g.
+_iomaxemàsu_, legit, _naravaxe màsu_, discit.
+
+Particulæ, _saxe rare_, _uru_, _xeràre_, _uru_, magnum tribuunt honorem,
+prima postponitur præsenti negatiuo verborum secundæ coniugationis,
+ablato, _nu_, secunda verò postponitur negatiuis secundæ & tertiae eodem
+modo: v.g. _ãgue saxe raruru_, offero, rs, _iomaxe rarùru_, lego, is,
+_naravaxe rarùru_, disco, is, quia vero hæc coincidunt in literis cum
+verbis faciendi facere honoratis; ad tollendam æquiuocationem, vtimur
+particula, _ari_, _u_, anteposita, _vo_, verbis: v.g. _yomaxe aru_,
+lego, is, _nara vaxe aru_, disco.
+
+Verba passiua, de quibus infra, possunt admittere particulam, _saxe
+rare_, _uru_, v.g. _via mavare saxe raruru_, honoror, aris.
+
+Particula, _tamai_, _ó_, tribuit supremum honorem: illa vtimur loquendo
+de Deo, sanctis, regibus, & imperatoribus: postponitur vero radicibus
+verborum, quæ efficit tertiæ coniugationis: postponitur etiam radicibus
+passiuorum loquendo de Deo: v.g. _Deus filio, vmare tamò tòqi_, quando
+Dei filius natus est, _Deus ãgamerare tamo_, Deus honoratur.
+
+Particula, _tate matçuri_, _u_, humiliat significatum verbi cui
+adiungitur: postponitur autem radicibus verborum affirmatiuorum: v.g.
+_Deus vo gotaixetni zonji tate matçuru còtova ichi s[~u]gureta jèn gia_,
+amare Deum est suprema virtus: admittit tamen hæc particula honorem à
+particula, _re_, mutato _e_, in quo finitur in, _a_, v.g. loquendo de
+sanctis respectu Dei dicemus _Sancto_ _Domingo, Deus vo gotaixèt ni
+zonji tatematçurareta_, Sanctus Dominicus dilexit Deum.
+
+Particula etiam, _màráxi_, potest ad honorem eleuari particula, _rare_,
+v.g. _tòno iòri cònó còto vo Padre ni vatàxi mai raxerareta_, Dominus
+tradidit hanc rem patri.
+
+
+_De aliquibus verbis quæ de se habent honorem determinatum._
+
+_Mesare_, _uru_, significat facere quamcumque actionem quam potest, &
+est decens facere personam nobilem, vt est comedere, bibere, nauigare,
+equum ascendere &c. _vôxerare_, _uru_, significat loqui personam
+nobilem, _uomaraxi_, _uru_, _vomaraxi_, _ari_, _u_, significat dare
+personam nobilem, _uoxe_, _uru_, &, _uôxe ar[~i]_, _u_, significat loqui
+vel præcipere personam mediocrem.
+
+Verba quibus anteponuntur, _uôxe_, vel, _mexi_, eundem habent honorem
+cum illis; & absque illis: v.g. _uôxe tçuqerare_, _uru_, quod est
+præcipio, is, &, _mèxi tçuca uare_, _uru_, quod est seruio, is, est idem
+quod, _tçuqerare_, _uru_, &, _tçuca uare_, _uru_, ad vocandum imperatiue
+dicimus, _coi_, seruo vel inferiori, _iòrài_, dicitur non tam inferiori,
+_uaxèi_, est aliquantulum melius, _úogiare_, est superior modus vocandi,
+_gòzare_, veniat vestra dominatio, _gozaro_, vero in tempore futuri est
+honorabilior modus quia est sine imperio, _uo[~i]de nasarei_, vel,
+_uo[~i]de nasareô_, vel, _uo[~i]de nasarei caxi!_ est veniat vestra
+dominatio: vel, ò si veniat vestra dominatio! _cudasare_, _uru_,
+significat dare personam nobilem, _tamauari_, _u_, dare personam nobilem
+inferiori, _tamóri_, _u_, dare personam mediocrem, _mizzu uo nomaxète
+tamore_, da mihi bibere aquam, _cudasare_, _uru_, & _tamóri_, _u_,
+significat comedere personam humilem cibum honorando: _còxi mexi_, _u_,
+&, _qicoximexi_, _u_, est comedere, vel audire personam nobilem, _uoboxi
+mexi_, _u_, &, _uoboxi mesare_, _uru_, cogitare personam nobilem,
+_saxerare_, _uru_, facere personam nobilem & idem _nasare_, _uru_,
+_asobaxi_, _u_, &, _asobasare_, _[~i]uru_, significat facere personam
+nobilem quidquid illi est decens: v.g. venari, scribere legere,
+recitare, _ii_, _ú_, est loqui humiliando loquentem, & rem de qua
+loquitur, &, _mexi_, _u_, significat etiam loqui honorando personam, &
+rem de qua: vnde non recte dicam _mi ni móxe_, dic mihi; sed, _mi ni
+iie_, neque dicam, _tono ni iie_ dic domino, sed, _tòno ni mòxe_:
+_mairi_, _u_, significat ire ad locum cui honor debetur: v.g. _iglesia
+ie maire_, eas Ecclesiam, _cùre_, _uru_, &, _toràxe_, _uru_, significat
+dare, humiliando personam cui datur, _cui_, _[vu]_, est comedere sine
+aliquo respectu, _mexi_, _u_, est etiam comedere; sed est vrbanum: v.g.
+coram honestis non dicam, _mèxi uo cùi maraxita_; sed, _mèxi uo tabe
+maraxità_, comedi, _mairi_, _u_, vel, _uomairari_ _u_, est comedere
+personam nobilem vel mediocrem, _ãgara xerare_, _uru_, &, _uoãgari ari_,
+_u_, est modus nobilior, _qiqi_, _u_, est audire vt cumque; _uqe tama
+uari_, _u_, vero &, _uqetamóri_, _u_, est audire honorando personam à
+qua auditur: v.g. _goiqen uo uqetamòtta_, vestra consilia audiui, _móxi
+ãgue_, _uru_, est loqui humiliando se loquentem, & honorando personam
+cui dicitur, _móxi ire_, _uru_, loqui inter æquales, _chómon xi_, _uru_,
+audire sermones Dei, _gorànji_, _zuru_: vel, _goranjerare_, _uru_, est
+aspicere rem nobilem, _xi_, _uru_, est facere in communi, _itaxi_, _u_,
+est facere; sed dicitur modo vrbano, _tçucamatçuri_, _u_, est facere,
+humiliando se qui facit.
+
+
+_Aduertentiæ circa coniugationes verborum._
+
+Anteposita particula, _nama_, omnibus verbis inquocumque tempore;
+significant actionem màle & non perfectè: v.g. _nàma aró_, màle lauo,
+_namaiaqu_, male asso.
+
+Antepositis particulis, _tçui_, _cai_, _uchi_, _fàxe_, _uoi_, _ai_,
+_tòri_, verbis; non mutant significationem; aliquam tamen energiam, &
+efficaciam significatis tribuunt: v.g. idem est, _uchi còbosu_, quod,
+_cõbòsu_, effundo, _faxe noboru_, quod, _noboru_, ascendo, is, _uòxi
+còmi_, _u_: quod, _còmi_, _u_, includo, is, _ai ca uari_, _u_, id[~e]
+est, quod, _cauaru_, transmutor, aris, _tçuimauari_, _u_, idem est quod,
+_ma uari_, _u_, circuo, is, &, _tòri firõgue_, _uru_, idem quod
+_firõgue_, _uru_, extendo, is.
+
+Particula, _qitte_, est gerundium in, _do_, verbi, _qiri_, _u_, &
+postposita aliquibus radicibus verborum, magnam efficaciam illis
+tribuit: v.g. _tanomiqitte_, magnis præcibus obsecrando, _uomòi qìtte_,
+magnam assumendo resolution[~e]: vtimur etiam verbis, _tanomi qiri_,
+_u_, &, _uomoiqiri_, _u_.
+
+Anteposita particula, _ma_, aliquibus nominibus seu verbis dat
+significato vigorem: v.g. _mamucài_, valde præsens, _macuròi_, valde
+nigrum.
+
+Particula seu radix verbi, _macàri_, _u_, anteposita verbis
+significantibus motum facit verba modesta, & vrbana satis: v.g. _macari
+noboru_, ascendo, is, _macari c[~u]dari_, _u_, descendo, is, _macari i_,
+_iru_, ad sum: es.
+
+Postposita particula _va_, in oratione confirmat id quod antea dixerat
+quasi gloriando se illud prædixisse: v.g. _fune ua cuchi notçu ie iru
+uà_, nauigium intrat, _cuchinotçu_, ac si dicat, nonne ego bene dicebam?
+_aru ua_, vide si est sicut ego dixi!
+
+Particula, _a[~i]dani_, significat inter, idest tempus quod in aliqua
+actione consumitur: v.g. _ãgura a[~i]dani_, inter offerendum, vel dum
+offert, _iôda a[~i]dani_, dum legit, _narauózuru a[~i]dani_, dum discet.
+
+Particula, _ga_, significat, sed: v.g. _sóiú ga; nanto aró ca?_ sic
+dicunt; sed quomodo erit vel si erit nescio certe, _fùri ua fùru
+ma[~i]ga, fune uo dasu còto naró ca xiranu_, profecto non pluet; sed
+nescio vtrum poterit extrahi nauigium, _sono qinpenni ua gozaru
+ma[~i]ga; dòco cara toraxerarùru zo?_ non erunt apud vicinos vel in
+circuitu, vnde ergo afferunt?
+
+Particula, _gotòqu_, postposita præsentibus, præteritis & futuris
+significat, eo modo quo: v.g. _coxiraiùr[~u] gotòqu_, sicut, vel eo
+modo, quo ornas vel perficis, _qiita gotòqu_, sicut audiui, aliquando
+est, _gã gotòqu_, v.g. _móxitã gã gotoqu_, sicut dixit, _caraca uózú
+gotòqu_, comodo quo contendam vel rixabor idem facit particula, _ioni_,
+v.g. _Nifon no catãgui uo xirareta ioni, uôxerarùru_, loquitur sicut qui
+scit consuetudines Iaponiæ, _mósu ióni_, sicut dico, vtuntur etiam
+particula, _furi_, ad eundem finem v.g. _Toza no chijòcu uo nogareô zuru
+tameni catana uo saita fùri uo mixerareta_, ostendit se accinctum
+gladio, vt euaderet imminens infamiæ periculum, _minu furi uo
+saxerareta_, ostendit se non vidisse.
+
+Particula, _saie_, vtuntur ad significandum nec dum: v.g. _mma saie
+nacatta_, equi nec dum fuer[~u]t, _cotõba saie xiranu mòno_, neque loqui
+scit, _ji saie mixiranu mòno_, nec dum literas cognoscit vtuntur etiam
+eadem particula ad exaggerandum aliquid v.g. _q[~i]den to saie
+mox[~e]ba_, sufficeret si diceres te esse, _Padre no tçucauarùru to
+saie, móx[~e]ba_, si dixisset solùm quod patri seruiebat: ac si diceret:
+hoc sufficeret vt &c.
+
+Particula, _qere_, est confirmatio & terminatio orationis, & significat;
+itaque: v.g. _maitta qere_, venit itaque, _sate sóáru qere_, res denique
+sic se habet.
+
+Particula, _còso_, est magni momenti inter Iapones vtuntur enim illa in
+primis in sensu aduersatiuo: v.g. _còre còso ió gozare_, hoc est verè
+bonum: si oratio inqua inuenitur prædicta particula finiatur in verbo,
+tale verbum finitur in, _e_, vt in oratione posita: si autem verbum sit
+in tempore præterito additur illi, _re_, v.g. _iô còso gozatta re!_ bene
+veneris! deficit hæc regula vel quando oratio non finitur in verbo aut
+adiectiuo: v.g. _còre còso xixó yô_, hic est verus magister: vel quando
+post particulam, _còso_, est in oratione gerundium finitum in, _te_, vel
+permissiuum cum particula, _tomò_, aut præterita potentialia finita in,
+_tçur[vo]_, vel, _zzuró_, v.g. _uare coso iro iro xinro tçùcamatçùtte
+cutatireba tòxiiórini nari maraxita_, patiendo multos & diuersos labores
+vere factus sum senex defessus, & lassus, _uare còso corosarùru tomo_,
+ego enim & si occidar &c. _fara còso tattçuro_ forsan fuit iratus, _sato
+chicaqer[~e]ba coso f[~i]ga miiure_, videtur iam ignis quia prope est
+vicus: hæc oratio finitur in _e_, quia non est in ea regulæ exceptio,
+_uôxerarèta coto domo uo go côqua[~i] de cosõ gozarózure_, absque dubio
+facietis p[oe]nitentiam de ijs quæ dixistis, _cataji qenò cosõ gozare_,
+tibi valde congratulor & gratias ago: quando aliquis interrogat quis
+fecit hoc? respondent: v.g. _Patre coso_, Pater fecit: ac si dicant:
+videte si est persona quæcumque, quæ illud fecit? & quando quis
+responsum non audiuit aut percepit, & iterum interrogat, dicit qui
+loquutus est, _juan coso_, iam dixi, quod Ioannes &c.
+
+Quando non curat quis de ijs quæ illi dixerunt, vel habet se ac si non
+audisset vel iterum interrogat, solent respondere: v.g. _touoru na
+toii[~e]ba_, iam dixi tibi ne transeas, _iome to ii[~e]ba_, iam dixi
+tibi quòd legas, _Padre coso to iieba_, iam dixi quod pater est qui &c.
+
+_Maieni_, vel, _saqini_, postpositum præsentibus negatiuis, facit illa
+affirmatiua: v.g. _iglesiaie mairanu maie ni_, antequam eat Ecclesiam:
+etiam solet postponi futuris affirmatiuis: v.g. _maìrozuru tote nosaqi
+ni_, tantisper antequam veniret.
+
+Particula, _tocoro_, significat tempus in quo fit actio significata per
+uerb[~u] cui postponitur: _taburu tocoro ni_, quãdo comedebã, _tabeta
+tocoroni_, post prandium, _tabeôzuru tocorõ ni_, vel, _tabeôzuru ni_,
+quando eram comesturus: facit etiam eadem particula reduplicatiua
+denotando reduplicationem in quantum: v.g. _jesu christo humanidad no
+uon tocoro ua_, Iesus Christus in quantum homo, _uonor[~e]ga foxxezaru
+tocoro uo fõdocosu coto nacare_, quod tibi non vis, alteri ne facias,
+_f[~u]dai no tocoro uo uo iurùsu_, dono illi libertatem, _fito no acu no
+tocoro ni ua dôxin xenu_, non consentio hominum peccatis, _utag[vo]
+tocoro mo nai_, non remanet locus dubij vel dubitandi, _nocoru tocoro mo
+nai_, nihil amplius restat, _tçuini, sòno tocòro ie mairózu_, denique ad
+hoc peruenit, _fùmbet ni voiobanu tocoro gia_, res sunt quæ non
+intelliguntur, vel ad quas intellectus non peruenit, _nani mo naì tocoro
+vo iô qìcòximexe_, comedat vestra dominatio ex hac paruitate, quæ est
+nihil: exemplis cognoscetur vis significationis.
+
+Particulæ, _tocòro_, _Made_, vel, _made de gozaru_, solent postponi ad
+cadentiam; absque aliqua significatione, & idem est, _còto de gozaru_,
+v.g. _naranu made_, vel _naranu còto de gozaru_, est idem quod,
+_naranu_, non est possibile, _guijèt tçucamatçuro to zonzuru còto va
+cac[~u]go ita sanu coto gia_, amicitiam frangere neque in mentem mihi
+venit, hic, _itasanu coto gia_, est idem quod, _itasanu_, solum.
+
+Particula verò, _madeiò_, vtuntur aliquando ad confirmationem eorum, quæ
+dicunt: v.g. _caita madeio_, quod scripsi scripsi.
+
+Particula, _toqi_, postposita præsentibus, illa facit præterita
+imperfecta: v.g. _jennìn tachi va sa[~i]go ni voiobi tamó tòqi va buji
+n[~i] gozatta_, quando sancti perueniebant ad mortis horam erãt pacifici
+& quieti.
+
+Conuertendo, _ta_, præteritorum in, _tçu_; &, _da_, negatiuorum in,
+_zzu_, fit sensus; modo facio hoc; modo illud: v.g. _mòno vo caitçu,
+iôzzu, nando xite curasu bacari gia_, legendo, & scribendo, & alia
+faciendo, transigo vitam, _tattçu itçu vocu iori zaxiqi ie [~i]de zaxiqi
+iori vocu ie iri xitten battò xeraruru_, stando & sedendo: intrando, &
+exeundo, surgit & cadit: eumdem sensum facit particula, _ri_, postposita
+præteritis: v.g. _xeqen nò mòno va netari voqitari nôdari curasu bacari
+gia_, homines m[~u]di, vitam agunt dormiendo, surgendo, & bibendo,
+_mazzu ite ni ua uo mo facaxetari, cusa vo mo ficaxetari iroiro no
+x[~i]goto vo at[~e]gote cosó mairozure_, ibo & atrium verrere faciam, &
+herbas euellere, & denique ibo ad multa disponenda, _ima còno io fuqe
+iuq[~e]ba nome ia, vtaie ia fitó bìbo mõtçu, vtotçu sacamori suru_, cum
+iam sit alta nox prouocando se ad bibendum & cantandum lætantur homines
+saltando & cantando &c.
+
+Particula, _ie_, quæ est radix verbi, _ie iuru_, quod est possum, es,
+anteposita negatiuis significat non posse facere actionem significatam
+per verbum: v.g. _ie iomanu_, non possum legere, infinitiuis vero
+postponitur: v.g. _iomu còto voienu_, non possum legere: dicitur etiã
+_iomi va ie[~i]de_, vel _iomi mò ie[~i]de_, cum legere non possim aut
+legere non valendo. Infinitiuum gerit vices aliquando suppositi verbi:
+v.g. _xinuru cotova vosoròxij_, terribile est mori.
+
+Particula, _tai_, quæ significat volo, is, postposita radicibus verborum
+significat velle facere actionem significatam per verbum: v.g. _mizzu vo
+nòmi tai_, desidero aquam bibere, idem, _mizzu uo nomi tõ gozaru_, vel,
+_mizzu uo nomi tõ zonzuru_, sed istæ duæ vltimæ sunt nobiliores, &
+quibus coram nobilibus vtimur negatiui exempl[~u] est, _tomo nai_, v.g.
+_mizzu uo nòmi tòmo nai_, nolo aquam bibere idem est, _mizzu uo nomi
+tomo gozaranu, mairi tó mo zonjenu_, non habeo animum eundi. Si verò
+particula, _tai_, postponitur adiectiuis vel verbis significantibus
+actionem sensitiuam in secunda persona, conuertit, _i_, in, _c_, &
+postponitur verbum, _ari_, _u_, coniugatum secundum orationis
+exigentiam: v.g. _cui tacatta_, volui comedere. Si vero verbum loquatur
+de secunda, & tertia persona conuertit particula, _i_, in, _g_, &
+postponitur etiam, _ari_, _u_, vel cum honore secundum quòd persona
+meretur; vel sine particula honoris; sed absolute. Si vero sit persona
+inferior etiam si sit secunda vel tertia, _i_, conuertitur in, _c_,
+sicut dictum est de prima.
+
+Particula, _de_, aliquando facit subiunctiui sensum adiuncta aliquibus
+nominibus substantiuis: v.g. _uarãb[~e] de xinda_, mortuus est puer vel
+cum adhuc esset puer, _uar[~e]ga buchó fóde tofo mo gozanai_, cum ego
+sim negligens, & non curiosus, nihil erit, eo modo quo conueniebat,
+aptatum.
+
+Particula, _i[vo]_, quæ significat modum, potest poni radicibus
+verborum, & ipsis etiam verbis: quando radicibus, regit genitiuum;
+quando vero verbis regit eorum casus: v.g. _cono qio uo iomi i[vo]v a_,
+modus loquendi hunc librum, vel, _cono qió uo iomu io ua_, in prima
+oratione, _qio_, est in genitiuo cum particula, _no_, in secunda autem
+est in accusatiuo cum, _uo_, quia illud regit, _iomu_: _tei_, significat
+modum extraordinarium & admirationem causantem: v.g. _machicanuru tei uo
+goron jerarei_, videat vestra dominatio modum expectandi idest quo modo
+expectant: _arisama_, significat etiam modum: v.g. _me mo aterare nu
+arisama gia_, est modus & figura quæ nec prospici potest.
+
+_Sama_, significat tempus quo fit actio verbi cui postponitur, regitque
+casum, quem verbum ex se petit, postponitur verò radicibus: v.g. _saqe
+uo nomi sama ni_, quando actualiter bibebat vinum, _iado ie caieri sama
+ni_, quando domum reuertebatur, _fùne iori ãgari sama ni_, quando
+actualiter exibat e nauigio, _funè ni nori sama ni_, quando actualiter
+conscendebat nauim.
+
+Quando in oratione fuerint duo verba quorum actio per modum vnius fit,
+primum verbum debet esse in gerundio in do: v.g. _mizzu uo motte coi_,
+porta aquam, vel veni aquam portans, _funè uo uoite coi_, affer hic
+nauim, vel remis nauim trahendo veni, _core uo totte iqe_, porta hoc,
+vel tollendo hoc vade.
+
+Gerundium in, _do_, adiunctum verbis, rogandi, dandi, aut gratiam
+faciendi significat rogare, vel petere rem significatam per verba quibus
+anteponitur: v.g. _nifon guchi uo uoxiiète cureio_, doce me linguam
+Iaponicam, _so uoxerarete cudasaruru na_, ne dicat hoc vestra dominatio,
+_Deus no coto uo catatte tamore_, facias mihi gratiam referendi res quæ
+ad deum pertinent.
+
+Particula, _mo_, postposita gerundijs in, _do_, quæ in, _te_, vel, _de_,
+finiuntur significant, quamuis: v.g. _so moxite mo_, quamuis hoc dicas,
+_so iua[~i]de mo_, quamuis hoc non dicas, _ica fõdo susu m[~e]te mo,
+corobu mai_, quantumcumque mihi persuadeas; fidem non abnegabo; etiam
+vtuntur hoc modo, _so mox[~e]ba attemo_, etiam si hoc dicas, & _doxitemo
+co xitemo_, quodcumque facias &c.
+
+Si particula, _coso_, de qua supra, postponatur gerundio in, _do_,
+affirmatiuo, & finiatur oratio in prædicta particula fit oratio
+negatiua: v.g. _mite coso_, nulla tenus vidi, _atte coso_, nullo modo
+est. Si vero oratio non finitur in, _coso_, est affirmatiua & emphatica:
+v.g. _mite coso gozare_, vidi profecto: finitur verbum in, _e_, secundum
+regulam supra positam quando egimus de particula, _coso_.
+
+Quando verò gerundio in do negatiuo finito in, _e_, subsequuntur vel,
+_ua_, vel, _naranu_, aut, _cana uanu_, dicit necessitatem, &
+impossibilitatem ad contrarium: v.g. _maira[~i]de cana uanu_, est
+necessarium ire, _iua[~i]de uà nò còto nar[~e]domo, nànto xô ca?_ & si
+sit res quæ necessario debet dici; quid faciam? _xitãgaua[~i]de naranu_,
+est necessarium obedire; eundem etiam sensum, &si non cum tanta vi,
+facit futurum infinitiui; tam affirmatiuum: quam negatiuum, adiuncto
+tamen illi subiunctiuo permissiuo cum, _dòmo_: v.g. _mairo còto de
+gozatta r[~e]domò_, quamuis ire debuissem, _mairu mài quer[~e]domo_,
+quãuis non essem iturus, _mairo còto de gozanacattar[~e]domò_, quamuis
+non debuissem ire: vtuntur etiam gerundio in do negatiuo ad
+significandum, nisi: v.g. _òracio uo mosa[~i]de cúna_, ne comedas nisi
+prius orationem feceris.
+
+Gerundium verò finitum in, _e_, significat actionem iam esse factam:
+v.g. _mèxi cúte còi_, venias post prandium, _còno qiõga cait[~e]
+gozàru_, hic liber est scriptus, _chichi ni fùmi uo caca[~i]de
+cuiaxi[~u]gozaru_, p[oe]nitet me non misisse Epistolam patri tuo, _còno
+qiõga cait[~e] gozaranu_, non est scriptus hic liber.
+
+Postposita particula, _nagàra_, radicibus verborum, quando subsequitur
+verbum significans actionem repugnantem aut aduersatiuam, facit
+gerundium in, do: v.g. _Tõganin Deus iòri bàcutài no go uon, ò uqetate
+matçuri nagara; caiette somùqi tatematçuru_, peccatores recipiendo vel
+etiam si à Deo accipiant benefitia maxima, loco gratitudinis; ipsum
+potius offendunt, _jesu Cristo Deus de gozàri nagàrà, fito ni tàixitè
+cruzni càcaraxerareta_, Iesus Christus c[~u] esset Deus crucifixus est
+propter hominem: postponitur etiam, _nagàrà_, nominibus: v.g. _quantai
+nagarà_, quamuis sit inurbanitas, _sannin nagara_, tres simul, vel etiam
+si sintres, _aqiraca nagara_, quamuis sit clarum, hic, _aqiracana_
+amittit, _na_, & sic in adiectiuis quæ finiuntur in _na_.
+
+Postposita particula, _iàsui_, radicibus verborum tam actiuorum; quam
+passiuorum facit illas supinum in, _tu_, v.g. _iòmi iasui_, facile
+lectu, _còrosare iasui_, facilis occisu, ad idem tendunt hi modi
+loquendi, _iúte uà uosoroxij_, est dictu tremendum, _mite ua
+fux[~i]guina_, est res admirabilis visu, _iú uo mò uosoroxij_, est dictu
+tremendum.
+
+
+
+
+DE ADVERBIIS.
+
+
+_Caput primum._
+
+Ex adiectiuis finitis in, _ai_, fiunt aduerbia conuertendo, _ai_, in,
+_ó_, v.g. _fuc[vo], _profundè, ex finitis in _oi_, conuertendo illud in,
+_ô_, v.g. _caxico_, prudenter, ex finitis in, _ei_, conuertendo illud
+in, _eô_, v.g. _x[~i]gueo_, frequenter, ex finitis in, _vi_, conuertendo
+illud in, _ú_, v.g. _aiau_, periculose, ex finitis in, _ij_, conuertendo
+illud in, _iú_, v.g. _cauaiú_, miserabiliter.
+
+Fiunt etiam alia aduerbia postposito, _te_, radicibus verborum v.g.
+_sàdamète_, determinate, vel probabiliter, _aràvarete_, manifeste &c.
+
+
+_De aduerbijs locorum._
+
+Octo sunt aduerbia interrogandi, _[~i]zzucu_, _[~i]zzucàta_, _donata_,
+_doco?_ _dochi?_ _dòchira?_ _dòno tocòro_, _dòno fo?_ & significant quem
+locum? postponuntur autem illis particulæ, _va_, _no_, _ni_, _[~i]e_,
+_vo_, _cara_, & _iori_, secundum casuum exigentiam: v.g. vnde? quo?
+quam? qua? vbi, &c. postponi etiam illis potest, _màde_, quod significat
+terminum vsque: v.g. _docomade ie iqóca_, vsque quo ibis? & quando
+vtcumque interrogatur, ponitur particula, _ca?_ vel _zo_, & melius,
+_zo_, quàm, _ca_, si in oratione sit aliqua particula interrogatiua:
+v.g. _[~i]zzucu ie maitta zo_, quo iuisti, _dòno tocòro uo to uòtta zo_,
+quem locum transiuisti, _doco iori itta zo_, quà intrasti? _dòchi càra
+qita zo?_ vnde venit? _donata uà Pedro no iãdo zo_, vbi est domus Petri?
+_dòconi uòru zo?_ vbi vel in quo loco est? Respondetur multipliciter,
+_còno tòcoro_, _còto mòto_, _còre_, _conàta_, _còchi_, _còchira_,
+_còco_, _còco ra_, _còno cata_, _còno fò_, hic, _sòno tòcoro_, _soco
+moto_, _sòre_, _sònata_, _sòchi_, _sochira_, _sòco_, _socora_, _sòno
+càta_, _sono fo_ istic, _ano tocòro_, _aso co mòto_, _are_, _anata_,
+_achi_, _àchira_, _asocò_, _àsocora_, _àno càta_, _ano fó_, significat:
+illic, postponuntur his aduerbijs particulæ casuales. Aduerbia
+interrogandi cum particulis casualibus & postposito, _mo_, significant
+vbicumque: v.g. vel quacumque, vel quocumque: v.g. _donotocòro ièmò
+tòuoro_, transibo quocumque, _doconimo_ vbicumque, _dòco cara mo_,
+vndequaque. Si verò loco, _mo_, postponatur, _nàri tomo_, significat
+quemcumque locum diuisiue: v.g. _dòcoie nàri tomò mairo_, ibo ad
+quemcumque locum diuisiue: idem significat, _coco zo_, cum eisdem
+particulis casualibus & possunt poni inter, _doco_, &, _zo_, v.g. _dòco
+ni zo àru fõdon[~i]_, si quidem est in aliquo loco, _còco caxicò_,
+significat hic & illic, _doco mo caxico mo_, significat omnem locum.
+particulæ casuales solent poni ante _mo_, v.g. _do còni mo caxico ni
+mo_, in omni loco, aduerbio verò antecedenti postponuntur v.g. _còco
+càxico ni_, hic & illic, _còco caxico ie dòco_, _caxico iori_ &c.
+
+Particula, _vie_, significat supra; petit ante se suppositum in
+genitiuo: v.g. _fàndai no uie ni uoqe_, pone supra mensam, _còno uie uà
+gozàru mai_, non erit supra hoc: idest melius, _sono uie ni_, circa
+istud, _sòno, uie no sàta uo catàriare_, narra quæ circa hoc sunt, _còre
+ua [~i]zzure iori mò uie de gozaru_, non inuenietur, quid hoc superius:
+idest hoc est supremum, _xita_, significat: infra: & regit eosdem casus,
+quos præcedens: v.g. _fandai no xitani uòqe_, pone sub mensa, _micotõba
+no xita iori_, quando rex: v.g. finiuit loqui, _uoxita uo cudasarei_,
+det mihi vestra dominatio reliquias sui potus, quæ superauerunt.
+
+Particula, _sòba_, significat, latus & regit ante se genitiuum: v.g.
+_fito no sòba uò fanaruru_, separat se à latere alicuius.
+
+_Maie_, significat ante: & regit ante se genitiuum: v.g. _fito no maie
+uo touoru_, transeo coram alio, _cac[~u]gò no maie_, secundum
+dispositionem, _funbet no maie_, sicut credo vel cogito, vel iuxta
+sensum.
+
+_Mauari_, significat circum circa in giro: & regit ante se genitiuum:
+v.g. _igl[~e]sia no ma uari ni tçuchi uo nãgue sutçuru na_, ne proijcias
+terram in circuitu Ecclesiæ.
+
+_Vchi_, significat intra, & si ante se habet substantiuum debet esse in
+genitiuo: v.g. _iglesia no uchi_, intra Ecclesiam, _ano fito ua; fito no
+uchi de uanai_, ille homo non est inter homines, idest non est homo,
+_fùtacùchi cúta còto ua, cúta uchi deuanai_, comedisse duas buccellas,
+non est comedisse.
+
+_Foca_, significat foras, vel extra: & petit ante se genitiuum: v.g.
+_iglesiano foca ni_, extra Ecclesiam, _fòcaie iqe_, exi vel eas foras:
+aliquando loco particulæ genitiui, ponitur _iori_, v.g. _Deus uonãgo
+ichinin iori foca tçucùri tamauànu_, Deus non creauit nisi vnam
+mulierem; idest nullam formauit extra vnam, _Tèngu fito ni àcu uo
+susumùru iòri fòca uà, nài_, Dæmon nihil facit nisi persuadere peccata
+hominibus, _goxo uo tàsucàru tàme baptismo uo sazzucàru iòri fòca bechi
+no mich[~i] ga nai_, non est alia via ad saluandum hominem extra
+baptismum; idest, absque baptismo nemo potest saluari, _Deus no gracia
+iori foca_, absque dei gratia.
+
+_Naca_, significat medium in quantitatibus continuis vel discretis v.g.
+_qinò nàca ni_, in medio ligni, _fito no nàca ni_, in medio hominum.
+
+_Nacaba_, significat medium in rebus successiuis: & vtrumque petit ante
+se genitiuum: v.g. _dangui no nàcaba ni_, in medio sermonis, _sòre uo
+qijte, nacabà uà uosore; nacàba ua aqirete ita_ audiens istud, & metuit
+& expauit, idest medium tempus consumpsit timendo &c.
+
+_Ato_, significat retro, & regit ante se genitiuum: v.g. _sonatà no àto
+càra mairo_, veniam post te, idest, te sequar.
+
+_Vàqi_, significat latus: et petit ante se genitiuum: v.g. _Pedro no
+uaqi_, ad latus Petri, _misa no uaqi_, finita missa, _còno uaqi_ his
+diebus præteritis, omnia prædicta aduerbia requirunt post se casus quos
+petunt verba quibus subsequuntur.
+
+
+_Aduerbia ad causam interrogandum & responendum._
+
+Quare? vel qua de causa interrogatur multipliciter: v.g. _nàjeni_,
+_nàjoni_, _nàni xini?_ _nàni tote cà?_ _nàni no iuie ni?_ _nànto xita
+coto ni?_ _nani nò xisài ni iotte?_ quomodo? dicitur, _nànto xite?_
+_nànto ioni icàni to xite?_ Respondetur autem, quia vel ratio est: v.g.
+_sono iuie ua, nà jeni to iúni_, Quia, vero, etiam dicitur, _tocorõ de,
+fodoni, ni iotte, sacàini_, primum ex his tribus dicit multam
+causalitatem, secundum verò non tantam: tertium autem minorem.
+
+_Vie va_, significat: cum vel siquidem: v.g. _tõganai vie ua
+q[~i]zzuca[~i] ga nai_, non timeo, quia, vel siquidem non habeo culpam,
+eundem sensum facit particula, _cara_, v.g. _caiõni irò vo misùru càra
+va; càcusu còto va irànu_, in vanum illud abscondere tentas, siquidem
+talem colorem ostendisti. Si quidem, quasi illatiuum significat, _tòqi
+va_, &, _xicaru tòqi va_: _sari na garà_, significat, sed; _sàri tòte
+va_, significat, adhuc: _sàru tòte ua_, significat, siquidem res ita se
+habet: _sàrú tòte ua_, _qicoienu còto gja_, si ita est, intollerabile
+videtur.
+
+
+_Aduerbia temporis._
+
+Quando interrogatur per, _itçu_, vel, _itç[~u]goro_, a quot diebus?
+interrogatur per, _icca sàqi_, vel, _icca maie_, a quot mensibus?
+interrogatur per, _icutçuqi saqi?_ a quot annis interrogatur per _nànnèn
+maie_, solet addi, _ni_, quando verbum illud petit, & semper in fine
+interrogationis ponitur, _ca_, vel, _zo_, & melius, _zo?_
+
+Respondetur: nunc, _ima_, vel, _tãda ima_, iam, _mo_, v.g. _moiqe_, eas
+iam, aliquoties dicitur, _tòqi ni iotte_, vel, _jibùn ni iotte_, postea
+dicitur, _nochi_, _sòre cara_, vel, _sòre iòri_, post istud, _còre
+càra_, vel, _còre iòri_, post hoc, _àre iòri_, vel, _àre càra_, post
+illud. Statim dicitur, _iãgate_, postea, vel deinceps dicitur, _[~i]ma
+iòri nóchi_, vel, _ima iori xite uà_, vel, _ima iori [~i]go_, vel,
+_j[~i]gòn[~i]go_: isto mane, dicitur _qèsa_, _connichi_, vel, _qio_
+hodie, _àsu_, vel, _miônichi_, cras, cras manè, _asa_, _àxitatô_, vel,
+_àsatòcu_, cras nocte, _miònia_, antea, _ijen_, vel _saqini_, heri
+_qinô_, vel, _sàcujit_, nudius tertius, _uototoi_, vel _fùtçuca sàq[~i]
+ni_, diebus præteritis _còno giu_, _còno fõdo_, vel, _xenjìt_, vice
+præterita: idem _xendo_: vice futura, _còndo_, ab hinc duobus diebus,
+_asàtte_, vel _miõgo nichi_, post tres dies, _xiasàtte_, vel _mió mió
+gonichi_, _qiônen_, vel, _còzo_, anno præterito, hoc anno, _còto xi_, a
+tribus iam annis, _vòto tòxi_, vel, _uotõdoxi_, ab hinc vero quatuor
+annis. _sanuruuotõdoxi_ statim, _tàchi màq[~i]_ vel, _socuij ni_,
+_sunauàchi_, statim profecto, _tànteqi_, in illo momento.
+
+_Itçumade?_ vsque quando? _itçu mademo_; semper, _itçu càra_ a quo
+tempore, _itçu iori_, ex quo tempore?
+
+
+_Aduerbia negandi._
+
+_Iia_, vel, _iia_, significat non, _só deuanai_, non est ita, _iccana_
+vel, _iccanàgueni_, nullatenus, _iùme iùme_, neque per somnium,
+_sàrani_, vel, _ichiien_, _càtçutè_, vel, _càtçute mòtte_, nullo modo,
+_iò_, _iòmo_, vel, _iòmo iòmo_, neque cogitatione: v.g. _càtçute màiru
+mài_, nullatenus ibo, _iòmo sõ uà gozàru mài_ neque in mentem venit quod
+ita erit; & quando prædicta iunguntur affirmatiuis faciunt etiam sensum
+negatiuum, v.g. _iomo iòmo to mòxitar[~e]ba uo màiri atta_, cum dixisses
+te non iturum: iuisti tamen, _io mairõ_, nullo modo ibo.
+
+
+_Aduerbia affirmandi._
+
+_Nacanàca_, significat: ita est, _uõ_, significat: sic, assentiendo,
+_gueni_, vel, _gueni gueni_, sic se habet: v.g. _guèni guèni só mo aró_,
+absque dubio sic se habebit res, _chõdo_, significat, omnino, _saiòni_,
+_sòno bùn_, _sòno gotòqu_, _so de gozaru_, _sò re sóre_, _màsso gia_,
+_xicato_, significat: ita est, _mòttomò_, significat rationabiliter
+loquitur, _guioi nõ gotoqu_, sicut vestra credit vel dicit dominatio,
+_mòchi ron_, non cadit sub dubio seu disputatione, _nàcanàca nàru còto
+de gozaranu_, verè non est possibile, _nàcanàca no còto_, res est cui
+potest assentiri seu fides adhiberi, _ma còtoni_, verè, & idem
+significat, _xinjit_, vel, _xinjit ni_, _xei mon_, iuramento confirmo,
+_isasàca_, vel, _isasàca mòtte_ nec parum quidem, _issai_, vel _ixxet_
+nulla via, nullo modo, & quando iunguntur affirmatiuis significant
+prorsus in omni euentu.
+
+
+_Adverbia comparatiua._
+
+_Iori_, _iòri mò_, _iòri mo nà uo_, significat magis comparatiuè,
+persona quæ comparatur est in Nominatiuo; cui comparatur verò in
+ablatiuo cum aliqua ex prædictis particulis: v.g. _Pedro ua juan iòri mò
+gàcuxõ de gozaru_, Petrus est doctior Ioanne, _sòcoie nobòru iòri ua;
+mairan[~u]gà màxi gia_, melius est non ire; quam ascendere isthuc:
+_gotòqu_, _màma_, _ioni_, sunt aduerbia similitudinis, & petunt ante se
+genitiuum rei cui fit assimilatio: v.g. _Pedro nõ gotòqu_, sicut Petrus.
+Si verò antecedit verbum, non petunt genitiuum; v.g. _no iama ìe nari
+tomò qi tài màmani qite, nurur[~e]ba, n[~u]gui suteraruru_, etiam si
+eant ad campum, & montes se induunt, si volunt tali veste, & illam
+exuunt quando aqua madefit, _uomô màma ni_, vel, _uomô gotoqu_ vel,
+_uomô ioni_, sicut cogito, _conòmi no màma ni_, secundum desiderium & ad
+eius mensuram, _fõdo_, significat, tantum, vel quasi; & proportionem:
+v.g. _qifèn ano fito fõdo no gacuxõ de gozaru_, tam doctus es sicut
+ille, _farãga c[~u]dàru fòdo iòi_, in tantum erit sanus in quantum
+habuerit ventris purgationem, _m[~i]chi uò arùqu fõdo cutabituru_, sicut
+ambulo, sic deficio, _acai fõdo ioi_, dum est rubicundius, tanto melius,
+_xinùru fõdo no vazzurai de uanai_, infirmitas hæc non est ad mortem
+idest mortis causatiua, _funè ni mesaruru fõdo narãba uare mo
+nor[vo]zu_, si vestra dominatio tantum vult assumere laborem vt nauim
+ascendat; ego etiam, _tamèxi mo na[~i] fõdo ni atta to mosu_, dicunt
+fuisse sicut numquam, _uoqùru fòdo arãba sòre [~i]e mairozu_, si ad
+statum perueniam quod possim è lecto surgere conferam me ad vos,
+_chicara no fõdo uo mite_, videns virium proportionem _fõdo n[vo]
+tçuita_, peruenit in istanti, _core fõdo_, sicut hoc, _sòre fõdo_, sicut
+istud, _are fõdo_, sicut illud, _uouoi fõdo_ dum magis vel plus,
+_sucunai fõdo_, dum minus.
+
+
+_Aduerbia superlatiua._
+
+_Vie_, significat rem supremam: v.g. _christianno voxiie ua izzure iori
+mo vie de gozaru_, doctrina & fides Christiana est suprema & super
+omnes, _còno saqe no uie ua nai_, non est melius vinum isto, _ichi_:
+vel, _daiichi_, est supremum & vnicum: v.g. _gacuxo no uchi ni Sancto
+Thomas daiichi de gòzatta_, inter doctores Sanctus Thomas est supremus,
+_còre ua are iori vie_, hoc est superius illo: particula _xita_, est
+contraria, _uie_, significat verò inferius: v.g. _xiqitai ua anima iori
+xita de gozaru_, corpus est inferius anima.
+
+
+_Aduerbia intensionis & exaggerationis._
+
+_Ichidan_, _chicãgoro_, _icco_, significant valde: v.g. _chicãgoro no uo
+cocorõ gaqe de gozaru_, est maxima cura & diligentia, &c. _sòre ua icco
+uarui còto gia_, istud est valde malum, _bexxite_, significat præcipue,
+_tòri uaqe_, significat in particulari vel specialiter, _coto no foca_,
+raro, & extraordinarie, _icanimo_, significat, valde, _amari ni_,
+significat nimis, & denique ex adiectiuis formantur aduerbia modo supra
+dicto, quæ significant aduerbialiter quod adiectiua absolute: v.g. ex
+_fucai_, quod est, profundus, a, um, _fuco_, quòd est profundè, _icani
+mo xizzucani_ valde quietè, _tani coto ni_, extraordinariè,
+_xitàtacani_, vel, _gui[vo] sanni_, formidabiliter idest, nimis: vide in
+dictionario.
+
+
+_Aduerbia congregandi._
+
+_Voxinabete_, significat vniuersaliter, _sôbet_, communiter, idem
+significant, _tçune ni_, vel, _sojite_, _feijeini_, regulariter,
+_voioso_, _tabùn_, _vòcata_, _ioppõdoni_, significant: maiori ex parte,
+_qèccu_, vel, _caiette_, significant, quin potius, vel, _tènnèn_,
+significat forsan, & idem significant, _xijen_, _icasama_, _sadamete_,
+significãt probabiliter, _canarazu_, absque dubio indefectibiliter,
+_moxi xjien_, si forte, _xotocu_, naturaliter, _jinen_, casu, _x[~i]dai
+x[~i]dai ni_, vel, _jèn jenni_, vel, _x[~i]dai ni_, successiue leniter,
+_vonozzu cara_, per se absque alio.
+
+
+_Aduerbia concludendi, & aduertendi._
+
+_Ficqio_, &, _tçuini_, denique, significant vel resolutorie, _tç[~u]go_,
+summatim, _no no_, non est ita? v.g. _nòno icani qicaxeraruru ca?_ heus
+audis ne? _moxi_, significat etiam; heus; sed est vocabulum vrbanum:
+v.g. _moxi Padre sama_, heus reuerende pater, _iare_, est etiam heus,
+cum inferioribus: v.g. _iare taro quaja to ii[~e]ba_ dicens heus, _taro
+quaja_: _iai_ significat etiam heus sed vilius: v.g. _iai sochi ga mòtta
+mono ua nan[~i]zo?_ heus tu quid est quod portas? idem significat, _ia_,
+v.g. _ia uo tòno barã domo ùa nani uo sauãgu zo?_ heus vos milites &
+boni homines quid turbamini? ad eundem sensum tendit particula _ai_,
+postposita v.g. _izzure mo mina iô qiqe ai_, heus vos omnes audite.
+
+Particula, _ca_, &, _zo_, vt supra dictum est, sunt ad interrogandum,
+idem habent munus particulæ _ia_, vel _caia_, sed sunt humiliores: v.g.
+_are ua tare caia?_ quis est ille? _còre ia_, istud? _io suqète tare ca
+ua tazzuneô zo?_ cum sit alta nox, quis potest interrogare, & querere?
+_sòre de aro ca toiú còto gia_, dico, si erit istud?
+
+_No?_ petit consensum: v.g. _gozaro ca no?_ veniet? nonne? _mairo to
+uoxerareta no?_ non ne dixit quod veniet? _no Pedro dono?_ non est ita
+domine Petre? _na_, significat idem; sed est inferius: v.g. _soqiita
+na_, nonne sic audisti? aliquando in oratione vbi est _zo_, solet poni;
+_baxi_; quæ est particula dubitandi: v.g. _nanto xita xisa[~i] de baxi
+gozaru zo?_ qua de causa accidit hoc? _sate nanto iú uoqiacu de baxi
+gozaru zo_, quomodo vocatur vester iste hospes? _goiô bax[~i] gozaruca?_
+est ne tibi aliquid necessarum?
+
+_Io_, vel, _zo_; affirmant & faciunt cadentiam orationis: v.g. _caita
+zo_, vere scripsit, _maitta io_, venit profecto, _sono tòqi vare va ichi
+dan varui tçucai vo xiraruite gozaru io_, tunc profecto mala nuntia seu
+missiones sum exequutus & feci, _bacari_, significat, tantum vel
+solummodo, _sóre ni cãguitte_, istud solum, _còre ni cãguirazu_, non hoc
+solùm: aliquando, _bacari_, significat magis vel minus: v.g. _fiacu
+bacari_, erunt centum, _fiacunin bacari corosareta_, centum vsque
+homines occisi sunt, _nó_, _nóte_, _naqu xite_, _naqute_, significant
+sine vel absque: v.g. _raxximo nó_, absque ratione, & ordine, _cac[~u]gò
+nó_, absque præparatione.
+
+Aduerbia sonus sunt multiplicia secundum diuersitatem quam Iapones in
+sonus terminatione percipiunt, & illis, _to_, solent postponere: v.g.
+_ua ua to xite_, vociferando dicentes, _ua ua_, & si illis postponitur
+_meqi_, _u_, significat talem strepitum facere: v.g. _ua meqi_, _u_, va
+dicendo vociferor, aris, &c.
+
+
+_De Præpositionibus casuum._
+
+_Tame_, significat ni vel erga: v.g. _sonata no tame_, tibi, regit ante
+se genitiuum, _nanno tame_, ad quid, _nanini naru ca?_ ad quid est?
+_nani ni xô ca?_ ad quid faciendum habes illud? _nani no iô ni tatçu
+ca?_ ad quid est necessarium vel proficuum? _maitte no iô ua?_ quæ ne
+necessitas est eundi?
+
+_Tai xite_, significat propter, vel contra, v.g. _tèngu ni tai xite
+te qito_, pugnare contra dæmonem & ei resistere, _Deus ni tai xite
+c[~u]guio uo coraiuru_, suffero labores propter Deum, _uie iori_,
+significat etiam, propter: v.g. _uon jifi no uie iori_, propter suam
+misericordiam.
+
+_Ni iotte_, significat etiam causam quare: v.g. _Deus iori fito
+no jento acu ni iotte go fempô uo ataie saxerareozu_, deus tribuet
+hominibus secundum opera eorum vel vitij vel virtutis, deriuatur
+a verbo, _ìori_, _u_.
+
+_Nitçuite_, significat circa, & deriuatur a verbo, _tçuqi_, _u_, v.g.
+_còre ni tçuite_, vel _còre ni tçuqi_, vel, _còre ni tçuqete_, circa
+hoc, _sono gui ni uoite ua zonjenu_, nihil circa hoc negotium scio,
+_vôxe uamottomo nar[~e]domo uãgami ni totte ua cana[~i] gatai_, bene
+dicit vestra dominatio; sed quod ad me attinet est factu difficile,
+_Dai quan ni itatte ua ichinin bacari sadameio_, quod ad economum seu
+maiordomum attinet, vnum tantum constitue, hæc omnia, _itatte_, v.g.
+_tòtte_, sunt gerundia verborum sicut & præcedentia, etiam solent
+dicere, _Padre còto ua_ quod at patrem attinet, _uarera còto ua_,
+circa meas res, vel quod ad me attinet, _xitãgatte_, vel, _xitãgote_,
+significãt iuxta, & sunt gerundia verborum, _xitãgari_: _u_, &,
+_xitãgai_: _ó_, vnde ante se regunt datiuum sicut eorum verba: v.g.
+_guioi ni xitãgatte_, vel _xitãgote_, secundum quod vestra præcipit
+dominatio, _x[~i]dai_ significat idem: v.g. _conata x[~i]dai_, sicut
+volueris, aliquando etiam iungitur radicibus verborum: v.g. _mairi
+x[~i]dai_, secundum quod venerit vel eius aduentum.
+
+_Ni_, significat locum in quo: idem significat, _ni uoite_, sed
+permanentius: v.g. _go fatto ua fuximi ni uoite uôxe[~i]dasareta_, hanc
+legem posuit dum esset in ciuitate, _fuximi Bungo funai ni itatte_, in
+ciuitate Funairegni de Bungo: _iglesia ni uoru_, est in Ecclesia.
+
+_De_, significat locum in quo fit actio: v.g. _mich[~i]de Pedro ni
+uota_, obuium habui Petrum in via; eædem particulæ, _de_, & _uomotte_,
+significant instrumentum quo fit actio, _bo uomotte Pedro uo uchi
+coròita_, ligno Petrum cecidit, _Padre sama catararetãde nauo qicoieta_,
+ex quo pater reuerendus illud narrauit melius fuit intellectum, _necqi
+de xinda_, mortuus est febri.
+
+_Cara_, vel _iori_, significat locum e quo vel vnde: v.g. _iglesia
+cara_, ex Ecclesia, etiam dicunt, _fune cara maitta_, nauigio venit,
+_cachi cara maitta_, pedes venit, _fun[~e] de maitta_, est idem quod,
+_fune cara maitta_, & _fune ninotte maitta_: _fana cara me cara
+m[~i]guruxij mòno gia_, est indecorus oculis & naribus, _iori_,
+significat locum per quem: v.g. _sama iori faitta_, intrauit per
+fenestram.
+
+_Tomoni_, significat; simul: v.g. _sonata to tomoni mairozu_ ibo simul
+tecum, _mosu to tomoni_, simul ac dixit.
+
+_Ie_, significat locum ad quem: v.g. _achiie mairo_, ibo illuc, _mi aco
+ni saite mairo_, vel _miiaco ni muqete mairo_, ibo directe ad curiam,
+_miiaco no cataie noboru_, ascendit ad curiam idem, _miiaco no foie
+noboru_, aliqui dicunt, _miiaco no iori_, vel _miiaco sana_, vel _miiaco
+no gotoqu noboru_, sed non est bonus loquendi modus; sed rusticorum.
+
+_De_, significat materiam ex qua: v.g. _tçuch[~i] de ca uàra uo
+tçuquru_, regulas ex terra vel limo construere, _nànde còre uo tçuqùru
+ca?_ ex quo hoc facis?
+
+_Vie_, significat erga: v.g. _zu[~i]bun cõdomo no vie uo fito ni mo nàxi
+marasuru ioni to cocòrõ gaqe marasuru_; omni cum diligentia curo circa
+vel erga vel de meis filijs, quomodo illos faciam homines.
+
+_Sònata no fiquànno vo saiban mesarèio_, habeto curam de tuis seruis?
+
+_Made_, significat vsque: v.g. _àsumade_, vsque mane, _inòchi vo vxino
+màde aru mai_, non ammittet vitam vel vsque ad vitæ amissionem non
+perueniet, _sore made vomoi mo ioranu gui gia_, non peruenit ad mentem
+meam vsque adhuc, _cocòro zaxi ar[~e]ba canauanumàde mo xei uo iruru_,
+quando aliquid desideratur, adhibentur vires vsque ad impossibile, _mosu
+màde mo nai_, non est necessarium dicere, _còno tocòro made maitta_,
+hucusque veni.
+
+
+_De coniunctionibus & diuisionibus._
+
+_To_, significat, &, copulatiue: v.g. _Pedro to juanto Nagasaqi ie ita_,
+Petrus & Ioannes ierunt Nagasaquim, _còreto, àreto uò tòru_, accipio hoc
+& illud: idem significat, _mo_, v.g. _Pedro mo juan mo Nãgasaqi càra
+mõdotta_, Petrus & Ioannes redierunt e Nagasaqui, _naqu mono mo ari,
+uaró mòno mo aru_, sunt qui flent, & sunt etiam qui rident, _mo_,
+anteponitur multoties negatiuis: v.g. _nan[~i]goto mo gozaranu ca?_ non
+est aliquid noui?
+
+_Mata_, significat, &, vbicumque inueniatur siue inter nomina siue
+verba, _ca_, significat vel: v.g. _Pedro ca; juan ca coi to iie_, dic
+quod veniat Petrus vel Ioannes, _arui ua_, significat etiam vel: v.g.
+_arui ua Pedro, arui ua juan_, vel Petrus, vel Ioannes, _arui ua iomu,
+arui uamono uo caqu_, vel lego vel scribo, _moxi ua_, significat si vero
+in medio orationis: v.g. _móxi ua càn[~e]ga nai naraba_, &c. si vero non
+habeas argentum.
+
+Ad orationum contexturam vtuntur, _mata ua_, & præter hoc vel præterea:
+v.g. _arui ua iama[~i]ga uocoru ca, mata na isõgui no fumi qita ruca
+&c._ vel accidit aliqua infirmitas, præter hoc si venit aliqua epistola.
+
+_Xicar[~e]ba_, significat: cum res ita se habeant, _sari nagara_, sed,
+_so aru tocorõde_, cum hoc ita sit, _saraba_, cum hoc ita se habeat,
+_sar[~e]ba sareba_, cum ergo &c. _ca?_ significat si? v.g. _maitta
+camiio_, vide si venit vel iuit, _maitta ca xiranu_, nescio si venit,
+_iara_, significat si diuisiue: v.g. _fito iara chicuxo iara xiranu_,
+nescio vtrum sit homo vel animal, _nani iara to moxita_, nescio quod
+dixerit.
+
+Ex particulis, _nanica_, & _tòcàcu_, intromissis alijs particulis fiunt
+quædam quasi disiunctiua seu exageratiua: v.g. _nani ia ca ia?_ quæ res?
+idem est, _nani iara ca iara?_ & _nànto iara cato iara?_ _nanto xite_,
+_ca toxite_, quomodo? _nanto mo ca tòmo_, nullo modo, _nanimo camo_,
+nihil, _nan[~i]goto mo cãgotomo, mina içtuuari naruzo_, denique omnia
+sunt mendacia, _nanino cano_ vel _nanto, xite cato xite_, modus
+excusandi se, _nanino cano to iúte_, dicens hoc & illud, _domo como_,
+quomodocumque sit idem, _doxitema co xitemo doxite coxite_, faciendo
+diuersa hoc & illud, _do xôcô xô_, faciam hoc & illud.
+
+_Tòmo cacumo_, in omnibus, idem, _toni cacuni_, idem etiam _tonimo
+cacuni mo_, vel _totemo cacutemo_, _còre to ij_; _care to ij_, hoc &
+illud dicens: idest excusationes, _care core_, illud & hoc _coco
+caxico_, hic & illuc, _conata canata_, istic & illic, _uomo xirô,
+uocaxu_, accommodando se quasi adulari.
+
+Si particula, _mòtte_, postponatur particulis, _catçute_, _isasaca_,
+_tomoni_, _nani_, _nani nani iori_, adiungitur illis efficacia &
+energia: v.g. _catçute motte so aru mai_, nullo modo erit talis res.
+
+
+_De interiectione._
+
+_Sate_, _satesate_, _satemo satemo_, sunt interiectiones admirantis:
+v.g. _satemo Deus no uôqinaru uonjificana_, o magna misericordia Dei!
+
+_Auare_, est interiectio miserentis: v.g. _auare mutçucaxij iò no naca
+cana_, o mundus repletus miserijs.
+
+_Ha!_ est interiectio p[oe]nitentis: v.g. _Ha fax[~i] demo
+uomoxiro[~i]ga; tocoro niiote qi coie canuru_, o labor sonus & cantus
+harmonia est valde gracilis; sed non bene omnia percipiuntur!
+
+_Iara!_ est interiectio tam lætitiæ; quam tristitiæ: v.g. _iara iara
+medetaia_, o quantum gaudeo &c. idem, _ia_, v.g. _satemo iiaxii
+iatç[~u]baraia!_ o quam vilis & abiectus! _gongo dodan fux[~i]guina
+xisai cana!_ o quam rara & ridicula ratio, _iei_, est interiectio
+mirantis: v.g. _iei Padre sama coch[~i] gozaru io_, hic est pater!
+
+_Hat_, est interiectio eius qui repente terretur: v.g. _Benqei core uo
+mite hat coto naxi to zonjite, sono màma niuani bo uo voroxi &c._ videns
+hoc benquei &c.
+
+
+_De sintaxi, & casibus, quos regunt verba._
+
+Nominatiuum ponitur in principio orationis, verbum vero in fine, reliqua
+vero secundum cadentiam: v.g. _Pedro ua Nagasaq[~i] de xutrai xita iqi
+iqi nitçuite juan uo coroita_, Petrus occidit Ioannem circa vel in
+quadam differentia quæ fuit vel accidit Nagasaqui: in aliquibus
+orationibus grauibus verbi suppositum ipsi postponitur; sed raro: v.g.
+_tare mo cana uanu futari noqimi ni tçucoro còto ua_, nemo potest duobus
+dominis seruire hic, _tçucoru coto ua_, est verbi suppositum, _core
+niiote tanomi tatematçuru itçumo uirgen_, ideo præcor Beatam Mariam
+semper Virginem.
+
+Orationes subiunctiui absoluti vel permissiui, & infinitiui, &
+conditionales, & causales semper anteponuntur orationibus de indicatiuo
+aut imperatiuo; etiam si in linguis Latina aut Europæis non fiat sic
+sensus: v.g. _achi cara tomeraruru tomo; tomaru na_, ne remaneas etiam
+si illinc detinere te velint, _sòre uo qiitar[~e]ba, fara uotatete
+mõdotta_; cum hæc audisset, iratus reuersus est, _taxicani uqetamotta
+niiotte coso, móxi ãgue maraxitare_, fideliter audiui, ideo retuli &
+dixi, _faio gozatta raba uo mexi uo xinjô mono uo_, si cito venisses
+dedissem tibi manducare.
+
+Quando sunt duo verba eiusdem temporis in eadem oratione, primum erit in
+gerundio in, _e_, & alterum in tempore quod orationis sensus exiget:
+v.g. _còre uo tòtte giqini m[~i]ga como no ni uataxe_, accipe hoc &
+trade seruitori meo.
+
+Quando vero fuerint duæ vel plures orationes quæ loquuntur de eodem
+subiecto vel tempore, solum vltimum verbum erit in tempore, quod
+orationis sensus petierit, reliquorum vero aliqua erunt in radicibus:
+alia autem in gerundio in, _e_, v.g. _touazunba cotaiezu, voxe arãba
+tçuxxinde qiqe_, si te non interrogant ne respondeas, si loquantur
+audias attente, _Deus no uo còto uo macotoni uqe, go uoqite mo cama
+ua[~i]de, sono mama inferno ni uochita_, neque in Deum credidit, neque
+eius mandata seruauit: vnde cecidit in infernum.
+
+Verbum semper sequitur in honore tertiam personam; nullus enim se
+honorat nisi sit rex qui de se loquens dicit, _iorocõbi ni nòboximesu_,
+gaudeo plane.
+
+Quando fuerint multa adiectiua omnia erunt aduerbialiter præter vltimum:
+v.g. _qe nango, iro curô, icanimo vtçucuxij mono_, erat speciosus valde,
+habens pilos longos & colorem nigrum &c.
+
+Anteposita particula, _to_, verbis significantibus intelligere, credere,
+audire &c. supplet verbum sumes fui, & significat: quod v.g. _fito
+tozonjita_, credidi vel putaui quòd esset hommo, _qixó uo jennin to vomo
+uô ca?_ credam te esse sanctum? _amata no fito xini no fonouo ni moiuru
+uo misaxerareô_, videbis multos homines iræ flammis ardentes: hic
+suppletur particula _to_, a _moiuru uo_ quod est verbi suppositum.
+quando verò postponunt, _mo_, ad _to_, tunc tenaciter affirmant quod
+dicunt: v.g. _mairõ tomo_, omnino ibo vel iturus sum.
+
+Particula, _to_, in primo sensu suppletur aliquando per, _ioni_, v.g.
+_ãgueta ioni gozaru_, dicunt quod obtulit, _ica iona fito to ua xiranu_,
+nescio quis homo sit ille. aliquando verbum substantiuum supplet
+particulam, _to_ v.g. _mairó de gozatta_, dixit quod veniet, _xô de ua
+naqer[~e]domo_, quamuis non dico quod faciam &c.
+
+_Qiuzo còre uo mite, ima uo sa[~i]go no coto dear[~e]ba_, videns hoc,
+_quiuzo_, credensque horam mortis iam adesse, hic verbum substantiuum
+supplet, _to_ & fit quasi verbum actiuum regens accusatiuum, _ima uo_,
+supplet etiam, _to_, particulæ, _sona_ & _guena_ significat, videtur,
+_sona_, postponitur radicibus verborum: v.g. _dèqi sona_, videtur quod
+finietur, si verò illi postponatur aliquod verbum substantiuum mutat,
+_a_, in, _i_, v.g. _dèqisonigozaru_ videtur quod perficietur, _deqi soni
+mo zonjenu_, credo quod non finietur: postponitur etiam, _sona_,
+adiectiuis finitis in, _i_, & illud amittunt: v.g. _io sona_, videtur
+bonus vel quod sit bonus, _x[~i]guè sona_, videtur frequens, _a iau
+sona_, videtur periculosum, si vero postponatur adiectiuis finitis in,
+_na_, illud amittunt, v.g. _aqi raca sona_, videtur quod sit clarum.
+
+Particula, _guèna_, postponitur nominibus & verbis iam formatis: v.g.
+_maittã guena_, credo quod venit: si autem illi postponatur verbum
+substantiuum, mutat, _a_, in, _i_, v.g. _maittã guen[~i] gozaru_, credo
+quod venit, _sona_, significat, videtur, & _guena_, credo; sed vtraque
+vtuntur in occasionibus in exemplis expressis.
+
+Quando in oratione fuerint duo præterita, primum erit in tali voce;
+secundum vero in voce futuri: v.g. _qesa càra so uôxerareta raba mo faia
+de maraxô_, si hoc dixisses isto mane; iam recessissem.
+
+Quando refertur id quod alius dixit, dicitur hoc modo, _Padre mósàruru
+ua: iãgate sonatàie mairó to mosaruru_, Pater dixit se statim huc
+venturum, aliquando quando se excusant, solet suppleri, _to_, per _no_,
+v.g. _asu no_, _ra[~i]guàt no_, _nàndo to noburu na_ ne differas dicendo
+quod cras; vel mense venturo &c.
+
+Quando post, _n_, sequitur, _uo_, amittitur, _u_, v.g. _go uono uqe
+tatema tçutta_, benefitia accepi.
+
+Aduerbia semper anteponuntur verbis; præter aduerbia temporis, quæ in
+principio orationis constituuntur: v.g. _sore uo qijte iccó xicàri
+maràxita_, audiens istud iratus est valde, _qiô nen espana carà uatàttà
+tòqi_, quando anno præterito ex Hispania transfretaui: omne verbum
+requirit ante se nominatiuum expressum aut sub intellectum: v.g. _uare
+iqe_, uel, _iqe_, in quo subintelligitur, _uare_, vade, in aliquibus
+autem orationibus uidetur hæc regula deficere: u.g. _xisai uõba core ni
+uà mósàre maràxozu_, hic causam & rationem refert seu dabit: hic nullum
+uidetur nominatiuum, quin potius, _are ni ua_, est datiuum aut
+ablatiuum, _àre ni uà, nauo uoixri atta_, ille melius scit: in ista
+etiam oratione, _àre ni ua_, deberet esse nominatiuum, _cacàru uo ni uà
+cõganeno cusari uo icus[~u]gi mo tcuqeta dõgu de gozàru_, pro torque
+habebat catenam auream multos habentem anulos.
+
+_Core ni ua gozonji aru mài_, non cognoscet de hoc uestra dominatio,
+hic, _còre ni ua_, uidetur supplere accusatiuum quod regit, _zonji_:
+_uru_.
+
+Verbum impersonale aut infinitum petit ante se nominatiuum; u.g. _Pedro
+ua màitta to mósu_, dicunt quod Petrus uenit.
+
+Verbum, _iri_: _u_, pro indigeo, es, regit duo nominatiua, _rei_, &
+personæ indigentis: u.g. _uatacuxi uà còno càn[~e]ga iru_, ego indigeo
+uel habeo necessitatem huius argenti: etiam regit datiuum de persona:
+u.g. _sono tame ni ua càn[~e]ga iranu_, non indiget argento seu nummis.
+
+Verbum actiuum petit ante se accusatiuum pro supposito: u.g. _càne uo
+motànu_, non habeo pecunias.
+
+Aliqua nomina, _cobita_ seu _coie_, quæ ut supra dictum est, sunt
+m[~e]dicata a lingua Chinensi: regunt eosdem casus quos verba Iaponica
+quæ illis correspondent; v.g. _ni ua uo qenbut noa[~i]dani mèxi uo
+coxiraie io_, præpara cibum dum hortum videmus, hic nomen _qenbut_,
+regit accusatiuum, _ni ua uo_, quia, _mi_: _ru_, quod est video, es,
+regit accusatiuum, _fito ni guenzan suru_, est idem quod _fito ni uó_,
+obuium video hominem, & regit, _guenzan_, datiuum sicut, _ai_, _ó_.
+
+Quando vocabulum cobitum ex duobus componitur, cognoscetur esse verbum,
+si primum, verbi significationem habeat: v.g. _jóten_, est verbum, &
+significat in cælum ascendere, quia _jo_, est asc[~e]do, is, _tenjo_,
+vero est nomen, quia, _jo_, postponitur & anteponitur, _ten_, quod
+significat cælum.
+
+Verba passiua petunt ablatiuum pro persona agente: v.g. _Pedro carà
+còròsàreta_, occisus est a Petro, sed melius regunt datiuum: v.g. _Pedro
+ni corosareta_, _Pedro ua nusu bito ni càne uo torareta_, latrones
+furati sunt pecunias Petri.
+
+Sunt etiam aliqua neutra, quæ accusatiuum regunt sicut actiua: v.g.
+_xiqitai uo fanaruru_, discedere a corpore, seu mori _axi uo uãzzuró_,
+dolere pedes, &, _n[~i]gue uru_, pro eo quod est fugio, is, _nogàre_,
+_uru_, euado, is: _de_, _uru_, exeo, is: _nòqe_, _uru_, recedo, is:
+_touorì_, _u_: transeo, is: _nori_, _u_, nauigo, as, v.g. _caixo uo
+noru_, nauigo mare, _iuqi_: _u_, ambulo, as, _michi uo iuqu_, viam
+ambulo, _uo uari_: _u_ finior, iris, _mairi_: _u_; _x[vo]gui uo mairu_
+ad tabulam latr[~u]culariam ludo, _iorocobi_, _u_: _cocoro uo iorocòbu_:
+lætifico cor: _abi_, _uru_, _mizzu uo abiru_, lauo me aqua vel aquam
+supra infundo, _auàremi_, _u_, misereor, eris, _canàximi_, _u_, tristor,
+aris, _còie_, _uru_, transeo, is, _fabacari_, _u_, verecundor, aris,
+_facarai_, _o_, prouideo, es, _faxiri_, _u_, velo nauigo, as, v.g.
+_caixo_, vo, _faxiru_, velo mare nauigo; _fãgi_, _zzuru_, verecundor,
+aris, _fedate_, _tçuru_, secedo, is, _fe_, _uru_, transigo, is, v.g.
+_ficazu vo furu_, multos dies transigo, _dori uo fumaiuru_, fundari in
+ratione vel rationem pro fundamento habere, _itàmi_, _u_, doleo, es, _ma
+vari_, _u_, circuo, is: v.g. _còno còto vàri uo m[vo]xi mauattà_,
+multoties & per circuitum dixit nuntium, hic & ibi: idem significat &
+regit, _m[~e]guri_, _u_, _nãgusami_, _u_, recreo, as, _cocoro vò
+nãgusamu_, cor lætifico, as, _naqì_, _u_, ploro, as, _tasucàri_, _u_,
+saluo, as, _inochi vo tasucaru_, periculum vitæ euado, _goxo vo tasu
+caru_, saluari in uita futura, _tachi tçu_, recedo, is, v.g. _tocòro vo
+tatçu_, de sero locum vel a loco recedo, _tomurai_, _ó_, defunctis
+exequias facio, is, _vcãgai_, _õ_ dubitando inquiro, is, _voximi_, _u_,
+æstimo, as, _vràmi_, _u_, quæror, eris, _xinobi_, _u_, occulte expecto
+quasi insidiose: v.g. _fito nò mè vò xinòbu_, attendo siquis me videt,
+aliqua ex prædictis quæ requirunt accusatiuum loci, admittunt etiam
+ablatiuum cum particulis, _cara_, vel, _iori_, v.g. _tocòro vo tatçu_,
+est idem quod, _tocòro iori tatçu_, a loco recedo.
+
+Aliqua etiam sunt actiua verba quæ duos casus accusatiuos petunt: v.g.
+_fori_, _u_, _daxi_, _u_, _fanaxi_, _u_, _tate_, _tçuru_, v.g. _Pedro vo
+socò vo voi idaita_, Petrum eduxerunt ab isto loco: potest etiam regere
+ablatiuum loci: v.g. _Pedro vo socò cara voi daita_, aliqua petunt vel
+Datiuum vel accusatiuum v.g. _fito vo_, vel, _fito ni sanare_, _uru_ ab
+hominibus recedo, is, _Deus vo_, vel _Deus ni somùqi_, _u_, Deum
+offendok is, verba huiusmodi sunt, quæ significant timere, offendere, &
+recedere.
+
+Multa vero verba quæ significant auxilium præstare, commodum, damnum,
+obedientiam, superioritatem, subiectionem, seruitutem, victoriam, &
+similia, regunt Datiuum: v.g. _chiie saicacu ioni coieta_, excedit alios
+sapientia & industria.
+
+Verba verò dandi, & promittendi regunt accusatiuum rei & datiuum
+personæ: v.g. _fito ni càne vo curùru_, dare pecunias alicui.
+
+Multa sunt verba, quæ admittunt ante se radices alior[~u] verborum
+immutatas; & tunc prædictæ radices habent sensum quasi infinitiui: v.g.
+_qiqi faji me_, _uru_, audire incipio, is, verba vero sunt, _nare_,
+_urù_, assuefio, is, seu assuesco, is, & idem, _tçuqe_, _uru_, _fate_,
+_tçuru_, finior, iris, _narai_, _ó_, disco, is, _sòme_, _uru_, incipio,
+is, _tõdoqe_, _uru_, perseuero, as, vel prosequor, eris, _ate tçuru_,
+dirigo, is, _atàri_, _u_, casu reperio, is, _vaqe uru_, diuido, is,
+_càne_, _uru_, dificile possum, es, _soconai_, _o_, erro, as, _sumaxi_,
+_u_, perficio; is, _s[~u]goxi_, _u_, excedo, is, _fãgue maxi_, _u_,
+multum & intense laboro, as, _àqi_, _u_, fastidio, is, _tai_, volo, is,
+& _tomonai_, nollo, is, si vero radices verborum anteponantur adiectiuis
+finitis in _i_, faciunt quasi supinum in _tu_, v.g. _iòmi iasui_, facile
+lectu &c.
+
+Nomina numeralia si subsequatur illis nomen substantiuum debent esse in
+genitiuo: v.g. _fito tçu no tõga_, vnum peccatum, idem petit particula,
+_fõdo_, quando significat omnis, e, v.g. _àru fõdo no fito_, quotquot
+sunt homines, idem petit particula, _iori_ v.g. _Nanban iòri no mono_,
+res Europæ; sed hic est relatiuum: petunt etiam genitiuum numeralia, seu
+nomina quæ dicunt multitudinem vel paucitatem: v.g. _amàta no fito_,
+multi homines, sunt autem nomina prædicta, _bechi_, alter, a, um, _fon_,
+proprius a, um, _cazucazu_, multi, æ, a, _sama zama_, multi modus, a,
+um, _iro iro_, multus, a, _iorõzzu_, quilibet &c. _[~i]zzure_, quis, æ,
+_issai_, omnis, e, idem, _vòno vòno_, & _cotõgotoqu_, _reqi reqi_,
+personæ nobiles, _igue_, quod subsequitur, _nocori_, quod remanet,
+_itçumo_, semper: v.g. _itçumo no coto_, id quod semper: _tçune_,
+ordinarius, a, um, _ima_, mòdo, _isasaca_, parum: idem, _sòto_, vel
+_sucoxi_, _xótocu_, naturaliter, _sòno fòca_, extra: prædicta petunt
+ante se genitiuum si illis subsequatur nomen substantiuum, & tunc
+adiectiua debent reputari si verò non subsequatur substantiuum nomen;
+sed verbum; tale genitiuum non petunt: v.g. _iorõzzu danco xite iocaro_,
+bonum erit si omnes faciatis consilium.
+
+
+_De Arithmetica Iaponiæ & materia numerorum, in quibus hoc opus hic
+labor._
+
+Duo sunt modi numerandi in lingua ista Iaponica primus est per numeralia
+communia propria ipsius linguæ, quæ vocant, _iomi_, & hæc perueniunt
+solum vsque ad decem: v.g. _fitòtçu_ vnum, & solent hoc vti ad dicendum
+parum: v.g. _sàqe fitotçu nòmaxete tamóre_, da mihi bibere parum vini,
+_futatçu_, duo, _mitçu_, tria, _iòtcu_, quatuor, _itçutçu_, quinque,
+_mutçu_, sex, _nanatçu_, septem, _iàtçu_, octo, _coco notçu_, nouem, _to
+vo_, decem, _icutçu_, significat, quot? in rebus quæ non habent propriam
+numerationem.
+
+Secundus modus numerandi est per vocabula, _coie_, idest m[~e]dicata a
+lingua Chinensi, hoc verò non vtuntur vsque ad decem per se; nisi rebus
+numeratis adiungantur, quæ quidem res debent significari vocabulis etiam
+Chin[~e]sibus; & non Iaponijs: termini numerales sunt, _ichi_, vnum,
+_ni_, duo, _san_, tria, _xi_, quatuor, _go_, quinque, _ròcu_, sex,
+_xichi_, septem, _sachi_, octo, _cù_, nouem, _j[vu]_, decem vtuntur per
+se istis a numero vndecimo & supra, est autem vndecim, _juich_, _juni_,
+duodecim, _jusan_, tredecim, _júcù_, decem & nouem, & numeris denarijs
+anteponuntur numeri vsque ad decem: v.g. _nij[vu]_, viginti, _sànju_,
+triginta, _sanju ichi_, triginta vnum, _cùju_, nonaginta, _fiacu_, vero
+significat centum, _fiacu ichi_ centum & vnum _fiacu ju_, centum &
+decem, _fiacu sanju_, centum & triginta, _ni fiacu_, ducenta,
+_sàmbiàcu_, trecentum, _xen_, autem significat mille, _xen ichi_, mille
+& vnum, _xen roppiacu sànju ichi_, mille sexcenti triginta vnum.
+
+Numeri vero Iaponij antepositi vocabulis Iaponiæ, quæ vocant _iomi_, et
+ablato, _tçu_, a numeralibus prædictis, siue sint nomina siue radices
+verborum quibus iunguntur numerãt res significatas per talia vocabula:
+v.g. _fito cotõba_, vnum verbum, _futa coto vari_, duæ rationes,
+_miàmi_, tria retia vel tres retis missiones, _iocama_, coquere quatuor
+vicibus in caldaria, _itçucàqe_, quinque aggressiones, _mùcasàne_, sex
+vestes seu cooperturæ, _nànà catana_ septem vulnerationes gladio: _ià
+catãgue_, octo onera, _cùca vari_ novem transmutationes, _tò cusa_,
+decem differentiæ: post numerum vero decimum, hoc modo numerandi non
+vtuntur; sed dicunt, _iro j[vu]ichi_, vel _júichi no iro_, vndecim
+colores: ad interrogandum vero est verbum, _icùtçu_, si verò res de qua
+interrogatur postponatur, debet addi numeralibus particula, _no_, v.g.
+_itçucu no qi zo_ quot ligna sunt? idem, _qi icutçu zo?_ et respondetur,
+_futatçu_, duo, _mitçu_, tria etc: interrogatur etiam per, _icutçu_
+ablato, _tçu_ posita vero re numerata de qua interrogatur: v.g. _icù
+tocoro_, quot loca? _icu toqi_, quot horæ? _fito fanaxi_, vnus sermo vel
+conversatio, _futasugi_, duæ lineæ, _iote_, quatuor manus inter
+digladiatores: v.g. _itçutçu bu_, quinque grana, _mu tocoro_, sex loca,
+_iamavari_, sex circuitiones, _cuninai_, nouem onera eo modo quo Iapones
+onus portant ante & retro in ligno, _tò vatari_, decem transitiones:
+v.g. & alia omnia quæ numerari possunt, idem autem est dicere, _mu
+tocoro_ quòd, _mutçu notocoro_ & quod, _tocoro mutçu_, sex loca, _fito
+ie_, significat rem simplicem, _futa ie_, duplicem seu duplicatam,
+_miie_, triplicatam &c. idem fit cum numeralibus chinensibus seu,
+_coye_, adiunctis vocabulis etiam chin[~e]sibus: & aliquando in ista
+numeratione nihil ammittunt numeri aut res numeratæ; aliquoties autem
+vel alterum vel vtrumque aliquid ammittit vel mutat, & præcipuè in
+numeris primo, secundo, tertio, sexto, decimo, & centesimo: & aliæ sunt
+mutationes: hic autem ponentur communiores; quando verò in particulari
+nihil fuerit adnotatum, est signum quod nulla est transmutatio.
+
+Interrogatio de hominibus fit per, _icutari?_ quot homines? Responsio
+verò fit postponendo, _nin_, numeralibus chinensibus: v.g. _ichi nin_,
+vnus homo, _ninin_, duo, _iottari_, vero significat quatuor: quia,
+_xinin_, significat hominem mortuum.
+
+Interrogatio de diebus fit per, _icca_, quot dies? & vnus dicitur, _fi
+fitoi_, quia, _ichinichì_, significat diem solarem integrum, _futçuca_,
+duo dies, _micca_, tres, _iocca_, quatuor, _itçuca_, quinque, _muìca_,
+sex, _nànucà_, septem, _iòca_, octo, _còconoca_, nouem, _toca_, decem,
+_fatçuca_, viginti reliqui numeri dierum sunt per numeralia, _coie_.
+
+Numerus noctium, est postponendo, _ìa_ numeralibus, _coie_, v.g. _ichi
+ia_, vna nox, _ni ia_, duæ &c. fit etiam postposito, _io_, quod
+significat Iaponice noctem numeralibus, _iomi_, _icuio_, quot noctes?
+_futaio_, duæ, _nanàio_, septem noctes &c.
+
+Numeratio mensium anni fit postposito, _guat_, numeralibus, _coie_, sed
+prima luna vocatur, _xõguat_, secunda vero, _n[~i]guat_, tertia,
+_sãguat_, quarta, _x[~i]guat_, vndecima verò dicitur, _ximò tçuqi_,
+duodecima verò & vltima dicitur, _xi vàsu_, si autem velimus numerare
+menses absolutè postponimus, _tçuq[~i]_, quod lunam significat
+numeralibus, _iomi_, ablato, _tçu_, interrogamus vero, _icutçuqi?_ quot
+menses? & respondetur, _fito tçuqi_, vnus, vsque ad decem, quod est,
+_totçuqi_, post decem verò fit numeratio per numeralia, _coie_, v.g. _jú
+ich[~i]guat_, vndecim menses, ad interrogandum verò de mense quisnam
+sit; Ianuarius ne an Februarius? fit per, _nànguat_, Primus autem mensis
+anni Iaponensis est luna Martij.
+
+Annumeratio annorum fit postposito, _nen_, numeralibus, _coie_:
+interrogatio fit anteposito, _nen_, v.g. _nànnèn_, quot anni?
+Respondetur autem, _ichinen_, vnus, _ionen_, quatuor, _sanganen_, tres,
+_sò ionèn_, tres vel quatuor, _sò xi júnèn_, triginta vel quadraginta
+anni, _fatàchi_, significat viginti annos in hominibus, id[~e] _ni
+junen_, vel, _ni ju no toxi_, vel _tòxi ni jú_, interrogant autem,
+_icutoxi_, vel _tòxi icùtçu_, quot annos habet? numerant etiam annos
+hominum & animalium perfectorum, boum scilicet, & equorum &c.
+postponendo, _sai_, numeralibus, _coie_, v.g. _issai_, vnus, _ni sai_
+duo, _san zài_, tres anni.
+
+Annumeratio vicium fit postposito, _do_, numeralibus, _coie_, v.g.
+_nàndo_, quot vices? _ich[~i]do_, vna _iõdo_, quatuor, _gõdo_,
+quinquies, _sai san_, bis vel ter.
+
+Annumeratio nauium fit postposito, _sô_, numeralibus, _coie_, v.g.
+_nànzo_, quot naues? Respondetur: _issô_, vna, _nisò_, duæ, _san zô_,
+tres _fassô_, octo, _jússô_, decem.
+
+_Ichiren, _vna linea, duæ _niren_, _saren_ tres lineæ v.g. ficorum,
+margaritarum, &c.
+
+Annumeratio orationum, tractatuum, vel repetitionum eiusd[~e] rei fit
+postposito, _fen_, numeralibus: v.g. _ippen_, vna, _nifen_, duæ,
+_sanben_, tres _aue maria fiàcu gojippèn_, centum quinquaginta aue
+maria.
+
+Annumeratio argenteorum fit postponendo, _momme_, numeralibus v.g. _ichi
+mòmme_, vnus, _ni mòmme_, duo, _san mòme_, tres: vnus autem argenteus
+diuiditur in decem quæ vocant _ippùn_ itaque, _ippùn_, significat
+decimam partem argentei, _nifùn_, duæ ex prædictis partibus, _gofùn_,
+media dragma, _roppun_, sex ex prædictis decem partibus.
+
+Decima quoque verò pars argentei diuiditur adhuc in alijs decem quarum
+vnam vocant, _ichirin_, _nirin_, _farin_, _iòrin_, _gorin_, _rocurin_,
+_xichirin_, _fachirin_, _curin_, & statim est, _ippun_, quod est
+argentei decima pars, _fiacu me_, sunt centum argenteos, _fiacu ichi
+momme_, centum & vnus, _icquan me_, mille, _jicquanme_ decem mille: sunt
+etiam aliæ monetæ ex ære, quarum annumeratio, fit postposito, _mai_, vel
+_mon_, numeralibus: v.g. _ichi mon_, vna ex illis monetis, _nì mon_, duæ
+_san mai_, tres centum vero ex istis monetis faciunt nondum dimidium
+argenteum; mille vero ex prædictis monetis vocant, _icquan_, _jicquan_,
+verò decem mille &c.
+
+_Còreua ica fõdo ni suru_, quantum valet hoc vel, _ica fõdo ni vru_,
+quanti pretij est & venditur? _ni momme suru_, decem argenteos valet,
+_ni mòmme ni iàsui_, plus duabus dragmis vendi potest: vel duabus
+dragmis si vendatur est vile.
+
+Annumeratio mensurarum tam rerum liquidarum, quam non fit postposito,
+_xô_, numeralibus ad faciendam mensuram modij: v.g. _ixxo_, vna, _nixo_,
+duæ, _sango_, tres: decem verò dicunt, _itto_, postposito, _to_, _nitò_,
+viginti, _sando_, triginta: vnam vero dicunt, _ittò_, quã diuidunt adhuc
+in decem partes, qùarum annumeratio fit postposito _go_, numeralibus
+v.g. _ich[~i]go_, vna, _n[~i]go_, duæ, _sango_ tres, _ixxô gõgo_, una
+mensura & dimidia ex mensura, _fatto_, octoginta mensuræ existis: centum
+verò dicunt, _ichi cocu_, postposito _còcu_, numeralibus, _ni còcu_,
+ducentæ, _sangocu_, trecentæ _jiccòcu_, mille, _xèngocu_, decem mille,
+_ichi mangocu_, centum mille.
+
+Annumeratio mensuræ statuum hominis fit postposito, _fitò_, numeralibus,
+_iomi_, v.g. _fitò firò_, vna: _futa firò_, duæ, _jippiro_, decem:
+mensuram verò palmorum faciunt postposito, _xacu_, numeralibus, _coie_,
+v.g. _ìxxacu_, vnus palmus seu tertia quam Hispani vocant _sanjacu_,
+tres, _goxacu_, vero facit vnum statum qui vocatur vt dictum est, _fito
+firo_, sex vero ex mensuris quæ vocatur, _xàcu_, & est tertia, faciunt
+mensuram unam quæ uocatur, _ìcqen_, una, _nicqen_, duæ, _jicqen_, decem,
+_sanguen_, tres: ex sexaginta uero ex istis fit alia mensura quam
+uocant, _icchó_, idest unus callis, _niccho_ duo, _jicchio_ decem,
+_sangio_, tres: ex sexaginta uerò tribus ex istis fit una leuca seu
+miliare ex miliaribus partis superioris Iaponiæ, quod uocant, _ichiri_,
+postposito, _ri_, numeralibus, _coie_: _niri_, duo miliaria, _sanri_,
+tria, _gòri_, quinque, _júri_, decem, _iori_, quatuor: quia _xiri_,
+significat anum, _fan michi_, dimidiam leucam dicunt: u.g. _iòco fan
+miqi tate ichirì_, uia recta habet una leucam; ex transuerso uero
+dimidiam _faba icqen_, latitudo est sex tertiarum _io fo futa firo_,
+habet duos status in quadro.
+
+Numeri cardinales primus secundus &c. fiunt postposito, _ban_
+numeralibus, _coie_, u.g. _ichi ban_, primus, _niban_ secundus ad
+significandum uerò terminum additur, _me_, prædictis: u.g. _xiban me_,
+quartus: fit etiam numerus cardinalis anteponendo, _dai_, numeris,
+_coie_: u.g. _daiichi_, primus, _daini_, secundus, &c.
+
+Annumeratio duplicium sit postposito, _bai_, numeralibus: u.g. _ichi
+bai_, duplum, _nibai_ triplum, _sanbài_, quadruplum, _fiàcuzõbai_,
+centuplum.
+
+Annumeratio partium ex tot una, fit anteponendo numeralia ad, _buichi_,
+u.g. _ni buichi_, ex duabus partibus una, _san buichi_ ex tribus una.
+
+Ad decimandum uerò postponitur, _vàri_, numeralibus: u.g. _ichi vàri_;
+ex decem partibus una, _xi vàri gobu_, ex decem partibus quatuor &
+dimidiam, _ju buichi_, autem coincidit cum, _ichi vàri_.
+
+Numeratio remorum arcabusiorum & eorum quæ sunt longa ut ligna fit
+postposito, _chõ_, numeralibus: u.g. _icchó_ unum, _nichó_, duo,
+_sangio_, tria, _jichió_, decem.
+
+Annumeratia piscium & lignorum ad comburendum &c. fit postposito _con_,
+numeralibus: u.g. _ìccon_, unus _sangon_ tres _jiccon_, decem,
+_fiaccon_, centum, _fiacu go ju sangon_, centum quinquaginta tres: tot
+prendidit Sãnctus Petrus & cum tanti essent non est scissum rete.
+
+Annumeratio foliorum papiri, uittarum argenti &c. fit postposito _mai_,
+numeralibus: u.g. _ichi mai_, una, _cami gomai_ quinque folia papiri.
+
+Annumeratio tabulatorum quæ sunt pauimenta domus fit postposito, _cai_,
+numeralibus: u.g. _nicai_, unus, _sangai_ duo, _xicai_ tres, _gocai_
+quatuor sicut habent domus Matriti.
+
+Annumeratio uerò uasorum et calicum quibus bibunt fit postposito, _fai_,
+numeralibus: u.g. _ippai_, unus potus, uel unum haustum, _ni fai_ duo,
+_sanbai_ tria, _jippai_, decem etc.
+
+Annumeratio telarum ex sericis: u.g. et aliorum similium fit postposito,
+_tan_, numeralibus: u.g. _irtàn_, unum, _ni tan_, duo, _sandan_ tres,
+_jittan_ decem, _xichitan bunè_, uocant nauigium quod uelo petit septem.
+
+Dicitur etiam postposito, _mai_, numeralibus: u.g. _gomai_, quinque,
+_gomai bunè_, nauicula quæ pro uelo petit quinque.
+
+Annumeratio animalium quadrupedum fit postposito, _fiqi_, numeralibus.
+u.g. _ippiqi_, unum _nifiqi_, duo _sanbiqi_, tria _roppiqi_, sex
+_jippiqi_, decem, _fiappiqi_, centum, _xenbiqi_, mille.
+
+Annumeratio imaginum, picturarum, & medicinarum fit postposito, _fucu_,
+numeralibus: v.g. _ippùcu_, vna, _nifucu_, duæ _sànbucu_, tres,
+_roppucu_, sex, _jippucu_, decem; ita annumerãtur etiam acus.
+
+Annumeratio librarum fit postposito _qin_, numeralibus: v.g. _icqin_,
+vna libra, _niqin_, duæ, _sanguin_, tres, _ròcqin_, sex, _jicqin_ decem,
+_fiàcqin_, centum: _xenguin_, mille.
+
+Annumeratio missarum, & congregationum hominum fit postposito, _za_,
+numeralibus: v.g. _ichi za_, vna _niza_, duæ, _sanza_, tres; _juza_, &
+melius, _tòza_, decem.
+
+Annumeratio saccorum orizæ, aut tritici etc. fit postposito, _fiô_,
+numeralibus: v.g. _ippiô_, vnus, _ni fiô_, duo _sanbiô_, tres, _xi fio_,
+quatuor, _roppio_, sex, _jippio_, decem, _fiappio_, centum, _xenbiô_,
+mille.
+
+Annumeratio lignorum, arundinum, acuum, fit postposito _fon_,
+numeralibus: v.g. _ippon_, vnum, _ni fon_, duo, _sanbon_, tria,
+_roppon_, sex, _jippon_, decem, _fiàppon_, centum, _xenbòn_, mille.
+
+Annumeratio fasciculorum fit postposito _va_, numeralibus: v.g. _ichi
+va_, vnus; _ni ua_, duo, _sanba_, tres, _jippa_; decem _júichi va_;
+vndecim; _ni jippa_; uiginti.
+
+Annumeratio onerum seu sarcinarum; quas equi portant; fit postposito;
+_só_; numeralibus: u.g. _issó_ unum; _niso_ duo; _sanzó_ tria; _jisso_;
+decem: eodem modo numerantur illa instrumenta quæ uocantur; _biobu_; duo
+enim seu par ex illis uocatur; _issó_; etc.
+
+Annumeratio uero eius quod uulgo dicimus mano de papel fit postposito,
+_giô_; numeralibus: u.g. _ichi gio_; una _nigio_; duæ, _sangiô_ tres;
+usque ad decem quæ sit postposito; _socu_, numeralibus: u.g. _issocu_
+decem, seu vna quæ uulgo uocatur media resma, _ni socu_; viginti quæ
+erit resma integra cum ista particula; _socu_ postposita numeralibus
+annumerant etiam par calceorum: u.g. _issô cu_, par calceorum.
+
+Annumeratio substantiarum fit postposito, _tai_, numeralibus: u.g.
+_ittai_, una; _nitai_ duæ; _sandai_; tres; _Deus no von tocoro va
+goittai de gozaru_; Deus in quantum Deus est vna substantia et essentia.
+
+Annumeratio capitulorum fit postposita _cagiô_, numeralibus: v.g.
+_iccagiô_ vnum, _nicagio_ duo, _sangagio_ tria, _roccagio_ sex,
+_fiaccagìo_, centum.
+
+Annumeratio guttarum fit postposito, _tèqi_, numeralibus: v.g. _ittèqi_,
+vna gutta, _jitteqi_, decem: idem fit postposito, _xizzucu_ numeralibus,
+_iomi_; v.g. _fito xizzucu_, vna &c. debet auferri, _tçu_, a numero vt
+videtur.
+
+Annumeratio paxillorum quibus comedunt, & eorum quæ bina & bina
+portantur, fit postposito, _tçui_, numeralibus: v.g. _itçui_, vnum par,
+_jittçui_, decem.
+
+Annumeratio sarcinarum hominum fit postposita, _ca_, numeralibus: v.g.
+_icca_ vna, _nica_ duæ, _sànga_, tres.
+
+Annumeratio librorum fit postposito, _quan_, numeralibus: v.g. _icquan_
+vnus, _niquan_ duo, _sanguàn_ tres, _ròquan_ sex, _jiquan_ decem.
+
+Ad interrogandum verò anteponitur, _nan_, nominibus mutatis vel non
+literis sicut in numero tertio: v.g. _àno mmadòmo va nanbiqi zo?_ quot
+sunt illi equi?
+
+Annumeratio regnorum fit postposito, _cacocu_, numeralibus: v.g. _icca
+cocu_, vnum, _ni cacocu_ duo, _sangacocu_ tria, _jiccacocu_, decem:
+regna verò diuiduntur in prouincias seu districtus quos vocant
+postposito, _gun_, numeralibus: v.g. _ichigun_, vna prouincia, _nigun_,
+duæ, _sangun_, tres &c.
+
+Sermones vero & exhortationes annumerantur postposito, _dan_
+numeralibus: v.g. _ichi dan_, vnus sermo vel concio, verba vero
+annumerantur postposito, _gon_, vel _guen_, numeralibus: v.g.
+_ich[~i]gon_ vnum, _sanguen_ tria verba.
+
+Postposita particula, _zzutçu_, numeralibus tam, _coie_, quam _iomi_,
+fit sensus binus, a, um, v.g. _ichinin ni vxi sanbiqi zzutçu vo
+toraxeta_, vni dedit tres vaccas, _ichinin zzutçu saqe sànbài zzutçu vo
+nomarèta_, vnusquisque bibit tria hausta vini.
+
+Ad loquendum diuisiue duo vel tria: v.g. copulant duo numeralia: v.g.
+_x[~i]gonin_, quatuor vel quinque homines, cætera ex his elicies.
+
+Particulæ honoris sunt quatuor, _vo_, _von_, _go_, _mi_, duæ primæ
+iunguntur vocabulis, _iomi_, vltimæ verò iunguntur vocabulis, _coie_,
+siue chinensibus: vltima est honoratior & illa vtimur ad loquendum de
+rebus diuinis: v.g. _midexi tachi_, discipuli Christi Domini, _goichi
+nin vocoite cudasarei_, mittatis obsecro vnum ex dominis.
+
+Verba verò quæ sequ[~u]tur etiam si habeant particulas honoris; habent
+se tamen ex parte loquentis; honorem verò important inquantum personam
+cum qua loquimur vel de qua loquimur attingunt: v.g. _go focô_, quod
+significat seruitium, _von furu mài_, quod est conuiuium, _von cotõba_,
+quod est verbum seu sermo, _von monõ gatàri_, quod est conuersatio, _von
+natçucaxij_, vel _von nocori vo voi_, habere quod Lusitani vocant
+saudades vel Hispani cariño, _von tòri auaxe_, quod est intercessio,
+_von mi mai_, quod est visitatio, _von chà_, quod est quidam potus quo
+inuitant, _go dancó_, quod est consultatio seu congregatio ad consilium
+capiendum, _von rei_, quod est gratiarum actio, _von busata_, quod est
+defectus in vrbanitate, _vomòtenaxi_, quod est bene & laute tractare,
+_go chiso_, quod est æstimatio, _go iqen_, quod est consilium v.g.
+_fabacari nagara go iqen vo moxitài_, & si sit inuerecundum & indecens
+volo tamen consilium tibi dare &c.
+
+
+_Aliquæ regulæ coniugationum in scriptura librorum._
+
+Aliquando fit verbum affirmatiuum cum præsenti negatiuo supra posito;
+ablato _u_, in quo finitur: v.g. _oracio vo tçutomen tòqi va_, quãdo
+habeo orationem, _xòsa vo tçutotmèn tàme ni va_, ad exequendum opus,
+_mich[~i] biqi tama van to voboxi mexi_, ad illum deducendum &c.
+
+Ad futurum affirmatiuum additur particula, _bèqi_, affirmatiuo
+supraposito ablato, _ru_, & ad futurum negatiuum additur, _bècarazu_,
+affirmatiuo: v.g. _mòsu beqi_, dices, _mòsu beqarazu_, non dices: si
+vero oratio finitur in futuro, _bèqi_, conuertitur in _bexi_.
+
+Infinitiuum futuri fit addito, _còto_, futuro: v.g. _iòmu bèqi coto_,
+subiunctiuum fit postposito, _qer[~e]ba_, radicibus verborum v.g.
+_sugure qer[~e]ba_.
+
+Gerundium in do fit postposito, _te_, radicibus: v.g. _qiqi tamaite_.
+
+Verbum substantiuum in scriptura librorum est, _nàri u_ & _qeri u_, & si
+in illo finitur oratio est in radice: v.g. _sadàme naqi io no ixei
+nari_, est dignitas mundi qui non habet stabilitatem.
+
+Præteritum est postposito, _ari_, _u_, radicibus: v.g. _s[~u]guretaru_,
+si verò oratio in illo finitur remanet, _ari_, _u_, in radice: v.g.
+_s[~u]guretari_.
+
+Præteritum plusquam perfectum est postposito _nari_, præsenti: v.g.
+_ãgue tamo nari_, adorauerant.
+
+Si forte fuerint aliquæ aliæ regulæ in librorum scriptura erunt ita
+faciles quod facillimo negotio illas consequentur qui in lingua Iaponica
+fuerint tam prouecti, vt iam eius librorum lectioni possint vacare.
+
+
+
+
+LAVS DEO.
+
+
+_ERRATA SIC CORRIGE._
+
+Primus numerus paginam, secundus lineam indicat.
+
+[Transcriber's Note:
+The listed changes have been made without further comment, except where
+the Errata list itself contains an error. For each word, the context is
+given in braces ("curly brackets").]
+
+pag. 3. linea 2. iu. lege in.
+ {plantationis Orthodoxæ fidei nostræ in Regno Iaponico}
+7.25. _niffion._ l. _niffon._
+ {u.g. _niffon guchi và Xiranu_}
+10.7. _goraru_. l. _gozaru_.
+ {_còno iàma và tacõ gozaru_, hic mons altus est, & excelsus}
+14. & 15. accentus supra, _o_, sunt acuti & debent esse graues.
+ {_passage could not be identified_}
+16.5. _mainnen_. l. _mainen_.
+ {_mainen_, significabit singulis annis uel omnibus annis}
+19.24. loca. l. loco.
+ {_sonaie sonóru_ in loco sublimi colloco, as}
+24. antepenultima. _de gozate_. l. _de gozatte_.
+ {_caqu de gozatte còso_, hoc nullo modo est scribere}
+28.12. _[~e]gue_ l. _ãgue_.
+ {_ãgue mai tomò_, &si non sit oblaturus}
+33.22. _fucacaranda._ l. _fucacarananda_.
+ {Præteritum, _fucacarananda_, non fuit &c.}
+33.28. _cuuaav_ l. _cuvazu_.
+ {_cu vazu ni vòite va_, si non comedis}
+34. antepenultima. _incadeca_. l. _icãdeca_.
+ {_còre fõdo xei uo iru ru saie còto naricanùru ni; ucato xite ua,
+ icãdeca banji canauozo?_}
+36. penultima. _voi cotaranu_. l. _vo cotaranu_.
+ {& præsens negatiuum, _vo cotaranu_}
+39.25. _cu vanu_. l. _cui maraxenu_.
+ {_Nan ban jin va core vo cui maraxenu_, Europei hoc non manducant}
+40. antepenultima amittit. l. admittit.
+ {admittit tamen hæc particula honorem à particula}
+43.10. anteposita particula. _na_. l. postposita particula. _va_.
+ {Postposita particula _va_}
+42.32. _nobrou_. l. _noboru_.
+ {_noboru_, ascendo, is}
+42.11. _vqetaam vari_. l. _vqe tamavari_.
+ {_uqe tamauari_, _u_, vero}
+48. vltima. _vosorozij_. l. _vosoroxij_.
+49.1. _vosoroxi_. l. _vosoroxij_.
+ {_uosoroxij_, est dictu tremendum, _mite ua fux[~i]guina_, est res
+ admirabilis visu, _iú uo mò uosoroxij_, est dictu tremendum}
+49.26. significat. l. significant.
+ {significant quem locum?}
+50.10. _doco._ l. _coco_.
+ {idem significat, _coco zo_}
+51.3. _Poca_. l. _foca_.
+ {_Foca_, significat foras, vel extra}
+57.26. _teugu_. l. _tengu_.
+ {_tengu ni tai xite te qito_, pugnare contra dæmonem & ei resistere}
+60.5. _tocude_. l. _tocorõde_.
+ {_so aru tocorõde_, cum hoc ita sit}
+60.19. _vo xite_. l. _coxite_.
+ {_doxitema co xitemo doxite coxite_, faciendo diuersa hoc & illud}
+60.26. _mate._ ommittatur et non legatur.
+ {Si particula, _mòtte_, postponatur particulis, _catçute_, _mate_,
+ _isasaca_}
+61.34. _ãgne_. l. _ãgue_.
+ {_taxicani uqetamotta niiotte coso, móxi ãgue maraxitare_, fideliter
+ audiui, ideo retuli & dixi}
+64.15. _ni va qenbut_. l. _ni va vo qenbut_.
+ {_ni ua uo qenbut noa[~i]dani mèxi uo coxiraie io_, præpara cibum dum
+ hortum videmus}
+64.19. _genzan_. l. _guenzan_.
+ {regit, _guenzan_, datiuum sicut, _ai_, _ó_}
+67.14. _iiuni_, _iusan_. l. _juni_, _jusan_.
+ {_juich_, _juni_, duodecim, _jusan_, tredecim}
+70.31. _culum_. l. _anum_.
+ {_xiri_, significat anum}
+
+ * * * * *
+ * * * *
+ * * * * *
+
+Errors and Anomalies
+
+
+Latin:
+
+Punctuation and capitalization are as in the original _except_:
+ "." (period/full stop) followed by a lower-case letter was changed
+ to : (colon) unless a comma was clearly called for.
+ Missing or inappropriate punctuation at paragraph-end was changed
+ to "."
+In "potest ne" and similar forms, "ne" is always printed as a separate
+word. Conversely, "idest" is printed as a single word.
+
+
+Japanese:
+
+The translation of this text is currently in preparation at Project
+Gutenberg. It was consulted to clarify long-s ambiguities and to resolve
+some uncertainties in accentuation, primarily ô : õ. There was no
+attempt to make the forms consistent or correct, or to regularize
+word/morpheme breaks.
+
+
+Typographical Errors, grouped thematically:
+
+The errata listed by the author have been corrected in the text.
+In addition, the following errors have been corrected, with the original
+form given in braces:
+
+
+n for u, u for n:
+
+_varàmberaxij_, quod significat {siguificat} id quod puerilis, e tunc
+ si uerbum subsequatur {subsequatnr}, mutat, _na_, in, _ni_
+Litera, _j_, pronunciatur {prouunciatur} blande
+Si vero prædicta signa, fuerint supra _ú_, pronuntiatur {pronnntiatur}
+_ii_, _ú_, est loqui humiliando {hnmiliando} loquentem
+_mairi_, _u_, significat {siguificat} ire ad locum cui honor debetur
+homines m[~u]di, vitam agunt {agnut} dormiendo, surgendo, & bibendo
+_To_, significat, {siguificat} &, copulatiue
+nihil ammittunt {ammittnnt} numeri aut res numeratæ;
+
+
+-qu- for -quu-:
+
+equum {equm} ascendere &c
+& iterum interrogat, dicit qui loquutus {loqutus} est
+subsequuntur {subsequntur} vel, _ua_, vel, _naranu_
+tunc profecto mala nuntia seu missiones sum exequutus {exequtus}
+duæ vel plures orationes quæ loquuntur {loquntur} de eodem subiecto
+
+
+Missing -n- or tilde in Latin:
+
+_quæ verò finiuntur in, _xi_, vel, _qi_, illud conuertunt {couertunt}
+illam exuunt quando {quado} aqua madefit
+
+
+f for (long) s:
+
+Sensus uero est idem siue finiatur in, _no_, siue {fiue} in _na_
+_saq[~e] gana_, ò vinum! ac si {ac fi} diceret:
+_Vie, _significat {fignificat} rem supremam
+
+
+Word breaks or spacing:
+
+ex parte mea, vel quantum {quan-,/tum _at line break_} ad me attinet
+Pronomen aliquis &c. faciunt particulæ {faciun tparticulæ}
+_uqetamóri_, _u_, est audire honorando personam à qua {àqua} auditur
+_uarãb[~e] de xinda_, mortuus est puer vel cum adhuc {ad huc} esset puer
+quando actualiter exibat e nauigio, {enauigio}
+Quando non curat quis de ijs {deijs} quæ illi dixerunt
+_mosu to tomoni_, {tomon,i} simul ac dixit
+habeto curam de tuis {de-/tuis _at line break_} seruis?
+v.g. _Pedro to juanto {toj uanto} Nagasaqi ie ita_
+aliquando in ista {inista} numeratione
+bis vel ter {velter}
+_aue maria {auema ria} fiàcu gojippèn_, centum quinquaginta aue maria
+tres centum vero ex istis {existis} monetis faciunt nondum dimidium
+mille vero ex prædictis {exprædictis} monetis vocant
+ex sexaginta {sex aginta} uero ex istis fit alia mensura
+
+
+Other Errors:
+
+non enim pronunciatur vt _tç_, aut ut _t_ {_s_}, uel, _c_
+_Padre no võ qirumòno_, Patris vestis seu habitus {habibitus}
+_Nàn bàn mòno vo fomùru nà_, ne laudes res Europæ {Eropæ}
+_cùchi_, _cutçuru_ {cutcuru}, putresco, is
+_ãguenanzzuro_, possibile {posibile} est non obtulisse
+_ãguru mai còto mo arozu_, possibile {posibile} est quod non offert
+_saxerare_, _uru_, facere personam {persoram} nobilem
+Ased quomodo erit vel si erit nescio {næscio} certe
+sed nescio {næscio} vtrum poterit extrahi nauigium
+_fara còso tattçuro_ forsan {forsam} fuit iratus
+_funè ni nori sama ni_, quando actualiter{astualiter} conscendebat nauim
+_isasàca_ {_i asàca_}, vel, _isasàca mòtte_ nec parum quidem
+inter doctores Sanctus Thomas {Themas} est supremus
+successiue leniter {lenter}
+ideo præcor Beatam Mariam semper Virginem {Virgitem}
+aliquoties autem vel alterum vel {vol} vtrumque aliquid ammittit
+
+
+Inappropriate type style (emphatic for non-emphatic or the reverse):
+
+De pronomine.
+De pronomine secundæ personæ scilicet ego &c.
+Aduerbia interrogandi cum particulis casualibus & postposito, mo,
+ significant vbicumque
+Ha! est interiectio p[oe]nitentis
+Aliqua nomina, _cobita seu coie_
+decem verò dicunt, _itto_, postposito, to,
+_jippiro_, decem {_printed at line break as _jippi_-/ro}
+vnus palmus seu tertia quam Hispani vocant sanjacu, tres
+
+
+Not Changed:
+
+_De pronomine secundæ personæ scilicet ego &c._ {_sic_ "secundæ"}
+_sannin nagara_, tres simul, vel etiam si sintres {_sic_ "sintres"}
+_qinô_, vel, _sàcujit_, nudius tertius {_sic_ "nudius": dies?}
+regulas ex terra vel limo construere {_sic_ "regulas": tegulas?}
+
+
+Errors in Errata:
+
+42.32. _nobrou_ {_uobrou_}. l. _noboru_.
+43.10. anteposita {antepenultima} particula. _na_.
+42.11. _vqetaam vari_. {_vqetm vari_}
+49.1. _vosoroxi_. {_missing "l."_} _vosoroxij_.
+60.26. {24} _mate._ ommittatur et non legatur.
+64.19. _genzan_ {_geuzan_}. l. _guenzan_.
+67.14. _iiuni_ {iuni}, _iusan_.
+
+
+
+
+
+End of Project Gutenberg's Ars grammaticae Iaponicae linguae, by Diego Collado
+
+
+
+*** END OF THE PROJECT GUTENBERG EBOOK ARS GRAMMATICAE IAPONICAE LINGUAE ***
+
+
+ 
+
+Updated editions will replace the previous one—the old editions will
+be renamed.
+
+Creating the works from print editions not protected by U.S. copyright
+law means that no one owns a United States copyright in these works,
+so the Foundation (and you!) can copy and distribute it in the United
+States without permission and without paying copyright
+royalties. Special rules, set forth in the General Terms of Use part
+of this license, apply to copying and distributing Project
+Gutenberg™ electronic works to protect the PROJECT GUTENBERG™
+concept and trademark. Project Gutenberg is a registered trademark,
+and may not be used if you charge for an eBook, except by following
+the terms of the trademark license, including paying royalties for use
+of the Project Gutenberg trademark. If you do not charge anything for
+copies of this eBook, complying with the trademark license is very
+easy. You may use this eBook for nearly any purpose such as creation
+of derivative works, reports, performances and research. Project
+Gutenberg eBooks may be modified and printed and given away—you may
+do practically ANYTHING in the United States with eBooks not protected
+by U.S. copyright law. Redistribution is subject to the trademark
+license, especially commercial redistribution.
+
+
+START: FULL LICENSE
+
+THE FULL PROJECT GUTENBERG LICENSE
+
+PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK
+
+To protect the Project Gutenberg™ mission of promoting the free
+distribution of electronic works, by using or distributing this work
+(or any other work associated in any way with the phrase “Project
+Gutenberg”), you agree to comply with all the terms of the Full
+Project Gutenberg™ License available with this file or online at
+www.gutenberg.org/license.
+
+Section 1. General Terms of Use and Redistributing Project Gutenberg™
+electronic works
+
+1.A. By reading or using any part of this Project Gutenberg™
+electronic work, you indicate that you have read, understand, agree to
+and accept all the terms of this license and intellectual property
+(trademark/copyright) agreement. If you do not agree to abide by all
+the terms of this agreement, you must cease using and return or
+destroy all copies of Project Gutenberg™ electronic works in your
+possession. If you paid a fee for obtaining a copy of or access to a
+Project Gutenberg™ electronic work and you do not agree to be bound
+by the terms of this agreement, you may obtain a refund from the person
+or entity to whom you paid the fee as set forth in paragraph 1.E.8.
+
+1.B. “Project Gutenberg” is a registered trademark. It may only be
+used on or associated in any way with an electronic work by people who
+agree to be bound by the terms of this agreement. There are a few
+things that you can do with most Project Gutenberg™ electronic works
+even without complying with the full terms of this agreement. See
+paragraph 1.C below. There are a lot of things you can do with Project
+Gutenberg™ electronic works if you follow the terms of this
+agreement and help preserve free future access to Project Gutenberg™
+electronic works. See paragraph 1.E below.
+
+1.C. The Project Gutenberg Literary Archive Foundation (“the
+Foundation” or PGLAF), owns a compilation copyright in the collection
+of Project Gutenberg™ electronic works. Nearly all the individual
+works in the collection are in the public domain in the United
+States. If an individual work is unprotected by copyright law in the
+United States and you are located in the United States, we do not
+claim a right to prevent you from copying, distributing, performing,
+displaying or creating derivative works based on the work as long as
+all references to Project Gutenberg are removed. Of course, we hope
+that you will support the Project Gutenberg™ mission of promoting
+free access to electronic works by freely sharing Project Gutenberg™
+works in compliance with the terms of this agreement for keeping the
+Project Gutenberg™ name associated with the work. You can easily
+comply with the terms of this agreement by keeping this work in the
+same format with its attached full Project Gutenberg™ License when
+you share it without charge with others.
+
+1.D. The copyright laws of the place where you are located also govern
+what you can do with this work. Copyright laws in most countries are
+in a constant state of change. If you are outside the United States,
+check the laws of your country in addition to the terms of this
+agreement before downloading, copying, displaying, performing,
+distributing or creating derivative works based on this work or any
+other Project Gutenberg™ work. The Foundation makes no
+representations concerning the copyright status of any work in any
+country other than the United States.
+
+1.E. Unless you have removed all references to Project Gutenberg:
+
+1.E.1. The following sentence, with active links to, or other
+immediate access to, the full Project Gutenberg™ License must appear
+prominently whenever any copy of a Project Gutenberg™ work (any work
+on which the phrase “Project Gutenberg” appears, or with which the
+phrase “Project Gutenberg” is associated) is accessed, displayed,
+performed, viewed, copied or distributed:
+
+ This eBook is for the use of anyone anywhere in the United States and most
+ other parts of the world at no cost and with almost no restrictions
+ whatsoever. You may copy it, give it away or re-use it under the terms
+ of the Project Gutenberg License included with this eBook or online
+ at www.gutenberg.org. If you
+ are not located in the United States, you will have to check the laws
+ of the country where you are located before using this eBook.
+ 
+1.E.2. If an individual Project Gutenberg™ electronic work is
+derived from texts not protected by U.S. copyright law (does not
+contain a notice indicating that it is posted with permission of the
+copyright holder), the work can be copied and distributed to anyone in
+the United States without paying any fees or charges. If you are
+redistributing or providing access to a work with the phrase “Project
+Gutenberg” associated with or appearing on the work, you must comply
+either with the requirements of paragraphs 1.E.1 through 1.E.7 or
+obtain permission for the use of the work and the Project Gutenberg™
+trademark as set forth in paragraphs 1.E.8 or 1.E.9.
+
+1.E.3. If an individual Project Gutenberg™ electronic work is posted
+with the permission of the copyright holder, your use and distribution
+must comply with both paragraphs 1.E.1 through 1.E.7 and any
+additional terms imposed by the copyright holder. Additional terms
+will be linked to the Project Gutenberg™ License for all works
+posted with the permission of the copyright holder found at the
+beginning of this work.
+
+1.E.4. Do not unlink or detach or remove the full Project Gutenberg™
+License terms from this work, or any files containing a part of this
+work or any other work associated with Project Gutenberg™.
+
+1.E.5. Do not copy, display, perform, distribute or redistribute this
+electronic work, or any part of this electronic work, without
+prominently displaying the sentence set forth in paragraph 1.E.1 with
+active links or immediate access to the full terms of the Project
+Gutenberg™ License.
+
+1.E.6. You may convert to and distribute this work in any binary,
+compressed, marked up, nonproprietary or proprietary form, including
+any word processing or hypertext form. However, if you provide access
+to or distribute copies of a Project Gutenberg™ work in a format
+other than “Plain Vanilla ASCII” or other format used in the official
+version posted on the official Project Gutenberg™ website
+(www.gutenberg.org), you must, at no additional cost, fee or expense
+to the user, provide a copy, a means of exporting a copy, or a means
+of obtaining a copy upon request, of the work in its original “Plain
+Vanilla ASCII” or other form. Any alternate format must include the
+full Project Gutenberg™ License as specified in paragraph 1.E.1.
+
+1.E.7. Do not charge a fee for access to, viewing, displaying,
+performing, copying or distributing any Project Gutenberg™ works
+unless you comply with paragraph 1.E.8 or 1.E.9.
+
+1.E.8. You may charge a reasonable fee for copies of or providing
+access to or distributing Project Gutenberg™ electronic works
+provided that:
+
+ • You pay a royalty fee of 20% of the gross profits you derive from
+ the use of Project Gutenberg™ works calculated using the method
+ you already use to calculate your applicable taxes. The fee is owed
+ to the owner of the Project Gutenberg™ trademark, but he has
+ agreed to donate royalties under this paragraph to the Project
+ Gutenberg Literary Archive Foundation. Royalty payments must be paid
+ within 60 days following each date on which you prepare (or are
+ legally required to prepare) your periodic tax returns. Royalty
+ payments should be clearly marked as such and sent to the Project
+ Gutenberg Literary Archive Foundation at the address specified in
+ Section 4, “Information about donations to the Project Gutenberg
+ Literary Archive Foundation.”
+ 
+ • You provide a full refund of any money paid by a user who notifies
+ you in writing (or by e-mail) within 30 days of receipt that s/he
+ does not agree to the terms of the full Project Gutenberg™
+ License. You must require such a user to return or destroy all
+ copies of the works possessed in a physical medium and discontinue
+ all use of and all access to other copies of Project Gutenberg™
+ works.
+ 
+ • You provide, in accordance with paragraph 1.F.3, a full refund of
+ any money paid for a work or a replacement copy, if a defect in the
+ electronic work is discovered and reported to you within 90 days of
+ receipt of the work.
+ 
+ • You comply with all other terms of this agreement for free
+ distribution of Project Gutenberg™ works.
+ 
+
+1.E.9. If you wish to charge a fee or distribute a Project
+Gutenberg™ electronic work or group of works on different terms than
+are set forth in this agreement, you must obtain permission in writing
+from the Project Gutenberg Literary Archive Foundation, the manager of
+the Project Gutenberg™ trademark. Contact the Foundation as set
+forth in Section 3 below.
+
+1.F.
+
+1.F.1. Project Gutenberg volunteers and employees expend considerable
+effort to identify, do copyright research on, transcribe and proofread
+works not protected by U.S. copyright law in creating the Project
+Gutenberg™ collection. Despite these efforts, Project Gutenberg™
+electronic works, and the medium on which they may be stored, may
+contain “Defects,” such as, but not limited to, incomplete, inaccurate
+or corrupt data, transcription errors, a copyright or other
+intellectual property infringement, a defective or damaged disk or
+other medium, a computer virus, or computer codes that damage or
+cannot be read by your equipment.
+
+1.F.2. LIMITED WARRANTY, DISCLAIMER OF DAMAGES - Except for the “Right
+of Replacement or Refund” described in paragraph 1.F.3, the Project
+Gutenberg Literary Archive Foundation, the owner of the Project
+Gutenberg™ trademark, and any other party distributing a Project
+Gutenberg™ electronic work under this agreement, disclaim all
+liability to you for damages, costs and expenses, including legal
+fees. YOU AGREE THAT YOU HAVE NO REMEDIES FOR NEGLIGENCE, STRICT
+LIABILITY, BREACH OF WARRANTY OR BREACH OF CONTRACT EXCEPT THOSE
+PROVIDED IN PARAGRAPH 1.F.3. YOU AGREE THAT THE FOUNDATION, THE
+TRADEMARK OWNER, AND ANY DISTRIBUTOR UNDER THIS AGREEMENT WILL NOT BE
+LIABLE TO YOU FOR ACTUAL, DIRECT, INDIRECT, CONSEQUENTIAL, PUNITIVE OR
+INCIDENTAL DAMAGES EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+1.F.3. LIMITED RIGHT OF REPLACEMENT OR REFUND - If you discover a
+defect in this electronic work within 90 days of receiving it, you can
+receive a refund of the money (if any) you paid for it by sending a
+written explanation to the person you received the work from. If you
+received the work on a physical medium, you must return the medium
+with your written explanation. The person or entity that provided you
+with the defective work may elect to provide a replacement copy in
+lieu of a refund. If you received the work electronically, the person
+or entity providing it to you may choose to give you a second
+opportunity to receive the work electronically in lieu of a refund. If
+the second copy is also defective, you may demand a refund in writing
+without further opportunities to fix the problem.
+
+1.F.4. Except for the limited right of replacement or refund set forth
+in paragraph 1.F.3, this work is provided to you ‘AS-IS’, WITH NO
+OTHER WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PURPOSE.
+
+1.F.5. Some states do not allow disclaimers of certain implied
+warranties or the exclusion or limitation of certain types of
+damages. If any disclaimer or limitation set forth in this agreement
+violates the law of the state applicable to this agreement, the
+agreement shall be interpreted to make the maximum disclaimer or
+limitation permitted by the applicable state law. The invalidity or
+unenforceability of any provision of this agreement shall not void the
+remaining provisions.
+
+1.F.6. INDEMNITY - You agree to indemnify and hold the Foundation, the
+trademark owner, any agent or employee of the Foundation, anyone
+providing copies of Project Gutenberg™ electronic works in
+accordance with this agreement, and any volunteers associated with the
+production, promotion and distribution of Project Gutenberg™
+electronic works, harmless from all liability, costs and expenses,
+including legal fees, that arise directly or indirectly from any of
+the following which you do or cause to occur: (a) distribution of this
+or any Project Gutenberg™ work, (b) alteration, modification, or
+additions or deletions to any Project Gutenberg™ work, and (c) any
+Defect you cause.
+
+Section 2. Information about the Mission of Project Gutenberg™
+
+Project Gutenberg™ is synonymous with the free distribution of
+electronic works in formats readable by the widest variety of
+computers including obsolete, old, middle-aged and new computers. It
+exists because of the efforts of hundreds of volunteers and donations
+from people in all walks of life.
+
+Volunteers and financial support to provide volunteers with the
+assistance they need are critical to reaching Project Gutenberg™’s
+goals and ensuring that the Project Gutenberg™ collection will
+remain freely available for generations to come. In 2001, the Project
+Gutenberg Literary Archive Foundation was created to provide a secure
+and permanent future for Project Gutenberg™ and future
+generations. To learn more about the Project Gutenberg Literary
+Archive Foundation and how your efforts and donations can help, see
+Sections 3 and 4 and the Foundation information page at www.gutenberg.org.
+
+Section 3. Information about the Project Gutenberg Literary Archive Foundation
+
+The Project Gutenberg Literary Archive Foundation is a non-profit
+501(c)(3) educational corporation organized under the laws of the
+state of Mississippi and granted tax exempt status by the Internal
+Revenue Service. The Foundation’s EIN or federal tax identification
+number is 64-6221541. Contributions to the Project Gutenberg Literary
+Archive Foundation are tax deductible to the full extent permitted by
+U.S. federal laws and your state’s laws.
+
+The Foundation’s business office is located at 809 North 1500 West,
+Salt Lake City, UT 84116, (801) 596-1887. Email contact links and up
+to date contact information can be found at the Foundation’s website
+and official page at www.gutenberg.org/contact
+
+Section 4. Information about Donations to the Project Gutenberg
+Literary Archive Foundation
+
+Project Gutenberg™ depends upon and cannot survive without widespread
+public support and donations to carry out its mission of
+increasing the number of public domain and licensed works that can be
+freely distributed in machine-readable form accessible by the widest
+array of equipment including outdated equipment. Many small donations
+($1 to $5,000) are particularly important to maintaining tax exempt
+status with the IRS.
+
+The Foundation is committed to complying with the laws regulating
+charities and charitable donations in all 50 states of the United
+States. Compliance requirements are not uniform and it takes a
+considerable effort, much paperwork and many fees to meet and keep up
+with these requirements. We do not solicit donations in locations
+where we have not received written confirmation of compliance. To SEND
+DONATIONS or determine the status of compliance for any particular state
+visit www.gutenberg.org/donate.
+
+While we cannot and do not solicit contributions from states where we
+have not met the solicitation requirements, we know of no prohibition
+against accepting unsolicited donations from donors in such states who
+approach us with offers to donate.
+
+International donations are gratefully accepted, but we cannot make
+any statements concerning tax treatment of donations received from
+outside the United States. U.S. laws alone swamp our small staff.
+
+Please check the Project Gutenberg web pages for current donation
+methods and addresses. Donations are accepted in a number of other
+ways including checks, online payments and credit card donations. To
+donate, please visit: www.gutenberg.org/donate.
+
+Section 5. General Information About Project Gutenberg™ electronic works
+
+Professor Michael S. Hart was the originator of the Project
+Gutenberg™ concept of a library of electronic works that could be
+freely shared with anyone. For forty years, he produced and
+distributed Project Gutenberg™ eBooks with only a loose network of
+volunteer support.
+
+Project Gutenberg™ eBooks are often created from several printed
+editions, all of which are confirmed as not protected by copyright in
+the U.S. unless a copyright notice is included. Thus, we do not
+necessarily keep eBooks in compliance with any particular paper
+edition.
+
+Most people start at our website which has the main PG search
+facility: www.gutenberg.org.
+
+This website includes information about Project Gutenberg™,
+including how to make donations to the Project Gutenberg Literary
+Archive Foundation, how to help produce our new eBooks, and how to
+subscribe to our email newsletter to hear about new eBooks.
