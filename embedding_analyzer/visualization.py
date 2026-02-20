@@ -10,13 +10,16 @@ from .config import OUTPUT_DIR
 from .utils import _reduce_dimensions
 
 
-def plot_interactive_2d(data: List[Dict], sample_size: int = 1500, save_html: bool = True):
+def plot_interactive_2d(data: List[Dict], sample_size: int = -1, save_html: bool = True):
     if not data:
         print("Нет данных для визуализации.")
         return
 
-    sample_size = min(sample_size, len(data))
-    sample = data[:sample_size]
+    if sample_size == -1:
+        sample = data
+    else:
+        sample_size = min(sample_size, len(data))
+        sample = data[:sample_size]
     embeddings = np.stack([item["embedding"] for item in sample])
     embedding_2d = _reduce_dimensions(embeddings)
 
@@ -103,4 +106,4 @@ def analyze_embeddings():
     analyzer = EmbeddingAnalyzer(collection_name="corpus")
     analyzer.print_statistics()
     analyzer.save_summary()
-    plot_interactive_2d(analyzer.df, sample_size=1500)
+    plot_interactive_2d(analyzer.df, sample_size=-1)
