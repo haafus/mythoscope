@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Файлы корпуса</title>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f5;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            color: #5a524c;
+            border: 1px solid #d0ccc8;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #f0eeec;
+            border-color: #c0bcb8;
+        }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        h1 {
+            color: #3a3532;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e8e6e4;
+            overflow-x: auto;
+        }
+
+        table.dataTable {
+            border-collapse: collapse;
+            width: 100% !important;
+        }
+
+        table.dataTable thead th {
+            background: #f5f4f3;
+            color: #3a3532;
+            font-weight: 600;
+            padding: 14px 16px;
+            border-bottom: 2px solid #e0dedc;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        table.dataTable tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0eeec;
+            color: #4a4542;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 300px;
+        }
+
+        table.dataTable tbody td:last-child {
+            text-align: center;
+            max-width: none;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .open-txt {
+            background: #5a524c;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .open-txt:hover {
+            background: #6b635c;
+        }
+
+        .dataTables_wrapper .dataTables_length {
+            margin-bottom: 16px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin: 0 4px;
+            background: white;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 16px;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 14px;
+            margin-left: 8px;
+            width: 220px;
+        }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            outline: none;
+            border-color: #b0aca8;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            color: #666;
+            margin-top: 16px;
+            font-size: 0.9rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-top: 16px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 4px !important;
+            margin: 0 2px;
+            border: 1px solid #ddd !important;
+            background: white !important;
+            color: #444 !important;
+            padding: 6px 12px !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #f5f4f3 !important;
+            border-color: #ccc !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #5a524c !important;
+            color: white !important;
+            border-color: #5a524c !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='home.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Назад
+        </button>
+
+        <h1>Таблица корпуса</h1>
+
+        <div class="table-wrapper">
+            <table id="corp-table" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Наименование</th>
+                        <th>Традиция</th>
+                        <th>Язык</th>
+                        <th>Тип</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const csvUrl = '../corpus/corpus_catalog.csv';
+
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+                const data = results.data;
+                if (data.length === 0) {
+                    alert('CSV файл пуст или неправильно загружен.');
+                    return;
+                }
+                const requiredFields = ['id', 'tradition', 'language', 'type'];
+                const missingFields = requiredFields.filter(field => !(field in data[0]));
+                if (missingFields.length > 0) {
+                    alert('Отсутствуют поля: ' + missingFields.join(', '));
+                    return;
+                }
+
+                $('#corp-table').DataTable({
+                    data: data,
+                    destroy: true,
+                    autoWidth: true,
+                    scrollX: false,
+                    language: {
+                        "processing": "Подождите...",
+                        "search": "Поиск:",
+                        "lengthMenu": "Показать _MENU_ записей",
+                        "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+                        "infoEmpty": "Записи с 0 до 0 из 0 записей",
+                        "infoFiltered": "(отфильтровано из _MAX_ записей)",
+                        "infoPostFix": "",
+                        "loadingRecords": "Загрузка записей...",
+                        "zeroRecords": "Записи отсутствуют.",
+                        "emptyTable": "В таблице отсутствуют данные",
+                        "paginate": {
+                            "first": "Первая",
+                            "previous": "Предыдущая",
+                            "next": "Следующая",
+                            "last": "Последняя"
+                        },
+                        "aria": {
+                            "sortAscending": ": активировать для сортировки столбца по возрастанию",
+                            "sortDescending": ": активировать для сортировки столбца по убыванию"
+                        }
+                    },
+                    columns: [
+                        { data: 'id' },
+                        { data: 'tradition' },
+                        { data: 'language' },
+                        { data: 'type' },
+                        {
+                            data: null,
+                            orderable: false,
+                            className: 'dt-center',
+                            render: function (row) {
+                                return `<button class="open-txt" data-tradition="${row.tradition}"
+                                data-filename="${row.id}">Открыть</button>`;
+                            }
+                        }
+                    ]
+                });
+            },
+            error: function (err) {
+                alert('Ошибка загрузки CSV: ' + err.message);
+            }
+        });
+
+        $('#corp-table tbody').on('click', '.open-txt', function () {
+            const filename = $(this).data('filename');
+            const tradition = $(this).data('tradition');
+            const safeTradition = tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
+            const txtUrl = `../corpus/${safeTradition}/${filename}/${filename}.txt`;
+
+            fetch(txtUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error('Файл не найден');
+                    return res.text();
+                })
+                .then(text => {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    const maxLineWidth = 180;
+                    const lineHeight = 10;
+                    const lines = doc.splitTextToSize(text, maxLineWidth);
+                    const pageHeight = doc.internal.pageSize.height;
+                    const yStart = 10;
+                    let y = yStart;
+                    const linesPerPage = Math.floor((pageHeight - yStart) / lineHeight);
+
+                    for (let i = 0; i < lines.length; i++) {
+                        if (i > 0 && i % linesPerPage === 0) {
+                            doc.addPage();
+                            y = yStart;
+                        }
+                        doc.text(lines[i], 10, y);
+                        y += lineHeight;
+                    }
+
+                    const pdfBlob = doc.output('blob');
+                    const url = URL.createObjectURL(pdfBlob);
+                    window.open(url, '_blank');
+                })
+                .catch(err => alert('Ошибка: ' + err.message));
+        });
+    </script>
+</body>
+</html>

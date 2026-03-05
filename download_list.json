@@ -91,25 +91,11 @@
     "url": "https://www.gutenberg.org/cache/epub/17897/pg17897.txt"
   },
   {
-    "id": "hadith_muslim_trans",
-    "tradition": "Islam",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17898/pg17898.txt"
-  },
-  {
     "id": "bhagavad_gita_trans",
     "tradition": "India/Hinduism",
     "language": "English",
     "type": "translation",
     "url": "https://www.gutenberg.org/cache/epub/2778/pg2778.txt"
-  },
-  {
-    "id": "ramayana_trans",
-    "tradition": "India/Hinduism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/12829/pg12829.txt"
   },
   {
     "id": "upanishads_trans",
@@ -119,76 +105,6 @@
     "url": "https://www.gutenberg.org/cache/epub/21244/pg21244.txt"
   },
   {
-    "id": "mishnah_orig",
-    "tradition": "Judaism",
-    "language": "Hebrew",
-    "type": "original",
-    "url": "https://www.sefaria.org/api/texts/Mishnah?lang=bi"
-  },
-  {
-    "id": "mishnah_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.sefaria.org/api/texts/Mishnah?lang=en"
-  },
-  {
-    "id": "berakhot_orig",
-    "tradition": "Judaism",
-    "language": "Hebrew",
-    "type": "original",
-    "url": "https://www.sefaria.org/api/texts/Mishnah.Berakhot?lang=bi"
-  },
-  {
-    "id": "berakhot_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.sefaria.org/api/texts/Mishnah.Berakhot?lang=en"
-  },
-  {
-    "id": "talmud_bavli_orig",
-    "tradition": "Judaism",
-    "language": "Aramaic",
-    "type": "original",
-    "url": "https://www.sefaria.org/api/texts/Bavli?lang=bi"
-  },
-  {
-    "id": "talmud_bavli_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.sefaria.org/api/texts/Bavli?lang=en"
-  },
-  {
-    "id": "torah_orig",
-    "tradition": "Judaism",
-    "language": "Hebrew",
-    "type": "original",
-    "url": "https://www.sefaria.org/api/texts/Torah?lang=bi"
-  },
-  {
-    "id": "torah_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.sefaria.org/api/texts/Torah?lang=en"
-  },
-  {
-    "id": "talmud_yerushalmi_orig",
-    "tradition": "Judaism",
-    "language": "Hebrew",
-    "type": "original",
-    "url": "https://www.sefaria.org/api/texts/Yerushalmi?lang=bi"
-  },
-  {
-    "id": "talmud_yerushalmi_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.sefaria.org/api/texts/Yerushalmi?lang=en"
-  },
-  {
     "id": "midrash_rabbah_trans",
     "tradition": "Judaism",
     "language": "English",
@@ -196,164 +112,115 @@
     "url": "https://www.gutenberg.org/cache/epub/17706/pg17706.txt"
   },
   {
-    "id": "bible_kjv_orig",
+    "id": "new_testament_greek_trans",
     "tradition": "Christianity",
     "language": "English",
-    "type": "original",
-    "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  },
-  {
-    "id": "new_testament_orig",
-    "tradition": "Christianity",
-    "language": "Greek",
     "type": "original",
     "url": "https://www.gutenberg.org/cache/epub/1744/pg1744.txt"
   },
   {
-    "id": "apocrypha_trans",
+    "id": "bible_kjv_trans",
     "tradition": "Christianity",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17707/pg17707.txt"
+    "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   },
   {
-    "id": "bible_vulgate_trans",
+    "id": "augustine_confessions_trans",
     "tradition": "Christianity",
-    "language": "Latin",
+    "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17708/pg17708.txt"
+    "url": "https://www.gutenberg.org/cache/epub/3296/pg3296.txt"
   },
   {
-    "id": "bible_sephardic_trans",
+    "id": "desert_fathers_trans",
+    "tradition": "Christianity",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/35765/pg35765.txt"
+  },
+  {
+    "id": "buddhist_tripitaka_trans",
+    "tradition": "India/Buddhism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/2055/pg2055.txt"
+  },
+  {
+    "id": "dhammapada_trans",
+    "tradition": "India/Buddhism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/2017/pg2017.txt"
+  },
+  {
+    "id": "tao_te_ching_trans",
+    "tradition": "China/Taoism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  },
+  {
+    "id": "chuang_tzu_trans",
+    "tradition": "China/Taoism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/5380/pg5380.txt"
+  },
+  {
+    "id": "egyptian_book_of_the_dead_trans",
+    "tradition": "Egypt",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/16550/pg16550.txt"
+  },
+  {
+    "id": "enuma_elish_trans",
+    "tradition": "Mesopotamia",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/11082/pg11082.txt"
+  },
+  {
+    "id": "gilgamesh_trans",
+    "tradition": "Mesopotamia",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/11027/pg11027.txt"
+  },
+  {
+    "id": "norse_edda_trans",
+    "tradition": "Scandinavia",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/14726/pg14726.txt"
+  },
+  {
+    "id": "mabinogion_trans",
+    "tradition": "Wales/Celtic",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/5160/pg5160.txt"
+  },
+  {
+    "id": "dead_sea_scrolls_trans",
     "tradition": "Judaism",
-    "language": "Hebrew",
+    "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17709/pg17709.txt"
+    "url": "https://www.gutenberg.org/cache/epub/17912/pg17912.txt"
   },
   {
-    "id": "bible_orthodox_trans",
-    "tradition": "Christianity",
-    "language": "Greek",
+    "id": "philo_works_trans",
+    "tradition": "Judaism",
+    "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17710/pg17710.txt"
+    "url": "https://www.gutenberg.org/cache/epub/20867/pg20867.txt"
   },
   {
-    "id": "bible_coptic_trans",
-    "tradition": "Christianity",
-    "language": "Coptic",
+    "id": "josephus_antiquities_trans",
+    "tradition": "Judaism",
+    "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17711/pg17711.txt"
-  },
-  {
-    "id": "bible_syriac_trans",
-    "tradition": "Christianity",
-    "language": "Syriac",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17712/pg17712.txt"
-  },
-  {
-    "id": "bible_georgian_trans",
-    "tradition": "Christianity",
-    "language": "Georgian",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17713/pg17713.txt"
-  },
-  {
-    "id": "bible_ethiopic_trans",
-    "tradition": "Christianity",
-    "language": "Ge'ez",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17714/pg17714.txt"
-  },
-  {
-    "id": "bible_armenian_trans",
-    "tradition": "Christianity",
-    "language": "Armenian",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17715/pg17715.txt"
-  },
-  {
-    "id": "bible_slavonic_trans",
-    "tradition": "Christianity",
-    "language": "Church Slavonic",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17716/pg17716.txt"
-  },
-  {
-    "id": "bible_chinese_trans",
-    "tradition": "Christianity",
-    "language": "Chinese",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17717/pg17717.txt"
-  },
-  {
-    "id": "bible_japanese_trans",
-    "tradition": "Christianity",
-    "language": "Japanese",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17718/pg17718.txt"
-  },
-  {
-    "id": "bible_korean_trans",
-    "tradition": "Christianity",
-    "language": "Korean",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17719/pg17719.txt"
-  },
-  {
-    "id": "bible_russian_trans",
-    "tradition": "Christianity",
-    "language": "Russian",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17720/pg17720.txt"
-  },
-  {
-    "id": "bible_spanish_trans",
-    "tradition": "Christianity",
-    "language": "Spanish",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17721/pg17721.txt"
-  },
-  {
-    "id": "bible_french_trans",
-    "tradition": "Christianity",
-    "language": "French",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17722/pg17722.txt"
-  },
-  {
-    "id": "bible_german_trans",
-    "tradition": "Christianity",
-    "language": "German",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17723/pg17723.txt"
-  },
-  {
-    "id": "bible_italian_trans",
-    "tradition": "Christianity",
-    "language": "Italian",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17724/pg17724.txt"
-  },
-  {
-    "id": "bible_portuguese_trans",
-    "tradition": "Christianity",
-    "language": "Portuguese",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17725/pg17725.txt"
-  },
-  {
-    "id": "bible_dutch_trans",
-    "tradition": "Christianity",
-    "language": "Dutch",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17726/pg17726.txt"
-  },
-  {
-    "id": "bible_polish_trans",
-    "tradition": "Christianity",
-    "language": "Polish",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17727/pg17727.txt"
+    "url": "https://www.gutenberg.org/cache/epub/2848/pg2848.txt"
   }
 ]
