@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #faf9f5;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #3a3532;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .plot-section {
+            flex: 1;
+            position: relative;
+            min-width: 0;
+        }
+
+        .plot-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e8e6e4;
+            min-height: 500px;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .plot-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            border-radius: 0;
+        }
+
+        .plot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0eeec;
+            background: white;
+        }
+
+        .plot-title {
+            color: #3a3532;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .plot-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: #f5f4f2;
+            border: 1px solid #e0dedb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #5a524c;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #ebe9e6;
+            border-color: #d0ccc8;
+        }
+
+        .control-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            height: 600px;
+        }
+
+        .plot-container.fullscreen .iframe-wrapper {
+            height: calc(100vh - 70px);
+        }
+
+        #plot-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 600px;
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .search-wrapper {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .search-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e8e6e4;
+            transition: all 0.3s ease;
+        }
+
+        .search-panel.collapsed {
+            padding: 12px 20px;
+        }
+
+        .search-panel.collapsed .search-content {
+            display: none;
+        }
+
+        .search-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .search-toggle h3 {
+            color: #5a524c;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .toggle-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+            color: #5a524c;
+        }
+
+        .search-panel.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .search-panel label {
+            display: block;
+            color: #5a524c;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            margin-top: 15px;
+        }
+
+        .search-panel textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-panel textarea:focus {
+            border-color: #5a524c;
+        }
+
+        .search-btn {
+            width: 100%;
+            margin-top: 12px;
+            background: #5a524c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover:not(:disabled) {
+            background: #6b635c;
+        }
+
+        .search-btn:disabled {
+            background: #c0bcb8;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            color: #5a524c;
+            border: 1px solid #d0ccc8;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #f0eeec;
+            border-color: #c0bcb8;
+        }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .exit-fullscreen {
+            display: none;
+        }
+
+        .plot-container.fullscreen .exit-fullscreen {
+            display: flex;
+        }
+
+        .plot-container.fullscreen .enter-fullscreen {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='home.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Назад
+        </button>
+
+        <h1>Анализ</h1>
+
+        <div class="main-content">
+            <div class="plot-section">
+                <div class="plot-container" id="plotContainer">
+                    <div class="plot-header">
+                        <span class="plot-title">Визуализация UMAP Традиций</span>
+                        <div class="plot-controls">
+                            <button class="control-btn enter-fullscreen" onclick="toggleFullscreen()" title="На весь экран">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                                </svg>
+                                <span>Развернуть</span>
+                            </button>
+                            <button class="control-btn exit-fullscreen" onclick="toggleFullscreen()" title="Свернуть">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+                                </svg>
+                                <span>Свернуть</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="iframe-wrapper">
+                        <iframe id="plot-iframe" src="../analysis/umap_traditions.html"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-wrapper">
+                <div class="search-panel" id="searchPanel">
+                    <div class="search-toggle" onclick="toggleSearch()">
+                        <h3>Поиск соответствий</h3>
+                        <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="search-content">
+                        <label for="search-text">Поиск соответствий по вашему запросу</label>
+                        <textarea
+                            id="search-text"
+                            placeholder="Введите текст для поиска соответствий..."
+                        ></textarea>
+                        <button
+                            class="search-btn"
+                            id="search-btn"
+                            disabled
+                            onclick="openModal()"
+                        >
+                            Искать соответствия
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchText = document.getElementById('search-text');
+        const searchBtn = document.getElementById('search-btn');
+        const searchPanel = document.getElementById('searchPanel');
+        const plotContainer = document.getElementById('plotContainer');
+
+        searchText.addEventListener('input', function() {
+            searchBtn.disabled = this.value.trim().length === 0;
+        });
+
+        function openModal() {
+            const text = searchText.value.trim();
+            if (text) {
+                window.open('searchSimilarities.html', 'searchModal', 'width=600,height=400,centerscreen=yes');
+            }
+        }
+
+        function toggleSearch() {
+            searchPanel.classList.toggle('collapsed');
+        }
+
+        function toggleFullscreen() {
+            plotContainer.classList.toggle('fullscreen');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && plotContainer.classList.contains('fullscreen')) {
+                toggleFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
