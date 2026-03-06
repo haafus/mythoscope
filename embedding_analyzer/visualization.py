@@ -10,13 +10,16 @@ from .config import OUTPUT_DIR
 from .utils import _reduce_dimensions
 
 
-def plot_interactive_2d(data: List[Dict], sample_size: int = 1500, save_html: bool = True):
+def plot_interactive_2d(data: List[Dict], sample_size: int = -1, save_html: bool = True):
     if not data:
         print("Нет данных для визуализации.")
         return
 
-    sample_size = min(sample_size, len(data))
-    sample = data[:sample_size]
+    if sample_size == -1:
+        sample = data
+    else:
+        sample_size = min(sample_size, len(data))
+        sample = data[:sample_size]
     embeddings = np.stack([item["embedding"] for item in sample])
     embedding_2d = _reduce_dimensions(embeddings)
 
@@ -27,6 +30,7 @@ def plot_interactive_2d(data: List[Dict], sample_size: int = 1500, save_html: bo
         "id": [item["id"] for item in sample],
         "chunk_index": [item["chunk_index"] for item in sample],
         "text": [item["text"] for item in sample],
+        "text_short": [item["text"] if len(item["text"]) < 100 else item["text"][:100] + "…" for item in sample],
         "model": [item["model"] for item in sample]
     })
 
@@ -40,7 +44,7 @@ def plot_interactive_2d(data: List[Dict], sample_size: int = 1500, save_html: bo
         y="umap_y",
         color="tradition",
         color_discrete_map=color_map,
-        hover_data={"id": True, "chunk_index": True, "text": True, "model": False},
+        hover_data=["id", "chunk_index", "text_short", "tradition"],
         title="UMAP визуализация эмбеддингов по традициям",
         labels={"tradition": "Традиция", "umap_x": "UMAP 1", "umap_y": "UMAP 2"},
         width=1200,
@@ -49,7 +53,7 @@ def plot_interactive_2d(data: List[Dict], sample_size: int = 1500, save_html: bo
 
     fig.update_traces(
         marker=dict(size=6, opacity=0.8),
-        hovertemplate="<b>Традиция:</b> %{color}<br>"
+        hovertemplate="<b>Традиция:</b> %{customdata[3]}<br>"
                       "<b>ID:</b> %{customdata[0]}<br>"
                       "<b>Чанк:</b> %{customdata[1]}<br>"
                       "<b>Текст:</b> %{customdata[2]}<br>"
@@ -103,4 +107,4 @@ def analyze_embeddings():
     analyzer = EmbeddingAnalyzer(collection_name="corpus")
     analyzer.print_statistics()
     analyzer.save_summary()
-    plot_interactive_2d(analyzer.df, sample_size=1500)
+    plot_interactive_2d(analyzer.df, sample_size=-1)

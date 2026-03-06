@@ -1,0 +1,84 @@
+{
+  "mythology_text_corpora_urls": [
+    {
+      "name": "Perseus Digital Library",
+      "url": "http://www.perseus.tufts.edu"
+    },
+    {
+      "name": "Sacred Texts Archive",
+      "url": "https://www.sacred-texts.com"
+    },
+    {
+      "name": "Electronic Text Corpus of Sumerian Literature (ETCSL)",
+      "url": "https://etcsl.orinst.ox.ac.uk"
+    },
+    {
+      "name": "Thesaurus Linguae Aegyptiae",
+      "url": "https://thesaurus-linguae-aegyptiae.de"
+    },
+    {
+      "name": "Sanskrit Library",
+      "url": "https://www.sanskritlibrary.org"
+    },
+    {
+      "name": "GRETIL (Göttingen Register of Electronic Texts in Indian Languages)",
+      "url": "https://gretil.sub.uni-goettingen.de"
+    },
+    {
+      "name": "Chinese Text Project",
+      "url": "https://ctext.org"
+    },
+    {
+      "name": "National Institute of Japanese Literature",
+      "url": "https://www.nijl.ac.jp"
+    },
+    {
+      "name": "Internet Archive",
+      "url": "https://archive.org"
+    },
+    {
+      "name": "Project Gutenberg",
+      "url": "https://www.gutenberg.org"
+    },
+    {
+      "name": "HathiTrust Digital Library",
+      "url": "https://www.hathitrust.org"
+    },
+    {
+      "name": "Fordham Internet History Sourcebooks",
+      "url": "https://sourcebooks.fordham.edu"
+    },
+    {
+      "name": "Open Islamicate Texts Initiative (OpenITI)",
+      "url": "https://openiti.org"
+    },
+    {
+      "name": "TITUS Project",
+      "url": "https://titus.uni-frankfurt.de"
+    },
+    {
+      "name": "Finnish Literature Society Archive",
+      "url": "https://www.finlit.fi"
+    },
+    {
+      "name": "American Folklife Center (Library of Congress)",
+      "url": "https://www.loc.gov/folklife"
+    },
+    {
+      "name": "World Oral Literature Project",
+      "url": "https://www.oralliterature.org"
+    },
+    {
+      "name": "Native American Ethnography (Alexander Street)",
+      "url": "https://alexanderstreet.com/products/native-american-ethnography"
+    },
+    {
+      "name": "University of Auckland Library (Polynesian texts collections)",
+      "url": "https://www.auckland.ac.nz/en/library"
+    },
+    {
+      "name": "Buddhist Digital Resource Center",
+      "url": "https://www.bdrc.io"
+    }
+  ]
+}
