@@ -1,0 +1,17 @@
+{
+  "model_name": "sentence-transformers/LaBSE",
+  "output_dir": "analysis\\sentence-transformers_LaBSE",
+  "statistics": {
+    "n_samples": 2055,
+    "embedding_dim": 768,
+    "traditions": 1,
+    "tradition_counts": {
+      "India/Vedic": 2055
+    },
+    "model": "sentence-transformers/LaBSE",
+    "total_chunks_in_db": 2055
+  },
+  "available_models": [
+    "sentence-transformers/LaBSE"
+  ]
+}

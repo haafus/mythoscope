@@ -1,13 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="22dfc77f-98d5-44fb-8000-3bf35d3376e1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/MythoSemantic.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/corpus_builder/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/analysis_summary.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/umap_traditions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/umap_traditions_data.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/162ab049-26e1-4967-8157-d7fcf1843696/data_level0.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/162ab049-26e1-4967-8157-d7fcf1843696/header.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/162ab049-26e1-4967-8157-d7fcf1843696/index_metadata.pickle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/162ab049-26e1-4967-8157-d7fcf1843696/length.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/162ab049-26e1-4967-8157-d7fcf1843696/link_lists.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/chroma.sqlite3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/China_Confucianism/analects_trans/analects_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/China_Confucianism/book_of_changes_trans/book_of_changes_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/China_Confucianism/mencius_trans/mencius_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/China_Taoism/chuang_tzu_trans/chuang_tzu_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/China_Taoism/tao_te_ching_trans/tao_te_ching_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/apocrypha_trans/apocrypha_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/augustine_confessions_trans/augustine_confessions_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_armenian_trans/bible_armenian_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_chinese_trans/bible_chinese_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_coptic_trans/bible_coptic_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_dutch_trans/bible_dutch_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_ethiopic_trans/bible_ethiopic_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_french_trans/bible_french_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_georgian_trans/bible_georgian_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_german_trans/bible_german_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_italian_trans/bible_italian_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_japanese_trans/bible_japanese_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_kjv_orig/bible_kjv_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_korean_trans/bible_korean_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_orthodox_trans/bible_orthodox_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_polish_trans/bible_polish_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_portuguese_trans/bible_portuguese_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_russian_trans/bible_russian_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_slavonic_trans/bible_slavonic_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_spanish_trans/bible_spanish_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_syriac_trans/bible_syriac_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_vulgate_trans/bible_vulgate_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/desert_fathers_trans/desert_fathers_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/new_testament_greek_trans/new_testament_greek_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/new_testament_orig/new_testament_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Egypt/egyptian_book_of_the_dead_trans/egyptian_book_of_the_dead_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Greece/iliad_trans/iliad_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Greece/odyssey_trans/odyssey_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Buddhism/buddhist_tripitaka_trans/buddhist_tripitaka_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Buddhism/dhammapada_trans/dhammapada_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Hinduism/bhagavad_gita_trans/bhagavad_gita_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Hinduism/ramayana_trans/ramayana_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Hinduism/upanishads_trans/upanishads_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Vedic/atharvaveda_trans/atharvaveda_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Vedic/rigveda_trans/rigveda_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Vedic/samaveda_trans/samaveda_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/India_Vedic/yajurveda_trans/yajurveda_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Islam/hadith_bukhari_trans/hadith_bukhari_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Islam/hadith_muslim_trans/hadith_muslim_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Islam/quran_english_trans/quran_english_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Japan_Shinto/shinto_kojiki_trans/shinto_kojiki_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Japan_Shinto/shinto_nihongi_trans/shinto_nihongi_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/berakhot_orig/berakhot_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/berakhot_trans/berakhot_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/bible_sephardic_trans/bible_sephardic_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/dead_sea_scrolls_trans/dead_sea_scrolls_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_antiquities_trans/josephus_antiquities_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/midrash_rabbah_trans/midrash_rabbah_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/mishnah_orig/mishnah_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/mishnah_trans/mishnah_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/philo_works_trans/philo_works_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/talmud_bavli_orig/talmud_bavli_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/talmud_bavli_trans/talmud_bavli_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/talmud_yerushalmi_orig/talmud_yerushalmi_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/talmud_yerushalmi_trans/talmud_yerushalmi_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/torah_orig/torah_orig.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/torah_trans/torah_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Mesopotamia/enuma_elish_trans/enuma_elish_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Mesopotamia/gilgamesh_trans/gilgamesh_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Scandinavia/norse_edda_trans/norse_edda_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Wales_Celtic/mabinogion_trans/mabinogion_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/corpus_catalog.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/corpus_metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/processed_urls.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/download_and_build_corpus.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/download_list.json" beforeDir="false" afterPath="$PROJECT_DIR$/download_list.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding_analyzer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding_analyzer/analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/analyzer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding_analyzer/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding_analyzer/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/loader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding_analyzer/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embedding_analyzer/visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/visualization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/cache_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/cache_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/chroma_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/chroma_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/chunking.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/chunking.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/models_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/models_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/template/analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/analysis.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/template/corpus.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/corpus.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/template/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/home.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -20,17 +133,117 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "fix__corpus__and__ui",
-    "ignore.virus.scanning.warn.message": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.add_discription_to_text.executor&quot;: &quot;Run&quot;,
+    &quot;Python.clean_gutenberg (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.clean_gutenberg.executor&quot;: &quot;Run&quot;,
+    &quot;Python.executable_features.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fix__corpus__and__ui&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager">
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic" />
+      <recent name="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\executable" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.clean_gutenberg (1)">
+    <configuration name="add_discription_to_text" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MythoSemantic" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/executable" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\add_discription_to_text.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="clean_gutenberg (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MythoSemantic" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/clean_gutenberg.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="clean_gutenberg" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MythoSemantic" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/corpus_builder" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\clean_gutenberg.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="executable_features" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MythoSemantic" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/executable" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\executable_features.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MythoSemantic" />
       <option name="ENV_FILES" value="" />
@@ -56,7 +269,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.clean_gutenberg (1)" />
+        <item itemvalue="Python.clean_gutenberg" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.add_discription_to_text" />
+        <item itemvalue="Python.executable_features" />
       </list>
     </recent_temporary>
   </component>

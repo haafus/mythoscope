@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <title>Файлы корпуса</title>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js  "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js  "></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css  " />
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js  "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js  "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js  "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js  "></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -23,6 +25,15 @@
             margin: 0 auto;
         }
 
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -34,7 +45,6 @@
             border-radius: 6px;
             font-size: 0.95rem;
             cursor: pointer;
-            margin-bottom: 30px;
             transition: all 0.2s ease;
         }
 
@@ -50,9 +60,94 @@
 
         h1 {
             color: #3a3532;
-            margin-bottom: 30px;
+            margin-bottom: 0;
             font-size: 1.8rem;
             font-weight: 600;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #5a524c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dropdown-btn:hover {
+            background: #6b635c;
+        }
+
+        .dropdown-btn svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s;
+        }
+
+        .dropdown.active .dropdown-btn svg {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background: white;
+            min-width: 220px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid #e8e6e4;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #4a4542;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0eeec;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #faf9f5;
+        }
+
+        .dropdown-item svg {
+            width: 18px;
+            height: 18px;
+            color: #5a524c;
         }
 
         .table-wrapper {
@@ -88,13 +183,108 @@
             max-width: 300px;
         }
 
-        table.dataTable tbody td:last-child {
-            text-align: center;
-            max-width: none;
-        }
-
         table.dataTable tbody tr:hover {
             background-color: #fafafa;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #5a524c;
+            transition: transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .expand-btn:hover {
+            color: #3a3532;
+        }
+
+        .expand-btn.expanded {
+            transform: rotate(90deg);
+        }
+
+        .expand-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        tr.details-row {
+            background: #faf9f5 !important;
+        }
+
+        tr.details-row td {
+            padding: 0;
+            border-bottom: none;
+        }
+
+        .details-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .details-content.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .details-description {
+            color: #5a524c;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .details-description strong {
+            color: #3a3532;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .details-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            color: #5a524c;
+            border: 1px solid #d0ccc8;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f4f3;
+            border-color: #c0bcb8;
+        }
+
+        .btn-secondary svg {
+            width: 16px;
+            height: 16px;
         }
 
         .open-txt {
@@ -178,28 +368,87 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
+
+        .progress-modal {
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e8e6e4;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #5a524c;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #5a524c;
+            font-size: 0.9rem;
+        }
+
+        #modalContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        #modalContainer > * {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <button class="back-btn" onclick="window.location.href='home.html'">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            Назад
-        </button>
+        <div class="header-actions">
+            <button class="back-btn" onclick="window.location.href='home.html'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Назад
+            </button>
 
-        <h1>Таблица корпуса</h1>
+            <h1>Таблица корпуса</h1>
+
+            <div class="dropdown" id="actionsDropdown">
+                <button class="dropdown-btn" onclick="toggleDropdown()">
+                    Другие действия
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="dropdown-content">
+                    <div class="dropdown-item" onclick="downloadAll()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Скачать все
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="table-wrapper">
             <table id="corp-table" class="display" style="width:100%">
                 <thead>
                     <tr>
+                        <th style="width: 40px;"></th>
                         <th>Наименование</th>
                         <th>Традиция</th>
                         <th>Язык</th>
                         <th>Тип</th>
-                        <th>Действие</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -207,7 +456,22 @@
         </div>
     </div>
 
+    <div id="modalContainer"></div>
+
+    <div class="modal-overlay" id="progressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+        <div class="modal progress-modal" style="background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);">
+            <h2 style="color: #3a3532; margin-bottom: 20px; font-size: 1.3rem;">Скачивание документов</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progressText">Подготовка...</div>
+        </div>
+    </div>
+
     <script>
+        let tableData = [];
+        let table;
+
         const csvUrl = '../corpus/corpus_catalog.csv';
 
         Papa.parse(csvUrl, {
@@ -227,7 +491,9 @@
                     return;
                 }
 
-                $('#corp-table').DataTable({
+                tableData = data;
+
+                table = $('#corp-table').DataTable({
                     data: data,
                     destroy: true,
                     autoWidth: true,
@@ -255,30 +521,91 @@
                         }
                     },
                     columns: [
-                        { data: 'id' },
-                        { data: 'tradition' },
-                        { data: 'language' },
-                        { data: 'type' },
                         {
                             data: null,
                             orderable: false,
                             className: 'dt-center',
-                            render: function (row) {
-                                return `<button class="open-txt" data-tradition="${row.tradition}"
-                                data-filename="${row.id}">Открыть</button>`;
+                            render: function (data, type, row, meta) {
+                                return `<button class="expand-btn" onclick="toggleRow(${meta.row})" id="expand-btn-${meta.row}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>`;
                             }
-                        }
-                    ]
+                        },
+                        { data: 'id' },
+                        { data: 'tradition' },
+                        { data: 'language' },
+                        { data: 'type' }
+                    ],
+                    createdRow: function(row, data, dataIndex) {
+                        $(row).attr('data-index', dataIndex);
+                    }
                 });
+
+                setTimeout(() => addDetailRows(), 100);
             },
             error: function (err) {
                 alert('Ошибка загрузки CSV: ' + err.message);
             }
         });
 
-        $('#corp-table tbody').on('click', '.open-txt', function () {
-            const filename = $(this).data('filename');
-            const tradition = $(this).data('tradition');
+        function addDetailRows() {
+            $('#corp-table tbody tr').each(function() {
+                const index = $(this).attr('data-index');
+                if (index !== undefined && !$(this).next().hasClass('details-row')) {
+                    const data = tableData[index];
+                    const description = data.description || 'Описание отсутствует';
+                    const safeTradition = data.tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
+                    const fileUrl = `../corpus/${safeTradition}/${data.id}/${data.id}.txt`;
+
+                    const detailsRow = `
+                        <tr class="details-row" id="details-${index}">
+                            <td colspan="5" style="padding: 0;">
+                                <div class="details-content" id="details-content-${index}">
+                                    <div class="details-grid">
+                                        <div class="details-description">
+                                            <strong>Описание:</strong>
+                                            ${description}
+                                        </div>
+                                        <div class="details-actions">
+                                            <button class="btn-secondary" onclick="downloadFile('${fileUrl}', '${data.id}.txt')">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                                </svg>
+                                                Скачать
+                                            </button>
+                                            <button class="open-txt" onclick="openDocument('${data.id}', '${data.tradition}')">
+                                                Открыть
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    $(this).after(detailsRow);
+                }
+            });
+        }
+
+        function toggleRow(index) {
+            const btn = $(`#expand-btn-${index}`);
+            const content = $(`#details-content-${index}`);
+            const isExpanded = btn.hasClass('expanded');
+
+            if (isExpanded) {
+                btn.removeClass('expanded');
+                content.removeClass('show');
+            } else {
+                btn.addClass('expanded');
+                content.addClass('show');
+            }
+        }
+
+        function openDocument(filename, tradition) {
             const safeTradition = tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
             const txtUrl = `../corpus/${safeTradition}/${filename}/${filename}.txt`;
 
@@ -312,6 +639,99 @@
                     window.open(url, '_blank');
                 })
                 .catch(err => alert('Ошибка: ' + err.message));
+        }
+
+        function downloadFile(url, filename) {
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch(err => alert('Ошибка скачивания: ' + err.message));
+        }
+
+        function toggleDropdown() {
+            document.getElementById('actionsDropdown').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('actionsDropdown');
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        async function downloadAll() {
+            if (tableData.length === 0) {
+                alert('Нет данных для скачивания');
+                return;
+            }
+
+            toggleDropdown();
+
+            const progressModal = document.getElementById('progressModal');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressModal.style.display = 'flex';
+
+            const zip = new JSZip();
+            const folder = zip.folder("corpus_documents");
+            let downloaded = 0;
+            const total = tableData.length;
+
+            for (let i = 0; i < tableData.length; i++) {
+                const doc = tableData[i];
+                const safeTradition = doc.tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
+                const fileUrl = `../corpus/${safeTradition}/${doc.id}/${doc.id}.txt`;
+
+                try {
+                    const response = await fetch(fileUrl);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const text = await blob.text();
+                        folder.file(`${doc.id}.txt`, text);
+                    } else {
+                        console.warn(`Файл не найден: ${fileUrl}`);
+                    }
+                } catch (error) {
+                    console.error(`Ошибка загрузки ${doc.id}:`, error);
+                }
+
+                downloaded++;
+                const progress = (downloaded / total) * 100;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Скачано ${downloaded} из ${total} документов...`;
+            }
+            const headers = ['id', 'tradition', 'language', 'type', 'description'];
+            const csvContent = [
+                headers.join(','),
+                ...tableData.map(row => headers.map(h => `"${(row[h] || '').replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+            folder.file("corpus_catalog.csv", '\ufeff' + csvContent);
+
+            progressText.textContent = 'Создание архива...';
+
+            try {
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, "corpus_all_documents.zip");
+
+                setTimeout(() => {
+                    progressModal.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 500);
+            } catch (error) {
+                alert('Ошибка создания архива: ' + error.message);
+                progressModal.style.display = 'none';
+            }
+        }
+
+        $('#corp-table').on('draw.dt', function() {
+            setTimeout(() => addDetailRows(), 50);
         });
     </script>
 </body>

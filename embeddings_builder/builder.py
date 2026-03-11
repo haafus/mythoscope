@@ -8,12 +8,12 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from .cache_manager import load_from_cache, save_to_cache
-from .chroma_manager import save_to_chroma_collection, query_chroma_collection
+from .chroma_manager import save_to_chroma_collection, query_chroma_collection, delete_collection
 from .chunking import create_chunking_strategies
 from .models_repository import MODELS
+from .config import get_model_output_dir
 
 logger = logging.getLogger(__name__)
-
 
 class EmbeddingBuilder:
 
@@ -28,12 +28,12 @@ class EmbeddingBuilder:
             text_type: str = "translate",
     ):
         self.corpus_dir = Path(corpus_dir)
-        self.out_dir = Path(out_dir)
+        self.base_out_dir = Path(out_dir)
         self.chroma_path = Path(chroma_path)
         self.cache_dir = Path(cache_dir)
 
-        for path in [self.out_dir, self.chroma_path, self.cache_dir]:
-            path.mkdir(parents=True, exist_ok=True)
+        self.chroma_path.mkdir(parents=True, exist_ok=True)
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         if text_type not in {"original", "translate", "both"}:
             raise ValueError("text_type должен быть одним из: 'original', 'translate', 'both'")
@@ -47,6 +47,12 @@ class EmbeddingBuilder:
 
         self.model_registry = MODELS
         self.set_model(embedding_model)
+
+    def _update_output_dir(self):
+        out_dir_str = get_model_output_dir(str(self.base_out_dir), self.model_name)
+        self.out_dir = Path(out_dir_str)
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Папка для результатов: {self.out_dir}")
 
     def list_models(self) -> List[str]:
         return list(self.model_registry.keys())
@@ -110,6 +116,7 @@ class EmbeddingBuilder:
         self.model = self.model_registry[model_name]["model"]
         self.model_dim = self.model_registry[model_name]["dim"]
         self.model_type = self.model_registry[model_name]["type"]
+        self._update_output_dir()
 
     def get_current_model(self) -> Optional[str]:
         return getattr(self, 'model_name', None)
@@ -174,8 +181,7 @@ class EmbeddingBuilder:
             "embedding_dim": self.model_dim,
         }
 
-    def compare_models_and_strategies(self, text: str, models: List[str] = None, strategies: List[str] = None) -> Dict[
-        str, Any]:
+    def compare_models_and_strategies(self, text: str, models: List[str] = None, strategies: List[str] = None) -> Dict[str, Any]:
         if models is None:
             models = self.list_models()
         if strategies is None:
@@ -230,13 +236,21 @@ class EmbeddingBuilder:
 
         return {"collection": collection_name, "added": len(chunks)}
 
-    def save_all_corpus_to_chroma(self, collection_name: str = "default"):
+    def save_all_corpus_to_chroma(self, collection_name: str = "default", clear_existing: bool = True):
         texts = self._load_corpus_files()
         if not texts:
             logger.warning("Файлы в corpus/ не найдены. Проверьте структуру папки.")
             return
 
+        if clear_existing:
+            try:
+                delete_collection(self.chroma_client, collection_name)
+                logger.info(f"Коллекция '{collection_name}' очищена перед записью.")
+            except Exception as e:
+                logger.warning(f"Не удалось очистить коллекцию: {e}")
+
         logger.info(f"Сохраняю {len(texts)} файлов в коллекцию '{collection_name}'...")
+        logger.info(f"Используется модель: {self.model_name}")
 
         added_total = 0
         for idx, text_data in enumerate(texts, 1):
