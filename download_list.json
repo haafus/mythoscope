@@ -75,5 +75,19 @@
     "language": "English",
     "type": "translation",
     "url": "https://www.gutenberg.org/cache/epub/7145/pg7145.txt"
+  },
+  {
+    "id": "ancient_egyptian_legends_murray",
+    "tradition": "Ancient_Egyptian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/74354.txt.utf-8"
+  },
+  {
+    "id": "taoism_books_listing",
+    "tradition": "Taoism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/38585.txt.utf-8"
   }
 ]
