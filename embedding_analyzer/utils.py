@@ -8,11 +8,10 @@ import umap
 
 def load_corpus_metadata(path: str) -> Dict[str, str]:
     if not os.path.exists(path):
-        print(f"{path} не найден, 'tradition' будет 'unknown'")
         return {}
     with open(path, "r", encoding="utf-8") as f:
         metadata = json.load(f)
-    return {item["id"]: item["tradition"] for item in metadata}
+    return {str(item["id"]): item["tradition"] for item in metadata}
 
 
 def _reduce_dimensions(embeddings: np.ndarray, n_components: int = 2) -> np.ndarray:

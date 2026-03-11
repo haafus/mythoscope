@@ -1,7 +1,6 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import chromadb
-
 
 def save_to_chroma_collection(
         client: chromadb.PersistentClient,
@@ -19,6 +18,11 @@ def save_to_chroma_collection(
         documents=documents,
     )
 
+def delete_collection(client: chromadb.PersistentClient, collection_name: str):
+    try:
+        client.delete_collection(name=collection_name)
+    except Exception:
+        pass
 
 def query_chroma_collection(
         collection: chromadb.Collection,

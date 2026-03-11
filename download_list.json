@@ -1,226 +1,93 @@
 [
   {
-    "id": "rigveda_trans",
-    "tradition": "India/Vedic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/14518/pg14518.txt"
-  },
-  {
-    "id": "samaveda_trans",
-    "tradition": "India/Vedic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/14519/pg14519.txt"
-  },
-  {
-    "id": "yajurveda_trans",
-    "tradition": "India/Vedic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/14520/pg14520.txt"
-  },
-  {
-    "id": "atharvaveda_trans",
-    "tradition": "India/Vedic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/14521/pg14521.txt"
-  },
-  {
-    "id": "iliad_trans",
-    "tradition": "Greece",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/6130/pg6130.txt"
-  },
-  {
-    "id": "odyssey_trans",
-    "tradition": "Greece",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/1727/pg1727.txt"
-  },
-  {
-    "id": "shinto_kojiki_trans",
-    "tradition": "Japan/Shinto",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17584/pg17584.txt"
-  },
-  {
-    "id": "shinto_nihongi_trans",
-    "tradition": "Japan/Shinto",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17585/pg17585.txt"
-  },
-  {
-    "id": "analects_trans",
-    "tradition": "China/Confucianism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/4424/pg4424.txt"
-  },
-  {
-    "id": "mencius_trans",
-    "tradition": "China/Confucianism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2713/pg2713.txt"
-  },
-  {
-    "id": "book_of_changes_trans",
-    "tradition": "China/Confucianism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17704/pg17704.txt"
-  },
-  {
-    "id": "quran_english_trans",
-    "tradition": "Islam",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/1799/pg1799.txt"
-  },
-  {
-    "id": "hadith_bukhari_trans",
-    "tradition": "Islam",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17897/pg17897.txt"
-  },
-  {
-    "id": "bhagavad_gita_trans",
-    "tradition": "India/Hinduism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2778/pg2778.txt"
-  },
-  {
-    "id": "upanishads_trans",
-    "tradition": "India/Hinduism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/21244/pg21244.txt"
-  },
-  {
-    "id": "midrash_rabbah_trans",
+    "id": "josephus_antiquities_trans",
     "tradition": "Judaism",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17706/pg17706.txt"
+    "url": "https://www.gutenberg.org/cache/epub/2848/pg2848.txt"
   },
   {
-    "id": "new_testament_greek_trans",
-    "tradition": "Christianity",
-    "language": "English",
-    "type": "original",
-    "url": "https://www.gutenberg.org/cache/epub/1744/pg1744.txt"
-  },
-  {
-    "id": "bible_kjv_trans",
-    "tradition": "Christianity",
+    "id": "josephus_wars_trans",
+    "tradition": "Judaism",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+    "url": "https://www.gutenberg.org/cache/epub/2850/pg2850.txt"
+  },
+  {
+    "id": "sayings_of_the_jewish_fathers_trans",
+    "tradition": "Judaism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/8547/pg8547.txt"
   },
   {
     "id": "augustine_confessions_trans",
     "tradition": "Christianity",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/3296/pg3296.txt"
+    "url": "https://www.gutenberg.org/files/3296/3296-0.txt"
   },
   {
-    "id": "desert_fathers_trans",
+    "id": "bible_kjv_old_testament",
     "tradition": "Christianity",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/35765/pg35765.txt"
+    "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   },
   {
-    "id": "buddhist_tripitaka_trans",
-    "tradition": "India/Buddhism",
+    "id": "quran_english_pickthall",
+    "tradition": "Islam",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2055/pg2055.txt"
+    "url": "https://www.gutenberg.org/cache/epub/2800/pg2800.txt"
   },
   {
-    "id": "dhammapada_trans",
-    "tradition": "India/Buddhism",
+    "id": "dhammapada_max_muller",
+    "tradition": "Buddhism",
     "language": "English",
     "type": "translation",
     "url": "https://www.gutenberg.org/cache/epub/2017/pg2017.txt"
   },
   {
-    "id": "tao_te_ching_trans",
-    "tradition": "China/Taoism",
+    "id": "analects_confucius_legge",
+    "tradition": "Confucianism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/4094/pg4094.txt"
+  },
+  {
+    "id": "dao_de_jing_legge",
+    "tradition": "Taoism",
     "language": "English",
     "type": "translation",
     "url": "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   },
   {
-    "id": "chuang_tzu_trans",
-    "tradition": "China/Taoism",
+    "id": "the_holy_bible",
+    "tradition": "Christianity",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/5380/pg5380.txt"
+    "url": "https://www.gutenberg.org/files/1581/1581-0.txt"
   },
   {
-    "id": "egyptian_book_of_the_dead_trans",
-    "tradition": "Egypt",
+    "id": "egyptian_book_of_the_dead",
+    "tradition": "Ancient_Egyptian",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/16550/pg16550.txt"
+    "url": "https://www.gutenberg.org/cache/epub/7145/pg7145.txt"
   },
   {
-    "id": "enuma_elish_trans",
-    "tradition": "Mesopotamia",
+    "id": "ancient_egyptian_legends_murray",
+    "tradition": "Ancient_Egyptian",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/11082/pg11082.txt"
+    "url": "https://www.gutenberg.org/ebooks/74354.txt.utf-8"
   },
   {
-    "id": "gilgamesh_trans",
-    "tradition": "Mesopotamia",
+    "id": "taoism_books_listing",
+    "tradition": "Taoism",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/11027/pg11027.txt"
-  },
-  {
-    "id": "norse_edda_trans",
-    "tradition": "Scandinavia",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/14726/pg14726.txt"
-  },
-  {
-    "id": "mabinogion_trans",
-    "tradition": "Wales/Celtic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/5160/pg5160.txt"
-  },
-  {
-    "id": "dead_sea_scrolls_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/17912/pg17912.txt"
-  },
-  {
-    "id": "philo_works_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/20867/pg20867.txt"
-  },
-  {
-    "id": "josephus_antiquities_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2848/pg2848.txt"
+    "url": "https://www.gutenberg.org/ebooks/38585.txt.utf-8"
   }
 ]

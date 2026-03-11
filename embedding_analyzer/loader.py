@@ -2,7 +2,7 @@ from typing import List, Dict
 
 import chromadb
 
-from .config import CORPUS_METADATA_PATH, CHROMA_PATH
+from embeddings_builder.config import CORPUS_METADATA_PATH, CHROMA_PATH
 from .utils import load_corpus_metadata, safe_numpy_array
 
 
