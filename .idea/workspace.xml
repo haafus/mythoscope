@@ -4,7 +4,44 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="22dfc77f-98d5-44fb-8000-3bf35d3376e1" name="Changes" comment="" />
+    <list default="true" id="22dfc77f-98d5-44fb-8000-3bf35d3376e1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/MythoSemantic.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/analysis_summary.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/model_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_traditions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_traditions_data.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/models.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/analysis_summary.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/model_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_traditions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_LaBSE/umap_traditions_data.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/analysis_summary.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/model_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_traditions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_traditions_data.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/chroma.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chroma_db/chroma.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clean_gutenberg.py" beforeDir="false" afterPath="$PROJECT_DIR$/clean_gutenberg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Ancient_Egyptian/ancient_egyptian_legends_murray/ancient_egyptian_legends_murray.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Ancient_Egyptian/egyptian_book_of_the_dead/egyptian_book_of_the_dead.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Buddhism/dhammapada_max_muller/dhammapada_max_muller.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/augustine_confessions_trans/augustine_confessions_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_kjv_old_testament/bible_kjv_old_testament.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Christianity/the_holy_bible/the_holy_bible.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Confucianism/analects_confucius_legge/analects_confucius_legge.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Islam/quran_english_pickthall/quran_english_pickthall.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_antiquities_trans/josephus_antiquities_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_wars_trans/josephus_wars_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Judaism/sayings_of_the_jewish_fathers_trans/sayings_of_the_jewish_fathers_trans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Taoism/dao_de_jing_legge/dao_de_jing_legge.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/Taoism/taoism_books_listing/taoism_books_listing.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/corpus_catalog.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/corpus_metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/processed_urls.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/download_list.json" beforeDir="false" afterPath="$PROJECT_DIR$/download_list.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/embeddings_builder/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/config.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,6 +83,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup" />
       <recent name="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic" />
       <recent name="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\executable" />
     </key>

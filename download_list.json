@@ -89,5 +89,152 @@
     "language": "English",
     "type": "translation",
     "url": "https://www.gutenberg.org/ebooks/38585.txt.utf-8"
+  },
+  {
+    "id": "upanishads_paramananda",
+    "tradition": "Hinduism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/3283/pg3283.txt"
+  },
+  {
+    "id": "sacred_books_of_the_east_max_muller",
+    "tradition": "Multiple asian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/12894.txt.utf-8"
+  },
+  {
+    "id": "poetic_edda_bellows",
+    "tradition": "Norse",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/73533.txt.utf-8"
+  },
+  {
+    "id": "popol_vuh_spence",
+    "tradition": "Maya",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/56550.txt.utf-8"
+  },
+  {
+    "id": "prose_edda_anderson",
+    "tradition": "Norse",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/18947.txt.utf-8"
+  },
+  {
+    "id": "mabinogion_guest",
+    "tradition": "Celtic",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/19976.txt.utf-8"
+  },
+  {
+    "id": "gilgamesh_budge",
+    "tradition": "Mesopotamian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/7096/pg7096.txt"
+  },
+  {
+    "id": "maori_religion_shortland",
+    "tradition": "Maori",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/42218/pg42218.txt"
+  },
+  {
+    "id": "russian_folk_tales",
+    "tradition": "Slavic",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/62509.txt.utf-8"
+  },
+  {
+    "id": "west_african_folk_tales",
+    "tradition": "West_African",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/66923.txt.utf-8"
+  },
+  {
+    "id": "vikram_and_vampire_burton",
+    "tradition": "Hindu",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/2400.txt.utf-8"
+  },
+  {
+    "id": "ainu_folk_tales",
+    "tradition": "Ainu",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/29287.txt.utf-8"
+  },
+  {
+    "id": "japanese_myths_legends",
+    "tradition": "Japanese",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/45723.txt.utf-8"
+  },
+  {
+    "id": "legends_of_the_gods_budge",
+    "tradition": "Ancient_Egyptian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/9411.txt.utf-8"
+  },
+  {
+    "id": "hindu_law_yajnavalkya",
+    "tradition": "Hinduism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/files/21918/21918-0.txt"
+  },
+  {
+    "id": "buddhist_psalms_shinran",
+    "tradition": "Buddhism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/7015.txt.utf-8"
+  },
+  {
+    "id": "the_parsis_zoroastrianism",
+    "tradition": "Zoroastrianism",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/29109.txt.utf-8"
+  },
+  {
+    "id": "shinto_cult_terry",
+    "tradition": "Shinto",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/42747.txt.utf-8"
+  },
+  {
+    "id": "rig_veda_americanus_aztec",
+    "tradition": "Aztec",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/14993.txt.utf-8"
+  },
+  {
+    "id": "australian_aboriginal_myths",
+    "tradition": "Australian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/71940.txt.utf-8"
+  },
+  {
+    "id": "codex_junius_old_english",
+    "tradition": "Anglo-Saxon",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/ebooks/618.txt.utf-8"
   }
 ]
