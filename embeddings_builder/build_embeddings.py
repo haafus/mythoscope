@@ -48,5 +48,3 @@ def build_embeddings(clear_existing: bool = True):
 
     return builder
 
-if __name__ == "__main__":
-    build_embeddings(clear_existing=True)
