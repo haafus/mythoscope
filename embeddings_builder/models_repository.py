@@ -11,6 +11,6 @@ MODELS = {
                                     "type": "local"},
     "intfloat/e5-large-v2": {"path": "intfloat/e5-large-v2", "model": None, "loaded": False, "dim": 1024,
                              "type": "local"},
-    "Qwen/Qwen3-Embedding": {"path": "Qwen/Qwen3-Embedding", "model": None, "loaded": False, "dim": 3072,
+    "Qwen/Qwen3-Embedding": {"path": "Qwen/Qwen3-Embedding-4B", "model": None, "loaded": False, "dim": 3072,
                              "type": "local"},
 }

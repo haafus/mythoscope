@@ -5,7 +5,7 @@ DEFAULTS = {
     "out_dir": "analysis",
     "chroma_path": "./chroma_db",
     "cache_dir": "./cache",
-    "embedding_model": "BAAI/bge-m3",
+    "embedding_model": "Qwen/Qwen3-Embedding",
     "chunking": "paragraph_based",
     "text_type": "both",
 }
