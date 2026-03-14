@@ -1,0 +1,40 @@
+{
+  "model_name": "BAAI/bge-m3",
+  "output_dir": "analysis/BAAI_bge-m3",
+  "statistics": {
+    "n_samples": 13938,
+    "embedding_dim": 1024,
+    "traditions": 24,
+    "tradition_counts": {
+      "Judaism": 1295,
+      "Ainu": 213,
+      "Anglo-Saxon": 414,
+      "Christianity": 469,
+      "Taoism": 257,
+      "Japanese": 1399,
+      "Celtic": 268,
+      "Maori": 326,
+      "Islam": 2881,
+      "Shinto": 103,
+      "Mesopotamian": 100,
+      "Maya": 102,
+      "Buddhism": 424,
+      "Hindu": 890,
+      "Confucianism": 241,
+      "Slavic": 1350,
+      "Australian": 99,
+      "Aztec": 198,
+      "Multiple asian": 911,
+      "Ancient_Egyptian": 785,
+      "Hinduism": 247,
+      "West_African": 348,
+      "Zoroastrianism": 121,
+      "Norse": 497
+    },
+    "model": "BAAI/bge-m3",
+    "total_chunks_in_db": 13938
+  },
+  "available_models": [
+    "BAAI/bge-m3"
+  ]
+}
