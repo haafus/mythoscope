@@ -1,0 +1,35 @@
+Обзор анализа
+==================================================
+Модель: intfloat/e5-large-v2
+Всего чанков: 13938
+Чанков выбранной модели: 13938
+Размерность: 1024
+Традиций: 24
+
+Распределение по традициям:
+--------------------------------------------------
+  Islam: 2881
+  Japanese: 1399
+  Slavic: 1350
+  Judaism: 1295
+  Multiple asian: 911
+  Hindu: 890
+  Ancient_Egyptian: 785
+  Norse: 497
+  Christianity: 469
+  Buddhism: 424
+  Anglo-Saxon: 414
+  West_African: 348
+  Maori: 326
+  Celtic: 268
+  Taoism: 257
+  Hinduism: 247
+  Confucianism: 241
+  Ainu: 213
+  Aztec: 198
+  Zoroastrianism: 121
+  Shinto: 103
+  Maya: 102
+  Mesopotamian: 100
+  Australian: 99
+==================================================
