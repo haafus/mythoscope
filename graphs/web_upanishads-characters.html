@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Graph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #cy {
+            flex: 1;
+            background-color: #fafafa;
+        }
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 80%;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 16px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.2s;
+            user-select: text;
+        }
+        #info-panel table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #info-panel th, #info-panel td {
+            text-align: left;
+            padding: 6px 4px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        #info-panel th {
+            font-weight: 600;
+            color: #4a4a4a;
+            width: 35%;
+        }
+        #info-panel td {
+            color: #2c3e50;
+            width: 65%;
+        }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            pointer-events: auto;
+            color: #888;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        h4 {
+            margin: 0 0 8px 0;
+            color: #5e4b8b;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    <div id="info-panel" style="display: none;">
+        <button class="close-btn" id="close-panel">&times;</button>
+        <div id="info-content"></div>
+    </div>
+
+    <script>
+        const nodesData = [
+  {
+    "id": "214469",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Just, wise, compassionate, powerful, able to grant boons",
+    "description": "Description: The Ruler of Death, also called Vaivaswata, who tests and instructs Nachiketas.;\nRoles: Deity, teacher, judge of the dead;\nEpithets: Death, Vaivaswata, Ruler of Death;\nAttributes: Just, wise, compassionate, powerful, able to grant boons;\nActions: Receives Nachiketas after a three‑day wait, grants him three boons, offers worldly pleasures to test him, teaches the nature of the Self, immortality, and the path to Brahman;",
+    "shared_name": "Yama",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Death, Vaivaswata, Ruler of Death",
+    "SUID": 214469,
+    "SelfLoops": 0,
+    "id_original": "Yama",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 7,
+    "Actions": "Receives Nachiketas after a three‑day wait, grants him three boons, offers worldly pleasures to test him, teaches the nature of the Self, immortality, and the path to Brahman",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deity, teacher, judge of the dead",
+    "Radiality": 1.0,
+    "display_name": "Yama",
+    "Stress": 2,
+    "BetweennessCentrality": 1.0,
+    "NumberOfUndirectedEdges": 7,
+    "name": "Yama",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 7,
+    "size": 8.0
+  },
+  {
+    "id": "214466",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Powerful, swift, but limited in power compared to Brahman",
+    "description": "Description: The god of wind, one of the chief Devas who confronts Brahman.;\nRoles: Deva, god of wind;\nEpithets: Matarisva (traveller of Heaven);\nAttributes: Powerful, swift, but limited in power compared to Brahman;\nActions: Approaches the mysterious form of Brahman, is asked who he is, claims to blow away all things, fails to blow away a straw, returns humbled;",
+    "shared_name": "Vayu",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Matarisva (traveller of Heaven)",
+    "SUID": 214466,
+    "SelfLoops": 0,
+    "id_original": "Vayu",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.5,
+    "selected": false,
+    "ClosenessCentrality": 0.6666666666666666,
+    "Degree": 2,
+    "Actions": "Approaches the mysterious form of Brahman, is asked who he is, claims to blow away all things, fails to blow away a straw, returns humbled",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deva, god of wind",
+    "Radiality": 0.75,
+    "display_name": "Vayu",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Vayu",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 2.0,
+    "degree": 2,
+    "size": 3.7142857142857144
+  },
+  {
+    "id": "214463",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Pious but flawed in sacrifice, impatient when questioned",
+    "description": "Description: Father of Nachiketas, a sacrificer who performs the Viswajit sacrifice.;\nRoles: Brahmana, sacrificer, father;\nEpithets: Vahasrava, Auddalaki Aruni;\nAttributes: Pious but flawed in sacrifice, impatient when questioned;\nActions: Gives away all his possessions at a sacrifice, is questioned by his son, gives Nachiketas to Death in anger, later is freed from anxiety by Yama’s boon;",
+    "shared_name": "Vajasrava",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Vahasrava, Auddalaki Aruni",
+    "SUID": 214463,
+    "SelfLoops": 0,
+    "id_original": "Vajasrava",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.5,
+    "selected": false,
+    "ClosenessCentrality": 0.6666666666666666,
+    "Degree": 1,
+    "Actions": "Gives away all his possessions at a sacrifice, is questioned by his son, gives Nachiketas to Death in anger, later is freed from anxiety by Yama’s boon",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Brahmana, sacrificer, father",
+    "Radiality": 0.75,
+    "display_name": "Vajasrava",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Vajasrava",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 2.0,
+    "degree": 1,
+    "size": 2.857142857142857
+  },
+  {
+    "id": "214460",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Radiant, wise, compassionate, personification of divine wisdom",
+    "description": "Description: A beautiful woman of golden hue, daughter of Haimavat (the Himalaya), who reveals the identity of Brahman to Indra.;\nRoles: Goddess, revealer of truth;\nEpithets: Uma, daughter of Haimavat;\nAttributes: Radiant, wise, compassionate, personification of divine wisdom;\nActions: Appears to Indra, explains that the mysterious form was Brahman and that the Devas’ victory came from Him;",
+    "shared_name": "Uma",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Uma, daughter of Haimavat",
+    "SUID": 214460,
+    "SelfLoops": 0,
+    "id_original": "Uma",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 2,
+    "Actions": "Appears to Indra, explains that the mysterious form was Brahman and that the Devas’ victory came from Him",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Goddess, revealer of truth",
+    "Radiality": 1.0,
+    "display_name": "Uma",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Uma",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 2,
+    "size": 3.7142857142857144
+  },
+  {
+    "id": "214457",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "Wise, experienced, able to impart spiritual knowledge",
+    "description": "Description: The wise master who instructs the disciple about Brahman and the parable of the Devas.;\nRoles: Teacher, spiritual guide;\nEpithets: Master;\nAttributes: Wise, experienced, able to impart spiritual knowledge;\nActions: Answers the disciple’s questions, explains that Brahman is the ear of the ear, mind of the mind, etc.; tells the story of the Devas and Brahman; concludes with the teaching of the Upanishad;",
+    "shared_name": "Teacher (Kena)",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Master",
+    "SUID": 214457,
+    "SelfLoops": 0,
+    "id_original": "Teacher (Kena)",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "Answers the disciple’s questions, explains that Brahman is the ear of the ear, mind of the mind, etc.; tells the story of the Devas and Brahman; concludes with the teaching of the Upanishad",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Teacher, spiritual guide",
+    "Radiality": "Infinity",
+    "display_name": "Teacher (Kena)",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Teacher (Kena)",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "214454",
+    "Category": "Group",
+    "Eccentricity": 1,
+    "Attributes": "",
+    "description": "",
+    "shared_name": "Teacher",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 214454,
+    "SelfLoops": 0,
+    "id_original": "Teacher",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 3,
+    "Actions": "",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "",
+    "Radiality": 1.0,
+    "display_name": "Teacher",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Teacher",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 3,
+    "size": 4.571428571428571
+  },
+  {
+    "id": "214451",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Pious, resolute, discerning, pure-hearted, fearless in seeking ultimate knowledge",
+    "description": "Description: A young son of Vajasrava, who is given to Yama by his father and seeks to learn the secret of death.;\nRoles: Disciple, seeker of truth;\nEpithets: O Gautama (addressed by Yama);\nAttributes: Pious, resolute, discerning, pure-hearted, fearless in seeking ultimate knowledge;\nActions: Questions his father about the sacrifice, goes to Yama’s abode, waits three days without food, chooses three boons, rejects worldly temptations, receives instruction on the Self and immortality;",
+    "shared_name": "Nachiketas",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "O Gautama (addressed by Yama)",
+    "SUID": 214451,
+    "SelfLoops": 0,
+    "id_original": "Nachiketas",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.5,
+    "selected": false,
+    "ClosenessCentrality": 0.6666666666666666,
+    "Degree": 6,
+    "Actions": "Questions his father about the sacrifice, goes to Yama’s abode, waits three days without food, chooses three boons, rejects worldly temptations, receives instruction on the Self and immortality",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, seeker of truth",
+    "Radiality": 0.75,
+    "display_name": "Nachiketas",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 6,
+    "name": "Nachiketas",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 2.0,
+    "degree": 6,
+    "size": 7.142857142857142
+  },
+  {
+    "id": "214448",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Wise, humble, persistent, closest to the Supreme",
+    "description": "Description: The king of the Devas, who comes closest to knowing Brahman.;\nRoles: Deva, king of the gods;\nEpithets: Maghavan (Worshipful One);\nAttributes: Wise, humble, persistent, closest to the Supreme;\nActions: Approaches Brahman, finds it has disappeared, sees Uma, learns from her that it was Brahman, thereby gains true knowledge;",
+    "shared_name": "Indra",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Maghavan (Worshipful One)",
+    "SUID": 214448,
+    "SelfLoops": 0,
+    "id_original": "Indra",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 2,
+    "Actions": "Approaches Brahman, finds it has disappeared, sees Uma, learns from her that it was Brahman, thereby gains true knowledge",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deva, king of the gods",
+    "Radiality": 1.0,
+    "display_name": "Indra",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Indra",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 2,
+    "size": 3.7142857142857144
+  },
+  {
+    "id": "214445",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "Inquisitive, earnest, intellectually receptive",
+    "description": "Description: A sincere seeker who questions the teacher about the source of mind, life, speech, and senses.;\nRoles: Disciple, seeker;\nEpithets: Disciple;\nAttributes: Inquisitive, earnest, intellectually receptive;\nActions: Asks the teacher to explain who directs the mind, life, speech, eye, and ear; later expresses that he neither knows nor does not know Brahman;",
+    "shared_name": "Disciple (Kena)",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Disciple",
+    "SUID": 214445,
+    "SelfLoops": 0,
+    "id_original": "Disciple (Kena)",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "Asks the teacher to explain who directs the mind, life, speech, eye, and ear; later expresses that he neither knows nor does not know Brahman",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, seeker",
+    "Radiality": "Infinity",
+    "display_name": "Disciple (Kena)",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Disciple (Kena)",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "214442",
+    "Category": "Group",
+    "Eccentricity": 1,
+    "Attributes": "",
+    "description": "",
+    "shared_name": "Disciple",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 214442,
+    "SelfLoops": 0,
+    "id_original": "Disciple",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 3,
+    "Actions": "",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "",
+    "Radiality": 1.0,
+    "display_name": "Disciple",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Disciple",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 3,
+    "size": 4.571428571428571
+  },
+  {
+    "id": "214439",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Infinite, omnipotent, beyond speech and mind, self‑luminous, the essence of all",
+    "description": "Description: The Absolute, the Supreme Being, source of all existence; appears as a mysterious form to humble the Devas.;\nRoles: Supreme Being, Absolute Reality;\nEpithets: The One without a second, Tadvanam (object of adoration);\nAttributes: Infinite, omnipotent, beyond speech and mind, self‑luminous, the essence of all;\nActions: Appears before the Devas after their victory, tests Agni and Vayu with a straw, vanishes before Indra, reveals through Uma that all power flows from It;",
+    "shared_name": "Brahman",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "The One without a second, Tadvanam (object of adoration)",
+    "SUID": 214439,
+    "SelfLoops": 0,
+    "id_original": "Brahman",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 4,
+    "Actions": "Appears before the Devas after their victory, tests Agni and Vayu with a straw, vanishes before Indra, reveals through Uma that all power flows from It",
+    "PartnerOfMultiEdgedNodePairs": 2,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Supreme Being, Absolute Reality",
+    "Radiality": 1.0,
+    "display_name": "Brahman",
+    "Stress": 2,
+    "BetweennessCentrality": 1.0,
+    "NumberOfUndirectedEdges": 4,
+    "name": "Brahman",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 4,
+    "size": 5.428571428571429
+  },
+  {
+    "id": "214436",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Powerful, swift, but limited in power compared to Brahman",
+    "description": "Description: The god of fire, one of the chief Devas who confronts Brahman.;\nRoles: Deva, god of fire;\nEpithets: Jataveda (All-knowing);\nAttributes: Powerful, swift, but limited in power compared to Brahman;\nActions: Approaches the mysterious form of Brahman, is asked who he is, claims to burn all things, fails to burn a straw, returns humbled;",
+    "shared_name": "Agni",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Jataveda (All-knowing)",
+    "SUID": 214436,
+    "SelfLoops": 0,
+    "id_original": "Agni",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.5,
+    "selected": false,
+    "ClosenessCentrality": 0.6666666666666666,
+    "Degree": 2,
+    "Actions": "Approaches the mysterious form of Brahman, is asked who he is, claims to burn all things, fails to burn a straw, returns humbled",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deva, god of fire",
+    "Radiality": 0.75,
+    "display_name": "Agni",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Agni",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 2.0,
+    "degree": 2,
+    "size": 3.7142857142857144
+  }
+];
+        const edgesData = [
+  {
+    "id": "214487",
+    "source": "214469",
+    "target": "214451",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Yama (interacts with) Nachiketas",
+    "shared_interaction": "interacts with",
+    "name": "Yama (interacts with) Nachiketas",
+    "interaction": "interacts with",
+    "data_key_column": 214487,
+    "SUID": 214487,
+    "source_original": "Yama",
+    "selected": false,
+    "target_original": "Nachiketas",
+    "relation": "teaches about the Self to"
+  },
+  {
+    "id": "214484",
+    "source": "214469",
+    "target": "214451",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Yama (interacts with) Nachiketas",
+    "shared_interaction": "interacts with",
+    "name": "Yama (interacts with) Nachiketas",
+    "interaction": "interacts with",
+    "data_key_column": 214484,
+    "SUID": 214484,
+    "source_original": "Yama",
+    "selected": false,
+    "target_original": "Nachiketas",
+    "relation": "offers worldly pleasures to"
+  },
+  {
+    "id": "214481",
+    "source": "214469",
+    "target": "214451",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Yama (interacts with) Nachiketas",
+    "shared_interaction": "interacts with",
+    "name": "Yama (interacts with) Nachiketas",
+    "interaction": "interacts with",
+    "data_key_column": 214481,
+    "SUID": 214481,
+    "source_original": "Yama",
+    "selected": false,
+    "target_original": "Nachiketas",
+    "relation": "teaches about fire-sacrifice to"
+  },
+  {
+    "id": "214478",
+    "source": "214469",
+    "target": "214451",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Yama (interacts with) Nachiketas",
+    "shared_interaction": "interacts with",
+    "name": "Yama (interacts with) Nachiketas",
+    "interaction": "interacts with",
+    "data_key_column": 214478,
+    "SUID": 214478,
+    "source_original": "Yama",
+    "selected": false,
+    "target_original": "Nachiketas",
+    "relation": "grants boons to"
+  },
+  {
+    "id": "214508",
+    "source": "214466",
+    "target": "214439",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Vayu (interacts with) Brahman",
+    "shared_interaction": "interacts with",
+    "name": "Vayu (interacts with) Brahman",
+    "interaction": "interacts with",
+    "data_key_column": 214508,
+    "SUID": 214508,
+    "source_original": "Vayu",
+    "selected": false,
+    "target_original": "Brahman",
+    "relation": "fails test from"
+  },
+  {
+    "id": "214472",
+    "source": "214463",
+    "target": "214469",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Vajasrava (interacts with) Yama",
+    "shared_interaction": "interacts with",
+    "name": "Vajasrava (interacts with) Yama",
+    "interaction": "interacts with",
+    "data_key_column": 214472,
+    "SUID": 214472,
+    "source_original": "Vajasrava",
+    "selected": false,
+    "target_original": "Yama",
+    "relation": "gives Nachiketas to"
+  },
+  {
+    "id": "214514",
+    "source": "214460",
+    "target": "214448",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Uma (interacts with) Indra",
+    "shared_interaction": "interacts with",
+    "name": "Uma (interacts with) Indra",
+    "interaction": "interacts with",
+    "data_key_column": 214514,
+    "SUID": 214514,
+    "source_original": "Uma",
+    "selected": false,
+    "target_original": "Indra",
+    "relation": "tells"
+  },
+  {
+    "id": "214517",
+    "source": "214454",
+    "target": "214442",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Teacher (interacts with) Disciple",
+    "shared_interaction": "interacts with",
+    "name": "Teacher (interacts with) Disciple",
+    "interaction": "interacts with",
+    "data_key_column": 214517,
+    "SUID": 214517,
+    "source_original": "Teacher",
+    "selected": false,
+    "target_original": "Disciple",
+    "relation": "teaches Upanishad to"
+  },
+  {
+    "id": "214496",
+    "source": "214454",
+    "target": "214442",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Teacher (interacts with) Disciple",
+    "shared_interaction": "interacts with",
+    "name": "Teacher (interacts with) Disciple",
+    "interaction": "interacts with",
+    "data_key_column": 214496,
+    "SUID": 214496,
+    "source_original": "Teacher",
+    "selected": false,
+    "target_original": "Disciple",
+    "relation": "answers"
+  },
+  {
+    "id": "214490",
+    "source": "214451",
+    "target": "214469",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Nachiketas (interacts with) Yama",
+    "shared_interaction": "interacts with",
+    "name": "Nachiketas (interacts with) Yama",
+    "interaction": "interacts with",
+    "data_key_column": 214490,
+    "SUID": 214490,
+    "source_original": "Nachiketas",
+    "selected": false,
+    "target_original": "Yama",
+    "relation": "refuses"
+  },
+  {
+    "id": "214475",
+    "source": "214451",
+    "target": "214469",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Nachiketas (interacts with) Yama",
+    "shared_interaction": "interacts with",
+    "name": "Nachiketas (interacts with) Yama",
+    "interaction": "interacts with",
+    "data_key_column": 214475,
+    "SUID": 214475,
+    "source_original": "Nachiketas",
+    "selected": false,
+    "target_original": "Yama",
+    "relation": "asks boons from"
+  },
+  {
+    "id": "214511",
+    "source": "214448",
+    "target": "214460",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Indra (interacts with) Uma",
+    "shared_interaction": "interacts with",
+    "name": "Indra (interacts with) Uma",
+    "interaction": "interacts with",
+    "data_key_column": 214511,
+    "SUID": 214511,
+    "source_original": "Indra",
+    "selected": false,
+    "target_original": "Uma",
+    "relation": "asks"
+  },
+  {
+    "id": "214493",
+    "source": "214442",
+    "target": "214454",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Disciple (interacts with) Teacher",
+    "shared_interaction": "interacts with",
+    "name": "Disciple (interacts with) Teacher",
+    "interaction": "interacts with",
+    "data_key_column": 214493,
+    "SUID": 214493,
+    "source_original": "Disciple",
+    "selected": false,
+    "target_original": "Teacher",
+    "relation": "asks"
+  },
+  {
+    "id": "214505",
+    "source": "214439",
+    "target": "214466",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Brahman (interacts with) Vayu",
+    "shared_interaction": "interacts with",
+    "name": "Brahman (interacts with) Vayu",
+    "interaction": "interacts with",
+    "data_key_column": 214505,
+    "SUID": 214505,
+    "source_original": "Brahman",
+    "selected": false,
+    "target_original": "Vayu",
+    "relation": "tests"
+  },
+  {
+    "id": "214499",
+    "source": "214439",
+    "target": "214436",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Brahman (interacts with) Agni",
+    "shared_interaction": "interacts with",
+    "name": "Brahman (interacts with) Agni",
+    "interaction": "interacts with",
+    "data_key_column": 214499,
+    "SUID": 214499,
+    "source_original": "Brahman",
+    "selected": false,
+    "target_original": "Agni",
+    "relation": "tests"
+  },
+  {
+    "id": "214502",
+    "source": "214436",
+    "target": "214439",
+    "EdgeBetweenness": 4.0,
+    "shared_name": "Agni (interacts with) Brahman",
+    "shared_interaction": "interacts with",
+    "name": "Agni (interacts with) Brahman",
+    "interaction": "interacts with",
+    "data_key_column": 214502,
+    "SUID": 214502,
+    "source_original": "Agni",
+    "selected": false,
+    "target_original": "Brahman",
+    "relation": "fails test from"
+  }
+];
+
+        const elements = [
+            ...nodesData.map(node => ({ data: node })),
+            ...edgesData.map(edge => ({ data: edge }))
+        ];
+
+        const categoryColors = {
+            'Character': '#dcd0ff',
+            'Group': '#cccccc'
+        };
+        const defaultColor = '#aaaaaa';
+
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: elements,
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': function(ele) {
+                            const cat = ele.data('Category');
+                            return categoryColors[cat] || defaultColor;
+                        },
+                        'width': function(ele) { return ele.data('size') || 3; },
+                        'height': function(ele) { return ele.data('size') || 3; },
+                        'label': function(ele) { return ele.data('display_name') || ele.data('Name') || ele.data('shared name') || ele.data('id'); },
+                        'font-size': '2.2px',
+                        'text-valign': 'bottom',
+                        'text-halign': 'center',
+                        'text-margin-y': 1,
+                        'border-width': 0.2,
+                        'border-color': '#555'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 0.2,
+                        'line-color': '#aaa',
+                        'target-arrow-color': '#aaa',
+                        'target-arrow-shape': 'triangle',
+                        'target-arrow-scale': 0.1,
+                        'arrow-scale': 0.1,
+                        'curve-style': 'bezier',
+                        'label': 'data(relation)',
+                        'font-size': '1.5px',
+                        'text-rotation': 'autorotate',
+                        'text-margin-y': -1,
+                        'text-background-opacity': 0.7,
+                        'text-background-color': '#ffffff'
+                    }
+                },
+                {
+                    selector: 'node.hover-highlight',
+                    style: {
+                        'border-width': 0.3,
+                        'border-color': '#ffaa00',
+                        'overlay-opacity': 0.3,
+                        'overlay-color': '#ffaa00',
+                        'overlay-padding': '1px'
+                    }
+                },
+                {
+                    selector: 'edge.hover-highlight',
+                    style: {
+                        'width': 0.4,
+                        'line-color': '#ffaa00',
+                        'target-arrow-color': '#ffaa00'
+                    }
+                },
+                {
+                    selector: '.faded',
+                    style: {
+                        'opacity': 0.1
+                    }
+                }
+            ],
+            layout: {
+                name: 'cose',
+                idealEdgeLength: 5,
+                padding: 50,
+                spacingFactor: 5,
+                nodeRepulsion: 40000,
+                gravity: 0.0005,
+                numIter: 10000
+            },
+            wheelSensitivity: 0.5
+        });
+
+        let hoveredNode = null;
+        function fadeOthers(node) {
+            const neighbors = node.neighborhood().nodes();
+            const incidentEdges = node.connectedEdges();
+            const highlightSet = node.union(neighbors).union(incidentEdges);
+            cy.elements().not(highlightSet).addClass('faded');
+            node.addClass('hover-highlight');
+            incidentEdges.addClass('hover-highlight');
+            neighbors.addClass('hover-highlight');
+        }
+        function restoreAll() {
+            cy.elements().removeClass('faded hover-highlight');
+        }
+        cy.on('mouseover', 'node', function(evt) {
+            if (hoveredNode === evt.target) return;
+            hoveredNode = evt.target;
+            fadeOthers(hoveredNode);
+        });
+        cy.on('mouseout', 'node', function() {
+            hoveredNode = null;
+            restoreAll();
+        });
+
+        const tooltipDiv = document.createElement('div');
+        tooltipDiv.style.position = 'absolute';
+        tooltipDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        tooltipDiv.style.color = '#fff';
+        tooltipDiv.style.padding = '4px 8px';
+        tooltipDiv.style.borderRadius = '6px';
+        tooltipDiv.style.fontSize = '12px';
+        tooltipDiv.style.pointerEvents = 'none';
+        tooltipDiv.style.zIndex = '1000';
+        tooltipDiv.style.display = 'none';
+        document.body.appendChild(tooltipDiv);
+
+        cy.on('mouseover', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        tooltipDiv.style.display = 'block';
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+
+    cy.on('mousemove', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+        const infoPanel = document.getElementById('info-panel');
+        const infoContent = document.getElementById('info-content');
+        const closeBtn = document.getElementById('close-panel');
+        closeBtn.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formatNodeInfo(nodeData) {
+            var fieldNames = {
+                'display_name': 'Name',
+                'Category': 'Category',
+                'Description': 'Description',
+                'Roles': 'Roles',
+                'Epithets': 'Epithets',
+                'Attributes': 'Attributes',
+                'Actions': 'Actions',
+                'AverageShortestPathLength': 'Average Shortest Path Length',
+                'ClusteringCoefficient': 'Clustering Coefficient',
+                'ClosenessCentrality': 'Closeness Centrality',
+                'Degree': 'Degree',
+                'BetweennessCentrality': 'Betweenness Centrality',
+                'Radiality': 'Radiality'
+            };
+            var fieldsOrder = [
+                'display_name', 'Category', 'Description', 'Roles', 'Epithets', 'Attributes', 'Actions',
+                'AverageShortestPathLength', 'ClusteringCoefficient', 'ClosenessCentrality',
+                'Degree', 'BetweennessCentrality', 'Radiality'
+            ];
+            var title = nodeData.display_name || nodeData.Name || nodeData['shared name'] || nodeData.id || 'Информация об узле';
+            var html = '<h4>' + escapeHtml(title) + '</h4>';
+            html += '<table>';
+            for (var i = 0; i < fieldsOrder.length; i++) {
+                var field = fieldsOrder[i];
+                var value = nodeData[field];
+                if (value !== undefined && value !== null && value !== '') {
+                    if (typeof value === 'object') value = JSON.stringify(value);
+                    var displayName = fieldNames[field] || field;
+                    html += '<tr>';
+                    html += '<th>' + escapeHtml(displayName) + '</th>';
+                    html += '<td>' + escapeHtml(String(value)) + '<\/td>';
+                    html += '</tr>';
+                }
+            }
+            html += '</table>';
+            return html;
+        }
+
+        cy.on('tap', 'node', (evt) => {
+            const node = evt.target;
+            const nodeData = node.data();
+            infoContent.innerHTML = formatNodeInfo(nodeData);
+            infoPanel.style.display = 'block';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!infoPanel.contains(e.target) && e.target !== infoPanel && !cy.getElementById(e.target.id)) {
+                infoPanel.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            cy.resize();
+        });
+    </script>
+</body>
+</html>
