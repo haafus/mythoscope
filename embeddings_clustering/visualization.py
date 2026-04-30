@@ -12,7 +12,6 @@ from sklearn.preprocessing import StandardScaler
 
 try:
     import umap
-
     UMAP_AVAILABLE = True
 except ImportError:
     UMAP_AVAILABLE = False
@@ -21,7 +20,6 @@ except ImportError:
 try:
     from sklearn.decomposition import PCA
     from sklearn.manifold import TSNE
-
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
@@ -29,13 +27,11 @@ except ImportError:
 
 
 def reduce_dimensions(embeddings: np.ndarray, method: str = 'umap', n_components: int = 2) -> np.ndarray:
-    """Уменьшение размерности эмбеддингов"""
     if len(embeddings) == 0:
         return np.array([])
 
     if len(embeddings) < 3:
         print(f"Предупреждение: слишком мало точек ({len(embeddings)}) для уменьшения размерности")
-        # Возвращаем нулевые координаты
         return np.zeros((len(embeddings), n_components))
 
     scaler = StandardScaler()
@@ -68,7 +64,6 @@ def reduce_dimensions(embeddings: np.ndarray, method: str = 'umap', n_components
                 reducer = PCA(n_components=n_components, random_state=42)
                 return reducer.fit_transform(embeddings_scaled)
 
-    # Фолбэк: возвращаем нули
     print("Не удалось выполнить уменьшение размерности")
     return np.zeros((len(embeddings), n_components))
 
@@ -80,8 +75,6 @@ def plot_clustering_results_2d(
         title: str = "Результаты кластеризации",
         output_path: str = None
 ) -> Optional[go.Figure]:
-    """Визуализация результатов кластеризации в 2D"""
-
     if len(embeddings_2d) == 0:
         print("Нет данных для визуализации")
         return None
@@ -170,7 +163,6 @@ def plot_confusion_matrix_heatmap(
     clean_true = true_labels[mask]
     clean_pred = predicted_labels[mask]
 
-    # Преобразуем строковые метки в числовые для матрицы
     from sklearn.preprocessing import LabelEncoder
     le_true = LabelEncoder()
     le_pred = LabelEncoder()

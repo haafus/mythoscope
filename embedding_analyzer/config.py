@@ -5,8 +5,6 @@ from typing import Optional
 
 
 class AnalyzerConfig:
-    """Единый конфиг для анализатора, читающий из основного config.yaml"""
-
     def __init__(self, config_path: str = "config.yaml"):
         self.config_path = Path(config_path)
         self._config = self._load_config()
@@ -34,7 +32,6 @@ class AnalyzerConfig:
         return os.path.join(self.corpus_dir, 'corpus_metadata.json')
 
 
-# Глобальный экземпляр
 _analyzer_config = None
 
 
@@ -45,7 +42,6 @@ def get_analyzer_config() -> AnalyzerConfig:
     return _analyzer_config
 
 
-# Для обратной совместимости с существующим кодом
 def get_corpus_metadata_path() -> str:
     return get_analyzer_config().corpus_metadata_path
 
@@ -61,20 +57,15 @@ def get_output_dir() -> str:
 def set_paths(chroma_path: Optional[str] = None,
               output_dir: Optional[str] = None,
               corpus_dir: Optional[str] = None):
-    """
-    Установка путей (создает/обновляет config.yaml)
-    """
     config = get_analyzer_config()
     config_path = config.config_path
 
-    # Загружаем существующую конфигурацию
     if config_path.exists():
         with open(config_path, 'r', encoding='utf-8') as f:
             full_config = yaml.safe_load(f) or {}
     else:
         full_config = {}
 
-    # Обновляем пути
     if 'paths' not in full_config:
         full_config['paths'] = {}
 
@@ -85,23 +76,19 @@ def set_paths(chroma_path: Optional[str] = None,
     if corpus_dir:
         full_config['paths']['corpus_dir'] = corpus_dir
 
-    # Сохраняем конфигурацию
     with open(config_path, 'w', encoding='utf-8') as f:
         yaml.dump(full_config, f, allow_unicode=True, default_flow_style=False)
 
-    # Обновляем внутреннее состояние - ИСПРАВЛЕНО
     global _analyzer_config
     _analyzer_config = AnalyzerConfig(str(config_path))
 
 
 def get_model_output_dir(model_name: str) -> str:
-    """Получить директорию для конкретной модели"""
     config = get_analyzer_config()
     safe_name = model_name.replace("/", "_").replace("\\", "_")
     return os.path.join(config.output_dir, safe_name)
 
 
-# Константы для обратной совместимости - ИСПРАВЛЕНО (теперь функции, а не переменные)
 def CORPUS_METADATA_PATH():
     return get_corpus_metadata_path()
 

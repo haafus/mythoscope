@@ -3,7 +3,7 @@ import json
 import numpy as np
 from typing import Dict, List, Optional, Any
 from .loader import EmbeddingDataLoader
-from .config import get_analyzer_config, get_model_output_dir  # ДОБАВЛЕН ИМПОРТ
+from .config import get_analyzer_config, get_model_output_dir
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,11 +30,8 @@ class EmbeddingAnalyzer:
         else:
             logger.info(f"Доступные модели: {self.available_models}")
             logger.info(f"Используйте .set_model('имя_модели') для загрузки данных")
-            # ИСПРАВЛЕНО: Не вызываем set_model автоматически если моделей несколько
-            # self.set_model(self.available_models[0])  # УБРАНО
 
     def set_model(self, model_name: str) -> None:
-        """Меняет модель и перезагружает данные из Chroma"""
         if model_name not in self.available_models:
             raise ValueError(
                 f"Модель '{model_name}' не найдена. "
@@ -42,7 +39,6 @@ class EmbeddingAnalyzer:
             )
 
         self.model_name = model_name
-        # ИСПРАВЛЕНО: Используем get_model_output_dir для консистентности
         self.output_dir = get_model_output_dir(model_name)
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -55,9 +51,7 @@ class EmbeddingAnalyzer:
         else:
             logger.info(f"Загружено чанков: {len(self.data)}")
 
-
     def filter_by_model(self) -> List[Dict[str, Any]]:
-        """Возвращает данные для текущей модели"""
         if not self._is_loaded or not self.data:
             raise RuntimeError("Данные не загружены. Вызовите .set_model() сначала.")
         return self.data
@@ -109,7 +103,6 @@ class EmbeddingAnalyzer:
             logger.warning("Нет данных для сохранения")
             return
 
-        # Отложенный импорт для избежания циркулярной зависимости
         from .visualization import save_summary_to_files
 
         os.makedirs(self.output_dir, exist_ok=True)
@@ -130,17 +123,13 @@ class EmbeddingAnalyzer:
         logger.info(f"Информация о модели сохранена: {info_path}")
 
     def save_models_list(self, output_dir: Optional[str] = None) -> str:
-        """Сохраняет список доступных моделей"""
         if output_dir is None:
             output_dir = self.config.output_dir
 
         os.makedirs(output_dir, exist_ok=True)
         list_path = os.path.join(output_dir, "models.json")
 
-        # Загружаем существующие модели
         existing_models = self._load_existing_models(list_path)
-
-        # Объединяем с текущими
         all_models = sorted(set(existing_models + self.available_models))
 
         with open(list_path, 'w', encoding='utf-8') as f:
@@ -151,7 +140,6 @@ class EmbeddingAnalyzer:
 
     @staticmethod
     def _load_existing_models(list_path: str) -> List[str]:
-        """Загружает существующий список моделей"""
         if not os.path.exists(list_path):
             return []
 

@@ -49,11 +49,9 @@ def query_chroma_collection(
 
 @contextmanager
 def get_chroma_collection(client: chromadb.PersistentClient, collection_name: str):
-    """Context manager for safe collection access"""
     collection = None
     try:
         collection = client.get_or_create_collection(name=collection_name)
         yield collection
     finally:
-        # Chroma doesn't require explicit closing, but we keep for future
         pass

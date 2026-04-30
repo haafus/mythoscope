@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class CacheValidator:
-    """Validate cache integrity using CRC32 or MD5"""
 
     def __init__(self, cache_dir: Path, validation_method: str = "crc32", ttl_days: int = 30):
         self.cache_dir = Path(cache_dir)
@@ -20,11 +19,9 @@ class CacheValidator:
         self._load_checksums()
 
     def _get_checksum_file(self) -> Path:
-        """Get path to checksum index file"""
         return self.cache_dir / ".checksums.json"
 
     def _load_checksums(self) -> None:
-        """Load checksums from index file"""
         checksum_file = self._get_checksum_file()
         if checksum_file.exists():
             try:
@@ -35,7 +32,6 @@ class CacheValidator:
                 logger.warning(f"Failed to load checksums: {e}")
 
     def _save_checksums(self) -> None:
-        """Save checksums to index file"""
         try:
             import json
             checksum_file = self._get_checksum_file()
@@ -46,15 +42,12 @@ class CacheValidator:
             logger.warning(f"Failed to save checksums: {e}")
 
     def _calculate_crc32(self, data: bytes) -> str:
-        """Calculate CRC32 checksum"""
         return format(zlib.crc32(data) & 0xFFFFFFFF, '08x')
 
     def _calculate_md5(self, data: bytes) -> str:
-        """Calculate MD5 checksum"""
         return hashlib.md5(data).hexdigest()
 
     def _calculate_checksum(self, data: bytes) -> str:
-        """Calculate checksum using configured method"""
         if self.validation_method == "crc32":
             return self._calculate_crc32(data)
         elif self.validation_method == "md5":
@@ -63,7 +56,6 @@ class CacheValidator:
             return ""
 
     def compute_checksum_for_file(self, file_path: Path) -> Optional[str]:
-        """Compute checksum for a cache file"""
         if not file_path.exists():
             return None
 
@@ -76,28 +68,23 @@ class CacheValidator:
             return None
 
     def validate_file(self, file_path: Path) -> Tuple[bool, Optional[str]]:
-        """Validate a single cache file, returns (is_valid, checksum)"""
         if not file_path.exists():
             return False, None
 
-        # Check TTL
         if self.ttl_days > 0:
             mtime = datetime.fromtimestamp(file_path.stat().st_mtime)
             if datetime.now() - mtime > timedelta(days=self.ttl_days):
                 logger.debug(f"Cache file expired: {file_path}")
                 return False, None
 
-        # Get stored checksum
         stored_checksum = self._checksums.get(file_path.name)
         if not stored_checksum and self.validation_method != "none":
-            # No stored checksum, compute and store
             computed = self.compute_checksum_for_file(file_path)
             if computed:
                 self._checksums[file_path.name] = computed
                 self._save_checksums()
             return True, computed
 
-        # Compute current checksum and compare
         if self.validation_method != "none" and stored_checksum:
             current_checksum = self.compute_checksum_for_file(file_path)
             if current_checksum and current_checksum != stored_checksum:
@@ -107,7 +94,6 @@ class CacheValidator:
         return True, stored_checksum
 
     def validate_all(self) -> Dict[str, Any]:
-        """Validate all cache files"""
         results = {
             "total": 0,
             "valid": 0,
@@ -141,14 +127,12 @@ class CacheValidator:
         return results
 
     def cleanup_corrupted(self) -> int:
-        """Remove corrupted cache files"""
         results = self.validate_all()
         removed = 0
 
         for file_path in results["corrupted_files"]:
             try:
                 Path(file_path).unlink()
-                # Remove from checksum index
                 self._checksums.pop(Path(file_path).name, None)
                 removed += 1
                 logger.info(f"Removed corrupted cache file: {file_path}")
@@ -161,7 +145,6 @@ class CacheValidator:
         return removed
 
     def update_checksum(self, file_path: Path) -> bool:
-        """Update checksum for a specific file"""
         checksum = self.compute_checksum_for_file(file_path)
         if checksum:
             self._checksums[file_path.name] = checksum

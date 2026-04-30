@@ -32,8 +32,8 @@ def find_free_port(start_port=8000, max_port=9000):
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     _analyzers = {}
-    _search_models = {}  # Кэш для моделей sentence-transformers
-    _embeddings_cache = {}  # Кэш для эмбеддингов точек
+    _search_models = {}
+    _embeddings_cache = {}
 
     @staticmethod
     def normalize_model_name(model_name: str) -> str:
@@ -54,7 +54,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self._analyzers[normalized_name]
 
     def get_all_data_with_embeddings(self, model_name: str) -> List[Dict[str, Any]]:
-        """Получает все данные с эмбеддингами для модели"""
         cache_key = f"{model_name}_data"
         if cache_key in self._embeddings_cache:
             return self._embeddings_cache[cache_key]
@@ -79,7 +78,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         parsed_url = urlparse(self.path)
         path = parsed_url.path
 
-        # API endpoints
         if path == '/api/get_details' or path.endswith('/api/get_details'):
             self._handle_api_get_details(parsed_url)
             return
@@ -108,7 +106,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._handle_scan_graph()
             return
 
-        # Статические файлы
         super().do_GET()
 
     def _send_json_response(self, data, status=200):
@@ -125,7 +122,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps(error_data, ensure_ascii=False).encode('utf-8'))
 
     def _handle_api_get_models(self):
-        """Возвращает список доступных моделей"""
         try:
             models_path = os.path.join(html_dir, 'analysis', 'models.json')
             if os.path.exists(models_path):
@@ -134,14 +130,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     self._send_json_response({"models": models})
                     return
 
-            # Fallback: пробуем получить через analyzer
             analyzer = EmbeddingAnalyzer(collection_name="corpus")
             self._send_json_response({"models": analyzer.available_models})
         except Exception as e:
             self._send_error_response(f"Failed to get models: {str(e)}", 500)
 
     def _handle_api_get_point_info(self, parsed_url):
-        """Возвращает информацию о точке без соседей (быстрый запрос)"""
         query = parse_qs(parsed_url.query)
         point_id = query.get('id', [None])[0]
         model_name = query.get('model', [None])[0]
@@ -180,7 +174,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._send_error_response(f"Internal Server Error: {str(e)}", 500)
 
     def _handle_api_get_neighbors(self, parsed_url):
-        """Возвращает соседей для точки (вычисления на бэке)"""
         query = parse_qs(parsed_url.query)
         point_id = query.get('id', [None])[0]
         model_name = query.get('model', [None])[0]
@@ -218,7 +211,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._send_error_response(f"Internal Server Error: {str(e)}", 500)
 
     def _handle_api_get_details(self, parsed_url):
-        """Возвращает полную информацию о точке с соседями"""
         query = parse_qs(parsed_url.query)
         point_id = query.get('id', [None])[0]
         model_name = query.get('model', [None])[0]
@@ -264,7 +256,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._send_error_response(f"Internal Server Error: {str(e)}", 500)
 
     def _handle_api_search(self, parsed_url):
-        """Поиск по тексту с вычислением эмбеддинга на бэке"""
         query = parse_qs(parsed_url.query)
         search_text = query.get('q', [None])[0]
         model_name = query.get('model', [None])[0]
@@ -281,16 +272,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         normalized_model = self.normalize_model_name(model_name)
 
         try:
-            # Получаем все данные для модели
             data = self.get_all_data_with_embeddings(normalized_model)
 
-            # Генерируем эмбеддинг для запроса
             query_embedding = self._get_query_embedding(normalized_model, search_text)
             if query_embedding is None:
                 self._send_error_response("Failed to generate query embedding", 500)
                 return
 
-            # Вычисляем косинусное расстояние до всех точек
             results = self._search_by_embedding(data, query_embedding, top_k)
 
             self._send_json_response({
@@ -307,7 +295,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._send_error_response(f"Internal Server Error: {str(e)}", 500)
 
     def _handle_api_get_plot_data(self, parsed_url):
-        """Возвращает данные для построения графика (координаты и метки)"""
         query = parse_qs(parsed_url.query)
         model_name = query.get('model', [None])[0]
         method = query.get('method', ['umap'])[0]
@@ -319,7 +306,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         normalized_model = self.normalize_model_name(model_name)
 
         try:
-            # Пытаемся загрузить предварительно вычисленные координаты
             output_dir = os.path.join(html_dir, 'analysis', normalized_model.replace('/', '_'))
             coord_file = os.path.join(output_dir, f'{method}_2d_coords.json')
 
@@ -329,7 +315,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     self._send_json_response(coords_data)
                     return
 
-            # Если нет, вычисляем на лету (медленнее, но работает)
             data = self.get_all_data_with_embeddings(normalized_model)
 
             if not data:
@@ -338,11 +323,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             embeddings = np.stack([item["embedding"] for item in data])
 
-            # Редукция размерности
             from embedding_analyzer.utils import reduce_dimensions
             coords = reduce_dimensions(embeddings, method=method, n_components=2)
 
-            # Формируем ответ
             response_data = {
                 "method": method,
                 "points": [
@@ -367,14 +350,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._send_error_response(f"Internal Server Error: {str(e)}", 500)
 
     def _find_item_by_id(self, data: List[Dict], point_id: str) -> Dict:
-        """Находит элемент по ID"""
         for item in data:
             if str(item.get('id')) == str(point_id):
                 return item
         return None
 
     def _compute_neighbors(self, data: List[Dict], target_item: Dict, n_neighbors: int = 10) -> List[Dict]:
-        """Вычисляет соседей на основе косинусного расстояния"""
         target_emb = np.array(target_item['embedding']).reshape(1, -1)
         embeddings = np.array([item['embedding'] for item in data])
 
@@ -395,7 +376,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return neighbors
 
     def _search_by_embedding(self, data: List[Dict], query_embedding: List[float], top_k: int = 10) -> List[Dict]:
-        """Поиск ближайших точек по эмбеддингу"""
         query_emb = np.array(query_embedding).reshape(1, -1)
         embeddings = np.array([item['embedding'] for item in data])
 
@@ -414,17 +394,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 "distance": float(distances[idx])
             })
 
-        # Сортируем по убыванию схожести
         results.sort(key=lambda x: x['similarity_score'], reverse=True)
         return results
 
     def _get_query_embedding(self, model_name: str, text: str) -> List[float]:
-        """Генерирует эмбеддинг для текста запроса"""
         try:
             from sentence_transformers import SentenceTransformer
             from embeddings_builder.models_repository import MODELS
 
-            # Используем кэш моделей
             if model_name not in self._search_models:
                 if model_name in MODELS:
                     model_path = MODELS[model_name]["path"]

@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 
 def _get_model_output_dir(base_out_dir: str, model_name: str) -> str:
-    """Get model-specific output directory"""
     if not model_name:
         return base_out_dir
     safe_name = model_name.replace("/", "_").replace("\\", "_")
@@ -46,7 +45,6 @@ class EmbeddingBuilder:
             batch_size: int = 32,
             metrics: Optional[PerformanceMetrics] = None,
     ):
-
 
         self.corpus_dir = Path(corpus_dir)
         self.base_out_dir = Path(out_dir)
@@ -81,7 +79,6 @@ class EmbeddingBuilder:
         self.model_registry = MODELS
         self.set_model(embedding_model)
 
-        # Cleanup old cache on initialization
         cleanup_cache(
             self.cache_dir,
             max_size_mb=1024,
@@ -123,7 +120,6 @@ class EmbeddingBuilder:
                 raise RuntimeError("Нет доступных моделей после удаления.")
 
     def unload_model(self, model_name: Optional[str] = None):
-        """Выгрузка модели из памяти"""
         if model_name is None:
             model_name = self.get_current_model()
         if model_name and model_name in self.model_registry:
@@ -153,7 +149,6 @@ class EmbeddingBuilder:
                 if self.model_registry[model_name]["loaded"]:
                     return
 
-                # Выгружаем предыдущую модель
                 if hasattr(self, 'model_name') and self.model_name != model_name:
                     self.unload_model(self.model_name)
 
@@ -166,7 +161,6 @@ class EmbeddingBuilder:
                     self.model_registry[model_name]["loaded"] = True
                     logger.info(f"Модель '{model_name}' успешно загружена на {device}.")
                 except Exception as e:
-                    # Fallback на локальную копию если есть
                     local_path = Path.home() / ".cache" / "huggingface" / "models" / model_name.replace("/", "_")
                     if local_path.exists():
                         logger.info(f"Попытка загрузить модель из локального кэша: {local_path}")
@@ -196,7 +190,6 @@ class EmbeddingBuilder:
 
     @contextmanager
     def use_model(self, model_name: str):
-        """Context manager for temporary model switching"""
         original_model = self.get_current_model()
         try:
             self.set_model(model_name)
@@ -219,21 +212,19 @@ class EmbeddingBuilder:
 
     @staticmethod
     def get_optimal_batch_size(model_name: str, model_dim: int = None) -> int:
-        """Определение оптимального batch_size на основе модели"""
-        # Если размерность не указана, пробуем получить из реестра
         if model_dim is None:
             if model_name in MODELS:
                 model_dim = MODELS[model_name].get("dim", 768)
             else:
                 model_dim = 768
 
-        if model_dim >= 3072:  # Qwen3-Embedding
+        if model_dim >= 3072:
             return 8
-        elif model_dim >= 1024:  # BGE-M3, E5-large
+        elif model_dim >= 1024:
             return 16
-        elif model_dim >= 768:  # Jina, Nomic, LaBSE
+        elif model_dim >= 768:
             return 24
-        else:  # MiniLM и другие
+        else:
             return 32
 
     def set_chunking_strategy(self, strategy_name: str):
@@ -256,10 +247,8 @@ class EmbeddingBuilder:
         return self.current_chunking(text)
 
     def _load_single_cache(self, key: str) -> Optional[np.ndarray]:
-        """Helper method for parallel cache loading"""
         cache_file = self.cache_dir / f"{key}.pkl"
         if cache_file.exists():
-            # We need to load without text parameter since we only have key
             try:
                 import pickle
                 with open(cache_file, 'rb') as f:
@@ -270,7 +259,6 @@ class EmbeddingBuilder:
         return None
 
     def _batch_load_from_cache(self, cache_keys: List[str]) -> List[Optional[np.ndarray]]:
-        """Групповая загрузка из кэша с использованием многопоточности"""
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(self._load_single_cache, key) for key in cache_keys]
             return [f.result() for f in futures]
@@ -280,14 +268,12 @@ class EmbeddingBuilder:
             return np.array([])
 
         with self.metrics.track("generate_embeddings"):
-            # Используем меньший batch_size для кэширования
             CACHE_BATCH_SIZE = 50
 
             final_embeddings = np.empty((len(sentences), self.model_dim), dtype=np.float32)
             to_compute_indices = []
             to_compute_text = []
 
-            # Групповая проверка кэша с лимитом
             for i in range(0, len(sentences), CACHE_BATCH_SIZE):
                 batch = sentences[i:i + CACHE_BATCH_SIZE]
                 cache_keys = [self._get_cache_key(text) for text in batch]
@@ -301,13 +287,10 @@ class EmbeddingBuilder:
                         to_compute_indices.append(global_idx)
                         to_compute_text.append(text)
 
-                # Очищаем временные данные
                 del cache_keys
                 del cached_embeddings
 
-            # Вычисляем недостающие эмбеддинги
             if to_compute_text:
-                # Разбиваем на подбатчи для экономии памяти
                 for k in range(0, len(to_compute_text), self.batch_size):
                     batch_text = to_compute_text[k:k + self.batch_size]
                     batch_indices = to_compute_indices[k:k + self.batch_size]
@@ -323,7 +306,6 @@ class EmbeddingBuilder:
                         final_embeddings[idx] = emb
                         save_to_cache(text, emb, self.model_name, self.current_chunking, self.cache_dir)
 
-                    # Очищаем после каждого батча
                     del computed
                     del batch_text
                     gc.collect()
@@ -364,8 +346,7 @@ class EmbeddingBuilder:
             if batch_size is not None:
                 self.batch_size = original_batch_size
 
-    def compare_models_and_strategies(self, text: str, models: List[str] = None, strategies: List[str] = None) -> Dict[
-        str, Any]:
+    def compare_models_and_strategies(self, text: str, models: List[str] = None, strategies: List[str] = None) -> Dict[str, Any]:
         if models is None:
             models = self.list_models()
         if strategies is None:
@@ -413,7 +394,6 @@ class EmbeddingBuilder:
 
         collection = self.chroma_client.get_or_create_collection(name=collection_name)
 
-        # Исправление: отдельный batch size для Chroma
         CHROMA_BATCH_SIZE = 100
         batch_size_chroma = min(CHROMA_BATCH_SIZE, len(chunks))
 
@@ -433,7 +413,6 @@ class EmbeddingBuilder:
         return {"collection": collection_name, "added": len(chunks)}
 
     def _iter_corpus_files(self) -> Generator[Dict[str, Any], None, None]:
-        """Генератор для потоковой загрузки файлов (оптимизация памяти)"""
         for txt_file in self.corpus_dir.rglob("*.txt"):
             if self.text_type == "original" and not txt_file.name.endswith("_orig.txt"):
                 continue
@@ -455,7 +434,6 @@ class EmbeddingBuilder:
         with self.metrics.track("save_all_corpus_to_chroma"):
             file_generator = self._iter_corpus_files()
 
-            # Собираем файлы в список с метаданными без чтения содержимого
             files_info = []
             for file_info in file_generator:
                 files_info.append({
@@ -466,7 +444,6 @@ class EmbeddingBuilder:
 
             total_files = len(files_info)
 
-            # Создаем новый генератор для обработки
             file_generator = self._iter_corpus_files()
 
         if total_files == 0:
@@ -485,11 +462,9 @@ class EmbeddingBuilder:
 
         added_total = 0
 
-        # Добавлен прогресс-бар
         with tqdm(total=total_files, desc="Обработка файлов", unit="файл") as pbar:
             for idx, file_info in enumerate(files_info, 1):
                 try:
-                    # Читаем файл только сейчас
                     with open(file_info['path'], 'r', encoding='utf-8') as f:
                         content = f.read()
 
@@ -499,13 +474,11 @@ class EmbeddingBuilder:
                         metadata=file_info
                     )
 
-                    # Явно удаляем content из памяти
                     del content
 
                     added_total += result["added"]
 
-                    # Более агрессивная очистка памяти
-                    if idx % 5 == 0:  # Каждые 5 файлов
+                    if idx % 5 == 0:
                         gc.collect()
                         if torch.cuda.is_available():
                             torch.cuda.empty_cache()
@@ -532,6 +505,5 @@ class EmbeddingBuilder:
         return results
 
     def __del__(self):
-        """Destructor to clean up GPU memory"""
         if hasattr(self, 'model_name'):
             self.unload_model(self.model_name)
