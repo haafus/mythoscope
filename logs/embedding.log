@@ -1,0 +1,163 @@
+2026-04-13 08:47:12,078 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-04-13 08:47:12,240 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-04-13 08:47:21,110 - embeddings_builder.builder - INFO - Модель 'BAAI/bge-m3' успешно загружена на cpu.
+2026-04-13 08:47:21,111 - embeddings_builder.builder - INFO - Папка для результатов: analysis\BAAI_bge-m3
+2026-04-13 08:47:21,155 - root - INFO - ============================================================
+2026-04-13 08:47:21,156 - root - INFO - Запуск генерации эмбеддингов...
+2026-04-13 08:47:21,156 - root - INFO -    Источник: corpus
+2026-04-13 08:47:21,156 - root - INFO -    Тип текстов: both
+2026-04-13 08:47:21,156 - root - INFO -    Chroma DB: ./chroma_db
+2026-04-13 08:47:21,156 - root - INFO -    Модель: BAAI/bge-m3
+2026-04-13 08:47:21,157 - root - INFO -    Папка результатов: analysis\BAAI_bge-m3
+2026-04-13 08:47:21,157 - root - INFO -    Очистка коллекции: True
+2026-04-13 08:47:21,157 - root - INFO -    Размер батча: 32
+2026-04-13 08:47:21,157 - root - INFO - ============================================================
+2026-04-13 08:47:21,274 - embeddings_builder.performance_metrics - INFO - Operation 'save_all_corpus_to_chroma' completed in 0.12s
+2026-04-13 08:47:21,500 - embeddings_builder.builder - INFO - Коллекция 'corpus' очищена перед записью.
+2026-04-13 08:47:21,500 - embeddings_builder.builder - INFO - Сохраняю 34 файлов в коллекцию 'corpus'...
+2026-04-13 08:47:21,500 - embeddings_builder.builder - INFO - Используется модель: BAAI/bge-m3
+2026-04-13 08:49:51,483 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 149.98s
+2026-04-13 08:49:51,986 - embeddings_builder.builder - INFO - [1/34] ainu_folk_tales.txt (365 чанков)
+2026-04-13 08:52:59,385 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 187.40s
+2026-04-13 08:53:02,518 - embeddings_builder.builder - INFO - [2/34] ancient_egyptian_legends_murray.txt (428 чанков)
+2026-04-13 08:54:30,458 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 87.94s
+2026-04-13 08:54:30,730 - embeddings_builder.builder - INFO - [3/34] egyptian_book_of_the_dead.txt (164 чанков)
+2026-04-13 09:01:01,045 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 390.30s
+2026-04-13 09:01:02,510 - embeddings_builder.builder - INFO - [4/34] legends_of_the_gods_budge.txt (869 чанков)
+2026-04-13 09:05:08,370 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 245.85s
+2026-04-13 09:05:09,466 - embeddings_builder.builder - INFO - [5/34] codex_junius_old_english.txt (625 чанков)
+2026-04-13 09:06:20,664 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 71.18s
+2026-04-13 09:06:20,962 - embeddings_builder.builder - INFO - [6/34] australian_aboriginal_myths.txt (147 чанков)
+2026-04-13 09:09:20,276 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 179.31s
+2026-04-13 09:09:22,540 - embeddings_builder.builder - INFO - [7/34] rig_veda_americanus_aztec.txt (279 чанков)
+2026-04-13 09:11:46,359 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 143.81s
+2026-04-13 09:11:47,036 - embeddings_builder.builder - INFO - [8/34] buddhist_psalms_shinran.txt (343 чанков)
+2026-04-13 09:13:18,185 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 91.15s
+2026-04-13 09:13:18,531 - embeddings_builder.builder - INFO - [9/34] dhammapada_max_muller.txt (233 чанков)
+2026-04-13 09:16:41,919 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 203.38s
+2026-04-13 09:16:42,894 - embeddings_builder.builder - INFO - [10/34] mabinogion_guest.txt (504 чанков)
+2026-04-13 09:25:32,202 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 529.11s
+2026-04-13 09:25:35,031 - embeddings_builder.builder - INFO - [11/34] augustine_confessions_trans.txt (1405 чанков)
+2026-04-13 11:09:49,996 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 6254.90s
+2026-04-13 11:10:21,763 - embeddings_builder.builder - INFO - [12/34] bible_kjv_old_testament.txt (15492 чанков)
+2026-04-13 13:22:40,290 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 7938.43s
+2026-04-13 13:23:23,162 - embeddings_builder.builder - INFO - [13/34] the_holy_bible.txt (19161 чанков)
+2026-04-13 13:27:48,279 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 265.11s
+2026-04-13 13:27:49,724 - embeddings_builder.builder - INFO - [14/34] analects_confucius_legge.txt (473 чанков)
+2026-04-13 13:36:56,877 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 547.15s
+2026-04-13 13:37:01,826 - embeddings_builder.builder - INFO - [15/34] vikram_and_vampire_burton.txt (1323 чанков)
+2026-04-13 13:37:07,353 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 5.52s
+2026-04-13 13:37:07,426 - embeddings_builder.builder - INFO - [16/34] hindu_law_yajnavalkya.txt (10 чанков)
+2026-04-13 13:39:06,916 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 119.49s
+2026-04-13 13:39:07,652 - embeddings_builder.builder - INFO - [17/34] upanishads_paramananda.txt (325 чанков)
+2026-04-13 14:03:00,953 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 1433.28s
+2026-04-13 14:03:12,451 - embeddings_builder.builder - INFO - [18/34] quran_english_pickthall.txt (3657 чанков)
+2026-04-13 14:16:54,575 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 822.11s
+2026-04-13 14:16:59,168 - embeddings_builder.builder - INFO - [19/34] japanese_myths_legends.txt (2134 чанков)
+2026-04-13 14:17:01,821 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 2.65s
+2026-04-13 14:17:01,884 - embeddings_builder.builder - INFO - [20/34] josephus_antiquities_trans.txt (6 чанков)
+2026-04-13 14:34:53,859 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 1071.76s
+2026-04-13 14:35:01,427 - embeddings_builder.builder - INFO - [21/34] josephus_wars_trans.txt (3037 чанков)
+2026-04-13 14:38:50,139 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 228.71s
+2026-04-13 14:38:51,161 - embeddings_builder.builder - INFO - [22/34] sayings_of_the_jewish_fathers_trans.txt (453 чанков)
+2026-04-13 14:42:48,672 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 237.51s
+2026-04-13 14:42:50,010 - embeddings_builder.builder - INFO - [23/34] maori_religion_shortland.txt (476 чанков)
+2026-04-13 14:44:16,715 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 86.70s
+2026-04-13 14:44:17,122 - embeddings_builder.builder - INFO - [24/34] popol_vuh_spence.txt (193 чанков)
+2026-04-13 14:45:46,494 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 89.37s
+2026-04-13 14:45:46,969 - embeddings_builder.builder - INFO - [25/34] gilgamesh_budge.txt (210 чанков)
+2026-04-13 15:01:24,836 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 937.86s
+2026-04-13 15:01:31,434 - embeddings_builder.builder - INFO - [26/34] sacred_books_of_the_east_max_muller.txt (2476 чанков)
+2026-04-13 15:01:35,784 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 4.35s
+2026-04-13 15:01:35,941 - embeddings_builder.builder - INFO - [27/34] poetic_edda_bellows.txt (5 чанков)
+2026-04-13 15:09:02,451 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 446.50s
+2026-04-13 15:09:06,411 - embeddings_builder.builder - INFO - [28/34] prose_edda_anderson.txt (1003 чанков)
+2026-04-13 15:10:54,520 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 108.11s
+2026-04-13 15:10:55,288 - embeddings_builder.builder - INFO - [29/34] shinto_cult_terry.txt (245 чанков)
+2026-04-13 15:22:28,784 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 693.49s
+2026-04-13 15:22:32,912 - embeddings_builder.builder - INFO - [30/34] russian_folk_tales.txt (1742 чанков)
+2026-04-13 15:24:13,206 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 100.10s
+2026-04-13 15:24:13,982 - embeddings_builder.builder - INFO - [31/34] dao_de_jing_legge.txt (221 чанков)
+2026-04-13 15:25:09,219 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 55.23s
+2026-04-13 15:25:09,462 - embeddings_builder.builder - INFO - [32/34] taoism_books_listing.txt (115 чанков)
+2026-04-13 15:28:25,782 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 196.32s
+2026-04-13 15:28:26,851 - embeddings_builder.builder - INFO - [33/34] west_african_folk_tales.txt (475 чанков)
+2026-04-13 15:30:30,185 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 123.33s
+2026-04-13 15:30:30,897 - embeddings_builder.builder - INFO - [34/34] the_parsis_zoroastrianism.txt (259 чанков)
+2026-04-13 15:30:30,901 - embeddings_builder.builder - INFO - Всего добавлено: 58853 чанков в коллекцию 'corpus'
+2026-04-13 15:30:30,906 - embeddings_builder.performance_metrics - INFO - Performance metrics saved to analysis\performance_metrics.json
+2026-04-13 15:30:30,909 - embeddings_builder.performance_metrics - INFO - Performance metrics saved to analysis\performance_metrics.json
+2026-04-13 15:30:30,910 - root - INFO - ============================================================
+2026-04-13 15:30:30,910 - root - INFO - Все эмбеддинги сохранены в Chroma.
+2026-04-13 15:30:30,911 - root - INFO - Результаты анализа будут сохранены в: analysis\BAAI_bge-m3
+2026-04-13 15:30:30,911 - root - INFO - Метрики производительности: analysis\BAAI_bge-m3/performance_metrics.json
+2026-04-13 15:30:30,912 - root - INFO - ============================================================
+2026-04-22 09:13:38,055 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-04-22 09:16:39,747 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-04-22 09:16:39,816 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-04-22 09:16:47,881 - embeddings_builder.builder - INFO - Модель 'BAAI/bge-m3' успешно загружена на cpu.
+2026-04-22 09:16:47,882 - embeddings_builder.builder - INFO - Папка для результатов: analysis\BAAI_bge-m3
+2026-04-22 09:16:47,882 - root - INFO - ============================================================
+2026-04-22 09:16:47,883 - root - INFO - Запуск генерации эмбеддингов...
+2026-04-22 09:16:47,883 - root - INFO -    Источник: corpus
+2026-04-22 09:16:47,883 - root - INFO -    Тип текстов: both
+2026-04-22 09:16:47,883 - root - INFO -    Chroma DB: ./chroma_db
+2026-04-22 09:16:47,883 - root - INFO -    Модель: BAAI/bge-m3
+2026-04-22 09:16:47,883 - root - INFO -    Папка результатов: analysis\BAAI_bge-m3
+2026-04-22 09:16:47,884 - root - INFO -    Очистка коллекции: True
+2026-04-22 09:16:47,884 - root - INFO -    Размер батча: 32
+2026-04-22 09:16:47,884 - root - INFO - ============================================================
+2026-04-22 09:16:47,896 - embeddings_builder.performance_metrics - INFO - Operation 'save_all_corpus_to_chroma' completed in 0.01s
+2026-04-22 09:16:47,898 - embeddings_builder.builder - INFO - Коллекция 'corpus' очищена перед записью.
+2026-04-22 09:16:47,899 - embeddings_builder.builder - INFO - Сохраняю 6 файлов в коллекцию 'corpus'...
+2026-04-22 09:16:47,899 - embeddings_builder.builder - INFO - Используется модель: BAAI/bge-m3
+2026-04-22 09:21:16,182 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 268.28s
+2026-04-22 09:26:34,649 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 318.11s
+2026-04-22 09:28:14,204 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 97.20s
+2026-04-22 09:38:41,191 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 626.80s
+2026-04-22 09:47:05,452 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 503.25s
+2026-04-22 09:48:55,951 - embeddings_builder.performance_metrics - INFO - Operation 'generate_embeddings' completed in 109.48s
+2026-04-22 09:48:56,109 - embeddings_builder.builder - INFO - Всего добавлено: 1436 чанков в коллекцию 'corpus'
+2026-04-22 09:48:56,110 - embeddings_builder.performance_metrics - INFO - Performance metrics saved to analysis\performance_metrics.json
+2026-04-22 09:48:56,111 - embeddings_builder.performance_metrics - INFO - Performance metrics saved to analysis\performance_metrics.json
+2026-04-22 09:48:56,112 - root - INFO - ============================================================
+2026-04-22 09:48:56,112 - root - INFO - Все эмбеддинги сохранены в Chroma.
+2026-04-22 09:48:56,112 - root - INFO - Результаты анализа будут сохранены в: analysis\BAAI_bge-m3
+2026-04-22 09:48:56,112 - root - INFO - Метрики производительности: analysis\BAAI_bge-m3/performance_metrics.json
+2026-04-22 09:48:56,113 - root - INFO - ============================================================
+2026-04-22 09:48:56,114 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-04-22 09:48:56,298 - embedding_analyzer.analyzer - INFO - Загрузка данных для модели: BAAI/bge-m3...
+2026-04-22 09:48:56,529 - embedding_analyzer.analyzer - INFO - Загружено чанков: 1436
+2026-04-22 09:48:56,602 - embedding_analyzer.visualization - INFO - CSV saved: analysis\BAAI_bge-m3\embeddings_data.csv
+2026-04-22 09:48:56,603 - embedding_analyzer.visualization - INFO - Text summary saved: analysis\BAAI_bge-m3\analysis_summary.txt
+2026-04-22 09:48:56,605 - embedding_analyzer.analyzer - INFO - Информация о модели сохранена: analysis\BAAI_bge-m3\model_info.json
+2026-04-22 09:48:56,607 - embedding_analyzer.analyzer - INFO - Список моделей сохранен: analysis\models.json
+2026-04-22 09:48:56,607 - embedding_analyzer.visualization - INFO - Generating visualizations...
+2026-04-22 09:48:56,608 - embedding_analyzer.visualization - INFO -   - 2D UMAP...
+2026-04-22 09:49:07,977 - embedding_analyzer.visualization - INFO - Saved: analysis\BAAI_bge-m3\umap_2d_traditions.html
+2026-04-22 09:49:07,979 - embedding_analyzer.visualization - INFO -   - 2D PCA...
+2026-04-22 09:49:08,239 - embedding_analyzer.visualization - INFO - Saved: analysis\BAAI_bge-m3\pca_2d_traditions.html
+2026-04-22 09:49:08,240 - embedding_analyzer.visualization - INFO -   - 2D t-SNE...
+2026-04-22 09:49:15,910 - embedding_analyzer.visualization - INFO - Saved: analysis\BAAI_bge-m3\tsne_2d_traditions.html
+2026-04-22 09:49:15,911 - embedding_analyzer.visualization - INFO -   - Distance heatmap...
+2026-04-22 09:49:16,356 - embedding_analyzer.visualization - INFO - Heatmap saved: analysis\BAAI_bge-m3\distance_heatmap.html
+2026-04-22 09:49:16,356 - embedding_analyzer.visualization - INFO -   - Comparison dashboard...
+2026-04-22 09:49:16,362 - embedding_analyzer.visualization - INFO - Computing UMAP...
+2026-04-22 09:49:20,555 - embedding_analyzer.visualization - INFO - Computing PCA...
+2026-04-22 09:49:20,610 - embedding_analyzer.visualization - INFO - Computing TSNE...
+2026-04-22 09:49:25,504 - embedding_analyzer.visualization - INFO - Comparison dashboard saved: analysis\BAAI_bge-m3\methods_comparison.html
+2026-04-22 09:49:25,505 - embedding_analyzer.visualization - INFO -   - Tradition distribution chart...
+2026-04-22 09:49:25,557 - embedding_analyzer.visualization - INFO - Distribution chart saved: analysis\BAAI_bge-m3\tradition_distribution.html
+2026-04-22 09:49:25,557 - embedding_analyzer.visualization - INFO -   - Adding click handlers...
+2026-04-22 09:49:25,561 - embedding_analyzer.visualization - INFO - Added click handler to analysis\BAAI_bge-m3\umap_2d_traditions.html
+2026-04-22 09:49:25,565 - embedding_analyzer.visualization - INFO - Added click handler to analysis\BAAI_bge-m3\pca_2d_traditions.html
+2026-04-22 09:49:25,569 - embedding_analyzer.visualization - INFO - Added click handler to analysis\BAAI_bge-m3\tsne_2d_traditions.html
+2026-04-22 09:49:25,570 - embedding_analyzer.visualization - INFO - 
+All visualizations saved to: analysis\BAAI_bge-m3
+2026-04-22 09:49:25,656 - embedding_analyzer.analyzer - INFO - Загрузка данных для модели: BAAI/bge-m3...
+2026-04-22 09:49:25,872 - embedding_analyzer.analyzer - INFO - Загружено чанков: 1436
+2026-04-22 09:49:25,872 - embedding_analyzer.analyzer - INFO - Загрузка данных для модели: BAAI/bge-m3...
+2026-04-22 09:49:26,078 - embedding_analyzer.analyzer - INFO - Загружено чанков: 1436
+2026-04-22 12:58:12,775 - embeddings_builder.build_embeddings - INFO - Получен сигнал прерывания, сохраняем метрики и очищаем ресурсы...
+2026-04-22 12:58:12,799 - embeddings_builder.performance_metrics - INFO - Performance metrics saved to analysis\performance_metrics.json
+2026-04-22 12:58:12,800 - embeddings_builder.build_embeddings - INFO - Метрики сохранены

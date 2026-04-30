@@ -1,0 +1,53 @@
+{
+  "kmeans": {
+    "n_clusters_found": 5,
+    "n_noise_points": 0,
+    "noise_ratio": 0.0,
+    "silhouette_score": 0.05352201859639243,
+    "davies_bouldin_score": 3.925182724199287,
+    "calinski_harabasz_score": 48.395531720775985,
+    "avg_intra_distance": 0.6785376938626386,
+    "avg_inter_distance": 0.42381619620438704,
+    "separation_ratio": 0.6246022881820671,
+    "adjusted_rand_score": 0.5235940603640962,
+    "normalized_mutual_info": 0.6206112603482865,
+    "adjusted_mutual_info": 0.6188929726349961,
+    "homogeneity": 0.5988145719338771,
+    "completeness": 0.6440546763231559,
+    "v_measure": 0.6206112603482867,
+    "cluster_compactness": 0.5957566539353711
+  },
+  "agglomerative": {
+    "n_clusters_found": 1436,
+    "n_noise_points": 0,
+    "noise_ratio": 0.0,
+    "avg_intra_distance": 0.0,
+    "avg_inter_distance": 1.0151298789888719,
+    "separation_ratio": 0.0,
+    "adjusted_rand_score": 0.0,
+    "normalized_mutual_info": 0.36405337203128346,
+    "adjusted_mutual_info": 2.141133164590386e-13,
+    "homogeneity": 0.9999999999999998,
+    "completeness": 0.2225337708500385,
+    "v_measure": 0.3640533720312835,
+    "cluster_compactness": 0.0
+  },
+  "dbscan": {
+    "n_clusters_found": 4,
+    "n_noise_points": 98,
+    "noise_ratio": 0.06824512534818941,
+    "silhouette_score": 0.05330563583099316,
+    "davies_bouldin_score": 2.2930582578042706,
+    "calinski_harabasz_score": 15.052298977596626,
+    "avg_intra_distance": 0.5898326009392715,
+    "avg_inter_distance": 0.6504495499184045,
+    "separation_ratio": 1.102769750065704,
+    "adjusted_rand_score": 0.05956690401946078,
+    "normalized_mutual_info": 0.223195420691645,
+    "adjusted_mutual_info": 0.21824514757167462,
+    "homogeneity": 0.12867387999283258,
+    "completeness": 0.8409210429124265,
+    "v_measure": 0.22319542069164494,
+    "cluster_compactness": 0.6289970399457157
+  }
+}

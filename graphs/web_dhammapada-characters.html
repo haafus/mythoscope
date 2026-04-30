@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Graph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #cy {
+            flex: 1;
+            background-color: #fafafa;
+        }
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 80%;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 16px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.2s;
+            user-select: text;
+        }
+        #info-panel table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #info-panel th, #info-panel td {
+            text-align: left;
+            padding: 6px 4px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        #info-panel th {
+            font-weight: 600;
+            color: #4a4a4a;
+            width: 35%;
+        }
+        #info-panel td {
+            color: #2c3e50;
+            width: 65%;
+        }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            pointer-events: auto;
+            color: #888;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        h4 {
+            margin: 0 0 8px 0;
+            color: #5e4b8b;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    <div id="info-panel" style="display: none;">
+        <button class="close-btn" id="close-panel">&times;</button>
+        <div id="info-content"></div>
+    </div>
+
+    <script>
+        const nodesData = [
+  {
+    "id": "195759",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "Messengers of death, brings life to an end",
+    "description": "Description: Lord of the departed, king of death.;\nRoles: Deity, Judge of the dead;\nEpithets: king of death, lord of the departed;\nAttributes: Messengers of death, brings life to an end;\nActions: Carries off the heedless, drives the life of men;",
+    "shared_name": "Yama",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "king of death, lord of the departed",
+    "SUID": 195759,
+    "SelfLoops": 0,
+    "id_original": "Yama",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "Carries off the heedless, drives the life of men",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deity, Judge of the dead",
+    "Radiality": "Infinity",
+    "display_name": "Yama",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Yama",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "195756",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "Free from vanity, only preachers",
+    "description": "Description: An epithet of the Buddha, meaning 'thus gone' or 'thus come'.;\nRoles: Buddha;\nEpithets: Tathagata;\nAttributes: Free from vanity, only preachers;\nActions: Preach the way, are not shaken;",
+    "shared_name": "Tathagata",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Tathagata",
+    "SUID": 195756,
+    "SelfLoops": 0,
+    "id_original": "Tathagata",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "Preach the way, are not shaken",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Buddha",
+    "Radiality": "Infinity",
+    "display_name": "Tathagata",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Tathagata",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "195753",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "Showed Nirvana",
+    "description": "Description: An epithet of the Buddha, meaning 'well-gone' or 'well-spoken'.;\nRoles: Buddha;\nEpithets: Sugata;\nAttributes: Showed Nirvana;\nActions: Shown Nirvana;",
+    "shared_name": "Sugata",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Sugata",
+    "SUID": 195753,
+    "SelfLoops": 0,
+    "id_original": "Sugata",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "Shown Nirvana",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Buddha",
+    "Radiality": "Infinity",
+    "display_name": "Sugata",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Sugata",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "195750",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Ruler of the heaven where pleasures are collected, opponent of the Buddha",
+    "description": "Description: The tempter, ruler of the heaven of pleasures, who tries to hinder spiritual progress.;\nRoles: Tempter, Deity;\nEpithets: the tempter;\nAttributes: Ruler of the heaven where pleasures are collected, opponent of the Buddha;\nActions: Overthrows the heedless, bonds of Mara, cannot conquer the self-controlled, leads astray, crushed by the wise;",
+    "shared_name": "Mara",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "the tempter",
+    "SUID": 195750,
+    "SelfLoops": 0,
+    "id_original": "Mara",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 1,
+    "Actions": "Overthrows the heedless, bonds of Mara, cannot conquer the self-controlled, leads astray, crushed by the wise",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Tempter, Deity",
+    "Radiality": 1.0,
+    "display_name": "Mara",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Mara",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 1,
+    "size": 8.0
+  },
+  {
+    "id": "195747",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "Rose to lordship of the gods by earnestness",
+    "description": "Description: Another name for Indra, king of the gods.;\nRoles: Deity, King of the gods;\nEpithets: Maghavan;\nAttributes: Rose to lordship of the gods by earnestness;\nActions: ;",
+    "shared_name": "Maghavan",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Maghavan",
+    "SUID": 195747,
+    "SelfLoops": 0,
+    "id_original": "Maghavan",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deity, King of the gods",
+    "Radiality": "Infinity",
+    "display_name": "Maghavan",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Maghavan",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "195744",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Omniscient, trackless, conqueror not conquered again, taught the way, preacher of the law",
+    "description": "Description: The historical Buddha, founder of Buddhism.;\nRoles: Buddha, Teacher, Awakened One;\nEpithets: Gotama, Buddha, the Awakened, the Well-awakened, Sugata, Tathagata;\nAttributes: Omniscient, trackless, conqueror not conquered again, taught the way, preacher of the law;\nActions: Preached the way to end pain, taught the four noble truths, conquered all, shown Nirvana;",
+    "shared_name": "Gotama Buddha",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Gotama, Buddha, the Awakened, the Well-awakened, Sugata, Tathagata",
+    "SUID": 195744,
+    "SelfLoops": 0,
+    "id_original": "Gotama Buddha",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 1,
+    "Actions": "Preached the way to end pain, taught the four noble truths, conquered all, shown Nirvana",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Buddha, Teacher, Awakened One",
+    "Radiality": 1.0,
+    "display_name": "Gotama Buddha",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Gotama Buddha",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 1,
+    "size": 8.0
+  },
+  {
+    "id": "195741",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Praises the virtuous",
+    "description": "Description: The supreme deity in later Vedic and Hindu tradition, here as a praised god.;\nRoles: Deity;\nEpithets: Brahman;\nAttributes: Praises the virtuous;\nActions: Praises the man who is without blemish, wise, rich in knowledge and virtue;",
+    "shared_name": "Brahman",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Brahman",
+    "SUID": 195741,
+    "SelfLoops": 0,
+    "id_original": "Brahman",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 1,
+    "Actions": "Praises the man who is without blemish, wise, rich in knowledge and virtue",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Deity",
+    "Radiality": 1.0,
+    "display_name": "Brahman",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Brahman",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 1,
+    "size": 8.0
+  },
+  {
+    "id": "195738",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Addressed by the Buddha",
+    "description": "Description: A person addressed in verse 227, likely a disciple or a contemporary.;\nRoles: Disciple;\nEpithets: ;\nAttributes: Addressed by the Buddha;\nActions: ;",
+    "shared_name": "Atula",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 195738,
+    "SelfLoops": 0,
+    "id_original": "Atula",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 1,
+    "Actions": "",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple",
+    "Radiality": 1.0,
+    "display_name": "Atula",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Atula",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 1,
+    "size": 8.0
+  }
+];
+        const edgesData = [
+  {
+    "id": "195765",
+    "source": "195750",
+    "target": "195741",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Mara (interacts with) Brahman",
+    "shared_interaction": "interacts with",
+    "name": "Mara (interacts with) Brahman",
+    "interaction": "interacts with",
+    "data_key_column": 195765,
+    "SUID": 195765,
+    "source_original": "Mara",
+    "selected": false,
+    "target_original": "Brahman",
+    "relation": "accompanies"
+  },
+  {
+    "id": "195762",
+    "source": "195744",
+    "target": "195738",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Gotama Buddha (interacts with) Atula",
+    "shared_interaction": "interacts with",
+    "name": "Gotama Buddha (interacts with) Atula",
+    "interaction": "interacts with",
+    "data_key_column": 195762,
+    "SUID": 195762,
+    "source_original": "Gotama Buddha",
+    "selected": false,
+    "target_original": "Atula",
+    "relation": "addresses"
+  }
+];
+
+        const elements = [
+            ...nodesData.map(node => ({ data: node })),
+            ...edgesData.map(edge => ({ data: edge }))
+        ];
+
+        const categoryColors = {
+            'Character': '#dcd0ff',
+            'Group': '#cccccc'
+        };
+        const defaultColor = '#aaaaaa';
+
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: elements,
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': function(ele) {
+                            const cat = ele.data('Category');
+                            return categoryColors[cat] || defaultColor;
+                        },
+                        'width': function(ele) { return ele.data('size') || 3; },
+                        'height': function(ele) { return ele.data('size') || 3; },
+                        'label': function(ele) { return ele.data('display_name') || ele.data('Name') || ele.data('shared name') || ele.data('id'); },
+                        'font-size': '2.2px',
+                        'text-valign': 'bottom',
+                        'text-halign': 'center',
+                        'text-margin-y': 1,
+                        'border-width': 0.2,
+                        'border-color': '#555'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 0.2,
+                        'line-color': '#aaa',
+                        'target-arrow-color': '#aaa',
+                        'target-arrow-shape': 'triangle',
+                        'target-arrow-scale': 0.1,
+                        'arrow-scale': 0.1,
+                        'curve-style': 'bezier',
+                        'label': 'data(relation)',
+                        'font-size': '1.5px',
+                        'text-rotation': 'autorotate',
+                        'text-margin-y': -1,
+                        'text-background-opacity': 0.7,
+                        'text-background-color': '#ffffff'
+                    }
+                },
+                {
+                    selector: 'node.hover-highlight',
+                    style: {
+                        'border-width': 0.3,
+                        'border-color': '#ffaa00',
+                        'overlay-opacity': 0.3,
+                        'overlay-color': '#ffaa00',
+                        'overlay-padding': '1px'
+                    }
+                },
+                {
+                    selector: 'edge.hover-highlight',
+                    style: {
+                        'width': 0.4,
+                        'line-color': '#ffaa00',
+                        'target-arrow-color': '#ffaa00'
+                    }
+                },
+                {
+                    selector: '.faded',
+                    style: {
+                        'opacity': 0.1
+                    }
+                }
+            ],
+            layout: {
+                name: 'cose',
+                idealEdgeLength: 5,
+                padding: 50,
+                spacingFactor: 5,
+                nodeRepulsion: 40000,
+                gravity: 0.0005,
+                numIter: 10000
+            },
+            wheelSensitivity: 0.5
+        });
+
+        let hoveredNode = null;
+        function fadeOthers(node) {
+            const neighbors = node.neighborhood().nodes();
+            const incidentEdges = node.connectedEdges();
+            const highlightSet = node.union(neighbors).union(incidentEdges);
+            cy.elements().not(highlightSet).addClass('faded');
+            node.addClass('hover-highlight');
+            incidentEdges.addClass('hover-highlight');
+            neighbors.addClass('hover-highlight');
+        }
+        function restoreAll() {
+            cy.elements().removeClass('faded hover-highlight');
+        }
+        cy.on('mouseover', 'node', function(evt) {
+            if (hoveredNode === evt.target) return;
+            hoveredNode = evt.target;
+            fadeOthers(hoveredNode);
+        });
+        cy.on('mouseout', 'node', function() {
+            hoveredNode = null;
+            restoreAll();
+        });
+
+        const tooltipDiv = document.createElement('div');
+        tooltipDiv.style.position = 'absolute';
+        tooltipDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        tooltipDiv.style.color = '#fff';
+        tooltipDiv.style.padding = '4px 8px';
+        tooltipDiv.style.borderRadius = '6px';
+        tooltipDiv.style.fontSize = '12px';
+        tooltipDiv.style.pointerEvents = 'none';
+        tooltipDiv.style.zIndex = '1000';
+        tooltipDiv.style.display = 'none';
+        document.body.appendChild(tooltipDiv);
+
+        cy.on('mouseover', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        tooltipDiv.style.display = 'block';
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+
+    cy.on('mousemove', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+        const infoPanel = document.getElementById('info-panel');
+        const infoContent = document.getElementById('info-content');
+        const closeBtn = document.getElementById('close-panel');
+        closeBtn.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formatNodeInfo(nodeData) {
+            var fieldNames = {
+                'display_name': 'Name',
+                'Category': 'Category',
+                'Description': 'Description',
+                'Roles': 'Roles',
+                'Epithets': 'Epithets',
+                'Attributes': 'Attributes',
+                'Actions': 'Actions',
+                'AverageShortestPathLength': 'Average Shortest Path Length',
+                'ClusteringCoefficient': 'Clustering Coefficient',
+                'ClosenessCentrality': 'Closeness Centrality',
+                'Degree': 'Degree',
+                'BetweennessCentrality': 'Betweenness Centrality',
+                'Radiality': 'Radiality'
+            };
+            var fieldsOrder = [
+                'display_name', 'Category', 'Description', 'Roles', 'Epithets', 'Attributes', 'Actions',
+                'AverageShortestPathLength', 'ClusteringCoefficient', 'ClosenessCentrality',
+                'Degree', 'BetweennessCentrality', 'Radiality'
+            ];
+            var title = nodeData.display_name || nodeData.Name || nodeData['shared name'] || nodeData.id || 'Информация об узле';
+            var html = '<h4>' + escapeHtml(title) + '</h4>';
+            html += '<table>';
+            for (var i = 0; i < fieldsOrder.length; i++) {
+                var field = fieldsOrder[i];
+                var value = nodeData[field];
+                if (value !== undefined && value !== null && value !== '') {
+                    if (typeof value === 'object') value = JSON.stringify(value);
+                    var displayName = fieldNames[field] || field;
+                    html += '<tr>';
+                    html += '<th>' + escapeHtml(displayName) + '</th>';
+                    html += '<td>' + escapeHtml(String(value)) + '<\/td>';
+                    html += '</tr>';
+                }
+            }
+            html += '</table>';
+            return html;
+        }
+
+        cy.on('tap', 'node', (evt) => {
+            const node = evt.target;
+            const nodeData = node.data();
+            infoContent.innerHTML = formatNodeInfo(nodeData);
+            infoPanel.style.display = 'block';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!infoPanel.contains(e.target) && e.target !== infoPanel && !cy.getElementById(e.target.id)) {
+                infoPanel.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            cy.resize();
+        });
+    </script>
+</body>
+</html>
