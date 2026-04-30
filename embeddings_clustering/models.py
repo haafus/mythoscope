@@ -43,16 +43,14 @@ class KMeansClustering(BaseClusteringModel):
         embeddings_scaled = self.scaler.fit_transform(embeddings)
 
         if self.n_clusters is None:
-            # Используем более надежный метод определения числа кластеров
             max_k = min(self.max_clusters, len(embeddings) - 1)
             if max_k < 2:
                 self.n_clusters = 1
             else:
-                # Используем silhouette score вместо инерции
                 best_k = 2
                 best_score = -1
 
-                for k in range(2, min(max_k + 1, 11)):  # до 10 кластеров
+                for k in range(2, min(max_k + 1, 11)):
                     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
                     labels = kmeans.fit_predict(embeddings_scaled)
 
@@ -197,4 +195,4 @@ def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
 
 
 def list_available_models() -> List[str]:
-    return ['kmeans', 'agglomerative', 'dbscan'] #, 'spectral', 'birch']
+    return ['kmeans', 'agglomerative', 'dbscan']

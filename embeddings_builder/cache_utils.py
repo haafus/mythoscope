@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_cache_key(text: str, model_name: str, chunking_strategy: Any) -> str:
-    """Generate cache key for text and parameters"""
     key_str = f"{text}|{model_name}|{chunking_strategy.name}|{chunking_strategy.chunk_size}|{chunking_strategy.chunk_overlap}"
     return hashlib.md5(key_str.encode('utf-8')).hexdigest()
 
@@ -22,7 +21,6 @@ def save_to_cache(
         cache_dir: Path,
         key: Optional[str] = None
 ) -> bool:
-    """Save embedding to cache"""
     try:
         if key is None:
             key = get_cache_key(text, model_name, chunking_strategy)
@@ -53,7 +51,6 @@ def load_from_cache(
         cache_dir: Path,
         key: Optional[str] = None
 ) -> Optional[np.ndarray]:
-    """Load embedding from cache"""
     try:
         if key is None:
             key = get_cache_key(text, model_name, chunking_strategy)
@@ -66,7 +63,6 @@ def load_from_cache(
         with open(cache_file, 'rb') as f:
             data = pickle.load(f)
 
-        # Validate cache integrity
         if (data['text'] == text and
                 data['model_name'] == model_name and
                 data['chunking_name'] == chunking_strategy.name):
@@ -80,7 +76,6 @@ def load_from_cache(
 
 
 def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) -> int:
-    """Clean old cache files and enforce size limit"""
     from datetime import datetime, timedelta
 
     if not cache_dir.exists():
@@ -91,7 +86,6 @@ def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) 
     cutoff_time = current_time - timedelta(days=ttl_days)
     total_size = 0
 
-    # First pass: remove expired files and calculate total size
     cache_files = list(cache_dir.glob("*.pkl"))
 
     for cache_file in cache_files:
@@ -103,10 +97,8 @@ def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) 
         else:
             total_size += cache_file.stat().st_size
 
-    # Second pass: remove oldest files if exceeding size limit
     max_size_bytes = max_size_mb * 1024 * 1024
     if total_size > max_size_bytes:
-        # Sort by modification time (oldest first)
         cache_files = sorted(
             [f for f in cache_dir.glob("*.pkl") if f.exists()],
             key=lambda f: f.stat().st_mtime

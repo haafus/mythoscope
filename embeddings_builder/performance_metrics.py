@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class PerformanceMetrics:
-    """Track performance metrics including time and memory usage"""
 
     def __init__(self, metrics_file: Optional[str] = None, track_memory: bool = True):
         self.metrics_file = Path(metrics_file) if metrics_file else None
@@ -22,7 +21,6 @@ class PerformanceMetrics:
         self.memory_start: Optional[float] = None
 
     def start_operation(self, name: str) -> None:
-        """Start tracking an operation"""
         self.current_operation = name
         self.operation_start = time.time()
 
@@ -32,7 +30,6 @@ class PerformanceMetrics:
         logger.debug(f"Starting operation: {name}")
 
     def end_operation(self, name: Optional[str] = None) -> Dict[str, Any]:
-        """End tracking and return metrics for the operation"""
         op_name = name or self.current_operation
         if not op_name or not self.operation_start:
             logger.warning("No active operation to end")
@@ -51,7 +48,6 @@ class PerformanceMetrics:
             metrics["memory_usage_mb"] = memory_end
             metrics["memory_delta_mb"] = memory_end - self.memory_start
 
-        # Store in metrics dictionary
         if op_name not in self.metrics:
             self.metrics[op_name] = []
         self.metrics[op_name].append(metrics)
@@ -68,7 +64,6 @@ class PerformanceMetrics:
 
     @contextmanager
     def track(self, name: str):
-        """Context manager for tracking operations"""
         self.start_operation(name)
         try:
             yield self
@@ -76,7 +71,6 @@ class PerformanceMetrics:
             self.end_operation(name)
 
     def _get_memory_usage(self) -> float:
-        """Get current memory usage in MB with error handling"""
         try:
             process = psutil.Process()
             return process.memory_info().rss / 1024 / 1024
@@ -85,7 +79,6 @@ class PerformanceMetrics:
             return 0.0
 
     def get_summary(self, operation: Optional[str] = None) -> Dict[str, Any]:
-        """Get summary statistics for operations"""
         if operation:
             ops = self.metrics.get(operation, [])
         else:
@@ -115,7 +108,6 @@ class PerformanceMetrics:
         return summary
 
     def save(self) -> None:
-        """Save metrics to file"""
         if not self.metrics_file:
             return
 
@@ -133,7 +125,6 @@ class PerformanceMetrics:
         logger.info(f"Performance metrics saved to {self.metrics_file}")
 
     def reset(self) -> None:
-        """Reset all metrics"""
         self.metrics = {}
         self.current_operation = None
         self.operation_start = None

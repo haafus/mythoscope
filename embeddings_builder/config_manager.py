@@ -6,7 +6,6 @@ from copy import deepcopy
 
 
 class ConfigManager:
-    """Manages configuration from YAML/JSON files with defaults"""
 
     DEFAULTS = {
         "paths": {
@@ -54,7 +53,6 @@ class ConfigManager:
             self.load()
 
     def load(self) -> None:
-        """Load configuration from file"""
         if not self.config_path or not self.config_path.exists():
             return
 
@@ -69,7 +67,6 @@ class ConfigManager:
         self._merge_config(self._config, loaded or {})
 
     def _merge_config(self, base: Dict, override: Dict) -> None:
-        """Deep merge configuration dictionaries"""
         for key, value in override.items():
             if key in base and isinstance(base[key], dict) and isinstance(value, dict):
                 self._merge_config(base[key], value)
@@ -77,7 +74,6 @@ class ConfigManager:
                 base[key] = value
 
     def save(self, path: Optional[str] = None) -> None:
-        """Save configuration to file"""
         save_path = Path(path) if path else self.config_path
         if not save_path:
             raise ValueError("No save path specified")
@@ -91,7 +87,6 @@ class ConfigManager:
                 json.dump(self._config, f, indent=2, ensure_ascii=False)
 
     def get(self, key_path: str, default: Any = None) -> Any:
-        """Get value by dot-separated key path"""
         keys = key_path.split('.')
         value = self._config
         for key in keys:
@@ -104,7 +99,6 @@ class ConfigManager:
         return value
 
     def set(self, key_path: str, value: Any) -> None:
-        """Set value by dot-separated key path"""
         keys = key_path.split('.')
         target = self._config
         for key in keys[:-1]:
@@ -114,14 +108,11 @@ class ConfigManager:
         target[keys[-1]] = value
 
     def get_all(self) -> Dict:
-        """Get complete configuration"""
         return deepcopy(self._config)
 
     def validate(self) -> List[str]:
-        """Validate configuration and return list of issues"""
         issues = []
 
-        # Validate paths
         corpus_dir = self.get('paths.corpus_dir')
         if not Path(corpus_dir).exists():
             issues.append(f"Корневая директория не существует: {corpus_dir}")
@@ -133,7 +124,6 @@ class ConfigManager:
             except Exception as e:
                 issues.append(f"Не удалось создать выходную директорию {out_dir}: {e}")
 
-        # Validate embedding parameters
         batch_size = self.get('embedding.batch_size')
         if not isinstance(batch_size, int) or batch_size < 1 or batch_size > 1024:
             issues.append(f"batch_size должен быть между 1 и 1024, получено: {batch_size}")
@@ -142,13 +132,11 @@ class ConfigManager:
         if text_type not in ['original', 'translate', 'both']:
             issues.append(f"Некорректный text_type: {text_type}. Допустимые значения: original, translate, both")
 
-        # Validate chunking strategy
         chunking = self.get('embedding.default_chunking')
         valid_strategies = ['character', 'sentence', 'paragraph']
         if chunking not in valid_strategies:
             issues.append(f"Некорректная стратегия чанкинга: {chunking}. Допустимые: {valid_strategies}")
 
-        # Validate cache settings
         cache_validation = self.get('cache.validation')
         if cache_validation not in ['crc32', 'md5', 'none']:
             issues.append(f"Некорректный метод валидации кэша: {cache_validation}")

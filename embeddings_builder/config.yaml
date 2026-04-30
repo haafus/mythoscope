@@ -36,5 +36,5 @@ performance:
 
 cache:
   validation: "crc32"  # crc32, md5, or none
-  max_size_mb: 1024  # Maximum cache size in MB
-  ttl_days: 30  # Cache TTL in days
+  max_size_mb: 1024  #MB
+  ttl_days: 30

@@ -5,71 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="22dfc77f-98d5-44fb-8000-3bf35d3376e1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/MythoSemantic.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/embeddings_builder/config_manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/analysis_summary.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/model_info.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_traditions.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/BAAI_bge-m3/umap_traditions_data.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/analysis_summary.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/model_info.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_traditions.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Qwen_Qwen3-Embedding/umap_traditions_data.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/analysis_summary.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/model_info.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_traditions.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/intfloat_e5-large-v2/umap_traditions_data.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/models.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Aztec/rig_veda_americanus_aztec/rig_veda_americanus_aztec.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Buddhism/buddhist_psalms_shinran/buddhist_psalms_shinran.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Buddhism/dhammapada_max_muller/dhammapada_max_muller.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Celtic/mabinogion_guest/mabinogion_guest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Christianity/augustine_confessions_trans/augustine_confessions_trans.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Christianity/bible_kjv_old_testament/bible_kjv_old_testament.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Christianity/the_holy_bible/the_holy_bible.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Confucianism/analects_confucius_legge/analects_confucius_legge.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Hindu/vikram_and_vampire_burton/vikram_and_vampire_burton.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Hinduism/hindu_law_yajnavalkya/hindu_law_yajnavalkya.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Hinduism/upanishads_paramananda/upanishads_paramananda.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Islam/quran_english_pickthall/quran_english_pickthall.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Japanese/japanese_myths_legends/japanese_myths_legends.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_antiquities_trans/josephus_antiquities_trans.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Judaism/josephus_wars_trans/josephus_wars_trans.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Judaism/sayings_of_the_jewish_fathers_trans/sayings_of_the_jewish_fathers_trans.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Maori/maori_religion_shortland/maori_religion_shortland.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Maya/popol_vuh_spence/popol_vuh_spence.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Mesopotamian/gilgamesh_budge/gilgamesh_budge.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Multiple_asian/sacred_books_of_the_east_max_muller/sacred_books_of_the_east_max_muller.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Norse/poetic_edda_bellows/poetic_edda_bellows.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Norse/prose_edda_anderson/prose_edda_anderson.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Shinto/shinto_cult_terry/shinto_cult_terry.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Slavic/russian_folk_tales/russian_folk_tales.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Taoism/dao_de_jing_legge/dao_de_jing_legge.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Taoism/taoism_books_listing/taoism_books_listing.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/West_African/west_african_folk_tales/west_african_folk_tales.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/Zoroastrianism/the_parsis_zoroastrianism/the_parsis_zoroastrianism.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/analyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embedding_analyzer/visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/visualization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/build_embeddings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/cache_manager.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/chroma_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/chroma_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/chunking.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings_builder/chunking.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings_builder/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/embedding_analyzer/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/locations_graph.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/personas_graph.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/analysis.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/corpus.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/corpus.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/graphs.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/graphs.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/searchSimilarities.html" beforeDir="false" afterPath="$PROJECT_DIR$/template/searchSimilarities.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chroma_db/chroma.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/chroma_db/chroma.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,24 +32,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.add_discription_to_text.executor&quot;: &quot;Run&quot;,
-    &quot;Python.clean_gutenberg (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.clean_gutenberg.executor&quot;: &quot;Run&quot;,
-    &quot;Python.executable_features.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run_clustering.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.add_discription_to_text.executor": "Run",
+    "Python.clean_gutenberg (1).executor": "Run",
+    "Python.clean_gutenberg.executor": "Run",
+    "Python.executable_features.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.run_clustering.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "add__graphs",
+    "ignore.virus.scanning.warn.message": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\embedding_analyzer" />

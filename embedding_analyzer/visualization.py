@@ -15,7 +15,6 @@ from sklearn.metrics.pairwise import cosine_distances
 from .config import get_analyzer_config
 from .utils import reduce_dimensions
 
-# Константы
 MAX_TEXT_PREVIEW_LEN = 200
 MAX_VIS_SAMPLES = 3000
 DEFAULT_SAMPLE_SIZE = -1
@@ -25,20 +24,17 @@ DASHBOARD_HEIGHT = 700
 DISTRIBUTION_HEIGHT = 600
 DISTRIBUTION_WIDTH = 900
 
-# Настройка логирования
 logger = logging.getLogger(__name__)
 
 
 def _ensure_dir(path: str) -> str:
-    """Создает директорию если не существует"""
     os.makedirs(path, exist_ok=True)
     return path
 
 
 def _check_umap_available() -> bool:
-    """Проверяет доступность UMAP"""
     try:
-        import umap  # noqa: F401
+        import umap
         return True
     except ImportError:
         logger.warning("UMAP not installed. Install with: pip install umap-learn")
@@ -46,27 +42,19 @@ def _check_umap_available() -> bool:
 
 
 def _get_color_map(traditions: List[str]) -> Dict[str, str]:
-    """
-    Создает маппинг традиций к цветам.
-    Использует циклическое повторение базовой палитры Plotly.
-    """
     n_traditions = len(traditions)
-    # Используем качественную цветовую карту для дискретных данных
     base_colors = px.colors.qualitative.Plotly
 
-    # Циклически повторяем базовую палитру для любого количества традиций
     colors = [base_colors[i % len(base_colors)] for i in range(n_traditions)]
 
-    # Если традиций очень много, добавляем дополнительные цвета через HSV
     if n_traditions > len(base_colors):
         additional_needed = n_traditions - len(base_colors)
         additional_colors = []
         for i in range(additional_needed):
-            hue = (i * 0.618033988749895) % 1.0  # Золотое сечение для равномерного распределения
+            hue = (i * 0.618033988749895) % 1.0
             rgb = colorsys.hsv_to_rgb(hue, 0.7, 0.9)
             hex_color = '#{:02x}{:02x}{:02x}'.format(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
             additional_colors.append(hex_color)
-        # Заменяем последние дополнительные_нужно цветов на сгенерированные
         colors = colors[:-additional_needed] + additional_colors
 
     return {trad: colors[i] for i, trad in enumerate(sorted(traditions))}
@@ -78,9 +66,6 @@ def _reduce_dimensions_safe(
         n_components: int = 2,
         max_samples: int = MAX_VIS_SAMPLES
 ) -> Optional[np.ndarray]:
-    """
-    Безопасное применение редукции размерности с сэмплированием при необходимости
-    """
     if len(embeddings) > max_samples and method in ['tsne']:
         logger.info(f"Too many samples ({len(embeddings)}) for {method.upper()}, sampling {max_samples}")
         indices = np.random.choice(len(embeddings), max_samples, replace=False)
@@ -103,13 +88,11 @@ def _create_interactive_figure_2d(
         output_dir: str = None,
         filename: str = None
 ) -> go.Figure:
-    """Создает интерактивный 2D график"""
     fig = go.Figure()
 
     for tradition, color in color_map.items():
         trad_data = df_plot[df_plot["tradition"] == tradition]
         if not trad_data.empty:
-            # Подготовка customdata без эмбеддингов для экономии памяти
             customdata = []
             for _, row in trad_data.iterrows():
                 text_preview = row["text"][:MAX_TEXT_PREVIEW_LEN]
@@ -140,7 +123,6 @@ def _create_interactive_figure_2d(
                               "Text: %{customdata[3]}<extra></extra>"
             ))
 
-    # Улучшенный layout с легендой под графиком
     fig.update_layout(
         title=dict(
             text=title,
@@ -150,18 +132,18 @@ def _create_interactive_figure_2d(
         ),
         showlegend=True,
         legend=dict(
-            orientation='h',  # Горизонтальная легенда
+            orientation='h',
             yanchor='top',
-            y=-0.15,  # Под графиком
+            y=-0.15,
             xanchor='center',
-            x=0.5,  # По центру
+            x=0.5,
             bgcolor='rgba(255,255,255,0.9)',
             bordercolor='rgba(0,0,0,0.2)',
             borderwidth=1,
             font=dict(size=11)
         ),
         hovermode='closest',
-        margin=dict(l=50, r=50, t=80, b=100),  # Увеличен нижний отступ для легенды
+        margin=dict(l=50, r=50, t=80, b=100),
         plot_bgcolor='rgba(240,240,240,0.5)',
         paper_bgcolor='white',
         xaxis=dict(
@@ -192,7 +174,6 @@ def plot_interactive_2d(
         model_name: str = None,
         method: str = 'umap'
 ) -> Optional[go.Figure]:
-    """Создает 2D интерактивную визуализацию эмбеддингов"""
     if not data:
         logger.warning("No data for visualization.")
         return None
@@ -206,7 +187,6 @@ def plot_interactive_2d(
 
     output_dir = _ensure_dir(output_dir)
 
-    # Сэмплирование данных если нужно
     if sample_size == DEFAULT_SAMPLE_SIZE:
         sample = data
     else:
@@ -219,7 +199,6 @@ def plot_interactive_2d(
         logger.error(f"Failed to stack embeddings: {e}")
         return None
 
-    # Редукция размерности
     embedding_2d = _reduce_dimensions_safe(embeddings, method=method, n_components=2)
     if embedding_2d is None:
         return None
@@ -262,7 +241,6 @@ def plot_distance_heatmap(
         model_name: str = None,
         save_html: bool = True
 ) -> Optional[go.Figure]:
-    """Создает тепловую карту расстояний между традициями"""
     if not data:
         logger.warning("No data for visualization.")
         return None
@@ -272,7 +250,6 @@ def plot_distance_heatmap(
 
     output_dir = _ensure_dir(output_dir)
 
-    # Сбор эмбеддингов по традициям
     traditions_data = {}
     for item in data:
         trad = item["tradition"]
@@ -280,7 +257,6 @@ def plot_distance_heatmap(
             traditions_data[trad] = []
         traditions_data[trad].append(item["embedding"])
 
-    # Вычисление центроидов
     centroids = {}
     for trad, embeddings in traditions_data.items():
         centroids[trad] = np.mean(embeddings, axis=0)
@@ -296,12 +272,11 @@ def plot_distance_heatmap(
                 distance_matrix[i, j] = dist
                 distance_matrix[j, i] = dist
 
-    # Улучшенная тепловая карта с аннотациями
     fig = px.imshow(
         distance_matrix,
         x=trad_list,
         y=trad_list,
-        text_auto='.3f',  # Форматирование чисел
+        text_auto='.3f',
         aspect="auto",
         color_continuous_scale="Viridis",
         title=f"Heatmap of distances between traditions{' - ' + model_name if model_name else ''}",
@@ -319,16 +294,15 @@ def plot_distance_heatmap(
         xaxis=dict(
             tickangle=45,
             tickfont=dict(size=11),
-            side='bottom'  # Названия традиций снизу
+            side='bottom'
         ),
         yaxis=dict(
             tickfont=dict(size=11),
             title=dict(text="Tradition", font=dict(size=12))
         ),
-        margin=dict(l=100, r=50, t=80, b=150)  # Больше места для подписей снизу
+        margin=dict(l=100, r=50, t=80, b=150)
     )
 
-    # Улучшение отображения чисел на тепловой карте
     fig.update_traces(
         textfont=dict(size=10, color='white' if distance_matrix.max() > 0.5 else 'black'),
         hovertemplate="Distance between %{x} and %{y}: %{z:.4f}<extra></extra>"
@@ -348,7 +322,6 @@ def plot_comparison_dashboard(
         model_name: str = None,
         save_html: bool = True
 ) -> Optional[go.Figure]:
-    """Создает дашборд сравнения методов визуализации"""
     if not data:
         logger.warning("No data for visualization.")
         return None
@@ -358,7 +331,6 @@ def plot_comparison_dashboard(
 
     output_dir = _ensure_dir(output_dir)
 
-    # Ограничение размера выборки для t-SNE
     if len(data) > MAX_VIS_SAMPLES:
         logger.info(f"Too much data ({len(data)}). Using sample of {MAX_VIS_SAMPLES} for visualization")
         indices = np.random.choice(len(data), MAX_VIS_SAMPLES, replace=False)
@@ -372,7 +344,6 @@ def plot_comparison_dashboard(
         logger.error(f"Failed to stack embeddings: {e}")
         return None
 
-    # Редукция размерности разными методами
     methods_to_use = []
     if _check_umap_available():
         methods_to_use.append('umap')
@@ -403,7 +374,6 @@ def plot_comparison_dashboard(
 
     for idx, (method, coords) in enumerate(coords_dict.items(), 1):
         for tradition in unique_traditions:
-            # Векторизованная фильтрация
             mask = traditions_array == tradition
             indices = np.where(mask)[0]
 
@@ -429,7 +399,6 @@ def plot_comparison_dashboard(
                     row=1, col=idx
                 )
 
-        # Настройка осей для каждого подграфика
         fig.update_xaxes(
             title_text=f"<b>{method.upper()} 1</b>",
             row=1, col=idx,
@@ -455,9 +424,9 @@ def plot_comparison_dashboard(
         width=550 * len(coords_dict),
         showlegend=True,
         legend=dict(
-            orientation='h',  # Горизонтальная легенда
+            orientation='h',
             yanchor='top',
-            y=-0.2,  # Увеличенный отступ под графиками (было -0.25, стало -0.2)
+            y=-0.2,
             xanchor='center',
             x=0.5,
             bgcolor='rgba(255,255,255,0.95)',
@@ -470,7 +439,7 @@ def plot_comparison_dashboard(
         plot_bgcolor='rgba(240,240,240,0.3)',
         paper_bgcolor='white',
         hovermode='closest',
-        margin=dict(l=60, r=60, t=80, b=120)  # Увеличенные отступы, особенно снизу для легенды
+        margin=dict(l=60, r=60, t=80, b=120)
     )
 
     if save_html and output_dir:
@@ -487,7 +456,6 @@ def plot_tradition_distribution(
         model_name: str = None,
         save_html: bool = True
 ) -> Optional[go.Figure]:
-    """Создает круговую диаграмму распределения традиций"""
     if not data:
         logger.warning("No data for visualization.")
         return None
@@ -497,13 +465,11 @@ def plot_tradition_distribution(
 
     output_dir = _ensure_dir(output_dir)
 
-    # Подсчет количества по традициям
     tradition_counts = {}
     for item in data:
         trad = item["tradition"]
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
 
-    # Сортировка по убыванию
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
     traditions = [t[0] for t in sorted_traditions]
     counts = [t[1] for t in sorted_traditions]
@@ -511,7 +477,6 @@ def plot_tradition_distribution(
     color_map = _get_color_map(traditions)
     colors = [color_map[t] for t in traditions]
 
-    # Создание круговой диаграммы
     fig = go.Figure(data=[go.Pie(
         labels=traditions,
         values=counts,
@@ -519,8 +484,8 @@ def plot_tradition_distribution(
         textinfo='label+percent',
         textposition='auto',
         hoverinfo='label+value+percent',
-        hole=0.3,  # Сделать пончиком
-        pull=[0.05 if i < 3 else 0 for i in range(len(traditions))]  # Выделить топ-3
+        hole=0.3,
+        pull=[0.05 if i < 3 else 0 for i in range(len(traditions))]
     )])
 
     title = f"Distribution of texts by tradition{' - ' + model_name if model_name else ''}"
@@ -556,13 +521,11 @@ def plot_tradition_distribution(
 
 
 def save_summary_to_files(data: List[Dict], stats: Dict, output_dir: str = None):
-    """Сохраняет сводку анализа в CSV и TXT файлы"""
     if output_dir is None:
         output_dir = get_analyzer_config().output_dir
 
     output_dir = _ensure_dir(output_dir)
 
-    # Исключаем эмбеддинги из DataFrame для экономии памяти
     data_without_embeddings = []
     for item in data:
         item_copy = {k: v for k, v in item.items() if k != 'embedding'}
@@ -573,7 +536,6 @@ def save_summary_to_files(data: List[Dict], stats: Dict, output_dir: str = None)
     df_summary.to_csv(csv_path, index=False, encoding="utf-8")
     logger.info(f"CSV saved: {csv_path}")
 
-    # Сохранение TXT отчета
     txt_path = os.path.join(output_dir, "analysis_summary.txt")
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(f"Embedding Analysis Summary\n")
@@ -597,7 +559,6 @@ def save_summary_to_files(data: List[Dict], stats: Dict, output_dir: str = None)
 
 
 def save_models_list(models: List[str], output_dir: str = None):
-    """Сохраняет список доступных моделей"""
     if output_dir is None:
         output_dir = get_analyzer_config().output_dir
 
@@ -624,26 +585,21 @@ def save_models_list(models: List[str], output_dir: str = None):
 
 
 def add_click_handler_to_html(html_path: str):
-    """Добавляет JavaScript обработчик кликов в HTML файл визуализации"""
     try:
         with open(html_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Проверяем, есть ли уже обработчик
         if 'pointClickHandler' in content:
             return
 
-        # JavaScript код для обработки кликов
         click_handler_js = '''
         <script>
         (function() {
-            // Функция для получения параметров из URL
             function getUrlParameter(name) {
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get(name);
             }
 
-            // Функция для отправки сообщения о клике
             function sendPointClick(pointId) {
                 if (window.parent !== window) {
                     window.parent.postMessage({
@@ -653,13 +609,10 @@ def add_click_handler_to_html(html_path: str):
                 }
             }
 
-            // Добавляем обработчик кликов на график
             function addClickHandler() {
-                // Ждем загрузки графика
                 setTimeout(function() {
                     const plotDiv = document.querySelector('.plotly-graph-div') || document.getElementById('plotly-graph');
                     if (plotDiv && plotDiv.on) {
-                        // Используем Plotly событие
                         plotDiv.on('plotly_click', function(data) {
                             if (data.points && data.points[0] && data.points[0].customdata) {
                                 let pointId = data.points[0].customdata[0];
@@ -670,20 +623,17 @@ def add_click_handler_to_html(html_path: str):
                         });
                         console.log('Click handler added to plot');
                     } else {
-                        // Если график еще не загружен, пробуем снова
                         setTimeout(addClickHandler, 500);
                     }
                 }, 1000);
             }
 
-            // Запускаем добавление обработчика
             addClickHandler();
         })();
         </script>
         </body>
         '''
 
-        # Вставляем скрипт перед закрывающим тегом body
         if '</body>' in content:
             content = content.replace('</body>', click_handler_js)
         else:
@@ -698,7 +648,6 @@ def add_click_handler_to_html(html_path: str):
 
 
 def generate_clickable_plots(output_dir: str, model_name: str):
-    """Генерирует все визуализации с поддержкой кликов"""
     viz_files = [
         'umap_2d_traditions.html',
         'pca_2d_traditions.html',
@@ -716,7 +665,6 @@ def analyze_embeddings(
         model_name: str = None,
         generate_all_plots: bool = True
 ):
-    """Основная функция для анализа эмбеддингов"""
     from .analyzer import EmbeddingAnalyzer
 
     try:
@@ -747,7 +695,6 @@ def analyze_embeddings(
 
             logger.info("Generating visualizations...")
 
-            # 2D визуализации
             for method in ['umap', 'pca']:
                 logger.info(f"  - 2D {method.upper()}...")
                 try:
@@ -758,7 +705,6 @@ def analyze_embeddings(
                 except Exception as e:
                     logger.error(f"    Error creating {method.upper()}: {e}")
 
-            # t-SNE с ограничением
             logger.info("  - 2D t-SNE...")
             try:
                 plot_interactive_2d(
@@ -768,28 +714,24 @@ def analyze_embeddings(
             except Exception as e:
                 logger.error(f"    Error creating t-SNE: {e}")
 
-            # Тепловая карта расстояний
             logger.info("  - Distance heatmap...")
             try:
                 plot_distance_heatmap(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
             except Exception as e:
                 logger.error(f"    Error creating heatmap: {e}")
 
-            # Сравнительная панель
             logger.info("  - Comparison dashboard...")
             try:
                 plot_comparison_dashboard(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
             except Exception as e:
                 logger.error(f"    Error creating comparison dashboard: {e}")
 
-            # Диаграмма распределения
             logger.info("  - Tradition distribution chart...")
             try:
                 plot_tradition_distribution(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
             except Exception as e:
                 logger.error(f"    Error creating distribution chart: {e}")
 
-            # Добавляем обработчики кликов к графикам
             logger.info("  - Adding click handlers...")
             try:
                 generate_clickable_plots(analyzer.output_dir, analyzer.model_name)

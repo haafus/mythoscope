@@ -22,7 +22,6 @@ class EmbeddingDataLoader:
 
     @property
     def collection(self):
-        """Ленивая загрузка коллекции"""
         if self._collection is None:
             try:
                 self._collection = self.client.get_collection(name=self.collection_name)
@@ -32,7 +31,6 @@ class EmbeddingDataLoader:
         return self._collection
 
     def _load_metadata_map(self) -> Dict[str, str]:
-        """Загружает маппинг ID -> tradition"""
         if self._metadata_map is not None:
             return self._metadata_map
 
@@ -53,7 +51,6 @@ class EmbeddingDataLoader:
         return self._metadata_map
 
     def _auto_migrate_all(self) -> None:
-        """Однократная массовая миграция всех записей при инициализации"""
         try:
             collection = self.collection
             count = collection.count()
@@ -61,7 +58,6 @@ class EmbeddingDataLoader:
             if count == 0:
                 return
 
-            # Проверяем необходимость миграции на небольшой выборке
             if not self._needs_migration(collection):
                 return
 
@@ -79,7 +75,6 @@ class EmbeddingDataLoader:
             logger.error(f"Auto-migration failed: {e}")
 
     def _needs_migration(self, collection) -> bool:
-        """Проверяет, нужна ли миграция"""
         try:
             sample = collection.get(limit=min(5, collection.count()), include=["metadatas"])
             if not sample["metadatas"]:
@@ -94,7 +89,6 @@ class EmbeddingDataLoader:
             return False
 
     def _migrate_records(self, collection, metadata_map: Dict[str, str]) -> int:
-        """Выполняет миграцию записей"""
         batch_size = 1000
         offset = 0
         migrated = 0
@@ -112,7 +106,6 @@ class EmbeddingDataLoader:
 
                 updates = self._prepare_updates(results, metadata_map)
 
-                # Обновляем записи
                 for doc_id, meta in updates:
                     try:
                         collection.update(ids=[doc_id], metadatas=[meta])
@@ -135,7 +128,6 @@ class EmbeddingDataLoader:
         return migrated
 
     def _prepare_updates(self, results: Dict, metadata_map: Dict[str, str]) -> List[tuple]:
-        """Подготавливает обновления для миграции"""
         updates = []
         for doc_id, meta in zip(results["ids"], results["metadatas"]):
             if not meta:
@@ -156,7 +148,6 @@ class EmbeddingDataLoader:
             batch_size: int = 5000,
             max_records: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        """Загружает данные из ChromaDB с возможностью ограничения"""
         all_data = []
         offset = 0
         where_filter = {"model": model_name} if model_name else None
@@ -191,7 +182,6 @@ class EmbeddingDataLoader:
         return all_data
 
     def _process_batch(self, results: Dict) -> List[Dict[str, Any]]:
-        """Обрабатывает batch данных"""
         batch_data = []
         ids = results.get("ids", [])
         embeddings = results.get("embeddings", [])
@@ -225,9 +215,7 @@ class EmbeddingDataLoader:
         return batch_data
 
     def get_available_models(self) -> List[str]:
-        """Получает список моделей из Chroma"""
         try:
-            # Используем get с лимитом для получения метаданных
             result = self.collection.get(limit=10000, include=["metadatas"])
             metadatas = result.get("metadatas", [])
             models = {m.get("model") for m in metadatas if m and "model" in m}
@@ -236,11 +224,8 @@ class EmbeddingDataLoader:
             logger.error(f"Failed to get available models: {e}")
             return []
 
-
     def close(self):
-        """Закрывает соединение с ChromaDB"""
         if hasattr(self, 'client'):
-            # ChromaDB client doesn't have explicit close, but we can clear reference
             self._collection = None
             self.client = None
 

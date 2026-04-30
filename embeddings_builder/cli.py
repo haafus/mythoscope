@@ -17,7 +17,6 @@ from .cache_validator import CacheValidator
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
 @click.pass_context
 def cli(ctx, config: str, verbose: bool):
-    """Embedding Builder CLI - Generate and manage embeddings for text corpus"""
     ctx.ensure_object(dict)
     ctx.obj['config_manager'] = ConfigManager(config)
     if verbose:
@@ -34,10 +33,8 @@ def cli(ctx, config: str, verbose: bool):
 @click.pass_context
 def generate(ctx, model: Optional[str], chunking: Optional[str], text_type: Optional[str],
              batch_size: Optional[int], clear: Optional[bool], collection: str):
-    """Generate embeddings for all files in corpus directory"""
     config_mgr = ctx.obj['config_manager']
 
-    # Override config with CLI arguments
     if model:
         config_mgr.set('embedding.default_model', model)
     if chunking:
@@ -49,7 +46,6 @@ def generate(ctx, model: Optional[str], chunking: Optional[str], text_type: Opti
     if clear is not None:
         config_mgr.set('embedding.clear_existing', clear)
 
-    # Start performance monitoring
     metrics = PerformanceMetrics(config_mgr.get('performance.metrics_file'))
     metrics.start_operation('generate_embeddings')
 
@@ -74,7 +70,6 @@ def generate(ctx, model: Optional[str], chunking: Optional[str], text_type: Opti
 @click.option('--model', '-m', default=None, help='Model to use for query encoding')
 @click.pass_context
 def query(ctx, query: str, collection: str, top_k: int, model: Optional[str]):
-    """Query the embedding database"""
     config_mgr = ctx.obj['config_manager']
 
     builder = EmbeddingBuilder(
@@ -110,7 +105,6 @@ def query(ctx, query: str, collection: str, top_k: int, model: Optional[str]):
 @click.argument('text_file', type=click.Path(exists=True))
 @click.pass_context
 def test(ctx, text_file: str, model: Optional[str], strategy: Optional[str]):
-    """Test embedding generation on a single file"""
     config_mgr = ctx.obj['config_manager']
 
     with open(text_file, 'r', encoding='utf-8') as f:
@@ -141,7 +135,6 @@ def test(ctx, text_file: str, model: Optional[str], strategy: Optional[str]):
         click.echo(f"  Embedding dimension: {result['embedding_dim']}")
         click.echo(f"  Batch size used: {result['batch_size_used']}")
 
-        # Show metrics
         if metrics.metrics:
             click.echo(f"\n  Performance:")
             click.echo(f"    Duration: {metrics.metrics.get('duration', 0):.2f}s")
@@ -157,7 +150,6 @@ def test(ctx, text_file: str, model: Optional[str], strategy: Optional[str]):
 @click.argument('text_file', type=click.Path(exists=True))
 @click.pass_context
 def compare(ctx, text_file: str, model: tuple, strategy: tuple):
-    """Compare different models and chunking strategies"""
     config_mgr = ctx.obj['config_manager']
 
     with open(text_file, 'r', encoding='utf-8') as f:
@@ -199,7 +191,6 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
 @click.option('--yes', is_flag=True, help='Skip confirmation')
 @click.pass_context
 def clear_cache(ctx, collection: str, yes: bool):
-    """Clear cache or Chroma collection"""
     config_mgr = ctx.obj['config_manager']
 
     if not yes:
@@ -218,7 +209,6 @@ def clear_cache(ctx, collection: str, yes: bool):
 @cli.command()
 @click.pass_context
 def validate_cache(ctx):
-    """Validate cache integrity"""
     config_mgr = ctx.obj['config_manager']
     validator = CacheValidator(config_mgr.get('paths.cache_dir'))
 
@@ -242,7 +232,6 @@ def validate_cache(ctx):
 @cli.command()
 @click.pass_context
 def show_config(ctx):
-    """Show current configuration"""
     config_mgr = ctx.obj['config_manager']
     config_dict = config_mgr.get_all()
     click.echo(json.dumps(config_dict, indent=2, default=str))
