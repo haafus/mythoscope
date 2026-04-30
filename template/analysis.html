@@ -1,9 +1,10 @@
+<!-- analysis.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Анализ эмбеддингов</title>
+    <title>Анализ эмбеддингов и кластеризации</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -13,25 +14,38 @@
             padding: 40px 20px;
         }
         .container { max-width: 1600px; margin: 0 auto; }
-        h1 { color: #3a3532; font-size: 2rem; font-weight: 600; margin-bottom: 30px; }
-        .model-selector {
-            margin-bottom: 20px;
+
+        .global-model-selector {
             background: white;
-            padding: 15px 20px;
+            padding: 20px 24px;
             border-radius: 12px;
             border: 1px solid #e8e6e4;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .model-selector label { color: #5a524c; font-size: 0.95rem; font-weight: 500; white-space: nowrap; }
-        .model-dropdown {
+        .global-model-selector label {
+            color: #3a3532;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .global-model-selector label svg {
+            width: 20px;
+            height: 20px;
+            color: #5a524c;
+        }
+        .global-model-selector select {
             flex: 1;
-            min-width: 200px;
-            padding: 10px 15px;
+            min-width: 280px;
+            padding: 12px 16px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.95rem;
             color: #3a3532;
             background: white;
@@ -39,117 +53,73 @@
             outline: none;
             transition: border-color 0.2s;
         }
-        .model-dropdown:hover { border-color: #c0ccc8; }
-        .model-dropdown:focus { border-color: #5a524c; }
-        .main-content { display: flex; gap: 20px; align-items: flex-start; }
-        .plot-section { flex: 1; position: relative; min-width: 0; }
-        .plot-container {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e8e6e4;
-            min-height: 500px;
-            position: relative;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        .plot-container.fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1000;
-            border-radius: 0;
-        }
-        .plot-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            border-bottom: 1px solid #f0eeec;
-            background: white;
-        }
-        .plot-title { color: #3a3532; font-size: 1.1rem; font-weight: 500; }
-        .plot-controls { display: flex; gap: 10px; }
-        .control-btn {
-            background: #f5f4f2;
-            border: 1px solid #e0dedb;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
-            color: #5a524c;
-            transition: all 0.2s;
-        }
-        .control-btn:hover { background: #ebe9e6; border-color: #d0ccc8; }
-        .control-btn svg { width: 16px; height: 16px; }
-        .iframe-wrapper { position: relative; width: 100%; height: 600px; }
-        .plot-container.fullscreen .iframe-wrapper { height: calc(100vh - 70px); }
-        #plot-iframe { width: 100%; height: 100%; border: none; display: block; }
-        .search-wrapper { width: 350px; flex-shrink: 0; }
-        .search-panel {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #e8e6e4;
-            transition: all 0.3s ease;
-        }
-        .search-panel.collapsed { padding: 12px 20px; }
-        .search-panel.collapsed .search-content { display: none; }
-        .search-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            user-select: none;
-        }
-        .search-toggle h3 { color: #5a524c; font-size: 1rem; font-weight: 600; }
-        .toggle-icon {
-            width: 20px;
-            height: 20px;
-            transition: transform 0.3s ease;
-            color: #5a524c;
-        }
-        .search-panel.collapsed .toggle-icon { transform: rotate(-90deg); }
-        .search-panel label {
-            display: block;
-            color: #5a524c;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 8px;
-            margin-top: 15px;
-        }
-        .search-panel textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-panel textarea:focus { border-color: #5a524c; }
-        .search-btn {
-            width: 100%;
-            margin-top: 12px;
+        .global-model-selector select:hover { border-color: #5a524c; }
+        .global-model-selector select:focus { border-color: #5a524c; box-shadow: 0 0 0 2px rgba(90,82,76,0.1); }
+        .refresh-models-btn {
             background: #5a524c;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .search-btn:hover:not(:disabled) { background: #6b635c; }
-        .search-btn:disabled { background: #c0bcb8; cursor: not-allowed; }
+        .refresh-models-btn:hover { background: #6b635c; }
+        .current-model-badge {
+            background: #f0eeec;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #5a524c;
+        }
+        .current-model-badge span {
+            font-weight: 600;
+            color: #3a3532;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #e8e6e4;
+        }
+        .tab-btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #8a8580;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+        }
+        .tab-btn:hover {
+            color: #3a3532;
+            background: #f5f4f2;
+        }
+        .tab-btn.active {
+            color: #5a524c;
+            border-bottom-color: #5a524c;
+            background: white;
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #e8e6e4;
+            border-top: none;
+            overflow: hidden;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -161,14 +131,26 @@
             border-radius: 6px;
             font-size: 0.95rem;
             cursor: pointer;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             transition: all 0.2s ease;
         }
         .back-btn:hover { background: #f0eeec; border-color: #c0ccc8; }
         .back-btn svg { width: 18px; height: 18px; }
-        .exit-fullscreen { display: none; }
-        .plot-container.fullscreen .exit-fullscreen { display: flex; }
-        .plot-container.fullscreen .enter-fullscreen { display: none; }
+
+        h1 { color: #3a3532; font-size: 2rem; font-weight: 600; margin-bottom: 20px; }
+
+        iframe {
+            width: 100%;
+            border: none;
+            display: block;
+        }
+
+        .tab-iframe {
+            width: 100%;
+            height: calc(100vh - 280px);
+            min-height: 600px;
+        }
+
         .error-message {
             background: #fee;
             border: 1px solid #fcc;
@@ -179,91 +161,73 @@
             display: none;
         }
         .error-message.show { display: block; }
-        @media (max-width: 1024px) {
-            .main-content { flex-direction: column; }
-            .search-wrapper { width: 100%; }
-            .model-selector { flex-wrap: wrap; }
+
+        @media (max-width: 768px) {
+            .tab-btn { padding: 10px 16px; font-size: 0.9rem; }
+            body { padding: 20px 10px; }
+            .global-model-selector { flex-direction: column; align-items: stretch; }
+            .global-model-selector select { min-width: auto; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <div class="container">
         <button class="back-btn" onclick="window.location.href='home.html'">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
             Назад
         </button>
         <h1>Анализ эмбеддингов</h1>
+
         <div class="error-message" id="errorMsg"></div>
-        <div class="model-selector">
-            <label for="model-select">Модель:</label>
-            <select class="model-dropdown" id="model-select">
+
+        <div class="global-model-selector">
+            <label>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                Модель эмбеддингов:
+            </label>
+            <select id="global-model-select">
                 <option value="">Загрузка моделей...</option>
             </select>
+            <button class="refresh-models-btn" id="refresh-models-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <path d="M23 4v6h-6M1 20v-6h6"/>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                Обновить
+            </button>
+            <div class="current-model-badge">
+                Текущая: <span id="current-model-display">—</span>
+            </div>
         </div>
-        <div class="main-content">
-            <div class="plot-section">
-                <div class="plot-container" id="plotContainer">
-                    <div class="plot-header">
-                        <span class="plot-title" id="plot-title">Визуализация UMAP Традиций</span>
-                        <div class="plot-controls">
-                            <button class="control-btn enter-fullscreen" onclick="toggleFullscreen()" title="На весь экран">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                                </svg>
-                                <span>Развернуть</span>
-                            </button>
-                            <button class="control-btn exit-fullscreen" onclick="toggleFullscreen()" title="Свернуть">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
-                                </svg>
-                                <span>Свернуть</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="iframe-wrapper">
-                        <iframe id="plot-iframe" src=""></iframe>
-                    </div>
-                </div>
-            </div>
-            <div class="search-wrapper">
-                <div class="search-panel collapsed" id="searchPanel">
-                    <div class="search-toggle" onclick="toggleSearch()">
-                        <h3>Поиск соответствий</h3>
-                        <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </div>
-                    <div class="search-content">
-                        <label for="search-text">Поиск соответствий по вашему запросу</label>
-                        <textarea id="search-text" placeholder="Введите текст для поиска соответствий..."></textarea>
-                        <button class="search-btn" id="search-btn" disabled onclick="openSearch()">Искать соответствия</button>
-                    </div>
-                </div>
-            </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="embeddings">Эмбеддинги</button>
+            <button class="tab-btn" data-tab="clustering">Кластеризация</button>
+        </div>
+
+        <div class="tab-content active" id="embeddings-tab">
+            <iframe id="embeddings-iframe" class="tab-iframe" src="embeddings_analysis.html"></iframe>
+        </div>
+
+        <div class="tab-content" id="clustering-tab">
+            <iframe id="clustering-iframe" class="tab-iframe" src="cluster_analysis.html"></iframe>
         </div>
     </div>
-    <script>
-        window.currentSelectedModel = null;
-        const CONFIG = {
-            ANALYSIS_PATH: '../analysis',
-            SEARCH_PAGE: 'searchSimilarities.html',
-            MODELS_JSON: 'models.json'
-        };
-        const searchText = document.getElementById('search-text');
-        const searchBtn = document.getElementById('search-btn');
-        const searchPanel = document.getElementById('searchPanel');
-        const plotContainer = document.getElementById('plotContainer');
-        const modelSelect = document.getElementById('model-select');
-        const plotIframe = document.getElementById('plot-iframe');
-        const plotTitle = document.getElementById('plot-title');
-        const errorMsg = document.getElementById('errorMsg');
 
-        searchText.addEventListener('input', function() {
-            searchBtn.disabled = this.value.trim().length === 0;
-        });
+    <script>
+        let currentModel = null;
+
+        const globalModelSelect = document.getElementById('global-model-select');
+        const currentModelDisplay = document.getElementById('current-model-display');
+        const embeddingsIframe = document.getElementById('embeddings-iframe');
+        const clusteringIframe = document.getElementById('clustering-iframe');
+        const errorMsg = document.getElementById('errorMsg');
 
         function showError(message) {
             errorMsg.textContent = message;
@@ -271,138 +235,135 @@
             setTimeout(() => errorMsg.classList.remove('show'), 5000);
         }
 
-        function openSearch() {
-            const text = searchText.value.trim();
-            if (text) {
-                const modelParam = window.currentSelectedModel ? `&model=${encodeURIComponent(window.currentSelectedModel)}` : '';
-                const url = `${CONFIG.SEARCH_PAGE}?q=${encodeURIComponent(text)}${modelParam}`;
-                window.open(url, 'searchWindow', 'width=800,height=600,centerscreen=yes');
-            }
-        }
-
-        function toggleSearch() { searchPanel.classList.toggle('collapsed'); }
-        function toggleFullscreen() { plotContainer.classList.toggle('fullscreen'); }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && plotContainer.classList.contains('fullscreen')) {
-                toggleFullscreen();
-            }
-        });
-
         function sanitizeModelName(name) {
             return name.replace(/\//g, '_').replace(/\\/g, '_');
         }
 
-        async function loadModels() {
-            try {
-                const response = await fetch(`${CONFIG.ANALYSIS_PATH}/${CONFIG.MODELS_JSON}`);
-                if (response.ok) {
-                    const models = await response.json();
-                    if (Array.isArray(models) && models.length > 0) {
-                        const sanitizedModels = models.map(model => sanitizeModelName(model));
-                        populateDropdown(sanitizedModels, models);
-                        return;
-                    }
+        function updateCurrentModelDisplay(model) {
+            if (model) {
+                currentModelDisplay.textContent = model.replace(/_/g, '/');
+            } else {
+                currentModelDisplay.textContent = '—';
+            }
+        }
+
+        function sendModelToIframe(iframe, model, iframeName, retryCount = 0) {
+            if (!iframe || !iframe.contentWindow) {
+                if (retryCount < 10) {
+                    setTimeout(() => sendModelToIframe(iframe, model, iframeName, retryCount + 1), 200);
                 }
-            } catch (e) {
-                console.log('models.json not available, trying directory listing...');
+                return;
             }
 
             try {
-                const response = await fetch(CONFIG.ANALYSIS_PATH);
-                if (!response.ok) throw new Error('Directory listing forbidden');
-                const text = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
-                const folders = Array.from(doc.querySelectorAll('a'))
-                    .map(a => a.getAttribute('href'))
-                    .filter(href => href && href.endsWith('/'))
-                    .map(href => href.replace(/\/$/, '').split('/').pop())
-                    .filter(name => name && !name.startsWith('.') && name !== 'analysis');
-                if (folders.length > 0) {
-                    populateDropdown(folders, folders);
-                } else {
-                    throw new Error('Модели не найдены');
+                iframe.contentWindow.postMessage({ type: 'modelChanged', model: model }, '*');
+                console.log(`Model sent to ${iframeName}: ${model}`);
+            } catch (e) {
+                console.log(`Failed to send to ${iframeName}:`, e);
+                if (retryCount < 10) {
+                    setTimeout(() => sendModelToIframe(iframe, model, iframeName, retryCount + 1), 200);
                 }
-            } catch (error) {
-                console.error('Failed to load models:', error);
-                modelSelect.innerHTML = '<option value="">Ошибка загрузки моделей</option>';
+            }
+        }
+
+        function broadcastModelChange(model) {
+            if (!model) return;
+
+            currentModel = model;
+            updateCurrentModelDisplay(model);
+
+            sendModelToIframe(embeddingsIframe, model, 'embeddings');
+            sendModelToIframe(clusteringIframe, model, 'clustering');
+        }
+
+        async function loadModels() {
+            try {
+                const response = await fetch('/api/get_models');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.models && data.models.length > 0) {
+                        populateDropdown(data.models);
+                        return;
+                    }
+                }
+                throw new Error('Failed to load models');
+            } catch (e) {
+                console.error('Failed to load models:', e);
+                globalModelSelect.innerHTML = '<option value="">Ошибка загрузки моделей</option>';
                 showError('Не удалось загрузить список моделей');
             }
         }
 
-        function populateDropdown(sanitizedModels, originalModels) {
-            modelSelect.innerHTML = '';
-
-            if (sanitizedModels.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Модели не найдены';
-                modelSelect.appendChild(option);
+        function populateDropdown(models) {
+            globalModelSelect.innerHTML = '';
+            if (models.length === 0) {
+                globalModelSelect.innerHTML = '<option value="">Модели не найдены</option>';
                 return;
             }
 
-            sanitizedModels.forEach((sanitizedModel, index) => {
+            models.forEach(model => {
                 const option = document.createElement('option');
-                option.value = sanitizedModel;
-                option.textContent = originalModels[index].replace(/_/g, '/');
-                modelSelect.appendChild(option);
+                option.value = sanitizeModelName(model);
+                option.textContent = model.replace(/_/g, '/');
+                globalModelSelect.appendChild(option);
             });
 
             try {
                 const lastModel = localStorage.getItem('selectedModel');
-                if (lastModel && sanitizedModels.includes(lastModel)) {
-                    modelSelect.value = lastModel;
-                    loadModelData(lastModel);
-                } else if (sanitizedModels.length > 0) {
-                    modelSelect.value = sanitizedModels[0];
-                    loadModelData(sanitizedModels[0]);
+                if (lastModel && models.some(m => sanitizeModelName(m) === lastModel)) {
+                    globalModelSelect.value = lastModel;
+                    broadcastModelChange(lastModel);
+                } else if (models.length > 0) {
+                    const firstModel = sanitizeModelName(models[0]);
+                    globalModelSelect.value = firstModel;
+                    broadcastModelChange(firstModel);
                 }
             } catch (e) {
-                if (sanitizedModels.length > 0) {
-                    modelSelect.value = sanitizedModels[0];
-                    loadModelData(sanitizedModels[0]);
+                if (models.length > 0) {
+                    const firstModel = sanitizeModelName(models[0]);
+                    globalModelSelect.value = firstModel;
+                    broadcastModelChange(firstModel);
                 }
             }
         }
 
-        function loadModelData(modelName) {
-            if (!modelName) return;
-
-            const modelPath = `${CONFIG.ANALYSIS_PATH}/${modelName}`;
-            const plotUrl = `${modelPath}/umap_traditions.html`;
-
-            plotIframe.src = plotUrl;
-
-            const displayName = modelName.replace(/_/g, '/');
-            plotTitle.textContent = `UMAP визуализация — ${displayName}`;
-
-            window.currentSelectedModel = modelName;
-
-            try {
-                localStorage.setItem('selectedModel', modelName);
-            } catch (e) {
-                console.warn('localStorage unavailable');
-            }
-
-            window.dispatchEvent(new CustomEvent('modelChanged', {
-                detail: { modelName: modelName, modelPath: modelPath }
-            }));
-        }
-
-        modelSelect.addEventListener('change', function() {
+        globalModelSelect.addEventListener('change', function() {
             if (this.value) {
-                loadModelData(this.value);
+                broadcastModelChange(this.value);
+                try {
+                    localStorage.setItem('selectedModel', this.value);
+                } catch(e) {}
             }
         });
 
-        plotIframe.addEventListener('error', function() {
-            showError('Не удалось загрузить визуализацию. Убедитесь, что файл umap_traditions.html существует.');
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('refresh-models-btn').addEventListener('click', function() {
             loadModels();
         });
+
+        // При переключении вкладок отправляем модель заново
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                this.classList.add('active');
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+
+                if (currentModel) {
+                    setTimeout(() => {
+                        if (tabName === 'embeddings') {
+                            sendModelToIframe(embeddingsIframe, currentModel, 'embeddings');
+                        } else if (tabName === 'clustering') {
+                            sendModelToIframe(clusteringIframe, currentModel, 'clustering');
+                        }
+                    }, 100);
+                }
+            });
+        });
+
+        loadModels();
     </script>
 </body>
 </html>

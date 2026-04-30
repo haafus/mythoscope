@@ -469,6 +469,40 @@
     </div>
 
     <script>
+        async function fetchWithRetry(url, maxRetries = 3) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    // Важно: проверяем заголовок Content-Length
+                    const contentLength = response.headers.get('Content-Length');
+                    const arrayBuffer = await response.arrayBuffer();
+
+                    if (contentLength && arrayBuffer.byteLength !== parseInt(contentLength)) {
+                        console.warn(`Размер не совпадает для ${url}: ожидалось ${contentLength}, получено ${arrayBuffer.byteLength}`);
+                        if (i < maxRetries - 1) {
+                            console.log(`Повторная попытка ${i + 1}/${maxRetries}...`);
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            continue;
+                        }
+                    }
+
+                    console.log(`✅ Успешно загружен ${url}: ${arrayBuffer.byteLength} байт`);
+                    return arrayBuffer;
+
+                } catch (error) {
+                    console.error(`Ошибка загрузки ${url} (попытка ${i + 1}/${maxRetries}):`, error);
+                    if (i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
         let tableData = [];
         let table;
 
@@ -605,6 +639,7 @@
             }
         }
 
+        // Исправленная функция открытия документа (показывает текст напрямую или PDF)
         function openDocument(filename, tradition) {
             const safeTradition = tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
             const txtUrl = `../corpus/${safeTradition}/${filename}/${filename}.txt`;
@@ -615,6 +650,7 @@
                     return res.text();
                 })
                 .then(text => {
+
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     const maxLineWidth = 180;
@@ -638,19 +674,31 @@
                     const url = URL.createObjectURL(pdfBlob);
                     window.open(url, '_blank');
                 })
-                .catch(err => alert('Ошибка: ' + err.message));
+                .catch(err => alert('Ошибка открытия: ' + err.message));
         }
+
 
         function downloadFile(url, filename) {
             fetch(url)
-                .then(response => response.blob())
+                .then(response => {
+                    if (!response.ok) throw new Error(`Файл не найден (${response.status})`);
+                    // Важно: читаем как blob только после проверки статуса
+                    return response.blob();
+                })
                 .then(blob => {
+
+                    console.log(`Скачивание ${filename}: ${blob.size} байт`);
+
+
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download = filename;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
+
+
+                    setTimeout(() => URL.revokeObjectURL(link.href), 100);
                 })
                 .catch(err => alert('Ошибка скачивания: ' + err.message));
         }
@@ -665,6 +713,7 @@
                 dropdown.classList.remove('active');
             }
         });
+
 
         async function downloadAll() {
             if (tableData.length === 0) {
@@ -681,32 +730,54 @@
 
             const zip = new JSZip();
             const folder = zip.folder("corpus_documents");
-            let downloaded = 0;
+            let processed = 0;
+            let succeeded = 0;
+            let failed = 0;
             const total = tableData.length;
 
-            for (let i = 0; i < tableData.length; i++) {
-                const doc = tableData[i];
+
+            const promises = tableData.map(async (doc) => {
                 const safeTradition = doc.tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
                 const fileUrl = `../corpus/${safeTradition}/${doc.id}/${doc.id}.txt`;
 
                 try {
                     const response = await fetch(fileUrl);
-                    if (response.ok) {
-                        const blob = await response.blob();
-                        const text = await blob.text();
-                        folder.file(`${doc.id}.txt`, text);
-                    } else {
-                        console.warn(`Файл не найден: ${fileUrl}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
                     }
+
+                    // КЛЮЧЕВОЙ МОМЕНТ: получаем ArrayBuffer (полные бинарные данные)
+                    const arrayBuffer = await response.arrayBuffer();
+
+                    // Дополнительная проверка: если файл должен быть не пустой, а размер 0 - ошибка
+                    if (arrayBuffer.byteLength === 0) {
+                        console.warn(`Предупреждение: файл ${doc.id}.txt пустой.`);
+                    } else {
+                        console.log(`Загружен ${doc.id}.txt: ${arrayBuffer.byteLength} байт`);
+                    }
+
+
+                    folder.file(`${doc.id}.txt`, new Uint8Array(arrayBuffer));
+
+                    succeeded++;
                 } catch (error) {
                     console.error(`Ошибка загрузки ${doc.id}:`, error);
-                }
+                    failed++;
+                } finally {
+                    processed++;
+                    const progress = (processed / total) * 100;
+                    progressFill.style.width = progress + '%';
+                    progressText.textContent = `Обработано ${processed} из ${total} (успешно: ${succeeded}, ошибок: ${failed})...`;
 
-                downloaded++;
-                const progress = (downloaded / total) * 100;
-                progressFill.style.width = progress + '%';
-                progressText.textContent = `Скачано ${downloaded} из ${total} документов...`;
-            }
+                    // Небольшая пауза, чтобы не заспамить сервер (опционально)
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+            });
+
+
+            await Promise.all(promises);
+
+
             const headers = ['id', 'tradition', 'language', 'type', 'description'];
             const csvContent = [
                 headers.join(','),
@@ -717,12 +788,18 @@
             progressText.textContent = 'Создание архива...';
 
             try {
-                const content = await zip.generateAsync({ type: "blob" });
+                const content = await zip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: { level: 6 }
+                });
+
                 saveAs(content, "corpus_all_documents.zip");
 
                 setTimeout(() => {
                     progressModal.style.display = 'none';
                     progressFill.style.width = '0%';
+                    alert(`Готово! Успешно загружено: ${succeeded} из ${total}. ${failed ? 'Ошибок: ' + failed : ''}`);
                 }, 500);
             } catch (error) {
                 alert('Ошибка создания архива: ' + error.message);

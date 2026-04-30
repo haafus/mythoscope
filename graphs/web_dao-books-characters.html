@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Graph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #cy {
+            flex: 1;
+            background-color: #fafafa;
+        }
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 80%;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 16px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.2s;
+            user-select: text;
+        }
+        #info-panel table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #info-panel th, #info-panel td {
+            text-align: left;
+            padding: 6px 4px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        #info-panel th {
+            font-weight: 600;
+            color: #4a4a4a;
+            width: 35%;
+        }
+        #info-panel td {
+            color: #2c3e50;
+            width: 65%;
+        }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            pointer-events: auto;
+            color: #888;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        h4 {
+            margin: 0 0 8px 0;
+            color: #5e4b8b;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    <div id="info-panel" style="display: none;">
+        <button class="close-btn" id="close-panel">&times;</button>
+        <div id="info-content"></div>
+    </div>
+
+    <script>
+        const nodesData = [
+  {
+    "id": "194194",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "takes part in changing of seasons but not transformed, attends to creatures but not changed by them, whole and complete in center, form whole and complete outside",
+    "description": "Description: A holy or wise person who has attained Dao and is not transformed by changes.;\nRoles: Ruler of creatures, Model of inner attainment;\nEpithets: ;\nAttributes: takes part in changing of seasons but not transformed, attends to creatures but not changed by them, whole and complete in center, form whole and complete outside;\nActions: does not encounter heavenly disasters or people who cause harm, respectfully develops fullness, uses creatures, does not allow creatures to use him;",
+    "shared_name": "The Sage",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194194,
+    "SelfLoops": 0,
+    "id_original": "The Sage",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "does not encounter heavenly disasters or people who cause harm, respectfully develops fullness, uses creatures, does not allow creatures to use him",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Ruler of creatures, Model of inner attainment",
+    "Radiality": "Infinity",
+    "display_name": "The Sage",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "The Sage",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "194191",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "",
+    "description": "Description: Oneness with creatures and duties; that which is maintained to transform and rule.;\nRoles: Principle of unity;\nEpithets: Oneness;\nAttributes: ;\nActions: when known allows transformation of creatures and change of duties, when maintained allows ruling of ten thousand creatures;",
+    "shared_name": "The One",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Oneness",
+    "SUID": 194191,
+    "SelfLoops": 0,
+    "id_original": "The One",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 1,
+    "Actions": "when known allows transformation of creatures and change of duties, when maintained allows ruling of ten thousand creatures",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Principle of unity",
+    "Radiality": 1.0,
+    "display_name": "The One",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "The One",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 1,
+    "size": 3.5
+  },
+  {
+    "id": "194188",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "",
+    "description": "Description: Spiritual beings that exist when Qi flows between heaven and earth; also refers to spirit-like understanding.;\nRoles: Spiritual entities;\nEpithets: ;\nAttributes: ;\nActions: can comprehend what contemplation does not;",
+    "shared_name": "Spirits",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194188,
+    "SelfLoops": 0,
+    "id_original": "Spirits",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "can comprehend what contemplation does not",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Spiritual entities",
+    "Radiality": "Infinity",
+    "display_name": "Spirits",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Spirits",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "194185",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "bright, dark and quiet, wide and spacious, close, magnanimous, vast, potent",
+    "description": "Description: Vitality, life force, life energy; needed for life and dwells in the heart/mind.;\nRoles: Fountainhead of life;\nEpithets: ;\nAttributes: bright, dark and quiet, wide and spacious, close, magnanimous, vast, potent;\nActions: cannot be brought to rest by force but can be calmed by De, cannot be summoned by voice but can be made welcome by intent, when regulated allows Dao to stay, consolidated like spirits, when still unify intent;",
+    "shared_name": "Qi",
+    "TopologicalCoefficient": 0.5,
+    "Epithets": "",
+    "SUID": 194185,
+    "SelfLoops": 0,
+    "id_original": "Qi",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.3333333333333333,
+    "selected": false,
+    "ClosenessCentrality": 0.75,
+    "Degree": 3,
+    "Actions": "cannot be brought to rest by force but can be calmed by De, cannot be summoned by voice but can be made welcome by intent, when regulated allows Dao to stay, consolidated like spirits, when still unify intent",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Fountainhead of life",
+    "Radiality": 0.8333333333333334,
+    "display_name": "Qi",
+    "Stress": 4,
+    "BetweennessCentrality": 0.6666666666666666,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Qi",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.5,
+    "degree": 3,
+    "size": 6.5
+  },
+  {
+    "id": "194182",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "",
+    "description": "Description: A person of noble or moral character who maintains Oneness.;\nRoles: One who maintains Oneness, Ruler of ten thousand creatures;\nEpithets: ;\nAttributes: ;\nActions: maintains Oneness and does not lose it, rules ten thousand creatures, uses creatures, does not allow creatures to use him;",
+    "shared_name": "Noble Man",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194182,
+    "SelfLoops": 0,
+    "id_original": "Noble Man",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 1,
+    "Actions": "maintains Oneness and does not lose it, rules ten thousand creatures, uses creatures, does not allow creatures to use him",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "One who maintains Oneness, Ruler of ten thousand creatures",
+    "Radiality": 1.0,
+    "display_name": "Noble Man",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Noble Man",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 1,
+    "size": 3.5
+  },
+  {
+    "id": "194179",
+    "Category": "Character",
+    "Eccentricity": 3,
+    "Attributes": "",
+    "description": "Description: The sky or celestial realm that produces essence and presides over proper alignment.;\nRoles: Producer of essence, Presider over proper alignment;\nEpithets: ;\nAttributes: ;\nActions: produces essence of people, its kindness naturally arrives with earth's righteousness;",
+    "shared_name": "Heaven",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194179,
+    "SelfLoops": 0,
+    "id_original": "Heaven",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 2.0,
+    "selected": false,
+    "ClosenessCentrality": 0.5,
+    "Degree": 1,
+    "Actions": "produces essence of people, its kindness naturally arrives with earth's righteousness",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Producer of essence, Presider over proper alignment",
+    "Radiality": 0.5,
+    "display_name": "Heaven",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Heaven",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 2.0,
+    "degree": 1,
+    "size": 3.5
+  },
+  {
+    "id": "194176",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "naturally full, overflowing, born, complete, benefits from calmness, can be regulated or confused",
+    "description": "Description: The seat of understanding, perception, and awareness; contains a heart/mind within itself.;\nRoles: That which regulates and calms the senses;\nEpithets: ;\nAttributes: naturally full, overflowing, born, complete, benefits from calmness, can be regulated or confused;\nActions: returns to original nature when leaving behind worries, happiness, love, anger, desire for profit, when still and Qi regulated allows Dao to stay, when properly aligned and still becomes settled, contains a heart/mind within;",
+    "shared_name": "Heart/Mind",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194176,
+    "SelfLoops": 1,
+    "id_original": "Heart/Mind",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 4,
+    "Actions": "returns to original nature when leaving behind worries, happiness, love, anger, desire for profit, when still and Qi regulated allows Dao to stay, when properly aligned and still becomes settled, contains a heart/mind within",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "That which regulates and calms the senses",
+    "Radiality": 1.0,
+    "display_name": "Heart/Mind",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Heart/Mind",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 4,
+    "size": 8.0
+  },
+  {
+    "id": "194173",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "",
+    "description": "Description: Spiritual beings that exist when Qi flows between heaven and earth.;\nRoles: Spiritual entities;\nEpithets: ;\nAttributes: ;\nActions: can comprehend what contemplation does not;",
+    "shared_name": "Ghosts",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194173,
+    "SelfLoops": 0,
+    "id_original": "Ghosts",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "can comprehend what contemplation does not",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Spiritual entities",
+    "Radiality": "Infinity",
+    "display_name": "Ghosts",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Ghosts",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "194170",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: Something that can arrive and settle in a person, required for life; essence of Qi.;\nRoles: Dwelling place of understanding, That which produces life;\nEpithets: ;\nAttributes: ;\nActions: naturally arrives when respectfully emptying its dwelling, arrives and settles with serious appearance and awe, when attained and never let go restrains ears and eyes, where essence exists there is naturally life;",
+    "shared_name": "Essence",
+    "TopologicalCoefficient": 0.5,
+    "Epithets": "",
+    "SUID": 194170,
+    "SelfLoops": 0,
+    "id_original": "Essence",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.3333333333333333,
+    "selected": false,
+    "ClosenessCentrality": 0.75,
+    "Degree": 3,
+    "Actions": "naturally arrives when respectfully emptying its dwelling, arrives and settles with serious appearance and awe, when attained and never let go restrains ears and eyes, where essence exists there is naturally life",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Dwelling place of understanding, That which produces life",
+    "Radiality": 0.8333333333333334,
+    "display_name": "Essence",
+    "Stress": 4,
+    "BetweennessCentrality": 0.6666666666666666,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Essence",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.5,
+    "degree": 3,
+    "size": 6.5
+  },
+  {
+    "id": "194167",
+    "Category": "Character",
+    "Eccentricity": 0,
+    "Attributes": "",
+    "description": "Description: The ground or terrestrial realm that produces form and presides over equability.;\nRoles: Producer of form, Presider over equability;\nEpithets: ;\nAttributes: ;\nActions: produces form of people, its righteousness naturally arrives with heaven's kindness;",
+    "shared_name": "Earth",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194167,
+    "SelfLoops": 0,
+    "id_original": "Earth",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 0.0,
+    "selected": false,
+    "ClosenessCentrality": 0.0,
+    "Degree": 0,
+    "Actions": "produces form of people, its righteousness naturally arrives with heaven's kindness",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Producer of form, Presider over equability",
+    "Radiality": "Infinity",
+    "display_name": "Earth",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 0,
+    "name": "Earth",
+    "IsSingleNode": true,
+    "NeighborhoodConnectivity": 0.0,
+    "degree": 0,
+    "size": 2.0
+  },
+  {
+    "id": "194164",
+    "Category": "Character",
+    "Eccentricity": 3,
+    "Attributes": "",
+    "description": "Description: Virtue or power that can arrive in a person and is used daily; when developed, wisdom arises.;\nRoles: ;\nEpithets: ;\nAttributes: ;\nActions: can calm Qi, can be developed, arrives when form is properly aligned, each day renewed by the sage;",
+    "shared_name": "De",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194164,
+    "SelfLoops": 0,
+    "id_original": "De",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 2.0,
+    "selected": false,
+    "ClosenessCentrality": 0.5,
+    "Degree": 1,
+    "Actions": "can calm Qi, can be developed, arrives when form is properly aligned, each day renewed by the sage",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "",
+    "Radiality": 0.5,
+    "display_name": "De",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "De",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 2.0,
+    "degree": 1,
+    "size": 3.5
+  },
+  {
+    "id": "194161",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "silent, close, dim and obscure, prolific, complete, all-pervasive, magnanimous, relaxed, hard, strong, nowhere to be found, not remote, minute and subtle",
+    "description": "Description: The reason that the form [of the heart/mind] is full; without root, stalk, leaves, or flowers; that which the mouth cannot speak, eyes cannot see, ears cannot hear; fills the world.;\nRoles: Giver of life, Maker complete of ten thousand creatures, That which people lose and die, attain and live;\nEpithets: ;\nAttributes: silent, close, dim and obscure, prolific, complete, all-pervasive, magnanimous, relaxed, hard, strong, nowhere to be found, not remote, minute and subtle;\nActions: can calmly dwell in a virtuous heart/mind, can be attained by cultivating heart/mind and stilling thoughts, detests thoughts and words about it, naturally arrives when still, settles when heart/mind maintains stillness;",
+    "shared_name": "Dao",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 194161,
+    "SelfLoops": 0,
+    "id_original": "Dao",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 2,
+    "Actions": "can calmly dwell in a virtuous heart/mind, can be attained by cultivating heart/mind and stilling thoughts, detests thoughts and words about it, naturally arrives when still, settles when heart/mind maintains stillness",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Giver of life, Maker complete of ten thousand creatures, That which people lose and die, attain and live",
+    "Radiality": 1.0,
+    "display_name": "Dao",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Dao",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 2,
+    "size": 5.0
+  }
+];
+        const edgesData = [
+  {
+    "id": "194218",
+    "source": "194182",
+    "target": "194191",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Noble Man (interacts with) The One",
+    "shared_interaction": "interacts with",
+    "name": "Noble Man (interacts with) The One",
+    "interaction": "interacts with",
+    "data_key_column": 194218,
+    "SUID": 194218,
+    "source_original": "Noble Man",
+    "selected": false,
+    "target_original": "The One",
+    "relation": "maintains"
+  },
+  {
+    "id": "194212",
+    "source": "194179",
+    "target": "194170",
+    "EdgeBetweenness": 6.0,
+    "shared_name": "Heaven (interacts with) Essence",
+    "shared_interaction": "interacts with",
+    "name": "Heaven (interacts with) Essence",
+    "interaction": "interacts with",
+    "data_key_column": 194212,
+    "SUID": 194212,
+    "source_original": "Heaven",
+    "selected": false,
+    "target_original": "Essence",
+    "relation": "produces"
+  },
+  {
+    "id": "194206",
+    "source": "194176",
+    "target": "194176",
+    "EdgeBetweenness": 0.0,
+    "shared_name": "Heart/Mind (interacts with) Heart/Mind",
+    "shared_interaction": "interacts with",
+    "name": "Heart/Mind (interacts with) Heart/Mind",
+    "interaction": "interacts with",
+    "data_key_column": 194206,
+    "SUID": 194206,
+    "source_original": "Heart/Mind",
+    "selected": false,
+    "target_original": "Heart/Mind",
+    "relation": "contains"
+  },
+  {
+    "id": "194209",
+    "source": "194170",
+    "target": "194185",
+    "EdgeBetweenness": 8.0,
+    "shared_name": "Essence (interacts with) Qi",
+    "shared_interaction": "interacts with",
+    "name": "Essence (interacts with) Qi",
+    "interaction": "interacts with",
+    "data_key_column": 194209,
+    "SUID": 194209,
+    "source_original": "Essence",
+    "selected": false,
+    "target_original": "Qi",
+    "relation": "is fountainhead of"
+  },
+  {
+    "id": "194203",
+    "source": "194170",
+    "target": "194185",
+    "EdgeBetweenness": 8.0,
+    "shared_name": "Essence (interacts with) Qi",
+    "shared_interaction": "interacts with",
+    "name": "Essence (interacts with) Qi",
+    "interaction": "interacts with",
+    "data_key_column": 194203,
+    "SUID": 194203,
+    "source_original": "Essence",
+    "selected": false,
+    "target_original": "Qi",
+    "relation": "is essence of"
+  },
+  {
+    "id": "194197",
+    "source": "194164",
+    "target": "194185",
+    "EdgeBetweenness": 6.0,
+    "shared_name": "De (interacts with) Qi",
+    "shared_interaction": "interacts with",
+    "name": "De (interacts with) Qi",
+    "interaction": "interacts with",
+    "data_key_column": 194197,
+    "SUID": 194197,
+    "source_original": "De",
+    "selected": false,
+    "target_original": "Qi",
+    "relation": "calms"
+  },
+  {
+    "id": "194215",
+    "source": "194161",
+    "target": "194176",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Dao (interacts with) Heart/Mind",
+    "shared_interaction": "interacts with",
+    "name": "Dao (interacts with) Heart/Mind",
+    "interaction": "interacts with",
+    "data_key_column": 194215,
+    "SUID": 194215,
+    "source_original": "Dao",
+    "selected": false,
+    "target_original": "Heart/Mind",
+    "relation": "settles in"
+  },
+  {
+    "id": "194200",
+    "source": "194161",
+    "target": "194176",
+    "EdgeBetweenness": 2.0,
+    "shared_name": "Dao (interacts with) Heart/Mind",
+    "shared_interaction": "interacts with",
+    "name": "Dao (interacts with) Heart/Mind",
+    "interaction": "interacts with",
+    "data_key_column": 194200,
+    "SUID": 194200,
+    "source_original": "Dao",
+    "selected": false,
+    "target_original": "Heart/Mind",
+    "relation": "resides in"
+  }
+];
+
+        const elements = [
+            ...nodesData.map(node => ({ data: node })),
+            ...edgesData.map(edge => ({ data: edge }))
+        ];
+
+        const categoryColors = {
+            'Character': '#dcd0ff',
+            'Group': '#cccccc'
+        };
+        const defaultColor = '#aaaaaa';
+
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: elements,
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': function(ele) {
+                            const cat = ele.data('Category');
+                            return categoryColors[cat] || defaultColor;
+                        },
+                        'width': function(ele) { return ele.data('size') || 3; },
+                        'height': function(ele) { return ele.data('size') || 3; },
+                        'label': function(ele) { return ele.data('display_name') || ele.data('Name') || ele.data('shared name') || ele.data('id'); },
+                        'font-size': '2.2px',
+                        'text-valign': 'bottom',
+                        'text-halign': 'center',
+                        'text-margin-y': 1,
+                        'border-width': 0.2,
+                        'border-color': '#555'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 0.2,
+                        'line-color': '#aaa',
+                        'target-arrow-color': '#aaa',
+                        'target-arrow-shape': 'triangle',
+                        'target-arrow-scale': 0.1,
+                        'arrow-scale': 0.1,
+                        'curve-style': 'bezier',
+                        'label': 'data(relation)',
+                        'font-size': '1.5px',
+                        'text-rotation': 'autorotate',
+                        'text-margin-y': -1,
+                        'text-background-opacity': 0.7,
+                        'text-background-color': '#ffffff'
+                    }
+                },
+                {
+                    selector: 'node.hover-highlight',
+                    style: {
+                        'border-width': 0.3,
+                        'border-color': '#ffaa00',
+                        'overlay-opacity': 0.3,
+                        'overlay-color': '#ffaa00',
+                        'overlay-padding': '1px'
+                    }
+                },
+                {
+                    selector: 'edge.hover-highlight',
+                    style: {
+                        'width': 0.4,
+                        'line-color': '#ffaa00',
+                        'target-arrow-color': '#ffaa00'
+                    }
+                },
+                {
+                    selector: '.faded',
+                    style: {
+                        'opacity': 0.1
+                    }
+                }
+            ],
+            layout: {
+                name: 'cose',
+                idealEdgeLength: 5,
+                padding: 50,
+                spacingFactor: 5,
+                nodeRepulsion: 40000,
+                gravity: 0.0005,
+                numIter: 10000
+            },
+            wheelSensitivity: 0.5
+        });
+
+        let hoveredNode = null;
+        function fadeOthers(node) {
+            const neighbors = node.neighborhood().nodes();
+            const incidentEdges = node.connectedEdges();
+            const highlightSet = node.union(neighbors).union(incidentEdges);
+            cy.elements().not(highlightSet).addClass('faded');
+            node.addClass('hover-highlight');
+            incidentEdges.addClass('hover-highlight');
+            neighbors.addClass('hover-highlight');
+        }
+        function restoreAll() {
+            cy.elements().removeClass('faded hover-highlight');
+        }
+        cy.on('mouseover', 'node', function(evt) {
+            if (hoveredNode === evt.target) return;
+            hoveredNode = evt.target;
+            fadeOthers(hoveredNode);
+        });
+        cy.on('mouseout', 'node', function() {
+            hoveredNode = null;
+            restoreAll();
+        });
+
+        const tooltipDiv = document.createElement('div');
+        tooltipDiv.style.position = 'absolute';
+        tooltipDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        tooltipDiv.style.color = '#fff';
+        tooltipDiv.style.padding = '4px 8px';
+        tooltipDiv.style.borderRadius = '6px';
+        tooltipDiv.style.fontSize = '12px';
+        tooltipDiv.style.pointerEvents = 'none';
+        tooltipDiv.style.zIndex = '1000';
+        tooltipDiv.style.display = 'none';
+        document.body.appendChild(tooltipDiv);
+
+        cy.on('mouseover', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        tooltipDiv.style.display = 'block';
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+
+    cy.on('mousemove', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+        const infoPanel = document.getElementById('info-panel');
+        const infoContent = document.getElementById('info-content');
+        const closeBtn = document.getElementById('close-panel');
+        closeBtn.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formatNodeInfo(nodeData) {
+            var fieldNames = {
+                'display_name': 'Name',
+                'Category': 'Category',
+                'Description': 'Description',
+                'Roles': 'Roles',
+                'Epithets': 'Epithets',
+                'Attributes': 'Attributes',
+                'Actions': 'Actions',
+                'AverageShortestPathLength': 'Average Shortest Path Length',
+                'ClusteringCoefficient': 'Clustering Coefficient',
+                'ClosenessCentrality': 'Closeness Centrality',
+                'Degree': 'Degree',
+                'BetweennessCentrality': 'Betweenness Centrality',
+                'Radiality': 'Radiality'
+            };
+            var fieldsOrder = [
+                'display_name', 'Category', 'Description', 'Roles', 'Epithets', 'Attributes', 'Actions',
+                'AverageShortestPathLength', 'ClusteringCoefficient', 'ClosenessCentrality',
+                'Degree', 'BetweennessCentrality', 'Radiality'
+            ];
+            var title = nodeData.display_name || nodeData.Name || nodeData['shared name'] || nodeData.id || 'Информация об узле';
+            var html = '<h4>' + escapeHtml(title) + '</h4>';
+            html += '<table>';
+            for (var i = 0; i < fieldsOrder.length; i++) {
+                var field = fieldsOrder[i];
+                var value = nodeData[field];
+                if (value !== undefined && value !== null && value !== '') {
+                    if (typeof value === 'object') value = JSON.stringify(value);
+                    var displayName = fieldNames[field] || field;
+                    html += '<tr>';
+                    html += '<th>' + escapeHtml(displayName) + '</th>';
+                    html += '<td>' + escapeHtml(String(value)) + '<\/td>';
+                    html += '</tr>';
+                }
+            }
+            html += '</table>';
+            return html;
+        }
+
+        cy.on('tap', 'node', (evt) => {
+            const node = evt.target;
+            const nodeData = node.data();
+            infoContent.innerHTML = formatNodeInfo(nodeData);
+            infoPanel.style.display = 'block';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!infoPanel.contains(e.target) && e.target !== infoPanel && !cy.getElementById(e.target.id)) {
+                infoPanel.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            cy.resize();
+        });
+    </script>
+</body>
+</html>

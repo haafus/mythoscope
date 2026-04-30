@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Graph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #cy {
+            flex: 1;
+            background-color: #fafafa;
+        }
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: 80%;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 16px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.2s;
+            user-select: text;
+        }
+        #info-panel table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #info-panel th, #info-panel td {
+            text-align: left;
+            padding: 6px 4px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        #info-panel th {
+            font-weight: 600;
+            color: #4a4a4a;
+            width: 35%;
+        }
+        #info-panel td {
+            color: #2c3e50;
+            width: 65%;
+        }
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            pointer-events: auto;
+            color: #888;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        h4 {
+            margin: 0 0 8px 0;
+            color: #5e4b8b;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    <div id="info-panel" style="display: none;">
+        <button class="close-btn" id="close-panel">&times;</button>
+        <div id="info-content"></div>
+    </div>
+
+    <script>
+        const nodesData = [
+  {
+    "id": "187502",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Wise, Learned",
+    "description": "Description: One of Buddha's two chief disciples, foremost in wisdom.;\nRoles: Disciple, Arhat;\nEpithets: Upatishya;\nAttributes: Wise, Learned;\nActions: Was converted after hearing a verse from Aśvajit, Became an arhat, Often assisted Buddha in teaching;",
+    "shared_name": "Śāriputra",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Upatishya",
+    "SUID": 187502,
+    "SelfLoops": 0,
+    "id_original": "Śāriputra",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Was converted after hearing a verse from Aśvajit, Became an arhat, Often assisted Buddha in teaching",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, Arhat",
+    "Radiality": 0.96301775147929,
+    "display_name": "Śāriputra",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Śāriputra",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187499",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Faithful, Grieving",
+    "description": "Description: Buddha's cousin and personal attendant.;\nRoles: Disciple, Attendant;\nEpithets: ;\nAttributes: Faithful, Grieving;\nActions: Served as Buddha's attendant, Heard and remembered all the sermons, Wept when Buddha announced his passing, Recited the Sūtra Piṭaka at the first council;",
+    "shared_name": "Ānanda",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187499,
+    "SelfLoops": 0,
+    "id_original": "Ānanda",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Served as Buddha's attendant, Heard and remembered all the sermons, Wept when Buddha announced his passing, Recited the Sūtra Piṭaka at the first council",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, Attendant",
+    "Radiality": 0.96301775147929,
+    "display_name": "Ānanda",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Ānanda",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187496",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Beautiful, Devout",
+    "description": "Description: A courtesan of Vaiśālī who became a devoted laywoman and donated her garden to Buddha.;\nRoles: Lay disciple, Donor;\nEpithets: ;\nAttributes: Beautiful, Devout;\nActions: Invited Buddha and the Saṅgha to a meal, Gave her garden to the order, Attained stream-entry;",
+    "shared_name": "Āmrā",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187496,
+    "SelfLoops": 0,
+    "id_original": "Āmrā",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Invited Buddha and the Saṅgha to a meal, Gave her garden to the order, Attained stream-entry",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Lay disciple, Donor",
+    "Radiality": 0.96301775147929,
+    "display_name": "Āmrā",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Āmrā",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187493",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Virtuous, Loving",
+    "description": "Description: Wife of Buddha before he left home, mother of Rāhula.;\nRoles: Wife of Buddha, Princess;\nEpithets: ;\nAttributes: Virtuous, Loving;\nActions: Married Siddhārtha, Gave birth to Rāhula, Lamented when the prince left, Later became a nun and attained arhatship;",
+    "shared_name": "Yaśodharā",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187493,
+    "SelfLoops": 0,
+    "id_original": "Yaśodharā",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Married Siddhārtha, Gave birth to Rāhula, Lamented when the prince left, Later became a nun and attained arhatship",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Wife of Buddha, Princess",
+    "Radiality": 0.96301775147929,
+    "display_name": "Yaśodharā",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Yaśodharā",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187490",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: A Brahman ascetic leader of a large following, converted by Buddha.;\nRoles: Ascetic, Disciple;\nEpithets: ;\nAttributes: ;\nActions: Lived on Mount Gayā, practiced fire sacrifice, Was converted after witnessing Buddha subdue a serpent, Led his five hundred followers to become monks;",
+    "shared_name": "Uravilvā Kāśyapa",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187490,
+    "SelfLoops": 0,
+    "id_original": "Uravilvā Kāśyapa",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Lived on Mount Gayā, practiced fire sacrifice, Was converted after witnessing Buddha subdue a serpent, Led his five hundred followers to become monks",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Ascetic, Disciple",
+    "Radiality": 0.96301775147929,
+    "display_name": "Uravilvā Kāśyapa",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Uravilvā Kāśyapa",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187487",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: A barber who became one of Buddha's disciples, foremost in knowledge of the Vinaya.;\nRoles: Disciple, Barber;\nEpithets: ;\nAttributes: ;\nActions: Became a monk after the Śākya princes joined the order, Recited the Vinaya at the first council;",
+    "shared_name": "Upāli",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187487,
+    "SelfLoops": 0,
+    "id_original": "Upāli",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Became a monk after the Śākya princes joined the order, Recited the Vinaya at the first council",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, Barber",
+    "Radiality": 0.96301775147929,
+    "display_name": "Upāli",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Upāli",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187484",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: The five ascetics who first practiced with Bodhisattva and later became his first disciples.;\nRoles: Disciples;\nEpithets: ;\nAttributes: ;\nActions: Practiced austerities with Bodhisattva, Initially doubted him after he accepted food, Became the first arhats after hearing the first sermon;",
+    "shared_name": "The five Bhikshus",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187484,
+    "SelfLoops": 0,
+    "id_original": "The five Bhikshus",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Practiced austerities with Bodhisattva, Initially doubted him after he accepted food, Became the first arhats after hearing the first sermon",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciples",
+    "Radiality": 0.96301775147929,
+    "display_name": "The five Bhikshus",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "The five Bhikshus",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187481",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: A powerful clan of Vaiśālī who became followers of Buddha.;\nRoles: Lay disciples, Warrior clan;\nEpithets: ;\nAttributes: ;\nActions: Visited Buddha in large numbers, Listened to his teachings and became devoted followers, Grieved when Buddha announced his death;",
+    "shared_name": "The Likkhavis",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187481,
+    "SelfLoops": 0,
+    "id_original": "The Likkhavis",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Visited Buddha in large numbers, Listened to his teachings and became devoted followers, Grieved when Buddha announced his death",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Lay disciples, Warrior clan",
+    "Radiality": 0.96301775147929,
+    "display_name": "The Likkhavis",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "The Likkhavis",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187478",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Loving, Grieving for his son",
+    "description": "Description: King of the Śākyas, father of Buddha.;\nRoles: King, Father of Buddha;\nEpithets: ;\nAttributes: Loving, Grieving for his son;\nActions: Rejoiced at the birth of his son, Sought to keep the prince from leaving home by surrounding him with pleasures, Sent ministers to persuade the prince to return, Eventually met Buddha after his enlightenment and became a disciple;",
+    "shared_name": "Suddhodana",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187478,
+    "SelfLoops": 0,
+    "id_original": "Suddhodana",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 3,
+    "Actions": "Rejoiced at the birth of his son, Sought to keep the prince from leaving home by surrounding him with pleasures, Sent ministers to persuade the prince to return, Eventually met Buddha after his enlightenment and became a disciple",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "King, Father of Buddha",
+    "Radiality": 0.96301775147929,
+    "display_name": "Suddhodana",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Suddhodana",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 3,
+    "size": 2.292682926829268
+  },
+  {
+    "id": "187475",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: A wandering ascetic who became Buddha's last disciple before his death.;\nRoles: Ascetic, Disciple;\nEpithets: ;\nAttributes: ;\nActions: Came to see Buddha before his death, Asked questions and was taught the eightfold path, Attained arhatship and entered Nirvāṇa before Buddha;",
+    "shared_name": "Subhadra",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187475,
+    "SelfLoops": 0,
+    "id_original": "Subhadra",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 3,
+    "Actions": "Came to see Buddha before his death, Asked questions and was taught the eightfold path, Attained arhatship and entered Nirvāṇa before Buddha",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Ascetic, Disciple",
+    "Radiality": 0.96301775147929,
+    "display_name": "Subhadra",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Subhadra",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 3,
+    "size": 2.292682926829268
+  },
+  {
+    "id": "187472",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: Son of Buddha and Yaśodharā.;\nRoles: Son of Buddha;\nEpithets: ;\nAttributes: ;\nActions: Was born shortly before Buddha left home, Later became a disciple and arhat;",
+    "shared_name": "Rāhula",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187472,
+    "SelfLoops": 0,
+    "id_original": "Rāhula",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Was born shortly before Buddha left home, Later became a disciple and arhat",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Son of Buddha",
+    "Radiality": 0.96301775147929,
+    "display_name": "Rāhula",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Rāhula",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187469",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: King of Kosala, a contemporary and supporter of Buddha.;\nRoles: King, Patron;\nEpithets: ;\nAttributes: ;\nActions: Met Buddha at the Jetavana monastery, Listened to his teachings, Became a lay disciple;",
+    "shared_name": "Prasenajit",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187469,
+    "SelfLoops": 0,
+    "id_original": "Prasenajit",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Met Buddha at the Jetavana monastery, Listened to his teachings, Became a lay disciple",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "King, Patron",
+    "Radiality": 0.96301775147929,
+    "display_name": "Prasenajit",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Prasenajit",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187466",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: Brother of Uravilvā Kāśyapa, converted together with his brother.;\nRoles: Ascetic, Disciple;\nEpithets: ;\nAttributes: ;\nActions: Converted by Buddha after his brother's conversion, Led his followers to become monks;",
+    "shared_name": "Nadī Kāśyapa",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187466,
+    "SelfLoops": 0,
+    "id_original": "Nadī Kāśyapa",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Converted by Buddha after his brother's conversion, Led his followers to become monks",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Ascetic, Disciple",
+    "Radiality": 0.96301775147929,
+    "display_name": "Nadī Kāśyapa",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Nadī Kāśyapa",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187463",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Pure, Beautiful",
+    "description": "Description: Queen, mother of Buddha, who died shortly after his birth.;\nRoles: Mother of Buddha, Queen;\nEpithets: ;\nAttributes: Pure, Beautiful;\nActions: Conceived Bodhisattva through a dream, Gave birth to the prince in Lumbinī garden, Died seven days after the birth and was reborn in heaven;",
+    "shared_name": "Māyā",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187463,
+    "SelfLoops": 0,
+    "id_original": "Māyā",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 3,
+    "Actions": "Conceived Bodhisattva through a dream, Gave birth to the prince in Lumbinī garden, Died seven days after the birth and was reborn in heaven",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Mother of Buddha, Queen",
+    "Radiality": 0.96301775147929,
+    "display_name": "Māyā",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Māyā",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 3,
+    "size": 2.292682926829268
+  },
+  {
+    "id": "187460",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Powerful, Deceptive",
+    "description": "Description: The evil one, tempter, who tried to prevent Buddha's enlightenment.;\nRoles: God of desire and death, Enemy of enlightenment;\nEpithets: Pisuna;\nAttributes: Powerful, Deceptive;\nActions: Came with his army to disturb Bodhisattva under the Bodhi tree, Sent his three daughters to tempt him, Was defeated and fled, Later asked Buddha to enter Nirvāṇa;",
+    "shared_name": "Māra",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Pisuna",
+    "SUID": 187460,
+    "SelfLoops": 0,
+    "id_original": "Māra",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Came with his army to disturb Bodhisattva under the Bodhi tree, Sent his three daughters to tempt him, Was defeated and fled, Later asked Buddha to enter Nirvāṇa",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "God of desire and death, Enemy of enlightenment",
+    "Radiality": 0.96301775147929,
+    "display_name": "Māra",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Māra",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187457",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Powerful, Miraculous",
+    "description": "Description: One of Buddha's two chief disciples, foremost in supernatural powers.;\nRoles: Disciple, Arhat;\nEpithets: Mugalin;\nAttributes: Powerful, Miraculous;\nActions: Was converted together with Śāriputra, Became an arhat, Performed many miracles;",
+    "shared_name": "Maudgalyāyana",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Mugalin",
+    "SUID": 187457,
+    "SelfLoops": 0,
+    "id_original": "Maudgalyāyana",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Was converted together with Śāriputra, Became an arhat, Performed many miracles",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, Arhat",
+    "Radiality": 0.96301775147929,
+    "display_name": "Maudgalyāyana",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Maudgalyāyana",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187454",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Strict, Ascetic",
+    "description": "Description: One of Buddha's foremost disciples, leader of the first council.;\nRoles: Disciple, Elder;\nEpithets: Mahā Kāśyapa;\nAttributes: Strict, Ascetic;\nActions: Was converted by Buddha, Took charge of the first council after Buddha's death, Presided over the compilation of the Dharma;",
+    "shared_name": "Mahākāśyapa",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Mahā Kāśyapa",
+    "SUID": 187454,
+    "SelfLoops": 0,
+    "id_original": "Mahākāśyapa",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Was converted by Buddha, Took charge of the first council after Buddha's death, Presided over the compilation of the Dharma",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, Elder",
+    "Radiality": 0.96301775147929,
+    "display_name": "Mahākāśyapa",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Mahākāśyapa",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187451",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Powerful, Devout",
+    "description": "Description: A later emperor of India who spread Buddhism and erected many stūpas.;\nRoles: Emperor, Patron of Buddhism;\nEpithets: Righteous Asoka;\nAttributes: Powerful, Devout;\nActions: Opened seven of the eight original stūpas, Distributed the relics and built eighty-four thousand stūpas, Attained the first stage of sanctity;",
+    "shared_name": "King Asoka",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Righteous Asoka",
+    "SUID": 187451,
+    "SelfLoops": 0,
+    "id_original": "King Asoka",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Opened seven of the eight original stūpas, Distributed the relics and built eighty-four thousand stūpas, Attained the first stage of sanctity",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Emperor, Patron of Buddhism",
+    "Radiality": 0.96301775147929,
+    "display_name": "King Asoka",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "King Asoka",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187448",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: One of the five ascetics who became Buddha's first disciples.;\nRoles: Disciple, Elder;\nEpithets: Ājñāta Kaundinya;\nAttributes: ;\nActions: Was one of the five who first practiced austerities with Bodhisattva, Attained stream-entry upon hearing the first sermon, Became an arhat;",
+    "shared_name": "Kaundinya",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Ājñāta Kaundinya",
+    "SUID": 187448,
+    "SelfLoops": 0,
+    "id_original": "Kaundinya",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Was one of the five who first practiced austerities with Bodhisattva, Attained stream-entry upon hearing the first sermon, Became an arhat",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Disciple, Elder",
+    "Radiality": 0.96301775147929,
+    "display_name": "Kaundinya",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Kaundinya",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187445",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Faithful",
+    "description": "Description: The charioteer who accompanied the prince when he left the palace.;\nRoles: Charioteer, Servant;\nEpithets: ;\nAttributes: Faithful;\nActions: Prepared the horse and accompanied Siddhārtha, Returned alone with the horse to Kapilavastu, Conveyed the prince's message to the king;",
+    "shared_name": "Kandaka",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187445,
+    "SelfLoops": 0,
+    "id_original": "Kandaka",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Prepared the horse and accompanied Siddhārtha, Returned alone with the horse to Kapilavastu, Conveyed the prince's message to the king",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Charioteer, Servant",
+    "Radiality": 0.96301775147929,
+    "display_name": "Kandaka",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Kandaka",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187442",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "",
+    "description": "Description: Brother of Uravilvā Kāśyapa, converted together with his brother.;\nRoles: Ascetic, Disciple;\nEpithets: ;\nAttributes: ;\nActions: Converted by Buddha after his brother's conversion, Led his followers to become monks;",
+    "shared_name": "Gayā Kāśyapa",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187442,
+    "SelfLoops": 0,
+    "id_original": "Gayā Kāśyapa",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Converted by Buddha after his brother's conversion, Led his followers to become monks",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Ascetic, Disciple",
+    "Radiality": 0.96301775147929,
+    "display_name": "Gayā Kāśyapa",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Gayā Kāśyapa",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187439",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Peaceful, Wise",
+    "description": "Description: A Brahman who mediated the division of Buddha's relics.;\nRoles: Brahman, Mediator;\nEpithets: ;\nAttributes: Peaceful, Wise;\nActions: Advised the kings to avoid war over the relics, Divided the relics into eight parts, Received the relic-pitcher as his share;",
+    "shared_name": "Drona",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187439,
+    "SelfLoops": 0,
+    "id_original": "Drona",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Advised the kings to avoid war over the relics, Divided the relics into eight parts, Received the relic-pitcher as his share",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Brahman, Mediator",
+    "Radiality": 0.96301775147929,
+    "display_name": "Drona",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Drona",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187436",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Jealous, Wicked",
+    "description": "Description: A cousin of Buddha who became his rival and attempted to kill him.;\nRoles: Cousin of Buddha, Schismatic;\nEpithets: ;\nAttributes: Jealous, Wicked;\nActions: Attempted to kill Buddha by rolling a stone from the Vulture Peak, Loosed a mad elephant against him, Eventually fell into hell;",
+    "shared_name": "Devadatta",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187436,
+    "SelfLoops": 0,
+    "id_original": "Devadatta",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Attempted to kill Buddha by rolling a stone from the Vulture Peak, Loosed a mad elephant against him, Eventually fell into hell",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Cousin of Buddha, Schismatic",
+    "Radiality": 0.96301775147929,
+    "display_name": "Devadatta",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Devadatta",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  },
+  {
+    "id": "187433",
+    "Category": "Character",
+    "Eccentricity": 1,
+    "Attributes": "Compassionate, All-knowing, Possessed of the thirty-two marks of a great man",
+    "description": "Description: The historical Buddha, also known as Siddhartha Gautama, who attained enlightenment and taught the Dharma.;\nRoles: Spiritual teacher, Founder of Buddhism;\nEpithets: Tathāgata, Bodhisattva, Sākyamuni, The World-honored One, The Lord;\nAttributes: Compassionate, All-knowing, Possessed of the thirty-two marks of a great man;\nActions: Was born from the right side of Queen Māyā, Took seven steps at birth and declared his purpose, Lived in the palace, married Yaśodharā, had a son Rāhula, Left the palace after seeing the four signs (old age, sickness, death, and a monk), Practiced austerities for six years, Attained enlightenment under the Bodhi tree, Defeated Māra, Preached his first sermon at Benares, turning the wheel of the law, Converted many disciples, including the five ascetics, Kāśyapa brothers, Śāriputra, Maudgalyāyana, etc., Returned to Kapilavastu and converted his father and other relatives, Performed miracles, such as walking in the air and subduing the mad elephant, Fixed the term of his life and announced his approaching death, Entered Parinirvāṇa at Kuśinagara;",
+    "shared_name": "Buddha",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Tathāgata, Bodhisattva, Sākyamuni, The World-honored One, The Lord",
+    "SUID": 187433,
+    "SelfLoops": 0,
+    "id_original": "Buddha",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.0,
+    "selected": false,
+    "ClosenessCentrality": 1.0,
+    "Degree": 42,
+    "Actions": "Was born from the right side of Queen Māyā, Took seven steps at birth and declared his purpose, Lived in the palace, married Yaśodharā, had a son Rāhula, Left the palace after seeing the four signs (old age, sickness, death, and a monk), Practiced austerities for six years, Attained enlightenment under the Bodhi tree, Defeated Māra, Preached his first sermon at Benares, turning the wheel of the law, Converted many disciples, including the five ascetics, Kāśyapa brothers, Śāriputra, Maudgalyāyana, etc., Returned to Kapilavastu and converted his father and other relatives, Performed miracles, such as walking in the air and subduing the mad elephant, Fixed the term of his life and announced his approaching death, Entered Parinirvāṇa at Kuśinagara",
+    "PartnerOfMultiEdgedNodePairs": 12,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Spiritual teacher, Founder of Buddhism",
+    "Radiality": 1.0,
+    "display_name": "Buddha",
+    "Stress": 650,
+    "BetweennessCentrality": 1.0,
+    "NumberOfUndirectedEdges": 42,
+    "name": "Buddha",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 1.0,
+    "degree": 42,
+    "size": 8.0
+  },
+  {
+    "id": "187430",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Generous, Reverent",
+    "description": "Description: King of Magadha, a patron of Buddha.;\nRoles: King, Patron;\nEpithets: ;\nAttributes: Generous, Reverent;\nActions: Met Buddha and offered him the Bamboo Grove monastery, Became a disciple, Supported the Saṅgha;",
+    "shared_name": "Bimbisāra",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187430,
+    "SelfLoops": 0,
+    "id_original": "Bimbisāra",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 3,
+    "Actions": "Met Buddha and offered him the Bamboo Grove monastery, Became a disciple, Supported the Saṅgha",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "King, Patron",
+    "Radiality": 0.96301775147929,
+    "display_name": "Bimbisāra",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 3,
+    "name": "Bimbisāra",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 3,
+    "size": 2.292682926829268
+  },
+  {
+    "id": "187427",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Wise, Aged",
+    "description": "Description: A sage who predicted the prince's future.;\nRoles: Seer, Rishi;\nEpithets: ;\nAttributes: Wise, Aged;\nActions: Visited the palace to see the newborn prince, Predicted that he would become either a universal monarch or a Buddha, Wept because he would die before hearing the Buddha's teaching;",
+    "shared_name": "Asita",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "",
+    "SUID": 187427,
+    "SelfLoops": 0,
+    "id_original": "Asita",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 1,
+    "Actions": "Visited the palace to see the newborn prince, Predicted that he would become either a universal monarch or a Buddha, Wept because he would die before hearing the Buddha's teaching",
+    "PartnerOfMultiEdgedNodePairs": 0,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Seer, Rishi",
+    "Radiality": 0.96301775147929,
+    "display_name": "Asita",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 1,
+    "name": "Asita",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 1,
+    "size": 2.0
+  },
+  {
+    "id": "187424",
+    "Category": "Character",
+    "Eccentricity": 2,
+    "Attributes": "Charitable, Devoted",
+    "description": "Description: A wealthy householder who donated the Jetavana monastery to the Saṅgha.;\nRoles: Lay disciple, Benefactor;\nEpithets: Friend of the Orphans and Destitute;\nAttributes: Charitable, Devoted;\nActions: Bought the Jetavana garden from Prince Jeta, Built a monastery there and offered it to Buddha, Became a stream-enterer;",
+    "shared_name": "Anāthapiṇḍada",
+    "TopologicalCoefficient": 0.0,
+    "Epithets": "Friend of the Orphans and Destitute",
+    "SUID": 187424,
+    "SelfLoops": 0,
+    "id_original": "Anāthapiṇḍada",
+    "NumberOfDirectedEdges": 0,
+    "AverageShortestPathLength": 1.9615384615384615,
+    "selected": false,
+    "ClosenessCentrality": 0.5098039215686275,
+    "Degree": 2,
+    "Actions": "Bought the Jetavana garden from Prince Jeta, Built a monastery there and offered it to Buddha, Became a stream-enterer",
+    "PartnerOfMultiEdgedNodePairs": 1,
+    "ClusteringCoefficient": 0.0,
+    "Roles": "Lay disciple, Benefactor",
+    "Radiality": 0.96301775147929,
+    "display_name": "Anāthapiṇḍada",
+    "Stress": 0,
+    "BetweennessCentrality": 0.0,
+    "NumberOfUndirectedEdges": 2,
+    "name": "Anāthapiṇḍada",
+    "IsSingleNode": false,
+    "NeighborhoodConnectivity": 26.0,
+    "degree": 2,
+    "size": 2.1463414634146343
+  }
+];
+        const edgesData = [
+  {
+    "id": "187559",
+    "source": "187502",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Śāriputra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Śāriputra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187559,
+    "SUID": 187559,
+    "source_original": "Śāriputra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187586",
+    "source": "187499",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Ānanda (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Ānanda (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187586,
+    "SUID": 187586,
+    "source_original": "Ānanda",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187607",
+    "source": "187496",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Āmrā (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Āmrā (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187607,
+    "SUID": 187607,
+    "source_original": "Āmrā",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "meets"
+  },
+  {
+    "id": "187604",
+    "source": "187496",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Āmrā (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Āmrā (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187604,
+    "SUID": 187604,
+    "source_original": "Āmrā",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187520",
+    "source": "187493",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Yaśodharā (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Yaśodharā (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187520,
+    "SUID": 187520,
+    "source_original": "Yaśodharā",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "wife of"
+  },
+  {
+    "id": "187565",
+    "source": "187490",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Uravilvā Kāśyapa (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Uravilvā Kāśyapa (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187565,
+    "SUID": 187565,
+    "source_original": "Uravilvā Kāśyapa",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187589",
+    "source": "187487",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Upāli (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Upāli (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187589,
+    "SUID": 187589,
+    "source_original": "Upāli",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187556",
+    "source": "187484",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "The five Bhikshus (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "The five Bhikshus (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187556,
+    "SUID": 187556,
+    "source_original": "The five Bhikshus",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "become disciples of"
+  },
+  {
+    "id": "187610",
+    "source": "187481",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "The Likkhavis (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "The Likkhavis (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187610,
+    "SUID": 187610,
+    "source_original": "The Likkhavis",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "meet"
+  },
+  {
+    "id": "187583",
+    "source": "187478",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Suddhodana (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Suddhodana (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187583,
+    "SUID": 187583,
+    "source_original": "Suddhodana",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187505",
+    "source": "187478",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Suddhodana (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Suddhodana (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187505,
+    "SUID": 187505,
+    "source_original": "Suddhodana",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "father of"
+  },
+  {
+    "id": "187622",
+    "source": "187475",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Subhadra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Subhadra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187622,
+    "SUID": 187622,
+    "source_original": "Subhadra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187616",
+    "source": "187475",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Subhadra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Subhadra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187616,
+    "SUID": 187616,
+    "source_original": "Subhadra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "meets"
+  },
+  {
+    "id": "187526",
+    "source": "187472",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Rāhula (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Rāhula (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187526,
+    "SUID": 187526,
+    "source_original": "Rāhula",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "son of"
+  },
+  {
+    "id": "187592",
+    "source": "187469",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Prasenajit (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Prasenajit (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187592,
+    "SUID": 187592,
+    "source_original": "Prasenajit",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "meets"
+  },
+  {
+    "id": "187568",
+    "source": "187466",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Nadī Kāśyapa (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Nadī Kāśyapa (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187568,
+    "SUID": 187568,
+    "source_original": "Nadī Kāśyapa",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187508",
+    "source": "187463",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Māyā (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Māyā (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187508,
+    "SUID": 187508,
+    "source_original": "Māyā",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "mother of"
+  },
+  {
+    "id": "187544",
+    "source": "187460",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Māra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Māra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187544,
+    "SUID": 187544,
+    "source_original": "Māra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "tempts"
+  },
+  {
+    "id": "187562",
+    "source": "187457",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Maudgalyāyana (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Maudgalyāyana (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187562,
+    "SUID": 187562,
+    "source_original": "Maudgalyāyana",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187574",
+    "source": "187454",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Mahākāśyapa (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Mahākāśyapa (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187574,
+    "SUID": 187574,
+    "source_original": "Mahākāśyapa",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187628",
+    "source": "187451",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "King Asoka (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "King Asoka (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187628,
+    "SUID": 187628,
+    "source_original": "King Asoka",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "builds stūpas for"
+  },
+  {
+    "id": "187553",
+    "source": "187448",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Kaundinya (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Kaundinya (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187553,
+    "SUID": 187553,
+    "source_original": "Kaundinya",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187532",
+    "source": "187445",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Kandaka (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Kandaka (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187532,
+    "SUID": 187532,
+    "source_original": "Kandaka",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "serves"
+  },
+  {
+    "id": "187571",
+    "source": "187442",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Gayā Kāśyapa (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Gayā Kāśyapa (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187571,
+    "SUID": 187571,
+    "source_original": "Gayā Kāśyapa",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187625",
+    "source": "187439",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Drona (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Drona (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187625,
+    "SUID": 187625,
+    "source_original": "Drona",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "mediates division of"
+  },
+  {
+    "id": "187598",
+    "source": "187436",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Devadatta (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Devadatta (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187598,
+    "SUID": 187598,
+    "source_original": "Devadatta",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "attacks"
+  },
+  {
+    "id": "187619",
+    "source": "187433",
+    "target": "187475",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Subhadra",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Subhadra",
+    "interaction": "interacts with",
+    "data_key_column": 187619,
+    "SUID": 187619,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Subhadra",
+    "relation": "teaches"
+  },
+  {
+    "id": "187613",
+    "source": "187433",
+    "target": "187481",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) The Likkhavis",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) The Likkhavis",
+    "interaction": "interacts with",
+    "data_key_column": 187613,
+    "SUID": 187613,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "The Likkhavis",
+    "relation": "preaches to"
+  },
+  {
+    "id": "187601",
+    "source": "187433",
+    "target": "187436",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Devadatta",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Devadatta",
+    "interaction": "interacts with",
+    "data_key_column": 187601,
+    "SUID": 187601,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Devadatta",
+    "relation": "subdues elephant for"
+  },
+  {
+    "id": "187595",
+    "source": "187433",
+    "target": "187463",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Māyā",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Māyā",
+    "interaction": "interacts with",
+    "data_key_column": 187595,
+    "SUID": 187595,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Māyā",
+    "relation": "preaches to"
+  },
+  {
+    "id": "187550",
+    "source": "187433",
+    "target": "187484",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) The five Bhikshus",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) The five Bhikshus",
+    "interaction": "interacts with",
+    "data_key_column": 187550,
+    "SUID": 187550,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "The five Bhikshus",
+    "relation": "teaches"
+  },
+  {
+    "id": "187547",
+    "source": "187433",
+    "target": "187460",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Māra",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Māra",
+    "interaction": "interacts with",
+    "data_key_column": 187547,
+    "SUID": 187547,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Māra",
+    "relation": "defeats"
+  },
+  {
+    "id": "187523",
+    "source": "187433",
+    "target": "187472",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Rāhula",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Rāhula",
+    "interaction": "interacts with",
+    "data_key_column": 187523,
+    "SUID": 187523,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Rāhula",
+    "relation": "father of"
+  },
+  {
+    "id": "187517",
+    "source": "187433",
+    "target": "187493",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Yaśodharā",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Yaśodharā",
+    "interaction": "interacts with",
+    "data_key_column": 187517,
+    "SUID": 187517,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Yaśodharā",
+    "relation": "husband of"
+  },
+  {
+    "id": "187514",
+    "source": "187433",
+    "target": "187463",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Māyā",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Māyā",
+    "interaction": "interacts with",
+    "data_key_column": 187514,
+    "SUID": 187514,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Māyā",
+    "relation": "son of"
+  },
+  {
+    "id": "187511",
+    "source": "187433",
+    "target": "187478",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Buddha (interacts with) Suddhodana",
+    "shared_interaction": "interacts with",
+    "name": "Buddha (interacts with) Suddhodana",
+    "interaction": "interacts with",
+    "data_key_column": 187511,
+    "SUID": 187511,
+    "source_original": "Buddha",
+    "selected": false,
+    "target_original": "Suddhodana",
+    "relation": "son of"
+  },
+  {
+    "id": "187541",
+    "source": "187430",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Bimbisāra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Bimbisāra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187541,
+    "SUID": 187541,
+    "source_original": "Bimbisāra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  },
+  {
+    "id": "187538",
+    "source": "187430",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Bimbisāra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Bimbisāra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187538,
+    "SUID": 187538,
+    "source_original": "Bimbisāra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "offers kingdom to"
+  },
+  {
+    "id": "187535",
+    "source": "187430",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Bimbisāra (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Bimbisāra (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187535,
+    "SUID": 187535,
+    "source_original": "Bimbisāra",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "meets"
+  },
+  {
+    "id": "187529",
+    "source": "187427",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Asita (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Asita (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187529,
+    "SUID": 187529,
+    "source_original": "Asita",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "predicts"
+  },
+  {
+    "id": "187580",
+    "source": "187424",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Anāthapiṇḍada (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Anāthapiṇḍada (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187580,
+    "SUID": 187580,
+    "source_original": "Anāthapiṇḍada",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "gives"
+  },
+  {
+    "id": "187577",
+    "source": "187424",
+    "target": "187433",
+    "EdgeBetweenness": 52.0,
+    "shared_name": "Anāthapiṇḍada (interacts with) Buddha",
+    "shared_interaction": "interacts with",
+    "name": "Anāthapiṇḍada (interacts with) Buddha",
+    "interaction": "interacts with",
+    "data_key_column": 187577,
+    "SUID": 187577,
+    "source_original": "Anāthapiṇḍada",
+    "selected": false,
+    "target_original": "Buddha",
+    "relation": "becomes disciple of"
+  }
+];
+
+        const elements = [
+            ...nodesData.map(node => ({ data: node })),
+            ...edgesData.map(edge => ({ data: edge }))
+        ];
+
+        const categoryColors = {
+            'Character': '#dcd0ff',
+            'Group': '#cccccc'
+        };
+        const defaultColor = '#aaaaaa';
+
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: elements,
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': function(ele) {
+                            const cat = ele.data('Category');
+                            return categoryColors[cat] || defaultColor;
+                        },
+                        'width': function(ele) { return ele.data('size') || 3; },
+                        'height': function(ele) { return ele.data('size') || 3; },
+                        'label': function(ele) { return ele.data('display_name') || ele.data('Name') || ele.data('shared name') || ele.data('id'); },
+                        'font-size': '2.2px',
+                        'text-valign': 'bottom',
+                        'text-halign': 'center',
+                        'text-margin-y': 1,
+                        'border-width': 0.2,
+                        'border-color': '#555'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 0.2,
+                        'line-color': '#aaa',
+                        'target-arrow-color': '#aaa',
+                        'target-arrow-shape': 'triangle',
+                        'target-arrow-scale': 0.1,
+                        'arrow-scale': 0.1,
+                        'curve-style': 'bezier',
+                        'label': 'data(relation)',
+                        'font-size': '1.5px',
+                        'text-rotation': 'autorotate',
+                        'text-margin-y': -1,
+                        'text-background-opacity': 0.7,
+                        'text-background-color': '#ffffff'
+                    }
+                },
+                {
+                    selector: 'node.hover-highlight',
+                    style: {
+                        'border-width': 0.3,
+                        'border-color': '#ffaa00',
+                        'overlay-opacity': 0.3,
+                        'overlay-color': '#ffaa00',
+                        'overlay-padding': '1px'
+                    }
+                },
+                {
+                    selector: 'edge.hover-highlight',
+                    style: {
+                        'width': 0.4,
+                        'line-color': '#ffaa00',
+                        'target-arrow-color': '#ffaa00'
+                    }
+                },
+                {
+                    selector: '.faded',
+                    style: {
+                        'opacity': 0.1
+                    }
+                }
+            ],
+            layout: {
+                name: 'cose',
+                idealEdgeLength: 5,
+                padding: 50,
+                spacingFactor: 5,
+                nodeRepulsion: 40000,
+                gravity: 0.0005,
+                numIter: 10000
+            },
+            wheelSensitivity: 0.5
+        });
+
+        let hoveredNode = null;
+        function fadeOthers(node) {
+            const neighbors = node.neighborhood().nodes();
+            const incidentEdges = node.connectedEdges();
+            const highlightSet = node.union(neighbors).union(incidentEdges);
+            cy.elements().not(highlightSet).addClass('faded');
+            node.addClass('hover-highlight');
+            incidentEdges.addClass('hover-highlight');
+            neighbors.addClass('hover-highlight');
+        }
+        function restoreAll() {
+            cy.elements().removeClass('faded hover-highlight');
+        }
+        cy.on('mouseover', 'node', function(evt) {
+            if (hoveredNode === evt.target) return;
+            hoveredNode = evt.target;
+            fadeOthers(hoveredNode);
+        });
+        cy.on('mouseout', 'node', function() {
+            hoveredNode = null;
+            restoreAll();
+        });
+
+        const tooltipDiv = document.createElement('div');
+        tooltipDiv.style.position = 'absolute';
+        tooltipDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        tooltipDiv.style.color = '#fff';
+        tooltipDiv.style.padding = '4px 8px';
+        tooltipDiv.style.borderRadius = '6px';
+        tooltipDiv.style.fontSize = '12px';
+        tooltipDiv.style.pointerEvents = 'none';
+        tooltipDiv.style.zIndex = '1000';
+        tooltipDiv.style.display = 'none';
+        document.body.appendChild(tooltipDiv);
+
+        cy.on('mouseover', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        tooltipDiv.style.display = 'block';
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+
+    cy.on('mousemove', 'edge', (evt) => {
+        const edge = evt.target;
+        const relation = edge.data('relation') || '';
+        const sourceNode = cy.getElementById(edge.data('source'));
+        const targetNode = cy.getElementById(edge.data('target'));
+        const sourceName = (sourceNode.data('display_name') || sourceNode.data('Name') || edge.data('source'));
+        const targetName = (targetNode.data('display_name') || targetNode.data('Name') || edge.data('target'));
+        tooltipDiv.innerHTML = `${sourceName} → ${targetName}<br><strong>${relation}</strong>`;
+        const mouseEvent = evt.originalEvent;
+        tooltipDiv.style.left = (mouseEvent.clientX + 10) + 'px';
+        tooltipDiv.style.top = (mouseEvent.clientY + 10) + 'px';
+    });
+        const infoPanel = document.getElementById('info-panel');
+        const infoContent = document.getElementById('info-content');
+        const closeBtn = document.getElementById('close-panel');
+        closeBtn.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formatNodeInfo(nodeData) {
+            var fieldNames = {
+                'display_name': 'Name',
+                'Category': 'Category',
+                'Description': 'Description',
+                'Roles': 'Roles',
+                'Epithets': 'Epithets',
+                'Attributes': 'Attributes',
+                'Actions': 'Actions',
+                'AverageShortestPathLength': 'Average Shortest Path Length',
+                'ClusteringCoefficient': 'Clustering Coefficient',
+                'ClosenessCentrality': 'Closeness Centrality',
+                'Degree': 'Degree',
+                'BetweennessCentrality': 'Betweenness Centrality',
+                'Radiality': 'Radiality'
+            };
+            var fieldsOrder = [
+                'display_name', 'Category', 'Description', 'Roles', 'Epithets', 'Attributes', 'Actions',
+                'AverageShortestPathLength', 'ClusteringCoefficient', 'ClosenessCentrality',
+                'Degree', 'BetweennessCentrality', 'Radiality'
+            ];
+            var title = nodeData.display_name || nodeData.Name || nodeData['shared name'] || nodeData.id || 'Информация об узле';
+            var html = '<h4>' + escapeHtml(title) + '</h4>';
+            html += '<table>';
+            for (var i = 0; i < fieldsOrder.length; i++) {
+                var field = fieldsOrder[i];
+                var value = nodeData[field];
+                if (value !== undefined && value !== null && value !== '') {
+                    if (typeof value === 'object') value = JSON.stringify(value);
+                    var displayName = fieldNames[field] || field;
+                    html += '<tr>';
+                    html += '<th>' + escapeHtml(displayName) + '</th>';
+                    html += '<td>' + escapeHtml(String(value)) + '<\/td>';
+                    html += '</tr>';
+                }
+            }
+            html += '</table>';
+            return html;
+        }
+
+        cy.on('tap', 'node', (evt) => {
+            const node = evt.target;
+            const nodeData = node.data();
+            infoContent.innerHTML = formatNodeInfo(nodeData);
+            infoPanel.style.display = 'block';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!infoPanel.contains(e.target) && e.target !== infoPanel && !cy.getElementById(e.target.id)) {
+                infoPanel.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            cy.resize();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "summary": {
+    "total_operations": 7,
+    "total_time_seconds": 1923.1364362239838,
+    "avg_duration_seconds": 274.73377660342624,
+    "min_duration_seconds": 0.011888265609741211,
+    "max_duration_seconds": 626.8043551445007,
+    "avg_memory_usage_mb": 4973.271763392857,
+    "max_memory_usage_mb": 5672.12109375
+  },
+  "detailed": {
+    "save_all_corpus_to_chroma": [
+      {
+        "operation": "save_all_corpus_to_chroma",
+        "duration_seconds": 0.011888265609741211,
+        "timestamp": "2026-04-22T09:16:47.896856",
+        "memory_usage_mb": 1770.05078125,
+        "memory_delta_mb": 1.7890625
+      }
+    ],
+    "generate_embeddings": [
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 268.2763423919678,
+        "timestamp": "2026-04-22T09:21:16.181190",
+        "memory_usage_mb": 4941.89453125,
+        "memory_delta_mb": 3171.4296875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 318.1064054965973,
+        "timestamp": "2026-04-22T09:26:34.648174",
+        "memory_usage_mb": 5585.40234375,
+        "memory_delta_mb": 625.9609375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 97.20481586456299,
+        "timestamp": "2026-04-22T09:28:14.204226",
+        "memory_usage_mb": 5552.4296875,
+        "memory_delta_mb": -39.03515625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 626.8043551445007,
+        "timestamp": "2026-04-22T09:38:41.191033",
+        "memory_usage_mb": 5647.41796875,
+        "memory_delta_mb": 89.95703125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 503.2547607421875,
+        "timestamp": "2026-04-22T09:47:05.452792",
+        "memory_usage_mb": 5643.5859375,
+        "memory_delta_mb": -11.15234375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 109.47786831855774,
+        "timestamp": "2026-04-22T09:48:55.951636",
+        "memory_usage_mb": 5672.12109375,
+        "memory_delta_mb": 22.72265625
+      }
+    ]
+  },
+  "generated_at": "2026-04-22T12:58:12.792361"
+}

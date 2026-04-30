@@ -1,35 +1,18 @@
-Обзор анализа
-==================================================
-Модель: BAAI/bge-m3
-Всего чанков: 13938
-Чанков выбранной модели: 13938
-Размерность: 1024
-Традиций: 24
+Embedding Analysis Summary
+============================================================
+Model: BAAI/bge-m3
+Total chunks in DB: 1436
+Chunks of selected model: 1436
+Embedding dimension: 1024
+Number of traditions: 6
 
-Распределение по традициям:
---------------------------------------------------
-  Islam: 2881
-  Japanese: 1399
-  Slavic: 1350
-  Judaism: 1295
-  Multiple asian: 911
-  Hindu: 890
-  Ancient_Egyptian: 785
-  Norse: 497
-  Christianity: 469
-  Buddhism: 424
-  Anglo-Saxon: 414
-  West_African: 348
-  Maori: 326
-  Celtic: 268
-  Taoism: 257
-  Hinduism: 247
-  Confucianism: 241
-  Ainu: 213
-  Aztec: 198
-  Zoroastrianism: 121
-  Shinto: 103
-  Maya: 102
-  Mesopotamian: 100
-  Australian: 99
-==================================================
+============================================================
+DISTRIBUTION BY TRADITIONS
+------------------------------------------------------------
+  legends_of_the_gods_budge     :  465 ( 32.4%)
+  codex_junius_old_english      :  360 ( 25.1%)
+  ancient_egyptian_legends_murray:  249 ( 17.3%)
+  ainu_folk_tales               :  195 ( 13.6%)
+  egyptian_book_of_the_dead     :   85 (  5.9%)
+  australian_aboriginal_myths   :   82 (  5.7%)
+============================================================
