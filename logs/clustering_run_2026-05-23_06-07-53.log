@@ -1,0 +1,133 @@
+2026-05-23 06:08:00,213 [INFO] embedding_analyzer.analyzer: Available models: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-23 06:08:00,215 [INFO] embedding_analyzer.analyzer: Use .set_model('model_name') to load data
+2026-05-23 06:08:00,215 [INFO] embeddings_clustering.run_clustering: Queued for clustering: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-23 06:08:00,215 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: BAAI/bge-m3
+2026-05-23 06:08:06,610 [INFO] embedding_analyzer.analyzer: Loading data for model: BAAI/bge-m3...
+2026-05-23 06:08:09,069 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:08:24,914 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:08:29,873 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:08:29,911 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:08:47,066 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 15
+2026-05-23 06:08:52,065 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:08:52,091 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:09:28,737 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:09:34,347 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/spectral/clusters_spectral.html
+2026-05-23 06:09:34,371 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:10:10,764 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:10:16,025 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/birch/clusters_birch.html
+2026-05-23 06:10:16,048 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:10:35,460 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:10:40,817 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/gmm/clusters_gmm.html
+2026-05-23 06:10:40,842 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:10:54,775 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.9772
+2026-05-23 06:10:54,965 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 5
+2026-05-23 06:11:00,308 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:11:00,331 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:11:29,116 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 15
+2026-05-23 06:11:33,766 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/optics/clusters_optics.html
+2026-05-23 06:11:33,790 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:11:33,819 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/BAAI_bge-m3/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:11:33,838 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: Qwen/Qwen3-Embedding
+2026-05-23 06:11:39,355 [INFO] embedding_analyzer.analyzer: Loading data for model: Qwen/Qwen3-Embedding...
+2026-05-23 06:11:43,362 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:12:04,386 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:12:11,020 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:12:11,046 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:12:29,839 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 13
+2026-05-23 06:12:34,777 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:12:34,800 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:13:11,850 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:13:18,772 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/spectral/clusters_spectral.html
+2026-05-23 06:13:18,796 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:14:28,723 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:14:35,106 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/birch/clusters_birch.html
+2026-05-23 06:14:35,129 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:14:55,143 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:15:00,298 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/gmm/clusters_gmm.html
+2026-05-23 06:15:00,321 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:15:15,924 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.9386
+2026-05-23 06:15:16,208 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 8
+2026-05-23 06:15:21,503 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:15:21,527 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:15:52,857 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 13
+2026-05-23 06:15:55,185 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/optics/clusters_optics.html
+2026-05-23 06:15:55,209 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:15:55,233 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:15:55,254 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: intfloat/e5-large-v2
+2026-05-23 06:16:01,061 [INFO] embedding_analyzer.analyzer: Loading data for model: intfloat/e5-large-v2...
+2026-05-23 06:16:03,502 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:16:18,139 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:16:23,310 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:16:23,335 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:16:40,383 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 16
+2026-05-23 06:16:45,412 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:16:45,435 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:17:27,601 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:17:33,280 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/spectral/clusters_spectral.html
+2026-05-23 06:17:33,305 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:17:33,531 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 1
+2026-05-23 06:17:33,596 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/birch/clusters_birch.html
+2026-05-23 06:17:33,619 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:17:53,510 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:17:58,747 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/gmm/clusters_gmm.html
+2026-05-23 06:17:58,772 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:18:12,837 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 2.0098
+2026-05-23 06:18:13,005 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 9
+2026-05-23 06:18:18,489 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:18:18,513 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:18:46,867 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 16
+2026-05-23 06:18:49,710 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/optics/clusters_optics.html
+2026-05-23 06:18:49,734 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:18:49,760 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/intfloat_e5-large-v2/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:18:49,782 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: sentence-transformers/LaBSE
+2026-05-23 06:18:55,672 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/LaBSE...
+2026-05-23 06:18:57,746 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:19:11,826 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:19:16,379 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:19:16,404 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:19:33,659 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 15
+2026-05-23 06:19:38,430 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:19:38,456 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:21:21,226 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:21:26,559 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/spectral/clusters_spectral.html
+2026-05-23 06:21:26,583 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:21:43,400 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:21:48,171 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/birch/clusters_birch.html
+2026-05-23 06:21:48,197 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:22:08,790 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:22:13,793 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/gmm/clusters_gmm.html
+2026-05-23 06:22:13,817 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:22:27,762 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.5823
+2026-05-23 06:22:27,961 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 5
+2026-05-23 06:22:33,401 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:22:33,425 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:23:02,225 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 11
+2026-05-23 06:23:03,894 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/optics/clusters_optics.html
+2026-05-23 06:23:03,917 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:23:03,948 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/sentence-transformers_LaBSE/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:23:03,969 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+2026-05-23 06:23:10,406 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2...
+2026-05-23 06:23:12,213 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:23:24,685 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:23:28,810 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:23:28,836 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:23:46,006 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 3
+2026-05-23 06:23:50,906 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:23:50,932 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:29:54,765 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:29:59,498 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/spectral/clusters_spectral.html
+2026-05-23 06:29:59,524 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:30:16,408 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:30:20,570 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/birch/clusters_birch.html
+2026-05-23 06:30:20,597 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:30:40,695 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:30:45,380 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/gmm/clusters_gmm.html
+2026-05-23 06:30:45,406 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:30:59,237 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.3168
+2026-05-23 06:30:59,936 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 8
+2026-05-23 06:31:04,673 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:31:04,698 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:31:33,853 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 2
+2026-05-23 06:31:33,934 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/optics/clusters_optics.html
+2026-05-23 06:31:33,955 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:31:33,979 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/comparison/metrics_dashboard.html

@@ -1,114 +1,118 @@
-#!/usr/bin/env python3
-
 import os
 import sys
 import argparse
 import json
 import numpy as np
 from pathlib import Path
+import logging
+from datetime import datetime
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+logger = logging.getLogger(__name__)
+
+
+def setup_logging() -> None:
+    log_dir = project_root / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_filename = log_dir / f"clustering_run_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+
+    file_handler = logging.FileHandler(log_filename, encoding="utf-8")
+    file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+
+    root_logger.addHandler(file_handler)
+    if not any(
+        isinstance(handler, logging.StreamHandler)
+        and not isinstance(handler, logging.FileHandler)
+        for handler in root_logger.handlers
+    ):
+        root_logger.addHandler(console_handler)
+
 try:
     from embedding_analyzer.analyzer import EmbeddingAnalyzer
 except ImportError:
-    print("Ошибка: embedding_analyzer не найден. Убедитесь, что он установлен или находится в проекте.")
+    logger.error("Error: embedding_analyzer was not found. Make sure it is installed or available in the project.")
     sys.exit(1)
 
-from .visualization import (
-    plot_clustering_results_2d,
-    plot_confusion_matrix_heatmap,
-    save_clustering_summary,
-    plot_metrics_dashboard,
-    reduce_dimensions
-)
-from .models import get_clustering_model, list_available_models
-from .metrics import calculate_clustering_metrics, evaluate_all_models
+if __package__:
+    from .visualization import (
+        plot_clustering_results_2d,
+        plot_confusion_matrix_heatmap,
+        plot_metrics_dashboard,
+        reduce_dimensions
+    )
+    from .models import get_clustering_model, list_available_models
+    from .metrics import calculate_clustering_metrics
+else:
+    from embeddings_clustering.visualization import (
+        plot_clustering_results_2d,
+        plot_confusion_matrix_heatmap,
+        plot_metrics_dashboard,
+        reduce_dimensions
+    )
+    from embeddings_clustering.models import get_clustering_model, list_available_models
+    from embeddings_clustering.metrics import calculate_clustering_metrics
 
 
-def run_clustering_analysis(
-        collection_name: str = "corpus",
-        model_name: str = None,
-        clustering_model: str = "kmeans",
-        clustering_params: dict = None,
+class NumpyEncoder(json.JSONEncoder):
+    """Custom encoder for converting numpy types to native Python types for JSON."""
+
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
+def _get_num_clusters(true_labels) -> int:
+    labels = np.array([label for label in true_labels if str(label) and str(label) != "unknown"])
+    n_samples = len(true_labels)
+    if n_samples == 0:
+        return 0
+
+    n_labels = len(np.unique(labels)) if len(labels) else len(np.unique(true_labels))
+    if n_samples == 1:
+        return 1
+    return max(2, min(n_labels, n_samples))
+
+
+def _process_single_model(
+        embeddings: np.ndarray,
+        true_labels: np.ndarray,
+        model_name: str,
+        cl_model_name: str,
+        clustering_params: dict,
+        base_dir: Path,
         generate_visualizations: bool = True,
-        output_base_dir: str = "analysis",
-        auto_detect: bool = True
-):
-
-    print("\n" + "=" * 70)
-    print("ЗАПУСК АНАЛИЗА КЛАСТЕРИЗАЦИИ")
-    print("=" * 70)
-
-    print("\n1. Загрузка эмбеддингов...")
-    analyzer = EmbeddingAnalyzer(collection_name=collection_name, model_name=model_name)
-
-    if not analyzer.available_models:
-        print("Ошибка: Нет доступных моделей эмбеддингов!")
-        return None
-
-    if model_name is None:
-        model_name = analyzer.available_models[0]
-        analyzer.set_model(model_name)
-
-    safe_model_name = model_name.replace("/", "_").replace("\\", "_")
-
-    print(f"\nАнализ для модели эмбеддингов: {model_name}")
-
-    data = analyzer.filter_by_model()
-    if not data:
-        print(f"Ошибка: Нет данных для модели '{model_name}'")
-        return None
-
-    embeddings = np.stack([item["embedding"] for item in data])
-    true_labels = np.array([item["tradition"] for item in data])
-
-    print(f"  • Загружено точек: {len(embeddings)}")
-    print(f"  • Размерность: {embeddings.shape[1]}")
-    print(f"  • Уникальных традиций: {len(np.unique(true_labels))}")
-
-    base_analysis_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / clustering_model
-    base_analysis_dir.mkdir(parents=True, exist_ok=True)
-    print(f"\n2. Результаты будут сохранены в: {base_analysis_dir}")
-
-    print(f"\n3. Запуск кластеризации (алгоритм: {clustering_model})...")
-
-    if clustering_params is None:
-        clustering_params = {}
-
-    if auto_detect:
-        print("  • Режим: АВТОМАТИЧЕСКОЕ определение параметров")
-
-        if clustering_model in ['kmeans', 'agglomerative', 'spectral']:
-            clustering_params.pop('n_clusters', None)
-            print("  • Автоматическое определение числа кластеров")
-        elif clustering_model == 'dbscan':
-            if 'auto_eps' not in clustering_params:
-                clustering_params['auto_eps'] = True
-            if 'min_samples' not in clustering_params:
-                clustering_params['min_samples'] = 5
-            print(f"  • Автоматическое определение eps для DBSCAN (auto_eps={clustering_params['auto_eps']})")
-        elif clustering_model == 'birch':
-            if 'threshold' not in clustering_params:
-                clustering_params['threshold'] = 0.5
-            print(f"  • Birch с порогом {clustering_params['threshold']}")
-    else:
-        print("  • Режим: РУЧНОЕ управление параметрами")
+        embeddings_2d: np.ndarray = None
+) -> dict:
+    """Universal function for running one clustering model and saving results."""
+    base_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        clusterer = get_clustering_model(clustering_model, **clustering_params)
+        clusterer = get_clustering_model(cl_model_name, **clustering_params)
         predicted_labels = clusterer.fit_predict(embeddings)
-        n_clusters = len(set(predicted_labels)) - (1 if -1 in predicted_labels else 0)
-        print(f"  • Найдено кластеров: {n_clusters}")
-        if -1 in predicted_labels:
-            print(f"  • Шумовых точек: {np.sum(predicted_labels == -1)}")
-    except Exception as e:
-        print(f"Ошибка при кластеризации: {e}")
-        return None
+        n_clusters_found = len(set(predicted_labels)) - (1 if -1 in predicted_labels else 0)
+        logger.info(f"  • Clusters actually found ({cl_model_name}): {n_clusters_found}")
+    except Exception:
+        logger.exception(f"Clustering error ({cl_model_name})")
+        return {'error': f"Error while running {cl_model_name}"}
 
-    print("\n4. Вычисление метрик качества...")
-    metrics = calculate_clustering_metrics(embeddings, predicted_labels, true_labels)
+        
+        
+    eval_embeddings = getattr(clusterer, 'processed_embeddings', embeddings)
+    
+    metrics = calculate_clustering_metrics(eval_embeddings, predicted_labels, true_labels)
 
     unique, counts = np.unique(predicted_labels, return_counts=True)
     cluster_counts = dict(zip(unique.tolist(), counts.tolist()))
@@ -118,7 +122,7 @@ def run_clustering_analysis(
         mask = true_labels == tradition
         trad_labels = predicted_labels[mask]
         unique_trad, counts_trad = np.unique(trad_labels, return_counts=True)
-        tradition_cluster_map[tradition] = dict(zip(unique_trad.tolist(), counts_trad.tolist()))
+        tradition_cluster_map[str(tradition)] = dict(zip(unique_trad.tolist(), counts_trad.tolist()))
 
     results = {
         'metrics': metrics,
@@ -128,561 +132,199 @@ def run_clustering_analysis(
         'true_labels': true_labels.tolist()
     }
 
-    print("\n" + "-" * 50)
-    print("МЕТРИКИ КЛАСТЕРИЗАЦИИ:")
-    print("-" * 50)
-
-    if metrics.get('silhouette_score'):
-        print(f"  Silhouette Score:        {metrics['silhouette_score']:.4f}")
-    if metrics.get('adjusted_rand_score'):
-        print(f"  Adjusted Rand Index:     {metrics['adjusted_rand_score']:.4f}")
-    if metrics.get('normalized_mutual_info'):
-        print(f"  Normalized Mutual Info:  {metrics['normalized_mutual_info']:.4f}")
-    if metrics.get('v_measure'):
-        print(f"  V-measure:               {metrics['v_measure']:.4f}")
-    if metrics.get('n_clusters_found'):
-        print(f"  Найдено кластеров:       {metrics['n_clusters_found']}")
-    if metrics.get('noise_ratio'):
-        print(f"  Доля шума:               {metrics['noise_ratio']:.2%}")
-
-    print("\n5. Сохранение результатов...")
-
-    metrics_path = base_analysis_dir / "clustering_metrics.json"
+    metrics_path = base_dir / "clustering_metrics.json"
     with open(metrics_path, 'w', encoding='utf-8') as f:
-        json_metrics = {}
-        for k, v in metrics.items():
-            if v is not None:
-                if isinstance(v, (np.float32, np.float64)):
-                    json_metrics[k] = float(v)
-                elif isinstance(v, (np.int32, np.int64)):
-                    json_metrics[k] = int(v)
-                else:
-                    json_metrics[k] = v
-            else:
-                json_metrics[k] = None
-        json.dump(json_metrics, f, ensure_ascii=False, indent=2)
-    print(f"  • Метрики сохранены: {metrics_path}")
+        json.dump(metrics, f, cls=NumpyEncoder, ensure_ascii=False, indent=2)
 
-    save_clustering_summary(
-        results,
-        str(base_analysis_dir),
-        model_name,
-        clustering_model
-    )
+    
+    np.save(base_dir / "cluster_labels.npy", predicted_labels)
 
     if generate_visualizations:
-        print("\n6. Создание визуализаций...")
-
         try:
-            print("  • Вычисление UMAP проекции...")
-            embeddings_2d = reduce_dimensions(embeddings, method='umap', n_components=2)
+            if embeddings_2d is None:
+                embeddings_2d = reduce_dimensions(embeddings, method='umap', n_components=2)
 
             if embeddings_2d is not None and len(embeddings_2d) > 0:
-                print("  • Создание графика кластеров...")
-                clusters_path = base_analysis_dir / f"clusters_{clustering_model}.html"
+                clusters_path = base_dir / f"clusters_{cl_model_name}.html"
                 plot_clustering_results_2d(
-                    embeddings_2d,
-                    predicted_labels,
-                    true_labels,
-                    title=f"Кластеризация эмбеддингов ({clustering_model})",
+                    embeddings_2d, predicted_labels, true_labels,
+                    title=f"Embedding clustering ({cl_model_name})",
                     output_path=str(clusters_path)
                 )
-                print(f"    ✓ Сохранен: {clusters_path}")
 
-                print("  • Создание матрицы соответствия...")
-                confusion_path = base_analysis_dir / f"confusion_matrix_{clustering_model}.html"
-                plot_confusion_matrix_heatmap(
-                    true_labels,
-                    predicted_labels,
-                    output_path=str(confusion_path)
-                )
-                print(f"    ✓ Сохранен: {confusion_path}")
-            else:
-                print("  • Предупреждение: Не удалось создать 2D проекцию для визуализации")
-        except Exception as e:
-            print(f"  • Ошибка при создании визуализаций: {e}")
-            import traceback
-            traceback.print_exc()
-
-    print("\n" + "=" * 70)
-    print("АНАЛИЗ ЗАВЕРШЕН")
-    print("=" * 70)
-    print(f"\nРезультаты сохранены в: {base_analysis_dir}")
+                confusion_path = base_dir / f"confusion_matrix_{cl_model_name}.html"
+                plot_confusion_matrix_heatmap(true_labels, predicted_labels, output_path=str(confusion_path))
+        except Exception:
+            logger.exception(f"Error creating visualizations ({cl_model_name})")
 
     return results
 
 
-def run_all_clustering_models(
-        collection_name: str = "corpus",
+def run_clustering_analysis(
         model_name: str = None,
-        models_to_run: list = None,
-        output_base_dir: str = "analysis",
-        auto_detect_clusters: bool = True
+        clustering_model: str = "kmeans",
+        clustering_params: dict = None,
+        generate_visualizations: bool = True,
+        output_base_dir: str = "analysis"
 ):
+    logger.info("STARTING CLUSTERING ANALYSIS")
 
-    if models_to_run is None:
-        models_to_run = list_available_models()
 
-    print("\n" + "=" * 70)
-    print("СРАВНИТЕЛЬНЫЙ АНАЛИЗ ВСЕХ МОДЕЛЕЙ КЛАСТЕРИЗАЦИИ")
-    print("=" * 70)
-    print(f"Модели для запуска: {models_to_run}")
-    print(f"Авто-определение кластеров: {'ВКЛЮЧЕНО' if auto_detect_clusters else 'ВЫКЛЮЧЕНО'}")
+    analyzer = EmbeddingAnalyzer(model_name=model_name)
 
-    analyzer = EmbeddingAnalyzer(collection_name=collection_name, model_name=model_name)
+    if not analyzer.available_models:
+        logger.error("Error: no available embedding models!")
+        return None
 
-    if model_name is None and analyzer.available_models:
+    if model_name is None:
         model_name = analyzer.available_models[0]
         analyzer.set_model(model_name)
 
-    print(f"Используется модель эмбеддингов: {model_name}")
-
     safe_model_name = model_name.replace("/", "_").replace("\\", "_")
+    logger.info(f"Analysis for embedding model: {model_name}")
 
     data = analyzer.filter_by_model()
     if not data:
-        print(f"Ошибка: Нет данных для модели '{model_name}'")
+        logger.error(f"Error: no data for model '{model_name}'")
         return None
 
     embeddings = np.stack([item["embedding"] for item in data])
     true_labels = np.array([item["tradition"] for item in data])
 
-    print(f"Загружено точек: {len(embeddings)}")
-    print(f"Уникальных традиций: {len(np.unique(true_labels))}")
+    logger.info(f"  • Points loaded: {len(embeddings)}")
+    logger.info(f"  • Dimension: {embeddings.shape[1]}")
 
-    all_results = {}
+    base_analysis_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / clustering_model
 
-    print("\nВычисление UMAP проекции для визуализаций...")
-    embeddings_2d = reduce_dimensions(embeddings, method='umap', n_components=2)
-    if embeddings_2d is None or len(embeddings_2d) == 0:
-        print("Предупреждение: Не удалось создать 2D проекцию")
-        embeddings_2d = None
+    if clustering_params is None:
+        clustering_params = {}
+    else:
+        clustering_params = dict(clustering_params)
 
-    all_metrics_for_dashboard = {}
+    num_clusters = _get_num_clusters(true_labels)
+    if clustering_model in ['kmeans', 'spectral', 'birch']:
+        clustering_params['n_clusters'] = num_clusters
+    elif clustering_model == 'gmm':
+        clustering_params['n_components'] = num_clusters
 
-    for cl_model in models_to_run:
-        print(f"\n{'=' * 50}")
-        print(f"Модель: {cl_model.upper()}")
-        print(f"{'=' * 50}")
-
-        try:
-            base_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / cl_model
-            base_dir.mkdir(parents=True, exist_ok=True)
-
-            clustering_params = {}
-
-            if auto_detect_clusters:
-                print(f"  • Режим: АВТОМАТИЧЕСКОЕ определение параметров")
-
-                if cl_model in ['kmeans', 'agglomerative', 'spectral']:
-                    clustering_params = {}
-                    print(f"  • Авто-определение числа кластеров для {cl_model}")
-                elif cl_model == 'dbscan':
-                    clustering_params = {'auto_eps': True, 'min_samples': 5}
-                    print(f"  • Авто-определение eps для DBSCAN (auto_eps=True)")
-                elif cl_model == 'birch':
-                    clustering_params = {'threshold': 0.5}
-                    print(f"  • Birch с автоматическим порогом {clustering_params['threshold']}")
-            else:
-                print(f"  • Режим: РУЧНОЕ управление (используем {len(np.unique(true_labels))} кластеров)")
-                n_true_clusters = len(np.unique(true_labels))
-                if cl_model in ['kmeans', 'agglomerative', 'spectral']:
-                    clustering_params = {'n_clusters': n_true_clusters}
-
-            clusterer = get_clustering_model(cl_model, **clustering_params)
-            predicted_labels = clusterer.fit_predict(embeddings)
-
-            n_clusters = len(set(predicted_labels)) - (1 if -1 in predicted_labels else 0)
-            n_noise = np.sum(predicted_labels == -1) if -1 in predicted_labels else 0
-
-            print(f"  • Найдено кластеров: {n_clusters}")
-            if n_noise > 0:
-                print(f"  • Шумовых точек: {n_noise} ({n_noise / len(predicted_labels) * 100:.1f}%)")
-
-            metrics = calculate_clustering_metrics(embeddings, predicted_labels, true_labels)
-            all_results[cl_model] = metrics
-            all_metrics_for_dashboard[cl_model] = metrics
-
-            print(f"\n  Ключевые метрики:")
-            print(f"    • Silhouette Score:      {metrics.get('silhouette_score', 0):.4f}")
-            print(f"    • Davies-Bouldin:        {metrics.get('davies_bouldin_score', 0):.4f}")
-            print(f"    • Adjusted Rand Index:   {metrics.get('adjusted_rand_score', 0):.4f}")
-            print(f"    • Normalized Mutual Info:{metrics.get('normalized_mutual_info', 0):.4f}")
-            print(f"    • V-measure:             {metrics.get('v_measure', 0):.4f}")
-            print(f"    • Separation Ratio:      {metrics.get('separation_ratio', 0):.4f}")
-
-            metrics_path = base_dir / "clustering_metrics.json"
-            with open(metrics_path, 'w', encoding='utf-8') as f:
-                json_metrics = {}
-                for k, v in metrics.items():
-                    if v is not None:
-                        if isinstance(v, (np.float32, np.float64)):
-                            json_metrics[k] = float(v)
-                        elif isinstance(v, (np.int32, np.int64)):
-                            json_metrics[k] = int(v)
-                        else:
-                            json_metrics[k] = v
-                    else:
-                        json_metrics[k] = None
-                json.dump(json_metrics, f, ensure_ascii=False, indent=2)
-            print(f"\n  • Метрики сохранены в: {metrics_path}")
-
-            if embeddings_2d is not None:
-                try:
-                    clusters_path = base_dir / f"clusters_{cl_model}.html"
-                    plot_clustering_results_2d(
-                        embeddings_2d,
-                        predicted_labels,
-                        true_labels,
-                        title=f"Кластеризация эмбеддингов ({cl_model}) - {n_clusters} кластеров",
-                        output_path=str(clusters_path)
-                    )
-                    print(f"  • Визуализация кластеров: {clusters_path}")
-
-                    confusion_path = base_dir / f"confusion_matrix_{cl_model}.html"
-                    plot_confusion_matrix_heatmap(
-                        true_labels,
-                        predicted_labels,
-                        output_path=str(confusion_path)
-                    )
-                    print(f"  • Матрица соответствия: {confusion_path}")
-                except Exception as viz_e:
-                    print(f"  • Предупреждение: не удалось создать визуализации: {viz_e}")
-
-            results_for_summary = {
-                'metrics': metrics,
-                'cluster_counts': dict(zip(*np.unique(predicted_labels, return_counts=True))),
-                'tradition_cluster_map': {},
-                'all_labels': predicted_labels.tolist(),
-                'true_labels': true_labels.tolist()
-            }
-
-            for tradition in np.unique(true_labels):
-                mask = true_labels == tradition
-                trad_labels = predicted_labels[mask]
-                unique_trad, counts_trad = np.unique(trad_labels, return_counts=True)
-                results_for_summary['tradition_cluster_map'][tradition] = dict(
-                    zip(unique_trad.tolist(), counts_trad.tolist()))
-
-            save_clustering_summary(
-                results_for_summary,
-                str(base_dir),
-                model_name,
-                cl_model
-            )
-            print(f"  • Текстовая сводка сохранена")
-
-            labels_path = base_dir / "cluster_labels.npy"
-            np.save(labels_path, predicted_labels)
-            print(f"  • Метки кластеров сохранены: {labels_path}")
-
-        except Exception as e:
-            print(f"\n  ✗ ОШИБКА при выполнении {cl_model}: {e}")
-            import traceback
-            traceback.print_exc()
-            all_results[cl_model] = {'error': str(e)}
-            all_metrics_for_dashboard[cl_model] = {'error': str(e)}
-
-    print("\n" + "=" * 70)
-    print("СОЗДАНИЕ СРАВНИТЕЛЬНЫХ ВИЗУАЛИЗАЦИЙ")
-    print("=" * 70)
-
-    try:
-        if embeddings_2d is not None and len(all_results) > 0:
-            comparison_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / "comparison"
-            comparison_dir.mkdir(parents=True, exist_ok=True)
-
-            dashboard_path = comparison_dir / "metrics_dashboard.html"
-            plot_metrics_dashboard(
-                all_metrics_for_dashboard,
-                output_path=str(dashboard_path)
-            )
-            print(f"  • Дашборд метрик: {dashboard_path}")
-
-            comparison_df = []
-            for model, metrics in all_results.items():
-                if 'error' not in metrics:
-                    row = {'model': model}
-                    for key in ['n_clusters_found', 'silhouette_score', 'davies_bouldin_score',
-                                'adjusted_rand_score', 'normalized_mutual_info', 'v_measure',
-                                'separation_ratio', 'noise_ratio']:
-                        val = metrics.get(key)
-                        if val is not None:
-                            row[key] = float(val) if isinstance(val, (np.float32, np.float64)) else val
-                        else:
-                            row[key] = None
-                    comparison_df.append(row)
-
-            if comparison_df:
-                import pandas as pd
-                df_comparison = pd.DataFrame(comparison_df)
-                csv_path = comparison_dir / "models_comparison.csv"
-                df_comparison.to_csv(csv_path, index=False)
-                print(f"  • Таблица сравнения (CSV): {csv_path}")
-
-                if 'adjusted_rand_score' in df_comparison.columns:
-                    best_model = df_comparison.loc[df_comparison['adjusted_rand_score'].idxmax()] if df_comparison[
-                        'adjusted_rand_score'].notna().any() else None
-                    if best_model is not None:
-                        print(
-                            f"\n  ★ ЛУЧШАЯ МОДЕЛЬ по ARI: {best_model['model']} (ARI = {best_model['adjusted_rand_score']:.4f})")
-
-                if 'silhouette_score' in df_comparison.columns:
-                    best_sil = df_comparison.loc[df_comparison['silhouette_score'].idxmax()] if df_comparison[
-                        'silhouette_score'].notna().any() else None
-                    if best_sil is not None:
-                        print(
-                            f"  ★ ЛУЧШАЯ МОДЕЛЬ по Silhouette: {best_sil['model']} (Silhouette = {best_sil['silhouette_score']:.4f})")
-    except Exception as e:
-        print(f"Ошибка при создании сравнительных визуализаций: {e}")
-        import traceback
-        traceback.print_exc()
-
-    comparison_path = Path(
-        project_root) / output_base_dir / safe_model_name / "clustering" / "all_models_comparison.json"
-    comparison_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(comparison_path, 'w', encoding='utf-8') as f:
-        json_compatible = {}
-        for model, metrics in all_results.items():
-            if 'error' not in metrics:
-                json_compatible[model] = {
-                    k: float(v) if isinstance(v, (np.float32, np.float64)) else (
-                        int(v) if isinstance(v, (np.int32, np.int64)) else v)
-                    for k, v in metrics.items() if v is not None
-                }
-            else:
-                json_compatible[model] = {'error': metrics['error']}
-        json.dump(json_compatible, f, ensure_ascii=False, indent=2)
-
-    print(f"\n  • Полное сравнение (JSON): {comparison_path}")
-
-    print("\n" + "=" * 70)
-    print("ИТОГОВЫЙ ОТЧЕТ О СРАВНЕНИИ МОДЕЛЕЙ")
-    print("=" * 70)
-    print(f"\nВсего протестировано моделей: {len([m for m in all_results if 'error' not in all_results[m]])}")
-    print(f"Директория с результатами: {Path(project_root) / output_base_dir / safe_model_name / 'clustering'}")
-
-    print("\nЛучшие результаты по каждой метрике:")
-
-    best_metrics = {
-        'adjusted_rand_score': ('ARI', -1),
-        'normalized_mutual_info': ('NMI', -1),
-        'v_measure': ('V-measure', -1),
-        'silhouette_score': ('Silhouette', -1),
-        'separation_ratio': ('Separation Ratio', -1)
-    }
-
-    for model, metrics in all_results.items():
-        if 'error' not in metrics:
-            for metric_key, (metric_name, _) in best_metrics.items():
-                val = metrics.get(metric_key)
-                if val is not None and val > best_metrics[metric_key][1]:
-                    best_metrics[metric_key] = (metric_name, val, model)
-
-    for metric_key, (metric_name, val, model) in best_metrics.items():
-        if val != -1:
-            print(f"  • {metric_name:20} -> {model:15} ({val:.4f})")
-
-    print("\n" + "=" * 70)
-    print("АНАЛИЗ ЗАВЕРШЕН")
-    print("=" * 70)
-
-    return all_results
-
-
-def run_auto_clustering_all_models(
-        collection_name: str = "corpus",
-        model_name: str = None,
-        output_base_dir: str = "analysis"
-):
-    return run_all_clustering_models(
-        collection_name=collection_name,
+    results = _process_single_model(
+        embeddings=embeddings,
+        true_labels=true_labels,
         model_name=model_name,
-        models_to_run=None,
-        output_base_dir=output_base_dir,
-        auto_detect_clusters=True
+        cl_model_name=clustering_model,
+        clustering_params=clustering_params,
+        base_dir=base_analysis_dir,
+        generate_visualizations=generate_visualizations
     )
 
-
-def build_all_clusters():
-    parser = argparse.ArgumentParser(
-        description='Запуск всех моделей кластеризации для анализа эмбеддингов',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Примеры использования:
-  python -m embedding_analyzer.clustering.run_clustering --all-models
-  python -m embedding_analyzer.clustering.run_clustering --all-models --collection my_corpus
-  python -m embedding_analyzer.clustering.run_clustering --all-models --model bert-base-multilingual-cased
-  python -m embedding_analyzer.clustering.run_clustering --all-models --output-dir my_analysis
-  python -m embedding_analyzer.clustering.run_clustering --all-models --no-viz
-        """
-    )
-
-    parser.add_argument(
-        '--collection',
-        type=str,
-        default='corpus',
-        help='Имя коллекции в ChromaDB (по умолчанию: corpus)'
-    )
-
-    parser.add_argument(
-        '--model',
-        type=str,
-        default=None,
-        help='Имя модели эмбеддингов (если не указана, используется первая доступная)'
-    )
-
-    parser.add_argument(
-        '--models',
-        type=str,
-        nargs='+',
-        default=None,
-        help='Список моделей кластеризации для запуска (по умолчанию: все доступные)'
-    )
-
-    parser.add_argument(
-        '--output-dir',
-        type=str,
-        default='analysis',
-        help='Директория для сохранения результатов (по умолчанию: analysis)'
-    )
-
-    parser.add_argument(
-        '--no-viz',
-        action='store_true',
-        help='Отключить создание визуализаций'
-    )
-
-    parser.add_argument(
-        '--no-auto',
-        action='store_true',
-        help='ОТКЛЮЧИТЬ автоматическое определение числа кластеров (использовать истинные метки)'
-    )
-
-    parser.add_argument(
-        '--save-embeddings-2d',
-        action='store_true',
-        help='Сохранить 2D проекцию эмбеддингов для последующего использования'
-    )
-
-    args = parser.parse_args()
-
-    print("\n" + "=" * 80)
-    print("ЗАПУСК ВСЕХ МОДЕЛЕЙ КЛАСТЕРИЗАЦИИ")
-    print("=" * 80)
-    print(f"Коллекция: {args.collection}")
-    print(f"Модель эмбеддингов: {args.model or 'авто-выбор'}")
-    print(f"Модели кластеризации: {args.models or 'все доступные'}")
-    print(f"Авто-определение параметров: {'ВЫКЛЮЧЕНО' if args.no_auto else 'ВКЛЮЧЕНО (ПО УМОЛЧАНИЮ)'}")
-    print(f"Визуализации: {'ВЫКЛЮЧЕНЫ' if args.no_viz else 'ВКЛЮЧЕНЫ'}")
-    print(f"Директория результатов: {args.output_dir}")
-    print("=" * 80 + "\n")
-
-    results = run_all_clustering_models(
-        collection_name=args.collection,
-        model_name=args.model,
-        models_to_run=args.models,
-        output_base_dir=args.output_dir,
-        auto_detect_clusters=not args.no_auto
-    )
-
-    if args.save_embeddings_2d and results:
-        try:
-            from embedding_analyzer.analyzer import EmbeddingAnalyzer
-            import pickle
-
-            analyzer = EmbeddingAnalyzer(collection_name=args.collection, model_name=args.model)
-            if args.model is None and analyzer.available_models:
-                model_name = analyzer.available_models[0]
-                analyzer.set_model(model_name)
-            else:
-                model_name = args.model
-
-            data = analyzer.filter_by_model()
-            if data:
-                embeddings = np.stack([item["embedding"] for item in data])
-                true_labels = np.array([item["tradition"] for item in data])
-
-                embeddings_2d = reduce_dimensions(embeddings, method='umap', n_components=2)
-
-                if embeddings_2d is not None and len(embeddings_2d) > 0:
-                    safe_model_name = model_name.replace("/", "_").replace("\\", "_")
-                    projection_dir = Path(project_root) / args.output_dir / safe_model_name
-                    projection_dir.mkdir(parents=True, exist_ok=True)
-
-                    projection_path = projection_dir / "embeddings_2d_projection.pkl"
-                    with open(projection_path, 'wb') as f:
-                        pickle.dump({
-                            'embeddings_2d': embeddings_2d,
-                            'true_labels': true_labels,
-                            'model_name': model_name
-                        }, f)
-                    print(f"\n2D проекция сохранена: {projection_path}")
-        except Exception as e:
-            print(f"Предупреждение: не удалось сохранить 2D проекцию: {e}")
-
-    print("\n" + "=" * 80)
-    print("ЗАВЕРШЕНО")
-    print("=" * 80)
-
+    logger.info("ANALYSIS COMPLETE")
     return results
 
 
-def build_clusters():
-    parser = argparse.ArgumentParser(description='Анализ кластеризации эмбеддингов')
-    parser.add_argument('--collection', type=str, default='corpus',
-                        help='Имя коллекции в ChromaDB')
-    parser.add_argument('--model', type=str, default=None,
-                        help='Имя модели эмбеддингов')
-    parser.add_argument('--clustering', type=str, default='kmeans',
-                        choices=list_available_models(),
-                        help='Алгоритм кластеризации (используется только с --single-model)')
-    parser.add_argument('--compare-all', action='store_true',
-                        help='Сравнить все модели кластеризации с авто-определением кластеров')
-    parser.add_argument('--all-models', action='store_true',
-                        help='Запустить все модели кластеризации (аналог --compare-all)')
-    parser.add_argument('--single-model', action='store_true',
-                        help='Запустить только одну модель')
-    parser.add_argument('--no-auto', action='store_true',
-                        help='ОТКЛЮЧИТЬ автоматическое определение числа кластеров (использовать истинные метки)')
-    parser.add_argument('--no-viz', action='store_true',
-                        help='Не создавать визуализации')
-    parser.add_argument('--output-dir', type=str, default='analysis',
-                        help='Директория для сохранения результатов (по умолчанию: analysis)')
-    parser.add_argument('--models-list', type=str, nargs='+', default=None,
-                        help='Список моделей кластеризации для запуска (например: kmeans dbscan)')
+def run_all_clustering_models(
+        model_name: str = None,
+        models_to_run: list = None,
+        output_base_dir: str = "analysis"
+):
+    if models_to_run is None:
+        models_to_run = list_available_models()
 
-    args = parser.parse_args()
+    analyzer = EmbeddingAnalyzer(model_name=model_name)
+    if not analyzer.available_models:
+        logger.error("Error: no available embedding models!")
+        return None
 
-    if args.single_model:
+    if model_name is None and analyzer.available_models:
+        model_name = analyzer.available_models[0]
+        analyzer.set_model(model_name)
+
+    safe_model_name = model_name.replace("/", "_").replace("\\", "_")
+    data = analyzer.filter_by_model()
+
+    if not data:
+        return None
+
+    embeddings = np.stack([item["embedding"] for item in data])
+    true_labels = np.array([item["tradition"] for item in data])
+    num_clusters = _get_num_clusters(true_labels)
+
+    all_results = {}
+
+    
+    embeddings_2d = reduce_dimensions(embeddings, method='umap', n_components=2)
+
+    for cl_model in models_to_run:
+        base_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / cl_model
+
         clustering_params = {}
-        auto_detect = not args.no_auto
+        if cl_model in ['kmeans', 'spectral', 'birch']:
+            clustering_params['n_clusters'] = num_clusters
+        elif cl_model == 'gmm':
+            clustering_params['n_components'] = num_clusters
 
-        print("=" * 80)
-        print(f"ЗАПУСК ОДНОЙ МОДЕЛИ: {args.clustering}")
-        print(f"Авто-определение: {'ВКЛЮЧЕНО' if auto_detect else 'ВЫКЛЮЧЕНО'}")
-        print("=" * 80)
-
-        run_clustering_analysis(
-            collection_name=args.collection,
-            model_name=args.model,
-            clustering_model=args.clustering,
+        results = _process_single_model(
+            embeddings=embeddings,
+            true_labels=true_labels,
+            model_name=model_name,
+            cl_model_name=cl_model,
             clustering_params=clustering_params,
-            generate_visualizations=not args.no_viz,
-            output_base_dir=args.output_dir,
-            auto_detect=auto_detect
+            base_dir=base_dir,
+            generate_visualizations=True,
+            embeddings_2d=embeddings_2d
         )
-    else:
-        print("=" * 80)
-        print("ЗАПУСК ВСЕХ МОДЕЛЕЙ КЛАСТЕРИЗАЦИИ (режим по умолчанию)")
-        print(f"Авто-определение: {'ВКЛЮЧЕНО' if not args.no_auto else 'ВЫКЛЮЧЕНО'}")
-        print("=" * 80)
 
-        run_all_clustering_models(
-            collection_name=args.collection,
-            model_name=args.model,
-            models_to_run=args.models_list,
-            output_base_dir=args.output_dir,
-            auto_detect_clusters=not args.no_auto
-        )
+        all_results[cl_model] = results.get('metrics', results)
+
+    
+    comparison_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / "comparison"
+    comparison_dir.mkdir(parents=True, exist_ok=True)
+
+    plot_metrics_dashboard(all_results, output_path=str(comparison_dir / "metrics_dashboard.html"))
+
+    with open(comparison_dir.parent / "all_models_comparison.json", 'w', encoding='utf-8') as f:
+        json.dump(all_results, f, cls=NumpyEncoder, ensure_ascii=False, indent=2)
+
+    return all_results
+
+def build_clusters():
+    parser = argparse.ArgumentParser(description='Embedding clustering analysis')
+    parser.add_argument('--model', type=str, default=None)
+    parser.add_argument('--clustering', type=str, default='kmeans', choices=list_available_models())
+    parser.add_argument('--single-model', action='store_true')
+    parser.add_argument('--no-viz', action='store_true')
+    parser.add_argument('--output-dir', type=str, default='analysis')
+    parser.add_argument('--models-list', type=str, nargs='+', default=None)
+    args = parser.parse_args()
+    setup_logging()
+
+    
+    from embedding_analyzer.analyzer import EmbeddingAnalyzer
+    analyzer = EmbeddingAnalyzer()
+    available_models = analyzer.available_models
+
+    if not available_models:
+        logger.error("ERROR: No available embedding models in the database!")
+        return
+
+    
+    models_to_process = [args.model] if args.model else available_models
+
+    logger.info(f"Queued for clustering: {models_to_process}")
+
+    
+    for current_model in models_to_process:
+        logger.info(f"Clustering embeddings for: {current_model}")
+
+        if args.single_model:
+            run_clustering_analysis(
+                model_name=current_model,
+                clustering_model=args.clustering,
+                generate_visualizations=not args.no_viz,
+                output_base_dir=args.output_dir
+            )
+        else:
+            run_all_clustering_models(
+                model_name=current_model,
+                models_to_run=args.models_list,
+                output_base_dir=args.output_dir
+            )

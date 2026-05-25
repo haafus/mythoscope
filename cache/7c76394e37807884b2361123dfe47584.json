@@ -1,0 +1,1 @@
+{"text": "1 Selden, de Diis Syris, Synt. I, chapter 4. 2 Al Beidâwi.\n 3 Idem. Vide D'Herbel. Bibl. Orient. p. 650, and Kor. chapter 2, p. 6,\n&c. 4 See Exod. xxxii. 24. 1 Al Beidâwi, Jallalo'ddin.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,0 +1,1 @@
+{"text": "“Should this force be insufficient,\nI can call on other powers,\nI can call the gods above me,\nCall the great god of the heavens,\nHim who gives the clouds their courses,\nHim who rules through boundless ether,\nWho directs the march of storm-winds.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

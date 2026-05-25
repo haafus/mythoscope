@@ -1,0 +1,1 @@
+{"text": "1 See the Prelim. Disc. Sec. III. p. 46, &c. 2 Vide Bobov. De\nVisit. Ægrot. p. 17. 3 See cap. 7, p. 106; c. II, p. 169, &c.\n 4 See the Prelim. Disc. p. 39. 5 Vide Abulf. Vit Moh. p. 50.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

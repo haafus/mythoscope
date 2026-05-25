@@ -1,0 +1,1 @@
+{"text": "Then again the mother questioned,\nHurriedly she asked the reason:\n“Why the men their swords were whetting,\nWhy their spears are being sharpened.”", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

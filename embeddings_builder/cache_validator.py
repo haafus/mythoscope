@@ -1,5 +1,4 @@
 import hashlib
-import pickle
 import zlib
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class CacheValidator:
-
     def __init__(self, cache_dir: Path, validation_method: str = "crc32", ttl_days: int = 30):
         self.cache_dir = Path(cache_dir)
         self.validation_method = validation_method
@@ -52,13 +50,11 @@ class CacheValidator:
             return self._calculate_crc32(data)
         elif self.validation_method == "md5":
             return self._calculate_md5(data)
-        else:
-            return ""
+        return ""
 
     def compute_checksum_for_file(self, file_path: Path) -> Optional[str]:
         if not file_path.exists():
             return None
-
         try:
             with open(file_path, 'rb') as f:
                 data = f.read()
@@ -107,12 +103,17 @@ class CacheValidator:
         if not self.cache_dir.exists():
             return results
 
-        for cache_file in self.cache_dir.glob("*.pkl"):
+        
+        for cache_file in self.cache_dir.glob("*.npy"):
             if cache_file.name.startswith('.'):
                 continue
 
             results["total"] += 1
             results["size_bytes"] += cache_file.stat().st_size
+
+            json_file = cache_file.with_suffix('.json')
+            if json_file.exists():
+                results["size_bytes"] += json_file.stat().st_size
 
             is_valid, checksum = self.validate_file(cache_file)
 
@@ -123,7 +124,6 @@ class CacheValidator:
                 results["corrupted_files"].append(str(cache_file))
 
         results["size_mb"] = results["size_bytes"] / 1024 / 1024
-
         return results
 
     def cleanup_corrupted(self) -> int:
@@ -132,8 +132,13 @@ class CacheValidator:
 
         for file_path in results["corrupted_files"]:
             try:
-                Path(file_path).unlink()
-                self._checksums.pop(Path(file_path).name, None)
+                base_path = Path(file_path)
+                base_path.unlink(missing_ok=True)
+
+                json_path = base_path.with_suffix('.json')
+                json_path.unlink(missing_ok=True)
+
+                self._checksums.pop(base_path.name, None)
                 removed += 1
                 logger.info(f"Removed corrupted cache file: {file_path}")
             except Exception as e:
@@ -143,11 +148,3 @@ class CacheValidator:
             self._save_checksums()
 
         return removed
-
-    def update_checksum(self, file_path: Path) -> bool:
-        checksum = self.compute_checksum_for_file(file_path)
-        if checksum:
-            self._checksums[file_path.name] = checksum
-            self._save_checksums()
-            return True
-        return False

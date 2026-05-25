@@ -3,30 +3,81 @@ import json
 import numpy as np
 from typing import List, Dict, Optional, Any, Generator
 import chromadb
+import csv
 from .config import get_analyzer_config
+from embeddings_builder.chroma_manager import collection_name_for_model, is_model_collection_name
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class EmbeddingDataLoader:
-    def __init__(self, collection_name: str = "corpus", auto_migrate: bool = True):
+    def __init__(self, auto_migrate: bool = True):
         self.config = get_analyzer_config()
-        self.collection_name = collection_name
         self.client = chromadb.PersistentClient(path=self.config.chroma_path)
         self._metadata_map: Optional[Dict[str, str]] = None
         self._collection = None
+        self._collection_names_cache: Dict[str, List[str]] = {}
 
         if auto_migrate:
             self._auto_migrate_all()
+
+    @staticmethod
+    def _collection_name(collection) -> str:
+        return collection if isinstance(collection, str) else collection.name
+
+    def _list_collection_names(self) -> List[str]:
+        try:
+            return sorted(self._collection_name(collection) for collection in self.client.list_collections())
+        except Exception as e:
+            logger.warning(f"Failed to list Chroma collections: {e}")
+            return []
+
+    def _resolve_collection_names(self, model_name: Optional[str] = None) -> List[str]:
+        cache_key = model_name or "*"
+        if cache_key in self._collection_names_cache:
+            return self._collection_names_cache[cache_key]
+
+        available = [
+            name for name in self._list_collection_names()
+            if is_model_collection_name(name)
+        ]
+
+        if model_name:
+            expected_name = collection_name_for_model(model_name)
+            names = [expected_name] if expected_name in available else []
+        else:
+            names = available
+
+        self._collection_names_cache[cache_key] = names
+        return names
+
+    def _iter_collections(self, model_name: Optional[str] = None):
+        names = self._resolve_collection_names(model_name=model_name)
+        if not names:
+            raise RuntimeError("Model-based Chroma collections not found")
+
+        for name in names:
+            try:
+                yield self.client.get_collection(name=name)
+            except Exception as e:
+                logger.warning(f"Failed to get collection '{name}': {e}")
 
     @property
     def collection(self):
         if self._collection is None:
             try:
-                self._collection = self.client.get_collection(name=self.collection_name)
+                
+                names = self._resolve_collection_names()
+                if not names:
+                    raise ValueError("Model-based Chroma collections do not exist")
+                self._collection = self.client.get_collection(name=names[0])
+            except ValueError:
+                
+                logger.warning("Model-based Chroma collections do not exist. Data may not have been generated yet.")
+                raise RuntimeError("Model-based Chroma collections not found")
             except Exception as e:
-                logger.error(f"Failed to get collection '{self.collection_name}': {e}")
+                logger.error(f"Failed to get model-based collection: {e}")
                 raise
         return self._collection
 
@@ -36,15 +87,35 @@ class EmbeddingDataLoader:
 
         metadata_path = self.config.corpus_metadata_path
         if not os.path.exists(metadata_path):
-            logger.warning(f"Metadata file not found: {metadata_path}")
-            self._metadata_map = {}
-            return self._metadata_map
+            catalog_path = os.path.join(self.config.corpus_dir, 'corpus_catalog.csv')
+            if os.path.exists(catalog_path):
+                metadata_path = catalog_path
+            else:
+                logger.warning(f"Metadata file not found: {metadata_path}")
+                self._metadata_map = {}
+                return self._metadata_map
 
         try:
-            with open(metadata_path, "r", encoding="utf-8") as f:
-                metadata = json.load(f)
-            self._metadata_map = {str(item["id"]): item["tradition"] for item in metadata}
-        except (json.JSONDecodeError, KeyError, IOError) as e:
+            self._metadata_map = {}
+            
+            if metadata_path.endswith('.json'):
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+                    for item in metadata:
+                        if "id" in item and "tradition" in item:
+                            self._metadata_map[str(item["id"])] = item["tradition"]
+                            self._metadata_map[str(item["id"]).replace(" ", "_")] = item["tradition"]
+            else:
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    if reader.fieldnames:
+                        for row in reader:
+                            text_id = row.get("id") or row.get("tid")
+                            tradition = row.get("tradition")
+                            if text_id and tradition:
+                                self._metadata_map[str(text_id)] = tradition
+                                self._metadata_map[str(text_id).replace(" ", "_")] = tradition
+        except Exception as e:
             logger.error(f"Failed to load metadata: {e}")
             self._metadata_map = {}
 
@@ -52,24 +123,27 @@ class EmbeddingDataLoader:
 
     def _auto_migrate_all(self) -> None:
         try:
-            collection = self.collection
-            count = collection.count()
-
-            if count == 0:
+            if not self._resolve_collection_names():
                 return
 
-            if not self._needs_migration(collection):
-                return
+            for collection in self._iter_collections():
+                count = collection.count()
 
-            logger.info("Обнаружены записи без tradition в Chroma. Выполняется миграция...")
-            metadata_map = self._load_metadata_map()
+                if count == 0:
+                    continue
 
-            if not metadata_map:
-                logger.warning("Нет данных для миграции")
-                return
+                if not self._needs_migration(collection):
+                    continue
 
-            migrated = self._migrate_records(collection, metadata_map)
-            logger.info(f"Миграция завершена. Обновлено {migrated} записей.")
+                logger.info(f"Records without tradition found in Chroma collection '{collection.name}'. Running migration...")
+                metadata_map = self._load_metadata_map()
+
+                if not metadata_map:
+                    logger.warning("No data to migrate")
+                    return
+
+                migrated = self._migrate_records(collection, metadata_map)
+                logger.info(f"Migration complete. Updated {migrated} records.")
 
         except Exception as e:
             logger.error(f"Auto-migration failed: {e}")
@@ -98,7 +172,7 @@ class EmbeddingDataLoader:
                 results = collection.get(
                     limit=batch_size,
                     offset=offset,
-                    include=["metadatas", "ids"]
+                    include=["metadatas"]
                 )
 
                 if not results["ids"]:
@@ -116,7 +190,7 @@ class EmbeddingDataLoader:
                 offset += batch_size
 
                 if migrated > 0 and offset % (batch_size * 5) == 0:
-                    logger.info(f"  Мигрировано {migrated} записей...")
+                    logger.info(f"  Migrated {migrated} records...")
 
                 if len(results["ids"]) < batch_size:
                     break
@@ -149,35 +223,37 @@ class EmbeddingDataLoader:
             max_records: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         all_data = []
-        offset = 0
         where_filter = {"model": model_name} if model_name else None
 
-        while True:
-            if max_records and len(all_data) >= max_records:
-                logger.info(f"Достигнут лимит записей: {max_records}")
-                break
+        for collection in self._iter_collections(model_name=model_name):
+            offset = 0
 
-            try:
-                results = self.collection.get(
-                    where=where_filter,
-                    limit=batch_size,
-                    offset=offset,
-                    include=["embeddings", "metadatas", "documents"]
-                )
-            except Exception as e:
-                logger.error(f"Failed to fetch data at offset {offset}: {e}")
-                break
+            while True:
+                if max_records and len(all_data) >= max_records:
+                    logger.info(f"Record limit reached: {max_records}")
+                    return all_data[:max_records]
 
-            if not results.get("ids"):
-                break
+                try:
+                    results = collection.get(
+                        where=where_filter,
+                        limit=batch_size,
+                        offset=offset,
+                        include=["embeddings", "metadatas", "documents"]
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to fetch data from '{collection.name}' at offset {offset}: {e}")
+                    break
 
-            batch_data = self._process_batch(results)
-            all_data.extend(batch_data)
+                if not results.get("ids"):
+                    break
 
-            offset += batch_size
+                batch_data = self._process_batch(results)
+                all_data.extend(batch_data)
 
-            if len(results["ids"]) < batch_size:
-                break
+                offset += batch_size
+
+                if len(results["ids"]) < batch_size:
+                    break
 
         return all_data
 
@@ -201,12 +277,17 @@ class EmbeddingDataLoader:
                 batch_data.append({
                     "id": meta.get("text_id", doc_id),
                     "tradition": meta.get("tradition", "unknown"),
+                    "major_tradition": meta.get("major_tradition", "unknown"),
                     "chunk_index": meta.get("chunk_index", 0),
                     "embedding": embedding,
                     "text": doc,
                     "model": meta.get("model", "unknown"),
                     "filename": meta.get("filename", "unknown"),
                     "chunking": meta.get("chunking", "unknown"),
+                    "doc_type": meta.get("doc_type", "unknown"),
+                    "color": meta.get("color", "#CCCCCC"),
+                    "language": meta.get("language", "unknown"),
+                    "url": meta.get("url", ""),
                 })
             except Exception as e:
                 logger.warning(f"Failed to process document {doc_id}: {e}")
@@ -215,10 +296,25 @@ class EmbeddingDataLoader:
         return batch_data
 
     def get_available_models(self) -> List[str]:
+        models = set()
+        batch_size = 5000
+
         try:
-            result = self.collection.get(limit=10000, include=["metadatas"])
-            metadatas = result.get("metadatas", [])
-            models = {m.get("model") for m in metadatas if m and "model" in m}
+            if not self._resolve_collection_names():
+                return []
+
+            for collection in self._iter_collections():
+                offset = 0
+                while True:
+                    result = collection.get(limit=batch_size, offset=offset, include=["metadatas"])
+                    metadatas = result.get("metadatas", [])
+                    models.update(m.get("model") for m in metadatas if m and "model" in m)
+
+                    ids = result.get("ids", [])
+                    if len(ids) < batch_size:
+                        break
+                    offset += batch_size
+
             return sorted(list(models))
         except Exception as e:
             logger.error(f"Failed to get available models: {e}")

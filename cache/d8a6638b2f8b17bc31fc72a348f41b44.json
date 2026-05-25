@@ -1,0 +1,1 @@
+{"text": "1 Idem. 2 Idem. 3 Idem, Jallalo'ddin. 4\nIdem. 5 Jallalo'ddin.\n6 Al Beidâwi. 7 Idem. See Gen. xxxvii. 10.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,0 +1,1 @@
+{"text": "Or cast thy body to the fire,\nOr bind around thy neck the rope:\nNo other refuge mayst thou hope.\nWhen Ráma, lord of valour true,\nHas gained the earth, his right and due,\nThen, free from duty’s binding debt,\nMy vanished sin shall I forget.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

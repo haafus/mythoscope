@@ -1,0 +1,1 @@
+{"text": "Then shall his furious shafts be sped,\nEach like a snake with fiery head,\nAnd in their flight shall hiss and flame\nMarked with the mighty archer’s name.(833)\nThen in the fiery deluge all\nThy giants round their king shall fall.”", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

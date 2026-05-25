@@ -1,0 +1,1 @@
+{"text": "CONTENTS.\n\n_________\n\nA TABLE\n\nOF THE\n\nSECTIONS OF THE PRELIMINARY DISCOURSE\n\n_________", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,12 +1,29 @@
-from .builder import EmbeddingBuilder
-from .build_embeddings import build_embeddings
-from .config_manager import ConfigManager
-from .performance_metrics import PerformanceMetrics
-from .cache_validator import CacheValidator
-from .cache_utils import load_from_cache, save_to_cache, cleanup_cache, get_cache_key
-from .models_repository import MODELS
-from .chunking import create_chunking_strategies, ChunkingStrategy
-from .chroma_manager import save_to_chroma_collection, delete_collection, query_chroma_collection, get_chroma_collection
+from importlib import import_module
+
+from .chroma_manager import (
+    collection_name_for_model,
+    delete_collection,
+    get_chroma_collection,
+    is_model_collection_name,
+    query_chroma_collection,
+    save_to_chroma_collection,
+)
+
+
+_LAZY_IMPORTS = {
+    "EmbeddingBuilder": (".builder", "EmbeddingBuilder"),
+    "build_embeddings": (".build_embeddings", "build_embeddings"),
+    "ConfigManager": (".config_manager", "ConfigManager"),
+    "PerformanceMetrics": (".performance_metrics", "PerformanceMetrics"),
+    "CacheValidator": (".cache_validator", "CacheValidator"),
+    "load_from_cache": (".cache_utils", "load_from_cache"),
+    "save_to_cache": (".cache_utils", "save_to_cache"),
+    "cleanup_cache": (".cache_utils", "cleanup_cache"),
+    "get_cache_key": (".cache_utils", "get_cache_key"),
+    "MODELS": (".models_repository", "MODELS"),
+    "create_chunking_strategies": (".chunking", "create_chunking_strategies"),
+    "ChunkingStrategy": (".chunking", "ChunkingStrategy"),
+}
 
 __all__ = [
     "EmbeddingBuilder",
@@ -25,4 +42,16 @@ __all__ = [
     "delete_collection",
     "query_chroma_collection",
     "get_chroma_collection",
+    "collection_name_for_model",
+    "is_model_collection_name",
 ]
+
+
+def __getattr__(name):
+    if name not in _LAZY_IMPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    module_name, attr_name = _LAZY_IMPORTS[name]
+    value = getattr(import_module(module_name, __name__), attr_name)
+    globals()[name] = value
+    return value

@@ -1,13 +1,26 @@
+import logging
 import os
 import yaml
 from pathlib import Path
 from typing import Optional
+from logging.handlers import RotatingFileHandler
 
+logger = logging.getLogger(__name__)
 
 class AnalyzerConfig:
     def __init__(self, config_path: str = "config.yaml"):
-        self.config_path = Path(config_path)
+        self.config_path = self._resolve_config_path(config_path)
         self._config = self._load_config()
+
+    @staticmethod
+    def _resolve_config_path(config_path: str) -> Path:
+        path = Path(config_path)
+        package_config = Path(__file__).with_name("config.yaml")
+        if path.exists():
+            return path
+        if path.name == "config.yaml" and package_config.exists():
+            return package_config
+        return path
 
     def _load_config(self):
         if self.config_path.exists():
@@ -30,6 +43,44 @@ class AnalyzerConfig:
     @property
     def corpus_metadata_path(self) -> str:
         return os.path.join(self.corpus_dir, 'corpus_metadata.json')
+
+    @property
+    def visualization_params(self) -> dict:
+        return self._config.get('visualization', {})
+
+    @property
+    def umap_configs(self) -> list:
+        default = [
+            {'n_neighbors': 5, 'min_dist': 0.1},
+            {'n_neighbors': 15, 'min_dist': 0.1},
+            {'n_neighbors': 50, 'min_dist': 0.1},
+            {'n_neighbors': 15, 'min_dist': 0.5},
+            {'n_neighbors': 15, 'min_dist': 0.8}
+        ]
+        return self.visualization_params.get('umap_configs', default)
+
+    @property
+    def tsne_configs(self) -> list:
+        default = [
+            {'perplexity': 5},
+            {'perplexity': 30},
+            {'perplexity': 50}
+        ]
+        return self.visualization_params.get('tsne_configs', default)
+
+    @property
+    def pca_configs(self) -> list:
+        default = [{}]
+        return self.visualization_params.get('pca_configs', default)
+
+    @property
+    def baseline_configs(self) -> dict:
+        default = {
+            'umap': {'n_neighbors': 15, 'min_dist': 0.1},
+            'tsne': {'perplexity': 30},
+            'pca': {}
+        }
+        return self.visualization_params.get('baseline_configs', default)
 
 
 _analyzer_config = None
@@ -88,14 +139,54 @@ def get_model_output_dir(model_name: str) -> str:
     safe_name = model_name.replace("/", "_").replace("\\", "_")
     return os.path.join(config.output_dir, safe_name)
 
-
-def CORPUS_METADATA_PATH():
-    return get_corpus_metadata_path()
-
-
 def CHROMA_PATH():
     return get_chroma_path()
 
 
 def OUTPUT_DIR():
     return get_output_dir()
+
+def setup_logging(log_dir: str = "logs", log_filename: str = "analyzer.log", clear_handlers: bool = False):
+    """Set up logging to file and console."""
+    
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, log_filename)
+
+    
+    formatter = logging.Formatter(
+        fmt='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    
+    file_handler = RotatingFileHandler(log_path, maxBytes=5*1024*1024, backupCount=3, encoding='utf-8')
+    file_handler.setFormatter(formatter)
+
+    
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+
+    
+    if clear_handlers and root_logger.hasHandlers():
+        root_logger.handlers.clear()
+
+    log_path_resolved = os.path.abspath(log_path)
+    has_file_handler = any(
+        isinstance(handler, RotatingFileHandler)
+        and getattr(handler, "baseFilename", None) == log_path_resolved
+        for handler in root_logger.handlers
+    )
+    has_console_handler = any(
+        isinstance(handler, logging.StreamHandler)
+        and not isinstance(handler, logging.FileHandler)
+        for handler in root_logger.handlers
+    )
+
+    if not has_file_handler:
+        root_logger.addHandler(file_handler)
+    if not has_console_handler:
+        root_logger.addHandler(console_handler)

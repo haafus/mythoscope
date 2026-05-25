@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Optional
 
 from .builder import EmbeddingBuilder
-from .build_embeddings import build_embeddings
+from .build_embeddings import build_embeddings, normalize_text_type
+from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
 from .config_manager import ConfigManager
 from .performance_metrics import PerformanceMetrics
 from .cache_validator import CacheValidator
@@ -26,13 +27,11 @@ def cli(ctx, config: str, verbose: bool):
 @cli.command()
 @click.option('--model', '-m', default=None, help='Embedding model to use')
 @click.option('--chunking', '-ch', default=None, help='Chunking strategy')
-@click.option('--text-type', '-t', default=None, type=click.Choice(['original', 'translate', 'both']))
+@click.option('--text-type', '-t', default=None, type=click.Choice(['original', 'translate', 'translation', 'all', 'both']))
 @click.option('--batch-size', '-b', default=None, type=int, help='Batch size for encoding')
-@click.option('--clear/--no-clear', default=None, help='Clear existing collection')
-@click.option('--collection', '-col', default='corpus', help='Chroma collection name')
 @click.pass_context
 def generate(ctx, model: Optional[str], chunking: Optional[str], text_type: Optional[str],
-             batch_size: Optional[int], clear: Optional[bool], collection: str):
+             batch_size: Optional[int]):
     config_mgr = ctx.obj['config_manager']
 
     if model:
@@ -40,19 +39,19 @@ def generate(ctx, model: Optional[str], chunking: Optional[str], text_type: Opti
     if chunking:
         config_mgr.set('embedding.default_chunking', chunking)
     if text_type:
-        config_mgr.set('embedding.text_type', text_type)
+        config_mgr.set('embedding.text_type', normalize_text_type(text_type))
     if batch_size:
         config_mgr.set('embedding.batch_size', batch_size)
-    if clear is not None:
-        config_mgr.set('embedding.clear_existing', clear)
-
     metrics = PerformanceMetrics(config_mgr.get('performance.metrics_file'))
     metrics.start_operation('generate_embeddings')
 
     try:
         builder = build_embeddings(
-            clear_existing=config_mgr.get('embedding.clear_existing'),
-            batch_size=config_mgr.get('embedding.batch_size')
+            batch_size=config_mgr.get('embedding.batch_size'),
+            config_path=str(config_mgr.config_path),
+            model_name=model,
+            chunking=chunking,
+            text_type=normalize_text_type(text_type) if text_type else None,
         )
         click.echo(click.style("✓ Embeddings generated successfully", fg='green'))
     except Exception as e:
@@ -65,11 +64,10 @@ def generate(ctx, model: Optional[str], chunking: Optional[str], text_type: Opti
 
 @cli.command()
 @click.argument('query')
-@click.option('--collection', '-col', default='corpus', help='Chroma collection name')
 @click.option('--top-k', '-k', default=5, type=int, help='Number of results to return')
 @click.option('--model', '-m', default=None, help='Model to use for query encoding')
 @click.pass_context
-def query(ctx, query: str, collection: str, top_k: int, model: Optional[str]):
+def query(ctx, query: str, top_k: int, model: Optional[str]):
     config_mgr = ctx.obj['config_manager']
 
     builder = EmbeddingBuilder(
@@ -84,7 +82,7 @@ def query(ctx, query: str, collection: str, top_k: int, model: Optional[str]):
     )
 
     try:
-        results = builder.query_chroma(query, collection, top_k)
+        results = builder.query_chroma(query, top_k=top_k)
         click.echo(f"\n{'=' * 60}")
         click.echo(click.style(f"Query: {query}", fg='cyan', bold=True))
         click.echo(f"{'=' * 60}\n")
@@ -187,21 +185,27 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
 
 
 @cli.command()
-@click.option('--collection', '-col', default='corpus', help='Collection name')
+@click.option('--model', '-m', default=None, help='Model whose collection should be deleted')
 @click.option('--yes', is_flag=True, help='Skip confirmation')
 @click.pass_context
-def clear_cache(ctx, collection: str, yes: bool):
+def clear_cache(ctx, model: Optional[str], yes: bool):
     config_mgr = ctx.obj['config_manager']
+    model_name = model or config_mgr.get('embedding.default_model')
+    collection = collection_name_for_model(model_name)
 
     if not yes:
-        click.confirm(f"Delete collection '{collection}'?", abort=True)
+        click.confirm(f"Delete collection '{collection}' for model '{model_name}'?", abort=True)
 
     import chromadb
-    client = chromadb.PersistentClient(path=config_mgr.get('paths.chroma_path'))
+    chroma_path = ensure_chroma_writable(config_mgr.get('paths.chroma_path'))
+    client = chromadb.PersistentClient(path=str(chroma_path))
 
     try:
-        client.delete_collection(collection)
-        click.echo(click.style(f"✓ Collection '{collection}' deleted", fg='green'))
+        deleted = delete_collection(client, collection)
+        if deleted:
+            click.echo(click.style(f"Collection '{collection}' deleted", fg='green'))
+        else:
+            click.echo(click.style(f"Collection '{collection}' does not exist", fg='yellow'))
     except Exception as e:
         click.echo(click.style(f"✗ Error deleting collection: {e}", fg='red'))
 

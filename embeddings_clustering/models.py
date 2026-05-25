@@ -1,26 +1,73 @@
+import logging
 import numpy as np
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, List
 from sklearn.cluster import (
     KMeans,
-    AgglomerativeClustering,
-    DBSCAN,
     Birch,
     SpectralClustering,
     MeanShift,
-    OPTICS
+    OPTICS,
+    HDBSCAN
 )
-from sklearn.preprocessing import StandardScaler
+from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import Normalizer
+from sklearn.cluster import estimate_bandwidth
+
+logger = logging.getLogger(__name__)
 
 
 class BaseClusteringModel:
-
-    def __init__(self, name: str, **params):
+    def __init__(
+            self,
+            name: str,
+            min_samples_required: int = 2,
+            needs_dim_reduction: bool = False,
+            n_components: int = 15,
+            **params
+    ):
         self.name = name
+        self.min_samples_required = min_samples_required
+        self.needs_dim_reduction = needs_dim_reduction
+        self.n_components = n_components
         self.params = params
         self.model = None
-        self.scaler = StandardScaler()
+        self.scaler = Normalizer(norm='l2')
+        self.processed_embeddings = None  
 
     def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
+        if len(embeddings) < self.min_samples_required:
+            self.processed_embeddings = embeddings
+            return np.zeros(len(embeddings), dtype=int)
+
+        data_ready = self.scaler.fit_transform(embeddings)
+
+        if self.needs_dim_reduction and data_ready.shape[1] > self.n_components:
+            data_ready = self._reduce_dimensions(data_ready)
+
+        
+        self.processed_embeddings = data_ready
+
+        return self._do_fit_predict(data_ready)
+
+    def _reduce_dimensions(self, data: np.ndarray) -> np.ndarray:
+        actual_components = min(self.n_components, len(data) - 2)
+        actual_components = max(2, actual_components)
+
+        try:
+            import umap
+            reducer = umap.UMAP(
+                n_components=actual_components,
+                metric='cosine',
+                random_state=42
+            )
+            return reducer.fit_transform(data)
+        except ImportError:
+            logger.warning("umap is not installed. Using PCA for dimensionality reduction.")
+            from sklearn.decomposition import PCA
+            reducer = PCA(n_components=actual_components, random_state=42)
+            return reducer.fit_transform(data)
+
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         raise NotImplementedError
 
     def get_params_info(self) -> Dict:
@@ -29,162 +76,104 @@ class BaseClusteringModel:
     def get_description(self) -> str:
         return f"{self.name}: {self.params}"
 
-
 class KMeansClustering(BaseClusteringModel):
-    def __init__(self, n_clusters: int = None, max_clusters: int = 1000, **kwargs):
+    def __init__(self, n_clusters: int = 2, **kwargs):
         super().__init__("kmeans", **kwargs)
         self.n_clusters = n_clusters
-        self.max_clusters = max_clusters
 
-    def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
-        if len(embeddings) < 2:
-            return np.zeros(len(embeddings), dtype=int)
-
-        embeddings_scaled = self.scaler.fit_transform(embeddings)
-
-        if self.n_clusters is None:
-            max_k = min(self.max_clusters, len(embeddings) - 1)
-            if max_k < 2:
-                self.n_clusters = 1
-            else:
-                best_k = 2
-                best_score = -1
-
-                for k in range(2, min(max_k + 1, 11)):
-                    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-                    labels = kmeans.fit_predict(embeddings_scaled)
-
-                    if len(set(labels)) > 1:
-                        from sklearn.metrics import silhouette_score
-                        score = silhouette_score(embeddings_scaled, labels)
-                        if score > best_score:
-                            best_score = score
-                            best_k = k
-
-                self.n_clusters = best_k
-                print(f"  • Автоматически выбрано {self.n_clusters} кластеров (silhouette={best_score:.3f})")
-
-        self.n_clusters = max(1, min(self.n_clusters, len(embeddings)))
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = KMeans(n_clusters=self.n_clusters, random_state=42, n_init=10)
-        return self.model.fit_predict(embeddings_scaled)
+        return self.model.fit_predict(data)
 
 
-class AgglomerativeClusteringModel(BaseClusteringModel):
+class HDBSCANClustering(BaseClusteringModel):
+    def __init__(self, min_cluster_size: int = 200, **kwargs):
+        super().__init__("hdbscan", needs_dim_reduction=True, **kwargs)
+        self.min_cluster_size = min_cluster_size
 
-    def __init__(self, n_clusters: int = None, distance_threshold: float = None, **kwargs):
-        super().__init__("agglomerative", **kwargs)
-        self.n_clusters = n_clusters
-        self.distance_threshold = distance_threshold
-
-    def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
-        if len(embeddings) < 2:
-            return np.zeros(len(embeddings), dtype=int)
-
-        embeddings_scaled = self.scaler.fit_transform(embeddings)
-
-        if self.n_clusters is None and self.distance_threshold is None:
-            self.distance_threshold = 1.5
-
-        self.model = AgglomerativeClustering(
-            n_clusters=self.n_clusters,
-            distance_threshold=self.distance_threshold,
-            metric='euclidean',
-            linkage='ward'
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
+        self.model = HDBSCAN(
+            min_cluster_size=self.min_cluster_size,
+            metric='euclidean'
         )
-        return self.model.fit_predict(embeddings_scaled)
-
-
-class DBSCANClustering(BaseClusteringModel):
-
-    def __init__(self, eps: float = 0.5, min_samples: int = 5, auto_eps: bool = True, **kwargs):
-        super().__init__("dbscan", **kwargs)
-        self.eps = eps
-        self.min_samples = min_samples
-        self.auto_eps = auto_eps
-
-    def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
-        if len(embeddings) < 2:
-            return np.zeros(len(embeddings), dtype=int)
-
-        embeddings_scaled = self.scaler.fit_transform(embeddings)
-
-        if self.auto_eps:
-            from sklearn.neighbors import NearestNeighbors
-            n_neighbors = min(20, len(embeddings) - 1)
-            if n_neighbors > 1:
-                nn = NearestNeighbors(n_neighbors=n_neighbors)
-                nn.fit(embeddings_scaled)
-                distances, _ = nn.kneighbors(embeddings_scaled)
-                avg_distances = np.mean(distances, axis=1)
-                self.eps = np.percentile(avg_distances, 90)
-            else:
-                self.eps = 0.5
-
-        self.model = DBSCAN(eps=self.eps, min_samples=self.min_samples)
-        return self.model.fit_predict(embeddings_scaled)
+        return self.model.fit_predict(data)
 
 
 class SpectralClusteringModel(BaseClusteringModel):
-
-    def __init__(self, n_clusters: int = None, max_clusters: int = 1000, **kwargs):
-        super().__init__("spectral", **kwargs)
+    def __init__(self, n_clusters: int = 2, **kwargs):
+        super().__init__("spectral", min_samples_required=3, **kwargs)
         self.n_clusters = n_clusters
-        self.max_clusters = max_clusters
 
-    def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
-        if len(embeddings) < 3:
-            return np.zeros(len(embeddings), dtype=int)
-
-        embeddings_scaled = self.scaler.fit_transform(embeddings)
-
-        if self.n_clusters is None:
-            best_score = -1
-            best_n = 2
-            max_n = min(self.max_clusters, len(embeddings) - 1)
-
-            for n in range(2, max_n + 1):
-                try:
-                    spectral = SpectralClustering(n_clusters=n, random_state=42, affinity='nearest_neighbors')
-                    labels = spectral.fit_predict(embeddings_scaled)
-                    if len(set(labels)) > 1:
-                        from sklearn.metrics import silhouette_score
-                        score = silhouette_score(embeddings_scaled, labels)
-                        if score > best_score:
-                            best_score = score
-                            best_n = n
-                except Exception:
-                    continue
-
-            self.n_clusters = best_n
-
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = SpectralClustering(n_clusters=self.n_clusters, random_state=42, affinity='nearest_neighbors')
-        return self.model.fit_predict(embeddings_scaled)
+        return self.model.fit_predict(data)
 
 
 class BirchClustering(BaseClusteringModel):
-
-    def __init__(self, n_clusters: int = None, threshold: float = 0.5, **kwargs):
+    def __init__(self, n_clusters: int = 2, threshold: float = 0.5, **kwargs):
         super().__init__("birch", **kwargs)
         self.n_clusters = n_clusters
         self.threshold = threshold
 
-    def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
-        if len(embeddings) < 2:
-            return np.zeros(len(embeddings), dtype=int)
-
-        embeddings_scaled = self.scaler.fit_transform(embeddings)
-
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = Birch(n_clusters=self.n_clusters, threshold=self.threshold)
-        return self.model.fit_predict(embeddings_scaled)
+        return self.model.fit_predict(data)
+
+
+class GMMClustering(BaseClusteringModel):
+    def __init__(self, n_components: int = 2, **kwargs):
+        super().__init__("gmm", needs_dim_reduction=True, **kwargs)
+        self.n_components = n_components
+
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
+        self.model = GaussianMixture(n_components=self.n_components, random_state=42)
+        return self.model.fit_predict(data)
+
+class MeanShiftClustering(BaseClusteringModel):
+    def __init__(self, **kwargs):
+        super().__init__("meanshift", needs_dim_reduction=True, **kwargs)
+
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
+        
+        
+        bandwidth = estimate_bandwidth(
+            data,
+            quantile=0.05,
+            n_samples=2000,
+            random_state=42
+        )
+
+        
+        if bandwidth <= 0:
+            bandwidth = 1.0  
+            logger.warning("Estimated bandwidth <= 0, using 1.0")
+
+        logger.info(f"MeanShift will use bandwidth: {bandwidth:.4f}")
+
+        
+        self.model = MeanShift(bandwidth=bandwidth, bin_seeding=True)
+        return self.model.fit_predict(data)
+
+
+class OPTICSClustering(BaseClusteringModel):
+    def __init__(self, min_samples: int = 200, **kwargs):
+        super().__init__("optics", needs_dim_reduction=True, **kwargs)
+        self.min_samples = min_samples
+
+    def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
+        self.model = OPTICS(min_samples=self.min_samples)
+        return self.model.fit_predict(data)
 
 
 def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
     models = {
         'kmeans': KMeansClustering,
-        'agglomerative': AgglomerativeClusteringModel,
-        'dbscan': DBSCANClustering,
+        'hdbscan': HDBSCANClustering,
         'spectral': SpectralClusteringModel,
         'birch': BirchClustering,
+        'gmm': GMMClustering,
+        'meanshift': MeanShiftClustering,
+        'optics': OPTICSClustering
     }
 
     if model_name not in models:
@@ -195,4 +184,4 @@ def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
 
 
 def list_available_models() -> List[str]:
-    return ['kmeans', 'agglomerative', 'dbscan']
+    return ['kmeans', 'hdbscan', 'spectral', 'birch', 'gmm', 'meanshift', 'optics']

@@ -1,0 +1,1 @@
+{"text": "1 Vide Kor. c. 18. 2 Pocock. ubi sup. p. 282-289. 3\nHyde, de Rel. Vet. Pers. p. 245, 402, &c.\n1 Midrash, Yalkut Reubeni. § Gehinnom. 2 Kor. c. 15.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

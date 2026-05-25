@@ -1,0 +1,1 @@
+{"text": "1 Al Beidâwi, Jallalo'ddin. 2 See chapter 19, p. 228.\n 3 Al Beidâwi. 4 Idem.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

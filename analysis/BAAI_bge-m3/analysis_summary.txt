@@ -1,18 +1,31 @@
 Embedding Analysis Summary
-============================================================
 Model: BAAI/bge-m3
-Total chunks in DB: 1436
-Chunks of selected model: 1436
+Total chunks in DB: 25673
+Chunks of selected model: 25673
 Embedding dimension: 1024
-Number of traditions: 6
+Number of traditions: 23
 
-============================================================
 DISTRIBUTION BY TRADITIONS
-------------------------------------------------------------
-  legends_of_the_gods_budge     :  465 ( 32.4%)
-  codex_junius_old_english      :  360 ( 25.1%)
-  ancient_egyptian_legends_murray:  249 ( 17.3%)
-  ainu_folk_tales               :  195 ( 13.6%)
-  egyptian_book_of_the_dead     :   85 (  5.9%)
-  australian_aboriginal_myths   :   82 (  5.7%)
-============================================================
+  Hinduism                      : 8102 ( 31.6%)
+  Christianity                  : 6076 ( 23.7%)
+  Islam                         : 3035 ( 11.8%)
+  Greek                         : 2166 (  8.4%)
+  Finnish                       : 1340 (  5.2%)
+  Chinese                       : 1037 (  4.0%)
+  Roman                         :  792 (  3.1%)
+  Celtic                        :  766 (  3.0%)
+  Polynesian                    :  370 (  1.4%)
+  Anglo-Saxon                   :  328 (  1.3%)
+  Babylonian                    :  278 (  1.1%)
+  Australian Aboriginal         :  277 (  1.1%)
+  West African                  :  245 (  1.0%)
+  Confucianism                  :  238 (  0.9%)
+  Japanese Buddhism             :  123 (  0.5%)
+  Maya                          :  105 (  0.4%)
+  Taoism                        :   87 (  0.3%)
+  Ancient Egyptian              :   85 (  0.3%)
+  Buddhism                      :   84 (  0.3%)
+  Australian                    :   82 (  0.3%)
+  Germanic                      :   31 (  0.1%)
+  Maori                         :   24 (  0.1%)
+  Norse                         :    2 (  0.0%)

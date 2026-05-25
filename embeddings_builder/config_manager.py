@@ -6,20 +6,23 @@ from copy import deepcopy
 
 
 class ConfigManager:
+    PACKAGE_CONFIG = Path(__file__).with_name("config.yaml")
 
     DEFAULTS = {
         "paths": {
             "corpus_dir": "corpus",
             "out_dir": "analysis",
             "chroma_path": "./chroma_db",
-            "cache_dir": "./cache"
+            "cache_dir": "./cache",
+            "chunked_dir": "corpus_chunked"
         },
         "embedding": {
             "default_model": "BAAI/bge-m3",
             "default_chunking": "paragraph",
-            "text_type": "both",
+            "text_type": "all",
             "batch_size": 32,
-            "clear_existing": True
+            "cache_batch_size": 50,
+            "chroma_batch_size": 100
         },
         "chunking": {
             "fixed_size": {"chunk_size": 512, "chunk_overlap": 64},
@@ -46,11 +49,23 @@ class ConfigManager:
     }
 
     def __init__(self, config_path: Optional[str] = None):
-        self.config_path = Path(config_path) if config_path else None
+        self.config_path = self._resolve_config_path(config_path)
         self._config = deepcopy(self.DEFAULTS)
 
         if self.config_path and self.config_path.exists():
             self.load()
+
+    @classmethod
+    def _resolve_config_path(cls, config_path: Optional[str]) -> Optional[Path]:
+        if config_path is None:
+            return cls.PACKAGE_CONFIG if cls.PACKAGE_CONFIG.exists() else None
+
+        path = Path(config_path)
+        if path.exists():
+            return path
+        if path.name == "config.yaml" and cls.PACKAGE_CONFIG.exists():
+            return cls.PACKAGE_CONFIG
+        return path
 
     def load(self) -> None:
         if not self.config_path or not self.config_path.exists():
@@ -115,34 +130,34 @@ class ConfigManager:
 
         corpus_dir = self.get('paths.corpus_dir')
         if not Path(corpus_dir).exists():
-            issues.append(f"Корневая директория не существует: {corpus_dir}")
+            issues.append(f"Root directory does not exist: {corpus_dir}")
 
         out_dir = self.get('paths.out_dir')
         if out_dir:
             try:
                 Path(out_dir).mkdir(parents=True, exist_ok=True)
             except Exception as e:
-                issues.append(f"Не удалось создать выходную директорию {out_dir}: {e}")
+                issues.append(f"Failed to create output directory {out_dir}: {e}")
 
         batch_size = self.get('embedding.batch_size')
         if not isinstance(batch_size, int) or batch_size < 1 or batch_size > 1024:
-            issues.append(f"batch_size должен быть между 1 и 1024, получено: {batch_size}")
+            issues.append(f"batch_size must be between 1 and 1024, got: {batch_size}")
 
         text_type = self.get('embedding.text_type')
-        if text_type not in ['original', 'translate', 'both']:
-            issues.append(f"Некорректный text_type: {text_type}. Допустимые значения: original, translate, both")
+        if text_type not in ['original', 'translate', 'translation', 'all', 'both']:
+            issues.append(f"Invalid text_type: {text_type}. Allowed values: original, translate, all")
 
         chunking = self.get('embedding.default_chunking')
         valid_strategies = ['character', 'sentence', 'paragraph']
         if chunking not in valid_strategies:
-            issues.append(f"Некорректная стратегия чанкинга: {chunking}. Допустимые: {valid_strategies}")
+            issues.append(f"Invalid chunking strategy: {chunking}. Allowed: {valid_strategies}")
 
         cache_validation = self.get('cache.validation')
         if cache_validation not in ['crc32', 'md5', 'none']:
-            issues.append(f"Некорректный метод валидации кэша: {cache_validation}")
+            issues.append(f"Invalid cache validation method: {cache_validation}")
 
         ttl_days = self.get('cache.ttl_days')
         if not isinstance(ttl_days, int) or ttl_days < 0:
-            issues.append(f"ttl_days должен быть неотрицательным целым числом, получено: {ttl_days}")
+            issues.append(f"ttl_days must be a non-negative integer, got: {ttl_days}")
 
         return issues

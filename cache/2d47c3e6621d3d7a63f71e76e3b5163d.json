@@ -1,0 +1,1 @@
+{"text": "4 Al Beidâwi. 5 Idem. 1 Idem. 2. Idem.\n 3 Idem.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

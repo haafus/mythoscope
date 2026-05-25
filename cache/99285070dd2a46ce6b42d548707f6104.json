@@ -1,0 +1,1 @@
+{"text": " And set insatiate Ithacus at ease.’\n This fair unfinish’d tale, these broken starts,\n Rais’d expectations in our longing hearts:\n Unknowing as we were in Grecian arts.\n His former trembling once again renew’d,\n With acted fear, the villain thus pursued:", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

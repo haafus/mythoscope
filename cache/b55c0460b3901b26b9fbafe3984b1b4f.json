@@ -1,0 +1,1 @@
+{"text": "Canto XVI. Rávan’s Speech.\n\nThen, while his breast with fury swelled,\nThus Rávaṇ spoke, as fate impelled:", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

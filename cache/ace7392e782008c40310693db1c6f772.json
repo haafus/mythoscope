@@ -1,0 +1,1 @@
+{"text": "[Footnote 1: Published by King, _Cuneiform Texts_, Part XXV,\nPlate 50.]\n\n[Footnote 2: Thus he is equated with En-Urta, Nergal, En-lil, Nabu,\nSin, Shamash, Adad, etc.]", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

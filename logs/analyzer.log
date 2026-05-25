@@ -1,0 +1,1045 @@
+2026-05-23 05:55:03 [INFO] embedding_analyzer.analyzer: Available models: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-23 05:55:03 [INFO] embedding_analyzer.analyzer: Use .set_model('model_name') to load data
+2026-05-23 05:55:03 [INFO] embedding_analyzer.visualization: Models queued for analysis: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-23 05:55:03 [INFO] embedding_analyzer.visualization: Starting model analysis: BAAI/bge-m3
+2026-05-23 05:55:08 [INFO] embedding_analyzer.analyzer: Loading data for model: BAAI/bge-m3...
+2026-05-23 05:55:11 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 05:55:11 [INFO] embedding_analyzer.visualization: CSV saved: analysis/BAAI_bge-m3/embeddings_data.csv
+2026-05-23 05:55:11 [INFO] embedding_analyzer.visualization: Text summary saved: analysis/BAAI_bge-m3/analysis_summary.txt
+2026-05-23 05:55:11 [INFO] embedding_analyzer.analyzer: Model information saved: analysis/BAAI_bge-m3/model_info.json
+2026-05-23 05:55:11 [INFO] embedding_analyzer.analyzer: Model list saved: analysis/models.json
+2026-05-23 05:55:11 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-23 05:55:11 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-23 05:55:27 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 05:55:38 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 05:56:01 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 05:56:12 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 05:56:22 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 05:56:22 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-23 05:56:24 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/tsne_2d_perplexity-5_traditions.html
+2026-05-23 05:56:27 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/tsne_2d_perplexity-30_traditions.html
+2026-05-23 05:56:30 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/tsne_2d_perplexity-50_traditions.html
+2026-05-23 05:56:30 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-23 05:56:32 [INFO] embedding_analyzer.visualization: Saved: analysis/BAAI_bge-m3/pca_2d_traditions.html
+2026-05-23 05:56:32 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-23 05:56:32 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-23 05:56:32 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-23 05:56:41 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-23 05:56:51 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-23 05:57:02 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-23 05:57:11 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-23 05:57:21 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/BAAI_bge-m3/umap_hyperparameters_dashboard.html
+2026-05-23 05:57:21 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-23 05:57:21 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-23 05:57:23 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-23 05:57:25 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-23 05:57:28 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/BAAI_bge-m3/tsne_hyperparameters_dashboard.html
+2026-05-23 05:57:28 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-23 05:57:28 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-23 05:57:28 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-23 05:57:38 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-23 05:57:38 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis/BAAI_bge-m3/methods_comparison.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis/BAAI_bge-m3/distance_heatmap.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis/BAAI_bge-m3/tradition_distribution.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/pca_2d_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/tradition_distribution.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/tsne_2d_perplexity-30_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/distance_heatmap.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/umap_hyperparameters_dashboard.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/tsne_2d_perplexity-50_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/tsne_2d_perplexity-5_traditions.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/methods_comparison.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Added click handler to analysis/BAAI_bge-m3/tsne_hyperparameters_dashboard.html
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: 
+All visualizations for BAAI/bge-m3 saved to: analysis/BAAI_bge-m3
+2026-05-23 05:57:41 [INFO] embedding_analyzer.visualization: Starting model analysis: Qwen/Qwen3-Embedding
+2026-05-23 05:57:47 [INFO] embedding_analyzer.analyzer: Loading data for model: Qwen/Qwen3-Embedding...
+2026-05-23 05:57:51 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 05:57:52 [INFO] embedding_analyzer.visualization: CSV saved: analysis/Qwen_Qwen3-Embedding/embeddings_data.csv
+2026-05-23 05:57:52 [INFO] embedding_analyzer.visualization: Text summary saved: analysis/Qwen_Qwen3-Embedding/analysis_summary.txt
+2026-05-23 05:57:52 [INFO] embedding_analyzer.analyzer: Model information saved: analysis/Qwen_Qwen3-Embedding/model_info.json
+2026-05-23 05:57:52 [INFO] embedding_analyzer.analyzer: Model list saved: analysis/models.json
+2026-05-23 05:57:52 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-23 05:57:52 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-23 05:58:00 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 05:58:12 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 05:58:42 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 05:58:54 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 05:59:06 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 05:59:06 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-23 05:59:09 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-5_traditions.html
+2026-05-23 05:59:12 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-30_traditions.html
+2026-05-23 05:59:15 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-50_traditions.html
+2026-05-23 05:59:15 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-23 05:59:16 [INFO] embedding_analyzer.visualization: Saved: analysis/Qwen_Qwen3-Embedding/pca_2d_traditions.html
+2026-05-23 05:59:16 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-23 05:59:16 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-23 05:59:16 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-23 05:59:30 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-23 05:59:45 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-23 06:00:01 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-23 06:00:15 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-23 06:00:30 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/Qwen_Qwen3-Embedding/umap_hyperparameters_dashboard.html
+2026-05-23 06:00:30 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-23 06:00:30 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-23 06:00:32 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-23 06:00:34 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-23 06:00:37 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/Qwen_Qwen3-Embedding/tsne_hyperparameters_dashboard.html
+2026-05-23 06:00:37 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-23 06:00:37 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-23 06:00:37 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-23 06:00:52 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-23 06:00:52 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis/Qwen_Qwen3-Embedding/methods_comparison.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis/Qwen_Qwen3-Embedding/distance_heatmap.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis/Qwen_Qwen3-Embedding/tradition_distribution.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/pca_2d_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/tradition_distribution.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/distance_heatmap.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/umap_hyperparameters_dashboard.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/methods_comparison.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Added click handler to analysis/Qwen_Qwen3-Embedding/tsne_hyperparameters_dashboard.html
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: 
+All visualizations for Qwen/Qwen3-Embedding saved to: analysis/Qwen_Qwen3-Embedding
+2026-05-23 06:00:55 [INFO] embedding_analyzer.visualization: Starting model analysis: intfloat/e5-large-v2
+2026-05-23 06:01:01 [INFO] embedding_analyzer.analyzer: Loading data for model: intfloat/e5-large-v2...
+2026-05-23 06:01:04 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:01:04 [INFO] embedding_analyzer.visualization: CSV saved: analysis/intfloat_e5-large-v2/embeddings_data.csv
+2026-05-23 06:01:04 [INFO] embedding_analyzer.visualization: Text summary saved: analysis/intfloat_e5-large-v2/analysis_summary.txt
+2026-05-23 06:01:04 [INFO] embedding_analyzer.analyzer: Model information saved: analysis/intfloat_e5-large-v2/model_info.json
+2026-05-23 06:01:04 [INFO] embedding_analyzer.analyzer: Model list saved: analysis/models.json
+2026-05-23 06:01:04 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-23 06:01:04 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-23 06:01:11 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:01:22 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:01:45 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:01:55 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:02:07 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:02:07 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-23 06:02:09 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:02:11 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:02:14 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:02:14 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-23 06:02:15 [INFO] embedding_analyzer.visualization: Saved: analysis/intfloat_e5-large-v2/pca_2d_traditions.html
+2026-05-23 06:02:15 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-23 06:02:15 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-23 06:02:15 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-23 06:02:24 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-23 06:02:34 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-23 06:02:44 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-23 06:02:54 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-23 06:03:04 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/intfloat_e5-large-v2/umap_hyperparameters_dashboard.html
+2026-05-23 06:03:04 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-23 06:03:04 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-23 06:03:05 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-23 06:03:08 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-23 06:03:11 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/intfloat_e5-large-v2/tsne_hyperparameters_dashboard.html
+2026-05-23 06:03:11 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-23 06:03:11 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-23 06:03:11 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-23 06:03:21 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-23 06:03:21 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis/intfloat_e5-large-v2/methods_comparison.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis/intfloat_e5-large-v2/distance_heatmap.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis/intfloat_e5-large-v2/tradition_distribution.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/pca_2d_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/tradition_distribution.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/distance_heatmap.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/umap_hyperparameters_dashboard.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/methods_comparison.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis/intfloat_e5-large-v2/tsne_hyperparameters_dashboard.html
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: 
+All visualizations for intfloat/e5-large-v2 saved to: analysis/intfloat_e5-large-v2
+2026-05-23 06:03:24 [INFO] embedding_analyzer.visualization: Starting model analysis: sentence-transformers/LaBSE
+2026-05-23 06:03:30 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/LaBSE...
+2026-05-23 06:03:32 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:03:33 [INFO] embedding_analyzer.visualization: CSV saved: analysis/sentence-transformers_LaBSE/embeddings_data.csv
+2026-05-23 06:03:33 [INFO] embedding_analyzer.visualization: Text summary saved: analysis/sentence-transformers_LaBSE/analysis_summary.txt
+2026-05-23 06:03:33 [INFO] embedding_analyzer.analyzer: Model information saved: analysis/sentence-transformers_LaBSE/model_info.json
+2026-05-23 06:03:33 [INFO] embedding_analyzer.analyzer: Model list saved: analysis/models.json
+2026-05-23 06:03:33 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-23 06:03:33 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-23 06:03:39 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:03:51 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:04:12 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:04:22 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:04:33 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:04:33 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-23 06:04:35 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:04:38 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:04:41 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:04:41 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-23 06:04:42 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_LaBSE/pca_2d_traditions.html
+2026-05-23 06:04:42 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-23 06:04:42 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-23 06:04:42 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-23 06:04:50 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-23 06:04:58 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-23 06:05:08 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-23 06:05:17 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-23 06:05:26 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/sentence-transformers_LaBSE/umap_hyperparameters_dashboard.html
+2026-05-23 06:05:26 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-23 06:05:26 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-23 06:05:28 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-23 06:05:30 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-23 06:05:33 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/sentence-transformers_LaBSE/tsne_hyperparameters_dashboard.html
+2026-05-23 06:05:33 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-23 06:05:33 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-23 06:05:33 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-23 06:05:42 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-23 06:05:42 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis/sentence-transformers_LaBSE/methods_comparison.html
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis/sentence-transformers_LaBSE/distance_heatmap.html
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis/sentence-transformers_LaBSE/tradition_distribution.html
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:05:44 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/pca_2d_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/tradition_distribution.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/distance_heatmap.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/umap_hyperparameters_dashboard.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/methods_comparison.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_LaBSE/tsne_hyperparameters_dashboard.html
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: 
+All visualizations for sentence-transformers/LaBSE saved to: analysis/sentence-transformers_LaBSE
+2026-05-23 06:05:45 [INFO] embedding_analyzer.visualization: Starting model analysis: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+2026-05-23 06:05:51 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2...
+2026-05-23 06:05:52 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:05:53 [INFO] embedding_analyzer.visualization: CSV saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/embeddings_data.csv
+2026-05-23 06:05:53 [INFO] embedding_analyzer.visualization: Text summary saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/analysis_summary.txt
+2026-05-23 06:05:53 [INFO] embedding_analyzer.analyzer: Model information saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/model_info.json
+2026-05-23 06:05:53 [INFO] embedding_analyzer.analyzer: Model list saved: analysis/models.json
+2026-05-23 06:05:53 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-23 06:05:53 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-23 06:05:59 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:06:09 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:06:29 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:06:39 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:06:50 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:06:50 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-23 06:06:52 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:06:54 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:06:57 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:06:57 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-23 06:06:58 [INFO] embedding_analyzer.visualization: Saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/pca_2d_traditions.html
+2026-05-23 06:06:58 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-23 06:06:58 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-23 06:06:58 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-23 06:07:05 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-23 06:07:12 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-23 06:07:21 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-23 06:07:28 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-23 06:07:36 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_hyperparameters_dashboard.html
+2026-05-23 06:07:36 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-23 06:07:36 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-23 06:07:38 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-23 06:07:40 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-23 06:07:43 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_hyperparameters_dashboard.html
+2026-05-23 06:07:43 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-23 06:07:43 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-23 06:07:43 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-23 06:07:50 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-23 06:07:51 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/methods_comparison.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/distance_heatmap.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tradition_distribution.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/pca_2d_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tradition_distribution.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-30_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/distance_heatmap.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/umap_hyperparameters_dashboard.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-50_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_2d_perplexity-5_traditions.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/methods_comparison.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: Added click handler to analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/tsne_hyperparameters_dashboard.html
+2026-05-23 06:07:53 [INFO] embedding_analyzer.visualization: 
+All visualizations for sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 saved to: analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2
+2026-05-23 06:08:00 [INFO] embedding_analyzer.analyzer: Available models: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-23 06:08:00 [INFO] embedding_analyzer.analyzer: Use .set_model('model_name') to load data
+2026-05-23 06:08:00 [INFO] embeddings_clustering.run_clustering: Queued for clustering: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-23 06:08:00 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: BAAI/bge-m3
+2026-05-23 06:08:06 [INFO] embedding_analyzer.analyzer: Loading data for model: BAAI/bge-m3...
+2026-05-23 06:08:09 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:08:24 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:08:29 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:08:29 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:08:47 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 15
+2026-05-23 06:08:52 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:08:52 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:09:28 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:09:34 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/spectral/clusters_spectral.html
+2026-05-23 06:09:34 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:10:10 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:10:16 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/birch/clusters_birch.html
+2026-05-23 06:10:16 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:10:35 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:10:40 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/gmm/clusters_gmm.html
+2026-05-23 06:10:40 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:10:54 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.9772
+2026-05-23 06:10:54 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 5
+2026-05-23 06:11:00 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:11:00 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:11:29 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 15
+2026-05-23 06:11:33 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/BAAI_bge-m3/clustering/optics/clusters_optics.html
+2026-05-23 06:11:33 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/BAAI_bge-m3/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:11:33 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/BAAI_bge-m3/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:11:33 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: Qwen/Qwen3-Embedding
+2026-05-23 06:11:39 [INFO] embedding_analyzer.analyzer: Loading data for model: Qwen/Qwen3-Embedding...
+2026-05-23 06:11:43 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:12:04 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:12:11 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:12:11 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:12:29 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 13
+2026-05-23 06:12:34 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:12:34 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:13:11 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:13:18 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/spectral/clusters_spectral.html
+2026-05-23 06:13:18 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:14:28 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:14:35 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/birch/clusters_birch.html
+2026-05-23 06:14:35 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:14:55 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:15:00 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/gmm/clusters_gmm.html
+2026-05-23 06:15:00 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:15:15 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.9386
+2026-05-23 06:15:16 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 8
+2026-05-23 06:15:21 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:15:21 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:15:52 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 13
+2026-05-23 06:15:55 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/optics/clusters_optics.html
+2026-05-23 06:15:55 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:15:55 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/Qwen_Qwen3-Embedding/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:15:55 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: intfloat/e5-large-v2
+2026-05-23 06:16:01 [INFO] embedding_analyzer.analyzer: Loading data for model: intfloat/e5-large-v2...
+2026-05-23 06:16:03 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:16:18 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:16:23 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:16:23 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:16:40 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 16
+2026-05-23 06:16:45 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:16:45 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:17:27 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:17:33 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/spectral/clusters_spectral.html
+2026-05-23 06:17:33 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:17:33 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 1
+2026-05-23 06:17:33 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/birch/clusters_birch.html
+2026-05-23 06:17:33 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:17:53 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:17:58 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/gmm/clusters_gmm.html
+2026-05-23 06:17:58 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:18:12 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 2.0098
+2026-05-23 06:18:13 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 9
+2026-05-23 06:18:18 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:18:18 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:18:46 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 16
+2026-05-23 06:18:49 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/intfloat_e5-large-v2/clustering/optics/clusters_optics.html
+2026-05-23 06:18:49 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/intfloat_e5-large-v2/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:18:49 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/intfloat_e5-large-v2/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:18:49 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: sentence-transformers/LaBSE
+2026-05-23 06:18:55 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/LaBSE...
+2026-05-23 06:18:57 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:19:11 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:19:16 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:19:16 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:19:33 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 15
+2026-05-23 06:19:38 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:19:38 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:21:21 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:21:26 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/spectral/clusters_spectral.html
+2026-05-23 06:21:26 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:21:43 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:21:48 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/birch/clusters_birch.html
+2026-05-23 06:21:48 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:22:08 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:22:13 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/gmm/clusters_gmm.html
+2026-05-23 06:22:13 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:22:27 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.5823
+2026-05-23 06:22:27 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 5
+2026-05-23 06:22:33 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:22:33 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:23:02 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 11
+2026-05-23 06:23:03 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_LaBSE/clustering/optics/clusters_optics.html
+2026-05-23 06:23:03 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_LaBSE/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:23:03 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/sentence-transformers_LaBSE/clustering/comparison/metrics_dashboard.html
+2026-05-23 06:23:03 [INFO] embeddings_clustering.run_clustering: Clustering embeddings for: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+2026-05-23 06:23:10 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2...
+2026-05-23 06:23:12 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-23 06:23:24 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (kmeans): 23
+2026-05-23 06:23:28 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/kmeans/clusters_kmeans.html
+2026-05-23 06:23:28 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/kmeans/confusion_matrix_kmeans.html
+2026-05-23 06:23:46 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (hdbscan): 3
+2026-05-23 06:23:50 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/hdbscan/clusters_hdbscan.html
+2026-05-23 06:23:50 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/hdbscan/confusion_matrix_hdbscan.html
+2026-05-23 06:29:54 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (spectral): 23
+2026-05-23 06:29:59 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/spectral/clusters_spectral.html
+2026-05-23 06:29:59 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/spectral/confusion_matrix_spectral.html
+2026-05-23 06:30:16 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (birch): 23
+2026-05-23 06:30:20 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/birch/clusters_birch.html
+2026-05-23 06:30:20 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/birch/confusion_matrix_birch.html
+2026-05-23 06:30:40 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (gmm): 23
+2026-05-23 06:30:45 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/gmm/clusters_gmm.html
+2026-05-23 06:30:45 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/gmm/confusion_matrix_gmm.html
+2026-05-23 06:30:59 [INFO] embeddings_clustering.models: MeanShift will use bandwidth: 1.3168
+2026-05-23 06:30:59 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (meanshift): 8
+2026-05-23 06:31:04 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/meanshift/clusters_meanshift.html
+2026-05-23 06:31:04 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/meanshift/confusion_matrix_meanshift.html
+2026-05-23 06:31:33 [INFO] embeddings_clustering.run_clustering:   • Clusters actually found (optics): 2
+2026-05-23 06:31:33 [INFO] embeddings_clustering.visualization: Visualization saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/optics/clusters_optics.html
+2026-05-23 06:31:33 [INFO] embeddings_clustering.visualization: Confusion matrix saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/optics/confusion_matrix_optics.html
+2026-05-23 06:31:33 [INFO] embeddings_clustering.visualization: Metrics dashboard saved: /content/analysis/sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2/clustering/comparison/metrics_dashboard.html
+2026-05-25 12:28:16 [INFO] chromadb.telemetry.product.posthog: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-05-25 12:28:38 [INFO] embedding_analyzer.analyzer: Available models: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-25 12:28:38 [INFO] embedding_analyzer.analyzer: Use .set_model('model_name') to load data
+2026-05-25 12:28:38 [INFO] embedding_analyzer.visualization: Models queued for analysis: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-25 12:28:38 [INFO] embedding_analyzer.visualization: Starting model analysis: BAAI/bge-m3
+2026-05-25 12:28:47 [INFO] embedding_analyzer.analyzer: Loading data for model: BAAI/bge-m3...
+2026-05-25 12:28:52 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 12:28:54 [INFO] embedding_analyzer.visualization: CSV saved: analysis\BAAI_bge-m3\embeddings_data.csv
+2026-05-25 12:28:54 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\BAAI_bge-m3\analysis_summary.txt
+2026-05-25 12:28:54 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\BAAI_bge-m3\model_info.json
+2026-05-25 12:28:54 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 12:28:54 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 12:28:54 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 12:29:29 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:29:51 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:30:37 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:30:59 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:31:21 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:31:21 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 12:31:35 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:31:49 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:32:05 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:32:05 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 12:32:10 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\pca_2d_traditions.html
+2026-05-25 12:32:10 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 12:32:10 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 12:32:10 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 12:32:32 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 12:32:48 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 12:33:07 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 12:33:23 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 12:33:39 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\BAAI_bge-m3\umap_hyperparameters_dashboard.html
+2026-05-25 12:33:39 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 12:33:39 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 12:33:47 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 12:33:58 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 12:34:11 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\BAAI_bge-m3\tsne_hyperparameters_dashboard.html
+2026-05-25 12:34:11 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 12:34:11 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 12:34:11 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 12:34:27 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 12:34:27 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 12:34:37 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\BAAI_bge-m3\methods_comparison.html
+2026-05-25 12:34:37 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\BAAI_bge-m3\distance_heatmap.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\BAAI_bge-m3\tradition_distribution.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\distance_heatmap.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\methods_comparison.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\pca_2d_traditions.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tradition_distribution.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_hyperparameters_dashboard.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:34:38 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:34:39 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:34:39 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:34:39 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:34:39 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_hyperparameters_dashboard.html
+2026-05-25 12:34:39 [INFO] embedding_analyzer.visualization: 
+All visualizations for BAAI/bge-m3 saved to: analysis\BAAI_bge-m3
+2026-05-25 12:34:39 [INFO] embedding_analyzer.visualization: Starting model analysis: Qwen/Qwen3-Embedding
+2026-05-25 12:34:49 [INFO] embedding_analyzer.analyzer: Loading data for model: Qwen/Qwen3-Embedding...
+2026-05-25 12:34:58 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 12:35:00 [INFO] embedding_analyzer.visualization: CSV saved: analysis\Qwen_Qwen3-Embedding\embeddings_data.csv
+2026-05-25 12:35:00 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\Qwen_Qwen3-Embedding\analysis_summary.txt
+2026-05-25 12:35:00 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\Qwen_Qwen3-Embedding\model_info.json
+2026-05-25 12:35:00 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 12:35:00 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 12:35:00 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 12:35:19 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:35:47 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:36:51 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:37:16 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:37:45 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:37:45 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 12:37:53 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:38:05 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:38:19 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:38:19 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 12:38:25 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\pca_2d_traditions.html
+2026-05-25 12:38:25 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 12:38:25 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 12:38:25 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 12:38:47 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 12:39:09 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 12:39:32 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 12:39:55 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 12:40:18 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\Qwen_Qwen3-Embedding\umap_hyperparameters_dashboard.html
+2026-05-25 12:40:18 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 12:40:18 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 12:40:27 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 12:40:39 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 12:40:52 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\Qwen_Qwen3-Embedding\tsne_hyperparameters_dashboard.html
+2026-05-25 12:40:52 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 12:40:52 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 12:40:52 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 12:41:16 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 12:41:16 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\Qwen_Qwen3-Embedding\methods_comparison.html
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\Qwen_Qwen3-Embedding\distance_heatmap.html
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\Qwen_Qwen3-Embedding\tradition_distribution.html
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\distance_heatmap.html
+2026-05-25 12:41:28 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\methods_comparison.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\pca_2d_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tradition_distribution.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_hyperparameters_dashboard.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_hyperparameters_dashboard.html
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: 
+All visualizations for Qwen/Qwen3-Embedding saved to: analysis\Qwen_Qwen3-Embedding
+2026-05-25 12:41:29 [INFO] embedding_analyzer.visualization: Starting model analysis: intfloat/e5-large-v2
+2026-05-25 12:41:40 [INFO] embedding_analyzer.analyzer: Loading data for model: intfloat/e5-large-v2...
+2026-05-25 12:41:44 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 12:41:46 [INFO] embedding_analyzer.visualization: CSV saved: analysis\intfloat_e5-large-v2\embeddings_data.csv
+2026-05-25 12:41:46 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\intfloat_e5-large-v2\analysis_summary.txt
+2026-05-25 12:41:46 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\intfloat_e5-large-v2\model_info.json
+2026-05-25 12:41:46 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 12:41:46 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 12:41:46 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 12:42:00 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:42:20 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:43:04 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:43:24 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:43:44 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:43:44 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 12:43:51 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:44:01 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:44:15 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:44:15 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 12:44:19 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\pca_2d_traditions.html
+2026-05-25 12:44:19 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 12:44:19 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 12:44:19 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 12:44:34 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 12:44:49 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 12:45:06 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 12:45:20 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 12:45:34 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\intfloat_e5-large-v2\umap_hyperparameters_dashboard.html
+2026-05-25 12:45:34 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 12:45:34 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 12:45:42 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 12:45:52 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 12:46:05 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\intfloat_e5-large-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 12:46:05 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 12:46:05 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 12:46:05 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 12:46:21 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 12:46:21 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\intfloat_e5-large-v2\methods_comparison.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\intfloat_e5-large-v2\distance_heatmap.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\intfloat_e5-large-v2\tradition_distribution.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\distance_heatmap.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\methods_comparison.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\pca_2d_traditions.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tradition_distribution.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 12:46:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_hyperparameters_dashboard.html
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: 
+All visualizations for intfloat/e5-large-v2 saved to: analysis\intfloat_e5-large-v2
+2026-05-25 12:46:32 [INFO] embedding_analyzer.visualization: Starting model analysis: sentence-transformers/LaBSE
+2026-05-25 12:46:41 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/LaBSE...
+2026-05-25 12:46:45 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 12:46:47 [INFO] embedding_analyzer.visualization: CSV saved: analysis\sentence-transformers_LaBSE\embeddings_data.csv
+2026-05-25 12:46:47 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\sentence-transformers_LaBSE\analysis_summary.txt
+2026-05-25 12:46:47 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\sentence-transformers_LaBSE\model_info.json
+2026-05-25 12:46:47 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 12:46:47 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 12:46:47 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 12:46:59 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:47:18 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:47:58 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:48:18 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:48:38 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:48:38 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 12:48:46 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:49:01 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:49:17 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:49:17 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 12:49:22 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\pca_2d_traditions.html
+2026-05-25 12:49:22 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 12:49:22 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 12:49:22 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 12:49:36 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 12:49:51 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 12:50:08 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 12:50:26 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 12:50:42 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_LaBSE\umap_hyperparameters_dashboard.html
+2026-05-25 12:50:42 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 12:50:42 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 12:50:54 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 12:51:12 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 12:51:30 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_LaBSE\tsne_hyperparameters_dashboard.html
+2026-05-25 12:51:30 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 12:51:30 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 12:51:30 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 12:51:45 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 12:51:45 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\sentence-transformers_LaBSE\methods_comparison.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\sentence-transformers_LaBSE\distance_heatmap.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\sentence-transformers_LaBSE\tradition_distribution.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\distance_heatmap.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\methods_comparison.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\pca_2d_traditions.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tradition_distribution.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:51:57 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_hyperparameters_dashboard.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_hyperparameters_dashboard.html
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: 
+All visualizations for sentence-transformers/LaBSE saved to: analysis\sentence-transformers_LaBSE
+2026-05-25 12:51:58 [INFO] embedding_analyzer.visualization: Starting model analysis: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+2026-05-25 12:52:08 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2...
+2026-05-25 12:52:11 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 12:52:12 [INFO] embedding_analyzer.visualization: CSV saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\embeddings_data.csv
+2026-05-25 12:52:12 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\analysis_summary.txt
+2026-05-25 12:52:12 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\model_info.json
+2026-05-25 12:52:12 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 12:52:12 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 12:52:12 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 12:52:24 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:52:41 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:53:14 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:53:31 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:53:48 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:53:48 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 12:53:57 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:54:07 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:54:18 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:54:18 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 12:54:21 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\pca_2d_traditions.html
+2026-05-25 12:54:21 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 12:54:21 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 12:54:21 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 12:54:31 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 12:54:43 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 12:54:55 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 12:55:06 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 12:55:16 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_hyperparameters_dashboard.html
+2026-05-25 12:55:16 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 12:55:16 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 12:55:23 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 12:55:32 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 12:55:43 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 12:55:43 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 12:55:43 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 12:55:43 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 12:55:54 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 12:55:54 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\methods_comparison.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\distance_heatmap.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tradition_distribution.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\distance_heatmap.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\methods_comparison.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\pca_2d_traditions.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tradition_distribution.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 12:56:04 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_hyperparameters_dashboard.html
+2026-05-25 12:56:05 [INFO] embedding_analyzer.visualization: 
+All visualizations for sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 saved to: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2
+2026-05-25 13:10:12 [INFO] chromadb.telemetry.product.posthog: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-05-25 13:10:24 [INFO] embedding_analyzer.analyzer: Available models: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-25 13:10:24 [INFO] embedding_analyzer.analyzer: Use .set_model('model_name') to load data
+2026-05-25 13:10:24 [INFO] embedding_analyzer.visualization: Models queued for analysis: ['BAAI/bge-m3', 'Qwen/Qwen3-Embedding', 'intfloat/e5-large-v2', 'sentence-transformers/LaBSE', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2']
+2026-05-25 13:10:24 [INFO] embedding_analyzer.visualization: Starting model analysis: BAAI/bge-m3
+2026-05-25 13:10:32 [INFO] embedding_analyzer.analyzer: Loading data for model: BAAI/bge-m3...
+2026-05-25 13:10:36 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 13:10:38 [INFO] embedding_analyzer.visualization: CSV saved: analysis\BAAI_bge-m3\embeddings_data.csv
+2026-05-25 13:10:38 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\BAAI_bge-m3\analysis_summary.txt
+2026-05-25 13:10:38 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\BAAI_bge-m3\model_info.json
+2026-05-25 13:10:38 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 13:10:38 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 13:10:38 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 13:11:09 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:11:30 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:12:09 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:12:28 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:12:47 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:12:47 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 13:12:56 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:13:05 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:13:16 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:13:16 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 13:13:21 [INFO] embedding_analyzer.visualization: Saved: analysis\BAAI_bge-m3\pca_2d_traditions.html
+2026-05-25 13:13:21 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 13:13:21 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 13:13:21 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 13:13:37 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 13:13:50 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 13:14:05 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 13:14:19 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 13:14:32 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\BAAI_bge-m3\umap_hyperparameters_dashboard.html
+2026-05-25 13:14:32 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 13:14:32 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 13:14:39 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 13:14:47 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 13:14:59 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\BAAI_bge-m3\tsne_hyperparameters_dashboard.html
+2026-05-25 13:14:59 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 13:14:59 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 13:14:59 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 13:15:13 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 13:15:13 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 13:15:22 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\BAAI_bge-m3\methods_comparison.html
+2026-05-25 13:15:22 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\BAAI_bge-m3\distance_heatmap.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\BAAI_bge-m3\tradition_distribution.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\distance_heatmap.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\methods_comparison.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\pca_2d_traditions.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tradition_distribution.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:15:23 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\tsne_hyperparameters_dashboard.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Added click handler to analysis\BAAI_bge-m3\umap_hyperparameters_dashboard.html
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: 
+All visualizations for BAAI/bge-m3 saved to: analysis\BAAI_bge-m3
+2026-05-25 13:15:24 [INFO] embedding_analyzer.visualization: Starting model analysis: Qwen/Qwen3-Embedding
+2026-05-25 13:15:24 [INFO] backoff: Backing off send_request(...) for 0.1s (requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')))
+2026-05-25 13:15:33 [INFO] embedding_analyzer.analyzer: Loading data for model: Qwen/Qwen3-Embedding...
+2026-05-25 13:15:41 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 13:15:43 [INFO] embedding_analyzer.visualization: CSV saved: analysis\Qwen_Qwen3-Embedding\embeddings_data.csv
+2026-05-25 13:15:43 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\Qwen_Qwen3-Embedding\analysis_summary.txt
+2026-05-25 13:15:43 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\Qwen_Qwen3-Embedding\model_info.json
+2026-05-25 13:15:43 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 13:15:43 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 13:15:43 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 13:16:01 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:16:26 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:17:22 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:17:46 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:18:10 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:18:10 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 13:18:17 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:18:27 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:18:39 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:18:39 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 13:18:46 [INFO] embedding_analyzer.visualization: Saved: analysis\Qwen_Qwen3-Embedding\pca_2d_traditions.html
+2026-05-25 13:18:46 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 13:18:46 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 13:18:46 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 13:19:07 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 13:19:28 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 13:19:50 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 13:20:11 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 13:20:31 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\Qwen_Qwen3-Embedding\umap_hyperparameters_dashboard.html
+2026-05-25 13:20:31 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 13:20:31 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 13:20:38 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 13:20:47 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 13:20:58 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\Qwen_Qwen3-Embedding\tsne_hyperparameters_dashboard.html
+2026-05-25 13:20:58 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 13:20:58 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 13:20:58 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 13:21:20 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 13:21:21 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\Qwen_Qwen3-Embedding\methods_comparison.html
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\Qwen_Qwen3-Embedding\distance_heatmap.html
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\Qwen_Qwen3-Embedding\tradition_distribution.html
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\distance_heatmap.html
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\methods_comparison.html
+2026-05-25 13:21:30 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\pca_2d_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tradition_distribution.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\tsne_hyperparameters_dashboard.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Added click handler to analysis\Qwen_Qwen3-Embedding\umap_hyperparameters_dashboard.html
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: 
+All visualizations for Qwen/Qwen3-Embedding saved to: analysis\Qwen_Qwen3-Embedding
+2026-05-25 13:21:31 [INFO] embedding_analyzer.visualization: Starting model analysis: intfloat/e5-large-v2
+2026-05-25 13:21:40 [INFO] embedding_analyzer.analyzer: Loading data for model: intfloat/e5-large-v2...
+2026-05-25 13:21:44 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 13:21:46 [INFO] embedding_analyzer.visualization: CSV saved: analysis\intfloat_e5-large-v2\embeddings_data.csv
+2026-05-25 13:21:46 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\intfloat_e5-large-v2\analysis_summary.txt
+2026-05-25 13:21:46 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\intfloat_e5-large-v2\model_info.json
+2026-05-25 13:21:46 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 13:21:46 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 13:21:46 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 13:22:00 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:22:21 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:23:00 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:23:20 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:23:40 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:23:40 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 13:23:46 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:23:56 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:24:08 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:24:08 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 13:24:14 [INFO] embedding_analyzer.visualization: Saved: analysis\intfloat_e5-large-v2\pca_2d_traditions.html
+2026-05-25 13:24:14 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 13:24:14 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 13:24:14 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 13:24:27 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 13:24:41 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 13:24:57 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 13:25:10 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 13:25:24 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\intfloat_e5-large-v2\umap_hyperparameters_dashboard.html
+2026-05-25 13:25:24 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 13:25:24 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 13:25:30 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 13:25:40 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 13:25:51 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\intfloat_e5-large-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 13:25:51 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 13:25:51 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 13:25:51 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 13:26:06 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 13:26:06 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\intfloat_e5-large-v2\methods_comparison.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\intfloat_e5-large-v2\distance_heatmap.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\intfloat_e5-large-v2\tradition_distribution.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\distance_heatmap.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\methods_comparison.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\pca_2d_traditions.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tradition_distribution.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:26:16 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:26:17 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:26:17 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:26:17 [INFO] embedding_analyzer.visualization: Added click handler to analysis\intfloat_e5-large-v2\umap_hyperparameters_dashboard.html
+2026-05-25 13:26:17 [INFO] embedding_analyzer.visualization: 
+All visualizations for intfloat/e5-large-v2 saved to: analysis\intfloat_e5-large-v2
+2026-05-25 13:26:17 [INFO] embedding_analyzer.visualization: Starting model analysis: sentence-transformers/LaBSE
+2026-05-25 13:26:26 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/LaBSE...
+2026-05-25 13:26:30 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 13:26:31 [INFO] embedding_analyzer.visualization: CSV saved: analysis\sentence-transformers_LaBSE\embeddings_data.csv
+2026-05-25 13:26:31 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\sentence-transformers_LaBSE\analysis_summary.txt
+2026-05-25 13:26:31 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\sentence-transformers_LaBSE\model_info.json
+2026-05-25 13:26:31 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 13:26:31 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 13:26:31 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 13:26:44 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:27:04 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:27:41 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:28:01 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:28:20 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:28:20 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 13:28:28 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:28:37 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:28:49 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:28:49 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 13:28:54 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_LaBSE\pca_2d_traditions.html
+2026-05-25 13:28:54 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 13:28:54 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 13:28:54 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 13:29:06 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 13:29:19 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 13:29:33 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 13:29:46 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 13:29:58 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_LaBSE\umap_hyperparameters_dashboard.html
+2026-05-25 13:29:58 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 13:29:58 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 13:30:05 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 13:30:14 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 13:30:25 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_LaBSE\tsne_hyperparameters_dashboard.html
+2026-05-25 13:30:25 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 13:30:25 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 13:30:25 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 13:30:39 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 13:30:39 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\sentence-transformers_LaBSE\methods_comparison.html
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\sentence-transformers_LaBSE\distance_heatmap.html
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\sentence-transformers_LaBSE\tradition_distribution.html
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\distance_heatmap.html
+2026-05-25 13:30:48 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\methods_comparison.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\pca_2d_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tradition_distribution.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\tsne_hyperparameters_dashboard.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_LaBSE\umap_hyperparameters_dashboard.html
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: 
+All visualizations for sentence-transformers/LaBSE saved to: analysis\sentence-transformers_LaBSE
+2026-05-25 13:30:49 [INFO] embedding_analyzer.visualization: Starting model analysis: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+2026-05-25 13:30:58 [INFO] embedding_analyzer.analyzer: Loading data for model: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2...
+2026-05-25 13:31:01 [INFO] embedding_analyzer.analyzer: Chunks loaded: 25673
+2026-05-25 13:31:03 [INFO] embedding_analyzer.visualization: CSV saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\embeddings_data.csv
+2026-05-25 13:31:03 [INFO] embedding_analyzer.visualization: Text summary saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\analysis_summary.txt
+2026-05-25 13:31:03 [INFO] embedding_analyzer.analyzer: Model information saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\model_info.json
+2026-05-25 13:31:03 [INFO] embedding_analyzer.analyzer: Model list saved: analysis\models.json
+2026-05-25 13:31:03 [INFO] embedding_analyzer.visualization: Generating visualizations with hyperparameter variations...
+2026-05-25 13:31:03 [INFO] embedding_analyzer.visualization:   - Generating individual UMAP plots...
+2026-05-25 13:31:16 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:31:34 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:32:06 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:32:24 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:32:41 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:32:41 [INFO] embedding_analyzer.visualization:   - Generating individual TSNE plots...
+2026-05-25 13:32:48 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:32:58 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:33:12 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:33:12 [INFO] embedding_analyzer.visualization:   - Generating individual PCA plots...
+2026-05-25 13:33:17 [INFO] embedding_analyzer.visualization: Saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\pca_2d_traditions.html
+2026-05-25 13:33:17 [INFO] embedding_analyzer.visualization:   - Generating hyperparameter tuning dashboards...
+2026-05-25 13:33:17 [INFO] embedding_analyzer.visualization: Sampling 3000 for UMAP hyperparameter tuning
+2026-05-25 13:33:17 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 5, 'min_dist': 0.1}
+2026-05-25 13:33:28 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.1}
+2026-05-25 13:33:40 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 50, 'min_dist': 0.1}
+2026-05-25 13:33:52 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.5}
+2026-05-25 13:34:03 [INFO] embedding_analyzer.visualization: Computing UMAP with params: {'n_neighbors': 15, 'min_dist': 0.8}
+2026-05-25 13:34:14 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_hyperparameters_dashboard.html
+2026-05-25 13:34:14 [INFO] embedding_analyzer.visualization: Sampling 3000 for TSNE hyperparameter tuning
+2026-05-25 13:34:14 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 5}
+2026-05-25 13:34:21 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 30}
+2026-05-25 13:34:32 [INFO] embedding_analyzer.visualization: Computing TSNE with params: {'perplexity': 50}
+2026-05-25 13:34:44 [INFO] embedding_analyzer.visualization: Tuning dashboard saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 13:34:44 [INFO] embedding_analyzer.visualization:   - Generating cross-method comparison dashboard...
+2026-05-25 13:34:44 [INFO] embedding_analyzer.visualization: Too much data (25673). Using sample of 3000 for visualization
+2026-05-25 13:34:44 [INFO] embedding_analyzer.visualization: Computing UMAP for comparison dashboard
+2026-05-25 13:34:55 [INFO] embedding_analyzer.visualization: Computing PCA for comparison dashboard
+2026-05-25 13:34:55 [INFO] embedding_analyzer.visualization: Computing TSNE for comparison dashboard
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Comparison dashboard saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\methods_comparison.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization:   - Distance heatmap...
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Heatmap saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\distance_heatmap.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization:   - Tradition distribution chart...
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Distribution chart saved: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tradition_distribution.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization:   - Adding click handlers...
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\distance_heatmap.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\methods_comparison.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\pca_2d_traditions.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tradition_distribution.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-30_traditions.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-50_traditions.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_2d_perplexity-5_traditions.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\tsne_hyperparameters_dashboard.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.1_traditions.html
+2026-05-25 13:35:05 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.5_traditions.html
+2026-05-25 13:35:06 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-15_min_dist-0.8_traditions.html
+2026-05-25 13:35:06 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-50_min_dist-0.1_traditions.html
+2026-05-25 13:35:06 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_2d_n_neighbors-5_min_dist-0.1_traditions.html
+2026-05-25 13:35:06 [INFO] embedding_analyzer.visualization: Added click handler to analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2\umap_hyperparameters_dashboard.html
+2026-05-25 13:35:06 [INFO] embedding_analyzer.visualization: 
+All visualizations for sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 saved to: analysis\sentence-transformers_paraphrase-multilingual-MiniLM-L12-v2

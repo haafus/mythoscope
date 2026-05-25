@@ -11,6 +11,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.metrics.pairwise import cosine_distances
+import glob
+import textwrap
 
 from .config import get_analyzer_config
 from .utils import reduce_dimensions
@@ -18,11 +20,15 @@ from .utils import reduce_dimensions
 MAX_TEXT_PREVIEW_LEN = 200
 MAX_VIS_SAMPLES = 3000
 DEFAULT_SAMPLE_SIZE = -1
+RANDOM_SEED = 42
 HEATMAP_WIDTH = 1000
 HEATMAP_HEIGHT = 900
 DASHBOARD_HEIGHT = 700
 DISTRIBUTION_HEIGHT = 600
 DISTRIBUTION_WIDTH = 900
+GRID_COLOR = 'rgba(190,200,210,0.45)'
+ZERO_LINE_COLOR = 'rgba(120,130,140,0.55)'
+AXIS_LINE_COLOR = 'rgba(120,130,140,0.65)'
 
 logger = logging.getLogger(__name__)
 
@@ -41,41 +47,62 @@ def _check_umap_available() -> bool:
         return False
 
 
-def _get_color_map(traditions: List[str]) -> Dict[str, str]:
-    n_traditions = len(traditions)
+def _get_color_map(data: List[Dict]) -> Dict[str, str]:
+    """
+    Extract tradition colors directly from the data.
+    If a color is missing, assign a default from the Plotly palette.
+    """
+    color_map = {}
+    for item in data:
+        tradition = item.get("tradition", "unknown")
+        color = item.get("color")
+        if tradition not in color_map and color:
+            color_map[tradition] = color
+
+    
     base_colors = px.colors.qualitative.Plotly
+    unique_traditions = sorted(set(item.get("tradition", "unknown") for item in data))
 
-    colors = [base_colors[i % len(base_colors)] for i in range(n_traditions)]
+    for i, trad in enumerate(unique_traditions):
+        if trad not in color_map:
+            color_map[trad] = base_colors[i % len(base_colors)]
 
-    if n_traditions > len(base_colors):
-        additional_needed = n_traditions - len(base_colors)
-        additional_colors = []
-        for i in range(additional_needed):
-            hue = (i * 0.618033988749895) % 1.0
-            rgb = colorsys.hsv_to_rgb(hue, 0.7, 0.9)
-            hex_color = '#{:02x}{:02x}{:02x}'.format(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
-            additional_colors.append(hex_color)
-        colors = colors[:-additional_needed] + additional_colors
-
-    return {trad: colors[i] for i, trad in enumerate(sorted(traditions))}
+    return color_map
 
 
 def _reduce_dimensions_safe(
         embeddings: np.ndarray,
         method: str = 'umap',
         n_components: int = 2,
-        max_samples: int = MAX_VIS_SAMPLES
+        reducer_kwargs: Optional[Dict[str, Any]] = None
 ) -> Optional[np.ndarray]:
-    if len(embeddings) > max_samples and method in ['tsne']:
-        logger.info(f"Too many samples ({len(embeddings)}) for {method.upper()}, sampling {max_samples}")
-        indices = np.random.choice(len(embeddings), max_samples, replace=False)
-        embeddings = embeddings[indices]
+    if reducer_kwargs is None:
+        reducer_kwargs = {}
 
     try:
-        return reduce_dimensions(embeddings, method=method, n_components=n_components)
+        return reduce_dimensions(embeddings, method=method, n_components=n_components, **reducer_kwargs)
     except Exception as e:
         logger.error(f"Dimension reduction failed for {method}: {e}")
         return None
+
+
+def _cartesian_axis(title: str, tickangle: int = 0, showticklabels: bool = True) -> Dict[str, Any]:
+    return dict(
+        title=dict(text=title, font=dict(size=12)),
+        showgrid=True,
+        gridcolor=GRID_COLOR,
+        gridwidth=1,
+        zeroline=True,
+        zerolinecolor=ZERO_LINE_COLOR,
+        zerolinewidth=1,
+        showline=True,
+        linecolor=AXIS_LINE_COLOR,
+        mirror=True,
+        ticks='outside',
+        tickfont=dict(size=10),
+        tickangle=tickangle,
+        showticklabels=showticklabels,
+    )
 
 
 def _create_interactive_figure_2d(
@@ -98,11 +125,13 @@ def _create_interactive_figure_2d(
                 text_preview = row["text"][:MAX_TEXT_PREVIEW_LEN]
                 if len(row["text"]) > MAX_TEXT_PREVIEW_LEN:
                     text_preview += "..."
+                text_preview = "<br>".join(textwrap.wrap(text_preview, width=60))
                 customdata.append([
                     row["id"],
                     row["tradition"],
                     row["chunk_index"],
-                    text_preview
+                    text_preview,
+                    row.get("doc_type", "unknown")  
                 ])
 
             fig.add_trace(go.Scatter(
@@ -118,6 +147,7 @@ def _create_interactive_figure_2d(
                 ),
                 customdata=customdata,
                 hovertemplate="<b>%{customdata[1]}</b><br>"
+                              "Type: %{customdata[4]}<br>"  
                               "ID: %{customdata[0]}<br>"
                               "Chunk: %{customdata[2]}<br>"
                               "Text: %{customdata[3]}<extra></extra>"
@@ -146,16 +176,8 @@ def _create_interactive_figure_2d(
         margin=dict(l=50, r=50, t=80, b=100),
         plot_bgcolor='rgba(240,240,240,0.5)',
         paper_bgcolor='white',
-        xaxis=dict(
-            title=dict(text=f"{x_col.split('_')[0].upper()} component 1", font=dict(size=12)),
-            gridcolor='rgba(200,200,200,0.5)',
-            zerolinecolor='rgba(150,150,150,0.5)'
-        ),
-        yaxis=dict(
-            title=dict(text=f"{y_col.split('_')[0].upper()} component 2", font=dict(size=12)),
-            gridcolor='rgba(200,200,200,0.5)',
-            zerolinecolor='rgba(150,150,150,0.5)'
-        )
+        xaxis=_cartesian_axis(f"{x_col.split('_')[0].upper()} component 1"),
+        yaxis=_cartesian_axis(f"{y_col.split('_')[0].upper()} component 2")
     )
 
     if filename and output_dir:
@@ -172,7 +194,8 @@ def plot_interactive_2d(
         save_html: bool = True,
         output_dir: str = None,
         model_name: str = None,
-        method: str = 'umap'
+        method: str = 'umap',
+        reducer_kwargs: Optional[Dict[str, Any]] = None
 ) -> Optional[go.Figure]:
     if not data:
         logger.warning("No data for visualization.")
@@ -186,12 +209,24 @@ def plot_interactive_2d(
         output_dir = get_analyzer_config().output_dir
 
     output_dir = _ensure_dir(output_dir)
+    reducer_kwargs = reducer_kwargs or {}
 
-    if sample_size == DEFAULT_SAMPLE_SIZE:
-        sample = data
+    
+
+    
+    if method == 'tsne':
+        if sample_size == DEFAULT_SAMPLE_SIZE or sample_size > MAX_VIS_SAMPLES:
+            sample_size = MAX_VIS_SAMPLES
+            logger.info(f"t-SNE optimization: limiting sample size to {sample_size}")
+
+    
+    if sample_size != DEFAULT_SAMPLE_SIZE and len(data) > sample_size:
+        indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_size, replace=False)
+        sample = [data[i] for i in indices]
     else:
-        sample_size = min(sample_size, len(data))
-        sample = data[:sample_size]
+        sample = data
+
+    
 
     try:
         embeddings = np.stack([item["embedding"] for item in sample])
@@ -199,27 +234,41 @@ def plot_interactive_2d(
         logger.error(f"Failed to stack embeddings: {e}")
         return None
 
-    embedding_2d = _reduce_dimensions_safe(embeddings, method=method, n_components=2)
+    
+    embedding_2d = _reduce_dimensions_safe(
+        embeddings,
+        method=method,
+        n_components=2,
+        reducer_kwargs=reducer_kwargs
+    )
+
     if embedding_2d is None:
         return None
 
+    
     df_plot = pd.DataFrame({
         f"{method}_x": embedding_2d[:, 0],
         f"{method}_y": embedding_2d[:, 1],
-        "tradition": [item["tradition"] for item in sample],
-        "id": [item["id"] for item in sample],
-        "chunk_index": [item["chunk_index"] for item in sample],
-        "text": [item["text"] for item in sample],
+        "tradition": [item.get("tradition", "unknown") for item in sample],
+        "id": [item.get("id", "unknown") for item in sample],
+        "chunk_index": [item.get("chunk_index", 0) for item in sample],
+        "text": [item.get("text", "") for item in sample],
+        "doc_type": [item.get("doc_type", "unknown") for item in sample],
     })
 
-    traditions = sorted(df_plot["tradition"].unique())
-    color_map = _get_color_map(traditions)
+    color_map = _get_color_map(data)
 
-    title = f"{method.upper()} visualization of embeddings by tradition"
+    
+    params_str = ", ".join([f"{k}={v}" for k, v in reducer_kwargs.items()])
+    title_suffix = f" ({params_str})" if params_str else ""
+    title = f"{method.upper()} visualization by tradition{title_suffix}"
+
     if model_name:
         title += f" - {model_name}"
 
-    filename = f"{method}_2d_traditions.html" if save_html else None
+    
+    file_params = "_".join([f"{k}-{v}" for k, v in reducer_kwargs.items()])
+    filename = f"{method}_2d_{file_params + '_' if file_params else ''}traditions.html" if save_html else None
 
     fig = _create_interactive_figure_2d(
         df_plot=df_plot,
@@ -234,6 +283,104 @@ def plot_interactive_2d(
 
     return fig
 
+
+def plot_hyperparameter_tuning_dashboard(
+        data: List[Dict],
+        method: str = 'umap',
+        param_configs: List[Dict[str, Any]] = None,
+        output_dir: str = None,
+        model_name: str = None,
+        save_html: bool = True
+) -> Optional[go.Figure]:
+    if not data or not param_configs:
+        return None
+
+    if output_dir is None:
+        output_dir = get_analyzer_config().output_dir
+    output_dir = _ensure_dir(output_dir)
+
+    if len(data) > MAX_VIS_SAMPLES:
+        logger.info(f"Sampling {MAX_VIS_SAMPLES} for {method.upper()} hyperparameter tuning")
+        indices = np.random.default_rng(RANDOM_SEED).choice(len(data), MAX_VIS_SAMPLES, replace=False)
+        sample_data = [data[i] for i in indices]
+    else:
+        sample_data = data
+
+    embeddings = np.stack([item["embedding"] for item in sample_data])
+    traditions = [item.get("tradition", "unknown") for item in sample_data]
+    unique_traditions = sorted(set(traditions))
+    color_map = _get_color_map(data)
+
+    
+    cols = min(3, len(param_configs))
+    rows = (len(param_configs) - 1) // cols + 1
+
+    titles = [
+        f"{method.upper()} ({', '.join(f'{k}={v}' for k, v in cfg.items()) or 'default'})"
+        for cfg in param_configs
+    ]
+
+    fig = make_subplots(rows=rows, cols=cols, subplot_titles=titles, horizontal_spacing=0.08, vertical_spacing=0.1)
+    traditions_array = np.array(traditions)
+
+    for idx, cfg in enumerate(param_configs):
+        r = idx // cols + 1
+        c = idx % cols + 1
+
+        logger.info(f"Computing {method.upper()} with params: {cfg}")
+        coords = _reduce_dimensions_safe(embeddings, method=method, n_components=2, reducer_kwargs=cfg)
+
+        if coords is None:
+            continue
+
+        for tradition in unique_traditions:
+            mask = traditions_array == tradition
+            indices = np.where(mask)[0]
+
+            if len(indices) > 0:
+                fig.add_trace(
+                    go.Scatter(
+                        x=coords[indices, 0],
+                        y=coords[indices, 1],
+                        mode='markers',
+                        name=tradition if idx == 0 else None,
+                        marker=dict(size=5, opacity=0.7, color=color_map[tradition]),
+                        legendgroup=tradition,
+                        showlegend=(idx == 0),
+                        hovertemplate=f"<b>{tradition}</b><br>X: %{{x:.3f}}<br>Y: %{{y:.3f}}<extra></extra>"
+                    ),
+                    row=r, col=c
+                )
+
+        fig.update_xaxes(
+            **_cartesian_axis(f"{method.upper()} component 1"),
+            row=r,
+            col=c
+        )
+        fig.update_yaxes(
+            **_cartesian_axis(f"{method.upper()} component 2"),
+            row=r,
+            col=c
+        )
+
+    title = f"{method.upper()} Hyperparameter Tuning{' - ' + model_name if model_name else ''}"
+    fig.update_layout(
+        title=dict(text=title, font=dict(size=18), x=0.5, xanchor='center'),
+        height=400 * rows + 100,
+        width=400 * cols,
+        showlegend=True,
+        legend=dict(orientation='h', yanchor='top', y=-0.1, xanchor='center', x=0.5),
+        plot_bgcolor='rgba(248,249,250,0.95)',
+        paper_bgcolor='white',
+        margin=dict(l=40, r=40, t=80, b=80)
+    )
+
+    if save_html and output_dir:
+        output_path = os.path.join(output_dir, f"{method}_hyperparameters_dashboard.html")
+        fig.write_html(output_path)
+        logger.info(f"Tuning dashboard saved: {output_path}")
+
+    return fig
 
 def plot_distance_heatmap(
         data: List[Dict],
@@ -252,7 +399,7 @@ def plot_distance_heatmap(
 
     traditions_data = {}
     for item in data:
-        trad = item["tradition"]
+        trad = item.get("tradition", "unknown")
         if trad not in traditions_data:
             traditions_data[trad] = []
         traditions_data[trad].append(item["embedding"])
@@ -292,13 +439,16 @@ def plot_distance_heatmap(
             xanchor='center'
         ),
         xaxis=dict(
+            title=dict(text="Tradition", font=dict(size=12)),
             tickangle=45,
             tickfont=dict(size=11),
-            side='bottom'
+            side='bottom',
+            showgrid=False
         ),
         yaxis=dict(
             tickfont=dict(size=11),
-            title=dict(text="Tradition", font=dict(size=12))
+            title=dict(text="Tradition", font=dict(size=12)),
+            showgrid=False
         ),
         margin=dict(l=100, r=50, t=80, b=150)
     )
@@ -320,7 +470,8 @@ def plot_comparison_dashboard(
         data: List[Dict],
         output_dir: str = None,
         model_name: str = None,
-        save_html: bool = True
+        save_html: bool = True,
+        baseline_configs: Optional[Dict[str, Any]] = None  
 ) -> Optional[go.Figure]:
     if not data:
         logger.warning("No data for visualization.")
@@ -333,7 +484,7 @@ def plot_comparison_dashboard(
 
     if len(data) > MAX_VIS_SAMPLES:
         logger.info(f"Too much data ({len(data)}). Using sample of {MAX_VIS_SAMPLES} for visualization")
-        indices = np.random.choice(len(data), MAX_VIS_SAMPLES, replace=False)
+        indices = np.random.default_rng(RANDOM_SEED).choice(len(data), MAX_VIS_SAMPLES, replace=False)
         sample_data = [data[i] for i in indices]
     else:
         sample_data = data
@@ -349,20 +500,31 @@ def plot_comparison_dashboard(
         methods_to_use.append('umap')
     methods_to_use.extend(['pca', 'tsne'])
 
+    
+    if baseline_configs is None:
+        baseline_configs = get_analyzer_config().baseline_configs
+
     coords_dict = {}
     for method in methods_to_use:
-        logger.info(f"Computing {method.upper()}...")
-        coords = _reduce_dimensions_safe(embeddings, method=method, n_components=2)
+        logger.info(f"Computing {method.upper()} for comparison dashboard")
+
+        
+        kwargs = baseline_configs.get(method, {})
+
+        coords = _reduce_dimensions_safe(
+            embeddings,
+            method=method,
+            n_components=2,
+            reducer_kwargs=kwargs  
+        )
         if coords is not None:
             coords_dict[method] = coords
 
-    if not coords_dict:
-        logger.error("No visualization methods succeeded")
-        return None
-
-    traditions = [item["tradition"] for item in sample_data]
+    traditions = [item.get("tradition", "unknown") for item in sample_data]
     unique_traditions = sorted(set(traditions))
-    color_map = _get_color_map(unique_traditions)
+
+    
+    color_map = _get_color_map(data)
 
     fig = make_subplots(
         rows=1, cols=len(coords_dict),
@@ -393,23 +555,21 @@ def plot_comparison_dashboard(
                         legendgroup=tradition,
                         showlegend=(idx == 1),
                         hovertemplate=f"<b>{tradition}</b><br>"
-                                      f"{method.upper()}1: %{{x:.3f}}<br>"
-                                      f"{method.upper()}2: %{{y:.3f}}<extra></extra>"
+                                      f"{method.upper()} component 1: %{{x:.3f}}<br>"
+                                      f"{method.upper()} component 2: %{{y:.3f}}<extra></extra>"
                     ),
                     row=1, col=idx
                 )
 
         fig.update_xaxes(
-            title_text=f"<b>{method.upper()} 1</b>",
-            row=1, col=idx,
-            gridcolor='rgba(200,200,200,0.3)',
-            zerolinecolor='rgba(150,150,150,0.5)'
+            **_cartesian_axis(f"{method.upper()} component 1"),
+            row=1,
+            col=idx
         )
         fig.update_yaxes(
-            title_text=f"<b>{method.upper()} 2</b>" if idx == 1 else None,
-            row=1, col=idx,
-            gridcolor='rgba(200,200,200,0.3)',
-            zerolinecolor='rgba(150,150,150,0.5)'
+            **_cartesian_axis(f"{method.upper()} component 2"),
+            row=1,
+            col=idx
         )
 
     title = f"Comparison of visualization methods{' - ' + model_name if model_name else ''}"
@@ -436,7 +596,7 @@ def plot_comparison_dashboard(
             itemclick='toggle',
             itemdoubleclick='toggleothers'
         ),
-        plot_bgcolor='rgba(240,240,240,0.3)',
+        plot_bgcolor='rgba(248,249,250,0.95)',
         paper_bgcolor='white',
         hovermode='closest',
         margin=dict(l=60, r=60, t=80, b=120)
@@ -466,29 +626,42 @@ def plot_tradition_distribution(
     output_dir = _ensure_dir(output_dir)
 
     tradition_counts = {}
+    tradition_docs = {}
     for item in data:
-        trad = item["tradition"]
+        trad = item.get("tradition", "unknown")
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
+        tradition_docs.setdefault(trad, set()).add(item.get("id", "unknown"))
 
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
     traditions = [t[0] for t in sorted_traditions]
     counts = [t[1] for t in sorted_traditions]
+    total_chunks = sum(counts)
+    percentages = [(count / total_chunks * 100) if total_chunks else 0 for count in counts]
+    doc_counts = [len(tradition_docs.get(trad, set())) for trad in traditions]
 
-    color_map = _get_color_map(traditions)
+    
+    color_map = _get_color_map(data)
     colors = [color_map[t] for t in traditions]
 
-    fig = go.Figure(data=[go.Pie(
-        labels=traditions,
-        values=counts,
-        marker=dict(colors=colors, line=dict(color='white', width=2)),
-        textinfo='label+percent',
-        textposition='auto',
-        hoverinfo='label+value+percent',
-        hole=0.3,
-        pull=[0.05 if i < 3 else 0 for i in range(len(traditions))]
+    fig = go.Figure(data=[go.Bar(
+        x=counts,
+        y=traditions,
+        orientation='h',
+        marker=dict(
+            color=colors,
+            line=dict(color='rgba(255,255,255,0.9)', width=1)
+        ),
+        customdata=np.column_stack([percentages, doc_counts]),
+        text=[f"{count:,} chunks ({pct:.1f}%)" for count, pct in zip(counts, percentages)],
+        textposition='outside',
+        cliponaxis=False,
+        hovertemplate="<b>%{y}</b><br>"
+                      "Chunks: %{x:,}<br>"
+                      "Share: %{customdata[0]:.2f}%<br>"
+                      "Source texts: %{customdata[1]}<extra></extra>"
     )])
 
-    title = f"Distribution of texts by tradition{' - ' + model_name if model_name else ''}"
+    title = f"Distribution of chunks by tradition{' - ' + model_name if model_name else ''}"
     fig.update_layout(
         title=dict(
             text=title,
@@ -496,20 +669,22 @@ def plot_tradition_distribution(
             x=0.5,
             xanchor='center'
         ),
-        showlegend=True,
-        legend=dict(
-            orientation='v',
-            yanchor='top',
-            y=1,
-            xanchor='left',
-            x=1.02,
-            bgcolor='rgba(255,255,255,0.9)',
-            bordercolor='rgba(0,0,0,0.2)',
-            borderwidth=1
-        ),
-        height=DISTRIBUTION_HEIGHT,
-        width=DISTRIBUTION_WIDTH,
-        margin=dict(l=50, r=200, t=80, b=50)
+        showlegend=False,
+        height=max(DISTRIBUTION_HEIGHT, 28 * len(traditions) + 180),
+        width=max(DISTRIBUTION_WIDTH, 1050),
+        margin=dict(l=180, r=160, t=90, b=80),
+        plot_bgcolor='rgba(248,249,250,0.95)',
+        paper_bgcolor='white',
+        xaxis=_cartesian_axis("Number of chunks"),
+        yaxis=dict(
+            title=dict(text="Tradition", font=dict(size=12)),
+            autorange='reversed',
+            showgrid=False,
+            showline=True,
+            linecolor=AXIS_LINE_COLOR,
+            ticks='outside',
+            tickfont=dict(size=11)
+        )
     )
 
     if save_html and output_dir:
@@ -539,7 +714,6 @@ def save_summary_to_files(data: List[Dict], stats: Dict, output_dir: str = None)
     txt_path = os.path.join(output_dir, "analysis_summary.txt")
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(f"Embedding Analysis Summary\n")
-        f.write(f"{'=' * 60}\n")
         if stats.get("model"):
             f.write(f"Model: {stats['model']}\n")
         f.write(f"Total chunks in DB: {stats.get('total_chunks_in_db', stats['n_samples'])}\n")
@@ -547,13 +721,11 @@ def save_summary_to_files(data: List[Dict], stats: Dict, output_dir: str = None)
         f.write(f"Embedding dimension: {stats['embedding_dim']}\n")
         f.write(f"Number of traditions: {stats['traditions']}\n")
 
-        f.write(f"\n{'=' * 60}\n")
+        f.write("\n")
         f.write("DISTRIBUTION BY TRADITIONS\n")
-        f.write(f"{'-' * 60}\n")
         for trad, count in sorted(stats['tradition_counts'].items(), key=lambda x: -x[1]):
             percentage = count / stats['n_samples'] * 100
             f.write(f"  {trad:<30}: {count:>4} ({percentage:>5.1f}%)\n")
-        f.write(f"{'=' * 60}\n")
 
     logger.info(f"Text summary saved: {txt_path}")
 
@@ -648,101 +820,131 @@ def add_click_handler_to_html(html_path: str):
 
 
 def generate_clickable_plots(output_dir: str, model_name: str):
-    viz_files = [
-        'umap_2d_traditions.html',
-        'pca_2d_traditions.html',
-        'tsne_2d_traditions.html'
-    ]
+    
+    html_files = glob.glob(os.path.join(output_dir, "*.html"))
 
-    for filename in viz_files:
-        filepath = os.path.join(output_dir, filename)
-        if os.path.exists(filepath):
-            add_click_handler_to_html(filepath)
+    if not html_files:
+        logger.warning(f"No HTML files found in {output_dir} to make clickable.")
+        return
+
+    for filepath in html_files:
+        add_click_handler_to_html(filepath)
 
 
-def analyze_embeddings(
-        collection_name: str = "corpus",
-        model_name: str = None,
-        generate_all_plots: bool = True
-):
+def analyze_embeddings(model_name: str = None, generate_all_plots: bool = True):
+    from .config import setup_logging
     from .analyzer import EmbeddingAnalyzer
 
+    setup_logging()
+
     try:
-        analyzer = EmbeddingAnalyzer(collection_name=collection_name, model_name=model_name)
+        
+        base_analyzer = EmbeddingAnalyzer()
+        available_models = base_analyzer.available_models
 
-        if not analyzer.data:
-            logger.error("=" * 60)
-            logger.error("ERROR: Failed to load data for analysis!")
-            logger.error("=" * 60)
-            logger.error("Possible reasons:")
-            logger.error("1. Chroma database is empty")
-            logger.error("2. No embeddings with 'model' metadata in database")
-            logger.error("3. Specified model does not exist")
-            logger.error(f"\nAvailable models: {analyzer.available_models}")
-            logger.error("=" * 60)
-            return analyzer
+        if not available_models:
+            logger.error("ERROR: No available models in the Chroma database!")
+            return None
 
-        analyzer.print_statistics()
-        analyzer.save_summary()
-        analyzer.save_models_list()
+        
+        models_to_analyze = [model_name] if model_name else available_models
+        logger.info(f"Models queued for analysis: {models_to_analyze}")
 
-        if generate_all_plots and analyzer.data:
-            data = analyzer.filter_by_model()
+        
+        for current_model in models_to_analyze:
+            logger.info(f"Starting model analysis: {current_model}")
 
-            if not data:
-                logger.warning("No data for visualization")
-                return analyzer
+            analyzer = EmbeddingAnalyzer(model_name=current_model)
 
-            logger.info("Generating visualizations...")
+            if not analyzer.data:
+                logger.warning(f"No data found for model {current_model} has no data, skipping...")
+                continue
 
-            for method in ['umap', 'pca']:
-                logger.info(f"  - 2D {method.upper()}...")
+            analyzer.print_statistics()
+            analyzer.save_summary()
+            analyzer.save_models_list()
+
+            if generate_all_plots and analyzer.data:
+                data = analyzer.filter_by_model()
+
+                logger.info("Generating visualizations with hyperparameter variations...")
+
+                config = get_analyzer_config()
+                umap_configs = config.umap_configs
+                tsne_configs = config.tsne_configs
+                pca_configs = config.pca_configs
+                baseline_configs = config.baseline_configs
+
+                configs_map = {'umap': umap_configs, 'tsne': tsne_configs, 'pca': pca_configs}
+
+                for method, configs in configs_map.items():
+                    if method == 'umap' and not _check_umap_available():
+                        continue
+
+                    logger.info(f"  - Generating individual {method.upper()} plots...")
+                    for cfg in configs:
+                        try:
+                            plot_interactive_2d(
+                                data,
+                                sample_size=MAX_VIS_SAMPLES if method == 'tsne' else DEFAULT_SAMPLE_SIZE,
+                                output_dir=analyzer.output_dir,
+                                model_name=analyzer.model_name,
+                                method=method,
+                                reducer_kwargs=cfg
+                            )
+                        except Exception as e:
+                            logger.error(f"    Error creating {method.upper()} with {cfg}: {e}")
+
+                logger.info("  - Generating hyperparameter tuning dashboards...")
                 try:
-                    plot_interactive_2d(
-                        data, sample_size=DEFAULT_SAMPLE_SIZE, output_dir=analyzer.output_dir,
-                        model_name=analyzer.model_name, method=method
+                    if _check_umap_available():
+                        plot_hyperparameter_tuning_dashboard(
+                            data, method='umap', param_configs=umap_configs,
+                            output_dir=analyzer.output_dir, model_name=analyzer.model_name
+                        )
+                    plot_hyperparameter_tuning_dashboard(
+                        data, method='tsne', param_configs=tsne_configs,
+                        output_dir=analyzer.output_dir, model_name=analyzer.model_name
                     )
                 except Exception as e:
-                    logger.error(f"    Error creating {method.upper()}: {e}")
+                    logger.error(f"    Error creating hyperparameter dashboards: {e}")
 
-            logger.info("  - 2D t-SNE...")
-            try:
-                plot_interactive_2d(
-                    data, sample_size=MAX_VIS_SAMPLES, output_dir=analyzer.output_dir,
-                    model_name=analyzer.model_name, method='tsne'
-                )
-            except Exception as e:
-                logger.error(f"    Error creating t-SNE: {e}")
+                logger.info("  - Generating cross-method comparison dashboard...")
+                try:
+                    plot_comparison_dashboard(
+                        data,
+                        output_dir=analyzer.output_dir,
+                        model_name=analyzer.model_name,
+                        baseline_configs=baseline_configs
+                    )
+                except Exception as e:
+                    logger.error(f"    Error creating comparison dashboard: {e}")
 
-            logger.info("  - Distance heatmap...")
-            try:
-                plot_distance_heatmap(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-            except Exception as e:
-                logger.error(f"    Error creating heatmap: {e}")
+                logger.info("  - Distance heatmap...")
+                try:
+                    plot_distance_heatmap(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
+                except Exception as e:
+                    logger.error(f"    Error creating heatmap: {e}")
 
-            logger.info("  - Comparison dashboard...")
-            try:
-                plot_comparison_dashboard(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-            except Exception as e:
-                logger.error(f"    Error creating comparison dashboard: {e}")
+                logger.info("  - Tradition distribution chart...")
+                try:
+                    plot_tradition_distribution(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
+                except Exception as e:
+                    logger.error(f"    Error creating distribution chart: {e}")
 
-            logger.info("  - Tradition distribution chart...")
-            try:
-                plot_tradition_distribution(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-            except Exception as e:
-                logger.error(f"    Error creating distribution chart: {e}")
+                logger.info("  - Adding click handlers...")
+                try:
+                    generate_clickable_plots(analyzer.output_dir, analyzer.model_name)
+                except Exception as e:
+                    logger.error(f"    Error adding click handlers: {e}")
 
-            logger.info("  - Adding click handlers...")
-            try:
-                generate_clickable_plots(analyzer.output_dir, analyzer.model_name)
-            except Exception as e:
-                logger.error(f"    Error adding click handlers: {e}")
+                logger.info(f"\nAll visualizations for {current_model} saved to: {analyzer.output_dir}")
 
-            logger.info(f"\nAll visualizations saved to: {analyzer.output_dir}")
+        
+        return analyzer
 
     except Exception as e:
         logger.error(f"Critical error during embedding analysis: {e}")
         import traceback
         traceback.print_exc()
-
-    return analyzer
+        return None

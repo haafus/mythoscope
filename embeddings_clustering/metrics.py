@@ -1,5 +1,6 @@
 import numpy as np
-from typing import Dict, List, Optional
+import logging
+from typing import Dict, Optional
 from sklearn.metrics import (
     silhouette_score,
     davies_bouldin_score,
@@ -9,8 +10,11 @@ from sklearn.metrics import (
     homogeneity_score,
     completeness_score,
     v_measure_score,
-    adjusted_mutual_info_score
+    adjusted_mutual_info_score,
+    pairwise_distances
 )
+
+logger = logging.getLogger(__name__)
 
 
 def calculate_clustering_metrics(
@@ -28,154 +32,79 @@ def calculate_clustering_metrics(
 
     metrics['n_clusters_found'] = n_clusters
     metrics['n_noise_points'] = n_noise
-    metrics['noise_ratio'] = n_noise / len(predicted_labels) if len(predicted_labels) > 0 else 0
+    metrics['noise_ratio'] = float(n_noise / len(predicted_labels)) if len(predicted_labels) > 0 else 0.0
+
+    mask = predicted_labels != -1
 
     if n_clusters >= 2:
-        mask = predicted_labels != -1
-        n_points = np.sum(mask)
+        
+        clean_embeddings = embeddings[mask]
+        clean_labels = predicted_labels[mask]
 
-        if n_points > n_clusters and n_points >= 2:
-            clean_embeddings = embeddings[mask]
-            clean_labels = predicted_labels[mask]
-
-            try:
-                if n_points >= 3:
-                    metrics['silhouette_score'] = silhouette_score(clean_embeddings, clean_labels)
-                else:
-                    metrics['silhouette_score'] = None
-            except Exception as e:
-                metrics['silhouette_score'] = None
-
-            try:
-                metrics['davies_bouldin_score'] = davies_bouldin_score(clean_embeddings, clean_labels)
-            except Exception:
-                metrics['davies_bouldin_score'] = None
-
-            try:
-                metrics['calinski_harabasz_score'] = calinski_harabasz_score(clean_embeddings, clean_labels)
-            except Exception:
-                metrics['calinski_harabasz_score'] = None
-
-    unique_labels = [l for l in set(predicted_labels) if l != -1]
-    intra_distances = []
-
-    for label in unique_labels:
-        cluster_points = embeddings[predicted_labels == label]
-        if len(cluster_points) > 1:
-            centroid = cluster_points.mean(axis=0)
-            intra_distances.append(np.mean(np.linalg.norm(cluster_points - centroid, axis=1)))
-
-    metrics['avg_intra_distance'] = np.mean(intra_distances) if intra_distances else 0.0
-
-    if len(unique_labels) > 1:
+        unique_labels = np.unique(clean_labels)
         centroids = []
+        intra_dists = []
+
         for label in unique_labels:
-            cluster_points = embeddings[predicted_labels == label]
-            if len(cluster_points) > 0:
-                centroids.append(cluster_points.mean(axis=0))
+            cluster_points = clean_embeddings[clean_labels == label]
+            raw_centroid = np.mean(cluster_points, axis=0)
+
+            
+            centroids.append(raw_centroid)
+
+            if len(cluster_points) > 1:
+                dist_to_centroid = np.mean(pairwise_distances(cluster_points, [raw_centroid]))
+            else:
+                dist_to_centroid = 0.0
+            intra_dists.append(dist_to_centroid)
+
+        metrics['avg_intra_distance'] = float(np.mean(intra_dists))
 
         if len(centroids) > 1:
-            centroids = np.array(centroids)
-            from sklearn.metrics.pairwise import euclidean_distances
-            dist_matrix = euclidean_distances(centroids)
-            inter_distances = dist_matrix[np.triu_indices_from(dist_matrix, k=1)]
-            metrics['avg_inter_distance'] = np.mean(inter_distances)
-
-            if metrics['avg_intra_distance'] > 0:
-                metrics['separation_ratio'] = metrics['avg_inter_distance'] / metrics['avg_intra_distance']
-            else:
-                metrics['separation_ratio'] = 0.0
+            centroid_matrix = np.array(centroids)
+            centroid_dists = pairwise_distances(centroid_matrix)
+            upper_tri_indices = np.triu_indices(len(centroids), k=1)
+            avg_inter_distance = np.mean(centroid_dists[upper_tri_indices])
+            metrics['avg_inter_distance'] = float(avg_inter_distance)
         else:
             metrics['avg_inter_distance'] = 0.0
-            metrics['separation_ratio'] = 0.0
-    else:
-        metrics['avg_inter_distance'] = 0.0
-        metrics['separation_ratio'] = 0.0
 
-    if true_labels is not None and n_clusters >= 2:
-        mask = predicted_labels != -1
-        if np.sum(mask) > 0:
+        if metrics['avg_intra_distance'] > 0:
+            metrics['separation_ratio'] = float(metrics['avg_inter_distance'] / metrics['avg_intra_distance'])
+        else:
+            metrics['separation_ratio'] = float('inf') if metrics['avg_inter_distance'] > 0 else 0.0
+
+        if len(set(clean_labels)) >= 2:
+            try:
+                metrics['silhouette_score'] = float(silhouette_score(clean_embeddings, clean_labels))
+                metrics['davies_bouldin_score'] = float(davies_bouldin_score(clean_embeddings, clean_labels))
+                metrics['calinski_harabasz_score'] = float(calinski_harabasz_score(clean_embeddings, clean_labels))
+            except Exception:
+                logger.exception("Error calculating internal metrics")
+
+        if true_labels is not None and np.sum(mask) > 0:
             clean_pred = predicted_labels[mask]
             clean_true = true_labels[mask]
 
-            unique_pred = np.unique(clean_pred)
-            pred_mapping = {old: new for new, old in enumerate(unique_pred)}
-            clean_pred_mapped = np.array([pred_mapping[l] for l in clean_pred])
+            external_metrics = {
+                'adjusted_rand_score': adjusted_rand_score,
+                'normalized_mutual_info': normalized_mutual_info_score,
+                'adjusted_mutual_info': adjusted_mutual_info_score,
+                'homogeneity': homogeneity_score,
+                'completeness': completeness_score,
+                'v_measure': v_measure_score
+            }
 
-            unique_true = np.unique(clean_true)
-            true_mapping = {old: new for new, old in enumerate(unique_true)}
-            clean_true_mapped = np.array([true_mapping[l] for l in clean_true])
-
-            try:
-                metrics['adjusted_rand_score'] = adjusted_rand_score(clean_true_mapped, clean_pred_mapped)
-            except Exception:
-                metrics['adjusted_rand_score'] = None
-
-            try:
-                metrics['normalized_mutual_info'] = normalized_mutual_info_score(clean_true_mapped, clean_pred_mapped)
-            except Exception:
-                metrics['normalized_mutual_info'] = None
-
-            try:
-                metrics['adjusted_mutual_info'] = adjusted_mutual_info_score(clean_true_mapped, clean_pred_mapped)
-            except Exception:
-                metrics['adjusted_mutual_info'] = None
-
-            try:
-                metrics['homogeneity'] = homogeneity_score(clean_true_mapped, clean_pred_mapped)
-            except Exception:
-                metrics['homogeneity'] = None
-
-            try:
-                metrics['completeness'] = completeness_score(clean_true_mapped, clean_pred_mapped)
-            except Exception:
-                metrics['completeness'] = None
-
-            try:
-                metrics['v_measure'] = v_measure_score(clean_true_mapped, clean_pred_mapped)
-            except Exception:
-                metrics['v_measure'] = None
+            for metric_name, metric_func in external_metrics.items():
+                try:
+                    metrics[metric_name] = float(metric_func(clean_true, clean_pred))
+                except Exception:
+                    logger.exception(f"Error {metric_name}")
+                    metrics[metric_name] = None
 
     if n_clusters >= 2 and metrics.get('avg_intra_distance', 0) > 0:
-        metrics['cluster_compactness'] = 1 / (1 + metrics['avg_intra_distance'])
+        metrics['cluster_compactness'] = float(1 / (1 + metrics['avg_intra_distance']))
     else:
         metrics['cluster_compactness'] = 0.0
 
     return metrics
-
-
-def evaluate_all_models(
-        embeddings: np.ndarray,
-        true_labels: np.ndarray,
-        models_to_test: List[str] = None
-) -> Dict[str, Dict]:
-    from .models import get_clustering_model, list_available_models
-
-    if models_to_test is None:
-        models_to_test = list_available_models()
-
-    results = {}
-
-    if len(embeddings) == 0:
-        return {'error': 'Empty embeddings array'}
-
-    for model_name in models_to_test:
-        try:
-            n_true_clusters = len(np.unique(true_labels))
-
-            if model_name in ['kmeans', 'agglomerative', 'spectral']:
-                model = get_clustering_model(model_name, n_clusters=n_true_clusters)
-            elif model_name == 'gmm':
-                model = get_clustering_model(model_name, n_components=n_true_clusters)
-            else:
-                model = get_clustering_model(model_name)
-
-            predicted = model.fit_predict(embeddings)
-            metrics = calculate_clustering_metrics(embeddings, predicted, true_labels)
-            results[model_name] = metrics
-
-        except Exception as e:
-            print(f"Ошибка при тестировании модели {model_name}: {e}")
-            results[model_name] = {'error': str(e)}
-
-    return results

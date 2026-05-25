@@ -1,0 +1,1 @@
+{"text": "4 See D'Herbelot, p. 13. 1 Jallalo'ddin. See D'Herbelot,\nubi supra. 2 Gen. xv 3 Jallalo'ddin.\n4 Idem.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

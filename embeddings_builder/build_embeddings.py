@@ -5,43 +5,58 @@ import gc
 import torch
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from typing import Optional
+import shutil 
 
 from .builder import EmbeddingBuilder
 from .config_manager import ConfigManager
-
-# Глобальная переменная для graceful shutdown
-_builder = None
+from .chroma_manager import collection_name_for_model
 
 
-def signal_handler(signum, frame):
-    """Обработчик сигналов для корректного завершения"""
-    logger = logging.getLogger(__name__)
-    logger.info("Получен сигнал прерывания, сохраняем метрики и очищаем ресурсы...")
-
-    if _builder is not None:
-        try:
-            _builder.metrics.save()
-            logger.info("Метрики сохранены")
-
-            # Очистка GPU памяти
-            if hasattr(_builder, 'unload_model'):
-                _builder.unload_model()
-
-            # Принудительная сборка мусора
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-
-        except Exception as e:
-            logger.error(f"Ошибка при очистке: {e}")
-
-    logger.info("Завершение работы...")
-    sys.exit(0)
+def normalize_text_type(text_type: Optional[str]) -> Optional[str]:
+    aliases = {
+        "both": "all",
+        "translation": "translate",
+    }
+    return aliases.get(text_type, text_type)
 
 
-# Регистрация обработчиков сигналов
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
+class ApplicationContext:
+    """Application context for safe signal handling"""
+
+    def __init__(self):
+        self.builder = None
+
+    def signal_handler(self, signum, frame):
+        logger = logging.getLogger(__name__)
+        logger.info("Interrupt signal received, saving metrics and cleaning resources...")
+
+        if self.builder is not None:
+            try:
+                self.builder.metrics.save()
+                logger.info("Metrics saved")
+
+                
+                self.builder.close()
+
+                
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                    torch.mps.empty_cache()
+
+            except Exception as e:
+                logger.error(f"Cleanup error: {e}")
+
+        logger.info("Shutting down...")
+        sys.exit(0)
+
+
+
+app_context = ApplicationContext()
+signal.signal(signal.SIGINT, app_context.signal_handler)
+signal.signal(signal.SIGTERM, app_context.signal_handler)
 
 
 def setup_logging(config_path: str = "config.yaml"):
@@ -52,7 +67,7 @@ def setup_logging(config_path: str = "config.yaml"):
     log_file = Path(log_config.get("file", "logs/embedding.log"))
     log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    # Create rotating file handler
+    
     file_handler = RotatingFileHandler(
         log_file,
         maxBytes=log_config.get("max_bytes", 10485760),
@@ -61,43 +76,88 @@ def setup_logging(config_path: str = "config.yaml"):
     )
     file_handler.setLevel(getattr(logging, log_config.get("level", "INFO")))
 
-    # Console handler
+    
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
 
-    # Formatter
+    
     formatter = logging.Formatter(log_config.get("format", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
 
-    # Configure root logger
+    
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
-    root_logger.addHandler(file_handler)
-    root_logger.addHandler(console_handler)
+
+    log_file_resolved = str(log_file.resolve())
+    has_file_handler = any(
+        isinstance(handler, RotatingFileHandler)
+        and getattr(handler, "baseFilename", None) == log_file_resolved
+        for handler in root_logger.handlers
+    )
+    has_console_handler = any(
+        isinstance(handler, logging.StreamHandler)
+        and not isinstance(handler, logging.FileHandler)
+        for handler in root_logger.handlers
+    )
+
+    if not has_file_handler:
+        root_logger.addHandler(file_handler)
+    if not has_console_handler:
+        root_logger.addHandler(console_handler)
 
     return root_logger
 
 
-def build_embeddings(clear_existing: bool = True, batch_size: int = 32, config_path: str = "config.yaml"):
-    """Generate embeddings for all files in corpus directory"""
-    global _builder
 
-    # Setup logging
+
+def build_embeddings(
+        clear_existing: Optional[bool] = None,
+        batch_size: Optional[int] = None,
+        config_path: str = "config.yaml",
+        model_name: Optional[str] = None,
+        models: Optional[list] = None,
+        chunking: Optional[str] = None,
+        text_type: Optional[str] = None,
+):
+    """Generate embeddings for all files in corpus directory"""
+
+    if clear_existing is False:
+        raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
+
+    
     logger = setup_logging(config_path)
 
-    # Load configuration
+    
     config_mgr = ConfigManager(config_path)
 
     CORPUS_DIR = config_mgr.get("paths.corpus_dir")
     OUT_DIR = config_mgr.get("paths.out_dir")
     CHROMA_PATH = config_mgr.get("paths.chroma_path")
     CACHE_DIR = config_mgr.get("paths.cache_dir")
-    MODEL_NAME = config_mgr.get("embedding.default_model")
-    TEXT_TYPE = config_mgr.get("embedding.text_type")
-    CHUNKING = config_mgr.get("embedding.default_chunking")
+    CHUNKED_DIR = config_mgr.get("paths.chunked_dir", "corpus_chunked")
+    MODEL_NAME = model_name or config_mgr.get("embedding.default_model")
+    TEXT_TYPE = normalize_text_type(text_type or config_mgr.get("embedding.text_type"))
+    CHUNKING = chunking or config_mgr.get("embedding.default_chunking")
+    CACHE_BATCH = config_mgr.get("embedding.cache_batch_size", 50)
+    CHROMA_BATCH = config_mgr.get("embedding.chroma_batch_size", 100)
+    BATCH_SIZE = batch_size if batch_size is not None else config_mgr.get("embedding.batch_size")
+    CLEAR_EXISTING = clear_existing if clear_existing is not None else True
 
-    _builder = EmbeddingBuilder(
+    
+    
+    
+    if CLEAR_EXISTING:
+        chroma_dir = Path(CHROMA_PATH)
+        if chroma_dir.exists():
+            logger.info(f"Fully clearing ChromaDB directory: {chroma_dir.resolve()}")
+            try:
+                shutil.rmtree(chroma_dir, ignore_errors=True)
+            except Exception as e:
+                logger.warning(f"Failed to fully remove database directory: {e}")
+    
+
+    app_context.builder = EmbeddingBuilder(
         corpus_dir=CORPUS_DIR,
         out_dir=OUT_DIR,
         text_type=TEXT_TYPE,
@@ -105,34 +165,46 @@ def build_embeddings(clear_existing: bool = True, batch_size: int = 32, config_p
         chunking=CHUNKING,
         chroma_path=CHROMA_PATH,
         cache_dir=CACHE_DIR,
-        batch_size=batch_size,
+        chunked_dir=CHUNKED_DIR,
+        batch_size=BATCH_SIZE,
+        cache_batch_size=CACHE_BATCH,
+        chroma_batch_size=CHROMA_BATCH
     )
 
-    logger.info("=" * 60)
-    logger.info("Запуск генерации эмбеддингов...")
-    logger.info(f"   Источник: {CORPUS_DIR}")
-    logger.info(f"   Тип текстов: {_builder.text_type}")
+    models_to_run = models or ([MODEL_NAME] if model_name else config_mgr.get("embedding.models", [MODEL_NAME]))
+
+    logger.info("Starting embedding generation...")
+    logger.info(f"   Source: {CORPUS_DIR}")
+    logger.info(f"   Text type: {app_context.builder.text_type}")
     logger.info(f"   Chroma DB: {CHROMA_PATH}")
-    logger.info(f"   Модель: {MODEL_NAME}")
-    logger.info(f"   Папка результатов: {_builder.out_dir}")
-    logger.info(f"   Очистка коллекции: {clear_existing}")
-    logger.info(f"   Размер батча: {batch_size}")
-    logger.info("=" * 60)
+    logger.info(f"   Results directory: {app_context.builder.out_dir}")
+    logger.info(f"   Clear collection: {CLEAR_EXISTING}")
 
     try:
-        _builder.save_all_corpus_to_chroma(collection_name="corpus", clear_existing=clear_existing)
+        for model in models_to_run:
+            logger.info(f"   Model: {model}")
+            logger.info(f"   Model batch size: {BATCH_SIZE}")
+            
+            app_context.builder.set_model(model)
+
+            
+            collection_to_write = collection_name_for_model(model)
+
+            logger.info(f"Collection: {collection_to_write}")
+
+            
+            app_context.builder.save_all_corpus_to_chroma()
+
     except Exception as e:
-        logger.error(f"Ошибка при генерации эмбеддингов: {e}")
-        _builder.metrics.save()
+        logger.error(f"Embedding generation error: {e}")
         raise
     finally:
-        # Ensure metrics are saved even on error
-        _builder.metrics.save()
+        
+        app_context.builder.metrics.save()
+        app_context.builder.close()
 
-    logger.info("=" * 60)
-    logger.info("Все эмбеддинги сохранены в Chroma.")
-    logger.info(f"Результаты анализа будут сохранены в: {_builder.out_dir}")
-    logger.info(f"Метрики производительности: {_builder.out_dir}/performance_metrics.json")
-    logger.info("=" * 60)
+    logger.info("All embeddings saved to Chroma.")
+    logger.info(f"Analysis results will be saved to: {app_context.builder.out_dir}")
+    logger.info(f"Performance metrics: {app_context.builder.out_dir}/performance_metrics.json")
 
-    return _builder
+    return app_context.builder

@@ -1,13 +1,14 @@
-from .analyzer import EmbeddingAnalyzer
 from .config import (
+    setup_logging,         
     get_analyzer_config,
     AnalyzerConfig,
-    CORPUS_METADATA_PATH,
-    CHROMA_PATH,
-    OUTPUT_DIR,
+    get_chroma_path,
+    get_output_dir,
     set_paths,
     get_model_output_dir,
 )
+
+from .analyzer import EmbeddingAnalyzer
 from .visualization import (
     analyze_embeddings,
     plot_interactive_2d,
@@ -27,10 +28,9 @@ __all__ = [
     "plot_tradition_distribution",
     "save_models_list",
     "save_summary_to_files",
-    "CORPUS_METADATA_PATH",
-    "CHROMA_PATH",
-    "OUTPUT_DIR",
+    "get_chroma_path",
+    "get_output_dir",
     "set_paths",
     "get_model_output_dir",
-    "AnalyzerConfig",  # ДОБАВЛЕНО
+    "AnalyzerConfig",
 ]

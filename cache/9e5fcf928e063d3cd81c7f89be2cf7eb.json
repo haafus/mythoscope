@@ -1,0 +1,1 @@
+{"text": "SECTION LXV\n\nDuryodhana said,--‘Come, Kshatta, bring hither Draupadi the dear and\nloved wife of the Pandavas. Let her sweep the chambers, force her\nthereto, and let the unfortunate one stay where our serving-women are.’", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

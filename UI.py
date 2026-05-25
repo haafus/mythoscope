@@ -3,9 +3,13 @@ import socket
 import time
 import os
 import json
+import csv
+import io
+import zipfile
 import http.server
 import socketserver
 import webbrowser
+import re
 from urllib.parse import urlparse, parse_qs
 from typing import List, Dict, Any
 
@@ -17,6 +21,16 @@ from embedding_analyzer.analyzer import EmbeddingAnalyzer
 html_dir = os.path.dirname(os.path.abspath(__file__))
 PORT = 8000
 _server_running = False
+NAVBAR_PAGES = {
+    os.path.normcase(os.path.normpath(os.path.join('template', page)))
+    for page in (
+        'home.html',
+        'corpus.html',
+        'geography.html',
+        'embeddings_analysis.html',
+        'cluster_analysis.html',
+    )
+}
 
 
 def find_free_port(start_port=8000, max_port=9000):
@@ -48,7 +62,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         if normalized_name not in self._analyzers:
             self._analyzers[normalized_name] = EmbeddingAnalyzer(
-                collection_name="corpus",
                 model_name=normalized_name
             )
         return self._analyzers[normalized_name]
@@ -62,6 +75,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         data = analyzer.filter_by_model()
         self._embeddings_cache[cache_key] = data
         return data
+
+    @staticmethod
+    def _add_body_class(content: str, class_name: str) -> str:
+        def replace_body_tag(match):
+            attrs = match.group(1)
+            class_attr = re.search(r'class=(["\'])(.*?)\1', attrs, flags=re.IGNORECASE)
+
+            if class_attr:
+                classes = class_attr.group(2).split()
+                if class_name not in classes:
+                    classes.append(class_name)
+                    attrs = attrs[:class_attr.start(2)] + ' '.join(classes) + attrs[class_attr.end(2):]
+                return f'<body{attrs}>'
+
+            return f'<body{attrs} class="{class_name}">'
+
+        return re.sub(r'<body([^>]*)>', replace_body_tag, content, count=1, flags=re.IGNORECASE)
 
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -106,7 +136,99 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._handle_scan_graph()
             return
 
+        
+        if path.endswith('.html'):
+            self._handle_html_template(path)
+            return
+
+        if path == '/api/get_corpus_tree':
+            self._handle_api_get_corpus_tree()
+            return
+
+        if path == '/api/get_corpus_catalog':
+            self._handle_api_get_corpus_catalog()
+            return
+
+        if path == '/api/get_corpus_document' or path.endswith('/api/get_corpus_document'):
+            self._handle_api_get_corpus_document(parsed_url)
+            return
+
+        if path == '/api/get_book_content':
+            self._handle_api_get_book_content(parsed_url)
+            return
+
+        if path == '/api/download_corpus_archive':
+            self._handle_api_download_corpus_archive()
+            return
+
         super().do_GET()
+
+    
+    def _handle_html_template(self, path):
+        
+        safe_path = os.path.normpath(path.lstrip('/'))
+        file_path = os.path.join(html_dir, safe_path)
+        should_inject_navbar = os.path.normcase(safe_path) in NAVBAR_PAGES
+
+        
+        if not os.path.abspath(file_path).startswith(os.path.abspath(html_dir)):
+            self.send_error(403, "Access denied")
+            return
+
+        if not os.path.exists(file_path):
+            self.send_error(404, "File not found")
+            return
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            
+            navbar_path = os.path.join(html_dir, 'template', 'navbar.html')
+
+            
+            if should_inject_navbar and os.path.exists(navbar_path):
+                with open(navbar_path, 'r', encoding='utf-8') as nav_f:
+                    navbar_content = nav_f.read()
+
+                style_block = ''
+                style_match = re.search(r'\s*<style\b[^>]*>.*?</style>\s*', navbar_content, flags=re.IGNORECASE | re.DOTALL)
+                if style_match:
+                    style_block = style_match.group(0).strip()
+                    navbar_content = navbar_content[:style_match.start()] + navbar_content[style_match.end():]
+
+                if style_block:
+                    content, head_replacements = re.subn(
+                        r'</head\s*>',
+                        lambda match: style_block + '\n' + match.group(0),
+                        content,
+                        count=1,
+                        flags=re.IGNORECASE
+                    )
+                    if head_replacements == 0:
+                        navbar_content = style_block + '\n' + navbar_content
+
+                content = self._add_body_class(content, 'has-main-navbar')
+                
+                content = re.sub(
+                    r'(<body[^>]*>)',
+                    lambda match: match.group(1) + '\n' + navbar_content.strip(),
+                    content,
+                    count=1,
+                    flags=re.IGNORECASE
+                )
+
+            
+            encoded_content = content.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', str(len(encoded_content)))
+            self.end_headers()
+            self.wfile.write(encoded_content)
+
+        except Exception as e:
+            print(f"Template Error: {e}")
+            self.send_error(500, f"Server Error: {str(e)}")
 
     def _send_json_response(self, data, status=200):
         self.send_response(status)
@@ -130,7 +252,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     self._send_json_response({"models": models})
                     return
 
-            analyzer = EmbeddingAnalyzer(collection_name="corpus")
+            analyzer = EmbeddingAnalyzer()
             self._send_json_response({"models": analyzer.available_models})
         except Exception as e:
             self._send_error_response(f"Failed to get models: {str(e)}", 500)
@@ -160,8 +282,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             response_data = {
                 "id": str(target_item.get('id')),
-                "text": target_item.get('text', 'Текст отсутствует'),
-                "tradition": target_item.get('tradition', 'Неизвестно'),
+                "text": target_item.get('text', 'No text available'),
+                "tradition": target_item.get('tradition', 'Unknown'),
                 "chunk_index": target_item.get('chunk_index', 0),
                 "model": target_item.get('model', normalized_model)
             }
@@ -237,8 +359,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             response_data = {
                 "id": str(target_item.get('id')),
-                "text": target_item.get('text', 'Текст отсутствует'),
-                "tradition": target_item.get('tradition', 'Неизвестно'),
+                "text": target_item.get('text', 'No text available'),
+                "tradition": target_item.get('tradition', 'Unknown'),
                 "chunk_index": target_item.get('chunk_index', 0),
                 "model": target_item.get('model', normalized_model)
             }
@@ -376,6 +498,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return neighbors
 
     def _search_by_embedding(self, data: List[Dict], query_embedding: List[float], top_k: int = 10) -> List[Dict]:
+        
+        if not data:
+            return []
+
         query_emb = np.array(query_embedding).reshape(1, -1)
         embeddings = np.array([item['embedding'] for item in data])
 
@@ -422,16 +548,267 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def _handle_scan_graph(self):
         self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.end_headers()
 
         graphs_dir = os.path.join(html_dir, 'graphs')
+        response_data = {"folders": [], "files": {}}
+
         if not os.path.exists(graphs_dir):
-            self.wfile.write(json.dumps([]).encode('utf-8'))
+            self.wfile.write(json.dumps(response_data).encode('utf-8'))
             return
 
-        files = [f for f in os.listdir(graphs_dir) if f.endswith('.html')]
-        self.wfile.write(json.dumps(files).encode('utf-8'))
+        valid_exts = ('.html', '.htm', '.png', '.jpg', '.jpeg', '.svg', '.gif')
+
+        for item in os.listdir(graphs_dir):
+            item_path = os.path.join(graphs_dir, item)
+            if os.path.isdir(item_path):
+                files = [
+                    f for f in os.listdir(item_path)
+                    if os.path.isfile(os.path.join(item_path, f)) and f.lower().endswith(valid_exts)
+                ]
+                response_data["folders"].append(item)
+                response_data["files"][item] = files
+
+        response_data["folders"].sort()
+
+        self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+
+    def _handle_api_get_corpus_tree(self):
+        """Scan corpus_chunked and return its JSON tree."""
+        import traceback
+        corpus_path = os.path.join(html_dir, 'corpus_chunked')
+
+        if not os.path.exists(corpus_path):
+            self._send_error_response(f"Directory not found at {corpus_path}", 404)
+            return
+
+        def build_tree(current_path):
+            nodes = []
+            try:
+                entries = sorted([e for e in os.scandir(current_path) if not e.name.startswith('.')],
+                                key=lambda e: e.name)
+            except Exception:
+                return []
+
+            for entry in entries:
+                if entry.is_dir():
+                    nodes.append({
+                        "name": entry.name,
+                        "type": "folder",
+                        "children": build_tree(entry.path)
+                    })
+                elif entry.is_file() and entry.name.endswith('.txt'):
+                    rel_path = os.path.relpath(entry.path, corpus_path)
+                    nodes.append({
+                        "name": entry.name,
+                        "type": "file",
+                        "path": rel_path.replace("\\", "/")
+                    })
+            return nodes
+
+        try:
+            tree_data = build_tree(corpus_path)
+            self._send_json_response(tree_data)
+        except Exception as e:
+            traceback.print_exc()
+            self._send_error_response(str(e), 500)
+
+    def _handle_api_get_book_content(self, parsed_url):
+        """Return text file contents."""
+        query = parse_qs(parsed_url.query)
+        rel_path = query.get('path', [None])[0]
+
+        if not rel_path:
+            self._send_error_response("Missing path", 400)
+            return
+
+        corpus_root = os.path.join(html_dir, 'corpus_chunked')
+        safe_path = os.path.normpath(os.path.join(corpus_root, rel_path))
+
+        if not safe_path.startswith(os.path.abspath(corpus_root)):
+            self._send_error_response("Access denied", 403)
+            return
+
+        try:
+            if os.path.exists(safe_path):
+                with open(safe_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/plain; charset=utf-8')
+                self.end_headers()
+                self.wfile.write(content.encode('utf-8'))
+            else:
+                self._send_error_response("File not found", 404)
+        except Exception as e:
+            self._send_error_response(str(e), 500)
+
+
+    @staticmethod
+    def _sanitize_corpus_path_part(value: str) -> str:
+        value = (value or '').replace('/', '_').replace(' ', '_')
+        return re.sub(r'[\\/*?:"<>|]', '_', value).strip()
+
+    def _resolve_corpus_document_path(self, doc_id: str, major_tradition: str, tradition: str):
+        corpus_root = os.path.abspath(os.path.join(html_dir, 'corpus'))
+        major_path = self._sanitize_corpus_path_part(major_tradition)
+        tradition_path = self._sanitize_corpus_path_part(tradition)
+        title_path = self._sanitize_corpus_path_part(doc_id)
+        file_path = os.path.abspath(os.path.join(
+            corpus_root,
+            major_path,
+            tradition_path,
+            title_path,
+            f'{title_path}.txt'
+        ))
+
+        if not file_path.startswith(corpus_root + os.sep):
+            return corpus_root, None, title_path
+
+        return corpus_root, file_path, title_path
+
+    @staticmethod
+    def _to_int(value, default=0):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    def _get_corpus_catalog_documents(self):
+        metadata_path = os.path.join(html_dir, 'corpus', 'corpus_metadata.json')
+        catalog_path = os.path.join(html_dir, 'corpus', 'corpus_catalog.csv')
+
+        catalog_by_key = {}
+        if os.path.exists(catalog_path):
+            with open(catalog_path, 'r', encoding='utf-8-sig', newline='') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    key = (
+                        row.get('id', ''),
+                        row.get('major_tradition', ''),
+                        row.get('tradition', '')
+                    )
+                    catalog_by_key[key] = row
+
+        documents = []
+        if os.path.exists(metadata_path):
+            with open(metadata_path, 'r', encoding='utf-8') as f:
+                metadata_rows = json.load(f)
+        else:
+            metadata_rows = []
+
+        source_rows = metadata_rows
+        if not source_rows:
+            source_rows = list(catalog_by_key.values())
+
+        for row in source_rows:
+            key = (
+                row.get('id', ''),
+                row.get('major_tradition', ''),
+                row.get('tradition', '')
+            )
+            catalog_row = catalog_by_key.get(key, {})
+            description = catalog_row.get('description') or row.get('description') or ''
+
+            documents.append({
+                "id": row.get('id', ''),
+                "major_tradition": row.get('major_tradition', ''),
+                "tradition": row.get('tradition', ''),
+                "language": row.get('language', ''),
+                "type": row.get('type', ''),
+                "url": row.get('url', ''),
+                "word_count": self._to_int(row.get('word_count', catalog_row.get('word_count'))),
+                "sentence_count": self._to_int(row.get('sentence_count', catalog_row.get('sentence_count'))),
+                "char_count": self._to_int(row.get('char_count')),
+                "color": row.get('color') or catalog_row.get('color') or '#6b7280',
+                "description": description,
+            })
+
+        documents.sort(key=lambda item: (
+            item.get('major_tradition', ''),
+            item.get('tradition', ''),
+            item.get('id', '')
+        ))
+        return documents
+
+    def _handle_api_get_corpus_catalog(self):
+        try:
+            documents = self._get_corpus_catalog_documents()
+            self._send_json_response({
+                "documents": documents,
+                "total": len(documents)
+            })
+        except Exception as e:
+            self._send_error_response(str(e), 500)
+
+    def _handle_api_get_corpus_document(self, parsed_url):
+        query = parse_qs(parsed_url.query)
+        doc_id = query.get('id', [None])[0]
+        major_tradition = query.get('major_tradition', [None])[0]
+        tradition = query.get('tradition', [None])[0]
+        download = query.get('download', ['0'])[0].lower() in {'1', 'true', 'yes'}
+
+        if not doc_id or not major_tradition or not tradition:
+            self._send_error_response("Missing id, major_tradition, or tradition parameter", 400)
+            return
+
+        corpus_root, file_path, title_path = self._resolve_corpus_document_path(doc_id, major_tradition, tradition)
+
+        if not file_path:
+            self._send_error_response("Access denied", 403)
+            return
+
+        if not os.path.exists(file_path):
+            self._send_error_response(f"File not found: {os.path.relpath(file_path, html_dir)}", 404)
+            return
+
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            encoded_content = content.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/plain; charset=utf-8')
+            self.send_header('Content-Length', str(len(encoded_content)))
+            if download:
+                self.send_header('Content-Disposition', f'attachment; filename="{title_path}.txt"')
+            self.end_headers()
+            self.wfile.write(encoded_content)
+        except Exception as e:
+            self._send_error_response(str(e), 500)
+
+    def _handle_api_download_corpus_archive(self):
+        try:
+            documents = self._get_corpus_catalog_documents()
+            archive_buffer = io.BytesIO()
+
+            with zipfile.ZipFile(archive_buffer, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+                for doc in documents:
+                    corpus_root, file_path, title_path = self._resolve_corpus_document_path(
+                        doc.get('id', ''),
+                        doc.get('major_tradition', ''),
+                        doc.get('tradition', '')
+                    )
+
+                    if not file_path or not os.path.exists(file_path):
+                        continue
+
+                    archive_name = os.path.join(
+                        self._sanitize_corpus_path_part(doc.get('major_tradition', 'Unknown')),
+                        self._sanitize_corpus_path_part(doc.get('tradition', 'Unknown')),
+                        f'{title_path}.txt'
+                    ).replace('\\', '/')
+                    archive.write(file_path, archive_name)
+
+            archive_data = archive_buffer.getvalue()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/zip')
+            self.send_header('Content-Length', str(len(archive_data)))
+            self.send_header('Content-Disposition', 'attachment; filename="mythoscope_corpus.zip"')
+            self.end_headers()
+            self.wfile.write(archive_data)
+        except Exception as e:
+            self._send_error_response(str(e), 500)
 
 
 def start_server(port):

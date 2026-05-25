@@ -1,0 +1,1 @@
+{"text": "8 See the Prelim. Disc. p. 75. 9 Al Beidâwi. 10\nIdem. 1 Idem.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

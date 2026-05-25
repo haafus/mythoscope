@@ -1,156 +1,89 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Анализ кластеризации</title>
+    <title>Clustering Analysis</title>
     <style>
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #faf9f5;
+            color: #212529;
+            line-height: 1.5;
             min-height: 100vh;
+            padding: 40px 20px;
         }
-        .clustering-container {
-            padding: 20px;
-        }
-        .model-info {
-            margin-bottom: 20px;
-            background: #faf9f5;
-            padding: 12px 20px;
-            border-radius: 12px;
-            border: 1px solid #e8e6e4;
-            color: #5a524c;
-            font-size: 0.9rem;
-        }
-        .model-info span {
-            font-weight: 600;
-            color: #3a3532;
-        }
-        .model-subselector {
-            margin-bottom: 20px;
-            background: #faf9f5;
-            padding: 15px 20px;
-            border-radius: 12px;
-            border: 1px solid #e8e6e4;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .model-subselector label {
-            color: #5a524c;
-            font-size: 0.95rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        .clustering-dropdown {
-            flex: 1;
-            min-width: 200px;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            color: #3a3532;
-            background: white;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .clustering-dropdown:hover { border-color: #c0ccc8; }
-        .refresh-btn {
-            background: #5a524c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .refresh-btn:hover { background: #6b635c; }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-        .plot-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+
+        .header-actions {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; flex-wrap: wrap; gap: 20px;
         }
-        .plot-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e8e6e4;
-            overflow: hidden;
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; margin: 0; color: #111; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s ease; text-decoration: none; border: 1px solid transparent;
         }
-        .plot-card-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0eeec;
-            background: #faf9f5;
-            font-weight: 500;
-            color: #3a3532;
+        .btn-outline { background: transparent; border-color: #dee2e6; color: #495057; }
+        .btn-outline:hover { background: #e9ecef; color: #212529; }
+        .btn-primary { background: #111; color: #fff; }
+        .btn-primary:hover { background: #333; }
+        .btn svg { width: 16px; height: 16px; }
+
+
+        .controls-panel {
+            background: #fff; border-radius: 8px; border: 1px solid #dee2e6;
+            padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
         }
-        .plot-card-content {
-            padding: 15px;
-            min-height: 450px;
+        .form-group { display: flex; align-items: center; gap: 12px; }
+        .form-group label { font-size: 14px; font-weight: 500; color: #495057; }
+        select {
+            border: 1px solid #ced4da; border-radius: 6px; padding: 8px 12px;
+            font-size: 14px; color: #212529; outline: none; transition: border-color 0.2s;
+            min-width: 220px; background: #fff; cursor: pointer;
         }
-        .plot-card-content iframe {
-            width: 100%;
-            height: 450px;
-            border: none;
-        }
-        .metrics-panel {
-            background: #faf9f5;
-            border-radius: 12px;
-            border: 1px solid #e8e6e4;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .metrics-panel h3 {
-            color: #3a3532;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
+        select:focus { border-color: #111; }
+
+
         .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 24px;
         }
         .metric-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e8e6e4;
+            background: #fff; border-radius: 8px; border: 1px solid #dee2e6;
+            padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
-        .metric-value {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #5a524c;
+        .metric-value { font-size: 28px; font-weight: 600; color: #111; line-height: 1.2; }
+        .metric-label { font-size: 13px; color: #6c757d; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .val-good { color: #2b8a3e; }
+        .val-warn { color: #e67700; }
+        .val-bad { color: #c92a2a; }
+
+
+        .plot-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 24px;
         }
-        .metric-label {
-            font-size: 0.75rem;
-            color: #8a8580;
-            margin-top: 5px;
+        .plot-card {
+            background: #fff; border-radius: 8px; border: 1px solid #dee2e6;
+            overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
-        .metric-good { color: #2e7d32; }
-        .metric-medium { color: #ed6c02; }
-        .metric-bad { color: #d32f2f; }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #8a8580;
+        .plot-header {
+            padding: 16px 20px; border-bottom: 1px solid #dee2e6;
+            font-weight: 600; color: #111; font-size: 15px;
         }
-        .error-message {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .error-message.show { display: block; }
+        .plot-body { min-height: 500px; padding: 10px; }
+        .plot-body iframe { width: 100%; height: 500px; border: none; display: block; }
+
+        .loading-state { text-align: center; padding: 60px 20px; color: #6c757d; font-size: 15px; }
 
         @media (max-width: 768px) {
             .plot-grid { grid-template-columns: 1fr; }
@@ -158,234 +91,161 @@
     </style>
 </head>
 <body>
-    <div class="clustering-container">
-        <div class="error-message" id="errorMsg"></div>
+    <div class="container">
 
-        <div class="model-info">
-            Текущая модель: <span id="current-model-name">—</span>
+        <div class="controls-panel">
+            <div class="form-group">
+                <label>Model:</label>
+                <select id="global-model-select"><option value="">Loading models...</option></select>
+            </div>
+            <div class="form-group">
+                <label>Algorithm:</label>
+                <select id="clustering-select">
+                    <option value="birch">BIRCH</option>
+                    <option value="comparison">Comparison</option>
+                    <option value="gmm">Gaussian Mixture</option>
+                    <option value="hdbscan">HDBSCAN</option>
+                    <option value="kmeans">K-Means</option>
+                    <option value="meanshift">Meanshift</option>
+                    <option value="optics">Optics</option>
+                    <option value="spectral">Spectral</option>
+
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="triggerUpdate()">Refresh Data</button>
         </div>
 
-        <div class="model-subselector">
-            <label for="clustering-select">Алгоритм кластеризации:</label>
-            <select class="clustering-dropdown" id="clustering-select">
-                <option value="kmeans">K-Means</option>
-                <option value="agglomerative">Agglomerative</option>
-                <option value="dbscan">DBSCAN</option>
-                <option value="hdbscan">HDBSCAN</option>
-                <option value="gmm">Gaussian Mixture</option>
-                <option value="spectral">Spectral</option>
-                <option value="birch">BIRCH</option>
-            </select>
-            <button class="refresh-btn" id="refresh-clustering">Обновить</button>
-        </div>
+        <div class="metrics-grid" id="metrics-grid" style="display: none;">
+            </div>
 
-        <div class="metrics-panel" id="metrics-panel" style="display: none;">
-            <h3>Метрики качества кластеризации</h3>
-            <div class="metrics-grid" id="metrics-grid"></div>
-        </div>
-
-        <div class="plot-grid">
-            <div class="plot-card">
-                <div class="plot-card-header">Визуализация кластеров (UMAP)</div>
-                <div class="plot-card-content">
-                    <iframe id="clusters-iframe" src=""></iframe>
+        <div id="content-container">
+            <div class="plot-grid" id="plots-grid" style="display: none;">
+                <div class="plot-card">
+                    <div class="plot-header">Cluster Visualization (UMAP)</div>
+                    <div class="plot-body"><iframe id="clusters-iframe"></iframe></div>
+                </div>
+                <div class="plot-card">
+                    <div class="plot-header">Tradition Correspondence Matrix</div>
+                    <div class="plot-body"><iframe id="confusion-iframe"></iframe></div>
                 </div>
             </div>
-            <div class="plot-card">
-                <div class="plot-card-header">Матрица соответствия традиций и кластеров</div>
-                <div class="plot-card-content">
-                    <iframe id="confusion-iframe" src=""></iframe>
-                </div>
-            </div>
-            <div class="plot-card">
-                <div class="plot-card-header">Сравнение метрик моделей</div>
-                <div class="plot-card-content">
-                    <iframe id="comparison-iframe" src=""></iframe>
-                </div>
+            <div class="loading-state" id="loading-state">
+                Select a model and algorithm to display data...
             </div>
         </div>
-
-        <div class="loading" id="loading">Загрузка данных кластеризации...</div>
     </div>
 
     <script>
-        const CONFIG = {
-            ANALYSIS_PATH: '../analysis'
-        };
-
+        const CONFIG = { ANALYSIS_PATH: '../analysis' };
         let currentModel = null;
         let currentClustering = 'kmeans';
 
-        const clusteringSelect = document.getElementById('clustering-select');
-        const clustersIframe = document.getElementById('clusters-iframe');
-        const confusionIframe = document.getElementById('confusion-iframe');
-        const comparisonIframe = document.getElementById('comparison-iframe');
-        const metricsPanel = document.getElementById('metrics-panel');
+        const modelSelect = document.getElementById('global-model-select');
+        const clusterSelect = document.getElementById('clustering-select');
         const metricsGrid = document.getElementById('metrics-grid');
-        const loading = document.getElementById('loading');
-        const errorMsg = document.getElementById('errorMsg');
-        const currentModelNameSpan = document.getElementById('current-model-name');
+        const plotsGrid = document.getElementById('plots-grid');
+        const loadingState = document.getElementById('loading-state');
 
-        function getSafeModelName(modelName) {
-            if (!modelName) return null;
-            return modelName.replace(/\//g, '_').replace(/\\/g, '_');
-        }
 
-        function showError(message) {
-            errorMsg.textContent = message;
-            errorMsg.classList.add('show');
-            setTimeout(() => errorMsg.classList.remove('show'), 5000);
-        }
+        function sanitizeModelName(name) { return name ? name.replace(/\//g, '_').replace(/\\/g, '_') : null; }
 
-        function hideLoading() {
-            loading.style.display = 'none';
-        }
+        async function loadModels() {
+            try {
+                const res = await fetch('/api/get_models');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
 
-        function showLoading() {
-            loading.style.display = 'block';
-            metricsPanel.style.display = 'none';
-        }
+                modelSelect.innerHTML = '';
+                if (!data.models || data.models.length === 0) {
+                    modelSelect.innerHTML = '<option value="">No data</option>';
+                    return;
+                }
 
-        function getMetricClass(value, metricName) {
-            if (value === null || value === undefined) return '';
-            if (metricName === 'silhouette_score') {
-                if (value >= 0.5) return 'metric-good';
-                if (value >= 0.25) return 'metric-medium';
-                return 'metric-bad';
+                data.models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = sanitizeModelName(m); opt.textContent = m.replace(/_/g, '/');
+                    modelSelect.appendChild(opt);
+                });
+
+                const lastModel = localStorage.getItem('selectedModel');
+                if (lastModel && data.models.some(m => sanitizeModelName(m) === lastModel)) {
+                    modelSelect.value = lastModel;
+                }
+                triggerUpdate();
+            } catch (e) {
+                modelSelect.innerHTML = '<option value="">Load error</option>';
             }
-            if (metricName === 'adjusted_rand_score' || metricName === 'normalized_mutual_info' || metricName === 'v_measure') {
-                if (value >= 0.7) return 'metric-good';
-                if (value >= 0.4) return 'metric-medium';
-                return 'metric-bad';
+        }
+
+        function getMetricScoreClass(value, name) {
+            if (value === null || value === undefined) return '';
+            if (name === 'silhouette_score') return value >= 0.5 ? 'val-good' : (value >= 0.25 ? 'val-warn' : 'val-bad');
+            if (['adjusted_rand_score', 'normalized_mutual_info', 'v_measure'].includes(name)) {
+                return value >= 0.7 ? 'val-good' : (value >= 0.4 ? 'val-warn' : 'val-bad');
             }
             return '';
         }
 
-        function formatMetricName(name) {
-            const names = {
-                'silhouette_score': 'Silhouette Score',
-                'adjusted_rand_score': 'Adjusted Rand Index',
-                'normalized_mutual_info': 'NMI',
-                'v_measure': 'V-measure',
-                'n_clusters_found': 'Найдено кластеров',
-                'noise_ratio': 'Доля шума'
-            };
-            return names[name] || name;
-        }
+        const METRIC_NAMES = {
+            'silhouette_score': 'Silhouette', 'adjusted_rand_score': 'ARI',
+            'normalized_mutual_info': 'NMI', 'v_measure': 'V-measure',
+            'n_clusters_found': 'Clusters', 'noise_ratio': 'Noise Ratio'
+        };
 
-        function formatMetricValue(value, metricName) {
-            if (value === null || value === undefined) return '—';
-            if (metricName === 'noise_ratio') {
-                return `${(value * 100).toFixed(1)}%`;
-            }
-            if (metricName === 'n_clusters_found') {
-                return value;
-            }
-            if (typeof value === 'number') {
-                return value.toFixed(4);
-            }
-            return value;
-        }
+        async function triggerUpdate() {
+            currentModel = modelSelect.value;
+            currentClustering = clusterSelect.value;
+            if (!currentModel) return;
 
-        async function loadMetrics(modelName, clusteringModel) {
-            if (!modelName) return null;
-            const metricsPath = `${CONFIG.ANALYSIS_PATH}/${modelName}/clustering/${clusteringModel}/clustering_metrics.json`;
+            localStorage.setItem('selectedModel', currentModel);
+
+            plotsGrid.style.display = 'none';
+            metricsGrid.style.display = 'none';
+            loadingState.style.display = 'block';
+            loadingState.textContent = 'Loading clusters and metrics...';
+
+            const basePath = `${CONFIG.ANALYSIS_PATH}/${currentModel}/clustering/${currentClustering}`;
+
             try {
-                const response = await fetch(metricsPath);
-                if (response.ok) return await response.json();
+
+                document.getElementById('clusters-iframe').src = `${basePath}/clusters_${currentClustering}.html`;
+                document.getElementById('confusion-iframe').src = `${basePath}/confusion_matrix_${currentClustering}.html`;
+
+
+
+                const metricsRes = await fetch(`${basePath}/clustering_metrics.json`);
+                if (metricsRes.ok) {
+                    const metrics = await metricsRes.json();
+                    let html = '';
+                    ['silhouette_score', 'adjusted_rand_score', 'normalized_mutual_info', 'v_measure', 'n_clusters_found', 'noise_ratio'].forEach(key => {
+                        const val = metrics[key];
+                        if (val !== undefined && val !== null) {
+                            const formatted = key === 'noise_ratio' ? `${(val*100).toFixed(1)}%` :
+                                            (typeof val === 'number' && key !== 'n_clusters_found' ? val.toFixed(3) : val);
+                            const cssClass = getMetricScoreClass(val, key);
+                            html += `<div class="metric-card">
+                                        <div class="metric-value ${cssClass}">${formatted}</div>
+                                        <div class="metric-label">${METRIC_NAMES[key] || key}</div>
+                                     </div>`;
+                        }
+                    });
+                    metricsGrid.innerHTML = html;
+                    metricsGrid.style.display = html ? 'grid' : 'none';
+                }
+
+                loadingState.style.display = 'none';
+                plotsGrid.style.display = 'grid';
             } catch (e) {
-                console.log('Metrics not found:', metricsPath);
-            }
-            return null;
-        }
-
-        function updateMetricsDisplay(metrics) {
-            if (!metrics || Object.keys(metrics).length === 0) {
-                metricsPanel.style.display = 'none';
-                return;
-            }
-            const importantMetrics = ['silhouette_score', 'adjusted_rand_score', 'normalized_mutual_info', 'v_measure', 'n_clusters_found', 'noise_ratio'];
-            let html = '';
-            for (const metricName of importantMetrics) {
-                const value = metrics[metricName];
-                if (value !== undefined && value !== null) {
-                    const metricClass = getMetricClass(value, metricName);
-                    html += `
-                        <div class="metric-card">
-                            <div class="metric-value ${metricClass}">${formatMetricValue(value, metricName)}</div>
-                            <div class="metric-label">${formatMetricName(metricName)}</div>
-                        </div>
-                    `;
-                }
-            }
-            if (html) {
-                metricsGrid.innerHTML = html;
-                metricsPanel.style.display = 'block';
-            } else {
-                metricsPanel.style.display = 'none';
+                console.warn('Failed to load data:', e);
+                loadingState.innerHTML = 'Clustering files were not found. Generate them through the CLI.';
             }
         }
 
-        function loadClusteringData(modelName, clusteringModel) {
-            if (!modelName) return;
-            showLoading();
+        modelSelect.addEventListener('change', triggerUpdate);
+        clusterSelect.addEventListener('change', triggerUpdate);
 
-            const safeModelName = getSafeModelName(modelName);
-            const basePath = `${CONFIG.ANALYSIS_PATH}/${safeModelName}/clustering/${clusteringModel}`;
 
-            console.log('Loading clustering data from:', basePath);
-
-            // Загружаем кластеры
-            clustersIframe.src = `${basePath}/clusters_${clusteringModel}.html`;
-
-            // Загружаем матрицу соответствия
-            confusionIframe.src = `${basePath}/confusion_matrix_${clusteringModel}.html`;
-
-            // Загружаем сравнение моделей
-            comparisonIframe.src = `${CONFIG.ANALYSIS_PATH}/${safeModelName}/clustering/comparison_dashboard.html`;
-
-            // Загружаем метрики
-            loadMetrics(safeModelName, clusteringModel).then(metrics => {
-                if (metrics && !metrics.error) {
-                    updateMetricsDisplay(metrics);
-                } else {
-                    metricsPanel.style.display = 'none';
-                }
-                hideLoading();
-            }).catch(() => {
-                hideLoading();
-                metricsPanel.style.display = 'none';
-            });
-        }
-
-        function refresh() {
-            if (currentModel && currentClustering) {
-                currentModelNameSpan.textContent = currentModel;
-                loadClusteringData(currentModel, currentClustering);
-            }
-        }
-
-        clusteringSelect.addEventListener('change', function() {
-            currentClustering = this.value;
-            refresh();
-        });
-
-        document.getElementById('refresh-clustering').addEventListener('click', refresh);
-
-        window.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'modelChanged') {
-                console.log('Clustering received model:', event.data.model);
-                currentModel = event.data.model;
-                refresh();
-            }
-        });
-
-        window.addEventListener('load', function() {
-            if (window.parent !== window) {
-                window.parent.postMessage({ type: 'iframeReady', iframe: 'clustering' }, '*');
-                console.log('Clustering iframe ready');
-            }
-        });
+        window.addEventListener('DOMContentLoaded', loadModels);
     </script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Поиск соответствий - Результаты</title>
+    <title>Similarity Search - Results</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -132,22 +132,22 @@
 </head>
 <body>
     <div class="container">
-        <a href="javascript:history.back()" class="back-link">← Назад</a>
+        <a href="javascript:history.back()" class="back-link">Back</a>
 
         <div class="search-header">
-            <h2>🔍 Поиск семантических соответствий</h2>
+            <h2>🔍 Semantic Similarity Search</h2>
             <div class="search-form">
-                <input type="text" class="search-input" id="searchInput" placeholder="Введите текст для поиска..." />
-                <button class="search-button" id="searchBtn">🔎 Найти</button>
+                <input type="text" class="search-input" id="searchInput" placeholder="Enter text to search..." />
+                <button class="search-button" id="searchBtn">🔎 Search</button>
             </div>
             <div class="model-selector">
-                <label>Модель:</label>
+                <label>Model:</label>
                 <select class="model-select" id="modelSelect"></select>
             </div>
         </div>
 
         <div class="results-area" id="resultsArea">
-            <div class="loading">Введите текст для поиска</div>
+            <div class="loading">Enter text to search</div>
         </div>
     </div>
 
@@ -155,18 +155,18 @@
         let currentModel = null;
         let currentModelsList = [];
 
-        // Получаем параметры из URL
+
         const urlParams = new URLSearchParams(window.location.search);
         const queryParam = urlParams.get('q');
         const modelParam = urlParams.get('model');
 
-        // Загрузка списка моделей
+
         async function loadModels() {
             try {
-                // Пробуем загрузить из analysis/models.json
+
                 let response = await fetch('../analysis/models.json');
                 if (!response.ok) {
-                    // Пробуем альтернативный путь
+
                     response = await fetch('/analysis/models.json');
                 }
 
@@ -177,7 +177,7 @@
                     return;
                 }
 
-                // Если models.json не найден, пробуем получить список директорий
+
                 response = await fetch('../analysis/');
                 if (response.ok) {
                     const text = await response.text();
@@ -200,7 +200,7 @@
             } catch (error) {
                 console.error('Failed to load models:', error);
                 const select = document.getElementById('modelSelect');
-                select.innerHTML = '<option value="">Ошибка загрузки моделей</option>';
+                select.innerHTML = '<option value="">Error loading models</option>';
             }
         }
 
@@ -209,7 +209,7 @@
             select.innerHTML = '';
 
             if (!models || models.length === 0) {
-                select.innerHTML = '<option value="">Модели не найдены</option>';
+                select.innerHTML = '<option value="">No models found</option>';
                 return;
             }
 
@@ -220,7 +220,7 @@
                 select.appendChild(option);
             });
 
-            // Выбираем модель из URL параметра или первую доступную
+
             if (modelParam && models.includes(modelParam)) {
                 select.value = modelParam;
             } else if (models.length > 0) {
@@ -237,7 +237,7 @@
                 }
             });
 
-            // Если есть параметры в URL - выполняем поиск
+
             if (queryParam) {
                 document.getElementById('searchInput').value = decodeURIComponent(queryParam);
                 performSearch();
@@ -247,17 +247,17 @@
         async function performSearch() {
             const searchText = document.getElementById('searchInput').value.trim();
             if (!searchText) {
-                showMessage('Пожалуйста, введите текст для поиска', 'warning');
+                showMessage('Please enter text to search', 'warning');
                 return;
             }
 
             if (!currentModel) {
-                showMessage('Пожалуйста, выберите модель', 'warning');
+                showMessage('Please select a model', 'warning');
                 return;
             }
 
             const resultsArea = document.getElementById('resultsArea');
-            resultsArea.innerHTML = '<div class="loading">⏳ Поиск... Это может занять несколько секунд</div>';
+            resultsArea.innerHTML = '<div class="loading">⏳ Searching... This may take a few seconds</div>';
 
             try {
                 const response = await fetch(`/api/search?q=${encodeURIComponent(searchText)}&model=${encodeURIComponent(currentModel)}&top_k=20`);
@@ -272,8 +272,8 @@
             } catch (error) {
                 console.error('Search error:', error);
                 resultsArea.innerHTML = `<div class="no-results">
-                    ❌ Ошибка поиска: ${error.message}<br><br>
-                    <small>Убедитесь, что сервер запущен и модель ${currentModel} загружена</small>
+                    ❌ Search error: ${error.message}<br><br>
+                    <small>Make sure the server is running and model ${currentModel} is loaded</small>
                 </div>`;
             }
         }
@@ -287,15 +287,15 @@
             const resultsArea = document.getElementById('resultsArea');
 
             if (!data.results || data.results.length === 0) {
-                resultsArea.innerHTML = '<div class="no-results">😕 Ничего не найдено. Попробуйте изменить запрос.</div>';
+                resultsArea.innerHTML = '<div class="no-results">😕 Nothing found. Try changing the query.</div>';
                 return;
             }
 
             resultsArea.innerHTML = `
                 <div style="padding: 15px; background: #faf9f5; border-bottom: 1px solid #e8e6e4;">
-                    <strong>🔍 Найдено:</strong> ${data.total} результатов
+                    <strong>🔍 Found:</strong> ${data.total} results
                     <span style="float: right; font-size: 0.8rem; color: #8a827c;">
-                        Модель: ${escapeHtml(data.model.replace(/_/g, '/'))}
+                        Model: ${escapeHtml(data.model.replace(/_/g, '/'))}
                     </span>
                 </div>
                 ${data.results.map((result, index) => {
@@ -310,10 +310,10 @@
                     <div class="result-item" onclick="showPointDetails('${escapeHtml(result.id)}', '${escapeHtml(data.model)}')">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                             <span class="result-tradition">📚 ${escapeHtml(result.tradition)}</span>
-                            <span class="result-score ${scoreClass}">${similarityPercent}% сходство</span>
+                            <span class="result-score ${scoreClass}">${similarityPercent}% similarity</span>
                         </div>
                         <div style="font-size: 0.75rem; color: #8a827c; margin: 8px 0;">
-                            ID: ${escapeHtml(result.id)} | Чанк #${result.chunk_index}
+                            ID: ${escapeHtml(result.id)} | Chunk #${result.chunk_index}
                         </div>
                         <div class="result-text">${highlightedText}</div>
                     </div>
@@ -323,23 +323,23 @@
         }
 
         function showPointDetails(pointId, modelName) {
-            // Отправляем сообщение родительскому окну для открытия деталей
+
             if (window.opener && !window.opener.closed) {
                 window.opener.postMessage({
                     type: 'openPointDetails',
                     id: pointId,
                     model: modelName
                 }, '*');
-                // Показываем уведомление об успешной отправке
+
                 const notification = document.createElement('div');
-                notification.textContent = '✓ Детали открыты в основном окне';
+                notification.textContent = '✓ Details opened in the main window';
                 notification.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #2e7d32; color: white; padding: 10px 20px; border-radius: 8px; z-index: 1000; animation: fadeOut 2s forwards;';
                 document.body.appendChild(notification);
                 setTimeout(() => notification.remove(), 2000);
             } else {
-                // Если родительское окно закрыто, показываем alert
-                alert(`Точка: ${pointId}\nМодель: ${modelName}\n\nДетальная информация доступна в главном окне анализа эмбеддингов.`);
-                // Пытаемся открыть главное окно
+
+                alert(`Point: ${pointId}\nModel: ${modelName}\n\nDetailed information is available in the main embedding analysis window.`);
+
                 if (window.opener) {
                     window.opener.focus();
                 }
@@ -366,13 +366,13 @@
                     const regex = new RegExp('(' + escapeRegex(word) + ')', 'gi');
                     escapedText = escapedText.replace(regex, '<mark>$1</mark>');
                 } catch (e) {
-                    // Если regex не скомпилировался, пропускаем слово
+
                 }
             });
             return escapedText;
         }
 
-        // Добавляем стиль для анимации
+
         const style = document.createElement('style');
         style.textContent = `
             @keyframes fadeOut {
@@ -383,7 +383,7 @@
         `;
         document.head.appendChild(style);
 
-        // Инициализация
+
         document.getElementById('searchBtn').addEventListener('click', performSearch);
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') performSearch();

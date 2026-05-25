@@ -1,0 +1,1 @@
+{"text": "{Offa's consort, Thrytho, is contrasted with Hygd.}\n\nThrytho nursed anger, excellent[5] folk-queen,\n Hot-burning hatred: no hero whatever\n 'Mong household companions, her husband excepted\n\n{She is a terror to all save her husband.}", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

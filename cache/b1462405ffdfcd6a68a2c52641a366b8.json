@@ -1,0 +1,1 @@
+{"text": "5 D'Herbel. Bibl. Orient. p. 512, &c. 6 Poc. Spec. p. 80.\n 7 See before, p. 22. 1 See Casaubon, of Enthusiasm, c. 4.\n 2 Kor. c. 15, 21, &c.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

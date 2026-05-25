@@ -1,0 +1,1 @@
+{"text": "“Yudhishthira said, ‘O saint, whose sole wealth consists in religious\npractices! Tell me for what reason, Sagara, the foremost of kings,\nabandoned his own begotten son, endued with valour--an act so difficult\n(for all other men).”", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

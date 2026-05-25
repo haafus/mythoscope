@@ -1,0 +1,1 @@
+{"text": "3 Jallalo'ddin. 4 Idem. Yahya. 5 Jallalo'ddin.\n 6 Yahya.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

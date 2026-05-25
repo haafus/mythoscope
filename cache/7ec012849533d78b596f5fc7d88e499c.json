@@ -1,0 +1,1 @@
+{"text": "1 Yahya. 2 Al Beidâwi, Jallalo'ddin, Yahya, &c. See\nchapter 16, p. 203.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

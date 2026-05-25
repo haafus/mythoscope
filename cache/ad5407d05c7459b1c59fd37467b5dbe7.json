@@ -1,0 +1,1 @@
+{"text": "Janamejaya said,--O regenerate one, why was it that the god Agni become\nhostile in battle unto Sahadeva, who was fighting simply for the\naccomplishment of a sacrifice (and therefore, for the gratification of\nAgni himself)?", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -2,21 +2,42 @@
   "model_name": "BAAI/bge-m3",
   "output_dir": "analysis\\BAAI_bge-m3",
   "statistics": {
-    "n_samples": 1436,
+    "n_samples": 25673,
     "embedding_dim": 1024,
-    "traditions": 6,
+    "traditions": 23,
     "tradition_counts": {
-      "legends_of_the_gods_budge": 465,
-      "ancient_egyptian_legends_murray": 249,
-      "codex_junius_old_english": 360,
-      "australian_aboriginal_myths": 82,
-      "ainu_folk_tales": 195,
-      "egyptian_book_of_the_dead": 85
+      "Islam": 3035,
+      "Anglo-Saxon": 328,
+      "Roman": 792,
+      "Chinese": 1037,
+      "Celtic": 766,
+      "Maya": 105,
+      "Christianity": 6076,
+      "Greek": 2166,
+      "Babylonian": 278,
+      "Ancient Egyptian": 85,
+      "Japanese Buddhism": 123,
+      "Buddhism": 84,
+      "Norse": 2,
+      "Australian": 82,
+      "Finnish": 1340,
+      "Hinduism": 8102,
+      "West African": 245,
+      "Polynesian": 370,
+      "Maori": 24,
+      "Australian Aboriginal": 277,
+      "Confucianism": 238,
+      "Taoism": 87,
+      "Germanic": 31
     },
     "model": "BAAI/bge-m3",
-    "total_chunks_in_db": 1436
+    "total_chunks_in_db": 25673
   },
   "available_models": [
-    "BAAI/bge-m3"
+    "BAAI/bge-m3",
+    "Qwen/Qwen3-Embedding",
+    "intfloat/e5-large-v2",
+    "sentence-transformers/LaBSE",
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
   ]
 }

@@ -19,15 +19,14 @@ CHANGELOG_FILE = BACKUP_DIR / "changelog.txt"
 
 def setup_storage_dirs() -> None:
     BACKUP_DIR.mkdir(exist_ok=True)
-    logger.debug(f"Директория для бэкапов: {BACKUP_DIR.absolute()}")
+    logger.debug(f"Backup directory: {BACKUP_DIR.absolute()}")
 
     if not CHANGELOG_FILE.exists():
         with open(CHANGELOG_FILE, 'w', encoding='utf-8') as f:
-            f.write("=== CHANGELOG: Очистка файлов Project Gutenberg ===\n")
-            f.write(f"Создан: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"Директория хранения оригиналов: {BACKUP_DIR.absolute()}\n")
-            f.write("=" * 60 + "\n\n")
-        logger.info(f"Создан файл изменений: {CHANGELOG_FILE}")
+            f.write("CHANGELOG: Project Gutenberg file cleanup\n")
+            f.write(f"Created: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"Original storage directory: {BACKUP_DIR.absolute()}\n")
+        logger.info(f"Created changelog file: {CHANGELOG_FILE}")
 
 
 def save_original_file(filepath: Path, content: str) -> Path:
@@ -47,7 +46,7 @@ def save_original_file(filepath: Path, content: str) -> Path:
     backup_path = backup_dir / backup_filename
 
     backup_path.write_text(content, encoding='utf-8')
-    logger.debug(f"Оригинал сохранен: {backup_path}")
+    logger.debug(f"Original saved: {backup_path}")
 
     return backup_path
 
@@ -55,29 +54,28 @@ def save_original_file(filepath: Path, content: str) -> Path:
 def log_changes(filepath: Path, original_content: str, cleaned_content: str,
                 backup_path: Path, changes: Dict[str, any]) -> None:
     with open(CHANGELOG_FILE, 'a', encoding='utf-8') as f:
-        f.write(f"\n--- Изменения: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ---\n")
-        f.write(f"Файл: {filepath.absolute()}\n")
-        f.write(f"Оригинал сохранен в: {backup_path.absolute()}\n")
-        f.write(f"Относительный путь в бэкапе: {backup_path.relative_to(BACKUP_DIR)}\n")
+        f.write(f"\n--- Changes: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ---\n")
+        f.write(f"File: {filepath.absolute()}\n")
+        f.write(f"Original saved to: {backup_path.absolute()}\n")
+        f.write(f"Relative backup path: {backup_path.relative_to(BACKUP_DIR)}\n")
 
         orig_lines = len(original_content.splitlines())
         clean_lines = len(cleaned_content.splitlines())
         chars_removed = len(original_content) - len(cleaned_content)
 
-        f.write(f"Статистика:\n")
-        f.write(f"  - Исходный размер: {len(original_content)} символов, {orig_lines} строк\n")
-        f.write(f"  - Очищенный размер: {len(cleaned_content)} символов, {clean_lines} строк\n")
-        f.write(f"  - Удалено: {chars_removed} символов\n")
-        f.write(f"  - Удалено в %: {chars_removed/len(original_content)*100:.1f}%\n")
+        f.write(f"Statistics:\n")
+        f.write(f"  - Original size: {len(original_content)} characters, {orig_lines} lines\n")
+        f.write(f"  - Cleaned size: {len(cleaned_content)} characters, {clean_lines} lines\n")
+        f.write(f"  - Removed: {chars_removed} characters\n")
+        f.write(f"  - Removed percent: {chars_removed/len(original_content)*100:.1f}%\n")
 
         if changes.get('start_marker'):
-            f.write(f"  - Найден маркер начала: {changes['start_marker']}\n")
+            f.write(f"  - Start marker found: {changes['start_marker']}\n")
         if changes.get('end_marker'):
-            f.write(f"  - Найден маркер конца: {changes['end_marker']}\n")
+            f.write(f"  - End marker found: {changes['end_marker']}\n")
         if changes.get('footnotes_removed', 0) > 0:
-            f.write(f"  - Удалено сносок: {changes['footnotes_removed']}\n")
+            f.write(f"  - Footnotes removed: {changes['footnotes_removed']}\n")
 
-        f.write("-" * 40 + "\n")
 
 
 def get_backup_info() -> Dict:
@@ -98,7 +96,7 @@ def get_backup_info() -> Dict:
     if CHANGELOG_FILE.exists():
         info['changelog_size'] = CHANGELOG_FILE.stat().st_size
         content = CHANGELOG_FILE.read_text(encoding='utf-8')
-        info['changelog_entries'] = content.count("--- Изменения:")
+        info['changelog_entries'] = content.count("--- Changes:")
 
     return info
 
@@ -106,19 +104,18 @@ def get_backup_info() -> Dict:
 def show_backup_stats():
     info = get_backup_info()
 
-    print("\n=== Статистика хранения исходников ===")
-    print(f"Директория бэкапов: {info['backup_dir'].absolute()}")
-    print(f"Файл изменений: {info['changelog'].absolute()}")
-    print(f"\nСтатистика:")
-    print(f"  - Директория существует: {info['backup_dir_exists']}")
+    print("\nSource backup statistics")
+    print(f"Backup directory: {info['backup_dir'].absolute()}")
+    print(f"Changelog file: {info['changelog'].absolute()}")
+    print(f"\nStatistics:")
+    print(f"  - Directory exists: {info['backup_dir_exists']}")
     if info['backup_dir_exists']:
-        print(f"  - Файлов в бэкапе: {info['backup_files_count']}")
-        print(f"  - Размер бэкапов: {info.get('backup_dir_size', 0) / 1024:.1f} KB")
-    print(f"  - Файл изменений существует: {info['changelog_exists']}")
+        print(f"  - Backup files: {info['backup_files_count']}")
+        print(f"  - Backup size: {info.get('backup_dir_size', 0) / 1024:.1f} KB")
+    print(f"  - Changelog exists: {info['changelog_exists']}")
     if info['changelog_exists']:
-        print(f"  - Размер changelog.txt: {info['changelog_size']} байт")
-        print(f"  - Записей изменений: {info['changelog_entries']}")
-    print("=" * 40)
+        print(f"  - changelog.txt size: {info['changelog_size']} bytes")
+        print(f"  - Change entries: {info['changelog_entries']}")
 
 
 def clean_gutenberg_text(text: str, filename: Optional[str] = None) -> str:
@@ -126,7 +123,7 @@ def clean_gutenberg_text(text: str, filename: Optional[str] = None) -> str:
         return text
 
     original_length = len(text)
-    debug_info = filename if filename else "текст"
+    debug_info = filename if filename else "text"
 
     changes = {
         'start_marker': None,
@@ -155,7 +152,7 @@ def clean_gutenberg_text(text: str, filename: Optional[str] = None) -> str:
             while start_pos < len(text) and text[start_pos] in '\n\r':
                 start_pos += 1
             changes['start_marker'] = description
-            logger.debug(f"{debug_info}: Найден маркер начала текста: {description}")
+            logger.debug(f"{debug_info}: Text start marker found: {description}")
             break
 
     end_pos = len(text)
@@ -164,13 +161,13 @@ def clean_gutenberg_text(text: str, filename: Optional[str] = None) -> str:
         if match:
             end_pos = start_pos + match.start()
             changes['end_marker'] = description
-            logger.debug(f"{debug_info}: Найден маркер конца текста: {description}")
+            logger.debug(f"{debug_info}: Text end marker found: {description}")
             break
 
     cleaned_text = text[start_pos:end_pos].strip()
 
     if not cleaned_text:
-        logger.warning(f"{debug_info}: Не удалось извлечь текст, возвращаем оригинал")
+        logger.warning(f"{debug_info}: Could not extract text, returning original")
         return text
 
     cleaned_text, footnote_count = _remove_gutenberg_footer_notes_with_count(cleaned_text)
@@ -179,7 +176,7 @@ def clean_gutenberg_text(text: str, filename: Optional[str] = None) -> str:
     cleaned_text = _normalize_gutenberg_whitespace(cleaned_text)
     cleaned_text = _remove_header_metadata(cleaned_text)
 
-    logger.debug(f"{debug_info}: Очистка текста: {original_length} -> {len(cleaned_text)} символов")
+    logger.debug(f"{debug_info}: Text cleanup: {original_length} -> {len(cleaned_text)} characters")
 
     global _last_changes
     _last_changes = changes
@@ -201,7 +198,7 @@ def _remove_gutenberg_footer_notes_with_count(text: str) -> tuple[str, int]:
         if matches:
             footnote_count += len(matches)
             text = re.sub(pattern, '', text, flags=re.DOTALL | re.IGNORECASE)
-            logger.debug(f"Удалено {len(matches)} сносок типа '{description}'")
+            logger.debug(f"Removed {len(matches)} footnotes of type '{description}'")
 
     return text, footnote_count
 
@@ -275,20 +272,20 @@ def process_gutenberg_file(filepath: Path, backup: bool = False, save_sources: b
         content = filepath.read_text(encoding='utf-8')
 
         if not is_gutenberg_text(content):
-            logger.info(f"Файл {filepath} не содержит лицензий Gutenberg, пропускаем")
+            logger.info(f"File {filepath} does not contain Gutenberg license text, skipping")
             return False
 
         cleaned = clean_gutenberg_text(content, str(filepath))
 
         if cleaned == content:
-            logger.info(f"Файл {filepath} не требует изменений")
+            logger.info(f"File {filepath} does not require changes")
             return False
 
         if save_sources:
             setup_storage_dirs()
             backup_path = save_original_file(filepath, content)
             log_changes(filepath, content, cleaned, backup_path, _last_changes)
-            logger.info(f"Оригинал сохранен в: {backup_path}")
+            logger.info(f"Original saved to: {backup_path}")
 
         if backup:
             backup_path_local = filepath.with_suffix(filepath.suffix + '.bak')
@@ -298,22 +295,22 @@ def process_gutenberg_file(filepath: Path, backup: bool = False, save_sources: b
                 counter += 1
 
             filepath.rename(backup_path_local)
-            logger.info(f"Создана локальная резервная копия: {backup_path_local}")
+            logger.info(f"Created local backup: {backup_path_local}")
 
         filepath.write_text(cleaned, encoding='utf-8')
-        logger.info(f"Файл очищен: {filepath}")
+        logger.info(f"File cleaned: {filepath}")
 
         return True
 
     except Exception as e:
-        logger.error(f"Ошибка при обработке файла {filepath}: {e}")
+        logger.error(f"Error processing file {filepath}: {e}")
         return False
 
 
 def batch_clean_gutenberg_files(directory: Path, pattern: str = "*.txt", backup: bool = False,
                                 recursive: bool = True, save_sources: bool = True) -> int:
     if not directory.exists():
-        logger.error(f"Директория не найдена: {directory}")
+        logger.error(f"Directory not found: {directory}")
         return 0
 
     if save_sources:
@@ -338,12 +335,12 @@ def clean_gutenberg_in_builder(original_text: str, url: str = "", tid: str = "")
         return original_text
 
     if url and ('gutenberg.org' in url or 'gutenberg' in url.lower()):
-        logger.debug(f"{tid}: Обнаружен URL Project Gutenberg, применяем очистку")
+        logger.debug(f"{tid}: Project Gutenberg URL detected, applying cleanup")
         return clean_gutenberg_text(original_text, tid or url)
 
     if is_gutenberg_text(original_text):
-        logger.debug(f"{tid}: Обнаружен текст Project Gutenberg, применяем очистку")
-        return clean_gutenberg_text(original_text, tid or "неизвестный файл")
+        logger.debug(f"{tid}: Project Gutenberg text detected, applying cleanup")
+        return clean_gutenberg_text(original_text, tid or "unknown file")
 
     return original_text
 
@@ -365,40 +362,39 @@ def preview_gutenberg_files(directory: Path, pattern: str = "*.txt", recursive: 
             if is_gutenberg_text(content):
                 gutenberg_files.append(filepath)
         except Exception as e:
-            logger.debug(f"Не удалось прочитать {filepath}: {e}")
+            logger.debug(f"Failed to read {filepath}: {e}")
 
     return gutenberg_files
 
 
 def show_changelog():
     if CHANGELOG_FILE.exists():
-        print(f"\nСодержимое {CHANGELOG_FILE.absolute()}:")
-        print("=" * 60)
+        print(f"\nContents of {CHANGELOG_FILE.absolute()}:")
         with open(CHANGELOG_FILE, 'r', encoding='utf-8') as f:
             print(f.read())
     else:
-        print(f"Файл изменений не найден: {CHANGELOG_FILE.absolute()}")
+        print(f"Changelog file not found: {CHANGELOG_FILE.absolute()}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Очистка корпуса от лицензий Project Gutenberg")
+def clean_gutenberg_texts():
+    parser = argparse.ArgumentParser(description="Clean corpus files of Project Gutenberg license text")
     parser.add_argument("--dir", type=str, default=str(CORPUS_DIR),
-                        help="Директория с файлами корпуса")
+                        help="Directory with corpus files")
     parser.add_argument("--pattern", type=str, default="*.txt",
-                        help="Паттерн для поиска файлов")
+                        help="File search pattern")
     parser.add_argument("--backup", action="store_true",
-                        help="Создавать резервные копии оригиналов (локально)")
-    parser.add_argument("--file", type=str, help="Очистить конкретный файл (переопределяет --dir и --pattern)")
+                        help="Create local backups of originals")
+    parser.add_argument("--file", type=str, help="Clean a specific file (overrides --dir and --pattern)")
     parser.add_argument("--no-recursive", action="store_true",
-                        help="Не искать в подпапках (только в указанной директории)")
+                        help="Do not search subdirectories (only the selected directory)")
     parser.add_argument("--preview", action="store_true",
-                        help="Показать список файлов для обработки без очистки")
+                        help="Show files that would be processed without cleaning")
     parser.add_argument("--no-save-sources", action="store_true",
-                        help="Не сохранять исходники в папку sources_backup (по умолчанию сохраняются)")
+                        help="Do not save originals to sources_backup (saved by default)")
     parser.add_argument("--show-changelog", action="store_true",
-                        help="Показать содержимое файла изменений")
+                        help="Show changelog contents")
     parser.add_argument("--backup-stats", action="store_true",
-                        help="Показать статистику по сохраненным бэкапам")
+                        help="Show saved backup statistics")
 
     args = parser.parse_args()
 
@@ -413,40 +409,40 @@ def main():
     save_sources = not args.no_save_sources
 
     if save_sources:
-        logger.info(f"Исходники будут сохраняться в: {BACKUP_DIR.absolute()}")
-        logger.info(f"Лог изменений: {CHANGELOG_FILE.absolute()}")
+        logger.info(f"Originals will be saved to: {BACKUP_DIR.absolute()}")
+        logger.info(f"Change log: {CHANGELOG_FILE.absolute()}")
 
     if args.file:
         filepath = Path(args.file)
         if not filepath.exists():
-            logger.error(f"Файл не найден: {filepath}")
+            logger.error(f"File not found: {filepath}")
             return
 
         if process_gutenberg_file(filepath, args.backup, save_sources):
-            logger.info(f"Файл успешно очищен: {filepath}")
+            logger.info(f"File cleaned successfully: {filepath}")
             if save_sources:
-                logger.info(f"Оригинал сохранен в папку {BACKUP_DIR}/")
+                logger.info(f"Original saved to folder {BACKUP_DIR}/")
         else:
-            logger.info(f"Файл не требует очистки: {filepath}")
+            logger.info(f"File does not require cleanup: {filepath}")
 
     elif args.preview:
         directory = Path(args.dir)
         files = preview_gutenberg_files(directory, args.pattern, not args.no_recursive)
 
         if files:
-            print(f"\nНайдено файлов Project Gutenberg: {len(files)}")
-            print("Список файлов:")
+            print(f"\nProject Gutenberg files found: {len(files)}")
+            print("Files:")
             for f in files:
                 print(f"  - {f}")
         else:
-            print("Файлы Project Gutenberg не найдены")
+            print("No Project Gutenberg files found")
 
     else:
         directory = Path(args.dir)
 
         if not directory.exists():
-            logger.error(f"Директория не найдена: {directory}")
-            logger.info("Убедитесь, что директория существует или укажите правильный путь через --dir")
+            logger.error(f"Directory not found: {directory}")
+            logger.info("Make sure the directory exists or pass the correct path with --dir")
             return
 
         count = batch_clean_gutenberg_files(
@@ -457,14 +453,14 @@ def main():
             save_sources=save_sources
         )
 
-        logger.info(f"Очистка завершена. Обработано файлов: {count}")
+        logger.info(f"Cleanup complete. Files processed: {count}")
 
         if save_sources and count > 0:
-            logger.info(f"Исходники сохранены в папку: {BACKUP_DIR}/")
-            logger.info(f"Лог изменений: {CHANGELOG_FILE}")
+            logger.info(f"Originals saved to folder: {BACKUP_DIR}/")
+            logger.info(f"Change log: {CHANGELOG_FILE}")
 
 
 _last_changes = {}
 
 if __name__ == "__main__":
-    main()
+    clean_gutenberg_texts()

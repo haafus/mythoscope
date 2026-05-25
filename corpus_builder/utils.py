@@ -4,51 +4,36 @@ import hashlib
 import re
 from pathlib import Path
 import unicodedata
-from io import BytesIO
 import logging
 from typing import Optional
-import pymupdf
+import random
+import threading
 
+import pymupdf
+import trafilatura
+from bs4 import BeautifulSoup
+
+_color_lock = threading.Lock()
+_used_colors = set()
+_tradition_colors = {}
 logger = logging.getLogger(__name__)
 
 PYMUPDF_AVAILABLE = True
 
+def sanitize_filename(name: str) -> str:
+    return re.sub(r'[\\/*?:"<>|]', "_", name).strip()
 
 def md5(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
 
-
-def _detect_encoding(content: bytes) -> tuple[str, float]:
-    encodings_to_try = ['utf-8', 'windows-1252', 'iso-8859-1', 'cp1251', 'gb2312']
-
+def _decode_bytes(content: bytes) -> str:
+    encodings_to_try = ['utf-8', 'windows-1251', 'iso-8859-1', 'cp1251', 'gb2312']
     for enc in encodings_to_try:
         try:
-            content.decode(enc)
-            return enc, 0.8
+            return content.decode(enc)
         except UnicodeDecodeError:
             continue
-
-    return 'utf-8', 0.0
-
-
-def _decode_bytes(content: bytes, min_confidence: float = 0.7) -> str:
-    encoding, confidence = _detect_encoding(content)
-
-    if confidence > min_confidence:
-        try:
-            return content.decode(encoding, errors='replace')
-        except (UnicodeDecodeError, LookupError):
-            pass
-
-    encodings = ['utf-8', 'utf-8-sig', 'windows-1252', 'iso-8859-1', 'cp1251', 'gb2312']
-    for enc in encodings:
-        try:
-            return content.decode(enc, errors='strict')
-        except UnicodeDecodeError:
-            continue
-
     return content.decode('utf-8', errors='replace')
-
 
 def html_to_text(html_content: bytes, include_comments: bool = False,
                  include_tables: bool = True, target_language: Optional[str] = None) -> str:
@@ -56,17 +41,25 @@ def html_to_text(html_content: bytes, include_comments: bool = False,
         return ""
 
     try:
-        decoded = _decode_bytes(html_content)
+        text = trafilatura.extract(
+            html_content,
+            include_comments=include_comments,
+            include_tables=include_tables,
+            target_language=target_language,
+            favor_precision=True
+        )
+        if text:
+            logger.debug("HTML processed with Trafilatura")
+            return normalize_text(text)
     except Exception as e:
-        logger.error(f"Ошибка декодирования HTML: {e}")
-        return ""
+        logger.warning(f"Trafilatura failed, falling back to BeautifulSoup: {e}")
 
     try:
-        from bs4 import BeautifulSoup
+        decoded = _decode_bytes(html_content)
         soup = BeautifulSoup(decoded, "html.parser")
 
         for element in soup(["script", "style", "nav", "footer", "header",
-                             "aside", "iframe", "noscript"]):
+                             "aside", "iframe", "noscript", "form", "button"]):
             element.decompose()
 
         main_content = (
@@ -76,18 +69,13 @@ def html_to_text(html_content: bytes, include_comments: bool = False,
                 soup.find("div", class_=re.compile(r"content|main|article", re.I))
         )
 
-        if main_content:
-            text = main_content.get_text(separator='\n')
-        else:
-            text = soup.get_text(separator='\n')
-
-        logger.debug("HTML обработан с помощью BeautifulSoup")
-        return _normalize_text(text)
+        text = main_content.get_text(separator='\n') if main_content else soup.get_text(separator='\n')
+        logger.debug("HTML processed with BeautifulSoup")
+        return normalize_text(text)
 
     except Exception as e:
-        logger.error(f"Ошибка извлечения через BeautifulSoup: {e}")
-        return decoded[:10000]
-
+        logger.error(f"Critical HTML extraction error: {e}")
+        return ""
 
 def pdf_to_text(pdf_content: bytes, extract_tables: bool = False,
                 preserve_layout: bool = True, ocr_fallback: bool = False) -> str:
@@ -95,28 +83,21 @@ def pdf_to_text(pdf_content: bytes, extract_tables: bool = False,
         return ""
 
     if not PYMUPDF_AVAILABLE:
-        logger.error("PyMuPDF не установлен. Установите: pip install pymupdf")
+        logger.error("PyMuPDF is not installed.")
         return ""
 
     text_parts = []
-
     try:
         doc = pymupdf.open(stream=pdf_content, filetype="pdf")
 
         if doc.is_encrypted:
-            try:
-                if not doc.authenticate(""):
-                    logger.warning("Зашифрованный PDF, не удалось расшифровать")
-                    doc.close()
-                    return ""
-            except Exception as e:
-                logger.warning(f"Ошибка при расшифровке PDF: {e}")
+            if not doc.authenticate(""):
+                logger.warning("Encrypted PDF could not be decrypted")
                 doc.close()
                 return ""
 
         for page_num in range(len(doc)):
             page = doc[page_num]
-
             if preserve_layout:
                 blocks = page.get_text("blocks")
                 page_text = "\n".join(block[4] for block in blocks if block[4].strip())
@@ -130,52 +111,39 @@ def pdf_to_text(pdf_content: bytes, extract_tables: bool = False,
                     for table in tables.tables:
                         table_str = table.to_text()
                         if table_str:
-                            table_texts.append(f"[ТАБЛИЦА]\n{table_str}\n[/ТАБЛИЦА]")
-
+                            table_texts.append(f"[TABLE]\n{table_str}\n[/TABLE]")
                     if table_texts:
-                        if page_text:
-                            page_text += "\n\n" + "\n\n".join(table_texts)
-                        else:
-                            page_text = "\n\n".join(table_texts)
+                        page_text = (page_text + "\n\n" if page_text else "") + "\n\n".join(table_texts)
 
             if page_text:
-                text_parts.append(unicodedata.normalize('NFC', page_text))
+                text_parts.append(page_text)
 
         doc.close()
 
         if text_parts:
-            logger.debug(f"PDF обработан с помощью PyMuPDF ({len(text_parts)} стр.)")
-            return _normalize_text("\n\n".join(text_parts))
+            logger.debug(f"PDF processed with PyMuPDF ({len(text_parts)} pages)")
+            return normalize_text("\n\n".join(text_parts))
         else:
-            logger.warning("Не удалось извлечь текст из PDF")
+            logger.warning("Failed to extract text from PDF")
             return ""
 
     except Exception as e:
-        logger.error(f"Ошибка при обработке PDF через PyMuPDF: {e}")
+        logger.error(f"Error processing PDF with PyMuPDF: {e}")
         return ""
 
-
-def _normalize_text(text: str) -> str:
+def normalize_text(text: str) -> str:
     if not text:
         return ""
-
     text = unicodedata.normalize('NFC', text)
     text = re.sub(r'[ \t]+', ' ', text)
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = ''.join(char for char in text if char in ('\n', '\t') or ord(char) >= 32)
-
     return text.strip()
-
-
-def normalize_text(text: str) -> str:
-    return _normalize_text(text)
-
 
 def count_words(text: str) -> int:
     if not text:
         return 0
     return len(re.findall(r'\b\w+\b', text, re.UNICODE))
-
 
 def count_sentences(text: str) -> int:
     if not text:
@@ -183,16 +151,13 @@ def count_sentences(text: str) -> int:
     sentences = re.split(r'[.!?…]+[\s\n]+', text)
     return len([s for s in sentences if s.strip()])
 
-
 def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
-
 def extract_text_from_file(file_path: Path | str, **kwargs) -> str:
     path = Path(file_path)
-
     if not path.exists():
-        raise FileNotFoundError(f"Файл не найден: {path}")
+        raise FileNotFoundError(f"File not found: {path}")
 
     content = path.read_bytes()
     suffix = path.suffix.lower()
@@ -202,11 +167,26 @@ def extract_text_from_file(file_path: Path | str, **kwargs) -> str:
     elif suffix in ('.html', '.htm', '.xhtml'):
         return html_to_text(content, **kwargs)
     elif suffix in ('.txt', '.md', '.rst'):
-        return _normalize_text(_decode_bytes(content))
+        return normalize_text(_decode_bytes(content))
     else:
         if content[:4] == b'%PDF':
             return pdf_to_text(content, **kwargs)
         elif b'<html' in content[:1000].lower() or b'<!doctype html' in content[:1000].lower():
             return html_to_text(content, **kwargs)
         else:
-            return _normalize_text(_decode_bytes(content))
+            return normalize_text(_decode_bytes(content))
+
+
+def get_tradition_color(tradition: str) -> str:
+    with _color_lock:
+        
+        if tradition in _tradition_colors:
+            return _tradition_colors[tradition]
+
+        
+        while True:
+            color = "#{:06X}".format(random.randint(0, 0xFFFFFF))
+            if color not in _used_colors:
+                _used_colors.add(color)
+                _tradition_colors[tradition] = color
+                return color

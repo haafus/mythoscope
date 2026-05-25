@@ -1,0 +1,18 @@
+{
+  "n_clusters_found": 13,
+  "n_noise_points": 8866,
+  "noise_ratio": 0.34534335683402795,
+  "avg_intra_distance": 0.5347064733505249,
+  "avg_inter_distance": 7.914029598236084,
+  "separation_ratio": 14.80069906138591,
+  "silhouette_score": 0.7372239232063293,
+  "davies_bouldin_score": 0.30870234387855255,
+  "calinski_harabasz_score": 22873.513671875,
+  "adjusted_rand_score": 0.9099550497612453,
+  "normalized_mutual_info": 0.9059865443998288,
+  "adjusted_mutual_info": 0.9056062264361883,
+  "homogeneity": 0.8549161005696352,
+  "completeness": 0.9635462693778296,
+  "v_measure": 0.9059865443998287,
+  "cluster_compactness": 0.6515903968377941
+}

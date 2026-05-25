@@ -1,0 +1,1 @@
+{"text": "“Primary chief bard am I to Elphin,\n And my original country is the region of the summer stars;\n Idno and Heinin called me Merddin,\n At length every king will call me Taliesin.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

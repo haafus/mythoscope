@@ -21,19 +21,19 @@ class LanguageDetector:
         try:
             import fasttext
         except ImportError:
-            logger.warning("FastText не установлен. Установите: pip install fasttext")
+            logger.warning("FastText is not installed. Install it with: pip install fasttext")
             return False
 
         if not os.path.exists(cls._model_path):
-            logger.warning(f"Модель FastText не найдена по пути {cls._model_path}. "
-                           f"Запустите download_fasttext_model() для загрузки.")
+            logger.warning(f"FastText model not found at {cls._model_path}. "
+                           f"Run download_fasttext_model() to download it.")
             return False
 
         try:
             cls._fasttext_model = fasttext.load_model(cls._model_path)
             return True
         except Exception as e:
-            logger.error(f"Ошибка загрузки FastText модели: {e}")
+            logger.error(f"FastText model load error: {e}")
             return False
 
     @classmethod
@@ -42,7 +42,7 @@ class LanguageDetector:
             del cls._fasttext_model
             cls._fasttext_model = None
             gc.collect()
-            logger.info("FastText модель выгружена из памяти")
+            logger.info("FastText model unloaded from memory")
 
     @classmethod
     def detect(cls, text: str) -> str:
@@ -57,7 +57,7 @@ class LanguageDetector:
                 lang_code = predictions[0][0].replace('__label__', '')
                 return lang_code
             except Exception as e:
-                logger.debug(f"FastText ошибка: {e}, переключаюсь на langdetect")
+                logger.debug(f"FastText error: {e}, switching to langdetect")
 
         try:
             from langdetect import detect, DetectorFactory
@@ -105,20 +105,20 @@ def download_fasttext_model():
     model_path = os.path.join(cache_dir, "lid.176.bin")
 
     if os.path.exists(model_path):
-        print(f"Модель уже существует: {model_path}")
+        print(f"Model already exists: {model_path}")
         return model_path
 
     url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
-    print(f"Скачивание модели FastText (176 языков, ~130MB)...")
+    print(f"Downloading FastText model (176 languages, ~130MB)...")
     print(f"URL: {url}")
-    print(f"Путь: {model_path}")
+    print(f"Path: {model_path}")
 
     try:
         urllib.request.urlretrieve(url, model_path)
-        print("Загрузка завершена!")
+        print("Download complete!")
         return model_path
     except Exception as e:
-        print(f"Ошибка загрузки: {e}")
+        print(f"Load error: {e}")
         if os.path.exists(model_path):
             os.remove(model_path)
         raise
@@ -183,7 +183,7 @@ class RegexPatterns:
     SENTENCE_SPLITTER = re.compile(r'(?<=[.!?])\s+|(?<=[。！？।])\s*')
     PARAGRAPH_SPLITTER = re.compile(r'\n\s*\n')
 
-    CYRILLIC_PATTERN = re.compile(r'[а-яА-ЯёЁ]')
+    CYRILLIC_PATTERN = re.compile(r'[\u0400-\u04FF]')
     LATIN_PATTERN = re.compile(r'[a-zA-Z]')
     CJK_PATTERN = re.compile(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]')
     ARABIC_PATTERN = re.compile(r'[\u0600-\u06FF\u0750-\u077F]')
@@ -197,11 +197,11 @@ def character_based_chunking(
         separators: Optional[List[str]] = None
 ) -> List[str]:
     if chunk_size < 10:
-        raise ValueError("chunk_size должен быть минимум 10 символов")
+        raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap не может быть больше или равен chunk_size")
+        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
     if chunk_overlap < 0:
-        raise ValueError("chunk_overlap не может быть отрицательным")
+        raise ValueError("chunk_overlap cannot be negative")
 
     if separators is None:
         separators = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
@@ -294,9 +294,9 @@ def chunk_stream(
         buffer_size: int = 8192
 ) -> Generator[str, None, None]:
     if chunk_size < 10:
-        raise ValueError("chunk_size должен быть минимум 10 символов")
+        raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap не может быть больше или равен chunk_size")
+        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
 
     def process_buffer(buffer_text: str) -> List[str]:
         if not buffer_text:
@@ -331,9 +331,9 @@ def chunk_stream(
 
 def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int = 64) -> List[str]:
     if chunk_size < 10:
-        raise ValueError("chunk_size должен быть минимум 10 символов")
+        raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap не может быть больше или равен chunk_size")
+        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
 
     if not text: return []
     sentences = RegexPatterns.SENTENCE_SPLITTER.split(text)
@@ -368,9 +368,9 @@ def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int
 
 def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: int = 128) -> List[str]:
     if chunk_size < 10:
-        raise ValueError("chunk_size должен быть минимум 10 символов")
+        raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap не может быть больше или равен chunk_size")
+        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
 
     if not text: return []
     paragraphs = RegexPatterns.PARAGRAPH_SPLITTER.split(text)
@@ -414,11 +414,11 @@ class ChunkingStrategy:
             language: str = "auto"
     ):
         if chunk_size < 10:
-            raise ValueError("chunk_size должен быть минимум 10 символов")
+            raise ValueError("chunk_size must be at least 10 characters")
         if chunk_overlap >= chunk_size:
-            raise ValueError("chunk_overlap не может быть больше или равен chunk_size")
+            raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
         if chunk_overlap < 0:
-            raise ValueError("chunk_overlap не может быть отрицательным")
+            raise ValueError("chunk_overlap cannot be negative")
 
         self.name = name
         self.chunk_size = chunk_size
@@ -501,15 +501,17 @@ def create_chunking_strategies() -> Dict[str, ChunkingStrategy]:
 
 
 class LangChainIntegration:
-    @staticmethod
-    def create_langchain_splitter(method: str = "character", chunk_size: int = 512, chunk_overlap: int = 64):
-        if chunk_size < 10:
-            raise ValueError("chunk_size должен быть минимум 10 символов")
-        if chunk_overlap >= chunk_size:
-            raise ValueError("chunk_overlap не может быть больше или равен chunk_size")
+    _ImprovedTextSplitterClass = None
+
+    @classmethod
+    def _get_splitter_class(cls):
+        
+        if cls._ImprovedTextSplitterClass is not None:
+            return cls._ImprovedTextSplitterClass
 
         try:
             from langchain.text_splitter import TextSplitter
+
             class ImprovedTextSplitter(TextSplitter):
                 def __init__(self, chunk_size=512, chunk_overlap=64, method="character"):
                     super().__init__(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
@@ -524,7 +526,21 @@ class LangChainIntegration:
                 def split_text(self, text: str) -> List[str]:
                     return self.chunking_func(text, self.chunk_size, self.chunk_overlap)
 
-            return ImprovedTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap, method=method)
+            cls._ImprovedTextSplitterClass = ImprovedTextSplitter
+            return cls._ImprovedTextSplitterClass
+
         except ImportError:
-            logger.warning("LangChain не установлен.")
+            logger.warning("LangChain is not installed.")
             return None
+
+    @staticmethod
+    def create_langchain_splitter(method: str = "character", chunk_size: int = 512, chunk_overlap: int = 64):
+        if chunk_size < 10:
+            raise ValueError("chunk_size must be at least 10 characters")
+        if chunk_overlap >= chunk_size:
+            raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
+
+        SplitterClass = LangChainIntegration._get_splitter_class()
+        if SplitterClass:
+            return SplitterClass(chunk_size=chunk_size, chunk_overlap=chunk_overlap, method=method)
+        return None
