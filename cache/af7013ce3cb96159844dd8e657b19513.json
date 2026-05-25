@@ -1,0 +1,1 @@
+{"text": "Canto V. Ráma’s Lament.\n\nThere on the coast in long array\nThe Vánars’ marshalled legions lay,\nWhere Níla’s care had ordered well\nThe watch of guard and sentinel,\nAnd Mainda moved from post to post\nWith Dwivid to protect the host.", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

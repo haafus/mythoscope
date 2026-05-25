@@ -1,0 +1,1 @@
+{"text": "1 Al Beidâwi. 2 Idem, Al Zamakhshari, Al Bokhari, in Sonna,\n&c. 3 Idem. 1 Idem.\n2 Idem.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

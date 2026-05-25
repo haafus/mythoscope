@@ -1,0 +1,1 @@
+{"text": "Thus Lakshmaṇ cried, the mighty-souled:\nDown her sad cheeks the torrents rolled,\nAs to her son Kauśalyá spake:", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

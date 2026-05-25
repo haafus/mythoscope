@@ -1,0 +1,1 @@
+{"text": "7 Idem. Vide Abulfed. Vit. Moh. p. 58. 8 See cap. 3, p. 33 and\n45. 1 Al Beidâwi.\n9 Idem.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

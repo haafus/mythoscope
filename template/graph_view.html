@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Просмотр изображения</title>
+    <title>Image Viewer</title>
     <style>
         * {
             box-sizing: border-box;
@@ -116,16 +116,16 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        Назад
+        Back
     </a>
-    <div class="title" id="title-text">Загрузка...</div>
+    <div class="title" id="title-text">Loading...</div>
     <a id="download-link" href="#" download class="download-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        Скачать
+        Download
     </a>
 </div>
 
@@ -144,9 +144,9 @@
         const downloadLink = document.getElementById('download-link');
 
         imgEl.src = imagePath;
-        titleEl.textContent = title || 'Изображение графа';
+        titleEl.textContent = title || 'Graph image';
         downloadLink.href = imagePath;
-        document.title = (title || 'Изображение') + ' - MythoScope';
+        document.title = (title || 'Image') + ' - MythoScope';
 
         let scale = 1;
         const viewer = document.getElementById('viewer');

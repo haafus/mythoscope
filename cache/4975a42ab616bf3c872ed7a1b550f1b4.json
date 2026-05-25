@@ -1,0 +1,1 @@
+{"text": "And up to heaven the hermit went,\nLamenting, as from earth he passed,\nHis aged parents to the last.\nThus, unaware, the deed was done:\nMy hand, unwitting, killed thy son.\nFor what remains, O, let me win\nThy pardon for my heedless sin.”", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

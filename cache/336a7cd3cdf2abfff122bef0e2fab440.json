@@ -1,0 +1,1 @@
+{"text": "1 Idem. 2 Idem. 3 Page 56. 4 See Prid. Life\nof Mahomet, p. 116.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

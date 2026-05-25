@@ -1,0 +1,46 @@
+paths:
+  corpus_dir: "corpus"
+  out_dir: "analysis"
+  chroma_path: "./chroma_db"
+  cache_dir: "./cache"
+  chunked_dir: "corpus_chunked"
+
+embedding:
+  default_model: "BAAI/bge-m3"
+  models:
+    - "BAAI/bge-m3"
+    - "sentence-transformers/LaBSE"
+    - "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    - "intfloat/e5-large-v2"
+    - "Qwen/Qwen3-Embedding"
+  default_chunking: "paragraph"
+  text_type: "all"
+  batch_size: 32
+
+chunking:
+  character:
+    chunk_size: 512
+    chunk_overlap: 64
+  sentence:
+    chunk_size: 512
+    chunk_overlap: 64
+  paragraph:
+    chunk_size: 1024
+    chunk_overlap: 128
+
+logging:
+  level: "INFO"
+  file: "logs/embedding.log"
+  max_bytes: 10485760
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+performance:
+  enable_metrics: true
+  track_memory: true
+  metrics_file: "analysis/performance_metrics.json"
+
+cache:
+  validation: "crc32"
+  max_size_mb: 1024
+  ttl_days: 30

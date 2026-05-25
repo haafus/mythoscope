@@ -1,0 +1,1 @@
+{"text": "Near to the hermit’s home he drew,\nAnd there the tamer of his foes\nDwelt for a time in sweet repose.\nOne day within that holy wood\nBy saint Sutíkshṇa Ráma stood,\nAnd thus the prince with reverence meek\nTo that high sage began to speak:", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

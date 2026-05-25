@@ -1,0 +1,1 @@
+{"text": "1 Al Bokhari in Sonna, Al Beidâwi, Jallalo'ddin, &c. Vide Abu'lf. Vit.\nMoh. p. 82, &c., and Gagnier, Vie de Mahomet, lib. 4. c. 7.\n2 Al Beidâwi. 3 Abulfeda, Vit. Moh. p. 83. 4 Al Beidâwi.\n 5 See chapter 9, p. 144.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

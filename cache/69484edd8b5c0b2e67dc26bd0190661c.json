@@ -1,0 +1,1 @@
+{"text": "And that which hanging skulls compose:(233)\nThese fearful darts in fiery rain\nHe hurled upon the saint amain,\nAn awful miracle to view.\nBut as the ceaseless tempest flew,\nThe sage with wand of God-sent power\nStill swallowed up that fiery shower.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

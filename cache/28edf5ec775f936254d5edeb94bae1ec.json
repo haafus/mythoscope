@@ -1,0 +1,1 @@
+{"text": "5 Id. m. 6 Jallalo'ddin. 7 Iidem. 8\nJallalo'ddin, Yahya. 9 Al Zamakhshari, Al Beidâwi. 10\nIidem. 11 Yahya, Jallalo'ddin 12 Al Beidâwi.", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

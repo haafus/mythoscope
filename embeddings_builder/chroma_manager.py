@@ -1,16 +1,98 @@
-from typing import List, Dict, Any, Optional
+import hashlib
+import os
+import re
+import stat
+from pathlib import Path
+from typing import List, Dict, Any
 
 import chromadb
 
+MAX_CHROMA_COLLECTION_NAME = 63
+MODEL_COLLECTION_HASH_LEN = 8
+
+
+def collection_name_for_model(model_name: Any) -> str:
+    raw_name = str(model_name or "unknown").strip()
+    digest = hashlib.sha1(raw_name.encode("utf-8")).hexdigest()[:MODEL_COLLECTION_HASH_LEN]
+
+    safe_name = re.sub(r"[^0-9A-Za-z_-]+", "_", raw_name).strip("_-").lower()
+    safe_name = re.sub(r"_+", "_", safe_name)
+    if not safe_name:
+        safe_name = "model"
+
+    suffix = f"_{digest}"
+    max_base_len = MAX_CHROMA_COLLECTION_NAME - len(suffix)
+    safe_name = safe_name[:max_base_len].strip("_-")
+    if len(safe_name) < 3:
+        safe_name = f"{safe_name}_model".strip("_-")
+        safe_name = safe_name[:max_base_len].strip("_-")
+    if len(safe_name) < 3:
+        safe_name = "model"
+
+    return f"{safe_name}{suffix}"
+
+
+def is_model_collection_name(collection_name: str) -> bool:
+    if not collection_name:
+        return False
+    return bool(re.fullmatch(r"[a-z0-9][a-z0-9_-]{2,53}_[0-9a-f]{8}", collection_name))
+
+
+def _add_owner_write_permission(path: Path) -> None:
+    try:
+        mode = path.stat().st_mode
+        extra_bits = stat.S_IRUSR | stat.S_IWUSR
+        if path.is_dir():
+            extra_bits |= stat.S_IXUSR
+        path.chmod(mode | extra_bits)
+    except OSError:
+        pass
+
+
+def ensure_chroma_writable(chroma_path: Any) -> Path:
+    path = Path(chroma_path)
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        raise RuntimeError(f"Cannot create Chroma path '{path}': {error}") from error
+
+    _add_owner_write_permission(path)
+
+    probe_path = path / ".chroma_write_probe"
+    try:
+        with open(probe_path, "w", encoding="utf-8") as probe:
+            probe.write("ok")
+        probe_path.unlink(missing_ok=True)
+    except OSError as error:
+        raise RuntimeError(
+            f"Chroma path '{path}' is not writable. "
+            "Move chroma_path to a writable directory or fix filesystem permissions."
+        ) from error
+
+    db_files = list(path.glob("*.sqlite*")) + list(path.glob("*.db*"))
+    for db_file in db_files:
+        if not db_file.is_file():
+            continue
+        _add_owner_write_permission(db_file)
+        try:
+            with open(db_file, "ab"):
+                pass
+        except OSError as error:
+            raise RuntimeError(
+                f"Chroma database file '{db_file}' is not writable. "
+                "Fix its permissions or remove/recreate the Chroma DB in a writable location."
+            ) from error
+
+    return path
+
+
 def save_to_chroma_collection(
-        client: chromadb.PersistentClient,
-        collection_name: str,
+        collection: chromadb.Collection,
         ids: List[str],
         embeddings: List[List[float]],
         metadatas: List[Dict[str, Any]],
         documents: List[str],
 ):
-    collection = client.get_or_create_collection(name=collection_name)
     collection.upsert(
         ids=ids,
         embeddings=embeddings,
@@ -18,11 +100,33 @@ def save_to_chroma_collection(
         documents=documents,
     )
 
-def delete_collection(client: chromadb.PersistentClient, collection_name: str):
+def _is_missing_collection_error(error: Exception) -> bool:
+    message = str(error).lower()
+    return (
+        "does not exist" in message
+        or "doesn't exist" in message
+        or "not found" in message
+    )
+
+
+def _is_readonly_database_error(error: Exception) -> bool:
+    message = str(error).lower()
+    return "readonly database" in message or "read-only database" in message
+
+
+def delete_collection(client: chromadb.PersistentClient, collection_name: str) -> bool:
     try:
         client.delete_collection(name=collection_name)
-    except Exception:
-        pass
+        return True
+    except Exception as error:
+        if _is_missing_collection_error(error):
+            return False
+        if _is_readonly_database_error(error):
+            raise RuntimeError(
+                "Chroma database is read-only. Move chroma_path to a writable directory "
+                "or fix permissions for the Chroma DB files."
+            ) from error
+        raise
 
 def query_chroma_collection(
         collection: chromadb.Collection,
@@ -34,13 +138,18 @@ def query_chroma_collection(
         n_results=top_k,
         include=["documents", "metadatas", "distances"],
     )
+
+    if not results or not results.get("documents") or not results["documents"][0]:
+        return []
+
     formatted = []
-    for i in range(len(results["documents"][0])):
-        formatted.append(
-            {
-                "document": results["documents"][0][i],
-                "metadata": results["metadatas"][0][i],
-                "distance": results["distances"][0][i],
-            }
-        )
+    for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
+        formatted.append({
+            "document": doc,
+            "metadata": meta,
+            "distance": dist,
+        })
     return formatted
+
+def get_chroma_collection(client: chromadb.PersistentClient, collection_name: str) -> chromadb.Collection:
+    return client.get_or_create_collection(name=collection_name)

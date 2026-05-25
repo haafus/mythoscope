@@ -1,0 +1,1 @@
+{"text": "To whom the Father of th’ immortal race,\n Smiling with that serene indulgent face,\n With which he drives the clouds and clears the skies,\n First gave a holy kiss; then thus replies:", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

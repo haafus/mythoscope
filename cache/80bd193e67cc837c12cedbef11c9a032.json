@@ -1,0 +1,1 @@
+{"text": "The glorious hermit, far renowned,\nWith highest fame and virtue crowned,\nRejoiced these modest words to hear\nDelightful to the mind and ear.\n\nCanto XXI. Visvámitra’s Speech.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

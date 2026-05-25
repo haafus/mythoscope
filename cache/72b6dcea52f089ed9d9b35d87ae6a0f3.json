@@ -1,0 +1,1 @@
+{"text": "“Yudhishthira said, ‘O eminently virtuous one, O mighty sage, of the\nbestowal of gifts and the observance of asceticism, which is of greater\nefficacy in the next world, and which, harder of practice?’", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

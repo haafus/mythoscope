@@ -1,0 +1,1 @@
+{"text": "Canto CXIII. Mandodarí’s Lament.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

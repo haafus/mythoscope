@@ -1,0 +1,43 @@
+{
+  "model_name": "sentence-transformers/LaBSE",
+  "output_dir": "analysis\\sentence-transformers_LaBSE",
+  "statistics": {
+    "n_samples": 25673,
+    "embedding_dim": 768,
+    "traditions": 23,
+    "tradition_counts": {
+      "Islam": 3035,
+      "Anglo-Saxon": 328,
+      "Roman": 792,
+      "Chinese": 1037,
+      "Celtic": 766,
+      "Maya": 105,
+      "Christianity": 6076,
+      "Greek": 2166,
+      "Babylonian": 278,
+      "Ancient Egyptian": 85,
+      "Japanese Buddhism": 123,
+      "Buddhism": 84,
+      "Norse": 2,
+      "Australian": 82,
+      "Finnish": 1340,
+      "Hinduism": 8102,
+      "West African": 245,
+      "Polynesian": 370,
+      "Maori": 24,
+      "Australian Aboriginal": 277,
+      "Confucianism": 238,
+      "Taoism": 87,
+      "Germanic": 31
+    },
+    "model": "sentence-transformers/LaBSE",
+    "total_chunks_in_db": 25673
+  },
+  "available_models": [
+    "BAAI/bge-m3",
+    "Qwen/Qwen3-Embedding",
+    "intfloat/e5-large-v2",
+    "sentence-transformers/LaBSE",
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+  ]
+}

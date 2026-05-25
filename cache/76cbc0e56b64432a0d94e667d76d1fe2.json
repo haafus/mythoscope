@@ -1,0 +1,1 @@
+{"text": "Thus Hanúmán, well trained in lore\nOf language, spoke, and said no more.\nThe son of Raghu joyed to hear\nThe envoy’s speech, and bright of cheer\nHe turned to Lakshmaṇ by his side,\nAnd thus in words of transport cried:", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

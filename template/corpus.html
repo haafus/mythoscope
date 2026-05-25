@@ -1,738 +1,666 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Файлы корпуса</title>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js  "></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js  "></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css  " />
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js  "></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js  "></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js  "></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js  "></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MythoScope - Sources</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #faf9f5;
-            min-height: 100vh;
-            padding: 40px 20px;
+            height: 100vh;
+            overflow: hidden;
+            background: #faf9f6;
+            color: #212529;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
-            max-width: 1400px;
+            width: min(1500px, calc(100% - 48px));
             margin: 0 auto;
+            padding: 24px 0 30px;
+            flex: 1 1 auto;
+            min-height: 0;
         }
 
-        .header-actions {
+        .workspace {
+            height: 100%;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: minmax(230px, 290px) minmax(0, 1fr) minmax(260px, 330px);
+            gap: 18px;
+        }
+
+        .panel,
+        .reader {
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid #e8ecef;
+        }
+
+        .panel-title {
+            color: #111;
+            font-size: 15px;
+            font-weight: 650;
+        }
+
+        .panel-subtitle {
+            margin-top: 3px;
+            color: #7a828c;
+            font-size: 12px;
+        }
+
+        .library-tree {
+            overflow: auto;
+            padding: 10px 8px 16px;
+        }
+
+        .major-section {
+            margin-bottom: 12px;
+        }
+
+        .major-title {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: 0;
+            border-bottom: 1px solid #eceff1;
+            background: transparent;
+            color: #2f343b;
+            cursor: pointer;
+            font: inherit;
+            font-size: 17px;
+            font-weight: 700;
+            padding: 7px 4px 6px;
+            text-align: left;
+        }
+
+        .major-title::after {
+            content: "-";
+            color: #b0b7be;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .major-section.collapsed .major-title::after {
+            content: "+";
+        }
+
+        .major-body {
+            padding-top: 6px;
+        }
+
+        .major-section.collapsed .major-body {
+            display: none;
+        }
+
+        .tradition-group {
+            margin: 1px 0;
+        }
+
+        .tradition-title {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 10px minmax(0, 1fr) 14px;
+            align-items: center;
+            gap: 8px;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: #3f4650;
+            cursor: pointer;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 650;
+            padding: 5px 6px;
+            text-align: left;
+        }
+
+        .tradition-title:hover,
+        .tradition-group.open > .tradition-title {
+            background: #eef3f4;
+            color: #111;
+        }
+
+        .tradition-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--tradition-color, #6b7280);
+            box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.12);
+        }
+
+        .tradition-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tradition-toggle {
+            color: #a7afb7;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .document-list {
+            display: none;
+            list-style: none;
+            padding: 1px 0 4px 28px;
+        }
+
+        .tradition-group.open .document-list {
+            display: block;
+        }
+
+        .document-button {
+            width: 100%;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: #9299a1;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            line-height: 1.25;
+            padding: 5px 7px;
+            text-align: left;
+        }
+
+        .document-button:hover {
+            color: #111;
+            background: #f4f6f7;
+        }
+
+        .document-button.active {
+            color: #111;
+            background: #e2edf0;
+            font-weight: 600;
+        }
+
+        .reader {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .reader-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
+            min-height: 56px;
+            padding: 14px 22px;
+            border-bottom: 1px solid #e8ecef;
+            color: #7a828c;
+            font-size: 13px;
         }
 
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: transparent;
-            color: #5a524c;
-            border: 1px solid #d0ccc8;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .back-btn:hover {
-            background: #f0eeec;
-            border-color: #c0bcb8;
-        }
-
-        .back-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        h1 {
-            color: #3a3532;
-            margin-bottom: 0;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #5a524c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .dropdown-btn:hover {
-            background: #6b635c;
-        }
-
-        .dropdown-btn svg {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.2s;
-        }
-
-        .dropdown.active .dropdown-btn svg {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 8px;
-            background: white;
-            min-width: 220px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            border: 1px solid #e8e6e4;
-            z-index: 1000;
+        .reader-title {
             overflow: hidden;
-        }
-
-        .dropdown.active .dropdown-content {
-            display: block;
-            animation: slideDown 0.2s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            color: #4a4542;
-            text-decoration: none;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 1px solid #f0eeec;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: #faf9f5;
-        }
-
-        .dropdown-item svg {
-            width: 18px;
-            height: 18px;
-            color: #5a524c;
-        }
-
-        .table-wrapper {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #e8e6e4;
-            overflow-x: auto;
-        }
-
-        table.dataTable {
-            border-collapse: collapse;
-            width: 100% !important;
-        }
-
-        table.dataTable thead th {
-            background: #f5f4f3;
-            color: #3a3532;
-            font-weight: 600;
-            padding: 14px 16px;
-            border-bottom: 2px solid #e0dedc;
-            text-align: left;
+            color: #111;
+            font-size: 15px;
+            font-weight: 650;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        table.dataTable tbody td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0eeec;
-            color: #4a4542;
-            vertical-align: middle;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            max-width: 300px;
+        .reader-meta {
+            color: #8a929b;
+            flex: 0 0 auto;
         }
 
-        table.dataTable tbody tr:hover {
-            background-color: #fafafa;
+        .reader-content {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+            padding: 28px 46px 60px;
+            color: #111;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 17px;
+            line-height: 1.8;
+            white-space: pre-wrap;
         }
 
-        .expand-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            color: #5a524c;
-            transition: transform 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .expand-btn:hover {
-            color: #3a3532;
-        }
-
-        .expand-btn.expanded {
-            transform: rotate(90deg);
-        }
-
-        .expand-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        tr.details-row {
-            background: #faf9f5 !important;
-        }
-
-        tr.details-row td {
-            padding: 0;
-            border-bottom: none;
-        }
-
-        .details-content {
-            padding: 20px;
-            display: none;
-        }
-
-        .details-content.show {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .details-grid {
+        .reader-placeholder {
+            height: 100%;
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 20px;
-            align-items: start;
-        }
-
-        .details-description {
-            color: #5a524c;
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .details-description strong {
-            color: #3a3532;
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .details-actions {
-            display: flex;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: white;
-            color: #5a524c;
-            border: 1px solid #d0ccc8;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .btn-secondary:hover {
-            background: #f5f4f3;
-            border-color: #c0bcb8;
-        }
-
-        .btn-secondary svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .open-txt {
-            background: #5a524c;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .open-txt:hover {
-            background: #6b635c;
-        }
-
-        .dataTables_wrapper .dataTables_length {
-            margin-bottom: 16px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .dataTables_wrapper .dataTables_length select {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px 10px;
-            margin: 0 4px;
-            background: white;
-        }
-
-        .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 16px;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 8px 14px;
-            margin-left: 8px;
-            width: 220px;
-        }
-
-        .dataTables_wrapper .dataTables_filter input:focus {
-            outline: none;
-            border-color: #b0aca8;
-        }
-
-        .dataTables_wrapper .dataTables_info {
-            color: #666;
-            margin-top: 16px;
-            font-size: 0.9rem;
-        }
-
-        .dataTables_wrapper .dataTables_paginate {
-            margin-top: 16px;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            border-radius: 4px !important;
-            margin: 0 2px;
-            border: 1px solid #ddd !important;
-            background: white !important;
-            color: #444 !important;
-            padding: 6px 12px !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: #f5f4f3 !important;
-            border-color: #ccc !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: #5a524c !important;
-            color: white !important;
-            border-color: #5a524c !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .progress-modal {
+            place-items: center;
+            color: #8a929b;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
             text-align: center;
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e8e6e4;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 20px 0;
+        .book-info {
+            overflow: auto;
+            padding: 18px;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: #5a524c;
-            transition: width 0.3s ease;
+        .book-title {
+            color: #111;
+            overflow-wrap: anywhere;
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.25;
         }
 
-        .progress-text {
-            color: #5a524c;
-            font-size: 0.9rem;
+        .book-tradition {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 10px;
+            color: #58616c;
+            font-size: 13px;
         }
 
-        #modalContainer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .info-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--book-color, #6b7280);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 18px 0;
+        }
+
+        .stat-card {
+            border: 1px solid #e1e6eb;
+            border-radius: 6px;
+            background: #fafbfc;
+            padding: 11px 10px;
+        }
+
+        .stat-value {
+            color: #111;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            margin-top: 3px;
+            color: #7a828c;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .description-title {
+            margin: 18px 0 8px;
+            color: #111;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .description-text {
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 9px 12px;
+            cursor: pointer;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+        }
+
+        .btn-primary {
+            background: #111;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #30343a;
+        }
+
+        .btn-outline {
+            border-color: #d8dee4;
+            background: #fff;
+            color: #30343a;
+        }
+
+        .btn-outline:hover {
+            border-color: #bfc7cf;
+            background: #f5f7f8;
+            color: #111;
+        }
+
+        .btn.disabled {
             pointer-events: none;
-            z-index: 2000;
+            opacity: 0.45;
         }
 
-        #modalContainer > * {
-            pointer-events: auto;
+        .empty-state,
+        .error-state {
+            padding: 18px;
+            color: #7a828c;
+            font-size: 14px;
+        }
+
+        .error-state {
+            color: #a33b35;
+        }
+
+        @media (max-width: 1150px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow: auto;
+            }
+
+            .container {
+                width: min(100% - 32px, 1500px);
+            }
+
+            .workspace {
+                grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+                min-height: 780px;
+            }
+
+            .info-panel {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .container {
+                width: min(100% - 24px, 1500px);
+                padding-top: 16px;
+            }
+
+            .workspace {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+
+            .panel,
+            .reader {
+                min-height: 360px;
+            }
+
+            .library-panel {
+                max-height: 460px;
+            }
+
+            .reader-content {
+                padding: 22px 22px 44px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header-actions">
-            <button class="back-btn" onclick="window.location.href='home.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Назад
-            </button>
+    <main class="container">
+        <div class="workspace">
+            <aside class="panel library-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Literature</div>
+                </div>
+                <div class="library-tree" id="libraryTree">
+                    <div class="empty-state">Loading sources...</div>
+                </div>
+            </aside>
 
-            <h1>Таблица корпуса</h1>
+            <article class="reader">
+                <div class="reader-header">
+                    <div class="reader-title" id="readerTitle">Select a book to begin reading</div>
+                </div>
+                <div class="reader-content" id="readerContent">
+                    <div class="reader-placeholder">Choose a title from the literature list.</div>
+                </div>
+            </article>
 
-            <div class="dropdown" id="actionsDropdown">
-                <button class="dropdown-btn" onclick="toggleDropdown()">
-                    Другие действия
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
-                <div class="dropdown-content">
-                    <div class="dropdown-item" onclick="downloadAll()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Скачать все
+            <aside class="panel info-panel">
+                <div class="panel-header">
+                    <div class="panel-title">Book Information</div>
+                </div>
+                <div class="book-info" id="bookInfo">
+                    <div class="empty-state">Select a book to view words, sentences, description, and download options.</div>
+                    <div class="actions">
+                        <a class="btn btn-outline" href="/api/download_corpus_archive">Download Full Archive</a>
                     </div>
                 </div>
-            </div>
+            </aside>
         </div>
-
-        <div class="table-wrapper">
-            <table id="corp-table" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th style="width: 40px;"></th>
-                        <th>Наименование</th>
-                        <th>Традиция</th>
-                        <th>Язык</th>
-                        <th>Тип</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="modalContainer"></div>
-
-    <div class="modal-overlay" id="progressModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
-        <div class="modal progress-modal" style="background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);">
-            <h2 style="color: #3a3532; margin-bottom: 20px; font-size: 1.3rem;">Скачивание документов</h2>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-            <div class="progress-text" id="progressText">Подготовка...</div>
-        </div>
-    </div>
+    </main>
 
     <script>
-        let tableData = [];
-        let table;
+        let documents = [];
+        let selectedDoc = null;
 
-        const csvUrl = '../corpus/corpus_catalog.csv';
+        const libraryTree = document.getElementById('libraryTree');
+        const readerTitle = document.getElementById('readerTitle');
+        const readerContent = document.getElementById('readerContent');
+        const bookInfo = document.getElementById('bookInfo');
 
-        Papa.parse(csvUrl, {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function (results) {
-                const data = results.data;
-                if (data.length === 0) {
-                    alert('CSV файл пуст или неправильно загружен.');
-                    return;
-                }
-                const requiredFields = ['id', 'tradition', 'language', 'type'];
-                const missingFields = requiredFields.filter(field => !(field in data[0]));
-                if (missingFields.length > 0) {
-                    alert('Отсутствуют поля: ' + missingFields.join(', '));
-                    return;
-                }
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = String(value ?? '');
+            return div.innerHTML;
+        }
 
-                tableData = data;
+        function formatNumber(value) {
+            const number = Number(value || 0);
+            return Number.isFinite(number) ? number.toLocaleString('en-US') : '0';
+        }
 
-                table = $('#corp-table').DataTable({
-                    data: data,
-                    destroy: true,
-                    autoWidth: true,
-                    scrollX: false,
-                    language: {
-                        "processing": "Подождите...",
-                        "search": "Поиск:",
-                        "lengthMenu": "Показать _MENU_ записей",
-                        "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
-                        "infoEmpty": "Записи с 0 до 0 из 0 записей",
-                        "infoFiltered": "(отфильтровано из _MAX_ записей)",
-                        "infoPostFix": "",
-                        "loadingRecords": "Загрузка записей...",
-                        "zeroRecords": "Записи отсутствуют.",
-                        "emptyTable": "В таблице отсутствуют данные",
-                        "paginate": {
-                            "first": "Первая",
-                            "previous": "Предыдущая",
-                            "next": "Следующая",
-                            "last": "Последняя"
-                        },
-                        "aria": {
-                            "sortAscending": ": активировать для сортировки столбца по возрастанию",
-                            "sortDescending": ": активировать для сортировки столбца по убыванию"
-                        }
-                    },
-                    columns: [
-                        {
-                            data: null,
-                            orderable: false,
-                            className: 'dt-center',
-                            render: function (data, type, row, meta) {
-                                return `<button class="expand-btn" onclick="toggleRow(${meta.row})" id="expand-btn-${meta.row}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="9 18 15 12 9 6"></polyline>
-                                    </svg>
-                                </button>`;
-                            }
-                        },
-                        { data: 'id' },
-                        { data: 'tradition' },
-                        { data: 'language' },
-                        { data: 'type' }
-                    ],
-                    createdRow: function(row, data, dataIndex) {
-                        $(row).attr('data-index', dataIndex);
-                    }
-                });
-
-                setTimeout(() => addDetailRows(), 100);
-            },
-            error: function (err) {
-                alert('Ошибка загрузки CSV: ' + err.message);
-            }
-        });
-
-        function addDetailRows() {
-            $('#corp-table tbody tr').each(function() {
-                const index = $(this).attr('data-index');
-                if (index !== undefined && !$(this).next().hasClass('details-row')) {
-                    const data = tableData[index];
-                    const description = data.description || 'Описание отсутствует';
-                    const safeTradition = data.tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
-                    const fileUrl = `../corpus/${safeTradition}/${data.id}/${data.id}.txt`;
-
-                    const detailsRow = `
-                        <tr class="details-row" id="details-${index}">
-                            <td colspan="5" style="padding: 0;">
-                                <div class="details-content" id="details-content-${index}">
-                                    <div class="details-grid">
-                                        <div class="details-description">
-                                            <strong>Описание:</strong>
-                                            ${description}
-                                        </div>
-                                        <div class="details-actions">
-                                            <button class="btn-secondary" onclick="downloadFile('${fileUrl}', '${data.id}.txt')">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                                </svg>
-                                                Скачать
-                                            </button>
-                                            <button class="open-txt" onclick="openDocument('${data.id}', '${data.tradition}')">
-                                                Открыть
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    $(this).after(detailsRow);
-                }
+        function buildCorpusApiUrl(doc, options = {}) {
+            const params = new URLSearchParams({
+                id: doc.id || '',
+                major_tradition: doc.major_tradition || '',
+                tradition: doc.tradition || ''
             });
+
+            if (options.download) params.set('download', '1');
+            return `/api/get_corpus_document?${params.toString()}`;
         }
 
-        function toggleRow(index) {
-            const btn = $(`#expand-btn-${index}`);
-            const content = $(`#details-content-${index}`);
-            const isExpanded = btn.hasClass('expanded');
+        function groupDocuments(items) {
+            const grouped = new Map();
 
-            if (isExpanded) {
-                btn.removeClass('expanded');
-                content.removeClass('show');
-            } else {
-                btn.addClass('expanded');
-                content.addClass('show');
-            }
+            items.forEach(doc => {
+                const major = doc.major_tradition || 'Other';
+                const tradition = doc.tradition || 'Unknown';
+
+                if (!grouped.has(major)) grouped.set(major, new Map());
+                const majorGroup = grouped.get(major);
+                if (!majorGroup.has(tradition)) majorGroup.set(tradition, []);
+                majorGroup.get(tradition).push(doc);
+            });
+
+            return grouped;
         }
 
-        function openDocument(filename, tradition) {
-            const safeTradition = tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
-            const txtUrl = `../corpus/${safeTradition}/${filename}/${filename}.txt`;
-
-            fetch(txtUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error('Файл не найден');
-                    return res.text();
-                })
-                .then(text => {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    const maxLineWidth = 180;
-                    const lineHeight = 10;
-                    const lines = doc.splitTextToSize(text, maxLineWidth);
-                    const pageHeight = doc.internal.pageSize.height;
-                    const yStart = 10;
-                    let y = yStart;
-                    const linesPerPage = Math.floor((pageHeight - yStart) / lineHeight);
-
-                    for (let i = 0; i < lines.length; i++) {
-                        if (i > 0 && i % linesPerPage === 0) {
-                            doc.addPage();
-                            y = yStart;
-                        }
-                        doc.text(lines[i], 10, y);
-                        y += lineHeight;
-                    }
-
-                    const pdfBlob = doc.output('blob');
-                    const url = URL.createObjectURL(pdfBlob);
-                    window.open(url, '_blank');
-                })
-                .catch(err => alert('Ошибка: ' + err.message));
+        function createDocumentButton(doc) {
+            return `
+                <li>
+                    <button class="document-button${selectedDoc && selectedDoc.id === doc.id ? ' active' : ''}" type="button" data-doc-id="${escapeHtml(doc.id)}">
+                        ${escapeHtml(doc.id)}
+                    </button>
+                </li>
+            `;
         }
 
-        function downloadFile(url, filename) {
-            fetch(url)
-                .then(response => response.blob())
-                .then(blob => {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                })
-                .catch(err => alert('Ошибка скачивания: ' + err.message));
-        }
-
-        function toggleDropdown() {
-            document.getElementById('actionsDropdown').classList.toggle('active');
-        }
-
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('actionsDropdown');
-            if (!dropdown.contains(event.target)) {
-                dropdown.classList.remove('active');
-            }
-        });
-
-        async function downloadAll() {
-            if (tableData.length === 0) {
-                alert('Нет данных для скачивания');
+        function renderLibrary() {
+            if (!documents.length) {
+                libraryTree.innerHTML = '<div class="empty-state">No literature found.</div>';
                 return;
             }
 
-            toggleDropdown();
+            const grouped = groupDocuments(documents);
+            let html = '';
 
-            const progressModal = document.getElementById('progressModal');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            progressModal.style.display = 'flex';
+            grouped.forEach((traditions, major) => {
+                html += `<section class="major-section" data-major="${escapeHtml(major)}">
+                    <button class="major-title" type="button">${escapeHtml(major)}</button>
+                    <div class="major-body">`;
 
-            const zip = new JSZip();
-            const folder = zip.folder("corpus_documents");
-            let downloaded = 0;
-            const total = tableData.length;
+                traditions.forEach((docs, tradition) => {
+                    const isOpen = selectedDoc ? selectedDoc.tradition === tradition && selectedDoc.major_tradition === major : true;
+                    const color = docs[0] && docs[0].color ? docs[0].color : '#6b7280';
 
-            for (let i = 0; i < tableData.length; i++) {
-                const doc = tableData[i];
-                const safeTradition = doc.tradition.replace(/\\/g, '/').replace(/_/g, '_').replace(/\//g, '_');
-                const fileUrl = `../corpus/${safeTradition}/${doc.id}/${doc.id}.txt`;
+                    html += `
+                        <div class="tradition-group${isOpen ? ' open' : ''}" data-tradition="${escapeHtml(tradition)}">
+                            <button class="tradition-title" type="button" style="--tradition-color:${escapeHtml(color)}">
+                                <span class="tradition-dot"></span>
+                                <span class="tradition-name">${escapeHtml(tradition)}</span>
+                                <span class="tradition-toggle">${isOpen ? '-' : '+'}</span>
+                            </button>
+                            <ul class="document-list">
+                                ${docs.map(createDocumentButton).join('')}
+                            </ul>
+                        </div>
+                    `;
+                });
 
-                try {
-                    const response = await fetch(fileUrl);
-                    if (response.ok) {
-                        const blob = await response.blob();
-                        const text = await blob.text();
-                        folder.file(`${doc.id}.txt`, text);
-                    } else {
-                        console.warn(`Файл не найден: ${fileUrl}`);
-                    }
-                } catch (error) {
-                    console.error(`Ошибка загрузки ${doc.id}:`, error);
-                }
+                html += '</div></section>';
+            });
 
-                downloaded++;
-                const progress = (downloaded / total) * 100;
-                progressFill.style.width = progress + '%';
-                progressText.textContent = `Скачано ${downloaded} из ${total} документов...`;
+            libraryTree.innerHTML = html;
+
+            libraryTree.querySelectorAll('.major-title').forEach(button => {
+                button.addEventListener('click', () => {
+                    button.closest('.major-section').classList.toggle('collapsed');
+                });
+            });
+
+            libraryTree.querySelectorAll('.tradition-title').forEach(button => {
+                button.addEventListener('click', () => {
+                    const group = button.closest('.tradition-group');
+                    group.classList.toggle('open');
+                    const toggle = group.querySelector('.tradition-toggle');
+                    toggle.textContent = group.classList.contains('open') ? '-' : '+';
+                });
+            });
+
+            libraryTree.querySelectorAll('.document-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const doc = documents.find(item => item.id === button.dataset.docId);
+                    if (doc) openDocument(doc);
+                });
+            });
+        }
+
+        function renderBookInfo(doc, isLoading = false) {
+            if (!doc) {
+                bookInfo.innerHTML = `
+                    <div class="empty-state">Select a book to view words, sentences, description, and download options.</div>
+                    <div class="actions">
+                        <a class="btn btn-outline" href="/api/download_corpus_archive">Download Full Archive</a>
+                    </div>
+                `;
+                return;
             }
-            const headers = ['id', 'tradition', 'language', 'type', 'description'];
-            const csvContent = [
-                headers.join(','),
-                ...tableData.map(row => headers.map(h => `"${(row[h] || '').replace(/"/g, '""')}"`).join(','))
-            ].join('\n');
-            folder.file("corpus_catalog.csv", '\ufeff' + csvContent);
 
-            progressText.textContent = 'Создание архива...';
+            bookInfo.innerHTML = `
+                <div class="book-title">${escapeHtml(doc.id)}</div>
+                <div class="book-tradition">
+                    <span class="info-dot" style="--book-color:${escapeHtml(doc.color || '#6b7280')}"></span>
+                    <span>${escapeHtml(doc.major_tradition)} / ${escapeHtml(doc.tradition)}</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${formatNumber(doc.word_count)}</div>
+                        <div class="stat-label">Words</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${formatNumber(doc.sentence_count)}</div>
+                        <div class="stat-label">Sentences</div>
+                    </div>
+                </div>
+
+                <div class="description-title">Description</div>
+                <div class="description-text">${escapeHtml(doc.description || 'No description available.')}</div>
+
+                <div class="actions">
+                    <a class="btn btn-primary${isLoading ? ' disabled' : ''}" href="${buildCorpusApiUrl(doc, { download: true })}">Download Book</a>
+                    <a class="btn btn-outline" href="/api/download_corpus_archive">Download Full Archive</a>
+                </div>
+            `;
+        }
+
+        async function openDocument(doc) {
+            selectedDoc = doc;
+            renderLibrary();
+            renderBookInfo(doc, true);
+
+            readerTitle.textContent = doc.id;
+            readerContent.innerHTML = '<div class="reader-placeholder">Loading book text...</div>';
 
             try {
-                const content = await zip.generateAsync({ type: "blob" });
-                saveAs(content, "corpus_all_documents.zip");
+                const response = await fetch(buildCorpusApiUrl(doc));
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.error || 'Could not load this book.');
+                }
 
-                setTimeout(() => {
-                    progressModal.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }, 500);
+                const text = await response.text();
+                readerContent.textContent = text;
+                readerContent.scrollTop = 0;
+                renderBookInfo(doc, false);
             } catch (error) {
-                alert('Ошибка создания архива: ' + error.message);
-                progressModal.style.display = 'none';
+                readerContent.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+                renderBookInfo(doc, false);
             }
         }
 
-        $('#corp-table').on('draw.dt', function() {
-            setTimeout(() => addDetailRows(), 50);
-        });
+        async function loadCatalog() {
+            try {
+                const response = await fetch('/api/get_corpus_catalog', { cache: 'no-store' });
+                if (!response.ok) throw new Error('Could not load corpus catalog.');
+
+                const data = await response.json();
+                documents = Array.isArray(data.documents) ? data.documents : [];
+                renderLibrary();
+                renderBookInfo(null);
+            } catch (error) {
+                libraryTree.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+                readerContent.innerHTML = '<div class="reader-placeholder">The literature catalog could not be loaded.</div>';
+                renderBookInfo(null);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadCatalog);
     </script>
 </body>
 </html>

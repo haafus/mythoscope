@@ -1,0 +1,1 @@
+{"text": "1 Abu Hashem Hebatallah, apud Marracc. de Alc. p. 42. 2 Apud Poc.\nSpec. 220. 3 See after, in Sect. VIII. 4 Vide Poc. Spec. p.\n219, &c.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,0 +1,1 @@
+{"text": "“Hearing these words of his mother, Bhima said, ‘Ascertain, O mother the\nnature of the Brahmana’s distress and whence also it hath arisen.\nLearning all about it, relieve it I will however difficult may the task\nprove.’", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

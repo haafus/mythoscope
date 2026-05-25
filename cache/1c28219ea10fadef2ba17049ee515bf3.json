@@ -1,0 +1,1 @@
+{"text": "Wisely to tell of, and words that were clever\n To utter skilfully, earnestly speaking,\n Everything told he that he heard as to Sigmund's\n\n{Also of Sigemund, who has slain a great fire-dragon.}", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

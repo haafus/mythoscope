@@ -1,0 +1,1 @@
+{"text": "“The above are the contents of the Eighteen Parvas. In the appendix\n(Khita) are the Harivansa and the Vavishya. The number of slokas\ncontained in the Harivansa is twelve thousand.”", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

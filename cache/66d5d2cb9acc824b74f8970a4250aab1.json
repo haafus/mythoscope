@@ -1,0 +1,1 @@
+{"text": "Fell the snow on field and forest,\nFroze the hero’s ship of beauty,\nCold and lifeless bark of Ahti;\nSought to freeze wild Lemminkainen,\nFreeze him lifeless as his vessel,\nAsked the minstrel for his life-blood,\nFor his ears, and feet, and fingers.", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

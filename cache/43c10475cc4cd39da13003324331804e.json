@@ -1,0 +1,1 @@
+{"text": " And pushing at their chests his pointed lance,\n Wheel’d with so swift a motion, mad with fear,\n They threw their master headlong from the chair.\n They stare, they start, nor stop their course, before\n They bear the bounding chariot to the shore.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

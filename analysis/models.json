@@ -1,5 +1,7 @@
 [
   "BAAI/bge-m3",
   "Qwen/Qwen3-Embedding",
-  "intfloat/e5-large-v2"
+  "intfloat/e5-large-v2",
+  "sentence-transformers/LaBSE",
+  "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 ]

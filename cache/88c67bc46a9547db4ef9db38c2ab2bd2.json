@@ -1,0 +1,1 @@
+{"text": "1 Al Beidâwi. 2 Idem, Jallalo'ddin. Yahya. Vide D'Herbelot,\nBibl. Orient. p. 54. 3 Al Beidâwi, Jallalo'ddin, al Zamakhshari.\nVide D'Herbel. Bibl. Orient. Art. Balaam.", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

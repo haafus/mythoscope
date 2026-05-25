@@ -1,0 +1,1 @@
+{"text": "He ceased: then Raghu’s son replied\nTo the glad tale, and eager cried:\n“Bring them with all thy speed: delay\nNo more, dear friend, but haste away.”", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

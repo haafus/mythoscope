@@ -1,0 +1,1 @@
+{"text": "1 Idem, Jallal. 2 Idem. 3 Al Beidâwi. Vide Gagnier,\nVie de Mahom. vol. I, p. 362.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

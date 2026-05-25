@@ -1,0 +1,1 @@
+{"text": "“Indra then said, ‘O thou of great good fortune, tell me again, what the\njoys are of those persons that lead deathless lives,--joys that are\nadored by gods and Rishis!’", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

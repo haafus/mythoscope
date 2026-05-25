@@ -1,0 +1,1 @@
+{"text": "Canto XXV. Ráma’s Speech.\n\nThen Raghu’s son, whose feeling breast\nShared the great woe that moved the rest,\nStrove with wise charm their grief to ease\nAnd gently spoke in words like these:", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,35 +1,31 @@
-Обзор анализа
-==================================================
-Модель: intfloat/e5-large-v2
-Всего чанков: 13938
-Чанков выбранной модели: 13938
-Размерность: 1024
-Традиций: 24
+Embedding Analysis Summary
+Model: intfloat/e5-large-v2
+Total chunks in DB: 25673
+Chunks of selected model: 25673
+Embedding dimension: 1024
+Number of traditions: 23
 
-Распределение по традициям:
---------------------------------------------------
-  Islam: 2881
-  Japanese: 1399
-  Slavic: 1350
-  Judaism: 1295
-  Multiple asian: 911
-  Hindu: 890
-  Ancient_Egyptian: 785
-  Norse: 497
-  Christianity: 469
-  Buddhism: 424
-  Anglo-Saxon: 414
-  West_African: 348
-  Maori: 326
-  Celtic: 268
-  Taoism: 257
-  Hinduism: 247
-  Confucianism: 241
-  Ainu: 213
-  Aztec: 198
-  Zoroastrianism: 121
-  Shinto: 103
-  Maya: 102
-  Mesopotamian: 100
-  Australian: 99
-==================================================
+DISTRIBUTION BY TRADITIONS
+  Hinduism                      : 8102 ( 31.6%)
+  Christianity                  : 6076 ( 23.7%)
+  Islam                         : 3035 ( 11.8%)
+  Greek                         : 2166 (  8.4%)
+  Finnish                       : 1340 (  5.2%)
+  Chinese                       : 1037 (  4.0%)
+  Roman                         :  792 (  3.1%)
+  Celtic                        :  766 (  3.0%)
+  Polynesian                    :  370 (  1.4%)
+  Anglo-Saxon                   :  328 (  1.3%)
+  Babylonian                    :  278 (  1.1%)
+  Australian Aboriginal         :  277 (  1.1%)
+  West African                  :  245 (  1.0%)
+  Confucianism                  :  238 (  0.9%)
+  Japanese Buddhism             :  123 (  0.5%)
+  Maya                          :  105 (  0.4%)
+  Taoism                        :   87 (  0.3%)
+  Ancient Egyptian              :   85 (  0.3%)
+  Buddhism                      :   84 (  0.3%)
+  Australian                    :   82 (  0.3%)
+  Germanic                      :   31 (  0.1%)
+  Maori                         :   24 (  0.1%)
+  Norse                         :    2 (  0.0%)
