@@ -1,458 +1,348 @@
-=== CHANGELOG: Очистка файлов Project Gutenberg ===
-Создан: 2026-03-13 10:18:20
-Директория хранения оригиналов: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup
-============================================================
+CHANGELOG: Project Gutenberg file cleanup
+Created: 2026-05-23 05:41:12
+Original storage directory: /content/sources_backup
 
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/African/West_African/West_African_Folk-Tales/West_African_Folk-Tales.txt
+Original saved to: /content/sources_backup/African/West_African/West_African_Folk-Tales/West_African_Folk-Tales_20260523_054112.txt
+Relative backup path: African/West_African/West_African_Folk-Tales/West_African_Folk-Tales_20260523_054112.txt
+Statistics:
+  - Original size: 169019 characters, 3610 lines
+  - Cleaned size: 148563 characters, 2864 lines
+  - Removed: 20456 characters
+  - Removed percent: 12.1%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Ainu\ainu_folk_tales\ainu_folk_tales.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Ainu\ainu_folk_tales\ainu_folk_tales_20260313_101820.txt
-Относительный путь в бэкапе: Ainu\ainu_folk_tales\ainu_folk_tales_20260313_101820.txt
-Статистика:
-  - Исходный размер: 147883 символов, 2753 строк
-  - Очищенный размер: 128632 символов, 2275 строк
-  - Удалено: 19251 символов
-  - Удалено в %: 13.0%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Buddhist/Japanese_Buddhism/Buddhist_Psalms/Buddhist_Psalms.txt
+Original saved to: /content/sources_backup/Buddhist/Japanese_Buddhism/Buddhist_Psalms/Buddhist_Psalms_20260523_054112.txt
+Relative backup path: Buddhist/Japanese_Buddhism/Buddhist_Psalms/Buddhist_Psalms_20260523_054112.txt
+Statistics:
+  - Original size: 108543 characters, 2512 lines
+  - Cleaned size: 89160 characters, 2077 lines
+  - Removed: 19383 characters
+  - Removed percent: 17.9%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Ancient_Egyptian\ancient_egyptian_legends_murray\ancient_egyptian_legends_murray.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Ancient_Egyptian\ancient_egyptian_legends_murray\ancient_egyptian_legends_murray_20260313_101820.txt
-Относительный путь в бэкапе: Ancient_Egyptian\ancient_egyptian_legends_murray\ancient_egyptian_legends_murray_20260313_101820.txt
-Статистика:
-  - Исходный размер: 160673 символов, 3273 строк
-  - Очищенный размер: 141479 символов, 2800 строк
-  - Удалено: 19194 символов
-  - Удалено в %: 11.9%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Roman/The_Aeneid/The_Aeneid.txt
+Original saved to: /content/sources_backup/Indo-European/Roman/The_Aeneid/The_Aeneid_20260523_054112.txt
+Relative backup path: Indo-European/Roman/The_Aeneid/The_Aeneid_20260523_054112.txt
+Statistics:
+  - Original size: 646803 characters, 14870 lines
+  - Cleaned size: 627680 characters, 14434 lines
+  - Removed: 19123 characters
+  - Removed percent: 3.0%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Ancient_Egyptian\egyptian_book_of_the_dead\egyptian_book_of_the_dead.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Ancient_Egyptian\egyptian_book_of_the_dead\egyptian_book_of_the_dead_20260313_101820.txt
-Относительный путь в бэкапе: Ancient_Egyptian\egyptian_book_of_the_dead\egyptian_book_of_the_dead_20260313_101820.txt
-Статистика:
-  - Исходный размер: 89117 символов, 1571 строк
-  - Очищенный размер: 68985 символов, 1126 строк
-  - Удалено: 20132 символов
-  - Удалено в %: 22.6%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Norse/The_Poetic_Edda/The_Poetic_Edda.txt
+Original saved to: /content/sources_backup/Indo-European/Norse/The_Poetic_Edda/The_Poetic_Edda_20260523_054112.txt
+Relative backup path: Indo-European/Norse/The_Poetic_Edda/The_Poetic_Edda_20260523_054112.txt
+Statistics:
+  - Original size: 894163 characters, 24312 lines
+  - Cleaned size: 1564 characters, 82 lines
+  - Removed: 892599 characters
+  - Removed percent: 99.8%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Ancient_Egyptian\legends_of_the_gods_budge\legends_of_the_gods_budge.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Ancient_Egyptian\legends_of_the_gods_budge\legends_of_the_gods_budge_20260313_101820.txt
-Относительный путь в бэкапе: Ancient_Egyptian\legends_of_the_gods_budge\legends_of_the_gods_budge_20260313_101820.txt
-Статистика:
-  - Исходный размер: 353871 символов, 7235 строк
-  - Очищенный размер: 333831 символов, 5921 строк
-  - Удалено: 20040 символов
-  - Удалено в %: 5.7%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Germanic/The_Nibelungenlied/The_Nibelungenlied.txt
+Original saved to: /content/sources_backup/Indo-European/Germanic/The_Nibelungenlied/The_Nibelungenlied_20260523_054112.txt
+Relative backup path: Indo-European/Germanic/The_Nibelungenlied/The_Nibelungenlied_20260523_054112.txt
+Statistics:
+  - Original size: 655907 characters, 18572 lines
+  - Cleaned size: 21996 characters, 380 lines
+  - Removed: 633911 characters
+  - Removed percent: 96.6%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Anglo-Saxon\codex_junius_old_english\codex_junius_old_english.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Anglo-Saxon\codex_junius_old_english\codex_junius_old_english_20260313_101820.txt
-Относительный путь в бэкапе: Anglo-Saxon\codex_junius_old_english\codex_junius_old_english_20260313_101820.txt
-Статистика:
-  - Исходный размер: 230643 символов, 4616 строк
-  - Очищенный размер: 211447 символов, 4125 строк
-  - Удалено: 19196 символов
-  - Удалено в %: 8.3%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Anglo-Saxon/Beowulf/Beowulf.txt
+Original saved to: /content/sources_backup/Indo-European/Anglo-Saxon/Beowulf/Beowulf_20260523_054112.txt
+Relative backup path: Indo-European/Anglo-Saxon/Beowulf/Beowulf_20260523_054112.txt
+Statistics:
+  - Original size: 262263 characters, 6987 lines
+  - Cleaned size: 242653 characters, 6382 lines
+  - Removed: 19610 characters
+  - Removed percent: 7.5%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Australian\australian_aboriginal_myths\australian_aboriginal_myths.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Australian\australian_aboriginal_myths\australian_aboriginal_myths_20260313_101820.txt
-Относительный путь в бэкапе: Australian\australian_aboriginal_myths\australian_aboriginal_myths_20260313_101820.txt
-Статистика:
-  - Исходный размер: 824154 символов, 16179 строк
-  - Очищенный размер: 55917 символов, 1202 строк
-  - Удалено: 768237 символов
-  - Удалено в %: 93.2%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Celtic/The_Mabinogion/The_Mabinogion.txt
+Original saved to: /content/sources_backup/Indo-European/Celtic/The_Mabinogion/The_Mabinogion_20260523_054112.txt
+Relative backup path: Indo-European/Celtic/The_Mabinogion/The_Mabinogion_20260523_054112.txt
+Statistics:
+  - Original size: 589790 characters, 9919 lines
+  - Cleaned size: 570433 characters, 9452 lines
+  - Removed: 19357 characters
+  - Removed percent: 3.3%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Aztec\rig_veda_americanus_aztec\rig_veda_americanus_aztec.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Aztec\rig_veda_americanus_aztec\rig_veda_americanus_aztec_20260313_101820.txt
-Относительный путь в бэкапе: Aztec\rig_veda_americanus_aztec\rig_veda_americanus_aztec_20260313_101820.txt
-Статистика:
-  - Исходный размер: 117645 символов, 3239 строк
-  - Очищенный размер: 98285 символов, 2655 строк
-  - Удалено: 19360 символов
-  - Удалено в %: 16.5%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Greek/The_Iliad/The_Iliad.txt
+Original saved to: /content/sources_backup/Indo-European/Greek/The_Iliad/The_Iliad_20260523_054112.txt
+Relative backup path: Indo-European/Greek/The_Iliad/The_Iliad_20260523_054112.txt
+Statistics:
+  - Original size: 841799 characters, 14946 lines
+  - Cleaned size: 822625 characters, 14457 lines
+  - Removed: 19174 characters
+  - Removed percent: 2.3%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Buddhism\buddhist_psalms_shinran\buddhist_psalms_shinran.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Buddhism\buddhist_psalms_shinran\buddhist_psalms_shinran_20260313_101820.txt
-Относительный путь в бэкапе: Buddhism\buddhist_psalms_shinran\buddhist_psalms_shinran_20260313_101820.txt
-Статистика:
-  - Исходный размер: 108542 символов, 2512 строк
-  - Очищенный размер: 89160 символов, 2077 строк
-  - Удалено: 19382 символов
-  - Удалено в %: 17.9%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indo-European/Greek/The_Odyssey/The_Odyssey.txt
+Original saved to: /content/sources_backup/Indo-European/Greek/The_Odyssey/The_Odyssey_20260523_054112.txt
+Relative backup path: Indo-European/Greek/The_Odyssey/The_Odyssey_20260523_054112.txt
+Statistics:
+  - Original size: 697717 characters, 12244 lines
+  - Cleaned size: 626756 characters, 10669 lines
+  - Removed: 70961 characters
+  - Removed percent: 10.2%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Buddhism\dhammapada_max_muller\dhammapada_max_muller.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Buddhism\dhammapada_max_muller\dhammapada_max_muller_20260313_101820.txt
-Относительный путь в бэкапе: Buddhism\dhammapada_max_muller\dhammapada_max_muller_20260313_101820.txt
-Статистика:
-  - Исходный размер: 86090 символов, 2074 строк
-  - Очищенный размер: 66638 символов, 1604 строк
-  - Удалено: 19452 символов
-  - Удалено в %: 22.6%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Polynesian/Polynesian/Legends_of_Ma-ui_a_Demi_God_of_Polynesia/Legends_of_Ma-ui_a_Demi_God_of_Polynesia.txt
+Original saved to: /content/sources_backup/Polynesian/Polynesian/Legends_of_Ma-ui_a_Demi_God_of_Polynesia/Legends_of_Ma-ui_a_Demi_God_of_Polynesia_20260523_054112.txt
+Relative backup path: Polynesian/Polynesian/Legends_of_Ma-ui_a_Demi_God_of_Polynesia/Legends_of_Ma-ui_a_Demi_God_of_Polynesia_20260523_054112.txt
+Statistics:
+  - Original size: 246928 characters, 5230 lines
+  - Cleaned size: 227429 characters, 4728 lines
+  - Removed: 19499 characters
+  - Removed percent: 7.9%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Celtic\mabinogion_guest\mabinogion_guest.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Celtic\mabinogion_guest\mabinogion_guest_20260313_101820.txt
-Относительный путь в бэкапе: Celtic\mabinogion_guest\mabinogion_guest_20260313_101820.txt
-Статистика:
-  - Исходный размер: 212265 символов, 4020 строк
-  - Очищенный размер: 190181 символов, 3462 строк
-  - Удалено: 22084 символов
-  - Удалено в %: 10.4%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Polynesian/Maori/Te_Tohunga/Te_Tohunga.txt
+Original saved to: /content/sources_backup/Polynesian/Maori/Te_Tohunga/Te_Tohunga_20260523_054112.txt
+Relative backup path: Polynesian/Maori/Te_Tohunga/Te_Tohunga_20260523_054112.txt
+Statistics:
+  - Original size: 182683 characters, 4073 lines
+  - Cleaned size: 16167 characters, 486 lines
+  - Removed: 166516 characters
+  - Removed percent: 91.2%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Christianity\augustine_confessions_trans\augustine_confessions_trans.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Christianity\augustine_confessions_trans\augustine_confessions_trans_20260313_101820.txt
-Относительный путь в бэкапе: Christianity\augustine_confessions_trans\augustine_confessions_trans_20260313_101820.txt
-Статистика:
-  - Исходный размер: 621920 символов, 9712 строк
-  - Очищенный размер: 602721 символов, 9281 строк
-  - Удалено: 19199 символов
-  - Удалено в %: 3.1%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Chinese/Taoism/The_Tao_Teh_King/The_Tao_Teh_King.txt
+Original saved to: /content/sources_backup/Chinese/Taoism/The_Tao_Teh_King/The_Tao_Teh_King_20260523_054112.txt
+Relative backup path: Chinese/Taoism/The_Tao_Teh_King/The_Tao_Teh_King_20260523_054112.txt
+Statistics:
+  - Original size: 77725 characters, 1845 lines
+  - Cleaned size: 58384 characters, 1363 lines
+  - Removed: 19341 characters
+  - Removed percent: 24.9%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:20 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Christianity\bible_kjv_old_testament\bible_kjv_old_testament.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Christianity\bible_kjv_old_testament\bible_kjv_old_testament_20260313_101820.txt
-Относительный путь в бэкапе: Christianity\bible_kjv_old_testament\bible_kjv_old_testament_20260313_101820.txt
-Статистика:
-  - Исходный размер: 4351659 символов, 99969 строк
-  - Очищенный размер: 4332310 символов, 99322 строк
-  - Удалено: 19349 символов
-  - Удалено в %: 0.4%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Chinese/Confucianism/The_Analects_of_Confucius/The_Analects_of_Confucius.txt
+Original saved to: /content/sources_backup/Chinese/Confucianism/The_Analects_of_Confucius/The_Analects_of_Confucius_20260523_054112.txt
+Relative backup path: Chinese/Confucianism/The_Analects_of_Confucius/The_Analects_of_Confucius_20260523_054112.txt
+Statistics:
+  - Original size: 210160 characters, 4874 lines
+  - Cleaned size: 188738 characters, 4471 lines
+  - Removed: 21422 characters
+  - Removed percent: 10.2%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Christianity\the_holy_bible\the_holy_bible.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Christianity\the_holy_bible\the_holy_bible_20260313_101821.txt
-Относительный путь в бэкапе: Christianity\the_holy_bible\the_holy_bible_20260313_101821.txt
-Статистика:
-  - Исходный размер: 5732008 символов, 144109 строк
-  - Очищенный размер: 5711182 символов, 142061 строк
-  - Удалено: 20826 символов
-  - Удалено в %: 0.4%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Chinese/Chinese/Myths_and_Legends_of_China/Myths_and_Legends_of_China.txt
+Original saved to: /content/sources_backup/Chinese/Chinese/Myths_and_Legends_of_China/Myths_and_Legends_of_China_20260523_054112.txt
+Relative backup path: Chinese/Chinese/Myths_and_Legends_of_China/Myths_and_Legends_of_China_20260523_054112.txt
+Statistics:
+  - Original size: 698558 characters, 13321 lines
+  - Cleaned size: 672207 characters, 12244 lines
+  - Removed: 26351 characters
+  - Removed percent: 3.8%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Confucianism\analects_confucius_legge\analects_confucius_legge.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Confucianism\analects_confucius_legge\analects_confucius_legge_20260313_101821.txt
-Относительный путь в бэкапе: Confucianism\analects_confucius_legge\analects_confucius_legge_20260313_101821.txt
-Статистика:
-  - Исходный размер: 210159 символов, 4874 строк
-  - Очищенный размер: 188738 символов, 4471 строк
-  - Удалено: 21421 символов
-  - Удалено в %: 10.2%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Abrahamic/Christianity/The_King_James_Version_of_the_Bible/The_King_James_Version_of_the_Bible.txt
+Original saved to: /content/sources_backup/Abrahamic/Christianity/The_King_James_Version_of_the_Bible/The_King_James_Version_of_the_Bible_20260523_054112.txt
+Relative backup path: Abrahamic/Christianity/The_King_James_Version_of_the_Bible/The_King_James_Version_of_the_Bible_20260523_054112.txt
+Statistics:
+  - Original size: 4351660 characters, 99969 lines
+  - Cleaned size: 4332310 characters, 99322 lines
+  - Removed: 19350 characters
+  - Removed percent: 0.4%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Hindu\vikram_and_vampire_burton\vikram_and_vampire_burton.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Hindu\vikram_and_vampire_burton\vikram_and_vampire_burton_20260313_101821.txt
-Относительный путь в бэкапе: Hindu\vikram_and_vampire_burton\vikram_and_vampire_burton_20260313_101821.txt
-Статистика:
-  - Исходный размер: 464246 символов, 8646 строк
-  - Очищенный размер: 444687 символов, 8181 строк
-  - Удалено: 19559 символов
-  - Удалено в %: 4.2%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Abrahamic/Islam/The_Koran/The_Koran.txt
+Original saved to: /content/sources_backup/Abrahamic/Islam/The_Koran/The_Koran_20260523_054112.txt
+Relative backup path: Abrahamic/Islam/The_Koran/The_Koran_20260523_054112.txt
+Statistics:
+  - Original size: 2374123 characters, 41111 lines
+  - Cleaned size: 2353919 characters, 39623 lines
+  - Removed: 20204 characters
+  - Removed percent: 0.9%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Hinduism\hindu_law_yajnavalkya\hindu_law_yajnavalkya.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Hinduism\hindu_law_yajnavalkya\hindu_law_yajnavalkya_20260313_101821.txt
-Относительный путь в бэкапе: Hinduism\hindu_law_yajnavalkya\hindu_law_yajnavalkya_20260313_101821.txt
-Статистика:
-  - Исходный размер: 174926 символов, 4571 строк
-  - Очищенный размер: 3085 символов, 98 строк
-  - Удалено: 171841 символов
-  - Удалено в %: 98.2%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Mesopotamian/Babylonian/The_Code_of_Hammurabi/The_Code_of_Hammurabi.txt
+Original saved to: /content/sources_backup/Mesopotamian/Babylonian/The_Code_of_Hammurabi/The_Code_of_Hammurabi_20260523_054112.txt
+Relative backup path: Mesopotamian/Babylonian/The_Code_of_Hammurabi/The_Code_of_Hammurabi_20260523_054112.txt
+Statistics:
+  - Original size: 117716 characters, 2971 lines
+  - Cleaned size: 98464 characters, 2567 lines
+  - Removed: 19252 characters
+  - Removed percent: 16.4%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Hinduism\upanishads_paramananda\upanishads_paramananda.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Hinduism\upanishads_paramananda\upanishads_paramananda_20260313_101821.txt
-Относительный путь в бэкапе: Hinduism\upanishads_paramananda\upanishads_paramananda_20260313_101821.txt
-Статистика:
-  - Исходный размер: 121069 символов, 3009 строк
-  - Очищенный размер: 101724 символов, 2342 строк
-  - Удалено: 19345 символов
-  - Удалено в %: 16.0%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Mesopotamian/Babylonian/The_Babylonian_Legends_of_the_Creation/The_Babylonian_Legends_of_the_Creation.txt
+Original saved to: /content/sources_backup/Mesopotamian/Babylonian/The_Babylonian_Legends_of_the_Creation/The_Babylonian_Legends_of_the_Creation_20260523_054112.txt
+Relative backup path: Mesopotamian/Babylonian/The_Babylonian_Legends_of_the_Creation/The_Babylonian_Legends_of_the_Creation_20260523_054112.txt
+Statistics:
+  - Original size: 124942 characters, 3210 lines
+  - Cleaned size: 105699 characters, 2770 lines
+  - Removed: 19243 characters
+  - Removed percent: 15.4%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Islam\quran_english_pickthall\quran_english_pickthall.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Islam\quran_english_pickthall\quran_english_pickthall_20260313_101821.txt
-Относительный путь в бэкапе: Islam\quran_english_pickthall\quran_english_pickthall_20260313_101821.txt
-Статистика:
-  - Исходный размер: 1116843 символов, 26979 строк
-  - Очищенный размер: 1094991 символов, 26260 строк
-  - Удалено: 21852 символов
-  - Удалено в %: 2.0%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indigenous_Australian/Australian/Myths_of_the_Australian_Aborigines/Myths_of_the_Australian_Aborigines.txt
+Original saved to: /content/sources_backup/Indigenous_Australian/Australian/Myths_of_the_Australian_Aborigines/Myths_of_the_Australian_Aborigines_20260523_054112.txt
+Relative backup path: Indigenous_Australian/Australian/Myths_of_the_Australian_Aborigines/Myths_of_the_Australian_Aborigines_20260523_054112.txt
+Statistics:
+  - Original size: 824186 characters, 16183 lines
+  - Cleaned size: 55917 characters, 1202 lines
+  - Removed: 768269 characters
+  - Removed percent: 93.2%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Japanese\japanese_myths_legends\japanese_myths_legends.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Japanese\japanese_myths_legends\japanese_myths_legends_20260313_101821.txt
-Относительный путь в бэкапе: Japanese\japanese_myths_legends\japanese_myths_legends_20260313_101821.txt
-Статистика:
-  - Исходный размер: 733787 символов, 15138 строк
-  - Очищенный размер: 714238 символов, 14450 строк
-  - Удалено: 19549 символов
-  - Удалено в %: 2.7%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indigenous_Australian/Australian_Aboriginal/Australian_Legendary_Tales/Australian_Legendary_Tales.txt
+Original saved to: /content/sources_backup/Indigenous_Australian/Australian_Aboriginal/Australian_Legendary_Tales/Australian_Legendary_Tales_20260523_054112.txt
+Relative backup path: Indigenous_Australian/Australian_Aboriginal/Australian_Legendary_Tales/Australian_Legendary_Tales_20260523_054112.txt
+Statistics:
+  - Original size: 202737 characters, 3937 lines
+  - Cleaned size: 183190 characters, 3385 lines
+  - Removed: 19547 characters
+  - Removed percent: 9.6%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Judaism\josephus_antiquities_trans\josephus_antiquities_trans.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Judaism\josephus_antiquities_trans\josephus_antiquities_trans_20260313_101821.txt
-Относительный путь в бэкапе: Judaism\josephus_antiquities_trans\josephus_antiquities_trans_20260313_101821.txt
-Статистика:
-  - Исходный размер: 3016981 символов, 48980 строк
-  - Очищенный размер: 2224 символов, 74 строк
-  - Удалено: 3014757 символов
-  - Удалено в %: 99.9%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Finno-Ugric/Finnish/Kalevala_The_Epic_Poem_of_Finland/Kalevala_The_Epic_Poem_of_Finland.txt
+Original saved to: /content/sources_backup/Finno-Ugric/Finnish/Kalevala_The_Epic_Poem_of_Finland/Kalevala_The_Epic_Poem_of_Finland_20260523_054112.txt
+Relative backup path: Finno-Ugric/Finnish/Kalevala_The_Epic_Poem_of_Finland/Kalevala_The_Epic_Poem_of_Finland_20260523_054112.txt
+Statistics:
+  - Original size: 835992 characters, 25963 lines
+  - Cleaned size: 816488 characters, 25346 lines
+  - Removed: 19504 characters
+  - Removed percent: 2.3%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:21 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Judaism\josephus_wars_trans\josephus_wars_trans.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Judaism\josephus_wars_trans\josephus_wars_trans_20260313_101821.txt
-Относительный путь в бэкапе: Judaism\josephus_wars_trans\josephus_wars_trans_20260313_101821.txt
-Статистика:
-  - Исходный размер: 1319177 символов, 21768 строк
-  - Очищенный размер: 1298934 символов, 20466 строк
-  - Удалено: 20243 символов
-  - Удалено в %: 1.5%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Near_Eastern/Ancient_Egyptian/The_Book_of_the_Dead/The_Book_of_the_Dead.txt
+Original saved to: /content/sources_backup/Near_Eastern/Ancient_Egyptian/The_Book_of_the_Dead/The_Book_of_the_Dead_20260523_054112.txt
+Relative backup path: Near_Eastern/Ancient_Egyptian/The_Book_of_the_Dead/The_Book_of_the_Dead_20260523_054112.txt
+Statistics:
+  - Original size: 89118 characters, 1571 lines
+  - Cleaned size: 68985 characters, 1126 lines
+  - Removed: 20133 characters
+  - Removed percent: 22.6%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Judaism\sayings_of_the_jewish_fathers_trans\sayings_of_the_jewish_fathers_trans.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Judaism\sayings_of_the_jewish_fathers_trans\sayings_of_the_jewish_fathers_trans_20260313_101822.txt
-Относительный путь в бэкапе: Judaism\sayings_of_the_jewish_fathers_trans\sayings_of_the_jewish_fathers_trans_20260313_101822.txt
-Статистика:
-  - Исходный размер: 175774 символов, 3984 строк
-  - Очищенный размер: 156241 символов, 3475 строк
-  - Удалено: 19533 символов
-  - Удалено в %: 11.1%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Mesoamerican/Maya/The_Popol_Vuh/The_Popol_Vuh.txt
+Original saved to: /content/sources_backup/Mesoamerican/Maya/The_Popol_Vuh/The_Popol_Vuh_20260523_054112.txt
+Relative backup path: Mesoamerican/Maya/The_Popol_Vuh/The_Popol_Vuh_20260523_054112.txt
+Statistics:
+  - Original size: 94255 characters, 1853 lines
+  - Cleaned size: 73378 characters, 1284 lines
+  - Removed: 20877 characters
+  - Removed percent: 22.1%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
+  - Footnotes removed: 1
 
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Maori\maori_religion_shortland\maori_religion_shortland.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Maori\maori_religion_shortland\maori_religion_shortland_20260313_101822.txt
-Относительный путь в бэкапе: Maori\maori_religion_shortland\maori_religion_shortland_20260313_101822.txt
-Статистика:
-  - Исходный размер: 176523 символов, 4160 строк
-  - Очищенный размер: 157204 символов, 3605 строк
-  - Удалено: 19319 символов
-  - Удалено в %: 10.9%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indian/Buddhism/The_Dhammapada/The_Dhammapada.txt
+Original saved to: /content/sources_backup/Indian/Buddhism/The_Dhammapada/The_Dhammapada_20260523_054112.txt
+Relative backup path: Indian/Buddhism/The_Dhammapada/The_Dhammapada_20260523_054112.txt
+Statistics:
+  - Original size: 86091 characters, 2074 lines
+  - Cleaned size: 66638 characters, 1604 lines
+  - Removed: 19453 characters
+  - Removed percent: 22.6%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Maya\popol_vuh_spence\popol_vuh_spence.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Maya\popol_vuh_spence\popol_vuh_spence_20260313_101822.txt
-Относительный путь в бэкапе: Maya\popol_vuh_spence\popol_vuh_spence_20260313_101822.txt
-Статистика:
-  - Исходный размер: 94223 символов, 1849 строк
-  - Очищенный размер: 73378 символов, 1284 строк
-  - Удалено: 20845 символов
-  - Удалено в %: 22.1%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indian/Hinduism/The_Bhagavad_Gita/The_Bhagavad_Gita.txt
+Original saved to: /content/sources_backup/Indian/Hinduism/The_Bhagavad_Gita/The_Bhagavad_Gita_20260523_054112.txt
+Relative backup path: Indian/Hinduism/The_Bhagavad_Gita/The_Bhagavad_Gita_20260523_054112.txt
+Statistics:
+  - Original size: 140198 characters, 3687 lines
+  - Cleaned size: 120819 characters, 3201 lines
+  - Removed: 19379 characters
+  - Removed percent: 13.8%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Mesopotamian\gilgamesh_budge\gilgamesh_budge.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Mesopotamian\gilgamesh_budge\gilgamesh_budge_20260313_101822.txt
-Относительный путь в бэкапе: Mesopotamian\gilgamesh_budge\gilgamesh_budge_20260313_101822.txt
-Статистика:
-  - Исходный размер: 102169 символов, 1942 строк
-  - Очищенный размер: 77853 символов, 1417 строк
-  - Удалено: 24316 символов
-  - Удалено в %: 23.8%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indian/Hinduism/The_Mahabharata/The_Mahabharata.txt
+Original saved to: /content/sources_backup/Indian/Hinduism/The_Mahabharata/The_Mahabharata_20260523_054112.txt
+Relative backup path: Indian/Hinduism/The_Mahabharata/The_Mahabharata_20260523_054112.txt
+Statistics:
+  - Original size: 3693700 characters, 58870 lines
+  - Cleaned size: 3673154 characters, 57200 lines
+  - Removed: 20546 characters
+  - Removed percent: 0.6%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Multiple_asian\sacred_books_of_the_east_max_muller\sacred_books_of_the_east_max_muller.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Multiple_asian\sacred_books_of_the_east_max_muller\sacred_books_of_the_east_max_muller_20260313_101822.txt
-Относительный путь в бэкапе: Multiple_asian\sacred_books_of_the_east_max_muller\sacred_books_of_the_east_max_muller_20260313_101822.txt
-Статистика:
-  - Исходный размер: 1029127 символов, 17475 строк
-  - Очищенный размер: 1009444 символов, 16777 строк
-  - Удалено: 19683 символов
-  - Удалено в %: 1.9%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indian/Hinduism/The_Upanishads/The_Upanishads.txt
+Original saved to: /content/sources_backup/Indian/Hinduism/The_Upanishads/The_Upanishads_20260523_054112.txt
+Relative backup path: Indian/Hinduism/The_Upanishads/The_Upanishads_20260523_054112.txt
+Statistics:
+  - Original size: 121070 characters, 3009 lines
+  - Cleaned size: 101724 characters, 2342 lines
+  - Removed: 19346 characters
+  - Removed percent: 16.0%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG
 
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Norse\poetic_edda_bellows\poetic_edda_bellows.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Norse\poetic_edda_bellows\poetic_edda_bellows_20260313_101822.txt
-Относительный путь в бэкапе: Norse\poetic_edda_bellows\poetic_edda_bellows_20260313_101822.txt
-Статистика:
-  - Исходный размер: 894162 символов, 24312 строк
-  - Очищенный размер: 1564 символов, 82 строк
-  - Удалено: 892598 символов
-  - Удалено в %: 99.8%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Norse\prose_edda_anderson\prose_edda_anderson.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Norse\prose_edda_anderson\prose_edda_anderson_20260313_101822.txt
-Относительный путь в бэкапе: Norse\prose_edda_anderson\prose_edda_anderson_20260313_101822.txt
-Статистика:
-  - Исходный размер: 392264 символов, 9004 строк
-  - Очищенный размер: 372646 символов, 8431 строк
-  - Удалено: 19618 символов
-  - Удалено в %: 5.0%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Shinto\shinto_cult_terry\shinto_cult_terry.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Shinto\shinto_cult_terry\shinto_cult_terry_20260313_101822.txt
-Относительный путь в бэкапе: Shinto\shinto_cult_terry\shinto_cult_terry_20260313_101822.txt
-Статистика:
-  - Исходный размер: 131384 символов, 2335 строк
-  - Очищенный размер: 100885 символов, 1694 строк
-  - Удалено: 30499 символов
-  - Удалено в %: 23.2%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Slavic\russian_folk_tales\russian_folk_tales.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Slavic\russian_folk_tales\russian_folk_tales_20260313_101822.txt
-Относительный путь в бэкапе: Slavic\russian_folk_tales\russian_folk_tales_20260313_101822.txt
-Статистика:
-  - Исходный размер: 560892 символов, 12778 строк
-  - Очищенный размер: 541060 символов, 12042 строк
-  - Удалено: 19832 символов
-  - Удалено в %: 3.5%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Taoism\dao_de_jing_legge\dao_de_jing_legge.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Taoism\dao_de_jing_legge\dao_de_jing_legge_20260313_101822.txt
-Относительный путь в бэкапе: Taoism\dao_de_jing_legge\dao_de_jing_legge_20260313_101822.txt
-Статистика:
-  - Исходный размер: 77724 символов, 1845 строк
-  - Очищенный размер: 58384 символов, 1363 строк
-  - Удалено: 19340 символов
-  - Удалено в %: 24.9%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Taoism\taoism_books_listing\taoism_books_listing.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Taoism\taoism_books_listing\taoism_books_listing_20260313_101822.txt
-Относительный путь в бэкапе: Taoism\taoism_books_listing\taoism_books_listing_20260313_101822.txt
-Статистика:
-  - Исходный размер: 54053 символов, 1241 строк
-  - Очищенный размер: 32394 символов, 815 строк
-  - Удалено: 21659 символов
-  - Удалено в %: 40.1%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\West_African\west_african_folk_tales\west_african_folk_tales.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\West_African\west_african_folk_tales\west_african_folk_tales_20260313_101822.txt
-Относительный путь в бэкапе: West_African\west_african_folk_tales\west_african_folk_tales_20260313_101822.txt
-Статистика:
-  - Исходный размер: 168987 символов, 3606 строк
-  - Очищенный размер: 148563 символов, 2864 строк
-  - Удалено: 20424 символов
-  - Удалено в %: 12.1%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
-
---- Изменения: 2026-03-13 10:18:22 ---
-Файл: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\corpus\Zoroastrianism\the_parsis_zoroastrianism\the_parsis_zoroastrianism.txt
-Оригинал сохранен в: C:\Users\finic\Desktop\Новая папка (2)\MythoSemantic\sources_backup\Zoroastrianism\the_parsis_zoroastrianism\the_parsis_zoroastrianism_20260313_101822.txt
-Относительный путь в бэкапе: Zoroastrianism\the_parsis_zoroastrianism\the_parsis_zoroastrianism_20260313_101822.txt
-Статистика:
-  - Исходный размер: 173551 символов, 3148 строк
-  - Очищенный размер: 103526 символов, 1774 строк
-  - Удалено: 70025 символов
-  - Удалено в %: 40.3%
-  - Найден маркер начала: START OF PROJECT GUTENBERG
-  - Найден маркер конца: END OF PROJECT GUTENBERG
-  - Удалено сносок: 1
-----------------------------------------
+--- Changes: 2026-05-23 05:41:12 ---
+File: /content/corpus/Indian/Hinduism/The_Ramayan_of_Valmiki/The_Ramayan_of_Valmiki.txt
+Original saved to: /content/sources_backup/Indian/Hinduism/The_Ramayan_of_Valmiki/The_Ramayan_of_Valmiki_20260523_054112.txt
+Relative backup path: Indian/Hinduism/The_Ramayan_of_Valmiki/The_Ramayan_of_Valmiki_20260523_054112.txt
+Statistics:
+  - Original size: 2267887 characters, 67832 lines
+  - Cleaned size: 2246400 characters, 65170 lines
+  - Removed: 21487 characters
+  - Removed percent: 0.9%
+  - Start marker found: START OF PROJECT GUTENBERG
+  - End marker found: END OF PROJECT GUTENBERG

@@ -1,0 +1,1 @@
+{"text": " And ev’ry power and omen of the sky\n Direct my course for destin’d Italy;\n But only dire Celaeno, from the gods,\n A dismal famine fatally forebodes:\n O say what dangers I am first to shun,\n What toils vanquish, and what course to run.’", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

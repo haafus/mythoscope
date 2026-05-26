@@ -1,0 +1,1 @@
+{"text": "this may be compared to the feeling which prompts the unpremeditated\nassassination of a man who is guilty of great injustice, even though\nit be certain that in due course he would have met his deserts at\nthe hands of the public executioner.", "model_name": "BAAI/bge-m3", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

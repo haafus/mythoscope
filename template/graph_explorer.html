@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Просмотр графа</title>
+    <title>Graph Viewer</title>
     <style>
         * {
             box-sizing: border-box;
@@ -156,24 +156,24 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
-                Назад
+                Back
             </a>
             <div class="graph-info">
-                <span class="graph-title" id="title-text">Загрузка...</span>
-                <span class="graph-status">Интерактивный режим</span>
+                <span class="graph-title" id="title-text">Loading...</span>
+                <span class="graph-status">Interactive mode</span>
             </div>
         </div>
 
         <div class="controls">
-            <button class="btn" onclick="refresh()">Обновить</button>
-            <button class="btn btn-primary" onclick="toggleFullscreen()">Во весь экран</button>
+            <button class="btn" onclick="refresh()">Refresh</button>
+            <button class="btn btn-primary" onclick="toggleFullscreen()">Fullscreen</button>
         </div>
     </header>
 
     <main class="viewport">
         <iframe id="graph-frame" src="about:blank"></iframe>
         <div class="legend-card">
-            <b>Управление:</b> Зум — колесико мыши | Перемещение — зажать ЛКМ | Детали — клик по узлу
+            <b>Controls:</b> Zoom with mouse wheel | drag with left mouse button | click a node for details
         </div>
     </main>
 
@@ -187,10 +187,10 @@
 
         if (file) {
             frame.src = file;
-            titleDisplay.textContent = title || 'Без названия';
-            document.title = (title || 'Граф') + ' - MythoScope';
+            titleDisplay.textContent = title || 'Untitled';
+            document.title = (title || 'Graph') + ' - MythoScope';
         } else {
-            titleDisplay.textContent = 'Ошибка: Файл не указан';
+            titleDisplay.textContent = 'Error: no file specified';
         }
 
         function refresh() {

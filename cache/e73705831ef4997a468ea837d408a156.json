@@ -1,0 +1,1 @@
+{"text": "1 Al Beidâwi. 2 Jalallo'ddin. 3 Al Beidâwi.\n 4 Sect. I. p. 14, &c.\n5 Al Beidâwi, Jallalo'ddin.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

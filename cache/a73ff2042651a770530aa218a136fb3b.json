@@ -1,0 +1,1 @@
+{"text": "5 See the Prelim. Disc. Sec. IV. 1 Al Beidâwi. 2\nIdem. 3 Idem, Jallalo'ddin.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

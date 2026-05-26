@@ -1,0 +1,1 @@
+{"text": "3 Idem. Vide Abulfeda. Vit. Moh. p. 118, 119. 4 Abulfeda,\nibid.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

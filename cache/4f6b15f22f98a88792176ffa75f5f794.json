@@ -1,0 +1,1 @@
+{"text": "SECTION CXXVIII\n\n“Somaka said, ‘O Brahmana! whatever is to be performed--do precisely as\nit may be necessary. As I am desirous of having a number of sons, I shall\ndo all that may be prescribed by thee.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

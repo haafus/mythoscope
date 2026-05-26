@@ -1,0 +1,1 @@
+{"text": "O happy friends! for, if my verse can give\n Immortal life, your fame shall ever live,\n Fix’d as the Capitol’s foundation lies,\n And spread, where’er the Roman eagle flies!", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

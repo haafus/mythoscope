@@ -1,0 +1,1 @@
+{"text": "3 See before, p. 13. 4 Vide Abulfeda, Vit. Moham. p. 54.\n 5 Jallalo'ddin. 6 Idem. Yahya, &c.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

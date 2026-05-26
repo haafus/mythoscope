@@ -1,240 +1,254 @@
 [
   {
-    "id": "josephus_antiquities_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2848/pg2848.txt"
-  },
-  {
-    "id": "josephus_wars_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2850/pg2850.txt"
-  },
-  {
-    "id": "sayings_of_the_jewish_fathers_trans",
-    "tradition": "Judaism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/8547/pg8547.txt"
-  },
-  {
-    "id": "augustine_confessions_trans",
+    "title": "The King James Version of the Bible",
     "tradition": "Christianity",
+    "major_tradition": "Abrahamic",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/files/3296/3296-0.txt"
+    "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt",
+    "description": "The canonical King James English translation of the Bible, central to Christian scripture and influential in English-language religious literature."
   },
   {
-    "id": "bible_kjv_old_testament",
-    "tradition": "Christianity",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  },
-  {
-    "id": "quran_english_pickthall",
+    "title": "The Koran",
     "tradition": "Islam",
+    "major_tradition": "Abrahamic",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2800/pg2800.txt"
+    "url": "https://www.gutenberg.org/cache/epub/7440/pg7440.txt",
+    "description": "An English translation of the Qur'an, the central sacred text of Islam, presenting revelations associated with the Prophet Muhammad."
   },
   {
-    "id": "dhammapada_max_muller",
-    "tradition": "Buddhism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/2017/pg2017.txt"
-  },
-  {
-    "id": "analects_confucius_legge",
+    "title": "The Analects of Confucius",
     "tradition": "Confucianism",
+    "major_tradition": "Chinese",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/4094/pg4094.txt"
+    "url": "https://www.gutenberg.org/cache/epub/4094/pg4094.txt",
+    "description": "The foundational text of Confucianism, a record of the sayings of Confucius and his conversations with his disciples."
   },
   {
-    "id": "dao_de_jing_legge",
-    "tradition": "Taoism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  },
-  {
-    "id": "the_holy_bible",
-    "tradition": "Christianity",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/files/1581/1581-0.txt"
-  },
-  {
-    "id": "egyptian_book_of_the_dead",
-    "tradition": "Ancient_Egyptian",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/7145/pg7145.txt"
-  },
-  {
-    "id": "ancient_egyptian_legends_murray",
-    "tradition": "Ancient_Egyptian",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/74354.txt.utf-8"
-  },
-  {
-    "id": "taoism_books_listing",
-    "tradition": "Taoism",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/38585.txt.utf-8"
-  },
-  {
-    "id": "upanishads_paramananda",
+    "title": "The Upanishads",
     "tradition": "Hinduism",
+    "major_tradition": "Indian",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/3283/pg3283.txt"
+    "url": "https://www.gutenberg.org/cache/epub/3283/pg3283.txt",
+    "description": "Ancient Indian philosophical and religious texts that explore Brahman, Atman, liberation, and the foundations of Vedantic thought."
   },
   {
-    "id": "sacred_books_of_the_east_max_muller",
-    "tradition": "Multiple asian",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/12894.txt.utf-8"
-  },
-  {
-    "id": "poetic_edda_bellows",
-    "tradition": "Norse",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/73533.txt.utf-8"
-  },
-  {
-    "id": "popol_vuh_spence",
-    "tradition": "Maya",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/56550.txt.utf-8"
-  },
-  {
-    "id": "prose_edda_anderson",
-    "tradition": "Norse",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/18947.txt.utf-8"
-  },
-  {
-    "id": "mabinogion_guest",
-    "tradition": "Celtic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/19976.txt.utf-8"
-  },
-  {
-    "id": "gilgamesh_budge",
-    "tradition": "Mesopotamian",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/7096/pg7096.txt"
-  },
-  {
-    "id": "maori_religion_shortland",
-    "tradition": "Maori",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/cache/epub/42218/pg42218.txt"
-  },
-  {
-    "id": "russian_folk_tales",
-    "tradition": "Slavic",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/62509.txt.utf-8"
-  },
-  {
-    "id": "west_african_folk_tales",
-    "tradition": "West_African",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/66923.txt.utf-8"
-  },
-  {
-    "id": "vikram_and_vampire_burton",
-    "tradition": "Hindu",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/2400.txt.utf-8"
-  },
-  {
-    "id": "ainu_folk_tales",
-    "tradition": "Ainu",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/29287.txt.utf-8"
-  },
-  {
-    "id": "japanese_myths_legends",
-    "tradition": "Japanese",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/45723.txt.utf-8"
-  },
-  {
-    "id": "legends_of_the_gods_budge",
-    "tradition": "Ancient_Egyptian",
-    "language": "English",
-    "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/9411.txt.utf-8"
-  },
-  {
-    "id": "hindu_law_yajnavalkya",
+    "title": "The Ramayan of Valmiki",
     "tradition": "Hinduism",
+    "major_tradition": "Indian",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/files/21918/21918-0.txt"
+    "url": "https://www.gutenberg.org/cache/epub/24869/pg24869.txt",
+    "description": "An English verse translation of the Ramayana, one of India's great mythological epics, narrating the deeds of Rama, Sita, Hanuman, and Ravana."
   },
   {
-    "id": "buddhist_psalms_shinran",
+    "title": "The Dhammapada",
     "tradition": "Buddhism",
+    "major_tradition": "Indian",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/7015.txt.utf-8"
+    "url": "https://www.gutenberg.org/cache/epub/2017/pg2017.txt",
+    "description": "A celebrated collection of sayings attributed to the Buddha, emphasizing ethics, mindfulness, wisdom, and the path to liberation."
   },
   {
-    "id": "the_parsis_zoroastrianism",
-    "tradition": "Zoroastrianism",
+    "title": "The Tao Teh King",
+    "tradition": "Taoism",
+    "major_tradition": "Chinese",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/29109.txt.utf-8"
+    "url": "https://www.gutenberg.org/cache/epub/216/pg216.txt",
+    "description": "James Legge's English translation of the Tao Te Ching, a foundational Daoist text on the Way, virtue, simplicity, and non-action."
   },
   {
-    "id": "shinto_cult_terry",
-    "tradition": "Shinto",
+    "title": "Myths and Legends of China",
+    "tradition": "Chinese",
+    "major_tradition": "Chinese",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/42747.txt.utf-8"
+    "url": "https://www.gutenberg.org/cache/epub/15250/pg15250.txt",
+    "description": "A broad collection of Chinese myths, legends, deities, culture heroes, creation stories, and folk religious traditions."
   },
   {
-    "id": "rig_veda_americanus_aztec",
-    "tradition": "Aztec",
+    "title": "Buddhist Psalms",
+    "tradition": "Japanese Buddhism",
+    "major_tradition": "Buddhist",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/14993.txt.utf-8"
+    "url": "https://www.gutenberg.org/cache/epub/7015/pg7015.txt",
+    "description": "English translations of devotional Japanese Buddhist poems associated with Shinran Shonin and Pure Land religious thought."
   },
   {
-    "id": "australian_aboriginal_myths",
+    "title": "The Book of the Dead",
+    "tradition": "Ancient Egyptian",
+    "major_tradition": "Near Eastern",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/7145/pg7145.txt",
+    "description": "An English rendering of ancient Egyptian funerary texts intended to guide the deceased through judgment and the afterlife."
+  },
+  {
+    "title": "The Babylonian Legends of the Creation",
+    "tradition": "Babylonian",
+    "major_tradition": "Mesopotamian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/9914/pg9914.txt",
+    "description": "A translation and discussion of Babylonian creation mythology, including themes of cosmic order, divine conflict, and the origins of the world."
+  },
+  {
+    "title": "The Iliad",
+    "tradition": "Greek",
+    "major_tradition": "Indo-European",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/2199/pg2199.txt",
+    "description": "An ancient Greek epic poem attributed to Homer, set during the Trojan War and focusing on the quarrel between King Agamemnon and the warrior Achilles."
+  },
+  {
+    "title": "The Poetic Edda",
+    "tradition": "Norse",
+    "major_tradition": "Indo-European",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/73533/pg73533.txt",
+    "description": "A collection of Old Norse mythological and heroic poems, preserving major stories about Odin, Thor, Loki, Ragnarok, and legendary heroes."
+  },
+  {
+    "title": "Kalevala The Epic Poem of Finland",
+    "tradition": "Finnish",
+    "major_tradition": "Finno-Ugric",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/5186/pg5186.txt",
+    "description": "The Finnish national epic, compiled from oral poetry, featuring creation myths, magic songs, heroes, shamans, and mythic quests."
+  },
+  {
+    "title": "The Mabinogion",
+    "tradition": "Celtic",
+    "major_tradition": "Indo-European",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/5160/pg5160.txt",
+    "description": "A collection of medieval Welsh tales containing Celtic mythological motifs, heroic legends, magical transformations, and Arthurian material."
+  },
+  {
+    "title": "The Nibelungenlied",
+    "tradition": "Germanic",
+    "major_tradition": "Indo-European",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/7321/pg7321.txt",
+    "description": "A medieval German heroic epic involving Siegfried, Kriemhild, dragons, treasure, betrayal, and mythic heroic tradition."
+  },
+  {
+    "title": "West African Folk-Tales",
+    "tradition": "West African",
+    "major_tradition": "African",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/66923/pg66923.txt",
+    "description": "A collection of West African folktales, including trickster and animal stories often associated with Anansi and oral storytelling traditions."
+  },
+  {
+    "title": "Australian Legendary Tales",
+    "tradition": "Australian Aboriginal",
+    "major_tradition": "Indigenous Australian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/3833/pg3833.txt",
+    "description": "A collection of Aboriginal Australian legends and Dreaming-related stories recorded from oral traditions."
+  },
+  {
+    "title": "Te Tohunga",
+    "tradition": "Maori",
+    "major_tradition": "Polynesian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/54610/pg54610.txt",
+    "description": "A collection of ancient legends and traditions of the Maori, including mythic figures, ancestral stories, ritual specialists, and sacred knowledge."
+  },
+  {
+    "title": "Legends of Ma-ui a Demi God of Polynesia",
+    "tradition": "Polynesian",
+    "major_tradition": "Polynesian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/32601/pg32601.txt",
+    "description": "A collection of Polynesian legends about Maui, the trickster and culture hero known for feats such as fishing up islands and slowing the sun."
+  },
+  {
+    "title": "The Popol Vuh",
+    "tradition": "Maya",
+    "major_tradition": "Mesoamerican",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/56550/pg56550.txt",
+    "description": "The mythic and heroic sagas of the K'iche' Maya, including creation narratives, the Hero Twins, divine ancestry, and sacred history."
+  },
+  {
+    "title": "Myths of the Australian Aborigines",
     "tradition": "Australian",
+    "major_tradition": "Indigenous Australian",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/71940.txt.utf-8"
+    "url": "https://www.gutenberg.org/ebooks/71940.txt.utf-8",
+    "description": "A collection of myths about the Dreamtime and traditional beliefs of the indigenous peoples of Australia."
   },
   {
-    "id": "codex_junius_old_english",
-    "tradition": "Anglo-Saxon",
+    "title": "The Odyssey",
+    "tradition": "Greek",
+    "major_tradition": "Indo-European",
     "language": "English",
     "type": "translation",
-    "url": "https://www.gutenberg.org/ebooks/618.txt.utf-8"
+    "url": "https://www.gutenberg.org/cache/epub/1727/pg1727.txt",
+    "description": "An ancient Greek epic poem attributed to Homer, recounting the long, mythic journey of the hero Odysseus returning to Ithaca after the fall of Troy."
+  },
+  {
+    "title": "The Bhagavad Gita",
+    "tradition": "Hinduism",
+    "major_tradition": "Indian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/2388/pg2388.txt",
+    "description": "A central sacred scripture of Hinduism, presenting a philosophical dialogue between Prince Arjuna and the god Krishna on duty, honor, and the nature of reality."
+  },
+  {
+    "title": "Beowulf",
+    "tradition": "Anglo-Saxon",
+    "major_tradition": "Indo-European",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/16328/pg16328.txt",
+    "description": "The oldest surviving epic poem in Old English, telling the story of a Scandinavian hero who battles the monster Grendel, his vengeful mother, and a dragon."
+  },
+  {
+    "title": "The Aeneid",
+    "tradition": "Roman",
+    "major_tradition": "Indo-European",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/228/pg228.txt",
+    "description": "An ancient Roman epic by Virgil that follows Aeneas, a Trojan hero who travels to Italy after the fall of Troy and becomes the ancestor of the Romans."
+  },
+  {
+    "title": "The Code of Hammurabi",
+    "tradition": "Babylonian",
+    "major_tradition": "Mesopotamian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/17150/pg17150.txt",
+    "description": "One of the oldest deciphered writings of significant length in the world, providing a comprehensive Babylonian law code from ancient Mesopotamia."
+  },
+  {
+    "title": "The Mahabharata",
+    "tradition": "Hinduism",
+    "major_tradition": "Indian",
+    "language": "English",
+    "type": "translation",
+    "url": "https://www.gutenberg.org/cache/epub/15474/pg15474.txt",
+    "description": "A massive ancient Indian epic that narrates the Kurukshetra War between the Pandava and Kaurava princes, alongside vast philosophical and religious treatises."
   }
 ]

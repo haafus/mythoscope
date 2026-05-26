@@ -1,0 +1,1 @@
+{"text": " This golden charger, snatch’d from burning Troy,\n Anchises did in sacrifice employ;\n This royal robe and this tiara wore\n Old Priam, and this golden scepter bore\n In full assemblies, and in solemn games;\n These purple vests were weav’d by Dardan dames.”", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

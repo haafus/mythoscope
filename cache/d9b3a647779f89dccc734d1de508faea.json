@@ -1,0 +1,1 @@
+{"text": "Thus spake Vibhishaṇ wise and brave:\nThe Rákshas king no answer gave,\nBut bade his lords the council close,\nAnd sought his chamber for repose.\n\nCanto X. Vibhishan’s Counsel.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

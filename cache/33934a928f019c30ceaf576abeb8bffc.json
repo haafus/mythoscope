@@ -1,0 +1,1 @@
+{"text": "Of elephants and warrior steeds?\nIf, won by custom day by day,\nMy brother Bharat thirsts for sway,\nStill let him rule the nations, still\nThe throne of old Ikshváku fill.\nGo, mark him well: his feelings learn,\nAnd, ere we yet be near return.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

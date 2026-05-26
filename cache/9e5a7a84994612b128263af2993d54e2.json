@@ -1,0 +1,1 @@
+{"text": " Doth not whatever is in heaven and on earth belong unto GOD? He well\nknoweth what ye are about: and on a certain day they shall be assembled before\nhim; and he shall declare unto them that which they have done; for GOD knoweth\nall things.", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

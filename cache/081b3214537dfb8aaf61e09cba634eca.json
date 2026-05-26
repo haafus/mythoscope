@@ -1,0 +1,1 @@
+{"text": "“The Valakhilyas said, ‘O Prajapati, this sacrifice of us all is for an\nIndra! Indeed this hath also been meant for a son being born unto thee!\nLet this task be now left to thee. And in this matter do whatsoever thou\nseest to be good and proper.’", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,0 +1,1 @@
+{"text": "4 Or Ebn Atâ, according to Ebn Shohnan. 1 This explain a doubt\nof Mr. Bayle concerning a passage of Elmacinus, as translated by Erpenius, and\ncorrected by Bespier. Vide Bayle, Dic. Hist. Art. Abumuslimus, vers la fin,\net Rem. B.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

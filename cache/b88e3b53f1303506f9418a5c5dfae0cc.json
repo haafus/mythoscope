@@ -1,0 +1,1 @@
+{"text": "Thus spoke Polydamas, and his words pleased Hector well. He\n sprang in full armour from his chariot and said, “Polydamas,\n gather the chieftains here; I will go yonder into the fight, but\n will return at once when I have given them their orders.”", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

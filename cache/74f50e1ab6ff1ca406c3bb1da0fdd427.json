@@ -1,0 +1,1 @@
+{"text": "1:28 Whom we preach, warning every man, and teaching every man in all\nwisdom; that we may present every man perfect in Christ Jesus:\n1:29 Whereunto I also labour, striving according to his working, which\nworketh in me mightily.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

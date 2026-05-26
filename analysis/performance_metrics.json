@@ -1,0 +1,1033 @@
+{
+  "summary": {
+    "total_operations": 145,
+    "total_time_seconds": 645.5471317768097,
+    "avg_duration_seconds": 4.452049184667653,
+    "min_duration_seconds": 0.007129192352294922,
+    "max_duration_seconds": 69.56074500083923,
+    "avg_memory_usage_mb": 2996.212957974138,
+    "max_memory_usage_mb": 3665.375
+  },
+  "detailed": {
+    "save_all_corpus_to_chroma": [
+      {
+        "operation": "save_all_corpus_to_chroma",
+        "duration_seconds": 0.01818990707397461,
+        "timestamp": "2026-05-23T05:41:23.577359",
+        "memory_usage_mb": 1741.72265625,
+        "memory_delta_mb": 29.07421875
+      },
+      {
+        "operation": "save_all_corpus_to_chroma",
+        "duration_seconds": 0.0133514404296875,
+        "timestamp": "2026-05-23T05:44:04.832664",
+        "memory_usage_mb": 2742.9609375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "save_all_corpus_to_chroma",
+        "duration_seconds": 0.013612985610961914,
+        "timestamp": "2026-05-23T05:45:13.146589",
+        "memory_usage_mb": 3119.1875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "save_all_corpus_to_chroma",
+        "duration_seconds": 0.013479471206665039,
+        "timestamp": "2026-05-23T05:46:01.029268",
+        "memory_usage_mb": 3093.4453125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "save_all_corpus_to_chroma",
+        "duration_seconds": 0.013739824295043945,
+        "timestamp": "2026-05-23T05:48:38.140906",
+        "memory_usage_mb": 3212.9609375,
+        "memory_delta_mb": 0.0
+      }
+    ],
+    "generate_embeddings": [
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.481520652770996,
+        "timestamp": "2026-05-23T05:41:25.072589",
+        "memory_usage_mb": 2287.0234375,
+        "memory_delta_mb": 543.46484375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.6082637310028076,
+        "timestamp": "2026-05-23T05:41:25.881040",
+        "memory_usage_mb": 2307.60546875,
+        "memory_delta_mb": 1.4609375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 5.067386627197266,
+        "timestamp": "2026-05-23T05:41:31.082840",
+        "memory_usage_mb": 2321.76953125,
+        "memory_delta_mb": 8.62109375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.020907163619995117,
+        "timestamp": "2026-05-23T05:41:31.884655",
+        "memory_usage_mb": 2351.9453125,
+        "memory_delta_mb": 1.45703125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.19325923919677734,
+        "timestamp": "2026-05-23T05:41:32.100257",
+        "memory_usage_mb": 2349.96875,
+        "memory_delta_mb": 0.015625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.6791565418243408,
+        "timestamp": "2026-05-23T05:41:33.821970",
+        "memory_usage_mb": 2350.3515625,
+        "memory_delta_mb": 0.234375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.470851182937622,
+        "timestamp": "2026-05-23T05:41:38.586066",
+        "memory_usage_mb": 2357.8046875,
+        "memory_delta_mb": 6.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 7.551746845245361,
+        "timestamp": "2026-05-23T05:41:46.872530",
+        "memory_usage_mb": 2378.4375,
+        "memory_delta_mb": 6.35546875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 5.950466871261597,
+        "timestamp": "2026-05-23T05:41:53.887384",
+        "memory_usage_mb": 2393.375,
+        "memory_delta_mb": 4.1875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 2.0524117946624756,
+        "timestamp": "2026-05-23T05:41:56.920101",
+        "memory_usage_mb": 2414.3515625,
+        "memory_delta_mb": 0.00390625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.12935113906860352,
+        "timestamp": "2026-05-23T05:41:57.455292",
+        "memory_usage_mb": 2413.5703125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.37656092643737793,
+        "timestamp": "2026-05-23T05:41:57.878988",
+        "memory_usage_mb": 2410.69140625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 2.3342092037200928,
+        "timestamp": "2026-05-23T05:42:00.288203",
+        "memory_usage_mb": 2414.65625,
+        "memory_delta_mb": 3.609375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 5.745606899261475,
+        "timestamp": "2026-05-23T05:42:06.364581",
+        "memory_usage_mb": 2415.8984375,
+        "memory_delta_mb": 0.01953125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 25.990952491760254,
+        "timestamp": "2026-05-23T05:42:33.387273",
+        "memory_usage_mb": 2458.078125,
+        "memory_delta_mb": 23.8125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 13.24810528755188,
+        "timestamp": "2026-05-23T05:42:52.085366",
+        "memory_usage_mb": 2507.93359375,
+        "memory_delta_mb": 4.1328125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.7346811294555664,
+        "timestamp": "2026-05-23T05:42:55.732726",
+        "memory_usage_mb": 2522.11328125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.6391561031341553,
+        "timestamp": "2026-05-23T05:42:56.538940",
+        "memory_usage_mb": 2515.828125,
+        "memory_delta_mb": -0.99609375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.4689452648162842,
+        "timestamp": "2026-05-23T05:42:57.138608",
+        "memory_usage_mb": 2516.3984375,
+        "memory_delta_mb": 0.01171875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.4062561988830566,
+        "timestamp": "2026-05-23T05:42:58.627160",
+        "memory_usage_mb": 2516.7265625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 8.377256155014038,
+        "timestamp": "2026-05-23T05:43:07.253273",
+        "memory_usage_mb": 2517.88671875,
+        "memory_delta_mb": 0.02734375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.4487316608428955,
+        "timestamp": "2026-05-23T05:43:08.992123",
+        "memory_usage_mb": 2529.48046875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.5846569538116455,
+        "timestamp": "2026-05-23T05:43:09.690587",
+        "memory_usage_mb": 2528.11328125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.3334083557128906,
+        "timestamp": "2026-05-23T05:43:10.219038",
+        "memory_usage_mb": 2528.53515625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.8435001373291016,
+        "timestamp": "2026-05-23T05:43:11.184338",
+        "memory_usage_mb": 2528.875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 23.43826389312744,
+        "timestamp": "2026-05-23T05:43:34.868472",
+        "memory_usage_mb": 2530.22265625,
+        "memory_delta_mb": 0.640625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.7194368839263916,
+        "timestamp": "2026-05-23T05:43:40.467971",
+        "memory_usage_mb": 2558.265625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 17.502382516860962,
+        "timestamp": "2026-05-23T05:43:58.227601",
+        "memory_usage_mb": 2555.89453125,
+        "memory_delta_mb": 0.01171875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.36072778701782227,
+        "timestamp": "2026-05-23T05:44:05.212316",
+        "memory_usage_mb": 2743.20703125,
+        "memory_delta_mb": 0.23046875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.16684222221374512,
+        "timestamp": "2026-05-23T05:44:05.634912",
+        "memory_usage_mb": 2749.1171875,
+        "memory_delta_mb": 0.05078125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.159104585647583,
+        "timestamp": "2026-05-23T05:44:06.978286",
+        "memory_usage_mb": 2749.67578125,
+        "memory_delta_mb": 0.1328125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.011731624603271484,
+        "timestamp": "2026-05-23T05:44:07.837247",
+        "memory_usage_mb": 2753.99609375,
+        "memory_delta_mb": 1.3203125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.0377650260925293,
+        "timestamp": "2026-05-23T05:44:07.899503",
+        "memory_usage_mb": 2754.0,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.48375678062438965,
+        "timestamp": "2026-05-23T05:44:08.440419",
+        "memory_usage_mb": 2754.1171875,
+        "memory_delta_mb": 0.0234375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.1161408424377441,
+        "timestamp": "2026-05-23T05:44:09.865054",
+        "memory_usage_mb": 2755.27734375,
+        "memory_delta_mb": 0.1484375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.7337594032287598,
+        "timestamp": "2026-05-23T05:44:12.300324",
+        "memory_usage_mb": 2758.03515625,
+        "memory_delta_mb": 0.30078125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.4368717670440674,
+        "timestamp": "2026-05-23T05:44:14.757768",
+        "memory_usage_mb": 2764.39453125,
+        "memory_delta_mb": 0.0859375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.5420591831207275,
+        "timestamp": "2026-05-23T05:44:16.315617",
+        "memory_usage_mb": 2766.31640625,
+        "memory_delta_mb": 0.01171875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.037081003189086914,
+        "timestamp": "2026-05-23T05:44:16.687411",
+        "memory_usage_mb": 2767.453125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.1247560977935791,
+        "timestamp": "2026-05-23T05:44:16.858889",
+        "memory_usage_mb": 2767.52734375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.36376166343688965,
+        "timestamp": "2026-05-23T05:44:17.306037",
+        "memory_usage_mb": 2774.74609375,
+        "memory_delta_mb": 6.9296875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.5091326236724854,
+        "timestamp": "2026-05-23T05:44:19.138744",
+        "memory_usage_mb": 2776.01171875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 8.778621435165405,
+        "timestamp": "2026-05-23T05:44:28.863665",
+        "memory_usage_mb": 2796.80078125,
+        "memory_delta_mb": 14.546875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.382839679718018,
+        "timestamp": "2026-05-23T05:44:41.093920",
+        "memory_usage_mb": 2849.7109375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.20342707633972168,
+        "timestamp": "2026-05-23T05:44:44.268839",
+        "memory_usage_mb": 2857.3515625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.20215392112731934,
+        "timestamp": "2026-05-23T05:44:44.635700",
+        "memory_usage_mb": 2856.80859375,
+        "memory_delta_mb": -1.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.12609505653381348,
+        "timestamp": "2026-05-23T05:44:44.888506",
+        "memory_usage_mb": 2857.23828125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.40134572982788086,
+        "timestamp": "2026-05-23T05:44:45.363601",
+        "memory_usage_mb": 2857.48828125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.9525535106658936,
+        "timestamp": "2026-05-23T05:44:47.580908",
+        "memory_usage_mb": 2858.34375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.12644553184509277,
+        "timestamp": "2026-05-23T05:44:49.013179",
+        "memory_usage_mb": 2864.44140625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.15898633003234863,
+        "timestamp": "2026-05-23T05:44:49.263629",
+        "memory_usage_mb": 2863.734375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.1251997947692871,
+        "timestamp": "2026-05-23T05:44:49.539433",
+        "memory_usage_mb": 2864.0625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.25772714614868164,
+        "timestamp": "2026-05-23T05:44:49.868400",
+        "memory_usage_mb": 2864.328125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 6.800209045410156,
+        "timestamp": "2026-05-23T05:44:56.840320",
+        "memory_usage_mb": 2864.8828125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.21943163871765137,
+        "timestamp": "2026-05-23T05:45:01.687174",
+        "memory_usage_mb": 2883.50390625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.5113606452941895,
+        "timestamp": "2026-05-23T05:45:06.433624",
+        "memory_usage_mb": 2882.35546875,
+        "memory_delta_mb": 0.01171875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.1297307014465332,
+        "timestamp": "2026-05-23T05:45:13.572440",
+        "memory_usage_mb": 3122.06640625,
+        "memory_delta_mb": 2.875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.06408214569091797,
+        "timestamp": "2026-05-23T05:45:13.946489",
+        "memory_usage_mb": 3126.3125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.4015505313873291,
+        "timestamp": "2026-05-23T05:45:14.533891",
+        "memory_usage_mb": 3126.5625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.007129192352294922,
+        "timestamp": "2026-05-23T05:45:15.531494",
+        "memory_usage_mb": 3128.47265625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.015633106231689453,
+        "timestamp": "2026-05-23T05:45:15.567211",
+        "memory_usage_mb": 3128.4765625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.16513609886169434,
+        "timestamp": "2026-05-23T05:45:15.765639",
+        "memory_usage_mb": 3128.52734375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.3822453022003174,
+        "timestamp": "2026-05-23T05:45:16.411413",
+        "memory_usage_mb": 3129.0546875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.5896639823913574,
+        "timestamp": "2026-05-23T05:45:17.690118",
+        "memory_usage_mb": 3130.65234375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.49056458473205566,
+        "timestamp": "2026-05-23T05:45:19.277422",
+        "memory_usage_mb": 3132.69140625,
+        "memory_delta_mb": 0.00390625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.18396282196044922,
+        "timestamp": "2026-05-23T05:45:20.486530",
+        "memory_usage_mb": 3134.578125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.015492677688598633,
+        "timestamp": "2026-05-23T05:45:20.822209",
+        "memory_usage_mb": 3135.171875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.04377937316894531,
+        "timestamp": "2026-05-23T05:45:20.917198",
+        "memory_usage_mb": 3135.2109375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.1387956142425537,
+        "timestamp": "2026-05-23T05:45:21.143254",
+        "memory_usage_mb": 3135.44140625,
+        "memory_delta_mb": 0.0859375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.5115101337432861,
+        "timestamp": "2026-05-23T05:45:21.987117",
+        "memory_usage_mb": 3136.05859375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 2.901465654373169,
+        "timestamp": "2026-05-23T05:45:25.818843",
+        "memory_usage_mb": 3137.7578125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.4627313613891602,
+        "timestamp": "2026-05-23T05:45:34.733912",
+        "memory_usage_mb": 3148.796875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.07518339157104492,
+        "timestamp": "2026-05-23T05:45:37.773841",
+        "memory_usage_mb": 3154.125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.07141661643981934,
+        "timestamp": "2026-05-23T05:45:38.010161",
+        "memory_usage_mb": 3154.359375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.04686999320983887,
+        "timestamp": "2026-05-23T05:45:38.169265",
+        "memory_usage_mb": 3154.578125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.1372971534729004,
+        "timestamp": "2026-05-23T05:45:38.458569",
+        "memory_usage_mb": 3154.71875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.6813688278198242,
+        "timestamp": "2026-05-23T05:45:39.431386",
+        "memory_usage_mb": 3155.1875,
+        "memory_delta_mb": 0.0078125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.04622054100036621,
+        "timestamp": "2026-05-23T05:45:41.237597",
+        "memory_usage_mb": 3186.7734375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.058959007263183594,
+        "timestamp": "2026-05-23T05:45:41.462558",
+        "memory_usage_mb": 3186.91015625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.04461789131164551,
+        "timestamp": "2026-05-23T05:45:41.726316",
+        "memory_usage_mb": 3187.0859375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.09134960174560547,
+        "timestamp": "2026-05-23T05:45:41.968534",
+        "memory_usage_mb": 3187.22265625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 2.3364641666412354,
+        "timestamp": "2026-05-23T05:45:44.668083",
+        "memory_usage_mb": 3187.51171875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.07687664031982422,
+        "timestamp": "2026-05-23T05:45:53.415480",
+        "memory_usage_mb": 3195.125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.5422472953796387,
+        "timestamp": "2026-05-23T05:45:55.196340",
+        "memory_usage_mb": 3195.4375,
+        "memory_delta_mb": 0.0625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.245943307876587,
+        "timestamp": "2026-05-23T05:46:02.345177",
+        "memory_usage_mb": 3093.44921875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.5661263465881348,
+        "timestamp": "2026-05-23T05:46:03.145725",
+        "memory_usage_mb": 3096.38671875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.514076232910156,
+        "timestamp": "2026-05-23T05:46:07.787723",
+        "memory_usage_mb": 3096.4140625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.020750761032104492,
+        "timestamp": "2026-05-23T05:46:08.639071",
+        "memory_usage_mb": 3096.86328125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.14716529846191406,
+        "timestamp": "2026-05-23T05:46:08.810673",
+        "memory_usage_mb": 3096.86328125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.5994868278503418,
+        "timestamp": "2026-05-23T05:46:10.448736",
+        "memory_usage_mb": 3096.86328125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.111327648162842,
+        "timestamp": "2026-05-23T05:46:14.898297",
+        "memory_usage_mb": 3096.8671875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 7.11171293258667,
+        "timestamp": "2026-05-23T05:46:22.893911",
+        "memory_usage_mb": 3097.31640625,
+        "memory_delta_mb": 0.01171875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 5.6033313274383545,
+        "timestamp": "2026-05-23T05:46:29.631566",
+        "memory_usage_mb": 3098.1015625,
+        "memory_delta_mb": 0.0078125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.8139350414276123,
+        "timestamp": "2026-05-23T05:46:32.516585",
+        "memory_usage_mb": 3116.43359375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.12817001342773438,
+        "timestamp": "2026-05-23T05:46:33.031840",
+        "memory_usage_mb": 3117.9296875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.35376548767089844,
+        "timestamp": "2026-05-23T05:46:33.439632",
+        "memory_usage_mb": 3118.03515625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.6232306957244873,
+        "timestamp": "2026-05-23T05:46:35.162471",
+        "memory_usage_mb": 3119.62890625,
+        "memory_delta_mb": 1.2421875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.961955785751343,
+        "timestamp": "2026-05-23T05:46:40.490897",
+        "memory_usage_mb": 3121.1328125,
+        "memory_delta_mb": 0.0078125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 25.080557346343994,
+        "timestamp": "2026-05-23T05:47:06.609702",
+        "memory_usage_mb": 3127.109375,
+        "memory_delta_mb": 1.6640625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 12.83763313293457,
+        "timestamp": "2026-05-23T05:47:28.435276",
+        "memory_usage_mb": 3153.5859375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.669933557510376,
+        "timestamp": "2026-05-23T05:47:31.960689",
+        "memory_usage_mb": 3166.4453125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.6298701763153076,
+        "timestamp": "2026-05-23T05:47:32.764605",
+        "memory_usage_mb": 3167.02734375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.4446396827697754,
+        "timestamp": "2026-05-23T05:47:33.336421",
+        "memory_usage_mb": 3167.59765625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.3223838806152344,
+        "timestamp": "2026-05-23T05:47:34.745462",
+        "memory_usage_mb": 3167.94140625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 7.439143657684326,
+        "timestamp": "2026-05-23T05:47:42.454623",
+        "memory_usage_mb": 3169.0625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.39856958389282227,
+        "timestamp": "2026-05-23T05:47:44.399289",
+        "memory_usage_mb": 3176.12890625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.5271384716033936,
+        "timestamp": "2026-05-23T05:47:45.019470",
+        "memory_usage_mb": 3176.6171875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.3331730365753174,
+        "timestamp": "2026-05-23T05:47:45.529524",
+        "memory_usage_mb": 3177.0390625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.8101894855499268,
+        "timestamp": "2026-05-23T05:47:46.424122",
+        "memory_usage_mb": 3177.37890625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 22.032079935073853,
+        "timestamp": "2026-05-23T05:48:08.634192",
+        "memory_usage_mb": 3178.08984375,
+        "memory_delta_mb": 0.00390625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.6598372459411621,
+        "timestamp": "2026-05-23T05:48:14.135969",
+        "memory_usage_mb": 3197.2109375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 15.733470439910889,
+        "timestamp": "2026-05-23T05:48:30.132598",
+        "memory_usage_mb": 3197.828125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 3.3776822090148926,
+        "timestamp": "2026-05-23T05:48:41.578074",
+        "memory_usage_mb": 3321.57421875,
+        "memory_delta_mb": 108.609375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.4303474426269531,
+        "timestamp": "2026-05-23T05:48:43.299213",
+        "memory_usage_mb": 3330.59375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 11.873299360275269,
+        "timestamp": "2026-05-23T05:48:55.316311",
+        "memory_usage_mb": 3339.1875,
+        "memory_delta_mb": 7.75
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.04303717613220215,
+        "timestamp": "2026-05-23T05:48:56.223457",
+        "memory_usage_mb": 3358.43359375,
+        "memory_delta_mb": 0.125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.4714376926422119,
+        "timestamp": "2026-05-23T05:48:56.719369",
+        "memory_usage_mb": 3351.43359375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 4.193111181259155,
+        "timestamp": "2026-05-23T05:49:00.978299",
+        "memory_usage_mb": 3350.5078125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 11.298032283782959,
+        "timestamp": "2026-05-23T05:49:12.638936",
+        "memory_usage_mb": 3351.0625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 19.520430326461792,
+        "timestamp": "2026-05-23T05:49:33.018442",
+        "memory_usage_mb": 3394.89453125,
+        "memory_delta_mb": 11.328125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 15.739721059799194,
+        "timestamp": "2026-05-23T05:49:50.139405",
+        "memory_usage_mb": 3420.5546875,
+        "memory_delta_mb": 9.6640625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 5.2222208976745605,
+        "timestamp": "2026-05-23T05:49:56.427245",
+        "memory_usage_mb": 3429.2578125,
+        "memory_delta_mb": 0.01953125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.40700697898864746,
+        "timestamp": "2026-05-23T05:49:57.220123",
+        "memory_usage_mb": 3432.98828125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.8249640464782715,
+        "timestamp": "2026-05-23T05:49:58.096520",
+        "memory_usage_mb": 3433.2265625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 6.677270412445068,
+        "timestamp": "2026-05-23T05:50:04.869402",
+        "memory_usage_mb": 3432.24609375,
+        "memory_delta_mb": 0.13671875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 14.122040748596191,
+        "timestamp": "2026-05-23T05:50:19.409933",
+        "memory_usage_mb": 3432.3125,
+        "memory_delta_mb": 0.01171875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 69.56074500083923,
+        "timestamp": "2026-05-23T05:51:30.105828",
+        "memory_usage_mb": 3506.671875,
+        "memory_delta_mb": 59.359375
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 34.32614231109619,
+        "timestamp": "2026-05-23T05:52:13.278527",
+        "memory_usage_mb": 3578.30078125,
+        "memory_delta_mb": 1.015625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.9541563987731934,
+        "timestamp": "2026-05-23T05:52:18.531689",
+        "memory_usage_mb": 3547.99609375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.7056927680969238,
+        "timestamp": "2026-05-23T05:52:20.456158",
+        "memory_usage_mb": 3540.5390625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.1775600910186768,
+        "timestamp": "2026-05-23T05:52:21.783665",
+        "memory_usage_mb": 3540.89453125,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 3.8126494884490967,
+        "timestamp": "2026-05-23T05:52:25.708753",
+        "memory_usage_mb": 3541.7109375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 20.18759775161743,
+        "timestamp": "2026-05-23T05:52:46.337303",
+        "memory_usage_mb": 3550.32421875,
+        "memory_delta_mb": 0.015625
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.0140540599822998,
+        "timestamp": "2026-05-23T05:52:49.438601",
+        "memory_usage_mb": 3565.171875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.5023648738861084,
+        "timestamp": "2026-05-23T05:52:51.051831",
+        "memory_usage_mb": 3563.33203125,
+        "memory_delta_mb": 0.0078125
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 0.8736774921417236,
+        "timestamp": "2026-05-23T05:52:52.113378",
+        "memory_usage_mb": 3561.4296875,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 2.1777584552764893,
+        "timestamp": "2026-05-23T05:52:54.390912",
+        "memory_usage_mb": 3562.265625,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 60.23569631576538,
+        "timestamp": "2026-05-23T05:53:54.827837",
+        "memory_usage_mb": 3610.80078125,
+        "memory_delta_mb": 45.85546875
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 1.7523777484893799,
+        "timestamp": "2026-05-23T05:54:02.365348",
+        "memory_usage_mb": 3665.375,
+        "memory_delta_mb": 0.0
+      },
+      {
+        "operation": "generate_embeddings",
+        "duration_seconds": 44.83442282676697,
+        "timestamp": "2026-05-23T05:54:47.469626",
+        "memory_usage_mb": 3614.57421875,
+        "memory_delta_mb": 0.46875
+      }
+    ]
+  },
+  "generated_at": "2026-05-23T05:54:50.978324"
+}
