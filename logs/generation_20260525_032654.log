@@ -1,7 +1,0 @@
-2026-05-25 03:26:54,589 [INFO] graphs_generator.run_graph_generation: Starting graph generation process (force=True)...
-2026-05-25 03:26:54,604 [INFO] graphs_generator.run_graph_generation: --- Processing: The Dhammapada ---
-2026-05-25 03:26:54,604 [INFO] graphs_generator.run_graph_generation: Text split into 1 chunks.
-2026-05-25 03:26:54,604 [INFO] graphs_generator.run_graph_generation:   [Chunk 1/1] Extracting characters and relations...
-2026-05-25 03:26:54,604 [INFO] graphs_generator.run_graph_generation: Extracted unique items: Characters (1), Relations (0), Locations (0), Times (0)
-2026-05-25 03:26:54,604 [WARNING] graphs_generator.graph_generator: No valid relations. The graph will consist of isolated nodes.
-2026-05-25 03:26:54,604 [INFO] graphs_generator.graph_generator: Character graph saved successfully: C:\Users\finic\AppData\Local\Temp\graphgen_check_um73t3dg\graphs\The Dhammapada\characters.html
