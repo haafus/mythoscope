@@ -1,4 +1,9 @@
-from typing import Optional
+from concurrent.futures import ThreadPoolExecutor
+import logging
+import threading
+import time
+from typing import Dict, Optional
+from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -7,6 +12,12 @@ from ui_server.services.embedding_index import embedding_index_service
 from ui_server.services.projections import get_projection_data, get_saved_html_plot
 
 router = APIRouter(prefix="/api/similarity", tags=["similarity"])
+logger = logging.getLogger(__name__)
+
+_search_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="semantic-search")
+_search_jobs: Dict[str, Dict] = {}
+_search_jobs_lock = threading.Lock()
+_SEARCH_JOB_TTL_SECONDS = 60 * 30
 
 
 @router.get("/projections/{model_key}/{method}")
@@ -51,9 +62,89 @@ def point_neighbors(
     return {"point_id": point_id, "neighbors": neighbors}
 
 
+def _cleanup_search_jobs_locked() -> None:
+    cutoff = time.time() - _SEARCH_JOB_TTL_SECONDS
+    expired = [
+        job_id
+        for job_id, job in _search_jobs.items()
+        if job.get("status") in {"complete", "failed"} and job.get("finished_at", 0) < cutoff
+    ]
+    for job_id in expired:
+        _search_jobs.pop(job_id, None)
+
+
+def _set_search_job(job_id: str, **updates) -> None:
+    with _search_jobs_lock:
+        job = _search_jobs.get(job_id)
+        if job is not None:
+            job.update(updates)
+
+
+def _run_search_job(job_id: str, model: str, query: str, top_k: int) -> None:
+    _set_search_job(job_id, status="running", started_at=time.time())
+    try:
+        results = embedding_index_service.search(model, query, top_k)
+        _set_search_job(
+            job_id,
+            status="complete",
+            results=results,
+            total=len(results),
+            finished_at=time.time(),
+        )
+    except Exception as exc:
+        logger.exception("Semantic search job failed")
+        _set_search_job(
+            job_id,
+            status="failed",
+            error=str(exc) or exc.__class__.__name__,
+            finished_at=time.time(),
+        )
+
+
+@router.post("/search/jobs")
+def start_search_job(request: SearchRequest):
+    job_id = uuid4().hex
+    now = time.time()
+    job = {
+        "job_id": job_id,
+        "status": "queued",
+        "query": request.query,
+        "model": request.model,
+        "top_k": request.top_k,
+        "results": [],
+        "total": 0,
+        "submitted_at": now,
+    }
+    with _search_jobs_lock:
+        _cleanup_search_jobs_locked()
+        _search_jobs[job_id] = job
+
+    _search_executor.submit(_run_search_job, job_id, request.model, request.query, request.top_k)
+    return job
+
+
+@router.get("/search/jobs/{job_id}")
+def search_job(job_id: str):
+    with _search_jobs_lock:
+        job = _search_jobs.get(job_id)
+        if job is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Search job not found. The server may have restarted; start a new search.",
+            )
+        return dict(job)
+
+
 @router.post("/search")
 def search(request: SearchRequest):
-    results = embedding_index_service.search(request.model, request.query, request.top_k)
+    try:
+        results = embedding_index_service.search(request.model, request.query, request.top_k)
+    except Exception as exc:
+        logger.exception("Semantic search failed")
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc) or "Semantic search failed",
+        ) from exc
     return {
         "query": request.query,
         "model": request.model,

@@ -14,6 +14,7 @@ import {
     groupDocuments,
     HTML_ONLY_METHODS,
     METRIC_NAMES,
+    normalizePreviewText,
     normalizeRoute,
     parseHash,
     persistSelectedModel,
@@ -41,7 +42,7 @@ function render() {
         return;
     }
 
-    if (path === "/") return renderHome();
+    if (path === "/home") return renderHome();
     if (path === "/corpus") return renderCorpus();
     if (path === "/geography") return renderGeography();
     if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
@@ -49,7 +50,7 @@ function render() {
     if (path === "/searchSimilarities") return renderSearchSimilarities(parsed.params);
     if (["/ages", "/realms", "/beings"].includes(path)) return renderFutureDomain(path.slice(1));
 
-    window.location.hash = "#/";
+    window.location.hash = "#/corpus";
 }
 
 function renderHome() {
@@ -772,7 +773,7 @@ async function renderProjectionPlot(data) {
                 point.id,
                 point.tradition,
                 point.chunk_index,
-                String(point.text || "").substring(0, 220),
+                normalizePreviewText(point.text).substring(0, 220),
             ]),
             hoverinfo: "none",
         };
@@ -852,7 +853,7 @@ function bindProjectionTooltip(scatterPlot) {
         tooltip.innerHTML = `
             <div class="plot-hover-title">${escapeHtml(custom[1] || "Unknown")}</div>
             <div class="plot-hover-meta">ID: ${escapeHtml(custom[0] || "")} | Chunk: ${escapeHtml(custom[2] ?? 0)}</div>
-            <div class="plot-hover-text">${escapeHtml(custom[3] || "No preview available.")}</div>
+            <div class="plot-hover-text">${escapeHtml(normalizePreviewText(custom[3]) || "No preview available.")}</div>
         `;
 
         tooltip.classList.add("visible");
@@ -1124,6 +1125,85 @@ async function openBookReader(doc) {
     }
 }
 
+const SEARCH_JOB_POLL_MS = 1000;
+
+function delay(ms) {
+    return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+    });
+}
+
+function renderSearchStatus(job) {
+    const status = job.status === "queued" ? "Queued" : "Searching";
+    const model = escapeHtml(String(job.model || "").replace(/_/g, "/"));
+    return `
+        <div class="search-loading">
+            ${status}...
+            <small>Model: ${model}</small>
+        </div>
+    `;
+}
+
+async function runSemanticSearch({query, model, topK = 20, onStatus, shouldContinue}) {
+    const startJob = () => api("/api/similarity/search/jobs", {
+        method: "POST",
+        body: JSON.stringify({
+            query,
+            model,
+            top_k: topK,
+        }),
+    });
+
+    let started = await startJob();
+    let restarts = 0;
+
+    if (Array.isArray(started.results) && started.status === undefined) {
+        return started;
+    }
+
+    if (!started.job_id) {
+        throw new Error("Search did not start.");
+    }
+
+    if (onStatus) onStatus(started);
+
+    while (true) {
+        if (shouldContinue && !shouldContinue()) return null;
+        await delay(SEARCH_JOB_POLL_MS);
+        if (shouldContinue && !shouldContinue()) return null;
+
+        let job;
+        try {
+            job = await api(`/api/similarity/search/jobs/${encodeURIComponent(started.job_id)}`);
+        } catch (error) {
+            const message = String(error.message || "");
+            const jobWasLost = message.includes("Search job not found") || message.includes("Failed to fetch");
+            if (jobWasLost && restarts < 2) {
+                restarts += 1;
+                await delay(SEARCH_JOB_POLL_MS);
+                if (shouldContinue && !shouldContinue()) return null;
+                started = await startJob();
+                if (onStatus) onStatus({...started, status: "queued"});
+                continue;
+            }
+            throw error;
+        }
+
+        if (job.status === "complete") {
+            return {
+                query: job.query,
+                model: job.model,
+                results: Array.isArray(job.results) ? job.results : [],
+                total: Number(job.total || 0),
+            };
+        }
+        if (job.status === "failed") {
+            throw new Error(job.error || "Search failed.");
+        }
+        if (onStatus) onStatus(job);
+    }
+}
+
 async function performAnalysisSearch() {
     const searchText = document.getElementById("search-text");
     const searchBtn = document.getElementById("search-btn");
@@ -1138,15 +1218,19 @@ async function performAnalysisSearch() {
     setSearchResults('<div class="search-loading">Searching... This may take a few seconds.</div>');
 
     try {
-        const data = await api("/api/similarity/search", {
-            method: "POST",
-            body: JSON.stringify({
-                query: text,
-                model: state.selectedModel,
-                top_k: 20,
-            }),
+        const data = await runSemanticSearch({
+            query: text,
+            model: state.selectedModel,
+            topK: 20,
+            shouldContinue: () => requestId === state.analysisSearchRequestId,
+            onStatus: (job) => {
+                if (requestId === state.analysisSearchRequestId) {
+                    setSearchResults(renderSearchStatus(job));
+                }
+            },
         });
         if (requestId !== state.analysisSearchRequestId) return;
+        if (!data) return;
         displayAnalysisSearchResults(data);
     } catch (error) {
         if (requestId !== state.analysisSearchRequestId) return;
@@ -1486,20 +1570,28 @@ async function performSearchPageSearch() {
         return;
     }
 
+    const requestId = state.searchPageRequestId + 1;
+    state.searchPageRequestId = requestId;
     resultsArea.innerHTML = '<div class="loading">Searching... This may take a few seconds</div>';
 
     try {
         persistSelectedModel(modelSelect.value);
-        const data = await api("/api/similarity/search", {
-            method: "POST",
-            body: JSON.stringify({
-                query: searchText,
-                model: modelSelect.value,
-                top_k: 20,
-            }),
+        const data = await runSemanticSearch({
+            query: searchText,
+            model: modelSelect.value,
+            topK: 20,
+            shouldContinue: () => requestId === state.searchPageRequestId,
+            onStatus: (job) => {
+                if (requestId === state.searchPageRequestId) {
+                    resultsArea.innerHTML = renderSearchStatus(job);
+                }
+            },
         });
+        if (requestId !== state.searchPageRequestId) return;
+        if (!data) return;
         displaySearchResults(data);
     } catch (error) {
+        if (requestId !== state.searchPageRequestId) return;
         resultsArea.innerHTML = `<div class="no-results">
             Search error: ${escapeHtml(error.message)}<br><br>
             <small>Make sure the server is running and model ${escapeHtml(modelSelect.value)} is loaded</small>

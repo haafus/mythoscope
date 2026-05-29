@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 class AnalyzerConfig:
     def __init__(self, config_path: str = "config.yaml"):
         self.config_path = self._resolve_config_path(config_path)
+        self.project_root = Path(__file__).resolve().parent.parent
         self._config = self._load_config()
 
     @staticmethod
@@ -22,6 +23,43 @@ class AnalyzerConfig:
             return package_config
         return path
 
+    def _resolve_project_path(self, path_value: str) -> str:
+        path = Path(path_value)
+        if path.is_absolute():
+            return str(path)
+        return str(self.project_root / path)
+
+    @staticmethod
+    def _windows_short_path(path: Path) -> Path:
+        if os.name != "nt":
+            return path
+
+        def get_short(existing_path: Path) -> Optional[Path]:
+            try:
+                import ctypes
+
+                buffer = ctypes.create_unicode_buffer(32768)
+                length = ctypes.windll.kernel32.GetShortPathNameW(
+                    str(existing_path),
+                    buffer,
+                    len(buffer),
+                )
+                if length:
+                    return Path(buffer.value)
+            except Exception:
+                return None
+            return None
+
+        if path.exists():
+            return get_short(path) or path
+
+        if path.parent.exists():
+            short_parent = get_short(path.parent)
+            if short_parent:
+                return short_parent / path.name
+
+        return path
+
     def _load_config(self):
         if self.config_path.exists():
             with open(self.config_path, 'r', encoding='utf-8') as f:
@@ -30,7 +68,12 @@ class AnalyzerConfig:
 
     @property
     def chroma_path(self) -> str:
-        return self._config.get('paths', {}).get('chroma_path', './chroma_db')
+        resolved_path = Path(
+            self._resolve_project_path(
+                self._config.get('paths', {}).get('chroma_path', './chroma_db')
+            )
+        )
+        return str(self._windows_short_path(resolved_path))
 
     @property
     def output_dir(self) -> str:

@@ -22,8 +22,6 @@ def normalize_text_type(text_type: Optional[str]) -> Optional[str]:
 
 
 class ApplicationContext:
-    """Application context for safe signal handling"""
-
     def __init__(self):
         self.builder = None
 
@@ -60,7 +58,6 @@ signal.signal(signal.SIGTERM, app_context.signal_handler)
 
 
 def setup_logging(config_path: str = "config.yaml"):
-    """Setup logging with rotation based on config"""
     config_mgr = ConfigManager(config_path)
 
     log_config = config_mgr.get("logging")
@@ -120,8 +117,6 @@ def build_embeddings(
         chunking: Optional[str] = None,
         text_type: Optional[str] = None,
 ):
-    """Generate embeddings for all files in corpus directory"""
-
     if clear_existing is False:
         raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
 

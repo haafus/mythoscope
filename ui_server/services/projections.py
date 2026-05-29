@@ -1,5 +1,6 @@
 import base64
 import json
+import re
 import struct
 from functools import lru_cache
 from pathlib import Path
@@ -110,7 +111,7 @@ def _load_saved_html_projection(path: str, mtime: float, model_name: str, method
                     "id": str(point_id),
                     "tradition": str(tradition or "Unknown"),
                     "chunk_index": chunk_index,
-                    "text": str(_custom_value(custom, 3, "")),
+                    "text": _clean_saved_preview_text(_custom_value(custom, 3, "")),
                     "doc_type": str(_custom_value(custom, 4, "")),
                     "x": xs[index],
                     "y": ys[index],
@@ -251,6 +252,15 @@ def _extract_balanced_json(text: str, start: int, open_char: str, close_char: st
 
 def _custom_value(values: list, index: int, default):
     return values[index] if index < len(values) else default
+
+
+def _clean_saved_preview_text(value) -> str:
+    text = str(value or "")
+    text = re.sub(r"-\s*&lt;br\s*/?&gt;", "-", text, flags=re.IGNORECASE)
+    text = re.sub(r"-\s*<br\s*/?>", "-", text, flags=re.IGNORECASE)
+    text = re.sub(r"&lt;br\s*/?&gt;", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"<br\s*/?>", " ", text, flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def _as_int(value) -> int:

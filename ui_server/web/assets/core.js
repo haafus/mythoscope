@@ -14,6 +14,7 @@ export const state = {
     pendingPoint: null,
     lastAnalysisSearchData: null,
     analysisSearchRequestId: 0,
+    searchPageRequestId: 0,
     keydownHandler: null,
 };
 
@@ -67,6 +68,7 @@ export function parseHash() {
 }
 
 export function normalizeRoute(path) {
+    if (path === "/") return "/corpus";
     if (path === "/sources") return "/corpus";
     if (path === "/similarity") return "/embeddings_analysis";
     if (path === "/clusterisation") return "/cluster_analysis";
@@ -74,13 +76,14 @@ export function normalizeRoute(path) {
 }
 
 function routeClass(path) {
-    if (path === "/") return "route-home";
+    if (path === "/home") return "route-home";
+    if (path === "/") return "route-corpus";
     if (path === "/corpus") return "route-corpus";
     if (path === "/geography") return "route-geography";
     if (path === "/embeddings_analysis") return "route-embeddings";
     if (path === "/cluster_analysis") return "route-cluster";
     if (path === "/searchSimilarities") return "route-search";
-    return "route-home";
+    return "route-corpus";
 }
 
 export function setBodyClass(path) {
@@ -146,6 +149,16 @@ export function escapeHtml(value) {
     const div = document.createElement("div");
     div.textContent = String(value ?? "");
     return div.innerHTML;
+}
+
+export function normalizePreviewText(value) {
+    return String(value ?? "")
+        .replace(/-\s*&lt;br\s*\/?&gt;/gi, "-")
+        .replace(/-\s*<br\s*\/?>/gi, "-")
+        .replace(/&lt;br\s*\/?&gt;/gi, " ")
+        .replace(/<br\s*\/?>/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
 export function escapeAttribute(value) {
