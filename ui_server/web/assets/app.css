@@ -78,9 +78,28 @@ body.has-main-navbar > .main-navbar + #app > main.container {
     white-space: nowrap;
 }
 
+.nav-links > a.nav-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #adb5bd;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
 .nav-links > a:hover,
 .nav-links > a.active {
     color: #111;
+}
+
+.nav-links > a.nav-info:hover,
+.nav-links > a.nav-info.active {
+    border-color: #111;
+    background: #f8f9fa;
 }
 
 @media (max-width: 760px) {
@@ -1169,6 +1188,7 @@ body.route-cluster {
     text-align: center;
 }
 
+.analysis-page .search-loading small,
 .analysis-page .search-empty small {
     display: block;
     color: #8a929b;
@@ -1511,10 +1531,16 @@ body.route-search {
 }
 
 .search-page .loading,
+.search-page .search-loading,
 .search-page .no-results {
     text-align: center;
     padding: 60px;
     color: #8a827c;
+}
+
+.search-page .search-loading small {
+    display: block;
+    margin-top: 8px;
 }
 
 .search-page .back-link {

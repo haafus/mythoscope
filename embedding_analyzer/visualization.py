@@ -18,7 +18,7 @@ from .config import get_analyzer_config
 from .utils import reduce_dimensions
 
 MAX_TEXT_PREVIEW_LEN = 200
-MAX_VIS_SAMPLES = 3000
+MAX_VIS_SAMPLES = None
 DEFAULT_SAMPLE_SIZE = -1
 RANDOM_SEED = 42
 HEATMAP_WIDTH = 1000
@@ -31,6 +31,24 @@ ZERO_LINE_COLOR = 'rgba(120,130,140,0.55)'
 AXIS_LINE_COLOR = 'rgba(120,130,140,0.65)'
 
 logger = logging.getLogger(__name__)
+
+
+def _resolve_sample_limit(sample_size: Optional[int]) -> Optional[int]:
+    if sample_size is None or sample_size == DEFAULT_SAMPLE_SIZE:
+        return None
+    if sample_size <= 0:
+        return None
+    return sample_size
+
+
+def _sample_for_visualization(data: List[Dict], sample_size: Optional[int], reason: str) -> List[Dict]:
+    sample_limit = _resolve_sample_limit(sample_size)
+    if sample_limit is None or len(data) <= sample_limit:
+        return data
+
+    logger.info(f"Sampling {sample_limit} of {len(data)} records for {reason}")
+    indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_limit, replace=False)
+    return [data[i] for i in indices]
 
 
 def _ensure_dir(path: str) -> str:
@@ -190,7 +208,7 @@ def _create_interactive_figure_2d(
 
 def plot_interactive_2d(
         data: List[Dict],
-        sample_size: int = DEFAULT_SAMPLE_SIZE,
+        sample_size: Optional[int] = DEFAULT_SAMPLE_SIZE,
         save_html: bool = True,
         output_dir: str = None,
         model_name: str = None,
@@ -211,22 +229,14 @@ def plot_interactive_2d(
     output_dir = _ensure_dir(output_dir)
     reducer_kwargs = reducer_kwargs or {}
 
-    
-
-    
+    sample_limit = _resolve_sample_limit(sample_size)
     if method == 'tsne':
-        if sample_size == DEFAULT_SAMPLE_SIZE or sample_size > MAX_VIS_SAMPLES:
-            sample_size = MAX_VIS_SAMPLES
-            logger.info(f"t-SNE optimization: limiting sample size to {sample_size}")
+        max_vis_limit = _resolve_sample_limit(MAX_VIS_SAMPLES)
+        if max_vis_limit is not None and (sample_limit is None or sample_limit > max_vis_limit):
+            sample_limit = max_vis_limit
+            logger.info(f"t-SNE optimization: limiting sample size to {sample_limit}")
 
-    
-    if sample_size != DEFAULT_SAMPLE_SIZE and len(data) > sample_size:
-        indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_size, replace=False)
-        sample = [data[i] for i in indices]
-    else:
-        sample = data
-
-    
+    sample = _sample_for_visualization(data, sample_limit, f"{method.upper()} visualization")
 
     try:
         embeddings = np.stack([item["embedding"] for item in sample])
@@ -299,12 +309,11 @@ def plot_hyperparameter_tuning_dashboard(
         output_dir = get_analyzer_config().output_dir
     output_dir = _ensure_dir(output_dir)
 
-    if len(data) > MAX_VIS_SAMPLES:
-        logger.info(f"Sampling {MAX_VIS_SAMPLES} for {method.upper()} hyperparameter tuning")
-        indices = np.random.default_rng(RANDOM_SEED).choice(len(data), MAX_VIS_SAMPLES, replace=False)
-        sample_data = [data[i] for i in indices]
-    else:
-        sample_data = data
+    sample_data = _sample_for_visualization(
+        data,
+        MAX_VIS_SAMPLES,
+        f"{method.upper()} hyperparameter tuning"
+    )
 
     embeddings = np.stack([item["embedding"] for item in sample_data])
     traditions = [item.get("tradition", "unknown") for item in sample_data]
@@ -482,12 +491,11 @@ def plot_comparison_dashboard(
 
     output_dir = _ensure_dir(output_dir)
 
-    if len(data) > MAX_VIS_SAMPLES:
-        logger.info(f"Too much data ({len(data)}). Using sample of {MAX_VIS_SAMPLES} for visualization")
-        indices = np.random.default_rng(RANDOM_SEED).choice(len(data), MAX_VIS_SAMPLES, replace=False)
-        sample_data = [data[i] for i in indices]
-    else:
-        sample_data = data
+    sample_data = _sample_for_visualization(
+        data,
+        MAX_VIS_SAMPLES,
+        "cross-method comparison dashboard"
+    )
 
     try:
         embeddings = np.stack([item["embedding"] for item in sample_data])
@@ -886,7 +894,7 @@ def analyze_embeddings(model_name: str = None, generate_all_plots: bool = True):
                         try:
                             plot_interactive_2d(
                                 data,
-                                sample_size=MAX_VIS_SAMPLES if method == 'tsne' else DEFAULT_SAMPLE_SIZE,
+                                sample_size=DEFAULT_SAMPLE_SIZE,
                                 output_dir=analyzer.output_dir,
                                 model_name=analyzer.model_name,
                                 method=method,

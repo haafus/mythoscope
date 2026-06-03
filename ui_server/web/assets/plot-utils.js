@@ -1,3 +1,5 @@
+import {normalizePreviewText} from "./core.js";
+
 export function bindResponsivePlotFrame(iframe) {
     if (!iframe || iframe.dataset.responsiveFrame === "1") return;
     iframe.dataset.responsiveFrame = "1";
@@ -71,7 +73,7 @@ export async function renderSavedPlotInto(target, url, options = {}) {
             if (Array.isArray(trace.customdata)) {
                 trace.customdata.forEach(point => {
                     if (Array.isArray(point) && point[3]) {
-                        point[3] = wrapText(point[3], 60);
+                        point[3] = wrapText(normalizePreviewText(point[3]), 60);
                     }
                 });
             }

@@ -12,4 +12,5 @@ from ui_server.run_server import create_app, run_server
 app = create_app()
 
 if __name__ == "__main__":
+    #analyze_embeddings()
     run_server()

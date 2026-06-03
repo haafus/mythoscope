@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import csv
+import threading
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -25,15 +26,19 @@ class EmbeddingIndexService:
         self._indexes: Dict[str, ModelIndex] = {}
         self._point_records: Dict[str, Dict[str, Dict]] = {}
         self._search_models: Dict[str, object] = {}
+        self._index_lock = threading.RLock()
+        self._model_lock = threading.RLock()
 
     def get_index(self, model_key: str) -> ModelIndex:
         model_name = key_to_model(model_key)
-        if model_name in self._indexes:
-            return self._indexes[model_name]
 
-        index = self._load_index(model_name)
-        self._indexes[model_name] = index
-        return index
+        with self._index_lock:
+            if model_name in self._indexes:
+                return self._indexes[model_name]
+
+            index = self._load_index(model_name)
+            self._indexes[model_name] = index
+            return index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: Optional[int] = None) -> Dict:
         model_name = key_to_model(model_key)
@@ -159,12 +164,18 @@ class EmbeddingIndexService:
         from sentence_transformers import SentenceTransformer
         from embeddings_builder.models_repository import MODELS
 
-        if model_name not in self._search_models:
-            model_path = MODELS.get(model_name, {}).get("path", model_name)
-            self._search_models[model_name] = SentenceTransformer(model_path)
+        with self._model_lock:
+            if model_name not in self._search_models:
+                model_path = MODELS.get(model_name, {}).get("path", model_name)
+                self._search_models[model_name] = SentenceTransformer(model_path)
 
-        model = self._search_models[model_name]
-        embedding = model.encode([query], normalize_embeddings=True)[0]
+            model = self._search_models[model_name]
+            embedding = model.encode(
+                [query],
+                normalize_embeddings=True,
+                convert_to_numpy=True,
+                show_progress_bar=False,
+            )[0]
         return np.asarray(embedding, dtype=np.float32)
 
     @staticmethod
