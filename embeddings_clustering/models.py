@@ -50,22 +50,16 @@ class BaseClusteringModel:
         return self._do_fit_predict(data_ready)
 
     def _reduce_dimensions(self, data: np.ndarray) -> np.ndarray:
-        actual_components = min(self.n_components, len(data) - 2)
-        actual_components = max(2, actual_components)
+        from embedding_analyzer.utils import reduce_dimensions
 
-        try:
-            import umap
-            reducer = umap.UMAP(
-                n_components=actual_components,
-                metric='cosine',
-                random_state=42
-            )
-            return reducer.fit_transform(data)
-        except ImportError:
-            logger.warning("umap is not installed. Using PCA for dimensionality reduction.")
-            from sklearn.decomposition import PCA
-            reducer = PCA(n_components=actual_components, random_state=42)
-            return reducer.fit_transform(data)
+        actual_components = max(2, min(self.n_components, len(data) - 2))
+        return reduce_dimensions(
+            data,
+            method='umap',
+            n_components=actual_components,
+            metric='cosine',
+            fallback_on_error=True,
+        )
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         raise NotImplementedError

@@ -6,76 +6,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from typing import Dict, Optional
 
+from embedding_analyzer.utils import reduce_dimensions  # noqa: F401 — re-exported
+
 
 logger = logging.getLogger(__name__)
-
-
-try:
-    from sklearn.metrics import confusion_matrix
-    from sklearn.preprocessing import Normalizer
-    from sklearn.decomposition import PCA
-    from sklearn.manifold import TSNE
-    from sklearn.preprocessing import LabelEncoder
-    SKLEARN_AVAILABLE = True
-except ImportError:
-    SKLEARN_AVAILABLE = False
-    logger.warning("sklearn is not installed. Some functionality (PCA, TSNE, confusion matrices) will be unavailable.")
-
-try:
-    import umap
-    UMAP_AVAILABLE = True
-except ImportError:
-    UMAP_AVAILABLE = False
-    logger.warning("umap-learn is not installed. PCA will be used instead of UMAP if sklearn is available.")
-
-
-def reduce_dimensions(embeddings: np.ndarray, method: str = 'umap', n_components: int = 2) -> np.ndarray:
-    if len(embeddings) == 0:
-        return np.array([])
-
-    if len(embeddings) < 3:
-        logger.warning(f"Too few points ({len(embeddings)}) for dimensionality reduction")
-        return np.zeros((len(embeddings), n_components))
-
-    
-    if SKLEARN_AVAILABLE:
-        scaler = Normalizer(norm='l2')
-        embeddings_scaled = scaler.fit_transform(embeddings)
-    else:
-        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-        
-        embeddings_scaled = np.divide(embeddings, norms, out=np.zeros_like(embeddings), where=norms!=0)
-
-    if method == 'umap' and UMAP_AVAILABLE:
-        try:
-            n_neighbors = max(2, min(15, len(embeddings) - 1))
-            reducer = umap.UMAP(n_components=n_components, random_state=42, n_neighbors=n_neighbors, metric='cosine')
-            return reducer.fit_transform(embeddings_scaled)
-        except Exception:
-            logger.exception("Error using UMAP, trying PCA")
-            method = 'pca'
-
-    if method == 'pca' and SKLEARN_AVAILABLE:
-        try:
-            reducer = PCA(n_components=n_components, random_state=42)
-            return reducer.fit_transform(embeddings_scaled)
-        except Exception:
-            logger.exception("Error using PCA")
-            return np.zeros((len(embeddings), n_components))
-
-    if method == 'tsne' and SKLEARN_AVAILABLE:
-        try:
-            perplexity = max(1, min(30, len(embeddings) - 1))
-            reducer = TSNE(n_components=n_components, random_state=42, perplexity=perplexity, metric='cosine')
-            return reducer.fit_transform(embeddings_scaled)
-        except Exception:
-            logger.exception("Error using t-SNE, trying PCA")
-            if SKLEARN_AVAILABLE:
-                reducer = PCA(n_components=n_components, random_state=42)
-                return reducer.fit_transform(embeddings_scaled)
-
-    logger.error("Could not reduce dimensionality (required libraries are not installed)")
-    return np.zeros((len(embeddings), n_components))
 
 
 def plot_clustering_results_2d(
