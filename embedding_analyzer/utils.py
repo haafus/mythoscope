@@ -92,7 +92,7 @@ def _run_reducer(
             n_components=n_components,
             perplexity=max(1, perplexity),
             random_state=random_state,
-            n_iter=kwargs.get('n_iter', 1000),
+            max_iter=kwargs.get('max_iter', kwargs.get('n_iter', 1000)),
             metric=kwargs.get('metric', 'euclidean'),
         )
         return reducer.fit_transform(data)
