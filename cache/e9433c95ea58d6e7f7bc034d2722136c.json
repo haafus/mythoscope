@@ -1,1 +1,0 @@
-{"text": "“Return, my honoured lord, I pray,\nReturn, upon thy homeward way.”\nThe monarch, with the waiting crowd,\nLifted his voice and wept aloud,\nAnd with eyes dripping still to each\nOf his good queens he spake this speech:", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

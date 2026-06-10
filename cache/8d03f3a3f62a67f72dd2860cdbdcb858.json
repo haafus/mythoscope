@@ -1,1 +1,0 @@
-{"text": "As storms the skies, and torrents tear the ground,\n Thus rag’d the prince, and scatter’d deaths around.\n At length Ascanius and the Trojan train\n Broke from the camp, so long besieg’d in vain.", "model_name": "BAAI/bge-m3", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

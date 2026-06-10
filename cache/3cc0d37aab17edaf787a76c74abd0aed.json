@@ -1,1 +1,0 @@
-{"text": "Thereupon wild Lemminkainen\nCalled aloud in tones of thunder\nO’er the waters to the vessel;\nMade the distant hills re-echo\nWith the music of his calling:\n“Whence this vessel on the waters,\nWhose the war-ship sailing hither?”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

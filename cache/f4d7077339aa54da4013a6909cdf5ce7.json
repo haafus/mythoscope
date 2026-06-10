@@ -1,1 +1,0 @@
-{"text": "1 Jallalo'ddin, Yahya, Abulfeda, &c. 2 Ezek. xxxvii. 1-10.\n 3 Al Thalabi, Abu Ishak, &c.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

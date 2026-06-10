@@ -1,1 +1,0 @@
-{"text": "1 Al Beidâwi. 2 Idem, Jallalo'ddin. 3 See cap. 81.\n 4 Al Beidâwi.\n5 Idem.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,1 +1,0 @@
-{"text": "6:1 The sons of Levi; Gershon, Kohath, and Merari.\n\n6:2 And the sons of Kohath; Amram, Izhar, and Hebron, and Uzziel.\n\n6:3 And the children of Amram; Aaron, and Moses, and Miriam. The sons\nalso of Aaron; Nadab, and Abihu, Eleazar, and Ithamar.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

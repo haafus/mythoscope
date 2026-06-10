@@ -1,1 +1,0 @@
-{"text": "‘Formerly I had desired an alliance with thee. But I hesitated, being\nsubsequently deprived of my kingdom. Let this wish, therefore, that I had\nformerly entertained, be accomplished this very day. Thou art, indeed, a\nwelcome guest to me!’", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

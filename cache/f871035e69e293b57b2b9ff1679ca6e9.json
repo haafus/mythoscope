@@ -1,1 +1,0 @@
-{"text": "4 Ebn Shohnah. Vide D'Herbel. p. 537. 1 Apud Abulfar.\np. 275.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

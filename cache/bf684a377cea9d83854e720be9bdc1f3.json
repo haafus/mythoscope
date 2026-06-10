@@ -1,1 +1,0 @@
-{"text": "1 Poc. Spec. p. 65, 66. 2 Vide Gol. ad Alfrag. p. 232. 3\nPoc. Spec. p. 57. 4 Geogr. Nubiens. p. 52.\n5 See Prideaux's Life of Mahomet, p. 61. 1 Poc. Spec. p. 63, 64. 2\nAbulfeda. 3 Al Jannâbi and Ahmed Ebn Yusef.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,1 +1,0 @@
-{"text": "[Illustration: between Marduk (Bel) and the Dragon. Drawn from a\nbas-relief from the Palace of Ashur-nasir-pal, King of Assyria,\n885-860 B.C., at Nimrud. [Nimrud Gallery, Nos. 28 and 29.]]", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

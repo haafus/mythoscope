@@ -1,1 +1,0 @@
-{"text": "Destruction on each living thing,\nLet us appease, while yet we may,\nHim bright as fire, like fire to slay.\nYea, as the fiery flood of Fate\nLays all creation desolate,\nHe o’er the conquered Gods may reign:\nO, grant him what he longs to gain.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

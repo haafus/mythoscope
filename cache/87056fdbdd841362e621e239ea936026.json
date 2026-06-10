@@ -1,1 +1,0 @@
-{"text": "9 Jallalo'ddin, al Beidâwi. Vide Lud. de Dieu, in not. ad Hist.\nChristi Xaverii, p. 542. 10 Al Beidâwi. Vide de Dieu, ubi\nsup. p. 548. 1 Al Beidâwi 2 Idem. 3 Idem.\nJallalo'ddin, &c.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,1 +1,0 @@
-{"text": "“With such deceits he gain’d their easy hearts,\n Too prone to credit his perfidious arts.\n What Diomede, nor Thetis’ greater son,\n A thousand ships, nor ten years’ siege, had done:\n False tears and fawning words the city won.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

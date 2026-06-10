@@ -1,1 +1,0 @@
-{"text": " Among the rest, the rich Galesus lies;\n A good old man, while peace he preach’d in vain,\n Amidst the madness of th’ unruly train:\n Five herds, five bleating flocks, his pastures fill’d;\n His lands a hundred yoke of oxen till’d.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

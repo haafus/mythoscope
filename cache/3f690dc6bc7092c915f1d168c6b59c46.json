@@ -1,1 +1,0 @@
-{"text": "Canto LII. Vasishtha’s Feast.\n\nRight glad was Viśvámitra when\nHe saw the prince of saintly men.\nLow at his feet the hero bent,\nAnd did obeisance, reverent.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

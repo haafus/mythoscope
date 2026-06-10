@@ -1,1 +1,0 @@
-{"text": "He knows not where his lady lies.\nO, if he knew, o’er land and sea\nHis feet were swift to set me free;\nThis Lanká, girdled by the deep,\nWould fall consumed, a shapeless heap,\nAnd from each ruined home would rise\nA Rákshas widow’s groans and cries.”", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

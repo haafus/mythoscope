@@ -1,1 +1,0 @@
-{"text": "Haste, King! now let the thief be slain;\nBring thou the charger back again:\nThe sacred rite prevented thus\nBrings scathe and woe to all of us.\nRise, monarch, and provide with speed\nThat naught its happy course impede.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

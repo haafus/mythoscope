@@ -1,1 +1,0 @@
-{"text": " Drive down this body to the nether sky,\n Condemn’d with ghosts in endless night to lie,\n Before I break the plighted faith I gave!\n No! he who had my vows shall ever have;\n For, whom I lov’d on earth, I worship in the grave.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

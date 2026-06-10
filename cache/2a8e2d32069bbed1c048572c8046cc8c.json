@@ -1,1 +1,0 @@
-{"text": "1 Idem. 2 Idem. See c. 6, p. 99. 3 See Prid. Life\nof Mah. p. 85. Abulf. Vit. Moh. p. 76, and the notes to c. 33.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

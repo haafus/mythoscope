@@ -1,1 +1,0 @@
-{"text": "Where stores of precious wealth were massed,\nThe melancholy Bráhmans passed,\n Their hearts with anguish cleft:\nAloof from all, they came not near\nTo stranger or to kinsman dear,\nShowing in faces blank and drear\n That not one joy was left.", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

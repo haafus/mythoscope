@@ -1,1 +1,0 @@
-{"text": "1 Pocock, Specim. Hist. Arab. 33. 2 Gen. x. 30. 3 See Pocock,\nSpecim. 33, 34. 4 Golius ad Alfragan. 78, 79.\n5 Strabo says Arabia Felix was in his time divided into five kingdoms, l. 16,\np. 1129.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

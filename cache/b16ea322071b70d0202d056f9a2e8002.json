@@ -1,1 +1,0 @@
-{"text": "[Illustration: Marduk destroying Tiamat, who is here represented in the\nform of a huge serpent. From a seal-cylinder in the British Museum.\n[No. 89,589.]]", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

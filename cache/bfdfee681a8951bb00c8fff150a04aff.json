@@ -1,1 +1,0 @@
-{"text": "3 Vide Bobov. de Prec. Moham. p. 5, et Reland. Dissert. de Gemmis Arab\np. 235, 239. 4 Vide D'Herbelot, Bibl. Orient. Art. Corsi.\n1 Jallalo'ddin. 2 Jallalo'ddin, Yahya, &c See D'Herbel. Bibl.\nOrient. Art. Ozair. 3 Nehem. ii. 12, &c.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

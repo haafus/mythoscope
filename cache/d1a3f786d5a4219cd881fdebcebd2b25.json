@@ -1,1 +1,0 @@
-{"text": "Canto LXXV. The Night Attack.\n\nSugríva spake in words like these:\n“Now, Vánar lords, the occasion seize.\nFor now, of sons and brothers reft,\nTo Rávaṇ little hope is left:\nAnd if our host his gates assail\nHis weak defence will surely fail.”", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

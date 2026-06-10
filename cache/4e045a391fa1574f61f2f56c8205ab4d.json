@@ -1,1 +1,0 @@
-{"text": "“Vaisampayana continued, ‘Thus addressed by her, O Bharata, the Brahmana\nembraced her, and they both began to weep in silence, afflicted with\ngrief.’”\n\nSECTION CLXI\n\n(Vaka-vadha Parva continued)", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

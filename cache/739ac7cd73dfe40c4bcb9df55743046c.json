@@ -1,1 +1,0 @@
-{"text": "5 Jallalo'ddin. 6 Al Beidâwi. 7 Jallalo'ddin.\n 8 Idem, al Beidâwi\n9 Jallalo'ddin. 10 Apud al Beidâwi", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

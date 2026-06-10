@@ -1,1 +1,0 @@
-{"text": "1 Al Ghazâli. 2 Idem. 3 Vide Pocock, not. in Port. Mosis,\np. 277. 4 See before, p. 56.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

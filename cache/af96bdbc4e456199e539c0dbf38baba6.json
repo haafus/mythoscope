@@ -1,1 +1,0 @@
-{"text": "“Those who have seen us both,” answered Ulysses, “have always said we\nwere wonderfully like each other, and now you have noticed it too.”", "model_name": "intfloat/e5-large-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

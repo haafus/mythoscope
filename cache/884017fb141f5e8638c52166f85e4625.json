@@ -1,1 +1,0 @@
-{"text": "“How wondrous are these words of thine!”\nCried the famed chiefs of Raghu’s line,\nAs thus they heard the sage unfold\nThe marvels of the tale he told.", "model_name": "Qwen/Qwen3-Embedding", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

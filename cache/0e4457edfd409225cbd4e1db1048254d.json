@@ -1,1 +1,0 @@
-{"text": "Over the banished Ráma’s head,\nThy royal son to vigour grown\nAnd rooted firm will stand alone.\nThe king, I know, is well inclined,\nAnd this the hour to move his mind.\nBe bold: the threatened rite prevent,\nAnd force the king from his intent.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

@@ -1,1 +1,0 @@
-{"text": "“O save me, Lakshmaṇ, or I die.”\nMay it be well with both who stayed\nIn the great wood with none to aid,\nFor every fiend is now my foe\nFor Janasthán’s great overthrow,\nAnd many an omen seen to-day\nHas filled my heart with sore dismay.”", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

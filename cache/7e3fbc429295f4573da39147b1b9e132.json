@@ -1,1 +1,0 @@
-{"text": "“Janamejaya said, ‘O illustrious one, tell me the names of\nDhritarashtra’s sons according to the order of their birth beginning from\nthe eldest.’", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

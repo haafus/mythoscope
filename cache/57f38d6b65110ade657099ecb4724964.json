@@ -1,1 +1,0 @@
-{"text": "5 See the Prelim. Disc. Sect. III. 1 Elmacin. p. 5. Hottinger.\nHist. Orient. l. 2, c. 4. Abulfed. Vit. Moham. p. 56, &c. Prideaux's Life of\nMahom. p. 71, &c.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

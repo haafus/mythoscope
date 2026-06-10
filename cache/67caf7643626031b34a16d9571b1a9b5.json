@@ -1,1 +1,0 @@
-{"text": "2 Idem. 3 Idem. 1 See p. 338. 2 Vide J.\nLeon. Descript. Africæ, l. 2.\n3 Al Beidâwi. 4 See the Prelim. Disc. Sect. IV. p. 75, &c.\n 5 See ibid. p. 80.", "model_name": "sentence-transformers/LaBSE", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

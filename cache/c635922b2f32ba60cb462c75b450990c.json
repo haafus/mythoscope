@@ -1,1 +1,0 @@
-{"text": "4 Prelim. Disc. Sect IV. 5 Al Beidâwi. 6 Idem.\nVide Abulfeda, Vit. Moh. p. 65, 66, and note, ibid.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

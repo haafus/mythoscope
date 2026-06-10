@@ -1,1 +1,0 @@
-{"text": "1 See chapter 2, p. 17, note c. 2 Al Beidâwi. See the\nPrelim. Disc. Sect. I. p. 13-16. 3 Idem.\n4 Idem, Jallalo'ddin. 5 Idem. 6 See chapter 9, p. 148.\n 7 Jallalo'ddin, Al Beidâwi.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}

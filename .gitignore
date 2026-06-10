@@ -1,3 +1,20 @@
 .idea/
 __pycache__/
+*.pyc
+
+# generated artifacts — reproduce via pipeline, store outside git
 chroma_db/
+cache/
+analysis/
+sources_backup/
+logs/
+
+# data formats that should not be in git
+*.npy
+*.pkl
+
+# environment
+.env
+.venv/
+venv/
+*.egg-info/

@@ -1,1 +1,0 @@
-{"text": "1 Al Beidâwi, &c. 2 Idem, &c. 3 Idem, Kitab\nTafasir, &c. 4 Vide D'Herbelot. Bibl. Orient. Art. Jousouf.", "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", "chunking_name": "paragraph", "chunk_size": 1024, "chunk_overlap": 128}
