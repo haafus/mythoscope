@@ -1,23 +1,31 @@
 import concurrent.futures
 import csv
 import json
+import shutil
 import threading
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Set, Optional
-import shutil
 
-from . import catalog
-from . import logger
-from .config import CORPUS_DIR, METADATA_FILE, CATALOG_FILE, PROCESSED_URLS_FILE, DOWNLOAD_LIST_FILE
-from .downloader import load_download_list, download_file
-from .utils import md5, html_to_text, pdf_to_text, normalize_text, count_words, count_sentences, ensure_dir,\
-    _decode_bytes, sanitize_filename, get_tradition_color
+from . import catalog, logger
+from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE, PROCESSED_URLS_FILE
+from .downloader import download_file, load_download_list
+from .utils import (
+    _decode_bytes,
+    count_sentences,
+    count_words,
+    ensure_dir,
+    get_tradition_color,
+    html_to_text,
+    md5,
+    normalize_text,
+    pdf_to_text,
+    sanitize_filename,
+)
 
 data_lock = threading.Lock()
 
 
-def process_local_file(filename: Path, item: Dict, color: str) -> Optional[Dict]:
+def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
     tid = item.get("title", item.get("id", "unknown_id"))
     url = item["url"]
 
@@ -26,7 +34,7 @@ def process_local_file(filename: Path, item: Dict, color: str) -> Optional[Dict]
         existing_data = filename.read_bytes()
         h = md5(existing_data)
 
-        if filename.suffix.lower() == '.pdf':
+        if filename.suffix.lower() == ".pdf":
             text = pdf_to_text(existing_data)
         else:
             text = _decode_bytes(existing_data)
@@ -37,44 +45,59 @@ def process_local_file(filename: Path, item: Dict, color: str) -> Optional[Dict]
         sentence_count = count_sentences(text)
 
         return {
-            "id": tid, "major_tradition": item.get("major_tradition", "Unknown"),
-            "tradition": item["tradition"], "language": item["language"], "type": item["type"],
-            "url": url, "date_downloaded": datetime.utcnow().isoformat(),
-            "md5": h, "path": str(filename.resolve()),
-            "char_count": char_count, "word_count": word_count, "sentence_count": sentence_count,
-            "color": color  
+            "id": tid,
+            "major_tradition": item.get("major_tradition", "Unknown"),
+            "tradition": item["tradition"],
+            "language": item["language"],
+            "type": item["type"],
+            "url": url,
+            "date_downloaded": datetime.utcnow().isoformat(),
+            "md5": h,
+            "path": str(filename.resolve()),
+            "char_count": char_count,
+            "word_count": word_count,
+            "sentence_count": sentence_count,
+            "color": color,
         }
     except Exception as e:
         logger.error(f"{tid}: Error processing local file {filename}: {e}")
         return None
 
 
-def process_single_item(item: Dict, force: bool, metadata: List[Dict], processed_urls: Set[str]):
+def process_single_item(item: dict, force: bool, metadata: list[dict], processed_urls: set[str]):
     tid = item.get("title", item.get("id", "unknown_id"))
     tradition = item["tradition"]
     major_tradition = item.get("major_tradition", "Unknown")
     lang = item["language"]
     ftype = item["type"]
     url = item["url"]
-    description = item.get("description", "")  
+    description = item.get("description", "")
 
-    
     color = get_tradition_color(tradition)
 
-    if '_local_file' in item and not force:
-        filename = Path(item['_local_file'])
+    if "_local_file" in item and not force:
+        filename = Path(item["_local_file"])
         if filename.exists():
             local_meta = process_local_file(filename, item, color)
             if local_meta:
                 with data_lock:
                     metadata.append(local_meta)
                     processed_urls.add(url)
-                
-                catalog.add_to_catalog(tid, major_tradition, tradition, lang, ftype, url, True,
-                                       local_meta["word_count"],
-                                       local_meta["sentence_count"], color, description)
+
+                catalog.add_to_catalog(
+                    tid,
+                    major_tradition,
+                    tradition,
+                    lang,
+                    ftype,
+                    url,
+                    True,
+                    local_meta["word_count"],
+                    local_meta["sentence_count"],
+                    color,
+                    description,
+                )
             else:
-                
                 err_desc = f"{description} [Local file read error]" if description else "Local file read error"
                 catalog.add_to_catalog(tid, major_tradition, tradition, lang, ftype, url, False, 0, 0, color, err_desc)
             return
@@ -83,12 +106,13 @@ def process_single_item(item: Dict, force: bool, metadata: List[Dict], processed
 
     try:
         data = download_file(url)
-        content_type = item.get('content_type', '')
+        content_type = item.get("content_type", "")
         text = ""
 
-        is_pdf = url.lower().endswith('.pdf') or 'application/pdf' in content_type or data[:4] == b'%PDF'
-        is_html = b"<html" in data[:200].lower() or 'text/html' in content_type or b'<!doctype html' in data[
-            :200].lower()
+        is_pdf = url.lower().endswith(".pdf") or "application/pdf" in content_type or data[:4] == b"%PDF"
+        is_html = (
+            b"<html" in data[:200].lower() or "text/html" in content_type or b"<!doctype html" in data[:200].lower()
+        )
 
         if is_pdf:
             logger.debug(f"{tid}: PDF detected, extracting text")
@@ -104,9 +128,9 @@ def process_single_item(item: Dict, force: bool, metadata: List[Dict], processed
 
         data_utf8 = text.encode("utf-8")
 
-        major_tradition_path = sanitize_filename(major_tradition.replace('/', '_').replace(' ', '_'))
-        tradition_path = sanitize_filename(tradition.replace('/', '_').replace(' ', '_'))
-        title_path = sanitize_filename(tid.replace('/', '_').replace(' ', '_'))
+        major_tradition_path = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
+        tradition_path = sanitize_filename(tradition.replace("/", "_").replace(" ", "_"))
+        title_path = sanitize_filename(tid.replace("/", "_").replace(" ", "_"))
 
         folder = CORPUS_DIR / major_tradition_path / tradition_path / title_path
         filename = folder / f"{title_path}.txt"
@@ -122,23 +146,33 @@ def process_single_item(item: Dict, force: bool, metadata: List[Dict], processed
         sentence_count = count_sentences(text)
 
         with data_lock:
-            metadata.append({
-                "id": tid, "major_tradition": major_tradition, "tradition": tradition, "language": lang, "type": ftype,
-                "url": url, "date_downloaded": datetime.utcnow().isoformat(),
-                "md5": h, "path": str(filename.resolve()),
-                "char_count": char_count, "word_count": word_count, "sentence_count": sentence_count,
-                "color": color  
-            })
+            metadata.append(
+                {
+                    "id": tid,
+                    "major_tradition": major_tradition,
+                    "tradition": tradition,
+                    "language": lang,
+                    "type": ftype,
+                    "url": url,
+                    "date_downloaded": datetime.utcnow().isoformat(),
+                    "md5": h,
+                    "path": str(filename.resolve()),
+                    "char_count": char_count,
+                    "word_count": word_count,
+                    "sentence_count": sentence_count,
+                    "color": color,
+                }
+            )
             processed_urls.add(url)
 
-        
-        catalog.add_to_catalog(tid, major_tradition, tradition, lang, ftype, url, True, word_count, sentence_count,
-                               color, description)
+        catalog.add_to_catalog(
+            tid, major_tradition, tradition, lang, ftype, url, True, word_count, sentence_count, color, description
+        )
         logger.info(f"Saved successfully: {title_path}.txt (words: {word_count}, color: {color})")
 
     except Exception as e:
         logger.error(f"{tid}: Processing error: {e}")
-        
+
         err_desc = f"{description} [Error: {e}]" if description else str(e)
         catalog.add_to_catalog(tid, major_tradition, tradition, lang, ftype, url, False, 0, 0, color, err_desc)
 
@@ -150,13 +184,11 @@ def build_corpus(filter_type: set[str], force: bool = False):
 
     download_list = load_download_list(filter_type, force)
 
-    
     tradition_books = {}
     if Path(DOWNLOAD_LIST_FILE).exists():
-        with open(DOWNLOAD_LIST_FILE, "r", encoding="utf-8") as f:
+        with open(DOWNLOAD_LIST_FILE, encoding="utf-8") as f:
             full_items = json.load(f)
             for item in full_items:
-                
                 if item.get("type") in filter_type and "tradition" in item:
                     trad = item["tradition"]
                     tid = item.get("title", item.get("id", "unknown_id"))
@@ -166,31 +198,26 @@ def build_corpus(filter_type: set[str], force: bool = False):
                     tradition_books[trad].add(tid)
 
     unique_traditions = set(tradition_books.keys())
-    
 
     info_file_path = CORPUS_DIR / "traditions_info.json"
     existing_info = {}
 
     if info_file_path.exists():
         if force:
-            
             backup_path = CORPUS_DIR / "traditions_info_backup.json"
             shutil.copy2(info_file_path, backup_path)
-            logger.warning(
-                f"force=True: old reference file saved as {backup_path.name}, creating a clean template.")
+            logger.warning(f"force=True: old reference file saved as {backup_path.name}, creating a clean template.")
         else:
-            
             try:
-                with open(info_file_path, "r", encoding="utf-8") as f:
+                with open(info_file_path, encoding="utf-8") as f:
                     existing_info = json.load(f)
             except Exception as e:
                 logger.error(f"Error reading traditions_info.json: {e}")
 
     added_new_traditions = False
     for trad in sorted(unique_traditions):
-        
         color = get_tradition_color(trad)
-        
+
         books_list = sorted(list(tradition_books[trad]))
 
         if trad not in existing_info:
@@ -199,16 +226,14 @@ def build_corpus(filter_type: set[str], force: bool = False):
                 "region": "",
                 "coordinates": [],
                 "color": color,
-                "books": books_list  
+                "books": books_list,
             }
             added_new_traditions = True
         else:
             if "color" not in existing_info[trad]:
-                
                 existing_info[trad]["color"] = color
                 added_new_traditions = True
 
-            
             if existing_info[trad].get("books") != books_list:
                 existing_info[trad]["books"] = books_list
                 added_new_traditions = True
@@ -219,10 +244,9 @@ def build_corpus(filter_type: set[str], force: bool = False):
     if added_new_traditions and not force:
         logger.info("traditions_info.json updated (colors added or book lists refreshed).")
 
-
-    processed_urls: Set[str] = set()
+    processed_urls: set[str] = set()
     if PROCESSED_URLS_FILE.exists():
-        with open(PROCESSED_URLS_FILE, "r", encoding="utf-8") as f:
+        with open(PROCESSED_URLS_FILE, encoding="utf-8") as f:
             processed_urls = set(json.load(f))
 
     logger.info(f"Starting multithreaded build (items: {len(download_list)})")
@@ -236,11 +260,22 @@ def build_corpus(filter_type: set[str], force: bool = False):
 
     with open(CATALOG_FILE, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        
-        writer.writerow([
-            "id", "major_tradition", "tradition", "language", "type", "url", "availability",
-            "word_count", "sentence_count", "color", "description"
-        ])
+
+        writer.writerow(
+            [
+                "id",
+                "major_tradition",
+                "tradition",
+                "language",
+                "type",
+                "url",
+                "availability",
+                "word_count",
+                "sentence_count",
+                "color",
+                "description",
+            ]
+        )
         writer.writerows(catalog.catalog_rows)
 
     with open(PROCESSED_URLS_FILE, "w", encoding="utf-8") as f:
@@ -249,16 +284,14 @@ def build_corpus(filter_type: set[str], force: bool = False):
     logger.info("Corpus build complete.")
     logger.info(f"Total records: {len(catalog.catalog_rows)}")
 
-    
     available = sum(1 for row in catalog.catalog_rows if row[6])
     logger.info(f"Available: {available}")
     logger.info(f"Unavailable: {len(catalog.catalog_rows) - available}")
 
     if available > 0:
-        
         total_words = sum(row[7] for row in catalog.catalog_rows if row[6])
         total_sentences = sum(row[8] for row in catalog.catalog_rows if row[6])
-        logger.info(f"\nOverall statistics for available texts:")
+        logger.info("\nOverall statistics for available texts:")
         logger.info(f"  Total words: {total_words}")
         logger.info(f"  Total sentences: {total_sentences}")
         logger.info(f"  Average words per text: {total_words / available:.1f}")

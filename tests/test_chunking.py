@@ -8,6 +8,7 @@ _spec = importlib.util.spec_from_file_location(
     "embeddings_builder_chunking",
     os.path.join(os.path.dirname(__file__), "..", "embeddings_builder", "chunking.py"),
 )
+assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 character_based_chunking = _mod.character_based_chunking
@@ -128,9 +129,7 @@ class TestChunkingStrategy:
         assert strategy("   ") == []
 
     def test_call_with_metadata(self):
-        strategy = ChunkingStrategy(
-            name="test", chunk_size=100, chunk_overlap=10, language="en"
-        )
+        strategy = ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=10, language="en")
         text = "First chunk of text. " * 20
         results = strategy.call_with_metadata(text)
         assert len(results) >= 1

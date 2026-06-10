@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -45,8 +44,14 @@ class Settings(BaseSettings):
         return self.analysis_dir / safe_name
 
     def ensure_dirs(self) -> None:
-        for d in (self.corpus_dir, self.corpus_chunked_dir, self.cache_dir,
-                  self.analysis_dir, self.logs_dir, self.graphs_dir):
+        for d in (
+            self.corpus_dir,
+            self.corpus_chunked_dir,
+            self.cache_dir,
+            self.analysis_dir,
+            self.logs_dir,
+            self.graphs_dir,
+        ):
             d.mkdir(parents=True, exist_ok=True)
 
 

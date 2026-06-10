@@ -4,10 +4,8 @@ import re
 import struct
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from ui_server.services.models import get_model_output_dir, key_to_model, model_to_key
-
 
 SAVED_HTML_METHOD_FILES = {
     "pca": "pca_2d_traditions.html",
@@ -36,7 +34,7 @@ PLOTLY_DTYPE_FORMATS = {
 }
 
 
-def get_projection_data(model_key: str, method: str) -> Optional[Dict]:
+def get_projection_data(model_key: str, method: str) -> dict | None:
     output_dir = get_model_output_dir(model_key)
     candidates = [
         output_dir / f"{method}_2d_coords.json",
@@ -64,7 +62,7 @@ def get_projection_data(model_key: str, method: str) -> Optional[Dict]:
     return None
 
 
-def get_saved_html_plot(model_key: str, method: str) -> Dict:
+def get_saved_html_plot(model_key: str, method: str) -> dict:
     model_name = key_to_model(model_key)
     safe_dir = model_to_key(model_name)
     output_dir = get_model_output_dir(model_key)
@@ -85,7 +83,7 @@ def get_saved_html_plot(model_key: str, method: str) -> Dict:
 
 
 @lru_cache(maxsize=32)
-def _load_saved_html_projection(path: str, mtime: float, model_name: str, method: str) -> Optional[Dict]:
+def _load_saved_html_projection(path: str, mtime: float, model_name: str, method: str) -> dict | None:
     del mtime
     html = Path(path).read_text(encoding="utf-8", errors="replace")
     traces = _extract_plotly_traces(html)
@@ -129,7 +127,7 @@ def _load_saved_html_projection(path: str, mtime: float, model_name: str, method
     }
 
 
-def _extract_plotly_traces(html: str) -> Optional[list]:
+def _extract_plotly_traces(html: str) -> list | None:
     call_start = html.rfind("Plotly.newPlot(")
     if call_start == -1:
         return None
@@ -150,7 +148,7 @@ def _extract_plotly_traces(html: str) -> Optional[list]:
     return traces if isinstance(traces, list) else None
 
 
-def _plotly_array_values(value) -> List:
+def _plotly_array_values(value) -> list:
     if isinstance(value, list):
         return value
 
@@ -161,7 +159,7 @@ def _plotly_array_values(value) -> List:
         return _decode_plotly_typed_array(value)
 
     numeric_keys = sorted(
-        (key for key in value.keys() if str(key).isdigit()),
+        (key for key in value if str(key).isdigit()),
         key=lambda item: int(item),
     )
     if numeric_keys:
@@ -170,7 +168,7 @@ def _plotly_array_values(value) -> List:
     return []
 
 
-def _decode_plotly_typed_array(value: Dict) -> List:
+def _decode_plotly_typed_array(value: dict) -> list:
     dtype = str(value.get("dtype") or "").lower()
     dtype_key = dtype.lstrip("<>=")
     fmt = PLOTLY_DTYPE_FORMATS.get(dtype_key)
@@ -188,23 +186,16 @@ def _decode_plotly_typed_array(value: Dict) -> List:
     if usable_size <= 0:
         return []
 
-    values = [
-        item[0]
-        for item in struct.iter_unpack(endian + fmt, raw[:usable_size])
-    ]
+    values = [item[0] for item in struct.iter_unpack(endian + fmt, raw[:usable_size])]
     return _reshape_plotly_array(values, value.get("shape"))
 
 
-def _reshape_plotly_array(values: List, shape) -> List:
+def _reshape_plotly_array(values: list, shape) -> list:
     if not shape:
         return values
 
     try:
-        dimensions = [
-            int(part.strip())
-            for part in str(shape).replace("x", ",").split(",")
-            if part.strip()
-        ]
+        dimensions = [int(part.strip()) for part in str(shape).replace("x", ",").split(",") if part.strip()]
     except ValueError:
         return values
 
@@ -215,13 +206,10 @@ def _reshape_plotly_array(values: List, shape) -> List:
     if rows <= 0 or columns <= 0:
         return values
 
-    return [
-        values[index * columns:(index + 1) * columns]
-        for index in range(min(rows, len(values) // columns))
-    ]
+    return [values[index * columns : (index + 1) * columns] for index in range(min(rows, len(values) // columns))]
 
 
-def _extract_balanced_json(text: str, start: int, open_char: str, close_char: str) -> Optional[str]:
+def _extract_balanced_json(text: str, start: int, open_char: str, close_char: str) -> str | None:
     depth = 0
     in_string = False
     escaped = False
@@ -245,7 +233,7 @@ def _extract_balanced_json(text: str, start: int, open_char: str, close_char: st
         elif char == close_char:
             depth -= 1
             if depth == 0:
-                return text[start:index + 1]
+                return text[start : index + 1]
 
     return None
 

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import hashlib
-import re
-from pathlib import Path
-import unicodedata
 import logging
-from typing import Optional
 import random
+import re
 import threading
+import unicodedata
+from pathlib import Path
 
 import pymupdf
 import trafilatura
@@ -20,23 +19,28 @@ logger = logging.getLogger(__name__)
 
 PYMUPDF_AVAILABLE = True
 
+
 def sanitize_filename(name: str) -> str:
     return re.sub(r'[\\/*?:"<>|]', "_", name).strip()
+
 
 def md5(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
 
+
 def _decode_bytes(content: bytes) -> str:
-    encodings_to_try = ['utf-8', 'windows-1251', 'iso-8859-1', 'cp1251', 'gb2312']
+    encodings_to_try = ["utf-8", "windows-1251", "iso-8859-1", "cp1251", "gb2312"]
     for enc in encodings_to_try:
         try:
             return content.decode(enc)
         except UnicodeDecodeError:
             continue
-    return content.decode('utf-8', errors='replace')
+    return content.decode("utf-8", errors="replace")
 
-def html_to_text(html_content: bytes, include_comments: bool = False,
-                 include_tables: bool = True, target_language: Optional[str] = None) -> str:
+
+def html_to_text(
+    html_content: bytes, include_comments: bool = False, include_tables: bool = True, target_language: str | None = None
+) -> str:
     if not html_content:
         return ""
 
@@ -46,7 +50,7 @@ def html_to_text(html_content: bytes, include_comments: bool = False,
             include_comments=include_comments,
             include_tables=include_tables,
             target_language=target_language,
-            favor_precision=True
+            favor_precision=True,
         )
         if text:
             logger.debug("HTML processed with Trafilatura")
@@ -58,18 +62,19 @@ def html_to_text(html_content: bytes, include_comments: bool = False,
         decoded = _decode_bytes(html_content)
         soup = BeautifulSoup(decoded, "html.parser")
 
-        for element in soup(["script", "style", "nav", "footer", "header",
-                             "aside", "iframe", "noscript", "form", "button"]):
+        for element in soup(
+            ["script", "style", "nav", "footer", "header", "aside", "iframe", "noscript", "form", "button"]
+        ):
             element.decompose()
 
         main_content = (
-                soup.find("main") or
-                soup.find("article") or
-                soup.find(role="main") or
-                soup.find("div", class_=re.compile(r"content|main|article", re.I))
+            soup.find("main")
+            or soup.find("article")
+            or soup.find(role="main")
+            or soup.find("div", class_=re.compile(r"content|main|article", re.I))
         )
 
-        text = main_content.get_text(separator='\n') if main_content else soup.get_text(separator='\n')
+        text = main_content.get_text(separator="\n") if main_content else soup.get_text(separator="\n")
         logger.debug("HTML processed with BeautifulSoup")
         return normalize_text(text)
 
@@ -77,8 +82,10 @@ def html_to_text(html_content: bytes, include_comments: bool = False,
         logger.error(f"Critical HTML extraction error: {e}")
         return ""
 
-def pdf_to_text(pdf_content: bytes, extract_tables: bool = False,
-                preserve_layout: bool = True, ocr_fallback: bool = False) -> str:
+
+def pdf_to_text(
+    pdf_content: bytes, extract_tables: bool = False, preserve_layout: bool = True, ocr_fallback: bool = False
+) -> str:
     if not pdf_content:
         return ""
 
@@ -131,28 +138,33 @@ def pdf_to_text(pdf_content: bytes, extract_tables: bool = False,
         logger.error(f"Error processing PDF with PyMuPDF: {e}")
         return ""
 
+
 def normalize_text(text: str) -> str:
     if not text:
         return ""
-    text = unicodedata.normalize('NFC', text)
-    text = re.sub(r'[ \t]+', ' ', text)
-    text = re.sub(r'\n{3,}', '\n\n', text)
-    text = ''.join(char for char in text if char in ('\n', '\t') or ord(char) >= 32)
+    text = unicodedata.normalize("NFC", text)
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = "".join(char for char in text if char in ("\n", "\t") or ord(char) >= 32)
     return text.strip()
+
 
 def count_words(text: str) -> int:
     if not text:
         return 0
-    return len(re.findall(r'\b\w+\b', text, re.UNICODE))
+    return len(re.findall(r"\b\w+\b", text, re.UNICODE))
+
 
 def count_sentences(text: str) -> int:
     if not text:
         return 0
-    sentences = re.split(r'[.!?…]+[\s\n]+', text)
+    sentences = re.split(r"[.!?…]+[\s\n]+", text)
     return len([s for s in sentences if s.strip()])
+
 
 def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
+
 
 def extract_text_from_file(file_path: Path | str, **kwargs) -> str:
     path = Path(file_path)
@@ -162,16 +174,16 @@ def extract_text_from_file(file_path: Path | str, **kwargs) -> str:
     content = path.read_bytes()
     suffix = path.suffix.lower()
 
-    if suffix in ('.pdf',):
+    if suffix in (".pdf",):
         return pdf_to_text(content, **kwargs)
-    elif suffix in ('.html', '.htm', '.xhtml'):
+    elif suffix in (".html", ".htm", ".xhtml"):
         return html_to_text(content, **kwargs)
-    elif suffix in ('.txt', '.md', '.rst'):
+    elif suffix in (".txt", ".md", ".rst"):
         return normalize_text(_decode_bytes(content))
     else:
-        if content[:4] == b'%PDF':
+        if content[:4] == b"%PDF":
             return pdf_to_text(content, **kwargs)
-        elif b'<html' in content[:1000].lower() or b'<!doctype html' in content[:1000].lower():
+        elif b"<html" in content[:1000].lower() or b"<!doctype html" in content[:1000].lower():
             return html_to_text(content, **kwargs)
         else:
             return normalize_text(_decode_bytes(content))
@@ -179,13 +191,11 @@ def extract_text_from_file(file_path: Path | str, **kwargs) -> str:
 
 def get_tradition_color(tradition: str) -> str:
     with _color_lock:
-        
         if tradition in _tradition_colors:
             return _tradition_colors[tradition]
 
-        
         while True:
-            color = "#{:06X}".format(random.randint(0, 0xFFFFFF))
+            color = f"#{random.randint(0, 0xFFFFFF):06X}"
             if color not in _used_colors:
                 _used_colors.add(color)
                 _tradition_colors[tradition] = color

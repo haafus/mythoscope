@@ -1,8 +1,7 @@
-from concurrent.futures import ThreadPoolExecutor
 import logging
 import threading
 import time
-from typing import Dict, Optional
+from concurrent.futures import ThreadPoolExecutor
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Query
@@ -15,7 +14,7 @@ router = APIRouter(prefix="/api/similarity", tags=["similarity"])
 logger = logging.getLogger(__name__)
 
 _search_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="semantic-search")
-_search_jobs: Dict[str, Dict] = {}
+_search_jobs: dict[str, dict] = {}
 _search_jobs_lock = threading.Lock()
 _SEARCH_JOB_TTL_SECONDS = 60 * 30
 
@@ -41,7 +40,7 @@ def saved_html_plot(model_key: str, method: str):
 
 
 @router.get("/points/{model_key}/{point_id}")
-def point_info(model_key: str, point_id: str, chunk_index: Optional[int] = Query(None)):
+def point_info(model_key: str, point_id: str, chunk_index: int | None = Query(None)):
     try:
         return embedding_index_service.get_point(model_key, point_id, chunk_index)
     except KeyError as exc:
@@ -53,7 +52,7 @@ def point_neighbors(
     model_key: str,
     point_id: str,
     n: int = Query(10, ge=1, le=100),
-    chunk_index: Optional[int] = Query(None),
+    chunk_index: int | None = Query(None),
 ):
     try:
         neighbors = embedding_index_service.get_neighbors(model_key, point_id, n, chunk_index)

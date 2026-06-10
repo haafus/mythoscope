@@ -1,10 +1,10 @@
-import re
+import gc
+import hashlib
 import logging
 import os
-from typing import List, Callable, Optional, Dict, Any, Generator
+import re
 from dataclasses import dataclass
-import hashlib
-import gc
+from typing import Any, Callable, Generator
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +25,9 @@ class LanguageDetector:
             return False
 
         if not os.path.exists(cls._model_path):
-            logger.warning(f"FastText model not found at {cls._model_path}. "
-                           f"Run download_fasttext_model() to download it.")
+            logger.warning(
+                f"FastText model not found at {cls._model_path}. Run download_fasttext_model() to download it."
+            )
             return False
 
         try:
@@ -49,18 +50,19 @@ class LanguageDetector:
         if not text or len(text.strip()) < 3:
             return "unknown"
 
-        clean_text = ' '.join(text.split())
+        clean_text = " ".join(text.split())
 
         if cls._load_fasttext():
             try:
                 predictions = cls._fasttext_model.predict(clean_text.lower(), k=1)
-                lang_code = predictions[0][0].replace('__label__', '')
+                lang_code = predictions[0][0].replace("__label__", "")
                 return lang_code
             except Exception as e:
                 logger.debug(f"FastText error: {e}, switching to langdetect")
 
         try:
-            from langdetect import detect, DetectorFactory
+            from langdetect import DetectorFactory, detect
+
             DetectorFactory.seed = 0
             return detect(clean_text)
         except ImportError:
@@ -77,11 +79,11 @@ class LanguageDetector:
             return "unknown"
 
         counts = {
-            'ru': len(RegexPatterns.CYRILLIC_PATTERN.findall(text)),
-            'en': len(RegexPatterns.LATIN_PATTERN.findall(text)),
-            'zh': len(RegexPatterns.CJK_PATTERN.findall(text)),
-            'ar': len(RegexPatterns.ARABIC_PATTERN.findall(text)),
-            'hi': len(RegexPatterns.DEVANAGARI_PATTERN.findall(text)),
+            "ru": len(RegexPatterns.CYRILLIC_PATTERN.findall(text)),
+            "en": len(RegexPatterns.LATIN_PATTERN.findall(text)),
+            "zh": len(RegexPatterns.CJK_PATTERN.findall(text)),
+            "ar": len(RegexPatterns.ARABIC_PATTERN.findall(text)),
+            "hi": len(RegexPatterns.DEVANAGARI_PATTERN.findall(text)),
         }
 
         threshold = total_chars * 0.3
@@ -90,15 +92,15 @@ class LanguageDetector:
         if filtered:
             return max(filtered, key=filtered.get)
 
-        if counts['en'] > 0:
-            return 'en'
+        if counts["en"] > 0:
+            return "en"
 
         return "unknown"
 
 
 def download_fasttext_model():
-    import urllib.request
     import os
+    import urllib.request
 
     cache_dir = os.path.expanduser("~/.cache/fasttext")
     os.makedirs(cache_dir, exist_ok=True)
@@ -109,7 +111,7 @@ def download_fasttext_model():
         return model_path
 
     url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
-    print(f"Downloading FastText model (176 languages, ~130MB)...")
+    print("Downloading FastText model (176 languages, ~130MB)...")
     print(f"URL: {url}")
     print(f"Path: {model_path}")
 
@@ -136,12 +138,12 @@ class ChunkMetadata:
     overlap_with_next: bool = False
     word_count: int = 0
     char_count: int = 0
-    language: Optional[str] = None
+    language: str | None = None
     has_code: bool = False
     has_markdown: bool = False
-    parent_doc_hash: Optional[str] = None
+    parent_doc_hash: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "chunk_id": self.chunk_id,
             "index": self.index,
@@ -156,7 +158,7 @@ class ChunkMetadata:
             "language": self.language,
             "has_code": self.has_code,
             "has_markdown": self.has_markdown,
-            "parent_doc_hash": self.parent_doc_hash
+            "parent_doc_hash": self.parent_doc_hash,
         }
 
 
@@ -168,34 +170,31 @@ class ChunkWithMetadata:
 
 class RegexPatterns:
     CODE_PATTERN = re.compile(
-        r'```[\s\S]*?```|'
-        r'^\s*(def|class|import|from|return|if|else|for|while)\s|'
-        r'^\s*(function|const|let|var|if|else|for|while|switch)\s|'
-        r'^\s*(public|private|protected|static|void|int|string)\s|'
-        r'^\s*(#include|#define|int main|printf|scanf)\s',
-        re.MULTILINE
+        r"```[\s\S]*?```|"
+        r"^\s*(def|class|import|from|return|if|else|for|while)\s|"
+        r"^\s*(function|const|let|var|if|else|for|while|switch)\s|"
+        r"^\s*(public|private|protected|static|void|int|string)\s|"
+        r"^\s*(#include|#define|int main|printf|scanf)\s",
+        re.MULTILINE,
     )
-    MARKDOWN_PATTERN = re.compile(r'[#*`\[\]\(\)]|^>', re.MULTILINE)
-    CODE_BLOCK_PATTERN = re.compile(r'```[\s\S]*?```')
-    HEADER_PATTERN = re.compile(r'^#{1,6}\s', re.MULTILINE)
-    LIST_PATTERN = re.compile(r'^\s*[-*+]\s', re.MULTILINE)
+    MARKDOWN_PATTERN = re.compile(r"[#*`\[\]\(\)]|^>", re.MULTILINE)
+    CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```")
+    HEADER_PATTERN = re.compile(r"^#{1,6}\s", re.MULTILINE)
+    LIST_PATTERN = re.compile(r"^\s*[-*+]\s", re.MULTILINE)
 
-    SENTENCE_SPLITTER = re.compile(r'(?<=[.!?])\s+|(?<=[。！？।])\s*')
-    PARAGRAPH_SPLITTER = re.compile(r'\n\s*\n')
+    SENTENCE_SPLITTER = re.compile(r"(?<=[.!?])\s+|(?<=[。！？।])\s*")
+    PARAGRAPH_SPLITTER = re.compile(r"\n\s*\n")
 
-    CYRILLIC_PATTERN = re.compile(r'[\u0400-\u04FF]')
-    LATIN_PATTERN = re.compile(r'[a-zA-Z]')
-    CJK_PATTERN = re.compile(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]')
-    ARABIC_PATTERN = re.compile(r'[\u0600-\u06FF\u0750-\u077F]')
-    DEVANAGARI_PATTERN = re.compile(r'[\u0900-\u097F]')
+    CYRILLIC_PATTERN = re.compile(r"[\u0400-\u04FF]")
+    LATIN_PATTERN = re.compile(r"[a-zA-Z]")
+    CJK_PATTERN = re.compile(r"[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]")
+    ARABIC_PATTERN = re.compile(r"[\u0600-\u06FF\u0750-\u077F]")
+    DEVANAGARI_PATTERN = re.compile(r"[\u0900-\u097F]")
 
 
 def character_based_chunking(
-        text: str,
-        chunk_size: int = 512,
-        chunk_overlap: int = 64,
-        separators: Optional[List[str]] = None
-) -> List[str]:
+    text: str, chunk_size: int = 512, chunk_overlap: int = 64, separators: list[str] | None = None
+) -> list[str]:
     if chunk_size < 10:
         raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
@@ -206,37 +205,45 @@ def character_based_chunking(
     if separators is None:
         separators = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
 
-    if not text: return []
-    if len(text) <= chunk_size: return [text]
+    if not text:
+        return []
+    if len(text) <= chunk_size:
+        return [text]
 
     def _extract_tail(chunk: str, overlap_size: int) -> str:
-        if overlap_size <= 0 or len(chunk) <= overlap_size: return ""
+        if overlap_size <= 0 or len(chunk) <= overlap_size:
+            return ""
         tail_start = len(chunk) - overlap_size
         priority_seps = ["\n\n", "\n", ". ", "! ", "? ", "。", "！", "？", "।", "; ", ", ", "、", " ", ""]
         for sep in priority_seps:
-            if not sep: continue
+            if not sep:
+                continue
             search_start = max(0, tail_start - 50)
             last_sep_pos = chunk.rfind(sep, search_start, len(chunk))
             if last_sep_pos != -1 and last_sep_pos >= tail_start - 100:
-                return chunk[last_sep_pos + len(sep):]
+                return chunk[last_sep_pos + len(sep) :]
         return chunk[-overlap_size:]
 
-    def _split_recursive(text_to_split: str, seps: List[str], tail: str = "", depth: int = 0) -> List[str]:
+    def _split_recursive(text_to_split: str, seps: list[str], tail: str = "", depth: int = 0) -> list[str]:
         MAX_DEPTH = 10
         if depth > MAX_DEPTH:
             step = chunk_size - chunk_overlap
-            if step <= 0: step = chunk_size // 2
-            return [text_to_split[i:i + chunk_size] for i in range(0, len(text_to_split), step)]
+            if step <= 0:
+                step = chunk_size // 2
+            return [text_to_split[i : i + chunk_size] for i in range(0, len(text_to_split), step)]
 
         if not seps:
             full_text = tail + text_to_split
-            if len(full_text) <= chunk_size: return [full_text]
+            if len(full_text) <= chunk_size:
+                return [full_text]
             chunks = []
             step = chunk_size - chunk_overlap
-            if step <= 0: step = chunk_size // 2
+            if step <= 0:
+                step = chunk_size // 2
             for i in range(0, len(full_text), step):
-                chunk = full_text[i:i + chunk_size]
-                if chunk: chunks.append(chunk)
+                chunk = full_text[i : i + chunk_size]
+                if chunk:
+                    chunks.append(chunk)
             return chunks
 
         separator = seps[0]
@@ -247,7 +254,9 @@ def character_based_chunking(
         else:
             splits = [text_to_split] if text_to_split else []
 
-        if tail and splits: splits[0] = tail + splits[0]; tail = ""
+        if tail and splits:
+            splits[0] = tail + splits[0]
+            tail = ""
         chunks, current_chunk, current_tail = [], "", ""
 
         for split in splits:
@@ -268,11 +277,13 @@ def character_based_chunking(
                 else:
                     current_chunk = current_tail + split
                     current_tail = ""
-        if current_chunk: chunks.append(current_chunk)
+        if current_chunk:
+            chunks.append(current_chunk)
         return _merge_small_chunks(chunks, chunk_size)
 
-    def _merge_small_chunks(chunks: List[str], min_size: int) -> List[str]:
-        if not chunks: return []
+    def _merge_small_chunks(chunks: list[str], min_size: int) -> list[str]:
+        if not chunks:
+            return []
         merged, current = [], chunks[0]
         for i in range(1, len(chunks)):
             next_chunk = chunks[i]
@@ -288,22 +299,19 @@ def character_based_chunking(
 
 
 def chunk_stream(
-        file_path: str,
-        chunk_size: int = 512,
-        chunk_overlap: int = 64,
-        buffer_size: int = 8192
+    file_path: str, chunk_size: int = 512, chunk_overlap: int = 64, buffer_size: int = 8192
 ) -> Generator[str, None, None]:
     if chunk_size < 10:
         raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
         raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
 
-    def process_buffer(buffer_text: str) -> List[str]:
+    def process_buffer(buffer_text: str) -> list[str]:
         if not buffer_text:
             return []
         return character_based_chunking(buffer_text, chunk_size, chunk_overlap)
 
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding="utf-8") as f:
         buffer = ""
         last_chunk = ""
 
@@ -317,7 +325,7 @@ def chunk_stream(
             if len(buffer) >= chunk_size * 2:
                 chunks = process_buffer(buffer)
 
-                for i, c in enumerate(chunks[:-1]):
+                for _i, c in enumerate(chunks[:-1]):
                     yield c
 
                 last_chunk = chunks[-1] if chunks else ""
@@ -329,16 +337,18 @@ def chunk_stream(
                 yield c
 
 
-def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int = 64) -> List[str]:
+def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int = 64) -> list[str]:
     if chunk_size < 10:
         raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
         raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
 
-    if not text: return []
+    if not text:
+        return []
     sentences = RegexPatterns.SENTENCE_SPLITTER.split(text)
     sentences = [s for s in sentences if s.strip()]
-    if not sentences: return [text] if text else []
+    if not sentences:
+        return [text] if text else []
 
     chunks, current_sentences, current_length = [], [], 0
     overlap_sentences_count = max(1, chunk_overlap // 100) if chunk_overlap > 0 else 0
@@ -346,7 +356,8 @@ def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int
     for sent in sentences:
         sent_len = len(sent)
         if sent_len > chunk_size:
-            if current_sentences: chunks.append(" ".join(current_sentences))
+            if current_sentences:
+                chunks.append(" ".join(current_sentences))
             chunks.extend(character_based_chunking(sent, chunk_size, chunk_overlap))
             current_sentences, current_length = [], 0
             continue
@@ -362,20 +373,23 @@ def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int
         current_sentences.append(sent)
         current_length += sent_len + 1
 
-    if current_sentences: chunks.append(" ".join(current_sentences))
+    if current_sentences:
+        chunks.append(" ".join(current_sentences))
     return chunks
 
 
-def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: int = 128) -> List[str]:
+def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: int = 128) -> list[str]:
     if chunk_size < 10:
         raise ValueError("chunk_size must be at least 10 characters")
     if chunk_overlap >= chunk_size:
         raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
 
-    if not text: return []
+    if not text:
+        return []
     paragraphs = RegexPatterns.PARAGRAPH_SPLITTER.split(text)
     paragraphs = [p.strip() for p in paragraphs if p.strip()]
-    if not paragraphs: return [text[:chunk_size]] if text else []
+    if not paragraphs:
+        return [text[:chunk_size]] if text else []
 
     chunks, current_paragraphs, current_length = [], [], 0
     overlap_para_count = max(1, chunk_overlap // 200) if chunk_overlap > 0 else 0
@@ -383,7 +397,8 @@ def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: i
     for para in paragraphs:
         para_len = len(para)
         if para_len > chunk_size:
-            if current_paragraphs: chunks.append("\n\n".join(current_paragraphs))
+            if current_paragraphs:
+                chunks.append("\n\n".join(current_paragraphs))
             chunks.extend(character_based_chunking(para, chunk_size, chunk_overlap))
             current_paragraphs, current_length = [], 0
             continue
@@ -399,19 +414,20 @@ def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: i
         current_paragraphs.append(para)
         current_length += para_len + (2 if len(current_paragraphs) > 1 else 0)
 
-    if current_paragraphs: chunks.append("\n\n".join(current_paragraphs))
+    if current_paragraphs:
+        chunks.append("\n\n".join(current_paragraphs))
     return chunks
 
 
 class ChunkingStrategy:
     def __init__(
-            self,
-            name: str,
-            chunk_size: int = 512,
-            chunk_overlap: int = 64,
-            chunking_func: Optional[Callable] = None,
-            return_metadata: bool = False,
-            language: str = "auto"
+        self,
+        name: str,
+        chunk_size: int = 512,
+        chunk_overlap: int = 64,
+        chunking_func: Callable | None = None,
+        return_metadata: bool = False,
+        language: str = "auto",
     ):
         if chunk_size < 10:
             raise ValueError("chunk_size must be at least 10 characters")
@@ -427,13 +443,16 @@ class ChunkingStrategy:
         self.return_metadata = return_metadata
         self.language = language
 
-    def __call__(self, text: str) -> List[str]:
-        if not text or not text.strip(): return []
+    def __call__(self, text: str) -> list[str]:
+        if not text or not text.strip():
+            return []
         return self.chunking_func(text, self.chunk_size, self.chunk_overlap)
 
-    def call_with_metadata(self, text: str, doc_hash: Optional[str] = None) -> List[ChunkWithMetadata]:
-        if not text or not text.strip(): return []
-        if doc_hash is None: doc_hash = hashlib.md5(text.encode('utf-8')).hexdigest()[:8]
+    def call_with_metadata(self, text: str, doc_hash: str | None = None) -> list[ChunkWithMetadata]:
+        if not text or not text.strip():
+            return []
+        if doc_hash is None:
+            doc_hash = hashlib.md5(text.encode("utf-8")).hexdigest()[:8]
 
         chunks = self.chunking_func(text, self.chunk_size, self.chunk_overlap)
         chunks_with_metadata = []
@@ -457,19 +476,23 @@ class ChunkingStrategy:
             has_code = bool(RegexPatterns.CODE_PATTERN.search(chunk_text))
             has_markdown = bool(RegexPatterns.MARKDOWN_PATTERN.search(chunk_text))
 
-            if self.language == "auto":
-                detected_language = LanguageDetector.detect(chunk_text)
-            else:
-                detected_language = self.language
+            detected_language = LanguageDetector.detect(chunk_text) if self.language == "auto" else self.language
 
             metadata = ChunkMetadata(
-                chunk_id=chunk_id, index=i, start_pos=start_pos, end_pos=end_pos,
-                chunk_type=self._determine_chunk_type(chunk_text), strategy_used=self.name,
+                chunk_id=chunk_id,
+                index=i,
+                start_pos=start_pos,
+                end_pos=end_pos,
+                chunk_type=self._determine_chunk_type(chunk_text),
+                strategy_used=self.name,
                 overlap_with_prev=(i > 0 and self.chunk_overlap > 0),
                 overlap_with_next=(i < len(chunks) - 1 and self.chunk_overlap > 0),
-                word_count=len(chunk_text.split()), char_count=len(chunk_text),
-                language=detected_language, has_code=has_code, has_markdown=has_markdown,
-                parent_doc_hash=doc_hash
+                word_count=len(chunk_text.split()),
+                char_count=len(chunk_text),
+                language=detected_language,
+                has_code=has_code,
+                has_markdown=has_markdown,
+                parent_doc_hash=doc_hash,
             )
             chunks_with_metadata.append(ChunkWithMetadata(chunk_text, metadata))
         return chunks_with_metadata
@@ -481,22 +504,23 @@ class ChunkingStrategy:
             return "markdown_with_headers"
         elif RegexPatterns.LIST_PATTERN.search(text):
             return "list"
-        elif '\n\n' in text:
+        elif "\n\n" in text:
             return "multi_paragraph"
-        elif '. ' in text and len(text.split('. ')) > 2:
+        elif ". " in text and len(text.split(". ")) > 2:
             return "multi_sentence"
         else:
             return "text"
 
 
-def create_chunking_strategies() -> Dict[str, ChunkingStrategy]:
+def create_chunking_strategies() -> dict[str, ChunkingStrategy]:
     return {
-        "character": ChunkingStrategy(name="character", chunk_size=512, chunk_overlap=64,
-                                      chunking_func=character_based_chunking),
-        "sentence": ChunkingStrategy(name="sentence", chunk_size=512, chunk_overlap=64,
-                                     chunking_func=sentence_based_chunking),
-        "paragraph": ChunkingStrategy(name="paragraph", chunk_size=1024, chunk_overlap=128,
-                                      chunking_func=paragraph_based_chunking)
+        "character": ChunkingStrategy(
+            name="character", chunk_size=512, chunk_overlap=64, chunking_func=character_based_chunking
+        ),
+        "sentence": ChunkingStrategy(
+            name="sentence", chunk_size=512, chunk_overlap=64, chunking_func=sentence_based_chunking
+        ),
+        "paragraph": ChunkingStrategy(
+            name="paragraph", chunk_size=1024, chunk_overlap=128, chunking_func=paragraph_based_chunking
+        ),
     }
-
-

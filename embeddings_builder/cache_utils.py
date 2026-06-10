@@ -1,34 +1,38 @@
-import json
 import hashlib
+import json
 import logging
-from pathlib import Path
-from typing import Optional, Any
-import numpy as np
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
 
 def get_cache_key(text: str, model_name: str, chunking_strategy: Any) -> str:
-    key_str = f"{text}|{model_name}|{chunking_strategy.name}|{chunking_strategy.chunk_size}|{chunking_strategy.chunk_overlap}"
-    return hashlib.md5(key_str.encode('utf-8')).hexdigest()
+    key_str = (
+        f"{text}|{model_name}|{chunking_strategy.name}|{chunking_strategy.chunk_size}|{chunking_strategy.chunk_overlap}"
+    )
+    return hashlib.md5(key_str.encode("utf-8")).hexdigest()
 
 
-def save_to_cache(text: str, embedding: np.ndarray, model_name: str, chunking_strategy: Any, cache_dir: Path,
-                  key: Optional[str] = None) -> bool:
+def save_to_cache(
+    text: str, embedding: np.ndarray, model_name: str, chunking_strategy: Any, cache_dir: Path, key: str | None = None
+) -> bool:
     try:
         if key is None:
             key = get_cache_key(text, model_name, chunking_strategy)
         cache_dir.mkdir(parents=True, exist_ok=True)
         np.save(cache_dir / f"{key}.npy", embedding)
         metadata = {
-            'text': text,
-            'model_name': model_name,
-            'chunking_name': chunking_strategy.name,
-            'chunk_size': chunking_strategy.chunk_size,
-            'chunk_overlap': chunking_strategy.chunk_overlap
+            "text": text,
+            "model_name": model_name,
+            "chunking_name": chunking_strategy.name,
+            "chunk_size": chunking_strategy.chunk_size,
+            "chunk_overlap": chunking_strategy.chunk_overlap,
         }
-        with open(cache_dir / f"{key}.json", 'w', encoding='utf-8') as f:
+        with open(cache_dir / f"{key}.json", "w", encoding="utf-8") as f:
             json.dump(metadata, f, ensure_ascii=False)
         return True
     except Exception as e:
@@ -36,8 +40,9 @@ def save_to_cache(text: str, embedding: np.ndarray, model_name: str, chunking_st
         return False
 
 
-def load_from_cache(text: str, model_name: str, chunking_strategy: Any, cache_dir: Path, key: Optional[str] = None) ->\
-Optional[np.ndarray]:
+def load_from_cache(
+    text: str, model_name: str, chunking_strategy: Any, cache_dir: Path, key: str | None = None
+) -> np.ndarray | None:
     try:
         if key is None:
             key = get_cache_key(text, model_name, chunking_strategy)
@@ -47,11 +52,14 @@ Optional[np.ndarray]:
         if not npy_file.exists() or not json_file.exists():
             return None
 
-        with open(json_file, 'r', encoding='utf-8') as f:
+        with open(json_file, encoding="utf-8") as f:
             data = json.load(f)
 
-        if (data.get('text') == text and data.get('model_name') == model_name and data.get(
-                'chunking_name') == chunking_strategy.name):
+        if (
+            data.get("text") == text
+            and data.get("model_name") == model_name
+            and data.get("chunking_name") == chunking_strategy.name
+        ):
             return np.load(npy_file)
         else:
             logger.warning(f"Cache mismatch for key: {key}")
@@ -70,7 +78,6 @@ def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) 
     cutoff_time = current_time - timedelta(days=ttl_days)
     total_size = 0
 
-    
     for json_file in cache_dir.glob("*.json"):
         if json_file.name == ".checksums.json":
             continue
@@ -80,7 +87,6 @@ def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) 
             removed += 1
             logger.info(f"Removed orphaned cache JSON: {json_file.name}")
 
-    
     cache_files = list(cache_dir.glob("*.npy"))
     for cache_file in cache_files:
         mtime = datetime.fromtimestamp(cache_file.stat().st_mtime)
@@ -97,13 +103,9 @@ def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) 
             if json_file.exists():
                 total_size += json_file.stat().st_size
 
-    
     max_size_bytes = max_size_mb * 1024 * 1024
     if total_size > max_size_bytes:
-        cache_files = sorted(
-            [f for f in cache_dir.glob("*.npy") if f.exists()],
-            key=lambda f: f.stat().st_mtime
-        )
+        cache_files = sorted([f for f in cache_dir.glob("*.npy") if f.exists()], key=lambda f: f.stat().st_mtime)
         for cache_file in cache_files:
             if total_size <= max_size_bytes:
                 break

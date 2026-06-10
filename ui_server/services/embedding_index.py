@@ -1,13 +1,10 @@
-from dataclasses import dataclass
 import csv
 import threading
-from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 import numpy as np
 
-from ui_server.services.models import get_model_output_dir
-from ui_server.services.models import key_to_model
-
+from ui_server.services.models import get_model_output_dir, key_to_model
 
 MAX_PREVIEW_CHARS = 700
 
@@ -15,17 +12,17 @@ MAX_PREVIEW_CHARS = 700
 @dataclass
 class ModelIndex:
     model_name: str
-    items: List[Dict]
+    items: list[dict]
     matrix: np.ndarray
     normalized_matrix: np.ndarray
-    id_to_index: Dict[str, int]
+    id_to_index: dict[str, int]
 
 
 class EmbeddingIndexService:
     def __init__(self):
-        self._indexes: Dict[str, ModelIndex] = {}
-        self._point_records: Dict[str, Dict[str, Dict]] = {}
-        self._search_models: Dict[str, object] = {}
+        self._indexes: dict[str, ModelIndex] = {}
+        self._point_records: dict[str, dict[str, dict]] = {}
+        self._search_models: dict[str, object] = {}
         self._index_lock = threading.RLock()
         self._model_lock = threading.RLock()
 
@@ -40,7 +37,7 @@ class EmbeddingIndexService:
             self._indexes[model_name] = index
             return index
 
-    def get_point(self, model_key: str, point_id: str, chunk_index: Optional[int] = None) -> Dict:
+    def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
         model_name = key_to_model(model_key)
         item = self._get_point_record(model_name, point_id, chunk_index)
         if item is None:
@@ -71,7 +68,7 @@ class EmbeddingIndexService:
             },
         }
 
-    def get_neighbors(self, model_key: str, point_id: str, n: int = 10, chunk_index: Optional[int] = None) -> List[Dict]:
+    def get_neighbors(self, model_key: str, point_id: str, n: int = 10, chunk_index: int | None = None) -> list[dict]:
         index = self.get_index(model_key)
         item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
         if item_index is None:
@@ -84,7 +81,7 @@ class EmbeddingIndexService:
         similarities[item_index] = -np.inf
         return self._top_results(index, similarities, n)
 
-    def search(self, model_key: str, query: str, top_k: int = 20) -> List[Dict]:
+    def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = key_to_model(model_key)
         index = self.get_index(model_name)
         query_embedding = self._embed_query(model_name, query)
@@ -116,7 +113,7 @@ class EmbeddingIndexService:
             id_to_index=id_to_index,
         )
 
-    def _get_point_record(self, model_name: str, point_id: str, chunk_index: Optional[int] = None) -> Optional[Dict]:
+    def _get_point_record(self, model_name: str, point_id: str, chunk_index: int | None = None) -> dict | None:
         if model_name not in self._point_records:
             self._point_records[model_name] = self._load_point_records(model_name)
 
@@ -127,12 +124,12 @@ class EmbeddingIndexService:
         return records.get(str(point_id))
 
     @staticmethod
-    def _load_point_records(model_name: str) -> Dict[str, Dict]:
+    def _load_point_records(model_name: str) -> dict[str, dict]:
         csv_path = get_model_output_dir(model_name) / "embeddings_data.csv"
         if not csv_path.exists():
             return {}
 
-        records: Dict[str, Dict] = {}
+        records: dict[str, dict] = {}
         with csv_path.open("r", encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):
                 point_id = str(row.get("id", ""))
@@ -155,13 +152,14 @@ class EmbeddingIndexService:
         return records
 
     @staticmethod
-    def _point_key(point_id: str, chunk_index: Optional[int] = None) -> str:
+    def _point_key(point_id: str, chunk_index: int | None = None) -> str:
         if chunk_index is None or chunk_index == "":
             return str(point_id)
         return f"{point_id}::{chunk_index}"
 
     def _embed_query(self, model_name: str, query: str) -> np.ndarray:
         from sentence_transformers import SentenceTransformer
+
         from embeddings_builder.models_repository import MODELS
 
         with self._model_lock:
@@ -192,7 +190,7 @@ class EmbeddingIndexService:
         return vector / norm
 
     @staticmethod
-    def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> List[Dict]:
+    def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> list[dict]:
         limit = min(limit, len(index.items))
         if limit <= 0:
             return []

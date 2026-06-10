@@ -1,9 +1,9 @@
 import hashlib
-import zlib
-from pathlib import Path
-from typing import Dict, Any, Optional, Tuple
-from datetime import datetime, timedelta
 import logging
+import zlib
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class CacheValidator:
         self.cache_dir = Path(cache_dir)
         self.validation_method = validation_method
         self.ttl_days = ttl_days
-        self._checksums: Dict[str, str] = {}
+        self._checksums: dict[str, str] = {}
         self._load_checksums()
 
     def _get_checksum_file(self) -> Path:
@@ -24,7 +24,8 @@ class CacheValidator:
         if checksum_file.exists():
             try:
                 import json
-                with open(checksum_file, 'r', encoding='utf-8') as f:
+
+                with open(checksum_file, encoding="utf-8") as f:
                     self._checksums = json.load(f)
             except Exception as e:
                 logger.warning(f"Failed to load checksums: {e}")
@@ -32,15 +33,16 @@ class CacheValidator:
     def _save_checksums(self) -> None:
         try:
             import json
+
             checksum_file = self._get_checksum_file()
             checksum_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(checksum_file, 'w', encoding='utf-8') as f:
+            with open(checksum_file, "w", encoding="utf-8") as f:
                 json.dump(self._checksums, f, indent=2)
         except Exception as e:
             logger.warning(f"Failed to save checksums: {e}")
 
     def _calculate_crc32(self, data: bytes) -> str:
-        return format(zlib.crc32(data) & 0xFFFFFFFF, '08x')
+        return format(zlib.crc32(data) & 0xFFFFFFFF, "08x")
 
     def _calculate_md5(self, data: bytes) -> str:
         return hashlib.md5(data).hexdigest()
@@ -52,18 +54,18 @@ class CacheValidator:
             return self._calculate_md5(data)
         return ""
 
-    def compute_checksum_for_file(self, file_path: Path) -> Optional[str]:
+    def compute_checksum_for_file(self, file_path: Path) -> str | None:
         if not file_path.exists():
             return None
         try:
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 data = f.read()
             return self._calculate_checksum(data)
         except Exception as e:
             logger.error(f"Failed to compute checksum for {file_path}: {e}")
             return None
 
-    def validate_file(self, file_path: Path) -> Tuple[bool, Optional[str]]:
+    def validate_file(self, file_path: Path) -> tuple[bool, str | None]:
         if not file_path.exists():
             return False, None
 
@@ -89,7 +91,7 @@ class CacheValidator:
 
         return True, stored_checksum
 
-    def validate_all(self) -> Dict[str, Any]:
+    def validate_all(self) -> dict[str, Any]:
         results = {
             "total": 0,
             "valid": 0,
@@ -97,21 +99,20 @@ class CacheValidator:
             "expired": 0,
             "corrupted_files": [],
             "size_mb": 0,
-            "size_bytes": 0
+            "size_bytes": 0,
         }
 
         if not self.cache_dir.exists():
             return results
 
-        
         for cache_file in self.cache_dir.glob("*.npy"):
-            if cache_file.name.startswith('.'):
+            if cache_file.name.startswith("."):
                 continue
 
             results["total"] += 1
             results["size_bytes"] += cache_file.stat().st_size
 
-            json_file = cache_file.with_suffix('.json')
+            json_file = cache_file.with_suffix(".json")
             if json_file.exists():
                 results["size_bytes"] += json_file.stat().st_size
 
@@ -135,7 +136,7 @@ class CacheValidator:
                 base_path = Path(file_path)
                 base_path.unlink(missing_ok=True)
 
-                json_path = base_path.with_suffix('.json')
+                json_path = base_path.with_suffix(".json")
                 json_path.unlink(missing_ok=True)
 
                 self._checksums.pop(base_path.name, None)

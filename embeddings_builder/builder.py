@@ -1,31 +1,29 @@
-import os
-import gc
-import sys
-import logging
-import time
-import shutil
-import re
-import queue
-import threading
-from pathlib import Path
-from typing import List, Dict, Any, Optional, Generator
-from contextlib import contextmanager
-from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
 import csv
+import gc
+import logging
+import os
+import queue
+import re
+import shutil
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Any, Generator
 
 import chromadb
 import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer
+from tqdm import tqdm
 
-from .cache_utils import load_from_cache, save_to_cache, cleanup_cache, get_cache_key
+from .cache_utils import cleanup_cache, get_cache_key, save_to_cache
 from .chroma_manager import (
-    save_to_chroma_collection,
-    query_chroma_collection,
-    delete_collection,
-    ensure_chroma_writable,
     collection_name_for_model,
+    ensure_chroma_writable,
+    query_chroma_collection,
+    save_to_chroma_collection,
 )
 from .chunking import create_chunking_strategies
 from .models_repository import MODELS
@@ -60,24 +58,23 @@ def _get_model_output_dir(base_out_dir: str, model_name: str) -> str:
 
 
 class EmbeddingBuilder:
-    
     BATCH_SIZE_THRESHOLDS = [(3072, 8), (1024, 16), (768, 24)]
     DEFAULT_BATCH_SIZE = 32
 
     def __init__(
-            self,
-            corpus_dir: str,
-            out_dir: str,
-            chroma_path: str = "./chroma_db",
-            cache_dir: str = "./cache",
-            chunked_dir: str = "corpus_chunked",
-            embedding_model: str = "BAAI/bge-m3",
-            chunking: str = "paragraph",
-            text_type: str = "translate",
-            batch_size: int = None,
-            cache_batch_size: int = 50,
-            chroma_batch_size: int = 100,
-            metrics: Optional[PerformanceMetrics] = None,
+        self,
+        corpus_dir: str,
+        out_dir: str,
+        chroma_path: str = "./chroma_db",
+        cache_dir: str = "./cache",
+        chunked_dir: str = "corpus_chunked",
+        embedding_model: str = "BAAI/bge-m3",
+        chunking: str = "paragraph",
+        text_type: str = "translate",
+        batch_size: int = None,
+        cache_batch_size: int = 50,
+        chroma_batch_size: int = 100,
+        metrics: PerformanceMetrics | None = None,
     ):
         self.corpus_dir = Path(corpus_dir)
         self.base_out_dir = Path(out_dir)
@@ -88,7 +85,6 @@ class EmbeddingBuilder:
         self.cache_batch_size = cache_batch_size
         self.chroma_batch_size = chroma_batch_size
 
-        
         self._executor = ThreadPoolExecutor(max_workers=16)
 
         self._override_batch_size = batch_size is not None
@@ -100,8 +96,7 @@ class EmbeddingBuilder:
 
         if metrics is None:
             self.metrics = PerformanceMetrics(
-                metrics_file=Path(out_dir) / "performance_metrics.json",
-                track_memory=True
+                metrics_file=Path(out_dir) / "performance_metrics.json", track_memory=True
             )
         else:
             self.metrics = metrics
@@ -130,7 +125,7 @@ class EmbeddingBuilder:
         self.out_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Results directory: {self.out_dir}")
 
-    def list_models(self) -> List[str]:
+    def list_models(self) -> list[str]:
         return list(self.model_registry.keys())
 
     def add_model(self, model_name: str, model_path: str, dimension: int = 384, model_type: str = "local"):
@@ -152,24 +147,22 @@ class EmbeddingBuilder:
             self.model_registry[model_name]["loaded"] = False
         del self.model_registry[model_name]
 
-        
-        if hasattr(self, 'model_name') and self.model_name == model_name:
+        if hasattr(self, "model_name") and self.model_name == model_name:
             self.model_name = None
             logger.info("Active model removed. Set a new one with set_model().")
 
-    def unload_model(self, model_name: Optional[str] = None):
+    def unload_model(self, model_name: str | None = None):
         if model_name is None:
             model_name = self.get_current_model()
-        if model_name and model_name in self.model_registry:
-            if self.model_registry[model_name]["loaded"]:
-                del self.model_registry[model_name]["model"]
-                self.model_registry[model_name]["loaded"] = False
-                if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
-                elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-                    torch.mps.empty_cache()
-                gc.collect()
-                logger.info(f"Model '{model_name}' unloaded from memory")
+        if model_name and model_name in self.model_registry and self.model_registry[model_name]["loaded"]:
+            del self.model_registry[model_name]["model"]
+            self.model_registry[model_name]["loaded"] = False
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+            gc.collect()
+            logger.info(f"Model '{model_name}' unloaded from memory")
 
     def update_model(self, model_name: str, model_path: str = None, dimension: int = None, model_type: str = None):
         if model_name not in self.model_registry:
@@ -189,16 +182,15 @@ class EmbeddingBuilder:
                 if self.model_registry[model_name]["loaded"]:
                     return
 
-                if hasattr(self, 'model_name') and self.model_name != model_name:
+                if hasattr(self, "model_name") and self.model_name != model_name:
                     self.unload_model(self.model_name)
 
                 model_info = self.model_registry[model_name]
                 path = model_info["path"]
                 try:
-                    
                     if torch.cuda.is_available():
                         device = "cuda"
-                    elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
                         device = "mps"
                     else:
                         device = "cpu"
@@ -218,7 +210,8 @@ class EmbeddingBuilder:
                             logger.info(f"Model '{model_name}' loaded from local cache.")
                         except Exception as fallback_error:
                             raise RuntimeError(
-                                f"Failed to load model from {path} ({e}) and local cache ({fallback_error})") from e
+                                f"Failed to load model from {path} ({e}) and local cache ({fallback_error})"
+                            ) from e
                     else:
                         raise RuntimeError(f"Failed to load model '{model_name}' from {path}: {e}") from e
                 break
@@ -226,7 +219,7 @@ class EmbeddingBuilder:
                 if attempt == retries - 1:
                     raise
                 logger.warning(f"Attempt {attempt + 1} failed: {e}")
-                time.sleep(2 ** attempt)
+                time.sleep(2**attempt)
 
     def set_model(self, model_name: str):
         if model_name not in self.model_registry:
@@ -261,10 +254,10 @@ class EmbeddingBuilder:
             if original_model:
                 self.set_model(original_model)
 
-    def get_current_model(self) -> Optional[str]:
-        return getattr(self, 'model_name', None)
+    def get_current_model(self) -> str | None:
+        return getattr(self, "model_name", None)
 
-    def get_model_info(self, model_name: str = None) -> Dict[str, Any]:
+    def get_model_info(self, model_name: str = None) -> dict[str, Any]:
         if model_name is None:
             model_name = self.get_current_model()
         if model_name not in self.model_registry:
@@ -289,18 +282,18 @@ class EmbeddingBuilder:
             raise ValueError(f"Strategy '{strategy_name}' not found. Available: {available}")
         self.current_chunking = self.chunking_strategies[strategy_name]
 
-    def get_current_chunking_strategy(self) -> Optional[str]:
-        return getattr(self, 'current_chunking', None).name if hasattr(self, 'current_chunking') else None
+    def get_current_chunking_strategy(self) -> str | None:
+        return getattr(self, "current_chunking", None).name if hasattr(self, "current_chunking") else None
 
     def _get_cache_key(self, text: str) -> str:
         return get_cache_key(text, self.model_name, self.current_chunking)
 
-    def _chunk_text(self, text: str) -> List[str]:
+    def _chunk_text(self, text: str) -> list[str]:
         if not text or not text.strip():
             return []
         return [chunk for chunk in self.current_chunking(text) if chunk.strip()]
 
-    def _load_single_cache(self, key: str) -> Optional[np.ndarray]:
+    def _load_single_cache(self, key: str) -> np.ndarray | None:
         cache_npy_file = self.cache_dir / f"{key}.npy"
         cache_json_file = self.cache_dir / f"{key}.json"
 
@@ -311,11 +304,11 @@ class EmbeddingBuilder:
                 return None
         return None
 
-    def _batch_load_from_cache(self, cache_keys: List[str]) -> List[Optional[np.ndarray]]:
+    def _batch_load_from_cache(self, cache_keys: list[str]) -> list[np.ndarray | None]:
         futures = [self._executor.submit(self._load_single_cache, key) for key in cache_keys]
         return [f.result() for f in futures]
 
-    def _generate_embeddings(self, sentences: List[str]) -> np.ndarray:
+    def _generate_embeddings(self, sentences: list[str]) -> np.ndarray:
         if not sentences:
             return np.array([])
 
@@ -325,11 +318,11 @@ class EmbeddingBuilder:
             to_compute_text = []
 
             for i in range(0, len(sentences), self.cache_batch_size):
-                batch = sentences[i:i + self.cache_batch_size]
+                batch = sentences[i : i + self.cache_batch_size]
                 cache_keys = [self._get_cache_key(text) for text in batch]
                 cached_embeddings = self._batch_load_from_cache(cache_keys)
 
-                for j, (text, cached) in enumerate(zip(batch, cached_embeddings)):
+                for j, (text, cached) in enumerate(zip(batch, cached_embeddings, strict=False)):
                     global_idx = i + j
                     if cached is not None:
                         final_embeddings[global_idx] = cached
@@ -339,22 +332,19 @@ class EmbeddingBuilder:
 
             if to_compute_text:
                 for k in range(0, len(to_compute_text), self.batch_size):
-                    batch_text = to_compute_text[k:k + self.batch_size]
-                    batch_indices = to_compute_indices[k:k + self.batch_size]
+                    batch_text = to_compute_text[k : k + self.batch_size]
+                    batch_indices = to_compute_indices[k : k + self.batch_size]
 
                     computed = self.model.encode(
-                        batch_text,
-                        batch_size=len(batch_text),
-                        show_progress_bar=False,
-                        normalize_embeddings=True
+                        batch_text, batch_size=len(batch_text), show_progress_bar=False, normalize_embeddings=True
                     )
 
-                    for idx, text, emb in zip(batch_indices, batch_text, computed):
+                    for idx, text, emb in zip(batch_indices, batch_text, computed, strict=False):
                         final_embeddings[idx] = emb
                         save_to_cache(text, emb, self.model_name, self.current_chunking, self.cache_dir)
             return final_embeddings
 
-    def build_embeddings(self, text: str, chunking_strategy: str = None, batch_size: int = None) -> Dict[str, Any]:
+    def build_embeddings(self, text: str, chunking_strategy: str = None, batch_size: int = None) -> dict[str, Any]:
         if chunking_strategy:
             self.set_chunking_strategy(chunking_strategy)
 
@@ -388,8 +378,9 @@ class EmbeddingBuilder:
             if batch_size is not None:
                 self.batch_size = original_batch_size
 
-    def compare_models_and_strategies(self, text: str, models: List[str] = None, strategies: List[str] = None) -> Dict[
-        str, Any]:
+    def compare_models_and_strategies(
+        self, text: str, models: list[str] = None, strategies: list[str] = None
+    ) -> dict[str, Any]:
         if models is None:
             models = self.list_models()
         if strategies is None:
@@ -403,8 +394,9 @@ class EmbeddingBuilder:
                     results[f"{model_name}____{strategy_name}"] = result
         return results
 
-    def save_embeddings_to_chroma(self, text: str, metadata: Optional[Dict[str, Any]] = None,
-                                  batch_size: int = None) -> Dict[str, Any]:
+    def save_embeddings_to_chroma(
+        self, text: str, metadata: dict[str, Any] | None = None, batch_size: int = None
+    ) -> dict[str, Any]:
         """Synchronous save kept for backward compatibility when called directly"""
         collection_name = collection_name_for_model(self.model_name)
         result = self.build_embeddings(text, batch_size=batch_size)
@@ -418,7 +410,6 @@ class EmbeddingBuilder:
         if metadata is None:
             metadata = {}
 
-        
         def _safe_meta(val):
             return "" if val is None else val
 
@@ -448,7 +439,7 @@ class EmbeddingBuilder:
                 "doc_type": _safe_meta(doc_type),
                 "color": _safe_meta(color),
                 "language": _safe_meta(language),
-                "url": _safe_meta(url)
+                "url": _safe_meta(url),
             }
             for i in range(len(chunks))
         ]
@@ -466,31 +457,32 @@ class EmbeddingBuilder:
                 documents=chunks[i:batch_end],
             )
             logger.debug(
-                f"  Saved batch {i // batch_size_chroma + 1}/{(len(chunks) - 1) // batch_size_chroma + 1} to Chroma")
+                f"  Saved batch {i // batch_size_chroma + 1}/{(len(chunks) - 1) // batch_size_chroma + 1} to Chroma"
+            )
 
         return {"collection": collection_name, "added": len(chunks), "chunks": chunks}
 
-    def _iter_corpus_files(self) -> Generator[Dict[str, Any], None, None]:
+    def _iter_corpus_files(self) -> Generator[dict[str, Any], None, None]:
         catalog_file = self.corpus_dir / "corpus_catalog.csv"
         text_info = {}
 
         if catalog_file.exists():
             try:
-                with open(catalog_file, 'r', encoding='utf-8') as f:
+                with open(catalog_file, encoding="utf-8") as f:
                     reader = csv.DictReader(f)
                     for row in reader:
-                        tid = row.get('id') or row.get('tid')
+                        tid = row.get("id") or row.get("tid")
                         if not tid:
                             continue
                         row_info = {
-                            'text_id': _normalize_catalog_id(tid),
-                            'catalog_id': tid,
-                            'type': row.get('type', 'unknown'),
-                            'color': row.get('color', '#CCCCCC'),
-                            'major_tradition': row.get('major_tradition', 'unknown'),
-                            'tradition': row.get('tradition', 'unknown'),
-                            'language': row.get('language', 'unknown'),
-                            'url': row.get('url', ''),
+                            "text_id": _normalize_catalog_id(tid),
+                            "catalog_id": tid,
+                            "type": row.get("type", "unknown"),
+                            "color": row.get("color", "#CCCCCC"),
+                            "major_tradition": row.get("major_tradition", "unknown"),
+                            "tradition": row.get("tradition", "unknown"),
+                            "language": row.get("language", "unknown"),
+                            "url": row.get("url", ""),
                         }
                         text_info[str(tid)] = row_info
                         text_info[_normalize_catalog_id(tid)] = row_info
@@ -502,13 +494,14 @@ class EmbeddingBuilder:
         for txt_file in self.corpus_dir.rglob("*.txt"):
             tid = txt_file.stem
 
-            
             info = text_info.get(tid, {})
-            doc_type = info.get('type', 'unknown')
-            color = info.get('color', '#CCCCCC')
+            doc_type = info.get("type", "unknown")
+            color = info.get("color", "#CCCCCC")
 
-            if self.text_type == "original" and doc_type != "original": continue
-            if self.text_type in ["translate", "translation"] and doc_type not in ["translate", "translation"]: continue
+            if self.text_type == "original" and doc_type != "original":
+                continue
+            if self.text_type in ["translate", "translation"] and doc_type not in ["translate", "translation"]:
+                continue
 
             try:
                 rel_parts = txt_file.relative_to(self.corpus_dir).parts
@@ -519,9 +512,7 @@ class EmbeddingBuilder:
                 tradition = txt_file.parent.name
 
             try:
-                
-                
-                with open(txt_file, 'r', encoding='utf-8') as f:
+                with open(txt_file, encoding="utf-8") as f:
                     yield {
                         "filename": txt_file.name,
                         "content": f.read(),
@@ -533,7 +524,7 @@ class EmbeddingBuilder:
                         "doc_type": doc_type,
                         "color": color,
                         "language": info.get("language", "unknown"),
-                        "url": info.get("url", "")
+                        "url": info.get("url", ""),
                     }
             except Exception as e:
                 logger.warning(f"Failed to read file {txt_file}: {e}")
@@ -584,21 +575,16 @@ class EmbeddingBuilder:
             except Exception as e:
                 logger.warning(f"Failed to copy {traditions_file.name}: {e}")
 
-        #deleted = delete_collection(self.chroma_client, collection_name)
-        #if deleted:
-            #logger.info(f"Collection '{collection_name}' cleared before writing.")
-        #else:
-            #logger.info(f"Collection '{collection_name}' does not exist yet; writing from scratch.")
+        # deleted = delete_collection(self.chroma_client, collection_name)
+        # if deleted:
+        # logger.info(f"Collection '{collection_name}' cleared before writing.")
+        # else:
+        # logger.info(f"Collection '{collection_name}' does not exist yet; writing from scratch.")
 
         collection = self.chroma_client.get_or_create_collection(name=collection_name)
 
-        
         write_queue = queue.Queue(maxsize=10)
-        writer_thread = threading.Thread(
-            target=self._chroma_writer_worker,
-            args=(collection, write_queue),
-            daemon=True
-        )
+        writer_thread = threading.Thread(target=self._chroma_writer_worker, args=(collection, write_queue), daemon=True)
         writer_thread.start()
 
         logger.info(f"Saving {total_files} files to collection '{collection_name}'")
@@ -607,10 +593,9 @@ class EmbeddingBuilder:
         with tqdm(total=total_files, desc="Processing files", unit="file") as pbar:
             for file_info in files_info:
                 try:
-                    with open(file_info['path'], 'r', encoding='utf-8') as f:
+                    with open(file_info["path"], encoding="utf-8") as f:
                         content = f.read()
 
-                    
                     result = self.build_embeddings(content, batch_size=self.batch_size)
                     chunks = result.get("chunks", [])
                     embeddings = result.get("embeddings", [])
@@ -618,7 +603,6 @@ class EmbeddingBuilder:
                     if not chunks:
                         continue
 
-                    
                     text_id = file_info.get("text_id") or Path(file_info.get("path", "")).stem or "unknown"
                     text_id_safe = _safe_id_part(text_id)
                     model_id = _safe_id_part(self.model_name)
@@ -640,31 +624,31 @@ class EmbeddingBuilder:
                             "doc_type": _safe_meta(file_info.get("doc_type", "unknown")),
                             "color": _safe_meta(file_info.get("color", "#CCCCCC")),
                             "language": _safe_meta(file_info.get("language", "unknown")),
-                            "url": _safe_meta(file_info.get("url", ""))
+                            "url": _safe_meta(file_info.get("url", "")),
                         }
                         for i in range(len(chunks))
                     ]
 
-                    
                     batch_size_chroma = min(self.chroma_batch_size, len(chunks))
                     for i in range(0, len(chunks), batch_size_chroma):
                         batch_end = min(i + batch_size_chroma, len(chunks))
 
-                        write_queue.put((
-                            ids[i:batch_end],
-                            embeddings[i:batch_end].tolist(),
-                            metadatas[i:batch_end],
-                            chunks[i:batch_end]
-                        ))
+                        write_queue.put(
+                            (
+                                ids[i:batch_end],
+                                embeddings[i:batch_end].tolist(),
+                                metadatas[i:batch_end],
+                                chunks[i:batch_end],
+                            )
+                        )
 
                     added_total += len(chunks)
 
-                    
-                    rel_path = Path(file_info['path']).relative_to(self.corpus_dir)
+                    rel_path = Path(file_info["path"]).relative_to(self.corpus_dir)
                     out_file_path = self.chunked_dir / rel_path
                     out_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-                    with open(out_file_path, 'w', encoding='utf-8') as out_f:
+                    with open(out_file_path, "w", encoding="utf-8") as out_f:
                         for i, chunk in enumerate(chunks, 1):
                             out_f.write(f"=== [ CHUNK {i} | Size: {len(chunk)} chars ] ===\n")
                             out_f.write(chunk)
@@ -675,20 +659,19 @@ class EmbeddingBuilder:
                 finally:
                     pbar.update(1)
 
-        
         logger.info("Generation complete. Waiting for final batches to be written to disk...")
-        write_queue.put(None)  
+        write_queue.put(None)
         writer_thread.join()
 
         logger.info(f"Total added: {added_total} chunks to collection '{collection_name}'")
         self.metrics.save()
 
-    def query_chroma(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def query_chroma(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
         collection_name = collection_name_for_model(self.model_name)
         try:
             self._current_collection = self.chroma_client.get_collection(name=collection_name)
-        except Exception:
-            raise RuntimeError(f"Collection '{collection_name}' not found in ChromaDB.")
+        except Exception as err:
+            raise RuntimeError(f"Collection '{collection_name}' not found in ChromaDB.") from err
 
         query_embedding = self._generate_embeddings([query])[0]
         return query_chroma_collection(
@@ -699,20 +682,15 @@ class EmbeddingBuilder:
 
     def close(self):
         """Explicit resource release: stop threads and unload models"""
-        if hasattr(self, '_executor'):
-            
-            if sys.version_info >= (3, 9):
-                self._executor.shutdown(wait=True, cancel_futures=True)
-            else:
-                self._executor.shutdown(wait=True)
+        if hasattr(self, "_executor"):
+            self._executor.shutdown(wait=True, cancel_futures=True)
 
-        if hasattr(self, 'model_name') and self.model_name:
+        if hasattr(self, "model_name") and self.model_name:
             self.unload_model(self.model_name)
 
     def __del__(self):
         self.close()
 
-    
     def __enter__(self):
         return self
 

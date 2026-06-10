@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from ui_server.config import paths
 
@@ -9,7 +8,7 @@ def model_to_key(model_name: str) -> str:
     return (model_name or "").replace("/", "_").replace("\\", "_")
 
 
-def key_to_model(model_key: str, models: Optional[List[str]] = None) -> str:
+def key_to_model(model_key: str, models: list[str] | None = None) -> str:
     if not model_key:
         return model_key
 
@@ -24,7 +23,7 @@ def key_to_model(model_key: str, models: Optional[List[str]] = None) -> str:
     return model_key.replace("_", "/")
 
 
-def list_models_raw() -> List[str]:
+def list_models_raw() -> list[str]:
     models_path = paths.analysis_dir / "models.json"
     if models_path.exists():
         with models_path.open("r", encoding="utf-8") as handle:
@@ -35,7 +34,7 @@ def list_models_raw() -> List[str]:
     return _models_from_analysis_dirs()
 
 
-def list_model_summaries() -> List[Dict[str, str]]:
+def list_model_summaries() -> list[dict[str, str]]:
     return [
         {
             "name": model,
@@ -51,7 +50,7 @@ def get_model_output_dir(model_key: str) -> Path:
     return paths.analysis_dir / model_to_key(model_name)
 
 
-def get_model_info(model_key: str) -> Dict:
+def get_model_info(model_key: str) -> dict:
     info_path = get_model_output_dir(model_key) / "model_info.json"
     if not info_path.exists():
         return {}
@@ -60,7 +59,7 @@ def get_model_info(model_key: str) -> Dict:
         return json.load(handle)
 
 
-def _models_from_analysis_dirs() -> List[str]:
+def _models_from_analysis_dirs() -> list[str]:
     if not paths.analysis_dir.exists():
         return []
 
@@ -77,4 +76,3 @@ def _models_from_analysis_dirs() -> List[str]:
                 models.append(item.name.replace("_", "/"))
 
     return models
-

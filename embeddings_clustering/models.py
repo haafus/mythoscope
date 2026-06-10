@@ -1,29 +1,21 @@
 import logging
+
 import numpy as np
-from typing import Dict, List
-from sklearn.cluster import (
-    KMeans,
-    Birch,
-    SpectralClustering,
-    MeanShift,
-    OPTICS,
-    HDBSCAN
-)
+from sklearn.cluster import HDBSCAN, OPTICS, Birch, KMeans, MeanShift, SpectralClustering, estimate_bandwidth
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import Normalizer
-from sklearn.cluster import estimate_bandwidth
 
 logger = logging.getLogger(__name__)
 
 
 class BaseClusteringModel:
     def __init__(
-            self,
-            name: str,
-            min_samples_required: int = 2,
-            needs_dim_reduction: bool = False,
-            n_components: int = 15,
-            **params
+        self,
+        name: str,
+        min_samples_required: int = 2,
+        needs_dim_reduction: bool = False,
+        n_components: int = 15,
+        **params,
     ):
         self.name = name
         self.min_samples_required = min_samples_required
@@ -31,8 +23,8 @@ class BaseClusteringModel:
         self.n_components = n_components
         self.params = params
         self.model = None
-        self.scaler = Normalizer(norm='l2')
-        self.processed_embeddings = None  
+        self.scaler = Normalizer(norm="l2")
+        self.processed_embeddings = None
 
     def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
         if len(embeddings) < self.min_samples_required:
@@ -44,7 +36,6 @@ class BaseClusteringModel:
         if self.needs_dim_reduction and data_ready.shape[1] > self.n_components:
             data_ready = self._reduce_dimensions(data_ready)
 
-        
         self.processed_embeddings = data_ready
 
         return self._do_fit_predict(data_ready)
@@ -55,20 +46,21 @@ class BaseClusteringModel:
         actual_components = max(2, min(self.n_components, len(data) - 2))
         return reduce_dimensions(
             data,
-            method='umap',
+            method="umap",
             n_components=actual_components,
-            metric='cosine',
+            metric="cosine",
             fallback_on_error=True,
         )
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         raise NotImplementedError
 
-    def get_params_info(self) -> Dict:
+    def get_params_info(self) -> dict:
         return self.params
 
     def get_description(self) -> str:
         return f"{self.name}: {self.params}"
+
 
 class KMeansClustering(BaseClusteringModel):
     def __init__(self, n_clusters: int = 2, **kwargs):
@@ -86,10 +78,7 @@ class HDBSCANClustering(BaseClusteringModel):
         self.min_cluster_size = min_cluster_size
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
-        self.model = HDBSCAN(
-            min_cluster_size=self.min_cluster_size,
-            metric='euclidean'
-        )
+        self.model = HDBSCAN(min_cluster_size=self.min_cluster_size, metric="euclidean")
         return self.model.fit_predict(data)
 
 
@@ -99,7 +88,7 @@ class SpectralClusteringModel(BaseClusteringModel):
         self.n_clusters = n_clusters
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
-        self.model = SpectralClustering(n_clusters=self.n_clusters, random_state=42, affinity='nearest_neighbors')
+        self.model = SpectralClustering(n_clusters=self.n_clusters, random_state=42, affinity="nearest_neighbors")
         return self.model.fit_predict(data)
 
 
@@ -123,28 +112,21 @@ class GMMClustering(BaseClusteringModel):
         self.model = GaussianMixture(n_components=self.n_components, random_state=42)
         return self.model.fit_predict(data)
 
+
 class MeanShiftClustering(BaseClusteringModel):
     def __init__(self, **kwargs):
         super().__init__("meanshift", needs_dim_reduction=True, **kwargs)
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
-        
-        
-        bandwidth = estimate_bandwidth(
-            data,
-            quantile=0.05,
-            n_samples=2000,
-            random_state=42
-        )
 
-        
+        bandwidth = estimate_bandwidth(data, quantile=0.05, n_samples=2000, random_state=42)
+
         if bandwidth <= 0:
-            bandwidth = 1.0  
+            bandwidth = 1.0
             logger.warning("Estimated bandwidth <= 0, using 1.0")
 
         logger.info(f"MeanShift will use bandwidth: {bandwidth:.4f}")
 
-        
         self.model = MeanShift(bandwidth=bandwidth, bin_seeding=True)
         return self.model.fit_predict(data)
 
@@ -161,13 +143,13 @@ class OPTICSClustering(BaseClusteringModel):
 
 def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
     models = {
-        'kmeans': KMeansClustering,
-        'hdbscan': HDBSCANClustering,
-        'spectral': SpectralClusteringModel,
-        'birch': BirchClustering,
-        'gmm': GMMClustering,
-        'meanshift': MeanShiftClustering,
-        'optics': OPTICSClustering
+        "kmeans": KMeansClustering,
+        "hdbscan": HDBSCANClustering,
+        "spectral": SpectralClusteringModel,
+        "birch": BirchClustering,
+        "gmm": GMMClustering,
+        "meanshift": MeanShiftClustering,
+        "optics": OPTICSClustering,
     }
 
     if model_name not in models:
@@ -177,5 +159,5 @@ def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
     return models[model_name](**params)
 
 
-def list_available_models() -> List[str]:
-    return ['kmeans', 'hdbscan', 'spectral', 'birch', 'gmm', 'meanshift', 'optics']
+def list_available_models() -> list[str]:
+    return ["kmeans", "hdbscan", "spectral", "birch", "gmm", "meanshift", "optics"]

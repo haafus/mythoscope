@@ -1,10 +1,8 @@
-import pytest
-
 from clean_gutenberg import (
-    clean_gutenberg_text,
-    is_gutenberg_text,
     _normalize_gutenberg_whitespace,
     _remove_header_metadata,
+    clean_gutenberg_text,
+    is_gutenberg_text,
 )
 
 
@@ -67,7 +65,7 @@ class TestCleanGutenbergText:
 
     def test_empty_input(self):
         assert clean_gutenberg_text("") == ""
-        assert clean_gutenberg_text(None) is None
+        assert clean_gutenberg_text(None) is None  # type: ignore[arg-type]
 
     def test_preserves_content_between_markers(self):
         content_lines = [f"Line {i} of the book." for i in range(50)]
@@ -82,21 +80,13 @@ class TestCleanGutenbergText:
             assert line in result
 
     def test_only_start_marker(self):
-        text = (
-            "License header\n"
-            "*** START OF THE PROJECT GUTENBERG EBOOK Y ***\n\n"
-            "Content without end marker."
-        )
+        text = "License header\n*** START OF THE PROJECT GUTENBERG EBOOK Y ***\n\nContent without end marker."
         result = clean_gutenberg_text(text)
         assert "Content without end marker." in result
         assert "License header" not in result
 
     def test_only_end_marker(self):
-        text = (
-            "Content before end marker.\n\n"
-            "*** END OF THE PROJECT GUTENBERG EBOOK Z ***\n"
-            "License footer"
-        )
+        text = "Content before end marker.\n\n*** END OF THE PROJECT GUTENBERG EBOOK Z ***\nLicense footer"
         result = clean_gutenberg_text(text)
         assert "Content before end marker." in result
         assert "License footer" not in result
@@ -107,7 +97,7 @@ class TestNormalizeWhitespace:
         text = "Line one.\n\n\n\n\nLine two."
         result = _normalize_gutenberg_whitespace(text)
         assert "\n\n\n" not in result
-        assert "Line one.\n\nLine two." == result
+        assert result == "Line one.\n\nLine two."
 
     def test_removes_decorative_lines(self):
         text = "Before.\n**********\nAfter."

@@ -1,24 +1,24 @@
-import time
 import json
-import psutil
 import logging
-from pathlib import Path
-from typing import Dict, Any, Optional
+import time
 from contextlib import contextmanager
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import psutil
 
 logger = logging.getLogger(__name__)
 
 
 class PerformanceMetrics:
-
-    def __init__(self, metrics_file: Optional[str] = None, track_memory: bool = True):
+    def __init__(self, metrics_file: str | None = None, track_memory: bool = True):
         self.metrics_file = Path(metrics_file) if metrics_file else None
         self.track_memory = track_memory
-        self.metrics: Dict[str, Any] = {}
-        self.current_operation: Optional[str] = None
-        self.operation_start: Optional[float] = None
-        self.memory_start: Optional[float] = None
+        self.metrics: dict[str, Any] = {}
+        self.current_operation: str | None = None
+        self.operation_start: float | None = None
+        self.memory_start: float | None = None
 
     def start_operation(self, name: str) -> None:
         self.current_operation = name
@@ -29,7 +29,7 @@ class PerformanceMetrics:
 
         logger.debug(f"Starting operation: {name}")
 
-    def end_operation(self, name: Optional[str] = None) -> Dict[str, Any]:
+    def end_operation(self, name: str | None = None) -> dict[str, Any]:
         op_name = name or self.current_operation
         if not op_name or not self.operation_start:
             logger.warning("No active operation to end")
@@ -37,11 +37,7 @@ class PerformanceMetrics:
 
         duration = time.time() - self.operation_start
 
-        metrics = {
-            "operation": op_name,
-            "duration_seconds": duration,
-            "timestamp": datetime.now().isoformat()
-        }
+        metrics = {"operation": op_name, "duration_seconds": duration, "timestamp": datetime.now().isoformat()}
 
         if self.track_memory and self.memory_start is not None:
             memory_end = self._get_memory_usage()
@@ -78,7 +74,7 @@ class PerformanceMetrics:
             logger.warning(f"Cannot get memory usage: {e}")
             return 0.0
 
-    def get_summary(self, operation: Optional[str] = None) -> Dict[str, Any]:
+    def get_summary(self, operation: str | None = None) -> dict[str, Any]:
         if operation:
             ops = self.metrics.get(operation, [])
         else:
@@ -96,7 +92,7 @@ class PerformanceMetrics:
             "total_time_seconds": sum(durations),
             "avg_duration_seconds": sum(durations) / len(durations),
             "min_duration_seconds": min(durations),
-            "max_duration_seconds": max(durations)
+            "max_duration_seconds": max(durations),
         }
 
         if self.track_memory:
@@ -113,13 +109,9 @@ class PerformanceMetrics:
 
         self.metrics_file.parent.mkdir(parents=True, exist_ok=True)
 
-        output = {
-            "summary": self.get_summary(),
-            "detailed": self.metrics,
-            "generated_at": datetime.now().isoformat()
-        }
+        output = {"summary": self.get_summary(), "detailed": self.metrics, "generated_at": datetime.now().isoformat()}
 
-        with open(self.metrics_file, 'w', encoding='utf-8') as f:
+        with open(self.metrics_file, "w", encoding="utf-8") as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Performance metrics saved to {self.metrics_file}")

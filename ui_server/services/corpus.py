@@ -4,10 +4,8 @@ import json
 import re
 import zipfile
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 from ui_server.config import paths
-
 
 CATALOG_SOURCES = {
     "corpus": paths.corpus_dir,
@@ -31,7 +29,7 @@ def source_root(source: str = "corpus") -> Path:
     return CATALOG_SOURCES.get(source, paths.corpus_dir)
 
 
-def get_catalog_documents(source: str = "corpus") -> List[Dict]:
+def get_catalog_documents(source: str = "corpus") -> list[dict]:
     root = source_root(source)
     metadata_path = root / "corpus_metadata.json"
     catalog_path = root / "corpus_catalog.csv"
@@ -76,7 +74,9 @@ def get_catalog_documents(source: str = "corpus") -> List[Dict]:
                 "sentence_count": to_int(row.get("sentence_count", catalog_row.get("sentence_count"))),
                 "char_count": to_int(row.get("char_count")),
                 "color": row.get("color") or catalog_row.get("color") or tradition_info.get("color") or "#6b7280",
-                "description": catalog_row.get("description") or row.get("description") or tradition_info.get("description", ""),
+                "description": catalog_row.get("description")
+                or row.get("description")
+                or tradition_info.get("description", ""),
                 "source": source,
             }
         )
@@ -91,7 +91,7 @@ def get_catalog_documents(source: str = "corpus") -> List[Dict]:
     return documents
 
 
-def scan_document_rows(root: Path) -> List[Dict]:
+def scan_document_rows(root: Path) -> list[dict]:
     rows = []
     if not root.exists():
         return rows
@@ -119,18 +119,14 @@ def scan_document_rows(root: Path) -> List[Dict]:
     return rows
 
 
-def resolve_document_path(doc_id: str, major_tradition: str, tradition: str, source: str = "corpus") -> Tuple[Path, Optional[Path], str]:
+def resolve_document_path(
+    doc_id: str, major_tradition: str, tradition: str, source: str = "corpus"
+) -> tuple[Path, Path | None, str]:
     corpus_root = source_root(source).resolve()
     major_path = sanitize_path_part(major_tradition)
     tradition_path = sanitize_path_part(tradition)
     title_path = sanitize_path_part(doc_id)
-    file_path = (
-        corpus_root
-        / major_path
-        / tradition_path
-        / title_path
-        / f"{title_path}.txt"
-    ).resolve()
+    file_path = (corpus_root / major_path / tradition_path / title_path / f"{title_path}.txt").resolve()
 
     try:
         file_path.relative_to(corpus_root)
@@ -153,7 +149,7 @@ def resolve_document_path(doc_id: str, major_tradition: str, tradition: str, sou
     return corpus_root, file_path, title_path
 
 
-def read_document(doc_id: str, major_tradition: str, tradition: str, source: str = "corpus") -> Tuple[str, str]:
+def read_document(doc_id: str, major_tradition: str, tradition: str, source: str = "corpus") -> tuple[str, str]:
     _, file_path, title_path = resolve_document_path(doc_id, major_tradition, tradition, source)
     if not file_path:
         raise PermissionError("Access denied")
@@ -189,7 +185,7 @@ def build_corpus_archive() -> bytes:
     return archive_buffer.getvalue()
 
 
-def load_traditions_info(source: str = "chunked") -> Dict:
+def load_traditions_info(source: str = "chunked") -> dict:
     path = source_root(source) / "traditions_info.json"
     if path.exists():
         with path.open("r", encoding="utf-8") as handle:
@@ -199,7 +195,7 @@ def load_traditions_info(source: str = "chunked") -> Dict:
     return {}
 
 
-def get_traditions_info() -> Dict:
+def get_traditions_info() -> dict:
     for path in (
         paths.corpus_chunked_dir / "traditions_info.json",
         paths.corpus_dir / "traditions_info.json",

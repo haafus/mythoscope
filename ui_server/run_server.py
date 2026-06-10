@@ -1,8 +1,8 @@
+import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
-import uvicorn
 
 from ui_server.api import clustering, corpus, geography, models, similarity
 from ui_server.config import paths
@@ -38,9 +38,7 @@ def create_app() -> FastAPI:
         response = await call_next(request)
         path = request.url.path
 
-        if path.startswith("/api/"):
-            response.headers["Cache-Control"] = "no-store"
-        elif path.startswith("/assets/"):
+        if path.startswith("/api/") or path.startswith("/assets/"):
             response.headers["Cache-Control"] = "no-store"
         elif path.startswith(("/analysis/", "/template/", "/corpus/", "/corpus_chunked/")):
             response.headers["Cache-Control"] = "public, max-age=86400"
@@ -66,8 +64,6 @@ def create_app() -> FastAPI:
 
 def _index_response():
     return FileResponse(paths.web_root / "index.html")
-
-
 
 
 def run_server():

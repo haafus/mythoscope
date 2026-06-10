@@ -1,9 +1,9 @@
 import logging
 import os
-import yaml
-from pathlib import Path
-from typing import Optional
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+import yaml
 
 from settings import settings
 
@@ -27,7 +27,7 @@ class AnalyzerConfig:
 
     def _load_config(self):
         if self.config_path.exists():
-            with open(self.config_path, 'r', encoding='utf-8') as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 return yaml.safe_load(f) or {}
         return {}
 
@@ -49,41 +49,33 @@ class AnalyzerConfig:
 
     @property
     def visualization_params(self) -> dict:
-        return self._config.get('visualization', {})
+        return self._config.get("visualization", {})
 
     @property
     def umap_configs(self) -> list:
         default = [
-            {'n_neighbors': 5, 'min_dist': 0.1},
-            {'n_neighbors': 15, 'min_dist': 0.1},
-            {'n_neighbors': 50, 'min_dist': 0.1},
-            {'n_neighbors': 15, 'min_dist': 0.5},
-            {'n_neighbors': 15, 'min_dist': 0.8}
+            {"n_neighbors": 5, "min_dist": 0.1},
+            {"n_neighbors": 15, "min_dist": 0.1},
+            {"n_neighbors": 50, "min_dist": 0.1},
+            {"n_neighbors": 15, "min_dist": 0.5},
+            {"n_neighbors": 15, "min_dist": 0.8},
         ]
-        return self.visualization_params.get('umap_configs', default)
+        return self.visualization_params.get("umap_configs", default)
 
     @property
     def tsne_configs(self) -> list:
-        default = [
-            {'perplexity': 5},
-            {'perplexity': 30},
-            {'perplexity': 50}
-        ]
-        return self.visualization_params.get('tsne_configs', default)
+        default = [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
+        return self.visualization_params.get("tsne_configs", default)
 
     @property
     def pca_configs(self) -> list:
         default = [{}]
-        return self.visualization_params.get('pca_configs', default)
+        return self.visualization_params.get("pca_configs", default)
 
     @property
     def baseline_configs(self) -> dict:
-        default = {
-            'umap': {'n_neighbors': 15, 'min_dist': 0.1},
-            'tsne': {'perplexity': 30},
-            'pca': {}
-        }
-        return self.visualization_params.get('baseline_configs', default)
+        default = {"umap": {"n_neighbors": 15, "min_dist": 0.1}, "tsne": {"perplexity": 30}, "pca": {}}
+        return self.visualization_params.get("baseline_configs", default)
 
 
 _analyzer_config = None
@@ -108,9 +100,7 @@ def get_output_dir() -> str:
     return str(settings.analysis_dir)
 
 
-def set_paths(chroma_path: Optional[str] = None,
-              output_dir: Optional[str] = None,
-              corpus_dir: Optional[str] = None):
+def set_paths(chroma_path: str | None = None, output_dir: str | None = None, corpus_dir: str | None = None):
     if chroma_path:
         settings.chroma_dir = Path(chroma_path)
     if output_dir:
@@ -143,12 +133,9 @@ def setup_logging(log_dir: str = None, log_filename: str = "analyzer.log", clear
     os.makedirs(log_dir, exist_ok=True)
     log_path = os.path.join(log_dir, log_filename)
 
-    formatter = logging.Formatter(
-        fmt='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+    formatter = logging.Formatter(fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
-    file_handler = RotatingFileHandler(log_path, maxBytes=5*1024*1024, backupCount=3, encoding='utf-8')
+    file_handler = RotatingFileHandler(log_path, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8")
     file_handler.setFormatter(formatter)
 
     console_handler = logging.StreamHandler()
@@ -162,13 +149,11 @@ def setup_logging(log_dir: str = None, log_filename: str = "analyzer.log", clear
 
     log_path_resolved = os.path.abspath(log_path)
     has_file_handler = any(
-        isinstance(h, RotatingFileHandler)
-        and getattr(h, "baseFilename", None) == log_path_resolved
+        isinstance(h, RotatingFileHandler) and getattr(h, "baseFilename", None) == log_path_resolved
         for h in root_logger.handlers
     )
     has_console_handler = any(
-        isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler)
-        for h in root_logger.handlers
+        isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler) for h in root_logger.handlers
     )
 
     if not has_file_handler:

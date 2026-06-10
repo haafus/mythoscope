@@ -1,12 +1,15 @@
-import os
-import json
-import numpy as np
-from typing import List, Dict, Optional, Any, Generator
-import chromadb
 import csv
-from .config import get_analyzer_config
-from embeddings_builder.chroma_manager import collection_name_for_model, is_model_collection_name
+import json
 import logging
+import os
+from typing import Any
+
+import chromadb
+import numpy as np
+
+from embeddings_builder.chroma_manager import collection_name_for_model, is_model_collection_name
+
+from .config import get_analyzer_config
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +18,9 @@ class EmbeddingDataLoader:
     def __init__(self, auto_migrate: bool = True):
         self.config = get_analyzer_config()
         self.client = chromadb.PersistentClient(path=self.config.chroma_path)
-        self._metadata_map: Optional[Dict[str, str]] = None
+        self._metadata_map: dict[str, str] | None = None
         self._collection = None
-        self._collection_names_cache: Dict[str, List[str]] = {}
+        self._collection_names_cache: dict[str, list[str]] = {}
 
         if auto_migrate:
             self._auto_migrate_all()
@@ -26,22 +29,19 @@ class EmbeddingDataLoader:
     def _collection_name(collection) -> str:
         return collection if isinstance(collection, str) else collection.name
 
-    def _list_collection_names(self) -> List[str]:
+    def _list_collection_names(self) -> list[str]:
         try:
             return sorted(self._collection_name(collection) for collection in self.client.list_collections())
         except Exception as e:
             logger.warning(f"Failed to list Chroma collections: {e}")
             return []
 
-    def _resolve_collection_names(self, model_name: Optional[str] = None) -> List[str]:
+    def _resolve_collection_names(self, model_name: str | None = None) -> list[str]:
         cache_key = model_name or "*"
         if cache_key in self._collection_names_cache:
             return self._collection_names_cache[cache_key]
 
-        available = [
-            name for name in self._list_collection_names()
-            if is_model_collection_name(name)
-        ]
+        available = [name for name in self._list_collection_names() if is_model_collection_name(name)]
 
         if model_name:
             expected_name = collection_name_for_model(model_name)
@@ -52,7 +52,7 @@ class EmbeddingDataLoader:
         self._collection_names_cache[cache_key] = names
         return names
 
-    def _iter_collections(self, model_name: Optional[str] = None):
+    def _iter_collections(self, model_name: str | None = None):
         names = self._resolve_collection_names(model_name=model_name)
         if not names:
             raise RuntimeError("Model-based Chroma collections not found")
@@ -67,27 +67,25 @@ class EmbeddingDataLoader:
     def collection(self):
         if self._collection is None:
             try:
-                
                 names = self._resolve_collection_names()
                 if not names:
                     raise ValueError("Model-based Chroma collections do not exist")
                 self._collection = self.client.get_collection(name=names[0])
-            except ValueError:
-                
+            except ValueError as err:
                 logger.warning("Model-based Chroma collections do not exist. Data may not have been generated yet.")
-                raise RuntimeError("Model-based Chroma collections not found")
+                raise RuntimeError("Model-based Chroma collections not found") from err
             except Exception as e:
                 logger.error(f"Failed to get model-based collection: {e}")
                 raise
         return self._collection
 
-    def _load_metadata_map(self) -> Dict[str, str]:
+    def _load_metadata_map(self) -> dict[str, str]:
         if self._metadata_map is not None:
             return self._metadata_map
 
         metadata_path = self.config.corpus_metadata_path
         if not os.path.exists(metadata_path):
-            catalog_path = os.path.join(self.config.corpus_dir, 'corpus_catalog.csv')
+            catalog_path = os.path.join(self.config.corpus_dir, "corpus_catalog.csv")
             if os.path.exists(catalog_path):
                 metadata_path = catalog_path
             else:
@@ -97,16 +95,16 @@ class EmbeddingDataLoader:
 
         try:
             self._metadata_map = {}
-            
-            if metadata_path.endswith('.json'):
-                with open(metadata_path, "r", encoding="utf-8") as f:
+
+            if metadata_path.endswith(".json"):
+                with open(metadata_path, encoding="utf-8") as f:
                     metadata = json.load(f)
                     for item in metadata:
                         if "id" in item and "tradition" in item:
                             self._metadata_map[str(item["id"])] = item["tradition"]
                             self._metadata_map[str(item["id"]).replace(" ", "_")] = item["tradition"]
             else:
-                with open(metadata_path, "r", encoding="utf-8") as f:
+                with open(metadata_path, encoding="utf-8") as f:
                     reader = csv.DictReader(f)
                     if reader.fieldnames:
                         for row in reader:
@@ -135,7 +133,9 @@ class EmbeddingDataLoader:
                 if not self._needs_migration(collection):
                     continue
 
-                logger.info(f"Records without tradition found in Chroma collection '{collection.name}'. Running migration...")
+                logger.info(
+                    f"Records without tradition found in Chroma collection '{collection.name}'. Running migration..."
+                )
                 metadata_map = self._load_metadata_map()
 
                 if not metadata_map:
@@ -155,25 +155,20 @@ class EmbeddingDataLoader:
                 return False
 
             return any(
-                "tradition" not in meta or meta.get("tradition") == "unknown"
-                for meta in sample["metadatas"] if meta
+                "tradition" not in meta or meta.get("tradition") == "unknown" for meta in sample["metadatas"] if meta
             )
         except Exception as e:
             logger.warning(f"Failed to check migration need: {e}")
             return False
 
-    def _migrate_records(self, collection, metadata_map: Dict[str, str]) -> int:
+    def _migrate_records(self, collection, metadata_map: dict[str, str]) -> int:
         batch_size = 1000
         offset = 0
         migrated = 0
 
         while True:
             try:
-                results = collection.get(
-                    limit=batch_size,
-                    offset=offset,
-                    include=["metadatas"]
-                )
+                results = collection.get(limit=batch_size, offset=offset, include=["metadatas"])
 
                 if not results["ids"]:
                     break
@@ -201,9 +196,9 @@ class EmbeddingDataLoader:
 
         return migrated
 
-    def _prepare_updates(self, results: Dict, metadata_map: Dict[str, str]) -> List[tuple]:
+    def _prepare_updates(self, results: dict, metadata_map: dict[str, str]) -> list[tuple]:
         updates = []
-        for doc_id, meta in zip(results["ids"], results["metadatas"]):
+        for doc_id, meta in zip(results["ids"], results["metadatas"], strict=False):
             if not meta:
                 continue
 
@@ -217,11 +212,8 @@ class EmbeddingDataLoader:
         return updates
 
     def load_data(
-            self,
-            model_name: Optional[str] = None,
-            batch_size: int = 5000,
-            max_records: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+        self, model_name: str | None = None, batch_size: int = 5000, max_records: int | None = None
+    ) -> list[dict[str, Any]]:
         all_data = []
         where_filter = {"model": model_name} if model_name else None
 
@@ -238,7 +230,7 @@ class EmbeddingDataLoader:
                         where=where_filter,
                         limit=batch_size,
                         offset=offset,
-                        include=["embeddings", "metadatas", "documents"]
+                        include=["embeddings", "metadatas", "documents"],
                     )
                 except Exception as e:
                     logger.error(f"Failed to fetch data from '{collection.name}' at offset {offset}: {e}")
@@ -257,7 +249,7 @@ class EmbeddingDataLoader:
 
         return all_data
 
-    def _process_batch(self, results: Dict) -> List[Dict[str, Any]]:
+    def _process_batch(self, results: dict) -> list[dict[str, Any]]:
         batch_data = []
         ids = results.get("ids", [])
         embeddings = results.get("embeddings", [])
@@ -274,28 +266,30 @@ class EmbeddingDataLoader:
 
                 embedding = np.array(embeddings[i]) if isinstance(embeddings[i], list) else embeddings[i]
 
-                batch_data.append({
-                    "id": meta.get("text_id", doc_id),
-                    "tradition": meta.get("tradition", "unknown"),
-                    "major_tradition": meta.get("major_tradition", "unknown"),
-                    "chunk_index": meta.get("chunk_index", 0),
-                    "embedding": embedding,
-                    "text": doc,
-                    "model": meta.get("model", "unknown"),
-                    "filename": meta.get("filename", "unknown"),
-                    "chunking": meta.get("chunking", "unknown"),
-                    "doc_type": meta.get("doc_type", "unknown"),
-                    "color": meta.get("color", "#CCCCCC"),
-                    "language": meta.get("language", "unknown"),
-                    "url": meta.get("url", ""),
-                })
+                batch_data.append(
+                    {
+                        "id": meta.get("text_id", doc_id),
+                        "tradition": meta.get("tradition", "unknown"),
+                        "major_tradition": meta.get("major_tradition", "unknown"),
+                        "chunk_index": meta.get("chunk_index", 0),
+                        "embedding": embedding,
+                        "text": doc,
+                        "model": meta.get("model", "unknown"),
+                        "filename": meta.get("filename", "unknown"),
+                        "chunking": meta.get("chunking", "unknown"),
+                        "doc_type": meta.get("doc_type", "unknown"),
+                        "color": meta.get("color", "#CCCCCC"),
+                        "language": meta.get("language", "unknown"),
+                        "url": meta.get("url", ""),
+                    }
+                )
             except Exception as e:
                 logger.warning(f"Failed to process document {doc_id}: {e}")
                 continue
 
         return batch_data
 
-    def get_available_models(self) -> List[str]:
+    def get_available_models(self) -> list[str]:
         models = set()
         batch_size = 5000
 
@@ -321,7 +315,7 @@ class EmbeddingDataLoader:
             return []
 
     def close(self):
-        if hasattr(self, 'client'):
+        if hasattr(self, "client"):
             self._collection = None
             self.client = None
 

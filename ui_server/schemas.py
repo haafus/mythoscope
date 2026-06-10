@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -30,7 +30,7 @@ class PointInfo(BaseModel):
     tradition: str
     chunk_index: int
     model: str
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class Neighbor(BaseModel):
@@ -59,11 +59,11 @@ class CorpusDocument(BaseModel):
 class ProjectionResponse(BaseModel):
     model: str
     method: str
-    points: List[Dict[str, Any]]
+    points: list[dict[str, Any]]
 
 
 class SavedPlotResponse(BaseModel):
     exists: bool
-    url: Optional[str] = None
-    path: Optional[str] = None
-    reason: Optional[str] = None
+    url: str | None = None
+    path: str | None = None
+    reason: str | None = None

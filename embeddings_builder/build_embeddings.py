@@ -1,19 +1,19 @@
+import gc
 import logging
+import shutil
 import signal
 import sys
-import gc
-import torch
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
-import shutil 
+
+import torch
 
 from .builder import EmbeddingBuilder
-from .config_manager import ConfigManager
 from .chroma_manager import collection_name_for_model
+from .config_manager import ConfigManager
 
 
-def normalize_text_type(text_type: Optional[str]) -> Optional[str]:
+def normalize_text_type(text_type: str | None) -> str | None:
     aliases = {
         "both": "all",
         "translation": "translate",
@@ -34,14 +34,12 @@ class ApplicationContext:
                 self.builder.metrics.save()
                 logger.info("Metrics saved")
 
-                
                 self.builder.close()
 
-                
                 gc.collect()
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
-                elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
                     torch.mps.empty_cache()
 
             except Exception as e:
@@ -49,7 +47,6 @@ class ApplicationContext:
 
         logger.info("Shutting down...")
         sys.exit(0)
-
 
 
 app_context = ApplicationContext()
@@ -64,37 +61,31 @@ def setup_logging(config_path: str = "config.yaml"):
     log_file = Path(log_config.get("file", "logs/embedding.log"))
     log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    
     file_handler = RotatingFileHandler(
         log_file,
         maxBytes=log_config.get("max_bytes", 10485760),
         backupCount=log_config.get("backup_count", 5),
-        encoding='utf-8'
+        encoding="utf-8",
     )
     file_handler.setLevel(getattr(logging, log_config.get("level", "INFO")))
 
-    
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
 
-    
     formatter = logging.Formatter(log_config.get("format", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
 
-    
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
 
     log_file_resolved = str(log_file.resolve())
     has_file_handler = any(
-        isinstance(handler, RotatingFileHandler)
-        and getattr(handler, "baseFilename", None) == log_file_resolved
+        isinstance(handler, RotatingFileHandler) and getattr(handler, "baseFilename", None) == log_file_resolved
         for handler in root_logger.handlers
     )
     has_console_handler = any(
-        isinstance(handler, logging.StreamHandler)
-        and not isinstance(handler, logging.FileHandler)
+        isinstance(handler, logging.StreamHandler) and not isinstance(handler, logging.FileHandler)
         for handler in root_logger.handlers
     )
 
@@ -106,24 +97,20 @@ def setup_logging(config_path: str = "config.yaml"):
     return root_logger
 
 
-
-
 def build_embeddings(
-        clear_existing: Optional[bool] = None,
-        batch_size: Optional[int] = None,
-        config_path: str = "config.yaml",
-        model_name: Optional[str] = None,
-        models: Optional[list] = None,
-        chunking: Optional[str] = None,
-        text_type: Optional[str] = None,
+    clear_existing: bool | None = None,
+    batch_size: int | None = None,
+    config_path: str = "config.yaml",
+    model_name: str | None = None,
+    models: list | None = None,
+    chunking: str | None = None,
+    text_type: str | None = None,
 ):
     if clear_existing is False:
         raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
 
-    
     logger = setup_logging(config_path)
 
-    
     config_mgr = ConfigManager(config_path)
 
     CORPUS_DIR = config_mgr.get("paths.corpus_dir")
@@ -139,9 +126,6 @@ def build_embeddings(
     BATCH_SIZE = batch_size if batch_size is not None else config_mgr.get("embedding.batch_size")
     CLEAR_EXISTING = clear_existing if clear_existing is not None else True
 
-    
-    
-    
     if CLEAR_EXISTING:
         chroma_dir = Path(CHROMA_PATH)
         if chroma_dir.exists():
@@ -150,7 +134,6 @@ def build_embeddings(
                 shutil.rmtree(chroma_dir, ignore_errors=True)
             except Exception as e:
                 logger.warning(f"Failed to fully remove database directory: {e}")
-    
 
     app_context.builder = EmbeddingBuilder(
         corpus_dir=CORPUS_DIR,
@@ -163,7 +146,7 @@ def build_embeddings(
         chunked_dir=CHUNKED_DIR,
         batch_size=BATCH_SIZE,
         cache_batch_size=CACHE_BATCH,
-        chroma_batch_size=CHROMA_BATCH
+        chroma_batch_size=CHROMA_BATCH,
     )
 
     models_to_run = models or ([MODEL_NAME] if model_name else config_mgr.get("embedding.models", [MODEL_NAME]))
@@ -179,22 +162,19 @@ def build_embeddings(
         for model in models_to_run:
             logger.info(f"   Model: {model}")
             logger.info(f"   Model batch size: {BATCH_SIZE}")
-            
+
             app_context.builder.set_model(model)
 
-            
             collection_to_write = collection_name_for_model(model)
 
             logger.info(f"Collection: {collection_to_write}")
 
-            
             app_context.builder.save_all_corpus_to_chroma()
 
     except Exception as e:
         logger.error(f"Embedding generation error: {e}")
         raise
     finally:
-        
         app_context.builder.metrics.save()
         app_context.builder.close()
 

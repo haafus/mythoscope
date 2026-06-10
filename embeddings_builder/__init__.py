@@ -9,7 +9,6 @@ from .chroma_manager import (
     save_to_chroma_collection,
 )
 
-
 _LAZY_IMPORTS = {
     "EmbeddingBuilder": (".builder", "EmbeddingBuilder"),
     "build_embeddings": (".build_embeddings", "build_embeddings"),

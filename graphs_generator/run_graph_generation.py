@@ -1,17 +1,18 @@
+import copy
 import json
 import logging
-import yaml
-import copy
 from datetime import datetime
 from pathlib import Path
-from .prompts_loader import load_prompts
-from .llm_processing import LLMProcessor
-from .graph_generator import generate_and_save_graph
 
+import yaml
+
+from .graph_generator import generate_and_save_graph
+from .llm_processing import LLMProcessor
+from .prompts_loader import load_prompts
 
 CONFIG_PATH = "graphs_generator/config.yaml"
 try:
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(CONFIG_PATH, encoding="utf-8") as f:
         config = yaml.safe_load(f)
 except FileNotFoundError:
     print(f"File {CONFIG_PATH} not found. Exiting.")
@@ -50,12 +51,10 @@ log_filename = LOGS_DIR / f"generation_{datetime.now().strftime('%Y%m%d_%H%M%S')
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.FileHandler(log_filename, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.FileHandler(log_filename, encoding="utf-8"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
+
 
 def chunk_text(text: str, max_chars: int, overlap: int) -> list:
     chunks = []
@@ -65,7 +64,7 @@ def chunk_text(text: str, max_chars: int, overlap: int) -> list:
     while start < text_len:
         end = min(start + max_chars, text_len)
         if end < text_len:
-            split_pos = max(text.rfind('\n', start, end), text.rfind('.', start, end), text.rfind(' ', start, end))
+            split_pos = max(text.rfind("\n", start, end), text.rfind(".", start, end), text.rfind(" ", start, end))
             if split_pos == -1 or split_pos <= start:
                 split_pos = end
             else:
@@ -79,10 +78,11 @@ def chunk_text(text: str, max_chars: int, overlap: int) -> list:
 
     return chunks
 
+
 def deduplicate_entities(entities: list) -> list:
     unique_entities = {}
     for ent in entities:
-        name = ent.get('Name') or ent.get('name') or ent.get('NAME')
+        name = ent.get("Name") or ent.get("name") or ent.get("NAME")
         if not name:
             continue
 
@@ -93,15 +93,15 @@ def deduplicate_entities(entities: list) -> list:
         else:
             existing = unique_entities[norm_name]
             for key, value in ent.items():
-                if key.lower() in ['name']:
+                if key.lower() in ["name"]:
                     continue
 
-                if value in [None, "", [], "nan", "NaN"] or str(value).lower() == 'nan':
+                if value in [None, "", [], "nan", "NaN"] or str(value).lower() == "nan":
                     continue
 
                 existing_val = existing.get(key)
 
-                if existing_val in [None, "", [], "nan", "NaN"] or str(existing_val).lower() == 'nan':
+                if existing_val in [None, "", [], "nan", "NaN"] or str(existing_val).lower() == "nan":
                     existing[key] = copy.deepcopy(value)
                 elif isinstance(existing_val, list) and isinstance(value, list):
                     merged = existing_val.copy()
@@ -124,13 +124,14 @@ def deduplicate_entities(entities: list) -> list:
 
     return list(unique_entities.values())
 
+
 def deduplicate_relations(relations: list) -> list:
     unique_relations = set()
     deduplicated = []
     for rel in relations:
-        subj = str(rel.get('Subject', rel.get('subject', ''))).strip().lower()
-        obj = str(rel.get('Object', rel.get('object', ''))).strip().lower()
-        r_type = str(rel.get('Relation', rel.get('relation', ''))).strip().lower()
+        subj = str(rel.get("Subject", rel.get("subject", ""))).strip().lower()
+        obj = str(rel.get("Object", rel.get("object", ""))).strip().lower()
+        r_type = str(rel.get("Relation", rel.get("relation", ""))).strip().lower()
 
         if not subj or not obj:
             continue
@@ -142,6 +143,7 @@ def deduplicate_relations(relations: list) -> list:
 
     return deduplicated
 
+
 def run_generate_graphs(force: bool = False):
     logger.info(f"Starting graph generation process (force={force})...")
 
@@ -151,27 +153,22 @@ def run_generate_graphs(force: bool = False):
         logger.error(f"Failed to load prompts: {e}")
         return
 
-    llm = LLMProcessor(
-        api_key=API_KEY,
-        model_name=MODEL_NAME,
-        base_url=BASE_URL,
-        use_json_mode=USE_JSON_MODE  
-    )
+    llm = LLMProcessor(api_key=API_KEY, model_name=MODEL_NAME, base_url=BASE_URL, use_json_mode=USE_JSON_MODE)
 
     if not METADATA_PATH.exists():
         logger.error(f"Metadata file not found: {METADATA_PATH}")
         return
 
     try:
-        with open(METADATA_PATH, 'r', encoding='utf-8') as f:
+        with open(METADATA_PATH, encoding="utf-8") as f:
             corpus = json.load(f)
     except Exception as e:
         logger.error(f"Failed to read metadata: {e}")
         return
 
     for book in corpus:
-        book_id = book.get('id', 'unknown_book')
-        txt_path = Path(book.get('path', ''))
+        book_id = book.get("id", "unknown_book")
+        txt_path = Path(book.get("path", ""))
 
         book_out_dir = OUTPUT_BASE_DIR / book_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
@@ -190,7 +187,7 @@ def run_generate_graphs(force: bool = False):
             continue
 
         try:
-            with open(txt_path, 'r', encoding='utf-8') as f:
+            with open(txt_path, encoding="utf-8") as f:
                 text = f.read()
         except Exception as e:
             logger.error(f"Error reading file {txt_path}: {e}")
@@ -204,10 +201,10 @@ def run_generate_graphs(force: bool = False):
         all_characters, all_relations = [], []
         all_locations, all_times = [], []
 
-        chars_prompt = prompts.get('characters', 'Extract characters...')
-        rels_prompt = prompts.get('relations', 'Extract relations...')
-        locs_prompt = prompts.get('locations', 'Extract locations...')
-        time_prompt = prompts.get('time', 'Extract time...')
+        chars_prompt = prompts.get("characters", "Extract characters...")
+        rels_prompt = prompts.get("relations", "Extract relations...")
+        locs_prompt = prompts.get("locations", "Extract locations...")
+        time_prompt = prompts.get("time", "Extract time...")
 
         for i, chunk in enumerate(chunks):
             logger.info(f"  [Chunk {i + 1}/{len(chunks)}] Extracting characters and relations...")
@@ -237,17 +234,16 @@ def run_generate_graphs(force: bool = False):
         )
 
         try:
-
-            with open(book_out_dir / "personas.json", 'w', encoding='utf-8') as f:
+            with open(book_out_dir / "personas.json", "w", encoding="utf-8") as f:
                 json.dump(all_characters, f, ensure_ascii=False, indent=2)
 
-            with open(book_out_dir / "relations.json", 'w', encoding='utf-8') as f:
+            with open(book_out_dir / "relations.json", "w", encoding="utf-8") as f:
                 json.dump(all_relations, f, ensure_ascii=False, indent=2)
 
-            with open(book_out_dir / "locations.json", 'w', encoding='utf-8') as f:
+            with open(book_out_dir / "locations.json", "w", encoding="utf-8") as f:
                 json.dump(all_locations, f, ensure_ascii=False, indent=2)
 
-            with open(book_out_dir / "times.json", 'w', encoding='utf-8') as f:
+            with open(book_out_dir / "times.json", "w", encoding="utf-8") as f:
                 json.dump(all_times, f, ensure_ascii=False, indent=2)
 
             generate_and_save_graph(all_characters, all_relations, book_out_dir)

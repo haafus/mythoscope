@@ -1,9 +1,8 @@
 import hashlib
-import os
 import re
 import stat
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
 
 import chromadb
 
@@ -87,11 +86,11 @@ def ensure_chroma_writable(chroma_path: Any) -> Path:
 
 
 def save_to_chroma_collection(
-        collection: chromadb.Collection,
-        ids: List[str],
-        embeddings: List[List[float]],
-        metadatas: List[Dict[str, Any]],
-        documents: List[str],
+    collection: chromadb.Collection,
+    ids: list[str],
+    embeddings: list[list[float]],
+    metadatas: list[dict[str, Any]],
+    documents: list[str],
 ):
     collection.upsert(
         ids=ids,
@@ -100,13 +99,10 @@ def save_to_chroma_collection(
         documents=documents,
     )
 
+
 def _is_missing_collection_error(error: Exception) -> bool:
     message = str(error).lower()
-    return (
-        "does not exist" in message
-        or "doesn't exist" in message
-        or "not found" in message
-    )
+    return "does not exist" in message or "doesn't exist" in message or "not found" in message
 
 
 def _is_readonly_database_error(error: Exception) -> bool:
@@ -128,11 +124,12 @@ def delete_collection(client: chromadb.PersistentClient, collection_name: str) -
             ) from error
         raise
 
+
 def query_chroma_collection(
-        collection: chromadb.Collection,
-        query_embedding: List[float],
-        top_k: int = 5,
-) -> List[Dict[str, Any]]:
+    collection: chromadb.Collection,
+    query_embedding: list[float],
+    top_k: int = 5,
+) -> list[dict[str, Any]]:
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=top_k,
@@ -143,13 +140,16 @@ def query_chroma_collection(
         return []
 
     formatted = []
-    for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
-        formatted.append({
-            "document": doc,
-            "metadata": meta,
-            "distance": dist,
-        })
+    for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0], strict=False):
+        formatted.append(
+            {
+                "document": doc,
+                "metadata": meta,
+                "distance": dist,
+            }
+        )
     return formatted
+
 
 def get_chroma_collection(client: chromadb.PersistentClient, collection_name: str) -> chromadb.Collection:
     return client.get_or_create_collection(name=collection_name)

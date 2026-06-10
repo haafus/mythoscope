@@ -16,4 +16,3 @@ def model_stats(model_key: str):
     if not info:
         raise HTTPException(status_code=404, detail="Model info not found")
     return info
-

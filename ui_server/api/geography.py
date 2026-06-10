@@ -9,4 +9,3 @@ router = APIRouter(prefix="/api/geography", tags=["geography"])
 def traditions():
     data = get_traditions_info()
     return {"traditions": data, "total": len(data)}
-

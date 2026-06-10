@@ -1,21 +1,23 @@
-import os
 import json
-import numpy as np
-from typing import Dict, List, Optional, Any
-from .loader import EmbeddingDataLoader
-from .config import get_analyzer_config, get_model_output_dir
 import logging
+import os
+from typing import Any
+
+import numpy as np
+
+from .config import get_analyzer_config, get_model_output_dir
+from .loader import EmbeddingDataLoader
 
 logger = logging.getLogger(__name__)
 
 
 class EmbeddingAnalyzer:
-    def __init__(self, model_name: Optional[str] = None):
+    def __init__(self, model_name: str | None = None):
         self.config = get_analyzer_config()
         self.loader = EmbeddingDataLoader()
-        self.model_name: Optional[str] = None
+        self.model_name: str | None = None
         self.available_models = self.loader.get_available_models()
-        self.data: List[Dict[str, Any]] = []
+        self.data: list[dict[str, Any]] = []
         self._is_loaded = False
 
         if not self.available_models:
@@ -28,14 +30,11 @@ class EmbeddingAnalyzer:
             self.set_model(self.available_models[0])
         else:
             logger.info(f"Available models: {self.available_models}")
-            logger.info(f"Use .set_model('model_name') to load data")
+            logger.info("Use .set_model('model_name') to load data")
 
     def set_model(self, model_name: str) -> None:
         if model_name not in self.available_models:
-            raise ValueError(
-                f"Model '{model_name}' not found. "
-                f"Available models: {self.available_models}"
-            )
+            raise ValueError(f"Model '{model_name}' not found. Available models: {self.available_models}")
 
         self.model_name = model_name
         self.output_dir = get_model_output_dir(model_name)
@@ -50,12 +49,12 @@ class EmbeddingAnalyzer:
         else:
             logger.info(f"Chunks loaded: {len(self.data)}")
 
-    def filter_by_model(self) -> List[Dict[str, Any]]:
+    def filter_by_model(self) -> list[dict[str, Any]]:
         if not self._is_loaded or not self.data:
             raise RuntimeError("Data is not loaded. Call .set_model() first.")
         return self.data
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         if not self._is_loaded or not self.data:
             raise RuntimeError("Data is not loaded. Call .set_model() first.")
 
@@ -66,10 +65,7 @@ class EmbeddingAnalyzer:
             "n_samples": len(self.data),
             "embedding_dim": embeddings.shape[1],
             "traditions": len(traditions),
-            "tradition_counts": {
-                t: sum(1 for item in self.data if item["tradition"] == t)
-                for t in traditions
-            },
+            "tradition_counts": {t: sum(1 for item in self.data if item["tradition"] == t) for t in traditions},
             "model": self.model_name,
             "total_chunks_in_db": len(self.data),
         }
@@ -79,18 +75,18 @@ class EmbeddingAnalyzer:
             print("No data loaded!")
             if self.available_models:
                 print(f"Available models: {self.available_models}")
-                print(f"Use .set_model('model_name') to load data.")
+                print("Use .set_model('model_name') to load data.")
             print()
             return
 
         stats = self.get_statistics()
-        print(f"Embedding statistics:")
+        print("Embedding statistics:")
         print(f"   • Model: {self.model_name}")
         print(f"   • Chunks: {stats['n_samples']}")
         print(f"   • Dimension: {stats['embedding_dim']}")
         print(f"   • Traditions: {stats['traditions']}")
-        print(f"   • Tradition Distribution:")
-        for trad, count in sorted(stats['tradition_counts'].items(), key=lambda x: -x[1]):
+        print("   • Tradition Distribution:")
+        for trad, count in sorted(stats["tradition_counts"].items(), key=lambda x: -x[1]):
             print(f"     {trad:<20}: {count:>4}")
 
     def save_summary(self) -> None:
@@ -112,12 +108,12 @@ class EmbeddingAnalyzer:
         }
 
         info_path = os.path.join(self.output_dir, "model_info.json")
-        with open(info_path, 'w', encoding='utf-8') as f:
+        with open(info_path, "w", encoding="utf-8") as f:
             json.dump(model_info, f, ensure_ascii=False, indent=2)
 
         logger.info(f"Model information saved: {info_path}")
 
-    def save_models_list(self, output_dir: Optional[str] = None) -> str:
+    def save_models_list(self, output_dir: str | None = None) -> str:
         if output_dir is None:
             output_dir = self.config.output_dir
 
@@ -127,21 +123,21 @@ class EmbeddingAnalyzer:
         existing_models = self._load_existing_models(list_path)
         all_models = sorted(set(existing_models + self.available_models))
 
-        with open(list_path, 'w', encoding='utf-8') as f:
+        with open(list_path, "w", encoding="utf-8") as f:
             json.dump(all_models, f, ensure_ascii=False, indent=2)
 
         logger.info(f"Model list saved: {list_path}")
         return list_path
 
     @staticmethod
-    def _load_existing_models(list_path: str) -> List[str]:
+    def _load_existing_models(list_path: str) -> list[str]:
         if not os.path.exists(list_path):
             return []
 
         try:
-            with open(list_path, 'r', encoding='utf-8') as f:
+            with open(list_path, encoding="utf-8") as f:
                 data = json.load(f)
                 return data if isinstance(data, list) else []
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.warning(f"Failed to load {list_path}: {e}")
             return []
