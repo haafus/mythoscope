@@ -4,17 +4,19 @@ from pathlib import Path
 from typing import Any, Dict, Optional, List
 from copy import deepcopy
 
+from settings import settings as _settings
+
 
 class ConfigManager:
     PACKAGE_CONFIG = Path(__file__).with_name("config.yaml")
 
     DEFAULTS = {
         "paths": {
-            "corpus_dir": "corpus",
-            "out_dir": "analysis",
-            "chroma_path": "./chroma_db",
-            "cache_dir": "./cache",
-            "chunked_dir": "corpus_chunked"
+            "corpus_dir": str(_settings.corpus_dir),
+            "out_dir": str(_settings.analysis_dir),
+            "chroma_path": str(_settings.chroma_dir),
+            "cache_dir": str(_settings.cache_dir),
+            "chunked_dir": str(_settings.corpus_chunked_dir),
         },
         "embedding": {
             "default_model": "BAAI/bge-m3",

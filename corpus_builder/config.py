@@ -1,7 +1,7 @@
-from pathlib import Path
+from settings import settings
 
-DOWNLOAD_LIST_FILE = "download_list.json"
-CORPUS_DIR = Path("corpus")
-METADATA_FILE = CORPUS_DIR / "corpus_metadata.json"
-CATALOG_FILE = CORPUS_DIR / "corpus_catalog.csv"
-PROCESSED_URLS_FILE = CORPUS_DIR / "processed_urls.json"
+DOWNLOAD_LIST_FILE = str(settings.download_list_file)
+CORPUS_DIR = settings.corpus_dir
+METADATA_FILE = settings.corpus_metadata_path
+CATALOG_FILE = settings.corpus_catalog_path
+PROCESSED_URLS_FILE = settings.processed_urls_path

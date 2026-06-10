@@ -14,6 +14,7 @@ dependencies = [
     "numpy>=1.24.0",
     "scikit-learn>=1.3.0",
     "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
     "PyYAML>=6.0",
     "tqdm>=4.65.0",
 ]
@@ -64,6 +65,9 @@ mytho-embeddings = "embeddings_builder.cli:cli"
 mytho-corpus = "corpus_builder.build_corpus:build_and_save_corpus"
 mytho-cluster = "embeddings_clustering.run_clustering:build_clusters"
 mytho-clean-gutenberg = "clean_gutenberg:clean_gutenberg_texts"
+
+[tool.setuptools]
+py-modules = ["settings", "main", "clean_gutenberg"]
 
 [tool.setuptools.packages.find]
 include = [

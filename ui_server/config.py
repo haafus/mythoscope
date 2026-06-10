@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from settings import settings
+
 
 @dataclass(frozen=True)
 class ProjectPaths:
@@ -16,20 +18,18 @@ class ProjectPaths:
 
 def get_paths() -> ProjectPaths:
     ui_root = Path(__file__).resolve().parent
-    project_root = ui_root.parent
     web_root = ui_root / "web"
 
     return ProjectPaths(
-        project_root=project_root,
+        project_root=settings.project_root,
         ui_root=ui_root,
         web_root=web_root,
         assets_dir=web_root / "assets",
-        analysis_dir=project_root / "analysis",
-        template_dir=project_root / "template",
-        corpus_dir=project_root / "corpus",
-        corpus_chunked_dir=project_root / "corpus_chunked",
+        analysis_dir=settings.analysis_dir,
+        template_dir=settings.project_root / "template",
+        corpus_dir=settings.corpus_dir,
+        corpus_chunked_dir=settings.corpus_chunked_dir,
     )
 
 
 paths = get_paths()
-
