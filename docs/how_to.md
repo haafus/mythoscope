@@ -1,6 +1,17 @@
-﻿# How To: MythoSemantic
+# How To: MythoSemantic
 
 Краткая карта проекта: что делает каждый модуль, какие файлы он читает и пишет, и как его запускать. Все команды ниже предполагают запуск из корня проекта.
+
+## Структура проекта
+
+```
+config/          — статические конфиги, шаблоны, download_list.json
+outputs/         — всё, что генерируется при запуске (corpus, analysis, logs, …)
+src/             — исходный код (все Python-пакеты, settings.py, main.py)
+docs/            — документация
+tests/           — тесты
+pyproject.toml   — конфигурация проекта, зависимости, ruff, mypy
+```
 
 ## Подготовка окружения
 
@@ -8,10 +19,10 @@
 py -3 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+pip install -e ".[all,dev]"
 ```
 
-Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `cache/`, `chroma_db/`, `analysis/`, `corpus_chunked/`, `graphs/` и `logs/`.
+Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/cache/`, `outputs/chroma_db/`, `outputs/analysis/`, `outputs/corpus_chunked/`, `outputs/graphs/` и `outputs/logs/`.
 
 ## main.py
 
@@ -26,7 +37,7 @@ py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 Прямой запуск текущего поведения:
 
 ```powershell
-py -3 main.py
+py -3 src/main.py
 ```
 
 ## ui_server
@@ -35,8 +46,8 @@ py -3 main.py
 
 Возможности:
 - API для списка моделей, корпуса, географии, похожих фрагментов и кластеризации.
-- Раздача веб-интерфейса из `ui_server/web`.
-- Раздача готовых HTML-артефактов из `analysis/`, `template/`, `corpus/`, `corpus_chunked/`.
+- Раздача веб-интерфейса из `src/ui_server/web`.
+- Раздача готовых HTML-артефактов из `outputs/analysis/`, `config/template/`, `outputs/corpus/`, `outputs/corpus_chunked/`.
 
 Запуск:
 
@@ -52,36 +63,20 @@ Invoke-WebRequest http://127.0.0.1:8000/api/health
 
 Открыть интерфейс: `http://127.0.0.1:8000/`.
 
-## UI.py
-
-Старый HTTP-сервер на `SimpleHTTPRequestHandler`. Он поддерживает старые HTML-шаблоны из `template/` и старые API-ручки.
-
-Возможности:
-- Открывает домашнюю страницу из `template/home.html`.
-- Отдает старые страницы и часть API для поиска, соседей и корпуса.
-
-Запуск:
-
-```powershell
-py -3 -c "from UI import start_home_page; start_home_page()"
-```
-
-Примечание: для обычной работы лучше использовать `ui_server`, потому что старый сервер шире раздает файлы проекта.
-
 ## corpus_builder
 
-Модуль сборки корпуса из `download_list.json`.
+Модуль сборки корпуса из `config/download_list.json`.
 
 Основные файлы:
-- `corpus_builder/downloader.py` скачивает источники.
-- `corpus_builder/utils.py` извлекает текст из HTML/PDF/TXT и нормализует его.
-- `corpus_builder/builder.py` строит структуру `corpus/`, метаданные и каталог.
-- `corpus_builder/build_corpus.py` содержит CLI-обертку `build_and_save_corpus()`.
+- `src/corpus_builder/downloader.py` скачивает источники.
+- `src/corpus_builder/utils.py` извлекает текст из HTML/PDF/TXT и нормализует его.
+- `src/corpus_builder/builder.py` строит структуру `outputs/corpus/`, метаданные и каталог.
+- `src/corpus_builder/build_corpus.py` содержит CLI-обертку `build_and_save_corpus()`.
 
 Возможности:
 - Скачать и обработать источники.
-- Сохранить тексты в `corpus/<major>/<tradition>/<title>/<title>.txt`.
-- Создать `corpus/corpus_metadata.json`, `corpus/corpus_catalog.csv`, `corpus/traditions_info.json`.
+- Сохранить тексты в `outputs/corpus/<major>/<tradition>/<title>/<title>.txt`.
+- Создать `outputs/corpus/corpus_metadata.json`, `outputs/corpus/corpus_catalog.csv`, `outputs/corpus/traditions_info.json`.
 
 Запуск сборки всего корпуса:
 
@@ -114,31 +109,31 @@ py -3 -c "from corpus_builder.build_corpus import build_and_save_corpus; build_a
 Возможности:
 - Найти Gutenberg-тексты в корпусе.
 - Очистить один файл или директорию.
-- Сохранить оригиналы в `sources_backup/`.
-- Вести `sources_backup/changelog.txt`.
+- Сохранить оригиналы в `outputs/sources_backup/`.
+- Вести `outputs/sources_backup/changelog.txt`.
 
 Предпросмотр файлов:
 
 ```powershell
-py -3 clean_gutenberg.py --preview --dir corpus
+py -3 src/clean_gutenberg.py --preview --dir outputs/corpus
 ```
 
 Очистить весь корпус:
 
 ```powershell
-py -3 clean_gutenberg.py --dir corpus
+py -3 src/clean_gutenberg.py --dir outputs/corpus
 ```
 
 Очистить один файл:
 
 ```powershell
-py -3 clean_gutenberg.py --file "corpus\...\book.txt"
+py -3 src/clean_gutenberg.py --file "outputs\corpus\...\book.txt"
 ```
 
 Показать статистику бэкапов:
 
 ```powershell
-py -3 clean_gutenberg.py --backup-stats
+py -3 src/clean_gutenberg.py --backup-stats
 ```
 
 ## embeddings_builder
@@ -146,17 +141,17 @@ py -3 clean_gutenberg.py --backup-stats
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
-- `embeddings_builder/config.yaml` задает пути, модели, chunking и batch size.
-- `embeddings_builder/cli.py` предоставляет CLI.
-- `embeddings_builder/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
-- `embeddings_builder/chunking.py` содержит стратегии chunking.
-- `embeddings_builder/cache_utils.py` и `cache_validator.py` работают с кешем.
+- `config/embeddings_builder.yaml` задает пути, модели, chunking и batch size.
+- `src/embeddings_builder/cli.py` предоставляет CLI.
+- `src/embeddings_builder/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
+- `src/embeddings_builder/chunking.py` содержит стратегии chunking.
+- `src/embeddings_builder/cache_utils.py` и `cache_validator.py` работают с кешем.
 
 Возможности:
 - Построить эмбеддинги для нескольких моделей.
-- Сохранить чанки в `corpus_chunked/`.
-- Сохранить индекс в `chroma_db/`.
-- Кешировать эмбеддинги в `cache/`.
+- Сохранить чанки в `outputs/corpus_chunked/`.
+- Сохранить индекс в `outputs/chroma_db/`.
+- Кешировать эмбеддинги в `outputs/cache/`.
 - Делать запросы к Chroma.
 
 Посмотреть конфиг:
@@ -205,13 +200,13 @@ py -3 -m embeddings_builder.cli clear-cache --model "BAAI/bge-m3"
 
 ## embedding_analyzer
 
-Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `analysis/`.
+Модуль анализа эмбеддингов из Chroma DB и генерации HTML/CSV/JSON-артефактов в `outputs/analysis/`.
 
 Основные файлы:
-- `embedding_analyzer/loader.py` читает данные из Chroma.
-- `embedding_analyzer/analyzer.py` собирает статистику.
-- `embedding_analyzer/visualization.py` строит PCA, UMAP, t-SNE, heatmap и dashboard.
-- `embedding_analyzer/config.yaml` задает пути и параметры визуализации.
+- `src/embedding_analyzer/loader.py` читает данные из Chroma.
+- `src/embedding_analyzer/analyzer.py` собирает статистику.
+- `src/embedding_analyzer/visualization.py` строит PCA, UMAP, t-SNE, heatmap и dashboard.
+- `config/embedding_analyzer.yaml` задает пути и параметры визуализации.
 
 Возможности:
 - Получить статистику по модели.
@@ -235,14 +230,14 @@ py -3 -c "from embedding_analyzer import analyze_embeddings; analyze_embeddings(
 Модуль кластеризации эмбеддингов и сравнения алгоритмов.
 
 Основные файлы:
-- `embeddings_clustering/models.py` содержит KMeans, HDBSCAN из sklearn, Spectral, Birch, GMM, MeanShift, OPTICS.
-- `embeddings_clustering/metrics.py` считает метрики кластеризации.
-- `embeddings_clustering/visualization.py` строит HTML-графики и матрицы.
-- `embeddings_clustering/run_clustering.py` содержит запуск анализа.
+- `src/embeddings_clustering/models.py` содержит KMeans, HDBSCAN из sklearn, Spectral, Birch, GMM, MeanShift, OPTICS.
+- `src/embeddings_clustering/metrics.py` считает метрики кластеризации.
+- `src/embeddings_clustering/visualization.py` строит HTML-графики и матрицы.
+- `src/embeddings_clustering/run_clustering.py` содержит запуск анализа.
 
 Возможности:
 - Кластеризовать эмбеддинги одной или всех моделей.
-- Сохранить метрики и labels в `analysis/<model>/clustering/`.
+- Сохранить метрики и labels в `outputs/analysis/<model>/clustering/`.
 - Построить `clusters_*.html`, `confusion_matrix_*.html`, `metrics_dashboard.html`.
 
 Запустить все алгоритмы для всех доступных моделей:
@@ -268,16 +263,16 @@ py -3 -c "from embeddings_clustering.run_clustering import build_clusters; build
 Модуль извлечения персонажей, отношений, мест и времени через LLM и генерации графов.
 
 Основные файлы:
-- `graphs_generator/config.yaml` задает LLM, пути и параметры чанков.
-- `graphs_generator/prompts.txt` содержит промпты.
-- `graphs_generator/llm_processing.py` вызывает OpenAI-compatible API.
-- `graphs_generator/run_graph_generation.py` режет тексты и агрегирует сущности.
-- `graphs_generator/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
+- `config/graphs_generator.yaml` задает LLM, пути и параметры чанков.
+- `config/graphs_generator_prompts.txt` содержит промпты.
+- `src/graphs_generator/llm_processing.py` вызывает OpenAI-compatible API.
+- `src/graphs_generator/run_graph_generation.py` режет тексты и агрегирует сущности.
+- `src/graphs_generator/graph_generator.py` строит HTML-граф через NetworkX и Cytoscape.
 
 Возможности:
-- Пройти по книгам из `corpus/corpus_metadata.json`.
+- Пройти по книгам из `outputs/corpus/corpus_metadata.json`.
 - Извлечь сущности и связи через локальный или внешний LLM.
-- Сохранить графы в `graphs/<book_id>/characters.html`.
+- Сохранить графы в `outputs/graphs/<book_id>/characters.html`.
 
 Запуск по конфигу:
 
@@ -291,9 +286,9 @@ py -3 -c "from graphs_generator import run_generate_graphs; run_generate_graphs(
 py -3 -c "from graphs_generator import run_generate_graphs; run_generate_graphs(force=True)"
 ```
 
-Перед запуском проверьте `graphs_generator/config.yaml`: по умолчанию выбран локальный OpenAI-compatible сервер `http://127.0.0.1:1234/v1/`.
+Перед запуском проверьте `config/graphs_generator.yaml`: по умолчанию выбран локальный OpenAI-compatible сервер `http://127.0.0.1:1234/v1/`.
 
-## template
+## config/template
 
 HTML-шаблоны для старого UI.
 
@@ -301,12 +296,6 @@ HTML-шаблоны для старого UI.
 - Страницы `home.html`, `corpus.html`, `geography.html`, `embeddings_analysis.html`, `cluster_analysis.html`.
 - Общая навигация `navbar.html`.
 - Логотип `Logo.jpg`.
-
-Запускается через старый сервер:
-
-```powershell
-py -3 -c "from UI import start_home_page; start_home_page()"
-```
 
 ## ui_server/web
 
@@ -325,72 +314,18 @@ py -3 -c "from UI import start_home_page; start_home_page()"
 py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-## corpus
+## Директории outputs/
 
-Основной текстовый корпус.
+Все генерируемые данные хранятся в `outputs/`:
 
-Содержит:
-- исходные обработанные тексты;
-- `corpus_metadata.json`;
-- `corpus_catalog.csv`;
-- `traditions_info.json`;
-- `processed_urls.json`.
-
-Создается и обновляется через `corpus_builder`.
-
-## corpus_chunked
-
-Корпус после разбиения на чанки.
-
-Создается через `embeddings_builder`. Используется UI и анализом для просмотра фрагментов.
-
-## chroma_db
-
-Локальная Chroma DB с векторными коллекциями.
-
-Создается через `embeddings_builder`. Читается `embedding_analyzer`, `embeddings_clustering`, `ui_server` и старым `UI.py`.
-
-## analysis
-
-Готовые результаты анализа.
-
-Содержит:
-- `models.json`;
-- папки моделей;
-- `model_info.json`;
-- `embeddings_data.csv`;
-- HTML-графики PCA/UMAP/t-SNE;
-- результаты кластеризации.
-
-Создается через `embedding_analyzer` и `embeddings_clustering`. Раздается веб-сервером по `/analysis/...`.
-
-## graphs
-
-Готовые HTML-графы персонажей и связей.
-
-Создается через `graphs_generator`.
-
-## cache
-
-Кеш эмбеддингов в `.npy` и `.json`.
-
-Создается через `embeddings_builder`. Проверка:
-
-```powershell
-py -3 -m embeddings_builder.cli validate-cache
-```
-
-## logs
-
-Логи сборки корпуса, эмбеддингов, анализа, кластеризации и генерации графов.
-
-Создается автоматически почти всеми пайплайнами.
-
-## sources_backup
-
-Бэкапы исходных текстов перед очисткой Gutenberg.
-
-Создается `clean_gutenberg.py`.
+- `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `corpus_builder`.
+- `outputs/corpus_chunked/` — корпус после разбиения на чанки. Создается через `embeddings_builder`.
+- `outputs/chroma_db/` — локальная Chroma DB с векторными коллекциями. Создается через `embeddings_builder`.
+- `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `embedding_analyzer` и `embeddings_clustering`.
+- `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `graphs_generator`.
+- `outputs/cache/` — кеш эмбеддингов в `.npy` и `.json`. Создается через `embeddings_builder`.
+- `outputs/logs/` — логи всех пайплайнов.
+- `outputs/sources_backup/` — бэкапы исходных текстов перед очисткой Gutenberg.
 
 ## Типовой пайплайн
 
@@ -399,8 +334,8 @@ py -3 -m embeddings_builder.cli validate-cache
 py -3 -c "from corpus_builder.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type all
 
 # 2. Очистить Gutenberg-тексты, если нужно
-py -3 clean_gutenberg.py --preview --dir corpus
-py -3 clean_gutenberg.py --dir corpus
+py -3 src/clean_gutenberg.py --preview --dir outputs/corpus
+py -3 src/clean_gutenberg.py --dir outputs/corpus
 
 # 3. Построить эмбеддинги и Chroma DB
 py -3 -m embeddings_builder.cli generate
