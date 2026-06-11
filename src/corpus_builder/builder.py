@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from . import catalog, logger
-from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE, PROCESSED_URLS_FILE
+from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE, PROCESSED_URLS_FILE, config
 from .downloader import download_file, load_download_list
 from .utils import (
     _decode_bytes,
@@ -251,7 +251,7 @@ def build_corpus(filter_type: set[str], force: bool = False):
 
     logger.info(f"Starting multithreaded build (items: {len(download_list)})")
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=config.max_workers) as executor:
         for item in download_list:
             executor.submit(process_single_item, item, force, metadata, processed_urls)
 

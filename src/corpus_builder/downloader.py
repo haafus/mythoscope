@@ -7,16 +7,16 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from . import catalog, logger
-from .config import CORPUS_DIR, DOWNLOAD_LIST_FILE, PROCESSED_URLS_FILE
+from .config import CORPUS_DIR, DOWNLOAD_LIST_FILE, PROCESSED_URLS_FILE, config
 from .utils import get_tradition_color, sanitize_filename
 
 
 def create_retry_session() -> requests.Session:
     session = requests.Session()
     retry = Retry(
-        total=4,
-        backoff_factor=1.5,
-        status_forcelist=(429, 500, 502, 503, 504),
+        total=config.retry_total,
+        backoff_factor=config.retry_backoff_factor,
+        status_forcelist=config.retry_status_forcelist,
     )
     adapter = HTTPAdapter(max_retries=retry)
     session.mount("http://", adapter)
@@ -122,7 +122,7 @@ def download_file(url: str) -> bytes:
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "none",
     }
-    response = http_session.get(url, headers=headers, timeout=(10, 30))
+    response = http_session.get(url, headers=headers, timeout=(config.timeout_connect, config.timeout_read))
     response.raise_for_status()
     content: bytes = response.content
     return content
