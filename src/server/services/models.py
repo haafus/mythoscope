@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from settings import Settings
 from server.config import paths
+from settings import Settings
 
 
 def model_to_key(model_name: str) -> str:

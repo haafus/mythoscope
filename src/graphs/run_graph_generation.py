@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from .config import GraphsConfig, load_config
+from .config import load_config
 from .graph_generator import generate_and_save_graph
 from .llm_processing import LLMProcessor
 from .prompts_loader import load_prompts

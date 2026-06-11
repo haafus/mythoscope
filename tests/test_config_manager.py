@@ -1,7 +1,3 @@
-import json
-
-import yaml
-
 from embedding.config_manager import ConfigManager
 
 
@@ -61,6 +57,5 @@ class TestConfigManager:
 
     def test_merge_config(self):
         mgr = ConfigManager(config_path=None)
-        original = mgr.get("embedding.batch_size")
         mgr._merge_config(mgr._config, {"embedding": {"batch_size": 999}})
         assert mgr.get("embedding.batch_size") == 999

@@ -119,7 +119,6 @@ class TestCountSentences:
 
 class TestEnsureDir:
     def test_creates_directory(self, tmp_path):
-        from pathlib import Path
         new_dir = tmp_path / "new" / "nested" / "dir"
         assert not new_dir.exists()
         ensure_dir(new_dir)
