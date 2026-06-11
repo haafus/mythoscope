@@ -16,6 +16,16 @@ class ProjectPaths:
     corpus_chunked_dir: Path
 
 
+@dataclass(frozen=True)
+class ServerConfig:
+    host: str = "127.0.0.1"
+    port: int = 8000
+    gzip_minimum_size: int = 1024
+    cache_max_age: int = 86400
+    search_job_ttl_seconds: int = 1800
+    search_max_workers: int = 1
+
+
 def get_paths() -> ProjectPaths:
     ui_root = Path(__file__).resolve().parent
     web_root = ui_root / "web"
@@ -33,3 +43,4 @@ def get_paths() -> ProjectPaths:
 
 
 paths = get_paths()
+server_config = ServerConfig()
