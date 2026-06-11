@@ -1,19 +1,7 @@
-import importlib.util
-import os
-
 import numpy as np
 import pytest
 
-# Load module directly from file to avoid __init__.py pulling in chromadb
-_spec = importlib.util.spec_from_file_location(
-    "embedding_analyzer_utils",
-    os.path.join(os.path.dirname(__file__), "..", "embedding_analyzer", "utils.py"),
-)
-assert _spec is not None and _spec.loader is not None
-_mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_mod)
-reduce_dimensions = _mod.reduce_dimensions
-_check_umap = _mod._check_umap
+from embedding_analyzer.utils import _check_umap, reduce_dimensions
 
 
 @pytest.fixture

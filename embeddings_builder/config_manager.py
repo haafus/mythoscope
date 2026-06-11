@@ -5,51 +5,53 @@ from typing import Any
 
 import yaml
 
-from settings import settings as _settings
-
 
 class ConfigManager:
     PACKAGE_CONFIG = Path(__file__).with_name("config.yaml")
 
-    DEFAULTS = {
-        "paths": {
-            "corpus_dir": str(_settings.corpus_dir),
-            "out_dir": str(_settings.analysis_dir),
-            "chroma_path": str(_settings.chroma_dir),
-            "cache_dir": str(_settings.cache_dir),
-            "chunked_dir": str(_settings.corpus_chunked_dir),
-        },
-        "embedding": {
-            "default_model": _settings.default_embedding_model,
-            "default_chunking": _settings.default_chunking,
-            "text_type": "all",
-            "batch_size": 32,
-            "cache_batch_size": 50,
-            "chroma_batch_size": 100,
-        },
-        "chunking": {
-            "fixed_size": {"chunk_size": 512, "chunk_overlap": 64},
-            "sentence_based": {"chunk_size": 512, "chunk_overlap": 64},
-            "paragraph_based": {"chunk_size": 512, "chunk_overlap": 64},
-        },
-        "logging": {
-            "level": "INFO",
-            "file": "logs/embedding.log",
-            "max_bytes": 10485760,
-            "backup_count": 5,
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        },
-        "performance": {
-            "enable_metrics": True,
-            "track_memory": True,
-            "metrics_file": "analysis/performance_metrics.json",
-        },
-        "cache": {"validation": "crc32", "max_size_mb": 1024, "ttl_days": 30},
-    }
+    @staticmethod
+    def _build_defaults() -> dict:
+        from settings import settings as _settings
+
+        return {
+            "paths": {
+                "corpus_dir": str(_settings.corpus_dir),
+                "out_dir": str(_settings.analysis_dir),
+                "chroma_path": str(_settings.chroma_dir),
+                "cache_dir": str(_settings.cache_dir),
+                "chunked_dir": str(_settings.corpus_chunked_dir),
+            },
+            "embedding": {
+                "default_model": _settings.default_embedding_model,
+                "default_chunking": _settings.default_chunking,
+                "text_type": "all",
+                "batch_size": 32,
+                "cache_batch_size": 50,
+                "chroma_batch_size": 100,
+            },
+            "chunking": {
+                "fixed_size": {"chunk_size": 512, "chunk_overlap": 64},
+                "sentence_based": {"chunk_size": 512, "chunk_overlap": 64},
+                "paragraph_based": {"chunk_size": 512, "chunk_overlap": 64},
+            },
+            "logging": {
+                "level": "INFO",
+                "file": "logs/embedding.log",
+                "max_bytes": 10485760,
+                "backup_count": 5,
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            },
+            "performance": {
+                "enable_metrics": True,
+                "track_memory": True,
+                "metrics_file": "analysis/performance_metrics.json",
+            },
+            "cache": {"validation": "crc32", "max_size_mb": 1024, "ttl_days": 30},
+        }
 
     def __init__(self, config_path: str | None = None):
         self.config_path = self._resolve_config_path(config_path)
-        self._config = deepcopy(self.DEFAULTS)
+        self._config = self._build_defaults()
 
         if self.config_path and self.config_path.exists():
             self.load()

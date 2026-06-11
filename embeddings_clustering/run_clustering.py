@@ -147,10 +147,11 @@ def run_clustering_analysis(
     clustering_params: dict = None,
     generate_visualizations: bool = True,
     output_base_dir: str = "analysis",
+    _analyzer: "EmbeddingAnalyzer | None" = None,
 ):
     logger.info("STARTING CLUSTERING ANALYSIS")
 
-    analyzer = EmbeddingAnalyzer(model_name=model_name)
+    analyzer = _analyzer or EmbeddingAnalyzer(model_name=model_name)
 
     if not analyzer.available_models:
         logger.error("Error: no available embedding models!")
@@ -158,6 +159,8 @@ def run_clustering_analysis(
 
     if model_name is None:
         model_name = analyzer.available_models[0]
+        analyzer.set_model(model_name)
+    elif _analyzer is not None and analyzer.model_name != model_name:
         analyzer.set_model(model_name)
 
     safe_model_name = Settings.safe_model_name(model_name)
@@ -198,17 +201,24 @@ def run_clustering_analysis(
     return results
 
 
-def run_all_clustering_models(model_name: str = None, models_to_run: list = None, output_base_dir: str = "analysis"):
+def run_all_clustering_models(
+    model_name: str = None,
+    models_to_run: list = None,
+    output_base_dir: str = "analysis",
+    _analyzer: "EmbeddingAnalyzer | None" = None,
+):
     if models_to_run is None:
         models_to_run = list_available_models()
 
-    analyzer = EmbeddingAnalyzer(model_name=model_name)
+    analyzer = _analyzer or EmbeddingAnalyzer(model_name=model_name)
     if not analyzer.available_models:
         logger.error("Error: no available embedding models!")
         return None
 
     if model_name is None and analyzer.available_models:
         model_name = analyzer.available_models[0]
+        analyzer.set_model(model_name)
+    elif _analyzer is not None and analyzer.model_name != model_name:
         analyzer.set_model(model_name)
 
     safe_model_name = Settings.safe_model_name(model_name)
@@ -291,8 +301,12 @@ def build_clusters():
                 clustering_model=args.clustering,
                 generate_visualizations=not args.no_viz,
                 output_base_dir=args.output_dir,
+                _analyzer=analyzer,
             )
         else:
             run_all_clustering_models(
-                model_name=current_model, models_to_run=args.models_list, output_base_dir=args.output_dir
+                model_name=current_model,
+                models_to_run=args.models_list,
+                output_base_dir=args.output_dir,
+                _analyzer=analyzer,
             )
