@@ -75,6 +75,8 @@ class EmbeddingBuilder:
         batch_size: int | None = None,
         cache_batch_size: int = 50,
         chroma_batch_size: int = 100,
+        max_workers: int = 16,
+        queue_maxsize: int = 10,
         metrics: PerformanceMetrics | None = None,
     ):
         self.corpus_dir = Path(corpus_dir)
@@ -85,8 +87,9 @@ class EmbeddingBuilder:
         self.chunked_dir.mkdir(parents=True, exist_ok=True)
         self.cache_batch_size = cache_batch_size
         self.chroma_batch_size = chroma_batch_size
+        self.queue_maxsize = queue_maxsize
 
-        self._executor = ThreadPoolExecutor(max_workers=16)
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
 
         self._override_batch_size = batch_size is not None
 
@@ -592,7 +595,7 @@ class EmbeddingBuilder:
 
         collection = self.chroma_client.get_or_create_collection(name=collection_name)
 
-        write_queue: queue.Queue[tuple | None] = queue.Queue(maxsize=10)
+        write_queue: queue.Queue[tuple | None] = queue.Queue(maxsize=self.queue_maxsize)
         writer_thread = threading.Thread(target=self._chroma_writer_worker, args=(collection, write_queue), daemon=True)
         writer_thread.start()
 

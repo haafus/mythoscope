@@ -28,6 +28,8 @@ class ConfigManager:
                 "batch_size": 32,
                 "cache_batch_size": 50,
                 "chroma_batch_size": 100,
+                "max_workers": 16,
+                "queue_maxsize": 10,
             },
             "chunking": {
                 "fixed_size": {"chunk_size": 512, "chunk_overlap": 64},
