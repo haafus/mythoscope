@@ -12,9 +12,9 @@ except ImportError:
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     logger = logging.getLogger(__name__)
-    CORPUS_DIR = Path("corpus")
+    CORPUS_DIR = Path("outputs/corpus")
 
-BACKUP_DIR = Path("sources_backup")
+BACKUP_DIR = Path("outputs/sources_backup")
 CHANGELOG_FILE = BACKUP_DIR / "changelog.txt"
 
 

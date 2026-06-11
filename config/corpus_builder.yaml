@@ -1,7 +1,7 @@
 
 paths:
-  corpus_dir: "corpus"
-  download_list_file: "download_list.json"
+  corpus_dir: "outputs/corpus"
+  download_list_file: "config/download_list.json"
   metadata_file: "corpus_metadata.json"
   catalog_file: "corpus_catalog.csv"
   processed_urls_file: "processed_urls.json"
@@ -21,7 +21,7 @@ downloader:
 
 
 logging:
-  log_file_path: "logs/corpus.log"
+  log_file_path: "outputs/logs/corpus.log"
   max_bytes: 10485760
   backup_count: 5
 

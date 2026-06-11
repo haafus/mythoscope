@@ -18,10 +18,10 @@ processing:
   chunk_overlap: 1000
 
 paths:
-  metadata: "corpus/corpus_metadata.json"
-  prompts: "graphs_generator/prompts.txt"
-  output_base_dir: "graphs"
-  logs_dir: "logs"
+  metadata: "outputs/corpus/corpus_metadata.json"
+  prompts: "config/graphs_generator_prompts.txt"
+  output_base_dir: "outputs/graphs"
+  logs_dir: "outputs/logs"
 
 execution:
   force_overwrite: false

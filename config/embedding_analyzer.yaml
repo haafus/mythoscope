@@ -1,7 +1,7 @@
 paths:
-  chroma_path: "./chroma_db"
-  out_dir: "analysis"
-  corpus_dir: "corpus"
+  chroma_path: "outputs/chroma_db"
+  out_dir: "outputs/analysis"
+  corpus_dir: "outputs/corpus"
 
 visualization:
   umap_configs:

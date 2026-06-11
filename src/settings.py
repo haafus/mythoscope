@@ -7,16 +7,16 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent)
+    project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent)
 
-    corpus_dir: Path = Path("corpus")
-    corpus_chunked_dir: Path = Path("corpus_chunked")
-    chroma_dir: Path = Path("chroma_db")
-    cache_dir: Path = Path("cache")
-    analysis_dir: Path = Path("analysis")
-    logs_dir: Path = Path("logs")
-    graphs_dir: Path = Path("graphs")
-    download_list_file: Path = Path("download_list.json")
+    corpus_dir: Path = Path("outputs/corpus")
+    corpus_chunked_dir: Path = Path("outputs/corpus_chunked")
+    chroma_dir: Path = Path("outputs/chroma_db")
+    cache_dir: Path = Path("outputs/cache")
+    analysis_dir: Path = Path("outputs/analysis")
+    logs_dir: Path = Path("outputs/logs")
+    graphs_dir: Path = Path("outputs/graphs")
+    download_list_file: Path = Path("config/download_list.json")
 
     default_embedding_model: str = "BAAI/bge-m3"
     default_chunking: str = "paragraph"
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
-    model_config = {"env_file": ".env", "env_prefix": "MYTHO_", "extra": "ignore"}
+    model_config = {"env_file": [".env", "config/.env"], "env_prefix": "MYTHO_", "extra": "ignore"}
 
     @property
     def corpus_metadata_path(self) -> Path:

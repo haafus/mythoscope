@@ -3,11 +3,12 @@ __pycache__/
 *.pyc
 
 # generated artifacts — reproduce via pipeline, store outside git
-chroma_db/
-cache/
-analysis/
-sources_backup/
-logs/
+outputs/chroma_db/
+outputs/cache/
+outputs/analysis/
+outputs/sources_backup/
+outputs/logs/
+outputs/graphs/
 
 # data formats that should not be in git
 *.npy

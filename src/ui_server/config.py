@@ -26,7 +26,7 @@ def get_paths() -> ProjectPaths:
         web_root=web_root,
         assets_dir=web_root / "assets",
         analysis_dir=settings.analysis_dir,
-        template_dir=settings.project_root / "template",
+        template_dir=settings.project_root / "config" / "template",
         corpus_dir=settings.corpus_dir,
         corpus_chunked_dir=settings.corpus_chunked_dir,
     )

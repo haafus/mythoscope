@@ -71,7 +71,11 @@ mytho-clean-gutenberg = "clean_gutenberg:clean_gutenberg_texts"
 [tool.setuptools]
 py-modules = ["settings", "main", "clean_gutenberg"]
 
+[tool.setuptools.package-dir]
+"" = "src"
+
 [tool.setuptools.packages.find]
+where = ["src"]
 include = [
     "corpus_builder*",
     "embedding_analyzer*",
@@ -84,7 +88,7 @@ include = [
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-extend-exclude = ["run_in_colab.ipynb", "*.ipynb"]
+extend-exclude = ["docs/*.ipynb", "*.ipynb"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
@@ -107,7 +111,7 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 check_untyped_defs = true
 ignore_missing_imports = true
-exclude = ["run_in_colab\\.ipynb"]
+exclude = ["docs/"]
 
 [[tool.mypy.overrides]]
 module = ["settings", "clean_gutenberg", "embedding_analyzer.utils", "tests.*"]

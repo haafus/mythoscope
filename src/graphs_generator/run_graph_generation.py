@@ -12,7 +12,7 @@ from .prompts_loader import load_prompts
 
 logger = logging.getLogger(__name__)
 
-CONFIG_PATH = "graphs_generator/config.yaml"
+CONFIG_PATH = "config/graphs_generator.yaml"
 
 
 def _load_config() -> dict:

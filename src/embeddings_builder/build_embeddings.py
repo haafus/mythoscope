@@ -55,7 +55,7 @@ signal.signal(signal.SIGINT, app_context.signal_handler)
 signal.signal(signal.SIGTERM, app_context.signal_handler)
 
 
-def setup_logging(config_path: str = "config.yaml"):
+def setup_logging(config_path: str = "config/embeddings_builder.yaml"):
     config_mgr = ConfigManager(config_path)
     log_config = config_mgr.get("logging")
     _setup_logging(
@@ -70,7 +70,7 @@ def setup_logging(config_path: str = "config.yaml"):
 def build_embeddings(
     clear_existing: bool | None = None,
     batch_size: int | None = None,
-    config_path: str = "config.yaml",
+    config_path: str = "config/embeddings_builder.yaml",
     model_name: str | None = None,
     models: list | None = None,
     chunking: str | None = None,
@@ -87,7 +87,7 @@ def build_embeddings(
     OUT_DIR = config_mgr.get("paths.out_dir")
     CHROMA_PATH = config_mgr.get("paths.chroma_path")
     CACHE_DIR = config_mgr.get("paths.cache_dir")
-    CHUNKED_DIR = config_mgr.get("paths.chunked_dir", "corpus_chunked")
+    CHUNKED_DIR = config_mgr.get("paths.chunked_dir", "outputs/corpus_chunked")
     MODEL_NAME = model_name or config_mgr.get("embedding.default_model")
     TEXT_TYPE = normalize_text_type(text_type or config_mgr.get("embedding.text_type"))
     CHUNKING = chunking or config_mgr.get("embedding.default_chunking")

@@ -7,7 +7,7 @@ import yaml
 
 
 class ConfigManager:
-    PACKAGE_CONFIG = Path(__file__).with_name("config.yaml")
+    PACKAGE_CONFIG = Path(__file__).resolve().parent.parent.parent / "config" / "embeddings_builder.yaml"
 
     @staticmethod
     def _build_defaults() -> dict:
@@ -36,7 +36,7 @@ class ConfigManager:
             },
             "logging": {
                 "level": "INFO",
-                "file": "logs/embedding.log",
+                "file": "outputs/logs/embedding.log",
                 "max_bytes": 10485760,
                 "backup_count": 5,
                 "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -44,7 +44,7 @@ class ConfigManager:
             "performance": {
                 "enable_metrics": True,
                 "track_memory": True,
-                "metrics_file": "analysis/performance_metrics.json",
+                "metrics_file": "outputs/analysis/performance_metrics.json",
             },
             "cache": {"validation": "crc32", "max_size_mb": 1024, "ttl_days": 30},
         }

@@ -12,7 +12,7 @@ from .performance_metrics import PerformanceMetrics
 
 
 @click.group()
-@click.option("--config", "-c", default="config.yaml", help="Path to config file")
+@click.option("--config", "-c", default="config/embeddings_builder.yaml", help="Path to config file")
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output")
 @click.pass_context
 def cli(ctx, config: str, verbose: bool):

@@ -10,18 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class AnalyzerConfig:
-    def __init__(self, config_path: str = "config.yaml"):
+    def __init__(self, config_path: str = "config/embedding_analyzer.yaml"):
         self.config_path = self._resolve_config_path(config_path)
         self._config = self._load_config()
 
     @staticmethod
     def _resolve_config_path(config_path: str) -> Path:
         path = Path(config_path)
-        package_config = Path(__file__).with_name("config.yaml")
         if path.exists():
             return path
-        if path.name == "config.yaml" and package_config.exists():
-            return package_config
+        project_config = settings.project_root / "config" / "embedding_analyzer.yaml"
+        if project_config.exists():
+            return project_config
         return path
 
     def _load_config(self):

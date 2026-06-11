@@ -5,28 +5,28 @@ def test_default_paths():
     from settings import Settings
 
     s = Settings()
-    assert s.corpus_dir == Path("corpus")
-    assert s.chroma_dir == Path("chroma_db")
-    assert s.cache_dir == Path("cache")
-    assert s.analysis_dir == Path("analysis")
-    assert s.logs_dir == Path("logs")
+    assert s.corpus_dir == Path("outputs/corpus")
+    assert s.chroma_dir == Path("outputs/chroma_db")
+    assert s.cache_dir == Path("outputs/cache")
+    assert s.analysis_dir == Path("outputs/analysis")
+    assert s.logs_dir == Path("outputs/logs")
 
 
 def test_derived_paths():
     from settings import Settings
 
     s = Settings()
-    assert s.corpus_metadata_path == Path("corpus/corpus_metadata.json")
-    assert s.corpus_catalog_path == Path("corpus/corpus_catalog.csv")
-    assert s.processed_urls_path == Path("corpus/processed_urls.json")
+    assert s.corpus_metadata_path == Path("outputs/corpus/corpus_metadata.json")
+    assert s.corpus_catalog_path == Path("outputs/corpus/corpus_catalog.csv")
+    assert s.processed_urls_path == Path("outputs/corpus/processed_urls.json")
 
 
 def test_model_output_dir():
     from settings import Settings
 
     s = Settings()
-    assert s.model_output_dir("BAAI/bge-m3") == Path("analysis/BAAI_bge-m3")
-    assert s.model_output_dir("sentence-transformers/LaBSE") == Path("analysis/sentence-transformers_LaBSE")
+    assert s.model_output_dir("BAAI/bge-m3") == Path("outputs/analysis/BAAI_bge-m3")
+    assert s.model_output_dir("sentence-transformers/LaBSE") == Path("outputs/analysis/sentence-transformers_LaBSE")
 
 
 def test_env_override(monkeypatch):

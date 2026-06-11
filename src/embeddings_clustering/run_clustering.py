@@ -9,8 +9,8 @@ import numpy as np
 
 from settings import Settings, setup_logging
 
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root / "src"))
 
 logger = logging.getLogger(__name__)
 
@@ -146,7 +146,7 @@ def run_clustering_analysis(
     clustering_model: str = "kmeans",
     clustering_params: dict = None,
     generate_visualizations: bool = True,
-    output_base_dir: str = "analysis",
+    output_base_dir: str = "outputs/analysis",
     _analyzer: "EmbeddingAnalyzer | None" = None,
 ):
     logger.info("STARTING CLUSTERING ANALYSIS")
@@ -204,7 +204,7 @@ def run_clustering_analysis(
 def run_all_clustering_models(
     model_name: str = None,
     models_to_run: list = None,
-    output_base_dir: str = "analysis",
+    output_base_dir: str = "outputs/analysis",
     _analyzer: "EmbeddingAnalyzer | None" = None,
 ):
     if models_to_run is None:
@@ -274,7 +274,7 @@ def build_clusters():
     parser.add_argument("--clustering", type=str, default="kmeans", choices=list_available_models())
     parser.add_argument("--single-model", action="store_true")
     parser.add_argument("--no-viz", action="store_true")
-    parser.add_argument("--output-dir", type=str, default="analysis")
+    parser.add_argument("--output-dir", type=str, default="outputs/analysis")
     parser.add_argument("--models-list", type=str, nargs="+", default=None)
     args = parser.parse_args()
     setup_logging(log_filename=f"clustering_run_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
