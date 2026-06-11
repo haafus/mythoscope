@@ -75,15 +75,17 @@ def _run_reducer(data: np.ndarray, method: str, n_components: int, **kwargs: Any
             random_state=random_state,
             n_jobs=-1,
         )
-        return reducer.fit_transform(data)
+        result: np.ndarray = reducer.fit_transform(data)
+        return result
 
     if method == "pca":
         from sklearn.preprocessing import StandardScaler
 
         actual_components = min(n_components, data.shape[1], len(data) - 1)
-        scaled = StandardScaler().fit_transform(data)
+        scaled: np.ndarray = StandardScaler().fit_transform(data)
         reducer = PCA(n_components=max(1, actual_components), random_state=random_state)
-        return reducer.fit_transform(scaled)
+        result = reducer.fit_transform(scaled)
+        return result
 
     if method == "tsne":
         from sklearn.manifold import TSNE
@@ -96,7 +98,8 @@ def _run_reducer(data: np.ndarray, method: str, n_components: int, **kwargs: Any
             max_iter=kwargs.get("max_iter", kwargs.get("n_iter", 1000)),
             metric=kwargs.get("metric", "cosine"),
         )
-        return reducer.fit_transform(data)
+        result = reducer.fit_transform(data)
+        return result
 
     raise ValueError(f"Unknown method: {method}. Use 'umap', 'pca', or 'tsne'.")
 

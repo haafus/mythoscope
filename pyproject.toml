@@ -114,7 +114,7 @@ ignore_missing_imports = true
 exclude = ["docs/"]
 
 [[tool.mypy.overrides]]
-module = ["settings", "clean_gutenberg", "embedding_analyzer.utils", "tests.*"]
+module = ["settings", "clean_gutenberg", "embedding_analyzer.utils"]
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
