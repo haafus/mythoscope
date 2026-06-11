@@ -93,7 +93,11 @@ def setup_logging(
     if clear_handlers:
         root_logger.handlers.clear()
 
-    root_logger.addHandler(file_handler)
+    log_file_path = str(file_handler.baseFilename)
+    if not any(
+        isinstance(h, RotatingFileHandler) and str(h.baseFilename) == log_file_path for h in root_logger.handlers
+    ):
+        root_logger.addHandler(file_handler)
     if not any(
         isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler) for h in root_logger.handlers
     ):
