@@ -1,10 +1,9 @@
-from importlib import import_module
-
-_cg = import_module("01_corpus.clean_gutenberg")
-_normalize_gutenberg_whitespace = _cg._normalize_gutenberg_whitespace
-_remove_header_metadata = _cg._remove_header_metadata
-clean_gutenberg_text = _cg.clean_gutenberg_text
-is_gutenberg_text = _cg.is_gutenberg_text
+from corpus_builder.clean_gutenberg import (
+    _normalize_gutenberg_whitespace,
+    _remove_header_metadata,
+    clean_gutenberg_text,
+    is_gutenberg_text,
+)
 
 
 class TestIsGutenbergText:

@@ -1,7 +1,6 @@
-from importlib import import_module
 from unittest.mock import MagicMock
 
-get_cache_key = import_module("02_embed.cache_utils").get_cache_key
+from embeddings_builder.cache_utils import get_cache_key
 
 
 class TestGetCacheKey:

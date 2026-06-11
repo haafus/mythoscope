@@ -13,8 +13,8 @@ psutil_stub.AccessDenied = type("AccessDenied", (Exception,), {})  # type: ignor
 sys.modules["psutil"] = psutil_stub
 
 _spec = importlib.util.spec_from_file_location(
-    "02_embed.performance_metrics",
-    os.path.join(os.path.dirname(__file__), "..", "src", "02_embed", "performance_metrics.py"),
+    "embeddings_builder.performance_metrics",
+    os.path.join(os.path.dirname(__file__), "..", "src", "embeddings_builder", "performance_metrics.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)

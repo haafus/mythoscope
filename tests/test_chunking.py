@@ -5,8 +5,8 @@ import pytest
 
 # Load module directly from file to avoid __init__.py pulling in chromadb
 _spec = importlib.util.spec_from_file_location(
-    "02_embed_chunking",
-    os.path.join(os.path.dirname(__file__), "..", "src", "02_embed", "chunking.py"),
+    "embeddings_builder_chunking",
+    os.path.join(os.path.dirname(__file__), "..", "src", "embeddings_builder", "chunking.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)

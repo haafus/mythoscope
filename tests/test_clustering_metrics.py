@@ -4,8 +4,8 @@ import os
 import numpy as np
 
 _spec = importlib.util.spec_from_file_location(
-    "04_cluster_metrics",
-    os.path.join(os.path.dirname(__file__), "..", "src", "04_cluster", "metrics.py"),
+    "embeddings_clustering_metrics",
+    os.path.join(os.path.dirname(__file__), "..", "src", "embeddings_clustering", "metrics.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)

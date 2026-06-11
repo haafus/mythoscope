@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 
 _spec = importlib.util.spec_from_file_location(
-    "04_cluster_models",
-    os.path.join(os.path.dirname(__file__), "..", "src", "04_cluster", "models.py"),
+    "embeddings_clustering_models",
+    os.path.join(os.path.dirname(__file__), "..", "src", "embeddings_clustering", "models.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)
