@@ -1,35 +1,39 @@
 import logging
+from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml
-
+from config_loader import load_yaml_config
 from settings import settings
 from settings import setup_logging as _shared_setup_logging
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
 class AnalyzerConfig:
-    def __init__(self, config_path: str = "config/embedding_analyzer.yaml"):
-        self.config_path = self._resolve_config_path(config_path)
-        self._config = self._load_config()
+    # visualization parameters
+    umap_configs: list[dict] = field(
+        default_factory=lambda: [
+            {"n_neighbors": 5, "min_dist": 0.1},
+            {"n_neighbors": 15, "min_dist": 0.1},
+            {"n_neighbors": 50, "min_dist": 0.1},
+            {"n_neighbors": 15, "min_dist": 0.5},
+            {"n_neighbors": 15, "min_dist": 0.8},
+        ]
+    )
+    tsne_configs: list[dict] = field(
+        default_factory=lambda: [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
+    )
+    pca_configs: list[dict] = field(default_factory=lambda: [{}])
+    baseline_configs: dict = field(
+        default_factory=lambda: {
+            "umap": {"n_neighbors": 15, "min_dist": 0.1},
+            "tsne": {"perplexity": 30},
+            "pca": {},
+        }
+    )
 
-    @staticmethod
-    def _resolve_config_path(config_path: str) -> Path:
-        path = Path(config_path)
-        if path.exists():
-            return path
-        project_config = settings.project_root / "config" / "embedding_analyzer.yaml"
-        if project_config.exists():
-            return project_config
-        return path
-
-    def _load_config(self):
-        if self.config_path.exists():
-            with open(self.config_path, encoding="utf-8") as f:
-                return yaml.safe_load(f) or {}
-        return {}
-
+    # paths (always from settings)
     @property
     def chroma_path(self) -> str:
         return str(settings.chroma_dir)
@@ -46,49 +50,20 @@ class AnalyzerConfig:
     def corpus_metadata_path(self) -> str:
         return str(settings.corpus_metadata_path)
 
-    @property
-    def visualization_params(self) -> dict:
-        result: dict = self._config.get("visualization", {})
-        return result
 
-    @property
-    def umap_configs(self) -> list:
-        default: list = [
-            {"n_neighbors": 5, "min_dist": 0.1},
-            {"n_neighbors": 15, "min_dist": 0.1},
-            {"n_neighbors": 50, "min_dist": 0.1},
-            {"n_neighbors": 15, "min_dist": 0.5},
-            {"n_neighbors": 15, "min_dist": 0.8},
-        ]
-        result: list = self.visualization_params.get("umap_configs", default)
-        return result
-
-    @property
-    def tsne_configs(self) -> list:
-        default: list = [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
-        result: list = self.visualization_params.get("tsne_configs", default)
-        return result
-
-    @property
-    def pca_configs(self) -> list:
-        default: list = [{}]
-        result: list = self.visualization_params.get("pca_configs", default)
-        return result
-
-    @property
-    def baseline_configs(self) -> dict:
-        default: dict = {"umap": {"n_neighbors": 15, "min_dist": 0.1}, "tsne": {"perplexity": 30}, "pca": {}}
-        result: dict = self.visualization_params.get("baseline_configs", default)
-        return result
+def load_analyzer_config(config_path: str | None = None) -> AnalyzerConfig:
+    if config_path:
+        return load_yaml_config(AnalyzerConfig, "embedding_analyzer", config_path)
+    return load_yaml_config(AnalyzerConfig, "embedding_analyzer")
 
 
-_analyzer_config = None
+_analyzer_config: AnalyzerConfig | None = None
 
 
 def get_analyzer_config() -> AnalyzerConfig:
     global _analyzer_config
     if _analyzer_config is None:
-        _analyzer_config = AnalyzerConfig()
+        _analyzer_config = load_analyzer_config()
     return _analyzer_config
 
 
