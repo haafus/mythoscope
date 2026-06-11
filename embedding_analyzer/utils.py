@@ -94,7 +94,7 @@ def _run_reducer(data: np.ndarray, method: str, n_components: int, **kwargs: Any
             perplexity=max(1, perplexity),
             random_state=random_state,
             max_iter=kwargs.get("max_iter", kwargs.get("n_iter", 1000)),
-            metric=kwargs.get("metric", "euclidean"),
+            metric=kwargs.get("metric", "cosine"),
         )
         return reducer.fit_transform(data)
 

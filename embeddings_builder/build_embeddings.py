@@ -3,10 +3,11 @@ import logging
 import shutil
 import signal
 import sys
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import torch
+
+from settings import setup_logging as _setup_logging
 
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model
@@ -56,45 +57,14 @@ signal.signal(signal.SIGTERM, app_context.signal_handler)
 
 def setup_logging(config_path: str = "config.yaml"):
     config_mgr = ConfigManager(config_path)
-
     log_config = config_mgr.get("logging")
-    log_file = Path(log_config.get("file", "logs/embedding.log"))
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-
-    file_handler = RotatingFileHandler(
-        log_file,
-        maxBytes=log_config.get("max_bytes", 10485760),
-        backupCount=log_config.get("backup_count", 5),
-        encoding="utf-8",
+    _setup_logging(
+        log_filename=Path(log_config.get("file", "logs/embedding.log")).name,
+        level=log_config.get("level"),
+        max_bytes=log_config.get("max_bytes", 10485760),
+        backup_count=log_config.get("backup_count", 5),
     )
-    file_handler.setLevel(getattr(logging, log_config.get("level", "INFO")))
-
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-
-    formatter = logging.Formatter(log_config.get("format", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)
-
-    log_file_resolved = str(log_file.resolve())
-    has_file_handler = any(
-        isinstance(handler, RotatingFileHandler) and getattr(handler, "baseFilename", None) == log_file_resolved
-        for handler in root_logger.handlers
-    )
-    has_console_handler = any(
-        isinstance(handler, logging.StreamHandler) and not isinstance(handler, logging.FileHandler)
-        for handler in root_logger.handlers
-    )
-
-    if not has_file_handler:
-        root_logger.addHandler(file_handler)
-    if not has_console_handler:
-        root_logger.addHandler(console_handler)
-
-    return root_logger
+    return logging.getLogger(__name__)
 
 
 def build_embeddings(

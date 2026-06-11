@@ -1,11 +1,12 @@
 import json
 from pathlib import Path
 
+from settings import Settings
 from ui_server.config import paths
 
 
 def model_to_key(model_name: str) -> str:
-    return (model_name or "").replace("/", "_").replace("\\", "_")
+    return Settings.safe_model_name(model_name or "")
 
 
 def key_to_model(model_key: str, models: list[str] | None = None) -> str:

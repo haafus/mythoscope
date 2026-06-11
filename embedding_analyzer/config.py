@@ -1,11 +1,10 @@
 import logging
-import os
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import yaml
 
 from settings import settings
+from settings import setup_logging as _shared_setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -118,45 +117,11 @@ def get_model_output_dir(model_name: str) -> str:
     return str(path)
 
 
-def CHROMA_PATH():
-    return get_chroma_path()
-
-
-def OUTPUT_DIR():
-    return get_output_dir()
-
-
-def setup_logging(log_dir: str = None, log_filename: str = "analyzer.log", clear_handlers: bool = False):
-    if log_dir is None:
-        log_dir = str(settings.logs_dir)
-
-    os.makedirs(log_dir, exist_ok=True)
-    log_path = os.path.join(log_dir, log_filename)
-
-    formatter = logging.Formatter(fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-
-    file_handler = RotatingFileHandler(log_path, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8")
-    file_handler.setFormatter(formatter)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-
-    root_logger = logging.getLogger()
-    root_logger.setLevel(getattr(logging, settings.log_level, logging.INFO))
-
-    if clear_handlers and root_logger.hasHandlers():
-        root_logger.handlers.clear()
-
-    log_path_resolved = os.path.abspath(log_path)
-    has_file_handler = any(
-        isinstance(h, RotatingFileHandler) and getattr(h, "baseFilename", None) == log_path_resolved
-        for h in root_logger.handlers
+def setup_logging(log_dir: str | None = None, log_filename: str = "analyzer.log", clear_handlers: bool = False) -> None:
+    _shared_setup_logging(
+        log_filename=log_filename,
+        log_dir=log_dir,
+        max_bytes=5 * 1024 * 1024,
+        backup_count=3,
+        clear_handlers=clear_handlers,
     )
-    has_console_handler = any(
-        isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler) for h in root_logger.handlers
-    )
-
-    if not has_file_handler:
-        root_logger.addHandler(file_handler)
-    if not has_console_handler:
-        root_logger.addHandler(console_handler)

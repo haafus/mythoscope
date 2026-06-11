@@ -1,3 +1,5 @@
+import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from pydantic import Field
@@ -39,9 +41,12 @@ class Settings(BaseSettings):
     def processed_urls_path(self) -> Path:
         return self.corpus_dir / "processed_urls.json"
 
+    @staticmethod
+    def safe_model_name(model_name: str) -> str:
+        return model_name.replace("/", "_").replace("\\", "_")
+
     def model_output_dir(self, model_name: str) -> Path:
-        safe_name = model_name.replace("/", "_").replace("\\", "_")
-        return self.analysis_dir / safe_name
+        return self.analysis_dir / self.safe_model_name(model_name)
 
     def ensure_dirs(self) -> None:
         for d in (
@@ -56,3 +61,40 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def setup_logging(
+    log_filename: str = "app.log",
+    log_dir: str | None = None,
+    level: str | None = None,
+    max_bytes: int = 10 * 1024 * 1024,
+    backup_count: int = 5,
+    clear_handlers: bool = False,
+) -> None:
+    log_path = Path(log_dir or str(settings.logs_dir))
+    log_path.mkdir(parents=True, exist_ok=True)
+
+    log_level = getattr(logging, (level or settings.log_level).upper(), logging.INFO)
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+    file_handler = RotatingFileHandler(
+        log_path / log_filename, maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8"
+    )
+    file_handler.setLevel(log_level)
+    file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(log_level)
+    console_handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+
+    if clear_handlers:
+        root_logger.handlers.clear()
+
+    root_logger.addHandler(file_handler)
+    if not any(
+        isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler) for h in root_logger.handlers
+    ):
+        root_logger.addHandler(console_handler)

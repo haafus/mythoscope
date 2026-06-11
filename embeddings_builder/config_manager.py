@@ -20,8 +20,8 @@ class ConfigManager:
             "chunked_dir": str(_settings.corpus_chunked_dir),
         },
         "embedding": {
-            "default_model": "BAAI/bge-m3",
-            "default_chunking": "paragraph",
+            "default_model": _settings.default_embedding_model,
+            "default_chunking": _settings.default_chunking,
             "text_type": "all",
             "batch_size": 32,
             "cache_batch_size": 50,

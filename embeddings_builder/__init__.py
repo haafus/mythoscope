@@ -1,14 +1,5 @@
 from importlib import import_module
 
-from .chroma_manager import (
-    collection_name_for_model,
-    delete_collection,
-    get_chroma_collection,
-    is_model_collection_name,
-    query_chroma_collection,
-    save_to_chroma_collection,
-)
-
 _LAZY_IMPORTS = {
     "EmbeddingBuilder": (".builder", "EmbeddingBuilder"),
     "build_embeddings": (".build_embeddings", "build_embeddings"),
@@ -22,6 +13,12 @@ _LAZY_IMPORTS = {
     "MODELS": (".models_repository", "MODELS"),
     "create_chunking_strategies": (".chunking", "create_chunking_strategies"),
     "ChunkingStrategy": (".chunking", "ChunkingStrategy"),
+    "collection_name_for_model": (".chroma_manager", "collection_name_for_model"),
+    "delete_collection": (".chroma_manager", "delete_collection"),
+    "get_chroma_collection": (".chroma_manager", "get_chroma_collection"),
+    "is_model_collection_name": (".chroma_manager", "is_model_collection_name"),
+    "query_chroma_collection": (".chroma_manager", "query_chroma_collection"),
+    "save_to_chroma_collection": (".chroma_manager", "save_to_chroma_collection"),
 }
 
 __all__ = [

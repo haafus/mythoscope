@@ -13,7 +13,6 @@ MAX_PREVIEW_CHARS = 700
 class ModelIndex:
     model_name: str
     items: list[dict]
-    matrix: np.ndarray
     normalized_matrix: np.ndarray
     id_to_index: dict[str, int]
 
@@ -108,7 +107,6 @@ class EmbeddingIndexService:
         return ModelIndex(
             model_name=model_name,
             items=items,
-            matrix=matrix,
             normalized_matrix=normalized_matrix,
             id_to_index=id_to_index,
         )

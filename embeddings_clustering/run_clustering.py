@@ -7,32 +7,12 @@ from pathlib import Path
 
 import numpy as np
 
+from settings import Settings, setup_logging
+
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 logger = logging.getLogger(__name__)
-
-
-def setup_logging() -> None:
-    log_dir = project_root / "logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
-    log_filename = log_dir / f"clustering_run_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
-    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
-
-    file_handler = logging.FileHandler(log_filename, encoding="utf-8")
-    file_handler.setFormatter(formatter)
-
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-
-    root_logger.addHandler(file_handler)
-    if not any(
-        isinstance(handler, logging.StreamHandler) and not isinstance(handler, logging.FileHandler)
-        for handler in root_logger.handlers
-    ):
-        root_logger.addHandler(console_handler)
 
 
 try:
@@ -180,7 +160,7 @@ def run_clustering_analysis(
         model_name = analyzer.available_models[0]
         analyzer.set_model(model_name)
 
-    safe_model_name = model_name.replace("/", "_").replace("\\", "_")
+    safe_model_name = Settings.safe_model_name(model_name)
     logger.info(f"Analysis for embedding model: {model_name}")
 
     data = analyzer.filter_by_model()
@@ -231,7 +211,7 @@ def run_all_clustering_models(model_name: str = None, models_to_run: list = None
         model_name = analyzer.available_models[0]
         analyzer.set_model(model_name)
 
-    safe_model_name = model_name.replace("/", "_").replace("\\", "_")
+    safe_model_name = Settings.safe_model_name(model_name)
     data = analyzer.filter_by_model()
 
     if not data:
@@ -287,7 +267,7 @@ def build_clusters():
     parser.add_argument("--output-dir", type=str, default="analysis")
     parser.add_argument("--models-list", type=str, nargs="+", default=None)
     args = parser.parse_args()
-    setup_logging()
+    setup_logging(log_filename=f"clustering_run_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
 
     from embedding_analyzer.analyzer import EmbeddingAnalyzer
 

@@ -1,40 +1,14 @@
 import argparse
 import logging
-from logging.handlers import RotatingFileHandler
-from pathlib import Path
+
+from settings import setup_logging
 
 from .builder import build_corpus
 
 
-def setup_logging(log_file_path: str = "logs/corpus.log"):
-
-    log_file = Path(log_file_path)
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-
-    file_handler = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=5, encoding="utf-8")
-    file_handler.setLevel(logging.INFO)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
-
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)
-
-    if root_logger.hasHandlers():
-        root_logger.handlers.clear()
-
-    root_logger.addHandler(file_handler)
-    root_logger.addHandler(console_handler)
-
-    return root_logger
-
-
 def build_and_save_corpus():
-    logger = setup_logging()
+    setup_logging(log_filename="corpus.log", clear_handlers=True)
+    logger = logging.getLogger(__name__)
     logger.info("Starting corpus build...")
 
     parser = argparse.ArgumentParser(description="Build a text corpus from a URL list with cleanup")

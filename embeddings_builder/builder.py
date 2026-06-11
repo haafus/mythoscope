@@ -51,8 +51,9 @@ def _safe_id_part(value: Any) -> str:
 def _get_model_output_dir(base_out_dir: str, model_name: str) -> str:
     if not model_name:
         return base_out_dir
-    safe_name = model_name.replace("/", "_").replace("\\", "_")
-    model_dir = os.path.join(base_out_dir, safe_name)
+    from settings import Settings
+
+    model_dir = os.path.join(base_out_dir, Settings.safe_model_name(model_name))
     os.makedirs(model_dir, exist_ok=True)
     return model_dir
 
