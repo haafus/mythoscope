@@ -4,24 +4,12 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-import yaml
-
+from .config import GraphsConfig, load_config
 from .graph_generator import generate_and_save_graph
 from .llm_processing import LLMProcessor
 from .prompts_loader import load_prompts
 
 logger = logging.getLogger(__name__)
-
-CONFIG_PATH = "config/graphs_generator.yaml"
-
-
-def _load_config() -> dict:
-    try:
-        with open(CONFIG_PATH, encoding="utf-8") as f:
-            result: dict = yaml.safe_load(f)
-            return result
-    except FileNotFoundError as exc:
-        raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}") from exc
 
 
 def _setup_graph_logging(logs_dir: Path) -> None:
@@ -123,45 +111,36 @@ def deduplicate_relations(relations: list) -> list:
 
 
 def run_generate_graphs(force: bool = False):
-    config = _load_config()
+    cfg = load_config()
 
-    logs_dir = Path(config["paths"]["logs_dir"])
-    metadata_path = Path(config["paths"]["metadata"])
-    prompts_path = config["paths"]["prompts"]
-    output_base_dir = Path(config["paths"]["output_base_dir"])
+    _setup_graph_logging(cfg.logs_dir)
 
-    _setup_graph_logging(logs_dir)
-
-    llm_mode = config["llm"].get("mode", "api")
-    if llm_mode == "local":
-        llm_cfg = config["llm"]["local"]
-    else:
-        llm_cfg = config["llm"]["api"]
-
-    api_key = llm_cfg["api_key"]
-    model_name = llm_cfg["model_name"]
-    base_url = llm_cfg["base_url"]
-    use_json_mode = llm_cfg.get("use_json_mode", llm_mode != "local")
-
-    chunk_size = config["processing"]["chunk_size"]
-    chunk_overlap = config["processing"]["chunk_overlap"]
+    llm_cfg = cfg.active_llm_config
 
     logger.info(f"Starting graph generation process (force={force})...")
 
     try:
-        prompts = load_prompts(prompts_path)
+        prompts = load_prompts(cfg.prompts_path)
     except Exception as e:
         logger.error(f"Failed to load prompts: {e}")
         return
 
-    llm = LLMProcessor(api_key=api_key, model_name=model_name, base_url=base_url, use_json_mode=use_json_mode)
+    llm = LLMProcessor(
+        api_key=llm_cfg["api_key"],
+        model_name=llm_cfg["model_name"],
+        base_url=llm_cfg["base_url"],
+        use_json_mode=llm_cfg["use_json_mode"],
+        temperature=cfg.temperature,
+        max_retries=cfg.max_retries,
+        retry_backoff_factor=cfg.retry_backoff_factor,
+    )
 
-    if not metadata_path.exists():
-        logger.error(f"Metadata file not found: {metadata_path}")
+    if not cfg.metadata_path.exists():
+        logger.error(f"Metadata file not found: {cfg.metadata_path}")
         return
 
     try:
-        with open(metadata_path, encoding="utf-8") as f:
+        with open(cfg.metadata_path, encoding="utf-8") as f:
             corpus = json.load(f)
     except Exception as e:
         logger.error(f"Failed to read metadata: {e}")
@@ -171,7 +150,7 @@ def run_generate_graphs(force: bool = False):
         book_id = book.get("id", "unknown_book")
         txt_path = Path(book.get("path", ""))
 
-        book_out_dir = output_base_dir / book_id
+        book_out_dir = cfg.output_base_dir / book_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
         expected_html_path = book_out_dir / "characters.html"
@@ -196,7 +175,7 @@ def run_generate_graphs(force: bool = False):
 
         logger.info(f"--- Processing: {book_id} ---")
 
-        chunks = chunk_text(text, max_chars=chunk_size, overlap=chunk_overlap)
+        chunks = chunk_text(text, max_chars=cfg.chunk_size, overlap=cfg.chunk_overlap)
         logger.info(f"Text split into {len(chunks)} chunks.")
 
         all_characters, all_relations = [], []

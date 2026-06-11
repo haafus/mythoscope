@@ -8,17 +8,29 @@ logger = logging.getLogger(__name__)
 
 
 class LLMProcessor:
-    def __init__(self, api_key: str, model_name: str, base_url: str, use_json_mode: bool = True):
+    def __init__(
+        self,
+        api_key: str,
+        model_name: str,
+        base_url: str,
+        use_json_mode: bool = True,
+        temperature: float = 0.1,
+        max_retries: int = 5,
+        retry_backoff_factor: float = 5.0,
+    ):
         self.model_name = model_name
         self.use_json_mode = use_json_mode
+        self.temperature = temperature
+        self.max_retries = max_retries
+        self.retry_backoff_factor = retry_backoff_factor
 
         self.client = OpenAI(base_url=base_url, api_key=api_key)
 
-    def _ask_llm(self, system_prompt: str, user_content: str, max_retries: int = 5) -> list:
+    def _ask_llm(self, system_prompt: str, user_content: str) -> list:
         retries = 0
-        backoff_factor = 5
+        backoff_factor = self.retry_backoff_factor
 
-        while retries < max_retries:
+        while retries < self.max_retries:
             try:
                 kwargs = {
                     "model": self.model_name,
@@ -30,7 +42,7 @@ class LLMProcessor:
                         },
                         {"role": "user", "content": user_content},
                     ],
-                    "temperature": 0.1,
+                    "temperature": self.temperature,
                 }
 
                 if self.use_json_mode:
@@ -78,7 +90,7 @@ class LLMProcessor:
                 logger.error(f"Critical LLM or network error: {e}")
                 return []
 
-        logger.error(f"Maximum retry count exceeded ({max_retries}) because of API limits or failures. Skipping chunk.")
+        logger.error(f"Maximum retry count exceeded ({self.max_retries}) because of API limits or failures. Skipping chunk.")
         return []
 
     def extract_characters(self, text: str, prompt: str) -> list:
