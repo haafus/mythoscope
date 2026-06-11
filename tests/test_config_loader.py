@@ -1,6 +1,6 @@
 import yaml
 
-from config_loader import _flatten, load_yaml_config
+from settings import _flatten, load_yaml_config
 from corpus.config import CorpusConfig, load_config
 
 

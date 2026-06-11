@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from config_loader import load_yaml_config
-from settings import settings
+from settings import load_yaml_config, settings
 
 
 @dataclass

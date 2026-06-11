@@ -69,7 +69,7 @@ mytho-cluster = "clustering.run_clustering:build_clusters"
 mytho-clean-gutenberg = "corpus.clean_gutenberg:clean_gutenberg_texts"
 
 [tool.setuptools]
-py-modules = ["settings", "config_loader", "main"]
+py-modules = ["settings", "main"]
 
 [tool.setuptools.package-dir]
 "" = "src"
