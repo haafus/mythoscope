@@ -1,6 +1,17 @@
 # План рефакторинга конфигурации
 
-## Текущие проблемы
+## Статус: ВЫПОЛНЕНО
+
+- [x] Фаза 1: corpus_builder — dataclass + YAML override
+- [x] Фаза 2: graphs_generator — dataclass, больше не падает без YAML
+- [x] Фаза 3: embedding_analyzer — dataclass с backward-compatible API
+- [x] Фаза 4: embeddings_builder — извлечение хардкода в ConfigManager
+- [x] Фаза 5: ui_server — ServerConfig dataclass
+- [ ] Фаза 6: settings.py cleanup (setup_logging) — отложена, низкий приоритет
+
+---
+
+## Исходные проблемы (до рефакторинга)
 
 ### 1. Четыре разных паттерна конфигурации
 
