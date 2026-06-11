@@ -1,18 +1,13 @@
 import argparse
 import datetime
+import logging
 import re
 from pathlib import Path
 from typing import Any
 
-try:
-    from corpus_builder import logger
-    from corpus_builder.config import CORPUS_DIR
-except ImportError:
-    import logging
+from corpus_builder.config import CORPUS_DIR
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-    logger = logging.getLogger(__name__)
-    CORPUS_DIR = Path("outputs/corpus")
+logger = logging.getLogger(__name__)
 
 BACKUP_DIR = Path("outputs/sources_backup")
 CHANGELOG_FILE = BACKUP_DIR / "changelog.txt"

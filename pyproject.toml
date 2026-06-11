@@ -66,10 +66,10 @@ mytho-server = "ui_server.run_server:main"
 mytho-embeddings = "embeddings_builder.cli:cli"
 mytho-corpus = "corpus_builder.build_corpus:build_and_save_corpus"
 mytho-cluster = "embeddings_clustering.run_clustering:build_clusters"
-mytho-clean-gutenberg = "clean_gutenberg:clean_gutenberg_texts"
+mytho-clean-gutenberg = "corpus_builder.clean_gutenberg:clean_gutenberg_texts"
 
 [tool.setuptools]
-py-modules = ["settings", "main", "clean_gutenberg"]
+py-modules = ["settings", "main"]
 
 [tool.setuptools.package-dir]
 "" = "src"
@@ -114,7 +114,7 @@ ignore_missing_imports = true
 exclude = ["docs/"]
 
 [[tool.mypy.overrides]]
-module = ["settings", "clean_gutenberg", "embedding_analyzer.utils"]
+module = ["settings", "corpus_builder.clean_gutenberg", "embedding_analyzer.utils"]
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]

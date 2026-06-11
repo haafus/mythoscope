@@ -102,9 +102,9 @@ py -3 -c "from corpus_builder.build_corpus import build_and_save_corpus; build_a
 py -3 -c "from corpus_builder.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type all --force
 ```
 
-## clean_gutenberg.py
+## corpus_builder.clean_gutenberg
 
-Утилита очистки текстов Project Gutenberg от лицензии, служебных заголовков и хвостов.
+Утилита очистки текстов Project Gutenberg от лицензии, служебных заголовков и хвостов. Входит в пакет `corpus_builder`.
 
 Возможности:
 - Найти Gutenberg-тексты в корпусе.
@@ -115,25 +115,25 @@ py -3 -c "from corpus_builder.build_corpus import build_and_save_corpus; build_a
 Предпросмотр файлов:
 
 ```powershell
-py -3 src/clean_gutenberg.py --preview --dir outputs/corpus
+mytho-clean-gutenberg --preview --dir outputs/corpus
 ```
 
 Очистить весь корпус:
 
 ```powershell
-py -3 src/clean_gutenberg.py --dir outputs/corpus
+mytho-clean-gutenberg --dir outputs/corpus
 ```
 
 Очистить один файл:
 
 ```powershell
-py -3 src/clean_gutenberg.py --file "outputs\corpus\...\book.txt"
+mytho-clean-gutenberg --file "outputs\corpus\...\book.txt"
 ```
 
 Показать статистику бэкапов:
 
 ```powershell
-py -3 src/clean_gutenberg.py --backup-stats
+mytho-clean-gutenberg --backup-stats
 ```
 
 ## embeddings_builder
@@ -334,8 +334,8 @@ py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 py -3 -c "from corpus_builder.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type all
 
 # 2. Очистить Gutenberg-тексты, если нужно
-py -3 src/clean_gutenberg.py --preview --dir outputs/corpus
-py -3 src/clean_gutenberg.py --dir outputs/corpus
+mytho-clean-gutenberg --preview --dir outputs/corpus
+mytho-clean-gutenberg --dir outputs/corpus
 
 # 3. Построить эмбеддинги и Chroma DB
 py -3 -m embeddings_builder.cli generate
