@@ -168,7 +168,7 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
 
     click.echo("Running comparison... This may take a while.\n")
 
-    results = builder.compare_models_and_strategies(text, models, strategies)
+    results = builder.compare_models_and_strategies(text, list(models) if models else None, list(strategies) if strategies else None)
 
     click.echo(f"{'=' * 80}")
     click.echo(click.style("Comparison Results", fg="cyan", bold=True))

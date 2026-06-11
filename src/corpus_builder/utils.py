@@ -13,8 +13,8 @@ import trafilatura
 from bs4 import BeautifulSoup
 
 _color_lock = threading.Lock()
-_used_colors = set()
-_tradition_colors = {}
+_used_colors: set[str] = set()
+_tradition_colors: dict[str, str] = {}
 logger = logging.getLogger(__name__)
 
 PYMUPDF_AVAILABLE = True

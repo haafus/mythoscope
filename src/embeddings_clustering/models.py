@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 import numpy as np
 from sklearn.cluster import HDBSCAN, OPTICS, Birch, KMeans, MeanShift, SpectralClustering, estimate_bandwidth
@@ -22,9 +23,9 @@ class BaseClusteringModel:
         self.needs_dim_reduction = needs_dim_reduction
         self.n_components = n_components
         self.params = params
-        self.model = None
+        self.model: Any = None
         self.scaler = Normalizer(norm="l2")
-        self.processed_embeddings = None
+        self.processed_embeddings: np.ndarray | None = None
 
     def fit_predict(self, embeddings: np.ndarray) -> np.ndarray:
         if len(embeddings) < self.min_samples_required:
@@ -69,7 +70,8 @@ class KMeansClustering(BaseClusteringModel):
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = KMeans(n_clusters=self.n_clusters, random_state=42, n_init=10)
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 class HDBSCANClustering(BaseClusteringModel):
@@ -79,7 +81,8 @@ class HDBSCANClustering(BaseClusteringModel):
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = HDBSCAN(min_cluster_size=self.min_cluster_size, metric="euclidean")
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 class SpectralClusteringModel(BaseClusteringModel):
@@ -89,7 +92,8 @@ class SpectralClusteringModel(BaseClusteringModel):
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = SpectralClustering(n_clusters=self.n_clusters, random_state=42, affinity="nearest_neighbors")
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 class BirchClustering(BaseClusteringModel):
@@ -100,7 +104,8 @@ class BirchClustering(BaseClusteringModel):
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = Birch(n_clusters=self.n_clusters, threshold=self.threshold)
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 class GMMClustering(BaseClusteringModel):
@@ -110,7 +115,8 @@ class GMMClustering(BaseClusteringModel):
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = GaussianMixture(n_components=self.n_components, random_state=42)
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 class MeanShiftClustering(BaseClusteringModel):
@@ -128,7 +134,8 @@ class MeanShiftClustering(BaseClusteringModel):
         logger.info(f"MeanShift will use bandwidth: {bandwidth:.4f}")
 
         self.model = MeanShift(bandwidth=bandwidth, bin_seeding=True)
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 class OPTICSClustering(BaseClusteringModel):
@@ -138,7 +145,8 @@ class OPTICSClustering(BaseClusteringModel):
 
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         self.model = OPTICS(min_samples=self.min_samples)
-        return self.model.fit_predict(data)
+        result: np.ndarray = self.model.fit_predict(data)
+        return result
 
 
 def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
@@ -156,7 +164,9 @@ def get_clustering_model(model_name: str, **params) -> BaseClusteringModel:
         available = list(models.keys())
         raise ValueError(f"Unknown model: {model_name}. Available: {available}")
 
-    return models[model_name](**params)
+    model_cls = models[model_name]
+    result: BaseClusteringModel = model_cls(**params)
+    return result
 
 
 def list_available_models() -> list[str]:

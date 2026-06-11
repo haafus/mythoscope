@@ -124,9 +124,9 @@ def _create_interactive_figure_2d(
     y_col: str,
     title: str,
     color_map: dict,
-    model_name: str = None,
-    output_dir: str = None,
-    filename: str = None,
+    model_name: str | None = None,
+    output_dir: str | None = None,
+    filename: str | None = None,
 ) -> go.Figure:
     fig = go.Figure()
 
@@ -193,8 +193,8 @@ def plot_interactive_2d(
     data: list[dict],
     sample_size: int | None = DEFAULT_SAMPLE_SIZE,
     save_html: bool = True,
-    output_dir: str = None,
-    model_name: str = None,
+    output_dir: str | None = None,
+    model_name: str | None = None,
     method: str = "umap",
     reducer_kwargs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
@@ -273,9 +273,9 @@ def plot_interactive_2d(
 def plot_hyperparameter_tuning_dashboard(
     data: list[dict],
     method: str = "umap",
-    param_configs: list[dict[str, Any]] = None,
-    output_dir: str = None,
-    model_name: str = None,
+    param_configs: list[dict[str, Any]] | None = None,
+    output_dir: str | None = None,
+    model_name: str | None = None,
     save_html: bool = True,
 ) -> go.Figure | None:
     if not data or not param_configs:
@@ -356,7 +356,7 @@ def plot_hyperparameter_tuning_dashboard(
 
 
 def plot_distance_heatmap(
-    data: list[dict], output_dir: str = None, model_name: str = None, save_html: bool = True
+    data: list[dict], output_dir: str | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if not data:
         logger.warning("No data for visualization.")
@@ -367,7 +367,7 @@ def plot_distance_heatmap(
 
     output_dir = _ensure_dir(output_dir)
 
-    traditions_data = {}
+    traditions_data: dict[str, list] = {}
     for item in data:
         trad = item.get("tradition", "unknown")
         if trad not in traditions_data:
@@ -430,8 +430,8 @@ def plot_distance_heatmap(
 
 def plot_comparison_dashboard(
     data: list[dict],
-    output_dir: str = None,
-    model_name: str = None,
+    output_dir: str | None = None,
+    model_name: str | None = None,
     save_html: bool = True,
     baseline_configs: dict[str, Any] | None = None,
 ) -> go.Figure | None:
@@ -546,7 +546,7 @@ def plot_comparison_dashboard(
 
 
 def plot_tradition_distribution(
-    data: list[dict], output_dir: str = None, model_name: str = None, save_html: bool = True
+    data: list[dict], output_dir: str | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if not data:
         logger.warning("No data for visualization.")
@@ -557,8 +557,8 @@ def plot_tradition_distribution(
 
     output_dir = _ensure_dir(output_dir)
 
-    tradition_counts = {}
-    tradition_docs = {}
+    tradition_counts: dict[str, int] = {}
+    tradition_docs: dict[str, set] = {}
     for item in data:
         trad = item.get("tradition", "unknown")
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
@@ -622,7 +622,7 @@ def plot_tradition_distribution(
     return fig
 
 
-def save_summary_to_files(data: list[dict], stats: dict, output_dir: str = None):
+def save_summary_to_files(data: list[dict], stats: dict, output_dir: str | None = None):
     if output_dir is None:
         output_dir = get_analyzer_config().output_dir
 
@@ -657,7 +657,7 @@ def save_summary_to_files(data: list[dict], stats: dict, output_dir: str = None)
     logger.info(f"Text summary saved: {txt_path}")
 
 
-def save_models_list(models: list[str], output_dir: str = None):
+def save_models_list(models: list[str], output_dir: str | None = None):
     if output_dir is None:
         output_dir = get_analyzer_config().output_dir
 
@@ -758,7 +758,7 @@ def generate_clickable_plots(output_dir: str, model_name: str):
         add_click_handler_to_html(filepath)
 
 
-def analyze_embeddings(model_name: str = None, generate_all_plots: bool = True):
+def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool = True):
     from .analyzer import EmbeddingAnalyzer
     from .config import setup_logging
 
@@ -864,7 +864,8 @@ def analyze_embeddings(model_name: str = None, generate_all_plots: bool = True):
 
                 logger.info("  - Adding click handlers...")
                 try:
-                    generate_clickable_plots(analyzer.output_dir, analyzer.model_name)
+                    if analyzer.model_name:
+                        generate_clickable_plots(analyzer.output_dir, analyzer.model_name)
                 except Exception as e:
                     logger.error(f"    Error adding click handlers: {e}")
 

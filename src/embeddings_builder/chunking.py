@@ -52,10 +52,10 @@ class LanguageDetector:
 
         clean_text = " ".join(text.split())
 
-        if cls._load_fasttext():
+        if cls._load_fasttext() and cls._fasttext_model is not None:
             try:
                 predictions = cls._fasttext_model.predict(clean_text.lower(), k=1)
-                lang_code = predictions[0][0].replace("__label__", "")
+                lang_code: str = predictions[0][0].replace("__label__", "")
                 return lang_code
             except Exception as e:
                 logger.debug(f"FastText error: {e}, switching to langdetect")
@@ -64,7 +64,8 @@ class LanguageDetector:
             from langdetect import DetectorFactory, detect
 
             DetectorFactory.seed = 0
-            return detect(clean_text)
+            result: str = detect(clean_text)
+            return result
         except ImportError:
             pass
         except Exception:
@@ -90,7 +91,7 @@ class LanguageDetector:
         filtered = {k: v for k, v in counts.items() if v >= threshold}
 
         if filtered:
-            return max(filtered, key=filtered.get)
+            return max(filtered, key=lambda k: filtered[k])
 
         if counts["en"] > 0:
             return "en"
@@ -350,7 +351,9 @@ def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int
     if not sentences:
         return [text] if text else []
 
-    chunks, current_sentences, current_length = [], [], 0
+    chunks: list[str] = []
+    current_sentences: list[str] = []
+    current_length = 0
     overlap_sentences_count = max(1, chunk_overlap // 100) if chunk_overlap > 0 else 0
 
     for sent in sentences:
@@ -391,7 +394,9 @@ def paragraph_based_chunking(text: str, chunk_size: int = 1024, chunk_overlap: i
     if not paragraphs:
         return [text[:chunk_size]] if text else []
 
-    chunks, current_paragraphs, current_length = [], [], 0
+    chunks: list[str] = []
+    current_paragraphs: list[str] = []
+    current_length = 0
     overlap_para_count = max(1, chunk_overlap // 200) if chunk_overlap > 0 else 0
 
     for para in paragraphs:

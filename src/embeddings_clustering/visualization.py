@@ -15,7 +15,7 @@ def plot_clustering_results_2d(
     predicted_labels: np.ndarray,
     true_labels: np.ndarray | None = None,
     title: str = "Clustering results",
-    output_path: str = None,
+    output_path: str | None = None,
 ) -> go.Figure | None:
     if len(embeddings_2d) == 0:
         logger.warning("No data for visualization")
@@ -76,7 +76,7 @@ def plot_clustering_results_2d(
 
 
 def plot_confusion_matrix_heatmap(
-    true_labels: np.ndarray, predicted_labels: np.ndarray, output_path: str = None
+    true_labels: np.ndarray, predicted_labels: np.ndarray, output_path: str | None = None
 ) -> go.Figure | None:
     mask = predicted_labels != -1
     if np.sum(mask) == 0:
@@ -110,7 +110,7 @@ def plot_confusion_matrix_heatmap(
     return fig
 
 
-def plot_metrics_dashboard(metrics: dict[str, dict], output_path: str = None) -> go.Figure | None:
+def plot_metrics_dashboard(metrics: dict[str, dict], output_path: str | None = None) -> go.Figure | None:
     score_types = ["silhouette_score", "adjusted_rand_score", "normalized_mutual_info", "v_measure"]
     plot_data = []
 

@@ -124,4 +124,5 @@ def download_file(url: str) -> bytes:
     }
     response = http_session.get(url, headers=headers, timeout=(10, 30))
     response.raise_for_status()
-    return response.content
+    content: bytes = response.content
+    return content

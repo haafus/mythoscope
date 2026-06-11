@@ -92,7 +92,7 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
 
 
 def scan_document_rows(root: Path) -> list[dict]:
-    rows = []
+    rows: list[dict] = []
     if not root.exists():
         return rows
 

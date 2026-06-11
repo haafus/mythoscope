@@ -23,6 +23,8 @@ except ImportError:
 class TestEmbeddingModels(unittest.TestCase):
     """Test class for embedding models"""
 
+    results: dict[str, dict] = {}
+
     @classmethod
     def setUpClass(cls):
         """Set up before running all tests"""

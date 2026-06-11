@@ -15,6 +15,8 @@ from .config_manager import ConfigManager
 
 
 def normalize_text_type(text_type: str | None) -> str | None:
+    if text_type is None:
+        return None
     aliases = {
         "both": "all",
         "translation": "translate",
@@ -89,7 +91,7 @@ def build_embeddings(
     CACHE_DIR = config_mgr.get("paths.cache_dir")
     CHUNKED_DIR = config_mgr.get("paths.chunked_dir", "outputs/corpus_chunked")
     MODEL_NAME = model_name or config_mgr.get("embedding.default_model")
-    TEXT_TYPE = normalize_text_type(text_type or config_mgr.get("embedding.text_type"))
+    TEXT_TYPE: str = normalize_text_type(text_type or config_mgr.get("embedding.text_type")) or "all"
     CHUNKING = chunking or config_mgr.get("embedding.default_chunking")
     CACHE_BATCH = config_mgr.get("embedding.cache_batch_size", 50)
     CHROMA_BATCH = config_mgr.get("embedding.chroma_batch_size", 100)

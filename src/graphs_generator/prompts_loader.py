@@ -10,7 +10,7 @@ def load_prompts(filepath: str) -> dict:
 
     text = re.sub(r"\n{3,}", "\n\n", text)
 
-    prompts = {}
+    prompts: dict[str, str] = {}
 
     sections = re.split(r"(Locations:|Time:|Characters:|Relations:)", text)
 

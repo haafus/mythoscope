@@ -57,7 +57,8 @@ def get_model_info(model_key: str) -> dict:
         return {}
 
     with info_path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+        result: dict = json.load(handle)
+        return result
 
 
 def _models_from_analysis_dirs() -> list[str]:

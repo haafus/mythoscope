@@ -18,7 +18,8 @@ CONFIG_PATH = "config/graphs_generator.yaml"
 def _load_config() -> dict:
     try:
         with open(CONFIG_PATH, encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            result: dict = yaml.safe_load(f)
+            return result
     except FileNotFoundError as exc:
         raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}") from exc
 

@@ -60,7 +60,8 @@ def load_from_cache(
             and data.get("model_name") == model_name
             and data.get("chunking_name") == chunking_strategy.name
         ):
-            return np.load(npy_file)
+            result: np.ndarray = np.load(npy_file)
+            return result
         else:
             logger.warning(f"Cache mismatch for key: {key}")
             return None

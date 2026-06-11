@@ -72,15 +72,19 @@ class ConfigManager:
         if not self.config_path or not self.config_path.exists():
             return
 
+        loaded: dict | None = None
         with open(self.config_path, encoding="utf-8") as f:
             if self.config_path.suffix in [".yaml", ".yml"]:
-                loaded = yaml.safe_load(f)
+                raw = yaml.safe_load(f)
+                loaded = raw if isinstance(raw, dict) else None
             elif self.config_path.suffix == ".json":
-                loaded = json.load(f)
+                raw = json.load(f)
+                loaded = raw if isinstance(raw, dict) else None
             else:
                 raise ValueError(f"Unsupported config format: {self.config_path.suffix}")
 
-        self._merge_config(self._config, loaded or {})
+        if isinstance(loaded, dict):
+            self._merge_config(self._config, loaded)
 
     def _merge_config(self, base: dict, override: dict) -> None:
         for key, value in override.items():
@@ -104,7 +108,7 @@ class ConfigManager:
 
     def get(self, key_path: str, default: Any = None) -> Any:
         keys = key_path.split(".")
-        value = self._config
+        value: Any = self._config
         for key in keys:
             if isinstance(value, dict):
                 value = value.get(key)

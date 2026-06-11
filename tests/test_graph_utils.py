@@ -1,0 +1,99 @@
+import importlib.util
+import os
+import sys
+import types
+
+_parent = os.path.join(os.path.dirname(__file__), "..", "src", "graphs_generator")
+
+_stubs_added: list[str] = []
+for stub_name in ["networkx", "openai"]:
+    if stub_name not in sys.modules:
+        sys.modules[stub_name] = types.ModuleType(stub_name)
+        _stubs_added.append(stub_name)
+
+_graph_gen_stub = types.ModuleType("graphs_generator.graph_generator")
+_graph_gen_stub.generate_and_save_graph = lambda *a, **kw: None  # type: ignore[attr-defined]
+sys.modules["graphs_generator.graph_generator"] = _graph_gen_stub
+
+_llm_stub = types.ModuleType("graphs_generator.llm_processing")
+_llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
+sys.modules["graphs_generator.llm_processing"] = _llm_stub
+
+_spec = importlib.util.spec_from_file_location(
+    "graphs_generator.run_graph_generation",
+    os.path.join(_parent, "run_graph_generation.py"),
+)
+assert _spec is not None and _spec.loader is not None
+_mod = importlib.util.module_from_spec(_spec)
+sys.modules["graphs_generator.run_graph_generation"] = _mod
+_spec.loader.exec_module(_mod)
+
+chunk_text = _mod.chunk_text
+deduplicate_entities = _mod.deduplicate_entities
+deduplicate_relations = _mod.deduplicate_relations
+
+
+class TestChunkText:
+    def test_short_text_single_chunk(self):
+        chunks = chunk_text("Hello world.", max_chars=1000, overlap=100)
+        assert len(chunks) == 1
+        assert chunks[0] == "Hello world."
+
+    def test_empty_text(self):
+        assert chunk_text("", max_chars=100, overlap=10) == []
+
+    def test_splits_long_text(self):
+        text = "A" * 500 + " " + "B" * 500
+        chunks = chunk_text(text, max_chars=300, overlap=50)
+        assert len(chunks) > 1
+
+    def test_all_text_covered(self):
+        text = "Sentence one. Sentence two. Sentence three. Sentence four. Sentence five."
+        chunks = chunk_text(text, max_chars=30, overlap=5)
+        combined = " ".join(chunks)
+        for word in ["one", "two", "three", "four", "five"]:
+            assert word in combined
+
+
+class TestDeduplicateEntities:
+    def test_empty_list(self):
+        assert deduplicate_entities([]) == []
+
+    def test_no_duplicates(self):
+        entities = [{"name": "Zeus"}, {"name": "Hera"}]
+        result = deduplicate_entities(entities)
+        assert len(result) == 2
+
+    def test_removes_duplicates(self):
+        entities = [{"name": "Zeus"}, {"name": "zeus"}, {"name": "ZEUS"}]
+        result = deduplicate_entities(entities)
+        assert len(result) == 1
+
+    def test_merges_properties(self):
+        entities = [
+            {"name": "Zeus", "type": "god"},
+            {"name": "zeus", "description": "king of gods"},
+        ]
+        result = deduplicate_entities(entities)
+        assert len(result) == 1
+
+
+class TestDeduplicateRelations:
+    def test_empty_list(self):
+        assert deduplicate_relations([]) == []
+
+    def test_no_duplicates(self):
+        rels = [
+            {"subject": "Zeus", "object": "Hera", "relation": "married"},
+            {"subject": "Zeus", "object": "Athena", "relation": "father"},
+        ]
+        result = deduplicate_relations(rels)
+        assert len(result) == 2
+
+    def test_removes_duplicates(self):
+        rels = [
+            {"subject": "Zeus", "object": "Hera", "relation": "married"},
+            {"subject": "zeus", "object": "hera", "relation": "married"},
+        ]
+        result = deduplicate_relations(rels)
+        assert len(result) == 1

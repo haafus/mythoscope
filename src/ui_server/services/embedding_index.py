@@ -1,6 +1,7 @@
 import csv
 import threading
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -21,7 +22,7 @@ class EmbeddingIndexService:
     def __init__(self):
         self._indexes: dict[str, ModelIndex] = {}
         self._point_records: dict[str, dict[str, dict]] = {}
-        self._search_models: dict[str, object] = {}
+        self._search_models: dict[str, Any] = {}
         self._index_lock = threading.RLock()
         self._model_lock = threading.RLock()
 
@@ -98,7 +99,7 @@ class EmbeddingIndexService:
 
         matrix = np.stack([item["embedding"] for item in items]).astype(np.float32)
         normalized_matrix = self._normalize_matrix(matrix)
-        id_to_index = {}
+        id_to_index: dict[str, int] = {}
         for idx, item in enumerate(items):
             point_id = str(item.get("id"))
             id_to_index.setdefault(point_id, idx)
@@ -145,7 +146,8 @@ class EmbeddingIndexService:
                         "url": row.get("url", ""),
                     }
                     records.setdefault(point_id, record)
-                    records[EmbeddingIndexService._point_key(point_id, record["chunk_index"])] = record
+                    chunk_idx = record["chunk_index"]
+                    records[EmbeddingIndexService._point_key(point_id, int(chunk_idx) if chunk_idx is not None else None)] = record
 
         return records
 
@@ -166,19 +168,22 @@ class EmbeddingIndexService:
                 self._search_models[model_name] = SentenceTransformer(model_path)
 
             model = self._search_models[model_name]
-            embedding = model.encode(
+            raw = model.encode(
                 [query],
                 normalize_embeddings=True,
                 convert_to_numpy=True,
                 show_progress_bar=False,
-            )[0]
-        return np.asarray(embedding, dtype=np.float32)
+            )
+            embedding = raw[0]
+        arr = np.asarray(embedding, dtype=np.float32)
+        return arr  # type: ignore[return-value]
 
     @staticmethod
     def _normalize_matrix(matrix: np.ndarray) -> np.ndarray:
         norms = np.linalg.norm(matrix, axis=1, keepdims=True)
         norms[norms == 0] = 1
-        return matrix / norms
+        result: np.ndarray = matrix / norms
+        return result
 
     @staticmethod
     def _normalize_vector(vector: np.ndarray) -> np.ndarray:

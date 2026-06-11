@@ -69,7 +69,8 @@ class PerformanceMetrics:
     def _get_memory_usage(self) -> float:
         try:
             process = psutil.Process()
-            return process.memory_info().rss / 1024 / 1024
+            mem: float = process.memory_info().rss / 1024 / 1024
+            return mem
         except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
             logger.warning(f"Cannot get memory usage: {e}")
             return 0.0

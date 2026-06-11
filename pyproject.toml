@@ -117,19 +117,5 @@ exclude = ["docs/"]
 module = ["settings", "corpus_builder.clean_gutenberg", "embedding_analyzer.utils"]
 disallow_untyped_defs = true
 
-[[tool.mypy.overrides]]
-module = [
-    "embedding_analyzer.config",
-    "embedding_analyzer.visualization",
-    "embedding_analyzer.loader",
-    "embedding_analyzer.analyzer",
-    "corpus_builder.*",
-    "embeddings_builder.*",
-    "embeddings_clustering.*",
-    "graphs_generator.*",
-    "ui_server.*",
-]
-ignore_errors = true
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -74,7 +74,7 @@ def _process_single_model(
     clustering_params: dict,
     base_dir: Path,
     generate_visualizations: bool = True,
-    embeddings_2d: np.ndarray = None,
+    embeddings_2d: np.ndarray | None = None,
 ) -> dict:
     """Universal function for running one clustering model and saving results."""
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -142,9 +142,9 @@ def _process_single_model(
 
 
 def run_clustering_analysis(
-    model_name: str = None,
+    model_name: str | None = None,
     clustering_model: str = "kmeans",
-    clustering_params: dict = None,
+    clustering_params: dict | None = None,
     generate_visualizations: bool = True,
     output_base_dir: str = "outputs/analysis",
     _analyzer: "EmbeddingAnalyzer | None" = None,
@@ -202,8 +202,8 @@ def run_clustering_analysis(
 
 
 def run_all_clustering_models(
-    model_name: str = None,
-    models_to_run: list = None,
+    model_name: str | None = None,
+    models_to_run: list | None = None,
     output_base_dir: str = "outputs/analysis",
     _analyzer: "EmbeddingAnalyzer | None" = None,
 ):
@@ -218,8 +218,12 @@ def run_all_clustering_models(
     if model_name is None and analyzer.available_models:
         model_name = analyzer.available_models[0]
         analyzer.set_model(model_name)
-    elif _analyzer is not None and analyzer.model_name != model_name:
+    elif _analyzer is not None and model_name is not None and analyzer.model_name != model_name:
         analyzer.set_model(model_name)
+
+    if model_name is None:
+        logger.error("No model name available")
+        return None
 
     safe_model_name = Settings.safe_model_name(model_name)
     data = analyzer.filter_by_model()

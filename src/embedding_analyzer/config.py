@@ -48,33 +48,38 @@ class AnalyzerConfig:
 
     @property
     def visualization_params(self) -> dict:
-        return self._config.get("visualization", {})
+        result: dict = self._config.get("visualization", {})
+        return result
 
     @property
     def umap_configs(self) -> list:
-        default = [
+        default: list = [
             {"n_neighbors": 5, "min_dist": 0.1},
             {"n_neighbors": 15, "min_dist": 0.1},
             {"n_neighbors": 50, "min_dist": 0.1},
             {"n_neighbors": 15, "min_dist": 0.5},
             {"n_neighbors": 15, "min_dist": 0.8},
         ]
-        return self.visualization_params.get("umap_configs", default)
+        result: list = self.visualization_params.get("umap_configs", default)
+        return result
 
     @property
     def tsne_configs(self) -> list:
-        default = [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
-        return self.visualization_params.get("tsne_configs", default)
+        default: list = [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
+        result: list = self.visualization_params.get("tsne_configs", default)
+        return result
 
     @property
     def pca_configs(self) -> list:
-        default = [{}]
-        return self.visualization_params.get("pca_configs", default)
+        default: list = [{}]
+        result: list = self.visualization_params.get("pca_configs", default)
+        return result
 
     @property
     def baseline_configs(self) -> dict:
-        default = {"umap": {"n_neighbors": 15, "min_dist": 0.1}, "tsne": {"perplexity": 30}, "pca": {}}
-        return self.visualization_params.get("baseline_configs", default)
+        default: dict = {"umap": {"n_neighbors": 15, "min_dist": 0.1}, "tsne": {"perplexity": 30}, "pca": {}}
+        result: dict = self.visualization_params.get("baseline_configs", default)
+        return result
 
 
 _analyzer_config = None

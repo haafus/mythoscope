@@ -72,7 +72,7 @@ class EmbeddingBuilder:
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
         text_type: str = "translate",
-        batch_size: int = None,
+        batch_size: int | None = None,
         cache_batch_size: int = 50,
         chroma_batch_size: int = 100,
         metrics: PerformanceMetrics | None = None,
@@ -90,14 +90,14 @@ class EmbeddingBuilder:
 
         self._override_batch_size = batch_size is not None
 
-        if self._override_batch_size:
-            self.batch_size = batch_size
+        if self._override_batch_size and batch_size is not None:
+            self.batch_size: int = batch_size
         else:
             self.batch_size = self.DEFAULT_BATCH_SIZE
 
         if metrics is None:
             self.metrics = PerformanceMetrics(
-                metrics_file=Path(out_dir) / "performance_metrics.json", track_memory=True
+                metrics_file=str(Path(out_dir) / "performance_metrics.json"), track_memory=True
             )
         else:
             self.metrics = metrics
@@ -110,12 +110,16 @@ class EmbeddingBuilder:
         self.text_type = text_type
 
         self.chroma_client = chromadb.PersistentClient(path=str(self.chroma_path))
-        self._current_collection = None
+        self._current_collection: Any = None
 
         self.chunking_strategies = create_chunking_strategies()
         self.set_chunking_strategy(chunking)
 
         self.model_registry = MODELS
+        self.model_name: str = embedding_model
+        self.model: Any = None
+        self.model_dim: int = 0
+        self.model_type: str = "local"
         self.set_model(embedding_model)
 
         cleanup_cache(self.cache_dir, max_size_mb=1024, ttl_days=30)
@@ -149,7 +153,7 @@ class EmbeddingBuilder:
         del self.model_registry[model_name]
 
         if hasattr(self, "model_name") and self.model_name == model_name:
-            self.model_name = None
+            self.model_name = ""
             logger.info("Active model removed. Set a new one with set_model().")
 
     def unload_model(self, model_name: str | None = None):
@@ -165,7 +169,7 @@ class EmbeddingBuilder:
             gc.collect()
             logger.info(f"Model '{model_name}' unloaded from memory")
 
-    def update_model(self, model_name: str, model_path: str = None, dimension: int = None, model_type: str = None):
+    def update_model(self, model_name: str, model_path: str | None = None, dimension: int | None = None, model_type: str | None = None):
         if model_name not in self.model_registry:
             raise KeyError(f"Model '{model_name}' not found. Use add_model().")
         if model_path is not None:
@@ -230,13 +234,14 @@ class EmbeddingBuilder:
         self._load_model(model_name)
         self.model_name = model_name
         self.model = self.model_registry[model_name]["model"]
-        self.model_dim = self.model_registry[model_name]["dim"]
-        self.model_type = self.model_registry[model_name]["type"]
+        dim_value = self.model_registry[model_name]["dim"]
+        self.model_dim = int(dim_value) if dim_value is not None else 0
+        self.model_type = str(self.model_registry[model_name]["type"])
 
         if not self._override_batch_size:
             model_batch = self.model_registry[model_name].get("batch_size")
             if model_batch:
-                self.batch_size = model_batch
+                self.batch_size = int(model_batch)
             else:
                 self.batch_size = self.get_optimal_batch_size(model_name, self.model_dim)
             logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
@@ -258,7 +263,7 @@ class EmbeddingBuilder:
     def get_current_model(self) -> str | None:
         return getattr(self, "model_name", None)
 
-    def get_model_info(self, model_name: str = None) -> dict[str, Any]:
+    def get_model_info(self, model_name: str | None = None) -> dict[str, Any]:
         if model_name is None:
             model_name = self.get_current_model()
         if model_name not in self.model_registry:
@@ -268,9 +273,10 @@ class EmbeddingBuilder:
         return info
 
     @classmethod
-    def get_optimal_batch_size(cls, model_name: str, model_dim: int = None) -> int:
+    def get_optimal_batch_size(cls, model_name: str, model_dim: int | None = None) -> int:
         if model_dim is None:
-            model_dim = MODELS.get(model_name, {}).get("dim", 768)
+            dim_val = MODELS.get(model_name, {}).get("dim", 768)
+            model_dim = int(dim_val) if dim_val is not None else 768
 
         for min_dim, opt_batch in cls.BATCH_SIZE_THRESHOLDS:
             if model_dim >= min_dim:
@@ -284,7 +290,8 @@ class EmbeddingBuilder:
         self.current_chunking = self.chunking_strategies[strategy_name]
 
     def get_current_chunking_strategy(self) -> str | None:
-        return getattr(self, "current_chunking", None).name if hasattr(self, "current_chunking") else None
+        chunking = getattr(self, "current_chunking", None)
+        return chunking.name if chunking is not None else None
 
     def _get_cache_key(self, text: str) -> str:
         return get_cache_key(text, self.model_name, self.current_chunking)
@@ -300,7 +307,8 @@ class EmbeddingBuilder:
 
         if cache_npy_file.exists() and cache_json_file.exists():
             try:
-                return np.load(cache_npy_file)
+                result: np.ndarray = np.load(cache_npy_file)
+                return result
             except Exception:
                 return None
         return None
@@ -345,7 +353,7 @@ class EmbeddingBuilder:
                         save_to_cache(text, emb, self.model_name, self.current_chunking, self.cache_dir)
             return final_embeddings
 
-    def build_embeddings(self, text: str, chunking_strategy: str = None, batch_size: int = None) -> dict[str, Any]:
+    def build_embeddings(self, text: str, chunking_strategy: str | None = None, batch_size: int | None = None) -> dict[str, Any]:
         if chunking_strategy:
             self.set_chunking_strategy(chunking_strategy)
 
@@ -380,7 +388,7 @@ class EmbeddingBuilder:
                 self.batch_size = original_batch_size
 
     def compare_models_and_strategies(
-        self, text: str, models: list[str] = None, strategies: list[str] = None
+        self, text: str, models: list[str] | None = None, strategies: list[str] | None = None
     ) -> dict[str, Any]:
         if models is None:
             models = self.list_models()
@@ -396,7 +404,7 @@ class EmbeddingBuilder:
         return results
 
     def save_embeddings_to_chroma(
-        self, text: str, metadata: dict[str, Any] | None = None, batch_size: int = None
+        self, text: str, metadata: dict[str, Any] | None = None, batch_size: int | None = None
     ) -> dict[str, Any]:
         """Synchronous save kept for backward compatibility when called directly"""
         collection_name = collection_name_for_model(self.model_name)
@@ -584,7 +592,7 @@ class EmbeddingBuilder:
 
         collection = self.chroma_client.get_or_create_collection(name=collection_name)
 
-        write_queue = queue.Queue(maxsize=10)
+        write_queue: queue.Queue[tuple | None] = queue.Queue(maxsize=10)
         writer_thread = threading.Thread(target=self._chroma_writer_worker, args=(collection, write_queue), daemon=True)
         writer_thread.start()
 

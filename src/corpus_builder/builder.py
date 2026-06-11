@@ -180,11 +180,11 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
 def build_corpus(filter_type: set[str], force: bool = False):
     ensure_dir(CORPUS_DIR)
     catalog.clear_catalog()
-    metadata = []
+    metadata: list[dict] = []
 
     download_list = load_download_list(filter_type, force)
 
-    tradition_books = {}
+    tradition_books: dict[str, set] = {}
     if Path(DOWNLOAD_LIST_FILE).exists():
         with open(DOWNLOAD_LIST_FILE, encoding="utf-8") as f:
             full_items = json.load(f)

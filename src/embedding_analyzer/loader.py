@@ -214,7 +214,7 @@ class EmbeddingDataLoader:
     def load_data(
         self, model_name: str | None = None, batch_size: int = 5000, max_records: int | None = None
     ) -> list[dict[str, Any]]:
-        all_data = []
+        all_data: list[dict[str, Any]] = []
         where_filter = {"model": model_name} if model_name else None
 
         for collection in self._iter_collections(model_name=model_name):
@@ -290,7 +290,7 @@ class EmbeddingDataLoader:
         return batch_data
 
     def get_available_models(self) -> list[str]:
-        models = set()
+        models: set[str] = set()
         batch_size = 5000
 
         try:

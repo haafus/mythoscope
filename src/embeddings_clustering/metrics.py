@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 
 def calculate_clustering_metrics(
     embeddings: np.ndarray, predicted_labels: np.ndarray, true_labels: np.ndarray | None = None
-) -> dict[str, float]:
-    metrics = {}
+) -> dict[str, float | int | str | None]:
+    metrics: dict[str, float | int | str | None] = {}
 
     if len(embeddings) == 0:
         return {"error": "Empty embeddings array"}
@@ -65,10 +65,12 @@ def calculate_clustering_metrics(
         else:
             metrics["avg_inter_distance"] = 0.0
 
-        if metrics["avg_intra_distance"] > 0:
-            metrics["separation_ratio"] = float(metrics["avg_inter_distance"] / metrics["avg_intra_distance"])
+        intra = metrics["avg_intra_distance"]
+        inter = metrics["avg_inter_distance"]
+        if isinstance(intra, (int, float)) and isinstance(inter, (int, float)) and intra > 0:
+            metrics["separation_ratio"] = float(inter / intra)
         else:
-            metrics["separation_ratio"] = float("inf") if metrics["avg_inter_distance"] > 0 else 0.0
+            metrics["separation_ratio"] = float("inf") if isinstance(inter, (int, float)) and inter > 0 else 0.0
 
         if len(set(clean_labels)) >= 2:
             try:
@@ -98,8 +100,9 @@ def calculate_clustering_metrics(
                     logger.exception(f"Error {metric_name}")
                     metrics[metric_name] = None
 
-    if n_clusters >= 2 and metrics.get("avg_intra_distance", 0) > 0:
-        metrics["cluster_compactness"] = float(1 / (1 + metrics["avg_intra_distance"]))
+    avg_intra = metrics.get("avg_intra_distance")
+    if n_clusters >= 2 and isinstance(avg_intra, (int, float)) and avg_intra > 0:
+        metrics["cluster_compactness"] = float(1 / (1 + avg_intra))
     else:
         metrics["cluster_compactness"] = 0.0
 

@@ -92,13 +92,13 @@ class CacheValidator:
         return True, stored_checksum
 
     def validate_all(self) -> dict[str, Any]:
-        results = {
+        results: dict[str, Any] = {
             "total": 0,
             "valid": 0,
             "corrupted": 0,
             "expired": 0,
             "corrupted_files": [],
-            "size_mb": 0,
+            "size_mb": 0.0,
             "size_bytes": 0,
         }
 

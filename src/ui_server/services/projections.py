@@ -44,7 +44,8 @@ def get_projection_data(model_key: str, method: str) -> dict | None:
     for path in candidates:
         if path.exists():
             with path.open("r", encoding="utf-8") as handle:
-                return json.load(handle)
+                result: dict = json.load(handle)
+                return result
 
     if method in INTERACTIVE_SAVED_HTML_METHODS:
         saved_html_plot = get_saved_html_plot(model_key, method)

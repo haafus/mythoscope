@@ -17,7 +17,8 @@ def get_metrics(model_key: str, algorithm: str) -> dict:
         return {}
 
     with metrics_path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+        result: dict = json.load(handle)
+        return result
 
 
 def get_saved_cluster_plots(model_key: str, algorithm: str) -> dict:
