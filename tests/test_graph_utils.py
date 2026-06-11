@@ -3,7 +3,7 @@ import os
 import sys
 import types
 
-_parent = os.path.join(os.path.dirname(__file__), "..", "src", "graphs_generator")
+_parent = os.path.join(os.path.dirname(__file__), "..", "src", "05_graphs")
 
 _stubs_added: list[str] = []
 for stub_name in ["networkx", "openai"]:
@@ -11,21 +11,21 @@ for stub_name in ["networkx", "openai"]:
         sys.modules[stub_name] = types.ModuleType(stub_name)
         _stubs_added.append(stub_name)
 
-_graph_gen_stub = types.ModuleType("graphs_generator.graph_generator")
+_graph_gen_stub = types.ModuleType("05_graphs.graph_generator")
 _graph_gen_stub.generate_and_save_graph = lambda *a, **kw: None  # type: ignore[attr-defined]
-sys.modules["graphs_generator.graph_generator"] = _graph_gen_stub
+sys.modules["05_graphs.graph_generator"] = _graph_gen_stub
 
-_llm_stub = types.ModuleType("graphs_generator.llm_processing")
+_llm_stub = types.ModuleType("05_graphs.llm_processing")
 _llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
-sys.modules["graphs_generator.llm_processing"] = _llm_stub
+sys.modules["05_graphs.llm_processing"] = _llm_stub
 
 _spec = importlib.util.spec_from_file_location(
-    "graphs_generator.run_graph_generation",
+    "05_graphs.run_graph_generation",
     os.path.join(_parent, "run_graph_generation.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)
-sys.modules["graphs_generator.run_graph_generation"] = _mod
+sys.modules["05_graphs.run_graph_generation"] = _mod
 _spec.loader.exec_module(_mod)
 
 chunk_text = _mod.chunk_text

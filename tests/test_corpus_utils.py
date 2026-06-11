@@ -9,15 +9,15 @@ bs4_mod = sys.modules["bs4"]
 if not hasattr(bs4_mod, "BeautifulSoup"):
     bs4_mod.BeautifulSoup = type("BeautifulSoup", (), {})  # type: ignore[attr-defined]
 
-sys.modules.setdefault("corpus_builder", types.ModuleType("corpus_builder"))
-cb_mod = sys.modules["corpus_builder"]
+sys.modules.setdefault("01_corpus", types.ModuleType("01_corpus"))
+cb_mod = sys.modules["01_corpus"]
 if not hasattr(cb_mod, "logger"):
     import logging
-    cb_mod.logger = logging.getLogger("corpus_builder")  # type: ignore[attr-defined]
+    cb_mod.logger = logging.getLogger("01_corpus")  # type: ignore[attr-defined]
 
 _spec = importlib.util.spec_from_file_location(
-    "corpus_builder.utils",
-    os.path.join(os.path.dirname(__file__), "..", "src", "corpus_builder", "utils.py"),
+    "01_corpus.utils",
+    os.path.join(os.path.dirname(__file__), "..", "src", "01_corpus", "utils.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)
@@ -114,7 +114,6 @@ class TestCountSentences:
 
 class TestEnsureDir:
     def test_creates_directory(self, tmp_path):
-        from pathlib import Path
         new_dir = tmp_path / "new" / "nested" / "dir"
         assert not new_dir.exists()
         ensure_dir(new_dir)

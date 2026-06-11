@@ -1,7 +1,11 @@
+from importlib import import_module
+
 import numpy as np
 import pytest
 
-from embedding_analyzer.utils import _check_umap, reduce_dimensions
+_utils = import_module("03_project.utils")
+_check_umap = _utils._check_umap
+reduce_dimensions = _utils.reduce_dimensions
 
 
 @pytest.fixture

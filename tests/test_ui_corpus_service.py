@@ -1,4 +1,8 @@
-from ui_server.services.corpus import sanitize_path_part, to_int
+from importlib import import_module
+
+_corpus_svc = import_module("06_web.services.corpus")
+sanitize_path_part = _corpus_svc.sanitize_path_part
+to_int = _corpus_svc.to_int
 
 
 class TestToInt:
