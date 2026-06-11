@@ -78,9 +78,12 @@ def _run_reducer(data: np.ndarray, method: str, n_components: int, **kwargs: Any
         return reducer.fit_transform(data)
 
     if method == "pca":
+        from sklearn.preprocessing import StandardScaler
+
         actual_components = min(n_components, data.shape[1], len(data) - 1)
+        scaled = StandardScaler().fit_transform(data)
         reducer = PCA(n_components=max(1, actual_components), random_state=random_state)
-        return reducer.fit_transform(data)
+        return reducer.fit_transform(scaled)
 
     if method == "tsne":
         from sklearn.manifold import TSNE

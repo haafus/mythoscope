@@ -223,7 +223,7 @@ def _remove_header_metadata(text: str) -> str:
         r"^With an Introduction by ",
         r"^A Prolegomenon by ",
         r"^Preface by ",
-        r"^\[Transcriber[" " ]s Note:",
+        r"^\[Transcriber['’ ]s Note:",
     ]
 
     for i, line in enumerate(lines[:20]):

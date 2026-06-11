@@ -175,7 +175,7 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
     click.echo(f"{'=' * 80}\n")
 
     for key, result in results.items():
-        model_name, strategy_name = key.split("__")
+        model_name, strategy_name = key.split("____")
         click.echo(click.style(f"Model: {model_name}", fg="yellow"))
         click.echo(f"  Strategy: {strategy_name}")
         click.echo(f"  Chunks: {result['num_chunks']}")
