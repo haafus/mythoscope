@@ -9,6 +9,10 @@ class ModelSummary(BaseModel):
     safe_dir: str
 
 
+class ModelListResponse(BaseModel):
+    models: list[ModelSummary]
+
+
 class SearchRequest(BaseModel):
     query: str = Field(..., min_length=1)
     model: str
@@ -17,35 +21,43 @@ class SearchRequest(BaseModel):
 
 class SearchResult(BaseModel):
     id: str
-    tradition: str
-    chunk_index: int
+    tradition: str = "Unknown"
+    major_tradition: str = ""
+    chunk_index: int = 0
     similarity_score: float
     distance: float
-    text_preview: str
+    text: str = ""
+    text_preview: str = ""
+    filename: str = ""
+    book_title: str = ""
+
+
+class SearchResponse(BaseModel):
+    query: str
+    model: str
+    results: list[SearchResult]
+    total: int
 
 
 class PointInfo(BaseModel):
     id: str
-    text: str
-    tradition: str
-    chunk_index: int
-    model: str
+    text: str = ""
+    tradition: str = "Unknown"
+    chunk_index: int = 0
+    book_title: str = ""
+    model: str = ""
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class Neighbor(BaseModel):
-    id: str
-    tradition: str
-    chunk_index: int
-    similarity_score: float
-    distance: float
-    text_preview: str
+class NeighborsResponse(BaseModel):
+    point_id: str
+    neighbors: list[SearchResult]
 
 
 class CorpusDocument(BaseModel):
     id: str
-    major_tradition: str
-    tradition: str
+    major_tradition: str = ""
+    tradition: str = ""
     language: str = ""
     type: str = ""
     url: str = ""
@@ -54,12 +66,24 @@ class CorpusDocument(BaseModel):
     char_count: int = 0
     color: str = "#6b7280"
     description: str = ""
+    source: str = ""
+
+
+class CatalogResponse(BaseModel):
+    documents: list[CorpusDocument]
+    total: int
+
+
+class TraditionsResponse(BaseModel):
+    traditions: dict[str, Any]
+    total: int
 
 
 class ProjectionResponse(BaseModel):
     model: str
     method: str
     points: list[dict[str, Any]]
+    source: str = ""
 
 
 class SavedPlotResponse(BaseModel):

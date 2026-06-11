@@ -2,6 +2,7 @@ import csv
 import io
 import json
 import re
+import time
 import zipfile
 from pathlib import Path
 
@@ -11,6 +12,9 @@ CATALOG_SOURCES = {
     "corpus": paths.corpus_dir,
     "chunked": paths.corpus_chunked_dir,
 }
+
+_catalog_cache: dict[str, tuple[float, list[dict]]] = {}
+_CATALOG_TTL = 300
 
 
 def to_int(value, default: int = 0) -> int:
@@ -30,6 +34,10 @@ def source_root(source: str = "corpus") -> Path:
 
 
 def get_catalog_documents(source: str = "corpus") -> list[dict]:
+    cached = _catalog_cache.get(source)
+    if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
+        return cached[1]
+
     root = source_root(source)
     metadata_path = root / "corpus_metadata.json"
     catalog_path = root / "corpus_catalog.csv"
@@ -52,7 +60,7 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
 
     source_rows = metadata_rows or list(catalog_by_key.values()) or scan_document_rows(root)
     documents = []
-    traditions_info = load_traditions_info(source)
+    traditions_info = get_traditions_info(source)
 
     for row in source_rows:
         key = (
@@ -88,6 +96,8 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
             item.get("id", ""),
         )
     )
+
+    _catalog_cache[source] = (time.monotonic(), documents)
     return documents
 
 
@@ -121,7 +131,7 @@ def scan_document_rows(root: Path) -> list[dict]:
 
 def resolve_document_path(
     doc_id: str, major_tradition: str, tradition: str, source: str = "corpus"
-) -> tuple[Path, Path | None, str]:
+) -> tuple[Path | None, str]:
     corpus_root = source_root(source).resolve()
     major_path = sanitize_path_part(major_tradition)
     tradition_path = sanitize_path_part(tradition)
@@ -131,7 +141,7 @@ def resolve_document_path(
     try:
         file_path.relative_to(corpus_root)
     except ValueError:
-        return corpus_root, None, title_path
+        return None, title_path
 
     if source == "chunked" and not file_path.exists():
         file_path = next(
@@ -146,11 +156,11 @@ def resolve_document_path(
             file_path,
         )
 
-    return corpus_root, file_path, title_path
+    return file_path, title_path
 
 
 def read_document(doc_id: str, major_tradition: str, tradition: str, source: str = "corpus") -> tuple[str, str]:
-    _, file_path, title_path = resolve_document_path(doc_id, major_tradition, tradition, source)
+    file_path, title_path = resolve_document_path(doc_id, major_tradition, tradition, source)
     if not file_path:
         raise PermissionError("Access denied")
     if not file_path.exists():
@@ -159,13 +169,13 @@ def read_document(doc_id: str, major_tradition: str, tradition: str, source: str
     return file_path.read_text(encoding="utf-8"), title_path
 
 
-def build_corpus_archive() -> bytes:
+def build_corpus_archive() -> io.BytesIO:
     documents = get_catalog_documents()
-    archive_buffer = io.BytesIO()
+    buf = io.BytesIO()
 
-    with zipfile.ZipFile(archive_buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for doc in documents:
-            _, file_path, title_path = resolve_document_path(
+            file_path, title_path = resolve_document_path(
                 doc.get("id", ""),
                 doc.get("major_tradition", ""),
                 doc.get("tradition", ""),
@@ -182,20 +192,19 @@ def build_corpus_archive() -> bytes:
             ).as_posix()
             archive.write(file_path, archive_name)
 
-    return archive_buffer.getvalue()
+    buf.seek(0)
+    return buf
 
 
-def load_traditions_info(source: str = "chunked") -> dict:
-    path = source_root(source) / "traditions_info.json"
-    if path.exists():
-        with path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
-        return data if isinstance(data, dict) else {}
+def get_traditions_info(source: str | None = None) -> dict:
+    if source:
+        path = source_root(source) / "traditions_info.json"
+        if path.exists():
+            with path.open("r", encoding="utf-8") as handle:
+                data = json.load(handle)
+            return data if isinstance(data, dict) else {}
+        return {}
 
-    return {}
-
-
-def get_traditions_info() -> dict:
     for path in (
         paths.corpus_chunked_dir / "traditions_info.json",
         paths.corpus_dir / "traditions_info.json",

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from settings import settings
+from settings import load_yaml_config, settings
 
 
 @dataclass(frozen=True)
@@ -43,4 +43,4 @@ def get_paths() -> ProjectPaths:
 
 
 paths = get_paths()
-server_config = ServerConfig()
+server_config = load_yaml_config(ServerConfig, "server")

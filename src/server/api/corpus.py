@@ -1,14 +1,13 @@
-from io import BytesIO
-
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse, StreamingResponse
 
+from server.schemas import CatalogResponse
 from server.services.corpus import build_corpus_archive, get_catalog_documents, read_document
 
 router = APIRouter(prefix="/api/corpus", tags=["corpus"])
 
 
-@router.get("/catalog")
+@router.get("/catalog", response_model=CatalogResponse)
 def catalog(source: str = Query("corpus", pattern="^(corpus|chunked)$")):
     documents = get_catalog_documents(source)
     return {"documents": documents, "total": len(documents)}
@@ -32,9 +31,9 @@ def document(
 
 @router.get("/archive")
 def archive():
-    data = build_corpus_archive()
+    buf = build_corpus_archive()
     return StreamingResponse(
-        BytesIO(data),
+        buf,
         media_type="application/zip",
         headers={"Content-Disposition": 'attachment; filename="mythoscope_corpus.zip"'},
     )

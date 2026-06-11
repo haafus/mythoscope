@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
+from server.schemas import ModelListResponse
 from server.services.models import get_model_info, list_model_summaries
 
 router = APIRouter(prefix="/api/models", tags=["models"])
 
 
-@router.get("")
+@router.get("", response_model=ModelListResponse)
 def list_models():
     return {"models": list_model_summaries()}
 

@@ -84,8 +84,7 @@ def get_saved_html_plot(model_key: str, method: str) -> dict:
 
 
 @lru_cache(maxsize=32)
-def _load_saved_html_projection(path: str, mtime: float, model_name: str, method: str) -> dict | None:
-    del mtime
+def _load_saved_html_projection(path: str, _mtime: float, model_name: str, method: str) -> dict | None:
     html = Path(path).read_text(encoding="utf-8", errors="replace")
     traces = _extract_plotly_traces(html)
     if not traces:

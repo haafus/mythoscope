@@ -7,7 +7,7 @@ from uuid import uuid4
 from fastapi import APIRouter, HTTPException, Query
 
 from server.config import server_config
-from server.schemas import SearchRequest
+from server.schemas import NeighborsResponse, PointInfo, SavedPlotResponse, SearchRequest, SearchResponse
 from server.services.embedding_index import embedding_index_service
 from server.services.projections import get_projection_data, get_saved_html_plot
 
@@ -23,23 +23,23 @@ _search_jobs_lock = threading.Lock()
 def projection(model_key: str, method: str):
     data = get_projection_data(model_key, method)
     if not data:
-        saved_html_plot = get_saved_html_plot(model_key, method)
+        saved = get_saved_html_plot(model_key, method)
         raise HTTPException(
             status_code=404,
             detail={
                 "message": "Projection JSON not found",
-                "saved_html_plot": saved_html_plot,
+                "saved_html_plot": saved,
             },
         )
     return data
 
 
-@router.get("/saved-html/{model_key}/{method}")
+@router.get("/saved-html/{model_key}/{method}", response_model=SavedPlotResponse)
 def saved_html_plot(model_key: str, method: str):
     return get_saved_html_plot(model_key, method)
 
 
-@router.get("/points/{model_key}/{point_id}")
+@router.get("/points/{model_key}/{point_id}", response_model=PointInfo)
 def point_info(model_key: str, point_id: str, chunk_index: int | None = Query(None)):
     try:
         return embedding_index_service.get_point(model_key, point_id, chunk_index)
@@ -47,7 +47,7 @@ def point_info(model_key: str, point_id: str, chunk_index: int | None = Query(No
         raise HTTPException(status_code=404, detail="Point not found") from exc
 
 
-@router.get("/points/{model_key}/{point_id}/neighbors")
+@router.get("/points/{model_key}/{point_id}/neighbors", response_model=NeighborsResponse)
 def point_neighbors(
     model_key: str,
     point_id: str,
@@ -125,6 +125,7 @@ def start_search_job(request: SearchRequest):
 @router.get("/search/jobs/{job_id}")
 def search_job(job_id: str):
     with _search_jobs_lock:
+        _cleanup_search_jobs_locked()
         job = _search_jobs.get(job_id)
         if job is None:
             raise HTTPException(
@@ -134,7 +135,7 @@ def search_job(job_id: str):
         return dict(job)
 
 
-@router.post("/search")
+@router.post("/search", response_model=SearchResponse)
 def search(request: SearchRequest):
     try:
         results = embedding_index_service.search(request.model, request.query, request.top_k)

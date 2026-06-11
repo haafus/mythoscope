@@ -98,7 +98,6 @@ class EmbeddingIndexService:
         model_name = key_to_model(model_key)
         index = self.get_index(model_name)
         query_embedding = self._embed_query(model_name, query)
-        query_embedding = self._normalize_vector(query_embedding)
         similarities = index.normalized_matrix @ query_embedding
         return self._top_results(index, similarities, top_k)
 
@@ -166,7 +165,7 @@ class EmbeddingIndexService:
 
     @staticmethod
     def _point_key(point_id: str, chunk_index: int | None = None) -> str:
-        if chunk_index is None or chunk_index == "":
+        if chunk_index is None:
             return str(point_id)
         return f"{point_id}::{chunk_index}"
 
@@ -187,15 +186,14 @@ class EmbeddingIndexService:
                 self._search_models.move_to_end(model_name)
 
             model = self._search_models[model_name]
-            raw = model.encode(
-                [query],
-                normalize_embeddings=True,
-                convert_to_numpy=True,
-                show_progress_bar=False,
-            )
-            embedding = raw[0]
-        arr = np.asarray(embedding, dtype=np.float32)
-        return arr  # type: ignore[return-value]
+
+        raw = model.encode(
+            [query],
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+            show_progress_bar=False,
+        )
+        return np.asarray(raw[0], dtype=np.float32)
 
     @staticmethod
     def _normalize_matrix(matrix: np.ndarray) -> np.ndarray:
@@ -203,13 +201,6 @@ class EmbeddingIndexService:
         norms[norms == 0] = 1
         result: np.ndarray = matrix / norms
         return result
-
-    @staticmethod
-    def _normalize_vector(vector: np.ndarray) -> np.ndarray:
-        norm = float(np.linalg.norm(vector))
-        if norm == 0:
-            return vector
-        return vector / norm
 
     @staticmethod
     def _top_results(index: ModelIndex, similarities: np.ndarray, limit: int) -> list[dict]:

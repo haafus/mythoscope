@@ -1,0 +1,12 @@
+# Server Configuration
+#
+# All settings shown with their code defaults.
+# Uncomment and change only what you need to override.
+
+# server:
+#   host: "127.0.0.1"
+#   port: 8000
+#   gzip_minimum_size: 1024
+#   cache_max_age: 86400
+#   search_job_ttl_seconds: 1800
+#   search_max_workers: 1
