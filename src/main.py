@@ -1,4 +1,4 @@
-from ui_server.run_server import create_app, run_server
+from server.run_server import create_app, run_server
 
 app = create_app()
 

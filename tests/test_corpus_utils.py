@@ -9,15 +9,15 @@ bs4_mod = sys.modules["bs4"]
 if not hasattr(bs4_mod, "BeautifulSoup"):
     bs4_mod.BeautifulSoup = type("BeautifulSoup", (), {})  # type: ignore[attr-defined]
 
-sys.modules.setdefault("corpus_builder", types.ModuleType("corpus_builder"))
-cb_mod = sys.modules["corpus_builder"]
+sys.modules.setdefault("corpus", types.ModuleType("corpus"))
+cb_mod = sys.modules["corpus"]
 if not hasattr(cb_mod, "logger"):
     import logging
-    cb_mod.logger = logging.getLogger("corpus_builder")  # type: ignore[attr-defined]
+    cb_mod.logger = logging.getLogger("corpus")  # type: ignore[attr-defined]
 
 _spec = importlib.util.spec_from_file_location(
-    "corpus_builder.utils",
-    os.path.join(os.path.dirname(__file__), "..", "src", "corpus_builder", "utils.py"),
+    "corpus.utils",
+    os.path.join(os.path.dirname(__file__), "..", "src", "corpus", "utils.py"),
 )
 assert _spec is not None and _spec.loader is not None
 _mod = importlib.util.module_from_spec(_spec)

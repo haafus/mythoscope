@@ -1,4 +1,4 @@
-from corpus_builder.clean_gutenberg import (
+from corpus.clean_gutenberg import (
     _normalize_gutenberg_whitespace,
     _remove_header_metadata,
     clean_gutenberg_text,

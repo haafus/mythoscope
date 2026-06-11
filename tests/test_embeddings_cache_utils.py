@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from embeddings_builder.cache_utils import get_cache_key
+from embedding.cache_utils import get_cache_key
 
 
 class TestGetCacheKey:

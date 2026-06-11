@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from embedding_analyzer.utils import _check_umap, reduce_dimensions
+from projection.utils import _check_umap, reduce_dimensions
 
 
 @pytest.fixture

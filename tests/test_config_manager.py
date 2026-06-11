@@ -2,7 +2,7 @@ import json
 
 import yaml
 
-from embeddings_builder.config_manager import ConfigManager
+from embedding.config_manager import ConfigManager
 
 
 class TestConfigManager:

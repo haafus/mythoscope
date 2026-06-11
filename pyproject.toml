@@ -62,14 +62,14 @@ all = [
 ]
 
 [project.scripts]
-mytho-server = "ui_server.run_server:main"
-mytho-embeddings = "embeddings_builder.cli:cli"
-mytho-corpus = "corpus_builder.build_corpus:build_and_save_corpus"
-mytho-cluster = "embeddings_clustering.run_clustering:build_clusters"
-mytho-clean-gutenberg = "corpus_builder.clean_gutenberg:clean_gutenberg_texts"
+mytho-server = "server.run_server:main"
+mytho-embeddings = "embedding.cli:cli"
+mytho-corpus = "corpus.build_corpus:build_and_save_corpus"
+mytho-cluster = "clustering.run_clustering:build_clusters"
+mytho-clean-gutenberg = "corpus.clean_gutenberg:clean_gutenberg_texts"
 
 [tool.setuptools]
-py-modules = ["settings", "main"]
+py-modules = ["settings", "config_loader", "main"]
 
 [tool.setuptools.package-dir]
 "" = "src"
@@ -77,12 +77,12 @@ py-modules = ["settings", "main"]
 [tool.setuptools.packages.find]
 where = ["src"]
 include = [
-    "corpus_builder*",
-    "embedding_analyzer*",
-    "embeddings_builder*",
-    "embeddings_clustering*",
-    "graphs_generator*",
-    "ui_server*",
+    "corpus*",
+    "projection*",
+    "embedding*",
+    "clustering*",
+    "graphs*",
+    "server*",
 ]
 
 [tool.ruff]
@@ -114,7 +114,7 @@ ignore_missing_imports = true
 exclude = ["docs/"]
 
 [[tool.mypy.overrides]]
-module = ["settings", "corpus_builder.clean_gutenberg", "embedding_analyzer.utils"]
+module = ["settings", "corpus.clean_gutenberg", "projection.utils"]
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]

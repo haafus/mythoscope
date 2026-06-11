@@ -2,11 +2,11 @@
 
 ## Статус: ВЫПОЛНЕНО
 
-- [x] Фаза 1: corpus_builder — dataclass + YAML override
-- [x] Фаза 2: graphs_generator — dataclass, больше не падает без YAML
-- [x] Фаза 3: embedding_analyzer — dataclass с backward-compatible API
-- [x] Фаза 4: embeddings_builder — извлечение хардкода в ConfigManager
-- [x] Фаза 5: ui_server — ServerConfig dataclass
+- [x] Фаза 1: corpus — dataclass + YAML override
+- [x] Фаза 2: graphs — dataclass, больше не падает без YAML
+- [x] Фаза 3: projection — dataclass с backward-compatible API
+- [x] Фаза 4: embedding — извлечение хардкода в ConfigManager
+- [x] Фаза 5: server — ServerConfig dataclass
 - [ ] Фаза 6: settings.py cleanup (setup_logging) — отложена, низкий приоритет
 
 ---
@@ -17,45 +17,45 @@
 
 | Модуль | Паттерн | Файл |
 |--------|---------|------|
-| `embeddings_builder` | ConfigManager с deep merge | `config_manager.py` (169 строк) |
-| `embedding_analyzer` | AnalyzerConfig singleton с properties | `config.py` (133 строки) |
-| `corpus_builder` | `__getattr__` → settings | `config.py` (15 строк) |
-| `graphs_generator` | Прямой `yaml.safe_load()`, падает без файла | `run_graph_generation.py:18` |
-| `ui_server` | Frozen dataclass → settings | `config.py` (36 строк) |
+| `embedding` | ConfigManager с deep merge | `config_manager.py` (169 строк) |
+| `projection` | AnalyzerConfig singleton с properties | `config.py` (133 строки) |
+| `corpus` | `__getattr__` → settings | `config.py` (15 строк) |
+| `graphs` | Прямой `yaml.safe_load()`, падает без файла | `run_graph_generation.py:18` |
+| `server` | Frozen dataclass → settings | `config.py` (36 строк) |
 
 ### 2. Тройное дублирование значений
 
 ```
 settings.py:21        default_embedding_model = "BAAI/bge-m3"
 config_manager.py:25  "default_model": _settings.default_embedding_model  # берёт из settings
-embeddings_builder.yaml:9  default_model: "BAAI/bge-m3"                  # дублирует
+embedding.yaml:9  default_model: "BAAI/bge-m3"                  # дублирует
 ```
 
 ### 3. YAML-файлы config/ не загружаются модулями
 
-- `config/corpus_builder.yaml` — **не загружается нигде**. Значения захардкожены в `downloader.py`, `builder.py`.
-- `config/embedding_analyzer.yaml` — загружается, но значения дублируют property-дефолты.
-- `config/embeddings_builder.yaml` — загружается через ConfigManager, мержится поверх дефолтов.
-- `config/graphs_generator.yaml` — загружается напрямую, без дефолтов. Падает без файла.
+- `config/corpus.yaml` — **не загружается нигде**. Значения захардкожены в `downloader.py`, `builder.py`.
+- `config/projection.yaml` — загружается, но значения дублируют property-дефолты.
+- `config/embedding.yaml` — загружается через ConfigManager, мержится поверх дефолтов.
+- `config/graphs.yaml` — загружается напрямую, без дефолтов. Падает без файла.
 
 ### 4. Захардкоженные значения разбросаны по коду
 
 | Файл | Строка | Значение | Есть в YAML? |
 |------|--------|----------|--------------|
-| `embeddings_builder/builder.py` | 62 | `BATCH_SIZE_THRESHOLDS = [(3072,8),(1024,16),(768,24)]` | Нет |
-| `embeddings_builder/builder.py` | 89 | `ThreadPoolExecutor(max_workers=16)` | Нет |
-| `corpus_builder/builder.py` | 254 | `max_workers=10` | В YAML, но не читается |
-| `corpus_builder/downloader.py` | 17-19 | `total=4, backoff_factor=1.5` | В YAML, но не читается |
-| `corpus_builder/downloader.py` | 125 | `timeout=(10, 30)` | В YAML, но не читается |
-| `graphs_generator/llm_processing.py` | 17 | `max_retries=5` | Нет |
-| `graphs_generator/llm_processing.py` | 19 | `backoff_factor=5` | Нет |
-| `graphs_generator/llm_processing.py` | 33 | `temperature=0.1` | Нет |
-| `embedding_analyzer/visualization.py` | 18-29 | `HEATMAP_WIDTH=1000`, `DASHBOARD_HEIGHT=700`, etc. | Нет |
-| `ui_server/run_server.py` | 70 | `host="127.0.0.1", port=8000` | Нет |
-| `ui_server/run_server.py` | 17 | `minimum_size=1024` (gzip) | Нет |
-| `ui_server/run_server.py` | 44 | `max-age=86400` | Нет |
-| `ui_server/api/similarity.py` | 19 | `_SEARCH_JOB_TTL_SECONDS=1800` | Нет |
-| `embedding_analyzer/loader.py` | 165,215 | `batch_size=1000`, `batch_size=5000` | Нет |
+| `embedding/builder.py` | 62 | `BATCH_SIZE_THRESHOLDS = [(3072,8),(1024,16),(768,24)]` | Нет |
+| `embedding/builder.py` | 89 | `ThreadPoolExecutor(max_workers=16)` | Нет |
+| `corpus/builder.py` | 254 | `max_workers=10` | В YAML, но не читается |
+| `corpus/downloader.py` | 17-19 | `total=4, backoff_factor=1.5` | В YAML, но не читается |
+| `corpus/downloader.py` | 125 | `timeout=(10, 30)` | В YAML, но не читается |
+| `graphs/llm_processing.py` | 17 | `max_retries=5` | Нет |
+| `graphs/llm_processing.py` | 19 | `backoff_factor=5` | Нет |
+| `graphs/llm_processing.py` | 33 | `temperature=0.1` | Нет |
+| `projection/visualization.py` | 18-29 | `HEATMAP_WIDTH=1000`, `DASHBOARD_HEIGHT=700`, etc. | Нет |
+| `server/run_server.py` | 70 | `host="127.0.0.1", port=8000` | Нет |
+| `server/run_server.py` | 17 | `minimum_size=1024` (gzip) | Нет |
+| `server/run_server.py` | 44 | `max-age=86400` | Нет |
+| `server/api/similarity.py` | 19 | `_SEARCH_JOB_TTL_SECONDS=1800` | Нет |
+| `projection/loader.py` | 165,215 | `batch_size=1000`, `batch_size=5000` | Нет |
 
 ---
 
@@ -89,7 +89,7 @@ from settings import settings
 
 
 @dataclass
-class CorpusBuilderConfig:
+class CorpusConfig:
     # build
     default_type: str = "all"
     max_workers: int = 10
@@ -120,24 +120,24 @@ def _load_yaml_overrides(config_name: str) -> dict:
     return {}
 
 
-def load_config() -> CorpusBuilderConfig:
-    overrides = _load_yaml_overrides("corpus_builder")
+def load_config() -> CorpusConfig:
+    overrides = _load_yaml_overrides("corpus")
     # Flatten nested YAML into flat dataclass fields
     flat = {}
     for section in overrides.values():
         if isinstance(section, dict):
             flat.update(section)
         # top-level keys pass through
-    return CorpusBuilderConfig(**{
+    return CorpusConfig(**{
         k: v for k, v in flat.items()
-        if k in CorpusBuilderConfig.__dataclass_fields__
+        if k in CorpusConfig.__dataclass_fields__
     })
 ```
 
 ### Целевой формат YAML-файлов
 
 ```yaml
-# config/corpus_builder.yaml
+# config/corpus.yaml
 #
 # Все настройки показаны с дефолтами из кода.
 # Раскомментируйте и измените только то, что нужно.
@@ -166,12 +166,12 @@ def load_config() -> CorpusBuilderConfig:
 
 ## План по модулям
 
-### Фаза 1: `corpus_builder` (самый простой, хороший пилот)
+### Фаза 1: `corpus` (самый простой, хороший пилот)
 
 **Проблема:** YAML существует но не загружается. Значения захардкожены в `downloader.py` и `builder.py`.
 
 **Шаги:**
-1. Создать `corpus_builder/config.py` — dataclass `CorpusBuilderConfig` с полями:
+1. Создать `corpus/config.py` — dataclass `CorpusConfig` с полями:
    - `max_workers: int = 10`
    - `timeout_connect: int = 10`
    - `timeout_read: int = 30`
@@ -185,22 +185,22 @@ def load_config() -> CorpusBuilderConfig:
 2. Добавить `load_config()` → загружает YAML, возвращает dataclass
 3. В `downloader.py` — заменить хардкод на `config.timeout_connect`, `config.retry_total`, etc.
 4. В `builder.py:254` — заменить `max_workers=10` на `config.max_workers`
-5. Перевести `config/corpus_builder.yaml` в закомментированный формат
+5. Перевести `config/corpus.yaml` в закомментированный формат
 6. Пути оставить в `settings.py` (через существующий `__getattr__` или прямой импорт)
 
 **Файлы:**
-- Переписать: `src/corpus_builder/config.py`
-- Изменить: `src/corpus_builder/downloader.py`, `src/corpus_builder/builder.py`
-- Обновить: `config/corpus_builder.yaml`
+- Переписать: `src/corpus/config.py`
+- Изменить: `src/corpus/downloader.py`, `src/corpus/builder.py`
+- Обновить: `config/corpus.yaml`
 
 ---
 
-### Фаза 2: `graphs_generator` (самый сломанный)
+### Фаза 2: `graphs` (самый сломанный)
 
 **Проблема:** Падает без YAML. Нет дефолтов. LLM-параметры захардкожены в `llm_processing.py`.
 
 **Шаги:**
-1. Создать `graphs_generator/config.py` — dataclass `GraphsConfig` с полями:
+1. Создать `graphs/config.py` — dataclass `GraphsConfig` с полями:
    - `llm_mode: str = "local"`
    - `api_key: str = ""`, `api_model: str = "gpt-4o-mini"`, `api_base_url: str = "https://api.openai.com/v1"`, `api_json_mode: bool = True`
    - `local_api_key: str = "dummy-key"`, `local_model: str = "google/gemma-4-e4b"`, `local_base_url: str = "http://127.0.0.1:1234/v1/"`, `local_json_mode: bool = False`
@@ -211,22 +211,22 @@ def load_config() -> CorpusBuilderConfig:
 2. Добавить `load_config()` с YAML override
 3. В `run_graph_generation.py` — убрать `_load_config()`, использовать dataclass
 4. В `llm_processing.py` — убрать хардкод `temperature`, `max_retries`, `backoff_factor`, принимать из конфига
-5. Перевести `config/graphs_generator.yaml` в закомментированный формат
+5. Перевести `config/graphs.yaml` в закомментированный формат
 6. LLM-секреты (`api_key`) — читать из env vars через `settings.py`
 
 **Файлы:**
-- Создать: `src/graphs_generator/config.py`
-- Изменить: `src/graphs_generator/run_graph_generation.py`, `src/graphs_generator/llm_processing.py`
-- Обновить: `config/graphs_generator.yaml`
+- Создать: `src/graphs/config.py`
+- Изменить: `src/graphs/run_graph_generation.py`, `src/graphs/llm_processing.py`
+- Обновить: `config/graphs.yaml`
 
 ---
 
-### Фаза 3: `embedding_analyzer` (унификация)
+### Фаза 3: `projection` (унификация)
 
 **Проблема:** AnalyzerConfig — 133 строки с property-дефолтами + глобальный singleton + функции-обёртки. Дублирует YAML.
 
 **Шаги:**
-1. Переписать `embedding_analyzer/config.py` — dataclass `AnalyzerConfig`:
+1. Переписать `projection/config.py` — dataclass `AnalyzerConfig`:
    - `umap_configs: list[dict]` — дефолт из текущих property
    - `tsne_configs: list[dict]` — дефолт из текущих property
    - `pca_configs: list[dict] = field(default_factory=lambda: [{}])`
@@ -237,17 +237,17 @@ def load_config() -> CorpusBuilderConfig:
 3. Удалить singleton `_analyzer_config`, функции `get_analyzer_config()`, `get_chroma_path()`, etc.
 4. В `visualization.py` — убрать module-level константы, читать из конфига
 5. В `loader.py` — убрать хардкод `batch_size=1000` и `batch_size=5000`
-6. Перевести `config/embedding_analyzer.yaml` в закомментированный формат
+6. Перевести `config/projection.yaml` в закомментированный формат
 7. Пути оставить в `settings.py`
 
 **Файлы:**
-- Переписать: `src/embedding_analyzer/config.py`
-- Изменить: `src/embedding_analyzer/visualization.py`, `src/embedding_analyzer/loader.py`, `src/embedding_analyzer/analyzer.py`
-- Обновить: `config/embedding_analyzer.yaml`
+- Переписать: `src/projection/config.py`
+- Изменить: `src/projection/visualization.py`, `src/projection/loader.py`, `src/projection/analyzer.py`
+- Обновить: `config/projection.yaml`
 
 ---
 
-### Фаза 4: `embeddings_builder` (рефакторинг ConfigManager)
+### Фаза 4: `embedding` (рефакторинг ConfigManager)
 
 **Проблема:** ConfigManager — самый зрелый, но 169 строк, dict-based (нет типизации), дублирует settings.
 
@@ -264,35 +264,35 @@ def load_config() -> CorpusBuilderConfig:
 2. Сохранить `validate()` как метод dataclass
 3. Сохранить CLI override через `load_config(config_path=...)` — опциональный путь к YAML
 4. В `builder.py` — убрать `BATCH_SIZE_THRESHOLDS`, `DEFAULT_BATCH_SIZE`, `max_workers=16`, `maxsize=10` — брать из конфига
-5. Перевести `config/embeddings_builder.yaml` в закомментированный формат
+5. Перевести `config/embedding.yaml` в закомментированный формат
 6. Пути оставить в `settings.py`
 
 **Файлы:**
-- Переписать: `src/embeddings_builder/config_manager.py` → `src/embeddings_builder/config.py`
-- Изменить: `src/embeddings_builder/builder.py`, `src/embeddings_builder/cli.py`
-- Обновить: `config/embeddings_builder.yaml`
+- Переписать: `src/embedding/config_manager.py` → `src/embedding/config.py`
+- Изменить: `src/embedding/builder.py`, `src/embedding/cli.py`
+- Обновить: `config/embedding.yaml`
 - Обновить: `tests/test_config_manager.py`
 
 ---
 
-### Фаза 5: `ui_server` (добавить конфигурацию)
+### Фаза 5: `server` (добавить конфигурацию)
 
 **Проблема:** Нет YAML-конфига. Host/port/gzip/cache захардкожены.
 
 **Шаги:**
-1. Расширить `ui_server/config.py` — добавить к `ProjectPaths`:
+1. Расширить `server/config.py` — добавить к `ProjectPaths`:
    - `host: str = "127.0.0.1"`, `port: int = 8000`
    - `gzip_minimum_size: int = 1024`
    - `cache_max_age: int = 86400`
    - `search_job_ttl_seconds: int = 1800`
    - `similarity_max_workers: int = 1`
 2. Загружать из env vars через `settings.py` (добавить `MYTHO_UI_HOST`, `MYTHO_UI_PORT`)
-3. YAML для ui_server **не создавать** — достаточно env vars для серверных настроек
+3. YAML для server **не создавать** — достаточно env vars для серверных настроек
 4. В `run_server.py` — убрать хардкод, брать из конфига
 5. В `api/similarity.py` — убрать `_SEARCH_JOB_TTL_SECONDS`, `max_workers=1`
 
 **Файлы:**
-- Изменить: `src/ui_server/config.py`, `src/ui_server/run_server.py`, `src/ui_server/api/similarity.py`
+- Изменить: `src/server/config.py`, `src/server/run_server.py`, `src/server/api/similarity.py`
 - Изменить: `src/settings.py` (добавить `ui_host`, `ui_port`)
 
 ---
@@ -309,7 +309,7 @@ def load_config() -> CorpusBuilderConfig:
 **Файлы:**
 - Изменить: `src/settings.py`
 - Создать: `src/log_setup.py`
-- Обновить импорты: `embedding_analyzer/config.py`, `graphs_generator/run_graph_generation.py`, `embeddings_builder/cli.py`
+- Обновить импорты: `projection/config.py`, `graphs/run_graph_generation.py`, `embedding/cli.py`
 
 ---
 
@@ -373,12 +373,12 @@ def _flatten(d: dict, parent_key: str = "", sep: str = "_") -> dict:
 ## Порядок выполнения
 
 ```
-Фаза 1: corpus_builder     — пилот, самый простой модуль
-Фаза 2: graphs_generator    — починить падение без файла
+Фаза 1: corpus     — пилот, самый простой модуль
+Фаза 2: graphs    — починить падение без файла
 Фаза 6: settings.py cleanup — вынести logging (нужно перед фазами 3-4)
-Фаза 3: embedding_analyzer  — унификация singleton → dataclass
-Фаза 4: embeddings_builder  — рефакторинг ConfigManager → dataclass
-Фаза 5: ui_server           — добавить недостающую конфигурацию
+Фаза 3: projection  — унификация singleton → dataclass
+Фаза 4: embedding  — рефакторинг ConfigManager → dataclass
+Фаза 5: server           — добавить недостающую конфигурацию
 ```
 
 Каждая фаза — отдельный коммит. Тесты запускаются после каждой фазы.
@@ -390,7 +390,7 @@ def _flatten(d: dict, parent_key: str = "", sep: str = "_") -> dict:
 - **`settings.py` Settings class** — глобальные пути и env vars остаются как есть
 - **`.env` / `config/.env`** — механизм env vars через Pydantic не меняется
 - **`config/details/`** — справочные JSON-файлы (traditions.json, download_list.json) — не конфигурация приложения
-- **`config/graphs_generator_prompts.txt`** — промпты, не настройки
+- **`config/graphs_prompts.txt`** — промпты, не настройки
 - **Visualization constants** (`GRID_COLOR`, `ZERO_LINE_COLOR`) — визуальные константы остаются в коде, не выносятся в конфиг (это стилистика, не настройки)
 
 ## Результат

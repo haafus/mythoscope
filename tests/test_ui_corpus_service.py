@@ -1,4 +1,4 @@
-from ui_server.services.corpus import sanitize_path_part, to_int
+from server.services.corpus import sanitize_path_part, to_int
 
 
 class TestToInt:
