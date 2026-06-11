@@ -252,8 +252,11 @@ def build_corpus(filter_type: set[str], force: bool = False):
     logger.info(f"Starting multithreaded build (items: {len(download_list)})")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=config.max_workers) as executor:
-        for item in download_list:
-            executor.submit(process_single_item, item, force, metadata, processed_urls)
+        futures = [executor.submit(process_single_item, item, force, metadata, processed_urls) for item in download_list]
+        for future in concurrent.futures.as_completed(futures):
+            exc = future.exception()
+            if exc:
+                logger.error(f"Unhandled error in worker thread: {exc}")
 
     with open(METADATA_FILE, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)

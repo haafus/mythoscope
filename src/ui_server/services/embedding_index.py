@@ -1,5 +1,7 @@
 import csv
+import logging
 import threading
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Any
 
@@ -7,7 +9,11 @@ import numpy as np
 
 from ui_server.services.models import get_model_output_dir, key_to_model
 
+logger = logging.getLogger(__name__)
+
 MAX_PREVIEW_CHARS = 700
+MAX_CACHED_INDEXES = 3
+MAX_CACHED_SEARCH_MODELS = 2
 
 
 @dataclass
@@ -20,9 +26,9 @@ class ModelIndex:
 
 class EmbeddingIndexService:
     def __init__(self):
-        self._indexes: dict[str, ModelIndex] = {}
-        self._point_records: dict[str, dict[str, dict]] = {}
-        self._search_models: dict[str, Any] = {}
+        self._indexes: OrderedDict[str, ModelIndex] = OrderedDict()
+        self._point_records: OrderedDict[str, dict[str, dict]] = OrderedDict()
+        self._search_models: OrderedDict[str, Any] = OrderedDict()
         self._index_lock = threading.RLock()
         self._model_lock = threading.RLock()
 
@@ -31,10 +37,17 @@ class EmbeddingIndexService:
 
         with self._index_lock:
             if model_name in self._indexes:
+                self._indexes.move_to_end(model_name)
                 return self._indexes[model_name]
 
             index = self._load_index(model_name)
             self._indexes[model_name] = index
+
+            while len(self._indexes) > MAX_CACHED_INDEXES:
+                evicted_name, _ = self._indexes.popitem(last=False)
+                self._point_records.pop(evicted_name, None)
+                logger.info(f"Evicted index cache for model: {evicted_name}")
+
             return index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
@@ -166,6 +179,12 @@ class EmbeddingIndexService:
             if model_name not in self._search_models:
                 model_path = MODELS.get(model_name, {}).get("path", model_name)
                 self._search_models[model_name] = SentenceTransformer(model_path)
+
+                while len(self._search_models) > MAX_CACHED_SEARCH_MODELS:
+                    evicted_name, _ = self._search_models.popitem(last=False)
+                    logger.info(f"Evicted search model cache: {evicted_name}")
+            else:
+                self._search_models.move_to_end(model_name)
 
             model = self._search_models[model_name]
             raw = model.encode(

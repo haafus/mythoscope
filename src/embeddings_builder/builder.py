@@ -48,6 +48,10 @@ def _safe_id_part(value: Any) -> str:
     return re.sub(r"[^0-9A-Za-z_.-]+", "_", str(value or "unknown")).strip("_") or "unknown"
 
 
+def _safe_meta(val: Any) -> str:
+    return "" if val is None else val
+
+
 def _get_model_output_dir(base_out_dir: str, model_name: str) -> str:
     if not model_name:
         return base_out_dir
@@ -422,9 +426,6 @@ class EmbeddingBuilder:
         if metadata is None:
             metadata = {}
 
-        def _safe_meta(val):
-            return "" if val is None else val
-
         filename = metadata.get("filename", "unknown").replace(".txt", "")
         tradition = metadata.get("tradition", "unknown")
         major_tradition = metadata.get("major_tradition", "unknown")
@@ -620,9 +621,6 @@ class EmbeddingBuilder:
                     model_id = _safe_id_part(self.model_name)
 
                     ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
-
-                    def _safe_meta(val):
-                        return "" if val is None else val
 
                     metadatas = [
                         {

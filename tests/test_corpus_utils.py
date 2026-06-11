@@ -53,6 +53,11 @@ class TestSanitizeFilename:
         assert ">" not in result
         assert "|" not in result
 
+    def test_blocks_path_traversal(self):
+        assert ".." not in sanitize_filename("..")
+        assert ".." not in sanitize_filename("../etc/passwd")
+        assert ".." not in sanitize_filename("foo/../bar")
+
 
 class TestMd5:
     def test_known_hash(self):

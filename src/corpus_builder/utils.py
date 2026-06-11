@@ -21,7 +21,9 @@ PYMUPDF_AVAILABLE = True
 
 
 def sanitize_filename(name: str) -> str:
-    return re.sub(r'[\\/*?:"<>|]', "_", name).strip()
+    name = re.sub(r'[\\/*?:"<>|]', "_", name).strip()
+    name = name.replace("..", "_")
+    return name
 
 
 def md5(data: bytes) -> str:

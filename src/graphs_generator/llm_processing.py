@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class LLMProcessor:
+    MAX_BACKOFF_SECONDS = 120.0
+
     def __init__(
         self,
         api_key: str,
@@ -17,14 +19,16 @@ class LLMProcessor:
         temperature: float = 0.1,
         max_retries: int = 5,
         retry_backoff_factor: float = 5.0,
+        request_timeout: float = 120.0,
     ):
         self.model_name = model_name
         self.use_json_mode = use_json_mode
         self.temperature = temperature
         self.max_retries = max_retries
         self.retry_backoff_factor = retry_backoff_factor
+        self.request_timeout = request_timeout
 
-        self.client = OpenAI(base_url=base_url, api_key=api_key)
+        self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=request_timeout)
 
     def _ask_llm(self, system_prompt: str, user_content: str) -> list:
         retries = 0
@@ -64,27 +68,29 @@ class LLMProcessor:
                     if "data" in result and isinstance(result["data"], list):
                         return result["data"]
 
-                    for _key, value in result.items():
-                        if isinstance(value, list):
-                            return value
+                    list_values = [v for v in result.values() if isinstance(v, list)]
+                    if len(list_values) == 1:
+                        return list_values[0]
+
+                    logger.warning(f"Unexpected JSON structure with {len(list_values)} list keys: {list(result.keys())}")
 
                 return []
 
             except RateLimitError:
                 logger.warning(
-                    f"API limit reached (429). Waiting {backoff_factor} seconds before attempt {retries + 1}/{max_retries}..."
+                    f"API limit reached (429). Waiting {backoff_factor:.0f}s before attempt {retries + 1}/{self.max_retries}..."
                 )
                 time.sleep(backoff_factor)
                 retries += 1
-                backoff_factor *= 2
+                backoff_factor = min(backoff_factor * 2, self.MAX_BACKOFF_SECONDS)
 
             except APIError as e:
                 logger.warning(
-                    f"Temporary API server failure (possibly 503). Waiting {backoff_factor} seconds before attempt {retries + 1}/{max_retries}. Details: {e}"
+                    f"Temporary API server failure (possibly 503). Waiting {backoff_factor:.0f}s before attempt {retries + 1}/{self.max_retries}. Details: {e}"
                 )
                 time.sleep(backoff_factor)
                 retries += 1
-                backoff_factor *= 2
+                backoff_factor = min(backoff_factor * 2, self.MAX_BACKOFF_SECONDS)
 
             except Exception as e:
                 logger.error(f"Critical LLM or network error: {e}")
