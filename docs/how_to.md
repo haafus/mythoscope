@@ -7,7 +7,7 @@
 ```
 config/          — статические конфиги, шаблоны, download_list.json
 outputs/         — всё, что генерируется при запуске (corpus, analysis, logs, …)
-src/             — исходный код (все Python-пакеты, settings.py, main.py)
+src/             — исходный код (все Python-пакеты, settings.py, main.py, cli.py)
 docs/            — документация
 tests/           — тесты
 pyproject.toml   — конфигурация проекта, зависимости, ruff, mypy
@@ -15,53 +15,30 @@ pyproject.toml   — конфигурация проекта, зависимос
 
 ## Подготовка окружения
 
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Linux/macOS
+# .\.venv\Scripts\Activate.ps1   # Windows PowerShell
+pip install --upgrade pip
 pip install -e ".[all,dev]"
 ```
 
 Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/cache/`, `outputs/chroma_db/`, `outputs/analysis/`, `outputs/corpus_chunked/`, `outputs/graphs/` и `outputs/logs/`.
 
-## main.py
+## CLI
 
-Главная точка для FastAPI-приложения: создает `app = create_app()`. При прямом запуске сейчас запускает анализ эмбеддингов через `analyze_embeddings()`.
+Все команды проекта доступны через единую точку входа `mytho`:
 
-Запуск веб-сервера:
-
-```powershell
-py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```bash
+mytho --help
+mytho corpus --help
+mytho embeddings --help
+mytho projection --help
+mytho cluster --help
+mytho graphs --help
+mytho server --help
+mytho pipeline --help
 ```
-
-Прямой запуск текущего поведения:
-
-```powershell
-py -3 src/main.py
-```
-
-## server
-
-Современный FastAPI-сервер и SPA-интерфейс.
-
-Возможности:
-- API для списка моделей, корпуса, географии, похожих фрагментов и кластеризации.
-- Раздача веб-интерфейса из `src/server/web`.
-- Раздача готовых HTML-артефактов из `outputs/analysis/`, `config/template/`, `outputs/corpus/`, `outputs/corpus_chunked/`.
-
-Запуск:
-
-```powershell
-py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
-```
-
-Проверка:
-
-```powershell
-Invoke-WebRequest http://127.0.0.1:8000/api/health
-```
-
-Открыть интерфейс: `http://127.0.0.1:8000/`.
 
 ## corpus
 
@@ -71,7 +48,6 @@ Invoke-WebRequest http://127.0.0.1:8000/api/health
 - `src/corpus/downloader.py` скачивает источники.
 - `src/corpus/utils.py` извлекает текст из HTML/PDF/TXT и нормализует его.
 - `src/corpus/builder.py` строит структуру `outputs/corpus/`, метаданные и каталог.
-- `src/corpus/build_corpus.py` содержит CLI-обертку `build_and_save_corpus()`.
 
 Возможности:
 - Скачать и обработать источники.
@@ -80,31 +56,25 @@ Invoke-WebRequest http://127.0.0.1:8000/api/health
 
 Запуск сборки всего корпуса:
 
-```powershell
-py -3 -c "from corpus.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type all
+```bash
+mytho corpus build --type all
 ```
 
 Только переводы:
 
-```powershell
-py -3 -c "from corpus.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type translation
-```
-
-Только оригиналы:
-
-```powershell
-py -3 -c "from corpus.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type original
+```bash
+mytho corpus build --type translation
 ```
 
 Пересобрать с перезаписью:
 
-```powershell
-py -3 -c "from corpus.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type all --force
+```bash
+mytho corpus build --type all --force
 ```
 
-## corpus.clean_gutenberg
+### clean-gutenberg
 
-Утилита очистки текстов Project Gutenberg от лицензии, служебных заголовков и хвостов. Входит в пакет `corpus`.
+Утилита очистки текстов Project Gutenberg от лицензии, служебных заголовков и хвостов. Входит в группу `corpus`.
 
 Возможности:
 - Найти Gutenberg-тексты в корпусе.
@@ -114,26 +84,20 @@ py -3 -c "from corpus.build_corpus import build_and_save_corpus; build_and_save_
 
 Предпросмотр файлов:
 
-```powershell
-mytho-clean-gutenberg --preview --dir outputs/corpus
+```bash
+mytho corpus clean-gutenberg --preview --dir outputs/corpus
 ```
 
 Очистить весь корпус:
 
-```powershell
-mytho-clean-gutenberg --dir outputs/corpus
+```bash
+mytho corpus clean-gutenberg --dir outputs/corpus
 ```
 
 Очистить один файл:
 
-```powershell
-mytho-clean-gutenberg --file "outputs\corpus\...\book.txt"
-```
-
-Показать статистику бэкапов:
-
-```powershell
-mytho-clean-gutenberg --backup-stats
+```bash
+mytho corpus clean-gutenberg --file "outputs/corpus/.../book.txt"
 ```
 
 ## embedding
@@ -142,7 +106,7 @@ mytho-clean-gutenberg --backup-stats
 
 Основные файлы:
 - `config/embedding.yaml` задает пути, модели, chunking и batch size.
-- `src/embedding/cli.py` предоставляет CLI.
+- `src/embedding/cli.py` содержит click-команды (generate, query, test, compare и др.).
 - `src/embedding/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
 - `src/embedding/chunking.py` содержит стратегии chunking.
 - `src/embedding/cache_utils.py` и `cache_validator.py` работают с кешем.
@@ -156,47 +120,45 @@ mytho-clean-gutenberg --backup-stats
 
 Посмотреть конфиг:
 
-```powershell
-py -3 -m embedding.cli show-config
+```bash
+mytho embeddings show-config
 ```
 
 Сгенерировать эмбеддинги по конфигу:
 
-```powershell
-py -3 -m embedding.cli generate
+```bash
+mytho embeddings generate
 ```
 
 Сгенерировать для конкретной модели:
 
-```powershell
-py -3 -m embedding.cli generate --model "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+```bash
+mytho embeddings generate --model "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 ```
 
 Выбрать chunking и тип текста:
 
-```powershell
-py -3 -m embedding.cli generate --chunking paragraph --text-type all
+```bash
+mytho embeddings generate --chunking paragraph --text-type all
 ```
 
 Поиск по индексу:
 
-```powershell
-py -3 -m embedding.cli query "creation of the world" --model "BAAI/bge-m3" --top-k 5
+```bash
+mytho embeddings query "creation of the world" --model "BAAI/bge-m3" --top-k 5
 ```
 
 Проверить кеш:
 
-```powershell
-py -3 -m embedding.cli validate-cache
+```bash
+mytho embeddings validate-cache
 ```
 
 Удалить коллекцию модели:
 
-```powershell
-py -3 -m embedding.cli clear-cache --model "BAAI/bge-m3"
+```bash
+mytho embeddings clear-cache --model "BAAI/bge-m3"
 ```
-
-Важно: текущая генерация эмбеддингов по умолчанию пересоздает Chroma DB. Перед запуском убедитесь, что старый индекс можно заменить.
 
 ## projection
 
@@ -215,14 +177,20 @@ py -3 -m embedding.cli clear-cache --model "BAAI/bge-m3"
 
 Запустить анализ всех доступных моделей:
 
-```powershell
-py -3 -c "from projection import analyze_embeddings; analyze_embeddings()"
+```bash
+mytho projection
 ```
 
 Запустить анализ одной модели:
 
-```powershell
-py -3 -c "from projection import analyze_embeddings; analyze_embeddings('BAAI/bge-m3')"
+```bash
+mytho projection --model "BAAI/bge-m3"
+```
+
+Только статистика, без графиков:
+
+```bash
+mytho projection --model "BAAI/bge-m3" --no-plots
 ```
 
 ## clustering
@@ -233,7 +201,7 @@ py -3 -c "from projection import analyze_embeddings; analyze_embeddings('BAAI/bg
 - `src/clustering/models.py` содержит KMeans, HDBSCAN из sklearn, Spectral, Birch, GMM, MeanShift, OPTICS.
 - `src/clustering/metrics.py` считает метрики кластеризации.
 - `src/clustering/visualization.py` строит HTML-графики и матрицы.
-- `src/clustering/run_clustering.py` содержит запуск анализа.
+- `src/clustering/run_clustering.py` содержит логику запуска анализа.
 
 Возможности:
 - Кластеризовать эмбеддинги одной или всех моделей.
@@ -242,20 +210,20 @@ py -3 -c "from projection import analyze_embeddings; analyze_embeddings('BAAI/bg
 
 Запустить все алгоритмы для всех доступных моделей:
 
-```powershell
-py -3 -c "from clustering.run_clustering import build_clusters; build_clusters()"
+```bash
+mytho cluster
 ```
 
 Запустить один алгоритм для одной модели:
 
-```powershell
-py -3 -c "from clustering.run_clustering import build_clusters; build_clusters()" --model "BAAI/bge-m3" --single-model --clustering kmeans
+```bash
+mytho cluster --model "BAAI/bge-m3" --single-model --algorithm kmeans
 ```
 
 Запустить без визуализаций:
 
-```powershell
-py -3 -c "from clustering.run_clustering import build_clusters; build_clusters()" --single-model --clustering kmeans --no-viz
+```bash
+mytho cluster --single-model --algorithm kmeans --no-viz
 ```
 
 ## graphs
@@ -276,17 +244,46 @@ py -3 -c "from clustering.run_clustering import build_clusters; build_clusters()
 
 Запуск по конфигу:
 
-```powershell
-py -3 -c "from graphs import run_generate_graphs; run_generate_graphs()"
+```bash
+mytho graphs
 ```
 
 Запуск с перезаписью готовых графов:
 
-```powershell
-py -3 -c "from graphs import run_generate_graphs; run_generate_graphs(force=True)"
+```bash
+mytho graphs --force
 ```
 
 Перед запуском проверьте `config/graphs.yaml`: по умолчанию выбран локальный OpenAI-compatible сервер `http://127.0.0.1:1234/v1/`.
+
+## server
+
+Современный FastAPI-сервер и SPA-интерфейс.
+
+Возможности:
+- API для списка моделей, корпуса, географии, похожих фрагментов и кластеризации.
+- Раздача веб-интерфейса из `src/server/web`.
+- Раздача готовых HTML-артефактов из `outputs/analysis/`, `config/template/`, `outputs/corpus/`, `outputs/corpus_chunked/`.
+
+Запуск:
+
+```bash
+mytho server
+```
+
+С явным указанием хоста и порта:
+
+```bash
+mytho server --host 0.0.0.0 --port 9000
+```
+
+Проверка:
+
+```bash
+curl http://127.0.0.1:8000/api/health
+```
+
+Открыть интерфейс: `http://127.0.0.1:8000/`.
 
 ## config/template
 
@@ -308,44 +305,58 @@ HTML-шаблоны для старого UI.
 - `assets/plot-utils.js` работает с Plotly-графиками.
 - `assets/app.css` содержит стили.
 
-Запускается через FastAPI:
+Запускается через:
 
-```powershell
-py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```bash
+mytho server
 ```
 
 ## Директории outputs/
 
 Все генерируемые данные хранятся в `outputs/`:
 
-- `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `corpus`.
-- `outputs/corpus_chunked/` — корпус после разбиения на чанки. Создается через `embedding`.
-- `outputs/chroma_db/` — локальная Chroma DB с векторными коллекциями. Создается через `embedding`.
-- `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `projection` и `clustering`.
-- `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `graphs`.
-- `outputs/cache/` — кеш эмбеддингов в `.npy` и `.json`. Создается через `embedding`.
+- `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus build`.
+- `outputs/corpus_chunked/` — корпус после разбиения на чанки. Создается через `mytho embeddings generate`.
+- `outputs/chroma_db/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings generate`.
+- `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `mytho projection` и `mytho cluster`.
+- `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
+- `outputs/cache/` — кеш эмбеддингов в `.npy` и `.json`. Создается через `mytho embeddings generate`.
 - `outputs/logs/` — логи всех пайплайнов.
 - `outputs/sources_backup/` — бэкапы исходных текстов перед очисткой Gutenberg.
 
 ## Типовой пайплайн
 
-```powershell
+Запустить всё одной командой:
+
+```bash
+mytho pipeline --model "BAAI/bge-m3" --text-type all
+```
+
+Или по шагам:
+
+```bash
 # 1. Собрать корпус
-py -3 -c "from corpus.build_corpus import build_and_save_corpus; build_and_save_corpus()" --type all
+mytho corpus build --type all
 
 # 2. Очистить Gutenberg-тексты, если нужно
-mytho-clean-gutenberg --preview --dir outputs/corpus
-mytho-clean-gutenberg --dir outputs/corpus
+mytho corpus clean-gutenberg --preview --dir outputs/corpus
+mytho corpus clean-gutenberg --dir outputs/corpus
 
 # 3. Построить эмбеддинги и Chroma DB
-py -3 -m embedding.cli generate
+mytho embeddings generate
 
 # 4. Построить визуальный анализ эмбеддингов
-py -3 -c "from projection import analyze_embeddings; analyze_embeddings()"
+mytho projection
 
 # 5. Построить кластеризацию
-py -3 -c "from clustering.run_clustering import build_clusters; build_clusters()"
+mytho cluster
 
 # 6. Запустить веб-интерфейс
-py -3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+mytho server
+```
+
+Можно пропускать отдельные шаги:
+
+```bash
+mytho pipeline --skip-corpus --skip-graphs
 ```
