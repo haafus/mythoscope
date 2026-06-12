@@ -42,36 +42,6 @@ def save_to_cache(
         return False
 
 
-def load_from_cache(
-    text: str, model_name: str, chunking_strategy: Any, cache_dir: Path, key: str | None = None
-) -> np.ndarray | None:
-    try:
-        if key is None:
-            key = get_cache_key(text, model_name, chunking_strategy)
-        npy_file = cache_dir / f"{key}.npy"
-        json_file = cache_dir / f"{key}.json"
-
-        if not npy_file.exists() or not json_file.exists():
-            return None
-
-        with open(json_file, encoding="utf-8") as f:
-            data = json.load(f)
-
-        if (
-            data.get("text") == text
-            and data.get("model_name") == model_name
-            and data.get("chunking_name") == chunking_strategy.name
-        ):
-            result: np.ndarray = np.load(npy_file)
-            return result
-        else:
-            logger.warning(f"Cache mismatch for key: {key}")
-            return None
-    except Exception as e:
-        logger.error(f"Failed to load from cache: {e}")
-        return None
-
-
 def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) -> int:
     if not cache_dir.exists():
         return 0

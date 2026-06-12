@@ -86,15 +86,3 @@ class TestBirchClustering:
         model = BirchClustering(n_clusters=2)
         labels = model.fit_predict(data)
         assert len(labels) == 50
-
-
-class TestBaseClusteringModel:
-    def test_get_description(self):
-        model = KMeansClustering(n_clusters=2)
-        desc = model.get_description()
-        assert "kmeans" in desc
-
-    def test_get_params_info(self):
-        model = KMeansClustering(n_clusters=2)
-        info = model.get_params_info()
-        assert isinstance(info, dict)

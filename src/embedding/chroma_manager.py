@@ -149,7 +149,3 @@ def query_chroma_collection(
             }
         )
     return formatted
-
-
-def get_chroma_collection(client: chromadb.PersistentClient, collection_name: str) -> chromadb.Collection:
-    return client.get_or_create_collection(name=collection_name)

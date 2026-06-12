@@ -1,22 +1,22 @@
-import sys
+"""Integration smoke test: downloads and loads every registered embedding model.
+
+Heavy (gigabytes of model weights) — auto-skipped when ML dependencies are absent.
+Run explicitly: pytest tests/test_embedding_models_integration.py
+"""
+
 import time
 import unittest
 
 import numpy as np
+import pytest
 
-from .models_repository import MODELS
+from embedding.models_repository import MODELS
 
-try:
-    from sentence_transformers import SentenceTransformer
-except ImportError:
-    print("Error: 'sentence-transformers' is not installed")
-    print("Install it with: pip install sentence-transformers")
-    sys.exit(1)
+SentenceTransformer = pytest.importorskip("sentence_transformers").SentenceTransformer
 
 try:
     import torch
 except ImportError:
-    print("Warning: torch is not installed; GPU checks will be skipped")
     torch = None
 
 
@@ -154,38 +154,3 @@ class TestEmbeddingModels(unittest.TestCase):
                 print(f"      Error: {error}")
 
         print("TESTING COMPLETE")
-
-
-def run_tests():
-    """Run tests with settings for long operations"""
-
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestEmbeddingModels)
-
-    runner = unittest.TextTestRunner(verbosity=2, failfast=False)
-
-    result = runner.run(suite)
-
-    return 0 if result.wasSuccessful() else 1
-
-
-if __name__ == "__main__":
-    try:
-        import numpy as np
-    except ImportError:
-        print("Installing numpy...")
-        import subprocess
-
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"])
-        import numpy as np
-
-    try:
-        from sklearn.metrics.pairwise import cosine_similarity  # noqa: F401
-    except ImportError:
-        print("Installing scikit-learn...")
-        import subprocess
-
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "scikit-learn"])
-
-    exit_code = run_tests()
-    sys.exit(exit_code)

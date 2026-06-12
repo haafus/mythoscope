@@ -56,12 +56,6 @@ class BaseClusteringModel:
     def _do_fit_predict(self, data: np.ndarray) -> np.ndarray:
         raise NotImplementedError
 
-    def get_params_info(self) -> dict:
-        return self.params
-
-    def get_description(self) -> str:
-        return f"{self.name}: {self.params}"
-
 
 class KMeansClustering(BaseClusteringModel):
     def __init__(self, n_clusters: int = 2, **kwargs):

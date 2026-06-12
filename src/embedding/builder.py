@@ -141,29 +141,6 @@ class EmbeddingBuilder:
     def list_models(self) -> list[str]:
         return list(self.model_registry.keys())
 
-    def add_model(self, model_name: str, model_path: str, dimension: int = 384, model_type: str = "local"):
-        if model_name in self.model_registry:
-            raise ValueError(f"Model '{model_name}' already exists.")
-        self.model_registry[model_name] = {
-            "path": model_path,
-            "model": None,
-            "loaded": False,
-            "dim": dimension,
-            "type": model_type,
-        }
-
-    def remove_model(self, model_name: str):
-        if model_name not in self.model_registry:
-            raise KeyError(f"Model '{model_name}' not found in registry.")
-        if self.model_registry[model_name]["loaded"]:
-            del self.model_registry[model_name]["model"]
-            self.model_registry[model_name]["loaded"] = False
-        del self.model_registry[model_name]
-
-        if hasattr(self, "model_name") and self.model_name == model_name:
-            self.model_name = ""
-            logger.info("Active model removed. Set a new one with set_model().")
-
     def unload_model(self, model_name: str | None = None):
         if model_name is None:
             model_name = self.get_current_model()
@@ -176,16 +153,6 @@ class EmbeddingBuilder:
                 torch.mps.empty_cache()
             gc.collect()
             logger.info(f"Model '{model_name}' unloaded from memory")
-
-    def update_model(self, model_name: str, model_path: str | None = None, dimension: int | None = None, model_type: str | None = None):
-        if model_name not in self.model_registry:
-            raise KeyError(f"Model '{model_name}' not found. Use add_model().")
-        if model_path is not None:
-            self.model_registry[model_name]["path"] = model_path
-        if dimension is not None:
-            self.model_registry[model_name]["dim"] = dimension
-        if model_type is not None:
-            self.model_registry[model_name]["type"] = model_type
 
     def _load_model(self, model_name: str, retries: int = 3):
         for attempt in range(retries):
@@ -270,15 +237,6 @@ class EmbeddingBuilder:
 
     def get_current_model(self) -> str | None:
         return getattr(self, "model_name", None)
-
-    def get_model_info(self, model_name: str | None = None) -> dict[str, Any]:
-        if model_name is None:
-            model_name = self.get_current_model()
-        if model_name not in self.model_registry:
-            return {"error": f"Model '{model_name}' not found"}
-        info = self.model_registry[model_name].copy()
-        info["name"] = model_name
-        return info
 
     @classmethod
     def get_optimal_batch_size(cls, model_name: str, model_dim: int | None = None) -> int:

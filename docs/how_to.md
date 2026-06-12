@@ -295,7 +295,6 @@ mytho server
 - `outputs/graphs/` — готовые HTML-графы персонажей и связей. Создается через `mytho graphs`.
 - `outputs/cache/` — кеш эмбеддингов в `.npy` и `.json`. Создается через `mytho embeddings generate`.
 - `outputs/logs/` — логи всех пайплайнов.
-- `outputs/sources_backup/` — бэкапы исходных текстов перед очисткой Gutenberg.
 
 ## Типовой пайплайн
 

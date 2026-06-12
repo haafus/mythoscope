@@ -4,7 +4,7 @@ import logging
 import os
 import re
 from dataclasses import dataclass
-from typing import Any, Callable, Generator
+from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -67,9 +67,9 @@ class LanguageDetector:
             result: str = detect(clean_text)
             return result
         except ImportError:
-            pass
-        except Exception:
-            pass
+            logger.debug("langdetect is not installed, falling back to heuristic detection")
+        except Exception as e:
+            logger.debug(f"langdetect failed ({e}), falling back to heuristic detection")
 
         return cls._heuristic_detect(text)
 
@@ -297,45 +297,6 @@ def character_based_chunking(
         return merged
 
     return _split_recursive(text, separators)
-
-
-def chunk_stream(
-    file_path: str, chunk_size: int = 512, chunk_overlap: int = 64, buffer_size: int = 8192
-) -> Generator[str, None, None]:
-    if chunk_size < 10:
-        raise ValueError("chunk_size must be at least 10 characters")
-    if chunk_overlap >= chunk_size:
-        raise ValueError("chunk_overlap cannot be greater than or equal to chunk_size")
-
-    def process_buffer(buffer_text: str) -> list[str]:
-        if not buffer_text:
-            return []
-        return character_based_chunking(buffer_text, chunk_size, chunk_overlap)
-
-    with open(file_path, encoding="utf-8") as f:
-        buffer = ""
-        last_chunk = ""
-
-        while True:
-            chunk = f.read(buffer_size)
-            if not chunk:
-                break
-
-            buffer += chunk
-
-            if len(buffer) >= chunk_size * 2:
-                chunks = process_buffer(buffer)
-
-                for _i, c in enumerate(chunks[:-1]):
-                    yield c
-
-                last_chunk = chunks[-1] if chunks else ""
-                buffer = last_chunk
-
-        if buffer:
-            chunks = process_buffer(buffer)
-            for c in chunks:
-                yield c
 
 
 def sentence_based_chunking(text: str, chunk_size: int = 512, chunk_overlap: int = 64) -> list[str]:

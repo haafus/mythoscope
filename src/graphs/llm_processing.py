@@ -58,8 +58,12 @@ class LLMProcessor:
                 try:
                     result = json.loads(raw_content)
                 except json.JSONDecodeError:
-                    raw_content = raw_content.replace("```json", "").replace("```", "").strip()
-                    result = json.loads(raw_content)
+                    cleaned = raw_content.replace("```json", "").replace("```", "").strip()
+                    try:
+                        result = json.loads(cleaned)
+                    except json.JSONDecodeError:
+                        logger.error(f"LLM returned invalid JSON (first 300 chars): {raw_content[:300]!r}")
+                        return []
 
                 if isinstance(result, list):
                     return result
@@ -92,8 +96,8 @@ class LLMProcessor:
                 retries += 1
                 backoff_factor = min(backoff_factor * 2, self.MAX_BACKOFF_SECONDS)
 
-            except Exception as e:
-                logger.error(f"Critical LLM or network error: {e}")
+            except Exception:
+                logger.exception("Critical LLM or network error")
                 return []
 
         logger.error(f"Maximum retry count exceeded ({self.max_retries}) because of API limits or failures. Skipping chunk.")

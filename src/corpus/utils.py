@@ -168,29 +168,6 @@ def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
 
-def extract_text_from_file(file_path: Path | str, **kwargs) -> str:
-    path = Path(file_path)
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
-
-    content = path.read_bytes()
-    suffix = path.suffix.lower()
-
-    if suffix in (".pdf",):
-        return pdf_to_text(content, **kwargs)
-    elif suffix in (".html", ".htm", ".xhtml"):
-        return html_to_text(content, **kwargs)
-    elif suffix in (".txt", ".md", ".rst"):
-        return normalize_text(_decode_bytes(content))
-    else:
-        if content[:4] == b"%PDF":
-            return pdf_to_text(content, **kwargs)
-        elif b"<html" in content[:1000].lower() or b"<!doctype html" in content[:1000].lower():
-            return html_to_text(content, **kwargs)
-        else:
-            return normalize_text(_decode_bytes(content))
-
-
 def get_tradition_color(tradition: str) -> str:
     with _color_lock:
         if tradition in _tradition_colors:
