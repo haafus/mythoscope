@@ -11,10 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 def get_cache_key(text: str, model_name: str, chunking_strategy: Any) -> str:
-    key_str = (
-        f"{text}|{model_name}|{chunking_strategy.name}|{chunking_strategy.chunk_size}|{chunking_strategy.chunk_overlap}"
+    h = hashlib.md5()
+    h.update(text.encode("utf-8"))
+    h.update(
+        f"|{model_name}|{chunking_strategy.name}|{chunking_strategy.chunk_size}|{chunking_strategy.chunk_overlap}".encode()
     )
-    return hashlib.md5(key_str.encode("utf-8")).hexdigest()
+    return h.hexdigest()
 
 
 def save_to_cache(
