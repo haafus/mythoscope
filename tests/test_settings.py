@@ -54,8 +54,8 @@ def test_default_embedding_model():
     from settings import Settings
 
     s = Settings()
-    assert s.default_embedding_model == "BAAI/bge-m3"
-    assert s.default_chunking == "paragraph"
+    assert s.embedding.default_model == "BAAI/bge-m3"
+    assert s.embedding.default_chunking == "paragraph"
 
 
 def test_ensure_dirs(tmp_path, monkeypatch):

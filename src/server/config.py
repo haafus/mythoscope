@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from settings import load_yaml_config, settings
+from settings import settings
 
 
 @dataclass(frozen=True)
@@ -14,16 +14,6 @@ class ProjectPaths:
     template_dir: Path
     corpus_dir: Path
     corpus_chunked_dir: Path
-
-
-@dataclass(frozen=True)
-class ServerConfig:
-    host: str = "127.0.0.1"
-    port: int = 8000
-    gzip_minimum_size: int = 1024
-    cache_max_age: int = 86400
-    search_job_ttl_seconds: int = 1800
-    search_max_workers: int = 1
 
 
 def get_paths() -> ProjectPaths:
@@ -43,4 +33,4 @@ def get_paths() -> ProjectPaths:
 
 
 paths = get_paths()
-server_config = load_yaml_config(ServerConfig, "server")
+server_config = settings.server

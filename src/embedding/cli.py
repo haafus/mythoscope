@@ -1,23 +1,25 @@
 import click
 
+from settings import settings
+
 from .build_embeddings import build_embeddings, normalize_text_type
 from .builder import EmbeddingBuilder
 from .cache_validator import CacheValidator
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
-from .config_manager import EmbeddingConfig
 from .performance_metrics import PerformanceMetrics
 
 
-def _create_builder(cfg: EmbeddingConfig, *, model: str | None = None, chunking: str | None = None) -> EmbeddingBuilder:
+def _create_builder(*, model: str | None = None, chunking: str | None = None) -> EmbeddingBuilder:
+    emb = settings.embedding
     return EmbeddingBuilder(
-        corpus_dir=cfg.corpus_dir,
-        out_dir=cfg.out_dir,
-        chroma_path=cfg.chroma_path,
-        cache_dir=cfg.cache_dir,
-        embedding_model=model or cfg.default_model,
-        chunking=chunking or cfg.default_chunking,
-        text_type=cfg.text_type,
-        batch_size=cfg.batch_size,
+        corpus_dir=str(settings.corpus_dir),
+        out_dir=str(settings.analysis_dir),
+        chroma_path=str(settings.chroma_dir),
+        cache_dir=str(settings.cache_dir),
+        embedding_model=model or emb.default_model,
+        chunking=chunking or emb.default_chunking,
+        text_type=emb.text_type,
+        batch_size=emb.batch_size,
     )
 
 
@@ -34,13 +36,11 @@ def generate(ctx, model: str | None, chunking: str | None, text_type: str | None
 
     setup_logging(log_filename="embedding.log")
 
-    cfg = ctx.obj["embedding_config"]
-    metrics = PerformanceMetrics(cfg.metrics_file)
+    metrics = PerformanceMetrics(settings.embedding.metrics_file)
     metrics.start_operation("generate_embeddings")
 
     try:
         build_embeddings(
-            config=cfg,
             model_name=model,
             chunking=chunking,
             batch_size=batch_size,
@@ -61,8 +61,7 @@ def generate(ctx, model: str | None, chunking: str | None, text_type: str | None
 @click.option("--model", "-m", default=None, help="Model to use for query encoding")
 @click.pass_context
 def query(ctx, query: str, top_k: int, model: str | None):
-    cfg = ctx.obj["embedding_config"]
-    builder = _create_builder(cfg, model=model)
+    builder = _create_builder(model=model)
 
     try:
         results = builder.query_chroma(query, top_k=top_k)
@@ -86,12 +85,10 @@ def query(ctx, query: str, top_k: int, model: str | None):
 @click.argument("text_file", type=click.Path(exists=True))
 @click.pass_context
 def test(ctx, text_file: str, model: str | None, strategy: str | None):
-    cfg = ctx.obj["embedding_config"]
-
     with open(text_file, encoding="utf-8") as f:
         text = f.read()
 
-    builder = _create_builder(cfg, model=model, chunking=strategy)
+    builder = _create_builder(model=model, chunking=strategy)
 
     metrics = PerformanceMetrics()
     metrics.start_operation("test_embedding")
@@ -122,15 +119,13 @@ def test(ctx, text_file: str, model: str | None, strategy: str | None):
 @click.argument("text_file", type=click.Path(exists=True))
 @click.pass_context
 def compare(ctx, text_file: str, model: tuple, strategy: tuple):
-    cfg = ctx.obj["embedding_config"]
-
     with open(text_file, encoding="utf-8") as f:
         text = f.read()
 
     models = list(model) if model else None
     strategies = list(strategy) if strategy else None
 
-    builder = _create_builder(cfg)
+    builder = _create_builder()
 
     click.echo("Running comparison... This may take a while.\n")
 
@@ -154,8 +149,7 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
 def clear_cache(ctx, model: str | None, yes: bool):
-    cfg = ctx.obj["embedding_config"]
-    model_name = model or cfg.default_model
+    model_name = model or settings.embedding.default_model
     collection = collection_name_for_model(model_name)
 
     if not yes:
@@ -163,7 +157,7 @@ def clear_cache(ctx, model: str | None, yes: bool):
 
     import chromadb
 
-    chroma_path = ensure_chroma_writable(cfg.chroma_path)
+    chroma_path = ensure_chroma_writable(str(settings.chroma_dir))
     client = chromadb.PersistentClient(path=str(chroma_path))
 
     try:
@@ -179,8 +173,7 @@ def clear_cache(ctx, model: str | None, yes: bool):
 @click.command()
 @click.pass_context
 def validate_cache(ctx):
-    cfg = ctx.obj["embedding_config"]
-    validator = CacheValidator(cfg.cache_dir)
+    validator = CacheValidator(str(settings.cache_dir))
 
     click.echo("Validating cache...")
     results = validator.validate_all()

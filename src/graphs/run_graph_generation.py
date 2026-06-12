@@ -4,7 +4,8 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from .config import load_config
+from settings import settings
+
 from .graph_generator import generate_and_save_graph
 from .llm_processing import LLMProcessor
 from .prompts_loader import load_prompts
@@ -156,13 +157,14 @@ def deduplicate_relations(relations: list) -> list:
 
 
 def run_generate_graphs(force: bool = False):
-    cfg = load_config()
+    cfg = settings.graphs
     llm_cfg = cfg.active_llm_config
 
     logger.info(f"Starting graph generation process (force={force})...")
 
+    prompts_path = str(settings.project_root / "config" / "graphs_prompts.txt")
     try:
-        prompts = load_prompts(cfg.prompts_path)
+        prompts = load_prompts(prompts_path)
     except Exception as e:
         logger.error(f"Failed to load prompts: {e}")
         return
@@ -177,12 +179,13 @@ def run_generate_graphs(force: bool = False):
         retry_backoff_factor=cfg.retry_backoff_factor,
     )
 
-    if not cfg.metadata_path.exists():
-        logger.error(f"Metadata file not found: {cfg.metadata_path}")
+    metadata_path = settings.corpus_metadata_path
+    if not metadata_path.exists():
+        logger.error(f"Metadata file not found: {metadata_path}")
         return
 
     try:
-        with open(cfg.metadata_path, encoding="utf-8") as f:
+        with open(metadata_path, encoding="utf-8") as f:
             corpus = json.load(f)
     except Exception as e:
         logger.error(f"Failed to read metadata: {e}")
@@ -192,7 +195,7 @@ def run_generate_graphs(force: bool = False):
         book_id = book.get("id", "unknown_book")
         txt_path = Path(book.get("path", ""))
 
-        book_out_dir = cfg.output_base_dir / book_id
+        book_out_dir = settings.graphs_dir / book_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
         expected_html_path = book_out_dir / "characters.html"

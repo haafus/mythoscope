@@ -3,8 +3,6 @@ from settings import lazy_module_getattr
 _LAZY_IMPORTS = {
     "EmbeddingBuilder": (".builder", "EmbeddingBuilder"),
     "build_embeddings": (".build_embeddings", "build_embeddings"),
-    "EmbeddingConfig": (".config_manager", "EmbeddingConfig"),
-    "load_embedding_config": (".config_manager", "load_embedding_config"),
     "PerformanceMetrics": (".performance_metrics", "PerformanceMetrics"),
     "CacheValidator": (".cache_validator", "CacheValidator"),
     "save_to_cache": (".cache_utils", "save_to_cache"),

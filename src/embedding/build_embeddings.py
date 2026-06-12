@@ -7,10 +7,11 @@ from pathlib import Path
 
 import torch
 
+from settings import settings
+
 from .builder import EmbeddingBuilder, normalize_text_type
 from .cache_utils import cleanup_cache
 from .chroma_manager import collection_name_for_model
-from .config_manager import EmbeddingConfig, load_embedding_config
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +19,6 @@ logger = logging.getLogger(__name__)
 def build_embeddings(
     clear_existing: bool | None = None,
     batch_size: int | None = None,
-    config: EmbeddingConfig | None = None,
-    config_path: str | None = None,
     model_name: str | None = None,
     models: list | None = None,
     chunking: str | None = None,
@@ -28,18 +27,18 @@ def build_embeddings(
     if clear_existing is False:
         raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
 
-    cfg = config or load_embedding_config(config_path)
+    emb = settings.embedding
 
-    MODEL_NAME = model_name or cfg.default_model
-    TEXT_TYPE: str = normalize_text_type(text_type or cfg.text_type) or "all"
-    CHUNKING = chunking or cfg.default_chunking
-    BATCH_SIZE = batch_size if batch_size is not None else cfg.batch_size
+    MODEL_NAME = model_name or emb.default_model
+    TEXT_TYPE: str = normalize_text_type(text_type or emb.text_type) or "all"
+    CHUNKING = chunking or emb.default_chunking
+    BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
     CLEAR_EXISTING = clear_existing if clear_existing is not None else True
 
-    cleanup_cache(Path(cfg.cache_dir), max_size_mb=cfg.max_size_mb, ttl_days=cfg.ttl_days)
+    cleanup_cache(Path(str(settings.cache_dir)), max_size_mb=emb.cache_max_size_mb, ttl_days=emb.cache_ttl_days)
 
     if CLEAR_EXISTING:
-        chroma_dir = Path(cfg.chroma_path)
+        chroma_dir = Path(str(settings.chroma_dir))
         if chroma_dir.exists():
             logger.info(f"Fully clearing ChromaDB directory: {chroma_dir.resolve()}")
             try:
@@ -48,25 +47,25 @@ def build_embeddings(
                 logger.warning(f"Failed to fully remove database directory: {e}")
 
     builder = EmbeddingBuilder(
-        corpus_dir=cfg.corpus_dir,
-        out_dir=cfg.out_dir,
+        corpus_dir=str(settings.corpus_dir),
+        out_dir=str(settings.analysis_dir),
         text_type=TEXT_TYPE,
         embedding_model=MODEL_NAME,
         chunking=CHUNKING,
-        chroma_path=cfg.chroma_path,
-        cache_dir=cfg.cache_dir,
-        chunked_dir=cfg.chunked_dir,
+        chroma_path=str(settings.chroma_dir),
+        cache_dir=str(settings.cache_dir),
+        chunked_dir=str(settings.corpus_chunked_dir),
         batch_size=BATCH_SIZE,
-        cache_batch_size=cfg.cache_batch_size,
-        chroma_batch_size=cfg.chroma_batch_size,
+        cache_batch_size=emb.cache_batch_size,
+        chroma_batch_size=emb.chroma_batch_size,
     )
 
-    models_to_run = models or ([MODEL_NAME] if model_name else cfg.models or [MODEL_NAME])
+    models_to_run = models or ([MODEL_NAME] if model_name else emb.models or [MODEL_NAME])
 
     logger.info("Starting embedding generation...")
-    logger.info(f"   Source: {cfg.corpus_dir}")
+    logger.info(f"   Source: {settings.corpus_dir}")
     logger.info(f"   Text type: {builder.text_type}")
-    logger.info(f"   Chroma DB: {cfg.chroma_path}")
+    logger.info(f"   Chroma DB: {settings.chroma_dir}")
     logger.info(f"   Results directory: {builder.out_dir}")
     logger.info(f"   Clear collection: {CLEAR_EXISTING}")
 

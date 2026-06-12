@@ -2,16 +2,123 @@ import importlib
 import logging
 import sys
 from collections.abc import Callable
-from dataclasses import fields as dataclass_fields
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import TypeVar
 
-import yaml
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
-T = TypeVar("T")
+# ---------------------------------------------------------------------------
+# Sub-models (BaseModel — not BaseSettings, nested inside Settings)
+# ---------------------------------------------------------------------------
+
+
+class CorpusSettings(BaseModel):
+    max_workers: int = 10
+    timeout_connect: int = 10
+    timeout_read: int = 30
+    retry_total: int = 4
+    retry_backoff_factor: float = 1.5
+    retry_status_forcelist: list[int] = [429, 500, 502, 503, 504]
+    html_include_comments: bool = False
+    html_include_tables: bool = True
+    pdf_extract_tables: bool = False
+    pdf_preserve_layout: bool = True
+
+
+class EmbeddingSettings(BaseModel):
+    default_model: str = "BAAI/bge-m3"
+    default_chunking: str = "paragraph"
+    text_type: str = "all"
+    batch_size: int = 32
+    cache_batch_size: int = 50
+    chroma_batch_size: int = 100
+    max_workers: int = 16
+    queue_maxsize: int = 10
+    models: list[str] = []
+    metrics_file: str = "outputs/analysis/performance_metrics.json"
+    cache_max_size_mb: int = 1024
+    cache_ttl_days: int = 30
+
+
+class GraphsSettings(BaseModel):
+    mode: str = "local"
+    api_key: str = ""
+    model_name: str = "gpt-4o-mini"
+    base_url: str = "https://api.openai.com/v1"
+    use_json_mode: bool = True
+    local_api_key: str = "dummy-key"
+    local_model_name: str = "google/gemma-4-e4b"
+    local_base_url: str = "http://127.0.0.1:1234/v1/"
+    local_use_json_mode: bool = False
+    chunk_size: int = 4000
+    chunk_overlap: int = 1000
+    temperature: float = 0.1
+    max_retries: int = 5
+    retry_backoff_factor: float = 5.0
+
+    @property
+    def active_llm_config(self) -> dict:
+        if self.mode == "local":
+            return {
+                "api_key": self.local_api_key,
+                "model_name": self.local_model_name,
+                "base_url": self.local_base_url,
+                "use_json_mode": self.local_use_json_mode,
+            }
+        return {
+            "api_key": self.api_key,
+            "model_name": self.model_name,
+            "base_url": self.base_url,
+            "use_json_mode": self.use_json_mode,
+        }
+
+
+class ProjectionSettings(BaseModel):
+    umap_configs: list[dict] = [
+        {"n_neighbors": 5, "min_dist": 0.1},
+        {"n_neighbors": 15, "min_dist": 0.1},
+        {"n_neighbors": 50, "min_dist": 0.1},
+        {"n_neighbors": 15, "min_dist": 0.5},
+        {"n_neighbors": 15, "min_dist": 0.8},
+    ]
+    tsne_configs: list[dict] = [{"perplexity": 5}, {"perplexity": 30}, {"perplexity": 50}]
+    pca_configs: list[dict] = [{}]
+    baseline_configs: dict = {
+        "umap": {"n_neighbors": 15, "min_dist": 0.1},
+        "tsne": {"perplexity": 30},
+        "pca": {},
+    }
+
+    @property
+    def chroma_path(self) -> str:
+        return str(settings.chroma_dir)
+
+    @property
+    def output_dir(self) -> str:
+        return str(settings.analysis_dir)
+
+    @property
+    def corpus_dir(self) -> str:
+        return str(settings.corpus_dir)
+
+    @property
+    def corpus_metadata_path(self) -> str:
+        return str(settings.corpus_metadata_path)
+
+
+class ServerSettings(BaseModel):
+    host: str = "127.0.0.1"
+    port: int = 8000
+    gzip_minimum_size: int = 1024
+    cache_max_age: int = 86400
+    search_job_ttl_seconds: int = 1800
+    search_max_workers: int = 1
+
+
+# ---------------------------------------------------------------------------
+# Root settings
+# ---------------------------------------------------------------------------
 
 
 class Settings(BaseSettings):
@@ -26,16 +133,21 @@ class Settings(BaseSettings):
     graphs_dir: Path = Path("outputs/graphs")
     download_list_file: Path = Path("config/download_list.json")
 
-    default_embedding_model: str = "BAAI/bge-m3"
-    default_chunking: str = "paragraph"
-
-    openai_api_key: str = ""
-    openai_base_url: str = "https://api.openai.com/v1"
-    llm_model_name: str = "gpt-4o-mini"
-
     log_level: str = "INFO"
 
-    model_config = {"env_file": [".env", "config/.env"], "env_prefix": "MYTHO_", "extra": "ignore"}
+    # sub-settings
+    corpus: CorpusSettings = CorpusSettings()
+    embedding: EmbeddingSettings = EmbeddingSettings()
+    graphs: GraphsSettings = GraphsSettings()
+    projection: ProjectionSettings = ProjectionSettings()
+    server: ServerSettings = ServerSettings()
+
+    model_config = {
+        "env_file": [".env", "config/.env"],
+        "env_prefix": "MYTHO_",
+        "env_nested_delimiter": "__",
+        "extra": "ignore",
+    }
 
     @property
     def corpus_metadata_path(self) -> Path:
@@ -71,52 +183,12 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-def load_yaml_config(config_cls: type[T], config_name: str, config_path: str | None = None) -> T:
-    overrides = _load_yaml(config_name, config_path)
-    valid_fields = {f.name for f in dataclass_fields(config_cls)}  # type: ignore[arg-type]
-    flat: dict[str, object] = {}
-    for section_val in overrides.values():
-        if isinstance(section_val, dict):
-            flat.update(_flatten(section_val, valid_fields=valid_fields))
-    kwargs = {k: v for k, v in flat.items() if k in valid_fields}
-    return config_cls(**kwargs)  # type: ignore[return-value]
-
-
-def _load_yaml(config_name: str, config_path: str | None) -> dict:
-    candidates = (
-        [Path(config_path)]
-        if config_path
-        else [
-            Path(f"config/{config_name}.yaml"),
-            settings.project_root / "config" / f"{config_name}.yaml",
-        ]
-    )
-    for path in candidates:
-        if path.exists():
-            with open(path, encoding="utf-8") as f:
-                return yaml.safe_load(f) or {}
-    return {}
-
-
-def _flatten(d: dict, parent_key: str = "", sep: str = "_", valid_fields: set[str] | None = None) -> dict:
-    items: list[tuple[str, object]] = []
-    for k, v in d.items():
-        new_key = f"{parent_key}{sep}{k}" if parent_key else k
-        if isinstance(v, dict) and not (valid_fields and new_key in valid_fields):
-            items.extend(_flatten(v, new_key, sep, valid_fields).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
+# ---------------------------------------------------------------------------
+# Shared utilities
+# ---------------------------------------------------------------------------
 
 
 def lazy_module_getattr(module_name: str, lazy_imports: dict[str, tuple[str, str]]) -> Callable[[str], object]:
-    """PEP 562 ``__getattr__`` factory for package ``__init__`` files.
-
-    Defers submodule imports until the attribute is first accessed, so that
-    importing the package (or a light submodule) never pulls heavy optional
-    dependencies. Resolved attributes are cached on the module.
-    """
-
     def __getattr__(name: str) -> object:
         if name in lazy_imports:
             module_path, attr = lazy_imports[name]

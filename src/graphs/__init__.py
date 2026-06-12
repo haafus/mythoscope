@@ -1,8 +1,6 @@
 from settings import lazy_module_getattr
 
 _LAZY_IMPORTS = {
-    "GraphsConfig": (".config", "GraphsConfig"),
-    "load_config": (".config", "load_config"),
     "generate_and_save_graph": (".graph_generator", "generate_and_save_graph"),
     "LLMProcessor": (".llm_processing", "LLMProcessor"),
     "load_prompts": (".prompts_loader", "load_prompts"),
