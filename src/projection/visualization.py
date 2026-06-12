@@ -379,15 +379,8 @@ def plot_distance_heatmap(
         centroids[trad] = np.mean(embeddings, axis=0)
 
     trad_list = sorted(centroids.keys())
-    n_trads = len(trad_list)
-    distance_matrix = np.zeros((n_trads, n_trads))
-
-    for i, trad1 in enumerate(trad_list):
-        for j, trad2 in enumerate(trad_list):
-            if i <= j:
-                dist = cosine_distances([centroids[trad1]], [centroids[trad2]])[0][0]
-                distance_matrix[i, j] = dist
-                distance_matrix[j, i] = dist
+    centroid_matrix = np.array([centroids[trad] for trad in trad_list])
+    distance_matrix = cosine_distances(centroid_matrix, centroid_matrix)
 
     fig = px.imshow(
         distance_matrix,

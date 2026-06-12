@@ -97,3 +97,62 @@ class TestDeduplicateRelations:
         ]
         result = deduplicate_relations(rels)
         assert len(result) == 1
+
+
+load_checkpoint = _mod.load_checkpoint
+save_checkpoint = _mod.save_checkpoint
+clear_checkpoint = _mod.clear_checkpoint
+extract_from_chunk = _mod.extract_from_chunk
+
+
+class TestCheckpoint:
+    def test_roundtrip(self, tmp_path):
+        results = {"characters": [{"Name": "Zeus"}], "relations": [], "locations": [], "times": []}
+        save_checkpoint(tmp_path, 3, results)
+
+        cp = load_checkpoint(tmp_path)
+        assert cp["next_chunk"] == 3
+        assert cp["characters"] == [{"Name": "Zeus"}]
+
+    def test_missing_returns_none(self, tmp_path):
+        assert load_checkpoint(tmp_path) is None
+
+    def test_corrupt_returns_none(self, tmp_path):
+        (tmp_path / "checkpoint.json").write_text("{not json")
+        assert load_checkpoint(tmp_path) is None
+
+    def test_missing_next_chunk_returns_none(self, tmp_path):
+        (tmp_path / "checkpoint.json").write_text('{"characters": []}')
+        assert load_checkpoint(tmp_path) is None
+
+    def test_clear_is_idempotent(self, tmp_path):
+        save_checkpoint(tmp_path, 1, {})
+        clear_checkpoint(tmp_path)
+        assert load_checkpoint(tmp_path) is None
+        clear_checkpoint(tmp_path)
+
+
+class _FakeLLM:
+    def extract_characters(self, text, prompt):
+        return [{"Name": "Zeus"}]
+
+    def extract_relations(self, text, characters, prompt):
+        assert characters == [{"Name": "Zeus"}], "relations must receive extracted characters"
+        return [{"Subject": "Zeus", "Object": "Hera", "Relation": "spouse"}]
+
+    def extract_locations(self, text, prompt):
+        return [{"Name": "Olympus"}]
+
+    def extract_time(self, text, prompt):
+        return "not-a-list"
+
+
+class TestExtractFromChunk:
+    def test_collects_all_entity_types(self):
+        prompts = {"characters": "c", "relations": "r", "locations": "l", "time": "t"}
+        out = extract_from_chunk(_FakeLLM(), "some text", prompts)
+
+        assert out["characters"] == [{"Name": "Zeus"}]
+        assert out["relations"][0]["Subject"] == "Zeus"
+        assert out["locations"] == [{"Name": "Olympus"}]
+        assert out["times"] == []

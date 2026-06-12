@@ -80,6 +80,15 @@ class TestListModelsRaw:
         monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
         assert list_models_raw() == []
 
+    def test_cached_within_ttl(self, tmp_path, monkeypatch):
+        models_json = tmp_path / "models.json"
+        models_json.write_text(json.dumps(["model/a"]))
+        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+
+        assert list_models_raw() == ["model/a"]
+        models_json.write_text(json.dumps(["model/a", "model/b"]))
+        assert list_models_raw() == ["model/a"]
+
 
 class TestListModelSummaries:
     def test_returns_dicts_with_keys(self, tmp_path, monkeypatch):

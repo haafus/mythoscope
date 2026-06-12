@@ -291,25 +291,19 @@ class EmbeddingDataLoader:
 
     def get_available_models(self) -> list[str]:
         models: set[str] = set()
-        batch_size = 5000
 
         try:
             if not self._resolve_collection_names():
                 return []
 
+            # Each collection holds exactly one model, so a single record is
+            # enough — no need to page through the entire collection.
             for collection in self._iter_collections():
-                offset = 0
-                while True:
-                    result = collection.get(limit=batch_size, offset=offset, include=["metadatas"])
-                    metadatas = result.get("metadatas", [])
-                    models.update(m.get("model") for m in metadatas if m and "model" in m)
+                result = collection.get(limit=1, include=["metadatas"])
+                metadatas = result.get("metadatas", [])
+                models.update(m.get("model") for m in metadatas if m and "model" in m)
 
-                    ids = result.get("ids", [])
-                    if len(ids) < batch_size:
-                        break
-                    offset += batch_size
-
-            return sorted(list(models))
+            return sorted(models)
         except Exception as e:
             logger.error(f"Failed to get available models: {e}")
             return []

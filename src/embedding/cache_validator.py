@@ -41,27 +41,27 @@ class CacheValidator:
         except Exception as e:
             logger.warning(f"Failed to save checksums: {e}")
 
-    def _calculate_crc32(self, data: bytes) -> str:
-        return format(zlib.crc32(data) & 0xFFFFFFFF, "08x")
-
-    def _calculate_md5(self, data: bytes) -> str:
-        return hashlib.md5(data).hexdigest()
-
-    def _calculate_checksum(self, data: bytes) -> str:
-        if self.validation_method == "crc32":
-            return self._calculate_crc32(data)
-        elif self.validation_method == "md5":
-            return self._calculate_md5(data)
-        return ""
+    _CHUNK_SIZE = 1024 * 1024
 
     def compute_checksum_for_file(self, file_path: Path) -> str | None:
+        """Streams the file in chunks so large .npy files are never fully loaded into RAM."""
         if not file_path.exists():
             return None
         try:
-            with open(file_path, "rb") as f:
-                data = f.read()
-            return self._calculate_checksum(data)
-        except Exception as e:
+            if self.validation_method == "crc32":
+                crc = 0
+                with open(file_path, "rb") as f:
+                    while chunk := f.read(self._CHUNK_SIZE):
+                        crc = zlib.crc32(chunk, crc)
+                return format(crc & 0xFFFFFFFF, "08x")
+            elif self.validation_method == "md5":
+                h = hashlib.md5()
+                with open(file_path, "rb") as f:
+                    while chunk := f.read(self._CHUNK_SIZE):
+                        h.update(chunk)
+                return h.hexdigest()
+            return ""
+        except OSError as e:
             logger.error(f"Failed to compute checksum for {file_path}: {e}")
             return None
 

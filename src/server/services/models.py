@@ -1,10 +1,13 @@
 import json
+import time
 from pathlib import Path
 
 from server.config import paths
 from settings import Settings
 
 _key_to_model_cache: dict[str, str] = {}
+_models_cache: dict[str, tuple[float, list[str]]] = {}
+_MODELS_TTL = 300
 
 
 def model_to_key(model_name: str) -> str:
@@ -31,14 +34,24 @@ def key_to_model(model_key: str, models: list[str] | None = None) -> str:
 
 
 def list_models_raw() -> list[str]:
+    cache_key = str(paths.analysis_dir)
+    cached = _models_cache.get(cache_key)
+    if cached and time.monotonic() - cached[0] < _MODELS_TTL:
+        return cached[1]
+
+    models: list[str] | None = None
     models_path = paths.analysis_dir / "models.json"
     if models_path.exists():
         with models_path.open("r", encoding="utf-8") as handle:
             data = json.load(handle)
         if isinstance(data, list):
-            return [str(item) for item in data]
+            models = [str(item) for item in data]
 
-    return _models_from_analysis_dirs()
+    if models is None:
+        models = _models_from_analysis_dirs()
+
+    _models_cache[cache_key] = (time.monotonic(), models)
+    return models
 
 
 def list_model_summaries() -> list[dict[str, str]]:

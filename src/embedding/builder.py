@@ -18,7 +18,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
-from .cache_utils import cleanup_cache, get_cache_key, save_to_cache
+from .cache_utils import get_cache_key, save_to_cache
 from .chroma_manager import (
     collection_name_for_model,
     ensure_chroma_writable,
@@ -131,8 +131,6 @@ class EmbeddingBuilder:
         self.model_dim: int = 0
         self.model_type: str = "local"
         self.set_model(embedding_model)
-
-        cleanup_cache(self.cache_dir, max_size_mb=1024, ttl_days=30)
 
     def _update_output_dir(self):
         out_dir_str = _get_model_output_dir(str(self.base_out_dir), self.model_name)
@@ -524,24 +522,20 @@ class EmbeddingBuilder:
                 major_tradition = "unknown"
                 tradition = txt_file.parent.name
 
-            try:
-                with open(txt_file, encoding="utf-8") as f:
-                    yield {
-                        "filename": txt_file.name,
-                        "content": f.read(),
-                        "path": str(txt_file),
-                        "text_id": info.get("text_id", tid),
-                        "catalog_id": info.get("catalog_id", tid),
-                        "major_tradition": major_tradition,
-                        "tradition": tradition,
-                        "doc_type": doc_type,
-                        "color": color,
-                        "language": info.get("language", "unknown"),
-                        "url": info.get("url", ""),
-                    }
-            except Exception as e:
-                logger.warning(f"Failed to read file {txt_file}: {e}")
-                continue
+            # Content is intentionally NOT read here: callers read one file at a
+            # time so the whole corpus is never held in memory at once.
+            yield {
+                "filename": txt_file.name,
+                "path": str(txt_file),
+                "text_id": info.get("text_id", tid),
+                "catalog_id": info.get("catalog_id", tid),
+                "major_tradition": major_tradition,
+                "tradition": tradition,
+                "doc_type": doc_type,
+                "color": color,
+                "language": info.get("language", "unknown"),
+                "url": info.get("url", ""),
+            }
 
     def _chroma_writer_worker(self, collection, write_queue: queue.Queue):
         """Background thread for asynchronous writes to ChromaDB"""
@@ -600,7 +594,7 @@ class EmbeddingBuilder:
         with tqdm(total=total_files, desc="Processing files", unit="file") as pbar:
             for file_info in files_info:
                 try:
-                    content = file_info["content"]
+                    content = Path(file_info["path"]).read_text(encoding="utf-8")
                     result = self.build_embeddings(content, batch_size=self.batch_size)
                     chunks = result.get("chunks", [])
                     embeddings = result.get("embeddings", [])

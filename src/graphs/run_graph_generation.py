@@ -1,6 +1,7 @@
 import copy
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +11,61 @@ from .llm_processing import LLMProcessor
 from .prompts_loader import load_prompts
 
 logger = logging.getLogger(__name__)
+
+CHECKPOINT_FILE = "checkpoint.json"
+
+
+def load_checkpoint(book_out_dir: Path) -> dict | None:
+    path = book_out_dir / CHECKPOINT_FILE
+    if not path.exists():
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict) and isinstance(data.get("next_chunk"), int):
+            return data
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning(f"Ignoring unreadable checkpoint {path}: {e}")
+    return None
+
+
+def save_checkpoint(book_out_dir: Path, next_chunk: int, results: dict) -> None:
+    path = book_out_dir / CHECKPOINT_FILE
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"next_chunk": next_chunk, **results}, f, ensure_ascii=False)
+    except OSError as e:
+        logger.warning(f"Failed to save checkpoint {path}: {e}")
+
+
+def clear_checkpoint(book_out_dir: Path) -> None:
+    (book_out_dir / CHECKPOINT_FILE).unlink(missing_ok=True)
+
+
+def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str, list]:
+    """Extract all entity types from one chunk.
+
+    Characters, locations and time are independent and run in parallel;
+    relations depend on extracted characters and run afterwards.
+    """
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        chars_future = pool.submit(llm.extract_characters, chunk, prompts["characters"])
+        locs_future = pool.submit(llm.extract_locations, chunk, prompts["locations"])
+        times_future = pool.submit(llm.extract_time, chunk, prompts["time"])
+
+        chars = chars_future.result()
+        chars = chars if isinstance(chars, list) else []
+        rels = llm.extract_relations(chunk, chars, prompts["relations"])
+
+        locs = locs_future.result()
+        times = times_future.result()
+
+    return {
+        "characters": chars,
+        "relations": rels if isinstance(rels, list) else [],
+        "locations": locs if isinstance(locs, list) else [],
+        "times": times if isinstance(times, list) else [],
+    }
 
 
 def _setup_graph_logging(logs_dir: Path) -> None:
@@ -178,37 +234,34 @@ def run_generate_graphs(force: bool = False):
         chunks = chunk_text(text, max_chars=cfg.chunk_size, overlap=cfg.chunk_overlap)
         logger.info(f"Text split into {len(chunks)} chunks.")
 
-        all_characters, all_relations = [], []
-        all_locations, all_times = [], []
+        chunk_prompts = {
+            "characters": prompts.get("characters", "Extract characters..."),
+            "relations": prompts.get("relations", "Extract relations..."),
+            "locations": prompts.get("locations", "Extract locations..."),
+            "time": prompts.get("time", "Extract time..."),
+        }
 
-        chars_prompt = prompts.get("characters", "Extract characters...")
-        rels_prompt = prompts.get("relations", "Extract relations...")
-        locs_prompt = prompts.get("locations", "Extract locations...")
-        time_prompt = prompts.get("time", "Extract time...")
+        results: dict[str, list] = {"characters": [], "relations": [], "locations": [], "times": []}
+        start_chunk = 0
 
-        for i, chunk in enumerate(chunks):
-            logger.info(f"  [Chunk {i + 1}/{len(chunks)}] Extracting characters and relations...")
+        checkpoint = None if force else load_checkpoint(book_out_dir)
+        if checkpoint and checkpoint["next_chunk"] <= len(chunks):
+            start_chunk = checkpoint["next_chunk"]
+            for key in results:
+                results[key] = checkpoint.get(key, [])
+            logger.info(f"Resuming from chunk {start_chunk + 1}/{len(chunks)} (checkpoint found).")
 
-            chars = llm.extract_characters(chunk, chars_prompt)
-            current_chunk_chars = chars if isinstance(chars, list) else []
-            all_characters.extend(current_chunk_chars)
+        for i in range(start_chunk, len(chunks)):
+            logger.info(f"  [Chunk {i + 1}/{len(chunks)}] Extracting entities...")
+            chunk_results = extract_from_chunk(llm, chunks[i], chunk_prompts)
+            for key in results:
+                results[key].extend(chunk_results[key])
+            save_checkpoint(book_out_dir, i + 1, results)
 
-            rels = llm.extract_relations(chunk, current_chunk_chars, rels_prompt)
-            if isinstance(rels, list):
-                all_relations.extend(rels)
-
-            locs = llm.extract_locations(chunk, locs_prompt)
-            if isinstance(locs, list):
-                all_locations.extend(locs)
-
-            times = llm.extract_time(chunk, time_prompt)
-            if isinstance(times, list):
-                all_times.extend(times)
-
-        all_characters = deduplicate_entities(all_characters)
-        all_relations = deduplicate_relations(all_relations)
-        all_locations = deduplicate_entities(all_locations)
-        all_times = deduplicate_entities(all_times)
+        all_characters = deduplicate_entities(results["characters"])
+        all_relations = deduplicate_relations(results["relations"])
+        all_locations = deduplicate_entities(results["locations"])
+        all_times = deduplicate_entities(results["times"])
         logger.info(
             f"Extracted unique items: Characters ({len(all_characters)}), Relations ({len(all_relations)}), Locations ({len(all_locations)}), Times ({len(all_times)})"
         )
@@ -227,6 +280,7 @@ def run_generate_graphs(force: bool = False):
                 json.dump(all_times, f, ensure_ascii=False, indent=2)
 
             generate_and_save_graph(all_characters, all_relations, book_out_dir)
+            clear_checkpoint(book_out_dir)
 
         except Exception as e:
             logger.error(f"Error saving files or generating graph for {book_id}: {e}")
