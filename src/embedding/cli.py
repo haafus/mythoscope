@@ -32,7 +32,18 @@ def _create_builder(config_mgr: ConfigManager, *, model: str | None = None, chun
 @click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
 @click.pass_context
 def generate(ctx, model: str | None, chunking: str | None, text_type: str | None, batch_size: int | None):
+    from pathlib import Path
+
+    from settings import setup_logging
+
     config_mgr = ctx.obj["config_manager"]
+    log_config = config_mgr.get("logging")
+    setup_logging(
+        log_filename=Path(log_config.get("file", "logs/embedding.log")).name,
+        level=log_config.get("level"),
+        max_bytes=log_config.get("max_bytes", 10485760),
+        backup_count=log_config.get("backup_count", 5),
+    )
 
     if model:
         config_mgr.set("embedding.default_model", model)

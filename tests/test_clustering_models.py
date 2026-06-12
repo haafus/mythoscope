@@ -1,25 +1,15 @@
-import importlib.util
-import os
-
 import numpy as np
 import pytest
 
-_spec = importlib.util.spec_from_file_location(
-    "clustering_models",
-    os.path.join(os.path.dirname(__file__), "..", "src", "clustering", "models.py"),
+from clustering.models import (
+    BirchClustering,
+    GMMClustering,
+    HDBSCANClustering,
+    KMeansClustering,
+    SpectralClusteringModel,
+    get_clustering_model,
+    list_available_models,
 )
-assert _spec is not None and _spec.loader is not None
-_mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_mod)
-
-BaseClusteringModel = _mod.BaseClusteringModel
-KMeansClustering = _mod.KMeansClustering
-HDBSCANClustering = _mod.HDBSCANClustering
-SpectralClusteringModel = _mod.SpectralClusteringModel
-BirchClustering = _mod.BirchClustering
-GMMClustering = _mod.GMMClustering
-get_clustering_model = _mod.get_clustering_model
-list_available_models = _mod.list_available_models
 
 
 class TestGetClusteringModel:

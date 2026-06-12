@@ -6,6 +6,7 @@ import time
 import zipfile
 from pathlib import Path
 
+from corpus.utils import count_sentences, count_words
 from server.config import paths
 
 CATALOG_SOURCES = {
@@ -122,8 +123,8 @@ def scan_document_rows(root: Path) -> list[dict]:
                 "tradition": tradition.replace("_", " "),
                 "path": str(file_path.relative_to(root)),
                 "char_count": len(text),
-                "word_count": len(re.findall(r"\S+", text)),
-                "sentence_count": len(re.findall(r"[.!?]+", text)),
+                "word_count": count_words(text),
+                "sentence_count": count_sentences(text),
             }
         )
 

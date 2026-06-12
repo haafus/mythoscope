@@ -10,17 +10,15 @@ from . import catalog, logger
 from .clean_gutenberg import clean_gutenberg_in_builder
 from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE, PROCESSED_URLS_FILE, config
 from .downloader import download_file, load_download_list
+from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .utils import (
-    _decode_bytes,
     corpus_text_path,
     count_sentences,
     count_words,
     ensure_dir,
     get_tradition_color,
-    html_to_text,
     md5,
     normalize_text,
-    pdf_to_text,
 )
 
 data_lock = threading.Lock()

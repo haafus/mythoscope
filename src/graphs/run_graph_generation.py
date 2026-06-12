@@ -2,7 +2,6 @@ import copy
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 from pathlib import Path
 
 from .config import load_config
@@ -66,16 +65,6 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
         "locations": locs if isinstance(locs, list) else [],
         "times": times if isinstance(times, list) else [],
     }
-
-
-def _setup_graph_logging(logs_dir: Path) -> None:
-    from settings import setup_logging
-
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    setup_logging(
-        log_filename=f"generation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
-        log_dir=str(logs_dir),
-    )
 
 
 def chunk_text(text: str, max_chars: int, overlap: int) -> list:
@@ -168,9 +157,6 @@ def deduplicate_relations(relations: list) -> list:
 
 def run_generate_graphs(force: bool = False):
     cfg = load_config()
-
-    _setup_graph_logging(cfg.logs_dir)
-
     llm_cfg = cfg.active_llm_config
 
     logger.info(f"Starting graph generation process (force={force})...")

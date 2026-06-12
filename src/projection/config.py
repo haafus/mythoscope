@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from settings import load_yaml_config, settings
-from settings import setup_logging as _shared_setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -96,11 +95,3 @@ def get_model_output_dir(model_name: str) -> str:
     return str(path)
 
 
-def setup_logging(log_dir: str | None = None, log_filename: str = "analyzer.log", clear_handlers: bool = False) -> None:
-    _shared_setup_logging(
-        log_filename=log_filename,
-        log_dir=log_dir,
-        max_bytes=5 * 1024 * 1024,
-        backup_count=3,
-        clear_handlers=clear_handlers,
-    )

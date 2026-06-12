@@ -1,4 +1,4 @@
-import importlib
+from settings import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "EmbeddingAnalyzer": (".analyzer", "EmbeddingAnalyzer"),
@@ -8,7 +8,6 @@ _LAZY_IMPORTS = {
     "get_model_output_dir": (".config", "get_model_output_dir"),
     "get_output_dir": (".config", "get_output_dir"),
     "set_paths": (".config", "set_paths"),
-    "setup_logging": (".config", "setup_logging"),
     "analyze_embeddings": (".visualization", "analyze_embeddings"),
     "plot_comparison_dashboard": (".visualization", "plot_comparison_dashboard"),
     "plot_distance_heatmap": (".visualization", "plot_distance_heatmap"),
@@ -19,13 +18,4 @@ _LAZY_IMPORTS = {
 }
 
 __all__ = list(_LAZY_IMPORTS)
-
-
-def __getattr__(name: str):
-    if name in _LAZY_IMPORTS:
-        module_path, attr = _LAZY_IMPORTS[name]
-        mod = importlib.import_module(module_path, __name__)
-        val = getattr(mod, attr)
-        globals()[name] = val
-        return val
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+__getattr__ = lazy_module_getattr(__name__, _LAZY_IMPORTS)

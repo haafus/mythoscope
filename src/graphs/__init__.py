@@ -1,4 +1,4 @@
-import importlib
+from settings import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "GraphsConfig": (".config", "GraphsConfig"),
@@ -10,13 +10,4 @@ _LAZY_IMPORTS = {
 }
 
 __all__ = list(_LAZY_IMPORTS)
-
-
-def __getattr__(name: str):
-    if name in _LAZY_IMPORTS:
-        module_path, attr = _LAZY_IMPORTS[name]
-        mod = importlib.import_module(module_path, __name__)
-        val = getattr(mod, attr)
-        globals()[name] = val
-        return val
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+__getattr__ = lazy_module_getattr(__name__, _LAZY_IMPORTS)

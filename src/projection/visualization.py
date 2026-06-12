@@ -758,9 +758,6 @@ def generate_clickable_plots(output_dir: str, model_name: str):
 
 def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool = True):
     from .analyzer import EmbeddingAnalyzer
-    from .config import setup_logging
-
-    setup_logging()
 
     try:
         base_analyzer = EmbeddingAnalyzer()

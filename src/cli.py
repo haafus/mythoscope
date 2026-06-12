@@ -83,6 +83,9 @@ def embeddings(ctx, config: str, verbose: bool):
 @click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 def projection(model: str | None, no_plots: bool):
     """Generate dimensionality-reduction projections (PCA, t-SNE, UMAP)."""
+    from settings import setup_logging
+
+    setup_logging(log_filename="analyzer.log")
     from projection.visualization import analyze_embeddings
 
     analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots)
@@ -151,6 +154,14 @@ def cluster(model, clustering_model, single_model, no_viz, output_dir, models_li
 @click.option("--force", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
+    from datetime import datetime
+
+    from settings import setup_logging
+
+    setup_logging(
+        log_filename=f"generation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
+        log_dir="logs",
+    )
     from graphs.run_graph_generation import run_generate_graphs
 
     run_generate_graphs(force=force)

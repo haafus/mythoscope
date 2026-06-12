@@ -1,4 +1,4 @@
-from importlib import import_module
+from settings import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "EmbeddingBuilder": (".builder", "EmbeddingBuilder"),
@@ -19,31 +19,5 @@ _LAZY_IMPORTS = {
     "save_to_chroma_collection": (".chroma_manager", "save_to_chroma_collection"),
 }
 
-__all__ = [
-    "EmbeddingBuilder",
-    "build_embeddings",
-    "ConfigManager",
-    "PerformanceMetrics",
-    "CacheValidator",
-    "save_to_cache",
-    "cleanup_cache",
-    "get_cache_key",
-    "MODELS",
-    "create_chunking_strategies",
-    "ChunkingStrategy",
-    "save_to_chroma_collection",
-    "delete_collection",
-    "query_chroma_collection",
-    "collection_name_for_model",
-    "is_model_collection_name",
-]
-
-
-def __getattr__(name):
-    if name not in _LAZY_IMPORTS:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-    module_name, attr_name = _LAZY_IMPORTS[name]
-    value = getattr(import_module(module_name, __name__), attr_name)
-    globals()[name] = value
-    return value
+__all__ = list(_LAZY_IMPORTS)
+__getattr__ = lazy_module_getattr(__name__, _LAZY_IMPORTS)

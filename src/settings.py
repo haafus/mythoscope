@@ -1,4 +1,7 @@
+import importlib
 import logging
+import sys
+from collections.abc import Callable
 from dataclasses import fields as dataclass_fields
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -104,6 +107,25 @@ def _flatten(d: dict, parent_key: str = "", sep: str = "_", valid_fields: set[st
         else:
             items.append((new_key, v))
     return dict(items)
+
+
+def lazy_module_getattr(module_name: str, lazy_imports: dict[str, tuple[str, str]]) -> Callable[[str], object]:
+    """PEP 562 ``__getattr__`` factory for package ``__init__`` files.
+
+    Defers submodule imports until the attribute is first accessed, so that
+    importing the package (or a light submodule) never pulls heavy optional
+    dependencies. Resolved attributes are cached on the module.
+    """
+
+    def __getattr__(name: str) -> object:
+        if name in lazy_imports:
+            module_path, attr = lazy_imports[name]
+            value = getattr(importlib.import_module(module_path, module_name), attr)
+            sys.modules[module_name].__dict__[name] = value
+            return value
+        raise AttributeError(f"module {module_name!r} has no attribute {name!r}")
+
+    return __getattr__
 
 
 def setup_logging(

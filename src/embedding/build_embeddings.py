@@ -5,12 +5,12 @@ from pathlib import Path
 
 import torch
 
-from settings import setup_logging as _setup_logging
-
 from .builder import EmbeddingBuilder, normalize_text_type
 from .cache_utils import cleanup_cache
 from .chroma_manager import collection_name_for_model
 from .config_manager import ConfigManager
+
+logger = logging.getLogger(__name__)
 
 
 def build_embeddings(
@@ -26,15 +26,6 @@ def build_embeddings(
         raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
 
     config_mgr = ConfigManager(config_path)
-
-    log_config = config_mgr.get("logging")
-    _setup_logging(
-        log_filename=Path(log_config.get("file", "logs/embedding.log")).name,
-        level=log_config.get("level"),
-        max_bytes=log_config.get("max_bytes", 10485760),
-        backup_count=log_config.get("backup_count", 5),
-    )
-    logger = logging.getLogger(__name__)
 
     CORPUS_DIR = config_mgr.get("paths.corpus_dir")
     OUT_DIR = config_mgr.get("paths.out_dir")

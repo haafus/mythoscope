@@ -1,16 +1,6 @@
-import importlib.util
-import os
-
 import numpy as np
 
-_spec = importlib.util.spec_from_file_location(
-    "clustering_metrics",
-    os.path.join(os.path.dirname(__file__), "..", "src", "clustering", "metrics.py"),
-)
-assert _spec is not None and _spec.loader is not None
-_mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_mod)
-calculate_clustering_metrics = _mod.calculate_clustering_metrics
+from clustering.metrics import calculate_clustering_metrics
 
 
 class TestCalculateClusteringMetrics:
