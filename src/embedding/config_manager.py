@@ -31,11 +31,6 @@ class ConfigManager:
                 "max_workers": 16,
                 "queue_maxsize": 10,
             },
-            "chunking": {
-                "fixed_size": {"chunk_size": 512, "chunk_overlap": 64},
-                "sentence_based": {"chunk_size": 512, "chunk_overlap": 64},
-                "paragraph_based": {"chunk_size": 512, "chunk_overlap": 64},
-            },
             "logging": {
                 "level": "INFO",
                 "file": "outputs/logs/embedding.log",
