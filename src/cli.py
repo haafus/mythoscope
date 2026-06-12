@@ -67,10 +67,10 @@ def corpus(text_type: str, force: bool):
 @click.pass_context
 def embeddings(ctx, config: str, verbose: bool):
     """Generate, query, and manage embeddings."""
-    from embedding.config_manager import ConfigManager
+    from embedding.config_manager import load_embedding_config
 
     ctx.ensure_object(dict)
-    ctx.obj["config_manager"] = ConfigManager(config)
+    ctx.obj["embedding_config"] = load_embedding_config(config)
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 

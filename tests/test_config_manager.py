@@ -1,41 +1,65 @@
-from embedding.config_manager import ConfigManager
+from embedding.config_manager import EmbeddingConfig, load_embedding_config
 
 
-class TestConfigManager:
-    def test_default_config_has_paths(self):
-        mgr = ConfigManager(config_path=None)
-        assert mgr.get("paths.corpus_dir") is not None
-        assert mgr.get("paths.out_dir") is not None
+class TestEmbeddingConfig:
+    def test_defaults_have_paths(self):
+        cfg = EmbeddingConfig()
+        assert cfg.corpus_dir
+        assert cfg.out_dir
+        assert cfg.chroma_path
+        assert cfg.cache_dir
+        assert cfg.chunked_dir
 
-    def test_get_nested_key(self):
-        mgr = ConfigManager(config_path=None)
-        assert mgr.get("embedding.default_chunking") is not None
+    def test_defaults_have_embedding_params(self):
+        cfg = EmbeddingConfig()
+        assert cfg.default_model
+        assert cfg.default_chunking
+        assert cfg.text_type == "all"
+        assert cfg.batch_size == 32
 
-    def test_get_missing_key_returns_default(self):
-        mgr = ConfigManager(config_path=None)
-        assert mgr.get("nonexistent.key", "fallback") == "fallback"
+    def test_override_via_constructor(self):
+        cfg = EmbeddingConfig(batch_size=64, text_type="original")
+        assert cfg.batch_size == 64
+        assert cfg.text_type == "original"
 
-    def test_merge_config(self):
-        mgr = ConfigManager(config_path=None)
-        mgr._merge_config(mgr._config, {"embedding": {"batch_size": 999}})
-        assert mgr.get("embedding.batch_size") == 999
+    def test_models_defaults_to_empty(self):
+        cfg = EmbeddingConfig()
+        assert cfg.models == []
 
-    def test_load_yaml(self, tmp_path):
-        cfg = tmp_path / "test.yaml"
-        cfg.write_text("embedding:\n  batch_size: 64\n")
-        mgr = ConfigManager(config_path=str(cfg))
-        assert mgr.get("embedding.batch_size") == 64
+    def test_cache_defaults(self):
+        cfg = EmbeddingConfig()
+        assert cfg.max_size_mb == 1024
+        assert cfg.ttl_days == 30
 
-    def test_load_json(self, tmp_path):
-        cfg = tmp_path / "test.json"
-        cfg.write_text('{"embedding": {"batch_size": 128}}')
-        mgr = ConfigManager(config_path=str(cfg))
-        assert mgr.get("embedding.batch_size") == 128
+    def test_metrics_file_default(self):
+        cfg = EmbeddingConfig()
+        assert "performance_metrics" in cfg.metrics_file
 
-    def test_defaults_preserved_after_partial_load(self, tmp_path):
-        cfg = tmp_path / "partial.yaml"
-        cfg.write_text("embedding:\n  batch_size: 16\n")
-        mgr = ConfigManager(config_path=str(cfg))
-        assert mgr.get("embedding.batch_size") == 16
-        assert mgr.get("embedding.text_type") == "all"
-        assert mgr.get("paths.corpus_dir") is not None
+
+class TestLoadEmbeddingConfig:
+    def test_load_from_yaml(self, tmp_path):
+        cfg_file = tmp_path / "test.yaml"
+        cfg_file.write_text("embedding:\n  batch_size: 128\n  text_type: original\n")
+        cfg = load_embedding_config(str(cfg_file))
+        assert cfg.batch_size == 128
+        assert cfg.text_type == "original"
+
+    def test_defaults_preserved_on_partial_load(self, tmp_path):
+        cfg_file = tmp_path / "partial.yaml"
+        cfg_file.write_text("embedding:\n  batch_size: 16\n")
+        cfg = load_embedding_config(str(cfg_file))
+        assert cfg.batch_size == 16
+        assert cfg.text_type == "all"
+        assert cfg.cache_batch_size == 50
+
+    def test_cache_section_loaded(self, tmp_path):
+        cfg_file = tmp_path / "cache.yaml"
+        cfg_file.write_text("cache:\n  max_size_mb: 512\n  ttl_days: 7\n")
+        cfg = load_embedding_config(str(cfg_file))
+        assert cfg.max_size_mb == 512
+        assert cfg.ttl_days == 7
+
+    def test_missing_file_returns_defaults(self):
+        cfg = load_embedding_config("/nonexistent/path.yaml")
+        assert cfg.batch_size == 32
+        assert cfg.text_type == "all"
