@@ -1,8 +1,6 @@
 import gc
 import logging
 import shutil
-import signal
-import sys
 from pathlib import Path
 
 import torch
@@ -12,51 +10,6 @@ from settings import setup_logging as _setup_logging
 from .builder import EmbeddingBuilder, normalize_text_type
 from .chroma_manager import collection_name_for_model
 from .config_manager import ConfigManager
-
-
-class ApplicationContext:
-    def __init__(self):
-        self.builder = None
-
-    def signal_handler(self, signum, frame):
-        logger = logging.getLogger(__name__)
-        logger.info("Interrupt signal received, saving metrics and cleaning resources...")
-
-        if self.builder is not None:
-            try:
-                self.builder.metrics.save()
-                logger.info("Metrics saved")
-
-                self.builder.close()
-
-                gc.collect()
-                if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
-                elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-                    torch.mps.empty_cache()
-
-            except Exception as e:
-                logger.error(f"Cleanup error: {e}")
-
-        logger.info("Shutting down...")
-        sys.exit(0)
-
-
-app_context = ApplicationContext()
-signal.signal(signal.SIGINT, app_context.signal_handler)
-signal.signal(signal.SIGTERM, app_context.signal_handler)
-
-
-def setup_logging(config_path: str = "config/embedding.yaml"):
-    config_mgr = ConfigManager(config_path)
-    log_config = config_mgr.get("logging")
-    _setup_logging(
-        log_filename=Path(log_config.get("file", "logs/embedding.log")).name,
-        level=log_config.get("level"),
-        max_bytes=log_config.get("max_bytes", 10485760),
-        backup_count=log_config.get("backup_count", 5),
-    )
-    return logging.getLogger(__name__)
 
 
 def build_embeddings(
@@ -71,9 +24,16 @@ def build_embeddings(
     if clear_existing is False:
         raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
 
-    logger = setup_logging(config_path)
-
     config_mgr = ConfigManager(config_path)
+
+    log_config = config_mgr.get("logging")
+    _setup_logging(
+        log_filename=Path(log_config.get("file", "logs/embedding.log")).name,
+        level=log_config.get("level"),
+        max_bytes=log_config.get("max_bytes", 10485760),
+        backup_count=log_config.get("backup_count", 5),
+    )
+    logger = logging.getLogger(__name__)
 
     CORPUS_DIR = config_mgr.get("paths.corpus_dir")
     OUT_DIR = config_mgr.get("paths.out_dir")
@@ -97,7 +57,7 @@ def build_embeddings(
             except Exception as e:
                 logger.warning(f"Failed to fully remove database directory: {e}")
 
-    app_context.builder = EmbeddingBuilder(
+    builder = EmbeddingBuilder(
         corpus_dir=CORPUS_DIR,
         out_dir=OUT_DIR,
         text_type=TEXT_TYPE,
@@ -115,9 +75,9 @@ def build_embeddings(
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {CORPUS_DIR}")
-    logger.info(f"   Text type: {app_context.builder.text_type}")
+    logger.info(f"   Text type: {builder.text_type}")
     logger.info(f"   Chroma DB: {CHROMA_PATH}")
-    logger.info(f"   Results directory: {app_context.builder.out_dir}")
+    logger.info(f"   Results directory: {builder.out_dir}")
     logger.info(f"   Clear collection: {CLEAR_EXISTING}")
 
     try:
@@ -125,23 +85,24 @@ def build_embeddings(
             logger.info(f"   Model: {model}")
             logger.info(f"   Model batch size: {BATCH_SIZE}")
 
-            app_context.builder.set_model(model)
-
-            collection_to_write = collection_name_for_model(model)
-
-            logger.info(f"Collection: {collection_to_write}")
-
-            app_context.builder.save_all_corpus_to_chroma()
+            builder.set_model(model)
+            logger.info(f"Collection: {collection_name_for_model(model)}")
+            builder.save_all_corpus_to_chroma()
 
     except Exception as e:
         logger.error(f"Embedding generation error: {e}")
         raise
     finally:
-        app_context.builder.metrics.save()
-        app_context.builder.close()
+        builder.metrics.save()
+        builder.close()
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            torch.mps.empty_cache()
 
     logger.info("All embeddings saved to Chroma.")
-    logger.info(f"Analysis results will be saved to: {app_context.builder.out_dir}")
-    logger.info(f"Performance metrics: {app_context.builder.out_dir}/performance_metrics.json")
+    logger.info(f"Analysis results will be saved to: {builder.out_dir}")
+    logger.info(f"Performance metrics: {builder.out_dir}/performance_metrics.json")
 
-    return app_context.builder
+    return builder
