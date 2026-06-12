@@ -1,42 +1,24 @@
 import json
 import logging
-import sys
 from pathlib import Path
 
 import numpy as np
 
-from settings import Settings
+from projection.analyzer import EmbeddingAnalyzer
+from settings import Settings, settings
 
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root / "src"))
+from .metrics import calculate_clustering_metrics
+from .models import get_clustering_model, list_available_models
+from .visualization import (
+    plot_clustering_results_2d,
+    plot_confusion_matrix_heatmap,
+    plot_metrics_dashboard,
+    reduce_dimensions,
+)
 
 logger = logging.getLogger(__name__)
 
-
-try:
-    from projection.analyzer import EmbeddingAnalyzer
-except ImportError:
-    logger.error("Error: projection was not found. Make sure it is installed or available in the project.")
-    sys.exit(1)
-
-if __package__:
-    from .metrics import calculate_clustering_metrics
-    from .models import get_clustering_model, list_available_models
-    from .visualization import (
-        plot_clustering_results_2d,
-        plot_confusion_matrix_heatmap,
-        plot_metrics_dashboard,
-        reduce_dimensions,
-    )
-else:
-    from clustering.metrics import calculate_clustering_metrics
-    from clustering.models import get_clustering_model, list_available_models
-    from clustering.visualization import (
-        plot_clustering_results_2d,
-        plot_confusion_matrix_heatmap,
-        plot_metrics_dashboard,
-        reduce_dimensions,
-    )
+project_root = settings.project_root
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -50,6 +32,41 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         return super().default(obj)
+
+
+def _params_for(cl_model_name: str, num_clusters: int) -> dict:
+    """Map the computed cluster count onto each algorithm's parameter name."""
+    if cl_model_name in ("kmeans", "spectral", "birch"):
+        return {"n_clusters": num_clusters}
+    if cl_model_name == "gmm":
+        return {"n_components": num_clusters}
+    return {}
+
+
+def _prepare_model_data(
+    model_name: str | None, _analyzer: "EmbeddingAnalyzer | None"
+) -> tuple[str, np.ndarray, np.ndarray] | None:
+    """Resolve the analyzer/model and load embeddings + tradition labels."""
+    analyzer = _analyzer or EmbeddingAnalyzer(model_name=model_name)
+
+    if not analyzer.available_models:
+        logger.error("Error: no available embedding models!")
+        return None
+
+    if model_name is None:
+        model_name = analyzer.available_models[0]
+        analyzer.set_model(model_name)
+    elif _analyzer is not None and analyzer.model_name != model_name:
+        analyzer.set_model(model_name)
+
+    data = analyzer.filter_by_model()
+    if not data:
+        logger.error(f"Error: no data for model '{model_name}'")
+        return None
+
+    embeddings = np.stack([item["embedding"] for item in data])
+    true_labels = np.array([item["tradition"] for item in data])
+    return model_name, embeddings, true_labels
 
 
 def _get_num_clusters(true_labels) -> int:
@@ -152,41 +169,22 @@ def run_clustering_analysis(
 ):
     logger.info("STARTING CLUSTERING ANALYSIS")
 
-    analyzer = _analyzer or EmbeddingAnalyzer(model_name=model_name)
-
-    if not analyzer.available_models:
-        logger.error("Error: no available embedding models!")
+    prepared = _prepare_model_data(model_name, _analyzer)
+    if prepared is None:
         return None
-
-    if model_name is None:
-        model_name = analyzer.available_models[0]
-        analyzer.set_model(model_name)
-    elif _analyzer is not None and analyzer.model_name != model_name:
-        analyzer.set_model(model_name)
+    model_name, embeddings, true_labels = prepared
 
     safe_model_name = Settings.safe_model_name(model_name)
     logger.info(f"Analysis for embedding model: {model_name}")
-
-    data = analyzer.filter_by_model()
-    if not data:
-        logger.error(f"Error: no data for model '{model_name}'")
-        return None
-
-    embeddings = np.stack([item["embedding"] for item in data])
-    true_labels = np.array([item["tradition"] for item in data])
-
     logger.info(f"  • Points loaded: {len(embeddings)}")
     logger.info(f"  • Dimension: {embeddings.shape[1]}")
 
     base_analysis_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / clustering_model
 
-    clustering_params = {} if clustering_params is None else dict(clustering_params)
-
-    num_clusters = _get_num_clusters(true_labels)
-    if clustering_model in ["kmeans", "spectral", "birch"]:
-        clustering_params["n_clusters"] = num_clusters
-    elif clustering_model == "gmm":
-        clustering_params["n_components"] = num_clusters
+    clustering_params = {
+        **({} if clustering_params is None else dict(clustering_params)),
+        **_params_for(clustering_model, _get_num_clusters(true_labels)),
+    }
 
     results = _process_single_model(
         embeddings=embeddings,
@@ -211,29 +209,12 @@ def run_all_clustering_models(
     if models_to_run is None:
         models_to_run = list_available_models()
 
-    analyzer = _analyzer or EmbeddingAnalyzer(model_name=model_name)
-    if not analyzer.available_models:
-        logger.error("Error: no available embedding models!")
+    prepared = _prepare_model_data(model_name, _analyzer)
+    if prepared is None:
         return None
-
-    if model_name is None and analyzer.available_models:
-        model_name = analyzer.available_models[0]
-        analyzer.set_model(model_name)
-    elif _analyzer is not None and model_name is not None and analyzer.model_name != model_name:
-        analyzer.set_model(model_name)
-
-    if model_name is None:
-        logger.error("No model name available")
-        return None
+    model_name, embeddings, true_labels = prepared
 
     safe_model_name = Settings.safe_model_name(model_name)
-    data = analyzer.filter_by_model()
-
-    if not data:
-        return None
-
-    embeddings = np.stack([item["embedding"] for item in data])
-    true_labels = np.array([item["tradition"] for item in data])
     num_clusters = _get_num_clusters(true_labels)
 
     all_results = {}
@@ -243,11 +224,7 @@ def run_all_clustering_models(
     for cl_model in models_to_run:
         base_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / cl_model
 
-        clustering_params = {}
-        if cl_model in ["kmeans", "spectral", "birch"]:
-            clustering_params["n_clusters"] = num_clusters
-        elif cl_model == "gmm":
-            clustering_params["n_components"] = num_clusters
+        clustering_params = _params_for(cl_model, num_clusters)
 
         results = _process_single_model(
             embeddings=embeddings,
