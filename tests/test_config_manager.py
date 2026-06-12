@@ -15,47 +15,27 @@ class TestConfigManager:
         mgr = ConfigManager(config_path=None)
         assert mgr.get("nonexistent.key", "fallback") == "fallback"
 
-    def test_set_and_get(self):
-        mgr = ConfigManager(config_path=None)
-        mgr.set("custom.key", "value123")
-        assert mgr.get("custom.key") == "value123"
-
-    def test_set_nested(self):
-        mgr = ConfigManager(config_path=None)
-        mgr.set("a.b.c", 42)
-        assert mgr.get("a.b.c") == 42
-
-    def test_get_all(self):
-        mgr = ConfigManager(config_path=None)
-        all_config = mgr.get_all()
-        assert isinstance(all_config, dict)
-        assert "paths" in all_config
-        assert "embedding" in all_config
-
-    def test_validate_returns_list(self):
-        mgr = ConfigManager(config_path=None)
-        issues = mgr.validate()
-        assert isinstance(issues, list)
-
-    def test_save_and_load_yaml(self, tmp_path):
-        mgr = ConfigManager(config_path=None)
-        mgr.set("test_key", "test_value")
-        save_path = str(tmp_path / "config.yaml")
-        mgr.save(save_path)
-
-        mgr2 = ConfigManager(config_path=save_path)
-        assert mgr2.get("test_key") == "test_value"
-
-    def test_save_and_load_json(self, tmp_path):
-        mgr = ConfigManager(config_path=None)
-        mgr.set("test_key", "json_value")
-        save_path = str(tmp_path / "config.json")
-        mgr.save(save_path)
-
-        mgr2 = ConfigManager(config_path=save_path)
-        assert mgr2.get("test_key") == "json_value"
-
     def test_merge_config(self):
         mgr = ConfigManager(config_path=None)
         mgr._merge_config(mgr._config, {"embedding": {"batch_size": 999}})
         assert mgr.get("embedding.batch_size") == 999
+
+    def test_load_yaml(self, tmp_path):
+        cfg = tmp_path / "test.yaml"
+        cfg.write_text("embedding:\n  batch_size: 64\n")
+        mgr = ConfigManager(config_path=str(cfg))
+        assert mgr.get("embedding.batch_size") == 64
+
+    def test_load_json(self, tmp_path):
+        cfg = tmp_path / "test.json"
+        cfg.write_text('{"embedding": {"batch_size": 128}}')
+        mgr = ConfigManager(config_path=str(cfg))
+        assert mgr.get("embedding.batch_size") == 128
+
+    def test_defaults_preserved_after_partial_load(self, tmp_path):
+        cfg = tmp_path / "partial.yaml"
+        cfg.write_text("embedding:\n  batch_size: 16\n")
+        mgr = ConfigManager(config_path=str(cfg))
+        assert mgr.get("embedding.batch_size") == 16
+        assert mgr.get("embedding.text_type") == "all"
+        assert mgr.get("paths.corpus_dir") is not None

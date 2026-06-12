@@ -1,5 +1,3 @@
-import json
-
 import click
 
 from .build_embeddings import build_embeddings, normalize_text_type
@@ -45,14 +43,6 @@ def generate(ctx, model: str | None, chunking: str | None, text_type: str | None
         backup_count=log_config.get("backup_count", 5),
     )
 
-    if model:
-        config_mgr.set("embedding.default_model", model)
-    if chunking:
-        config_mgr.set("embedding.default_chunking", chunking)
-    if text_type:
-        config_mgr.set("embedding.text_type", normalize_text_type(text_type))
-    if batch_size:
-        config_mgr.set("embedding.batch_size", batch_size)
     metrics = PerformanceMetrics(config_mgr.get("performance.metrics_file"))
     metrics.start_operation("generate_embeddings")
 
@@ -216,11 +206,3 @@ def validate_cache(ctx):
         click.echo("\nCorrupted files:")
         for file in results["corrupted_files"]:
             click.echo(f"  - {file}")
-
-
-@click.command()
-@click.pass_context
-def show_config(ctx):
-    config_mgr = ctx.obj["config_manager"]
-    config_dict = config_mgr.get_all()
-    click.echo(json.dumps(config_dict, indent=2, default=str))
