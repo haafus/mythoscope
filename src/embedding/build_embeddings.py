@@ -9,19 +9,9 @@ import torch
 
 from settings import setup_logging as _setup_logging
 
-from .builder import EmbeddingBuilder
+from .builder import EmbeddingBuilder, normalize_text_type
 from .chroma_manager import collection_name_for_model
 from .config_manager import ConfigManager
-
-
-def normalize_text_type(text_type: str | None) -> str | None:
-    if text_type is None:
-        return None
-    aliases = {
-        "both": "all",
-        "translation": "translate",
-    }
-    return aliases.get(text_type, text_type)
 
 
 class ApplicationContext:

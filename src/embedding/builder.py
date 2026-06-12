@@ -32,7 +32,9 @@ from .performance_metrics import PerformanceMetrics
 logger = logging.getLogger(__name__)
 
 
-def _normalize_text_type(text_type: str) -> str:
+def normalize_text_type(text_type: str | None) -> str | None:
+    if text_type is None:
+        return None
     aliases = {
         "both": "all",
         "translation": "translate",
@@ -111,7 +113,7 @@ class EmbeddingBuilder:
 
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-        text_type = _normalize_text_type(text_type)
+        text_type = normalize_text_type(text_type) or text_type
         if text_type not in {"original", "translate", "all"}:
             raise ValueError("text_type must be one of: 'original', 'translate', 'all'")
         self.text_type = text_type
@@ -410,56 +412,39 @@ class EmbeddingBuilder:
                     results[f"{model_name}____{strategy_name}"] = result
         return results
 
-    def save_embeddings_to_chroma(
-        self, text: str, metadata: dict[str, Any] | None = None, batch_size: int | None = None
-    ) -> dict[str, Any]:
-        """Synchronous save kept for backward compatibility when called directly"""
-        collection_name = collection_name_for_model(self.model_name)
-        result = self.build_embeddings(text, batch_size=batch_size)
-        chunks = result["chunks"]
-        embeddings = result["embeddings"]
-
-        if len(chunks) == 0:
-            logger.warning("No chunks to save.")
-            return {"collection": collection_name, "added": 0}
-
-        if metadata is None:
-            metadata = {}
-
-        filename = metadata.get("filename", "unknown").replace(".txt", "")
-        tradition = metadata.get("tradition", "unknown")
-        major_tradition = metadata.get("major_tradition", "unknown")
-        text_id = metadata.get("text_id") or Path(metadata.get("path", "")).stem or "unknown"
-        doc_type = metadata.get("doc_type", "unknown")
-        color = metadata.get("color", "#CCCCCC")
-        language = metadata.get("language", "unknown")
-        url = metadata.get("url", "")
-
-        model_id = _safe_id_part(self.model_name)
+    def _build_chroma_entries(self, chunks: list[str], info: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]]]:
+        text_id = info.get("text_id") or Path(info.get("path", "")).stem or "unknown"
         text_id_safe = _safe_id_part(text_id)
+        model_id = _safe_id_part(self.model_name)
 
         ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
+
+        filename = info.get("filename", "unknown")
+        if isinstance(filename, str) and filename.endswith(".txt"):
+            filename = filename[:-4]
 
         metadatas = [
             {
                 "filename": _safe_meta(filename) or "unknown",
-                "tradition": _safe_meta(tradition),
-                "major_tradition": _safe_meta(major_tradition),
+                "tradition": _safe_meta(info.get("tradition", "unknown")),
+                "major_tradition": _safe_meta(info.get("major_tradition", "unknown")),
                 "chunk_index": i,
                 "model": _safe_meta(self.model_name),
                 "chunking": _safe_meta(self.current_chunking.name),
                 "text_id": _safe_meta(text_id),
-                "doc_type": _safe_meta(doc_type),
-                "color": _safe_meta(color),
-                "language": _safe_meta(language),
-                "url": _safe_meta(url),
+                "doc_type": _safe_meta(info.get("doc_type", "unknown")),
+                "color": _safe_meta(info.get("color", "#CCCCCC")),
+                "language": _safe_meta(info.get("language", "unknown")),
+                "url": _safe_meta(info.get("url", "")),
             }
             for i in range(len(chunks))
         ]
+        return ids, metadatas
 
-        collection = self.chroma_client.get_or_create_collection(name=collection_name)
+    def _write_chroma_batches(
+        self, collection: Any, chunks: list[str], embeddings: Any, ids: list[str], metadatas: list[dict[str, Any]],
+    ) -> None:
         batch_size_chroma = min(self.chroma_batch_size, len(chunks))
-
         for i in range(0, len(chunks), batch_size_chroma):
             batch_end = min(i + batch_size_chroma, len(chunks))
             save_to_chroma_collection(
@@ -469,9 +454,23 @@ class EmbeddingBuilder:
                 metadatas=metadatas[i:batch_end],
                 documents=chunks[i:batch_end],
             )
-            logger.debug(
-                f"  Saved batch {i // batch_size_chroma + 1}/{(len(chunks) - 1) // batch_size_chroma + 1} to Chroma"
-            )
+
+    def save_embeddings_to_chroma(
+        self, text: str, metadata: dict[str, Any] | None = None, batch_size: int | None = None
+    ) -> dict[str, Any]:
+        collection_name = collection_name_for_model(self.model_name)
+        result = self.build_embeddings(text, batch_size=batch_size)
+        chunks = result["chunks"]
+        embeddings = result["embeddings"]
+
+        if len(chunks) == 0:
+            logger.warning("No chunks to save.")
+            return {"collection": collection_name, "added": 0}
+
+        ids, metadatas = self._build_chroma_entries(chunks, metadata or {})
+
+        collection = self.chroma_client.get_or_create_collection(name=collection_name)
+        self._write_chroma_batches(collection, chunks, embeddings, ids, metadatas)
 
         return {"collection": collection_name, "added": len(chunks), "chunks": chunks}
 
@@ -588,12 +587,6 @@ class EmbeddingBuilder:
             except Exception as e:
                 logger.warning(f"Failed to copy {traditions_file.name}: {e}")
 
-        # deleted = delete_collection(self.chroma_client, collection_name)
-        # if deleted:
-        # logger.info(f"Collection '{collection_name}' cleared before writing.")
-        # else:
-        # logger.info(f"Collection '{collection_name}' does not exist yet; writing from scratch.")
-
         collection = self.chroma_client.get_or_create_collection(name=collection_name)
 
         write_queue: queue.Queue[tuple | None] = queue.Queue(maxsize=self.queue_maxsize)
@@ -606,9 +599,7 @@ class EmbeddingBuilder:
         with tqdm(total=total_files, desc="Processing files", unit="file") as pbar:
             for file_info in files_info:
                 try:
-                    with open(file_info["path"], encoding="utf-8") as f:
-                        content = f.read()
-
+                    content = file_info["content"]
                     result = self.build_embeddings(content, batch_size=self.batch_size)
                     chunks = result.get("chunks", [])
                     embeddings = result.get("embeddings", [])
@@ -616,33 +607,11 @@ class EmbeddingBuilder:
                     if not chunks:
                         continue
 
-                    text_id = file_info.get("text_id") or Path(file_info.get("path", "")).stem or "unknown"
-                    text_id_safe = _safe_id_part(text_id)
-                    model_id = _safe_id_part(self.model_name)
-
-                    ids = [f"{text_id_safe}_{model_id}_{i}" for i in range(len(chunks))]
-
-                    metadatas = [
-                        {
-                            "filename": _safe_meta(file_info.get("filename", "unknown")) or "unknown",
-                            "tradition": _safe_meta(file_info.get("tradition", "unknown")),
-                            "major_tradition": _safe_meta(file_info.get("major_tradition", "unknown")),
-                            "chunk_index": i,
-                            "model": _safe_meta(self.model_name),
-                            "chunking": _safe_meta(self.current_chunking.name),
-                            "text_id": _safe_meta(text_id),
-                            "doc_type": _safe_meta(file_info.get("doc_type", "unknown")),
-                            "color": _safe_meta(file_info.get("color", "#CCCCCC")),
-                            "language": _safe_meta(file_info.get("language", "unknown")),
-                            "url": _safe_meta(file_info.get("url", "")),
-                        }
-                        for i in range(len(chunks))
-                    ]
+                    ids, metadatas = self._build_chroma_entries(chunks, file_info)
 
                     batch_size_chroma = min(self.chroma_batch_size, len(chunks))
                     for i in range(0, len(chunks), batch_size_chroma):
                         batch_end = min(i + batch_size_chroma, len(chunks))
-
                         write_queue.put(
                             (
                                 ids[i:batch_end],

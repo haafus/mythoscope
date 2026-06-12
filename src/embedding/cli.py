@@ -6,7 +6,21 @@ from .build_embeddings import build_embeddings, normalize_text_type
 from .builder import EmbeddingBuilder
 from .cache_validator import CacheValidator
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
+from .config_manager import ConfigManager
 from .performance_metrics import PerformanceMetrics
+
+
+def _create_builder(config_mgr: ConfigManager, *, model: str | None = None, chunking: str | None = None) -> EmbeddingBuilder:
+    return EmbeddingBuilder(
+        corpus_dir=config_mgr.get("paths.corpus_dir"),
+        out_dir=config_mgr.get("paths.out_dir"),
+        chroma_path=config_mgr.get("paths.chroma_path"),
+        cache_dir=config_mgr.get("paths.cache_dir"),
+        embedding_model=model or config_mgr.get("embedding.default_model"),
+        chunking=chunking or config_mgr.get("embedding.default_chunking"),
+        text_type=config_mgr.get("embedding.text_type"),
+        batch_size=config_mgr.get("embedding.batch_size"),
+    )
 
 
 @click.command()
@@ -56,16 +70,7 @@ def generate(ctx, model: str | None, chunking: str | None, text_type: str | None
 def query(ctx, query: str, top_k: int, model: str | None):
     config_mgr = ctx.obj["config_manager"]
 
-    builder = EmbeddingBuilder(
-        corpus_dir=config_mgr.get("paths.corpus_dir"),
-        out_dir=config_mgr.get("paths.out_dir"),
-        chroma_path=config_mgr.get("paths.chroma_path"),
-        cache_dir=config_mgr.get("paths.cache_dir"),
-        embedding_model=model or config_mgr.get("embedding.default_model"),
-        chunking=config_mgr.get("embedding.default_chunking"),
-        text_type=config_mgr.get("embedding.text_type"),
-        batch_size=config_mgr.get("embedding.batch_size"),
-    )
+    builder = _create_builder(config_mgr, model=model)
 
     try:
         results = builder.query_chroma(query, top_k=top_k)
@@ -94,16 +99,7 @@ def test(ctx, text_file: str, model: str | None, strategy: str | None):
     with open(text_file, encoding="utf-8") as f:
         text = f.read()
 
-    builder = EmbeddingBuilder(
-        corpus_dir=config_mgr.get("paths.corpus_dir"),
-        out_dir=config_mgr.get("paths.out_dir"),
-        chroma_path=config_mgr.get("paths.chroma_path"),
-        cache_dir=config_mgr.get("paths.cache_dir"),
-        embedding_model=model or config_mgr.get("embedding.default_model"),
-        chunking=strategy or config_mgr.get("embedding.default_chunking"),
-        text_type=config_mgr.get("embedding.text_type"),
-        batch_size=config_mgr.get("embedding.batch_size"),
-    )
+    builder = _create_builder(config_mgr, model=model, chunking=strategy)
 
     metrics = PerformanceMetrics()
     metrics.start_operation("test_embedding")
@@ -142,16 +138,7 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
     models = list(model) if model else None
     strategies = list(strategy) if strategy else None
 
-    builder = EmbeddingBuilder(
-        corpus_dir=config_mgr.get("paths.corpus_dir"),
-        out_dir=config_mgr.get("paths.out_dir"),
-        chroma_path=config_mgr.get("paths.chroma_path"),
-        cache_dir=config_mgr.get("paths.cache_dir"),
-        embedding_model=config_mgr.get("embedding.default_model"),
-        chunking=config_mgr.get("embedding.default_chunking"),
-        text_type=config_mgr.get("embedding.text_type"),
-        batch_size=config_mgr.get("embedding.batch_size"),
-    )
+    builder = _create_builder(config_mgr)
 
     click.echo("Running comparison... This may take a while.\n")
 
