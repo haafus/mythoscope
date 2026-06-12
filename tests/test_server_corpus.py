@@ -82,6 +82,55 @@ class TestReadDocument:
             read_document("../../etc/passwd", "a", "b")
 
 
+class TestDocumentIndex:
+    def test_chunked_fallback_finds_file_by_normalized_name(self, tmp_path, monkeypatch):
+        _make_corpus(tmp_path, [("Euro_pean", "Greek_Myth", "The_Iliad", "wrath of Achilles")])
+        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": tmp_path})
+        monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
+
+        file_path, _ = resolve_document_path("The Iliad", "Euro pean", "Greek Myth", source="chunked")
+        assert file_path is not None
+        assert file_path.exists()
+        assert file_path.name == "The_Iliad.txt"
+
+    def test_lookup_is_case_insensitive(self, tmp_path, monkeypatch):
+        _make_corpus(tmp_path, [("European", "Greek", "Iliad", "text")])
+        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": tmp_path})
+        monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
+
+        file_path, _ = resolve_document_path("ILIAD", "european", "GREEK", source="chunked")
+        assert file_path is not None
+        assert file_path.exists()
+
+    def test_symlink_escape_excluded_from_index(self, tmp_path, monkeypatch):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        secret = outside / "secret.txt"
+        secret.write_text("secret data")
+
+        root = tmp_path / "corpus"
+        link_dir = root / "Major" / "Trad" / "Doc"
+        link_dir.mkdir(parents=True)
+        (link_dir / "Doc.txt").symlink_to(secret)
+
+        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": root})
+        monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
+
+        assert corpus_mod._document_index("chunked") == {}
+
+    def test_index_is_cached_within_ttl(self, tmp_path, monkeypatch):
+        _make_corpus(tmp_path, [("A", "B", "First", "text")])
+        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": tmp_path})
+        monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
+
+        first = corpus_mod._document_index("chunked")
+        assert len(first) == 1
+
+        _make_corpus(tmp_path, [("A", "B", "Second", "text")])
+        second = corpus_mod._document_index("chunked")
+        assert len(second) == 1
+
+
 class TestGetCatalogDocuments:
     def test_from_metadata_json(self, tmp_path, monkeypatch):
         metadata = [

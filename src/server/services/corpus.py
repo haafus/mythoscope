@@ -14,6 +14,7 @@ CATALOG_SOURCES = {
 }
 
 _catalog_cache: dict[str, tuple[float, list[dict]]] = {}
+_doc_index_cache: dict[str, tuple[float, dict[tuple[str, str, str], Path]]] = {}
 _CATALOG_TTL = 300
 
 
@@ -129,6 +130,32 @@ def scan_document_rows(root: Path) -> list[dict]:
     return rows
 
 
+def _document_index(source: str) -> dict[tuple[str, str, str], Path]:
+    """TTL-cached index of (major, tradition, title) -> file path, symlink-escape safe."""
+    cached = _doc_index_cache.get(source)
+    if cached and time.monotonic() - cached[0] < _CATALOG_TTL:
+        return cached[1]
+
+    root = source_root(source).resolve()
+    index: dict[tuple[str, str, str], Path] = {}
+    if root.exists():
+        for candidate in root.glob("*/*/*/*.txt"):
+            resolved = candidate.resolve()
+            try:
+                resolved.relative_to(root)
+            except ValueError:
+                continue
+            key = (
+                candidate.parents[2].name.replace("_", " ").casefold(),
+                candidate.parents[1].name.replace("_", " ").casefold(),
+                candidate.stem.replace("_", " ").casefold(),
+            )
+            index[key] = resolved
+
+    _doc_index_cache[source] = (time.monotonic(), index)
+    return index
+
+
 def resolve_document_path(
     doc_id: str, major_tradition: str, tradition: str, source: str = "corpus"
 ) -> tuple[Path | None, str]:
@@ -144,17 +171,8 @@ def resolve_document_path(
         return None, title_path
 
     if source == "chunked" and not file_path.exists():
-        file_path = next(
-            (
-                candidate.resolve()
-                for candidate in corpus_root.glob("*/*/*/*.txt")
-                if candidate.stem.replace("_", " ").casefold() == doc_id.casefold()
-                and candidate.parent.name.replace("_", " ").casefold() == doc_id.casefold()
-                and candidate.parents[1].name.replace("_", " ").casefold() == tradition.casefold()
-                and candidate.parents[2].name.replace("_", " ").casefold() == major_tradition.casefold()
-            ),
-            file_path,
-        )
+        key = (major_tradition.casefold(), tradition.casefold(), doc_id.casefold())
+        file_path = _document_index(source).get(key, file_path)
 
     return file_path, title_path
 

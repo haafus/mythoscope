@@ -18,8 +18,10 @@ if not hasattr(fu_mod, "UserAgent"):
 
     fu_mod.UserAgent = _FakeUA  # type: ignore[attr-defined]
 
+from datetime import datetime
+
 from corpus import catalog
-from corpus.builder import _add_to_catalog, _item_tid, _update_traditions_info
+from corpus.builder import _add_to_catalog, _build_metadata, _item_tid, _update_traditions_info
 
 
 class TestItemTid:
@@ -43,6 +45,15 @@ _BASE_ITEM = {
     "type": "translation",
     "url": "http://example.com/text",
 }
+
+
+class TestBuildMetadata:
+    def test_date_downloaded_is_timezone_aware(self):
+        stats = {"md5": "abc", "char_count": 10, "word_count": 2, "sentence_count": 1}
+        item = {**_BASE_ITEM, "title": "Iliad"}
+        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        parsed = datetime.fromisoformat(meta["date_downloaded"])
+        assert parsed.tzinfo is not None
 
 
 class TestAddToCatalog:

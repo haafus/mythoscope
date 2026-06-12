@@ -3,7 +3,7 @@ import csv
 import json
 import shutil
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from . import catalog, logger
@@ -52,7 +52,7 @@ def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
         "language": item["language"],
         "type": item["type"],
         "url": item["url"],
-        "date_downloaded": datetime.utcnow().isoformat(),
+        "date_downloaded": datetime.now(timezone.utc).isoformat(),
         "md5": stats["md5"],
         "path": path,
         "char_count": stats["char_count"],
@@ -149,8 +149,7 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
 
         with data_lock:
             ensure_dir(filename.parent)
-
-        filename.write_bytes(stats["data_utf8"])
+            filename.write_bytes(stats["data_utf8"])
 
         with data_lock:
             metadata.append(

@@ -24,7 +24,7 @@ def document(
         text, _ = read_document(doc_id, major_tradition, tradition, source)
         return text
     except PermissionError as exc:
-        raise HTTPException(status_code=403, detail=str(exc)) from exc
+        raise HTTPException(status_code=403, detail="Access denied") from exc
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Document not found") from exc
 

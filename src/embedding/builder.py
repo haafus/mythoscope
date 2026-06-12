@@ -124,7 +124,8 @@ class EmbeddingBuilder:
         self.chunking_strategies = create_chunking_strategies()
         self.set_chunking_strategy(chunking)
 
-        self.model_registry = MODELS
+        # Per-instance copy: add/remove/load mutations must not leak into the global registry
+        self.model_registry = {name: dict(info) for name, info in MODELS.items()}
         self.model_name: str = embedding_model
         self.model: Any = None
         self.model_dim: int = 0

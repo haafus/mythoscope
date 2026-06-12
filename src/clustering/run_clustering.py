@@ -86,9 +86,12 @@ def _process_single_model(
         logger.exception(f"Clustering error ({cl_model_name})")
         return {"error": f"Error while running {cl_model_name}"}
 
+    # Internal metrics (silhouette etc.) must be computed in the space the clusterer
+    # actually worked in (normalized/reduced), NOT in the UMAP-2D space used for plots.
     eval_embeddings = getattr(clusterer, "processed_embeddings", embeddings)
 
     metrics = calculate_clustering_metrics(eval_embeddings, predicted_labels, true_labels)
+    metrics["metrics_space"] = "processed" if hasattr(clusterer, "processed_embeddings") else "original"
 
     unique, counts = np.unique(predicted_labels, return_counts=True)
     cluster_counts = dict(zip(unique.tolist(), counts.tolist(), strict=False))
