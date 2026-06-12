@@ -26,6 +26,10 @@ from .utils import (
 data_lock = threading.Lock()
 
 
+def _item_tid(item: dict) -> str:
+    return item.get("title", item.get("id", "unknown_id"))
+
+
 def _finalize_text(text: str, url: str, tid: str) -> dict:
     text = normalize_text(text)
     text = clean_gutenberg_in_builder(text, url, tid)
@@ -42,7 +46,7 @@ def _finalize_text(text: str, url: str, tid: str) -> dict:
 
 def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
     return {
-        "id": item.get("title", item.get("id", "unknown_id")),
+        "id": _item_tid(item),
         "major_tradition": item.get("major_tradition", "Unknown"),
         "tradition": item["tradition"],
         "language": item["language"],
@@ -56,6 +60,23 @@ def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
         "sentence_count": stats["sentence_count"],
         "color": color,
     }
+
+
+def _add_to_catalog(item: dict, *, tid: str, color: str, success: bool, stats: dict | None = None, error: str = ""):
+    description = item.get("description", "")
+    if success and stats:
+        catalog.add_to_catalog(
+            tid, item.get("major_tradition", "Unknown"), item["tradition"],
+            item["language"], item["type"], item["url"],
+            True, stats["word_count"], stats["sentence_count"], color, description,
+        )
+    else:
+        err_desc = f"{description} [{error}]" if description else error
+        catalog.add_to_catalog(
+            tid, item.get("major_tradition", "Unknown"), item["tradition"],
+            item["language"], item["type"], item["url"],
+            False, 0, 0, color, err_desc,
+        )
 
 
 def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> str:
@@ -74,7 +95,7 @@ def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> st
 
 
 def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
-    tid = item.get("title", item.get("id", "unknown_id"))
+    tid = _item_tid(item)
     url = item["url"]
 
     try:
@@ -89,15 +110,9 @@ def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
 
 
 def process_single_item(item: dict, force: bool, metadata: list[dict], processed_urls: set[str]):
-    tid = item.get("title", item.get("id", "unknown_id"))
-    tradition = item["tradition"]
-    major_tradition = item.get("major_tradition", "Unknown")
-    lang = item["language"]
-    ftype = item["type"]
+    tid = _item_tid(item)
     url = item["url"]
-    description = item.get("description", "")
-
-    color = get_tradition_color(tradition)
+    color = get_tradition_color(item["tradition"])
 
     if "_local_file" in item and not force:
         filename = Path(item["_local_file"])
@@ -107,23 +122,9 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
                 with data_lock:
                     metadata.append(local_meta)
                     processed_urls.add(url)
-
-                catalog.add_to_catalog(
-                    tid,
-                    major_tradition,
-                    tradition,
-                    lang,
-                    ftype,
-                    url,
-                    True,
-                    local_meta["word_count"],
-                    local_meta["sentence_count"],
-                    color,
-                    description,
-                )
+                _add_to_catalog(item, tid=tid, color=color, success=True, stats=local_meta)
             else:
-                err_desc = f"{description} [Local file read error]" if description else "Local file read error"
-                catalog.add_to_catalog(tid, major_tradition, tradition, lang, ftype, url, False, 0, 0, color, err_desc)
+                _add_to_catalog(item, tid=tid, color=color, success=False, error="Local file read error")
             return
         else:
             logger.warning(f"{tid}: Local file {filename} not found, trying download")
@@ -138,8 +139,9 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
 
         stats = _finalize_text(text, url, tid)
 
+        major_tradition = item.get("major_tradition", "Unknown")
         major_tradition_path = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
-        tradition_path = sanitize_filename(tradition.replace("/", "_").replace(" ", "_"))
+        tradition_path = sanitize_filename(item["tradition"].replace("/", "_").replace(" ", "_"))
         title_path = sanitize_filename(tid.replace("/", "_").replace(" ", "_"))
 
         folder = CORPUS_DIR / major_tradition_path / tradition_path / title_path
@@ -156,26 +158,15 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
             )
             processed_urls.add(url)
 
-        catalog.add_to_catalog(
-            tid, major_tradition, tradition, lang, ftype, url, True,
-            stats["word_count"], stats["sentence_count"], color, description,
-        )
+        _add_to_catalog(item, tid=tid, color=color, success=True, stats=stats)
         logger.info(f"Saved successfully: {title_path}.txt (words: {stats['word_count']}, color: {color})")
 
     except Exception as e:
         logger.error(f"{tid}: Processing error: {e}")
-
-        err_desc = f"{description} [Error: {e}]" if description else str(e)
-        catalog.add_to_catalog(tid, major_tradition, tradition, lang, ftype, url, False, 0, 0, color, err_desc)
+        _add_to_catalog(item, tid=tid, color=color, success=False, error=f"Error: {e}")
 
 
-def build_corpus(filter_type: set[str], force: bool = False):
-    ensure_dir(CORPUS_DIR)
-    catalog.clear_catalog()
-    metadata: list[dict] = []
-
-    download_list = load_download_list(filter_type, force)
-
+def _update_traditions_info(filter_type: set[str], force: bool) -> None:
     tradition_books: dict[str, set] = {}
     if Path(DOWNLOAD_LIST_FILE).exists():
         with open(DOWNLOAD_LIST_FILE, encoding="utf-8") as f:
@@ -183,16 +174,12 @@ def build_corpus(filter_type: set[str], force: bool = False):
             for item in full_items:
                 if item.get("type") in filter_type and "tradition" in item:
                     trad = item["tradition"]
-                    tid = item.get("title", item.get("id", "unknown_id"))
-
                     if trad not in tradition_books:
                         tradition_books[trad] = set()
-                    tradition_books[trad].add(tid)
-
-    unique_traditions = set(tradition_books.keys())
+                    tradition_books[trad].add(_item_tid(item))
 
     info_file_path = CORPUS_DIR / "traditions_info.json"
-    existing_info = {}
+    existing_info: dict = {}
 
     if info_file_path.exists():
         if force:
@@ -206,11 +193,10 @@ def build_corpus(filter_type: set[str], force: bool = False):
             except Exception as e:
                 logger.error(f"Error reading traditions_info.json: {e}")
 
-    added_new_traditions = False
-    for trad in sorted(unique_traditions):
+    changed = False
+    for trad in sorted(tradition_books):
         color = get_tradition_color(trad)
-
-        books_list = sorted(list(tradition_books[trad]))
+        books_list = sorted(tradition_books[trad])
 
         if trad not in existing_info:
             existing_info[trad] = {
@@ -220,21 +206,30 @@ def build_corpus(filter_type: set[str], force: bool = False):
                 "color": color,
                 "books": books_list,
             }
-            added_new_traditions = True
+            changed = True
         else:
             if "color" not in existing_info[trad]:
                 existing_info[trad]["color"] = color
-                added_new_traditions = True
-
+                changed = True
             if existing_info[trad].get("books") != books_list:
                 existing_info[trad]["books"] = books_list
-                added_new_traditions = True
+                changed = True
 
     with open(info_file_path, "w", encoding="utf-8") as f:
         json.dump(existing_info, f, ensure_ascii=False, indent=2)
 
-    if added_new_traditions and not force:
+    if changed and not force:
         logger.info("traditions_info.json updated (colors added or book lists refreshed).")
+
+
+def build_corpus(filter_type: set[str], force: bool = False):
+    ensure_dir(CORPUS_DIR)
+    catalog.clear_catalog()
+    metadata: list[dict] = []
+
+    download_list = load_download_list(filter_type, force)
+
+    _update_traditions_info(filter_type, force)
 
     processed_urls: set[str] = set()
     if PROCESSED_URLS_FILE.exists():
