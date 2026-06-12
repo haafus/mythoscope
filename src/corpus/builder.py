@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from . import catalog, logger
+from .clean_gutenberg import clean_gutenberg_in_builder
 from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE, PROCESSED_URLS_FILE, config
 from .downloader import download_file, load_download_list
 from .utils import (
@@ -40,6 +41,7 @@ def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
             text = _decode_bytes(existing_data)
 
         text = normalize_text(text)
+        text = clean_gutenberg_in_builder(text, url, tid)
         char_count = len(text)
         word_count = count_words(text)
         sentence_count = count_sentences(text)
@@ -126,6 +128,7 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
         if not text or not text.strip():
             raise ValueError("Empty content after conversion")
 
+        text = clean_gutenberg_in_builder(text, url, tid)
         data_utf8 = text.encode("utf-8")
 
         major_tradition_path = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))

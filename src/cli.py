@@ -37,12 +37,7 @@ def mytho():
 # ---------------------------------------------------------------------------
 # corpus
 # ---------------------------------------------------------------------------
-@mytho.group()
-def corpus():
-    """Build and manage the text corpus."""
-
-
-@corpus.command()
+@mytho.command()
 @click.option(
     "--type",
     "text_type",
@@ -51,8 +46,8 @@ def corpus():
     help="Filter by text type.",
 )
 @click.option("--force", is_flag=True, help="Overwrite existing files.")
-def build(text_type: str, force: bool):
-    """Download and build the text corpus."""
+def corpus(text_type: str, force: bool):
+    """Download and build the text corpus (Gutenberg cleanup is automatic)."""
     from settings import setup_logging
 
     setup_logging(log_filename="corpus.log", clear_handlers=True)
@@ -61,52 +56,6 @@ def build(text_type: str, force: bool):
     filter_type = {"translation", "original"} if text_type == "all" else {text_type}
     build_corpus(filter_type=filter_type, force=force)
     click.echo(click.style("Corpus build completed.", fg="green"))
-
-
-@corpus.command("clean-gutenberg")
-@click.option("--dir", "directory", default=None, help="Directory with corpus files.")
-@click.option("--pattern", default="*.txt", help="File search pattern.")
-@click.option("--file", "single_file", default=None, help="Clean a specific file.")
-@click.option("--backup", is_flag=True, help="Create local backups.")
-@click.option("--no-recursive", is_flag=True, help="Don't search subdirectories.")
-@click.option("--preview", is_flag=True, help="Show files without cleaning.")
-@click.option("--no-save-sources", is_flag=True, help="Don't save originals to backup.")
-def clean_gutenberg(directory, pattern, single_file, backup, no_recursive, preview, no_save_sources):
-    """Remove Project Gutenberg boilerplate from corpus files."""
-    from pathlib import Path
-
-    from corpus.clean_gutenberg import (
-        batch_clean_gutenberg_files,
-        preview_gutenberg_files,
-        process_gutenberg_file,
-        setup_storage_dirs,
-    )
-    from corpus.config import CORPUS_DIR
-
-    target_dir = Path(directory or str(CORPUS_DIR))
-    save_sources = not no_save_sources
-
-    if single_file:
-        filepath = Path(single_file)
-        if not filepath.exists():
-            click.echo(click.style(f"File not found: {filepath}", fg="red"), err=True)
-            sys.exit(1)
-        if save_sources:
-            setup_storage_dirs()
-        if process_gutenberg_file(filepath, backup, save_sources):
-            click.echo(f"Cleaned: {filepath}")
-        else:
-            click.echo(f"No cleanup needed: {filepath}")
-    elif preview:
-        files = preview_gutenberg_files(target_dir, pattern, not no_recursive)
-        for f in files:
-            click.echo(f)
-        click.echo(f"\nTotal: {len(files)} files")
-    else:
-        count = batch_clean_gutenberg_files(
-            target_dir, pattern, backup, recursive=not no_recursive, save_sources=save_sources,
-        )
-        click.echo(f"Cleanup complete. Files processed: {count}")
 
 
 # ---------------------------------------------------------------------------

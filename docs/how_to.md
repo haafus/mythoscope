@@ -31,7 +31,6 @@ pip install -e ".[all,dev]"
 
 ```bash
 mytho --help
-mytho corpus --help
 mytho embeddings --help
 mytho projection --help
 mytho cluster --help
@@ -42,62 +41,36 @@ mytho pipeline --help
 
 ## corpus
 
-Модуль сборки корпуса из `config/download_list.json`.
+Модуль сборки корпуса из `config/download_list.json`. Тексты с Project Gutenberg автоматически очищаются от лицензионных заголовков и хвостов при скачивании.
 
 Основные файлы:
 - `src/corpus/downloader.py` скачивает источники.
 - `src/corpus/utils.py` извлекает текст из HTML/PDF/TXT и нормализует его.
 - `src/corpus/builder.py` строит структуру `outputs/corpus/`, метаданные и каталог.
+- `src/corpus/clean_gutenberg.py` автоматически удаляет Gutenberg-боллерплейт.
 
 Возможности:
 - Скачать и обработать источники.
+- Автоматически очистить Gutenberg-тексты (по маркерам в содержимом).
 - Сохранить тексты в `outputs/corpus/<major>/<tradition>/<title>/<title>.txt`.
 - Создать `outputs/corpus/corpus_metadata.json`, `outputs/corpus/corpus_catalog.csv`, `outputs/corpus/traditions_info.json`.
 
 Запуск сборки всего корпуса:
 
 ```bash
-mytho corpus build --type all
+mytho corpus --type all
 ```
 
 Только переводы:
 
 ```bash
-mytho corpus build --type translation
+mytho corpus --type translation
 ```
 
 Пересобрать с перезаписью:
 
 ```bash
-mytho corpus build --type all --force
-```
-
-### clean-gutenberg
-
-Утилита очистки текстов Project Gutenberg от лицензии, служебных заголовков и хвостов. Входит в группу `corpus`.
-
-Возможности:
-- Найти Gutenberg-тексты в корпусе.
-- Очистить один файл или директорию.
-- Сохранить оригиналы в `outputs/sources_backup/`.
-- Вести `outputs/sources_backup/changelog.txt`.
-
-Предпросмотр файлов:
-
-```bash
-mytho corpus clean-gutenberg --preview --dir outputs/corpus
-```
-
-Очистить весь корпус:
-
-```bash
-mytho corpus clean-gutenberg --dir outputs/corpus
-```
-
-Очистить один файл:
-
-```bash
-mytho corpus clean-gutenberg --file "outputs/corpus/.../book.txt"
+mytho corpus --type all --force
 ```
 
 ## embedding
@@ -315,7 +288,7 @@ mytho server
 
 Все генерируемые данные хранятся в `outputs/`:
 
-- `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus build`.
+- `outputs/corpus/` — основной текстовый корпус с метаданными и каталогом. Создается через `mytho corpus`.
 - `outputs/corpus_chunked/` — корпус после разбиения на чанки. Создается через `mytho embeddings generate`.
 - `outputs/chroma_db/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings generate`.
 - `outputs/analysis/` — результаты анализа: `models.json`, HTML-графики, кластеризация. Создается через `mytho projection` и `mytho cluster`.
@@ -335,23 +308,19 @@ mytho pipeline --model "BAAI/bge-m3" --text-type all
 Или по шагам:
 
 ```bash
-# 1. Собрать корпус
-mytho corpus build --type all
+# 1. Собрать корпус (Gutenberg-тексты очищаются автоматически)
+mytho corpus --type all
 
-# 2. Очистить Gutenberg-тексты, если нужно
-mytho corpus clean-gutenberg --preview --dir outputs/corpus
-mytho corpus clean-gutenberg --dir outputs/corpus
-
-# 3. Построить эмбеддинги и Chroma DB
+# 2. Построить эмбеддинги и Chroma DB
 mytho embeddings generate
 
-# 4. Построить визуальный анализ эмбеддингов
+# 3. Построить визуальный анализ эмбеддингов
 mytho projection
 
-# 5. Построить кластеризацию
+# 4. Построить кластеризацию
 mytho cluster
 
-# 6. Запустить веб-интерфейс
+# 5. Запустить веб-интерфейс
 mytho server
 ```
 

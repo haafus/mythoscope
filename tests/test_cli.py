@@ -17,23 +17,12 @@ class TestMythoTopLevel:
             assert cmd in result.output
 
 
-class TestCorpusGroup:
+class TestCorpusCommand:
     def test_help(self):
         result = runner.invoke(mytho, ["corpus", "--help"])
         assert result.exit_code == 0
-        assert "build" in result.output
-        assert "clean-gutenberg" in result.output
-
-    def test_build_help(self):
-        result = runner.invoke(mytho, ["corpus", "build", "--help"])
-        assert result.exit_code == 0
         assert "--type" in result.output
         assert "--force" in result.output
-
-    def test_clean_gutenberg_help(self):
-        result = runner.invoke(mytho, ["corpus", "clean-gutenberg", "--help"])
-        assert result.exit_code == 0
-        assert "--preview" in result.output
 
 
 class TestProjectionCommand:
