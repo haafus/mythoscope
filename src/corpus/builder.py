@@ -26,41 +26,63 @@ from .utils import (
 data_lock = threading.Lock()
 
 
+def _finalize_text(text: str, url: str, tid: str) -> dict:
+    text = normalize_text(text)
+    text = clean_gutenberg_in_builder(text, url, tid)
+    data_utf8 = text.encode("utf-8")
+    return {
+        "text": text,
+        "data_utf8": data_utf8,
+        "md5": md5(data_utf8),
+        "char_count": len(text),
+        "word_count": count_words(text),
+        "sentence_count": count_sentences(text),
+    }
+
+
+def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
+    return {
+        "id": item.get("title", item.get("id", "unknown_id")),
+        "major_tradition": item.get("major_tradition", "Unknown"),
+        "tradition": item["tradition"],
+        "language": item["language"],
+        "type": item["type"],
+        "url": item["url"],
+        "date_downloaded": datetime.utcnow().isoformat(),
+        "md5": stats["md5"],
+        "path": path,
+        "char_count": stats["char_count"],
+        "word_count": stats["word_count"],
+        "sentence_count": stats["sentence_count"],
+        "color": color,
+    }
+
+
+def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> str:
+    is_pdf = url.lower().endswith(".pdf") or "application/pdf" in content_type or data[:4] == b"%PDF"
+    is_html = (
+        b"<html" in data[:200].lower() or "text/html" in content_type or b"<!doctype html" in data[:200].lower()
+    )
+
+    if is_pdf:
+        logger.debug(f"{tid}: PDF detected, extracting text")
+        return pdf_to_text(data)
+    if is_html:
+        logger.debug(f"{tid}: HTML detected, converting to text")
+        return html_to_text(data)
+    return _decode_bytes(data)
+
+
 def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
     tid = item.get("title", item.get("id", "unknown_id"))
     url = item["url"]
 
     try:
         logger.info(f"{tid}: Processing existing file {filename}")
-        existing_data = filename.read_bytes()
-        h = md5(existing_data)
-
-        if filename.suffix.lower() == ".pdf":
-            text = pdf_to_text(existing_data)
-        else:
-            text = _decode_bytes(existing_data)
-
-        text = normalize_text(text)
-        text = clean_gutenberg_in_builder(text, url, tid)
-        char_count = len(text)
-        word_count = count_words(text)
-        sentence_count = count_sentences(text)
-
-        return {
-            "id": tid,
-            "major_tradition": item.get("major_tradition", "Unknown"),
-            "tradition": item["tradition"],
-            "language": item["language"],
-            "type": item["type"],
-            "url": url,
-            "date_downloaded": datetime.utcnow().isoformat(),
-            "md5": h,
-            "path": str(filename.resolve()),
-            "char_count": char_count,
-            "word_count": word_count,
-            "sentence_count": sentence_count,
-            "color": color,
-        }
+        data = filename.read_bytes()
+        text = _extract_text(data, url, tid)
+        stats = _finalize_text(text, url, tid)
+        return _build_metadata(item, path=str(filename.resolve()), color=color, stats=stats)
     except Exception as e:
         logger.error(f"{tid}: Error processing local file {filename}: {e}")
         return None
@@ -109,27 +131,12 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
     try:
         data = download_file(url)
         content_type = item.get("content_type", "")
-        text = ""
-
-        is_pdf = url.lower().endswith(".pdf") or "application/pdf" in content_type or data[:4] == b"%PDF"
-        is_html = (
-            b"<html" in data[:200].lower() or "text/html" in content_type or b"<!doctype html" in data[:200].lower()
-        )
-
-        if is_pdf:
-            logger.debug(f"{tid}: PDF detected, extracting text")
-            text = pdf_to_text(data)
-        elif is_html:
-            logger.debug(f"{tid}: HTML detected, converting to text")
-            text = html_to_text(data)
-        else:
-            text = normalize_text(_decode_bytes(data))
+        text = _extract_text(data, url, tid, content_type)
 
         if not text or not text.strip():
             raise ValueError("Empty content after conversion")
 
-        text = clean_gutenberg_in_builder(text, url, tid)
-        data_utf8 = text.encode("utf-8")
+        stats = _finalize_text(text, url, tid)
 
         major_tradition_path = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
         tradition_path = sanitize_filename(tradition.replace("/", "_").replace(" ", "_"))
@@ -141,37 +148,19 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
         with data_lock:
             ensure_dir(filename.parent)
 
-        filename.write_bytes(data_utf8)
-
-        h = md5(data_utf8)
-        char_count = len(text)
-        word_count = count_words(text)
-        sentence_count = count_sentences(text)
+        filename.write_bytes(stats["data_utf8"])
 
         with data_lock:
             metadata.append(
-                {
-                    "id": tid,
-                    "major_tradition": major_tradition,
-                    "tradition": tradition,
-                    "language": lang,
-                    "type": ftype,
-                    "url": url,
-                    "date_downloaded": datetime.utcnow().isoformat(),
-                    "md5": h,
-                    "path": str(filename.resolve()),
-                    "char_count": char_count,
-                    "word_count": word_count,
-                    "sentence_count": sentence_count,
-                    "color": color,
-                }
+                _build_metadata(item, path=str(filename.resolve()), color=color, stats=stats)
             )
             processed_urls.add(url)
 
         catalog.add_to_catalog(
-            tid, major_tradition, tradition, lang, ftype, url, True, word_count, sentence_count, color, description
+            tid, major_tradition, tradition, lang, ftype, url, True,
+            stats["word_count"], stats["sentence_count"], color, description,
         )
-        logger.info(f"Saved successfully: {title_path}.txt (words: {word_count}, color: {color})")
+        logger.info(f"Saved successfully: {title_path}.txt (words: {stats['word_count']}, color: {color})")
 
     except Exception as e:
         logger.error(f"{tid}: Processing error: {e}")
