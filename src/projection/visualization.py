@@ -64,6 +64,46 @@ def _check_umap_available() -> bool:
         return False
 
 
+def _traditions_of(data: list[dict]) -> list[str]:
+    return [item.get("tradition", "unknown") for item in data]
+
+
+def _add_tradition_scatter_traces(
+    fig: go.Figure,
+    coords: np.ndarray,
+    traditions_array: np.ndarray,
+    color_map: dict[str, str],
+    *,
+    row: int,
+    col: int,
+    show_legend: bool,
+    marker_extra: dict[str, Any] | None = None,
+    x_label: str = "X",
+    y_label: str = "Y",
+) -> None:
+    """One scatter trace per tradition (shared by the dashboard plots)."""
+    for tradition in sorted(set(traditions_array.tolist())):
+        indices = np.where(traditions_array == tradition)[0]
+        if len(indices) == 0:
+            continue
+        fig.add_trace(
+            go.Scatter(
+                x=coords[indices, 0],
+                y=coords[indices, 1],
+                mode="markers",
+                name=tradition if show_legend else None,
+                marker={"size": 5, "opacity": 0.7, "color": color_map[tradition], **(marker_extra or {})},
+                legendgroup=tradition,
+                showlegend=show_legend,
+                hovertemplate=(
+                    f"<b>{tradition}</b><br>{x_label}: %{{x:.3f}}<br>{y_label}: %{{y:.3f}}<extra></extra>"
+                ),
+            ),
+            row=row,
+            col=col,
+        )
+
+
 def _get_color_map(data: list[dict]) -> dict[str, str]:
     """
     Extract tradition colors directly from the data.
@@ -288,8 +328,7 @@ def plot_hyperparameter_tuning_dashboard(
     sample_data = _sample_for_visualization(data, MAX_VIS_SAMPLES, f"{method.upper()} hyperparameter tuning")
 
     embeddings = np.stack([item["embedding"] for item in sample_data])
-    traditions = [item.get("tradition", "unknown") for item in sample_data]
-    unique_traditions = sorted(set(traditions))
+    traditions = _traditions_of(sample_data)
     color_map = _get_color_map(data)
 
     cols = min(3, len(param_configs))
@@ -312,25 +351,9 @@ def plot_hyperparameter_tuning_dashboard(
         if coords is None:
             continue
 
-        for tradition in unique_traditions:
-            mask = traditions_array == tradition
-            indices = np.where(mask)[0]
-
-            if len(indices) > 0:
-                fig.add_trace(
-                    go.Scatter(
-                        x=coords[indices, 0],
-                        y=coords[indices, 1],
-                        mode="markers",
-                        name=tradition if idx == 0 else None,
-                        marker=dict(size=5, opacity=0.7, color=color_map[tradition]),
-                        legendgroup=tradition,
-                        showlegend=(idx == 0),
-                        hovertemplate=f"<b>{tradition}</b><br>X: %{{x:.3f}}<br>Y: %{{y:.3f}}<extra></extra>",
-                    ),
-                    row=r,
-                    col=c,
-                )
+        _add_tradition_scatter_traces(
+            fig, coords, traditions_array, color_map, row=r, col=c, show_legend=(idx == 0),
+        )
 
         fig.update_xaxes(**_cartesian_axis(f"{method.upper()} component 1"), row=r, col=c)
         fig.update_yaxes(**_cartesian_axis(f"{method.upper()} component 2"), row=r, col=c)
@@ -463,9 +486,7 @@ def plot_comparison_dashboard(
         if coords is not None:
             coords_dict[method] = coords
 
-    traditions = [item.get("tradition", "unknown") for item in sample_data]
-    unique_traditions = sorted(set(traditions))
-
+    traditions = _traditions_of(sample_data)
     color_map = _get_color_map(data)
 
     fig = make_subplots(
@@ -478,29 +499,13 @@ def plot_comparison_dashboard(
     traditions_array = np.array(traditions)
 
     for idx, (method, coords) in enumerate(coords_dict.items(), 1):
-        for tradition in unique_traditions:
-            mask = traditions_array == tradition
-            indices = np.where(mask)[0]
-
-            if len(indices) > 0:
-                fig.add_trace(
-                    go.Scatter(
-                        x=coords[indices, 0],
-                        y=coords[indices, 1],
-                        mode="markers",
-                        name=tradition if idx == 1 else None,
-                        marker=dict(
-                            size=6, opacity=0.7, color=color_map[tradition], line=dict(width=0.5, color="white")
-                        ),
-                        legendgroup=tradition,
-                        showlegend=(idx == 1),
-                        hovertemplate=f"<b>{tradition}</b><br>"
-                        f"{method.upper()} component 1: %{{x:.3f}}<br>"
-                        f"{method.upper()} component 2: %{{y:.3f}}<extra></extra>",
-                    ),
-                    row=1,
-                    col=idx,
-                )
+        _add_tradition_scatter_traces(
+            fig, coords, traditions_array, color_map,
+            row=1, col=idx, show_legend=(idx == 1),
+            marker_extra={"size": 6, "line": dict(width=0.5, color="white")},
+            x_label=f"{method.upper()} component 1",
+            y_label=f"{method.upper()} component 2",
+        )
 
         fig.update_xaxes(**_cartesian_axis(f"{method.upper()} component 1"), row=1, col=idx)
         fig.update_yaxes(**_cartesian_axis(f"{method.upper()} component 2"), row=1, col=idx)
