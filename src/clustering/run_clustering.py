@@ -1,13 +1,11 @@
-import argparse
 import json
 import logging
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import numpy as np
 
-from settings import Settings, setup_logging
+from settings import Settings
 
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root / "src"))
@@ -272,45 +270,3 @@ def run_all_clustering_models(
     return all_results
 
 
-def build_clusters():
-    parser = argparse.ArgumentParser(description="Embedding clustering analysis")
-    parser.add_argument("--model", type=str, default=None)
-    parser.add_argument("--clustering", type=str, default="kmeans", choices=list_available_models())
-    parser.add_argument("--single-model", action="store_true")
-    parser.add_argument("--no-viz", action="store_true")
-    parser.add_argument("--output-dir", type=str, default="outputs/analysis")
-    parser.add_argument("--models-list", type=str, nargs="+", default=None)
-    args = parser.parse_args()
-    setup_logging(log_filename=f"clustering_run_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
-
-    from projection.analyzer import EmbeddingAnalyzer
-
-    analyzer = EmbeddingAnalyzer()
-    available_models = analyzer.available_models
-
-    if not available_models:
-        logger.error("ERROR: No available embedding models in the database!")
-        return
-
-    models_to_process = [args.model] if args.model else available_models
-
-    logger.info(f"Queued for clustering: {models_to_process}")
-
-    for current_model in models_to_process:
-        logger.info(f"Clustering embeddings for: {current_model}")
-
-        if args.single_model:
-            run_clustering_analysis(
-                model_name=current_model,
-                clustering_model=args.clustering,
-                generate_visualizations=not args.no_viz,
-                output_base_dir=args.output_dir,
-                _analyzer=analyzer,
-            )
-        else:
-            run_all_clustering_models(
-                model_name=current_model,
-                models_to_run=args.models_list,
-                output_base_dir=args.output_dir,
-                _analyzer=analyzer,
-            )

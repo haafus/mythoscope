@@ -1,5 +1,4 @@
 import json
-import logging
 
 import click
 
@@ -7,22 +6,10 @@ from .build_embeddings import build_embeddings, normalize_text_type
 from .builder import EmbeddingBuilder
 from .cache_validator import CacheValidator
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
-from .config_manager import ConfigManager
 from .performance_metrics import PerformanceMetrics
 
 
-@click.group()
-@click.option("--config", "-c", default="config/embedding.yaml", help="Path to config file")
-@click.option("--verbose", "-v", is_flag=True, help="Enable verbose output")
-@click.pass_context
-def cli(ctx, config: str, verbose: bool):
-    ctx.ensure_object(dict)
-    ctx.obj["config_manager"] = ConfigManager(config)
-    if verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
-
-
-@cli.command()
+@click.command()
 @click.option("--model", "-m", default=None, help="Embedding model to use")
 @click.option("--chunking", "-ch", default=None, help="Chunking strategy")
 @click.option(
@@ -52,16 +39,16 @@ def generate(ctx, model: str | None, chunking: str | None, text_type: str | None
             chunking=chunking,
             text_type=normalize_text_type(text_type) if text_type else None,
         )
-        click.echo(click.style("✓ Embeddings generated successfully", fg="green"))
+        click.echo(click.style("Embeddings generated successfully", fg="green"))
     except Exception as e:
-        click.echo(click.style(f"✗ Error: {e}", fg="red"), err=True)
+        click.echo(click.style(f"Error: {e}", fg="red"), err=True)
         raise
     finally:
         metrics.end_operation("generate_embeddings")
         metrics.save()
 
 
-@cli.command()
+@click.command()
 @click.argument("query")
 @click.option("--top-k", "-k", default=5, type=int, help="Number of results to return")
 @click.option("--model", "-m", default=None, help="Model to use for query encoding")
@@ -93,10 +80,10 @@ def query(ctx, query: str, top_k: int, model: str | None):
             click.echo(f"    Text: {result['document'][:200]}...")
             click.echo()
     except Exception as e:
-        click.echo(click.style(f"✗ Error: {e}", fg="red"), err=True)
+        click.echo(click.style(f"Error: {e}", fg="red"), err=True)
 
 
-@cli.command()
+@click.command()
 @click.option("--model", "-m", default=None, help="Model name")
 @click.option("--strategy", "-s", default=None, help="Chunking strategy")
 @click.argument("text_file", type=click.Path(exists=True))
@@ -125,7 +112,7 @@ def test(ctx, text_file: str, model: str | None, strategy: str | None):
         result = builder.build_embeddings(text)
         metrics.end_operation("test_embedding")
 
-        click.echo(click.style("\n✓ Test completed successfully", fg="green"))
+        click.echo(click.style("\nTest completed successfully", fg="green"))
         click.echo(f"  Model: {result['model']}")
         click.echo(f"  Chunking: {result['chunking']}")
         click.echo(f"  Number of chunks: {result['num_chunks']}")
@@ -138,10 +125,10 @@ def test(ctx, text_file: str, model: str | None, strategy: str | None):
             if "memory_usage_mb" in metrics.metrics:
                 click.echo(f"    Memory usage: {metrics.metrics['memory_usage_mb']:.1f} MB")
     except Exception as e:
-        click.echo(click.style(f"✗ Error: {e}", fg="red"), err=True)
+        click.echo(click.style(f"Error: {e}", fg="red"), err=True)
 
 
-@cli.command()
+@click.command()
 @click.option("--model", "-m", multiple=True, help="Models to compare")
 @click.option("--strategy", "-s", multiple=True, help="Strategies to compare")
 @click.argument("text_file", type=click.Path(exists=True))
@@ -183,7 +170,7 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
         click.echo()
 
 
-@cli.command()
+@click.command()
 @click.option("--model", "-m", default=None, help="Model whose collection should be deleted")
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
@@ -207,10 +194,10 @@ def clear_cache(ctx, model: str | None, yes: bool):
         else:
             click.echo(click.style(f"Collection '{collection}' does not exist", fg="yellow"))
     except Exception as e:
-        click.echo(click.style(f"✗ Error deleting collection: {e}", fg="red"))
+        click.echo(click.style(f"Error deleting collection: {e}", fg="red"))
 
 
-@cli.command()
+@click.command()
 @click.pass_context
 def validate_cache(ctx):
     config_mgr = ctx.obj["config_manager"]
@@ -233,13 +220,9 @@ def validate_cache(ctx):
             click.echo(f"  - {file}")
 
 
-@cli.command()
+@click.command()
 @click.pass_context
 def show_config(ctx):
     config_mgr = ctx.obj["config_manager"]
     config_dict = config_mgr.get_all()
     click.echo(json.dumps(config_dict, indent=2, default=str))
-
-
-if __name__ == "__main__":
-    cli(obj={})

@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import logging
 import re
@@ -365,83 +364,4 @@ def show_changelog() -> None:
         print(f"Changelog file not found: {CHANGELOG_FILE.absolute()}")
 
 
-def clean_gutenberg_texts() -> None:
-    parser = argparse.ArgumentParser(description="Clean corpus files of Project Gutenberg license text")
-    parser.add_argument("--dir", type=str, default=str(CORPUS_DIR), help="Directory with corpus files")
-    parser.add_argument("--pattern", type=str, default="*.txt", help="File search pattern")
-    parser.add_argument("--backup", action="store_true", help="Create local backups of originals")
-    parser.add_argument("--file", type=str, help="Clean a specific file (overrides --dir and --pattern)")
-    parser.add_argument(
-        "--no-recursive", action="store_true", help="Do not search subdirectories (only the selected directory)"
-    )
-    parser.add_argument("--preview", action="store_true", help="Show files that would be processed without cleaning")
-    parser.add_argument(
-        "--no-save-sources", action="store_true", help="Do not save originals to sources_backup (saved by default)"
-    )
-    parser.add_argument("--show-changelog", action="store_true", help="Show changelog contents")
-    parser.add_argument("--backup-stats", action="store_true", help="Show saved backup statistics")
-
-    args = parser.parse_args()
-
-    if args.show_changelog:
-        show_changelog()
-        return
-
-    if args.backup_stats:
-        show_backup_stats()
-        return
-
-    save_sources = not args.no_save_sources
-
-    if save_sources:
-        logger.info(f"Originals will be saved to: {BACKUP_DIR.absolute()}")
-        logger.info(f"Change log: {CHANGELOG_FILE.absolute()}")
-
-    if args.file:
-        filepath = Path(args.file)
-        if not filepath.exists():
-            logger.error(f"File not found: {filepath}")
-            return
-
-        if process_gutenberg_file(filepath, args.backup, save_sources):
-            logger.info(f"File cleaned successfully: {filepath}")
-            if save_sources:
-                logger.info(f"Original saved to folder {BACKUP_DIR}/")
-        else:
-            logger.info(f"File does not require cleanup: {filepath}")
-
-    elif args.preview:
-        directory = Path(args.dir)
-        files = preview_gutenberg_files(directory, args.pattern, not args.no_recursive)
-
-        if files:
-            print(f"\nProject Gutenberg files found: {len(files)}")
-            print("Files:")
-            for f in files:
-                print(f"  - {f}")
-        else:
-            print("No Project Gutenberg files found")
-
-    else:
-        directory = Path(args.dir)
-
-        if not directory.exists():
-            logger.error(f"Directory not found: {directory}")
-            logger.info("Make sure the directory exists or pass the correct path with --dir")
-            return
-
-        count = batch_clean_gutenberg_files(
-            directory, args.pattern, args.backup, recursive=not args.no_recursive, save_sources=save_sources
-        )
-
-        logger.info(f"Cleanup complete. Files processed: {count}")
-
-        if save_sources and count > 0:
-            logger.info(f"Originals saved to folder: {BACKUP_DIR}/")
-            logger.info(f"Change log: {CHANGELOG_FILE}")
-
-
 _last_changes: dict[str, Any] = {}
-
-if __name__ == "__main__":
-    clean_gutenberg_texts()

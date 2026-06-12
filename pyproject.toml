@@ -63,11 +63,6 @@ all = [
 
 [project.scripts]
 mytho = "cli:mytho"
-mytho-server = "server.run_server:main"
-mytho-embeddings = "embedding.cli:cli"
-mytho-corpus = "corpus.build_corpus:build_and_save_corpus"
-mytho-cluster = "clustering.run_clustering:build_clusters"
-mytho-clean-gutenberg = "corpus.clean_gutenberg:clean_gutenberg_texts"
 
 [tool.setuptools]
 py-modules = ["settings", "main", "cli"]
