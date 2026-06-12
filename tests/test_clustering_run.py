@@ -12,7 +12,6 @@ _src = os.path.join(os.path.dirname(__file__), "..", "src")
 # modules that pull them in.
 _clustering_pkg = types.ModuleType("clustering")
 _clustering_pkg.__path__ = [os.path.join(_src, "clustering")]  # type: ignore[attr-defined]
-sys.modules.setdefault("clustering", _clustering_pkg)
 
 _viz_stub = types.ModuleType("clustering.visualization")
 for _fn in [
@@ -22,24 +21,38 @@ for _fn in [
     "reduce_dimensions",
 ]:
     setattr(_viz_stub, _fn, lambda *a, **kw: None)
-sys.modules.setdefault("clustering.visualization", _viz_stub)
 
 _proj_pkg = types.ModuleType("projection")
 _proj_pkg.__path__ = [os.path.join(_src, "projection")]  # type: ignore[attr-defined]
-sys.modules.setdefault("projection", _proj_pkg)
 
 _analyzer_stub = types.ModuleType("projection.analyzer")
 _analyzer_stub.EmbeddingAnalyzer = type("EmbeddingAnalyzer", (), {})  # type: ignore[attr-defined]
-sys.modules.setdefault("projection.analyzer", _analyzer_stub)
 
-_spec = importlib.util.spec_from_file_location(
-    "clustering.run_clustering",
-    os.path.join(_src, "clustering", "run_clustering.py"),
-)
-assert _spec is not None and _spec.loader is not None
-_mod = importlib.util.module_from_spec(_spec)
-sys.modules["clustering.run_clustering"] = _mod
-_spec.loader.exec_module(_mod)
+# Stubs live in sys.modules only while run_clustering.py is being loaded,
+# so they cannot leak into other test modules in the same pytest session.
+_added_stubs: list[str] = []
+for _name, _module in [
+    ("clustering", _clustering_pkg),
+    ("clustering.visualization", _viz_stub),
+    ("projection", _proj_pkg),
+    ("projection.analyzer", _analyzer_stub),
+]:
+    if _name not in sys.modules:
+        sys.modules[_name] = _module
+        _added_stubs.append(_name)
+
+try:
+    _spec = importlib.util.spec_from_file_location(
+        "clustering.run_clustering",
+        os.path.join(_src, "clustering", "run_clustering.py"),
+    )
+    assert _spec is not None and _spec.loader is not None
+    _mod = importlib.util.module_from_spec(_spec)
+    sys.modules["clustering.run_clustering"] = _mod
+    _spec.loader.exec_module(_mod)
+finally:
+    for _name in _added_stubs + ["clustering.run_clustering"]:
+        sys.modules.pop(_name, None)
 
 _params_for = _mod._params_for
 _get_num_clusters = _mod._get_num_clusters

@@ -7,7 +7,9 @@ import numpy as np
 
 _src = os.path.join(os.path.dirname(__file__), "..", "src")
 
-# Stub plotly/pandas so visualization.py imports without the optional deps.
+# Stub plotly/pandas ONLY for the duration of loading visualization.py.
+# Leaving a fake `pandas` in sys.modules session-wide breaks sklearn, which
+# sniffs sys.modules to decide whether pandas support is available.
 _px = types.ModuleType("plotly.express")
 _px.colors = types.SimpleNamespace(qualitative=types.SimpleNamespace(Plotly=["#111111", "#222222", "#333333"]))
 
@@ -24,27 +26,36 @@ _go.Figure = type("Figure", (), {})
 _subplots = types.ModuleType("plotly.subplots")
 _subplots.make_subplots = lambda *a, **kw: None
 
-_plotly = types.ModuleType("plotly")
-sys.modules.setdefault("plotly", _plotly)
-sys.modules.setdefault("plotly.express", _px)
-sys.modules.setdefault("plotly.graph_objects", _go)
-sys.modules.setdefault("plotly.subplots", _subplots)
 _pd = types.ModuleType("pandas")
 _pd.DataFrame = type("DataFrame", (), {})  # type: ignore[attr-defined]
-sys.modules.setdefault("pandas", _pd)
 
 _proj_pkg = types.ModuleType("projection")
 _proj_pkg.__path__ = [os.path.join(_src, "projection")]  # type: ignore[attr-defined]
-sys.modules.setdefault("projection", _proj_pkg)
 
-_spec = importlib.util.spec_from_file_location(
-    "projection.visualization",
-    os.path.join(_src, "projection", "visualization.py"),
-)
-assert _spec is not None and _spec.loader is not None
-_mod = importlib.util.module_from_spec(_spec)
-sys.modules["projection.visualization"] = _mod
-_spec.loader.exec_module(_mod)
+_added_stubs: list[str] = []
+for _name, _module in [
+    ("plotly", types.ModuleType("plotly")),
+    ("plotly.express", _px),
+    ("plotly.graph_objects", _go),
+    ("plotly.subplots", _subplots),
+    ("pandas", _pd),
+    ("projection", _proj_pkg),
+]:
+    if _name not in sys.modules:
+        sys.modules[_name] = _module
+        _added_stubs.append(_name)
+
+try:
+    _spec = importlib.util.spec_from_file_location(
+        "projection.visualization",
+        os.path.join(_src, "projection", "visualization.py"),
+    )
+    assert _spec is not None and _spec.loader is not None
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+finally:
+    for _name in _added_stubs:
+        sys.modules.pop(_name, None)
 
 _traditions_of = _mod._traditions_of
 _get_color_map = _mod._get_color_map
