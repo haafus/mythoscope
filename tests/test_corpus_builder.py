@@ -21,7 +21,8 @@ if not hasattr(fu_mod, "UserAgent"):
 from datetime import datetime
 
 from corpus import catalog
-from corpus.builder import _add_to_catalog, _build_metadata, _item_tid, _update_traditions_info
+from corpus.builder import _build_metadata, _item_tid, _update_traditions_info
+from corpus.catalog import add_item_to_catalog as _add_to_catalog
 
 
 class TestItemTid:
@@ -66,43 +67,43 @@ class TestAddToCatalog:
 
         assert len(catalog.catalog_rows) == 1
         row = catalog.catalog_rows[0]
-        assert row[0] == "Iliad"
-        assert row[1] == "Greek"
-        assert row[6] is True
-        assert row[7] == 500
-        assert row[8] == 40
+        assert row.tid == "Iliad"
+        assert row.major_tradition == "Greek"
+        assert row.available is True
+        assert row.word_count == 500
+        assert row.sentence_count == 40
 
     def test_error_records_zero_counts(self):
         item = {**_BASE_ITEM, "url": "http://example.com/fail"}
         _add_to_catalog(item, tid="Iliad", color="#FF0000", success=False, error="Timeout")
 
         row = catalog.catalog_rows[0]
-        assert row[6] is False
-        assert row[7] == 0
-        assert row[8] == 0
-        assert "Timeout" in row[10]
+        assert row.available is False
+        assert row.word_count == 0
+        assert row.sentence_count == 0
+        assert "Timeout" in row.description
 
     def test_error_with_description_includes_both(self):
         item = {**_BASE_ITEM, "url": "http://example.com/fail2", "description": "The Odyssey"}
         _add_to_catalog(item, tid="Odyssey", color="#FF0000", success=False, error="404")
 
         row = catalog.catalog_rows[0]
-        assert "The Odyssey" in row[10]
-        assert "404" in row[10]
+        assert "The Odyssey" in row.description
+        assert "404" in row.description
 
     def test_success_empty_description(self):
         item = {**_BASE_ITEM, "url": "http://example.com/nodesc"}
         stats = {"word_count": 10, "sentence_count": 1}
         _add_to_catalog(item, tid="X", color="#000", success=True, stats=stats)
 
-        assert catalog.catalog_rows[0][10] == ""
+        assert catalog.catalog_rows[0].description == ""
 
     def test_missing_major_tradition_defaults(self):
         item = {"tradition": "T", "language": "en", "type": "original", "url": "http://example.com/no-major"}
         stats = {"word_count": 1, "sentence_count": 1}
         _add_to_catalog(item, tid="X", color="#000", success=True, stats=stats)
 
-        assert catalog.catalog_rows[0][1] == "Unknown"
+        assert catalog.catalog_rows[0].major_tradition == "Unknown"
 
 
 class TestUpdateTraditionsInfo:

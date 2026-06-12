@@ -2,13 +2,17 @@ import json
 from pathlib import Path
 
 import requests
-from fake_useragent import UserAgent
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from . import catalog, logger
 from .config import CORPUS_DIR, DOWNLOAD_LIST_FILE, PROCESSED_URLS_FILE, config
-from .utils import get_tradition_color, sanitize_filename
+from .utils import corpus_text_path, get_tradition_color
+
+# Lazily initialized: creating a session / UserAgent at import time would make
+# any `import corpus.*` pay for it (UserAgent may even hit the network).
+_http_session: requests.Session | None = None
+_user_agent = None
 
 
 def create_retry_session() -> requests.Session:
@@ -24,8 +28,20 @@ def create_retry_session() -> requests.Session:
     return session
 
 
-http_session = create_retry_session()
-ua = UserAgent(fallback="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+def _get_http_session() -> requests.Session:
+    global _http_session
+    if _http_session is None:
+        _http_session = create_retry_session()
+    return _http_session
+
+
+def _get_user_agent():
+    global _user_agent
+    if _user_agent is None:
+        from fake_useragent import UserAgent
+
+        _user_agent = UserAgent(fallback="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+    return _user_agent
 
 
 def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]:
@@ -51,34 +67,14 @@ def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]
         url = item["url"]
         tid = item.get("title", item.get("id", "unknown_id"))
         tradition = item["tradition"]
-        major_tradition = item.get("major_tradition", "Unknown")
-        lang = item["language"]
-        ftype = item["type"]
-        description = item.get("description", "")
+        color = get_tradition_color(tradition)
 
         if url in seen_urls:
             logger.warning(f"Duplicate URL: {url}, skipping")
-            catalog.add_to_catalog(
-                tid,
-                major_tradition,
-                tradition,
-                lang,
-                ftype,
-                url,
-                False,
-                0,
-                0,
-                get_tradition_color(tradition),
-                description,
-            )
+            catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Duplicate URL")
             continue
 
-        major_tradition_path = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
-        tradition_path = sanitize_filename(tradition.replace("/", "_").replace(" ", "_"))
-        title_path = sanitize_filename(tid.replace("/", "_").replace(" ", "_"))
-
-        folder = CORPUS_DIR / major_tradition_path / tradition_path / title_path
-        filename = folder / f"{title_path}.txt"
+        filename = corpus_text_path(CORPUS_DIR, item.get("major_tradition", "Unknown"), tradition, tid)
 
         if filename.exists() and not force:
             logger.info(f"File exists for {tid}, will be processed locally")
@@ -88,19 +84,7 @@ def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]
             filtered.append(new_item)
         elif url in processed_urls and not force:
             logger.info(f"URL was already processed earlier (file is missing): {url}, skipping")
-            catalog.add_to_catalog(
-                tid,
-                major_tradition,
-                tradition,
-                lang,
-                ftype,
-                url,
-                False,
-                0,
-                0,
-                get_tradition_color(tradition),
-                description,
-            )
+            catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Previously processed, file missing")
             continue
         else:
             seen_urls.add(url)
@@ -112,7 +96,7 @@ def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]
 def download_file(url: str) -> bytes:
     logger.info(f"Downloading: {url}")
     headers = {
-        "User-Agent": ua.random,
+        "User-Agent": _get_user_agent().random,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
@@ -122,7 +106,7 @@ def download_file(url: str) -> bytes:
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "none",
     }
-    response = http_session.get(url, headers=headers, timeout=(config.timeout_connect, config.timeout_read))
+    response = _get_http_session().get(url, headers=headers, timeout=(config.timeout_connect, config.timeout_read))
     response.raise_for_status()
     content: bytes = response.content
     return content

@@ -52,7 +52,7 @@ class TestAddToCatalog:
     def test_adds_entry(self):
         add_to_catalog("t1", "major", "trad", "en", "translate", "http://x.com", True, 100, 10, "#FF0000")
         assert len(catalog_rows) == 1
-        assert catalog_rows[0][0] == "t1"
+        assert catalog_rows[0].tid == "t1"
 
     def test_skips_duplicate_url(self):
         add_to_catalog("t1", "major", "trad", "en", "translate", "http://x.com", True, 100, 10, "#FF0000")
@@ -67,14 +67,20 @@ class TestAddToCatalog:
     def test_entry_fields(self):
         add_to_catalog("tid", "maj", "trad", "ru", "original", "http://z.com", True, 50, 5, "#AABBCC", "desc")
         row = catalog_rows[0]
-        assert row[0] == "tid"
-        assert row[1] == "maj"
-        assert row[2] == "trad"
-        assert row[3] == "ru"
-        assert row[4] == "original"
-        assert row[5] == "http://z.com"
-        assert row[6] is True
-        assert row[7] == 50
-        assert row[8] == 5
-        assert row[9] == "#AABBCC"
-        assert row[10] == "desc"
+        assert row.tid == "tid"
+        assert row.major_tradition == "maj"
+        assert row.tradition == "trad"
+        assert row.language == "ru"
+        assert row.ftype == "original"
+        assert row.url == "http://z.com"
+        assert row.available is True
+        assert row.word_count == 50
+        assert row.sentence_count == 5
+        assert row.color == "#AABBCC"
+        assert row.description == "desc"
+
+    def test_as_csv_row_matches_header_order(self):
+        add_to_catalog("tid", "maj", "trad", "ru", "original", "http://z.com", True, 50, 5, "#AABBCC", "desc")
+        csv_row = catalog_rows[0].as_csv_row()
+        assert len(csv_row) == len(_mod.CSV_HEADER)
+        assert csv_row == ["tid", "maj", "trad", "ru", "original", "http://z.com", True, 50, 5, "#AABBCC", "desc"]

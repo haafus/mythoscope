@@ -168,6 +168,14 @@ def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
 
+def corpus_text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid: str) -> Path:
+    """Canonical on-disk location of a corpus text: <major>/<tradition>/<title>/<title>.txt"""
+    major = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
+    trad = sanitize_filename(tradition.replace("/", "_").replace(" ", "_"))
+    title = sanitize_filename(tid.replace("/", "_").replace(" ", "_"))
+    return corpus_dir / major / trad / title / f"{title}.txt"
+
+
 def get_tradition_color(tradition: str) -> str:
     with _color_lock:
         if tradition in _tradition_colors:

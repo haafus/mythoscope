@@ -12,6 +12,7 @@ from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE,
 from .downloader import download_file, load_download_list
 from .utils import (
     _decode_bytes,
+    corpus_text_path,
     count_sentences,
     count_words,
     ensure_dir,
@@ -20,7 +21,6 @@ from .utils import (
     md5,
     normalize_text,
     pdf_to_text,
-    sanitize_filename,
 )
 
 data_lock = threading.Lock()
@@ -60,23 +60,6 @@ def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
         "sentence_count": stats["sentence_count"],
         "color": color,
     }
-
-
-def _add_to_catalog(item: dict, *, tid: str, color: str, success: bool, stats: dict | None = None, error: str = ""):
-    description = item.get("description", "")
-    if success and stats:
-        catalog.add_to_catalog(
-            tid, item.get("major_tradition", "Unknown"), item["tradition"],
-            item["language"], item["type"], item["url"],
-            True, stats["word_count"], stats["sentence_count"], color, description,
-        )
-    else:
-        err_desc = f"{description} [{error}]" if description else error
-        catalog.add_to_catalog(
-            tid, item.get("major_tradition", "Unknown"), item["tradition"],
-            item["language"], item["type"], item["url"],
-            False, 0, 0, color, err_desc,
-        )
 
 
 def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> str:
@@ -122,9 +105,9 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
                 with data_lock:
                     metadata.append(local_meta)
                     processed_urls.add(url)
-                _add_to_catalog(item, tid=tid, color=color, success=True, stats=local_meta)
+                catalog.add_item_to_catalog(item, tid=tid, color=color, success=True, stats=local_meta)
             else:
-                _add_to_catalog(item, tid=tid, color=color, success=False, error="Local file read error")
+                catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Local file read error")
             return
         else:
             logger.warning(f"{tid}: Local file {filename} not found, trying download")
@@ -139,13 +122,7 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
 
         stats = _finalize_text(text, url, tid)
 
-        major_tradition = item.get("major_tradition", "Unknown")
-        major_tradition_path = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
-        tradition_path = sanitize_filename(item["tradition"].replace("/", "_").replace(" ", "_"))
-        title_path = sanitize_filename(tid.replace("/", "_").replace(" ", "_"))
-
-        folder = CORPUS_DIR / major_tradition_path / tradition_path / title_path
-        filename = folder / f"{title_path}.txt"
+        filename = corpus_text_path(CORPUS_DIR, item.get("major_tradition", "Unknown"), item["tradition"], tid)
 
         with data_lock:
             ensure_dir(filename.parent)
@@ -157,12 +134,12 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
             )
             processed_urls.add(url)
 
-        _add_to_catalog(item, tid=tid, color=color, success=True, stats=stats)
-        logger.info(f"Saved successfully: {title_path}.txt (words: {stats['word_count']}, color: {color})")
+        catalog.add_item_to_catalog(item, tid=tid, color=color, success=True, stats=stats)
+        logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']}, color: {color})")
 
     except Exception as e:
         logger.error(f"{tid}: Processing error: {e}")
-        _add_to_catalog(item, tid=tid, color=color, success=False, error=f"Error: {e}")
+        catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error=f"Error: {e}")
 
 
 def _update_traditions_info(filter_type: set[str], force: bool) -> None:
@@ -249,23 +226,8 @@ def build_corpus(filter_type: set[str], force: bool = False):
 
     with open(CATALOG_FILE, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-
-        writer.writerow(
-            [
-                "id",
-                "major_tradition",
-                "tradition",
-                "language",
-                "type",
-                "url",
-                "availability",
-                "word_count",
-                "sentence_count",
-                "color",
-                "description",
-            ]
-        )
-        writer.writerows(catalog.catalog_rows)
+        writer.writerow(catalog.CSV_HEADER)
+        writer.writerows(row.as_csv_row() for row in catalog.catalog_rows)
 
     with open(PROCESSED_URLS_FILE, "w", encoding="utf-8") as f:
         json.dump(list(processed_urls), f, ensure_ascii=False, indent=2)
@@ -273,14 +235,14 @@ def build_corpus(filter_type: set[str], force: bool = False):
     logger.info("Corpus build complete.")
     logger.info(f"Total records: {len(catalog.catalog_rows)}")
 
-    available = sum(1 for row in catalog.catalog_rows if row[6])
-    logger.info(f"Available: {available}")
-    logger.info(f"Unavailable: {len(catalog.catalog_rows) - available}")
+    available_rows = [row for row in catalog.catalog_rows if row.available]
+    logger.info(f"Available: {len(available_rows)}")
+    logger.info(f"Unavailable: {len(catalog.catalog_rows) - len(available_rows)}")
 
-    if available > 0:
-        total_words = sum(row[7] for row in catalog.catalog_rows if row[6])
-        total_sentences = sum(row[8] for row in catalog.catalog_rows if row[6])
+    if available_rows:
+        total_words = sum(row.word_count for row in available_rows)
+        total_sentences = sum(row.sentence_count for row in available_rows)
         logger.info("\nOverall statistics for available texts:")
         logger.info(f"  Total words: {total_words}")
         logger.info(f"  Total sentences: {total_sentences}")
-        logger.info(f"  Average words per text: {total_words / available:.1f}")
+        logger.info(f"  Average words per text: {total_words / len(available_rows):.1f}")
