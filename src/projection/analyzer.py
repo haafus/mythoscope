@@ -1,10 +1,10 @@
-import json
 import logging
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
+from json_utils import load_json, save_json
 from settings import settings
 
 from .loader import EmbeddingDataLoader
@@ -109,9 +109,7 @@ class EmbeddingAnalyzer:
         }
 
         info_path = self.output_dir / "model_info.json"
-        with open(info_path, "w", encoding="utf-8") as f:
-            json.dump(model_info, f, ensure_ascii=False, indent=2)
-
+        save_json(info_path, model_info, indent=2)
         logger.info(f"Model information saved: {info_path}")
 
     def save_models_list(self, output_dir: Path | None = None) -> Path:
@@ -121,24 +119,10 @@ class EmbeddingAnalyzer:
         output_dir.mkdir(parents=True, exist_ok=True)
         list_path = output_dir / "models.json"
 
-        existing_models = self._load_existing_models(list_path)
-        all_models = sorted(set(existing_models + self.available_models))
+        existing = load_json(list_path, default=[])
+        existing = existing if isinstance(existing, list) else []
+        all_models = sorted(set(existing + self.available_models))
 
-        with open(list_path, "w", encoding="utf-8") as f:
-            json.dump(all_models, f, ensure_ascii=False, indent=2)
-
+        save_json(list_path, all_models, indent=2)
         logger.info(f"Model list saved: {list_path}")
         return list_path
-
-    @staticmethod
-    def _load_existing_models(list_path: Path) -> list[str]:
-        if not list_path.exists():
-            return []
-
-        try:
-            with open(list_path, encoding="utf-8") as f:
-                data = json.load(f)
-                return data if isinstance(data, list) else []
-        except (OSError, json.JSONDecodeError) as e:
-            logger.warning(f"Failed to load {list_path}: {e}")
-            return []

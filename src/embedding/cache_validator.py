@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from json_utils import load_json, save_json
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,26 +22,10 @@ class CacheValidator:
         return self.cache_dir / ".checksums.json"
 
     def _load_checksums(self) -> None:
-        checksum_file = self._get_checksum_file()
-        if checksum_file.exists():
-            try:
-                import json
-
-                with open(checksum_file, encoding="utf-8") as f:
-                    self._checksums = json.load(f)
-            except Exception as e:
-                logger.warning(f"Failed to load checksums: {e}")
+        self._checksums = load_json(self._get_checksum_file(), default={})
 
     def _save_checksums(self) -> None:
-        try:
-            import json
-
-            checksum_file = self._get_checksum_file()
-            checksum_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(checksum_file, "w", encoding="utf-8") as f:
-                json.dump(self._checksums, f, indent=2)
-        except Exception as e:
-            logger.warning(f"Failed to save checksums: {e}")
+        save_json(self._get_checksum_file(), self._checksums, indent=2)
 
     _CHUNK_SIZE = 1024 * 1024
 

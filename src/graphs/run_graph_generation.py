@@ -4,6 +4,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from json_utils import load_json, save_json
 from settings import settings
 
 from .graph_generator import generate_and_save_graph
@@ -16,26 +17,14 @@ CHECKPOINT_FILE = "checkpoint.json"
 
 
 def load_checkpoint(book_out_dir: Path) -> dict | None:
-    path = book_out_dir / CHECKPOINT_FILE
-    if not path.exists():
-        return None
-    try:
-        with open(path, encoding="utf-8") as f:
-            data = json.load(f)
-        if isinstance(data, dict) and isinstance(data.get("next_chunk"), int):
-            return data
-    except (OSError, json.JSONDecodeError) as e:
-        logger.warning(f"Ignoring unreadable checkpoint {path}: {e}")
+    data = load_json(book_out_dir / CHECKPOINT_FILE)
+    if isinstance(data, dict) and isinstance(data.get("next_chunk"), int):
+        return data
     return None
 
 
 def save_checkpoint(book_out_dir: Path, next_chunk: int, results: dict) -> None:
-    path = book_out_dir / CHECKPOINT_FILE
-    try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump({"next_chunk": next_chunk, **results}, f, ensure_ascii=False)
-    except OSError as e:
-        logger.warning(f"Failed to save checkpoint {path}: {e}")
+    save_json(book_out_dir / CHECKPOINT_FILE, {"next_chunk": next_chunk, **results})
 
 
 def clear_checkpoint(book_out_dir: Path) -> None:

@@ -12,7 +12,7 @@ from sklearn.metrics.pairwise import cosine_distances
 
 from settings import settings
 
-from .utils import reduce_dimensions
+from .utils import _check_umap, reduce_dimensions
 
 MAX_TEXT_PREVIEW_LEN = 200
 MAX_VIS_SAMPLES = None
@@ -46,16 +46,6 @@ def _sample_for_visualization(data: list[dict], sample_size: int | None, reason:
     logger.info(f"Sampling {sample_limit} of {len(data)} records for {reason}")
     indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_limit, replace=False)
     return [data[i] for i in indices]
-
-
-def _check_umap_available() -> bool:
-    try:
-        import umap  # noqa: F401
-
-        return True
-    except ImportError:
-        logger.warning("UMAP not installed. Install with: pip install umap-learn")
-        return False
 
 
 def _traditions_of(data: list[dict]) -> list[str]:
@@ -236,7 +226,7 @@ def plot_interactive_2d(
         logger.warning("No data for visualization.")
         return None
 
-    if method == "umap" and not _check_umap_available():
+    if method == "umap" and not _check_umap():
         logger.warning("UMAP not available, falling back to PCA")
         method = "pca"
 
@@ -460,7 +450,7 @@ def plot_comparison_dashboard(
         return None
 
     methods_to_use = []
-    if _check_umap_available():
+    if _check_umap():
         methods_to_use.append("umap")
     methods_to_use.extend(["pca", "tsne"])
 
@@ -759,7 +749,7 @@ def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool =
                 configs_map = {"umap": umap_configs, "tsne": tsne_configs, "pca": pca_configs}
 
                 for method, configs in configs_map.items():
-                    if method == "umap" and not _check_umap_available():
+                    if method == "umap" and not _check_umap():
                         continue
 
                     logger.info(f"  - Generating individual {method.upper()} plots...")
@@ -778,7 +768,7 @@ def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool =
 
                 logger.info("  - Generating hyperparameter tuning dashboards...")
                 try:
-                    if _check_umap_available():
+                    if _check_umap():
                         plot_hyperparameter_tuning_dashboard(
                             data,
                             method="umap",
