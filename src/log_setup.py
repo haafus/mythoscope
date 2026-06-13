@@ -1,8 +1,11 @@
 import logging
+from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from settings import settings
+
+_TIMESTAMP_FMT = "%Y%m%d_%H%M%S"
 
 
 def setup_logging(
@@ -12,7 +15,12 @@ def setup_logging(
     max_bytes: int = 10 * 1024 * 1024,
     backup_count: int = 5,
     clear_handlers: bool = False,
+    timestamp: bool = False,
 ) -> None:
+    if timestamp:
+        stem, suffix = log_filename.rsplit(".", 1) if "." in log_filename else (log_filename, "log")
+        log_filename = f"{stem}_{datetime.now(tz=timezone.utc).strftime(_TIMESTAMP_FMT)}.{suffix}"
+
     log_path = Path(log_dir or settings.logs_dir)
     log_path.mkdir(parents=True, exist_ok=True)
 

@@ -104,9 +104,7 @@ def projection(model: str | None, no_plots: bool):
 @click.option("--models-list", multiple=True, help="Explicit list of algorithms to run.")
 def cluster(model, clustering_model, single_model, no_viz, output_dir, models_list):
     """Run clustering analysis on embeddings."""
-    from datetime import datetime
-
-    setup_logging(log_filename=f"clustering_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+    setup_logging(log_filename="clustering.log", timestamp=True)
 
     from clustering.run_clustering import run_all_clustering_models, run_clustering_analysis
     from projection.analyzer import EmbeddingAnalyzer
@@ -146,9 +144,7 @@ def cluster(model, clustering_model, single_model, no_viz, output_dir, models_li
 @click.option("--force", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    from datetime import datetime
-
-    setup_logging(log_filename=f"graphs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+    setup_logging(log_filename="graphs.log", timestamp=True)
     from graphs.run_graph_generation import run_generate_graphs
 
     run_generate_graphs(force=force)
