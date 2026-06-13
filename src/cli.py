@@ -78,7 +78,7 @@ def embeddings(ctx, verbose: bool):
 def projection(model: str | None, no_plots: bool):
     """Generate dimensionality-reduction projections (PCA, t-SNE, UMAP)."""
     setup_logging(log_filename="analyzer.log")
-    from projection.visualization import analyze_embeddings
+    from projection.run_analysis import analyze_embeddings
 
     analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots)
     if analyzer is None:
@@ -226,7 +226,7 @@ def _pipeline_embeddings(model: str | None, text_type: str):
 
 
 def _pipeline_projection(model: str | None):
-    from projection.visualization import analyze_embeddings
+    from projection.run_analysis import analyze_embeddings
 
     analyze_embeddings(model_name=model)
 

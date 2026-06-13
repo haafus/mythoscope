@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 from json_utils import load_json, save_json
 from settings import settings
@@ -95,11 +96,9 @@ class EmbeddingAnalyzer:
             logger.warning("No data to save")
             return
 
-        from .visualization import save_summary_to_files
-
         self.output_dir.mkdir(parents=True, exist_ok=True)
         stats = self.get_statistics()
-        save_summary_to_files(self.filter_by_model(), stats, self.output_dir)
+        _save_summary_to_files(self.filter_by_model(), stats, self.output_dir)
 
         model_info = {
             "model_name": self.model_name,
@@ -126,3 +125,32 @@ class EmbeddingAnalyzer:
         save_json(list_path, all_models, indent=2)
         logger.info(f"Model list saved: {list_path}")
         return list_path
+
+
+def _save_summary_to_files(data: list[dict], stats: dict, output_dir: Path) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    data_without_embeddings = [{k: v for k, v in item.items() if k != "embedding"} for item in data]
+
+    df_summary = pd.DataFrame(data_without_embeddings)
+    csv_path = output_dir / "embeddings_data.csv"
+    df_summary.to_csv(csv_path, index=False, encoding="utf-8")
+    logger.info(f"CSV saved: {csv_path}")
+
+    txt_path = output_dir / "analysis_summary.txt"
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write("Embedding Analysis Summary\n")
+        if stats.get("model"):
+            f.write(f"Model: {stats['model']}\n")
+        f.write(f"Total chunks in DB: {stats.get('total_chunks_in_db', stats['n_samples'])}\n")
+        f.write(f"Chunks of selected model: {stats['n_samples']}\n")
+        f.write(f"Embedding dimension: {stats['embedding_dim']}\n")
+        f.write(f"Number of traditions: {stats['traditions']}\n")
+
+        f.write("\n")
+        f.write("DISTRIBUTION BY TRADITIONS\n")
+        for trad, count in sorted(stats["tradition_counts"].items(), key=lambda x: -x[1]):
+            percentage = count / stats["n_samples"] * 100
+            f.write(f"  {trad:<30}: {count:>4} ({percentage:>5.1f}%)\n")
+
+    logger.info(f"Text summary saved: {txt_path}")
