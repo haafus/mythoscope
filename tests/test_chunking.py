@@ -129,13 +129,12 @@ class TestChunkingStrategy:
         assert strategy("   ") == []
 
     def test_call_with_metadata(self):
-        strategy = ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=10, language="en")
+        strategy = ChunkingStrategy(name="test", chunk_size=100, chunk_overlap=10)
         text = "First chunk of text. " * 20
         results = strategy.call_with_metadata(text)
         assert len(results) >= 1
         meta = results[0].metadata
         assert meta.strategy_used == "test"
-        assert meta.language == "en"
         assert meta.word_count > 0
         assert meta.char_count > 0
         assert meta.chunk_id is not None

@@ -1,129 +1,10 @@
-import gc
 import hashlib
 import logging
 import re
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
-
-
-_FASTTEXT_CACHE_DIR = Path.home() / ".cache" / "fasttext"
-_FASTTEXT_MODEL_FILE = "lid.176.bin"
-
-
-class LanguageDetector:
-    _fasttext_model = None
-    _model_path = _FASTTEXT_CACHE_DIR / _FASTTEXT_MODEL_FILE
-
-    @classmethod
-    def _load_fasttext(cls):
-        if cls._fasttext_model is not None:
-            return True
-
-        try:
-            import fasttext
-        except ImportError:
-            logger.warning("FastText is not installed. Install it with: pip install fasttext")
-            return False
-
-        if not cls._model_path.exists():
-            logger.warning(
-                f"FastText model not found at {cls._model_path}. Run download_fasttext_model() to download it."
-            )
-            return False
-
-        try:
-            cls._fasttext_model = fasttext.load_model(cls._model_path)
-            return True
-        except Exception as e:
-            logger.error(f"FastText model load error: {e}")
-            return False
-
-    @classmethod
-    def unload_model(cls):
-        if cls._fasttext_model is not None:
-            del cls._fasttext_model
-            cls._fasttext_model = None
-            gc.collect()
-            logger.info("FastText model unloaded from memory")
-
-    @classmethod
-    def detect(cls, text: str) -> str:
-        if not text or len(text.strip()) < 3:
-            return "unknown"
-
-        clean_text = " ".join(text.split())
-
-        if cls._load_fasttext() and cls._fasttext_model is not None:
-            try:
-                predictions = cls._fasttext_model.predict(clean_text.lower(), k=1)
-                lang_code: str = predictions[0][0].replace("__label__", "")
-                return lang_code
-            except Exception as e:
-                logger.debug(f"FastText error: {e}, switching to langdetect")
-
-        try:
-            from langdetect import DetectorFactory, detect
-
-            DetectorFactory.seed = 0
-            result: str = detect(clean_text)
-            return result
-        except ImportError:
-            logger.debug("langdetect is not installed, falling back to heuristic detection")
-        except Exception as e:
-            logger.debug(f"langdetect failed ({e}), falling back to heuristic detection")
-
-        return cls._heuristic_detect(text)
-
-    @classmethod
-    def _heuristic_detect(cls, text: str) -> str:
-        total_chars = len(text.strip())
-        if total_chars == 0:
-            return "unknown"
-
-        counts = {
-            "ru": len(RegexPatterns.CYRILLIC_PATTERN.findall(text)),
-            "en": len(RegexPatterns.LATIN_PATTERN.findall(text)),
-            "zh": len(RegexPatterns.CJK_PATTERN.findall(text)),
-            "ar": len(RegexPatterns.ARABIC_PATTERN.findall(text)),
-            "hi": len(RegexPatterns.DEVANAGARI_PATTERN.findall(text)),
-        }
-
-        threshold = total_chars * 0.3
-        filtered = {k: v for k, v in counts.items() if v >= threshold}
-
-        if filtered:
-            return max(filtered, key=lambda k: filtered[k])
-
-        if counts["en"] > 0:
-            return "en"
-
-        return "unknown"
-
-
-def download_fasttext_model():
-    import urllib.request
-
-    _FASTTEXT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    model_path = _FASTTEXT_CACHE_DIR / _FASTTEXT_MODEL_FILE
-
-    if model_path.exists():
-        logger.debug("FastText model already exists: %s", model_path)
-        return str(model_path)
-
-    url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
-    logger.info("Downloading FastText model (176 languages, ~130MB) to %s", model_path)
-
-    try:
-        urllib.request.urlretrieve(url, model_path)
-        logger.info("FastText model download complete")
-        return str(model_path)
-    except Exception as e:
-        logger.error("FastText model download failed: %s", e)
-        model_path.unlink(missing_ok=True)
-        raise
 
 
 @dataclass
@@ -138,7 +19,6 @@ class ChunkMetadata:
     overlap_with_next: bool = False
     word_count: int = 0
     char_count: int = 0
-    language: str | None = None
     has_code: bool = False
     has_markdown: bool = False
     parent_doc_hash: str | None = None
@@ -155,7 +35,6 @@ class ChunkMetadata:
             "overlap_with_next": self.overlap_with_next,
             "word_count": self.word_count,
             "char_count": self.char_count,
-            "language": self.language,
             "has_code": self.has_code,
             "has_markdown": self.has_markdown,
             "parent_doc_hash": self.parent_doc_hash,
@@ -184,12 +63,6 @@ class RegexPatterns:
 
     SENTENCE_SPLITTER = re.compile(r"(?<=[.!?])\s+|(?<=[。！？।])\s*")
     PARAGRAPH_SPLITTER = re.compile(r"\n\s*\n")
-
-    CYRILLIC_PATTERN = re.compile(r"[\u0400-\u04FF]")
-    LATIN_PATTERN = re.compile(r"[a-zA-Z]")
-    CJK_PATTERN = re.compile(r"[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]")
-    ARABIC_PATTERN = re.compile(r"[\u0600-\u06FF\u0750-\u077F]")
-    DEVANAGARI_PATTERN = re.compile(r"[\u0900-\u097F]")
 
 
 def character_based_chunking(
@@ -392,7 +265,6 @@ class ChunkingStrategy:
         chunk_overlap: int = 64,
         chunking_func: Callable | None = None,
         return_metadata: bool = False,
-        language: str = "auto",
     ):
         if chunk_size < 10:
             raise ValueError("chunk_size must be at least 10 characters")
@@ -406,7 +278,6 @@ class ChunkingStrategy:
         self.chunk_overlap = chunk_overlap
         self.chunking_func = chunking_func or character_based_chunking
         self.return_metadata = return_metadata
-        self.language = language
 
     def __call__(self, text: str) -> list[str]:
         if not text or not text.strip():
@@ -441,8 +312,6 @@ class ChunkingStrategy:
             has_code = bool(RegexPatterns.CODE_PATTERN.search(chunk_text))
             has_markdown = bool(RegexPatterns.MARKDOWN_PATTERN.search(chunk_text))
 
-            detected_language = LanguageDetector.detect(chunk_text) if self.language == "auto" else self.language
-
             metadata = ChunkMetadata(
                 chunk_id=chunk_id,
                 index=i,
@@ -454,7 +323,6 @@ class ChunkingStrategy:
                 overlap_with_next=(i < len(chunks) - 1 and self.chunk_overlap > 0),
                 word_count=len(chunk_text.split()),
                 char_count=len(chunk_text),
-                language=detected_language,
                 has_code=has_code,
                 has_markdown=has_markdown,
                 parent_doc_hash=doc_hash,
