@@ -32,7 +32,7 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
 @click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
 @click.pass_context
 def generate(ctx, model: str | None, chunking: str | None, text_type: str | None, batch_size: int | None):
-    from settings import setup_logging
+    from log_setup import setup_logging
 
     setup_logging(log_filename="embedding.log")
 

@@ -1,4 +1,4 @@
-from settings import lazy_module_getattr
+from lazy_imports import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "generate_and_save_graph": (".graph_generator", "generate_and_save_graph"),

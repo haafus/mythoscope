@@ -1,4 +1,4 @@
-from settings import lazy_module_getattr
+from lazy_imports import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "get_clustering_model": (".models", "get_clustering_model"),

@@ -1,4 +1,4 @@
-from settings import lazy_module_getattr
+from lazy_imports import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "EmbeddingAnalyzer": (".analyzer", "EmbeddingAnalyzer"),
