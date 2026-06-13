@@ -18,8 +18,6 @@ from .visualization import (
 
 logger = logging.getLogger(__name__)
 
-project_root = settings.project_root
-
 
 class NumpyEncoder(json.JSONEncoder):
     """Custom encoder for converting numpy types to native Python types for JSON."""
@@ -179,7 +177,7 @@ def run_clustering_analysis(
     logger.info(f"  • Points loaded: {len(embeddings)}")
     logger.info(f"  • Dimension: {embeddings.shape[1]}")
 
-    base_analysis_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / clustering_model
+    base_analysis_dir = settings.project_root / output_base_dir / safe_model_name / "clustering" / clustering_model
 
     clustering_params = {
         **({} if clustering_params is None else dict(clustering_params)),
@@ -222,7 +220,7 @@ def run_all_clustering_models(
     embeddings_2d = reduce_dimensions(embeddings, method="umap", n_components=2, normalize=True, fallback_on_error=True)
 
     for cl_model in models_to_run:
-        base_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / cl_model
+        base_dir = settings.project_root / output_base_dir / safe_model_name / "clustering" / cl_model
 
         clustering_params = _params_for(cl_model, num_clusters)
 
@@ -239,7 +237,7 @@ def run_all_clustering_models(
 
         all_results[cl_model] = results.get("metrics", results)
 
-    comparison_dir = Path(project_root) / output_base_dir / safe_model_name / "clustering" / "comparison"
+    comparison_dir = settings.project_root / output_base_dir / safe_model_name / "clustering" / "comparison"
     comparison_dir.mkdir(parents=True, exist_ok=True)
 
     plot_metrics_dashboard(all_results, output_path=str(comparison_dir / "metrics_dashboard.html"))
