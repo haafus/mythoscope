@@ -1,8 +1,11 @@
 import json
+import logging
 import time
 from pathlib import Path
 
 from settings import Settings, settings
+
+logger = logging.getLogger(__name__)
 
 _key_to_model_cache: dict[str, str] = {}
 _models_cache: dict[str, tuple[float, list[str]]] = {}
@@ -41,10 +44,13 @@ def list_models_raw() -> list[str]:
     models: list[str] | None = None
     models_path = settings.analysis_dir / "models.json"
     if models_path.exists():
-        with models_path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
-        if isinstance(data, list):
-            models = [str(item) for item in data]
+        try:
+            with models_path.open("r", encoding="utf-8") as handle:
+                data = json.load(handle)
+            if isinstance(data, list):
+                models = [str(item) for item in data]
+        except (OSError, json.JSONDecodeError) as e:
+            logger.warning("Failed to read %s: %s", models_path, e)
 
     if models is None:
         models = _models_from_analysis_dirs()
@@ -74,9 +80,13 @@ def get_model_info(model_key: str) -> dict:
     if not info_path.exists():
         return {}
 
-    with info_path.open("r", encoding="utf-8") as handle:
-        result: dict = json.load(handle)
-        return result
+    try:
+        with info_path.open("r", encoding="utf-8") as handle:
+            result: dict = json.load(handle)
+            return result
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning("Failed to read %s: %s", info_path, e)
+        return {}
 
 
 def _models_from_analysis_dirs() -> list[str]:
@@ -92,7 +102,8 @@ def _models_from_analysis_dirs() -> list[str]:
                     model_info = json.load(handle)
                 model_name = model_info.get("model_name")
                 models.append(model_name or item.name.replace("_", "/"))
-            except Exception:
+            except (OSError, json.JSONDecodeError) as e:
+                logger.warning("Failed to read %s: %s", info_path, e)
                 models.append(item.name.replace("_", "/"))
 
     return models

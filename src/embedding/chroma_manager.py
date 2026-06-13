@@ -1,10 +1,13 @@
 import hashlib
+import logging
 import re
 import stat
 from pathlib import Path
 from typing import Any
 
 import chromadb
+
+logger = logging.getLogger(__name__)
 
 MAX_CHROMA_COLLECTION_NAME = 63
 MODEL_COLLECTION_HASH_LEN = 8
@@ -44,8 +47,8 @@ def _add_owner_write_permission(path: Path) -> None:
         if path.is_dir():
             extra_bits |= stat.S_IXUSR
         path.chmod(mode | extra_bits)
-    except OSError:
-        pass
+    except OSError as e:
+        logger.debug("Could not set write permission on %s: %s", path, e)
 
 
 def ensure_chroma_writable(chroma_path: Any) -> Path:

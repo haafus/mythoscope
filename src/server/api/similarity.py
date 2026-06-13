@@ -90,12 +90,12 @@ def _run_search_job(job_id: str, model: str, query: str, top_k: int) -> None:
             total=len(results),
             finished_at=time.time(),
         )
-    except Exception as exc:
+    except Exception:
         logger.exception("Semantic search job failed")
         _set_search_job(
             job_id,
             status="failed",
-            error=f"Search failed ({exc.__class__.__name__})",
+            error="Search failed",
             finished_at=time.time(),
         )
 
@@ -143,7 +143,7 @@ def search(request: SearchRequest) -> dict:
         logger.exception("Semantic search failed")
         raise HTTPException(
             status_code=503,
-            detail=f"Semantic search failed ({exc.__class__.__name__})",
+            detail="Semantic search unavailable",
         ) from exc
     return {
         "query": request.query,

@@ -319,7 +319,7 @@ class EmbeddingBuilder:
                     pbar.update(1)
 
         logger.info("Generation complete. Waiting for final batches to be written to disk...")
-        ChromaWriter.stop_background_writer(write_queue, writer_thread)
+        self._chroma.stop_background_writer(write_queue, writer_thread)
 
         logger.info(f"Total added: {added_total} chunks to collection '{collection_name}'")
         self.metrics.save()

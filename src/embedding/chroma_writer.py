@@ -23,6 +23,7 @@ class ChromaWriter:
         self.chroma_client = chroma_client
         self.chroma_batch_size = chroma_batch_size
         self.queue_maxsize = queue_maxsize
+        self._write_error: Exception | None = None
 
     def build_entries(
         self, chunks: list[str], info: dict[str, Any], model_name: str, chunking_name: str
@@ -83,6 +84,8 @@ class ChromaWriter:
                 logger.debug(f"Background thread saved a batch of {len(ids)} chunks.")
             except Exception as e:
                 logger.error(f"Background Chroma write error: {e}")
+                if self._write_error is None:
+                    self._write_error = e
             finally:
                 write_queue.task_done()
 
@@ -92,7 +95,10 @@ class ChromaWriter:
         thread.start()
         return write_queue, thread
 
-    @staticmethod
-    def stop_background_writer(write_queue: queue.Queue, thread: threading.Thread) -> None:
+    def stop_background_writer(self, write_queue: queue.Queue, thread: threading.Thread) -> None:
         write_queue.put(None)
-        thread.join()
+        thread.join(timeout=300)
+        if thread.is_alive():
+            logger.error("Background writer thread did not finish within timeout")
+        if self._write_error is not None:
+            raise RuntimeError(f"Background Chroma write failed: {self._write_error}") from self._write_error

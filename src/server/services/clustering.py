@@ -1,6 +1,9 @@
 import json
+import logging
 
 from server.services.models import get_model_output_dir, key_to_model, model_to_key
+
+logger = logging.getLogger(__name__)
 
 
 def list_algorithms(model_key: str) -> list[str]:
@@ -16,9 +19,13 @@ def get_metrics(model_key: str, algorithm: str) -> dict:
     if not metrics_path.exists():
         return {}
 
-    with metrics_path.open("r", encoding="utf-8") as handle:
-        result: dict = json.load(handle)
-        return result
+    try:
+        with metrics_path.open("r", encoding="utf-8") as handle:
+            result: dict = json.load(handle)
+            return result
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning("Failed to read %s: %s", metrics_path, e)
+        return {}
 
 
 def get_saved_cluster_plots(model_key: str, algorithm: str) -> dict:

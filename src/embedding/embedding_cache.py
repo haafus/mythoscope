@@ -26,7 +26,8 @@ class EmbeddingCache:
         if cache_npy.exists() and cache_json.exists():
             try:
                 return np.load(cache_npy)
-            except Exception:
+            except Exception as e:
+                logger.warning("Corrupted cache file %s: %s", cache_npy, e)
                 return None
         return None
 

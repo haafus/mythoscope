@@ -1,12 +1,15 @@
 import csv
 import io
 import json
+import logging
 import time
 import zipfile
 from pathlib import Path
 
 from corpus.utils import count_sentences, count_words, sanitize_filename
 from settings import settings
+
+logger = logging.getLogger(__name__)
 
 _catalog_cache: dict[str, tuple[float, list[dict]]] = {}
 _doc_index_cache: dict[str, tuple[float, dict[tuple[str, str, str], Path]]] = {}
@@ -43,19 +46,25 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
 
     catalog_by_key = {}
     if catalog_path.exists():
-        with catalog_path.open("r", encoding="utf-8-sig", newline="") as handle:
-            for row in csv.DictReader(handle):
-                key = (
-                    row.get("id", ""),
-                    row.get("major_tradition", ""),
-                    row.get("tradition", ""),
-                )
-                catalog_by_key[key] = row
+        try:
+            with catalog_path.open("r", encoding="utf-8-sig", newline="") as handle:
+                for row in csv.DictReader(handle):
+                    key = (
+                        row.get("id", ""),
+                        row.get("major_tradition", ""),
+                        row.get("tradition", ""),
+                    )
+                    catalog_by_key[key] = row
+        except (OSError, csv.Error) as e:
+            logger.warning("Failed to read catalog %s: %s", catalog_path, e)
 
     metadata_rows = []
     if metadata_path.exists():
-        with metadata_path.open("r", encoding="utf-8") as handle:
-            metadata_rows = json.load(handle)
+        try:
+            with metadata_path.open("r", encoding="utf-8") as handle:
+                metadata_rows = json.load(handle)
+        except (OSError, json.JSONDecodeError) as e:
+            logger.warning("Failed to read metadata %s: %s", metadata_path, e)
 
     source_rows = metadata_rows or list(catalog_by_key.values()) or scan_document_rows(root)
     documents = []
@@ -213,21 +222,21 @@ def build_corpus_archive() -> io.BytesIO:
 
 
 def get_traditions_info(source: str | None = None) -> dict:
-    if source:
-        path = source_root(source) / "traditions_info.json"
-        if path.exists():
+    paths = (
+        [source_root(source) / "traditions_info.json"]
+        if source
+        else [
+            settings.corpus_chunked_dir / "traditions_info.json",
+            settings.corpus_dir / "traditions_info.json",
+        ]
+    )
+    for path in paths:
+        if not path.exists():
+            continue
+        try:
             with path.open("r", encoding="utf-8") as handle:
                 data = json.load(handle)
             return data if isinstance(data, dict) else {}
-        return {}
-
-    for path in (
-        settings.corpus_chunked_dir / "traditions_info.json",
-        settings.corpus_dir / "traditions_info.json",
-    ):
-        if path.exists():
-            with path.open("r", encoding="utf-8") as handle:
-                data = json.load(handle)
-            return data if isinstance(data, dict) else {}
-
+        except (OSError, json.JSONDecodeError) as e:
+            logger.warning("Failed to read %s: %s", path, e)
     return {}
