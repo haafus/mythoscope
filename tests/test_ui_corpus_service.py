@@ -1,4 +1,5 @@
-from server.services.corpus import sanitize_path_part, to_int
+from corpus.utils import sanitize_filename
+from server.services.corpus import to_int
 
 
 class TestToInt:
@@ -24,18 +25,18 @@ class TestToInt:
         assert to_int("") == 0
 
 
-class TestSanitizePathPart:
+class TestSanitizeFilename:
     def test_replaces_slashes(self):
-        assert "/" not in sanitize_path_part("a/b/c")
-        assert "\\" not in sanitize_path_part("a\\b\\c")
+        assert "/" not in sanitize_filename("a/b/c")
+        assert "\\" not in sanitize_filename("a\\b\\c")
 
     def test_replaces_spaces(self):
-        result = sanitize_path_part("hello world")
+        result = sanitize_filename("hello world")
         assert " " not in result
 
     def test_preserves_normal_text(self):
-        assert sanitize_path_part("simple") == "simple"
+        assert sanitize_filename("simple") == "simple"
 
     def test_empty_string(self):
-        result = sanitize_path_part("")
+        result = sanitize_filename("")
         assert isinstance(result, str)

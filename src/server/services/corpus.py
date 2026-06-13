@@ -1,12 +1,11 @@
 import csv
 import io
 import json
-import re
 import time
 import zipfile
 from pathlib import Path
 
-from corpus.utils import count_sentences, count_words
+from corpus.utils import count_sentences, count_words, sanitize_filename
 from settings import settings
 
 _catalog_cache: dict[str, tuple[float, list[dict]]] = {}
@@ -20,10 +19,6 @@ def to_int(value, default: int = 0) -> int:
     except (TypeError, ValueError):
         return default
 
-
-def sanitize_path_part(value: str) -> str:
-    value = (value or "").replace("/", "_").replace(" ", "_")
-    return re.sub(r'[\\/*?:"<>|]', "_", value).strip()
 
 
 def _catalog_sources() -> dict[str, Path]:
@@ -163,9 +158,9 @@ def resolve_document_path(
     doc_id: str, major_tradition: str, tradition: str, source: str = "corpus"
 ) -> tuple[Path | None, str]:
     corpus_root = source_root(source).resolve()
-    major_path = sanitize_path_part(major_tradition)
-    tradition_path = sanitize_path_part(tradition)
-    title_path = sanitize_path_part(doc_id)
+    major_path = sanitize_filename(major_tradition)
+    tradition_path = sanitize_filename(tradition)
+    title_path = sanitize_filename(doc_id)
     file_path = (corpus_root / major_path / tradition_path / title_path / f"{title_path}.txt").resolve()
 
     try:
@@ -207,8 +202,8 @@ def build_corpus_archive() -> io.BytesIO:
                 continue
 
             archive_name = (
-                Path(sanitize_path_part(doc.get("major_tradition", "Unknown")))
-                / sanitize_path_part(doc.get("tradition", "Unknown"))
+                Path(sanitize_filename(doc.get("major_tradition", "Unknown")))
+                / sanitize_filename(doc.get("tradition", "Unknown"))
                 / f"{title_path}.txt"
             ).as_posix()
             archive.write(file_path, archive_name)

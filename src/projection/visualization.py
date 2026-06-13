@@ -1,5 +1,4 @@
 import glob
-import json
 import logging
 import os
 import textwrap
@@ -654,32 +653,6 @@ def save_summary_to_files(data: list[dict], stats: dict, output_dir: str | None 
             f.write(f"  {trad:<30}: {count:>4} ({percentage:>5.1f}%)\n")
 
     logger.info(f"Text summary saved: {txt_path}")
-
-
-def save_models_list(models: list[str], output_dir: str | None = None):
-    if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-
-    output_dir = _ensure_dir(output_dir)
-
-    list_path = os.path.join(output_dir, "models.json")
-
-    existing_models = []
-    if os.path.exists(list_path):
-        try:
-            with open(list_path, encoding="utf-8") as f:
-                existing_models = json.load(f)
-        except Exception:
-            pass
-
-    all_models = list(set(existing_models + models))
-    all_models.sort()
-
-    with open(list_path, "w", encoding="utf-8") as f:
-        json.dump(all_models, f, ensure_ascii=False, indent=2)
-
-    logger.info(f"Models list saved: {list_path}")
-    return list_path
 
 
 def add_click_handler_to_html(html_path: str):

@@ -99,7 +99,7 @@ class EmbeddingBuilder:
 
         self._override_batch_size = batch_size is not None
 
-        if self._override_batch_size and batch_size is not None:
+        if batch_size is not None:
             self.batch_size: int = batch_size
         else:
             self.batch_size = self.DEFAULT_BATCH_SIZE

@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 def sanitize_filename(name: str) -> str:
-    name = re.sub(r'[\\/*?:"<>|]', "_", name).strip()
+    name = (name or "").strip().replace("/", "_").replace(" ", "_")
+    name = re.sub(r'[\\*?:"<>|]', "_", name)
     name = name.replace("..", "_")
     return name
 
@@ -53,9 +54,9 @@ def ensure_dir(path: Path):
 
 def corpus_text_path(corpus_dir: Path, major_tradition: str, tradition: str, tid: str) -> Path:
     """Canonical on-disk location of a corpus text: <major>/<tradition>/<title>/<title>.txt"""
-    major = sanitize_filename(major_tradition.replace("/", "_").replace(" ", "_"))
-    trad = sanitize_filename(tradition.replace("/", "_").replace(" ", "_"))
-    title = sanitize_filename(tid.replace("/", "_").replace(" ", "_"))
+    major = sanitize_filename(major_tradition)
+    trad = sanitize_filename(tradition)
+    title = sanitize_filename(tid)
     return corpus_dir / major / trad / title / f"{title}.txt"
 
 

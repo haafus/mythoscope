@@ -1,6 +1,4 @@
-import json
 import logging
-import os
 from typing import Any
 
 import numpy as np
@@ -22,14 +20,6 @@ def _check_umap() -> bool:
         except ImportError:
             _UMAP_AVAILABLE = False
     return _UMAP_AVAILABLE
-
-
-def load_corpus_metadata(path: str) -> dict[str, str]:
-    if not os.path.exists(path):
-        return {}
-    with open(path, encoding="utf-8") as f:
-        metadata = json.load(f)
-    return {str(item["id"]): item["tradition"] for item in metadata}
 
 
 def reduce_dimensions(
