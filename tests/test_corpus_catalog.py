@@ -1,5 +1,4 @@
 import importlib.util
-import logging
 import os
 import sys
 import types
@@ -10,9 +9,7 @@ bs4_mod = sys.modules["bs4"]
 if not hasattr(bs4_mod, "BeautifulSoup"):
     bs4_mod.BeautifulSoup = type("BeautifulSoup", (), {})  # type: ignore[attr-defined]
 
-cb = types.ModuleType("corpus")
-cb.logger = logging.getLogger("corpus")  # type: ignore[attr-defined]
-sys.modules.setdefault("corpus", cb)
+sys.modules.setdefault("corpus", types.ModuleType("corpus"))
 
 _spec = importlib.util.spec_from_file_location(
     "corpus.catalog",

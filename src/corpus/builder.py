@@ -1,6 +1,7 @@
 import concurrent.futures
 import csv
 import json
+import logging
 import shutil
 import threading
 from datetime import datetime, timezone
@@ -8,7 +9,7 @@ from pathlib import Path
 
 from settings import settings
 
-from . import catalog, logger
+from . import catalog
 from .clean_gutenberg import clean_gutenberg_in_builder
 from .downloader import download_file, load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
@@ -22,6 +23,7 @@ from .utils import (
     normalize_text,
 )
 
+logger = logging.getLogger(__name__)
 data_lock = threading.Lock()
 
 

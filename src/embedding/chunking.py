@@ -108,20 +108,18 @@ def download_fasttext_model():
     model_path = os.path.join(cache_dir, "lid.176.bin")
 
     if os.path.exists(model_path):
-        print(f"Model already exists: {model_path}")
+        logger.debug("FastText model already exists: %s", model_path)
         return model_path
 
     url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
-    print("Downloading FastText model (176 languages, ~130MB)...")
-    print(f"URL: {url}")
-    print(f"Path: {model_path}")
+    logger.info("Downloading FastText model (176 languages, ~130MB) to %s", model_path)
 
     try:
         urllib.request.urlretrieve(url, model_path)
-        print("Download complete!")
+        logger.info("FastText model download complete")
         return model_path
     except Exception as e:
-        print(f"Load error: {e}")
+        logger.error("FastText model download failed: %s", e)
         if os.path.exists(model_path):
             os.remove(model_path)
         raise

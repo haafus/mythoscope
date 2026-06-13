@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 
 import requests
@@ -7,8 +8,10 @@ from urllib3.util.retry import Retry
 
 from settings import settings
 
-from . import catalog, logger
+from . import catalog
 from .utils import corpus_text_path, get_tradition_color
+
+logger = logging.getLogger(__name__)
 
 # Lazily initialized: creating a session / UserAgent at import time would make
 # any `import corpus.*` pay for it (UserAgent may even hit the network).

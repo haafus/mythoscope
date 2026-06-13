@@ -3,6 +3,8 @@ import sys
 
 import click
 
+from log_setup import setup_logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -48,8 +50,6 @@ def mytho():
 @click.option("--force", is_flag=True, help="Overwrite existing files.")
 def corpus(text_type: str, force: bool):
     """Download and build the text corpus (Gutenberg cleanup is automatic)."""
-    from log_setup import setup_logging
-
     setup_logging(log_filename="corpus.log", clear_handlers=True)
     from corpus.builder import build_corpus
 
@@ -79,8 +79,6 @@ def embeddings(ctx, verbose: bool):
 @click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 def projection(model: str | None, no_plots: bool):
     """Generate dimensionality-reduction projections (PCA, t-SNE, UMAP)."""
-    from log_setup import setup_logging
-
     setup_logging(log_filename="analyzer.log")
     from projection.visualization import analyze_embeddings
 
@@ -108,9 +106,7 @@ def cluster(model, clustering_model, single_model, no_viz, output_dir, models_li
     """Run clustering analysis on embeddings."""
     from datetime import datetime
 
-    from log_setup import setup_logging
-
-    setup_logging(log_filename=f"clustering_run_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
+    setup_logging(log_filename=f"clustering_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
     from clustering.run_clustering import run_all_clustering_models, run_clustering_analysis
     from projection.analyzer import EmbeddingAnalyzer
@@ -152,12 +148,7 @@ def graphs(force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
     from datetime import datetime
 
-    from log_setup import setup_logging
-
-    setup_logging(
-        log_filename=f"generation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
-        log_dir="logs",
-    )
+    setup_logging(log_filename=f"graphs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
     from graphs.run_graph_generation import run_generate_graphs
 
     run_generate_graphs(force=force)
@@ -202,8 +193,6 @@ def server(host: str | None, port: int | None):
 @click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
 def pipeline(model, text_type, skip_corpus, skip_embeddings, skip_projection, skip_clustering, skip_graphs):
     """Run the full analysis pipeline end-to-end."""
-    from log_setup import setup_logging
-
     setup_logging(log_filename="pipeline.log", clear_handlers=True)
 
     steps = [

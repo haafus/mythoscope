@@ -1,7 +1,8 @@
+import logging
 import threading
 from dataclasses import dataclass, fields
 
-from . import logger
+logger = logging.getLogger(__name__)
 
 _catalog_lock = threading.Lock()
 catalog_rows: list["CatalogRow"] = []

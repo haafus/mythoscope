@@ -1,5 +1,6 @@
 import click
 
+from log_setup import setup_logging
 from settings import settings
 
 from .build_embeddings import build_embeddings, normalize_text_type
@@ -32,8 +33,6 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
 @click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
 @click.pass_context
 def generate(ctx, model: str | None, chunking: str | None, text_type: str | None, batch_size: int | None):
-    from log_setup import setup_logging
-
     setup_logging(log_filename="embedding.log")
 
     metrics = PerformanceMetrics(settings.embedding.metrics_file)

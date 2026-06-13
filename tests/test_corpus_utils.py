@@ -10,10 +10,6 @@ if not hasattr(bs4_mod, "BeautifulSoup"):
     bs4_mod.BeautifulSoup = type("BeautifulSoup", (), {})  # type: ignore[attr-defined]
 
 sys.modules.setdefault("corpus", types.ModuleType("corpus"))
-cb_mod = sys.modules["corpus"]
-if not hasattr(cb_mod, "logger"):
-    import logging
-    cb_mod.logger = logging.getLogger("corpus")  # type: ignore[attr-defined]
 
 _spec = importlib.util.spec_from_file_location(
     "corpus.utils",
