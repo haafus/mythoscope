@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pandas as pd
 
 from json_utils import load_json, save_json
 from settings import settings
@@ -128,6 +127,8 @@ class EmbeddingAnalyzer:
 
 
 def _save_summary_to_files(data: list[dict], stats: dict, output_dir: Path) -> None:
+    import pandas as pd
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     data_without_embeddings = [{k: v for k, v in item.items() if k != "embedding"} for item in data]
