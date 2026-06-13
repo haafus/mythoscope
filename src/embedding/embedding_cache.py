@@ -33,7 +33,14 @@ class EmbeddingCache:
 
     def _batch_load(self, cache_keys: list[str]) -> list[np.ndarray | None]:
         futures = [self._executor.submit(self._load_single, key) for key in cache_keys]
-        return [f.result() for f in futures]
+        results = []
+        for f in futures:
+            try:
+                results.append(f.result())
+            except Exception:
+                logger.exception("Cache load failed")
+                results.append(None)
+        return results
 
     def generate_embeddings(
         self,

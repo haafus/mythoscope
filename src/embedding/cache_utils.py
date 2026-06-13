@@ -56,43 +56,60 @@ def cleanup_cache(cache_dir: Path, max_size_mb: int = 1024, ttl_days: int = 30) 
             continue
         npy_file = cache_dir / f"{json_file.stem}.npy"
         if not npy_file.exists():
-            json_file.unlink()
-            removed += 1
-            logger.info(f"Removed orphaned cache JSON: {json_file.name}")
+            try:
+                json_file.unlink()
+                removed += 1
+                logger.info("Removed orphaned cache JSON: %s", json_file.name)
+            except OSError as e:
+                logger.debug("Could not remove orphaned JSON %s: %s", json_file, e)
 
     cache_files = list(cache_dir.glob("*.npy"))
     for cache_file in cache_files:
-        mtime = datetime.fromtimestamp(cache_file.stat().st_mtime)
+        try:
+            mtime = datetime.fromtimestamp(cache_file.stat().st_mtime)
+        except OSError:
+            continue
         json_file = cache_dir / f"{cache_file.stem}.json"
 
         if mtime < cutoff_time:
-            cache_file.unlink()
-            if json_file.exists():
-                json_file.unlink()
-            removed += 1
-            logger.info(f"Removed expired cache: {cache_file.name}")
+            try:
+                cache_file.unlink()
+                json_file.unlink(missing_ok=True)
+                removed += 1
+                logger.info("Removed expired cache: %s", cache_file.name)
+            except OSError as e:
+                logger.debug("Could not remove expired cache %s: %s", cache_file, e)
         else:
-            total_size += cache_file.stat().st_size
-            if json_file.exists():
-                total_size += json_file.stat().st_size
+            try:
+                total_size += cache_file.stat().st_size
+                if json_file.exists():
+                    total_size += json_file.stat().st_size
+            except OSError:
+                pass
 
     max_size_bytes = max_size_mb * 1024 * 1024
     if total_size > max_size_bytes:
-        cache_files = sorted([f for f in cache_dir.glob("*.npy") if f.exists()], key=lambda f: f.stat().st_mtime)
+        try:
+            cache_files = sorted(
+                [f for f in cache_dir.glob("*.npy") if f.exists()],
+                key=lambda f: f.stat().st_mtime,
+            )
+        except OSError:
+            cache_files = []
         for cache_file in cache_files:
             if total_size <= max_size_bytes:
                 break
-            json_file = cache_dir / f"{cache_file.stem}.json"
-
-            file_size = cache_file.stat().st_size
-            cache_file.unlink()
-            total_size -= file_size
-
-            if json_file.exists():
-                total_size -= json_file.stat().st_size
-                json_file.unlink()
-
-            removed += 1
-            logger.info(f"Removed cache file to enforce size limit: {cache_file.name}")
+            try:
+                file_size = cache_file.stat().st_size
+                cache_file.unlink()
+                total_size -= file_size
+                json_file = cache_dir / f"{cache_file.stem}.json"
+                if json_file.exists():
+                    total_size -= json_file.stat().st_size
+                    json_file.unlink()
+                removed += 1
+                logger.info("Removed cache file to enforce size limit: %s", cache_file.name)
+            except OSError as e:
+                logger.debug("Could not remove cache file %s: %s", cache_file, e)
 
     return removed

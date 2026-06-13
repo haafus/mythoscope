@@ -42,12 +42,25 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
         locs_future = pool.submit(llm.extract_locations, chunk, prompts["locations"])
         times_future = pool.submit(llm.extract_time, chunk, prompts["time"])
 
-        chars = chars_future.result()
+        try:
+            chars = chars_future.result(timeout=600)
+        except Exception:
+            logger.exception("Failed to extract characters from chunk")
+            chars = []
         chars = chars if isinstance(chars, list) else []
         rels = llm.extract_relations(chunk, chars, prompts["relations"])
 
-        locs = locs_future.result()
-        times = times_future.result()
+        try:
+            locs = locs_future.result(timeout=600)
+        except Exception:
+            logger.exception("Failed to extract locations from chunk")
+            locs = []
+
+        try:
+            times = times_future.result(timeout=600)
+        except Exception:
+            logger.exception("Failed to extract time from chunk")
+            times = []
 
     return {
         "characters": chars,
