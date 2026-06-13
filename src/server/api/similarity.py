@@ -6,15 +6,15 @@ from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Query
 
-from server.config import server_config
 from server.schemas import NeighborsResponse, PointInfo, SavedPlotResponse, SearchRequest, SearchResponse
 from server.services.embedding_index import embedding_index_service
 from server.services.projections import get_projection_data, get_saved_html_plot
+from settings import settings
 
 router = APIRouter(prefix="/api/similarity", tags=["similarity"])
 logger = logging.getLogger(__name__)
 
-_search_executor = ThreadPoolExecutor(max_workers=server_config.search_max_workers, thread_name_prefix="semantic-search")
+_search_executor = ThreadPoolExecutor(max_workers=settings.server.search_max_workers, thread_name_prefix="semantic-search")
 _search_jobs: dict[str, dict] = {}
 _search_jobs_lock = threading.Lock()
 
@@ -62,7 +62,7 @@ def point_neighbors(
 
 
 def _cleanup_search_jobs_locked() -> None:
-    cutoff = time.time() - server_config.search_job_ttl_seconds
+    cutoff = time.time() - settings.server.search_job_ttl_seconds
     expired = [
         job_id
         for job_id, job in _search_jobs.items()

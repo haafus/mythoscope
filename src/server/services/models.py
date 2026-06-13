@@ -2,8 +2,7 @@ import json
 import time
 from pathlib import Path
 
-from server.config import paths
-from settings import Settings
+from settings import Settings, settings
 
 _key_to_model_cache: dict[str, str] = {}
 _models_cache: dict[str, tuple[float, list[str]]] = {}
@@ -34,13 +33,13 @@ def key_to_model(model_key: str, models: list[str] | None = None) -> str:
 
 
 def list_models_raw() -> list[str]:
-    cache_key = str(paths.analysis_dir)
+    cache_key = str(settings.analysis_dir)
     cached = _models_cache.get(cache_key)
     if cached and time.monotonic() - cached[0] < _MODELS_TTL:
         return cached[1]
 
     models: list[str] | None = None
-    models_path = paths.analysis_dir / "models.json"
+    models_path = settings.analysis_dir / "models.json"
     if models_path.exists():
         with models_path.open("r", encoding="utf-8") as handle:
             data = json.load(handle)
@@ -67,7 +66,7 @@ def list_model_summaries() -> list[dict[str, str]]:
 
 def get_model_output_dir(model_key: str) -> Path:
     model_name = key_to_model(model_key)
-    return paths.analysis_dir / model_to_key(model_name)
+    return settings.analysis_dir / model_to_key(model_name)
 
 
 def get_model_info(model_key: str) -> dict:
@@ -81,11 +80,11 @@ def get_model_info(model_key: str) -> dict:
 
 
 def _models_from_analysis_dirs() -> list[str]:
-    if not paths.analysis_dir.exists():
+    if not settings.analysis_dir.exists():
         return []
 
     models = []
-    for item in sorted(paths.analysis_dir.iterdir()):
+    for item in sorted(settings.analysis_dir.iterdir()):
         if item.is_dir() and (item / "model_info.json").exists():
             info_path = item / "model_info.json"
             try:

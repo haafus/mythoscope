@@ -30,7 +30,3 @@ def get_paths() -> ProjectPaths:
         corpus_dir=settings.corpus_dir,
         corpus_chunked_dir=settings.corpus_chunked_dir,
     )
-
-
-paths = get_paths()
-server_config = settings.server

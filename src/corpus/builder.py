@@ -6,9 +6,10 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
+from settings import settings
+
 from . import catalog, logger
 from .clean_gutenberg import clean_gutenberg_in_builder
-from .config import CATALOG_FILE, CORPUS_DIR, DOWNLOAD_LIST_FILE, METADATA_FILE, PROCESSED_URLS_FILE, config
 from .downloader import download_file, load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .utils import (
@@ -120,7 +121,7 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
 
         stats = _finalize_text(text, url, tid)
 
-        filename = corpus_text_path(CORPUS_DIR, item.get("major_tradition", "Unknown"), item["tradition"], tid)
+        filename = corpus_text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), item["tradition"], tid)
 
         with data_lock:
             ensure_dir(filename.parent)
@@ -142,8 +143,8 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
 
 def _update_traditions_info(filter_type: set[str], force: bool) -> None:
     tradition_books: dict[str, set] = {}
-    if Path(DOWNLOAD_LIST_FILE).exists():
-        with open(DOWNLOAD_LIST_FILE, encoding="utf-8") as f:
+    if Path(settings.download_list_file).exists():
+        with open(settings.download_list_file, encoding="utf-8") as f:
             full_items = json.load(f)
             for item in full_items:
                 if item.get("type") in filter_type and "tradition" in item:
@@ -152,12 +153,12 @@ def _update_traditions_info(filter_type: set[str], force: bool) -> None:
                         tradition_books[trad] = set()
                     tradition_books[trad].add(_item_tid(item))
 
-    info_file_path = CORPUS_DIR / "traditions_info.json"
+    info_file_path = settings.corpus_dir / "traditions_info.json"
     existing_info: dict = {}
 
     if info_file_path.exists():
         if force:
-            backup_path = CORPUS_DIR / "traditions_info_backup.json"
+            backup_path = settings.corpus_dir / "traditions_info_backup.json"
             shutil.copy2(info_file_path, backup_path)
             logger.warning(f"force=True: old reference file saved as {backup_path.name}, creating a clean template.")
         else:
@@ -197,7 +198,7 @@ def _update_traditions_info(filter_type: set[str], force: bool) -> None:
 
 
 def build_corpus(filter_type: set[str], force: bool = False):
-    ensure_dir(CORPUS_DIR)
+    ensure_dir(settings.corpus_dir)
     catalog.clear_catalog()
     metadata: list[dict] = []
 
@@ -206,28 +207,28 @@ def build_corpus(filter_type: set[str], force: bool = False):
     _update_traditions_info(filter_type, force)
 
     processed_urls: set[str] = set()
-    if PROCESSED_URLS_FILE.exists():
-        with open(PROCESSED_URLS_FILE, encoding="utf-8") as f:
+    if settings.processed_urls_path.exists():
+        with open(settings.processed_urls_path, encoding="utf-8") as f:
             processed_urls = set(json.load(f))
 
     logger.info(f"Starting multithreaded build (items: {len(download_list)})")
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=config.max_workers) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers) as executor:
         futures = [executor.submit(process_single_item, item, force, metadata, processed_urls) for item in download_list]
         for future in concurrent.futures.as_completed(futures):
             exc = future.exception()
             if exc:
                 logger.error(f"Unhandled error in worker thread: {exc}")
 
-    with open(METADATA_FILE, "w", encoding="utf-8") as f:
+    with open(settings.corpus_metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
-    with open(CATALOG_FILE, "w", newline="", encoding="utf-8") as f:
+    with open(settings.corpus_catalog_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(catalog.CSV_HEADER)
         writer.writerows(row.as_csv_row() for row in catalog.catalog_rows)
 
-    with open(PROCESSED_URLS_FILE, "w", encoding="utf-8") as f:
+    with open(settings.processed_urls_path, "w", encoding="utf-8") as f:
         json.dump(list(processed_urls), f, ensure_ascii=False, indent=2)
 
     logger.info("Corpus build complete.")

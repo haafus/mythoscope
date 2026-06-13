@@ -5,8 +5,9 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from settings import settings
+
 from . import catalog, logger
-from .config import CORPUS_DIR, DOWNLOAD_LIST_FILE, PROCESSED_URLS_FILE, config
 from .utils import corpus_text_path, get_tradition_color
 
 # Lazily initialized: creating a session / UserAgent at import time would make
@@ -18,9 +19,9 @@ _user_agent = None
 def create_retry_session() -> requests.Session:
     session = requests.Session()
     retry = Retry(
-        total=config.retry_total,
-        backoff_factor=config.retry_backoff_factor,
-        status_forcelist=config.retry_status_forcelist,
+        total=settings.corpus.retry_total,
+        backoff_factor=settings.corpus.retry_backoff_factor,
+        status_forcelist=settings.corpus.retry_status_forcelist,
     )
     adapter = HTTPAdapter(max_retries=retry)
     session.mount("http://", adapter)
@@ -45,20 +46,20 @@ def _get_user_agent():
 
 
 def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]:
-    if not Path(DOWNLOAD_LIST_FILE).exists():
-        logger.error(f"Download list file not found: {DOWNLOAD_LIST_FILE}")
+    if not Path(settings.download_list_file).exists():
+        logger.error(f"Download list file not found: {settings.download_list_file}")
         return []
 
-    with open(DOWNLOAD_LIST_FILE, encoding="utf-8") as f:
+    with open(settings.download_list_file, encoding="utf-8") as f:
         items = json.load(f)
 
     items = [item for item in items if item["type"] in filter_type]
 
     processed_urls = set()
-    if PROCESSED_URLS_FILE.exists():
-        with open(PROCESSED_URLS_FILE, encoding="utf-8") as f:
+    if settings.processed_urls_path.exists():
+        with open(settings.processed_urls_path, encoding="utf-8") as f:
             processed_urls = set(json.load(f))
-        logger.info(f"Loaded {len(processed_urls)} previously processed URLs from {PROCESSED_URLS_FILE}")
+        logger.info(f"Loaded {len(processed_urls)} previously processed URLs from {settings.processed_urls_path}")
 
     seen_urls = set()
     filtered = []
@@ -74,7 +75,7 @@ def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]
             catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Duplicate URL")
             continue
 
-        filename = corpus_text_path(CORPUS_DIR, item.get("major_tradition", "Unknown"), tradition, tid)
+        filename = corpus_text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), tradition, tid)
 
         if filename.exists() and not force:
             logger.info(f"File exists for {tid}, will be processed locally")
@@ -106,7 +107,7 @@ def download_file(url: str) -> bytes:
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "none",
     }
-    response = _get_http_session().get(url, headers=headers, timeout=(config.timeout_connect, config.timeout_read))
+    response = _get_http_session().get(url, headers=headers, timeout=(settings.corpus.timeout_connect, settings.corpus.timeout_read))
     response.raise_for_status()
     content: bytes = response.content
     return content

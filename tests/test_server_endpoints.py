@@ -18,7 +18,6 @@ class TestSPAFallback:
         assert response.status_code == 200
 
     def test_missing_index_returns_404(self, tmp_path, monkeypatch):
-        from server import run_server as run_mod
         from server.config import ProjectPaths
 
         fake_paths = ProjectPaths(
@@ -31,7 +30,7 @@ class TestSPAFallback:
             corpus_dir=tmp_path / "d",
             corpus_chunked_dir=tmp_path / "e",
         )
-        monkeypatch.setattr(run_mod, "paths", fake_paths)
+        monkeypatch.setattr("server.run_server.get_paths", lambda: fake_paths)
         test_client = TestClient(create_app())
         response = test_client.get("/nonexistent/page")
         assert response.status_code == 404

@@ -108,15 +108,15 @@ class TestAddToCatalog:
 
 class TestUpdateTraditionsInfo:
     def _setup(self, tmp_path, monkeypatch, items):
-        import corpus.builder as builder_mod
+        from settings import settings
 
         dl_file = tmp_path / "download_list.json"
         dl_file.write_text(json.dumps(items))
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
 
-        monkeypatch.setattr(builder_mod, "DOWNLOAD_LIST_FILE", dl_file)
-        monkeypatch.setattr(builder_mod, "CORPUS_DIR", corpus_dir)
+        monkeypatch.setattr(settings, "download_list_file", dl_file)
+        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
         return corpus_dir
 
     def test_creates_new_file(self, tmp_path, monkeypatch):
@@ -187,12 +187,12 @@ class TestUpdateTraditionsInfo:
         assert "Norse" not in data
 
     def test_no_download_list(self, tmp_path, monkeypatch):
-        import corpus.builder as builder_mod
+        from settings import settings
 
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
-        monkeypatch.setattr(builder_mod, "DOWNLOAD_LIST_FILE", tmp_path / "nonexistent.json")
-        monkeypatch.setattr(builder_mod, "CORPUS_DIR", corpus_dir)
+        monkeypatch.setattr(settings, "download_list_file", tmp_path / "nonexistent.json")
+        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
 
         _update_traditions_info({"translation"}, force=False)
 

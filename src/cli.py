@@ -174,12 +174,12 @@ def server(host: str | None, port: int | None):
     """Start the web UI server."""
     import uvicorn
 
-    from server.config import server_config
+    from settings import settings as _settings
 
     uvicorn.run(
         "main:app",
-        host=host or server_config.host,
-        port=port or server_config.port,
+        host=host or _settings.server.host,
+        port=port or _settings.server.port,
         reload=False,
     )
 

@@ -31,8 +31,9 @@ class TestServerSettingsOverride:
 
 class TestProjectPaths:
     def test_paths_are_set(self):
-        from server.config import paths
+        from server.config import get_paths
 
+        paths = get_paths()
         assert paths.project_root is not None
         assert paths.ui_root is not None
         assert paths.web_root is not None

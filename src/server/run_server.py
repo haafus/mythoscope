@@ -5,7 +5,8 @@ from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from server.api import clustering, corpus, geography, models, similarity
-from server.config import paths, server_config
+from server.config import get_paths
+from settings import settings
 
 
 def create_app() -> FastAPI:
@@ -14,13 +15,16 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
 
-    app.add_middleware(GZipMiddleware, minimum_size=server_config.gzip_minimum_size)
+    srv = settings.server
+    app.add_middleware(GZipMiddleware, minimum_size=srv.gzip_minimum_size)
 
     app.include_router(models.router)
     app.include_router(corpus.router)
     app.include_router(geography.router)
     app.include_router(similarity.router)
     app.include_router(clustering.router)
+
+    paths = get_paths()
 
     if paths.assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(paths.assets_dir)), name="assets")
@@ -41,7 +45,7 @@ def create_app() -> FastAPI:
         if path.startswith("/api/") or path.startswith("/assets/"):
             response.headers["Cache-Control"] = "no-store"
         elif path.startswith(("/analysis/", "/template/", "/corpus/", "/corpus_chunked/")):
-            response.headers["Cache-Control"] = f"public, max-age={server_config.cache_max_age}"
+            response.headers["Cache-Control"] = f"public, max-age={srv.cache_max_age}"
         else:
             response.headers["Cache-Control"] = "no-cache"
 
@@ -53,23 +57,24 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     def index():
-        return _index_response()
+        return _index_response(paths)
 
     @app.get("/{full_path:path}")
     def spa_fallback(full_path: str):
         if not (paths.web_root / "index.html").exists():
             raise HTTPException(status_code=404, detail="Not found")
-        return _index_response()
+        return _index_response(paths)
 
     return app
 
 
-def _index_response():
+def _index_response(paths):
     return FileResponse(paths.web_root / "index.html")
 
 
 def run_server():
-    uvicorn.run("main:app", host=server_config.host, port=server_config.port, reload=False)
+    srv = settings.server
+    uvicorn.run("main:app", host=srv.host, port=srv.port, reload=False)
 
 
 def main():

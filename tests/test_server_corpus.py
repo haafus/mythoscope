@@ -8,6 +8,7 @@ from server.services.corpus import (
     read_document,
     resolve_document_path,
 )
+from settings import settings
 
 
 def _make_corpus(tmp_path, docs=None):
@@ -21,10 +22,15 @@ def _make_corpus(tmp_path, docs=None):
         (doc_dir / f"{title}.txt").write_text(text)
 
 
+def _patch_corpus(monkeypatch, tmp_path, source="corpus"):
+    monkeypatch.setattr(settings, "corpus_dir", tmp_path)
+    monkeypatch.setattr(settings, "corpus_chunked_dir", tmp_path)
+
+
 class TestResolveDocumentPath:
     def test_existing_file(self, tmp_path, monkeypatch):
         _make_corpus(tmp_path)
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         file_path, title = resolve_document_path("Iliad", "European", "Greek")
         assert file_path is not None
@@ -32,7 +38,7 @@ class TestResolveDocumentPath:
         assert title == "Iliad"
 
     def test_missing_file(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         file_path, title = resolve_document_path("Missing", "No", "Where")
         assert file_path is not None
@@ -40,7 +46,7 @@ class TestResolveDocumentPath:
         assert title == "Missing"
 
     def test_path_traversal_sanitized(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         file_path, title = resolve_document_path("../../etc/passwd", "a", "b")
         assert file_path is not None
@@ -48,7 +54,7 @@ class TestResolveDocumentPath:
         assert "/" not in title
 
     def test_sanitizes_special_chars(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         _, title = resolve_document_path('bad<>file:name', "a", "b")
         assert "<" not in title
@@ -59,14 +65,14 @@ class TestResolveDocumentPath:
 class TestReadDocument:
     def test_reads_text(self, tmp_path, monkeypatch):
         _make_corpus(tmp_path)
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         text, title = read_document("Iliad", "European", "Greek")
         assert "Achilles" in text
         assert title == "Iliad"
 
     def test_missing_raises_not_found(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         import pytest
 
@@ -74,7 +80,7 @@ class TestReadDocument:
             read_document("Nonexistent", "A", "B")
 
     def test_traversal_sanitized_raises_not_found(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         import pytest
 
@@ -85,7 +91,7 @@ class TestReadDocument:
 class TestDocumentIndex:
     def test_chunked_fallback_finds_file_by_normalized_name(self, tmp_path, monkeypatch):
         _make_corpus(tmp_path, [("Euro_pean", "Greek_Myth", "The_Iliad", "wrath of Achilles")])
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
 
         file_path, _ = resolve_document_path("The Iliad", "Euro pean", "Greek Myth", source="chunked")
@@ -95,7 +101,7 @@ class TestDocumentIndex:
 
     def test_lookup_is_case_insensitive(self, tmp_path, monkeypatch):
         _make_corpus(tmp_path, [("European", "Greek", "Iliad", "text")])
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
 
         file_path, _ = resolve_document_path("ILIAD", "european", "GREEK", source="chunked")
@@ -113,14 +119,15 @@ class TestDocumentIndex:
         link_dir.mkdir(parents=True)
         (link_dir / "Doc.txt").symlink_to(secret)
 
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": root})
+        monkeypatch.setattr(settings, "corpus_dir", root)
+        monkeypatch.setattr(settings, "corpus_chunked_dir", root)
         monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
 
         assert corpus_mod._document_index("chunked") == {}
 
     def test_index_is_cached_within_ttl(self, tmp_path, monkeypatch):
         _make_corpus(tmp_path, [("A", "B", "First", "text")])
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"chunked": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_doc_index_cache", {})
 
         first = corpus_mod._document_index("chunked")
@@ -137,7 +144,7 @@ class TestGetCatalogDocuments:
             {"id": "Iliad", "major_tradition": "European", "tradition": "Greek", "language": "en"},
         ]
         (tmp_path / "corpus_metadata.json").write_text(json.dumps(metadata))
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         docs = get_catalog_documents("corpus")
@@ -153,7 +160,7 @@ class TestGetCatalogDocuments:
             writer.writeheader()
             writer.writerow({"id": "Odyssey", "major_tradition": "European", "tradition": "Greek", "word_count": "5000"})
 
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         docs = get_catalog_documents("corpus")
@@ -162,14 +169,14 @@ class TestGetCatalogDocuments:
         assert docs[0]["word_count"] == 5000
 
     def test_empty_corpus(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         docs = get_catalog_documents("corpus")
         assert docs == []
 
     def test_cache_hit(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         get_catalog_documents("corpus")
@@ -183,7 +190,7 @@ class TestGetCatalogDocuments:
             {"id": "A", "major_tradition": "A", "tradition": "A"},
         ]
         (tmp_path / "corpus_metadata.json").write_text(json.dumps(metadata))
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
         monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
 
         docs = get_catalog_documents("corpus")
@@ -195,39 +202,23 @@ class TestGetTraditionsInfo:
     def test_from_specific_source(self, tmp_path, monkeypatch):
         info = {"Greek": {"color": "#ff0000", "description": "Ancient Greek"}}
         (tmp_path / "traditions_info.json").write_text(json.dumps(info))
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         result = get_traditions_info("corpus")
         assert result["Greek"]["color"] == "#ff0000"
 
     def test_fallback_without_source(self, tmp_path, monkeypatch):
-        from server.config import ProjectPaths
-
         info = {"Norse": {"color": "#0000ff"}}
         (tmp_path / "traditions_info.json").write_text(json.dumps(info))
         nonexistent = tmp_path / "nonexistent"
-        fake_paths = ProjectPaths(
-            project_root=tmp_path,
-            ui_root=tmp_path,
-            web_root=tmp_path,
-            assets_dir=tmp_path,
-            analysis_dir=tmp_path,
-            template_dir=tmp_path,
-            corpus_dir=nonexistent,
-            corpus_chunked_dir=tmp_path,
-        )
-        monkeypatch.setattr(corpus_mod, "paths", fake_paths)
-        monkeypatch.setattr(
-            corpus_mod,
-            "CATALOG_SOURCES",
-            {"corpus": nonexistent, "chunked": tmp_path},
-        )
+        monkeypatch.setattr(settings, "corpus_dir", nonexistent)
+        monkeypatch.setattr(settings, "corpus_chunked_dir", tmp_path)
 
         result = get_traditions_info()
         assert "Norse" in result
 
     def test_missing_returns_empty(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(corpus_mod, "CATALOG_SOURCES", {"corpus": tmp_path})
+        _patch_corpus(monkeypatch, tmp_path)
 
         result = get_traditions_info("corpus")
         assert result == {}

@@ -1,6 +1,5 @@
 import json
 
-from server.config import ProjectPaths
 from server.services.models import (
     get_model_info,
     get_model_output_dir,
@@ -9,19 +8,11 @@ from server.services.models import (
     list_models_raw,
     model_to_key,
 )
+from settings import settings
 
 
-def _paths_with_analysis(tmp_path):
-    return ProjectPaths(
-        project_root=tmp_path,
-        ui_root=tmp_path,
-        web_root=tmp_path,
-        assets_dir=tmp_path,
-        analysis_dir=tmp_path,
-        template_dir=tmp_path,
-        corpus_dir=tmp_path,
-        corpus_chunked_dir=tmp_path,
-    )
+def _patch_analysis(monkeypatch, tmp_path):
+    monkeypatch.setattr(settings, "analysis_dir", tmp_path)
 
 
 class TestModelToKey:
@@ -62,7 +53,7 @@ class TestListModelsRaw:
     def test_reads_models_json(self, tmp_path, monkeypatch):
         models_json = tmp_path / "models.json"
         models_json.write_text(json.dumps(["model/a", "model/b"]))
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
 
         result = list_models_raw()
         assert result == ["model/a", "model/b"]
@@ -71,19 +62,19 @@ class TestListModelsRaw:
         model_dir = tmp_path / "model_a"
         model_dir.mkdir()
         (model_dir / "model_info.json").write_text(json.dumps({"model_name": "author/model_a"}))
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
 
         result = list_models_raw()
         assert "author/model_a" in result
 
     def test_empty_dir(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
         assert list_models_raw() == []
 
     def test_cached_within_ttl(self, tmp_path, monkeypatch):
         models_json = tmp_path / "models.json"
         models_json.write_text(json.dumps(["model/a"]))
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
 
         assert list_models_raw() == ["model/a"]
         models_json.write_text(json.dumps(["model/a", "model/b"]))
@@ -94,7 +85,7 @@ class TestListModelSummaries:
     def test_returns_dicts_with_keys(self, tmp_path, monkeypatch):
         models_json = tmp_path / "models.json"
         models_json.write_text(json.dumps(["BAAI/bge-m3"]))
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
 
         result = list_model_summaries()
         assert len(result) == 1
@@ -109,18 +100,18 @@ class TestGetModelInfo:
         model_dir.mkdir()
         info = {"model_name": "test/model", "dim": 768}
         (model_dir / "model_info.json").write_text(json.dumps(info))
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
 
         result = get_model_info("test_model")
         assert result["model_name"] == "test/model"
 
     def test_missing_info(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
         assert get_model_info("nonexistent") == {}
 
 
 class TestGetModelOutputDir:
     def test_returns_path(self, tmp_path, monkeypatch):
-        monkeypatch.setattr("server.services.models.paths", _paths_with_analysis(tmp_path))
+        _patch_analysis(monkeypatch, tmp_path)
         result = get_model_output_dir("BAAI_bge-m3")
         assert result.parent == tmp_path

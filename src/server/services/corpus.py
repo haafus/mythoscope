@@ -7,12 +7,7 @@ import zipfile
 from pathlib import Path
 
 from corpus.utils import count_sentences, count_words
-from server.config import paths
-
-CATALOG_SOURCES = {
-    "corpus": paths.corpus_dir,
-    "chunked": paths.corpus_chunked_dir,
-}
+from settings import settings
 
 _catalog_cache: dict[str, tuple[float, list[dict]]] = {}
 _doc_index_cache: dict[str, tuple[float, dict[tuple[str, str, str], Path]]] = {}
@@ -31,8 +26,15 @@ def sanitize_path_part(value: str) -> str:
     return re.sub(r'[\\/*?:"<>|]', "_", value).strip()
 
 
+def _catalog_sources() -> dict[str, Path]:
+    return {
+        "corpus": settings.corpus_dir,
+        "chunked": settings.corpus_chunked_dir,
+    }
+
+
 def source_root(source: str = "corpus") -> Path:
-    return CATALOG_SOURCES.get(source, paths.corpus_dir)
+    return _catalog_sources().get(source, settings.corpus_dir)
 
 
 def get_catalog_documents(source: str = "corpus") -> list[dict]:
@@ -225,8 +227,8 @@ def get_traditions_info(source: str | None = None) -> dict:
         return {}
 
     for path in (
-        paths.corpus_chunked_dir / "traditions_info.json",
-        paths.corpus_dir / "traditions_info.json",
+        settings.corpus_chunked_dir / "traditions_info.json",
+        settings.corpus_dir / "traditions_info.json",
     ):
         if path.exists():
             with path.open("r", encoding="utf-8") as handle:
