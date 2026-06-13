@@ -145,6 +145,22 @@ class Settings(BaseSettings):
     def processed_urls_path(self) -> Path:
         return self.corpus_dir / "processed_urls.json"
 
+    @property
+    def template_dir(self) -> Path:
+        return self.project_root / "config" / "template"
+
+    @property
+    def server_dir(self) -> Path:
+        return self.project_root / "src" / "server"
+
+    @property
+    def web_root(self) -> Path:
+        return self.server_dir / "web"
+
+    @property
+    def assets_dir(self) -> Path:
+        return self.web_root / "assets"
+
     @staticmethod
     def safe_model_name(model_name: str) -> str:
         return model_name.replace("/", "_").replace("\\", "_")

@@ -29,11 +29,12 @@ class TestServerSettingsOverride:
         assert isinstance(settings.server, ServerSettings)
 
 
-class TestProjectPaths:
-    def test_paths_are_set(self):
-        from server.config import get_paths
+class TestServerPaths:
+    def test_web_root_under_server_dir(self):
+        assert settings.web_root == settings.server_dir / "web"
 
-        paths = get_paths()
-        assert paths.project_root is not None
-        assert paths.ui_root is not None
-        assert paths.web_root is not None
+    def test_assets_under_web_root(self):
+        assert settings.assets_dir == settings.web_root / "assets"
+
+    def test_template_dir_under_project_root(self):
+        assert settings.template_dir == settings.project_root / "config" / "template"

@@ -5,7 +5,6 @@ from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from server.api import clustering, corpus, geography, models, similarity
-from server.config import get_paths
 from settings import settings
 
 
@@ -24,18 +23,16 @@ def create_app() -> FastAPI:
     app.include_router(similarity.router)
     app.include_router(clustering.router)
 
-    paths = get_paths()
-
-    if paths.assets_dir.exists():
-        app.mount("/assets", StaticFiles(directory=str(paths.assets_dir)), name="assets")
-    if paths.analysis_dir.exists():
-        app.mount("/analysis", StaticFiles(directory=str(paths.analysis_dir)), name="analysis")
-    if paths.template_dir.exists():
-        app.mount("/template", StaticFiles(directory=str(paths.template_dir)), name="template")
-    if paths.corpus_dir.exists():
-        app.mount("/corpus", StaticFiles(directory=str(paths.corpus_dir)), name="corpus")
-    if paths.corpus_chunked_dir.exists():
-        app.mount("/corpus_chunked", StaticFiles(directory=str(paths.corpus_chunked_dir)), name="corpus_chunked")
+    if settings.assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(settings.assets_dir)), name="assets")
+    if settings.analysis_dir.exists():
+        app.mount("/analysis", StaticFiles(directory=str(settings.analysis_dir)), name="analysis")
+    if settings.template_dir.exists():
+        app.mount("/template", StaticFiles(directory=str(settings.template_dir)), name="template")
+    if settings.corpus_dir.exists():
+        app.mount("/corpus", StaticFiles(directory=str(settings.corpus_dir)), name="corpus")
+    if settings.corpus_chunked_dir.exists():
+        app.mount("/corpus_chunked", StaticFiles(directory=str(settings.corpus_chunked_dir)), name="corpus_chunked")
 
     @app.middleware("http")
     async def add_cache_headers(request: Request, call_next):
@@ -57,19 +54,19 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     def index():
-        return _index_response(paths)
+        return _index_response()
 
     @app.get("/{full_path:path}")
     def spa_fallback(full_path: str):
-        if not (paths.web_root / "index.html").exists():
+        if not (settings.web_root / "index.html").exists():
             raise HTTPException(status_code=404, detail="Not found")
-        return _index_response(paths)
+        return _index_response()
 
     return app
 
 
-def _index_response(paths):
-    return FileResponse(paths.web_root / "index.html")
+def _index_response():
+    return FileResponse(settings.web_root / "index.html")
 
 
 def run_server():
