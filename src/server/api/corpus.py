@@ -30,7 +30,7 @@ def document(
 
 
 @router.get("/archive")
-def archive():
+def archive() -> StreamingResponse:
     buf = build_corpus_archive()
     return StreamingResponse(
         buf,

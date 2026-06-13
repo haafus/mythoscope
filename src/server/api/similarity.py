@@ -20,7 +20,7 @@ _search_jobs_lock = threading.Lock()
 
 
 @router.get("/projections/{model_key}/{method}")
-def projection(model_key: str, method: str):
+def projection(model_key: str, method: str) -> dict:
     data = get_projection_data(model_key, method)
     if not data:
         saved = get_saved_html_plot(model_key, method)
@@ -35,7 +35,7 @@ def projection(model_key: str, method: str):
 
 
 @router.get("/saved-html/{model_key}/{method}", response_model=SavedPlotResponse)
-def saved_html_plot(model_key: str, method: str):
+def saved_html_plot(model_key: str, method: str) -> dict:
     return get_saved_html_plot(model_key, method)
 
 
@@ -101,7 +101,7 @@ def _run_search_job(job_id: str, model: str, query: str, top_k: int) -> None:
 
 
 @router.post("/search/jobs")
-def start_search_job(request: SearchRequest):
+def start_search_job(request: SearchRequest) -> dict:
     job_id = uuid4().hex
     now = time.time()
     job = {
@@ -123,7 +123,7 @@ def start_search_job(request: SearchRequest):
 
 
 @router.get("/search/jobs/{job_id}")
-def search_job(job_id: str):
+def search_job(job_id: str) -> dict:
     with _search_jobs_lock:
         _cleanup_search_jobs_locked()
         job = _search_jobs.get(job_id)
@@ -136,7 +136,7 @@ def search_job(job_id: str):
 
 
 @router.post("/search", response_model=SearchResponse)
-def search(request: SearchRequest):
+def search(request: SearchRequest) -> dict:
     try:
         results = embedding_index_service.search(request.model, request.query, request.top_k)
     except Exception as exc:

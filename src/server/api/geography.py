@@ -7,6 +7,6 @@ router = APIRouter(prefix="/api/geography", tags=["geography"])
 
 
 @router.get("/traditions", response_model=TraditionsResponse)
-def traditions():
+def traditions() -> dict:
     data = get_traditions_info()
     return {"traditions": data, "total": len(data)}

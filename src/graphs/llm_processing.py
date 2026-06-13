@@ -30,7 +30,7 @@ class LLMProcessor:
 
         self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=request_timeout)
 
-    def _ask_llm(self, system_prompt: str, user_content: str) -> list:
+    def _ask_llm(self, system_prompt: str, user_content: str) -> list[dict]:
         retries = 0
         backoff_factor = self.retry_backoff_factor
 
@@ -103,17 +103,17 @@ class LLMProcessor:
         logger.error(f"Maximum retry count exceeded ({self.max_retries}) because of API limits or failures. Skipping chunk.")
         return []
 
-    def extract_characters(self, text: str, prompt: str) -> list:
+    def extract_characters(self, text: str, prompt: str) -> list[dict]:
         return self._ask_llm(prompt, text)
 
-    def extract_relations(self, text: str, characters: list, prompt: str) -> list:
+    def extract_relations(self, text: str, characters: list, prompt: str) -> list[dict]:
         user_content = (
             f"DOCUMENT 1 (Text):\n{text}\n\nDOCUMENT 2 (Characters):\n{json.dumps(characters, ensure_ascii=False)}"
         )
         return self._ask_llm(prompt, user_content)
 
-    def extract_locations(self, text: str, prompt: str) -> list:
+    def extract_locations(self, text: str, prompt: str) -> list[dict]:
         return self._ask_llm(prompt, text)
 
-    def extract_time(self, text: str, prompt: str) -> list:
+    def extract_time(self, text: str, prompt: str) -> list[dict]:
         return self._ask_llm(prompt, text)

@@ -6,16 +6,16 @@ router = APIRouter(prefix="/api/clustering", tags=["clustering"])
 
 
 @router.get("/{model_key}/algorithms")
-def algorithms(model_key: str):
+def algorithms(model_key: str) -> dict:
     items = list_algorithms(model_key)
     return {"algorithms": items, "total": len(items)}
 
 
 @router.get("/{model_key}/{algorithm}/metrics")
-def metrics(model_key: str, algorithm: str):
+def metrics(model_key: str, algorithm: str) -> dict:
     return get_metrics(model_key, algorithm)
 
 
 @router.get("/{model_key}/{algorithm}/plots")
-def saved_plots(model_key: str, algorithm: str):
+def saved_plots(model_key: str, algorithm: str) -> dict:
     return get_saved_cluster_plots(model_key, algorithm)

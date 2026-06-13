@@ -238,7 +238,7 @@ def _extract_balanced_json(text: str, start: int, open_char: str, close_char: st
     return None
 
 
-def _custom_value(values: list, index: int, default):
+def _custom_value(values: list, index: int, default: float) -> float:
     return values[index] if index < len(values) else default
 
 

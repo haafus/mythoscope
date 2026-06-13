@@ -3,7 +3,7 @@ import logging
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 import torch
 from sentence_transformers import SentenceTransformer
@@ -124,7 +124,7 @@ class ModelManager:
             logger.info(f"Using default batch size: {self.batch_size}")
 
     @contextmanager
-    def use_model(self, model_name: str):
+    def use_model(self, model_name: str) -> Iterator["ModelManager"]:
         original_model = self.model_name
         try:
             self.set_model(model_name)

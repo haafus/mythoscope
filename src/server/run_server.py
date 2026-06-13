@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -35,7 +35,7 @@ def create_app() -> FastAPI:
         app.mount("/corpus_chunked", StaticFiles(directory=str(settings.corpus_chunked_dir)), name="corpus_chunked")
 
     @app.middleware("http")
-    async def add_cache_headers(request: Request, call_next):
+    async def add_cache_headers(request: Request, call_next) -> Response:
         response = await call_next(request)
         path = request.url.path
 
@@ -49,15 +49,15 @@ def create_app() -> FastAPI:
         return response
 
     @app.get("/api/health")
-    def health():
+    def health() -> dict[str, str]:
         return {"status": "ok"}
 
     @app.get("/")
-    def index():
+    def index() -> FileResponse:
         return _index_response()
 
     @app.get("/{full_path:path}")
-    def spa_fallback(full_path: str):
+    def spa_fallback(full_path: str) -> FileResponse:
         if not (settings.web_root / "index.html").exists():
             raise HTTPException(status_code=404, detail="Not found")
         return _index_response()
@@ -65,14 +65,14 @@ def create_app() -> FastAPI:
     return app
 
 
-def _index_response():
+def _index_response() -> FileResponse:
     return FileResponse(settings.web_root / "index.html")
 
 
-def run_server():
+def run_server() -> None:
     srv = settings.server
     uvicorn.run("main:app", host=srv.host, port=srv.port, reload=False)
 
 
-def main():
+def main() -> None:
     run_server()

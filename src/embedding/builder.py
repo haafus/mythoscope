@@ -2,7 +2,7 @@ import logging
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 import chromadb
 import numpy as np
@@ -119,7 +119,7 @@ class EmbeddingBuilder:
 
     # --- Output dir --------------------------------------------------------
 
-    def _update_output_dir(self):
+    def _update_output_dir(self) -> None:
         self.out_dir = _get_model_output_dir(self.base_out_dir, self.model_name)
         self.out_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Results directory: {self.out_dir}")
@@ -129,15 +129,15 @@ class EmbeddingBuilder:
     def list_models(self) -> list[str]:
         return self._models.list_models()
 
-    def unload_model(self, model_name: str | None = None):
+    def unload_model(self, model_name: str | None = None) -> None:
         self._models.unload_model(model_name)
 
-    def set_model(self, model_name: str):
+    def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
         self._update_output_dir()
 
     @contextmanager
-    def use_model(self, model_name: str):
+    def use_model(self, model_name: str) -> Iterator["EmbeddingBuilder"]:
         original = self._models.model_name
         try:
             self.set_model(model_name)
@@ -156,7 +156,7 @@ class EmbeddingBuilder:
 
     # --- Chunking ----------------------------------------------------------
 
-    def set_chunking_strategy(self, strategy_name: str):
+    def set_chunking_strategy(self, strategy_name: str) -> None:
         if strategy_name not in self.chunking_strategies:
             available = list(self.chunking_strategies.keys())
             raise ValueError(f"Strategy '{strategy_name}' not found. Available: {available}")
@@ -255,7 +255,7 @@ class EmbeddingBuilder:
 
         return {"collection": collection_name, "added": len(chunks), "chunks": chunks}
 
-    def save_all_corpus_to_chroma(self):
+    def save_all_corpus_to_chroma(self) -> None:
         collection_name = collection_name_for_model(self.model_name)
         with self.metrics.track("save_all_corpus_to_chroma"):
             files_info = list(iter_corpus_files(self.corpus_dir, self.text_type))
@@ -336,17 +336,17 @@ class EmbeddingBuilder:
 
     # --- Resource management -----------------------------------------------
 
-    def close(self):
+    def close(self) -> None:
         if hasattr(self, "_cache"):
             self._cache.close()
         if hasattr(self, "_models"):
             self._models.close()
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.close()
 
-    def __enter__(self):
+    def __enter__(self) -> "EmbeddingBuilder":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: type | None, exc_val: BaseException | None, exc_tb: Any) -> None:
         self.close()

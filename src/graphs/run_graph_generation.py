@@ -57,7 +57,7 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
     }
 
 
-def chunk_text(text: str, max_chars: int, overlap: int) -> list:
+def chunk_text(text: str, max_chars: int, overlap: int) -> list[str]:
     chunks = []
     start = 0
     text_len = len(text)
@@ -80,7 +80,7 @@ def chunk_text(text: str, max_chars: int, overlap: int) -> list:
     return chunks
 
 
-def deduplicate_entities(entities: list) -> list:
+def deduplicate_entities(entities: list[dict]) -> list[dict]:
     unique_entities = {}
     for ent in entities:
         name = ent.get("Name") or ent.get("name") or ent.get("NAME")
@@ -126,7 +126,7 @@ def deduplicate_entities(entities: list) -> list:
     return list(unique_entities.values())
 
 
-def deduplicate_relations(relations: list) -> list:
+def deduplicate_relations(relations: list[dict]) -> list[dict]:
     unique_relations = set()
     deduplicated = []
     for rel in relations:
@@ -145,7 +145,7 @@ def deduplicate_relations(relations: list) -> list:
     return deduplicated
 
 
-def run_generate_graphs(force: bool = False):
+def run_generate_graphs(force: bool = False) -> None:
     cfg = settings.graphs
     llm_cfg = cfg.active_llm_config
 
