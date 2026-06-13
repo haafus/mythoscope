@@ -11,12 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingCache:
-    def __init__(self, cache_dir: Path, cache_batch_size: int = 50, executor: ThreadPoolExecutor | None = None):
+    def __init__(self, cache_dir: Path, cache_batch_size: int = 50, max_workers: int = 16):
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.cache_batch_size = cache_batch_size
-        self._owns_executor = executor is None
-        self._executor = executor or ThreadPoolExecutor(max_workers=16)
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
 
     def _get_cache_key(self, text: str, model_name: str, chunking_strategy: Any) -> str:
         return get_cache_key(text, model_name, chunking_strategy)
@@ -82,5 +81,4 @@ class EmbeddingCache:
             return final_embeddings
 
     def close(self) -> None:
-        if self._owns_executor:
-            self._executor.shutdown(wait=True, cancel_futures=True)
+        self._executor.shutdown(wait=True, cancel_futures=True)

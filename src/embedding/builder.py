@@ -81,7 +81,7 @@ class EmbeddingBuilder:
             self.metrics = metrics
 
         self._models = ModelManager(batch_size=batch_size)
-        self._cache = EmbeddingCache(Path(cache_dir), cache_batch_size)
+        self._cache = EmbeddingCache(Path(cache_dir), cache_batch_size, max_workers=max_workers)
 
         self.chroma_client = chromadb.PersistentClient(path=str(self.chroma_path))
         self._chroma = ChromaWriter(self.chroma_client, chroma_batch_size, queue_maxsize)
