@@ -5,8 +5,6 @@ import click
 
 from log_setup import setup_logging
 
-logger = logging.getLogger(__name__)
-
 
 class _LazyEmbeddingGroup(click.Group):
     """Defers import of embedding.cli until a subcommand is actually invoked."""
