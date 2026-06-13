@@ -60,6 +60,7 @@ finally:
 _traditions_of = _mod._traditions_of
 _get_color_map = _mod._get_color_map
 _add_tradition_scatter_traces = _mod._add_tradition_scatter_traces
+_add_click_handler_to_html = _mod.add_click_handler_to_html
 
 
 class _FakeFig:
@@ -140,3 +141,31 @@ class TestAddTraditionScatterTraces:
         hover = fig.traces[0][0].kwargs["hovertemplate"]
         assert "UMAP component 1" in hover
         assert "UMAP component 2" in hover
+
+
+class TestAddClickHandlerToHtml:
+    def test_inserts_script_before_body_close(self, tmp_path):
+        html_file = tmp_path / "plot.html"
+        html_file.write_text("<html><body><div>content</div></body></html>")
+        _add_click_handler_to_html(str(html_file))
+        result = html_file.read_text()
+        assert "plotly_click" in result
+        assert "sendPointClick" in result
+        assert result.index("sendPointClick") < result.index("</body>")
+
+    def test_skips_when_handler_already_present(self, tmp_path):
+        original = "<html><body>pointClickHandler</body></html>"
+        html_file = tmp_path / "plot.html"
+        html_file.write_text(original)
+        _add_click_handler_to_html(str(html_file))
+        assert html_file.read_text() == original
+
+    def test_appends_when_no_body_close_tag(self, tmp_path):
+        html_file = tmp_path / "plot.html"
+        html_file.write_text("<html><div>no body close</div></html>")
+        _add_click_handler_to_html(str(html_file))
+        result = html_file.read_text()
+        assert "plotly_click" in result
+
+    def test_nonexistent_file_does_not_raise(self):
+        _add_click_handler_to_html("/nonexistent/path/plot.html")
