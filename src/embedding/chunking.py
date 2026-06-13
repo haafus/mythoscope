@@ -1,17 +1,21 @@
 import gc
 import hashlib
 import logging
-import os
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
 
+_FASTTEXT_CACHE_DIR = Path.home() / ".cache" / "fasttext"
+_FASTTEXT_MODEL_FILE = "lid.176.bin"
+
+
 class LanguageDetector:
     _fasttext_model = None
-    _model_path = os.path.expanduser("~/.cache/fasttext/lid.176.bin")
+    _model_path = _FASTTEXT_CACHE_DIR / _FASTTEXT_MODEL_FILE
 
     @classmethod
     def _load_fasttext(cls):
@@ -24,7 +28,7 @@ class LanguageDetector:
             logger.warning("FastText is not installed. Install it with: pip install fasttext")
             return False
 
-        if not os.path.exists(cls._model_path):
+        if not cls._model_path.exists():
             logger.warning(
                 f"FastText model not found at {cls._model_path}. Run download_fasttext_model() to download it."
             )
@@ -100,16 +104,14 @@ class LanguageDetector:
 
 
 def download_fasttext_model():
-    import os
     import urllib.request
 
-    cache_dir = os.path.expanduser("~/.cache/fasttext")
-    os.makedirs(cache_dir, exist_ok=True)
-    model_path = os.path.join(cache_dir, "lid.176.bin")
+    _FASTTEXT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    model_path = _FASTTEXT_CACHE_DIR / _FASTTEXT_MODEL_FILE
 
-    if os.path.exists(model_path):
+    if model_path.exists():
         logger.debug("FastText model already exists: %s", model_path)
-        return model_path
+        return str(model_path)
 
     url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
     logger.info("Downloading FastText model (176 languages, ~130MB) to %s", model_path)
@@ -117,11 +119,10 @@ def download_fasttext_model():
     try:
         urllib.request.urlretrieve(url, model_path)
         logger.info("FastText model download complete")
-        return model_path
+        return str(model_path)
     except Exception as e:
         logger.error("FastText model download failed: %s", e)
-        if os.path.exists(model_path):
-            os.remove(model_path)
+        model_path.unlink(missing_ok=True)
         raise
 
 

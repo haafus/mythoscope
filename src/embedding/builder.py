@@ -1,5 +1,4 @@
 import logging
-import os
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
@@ -34,24 +33,24 @@ def normalize_text_type(text_type: str | None) -> str | None:
     return aliases.get(text_type, text_type)
 
 
-def _get_model_output_dir(base_out_dir: str, model_name: str) -> str:
+def _get_model_output_dir(base_out_dir: Path, model_name: str) -> Path:
     if not model_name:
         return base_out_dir
     from settings import Settings
 
-    model_dir = os.path.join(base_out_dir, Settings.safe_model_name(model_name))
-    os.makedirs(model_dir, exist_ok=True)
+    model_dir = base_out_dir / Settings.safe_model_name(model_name)
+    model_dir.mkdir(parents=True, exist_ok=True)
     return model_dir
 
 
 class EmbeddingBuilder:
     def __init__(
         self,
-        corpus_dir: str,
-        out_dir: str,
-        chroma_path: str = "outputs/chroma_db",
-        cache_dir: str = "outputs/cache",
-        chunked_dir: str = "outputs/corpus_chunked",
+        corpus_dir: str | Path,
+        out_dir: str | Path,
+        chroma_path: str | Path = "outputs/chroma_db",
+        cache_dir: str | Path = "outputs/cache",
+        chunked_dir: str | Path = "outputs/corpus_chunked",
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
         text_type: str = "translate",
@@ -75,7 +74,7 @@ class EmbeddingBuilder:
 
         if metrics is None:
             self.metrics = PerformanceMetrics(
-                metrics_file=str(Path(out_dir) / "performance_metrics.json"), track_memory=True
+                metrics_file=str(self.base_out_dir / "performance_metrics.json"), track_memory=True
             )
         else:
             self.metrics = metrics
@@ -121,8 +120,7 @@ class EmbeddingBuilder:
     # --- Output dir --------------------------------------------------------
 
     def _update_output_dir(self):
-        out_dir_str = _get_model_output_dir(str(self.base_out_dir), self.model_name)
-        self.out_dir = Path(out_dir_str)
+        self.out_dir = _get_model_output_dir(self.base_out_dir, self.model_name)
         self.out_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"Results directory: {self.out_dir}")
 

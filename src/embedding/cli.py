@@ -13,10 +13,10 @@ from .performance_metrics import PerformanceMetrics
 def _create_builder(*, model: str | None = None, chunking: str | None = None) -> EmbeddingBuilder:
     emb = settings.embedding
     return EmbeddingBuilder(
-        corpus_dir=str(settings.corpus_dir),
-        out_dir=str(settings.analysis_dir),
-        chroma_path=str(settings.chroma_dir),
-        cache_dir=str(settings.cache_dir),
+        corpus_dir=settings.corpus_dir,
+        out_dir=settings.analysis_dir,
+        chroma_path=settings.chroma_dir,
+        cache_dir=settings.cache_dir,
         embedding_model=model or emb.default_model,
         chunking=chunking or emb.default_chunking,
         text_type=emb.text_type,

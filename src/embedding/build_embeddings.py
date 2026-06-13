@@ -3,7 +3,6 @@ from __future__ import annotations
 import gc
 import logging
 import shutil
-from pathlib import Path
 
 import torch
 
@@ -35,10 +34,10 @@ def build_embeddings(
     BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
     CLEAR_EXISTING = clear_existing if clear_existing is not None else True
 
-    cleanup_cache(Path(str(settings.cache_dir)), max_size_mb=emb.cache_max_size_mb, ttl_days=emb.cache_ttl_days)
+    cleanup_cache(settings.cache_dir, max_size_mb=emb.cache_max_size_mb, ttl_days=emb.cache_ttl_days)
 
     if CLEAR_EXISTING:
-        chroma_dir = Path(str(settings.chroma_dir))
+        chroma_dir = settings.chroma_dir
         if chroma_dir.exists():
             logger.info(f"Fully clearing ChromaDB directory: {chroma_dir.resolve()}")
             try:
@@ -47,14 +46,14 @@ def build_embeddings(
                 logger.warning(f"Failed to fully remove database directory: {e}")
 
     builder = EmbeddingBuilder(
-        corpus_dir=str(settings.corpus_dir),
-        out_dir=str(settings.analysis_dir),
+        corpus_dir=settings.corpus_dir,
+        out_dir=settings.analysis_dir,
         text_type=TEXT_TYPE,
         embedding_model=MODEL_NAME,
         chunking=CHUNKING,
-        chroma_path=str(settings.chroma_dir),
-        cache_dir=str(settings.cache_dir),
-        chunked_dir=str(settings.corpus_chunked_dir),
+        chroma_path=settings.chroma_dir,
+        cache_dir=settings.cache_dir,
+        chunked_dir=settings.corpus_chunked_dir,
         batch_size=BATCH_SIZE,
         cache_batch_size=emb.cache_batch_size,
         chroma_batch_size=emb.chroma_batch_size,
