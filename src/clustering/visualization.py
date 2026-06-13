@@ -115,7 +115,7 @@ def plot_metrics_dashboard(metrics: dict[str, dict], output_path: str | None = N
     plot_data = []
 
     for model_name, model_metrics in metrics.items():
-        if "error" not in model_metrics and model_metrics:
+        if model_metrics:
             for score_type in score_types:
                 value = model_metrics.get(score_type)
                 if value is not None:

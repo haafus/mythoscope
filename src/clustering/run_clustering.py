@@ -92,14 +92,10 @@ def _process_single_model(
     """Universal function for running one clustering model and saving results."""
     base_dir.mkdir(parents=True, exist_ok=True)
 
-    try:
-        clusterer = get_clustering_model(cl_model_name, **clustering_params)
-        predicted_labels = clusterer.fit_predict(embeddings)
-        n_clusters_found = len(set(predicted_labels)) - (1 if -1 in predicted_labels else 0)
-        logger.info(f"  • Clusters actually found ({cl_model_name}): {n_clusters_found}")
-    except Exception:
-        logger.exception(f"Clustering error ({cl_model_name})")
-        return {"error": f"Error while running {cl_model_name}"}
+    clusterer = get_clustering_model(cl_model_name, **clustering_params)
+    predicted_labels = clusterer.fit_predict(embeddings)
+    n_clusters_found = len(set(predicted_labels)) - (1 if -1 in predicted_labels else 0)
+    logger.info(f"  • Clusters actually found ({cl_model_name}): {n_clusters_found}")
 
     # Internal metrics (silhouette etc.) must be computed in the space the clusterer
     # actually worked in (normalized/reduced), NOT in the UMAP-2D space used for plots.
@@ -224,16 +220,20 @@ def run_all_clustering_models(
 
         clustering_params = _params_for(cl_model, num_clusters)
 
-        results = _process_single_model(
-            embeddings=embeddings,
-            true_labels=true_labels,
-            model_name=model_name,
-            cl_model_name=cl_model,
-            clustering_params=clustering_params,
-            base_dir=base_dir,
-            generate_visualizations=True,
-            embeddings_2d=embeddings_2d,
-        )
+        try:
+            results = _process_single_model(
+                embeddings=embeddings,
+                true_labels=true_labels,
+                model_name=model_name,
+                cl_model_name=cl_model,
+                clustering_params=clustering_params,
+                base_dir=base_dir,
+                generate_visualizations=True,
+                embeddings_2d=embeddings_2d,
+            )
+        except Exception:
+            logger.exception("Clustering failed for %s", cl_model)
+            continue
 
         all_results[cl_model] = results.get("metrics", results)
 

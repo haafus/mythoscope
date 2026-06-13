@@ -118,8 +118,8 @@ def _reduce_dimensions_safe(
 
     try:
         return reduce_dimensions(embeddings, method=method, n_components=n_components, **reducer_kwargs)
-    except Exception as e:
-        logger.error(f"Dimension reduction failed for {method}: {e}")
+    except Exception:
+        logger.exception("Dimension reduction failed for %s", method)
         return None
 
 
@@ -246,8 +246,8 @@ def plot_interactive_2d(
 
     try:
         embeddings = np.stack([item["embedding"] for item in sample])
-    except Exception as e:
-        logger.error(f"Failed to stack embeddings: {e}")
+    except Exception:
+        logger.exception("Failed to stack embeddings")
         return None
 
     embedding_2d = _reduce_dimensions_safe(embeddings, method=method, n_components=2, reducer_kwargs=reducer_kwargs)
@@ -445,8 +445,8 @@ def plot_comparison_dashboard(
 
     try:
         embeddings = np.stack([item["embedding"] for item in sample_data])
-    except Exception as e:
-        logger.error(f"Failed to stack embeddings: {e}")
+    except Exception:
+        logger.exception("Failed to stack embeddings")
         return None
 
     methods_to_use = []

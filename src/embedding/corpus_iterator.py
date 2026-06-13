@@ -40,8 +40,8 @@ def iter_corpus_files(corpus_dir: Path, text_type: str) -> Generator[dict[str, A
                     }
                     text_info[str(tid)] = row_info
                     text_info[_normalize_catalog_id(tid)] = row_info
-        except Exception as e:
-            logger.error(f"Error reading {catalog_file}: {e}")
+        except Exception:
+            logger.exception("Error reading %s", catalog_file)
     else:
         logger.warning(f"File {catalog_file} not found.")
 

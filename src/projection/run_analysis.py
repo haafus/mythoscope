@@ -60,11 +60,8 @@ def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool =
 
         return analyzer
 
-    except Exception as e:
-        logger.error(f"Critical error during embedding analysis: {e}")
-        import traceback
-
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Critical error during embedding analysis")
         return None
 
 
@@ -95,8 +92,8 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
                     method=method,
                     reducer_kwargs=cfg,
                 )
-            except Exception as e:
-                logger.error(f"    Error creating {method.upper()} with {cfg}: {e}")
+            except Exception:
+                logger.exception("Error creating %s with %s", method.upper(), cfg)
 
     logger.info("  - Generating hyperparameter tuning dashboards...")
     try:
@@ -109,8 +106,8 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
             data, method="tsne", param_configs=tsne_configs,
             output_dir=analyzer.output_dir, model_name=analyzer.model_name,
         )
-    except Exception as e:
-        logger.error(f"    Error creating hyperparameter dashboards: {e}")
+    except Exception:
+        logger.exception("Error creating hyperparameter dashboards")
 
     logger.info("  - Generating cross-method comparison dashboard...")
     try:
@@ -118,26 +115,26 @@ def _generate_all_plots(analyzer: EmbeddingAnalyzer) -> None:
             data, output_dir=analyzer.output_dir,
             model_name=analyzer.model_name, baseline_configs=baseline_configs,
         )
-    except Exception as e:
-        logger.error(f"    Error creating comparison dashboard: {e}")
+    except Exception:
+        logger.exception("Error creating comparison dashboard")
 
     logger.info("  - Distance heatmap...")
     try:
         plot_distance_heatmap(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-    except Exception as e:
-        logger.error(f"    Error creating heatmap: {e}")
+    except Exception:
+        logger.exception("Error creating heatmap")
 
     logger.info("  - Tradition distribution chart...")
     try:
         plot_tradition_distribution(data, output_dir=analyzer.output_dir, model_name=analyzer.model_name)
-    except Exception as e:
-        logger.error(f"    Error creating distribution chart: {e}")
+    except Exception:
+        logger.exception("Error creating distribution chart")
 
     logger.info("  - Adding click handlers...")
     try:
         if analyzer.model_name:
             generate_clickable_plots(analyzer.output_dir, analyzer.model_name)
-    except Exception as e:
-        logger.error(f"    Error adding click handlers: {e}")
+    except Exception:
+        logger.exception("Error adding click handlers")
 
     logger.info(f"\nAll visualizations for {analyzer.model_name} saved to: {analyzer.output_dir}")

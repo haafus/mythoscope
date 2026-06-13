@@ -154,8 +154,8 @@ def run_generate_graphs(force: bool = False) -> None:
     prompts_path = str(settings.project_root / "config" / "graphs_prompts.txt")
     try:
         prompts = load_prompts(prompts_path)
-    except Exception as e:
-        logger.error(f"Failed to load prompts: {e}")
+    except Exception:
+        logger.exception("Failed to load prompts")
         return
 
     llm = LLMProcessor(
@@ -176,8 +176,8 @@ def run_generate_graphs(force: bool = False) -> None:
     try:
         with open(metadata_path, encoding="utf-8") as f:
             corpus = json.load(f)
-    except Exception as e:
-        logger.error(f"Failed to read metadata: {e}")
+    except Exception:
+        logger.exception("Failed to read metadata")
         return
 
     for book in corpus:
@@ -203,8 +203,8 @@ def run_generate_graphs(force: bool = False) -> None:
         try:
             with open(txt_path, encoding="utf-8") as f:
                 text = f.read()
-        except Exception as e:
-            logger.error(f"Error reading file {txt_path}: {e}")
+        except Exception:
+            logger.exception("Error reading file %s", txt_path)
             continue
 
         logger.info(f"--- Processing: {book_id} ---")
@@ -260,5 +260,5 @@ def run_generate_graphs(force: bool = False) -> None:
             generate_and_save_graph(all_characters, all_relations, book_out_dir)
             clear_checkpoint(book_out_dir)
 
-        except Exception as e:
-            logger.error(f"Error saving files or generating graph for {book_id}: {e}")
+        except Exception:
+            logger.exception("Error saving files or generating graph for %s", book_id)

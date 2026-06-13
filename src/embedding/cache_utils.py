@@ -37,8 +37,8 @@ def save_to_cache(
         with open(cache_dir / f"{key}.json", "w", encoding="utf-8") as f:
             json.dump(metadata, f, ensure_ascii=False)
         return True
-    except Exception as e:
-        logger.error(f"Failed to save to cache: {e}")
+    except Exception:
+        logger.exception("Failed to save to cache")
         return False
 
 

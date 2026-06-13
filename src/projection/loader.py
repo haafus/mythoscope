@@ -110,8 +110,8 @@ class EmbeddingDataLoader:
                             if text_id and tradition:
                                 self._metadata_map[str(text_id)] = tradition
                                 self._metadata_map[str(text_id).replace(" ", "_")] = tradition
-        except Exception as e:
-            logger.error(f"Failed to load metadata: {e}")
+        except Exception:
+            logger.exception("Failed to load metadata")
             self._metadata_map = {}
 
         return self._metadata_map
@@ -142,8 +142,8 @@ class EmbeddingDataLoader:
                 migrated = self._migrate_records(collection, metadata_map)
                 logger.info(f"Migration complete. Updated {migrated} records.")
 
-        except Exception as e:
-            logger.error(f"Auto-migration failed: {e}")
+        except Exception:
+            logger.exception("Auto-migration failed")
 
     def _needs_migration(self, collection) -> bool:
         try:
@@ -187,8 +187,8 @@ class EmbeddingDataLoader:
                 if len(results["ids"]) < batch_size:
                     break
 
-            except Exception as e:
-                logger.error(f"Migration batch failed at offset {offset}: {e}")
+            except Exception:
+                logger.exception("Migration batch failed at offset %d", offset)
                 break
 
         return migrated
@@ -229,8 +229,8 @@ class EmbeddingDataLoader:
                         offset=offset,
                         include=["embeddings", "metadatas", "documents"],
                     )
-                except Exception as e:
-                    logger.error(f"Failed to fetch data from '{collection.name}' at offset {offset}: {e}")
+                except Exception:
+                    logger.exception("Failed to fetch data from '%s' at offset %d", collection.name, offset)
                     break
 
                 if not results.get("ids"):
@@ -301,8 +301,8 @@ class EmbeddingDataLoader:
                 models.update(m.get("model") for m in metadatas if m and "model" in m)
 
             return sorted(models)
-        except Exception as e:
-            logger.error(f"Failed to get available models: {e}")
+        except Exception:
+            logger.exception("Failed to get available models")
             return []
 
     def close(self):

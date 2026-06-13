@@ -70,8 +70,8 @@ def html_to_text(
         logger.debug("HTML processed with BeautifulSoup")
         return normalize_text(text)
 
-    except Exception as e:
-        logger.error(f"Critical HTML extraction error: {e}")
+    except Exception:
+        logger.exception("Critical HTML extraction error")
         return ""
 
 
@@ -126,6 +126,6 @@ def pdf_to_text(
             logger.warning("Failed to extract text from PDF")
             return ""
 
-    except Exception as e:
-        logger.error(f"Error processing PDF with PyMuPDF: {e}")
+    except Exception:
+        logger.exception("Error processing PDF with PyMuPDF")
         return ""

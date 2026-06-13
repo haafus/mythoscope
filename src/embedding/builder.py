@@ -313,8 +313,8 @@ class EmbeddingBuilder:
                             out_f.write(chunk)
                             out_f.write("\n\n")
 
-                except Exception as e:
-                    logger.error(f"Error processing {file_info.get('filename', 'unknown')}: {e}")
+                except Exception:
+                    logger.exception("Error processing %s", file_info.get('filename', 'unknown'))
                 finally:
                     pbar.update(1)
 

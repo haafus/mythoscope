@@ -23,7 +23,7 @@ def calculate_clustering_metrics(
     metrics: dict[str, float | int | str | None] = {}
 
     if len(embeddings) == 0:
-        return {"error": "Empty embeddings array"}
+        raise ValueError("Empty embeddings array")
 
     n_clusters = len(set(predicted_labels)) - (1 if -1 in predicted_labels else 0)
     n_noise = np.sum(predicted_labels == -1)

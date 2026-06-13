@@ -47,8 +47,8 @@ class CacheValidator:
                         h.update(chunk)
                 return h.hexdigest()
             return ""
-        except OSError as e:
-            logger.error(f"Failed to compute checksum for {file_path}: {e}")
+        except OSError:
+            logger.exception("Failed to compute checksum for %s", file_path)
             return None
 
     def validate_file(self, file_path: Path) -> tuple[bool, str | None]:
@@ -128,8 +128,8 @@ class CacheValidator:
                 self._checksums.pop(base_path.name, None)
                 removed += 1
                 logger.info(f"Removed corrupted cache file: {file_path}")
-            except Exception as e:
-                logger.error(f"Failed to remove {file_path}: {e}")
+            except Exception:
+                logger.exception("Failed to remove %s", file_path)
 
         if removed > 0:
             self._save_checksums()

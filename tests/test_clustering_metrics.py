@@ -1,12 +1,13 @@
 import numpy as np
+import pytest
 
 from clustering.metrics import calculate_clustering_metrics
 
 
 class TestCalculateClusteringMetrics:
     def test_empty_embeddings(self):
-        result = calculate_clustering_metrics(np.array([]), np.array([]))
-        assert result.get("error") == "Empty embeddings array"
+        with pytest.raises(ValueError, match="Empty embeddings"):
+            calculate_clustering_metrics(np.array([]), np.array([]))
 
     def test_single_cluster(self):
         embeddings = np.random.rand(10, 5)

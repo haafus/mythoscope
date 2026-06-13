@@ -83,7 +83,7 @@ class ChromaWriter:
                 )
                 logger.debug(f"Background thread saved a batch of {len(ids)} chunks.")
             except Exception as e:
-                logger.error(f"Background Chroma write error: {e}")
+                logger.exception("Background Chroma write error")
                 if self._write_error is None:
                     self._write_error = e
             finally:
