@@ -1,7 +1,6 @@
-import glob
 import logging
-import os
 import textwrap
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -47,11 +46,6 @@ def _sample_for_visualization(data: list[dict], sample_size: int | None, reason:
     logger.info(f"Sampling {sample_limit} of {len(data)} records for {reason}")
     indices = np.random.default_rng(RANDOM_SEED).choice(len(data), sample_limit, replace=False)
     return [data[i] for i in indices]
-
-
-def _ensure_dir(path: str) -> str:
-    os.makedirs(path, exist_ok=True)
-    return path
 
 
 def _check_umap_available() -> bool:
@@ -165,7 +159,7 @@ def _create_interactive_figure_2d(
     title: str,
     color_map: dict,
     model_name: str | None = None,
-    output_dir: str | None = None,
+    output_dir: Path | None = None,
     filename: str | None = None,
 ) -> go.Figure:
     fig = go.Figure()
@@ -222,9 +216,9 @@ def _create_interactive_figure_2d(
     )
 
     if filename and output_dir:
-        path = os.path.join(output_dir, filename)
-        fig.write_html(path, include_plotlyjs="cdn", full_html=True)
-        logger.info(f"Saved: {path}")
+        html_path = output_dir / filename
+        fig.write_html(str(html_path), include_plotlyjs="cdn", full_html=True)
+        logger.info(f"Saved: {html_path}")
 
     return fig
 
@@ -233,7 +227,7 @@ def plot_interactive_2d(
     data: list[dict],
     sample_size: int | None = DEFAULT_SAMPLE_SIZE,
     save_html: bool = True,
-    output_dir: str | None = None,
+    output_dir: Path | None = None,
     model_name: str | None = None,
     method: str = "umap",
     reducer_kwargs: dict[str, Any] | None = None,
@@ -247,9 +241,8 @@ def plot_interactive_2d(
         method = "pca"
 
     if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-
-    output_dir = _ensure_dir(output_dir)
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
     reducer_kwargs = reducer_kwargs or {}
 
     sample_limit = _resolve_sample_limit(sample_size)
@@ -314,7 +307,7 @@ def plot_hyperparameter_tuning_dashboard(
     data: list[dict],
     method: str = "umap",
     param_configs: list[dict[str, Any]] | None = None,
-    output_dir: str | None = None,
+    output_dir: Path | None = None,
     model_name: str | None = None,
     save_html: bool = True,
 ) -> go.Figure | None:
@@ -322,8 +315,8 @@ def plot_hyperparameter_tuning_dashboard(
         return None
 
     if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-    output_dir = _ensure_dir(output_dir)
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     sample_data = _sample_for_visualization(data, MAX_VIS_SAMPLES, f"{method.upper()} hyperparameter tuning")
 
@@ -371,24 +364,23 @@ def plot_hyperparameter_tuning_dashboard(
     )
 
     if save_html and output_dir:
-        output_path = os.path.join(output_dir, f"{method}_hyperparameters_dashboard.html")
-        fig.write_html(output_path)
+        output_path = output_dir / f"{method}_hyperparameters_dashboard.html"
+        fig.write_html(str(output_path))
         logger.info(f"Tuning dashboard saved: {output_path}")
 
     return fig
 
 
 def plot_distance_heatmap(
-    data: list[dict], output_dir: str | None = None, model_name: str | None = None, save_html: bool = True
+    data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if not data:
         logger.warning("No data for visualization.")
         return None
 
     if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-
-    output_dir = _ensure_dir(output_dir)
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     traditions_data: dict[str, list] = {}
     for item in data:
@@ -437,8 +429,8 @@ def plot_distance_heatmap(
     )
 
     if save_html and output_dir:
-        output_path = os.path.join(output_dir, "distance_heatmap.html")
-        fig.write_html(output_path)
+        output_path = output_dir / "distance_heatmap.html"
+        fig.write_html(str(output_path))
         logger.info(f"Heatmap saved: {output_path}")
 
     return fig
@@ -446,7 +438,7 @@ def plot_distance_heatmap(
 
 def plot_comparison_dashboard(
     data: list[dict],
-    output_dir: str | None = None,
+    output_dir: Path | None = None,
     model_name: str | None = None,
     save_html: bool = True,
     baseline_configs: dict[str, Any] | None = None,
@@ -456,9 +448,8 @@ def plot_comparison_dashboard(
         return None
 
     if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-
-    output_dir = _ensure_dir(output_dir)
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     sample_data = _sample_for_visualization(data, MAX_VIS_SAMPLES, "cross-method comparison dashboard")
 
@@ -536,24 +527,23 @@ def plot_comparison_dashboard(
     )
 
     if save_html and output_dir:
-        output_path = os.path.join(output_dir, "methods_comparison.html")
-        fig.write_html(output_path)
+        output_path = output_dir / "methods_comparison.html"
+        fig.write_html(str(output_path))
         logger.info(f"Comparison dashboard saved: {output_path}")
 
     return fig
 
 
 def plot_tradition_distribution(
-    data: list[dict], output_dir: str | None = None, model_name: str | None = None, save_html: bool = True
+    data: list[dict], output_dir: Path | None = None, model_name: str | None = None, save_html: bool = True
 ) -> go.Figure | None:
     if not data:
         logger.warning("No data for visualization.")
         return None
 
     if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-
-    output_dir = _ensure_dir(output_dir)
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     tradition_counts: dict[str, int] = {}
     tradition_docs: dict[str, set] = {}
@@ -613,18 +603,17 @@ def plot_tradition_distribution(
     )
 
     if save_html and output_dir:
-        output_path = os.path.join(output_dir, "tradition_distribution.html")
-        fig.write_html(output_path)
+        output_path = output_dir / "tradition_distribution.html"
+        fig.write_html(str(output_path))
         logger.info(f"Distribution chart saved: {output_path}")
 
     return fig
 
 
-def save_summary_to_files(data: list[dict], stats: dict, output_dir: str | None = None):
+def save_summary_to_files(data: list[dict], stats: dict, output_dir: Path | None = None):
     if output_dir is None:
-        output_dir = str(settings.analysis_dir)
-
-    output_dir = _ensure_dir(output_dir)
+        output_dir = settings.analysis_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     data_without_embeddings = []
     for item in data:
@@ -632,11 +621,11 @@ def save_summary_to_files(data: list[dict], stats: dict, output_dir: str | None 
         data_without_embeddings.append(item_copy)
 
     df_summary = pd.DataFrame(data_without_embeddings)
-    csv_path = os.path.join(output_dir, "embeddings_data.csv")
+    csv_path = output_dir / "embeddings_data.csv"
     df_summary.to_csv(csv_path, index=False, encoding="utf-8")
     logger.info(f"CSV saved: {csv_path}")
 
-    txt_path = os.path.join(output_dir, "analysis_summary.txt")
+    txt_path = output_dir / "analysis_summary.txt"
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write("Embedding Analysis Summary\n")
         if stats.get("model"):
@@ -718,16 +707,15 @@ def add_click_handler_to_html(html_path: str):
         logger.warning(f"Failed to add click handler to {html_path}: {e}")
 
 
-def generate_clickable_plots(output_dir: str, model_name: str):
-
-    html_files = glob.glob(os.path.join(output_dir, "*.html"))
+def generate_clickable_plots(output_dir: Path, model_name: str):
+    html_files = list(output_dir.glob("*.html"))
 
     if not html_files:
         logger.warning(f"No HTML files found in {output_dir} to make clickable.")
         return
 
     for filepath in html_files:
-        add_click_handler_to_html(filepath)
+        add_click_handler_to_html(str(filepath))
 
 
 def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool = True):

@@ -1,7 +1,6 @@
 import csv
 import json
 import logging
-import os
 from typing import Any
 
 import chromadb
@@ -81,10 +80,10 @@ class EmbeddingDataLoader:
         if self._metadata_map is not None:
             return self._metadata_map
 
-        metadata_path = str(settings.corpus_metadata_path)
-        if not os.path.exists(metadata_path):
-            catalog_path = os.path.join(str(settings.corpus_dir), "corpus_catalog.csv")
-            if os.path.exists(catalog_path):
+        metadata_path = settings.corpus_metadata_path
+        if not metadata_path.exists():
+            catalog_path = settings.corpus_catalog_path
+            if catalog_path.exists():
                 metadata_path = catalog_path
             else:
                 logger.warning(f"Metadata file not found: {metadata_path}")
@@ -94,7 +93,7 @@ class EmbeddingDataLoader:
         try:
             self._metadata_map = {}
 
-            if metadata_path.endswith(".json"):
+            if metadata_path.suffix == ".json":
                 with open(metadata_path, encoding="utf-8") as f:
                     metadata = json.load(f)
                     for item in metadata:

@@ -1,6 +1,6 @@
 import json
 import logging
-import os
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -19,6 +19,7 @@ class EmbeddingAnalyzer:
         self.available_models = self.loader.get_available_models()
         self.data: list[dict[str, Any]] = []
         self._is_loaded = False
+        self.output_dir: Path = settings.analysis_dir
 
         if not self.available_models:
             logger.warning("No available models in the Chroma database")
@@ -37,8 +38,8 @@ class EmbeddingAnalyzer:
             raise ValueError(f"Model '{model_name}' not found. Available models: {self.available_models}")
 
         self.model_name = model_name
-        self.output_dir = str(settings.model_output_dir(model_name))
-        os.makedirs(self.output_dir, exist_ok=True)
+        self.output_dir = settings.model_output_dir(model_name)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"Loading data for model: {model_name}...")
         self.data = self.loader.load_data(model_name=model_name)
@@ -96,29 +97,29 @@ class EmbeddingAnalyzer:
 
         from .visualization import save_summary_to_files
 
-        os.makedirs(self.output_dir, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         stats = self.get_statistics()
         save_summary_to_files(self.filter_by_model(), stats, self.output_dir)
 
         model_info = {
             "model_name": self.model_name,
-            "output_dir": self.output_dir,
+            "output_dir": str(self.output_dir),
             "statistics": stats,
             "available_models": self.available_models,
         }
 
-        info_path = os.path.join(self.output_dir, "model_info.json")
+        info_path = self.output_dir / "model_info.json"
         with open(info_path, "w", encoding="utf-8") as f:
             json.dump(model_info, f, ensure_ascii=False, indent=2)
 
         logger.info(f"Model information saved: {info_path}")
 
-    def save_models_list(self, output_dir: str | None = None) -> str:
+    def save_models_list(self, output_dir: Path | None = None) -> Path:
         if output_dir is None:
-            output_dir = str(settings.analysis_dir)
+            output_dir = settings.analysis_dir
 
-        os.makedirs(output_dir, exist_ok=True)
-        list_path = os.path.join(output_dir, "models.json")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        list_path = output_dir / "models.json"
 
         existing_models = self._load_existing_models(list_path)
         all_models = sorted(set(existing_models + self.available_models))
@@ -130,8 +131,8 @@ class EmbeddingAnalyzer:
         return list_path
 
     @staticmethod
-    def _load_existing_models(list_path: str) -> list[str]:
-        if not os.path.exists(list_path):
+    def _load_existing_models(list_path: Path) -> list[str]:
+        if not list_path.exists():
             return []
 
         try:
