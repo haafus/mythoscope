@@ -339,8 +339,10 @@ class EmbeddingBuilder:
     # --- Resource management -----------------------------------------------
 
     def close(self):
-        self._cache.close()
-        self._models.close()
+        if hasattr(self, "_cache"):
+            self._cache.close()
+        if hasattr(self, "_models"):
+            self._models.close()
 
     def __del__(self):
         self.close()
