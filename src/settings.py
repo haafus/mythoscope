@@ -90,22 +90,6 @@ class ProjectionSettings(BaseModel):
         "pca": {},
     }
 
-    @property
-    def chroma_path(self) -> str:
-        return str(settings.chroma_dir)
-
-    @property
-    def output_dir(self) -> str:
-        return str(settings.analysis_dir)
-
-    @property
-    def corpus_dir(self) -> str:
-        return str(settings.corpus_dir)
-
-    @property
-    def corpus_metadata_path(self) -> str:
-        return str(settings.corpus_metadata_path)
-
 
 class ServerSettings(BaseModel):
     host: str = "127.0.0.1"

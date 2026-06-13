@@ -8,16 +8,14 @@ import chromadb
 import numpy as np
 
 from embedding.chroma_manager import collection_name_for_model, is_model_collection_name
-
-from .config import get_analyzer_config
+from settings import settings
 
 logger = logging.getLogger(__name__)
 
 
 class EmbeddingDataLoader:
     def __init__(self, auto_migrate: bool = True):
-        self.config = get_analyzer_config()
-        self.client = chromadb.PersistentClient(path=self.config.chroma_path)
+        self.client = chromadb.PersistentClient(path=str(settings.chroma_dir))
         self._metadata_map: dict[str, str] | None = None
         self._collection = None
         self._collection_names_cache: dict[str, list[str]] = {}
@@ -83,9 +81,9 @@ class EmbeddingDataLoader:
         if self._metadata_map is not None:
             return self._metadata_map
 
-        metadata_path = self.config.corpus_metadata_path
+        metadata_path = str(settings.corpus_metadata_path)
         if not os.path.exists(metadata_path):
-            catalog_path = os.path.join(self.config.corpus_dir, "corpus_catalog.csv")
+            catalog_path = os.path.join(str(settings.corpus_dir), "corpus_catalog.csv")
             if os.path.exists(catalog_path):
                 metadata_path = catalog_path
             else:

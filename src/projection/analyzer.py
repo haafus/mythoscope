@@ -5,7 +5,8 @@ from typing import Any
 
 import numpy as np
 
-from .config import get_analyzer_config, get_model_output_dir
+from settings import settings
+
 from .loader import EmbeddingDataLoader
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 class EmbeddingAnalyzer:
     def __init__(self, model_name: str | None = None):
-        self.config = get_analyzer_config()
         self.loader = EmbeddingDataLoader()
         self.model_name: str | None = None
         self.available_models = self.loader.get_available_models()
@@ -37,7 +37,7 @@ class EmbeddingAnalyzer:
             raise ValueError(f"Model '{model_name}' not found. Available models: {self.available_models}")
 
         self.model_name = model_name
-        self.output_dir = get_model_output_dir(model_name)
+        self.output_dir = str(settings.model_output_dir(model_name))
         os.makedirs(self.output_dir, exist_ok=True)
 
         logger.info(f"Loading data for model: {model_name}...")
@@ -115,7 +115,7 @@ class EmbeddingAnalyzer:
 
     def save_models_list(self, output_dir: str | None = None) -> str:
         if output_dir is None:
-            output_dir = self.config.output_dir
+            output_dir = str(settings.analysis_dir)
 
         os.makedirs(output_dir, exist_ok=True)
         list_path = os.path.join(output_dir, "models.json")

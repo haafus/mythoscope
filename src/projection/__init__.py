@@ -2,10 +2,6 @@ from settings import lazy_module_getattr
 
 _LAZY_IMPORTS = {
     "EmbeddingAnalyzer": (".analyzer", "EmbeddingAnalyzer"),
-    "get_analyzer_config": (".config", "get_analyzer_config"),
-    "get_chroma_path": (".config", "get_chroma_path"),
-    "get_model_output_dir": (".config", "get_model_output_dir"),
-    "get_output_dir": (".config", "get_output_dir"),
     "analyze_embeddings": (".visualization", "analyze_embeddings"),
     "plot_comparison_dashboard": (".visualization", "plot_comparison_dashboard"),
     "plot_distance_heatmap": (".visualization", "plot_distance_heatmap"),

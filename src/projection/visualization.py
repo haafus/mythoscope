@@ -12,7 +12,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.metrics.pairwise import cosine_distances
 
-from .config import get_analyzer_config
+from settings import settings
+
 from .utils import reduce_dimensions
 
 MAX_TEXT_PREVIEW_LEN = 200
@@ -247,7 +248,7 @@ def plot_interactive_2d(
         method = "pca"
 
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
 
     output_dir = _ensure_dir(output_dir)
     reducer_kwargs = reducer_kwargs or {}
@@ -322,7 +323,7 @@ def plot_hyperparameter_tuning_dashboard(
         return None
 
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
     output_dir = _ensure_dir(output_dir)
 
     sample_data = _sample_for_visualization(data, MAX_VIS_SAMPLES, f"{method.upper()} hyperparameter tuning")
@@ -386,7 +387,7 @@ def plot_distance_heatmap(
         return None
 
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
 
     output_dir = _ensure_dir(output_dir)
 
@@ -456,7 +457,7 @@ def plot_comparison_dashboard(
         return None
 
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
 
     output_dir = _ensure_dir(output_dir)
 
@@ -474,7 +475,7 @@ def plot_comparison_dashboard(
     methods_to_use.extend(["pca", "tsne"])
 
     if baseline_configs is None:
-        baseline_configs = get_analyzer_config().baseline_configs
+        baseline_configs = settings.projection.baseline_configs
 
     coords_dict = {}
     for method in methods_to_use:
@@ -551,7 +552,7 @@ def plot_tradition_distribution(
         return None
 
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
 
     output_dir = _ensure_dir(output_dir)
 
@@ -622,7 +623,7 @@ def plot_tradition_distribution(
 
 def save_summary_to_files(data: list[dict], stats: dict, output_dir: str | None = None):
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
 
     output_dir = _ensure_dir(output_dir)
 
@@ -657,7 +658,7 @@ def save_summary_to_files(data: list[dict], stats: dict, output_dir: str | None 
 
 def save_models_list(models: list[str], output_dir: str | None = None):
     if output_dir is None:
-        output_dir = get_analyzer_config().output_dir
+        output_dir = str(settings.analysis_dir)
 
     output_dir = _ensure_dir(output_dir)
 
@@ -788,7 +789,7 @@ def analyze_embeddings(model_name: str | None = None, generate_all_plots: bool =
 
                 logger.info("Generating visualizations with hyperparameter variations...")
 
-                config = get_analyzer_config()
+                config = settings.projection
                 umap_configs = config.umap_configs
                 tsne_configs = config.tsne_configs
                 pca_configs = config.pca_configs
