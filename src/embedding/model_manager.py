@@ -1,8 +1,7 @@
 import gc
 import logging
 import time
-from contextlib import contextmanager
-from typing import Any, Iterator
+from typing import Any
 
 import torch
 from sentence_transformers import SentenceTransformer
@@ -38,9 +37,6 @@ class ModelManager:
         self.model_dim: int = 0
         self._override_batch_size = batch_size is not None
         self.batch_size: int = batch_size if batch_size is not None else DEFAULT_BATCH_SIZE
-
-    def list_models(self) -> list[str]:
-        return list(self.available_models)
 
     def unload_model(self) -> None:
         if self.model is not None:
@@ -86,16 +82,6 @@ class ModelManager:
             logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
         else:
             logger.info(f"Using default batch size: {self.batch_size}")
-
-    @contextmanager
-    def use_model(self, model_name: str) -> Iterator["ModelManager"]:
-        original_model = self.model_name
-        try:
-            self.set_model(model_name)
-            yield self
-        finally:
-            if original_model:
-                self.set_model(original_model)
 
     def close(self) -> None:
         self.unload_model()

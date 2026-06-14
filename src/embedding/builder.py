@@ -88,9 +88,6 @@ class EmbeddingBuilder:
 
     # --- Model management (delegated) --------------------------------------
 
-    def list_models(self) -> list[str]:
-        return self._models.list_models()
-
     def unload_model(self) -> None:
         self._models.unload_model()
 
