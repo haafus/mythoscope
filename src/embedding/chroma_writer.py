@@ -56,20 +56,6 @@ class ChromaWriter:
         ]
         return ids, metadatas
 
-    def write_batches(
-        self, collection: Any, chunks: list[str], embeddings: Any, ids: list[str], metadatas: list[dict[str, Any]]
-    ) -> None:
-        batch_size = min(self.chroma_batch_size, len(chunks))
-        for i in range(0, len(chunks), batch_size):
-            end = min(i + batch_size, len(chunks))
-            save_to_chroma_collection(
-                collection=collection,
-                ids=ids[i:end],
-                embeddings=embeddings[i:end].tolist(),
-                metadatas=metadatas[i:end],
-                documents=chunks[i:end],
-            )
-
     def _background_worker(self, collection: Any, write_queue: queue.Queue) -> None:
         while True:
             batch = write_queue.get()
