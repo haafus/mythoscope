@@ -4,7 +4,6 @@ MODELS = {
         "model": None,
         "loaded": False,
         "dim": 1024,
-        "type": "local",
         "batch_size": 16,
     },
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2": {
@@ -12,7 +11,6 @@ MODELS = {
         "model": None,
         "loaded": False,
         "dim": 384,
-        "type": "local",
         "batch_size": 128,
     },
     "sentence-transformers/LaBSE": {
@@ -20,7 +18,6 @@ MODELS = {
         "model": None,
         "loaded": False,
         "dim": 768,
-        "type": "local",
         "batch_size": 32,
     },
     "intfloat/e5-large-v2": {
@@ -28,7 +25,6 @@ MODELS = {
         "model": None,
         "loaded": False,
         "dim": 1024,
-        "type": "local",
         "batch_size": 16,
     },
     "Qwen/Qwen3-Embedding": {
@@ -36,7 +32,6 @@ MODELS = {
         "model": None,
         "loaded": False,
         "dim": 2560,
-        "type": "local",
         "batch_size": 4,
     },
 }

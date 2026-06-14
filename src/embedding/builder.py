@@ -106,10 +106,6 @@ class EmbeddingBuilder:
         return self._models.model_dim
 
     @property
-    def model_type(self) -> str:
-        return self._models.model_type
-
-    @property
     def batch_size(self) -> int:
         return self._models.batch_size
 

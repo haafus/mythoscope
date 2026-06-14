@@ -41,8 +41,6 @@ class ModelManager:
         self.model_name: str | None = None
         self.model: Any = None
         self.model_dim: int = 0
-        self.model_type: str = "local"
-
         self._override_batch_size = batch_size is not None
         self.batch_size: int = batch_size if batch_size is not None else DEFAULT_BATCH_SIZE
 
@@ -111,8 +109,6 @@ class ModelManager:
         self.model = self.registry[model_name]["model"]
         dim_value = self.registry[model_name]["dim"]
         self.model_dim = int(dim_value) if dim_value is not None else 0
-        self.model_type = str(self.registry[model_name]["type"])
-
         if not self._override_batch_size:
             model_batch = self.registry[model_name].get("batch_size")
             if model_batch:
