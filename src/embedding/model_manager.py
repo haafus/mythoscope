@@ -46,9 +46,8 @@ class ModelManager:
     def unload_model(self, model_name: str | None = None) -> None:
         if model_name is None:
             model_name = self.model_name
-        if model_name and model_name in self.registry and self.registry[model_name]["loaded"]:
-            del self.registry[model_name]["model"]
-            self.registry[model_name]["loaded"] = False
+        if model_name and model_name in self.registry and self.registry[model_name]["model"] is not None:
+            self.registry[model_name]["model"] = None
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
             elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
@@ -61,7 +60,7 @@ class ModelManager:
             try:
                 if model_name not in self.registry:
                     raise KeyError(f"Model '{model_name}' is not registered.")
-                if self.registry[model_name]["loaded"]:
+                if self.registry[model_name]["model"] is not None:
                     return
 
                 if self.model_name and self.model_name != model_name:
@@ -71,7 +70,6 @@ class ModelManager:
                 try:
                     model = SentenceTransformer(model_name, device=device)
                     self.registry[model_name]["model"] = model
-                    self.registry[model_name]["loaded"] = True
                     logger.info(f"Model '{model_name}' loaded successfully on {device}.")
                 except Exception as e:
                     local_path = Path.home() / ".cache" / "huggingface" / "models" / model_name.replace("/", "_")
@@ -80,7 +78,6 @@ class ModelManager:
                         try:
                             model = SentenceTransformer(str(local_path), device=device)
                             self.registry[model_name]["model"] = model
-                            self.registry[model_name]["loaded"] = True
                             logger.info(f"Model '{model_name}' loaded from local cache.")
                         except Exception as fallback_error:
                             raise RuntimeError(
