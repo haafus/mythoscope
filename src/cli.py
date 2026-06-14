@@ -32,6 +32,7 @@ class _LazyEmbeddingGroup(click.Group):
 @click.version_option(package_name="mythosemantic")
 def mytho():
     """MythoSemantic — computational framework for comparative mythology."""
+    setup_logging()
 
 
 # ---------------------------------------------------------------------------
@@ -48,7 +49,6 @@ def mytho():
 @click.option("--force", is_flag=True, help="Overwrite existing files.")
 def corpus(text_type: str, force: bool):
     """Download and build the text corpus (Gutenberg cleanup is automatic)."""
-    setup_logging(log_filename="corpus.log", clear_handlers=True)
     from corpus.builder import build_corpus
 
     filter_type = {"translation", "original"} if text_type == "all" else {text_type}
@@ -77,7 +77,6 @@ def embeddings(ctx, verbose: bool):
 @click.option("--no-plots", is_flag=True, help="Skip plot generation, only compute stats.")
 def projection(model: str | None, no_plots: bool):
     """Generate dimensionality-reduction projections (PCA, t-SNE, UMAP)."""
-    setup_logging(log_filename="analyzer.log")
     from projection.run_analysis import analyze_embeddings
 
     analyzer = analyze_embeddings(model_name=model, generate_all_plots=not no_plots)
@@ -102,8 +101,6 @@ def projection(model: str | None, no_plots: bool):
 @click.option("--models-list", multiple=True, help="Explicit list of algorithms to run.")
 def cluster(model, clustering_model, single_model, no_viz, output_dir, models_list):
     """Run clustering analysis on embeddings."""
-    setup_logging(log_filename="clustering.log", timestamp=True)
-
     from clustering.run_clustering import run_all_clustering_models, run_clustering_analysis
     from projection.analyzer import EmbeddingAnalyzer
 
@@ -142,7 +139,6 @@ def cluster(model, clustering_model, single_model, no_viz, output_dir, models_li
 @click.option("--force", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    setup_logging(log_filename="graphs.log", timestamp=True)
     from graphs.run_graph_generation import run_generate_graphs
 
     run_generate_graphs(force=force)
@@ -187,8 +183,6 @@ def server(host: str | None, port: int | None):
 @click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
 def pipeline(model, text_type, skip_corpus, skip_embeddings, skip_projection, skip_clustering, skip_graphs):
     """Run the full analysis pipeline end-to-end."""
-    setup_logging(log_filename="pipeline.log", clear_handlers=True)
-
     steps = [
         ("Corpus", skip_corpus, _pipeline_corpus, {"text_type": text_type}),
         ("Embeddings", skip_embeddings, _pipeline_embeddings, {"model": model, "text_type": text_type}),
