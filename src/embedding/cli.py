@@ -121,11 +121,11 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
         click.echo()
 
 
-@click.command()
+@click.command("delete-collection")
 @click.option("--model", "-m", default=None, help="Model whose collection should be deleted")
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
-def clear_cache(ctx, model: str | None, yes: bool):
+def delete_chroma_collection(ctx, model: str | None, yes: bool):
     model_name = model or settings.embedding.models[0]
     collection = collection_name_for_model(model_name)
 
