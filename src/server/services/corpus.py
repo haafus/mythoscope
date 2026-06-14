@@ -61,7 +61,6 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
                 "id": row.get("id", ""),
                 "major_tradition": row.get("major_tradition", ""),
                 "tradition": row.get("tradition", ""),
-                "language": row.get("language", ""),
                 "url": row.get("url", ""),
                 "word_count": to_int(row.get("word_count")),
                 "sentence_count": to_int(row.get("sentence_count")),

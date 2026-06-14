@@ -66,7 +66,6 @@ class EmbeddingIndexService:
             "metadata": {
                 "filename": item.get("filename", ""),
                 "major_tradition": item.get("major_tradition", ""),
-                "language": item.get("language", ""),
                 "url": item.get("url", ""),
             },
         }

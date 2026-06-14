@@ -58,8 +58,6 @@ class CorpusDocument(BaseModel):
     id: str
     major_tradition: str = ""
     tradition: str = ""
-    language: str = ""
-    type: str = ""
     url: str = ""
     word_count: int = 0
     sentence_count: int = 0

@@ -34,7 +34,6 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]
                     "color": item.get("color", "#CCCCCC"),
                     "major_tradition": item.get("major_tradition", "unknown"),
                     "tradition": item.get("tradition", "unknown"),
-                    "language": item.get("language", "unknown"),
                     "url": item.get("url", ""),
                 }
                 text_info[str(tid)] = row_info
@@ -65,6 +64,5 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]
             "major_tradition": major_tradition,
             "tradition": tradition,
             "color": info.get("color", "#CCCCCC"),
-            "language": info.get("language", "unknown"),
             "url": info.get("url", ""),
         }

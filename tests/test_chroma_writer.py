@@ -61,7 +61,6 @@ class TestBuildEntries:
             "tradition": "Buddhism",
             "major_tradition": "Eastern",
             "color": "#FF0000",
-            "language": "en",
             "url": "http://example.com",
         }
 

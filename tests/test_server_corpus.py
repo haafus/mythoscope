@@ -140,7 +140,7 @@ class TestDocumentIndex:
 class TestGetCatalogDocuments:
     def test_from_metadata_json(self, tmp_path, monkeypatch):
         metadata = [
-            {"id": "Iliad", "major_tradition": "European", "tradition": "Greek", "language": "en"},
+            {"id": "Iliad", "major_tradition": "European", "tradition": "Greek"},
         ]
         (tmp_path / "corpus_metadata.json").write_text(json.dumps(metadata))
         _patch_corpus(monkeypatch, tmp_path)
@@ -149,7 +149,6 @@ class TestGetCatalogDocuments:
         docs = get_catalog_documents("corpus")
         assert len(docs) == 1
         assert docs[0]["id"] == "Iliad"
-        assert docs[0]["language"] == "en"
         assert docs[0]["source"] == "corpus"
 
     def test_empty_corpus(self, tmp_path, monkeypatch):

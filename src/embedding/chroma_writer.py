@@ -48,7 +48,6 @@ class ChromaWriter:
                 "chunking": _safe_meta(chunking_name),
                 "text_id": _safe_meta(text_id),
                 "color": _safe_meta(info.get("color", "#CCCCCC")),
-                "language": _safe_meta(info.get("language", "unknown")),
                 "url": _safe_meta(info.get("url", "")),
             }
             for i in range(len(chunks))

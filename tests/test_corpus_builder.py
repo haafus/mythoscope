@@ -40,7 +40,6 @@ class TestItemTid:
 _BASE_ITEM = {
     "major_tradition": "Greek",
     "tradition": "Hellenic",
-    "language": "en",
     "url": "http://example.com/text",
 }
 
@@ -76,7 +75,7 @@ class TestBuildMetadataFields:
 
     def test_missing_major_tradition_defaults(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 1, "sentence_count": 1}
-        item = {"tradition": "T", "language": "en", "url": "http://example.com/no-major"}
+        item = {"tradition": "T", "url": "http://example.com/no-major"}
         meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
         assert meta["major_tradition"] == "Unknown"
 

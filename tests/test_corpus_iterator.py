@@ -79,7 +79,6 @@ class TestIterCorpusFiles:
                 "id": "mytext",
                 "tradition": "Buddhism",
                 "major_tradition": "Eastern",
-                "language": "en",
                 "color": "#FF0000",
                 "url": "http://example.com",
             },
@@ -90,7 +89,6 @@ class TestIterCorpusFiles:
         r = results[0]
         assert r["tradition"] == "Buddhism"
         assert r["major_tradition"] == "Eastern"
-        assert r["language"] == "en"
         assert r["color"] == "#FF0000"
         assert r["url"] == "http://example.com"
 
