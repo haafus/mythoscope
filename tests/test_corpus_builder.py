@@ -41,7 +41,6 @@ _BASE_ITEM = {
     "major_tradition": "Greek",
     "tradition": "Hellenic",
     "language": "en",
-    "type": "translation",
     "url": "http://example.com/text",
 }
 
@@ -77,7 +76,7 @@ class TestBuildMetadataFields:
 
     def test_missing_major_tradition_defaults(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 1, "sentence_count": 1}
-        item = {"tradition": "T", "language": "en", "type": "original", "url": "http://example.com/no-major"}
+        item = {"tradition": "T", "language": "en", "url": "http://example.com/no-major"}
         meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
         assert meta["major_tradition"] == "Unknown"
 
@@ -112,9 +111,9 @@ class TestUpdateTraditionsInfo:
 
     def test_creates_new_file(self, tmp_path, monkeypatch):
         items = [
-            {"title": "Iliad", "type": "translation", "tradition": "Greek"},
-            {"title": "Odyssey", "type": "translation", "tradition": "Greek"},
-            {"title": "Edda", "type": "original", "tradition": "Norse"},
+            {"title": "Iliad", "tradition": "Greek"},
+            {"title": "Odyssey", "tradition": "Greek"},
+            {"title": "Edda", "tradition": "Norse"},
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
@@ -130,8 +129,8 @@ class TestUpdateTraditionsInfo:
 
     def test_preserves_existing_descriptions(self, tmp_path, monkeypatch):
         items = [
-            {"title": "Iliad", "type": "translation", "tradition": "Greek"},
-            {"title": "Odyssey", "type": "translation", "tradition": "Greek"},
+            {"title": "Iliad", "tradition": "Greek"},
+            {"title": "Odyssey", "tradition": "Greek"},
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
@@ -164,10 +163,10 @@ class TestUpdateTraditionsInfo:
         backup = json.loads((corpus_dir / "traditions_info_backup.json").read_text())
         assert backup["Greek"]["description"] == "old data"
 
-    def test_includes_all_types(self, tmp_path, monkeypatch):
+    def test_includes_all_traditions(self, tmp_path, monkeypatch):
         items = [
-            {"title": "Iliad", "type": "translation", "tradition": "Greek"},
-            {"title": "Edda", "type": "original", "tradition": "Norse"},
+            {"title": "Iliad", "tradition": "Greek"},
+            {"title": "Edda", "tradition": "Norse"},
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
@@ -191,7 +190,7 @@ class TestUpdateTraditionsInfo:
         assert data == {}
 
     def test_adds_missing_color(self, tmp_path, monkeypatch):
-        items = [{"title": "Edda", "type": "original", "tradition": "Norse"}]
+        items = [{"title": "Edda", "tradition": "Norse"}]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
         existing = {"Norse": {"description": "Norse myths", "books": ["Edda"]}}
@@ -205,7 +204,7 @@ class TestUpdateTraditionsInfo:
 
     def test_uses_item_tid_for_books(self, tmp_path, monkeypatch):
         items = [
-            {"id": "book_42", "type": "translation", "tradition": "Egyptian"},
+            {"id": "book_42", "tradition": "Egyptian"},
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 

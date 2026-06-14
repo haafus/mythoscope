@@ -31,7 +31,6 @@ def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]
                 row_info = {
                     "text_id": _normalize_catalog_id(tid),
                     "catalog_id": tid,
-                    "type": item.get("type", "unknown"),
                     "color": item.get("color", "#CCCCCC"),
                     "major_tradition": item.get("major_tradition", "unknown"),
                     "tradition": item.get("tradition", "unknown"),
