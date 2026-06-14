@@ -110,7 +110,6 @@ def _load_saved_html_projection(path: str, _mtime: float, model_name: str, metho
                     "tradition": str(tradition or "Unknown"),
                     "chunk_index": chunk_index,
                     "text": _clean_saved_preview_text(_custom_value(custom, 3, "")),
-                    "doc_type": str(_custom_value(custom, 4, "")),
                     "x": xs[index],
                     "y": ys[index],
                 }

@@ -1,5 +1,6 @@
 import logging
 import shutil
+import time
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
@@ -17,7 +18,6 @@ from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
 from .corpus_iterator import iter_corpus_files
 from .model_manager import ModelManager
-from .performance_metrics import PerformanceMetrics
 
 logger = logging.getLogger(__name__)
 
@@ -44,20 +44,12 @@ class EmbeddingBuilder:
         batch_size: int | None = None,
         chroma_batch_size: int = 100,
         queue_maxsize: int = 10,
-        metrics: PerformanceMetrics | None = None,
     ):
         self.corpus_dir = Path(corpus_dir)
         self.base_out_dir = Path(out_dir)
         self.chroma_path = ensure_chroma_writable(chroma_path)
         self.chunked_dir = Path(chunked_dir)
         self.chunked_dir.mkdir(parents=True, exist_ok=True)
-
-        if metrics is None:
-            self.metrics = PerformanceMetrics(
-                metrics_file=str(self.base_out_dir / "performance_metrics.json"), track_memory=True
-            )
-        else:
-            self.metrics = metrics
 
         self._models = ModelManager(batch_size=batch_size)
 
@@ -135,14 +127,13 @@ class EmbeddingBuilder:
     def _generate_embeddings(self, sentences: list[str]) -> np.ndarray:
         if not sentences:
             return np.array([])
-        with self.metrics.track("generate_embeddings"):
-            embeddings = self._models.model.encode(
-                sentences,
-                batch_size=self._models.batch_size,
-                show_progress_bar=False,
-                normalize_embeddings=True,
-            )
-            return np.asarray(embeddings, dtype=np.float32)
+        embeddings = self._models.model.encode(
+            sentences,
+            batch_size=self._models.batch_size,
+            show_progress_bar=False,
+            normalize_embeddings=True,
+        )
+        return np.asarray(embeddings, dtype=np.float32)
 
     def build_embeddings(self, text: str, chunking_strategy: str | None = None, batch_size: int | None = None) -> dict[str, Any]:
         if chunking_strategy:
@@ -196,9 +187,9 @@ class EmbeddingBuilder:
 
     def save_all_corpus_to_chroma(self) -> None:
         collection_name = collection_name_for_model(self.model_name)
-        with self.metrics.track("save_all_corpus_to_chroma"):
-            files_info = list(iter_corpus_files(self.corpus_dir))
-            total_files = len(files_info)
+        t0 = time.monotonic()
+        files_info = list(iter_corpus_files(self.corpus_dir))
+        total_files = len(files_info)
 
         if total_files == 0:
             logger.warning("No files found in corpus/. Check the folder structure.")
@@ -260,8 +251,8 @@ class EmbeddingBuilder:
         logger.info("Generation complete. Waiting for final batches to be written to disk...")
         self._chroma.stop_background_writer(write_queue, writer_thread)
 
-        logger.info(f"Total added: {added_total} chunks to collection '{collection_name}'")
-        self.metrics.save()
+        elapsed = time.monotonic() - t0
+        logger.info(f"Total added: {added_total} chunks to collection '{collection_name}' in {elapsed:.1f}s")
 
     def query_chroma(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
         collection_name = collection_name_for_model(self.model_name)

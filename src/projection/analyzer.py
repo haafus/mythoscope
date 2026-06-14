@@ -97,7 +97,7 @@ class EmbeddingAnalyzer:
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
         stats = self.get_statistics()
-        _save_summary_to_files(self.filter_by_model(), stats, self.output_dir)
+        _save_summary_to_files(stats, self.output_dir)
 
         model_info = {
             "model_name": self.model_name,
@@ -126,17 +126,8 @@ class EmbeddingAnalyzer:
         return list_path
 
 
-def _save_summary_to_files(data: list[dict], stats: dict, output_dir: Path) -> None:
-    import pandas as pd
-
+def _save_summary_to_files(stats: dict, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    data_without_embeddings = [{k: v for k, v in item.items() if k != "embedding"} for item in data]
-
-    df_summary = pd.DataFrame(data_without_embeddings)
-    csv_path = output_dir / "embeddings_data.csv"
-    df_summary.to_csv(csv_path, index=False, encoding="utf-8")
-    logger.info(f"CSV saved: {csv_path}")
 
     txt_path = output_dir / "analysis_summary.txt"
     with open(txt_path, "w", encoding="utf-8") as f:

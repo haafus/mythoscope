@@ -72,7 +72,6 @@ def build_embeddings(
         logger.error(f"Embedding generation error: {e}")
         raise
     finally:
-        builder.metrics.save()
         builder.close()
         gc.collect()
         if torch.cuda.is_available():
@@ -81,7 +80,6 @@ def build_embeddings(
             torch.mps.empty_cache()
 
     logger.info("All embeddings saved to Chroma.")
-    logger.info(f"Analysis results will be saved to: {builder.out_dir}")
-    logger.info(f"Performance metrics: {builder.out_dir}/performance_metrics.json")
+    logger.info(f"Analysis results: {builder.out_dir}")
 
     return builder

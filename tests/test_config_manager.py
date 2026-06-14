@@ -17,9 +17,5 @@ class TestEmbeddingSettings:
         assert len(emb.models) == 5
         assert "BAAI/bge-m3" in emb.models
 
-    def test_metrics_file_default(self):
-        emb = EmbeddingSettings()
-        assert "performance_metrics" in emb.metrics_file
-
     def test_settings_embedding_is_embedding_settings(self):
         assert isinstance(settings.embedding, EmbeddingSettings)

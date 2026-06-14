@@ -60,7 +60,6 @@ class TestBuildEntries:
             "filename": "file.txt",
             "tradition": "Buddhism",
             "major_tradition": "Eastern",
-            "doc_type": "translate",
             "color": "#FF0000",
             "language": "en",
             "url": "http://example.com",

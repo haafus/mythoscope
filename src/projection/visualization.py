@@ -164,7 +164,7 @@ def _create_interactive_figure_2d(
                     text_preview += "..."
                 text_preview = "<br>".join(textwrap.wrap(text_preview, width=60))
                 customdata.append(
-                    [row["id"], row["tradition"], row["chunk_index"], text_preview, row.get("doc_type", "unknown")]
+                    [row["id"], row["tradition"], row["chunk_index"], text_preview]
                 )
 
             fig.add_trace(
@@ -176,7 +176,6 @@ def _create_interactive_figure_2d(
                     marker=dict(size=8, opacity=0.7, color=color, line=dict(width=1, color="white")),
                     customdata=customdata,
                     hovertemplate="<b>%{customdata[1]}</b><br>"
-                    "Type: %{customdata[4]}<br>"
                     "ID: %{customdata[0]}<br>"
                     "Chunk: %{customdata[2]}<br>"
                     "Text: %{customdata[3]}<extra></extra>",
@@ -263,7 +262,6 @@ def plot_interactive_2d(
             "id": [item.get("id", "unknown") for item in sample],
             "chunk_index": [item.get("chunk_index", 0) for item in sample],
             "text": [item.get("text", "") for item in sample],
-            "doc_type": [item.get("doc_type", "unknown") for item in sample],
         }
     )
 

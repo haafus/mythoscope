@@ -1,3 +1,5 @@
+import time
+
 import click
 
 from settings import settings
@@ -5,7 +7,6 @@ from settings import settings
 from .build_embeddings import build_embeddings
 from .builder import EmbeddingBuilder
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
-from .performance_metrics import PerformanceMetrics
 
 
 def _create_builder(*, model: str | None = None, chunking: str | None = None) -> EmbeddingBuilder:
@@ -26,22 +27,18 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
 @click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
 @click.pass_context
 def generate(ctx, model: str | None, chunking: str | None, batch_size: int | None):
-    metrics = PerformanceMetrics(settings.embedding.metrics_file)
-    metrics.start_operation("generate_embeddings")
-
+    t0 = time.monotonic()
     try:
         build_embeddings(
             model_name=model,
             chunking=chunking,
             batch_size=batch_size,
         )
-        click.echo(click.style("Embeddings generated successfully", fg="green"))
+        elapsed = time.monotonic() - t0
+        click.echo(click.style(f"Embeddings generated successfully in {elapsed:.1f}s", fg="green"))
     except Exception as e:
         click.echo(click.style(f"Error: {e}", fg="red"), err=True)
         raise
-    finally:
-        metrics.end_operation("generate_embeddings")
-        metrics.save()
 
 
 @click.command()
@@ -79,24 +76,17 @@ def test(ctx, text_file: str, model: str | None, strategy: str | None):
 
     builder = _create_builder(model=model, chunking=strategy)
 
-    metrics = PerformanceMetrics()
-    metrics.start_operation("test_embedding")
-
+    t0 = time.monotonic()
     try:
         result = builder.build_embeddings(text)
-        metrics.end_operation("test_embedding")
+        elapsed = time.monotonic() - t0
 
         click.echo(click.style("\nTest completed successfully", fg="green"))
         click.echo(f"  Model: {result['model']}")
         click.echo(f"  Chunking: {result['chunking']}")
         click.echo(f"  Number of chunks: {result['num_chunks']}")
         click.echo(f"  Batch size used: {result['batch_size_used']}")
-
-        if metrics.metrics:
-            click.echo("\n  Performance:")
-            click.echo(f"    Duration: {metrics.metrics.get('duration', 0):.2f}s")
-            if "memory_usage_mb" in metrics.metrics:
-                click.echo(f"    Memory usage: {metrics.metrics['memory_usage_mb']:.1f} MB")
+        click.echo(f"  Duration: {elapsed:.2f}s")
     except Exception as e:
         click.echo(click.style(f"Error: {e}", fg="red"), err=True)
 

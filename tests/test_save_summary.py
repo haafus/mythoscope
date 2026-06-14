@@ -3,13 +3,8 @@ import os
 import sys
 import types
 
-import pytest
-
-pd = pytest.importorskip("pandas")
-
 _src = os.path.join(os.path.dirname(__file__), "..", "src")
 
-# Stub chromadb so projection.loader can be imported without the real package.
 _chromadb = types.ModuleType("chromadb")
 _chromadb.Client = type("Client", (), {})  # type: ignore[attr-defined]
 
@@ -57,30 +52,13 @@ def _sample_stats():
     }
 
 
-def _sample_data():
-    return [
-        {"id": "a", "tradition": "greek", "text": "hello", "embedding": [0.1, 0.2]},
-        {"id": "b", "tradition": "norse", "text": "world", "embedding": [0.3, 0.4]},
-        {"id": "c", "tradition": "greek", "text": "foo", "embedding": [0.5, 0.6]},
-    ]
-
-
 class TestSaveSummaryToFiles:
-    def test_creates_csv_and_txt(self, tmp_path):
-        _save_summary_to_files(_sample_data(), _sample_stats(), tmp_path)
-        assert (tmp_path / "embeddings_data.csv").exists()
+    def test_creates_txt(self, tmp_path):
+        _save_summary_to_files(_sample_stats(), tmp_path)
         assert (tmp_path / "analysis_summary.txt").exists()
 
-    def test_csv_excludes_embedding_column(self, tmp_path):
-        _save_summary_to_files(_sample_data(), _sample_stats(), tmp_path)
-        df = pd.read_csv(tmp_path / "embeddings_data.csv")
-        assert "embedding" not in df.columns
-        assert "id" in df.columns
-        assert "tradition" in df.columns
-        assert len(df) == 3
-
     def test_txt_contains_model_and_stats(self, tmp_path):
-        _save_summary_to_files(_sample_data(), _sample_stats(), tmp_path)
+        _save_summary_to_files(_sample_stats(), tmp_path)
         txt = (tmp_path / "analysis_summary.txt").read_text()
         assert "test-model" in txt
         assert "128" in txt
@@ -88,7 +66,7 @@ class TestSaveSummaryToFiles:
         assert "norse" in txt
 
     def test_txt_tradition_percentages(self, tmp_path):
-        _save_summary_to_files(_sample_data(), _sample_stats(), tmp_path)
+        _save_summary_to_files(_sample_stats(), tmp_path)
         txt = (tmp_path / "analysis_summary.txt").read_text()
         assert "66.7%" in txt
         assert "33.3%" in txt
@@ -96,11 +74,11 @@ class TestSaveSummaryToFiles:
     def test_txt_omits_model_when_missing(self, tmp_path):
         stats = _sample_stats()
         stats["model"] = None
-        _save_summary_to_files(_sample_data(), stats, tmp_path)
+        _save_summary_to_files(stats, tmp_path)
         txt = (tmp_path / "analysis_summary.txt").read_text()
         assert "Model:" not in txt
 
     def test_creates_output_dir_if_needed(self, tmp_path):
         nested = tmp_path / "a" / "b" / "c"
-        _save_summary_to_files(_sample_data(), _sample_stats(), nested)
-        assert (nested / "embeddings_data.csv").exists()
+        _save_summary_to_files(_sample_stats(), nested)
+        assert (nested / "analysis_summary.txt").exists()

@@ -1,4 +1,3 @@
-import csv
 import logging
 import threading
 from collections import OrderedDict
@@ -7,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from server.services.models import get_model_output_dir, key_to_model
+from server.services.models import key_to_model
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,6 @@ class ModelIndex:
 class EmbeddingIndexService:
     def __init__(self):
         self._indexes: OrderedDict[str, ModelIndex] = OrderedDict()
-        self._point_records: OrderedDict[str, dict[str, dict]] = OrderedDict()
         self._search_models: OrderedDict[str, Any] = OrderedDict()
         self._index_lock = threading.RLock()
         self._model_lock = threading.RLock()
@@ -45,25 +43,18 @@ class EmbeddingIndexService:
 
             while len(self._indexes) > MAX_CACHED_INDEXES:
                 evicted_name, _ = self._indexes.popitem(last=False)
-                self._point_records.pop(evicted_name, None)
                 logger.info(f"Evicted index cache for model: {evicted_name}")
 
             return index
 
     def get_point(self, model_key: str, point_id: str, chunk_index: int | None = None) -> dict:
-        model_name = key_to_model(model_key)
-        item = self._get_point_record(model_name, point_id, chunk_index)
-        if item is None:
-            index = self.get_index(model_name)
-            item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
-            if item_index is None:
-                item_index = index.id_to_index.get(str(point_id))
-            if item_index is None:
-                raise KeyError(point_id)
-            item = index.items[item_index]
-
-        if not item:
+        index = self.get_index(model_key)
+        item_index = index.id_to_index.get(self._point_key(point_id, chunk_index))
+        if item_index is None:
+            item_index = index.id_to_index.get(str(point_id))
+        if item_index is None:
             raise KeyError(point_id)
+        item = index.items[item_index]
 
         return {
             "id": str(item.get("id")),
@@ -71,11 +62,10 @@ class EmbeddingIndexService:
             "tradition": item.get("tradition", "Unknown"),
             "chunk_index": item.get("chunk_index", 0),
             "book_title": item.get("filename", "") or item.get("id", ""),
-            "model": item.get("model", model_name),
+            "model": item.get("model", index.model_name),
             "metadata": {
                 "filename": item.get("filename", ""),
                 "major_tradition": item.get("major_tradition", ""),
-                "doc_type": item.get("doc_type", ""),
                 "language": item.get("language", ""),
                 "url": item.get("url", ""),
             },
@@ -123,45 +113,6 @@ class EmbeddingIndexService:
             normalized_matrix=normalized_matrix,
             id_to_index=id_to_index,
         )
-
-    def _get_point_record(self, model_name: str, point_id: str, chunk_index: int | None = None) -> dict | None:
-        if model_name not in self._point_records:
-            self._point_records[model_name] = self._load_point_records(model_name)
-
-        records = self._point_records[model_name]
-        item = records.get(self._point_key(point_id, chunk_index))
-        if item is not None:
-            return item
-        return records.get(str(point_id))
-
-    @staticmethod
-    def _load_point_records(model_name: str) -> dict[str, dict]:
-        csv_path = get_model_output_dir(model_name) / "embeddings_data.csv"
-        if not csv_path.exists():
-            return {}
-
-        records: dict[str, dict] = {}
-        with csv_path.open("r", encoding="utf-8", newline="") as handle:
-            for row in csv.DictReader(handle):
-                point_id = str(row.get("id", ""))
-                if point_id:
-                    record = {
-                        "id": point_id,
-                        "text": row.get("text", ""),
-                        "tradition": row.get("tradition", "Unknown"),
-                        "major_tradition": row.get("major_tradition", ""),
-                        "chunk_index": int(row.get("chunk_index") or 0),
-                        "model": row.get("model", model_name),
-                        "filename": row.get("filename", ""),
-                        "doc_type": row.get("doc_type", ""),
-                        "language": row.get("language", ""),
-                        "url": row.get("url", ""),
-                    }
-                    records.setdefault(point_id, record)
-                    chunk_idx = record["chunk_index"]
-                    records[EmbeddingIndexService._point_key(point_id, int(chunk_idx) if chunk_idx is not None else None)] = record
-
-        return records
 
     @staticmethod
     def _point_key(point_id: str, chunk_index: int | None = None) -> str:

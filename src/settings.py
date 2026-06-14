@@ -34,7 +34,6 @@ class EmbeddingSettings(BaseModel):
         "intfloat/e5-large-v2",
         "Qwen/Qwen3-Embedding-4B",
     ]
-    metrics_file: str = "outputs/analysis/performance_metrics.json"
 
 
 class GraphsSettings(BaseModel):

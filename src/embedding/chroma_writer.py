@@ -47,7 +47,6 @@ class ChromaWriter:
                 "model": _safe_meta(model_name),
                 "chunking": _safe_meta(chunking_name),
                 "text_id": _safe_meta(text_id),
-                "doc_type": _safe_meta(info.get("doc_type", "unknown")),
                 "color": _safe_meta(info.get("color", "#CCCCCC")),
                 "language": _safe_meta(info.get("language", "unknown")),
                 "url": _safe_meta(info.get("url", "")),
