@@ -172,12 +172,9 @@ class EmbeddingIndexService:
     def _embed_query(self, model_name: str, query: str) -> np.ndarray:
         from sentence_transformers import SentenceTransformer
 
-        from embedding.models_repository import MODELS
-
         with self._model_lock:
             if model_name not in self._search_models:
-                model_path = MODELS.get(model_name, {}).get("path", model_name)
-                self._search_models[model_name] = SentenceTransformer(model_path)
+                self._search_models[model_name] = SentenceTransformer(model_name)
 
                 while len(self._search_models) > MAX_CACHED_SEARCH_MODELS:
                     evicted_name, _ = self._search_models.popitem(last=False)

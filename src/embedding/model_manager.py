@@ -68,9 +68,8 @@ class ModelManager:
                     self.unload_model(self.model_name)
 
                 device = _select_device()
-                path = self.registry[model_name]["path"]
                 try:
-                    model = SentenceTransformer(path, device=device)
+                    model = SentenceTransformer(model_name, device=device)
                     self.registry[model_name]["model"] = model
                     self.registry[model_name]["loaded"] = True
                     logger.info(f"Model '{model_name}' loaded successfully on {device}.")
@@ -85,10 +84,10 @@ class ModelManager:
                             logger.info(f"Model '{model_name}' loaded from local cache.")
                         except Exception as fallback_error:
                             raise RuntimeError(
-                                f"Failed to load model from {path} ({e}) and local cache ({fallback_error})"
+                                f"Failed to load model '{model_name}' ({e}) and local cache ({fallback_error})"
                             ) from e
                     else:
-                        raise RuntimeError(f"Failed to load model '{model_name}' from {path}: {e}") from e
+                        raise RuntimeError(f"Failed to load model '{model_name}': {e}") from e
                 break
             except Exception as e:
                 if attempt == retries - 1:
