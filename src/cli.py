@@ -13,9 +13,9 @@ class _LazyEmbeddingGroup(click.Group):
 
     def _load(self):
         if not self._loaded:
-            from embedding.cli import compare, delete_chroma_collection, generate, query, test
+            from embedding.cli import delete_chroma_collection, generate, query
 
-            for cmd in [generate, query, test, compare, delete_chroma_collection]:
+            for cmd in [generate, query, delete_chroma_collection]:
                 self.add_command(cmd)
             self._loaded = True
 

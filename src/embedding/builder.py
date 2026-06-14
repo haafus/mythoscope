@@ -1,9 +1,8 @@
 import logging
 import shutil
 import time
-from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import chromadb
 import numpy as np
@@ -99,16 +98,6 @@ class EmbeddingBuilder:
         self._models.set_model(model_name)
         self._update_output_dir()
 
-    @contextmanager
-    def use_model(self, model_name: str) -> Iterator["EmbeddingBuilder"]:
-        original = self._models.model_name
-        try:
-            self.set_model(model_name)
-            yield self
-        finally:
-            if original:
-                self.set_model(original)
-
     # --- Chunking ----------------------------------------------------------
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
@@ -166,22 +155,6 @@ class EmbeddingBuilder:
         finally:
             if batch_size is not None:
                 self._models.batch_size = original_batch_size
-
-    def compare_models_and_strategies(
-        self, text: str, models: list[str] | None = None, strategies: list[str] | None = None
-    ) -> dict[str, Any]:
-        if models is None:
-            models = self.list_models()
-        if strategies is None:
-            strategies = list(self.chunking_strategies.keys())
-        results = {}
-        for model_name in models:
-            with self.use_model(model_name):
-                for strategy_name in strategies:
-                    self.set_chunking_strategy(strategy_name)
-                    result = self.build_embeddings(text)
-                    results[f"{model_name}____{strategy_name}"] = result
-        return results
 
     # --- Chroma I/O --------------------------------------------------------
 

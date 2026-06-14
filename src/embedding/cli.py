@@ -65,61 +65,6 @@ def query(ctx, query: str, top_k: int, model: str | None):
         click.echo(click.style(f"Error: {e}", fg="red"), err=True)
 
 
-@click.command()
-@click.option("--model", "-m", default=None, help="Model name")
-@click.option("--strategy", "-s", default=None, help="Chunking strategy")
-@click.argument("text_file", type=click.Path(exists=True))
-@click.pass_context
-def test(ctx, text_file: str, model: str | None, strategy: str | None):
-    with open(text_file, encoding="utf-8") as f:
-        text = f.read()
-
-    builder = _create_builder(model=model, chunking=strategy)
-
-    t0 = time.monotonic()
-    try:
-        result = builder.build_embeddings(text)
-        elapsed = time.monotonic() - t0
-
-        click.echo(click.style("\nTest completed successfully", fg="green"))
-        click.echo(f"  Model: {result['model']}")
-        click.echo(f"  Chunking: {result['chunking']}")
-        click.echo(f"  Number of chunks: {result['num_chunks']}")
-        click.echo(f"  Batch size used: {result['batch_size_used']}")
-        click.echo(f"  Duration: {elapsed:.2f}s")
-    except Exception as e:
-        click.echo(click.style(f"Error: {e}", fg="red"), err=True)
-
-
-@click.command()
-@click.option("--model", "-m", multiple=True, help="Models to compare")
-@click.option("--strategy", "-s", multiple=True, help="Strategies to compare")
-@click.argument("text_file", type=click.Path(exists=True))
-@click.pass_context
-def compare(ctx, text_file: str, model: tuple, strategy: tuple):
-    with open(text_file, encoding="utf-8") as f:
-        text = f.read()
-
-    models = list(model) if model else None
-    strategies = list(strategy) if strategy else None
-
-    builder = _create_builder()
-
-    click.echo("Running comparison... This may take a while.\n")
-
-    results = builder.compare_models_and_strategies(text, list(models) if models else None, list(strategies) if strategies else None)
-
-    click.echo(f"{'=' * 80}")
-    click.echo(click.style("Comparison Results", fg="cyan", bold=True))
-    click.echo(f"{'=' * 80}\n")
-
-    for key, result in results.items():
-        model_name, strategy_name = key.split("____")
-        click.echo(click.style(f"Model: {model_name}", fg="yellow"))
-        click.echo(f"  Strategy: {strategy_name}")
-        click.echo(f"  Chunks: {result['num_chunks']}")
-        click.echo()
-
 
 @click.command("delete-collection")
 @click.option("--model", "-m", default=None, help="Model whose collection should be deleted")
