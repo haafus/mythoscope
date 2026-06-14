@@ -145,11 +145,6 @@ class EmbeddingBuilder:
     def get_current_model(self) -> str | None:
         return self._models.model_name
 
-    @staticmethod
-    def get_optimal_batch_size(model_dim: int) -> int:
-        from .model_manager import get_optimal_batch_size
-        return get_optimal_batch_size(model_dim)
-
     # --- Chunking ----------------------------------------------------------
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
