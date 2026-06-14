@@ -2,7 +2,6 @@ import gc
 import logging
 import time
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Any, Iterator
 
 import torch
@@ -62,30 +61,15 @@ class ModelManager:
         if self.model is not None:
             self.unload_model()
 
+        device = _select_device()
         for attempt in range(retries):
             try:
-                device = _select_device()
-                try:
-                    model = SentenceTransformer(model_name, device=device)
-                    logger.info(f"Model '{model_name}' loaded successfully on {device}.")
-                    return model
-                except Exception as e:
-                    local_path = Path.home() / ".cache" / "huggingface" / "models" / model_name.replace("/", "_")
-                    if local_path.exists():
-                        logger.info(f"Trying to load model from local cache: {local_path}")
-                        try:
-                            model = SentenceTransformer(str(local_path), device=device)
-                            logger.info(f"Model '{model_name}' loaded from local cache.")
-                            return model
-                        except Exception as fallback_error:
-                            raise RuntimeError(
-                                f"Failed to load model '{model_name}' ({e}) and local cache ({fallback_error})"
-                            ) from e
-                    else:
-                        raise RuntimeError(f"Failed to load model '{model_name}': {e}") from e
+                model = SentenceTransformer(model_name, device=device)
+                logger.info(f"Model '{model_name}' loaded on {device}.")
+                return model
             except Exception as e:
                 if attempt == retries - 1:
-                    raise
+                    raise RuntimeError(f"Failed to load model '{model_name}': {e}") from e
                 logger.warning(f"Attempt {attempt + 1} failed: {e}")
                 time.sleep(2**attempt)
         raise RuntimeError(f"Failed to load model '{model_name}' after {retries} attempts")
