@@ -21,7 +21,6 @@ class TestCorpusCommand:
     def test_help(self):
         result = runner.invoke(mytho, ["corpus", "--help"])
         assert result.exit_code == 0
-        assert "--type" in result.output
         assert "--force" in result.output
 
 

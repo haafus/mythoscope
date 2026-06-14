@@ -43,7 +43,7 @@ class TestIterCorpusFiles:
             "tradition2/sub/file2.txt": "content2",
         })
 
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         filenames = {r["filename"] for r in results}
         assert "file1.txt" in filenames
         assert "file2.txt" in filenames
@@ -55,55 +55,28 @@ class TestIterCorpusFiles:
             "file.md": "# heading",
         })
 
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         assert len(results) == 1
         assert results[0]["filename"] == "file.txt"
 
-    def test_filter_original(self, tmp_path):
-        corpus = self._create_corpus(tmp_path, {
-            "orig.txt": "original text",
-            "trans.txt": "translated text",
-        }, metadata_items=[
-            {"id": "orig", "type": "original", "tradition": "t1", "major_tradition": "mt1"},
-            {"id": "trans", "type": "translate", "tradition": "t1", "major_tradition": "mt1"},
-        ])
-
-        results = list(iter_corpus_files(corpus, "original"))
-        assert len(results) == 1
-        assert results[0]["text_id"] == "orig"
-
-    def test_filter_translate(self, tmp_path):
-        corpus = self._create_corpus(tmp_path, {
-            "orig.txt": "original",
-            "trans.txt": "translated",
-        }, metadata_items=[
-            {"id": "orig", "type": "original", "tradition": "t1", "major_tradition": "mt1"},
-            {"id": "trans", "type": "translate", "tradition": "t1", "major_tradition": "mt1"},
-        ])
-
-        results = list(iter_corpus_files(corpus, "translate"))
-        assert len(results) == 1
-        assert results[0]["text_id"] == "trans"
-
-    def test_all_returns_everything(self, tmp_path):
+    def test_returns_all_files(self, tmp_path):
         corpus = self._create_corpus(tmp_path, {
             "a.txt": "aaa",
             "b.txt": "bbb",
         }, metadata_items=[
-            {"id": "a", "type": "original", "tradition": "t1", "major_tradition": "mt1"},
-            {"id": "b", "type": "translate", "tradition": "t1", "major_tradition": "mt1"},
+            {"id": "a", "tradition": "t1", "major_tradition": "mt1"},
+            {"id": "b", "tradition": "t1", "major_tradition": "mt1"},
         ])
 
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         assert len(results) == 2
 
-    def test_catalog_metadata_populates_fields(self, tmp_path):
+    def test_metadata_populates_fields(self, tmp_path):
         corpus = self._create_corpus(tmp_path, {
             "mytext.txt": "content",
         }, metadata_items=[
             {
                 "id": "mytext",
-                "type": "translate",
                 "tradition": "Buddhism",
                 "major_tradition": "Eastern",
                 "language": "en",
@@ -112,7 +85,7 @@ class TestIterCorpusFiles:
             },
         ])
 
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         assert len(results) == 1
         r = results[0]
         assert r["tradition"] == "Buddhism"
@@ -121,12 +94,12 @@ class TestIterCorpusFiles:
         assert r["color"] == "#FF0000"
         assert r["url"] == "http://example.com"
 
-    def test_no_catalog_uses_directory_structure(self, tmp_path):
+    def test_no_metadata_uses_directory_structure(self, tmp_path):
         corpus = self._create_corpus(tmp_path, {
             "Eastern/Buddhism/text.txt": "content",
         })
 
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         assert len(results) == 1
         r = results[0]
         assert r["major_tradition"] == "Eastern"
@@ -134,11 +107,11 @@ class TestIterCorpusFiles:
 
     def test_empty_corpus(self, tmp_path):
         corpus = self._create_corpus(tmp_path, {})
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         assert results == []
 
     def test_does_not_read_file_content(self, tmp_path):
         corpus = self._create_corpus(tmp_path, {"big.txt": "x" * 10000})
-        results = list(iter_corpus_files(corpus, "all"))
+        results = list(iter_corpus_files(corpus))
         assert "content" not in results[0]
         assert "text" not in results[0]

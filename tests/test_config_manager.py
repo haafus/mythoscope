@@ -6,13 +6,11 @@ class TestEmbeddingSettings:
         emb = settings.embedding
         assert emb.models
         assert emb.default_chunking
-        assert emb.text_type == "all"
         assert emb.batch_size == 32
 
     def test_override_via_constructor(self):
-        emb = EmbeddingSettings(batch_size=64, text_type="original")
+        emb = EmbeddingSettings(batch_size=64)
         assert emb.batch_size == 64
-        assert emb.text_type == "original"
 
     def test_models_defaults(self):
         emb = EmbeddingSettings()

@@ -47,15 +47,13 @@ def _get_user_agent():
     return _user_agent
 
 
-def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]:
+def load_download_list(force: bool = False) -> list[dict]:
     if not Path(settings.download_list_file).exists():
         logger.error(f"Download list file not found: {settings.download_list_file}")
         return []
 
     with open(settings.download_list_file, encoding="utf-8") as f:
         items = json.load(f)
-
-    items = [item for item in items if item["type"] in filter_type]
 
     processed_urls = set()
     if settings.processed_urls_path.exists():

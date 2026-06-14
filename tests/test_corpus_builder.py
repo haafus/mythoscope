@@ -118,7 +118,7 @@ class TestUpdateTraditionsInfo:
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
-        _update_traditions_info({"translation", "original"}, force=False)
+        _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert "Greek" in data
@@ -146,7 +146,7 @@ class TestUpdateTraditionsInfo:
         }
         (corpus_dir / "traditions_info.json").write_text(json.dumps(existing))
 
-        _update_traditions_info({"translation"}, force=False)
+        _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert data["Greek"]["description"] == "Ancient Greek mythology"
@@ -159,23 +159,23 @@ class TestUpdateTraditionsInfo:
         existing = {"Greek": {"description": "old data", "color": "#000", "books": []}}
         (corpus_dir / "traditions_info.json").write_text(json.dumps(existing))
 
-        _update_traditions_info(set(), force=True)
+        _update_traditions_info(force=True)
 
         backup = json.loads((corpus_dir / "traditions_info_backup.json").read_text())
         assert backup["Greek"]["description"] == "old data"
 
-    def test_filters_by_type(self, tmp_path, monkeypatch):
+    def test_includes_all_types(self, tmp_path, monkeypatch):
         items = [
             {"title": "Iliad", "type": "translation", "tradition": "Greek"},
             {"title": "Edda", "type": "original", "tradition": "Norse"},
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
-        _update_traditions_info({"translation"}, force=False)
+        _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert "Greek" in data
-        assert "Norse" not in data
+        assert "Norse" in data
 
     def test_no_download_list(self, tmp_path, monkeypatch):
         from settings import settings
@@ -185,7 +185,7 @@ class TestUpdateTraditionsInfo:
         monkeypatch.setattr(settings, "download_list_file", tmp_path / "nonexistent.json")
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
 
-        _update_traditions_info({"translation"}, force=False)
+        _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert data == {}
@@ -197,7 +197,7 @@ class TestUpdateTraditionsInfo:
         existing = {"Norse": {"description": "Norse myths", "books": ["Edda"]}}
         (corpus_dir / "traditions_info.json").write_text(json.dumps(existing))
 
-        _update_traditions_info({"original"}, force=False)
+        _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert data["Norse"]["color"].startswith("#")
@@ -209,7 +209,7 @@ class TestUpdateTraditionsInfo:
         ]
         corpus_dir = self._setup(tmp_path, monkeypatch, items)
 
-        _update_traditions_info({"translation"}, force=False)
+        _update_traditions_info(force=False)
 
         data = json.loads((corpus_dir / "traditions_info.json").read_text())
         assert data["Egyptian"]["books"] == ["book_42"]

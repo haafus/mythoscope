@@ -39,20 +39,12 @@ def mytho():
 # corpus
 # ---------------------------------------------------------------------------
 @mytho.command()
-@click.option(
-    "--type",
-    "text_type",
-    type=click.Choice(["translation", "original", "all"]),
-    default="all",
-    help="Filter by text type.",
-)
 @click.option("--force", is_flag=True, help="Overwrite existing files.")
-def corpus(text_type: str, force: bool):
+def corpus(force: bool):
     """Download and build the text corpus (Gutenberg cleanup is automatic)."""
     from corpus.builder import build_corpus
 
-    filter_type = {"translation", "original"} if text_type == "all" else {text_type}
-    build_corpus(filter_type=filter_type, force=force)
+    build_corpus(force=force)
     click.echo(click.style("Corpus build completed.", fg="green"))
 
 
@@ -170,22 +162,16 @@ def server(host: str | None, port: int | None):
 # ---------------------------------------------------------------------------
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
-@click.option(
-    "--text-type", "-t",
-    type=click.Choice(["translation", "original", "all"]),
-    default="all",
-    help="Corpus text type filter.",
-)
 @click.option("--skip-corpus", is_flag=True, help="Skip corpus download.")
 @click.option("--skip-embeddings", is_flag=True, help="Skip embedding generation.")
 @click.option("--skip-projection", is_flag=True, help="Skip projection generation.")
 @click.option("--skip-clustering", is_flag=True, help="Skip clustering analysis.")
 @click.option("--skip-graphs", is_flag=True, help="Skip graph extraction.")
-def pipeline(model, text_type, skip_corpus, skip_embeddings, skip_projection, skip_clustering, skip_graphs):
+def pipeline(model, skip_corpus, skip_embeddings, skip_projection, skip_clustering, skip_graphs):
     """Run the full analysis pipeline end-to-end."""
     steps = [
-        ("Corpus", skip_corpus, _pipeline_corpus, {"text_type": text_type}),
-        ("Embeddings", skip_embeddings, _pipeline_embeddings, {"model": model, "text_type": text_type}),
+        ("Corpus", skip_corpus, _pipeline_corpus, {}),
+        ("Embeddings", skip_embeddings, _pipeline_embeddings, {"model": model}),
         ("Projection", skip_projection, _pipeline_projection, {"model": model}),
         ("Clustering", skip_clustering, _pipeline_clustering, {"model": model}),
         ("Graphs", skip_graphs, _pipeline_graphs, {}),
@@ -206,17 +192,16 @@ def pipeline(model, text_type, skip_corpus, skip_embeddings, skip_projection, sk
     click.echo(click.style("\nPipeline finished.", fg="green", bold=True))
 
 
-def _pipeline_corpus(text_type: str):
+def _pipeline_corpus():
     from corpus.builder import build_corpus
 
-    filter_type = {"translation", "original"} if text_type == "all" else {text_type}
-    build_corpus(filter_type=filter_type)
+    build_corpus()
 
 
-def _pipeline_embeddings(model: str | None, text_type: str):
-    from embedding.build_embeddings import build_embeddings, normalize_text_type
+def _pipeline_embeddings(model: str | None):
+    from embedding.build_embeddings import build_embeddings
 
-    build_embeddings(model_name=model, text_type=normalize_text_type(text_type))
+    build_embeddings(model_name=model)
 
 
 def _pipeline_projection(model: str | None):

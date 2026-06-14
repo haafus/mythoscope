@@ -2,7 +2,7 @@ import click
 
 from settings import settings
 
-from .build_embeddings import build_embeddings, normalize_text_type
+from .build_embeddings import build_embeddings
 from .builder import EmbeddingBuilder
 from .cache_validator import CacheValidator
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
@@ -18,7 +18,6 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
         cache_dir=settings.cache_dir,
         embedding_model=model or emb.models[0],
         chunking=chunking or emb.default_chunking,
-        text_type=emb.text_type,
         batch_size=emb.batch_size,
     )
 
@@ -26,12 +25,9 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
 @click.command()
 @click.option("--model", "-m", default=None, help="Embedding model to use")
 @click.option("--chunking", "-ch", default=None, help="Chunking strategy")
-@click.option(
-    "--text-type", "-t", default=None, type=click.Choice(["original", "translate", "translation", "all", "both"])
-)
 @click.option("--batch-size", "-b", default=None, type=int, help="Batch size for encoding")
 @click.pass_context
-def generate(ctx, model: str | None, chunking: str | None, text_type: str | None, batch_size: int | None):
+def generate(ctx, model: str | None, chunking: str | None, batch_size: int | None):
     metrics = PerformanceMetrics(settings.embedding.metrics_file)
     metrics.start_operation("generate_embeddings")
 
@@ -40,7 +36,6 @@ def generate(ctx, model: str | None, chunking: str | None, text_type: str | None
             model_name=model,
             chunking=chunking,
             batch_size=batch_size,
-            text_type=normalize_text_type(text_type) if text_type else None,
         )
         click.echo(click.style("Embeddings generated successfully", fg="green"))
     except Exception as e:

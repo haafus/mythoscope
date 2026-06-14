@@ -167,13 +167,13 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
             metadata.append(_build_failure_metadata(item, color=color, error=str(e)))
 
 
-def _update_traditions_info(filter_type: set[str], force: bool) -> None:
+def _update_traditions_info(force: bool) -> None:
     tradition_books: dict[str, set] = {}
     if Path(settings.download_list_file).exists():
         with open(settings.download_list_file, encoding="utf-8") as f:
             full_items = json.load(f)
             for item in full_items:
-                if item.get("type") in filter_type and "tradition" in item:
+                if "tradition" in item:
                     trad = item["tradition"]
                     if trad not in tradition_books:
                         tradition_books[trad] = set()
@@ -223,13 +223,13 @@ def _update_traditions_info(filter_type: set[str], force: bool) -> None:
         logger.info("traditions_info.json updated (colors added or book lists refreshed).")
 
 
-def build_corpus(filter_type: set[str], force: bool = False):
+def build_corpus(force: bool = False):
     ensure_dir(settings.corpus_dir)
     metadata: list[dict] = []
 
-    download_list = load_download_list(filter_type, force)
+    download_list = load_download_list(force)
 
-    _update_traditions_info(filter_type, force)
+    _update_traditions_info(force)
 
     processed_urls: set[str] = set()
     if settings.processed_urls_path.exists():

@@ -23,16 +23,6 @@ from .performance_metrics import PerformanceMetrics
 logger = logging.getLogger(__name__)
 
 
-def normalize_text_type(text_type: str | None) -> str | None:
-    if text_type is None:
-        return None
-    aliases = {
-        "both": "all",
-        "translation": "translate",
-    }
-    return aliases.get(text_type, text_type)
-
-
 def _get_model_output_dir(base_out_dir: Path, model_name: str) -> Path:
     if not model_name:
         return base_out_dir
@@ -53,7 +43,6 @@ class EmbeddingBuilder:
         chunked_dir: str | Path = "outputs/corpus_chunked",
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
-        text_type: str = "translate",
         batch_size: int | None = None,
         cache_batch_size: int = 50,
         chroma_batch_size: int = 100,
@@ -66,11 +55,6 @@ class EmbeddingBuilder:
         self.chroma_path = ensure_chroma_writable(chroma_path)
         self.chunked_dir = Path(chunked_dir)
         self.chunked_dir.mkdir(parents=True, exist_ok=True)
-
-        text_type = normalize_text_type(text_type) or text_type
-        if text_type not in {"original", "translate", "all"}:
-            raise ValueError("text_type must be one of: 'original', 'translate', 'all'")
-        self.text_type = text_type
 
         if metrics is None:
             self.metrics = PerformanceMetrics(
@@ -217,7 +201,7 @@ class EmbeddingBuilder:
     def save_all_corpus_to_chroma(self) -> None:
         collection_name = collection_name_for_model(self.model_name)
         with self.metrics.track("save_all_corpus_to_chroma"):
-            files_info = list(iter_corpus_files(self.corpus_dir, self.text_type))
+            files_info = list(iter_corpus_files(self.corpus_dir))
             total_files = len(files_info)
 
         if total_files == 0:

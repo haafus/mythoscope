@@ -11,8 +11,8 @@ def _normalize_catalog_id(value: Any) -> str:
     return re.sub(r"\s+", "_", str(value or "").strip())
 
 
-def iter_corpus_files(corpus_dir: Path, text_type: str) -> Generator[dict[str, Any], None, None]:
-    """Yield metadata dicts for every .txt file in *corpus_dir* that matches *text_type*.
+def iter_corpus_files(corpus_dir: Path) -> Generator[dict[str, Any], None, None]:
+    """Yield metadata dicts for every .txt file in *corpus_dir*.
 
     The returned dict intentionally does NOT include file content — callers
     read one file at a time so the whole corpus is never held in memory.
@@ -49,12 +49,6 @@ def iter_corpus_files(corpus_dir: Path, text_type: str) -> Generator[dict[str, A
         tid = txt_file.stem
 
         info = text_info.get(tid, {})
-        doc_type = info.get("type", "unknown")
-
-        if text_type == "original" and doc_type != "original":
-            continue
-        if text_type in ["translate", "translation"] and doc_type not in ["translate", "translation"]:
-            continue
 
         try:
             rel_parts = txt_file.relative_to(corpus_dir).parts
@@ -71,7 +65,6 @@ def iter_corpus_files(corpus_dir: Path, text_type: str) -> Generator[dict[str, A
             "catalog_id": info.get("catalog_id", tid),
             "major_tradition": major_tradition,
             "tradition": tradition,
-            "doc_type": doc_type,
             "color": info.get("color", "#CCCCCC"),
             "language": info.get("language", "unknown"),
             "url": info.get("url", ""),

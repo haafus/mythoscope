@@ -8,7 +8,7 @@ import torch
 
 from settings import settings
 
-from .builder import EmbeddingBuilder, normalize_text_type
+from .builder import EmbeddingBuilder
 from .cache_utils import cleanup_cache
 from .chroma_manager import collection_name_for_model
 
@@ -21,7 +21,6 @@ def build_embeddings(
     model_name: str | None = None,
     models: list | None = None,
     chunking: str | None = None,
-    text_type: str | None = None,
 ):
     if clear_existing is False:
         raise ValueError("Incremental Chroma writes are not supported for full embedding generation.")
@@ -29,7 +28,6 @@ def build_embeddings(
     emb = settings.embedding
 
     MODEL_NAME = model_name or emb.models[0]
-    TEXT_TYPE: str = normalize_text_type(text_type or emb.text_type) or "all"
     CHUNKING = chunking or emb.default_chunking
     BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
     CLEAR_EXISTING = clear_existing if clear_existing is not None else True
@@ -48,7 +46,6 @@ def build_embeddings(
     builder = EmbeddingBuilder(
         corpus_dir=settings.corpus_dir,
         out_dir=settings.analysis_dir,
-        text_type=TEXT_TYPE,
         embedding_model=MODEL_NAME,
         chunking=CHUNKING,
         chroma_path=settings.chroma_dir,
@@ -63,7 +60,6 @@ def build_embeddings(
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
-    logger.info(f"   Text type: {builder.text_type}")
     logger.info(f"   Chroma DB: {settings.chroma_dir}")
     logger.info(f"   Results directory: {builder.out_dir}")
     logger.info(f"   Clear collection: {CLEAR_EXISTING}")
