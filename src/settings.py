@@ -138,10 +138,6 @@ class Settings(BaseSettings):
         return self.corpus_dir / "corpus_metadata.json"
 
     @property
-    def corpus_catalog_path(self) -> Path:
-        return self.corpus_dir / "corpus_catalog.csv"
-
-    @property
     def processed_urls_path(self) -> Path:
         return self.corpus_dir / "processed_urls.json"
 

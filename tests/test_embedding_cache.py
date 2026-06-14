@@ -1,7 +1,6 @@
 import json
 
 import numpy as np
-import pytest
 
 from embedding.embedding_cache import EmbeddingCache
 

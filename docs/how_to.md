@@ -60,7 +60,7 @@ mytho pipeline --help
 - Скачать и обработать источники.
 - Автоматически очистить Gutenberg-тексты (по маркерам в содержимом).
 - Сохранить тексты в `outputs/corpus/<major>/<tradition>/<title>/<title>.txt`.
-- Создать `outputs/corpus/corpus_metadata.json`, `outputs/corpus/corpus_catalog.csv`, `outputs/corpus/traditions_info.json`.
+- Создать `outputs/corpus/corpus_metadata.json`, `outputs/corpus/traditions_info.json`.
 
 Запуск сборки всего корпуса:
 

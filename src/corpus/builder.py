@@ -1,5 +1,4 @@
 import concurrent.futures
-import csv
 import json
 import logging
 import shutil
@@ -9,7 +8,6 @@ from pathlib import Path
 
 from settings import settings
 
-from . import catalog
 from .clean_gutenberg import clean_gutenberg_in_builder
 from .downloader import download_file, load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
@@ -60,6 +58,25 @@ def _build_metadata(item: dict, *, path: str, color: str, stats: dict) -> dict:
         "word_count": stats["word_count"],
         "sentence_count": stats["sentence_count"],
         "color": color,
+        "available": True,
+        "description": item.get("description", ""),
+    }
+
+
+def _build_failure_metadata(item: dict, *, color: str, error: str) -> dict:
+    description = item.get("description", "")
+    return {
+        "id": _item_tid(item),
+        "major_tradition": item.get("major_tradition", "Unknown"),
+        "tradition": item["tradition"],
+        "language": item["language"],
+        "type": item["type"],
+        "url": item["url"],
+        "available": False,
+        "word_count": 0,
+        "sentence_count": 0,
+        "color": color,
+        "description": f"{description} [{error}]" if description else error,
     }
 
 
@@ -102,13 +119,12 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
         filename = Path(item["_local_file"])
         if filename.exists():
             local_meta = process_local_file(filename, item, color)
-            if local_meta:
-                with data_lock:
+            with data_lock:
+                if local_meta:
                     metadata.append(local_meta)
                     processed_urls.add(url)
-                catalog.add_item_to_catalog(item, tid=tid, color=color, success=True, stats=local_meta)
-            else:
-                catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Local file read error")
+                else:
+                    metadata.append(_build_failure_metadata(item, color=color, error="Local file read error"))
             return
         else:
             logger.warning(f"{tid}: Local file {filename} not found, trying download")
@@ -135,12 +151,12 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
             )
             processed_urls.add(url)
 
-        catalog.add_item_to_catalog(item, tid=tid, color=color, success=True, stats=stats)
         logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']}, color: {color})")
 
     except Exception as e:
         logger.exception("%s: Processing error", tid)
-        catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error=f"Error: {e}")
+        with data_lock:
+            metadata.append(_build_failure_metadata(item, color=color, error=str(e)))
 
 
 def _update_traditions_info(filter_type: set[str], force: bool) -> None:
@@ -201,7 +217,6 @@ def _update_traditions_info(filter_type: set[str], force: bool) -> None:
 
 def build_corpus(filter_type: set[str], force: bool = False):
     ensure_dir(settings.corpus_dir)
-    catalog.clear_catalog()
     metadata: list[dict] = []
 
     download_list = load_download_list(filter_type, force)
@@ -225,25 +240,20 @@ def build_corpus(filter_type: set[str], force: bool = False):
     with open(settings.corpus_metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
-    with open(settings.corpus_catalog_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(catalog.CSV_HEADER)
-        writer.writerows(row.as_csv_row() for row in catalog.catalog_rows)
-
     with open(settings.processed_urls_path, "w", encoding="utf-8") as f:
         json.dump(list(processed_urls), f, ensure_ascii=False, indent=2)
 
     logger.info("Corpus build complete.")
-    logger.info(f"Total records: {len(catalog.catalog_rows)}")
+    logger.info(f"Total records: {len(metadata)}")
 
-    available_rows = [row for row in catalog.catalog_rows if row.available]
-    logger.info(f"Available: {len(available_rows)}")
-    logger.info(f"Unavailable: {len(catalog.catalog_rows) - len(available_rows)}")
+    available = [m for m in metadata if m.get("available", True)]
+    logger.info(f"Available: {len(available)}")
+    logger.info(f"Unavailable: {len(metadata) - len(available)}")
 
-    if available_rows:
-        total_words = sum(row.word_count for row in available_rows)
-        total_sentences = sum(row.sentence_count for row in available_rows)
+    if available:
+        total_words = sum(m.get("word_count", 0) for m in available)
+        total_sentences = sum(m.get("sentence_count", 0) for m in available)
         logger.info("\nOverall statistics for available texts:")
         logger.info(f"  Total words: {total_words}")
         logger.info(f"  Total sentences: {total_sentences}")
-        logger.info(f"  Average words per text: {total_words / len(available_rows):.1f}")
+        logger.info(f"  Average words per text: {total_words / len(available):.1f}")

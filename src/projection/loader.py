@@ -1,4 +1,3 @@
-import csv
 import json
 import logging
 from typing import Any
@@ -82,34 +81,18 @@ class EmbeddingDataLoader:
 
         metadata_path = settings.corpus_metadata_path
         if not metadata_path.exists():
-            catalog_path = settings.corpus_catalog_path
-            if catalog_path.exists():
-                metadata_path = catalog_path
-            else:
-                logger.warning(f"Metadata file not found: {metadata_path}")
-                self._metadata_map = {}
-                return self._metadata_map
+            logger.warning(f"Metadata file not found: {metadata_path}")
+            self._metadata_map = {}
+            return self._metadata_map
 
         try:
             self._metadata_map = {}
-
-            if metadata_path.suffix == ".json":
-                with open(metadata_path, encoding="utf-8") as f:
-                    metadata = json.load(f)
-                    for item in metadata:
-                        if "id" in item and "tradition" in item:
-                            self._metadata_map[str(item["id"])] = item["tradition"]
-                            self._metadata_map[str(item["id"]).replace(" ", "_")] = item["tradition"]
-            else:
-                with open(metadata_path, encoding="utf-8") as f:
-                    reader = csv.DictReader(f)
-                    if reader.fieldnames:
-                        for row in reader:
-                            text_id = row.get("id") or row.get("tid")
-                            tradition = row.get("tradition")
-                            if text_id and tradition:
-                                self._metadata_map[str(text_id)] = tradition
-                                self._metadata_map[str(text_id).replace(" ", "_")] = tradition
+            with open(metadata_path, encoding="utf-8") as f:
+                metadata = json.load(f)
+                for item in metadata:
+                    if "id" in item and "tradition" in item:
+                        self._metadata_map[str(item["id"])] = item["tradition"]
+                        self._metadata_map[str(item["id"]).replace(" ", "_")] = item["tradition"]
         except Exception:
             logger.exception("Failed to load metadata")
             self._metadata_map = {}

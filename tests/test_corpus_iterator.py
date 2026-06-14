@@ -1,8 +1,6 @@
-import csv
+import json
 
-import pytest
-
-from embedding.corpus_iterator import iter_corpus_files, _normalize_catalog_id
+from embedding.corpus_iterator import _normalize_catalog_id, iter_corpus_files
 
 
 class TestNormalizeCatalogId:
@@ -23,7 +21,7 @@ class TestNormalizeCatalogId:
 
 
 class TestIterCorpusFiles:
-    def _create_corpus(self, tmp_path, files, catalog_rows=None):
+    def _create_corpus(self, tmp_path, files, metadata_items=None):
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
 
@@ -32,13 +30,10 @@ class TestIterCorpusFiles:
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(content, encoding="utf-8")
 
-        if catalog_rows is not None:
-            catalog = corpus_dir / "corpus_catalog.csv"
-            fieldnames = list(catalog_rows[0].keys()) if catalog_rows else []
-            with open(catalog, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames)
-                writer.writeheader()
-                writer.writerows(catalog_rows)
+        if metadata_items is not None:
+            metadata_file = corpus_dir / "corpus_metadata.json"
+            with open(metadata_file, "w", encoding="utf-8") as f:
+                json.dump(metadata_items, f)
 
         return corpus_dir
 
@@ -68,7 +63,7 @@ class TestIterCorpusFiles:
         corpus = self._create_corpus(tmp_path, {
             "orig.txt": "original text",
             "trans.txt": "translated text",
-        }, catalog_rows=[
+        }, metadata_items=[
             {"id": "orig", "type": "original", "tradition": "t1", "major_tradition": "mt1"},
             {"id": "trans", "type": "translate", "tradition": "t1", "major_tradition": "mt1"},
         ])
@@ -81,7 +76,7 @@ class TestIterCorpusFiles:
         corpus = self._create_corpus(tmp_path, {
             "orig.txt": "original",
             "trans.txt": "translated",
-        }, catalog_rows=[
+        }, metadata_items=[
             {"id": "orig", "type": "original", "tradition": "t1", "major_tradition": "mt1"},
             {"id": "trans", "type": "translate", "tradition": "t1", "major_tradition": "mt1"},
         ])
@@ -94,7 +89,7 @@ class TestIterCorpusFiles:
         corpus = self._create_corpus(tmp_path, {
             "a.txt": "aaa",
             "b.txt": "bbb",
-        }, catalog_rows=[
+        }, metadata_items=[
             {"id": "a", "type": "original", "tradition": "t1", "major_tradition": "mt1"},
             {"id": "b", "type": "translate", "tradition": "t1", "major_tradition": "mt1"},
         ])
@@ -105,7 +100,7 @@ class TestIterCorpusFiles:
     def test_catalog_metadata_populates_fields(self, tmp_path):
         corpus = self._create_corpus(tmp_path, {
             "mytext.txt": "content",
-        }, catalog_rows=[
+        }, metadata_items=[
             {
                 "id": "mytext",
                 "type": "translate",

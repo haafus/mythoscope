@@ -8,8 +8,7 @@ from urllib3.util.retry import Retry
 
 from settings import settings
 
-from . import catalog
-from .utils import corpus_text_path, get_tradition_color
+from .utils import corpus_text_path
 
 logger = logging.getLogger(__name__)
 
@@ -71,11 +70,9 @@ def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]
         url = item["url"]
         tid = item.get("title", item.get("id", "unknown_id"))
         tradition = item["tradition"]
-        color = get_tradition_color(tradition)
 
         if url in seen_urls:
             logger.warning(f"Duplicate URL: {url}, skipping")
-            catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Duplicate URL")
             continue
 
         filename = corpus_text_path(settings.corpus_dir, item.get("major_tradition", "Unknown"), tradition, tid)
@@ -88,7 +85,6 @@ def load_download_list(filter_type: set[str], force: bool = False) -> list[dict]
             filtered.append(new_item)
         elif url in processed_urls and not force:
             logger.info(f"URL was already processed earlier (file is missing): {url}, skipping")
-            catalog.add_item_to_catalog(item, tid=tid, color=color, success=False, error="Previously processed, file missing")
             continue
         else:
             seen_urls.add(url)

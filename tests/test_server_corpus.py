@@ -1,4 +1,3 @@
-import csv
 import json
 
 import server.services.corpus as corpus_mod
@@ -152,21 +151,6 @@ class TestGetCatalogDocuments:
         assert docs[0]["id"] == "Iliad"
         assert docs[0]["language"] == "en"
         assert docs[0]["source"] == "corpus"
-
-    def test_from_catalog_csv(self, tmp_path, monkeypatch):
-        csv_path = tmp_path / "corpus_catalog.csv"
-        with csv_path.open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["id", "major_tradition", "tradition", "word_count"])
-            writer.writeheader()
-            writer.writerow({"id": "Odyssey", "major_tradition": "European", "tradition": "Greek", "word_count": "5000"})
-
-        _patch_corpus(monkeypatch, tmp_path)
-        monkeypatch.setattr(corpus_mod, "_catalog_cache", {})
-
-        docs = get_catalog_documents("corpus")
-        assert len(docs) == 1
-        assert docs[0]["id"] == "Odyssey"
-        assert docs[0]["word_count"] == 5000
 
     def test_empty_corpus(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)

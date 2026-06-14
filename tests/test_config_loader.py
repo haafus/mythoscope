@@ -38,6 +38,3 @@ class TestPathsFromSettings:
 
     def test_metadata_path(self):
         assert settings.corpus_metadata_path is not None
-
-    def test_catalog_path(self):
-        assert settings.corpus_catalog_path is not None

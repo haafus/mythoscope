@@ -2,7 +2,7 @@ import pytest
 
 pytest.importorskip("chromadb")
 
-from embedding.chroma_writer import _safe_id_part, _safe_meta, ChromaWriter
+from embedding.chroma_writer import ChromaWriter, _safe_id_part, _safe_meta
 
 
 class TestSafeIdPart:

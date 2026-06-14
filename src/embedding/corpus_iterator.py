@@ -1,4 +1,4 @@
-import csv
+import json
 import logging
 import re
 from pathlib import Path
@@ -17,33 +17,33 @@ def iter_corpus_files(corpus_dir: Path, text_type: str) -> Generator[dict[str, A
     The returned dict intentionally does NOT include file content — callers
     read one file at a time so the whole corpus is never held in memory.
     """
-    catalog_file = corpus_dir / "corpus_catalog.csv"
+    metadata_file = corpus_dir / "corpus_metadata.json"
     text_info: dict[str, dict[str, Any]] = {}
 
-    if catalog_file.exists():
+    if metadata_file.exists():
         try:
-            with open(catalog_file, encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    tid = row.get("id") or row.get("tid")
-                    if not tid:
-                        continue
-                    row_info = {
-                        "text_id": _normalize_catalog_id(tid),
-                        "catalog_id": tid,
-                        "type": row.get("type", "unknown"),
-                        "color": row.get("color", "#CCCCCC"),
-                        "major_tradition": row.get("major_tradition", "unknown"),
-                        "tradition": row.get("tradition", "unknown"),
-                        "language": row.get("language", "unknown"),
-                        "url": row.get("url", ""),
-                    }
-                    text_info[str(tid)] = row_info
-                    text_info[_normalize_catalog_id(tid)] = row_info
+            with open(metadata_file, encoding="utf-8") as f:
+                items = json.load(f)
+            for item in items:
+                tid = item.get("id")
+                if not tid:
+                    continue
+                row_info = {
+                    "text_id": _normalize_catalog_id(tid),
+                    "catalog_id": tid,
+                    "type": item.get("type", "unknown"),
+                    "color": item.get("color", "#CCCCCC"),
+                    "major_tradition": item.get("major_tradition", "unknown"),
+                    "tradition": item.get("tradition", "unknown"),
+                    "language": item.get("language", "unknown"),
+                    "url": item.get("url", ""),
+                }
+                text_info[str(tid)] = row_info
+                text_info[_normalize_catalog_id(tid)] = row_info
         except Exception:
-            logger.exception("Error reading %s", catalog_file)
+            logger.exception("Error reading %s", metadata_file)
     else:
-        logger.warning(f"File {catalog_file} not found.")
+        logger.warning(f"File {metadata_file} not found.")
 
     for txt_file in corpus_dir.rglob("*.txt"):
         tid = txt_file.stem

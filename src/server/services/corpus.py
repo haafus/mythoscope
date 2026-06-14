@@ -1,4 +1,3 @@
-import csv
 import io
 import json
 import logging
@@ -42,21 +41,6 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
 
     root = source_root(source)
     metadata_path = root / "corpus_metadata.json"
-    catalog_path = root / "corpus_catalog.csv"
-
-    catalog_by_key = {}
-    if catalog_path.exists():
-        try:
-            with catalog_path.open("r", encoding="utf-8-sig", newline="") as handle:
-                for row in csv.DictReader(handle):
-                    key = (
-                        row.get("id", ""),
-                        row.get("major_tradition", ""),
-                        row.get("tradition", ""),
-                    )
-                    catalog_by_key[key] = row
-        except (OSError, csv.Error) as e:
-            logger.warning("Failed to read catalog %s: %s", catalog_path, e)
 
     metadata_rows = []
     if metadata_path.exists():
@@ -66,17 +50,11 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
         except (OSError, json.JSONDecodeError) as e:
             logger.warning("Failed to read metadata %s: %s", metadata_path, e)
 
-    source_rows = metadata_rows or list(catalog_by_key.values()) or scan_document_rows(root)
+    source_rows = metadata_rows or scan_document_rows(root)
     documents = []
     traditions_info = get_traditions_info(source)
 
     for row in source_rows:
-        key = (
-            row.get("id", ""),
-            row.get("major_tradition", ""),
-            row.get("tradition", ""),
-        )
-        catalog_row = catalog_by_key.get(key, {})
         tradition_info = traditions_info.get(row.get("tradition", ""), {})
         documents.append(
             {
@@ -86,13 +64,11 @@ def get_catalog_documents(source: str = "corpus") -> list[dict]:
                 "language": row.get("language", ""),
                 "type": row.get("type", ""),
                 "url": row.get("url", ""),
-                "word_count": to_int(row.get("word_count", catalog_row.get("word_count"))),
-                "sentence_count": to_int(row.get("sentence_count", catalog_row.get("sentence_count"))),
+                "word_count": to_int(row.get("word_count")),
+                "sentence_count": to_int(row.get("sentence_count")),
                 "char_count": to_int(row.get("char_count")),
-                "color": row.get("color") or catalog_row.get("color") or tradition_info.get("color") or "#6b7280",
-                "description": catalog_row.get("description")
-                or row.get("description")
-                or tradition_info.get("description", ""),
+                "color": row.get("color") or tradition_info.get("color") or "#6b7280",
+                "description": row.get("description") or tradition_info.get("description", ""),
                 "source": source,
             }
         )

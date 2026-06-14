@@ -20,9 +20,7 @@ if not hasattr(fu_mod, "UserAgent"):
 
 from datetime import datetime
 
-from corpus import catalog
-from corpus.builder import _build_metadata, _item_tid, _update_traditions_info
-from corpus.catalog import add_item_to_catalog as _add_to_catalog
+from corpus.builder import _build_failure_metadata, _build_metadata, _item_tid, _update_traditions_info
 
 
 class TestItemTid:
@@ -57,53 +55,46 @@ class TestBuildMetadata:
         assert parsed.tzinfo is not None
 
 
-class TestAddToCatalog:
-    def setup_method(self):
-        catalog.clear_catalog()
+class TestBuildMetadataFields:
+    def test_available_is_true(self):
+        stats = {"md5": "abc", "char_count": 10, "word_count": 500, "sentence_count": 40}
+        item = {**_BASE_ITEM, "title": "Iliad"}
+        meta = _build_metadata(item, path="/tmp/x.txt", color="#FF0000", stats=stats)
+        assert meta["available"] is True
+        assert meta["word_count"] == 500
 
-    def test_success_records_stats(self):
-        stats = {"word_count": 500, "sentence_count": 40}
-        _add_to_catalog(_BASE_ITEM, tid="Iliad", color="#FF0000", success=True, stats=stats)
+    def test_description_from_item(self):
+        stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
+        item = {**_BASE_ITEM, "title": "Iliad", "description": "An epic poem"}
+        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        assert meta["description"] == "An epic poem"
 
-        assert len(catalog.catalog_rows) == 1
-        row = catalog.catalog_rows[0]
-        assert row.tid == "Iliad"
-        assert row.major_tradition == "Greek"
-        assert row.available is True
-        assert row.word_count == 500
-        assert row.sentence_count == 40
-
-    def test_error_records_zero_counts(self):
-        item = {**_BASE_ITEM, "url": "http://example.com/fail"}
-        _add_to_catalog(item, tid="Iliad", color="#FF0000", success=False, error="Timeout")
-
-        row = catalog.catalog_rows[0]
-        assert row.available is False
-        assert row.word_count == 0
-        assert row.sentence_count == 0
-        assert "Timeout" in row.description
-
-    def test_error_with_description_includes_both(self):
-        item = {**_BASE_ITEM, "url": "http://example.com/fail2", "description": "The Odyssey"}
-        _add_to_catalog(item, tid="Odyssey", color="#FF0000", success=False, error="404")
-
-        row = catalog.catalog_rows[0]
-        assert "The Odyssey" in row.description
-        assert "404" in row.description
-
-    def test_success_empty_description(self):
-        item = {**_BASE_ITEM, "url": "http://example.com/nodesc"}
-        stats = {"word_count": 10, "sentence_count": 1}
-        _add_to_catalog(item, tid="X", color="#000", success=True, stats=stats)
-
-        assert catalog.catalog_rows[0].description == ""
+    def test_empty_description(self):
+        stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
+        item = {**_BASE_ITEM, "title": "Iliad"}
+        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        assert meta["description"] == ""
 
     def test_missing_major_tradition_defaults(self):
+        stats = {"md5": "abc", "char_count": 10, "word_count": 1, "sentence_count": 1}
         item = {"tradition": "T", "language": "en", "type": "original", "url": "http://example.com/no-major"}
-        stats = {"word_count": 1, "sentence_count": 1}
-        _add_to_catalog(item, tid="X", color="#000", success=True, stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", color="#000", stats=stats)
+        assert meta["major_tradition"] == "Unknown"
 
-        assert catalog.catalog_rows[0].major_tradition == "Unknown"
+
+class TestBuildFailureMetadata:
+    def test_failure_has_zero_counts(self):
+        meta = _build_failure_metadata(_BASE_ITEM, color="#FF0000", error="Timeout")
+        assert meta["available"] is False
+        assert meta["word_count"] == 0
+        assert meta["sentence_count"] == 0
+        assert "Timeout" in meta["description"]
+
+    def test_failure_with_description_includes_both(self):
+        item = {**_BASE_ITEM, "description": "The Odyssey"}
+        meta = _build_failure_metadata(item, color="#FF0000", error="404")
+        assert "The Odyssey" in meta["description"]
+        assert "404" in meta["description"]
 
 
 class TestUpdateTraditionsInfo:
