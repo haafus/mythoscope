@@ -55,12 +55,6 @@ def load_download_list(force: bool = False) -> list[dict]:
     with open(settings.download_list_file, encoding="utf-8") as f:
         items = json.load(f)
 
-    processed_urls = set()
-    if settings.processed_urls_path.exists():
-        with open(settings.processed_urls_path, encoding="utf-8") as f:
-            processed_urls = set(json.load(f))
-        logger.info(f"Loaded {len(processed_urls)} previously processed URLs from {settings.processed_urls_path}")
-
     seen_urls = set()
     filtered = []
 
@@ -81,9 +75,6 @@ def load_download_list(force: bool = False) -> list[dict]:
             new_item["_local_file"] = str(filename)
             seen_urls.add(url)
             filtered.append(new_item)
-        elif url in processed_urls and not force:
-            logger.info(f"URL was already processed earlier (file is missing): {url}, skipping")
-            continue
         else:
             seen_urls.add(url)
             filtered.append(item)

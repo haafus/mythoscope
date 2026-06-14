@@ -118,7 +118,7 @@ def process_local_file(filename: Path, item: dict, color: str) -> dict | None:
         return None
 
 
-def process_single_item(item: dict, force: bool, metadata: list[dict], processed_urls: set[str]):
+def process_single_item(item: dict, force: bool, metadata: list[dict]):
     tid = _item_tid(item)
     url = item["url"]
     color = get_tradition_color(item["tradition"])
@@ -130,7 +130,6 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
             with data_lock:
                 if local_meta:
                     metadata.append(local_meta)
-                    processed_urls.add(url)
                 else:
                     metadata.append(_build_failure_metadata(item, color=color, error="Local file read error"))
             return
@@ -157,7 +156,6 @@ def process_single_item(item: dict, force: bool, metadata: list[dict], processed
             metadata.append(
                 _build_metadata(item, path=str(filename.resolve()), color=color, stats=stats)
             )
-            processed_urls.add(url)
 
         logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']}, color: {color})")
 
@@ -231,15 +229,10 @@ def build_corpus(force: bool = False):
 
     _update_traditions_info(force)
 
-    processed_urls: set[str] = set()
-    if settings.processed_urls_path.exists():
-        with open(settings.processed_urls_path, encoding="utf-8") as f:
-            processed_urls = set(json.load(f))
-
     logger.info(f"Starting multithreaded build (items: {len(download_list)})")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers) as executor:
-        futures = [executor.submit(process_single_item, item, force, metadata, processed_urls) for item in download_list]
+        futures = [executor.submit(process_single_item, item, force, metadata) for item in download_list]
         for future in concurrent.futures.as_completed(futures):
             exc = future.exception()
             if exc:
@@ -247,9 +240,6 @@ def build_corpus(force: bool = False):
 
     with open(settings.corpus_metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
-
-    with open(settings.processed_urls_path, "w", encoding="utf-8") as f:
-        json.dump(list(processed_urls), f, ensure_ascii=False, indent=2)
 
     logger.info("Corpus build complete.")
     logger.info(f"Total records: {len(metadata)}")

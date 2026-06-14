@@ -17,7 +17,6 @@ def test_derived_paths():
 
     s = Settings()
     assert s.corpus_metadata_path == Path("outputs/corpus/corpus_metadata.json")
-    assert s.processed_urls_path == Path("outputs/corpus/processed_urls.json")
 
 
 def test_model_output_dir():
