@@ -160,7 +160,6 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
 
 def run_generate_graphs(force: bool = False) -> None:
     cfg = settings.graphs
-    llm_cfg = cfg.active_llm_config
 
     logger.info(f"Starting graph generation process (force={force})...")
 
@@ -172,10 +171,10 @@ def run_generate_graphs(force: bool = False) -> None:
         return
 
     llm = LLMProcessor(
-        api_key=llm_cfg["api_key"],
-        model_name=llm_cfg["model_name"],
-        base_url=llm_cfg["base_url"],
-        use_json_mode=llm_cfg["use_json_mode"],
+        api_key=cfg.api_key,
+        model_name=cfg.model_name,
+        base_url=cfg.base_url,
+        use_json_mode=cfg.use_json_mode,
         temperature=cfg.temperature,
         max_retries=cfg.max_retries,
         retry_backoff_factor=cfg.retry_backoff_factor,

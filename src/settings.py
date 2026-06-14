@@ -42,36 +42,15 @@ class EmbeddingSettings(BaseModel):
 
 
 class GraphsSettings(BaseModel):
-    mode: str = "local"
     api_key: str = ""
     model_name: str = "gpt-4o-mini"
     base_url: str = "https://api.openai.com/v1"
     use_json_mode: bool = True
-    local_api_key: str = "dummy-key"
-    local_model_name: str = "google/gemma-4-e4b"
-    local_base_url: str = "http://127.0.0.1:1234/v1/"
-    local_use_json_mode: bool = False
     chunk_size: int = 4000
     chunk_overlap: int = 1000
     temperature: float = 0.1
     max_retries: int = 5
     retry_backoff_factor: float = 5.0
-
-    @property
-    def active_llm_config(self) -> dict:
-        if self.mode == "local":
-            return {
-                "api_key": self.local_api_key,
-                "model_name": self.local_model_name,
-                "base_url": self.local_base_url,
-                "use_json_mode": self.local_use_json_mode,
-            }
-        return {
-            "api_key": self.api_key,
-            "model_name": self.model_name,
-            "base_url": self.base_url,
-            "use_json_mode": self.use_json_mode,
-        }
 
 
 class ProjectionSettings(BaseModel):
