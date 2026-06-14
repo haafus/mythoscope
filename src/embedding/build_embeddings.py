@@ -9,7 +9,6 @@ import torch
 from settings import settings
 
 from .builder import EmbeddingBuilder
-from .cache_utils import cleanup_cache
 from .chroma_manager import collection_name_for_model
 
 logger = logging.getLogger(__name__)
@@ -32,8 +31,6 @@ def build_embeddings(
     BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size
     CLEAR_EXISTING = clear_existing if clear_existing is not None else True
 
-    cleanup_cache(settings.cache_dir, max_size_mb=emb.cache_max_size_mb, ttl_days=emb.cache_ttl_days)
-
     if CLEAR_EXISTING:
         chroma_dir = settings.chroma_dir
         if chroma_dir.exists():
@@ -49,10 +46,8 @@ def build_embeddings(
         embedding_model=MODEL_NAME,
         chunking=CHUNKING,
         chroma_path=settings.chroma_dir,
-        cache_dir=settings.cache_dir,
         chunked_dir=settings.corpus_chunked_dir,
         batch_size=BATCH_SIZE,
-        cache_batch_size=emb.cache_batch_size,
         chroma_batch_size=emb.chroma_batch_size,
     )
 

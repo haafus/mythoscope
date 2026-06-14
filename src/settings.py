@@ -24,7 +24,6 @@ class CorpusSettings(BaseModel):
 class EmbeddingSettings(BaseModel):
     default_chunking: str = "paragraph"
     batch_size: int = 32
-    cache_batch_size: int = 50
     chroma_batch_size: int = 100
     max_workers: int = 16
     queue_maxsize: int = 10
@@ -36,8 +35,6 @@ class EmbeddingSettings(BaseModel):
         "Qwen/Qwen3-Embedding-4B",
     ]
     metrics_file: str = "outputs/analysis/performance_metrics.json"
-    cache_max_size_mb: int = 1024
-    cache_ttl_days: int = 30
 
 
 class GraphsSettings(BaseModel):
@@ -89,7 +86,6 @@ class Settings(BaseSettings):
     corpus_dir: Path = Path("outputs/corpus")
     corpus_chunked_dir: Path = Path("outputs/corpus_chunked")
     chroma_dir: Path = Path("outputs/chroma_db")
-    cache_dir: Path = Path("outputs/cache")
     analysis_dir: Path = Path("outputs/analysis")
     logs_dir: Path = Path("outputs/logs")
     graphs_dir: Path = Path("outputs/graphs")
@@ -142,7 +138,6 @@ class Settings(BaseSettings):
         for d in (
             self.corpus_dir,
             self.corpus_chunked_dir,
-            self.cache_dir,
             self.analysis_dir,
             self.logs_dir,
             self.graphs_dir,

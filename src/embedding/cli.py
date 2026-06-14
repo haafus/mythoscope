@@ -4,7 +4,6 @@ from settings import settings
 
 from .build_embeddings import build_embeddings
 from .builder import EmbeddingBuilder
-from .cache_validator import CacheValidator
 from .chroma_manager import collection_name_for_model, delete_collection, ensure_chroma_writable
 from .performance_metrics import PerformanceMetrics
 
@@ -15,7 +14,6 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
         corpus_dir=settings.corpus_dir,
         out_dir=settings.analysis_dir,
         chroma_path=settings.chroma_dir,
-        cache_dir=settings.cache_dir,
         embedding_model=model or emb.models[0],
         chunking=chunking or emb.default_chunking,
         batch_size=emb.batch_size,
@@ -159,23 +157,3 @@ def clear_cache(ctx, model: str | None, yes: bool):
         click.echo(click.style(f"Error deleting collection: {e}", fg="red"))
 
 
-@click.command()
-@click.pass_context
-def validate_cache(ctx):
-    validator = CacheValidator(str(settings.cache_dir))
-
-    click.echo("Validating cache...")
-    results = validator.validate_all()
-
-    click.echo(f"\n{'=' * 60}")
-    click.echo(click.style("Cache Validation Results", fg="cyan", bold=True))
-    click.echo(f"{'=' * 60}")
-    click.echo(f"Total files: {results['total']}")
-    click.echo(f"Valid: {click.style(str(results['valid']), fg='green')}")
-    click.echo(f"Corrupted: {click.style(str(results['corrupted']), fg='red')}")
-    click.echo(f"Size: {results['size_mb']:.2f} MB")
-
-    if results["corrupted"] > 0:
-        click.echo("\nCorrupted files:")
-        for file in results["corrupted_files"]:
-            click.echo(f"  - {file}")

@@ -17,11 +17,6 @@ class TestEmbeddingSettings:
         assert len(emb.models) == 5
         assert "BAAI/bge-m3" in emb.models
 
-    def test_cache_defaults(self):
-        emb = EmbeddingSettings()
-        assert emb.cache_max_size_mb == 1024
-        assert emb.cache_ttl_days == 30
-
     def test_metrics_file_default(self):
         emb = EmbeddingSettings()
         assert "performance_metrics" in emb.metrics_file

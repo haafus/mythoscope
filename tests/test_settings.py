@@ -7,7 +7,6 @@ def test_default_paths():
     s = Settings()
     assert s.corpus_dir == Path("outputs/corpus")
     assert s.chroma_dir == Path("outputs/chroma_db")
-    assert s.cache_dir == Path("outputs/cache")
     assert s.analysis_dir == Path("outputs/analysis")
     assert s.logs_dir == Path("outputs/logs")
 
@@ -58,7 +57,6 @@ def test_default_embedding_model():
 
 def test_ensure_dirs(tmp_path, monkeypatch):
     monkeypatch.setenv("MYTHO_CORPUS_DIR", str(tmp_path / "corpus"))
-    monkeypatch.setenv("MYTHO_CACHE_DIR", str(tmp_path / "cache"))
     monkeypatch.setenv("MYTHO_ANALYSIS_DIR", str(tmp_path / "analysis"))
     monkeypatch.setenv("MYTHO_LOGS_DIR", str(tmp_path / "logs"))
     monkeypatch.setenv("MYTHO_GRAPHS_DIR", str(tmp_path / "graphs"))
@@ -70,7 +68,6 @@ def test_ensure_dirs(tmp_path, monkeypatch):
     s.ensure_dirs()
 
     assert (tmp_path / "corpus").is_dir()
-    assert (tmp_path / "cache").is_dir()
     assert (tmp_path / "analysis").is_dir()
     assert (tmp_path / "logs").is_dir()
     assert (tmp_path / "graphs").is_dir()

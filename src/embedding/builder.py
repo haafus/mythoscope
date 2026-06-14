@@ -16,7 +16,6 @@ from .chroma_manager import (
 from .chroma_writer import ChromaWriter
 from .chunking import create_chunking_strategies
 from .corpus_iterator import iter_corpus_files
-from .embedding_cache import EmbeddingCache
 from .model_manager import ModelManager
 from .performance_metrics import PerformanceMetrics
 
@@ -39,14 +38,11 @@ class EmbeddingBuilder:
         corpus_dir: str | Path,
         out_dir: str | Path,
         chroma_path: str | Path = "outputs/chroma_db",
-        cache_dir: str | Path = "outputs/cache",
         chunked_dir: str | Path = "outputs/corpus_chunked",
         embedding_model: str = "BAAI/bge-m3",
         chunking: str = "paragraph",
         batch_size: int | None = None,
-        cache_batch_size: int = 50,
         chroma_batch_size: int = 100,
-        max_workers: int = 16,
         queue_maxsize: int = 10,
         metrics: PerformanceMetrics | None = None,
     ):
@@ -64,7 +60,6 @@ class EmbeddingBuilder:
             self.metrics = metrics
 
         self._models = ModelManager(batch_size=batch_size)
-        self._cache = EmbeddingCache(Path(cache_dir), cache_batch_size, max_workers=max_workers)
 
         self.chroma_client = chromadb.PersistentClient(path=str(self.chroma_path))
         self._chroma = ChromaWriter(self.chroma_client, chroma_batch_size, queue_maxsize)
@@ -138,15 +133,16 @@ class EmbeddingBuilder:
     # --- Embeddings --------------------------------------------------------
 
     def _generate_embeddings(self, sentences: list[str]) -> np.ndarray:
-        return self._cache.generate_embeddings(
-            sentences,
-            model=self._models.model,
-            model_name=self._models.model_name,
-            model_dim=self._models.model_dim,
-            batch_size=self._models.batch_size,
-            chunking_strategy=self.current_chunking,
-            metrics=self.metrics,
-        )
+        if not sentences:
+            return np.array([])
+        with self.metrics.track("generate_embeddings"):
+            embeddings = self._models.model.encode(
+                sentences,
+                batch_size=self._models.batch_size,
+                show_progress_bar=False,
+                normalize_embeddings=True,
+            )
+            return np.asarray(embeddings, dtype=np.float32)
 
     def build_embeddings(self, text: str, chunking_strategy: str | None = None, batch_size: int | None = None) -> dict[str, Any]:
         if chunking_strategy:
@@ -280,8 +276,6 @@ class EmbeddingBuilder:
     # --- Resource management -----------------------------------------------
 
     def close(self) -> None:
-        if hasattr(self, "_cache"):
-            self._cache.close()
         if hasattr(self, "_models"):
             self._models.close()
 
