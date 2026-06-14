@@ -100,7 +100,6 @@ def test(ctx, text_file: str, model: str | None, strategy: str | None):
         click.echo(f"  Model: {result['model']}")
         click.echo(f"  Chunking: {result['chunking']}")
         click.echo(f"  Number of chunks: {result['num_chunks']}")
-        click.echo(f"  Embedding dimension: {result['embedding_dim']}")
         click.echo(f"  Batch size used: {result['batch_size_used']}")
 
         if metrics.metrics:
@@ -139,7 +138,6 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
         click.echo(click.style(f"Model: {model_name}", fg="yellow"))
         click.echo(f"  Strategy: {strategy_name}")
         click.echo(f"  Chunks: {result['num_chunks']}")
-        click.echo(f"  Embedding dim: {result['embedding_dim']}")
         click.echo()
 
 

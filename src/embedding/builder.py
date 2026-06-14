@@ -197,7 +197,6 @@ class EmbeddingBuilder:
                     "model": self.model_name,
                     "chunking": self.current_chunking.name,
                     "num_chunks": 0,
-                    "embedding_dim": self.model_dim,
                     "batch_size_used": self._models.batch_size,
                 }
             embeddings = self._generate_embeddings(chunks)
@@ -207,7 +206,6 @@ class EmbeddingBuilder:
                 "model": self.model_name,
                 "chunking": self.current_chunking.name,
                 "num_chunks": len(chunks),
-                "embedding_dim": self.model_dim,
                 "batch_size_used": self._models.batch_size,
             }
         finally:
