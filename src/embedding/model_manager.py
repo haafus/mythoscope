@@ -105,11 +105,7 @@ class ModelManager:
         self.model = self.registry[model_name]["model"]
         self.model_dim = self.model.get_sentence_embedding_dimension()
         if not self._override_batch_size:
-            model_batch = self.registry[model_name].get("batch_size")
-            if model_batch:
-                self.batch_size = int(model_batch)
-            else:
-                self.batch_size = get_optimal_batch_size(self.model_dim)
+            self.batch_size = get_optimal_batch_size(self.model_dim)
             logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
         else:
             logger.info(f"Using default batch size: {self.batch_size}")
