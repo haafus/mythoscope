@@ -16,11 +16,7 @@ BATCH_SIZE_THRESHOLDS = [(3072, 8), (1024, 16), (768, 24)]
 DEFAULT_BATCH_SIZE = 32
 
 
-def get_optimal_batch_size(model_name: str, model_dim: int | None = None) -> int:
-    if model_dim is None:
-        dim_val = MODELS.get(model_name, {}).get("dim", 768)
-        model_dim = int(dim_val) if dim_val is not None else 768
-
+def get_optimal_batch_size(model_dim: int) -> int:
     for min_dim, opt_batch in BATCH_SIZE_THRESHOLDS:
         if model_dim >= min_dim:
             return opt_batch
@@ -107,14 +103,13 @@ class ModelManager:
         self._load_model(model_name)
         self.model_name = model_name
         self.model = self.registry[model_name]["model"]
-        dim_value = self.registry[model_name]["dim"]
-        self.model_dim = int(dim_value) if dim_value is not None else 0
+        self.model_dim = self.model.get_sentence_embedding_dimension()
         if not self._override_batch_size:
             model_batch = self.registry[model_name].get("batch_size")
             if model_batch:
                 self.batch_size = int(model_batch)
             else:
-                self.batch_size = get_optimal_batch_size(model_name, self.model_dim)
+                self.batch_size = get_optimal_batch_size(self.model_dim)
             logger.info(f"Batch size automatically set to {self.batch_size} for model {model_name}")
         else:
             logger.info(f"Using default batch size: {self.batch_size}")

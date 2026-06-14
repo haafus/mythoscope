@@ -146,9 +146,9 @@ class EmbeddingBuilder:
         return self._models.model_name
 
     @staticmethod
-    def get_optimal_batch_size(model_name: str, model_dim: int | None = None) -> int:
+    def get_optimal_batch_size(model_dim: int) -> int:
         from .model_manager import get_optimal_batch_size
-        return get_optimal_batch_size(model_name, model_dim)
+        return get_optimal_batch_size(model_dim)
 
     # --- Chunking ----------------------------------------------------------
 
