@@ -1,6 +1,5 @@
 import gc
 import logging
-import time
 from typing import Any
 
 import torch
@@ -50,7 +49,7 @@ class ModelManager:
             gc.collect()
             logger.info("Model unloaded from memory")
 
-    def _load_model(self, model_name: str, retries: int = 3) -> SentenceTransformer:
+    def _load_model(self, model_name: str) -> SentenceTransformer:
         if self.model is not None and self.model_name == model_name:
             return self.model
 
@@ -58,17 +57,9 @@ class ModelManager:
             self.unload_model()
 
         device = _select_device()
-        for attempt in range(retries):
-            try:
-                model = SentenceTransformer(model_name, device=device)
-                logger.info(f"Model '{model_name}' loaded on {device}.")
-                return model
-            except Exception as e:
-                if attempt == retries - 1:
-                    raise RuntimeError(f"Failed to load model '{model_name}': {e}") from e
-                logger.warning(f"Attempt {attempt + 1} failed: {e}")
-                time.sleep(2**attempt)
-        raise RuntimeError(f"Failed to load model '{model_name}' after {retries} attempts")
+        model = SentenceTransformer(model_name, device=device)
+        logger.info(f"Model '{model_name}' loaded on {device}.")
+        return model
 
     def set_model(self, model_name: str) -> None:
         if model_name not in self.available_models:
