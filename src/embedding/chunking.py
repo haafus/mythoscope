@@ -2,7 +2,7 @@ import hashlib
 import logging
 import re
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -23,22 +23,6 @@ class ChunkMetadata:
     has_markdown: bool = False
     parent_doc_hash: str | None = None
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "chunk_id": self.chunk_id,
-            "index": self.index,
-            "start_pos": self.start_pos,
-            "end_pos": self.end_pos,
-            "chunk_type": self.chunk_type,
-            "strategy_used": self.strategy_used,
-            "overlap_with_prev": self.overlap_with_prev,
-            "overlap_with_next": self.overlap_with_next,
-            "word_count": self.word_count,
-            "char_count": self.char_count,
-            "has_code": self.has_code,
-            "has_markdown": self.has_markdown,
-            "parent_doc_hash": self.parent_doc_hash,
-        }
 
 
 class ChunkWithMetadata:

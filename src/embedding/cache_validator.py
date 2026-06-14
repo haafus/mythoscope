@@ -113,25 +113,3 @@ class CacheValidator:
         results["size_mb"] = results["size_bytes"] / 1024 / 1024
         return results
 
-    def cleanup_corrupted(self) -> int:
-        results = self.validate_all()
-        removed = 0
-
-        for file_path in results["corrupted_files"]:
-            try:
-                base_path = Path(file_path)
-                base_path.unlink(missing_ok=True)
-
-                json_path = base_path.with_suffix(".json")
-                json_path.unlink(missing_ok=True)
-
-                self._checksums.pop(base_path.name, None)
-                removed += 1
-                logger.info(f"Removed corrupted cache file: {file_path}")
-            except Exception:
-                logger.exception("Failed to remove %s", file_path)
-
-        if removed > 0:
-            self._save_checksums()
-
-        return removed

@@ -88,10 +88,18 @@ def _extract_text(data: bytes, url: str, tid: str, content_type: str = "") -> st
 
     if is_pdf:
         logger.debug(f"{tid}: PDF detected, extracting text")
-        return pdf_to_text(data)
+        return pdf_to_text(
+            data,
+            extract_tables=settings.corpus.pdf_extract_tables,
+            preserve_layout=settings.corpus.pdf_preserve_layout,
+        )
     if is_html:
         logger.debug(f"{tid}: HTML detected, converting to text")
-        return html_to_text(data)
+        return html_to_text(
+            data,
+            include_comments=settings.corpus.html_include_comments,
+            include_tables=settings.corpus.html_include_tables,
+        )
     return _decode_bytes(data)
 
 

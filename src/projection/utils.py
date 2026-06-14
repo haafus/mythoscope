@@ -92,7 +92,3 @@ def _run_reducer(data: np.ndarray, method: str, n_components: int, **kwargs: Any
         return result
 
     raise ValueError(f"Unknown method: {method}. Use 'umap', 'pca', or 'tsne'.")
-
-
-def safe_numpy_array(emb: list | np.ndarray) -> np.ndarray:
-    return np.array(emb) if isinstance(emb, list) else emb

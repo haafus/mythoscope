@@ -79,13 +79,6 @@ class TraditionsResponse(BaseModel):
     total: int
 
 
-class ProjectionResponse(BaseModel):
-    model: str
-    method: str
-    points: list[dict[str, Any]]
-    source: str = ""
-
-
 class SavedPlotResponse(BaseModel):
     exists: bool
     url: str | None = None

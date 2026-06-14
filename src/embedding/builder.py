@@ -138,9 +138,6 @@ class EmbeddingBuilder:
             if original:
                 self.set_model(original)
 
-    def get_current_model(self) -> str | None:
-        return self._models.model_name
-
     # --- Chunking ----------------------------------------------------------
 
     def set_chunking_strategy(self, strategy_name: str) -> None:
@@ -148,10 +145,6 @@ class EmbeddingBuilder:
             available = list(self.chunking_strategies.keys())
             raise ValueError(f"Strategy '{strategy_name}' not found. Available: {available}")
         self.current_chunking = self.chunking_strategies[strategy_name]
-
-    def get_current_chunking_strategy(self) -> str | None:
-        chunking = getattr(self, "current_chunking", None)
-        return chunking.name if chunking is not None else None
 
     def _chunk_text(self, text: str) -> list[str]:
         if not text or not text.strip():
@@ -220,25 +213,6 @@ class EmbeddingBuilder:
         return results
 
     # --- Chroma I/O --------------------------------------------------------
-
-    def save_embeddings_to_chroma(
-        self, text: str, metadata: dict[str, Any] | None = None, batch_size: int | None = None
-    ) -> dict[str, Any]:
-        collection_name = collection_name_for_model(self.model_name)
-        result = self.build_embeddings(text, batch_size=batch_size)
-        chunks = result["chunks"]
-        embeddings = result["embeddings"]
-
-        if len(chunks) == 0:
-            logger.warning("No chunks to save.")
-            return {"collection": collection_name, "added": 0}
-
-        ids, metadatas = self._chroma.build_entries(chunks, metadata or {}, self.model_name, self.current_chunking.name)
-
-        collection = self.chroma_client.get_or_create_collection(name=collection_name)
-        self._chroma.write_batches(collection, chunks, embeddings, ids, metadatas)
-
-        return {"collection": collection_name, "added": len(chunks), "chunks": chunks}
 
     def save_all_corpus_to_chroma(self) -> None:
         collection_name = collection_name_for_model(self.model_name)
