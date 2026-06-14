@@ -22,7 +22,6 @@ class CorpusSettings(BaseModel):
 
 
 class EmbeddingSettings(BaseModel):
-    default_model: str = "BAAI/bge-m3"
     default_chunking: str = "paragraph"
     text_type: str = "all"
     batch_size: int = 32

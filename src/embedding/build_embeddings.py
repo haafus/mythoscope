@@ -28,7 +28,7 @@ def build_embeddings(
 
     emb = settings.embedding
 
-    MODEL_NAME = model_name or emb.default_model
+    MODEL_NAME = model_name or emb.models[0]
     TEXT_TYPE: str = normalize_text_type(text_type or emb.text_type) or "all"
     CHUNKING = chunking or emb.default_chunking
     BATCH_SIZE = batch_size if batch_size is not None else emb.batch_size

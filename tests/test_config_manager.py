@@ -4,7 +4,7 @@ from settings import EmbeddingSettings, settings
 class TestEmbeddingSettings:
     def test_defaults_have_embedding_params(self):
         emb = settings.embedding
-        assert emb.default_model
+        assert emb.models
         assert emb.default_chunking
         assert emb.text_type == "all"
         assert emb.batch_size == 32

@@ -16,7 +16,7 @@ def _create_builder(*, model: str | None = None, chunking: str | None = None) ->
         out_dir=settings.analysis_dir,
         chroma_path=settings.chroma_dir,
         cache_dir=settings.cache_dir,
-        embedding_model=model or emb.default_model,
+        embedding_model=model or emb.models[0],
         chunking=chunking or emb.default_chunking,
         text_type=emb.text_type,
         batch_size=emb.batch_size,
@@ -143,7 +143,7 @@ def compare(ctx, text_file: str, model: tuple, strategy: tuple):
 @click.option("--yes", is_flag=True, help="Skip confirmation")
 @click.pass_context
 def clear_cache(ctx, model: str | None, yes: bool):
-    model_name = model or settings.embedding.default_model
+    model_name = model or settings.embedding.models[0]
     collection = collection_name_for_model(model_name)
 
     if not yes:
