@@ -14,9 +14,10 @@ class TestEmbeddingSettings:
         assert emb.batch_size == 64
         assert emb.text_type == "original"
 
-    def test_models_defaults_to_empty(self):
+    def test_models_defaults(self):
         emb = EmbeddingSettings()
-        assert emb.models == []
+        assert len(emb.models) == 5
+        assert "BAAI/bge-m3" in emb.models
 
     def test_cache_defaults(self):
         emb = EmbeddingSettings()

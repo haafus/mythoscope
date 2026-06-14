@@ -30,7 +30,13 @@ class EmbeddingSettings(BaseModel):
     chroma_batch_size: int = 100
     max_workers: int = 16
     queue_maxsize: int = 10
-    models: list[str] = []
+    models: list[str] = [
+        "BAAI/bge-m3",
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        "sentence-transformers/LaBSE",
+        "intfloat/e5-large-v2",
+        "Qwen/Qwen3-Embedding-4B",
+    ]
     metrics_file: str = "outputs/analysis/performance_metrics.json"
     cache_max_size_mb: int = 1024
     cache_ttl_days: int = 30

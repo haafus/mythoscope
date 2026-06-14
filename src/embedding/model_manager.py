@@ -8,7 +8,7 @@ from typing import Any, Iterator
 import torch
 from sentence_transformers import SentenceTransformer
 
-from .models_repository import MODELS
+from settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def _select_device() -> str:
 
 class ModelManager:
     def __init__(self, *, batch_size: int | None = None):
-        self.available_models: list[str] = list(MODELS)
+        self.available_models: list[str] = list(settings.embedding.models)
         self.model_name: str | None = None
         self.model: Any = None
         self.model_dim: int = 0
