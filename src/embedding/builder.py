@@ -109,10 +109,6 @@ class EmbeddingBuilder:
     def batch_size(self) -> int:
         return self._models.batch_size
 
-    @property
-    def model_registry(self) -> dict[str, dict[str, Any]]:
-        return self._models.registry
-
     # --- Output dir --------------------------------------------------------
 
     def _update_output_dir(self) -> None:
@@ -125,8 +121,8 @@ class EmbeddingBuilder:
     def list_models(self) -> list[str]:
         return self._models.list_models()
 
-    def unload_model(self, model_name: str | None = None) -> None:
-        self._models.unload_model(model_name)
+    def unload_model(self) -> None:
+        self._models.unload_model()
 
     def set_model(self, model_name: str) -> None:
         self._models.set_model(model_name)
