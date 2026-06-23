@@ -1,0 +1,17 @@
+.idea/
+__pycache__/
+*.pyc
+.DS_Store
+
+# generated artifacts — reproduce via pipeline, store outside git
+outputs/
+
+# data formats that should not be in git
+*.npy
+*.pkl
+
+# environment
+.env
+.venv/
+venv/
+*.egg-info/

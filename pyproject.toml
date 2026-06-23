@@ -1,0 +1,112 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mythoscope"
+version = "0.1.0"
+description = "Computational framework for comparative mythology"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+dependencies = [
+    "numpy>=1.24.0",
+    "scikit-learn>=1.3.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "tqdm>=4.65.0",
+    # The `mytho` CLI entry point requires click regardless of extras
+    "click>=8.0.0",
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "orjson>=3.9.0",
+]
+embeddings = [
+    "sentence-transformers>=2.2.0",
+    "torch>=2.0.0,<3.0.0",
+    "chromadb>=1.0.0",
+]
+analysis = [
+    "umap-learn>=0.5.5",
+    "plotly>=5.18.0",
+    "pandas>=2.0.0",
+]
+corpus = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "fake-useragent>=1.4.0",
+    "trafilatura>=1.6.0",
+    "PyMuPDF>=1.23.0",
+]
+graphs = [
+    "openai>=1.0.0",
+    "networkx>=3.0",
+    "pandas>=2.0.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+all = [
+    "mythoscope[server,embeddings,analysis,corpus,graphs]",
+]
+
+[project.scripts]
+mytho = "cli:mytho"
+
+[tool.setuptools]
+py-modules = ["settings", "main", "cli", "llm_processing"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "corpus*",
+    "projection*",
+    "embedding*",
+    "graphs*",
+    "server*",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["docs/*.ipynb", "*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",   # line length — handled by formatter where possible
+    "E701",   # multiple statements on one line — common in compact handlers
+    "E702",   # semicolon-separated statements
+    "UP035",  # deprecated typing imports — bulk fix later
+    "SIM108", # ternary operator — if/else often clearer
+    "SIM102", # collapsible if — nested ifs can be more readable
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "E402"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = ["docs/"]
+
+[[tool.mypy.overrides]]
+module = ["settings", "corpus.clean_gutenberg", "projection.utils"]
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
