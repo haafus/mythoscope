@@ -39,11 +39,20 @@ class EmbeddingEncoder:
             return
 
         self.unload()
-        self._model = SentenceTransformer(model_name, trust_remote_code=True)
+        self._model = self._load_model(model_name)
         self.model_name = model_name
         device = str(self._model.device)
         mem = _memory_info(device)
         logger.info(f"Model '{model_name}' loaded on {device}{f' ({mem})' if mem else ''}.")
+
+    @staticmethod
+    def _load_model(model_name: str) -> Any:
+        # Use the cache first to avoid a network hang offline; download only if missing.
+        try:
+            return SentenceTransformer(model_name, trust_remote_code=True, local_files_only=True)
+        except OSError:
+            logger.info(f"Model '{model_name}' not in local cache; fetching from the hub")
+            return SentenceTransformer(model_name, trust_remote_code=True)
 
     def encode(self, texts: list[str], **kwargs) -> np.ndarray:
         if self._model is None:
