@@ -133,6 +133,12 @@ mytho embeddings --model bge-m3
 mytho embeddings --model bge-m3 --force
 ```
 
+Загруженные модели кэшируются локально — чтобы очистить кэш и скачать модель заново, удалите её папку из кэша:
+
+```bash
+rm -rf ~/.cache/huggingface/hub/models--BAAI--bge-m3
+```
+
 ## projections
 
 Модуль анализа эмбеддингов из Chroma DB и генерации JSON-артефактов в `outputs/projections/`.
