@@ -47,10 +47,7 @@ class EmbeddingEncoder:
 
     @staticmethod
     def _load_model(model_name: str) -> Any:
-        # Prefer the local cache: when the model is already downloaded this avoids
-        # a network round-trip and the hang/timeout that the Hub's revision check
-        # would otherwise cause when the network is unavailable. Fall back to a
-        # normal load (which may download) only when the model is not cached.
+        # Use the cache first to avoid a network hang offline; download only if missing.
         try:
             return SentenceTransformer(model_name, trust_remote_code=True, local_files_only=True)
         except OSError:
