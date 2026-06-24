@@ -9,15 +9,38 @@ from server.services.similarity import similarity_service
 router = APIRouter(prefix="/api/similarity", tags=["similarity"])
 
 
+def _available_models() -> list[str]:
+    """Available embedding collections, mapping store failures to HTTP 503."""
+    try:
+        return chroma_manager.get_available_models()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Embedding store unavailable: {e}") from e
+
+
+def _require_collection(model: str) -> None:
+    """404 if the model has no embedding collection, 503 if the store is unreachable."""
+    if model not in _available_models():
+        raise HTTPException(status_code=404, detail=f"Model '{model}' not found")
+
+
 @router.get("/models", response_model=ModelListResponse)
 def list_models() -> dict:
-    models = [{"name": key, "key": key} for key in chroma_manager.get_available_models()]
+    models = [{"name": key, "key": key} for key in _available_models()]
     return {"models": models}
 
 
 @router.post("/search", response_model=list[SearchResult])
 def search(request: SearchRequest):
-    return similarity_service.search(request.model, request.query, request.top_k)
+    _require_collection(request.model)
+    try:
+        return similarity_service.search(request.model, request.query, request.top_k)
+    except ImportError as e:
+        # The viewer build ships without torch / embedding models; encoding a
+        # free-text query needs them. Point-neighbor search still works.
+        raise HTTPException(
+            status_code=503,
+            detail="Text-query search is unavailable in this build (embedding models not installed)",
+        ) from e
 
 
 @router.get("/points/{model}/{text_id}", response_model=list[SearchResult])
@@ -27,6 +50,7 @@ def point_info(
     chunk_index: int = Query(...),
     top_k: int = Query(1, ge=1, le=100),
 ):
+    _require_collection(model)
     return similarity_service.get_point(
         model, text_id, chunk_index, top_k=top_k,
     )

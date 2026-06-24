@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, ORJSONResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from server.api import corpus, graphs, similarity
@@ -9,10 +9,7 @@ from settings import settings
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(
-        title="MythoScope UI Server",
-        default_response_class=ORJSONResponse,
-    )
+    app = FastAPI(title="MythoScope UI Server")
 
     srv = settings.server
     app.add_middleware(GZipMiddleware, minimum_size=srv.gzip_minimum_size)

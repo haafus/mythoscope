@@ -20,8 +20,29 @@ python -m venv .venv
 source .venv/bin/activate   # Linux/macOS
 # .\.venv\Scripts\Activate.ps1   # Windows PowerShell
 pip install --upgrade pip
-pip install -e ".[all,dev]"
 ```
+
+Дальше выбери профиль установки под свой сценарий — они отличаются весом на порядки.
+
+### Сценарии установки
+
+| Профиль | Команда | Вес | Что умеет |
+|---|---|---|---|
+| **viewer** | `pip install -e ".[viewer]"` | ~300 МБ | поднять веб-сервер на уже готовых данных: тексты, графы, проекции **+ поиск соседей по точкам**. Без torch. |
+| **search** | `pip install -e ".[search]"` | ~5 ГБ (или ~640 МБ с CPU-torch) | то же + **семантический поиск по текстовому запросу** (тянет torch и модели эмбеддингов) |
+| **all** (сборка/разработка) | `pip install -e ".[all,dev]"` | ~5 ГБ | весь пайплайн: скачивание корпуса, эмбеддинги, проекции, графы + тесты/линтеры |
+
+Профили вложены: `viewer ⊂ search ⊂ all`. Низкоуровневые extras-кирпичики (`vectorstore`, `embeddings`, `analysis`, `corpus`, `graphs`) можно ставить и по отдельности.
+
+`dev` (pytest, ruff, mypy) — инструменты разработчика, не входит в `all`. Добавляй его явно при работе над кодом: `pip install -e ".[all,dev]"` (или `".[viewer,dev]"` и т.п.).
+
+- **viewer** не требует torch и скрейпинг-либ — это гарантируется тестом `tests/test_viewer_imports.py`. Эндпоинт `/api/similarity/search` (текст-поиск) в этом профиле отвечает `503`; поиск соседей по точкам и остальные страницы работают.
+- **search** добавляет текст-поиск: при первом запросе модель эмбеддингов скачивается с HuggingFace (нужен доступ к `huggingface.co`).
+- Если GPU нет, для `search`/`all` ставь CPU-only torch, чтобы не тянуть ~3.4 ГБ CUDA-библиотек:
+  ```bash
+  pip install torch --index-url https://download.pytorch.org/whl/cpu
+  pip install -e ".[search]"   # или ".[all,dev]"
+  ```
 
 Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/embeddings/`, `outputs/projections/`, `outputs/corpus/`, `outputs/graphs/` и `outputs/logs/`.
 
@@ -51,7 +72,7 @@ mytho clean
 
 ## corpus
 
-Модуль сборки корпуса из `config/download_list.json`. Тексты с Project Gutenberg автоматически очищаются от лицензионных заголовков и хвостов при скачивании.
+Модуль сборки корпуса из `config/corpus.json` (каталог источников). Тексты с Project Gutenberg автоматически очищаются от лицензионных заголовков и хвостов при скачивании.
 
 Основные файлы:
 - `src/corpus/downloader.py` скачивает источники.
@@ -84,8 +105,7 @@ mytho corpus --force
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
-- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции).
-- `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
+- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции); читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
 - `src/embeddings/chunking.py` разбивает тексты на чанки с перекрытием (используется и для embeddings, и для graphs).
 - `src/embeddings/chroma_manager.py` хранилище ChromaDB: module-level функции (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
 - `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей (`EmbeddingEncoder`).
@@ -137,6 +157,12 @@ mytho projections
 
 ```bash
 mytho projections --model bge-m3
+```
+
+Дополнительно построить motif-UMAP из LLM-саммари сюжетов:
+
+```bash
+mytho projections --motifs
 ```
 
 ## graphs
@@ -226,6 +252,7 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/corpus/traditions` | Традиции с координатами |
 | GET | `/api/graphs/{text_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
 | GET | `/api/similarity/models` | Список embedding-моделей |
+| GET | `/api/similarity/methods` | Список методов проекций |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
 | GET | `/api/similarity/points/{model}/{text_id}` | Информация о точке (+ соседи через `?chunk_index=N&top_k=N`) |
 | POST | `/api/similarity/search` | Семантический поиск |
@@ -323,6 +350,18 @@ mytho server
 
 ```bash
 mytho build --model bge-m3
+```
+
+Указать отдельную LLM-модель для шага graphs (embedding-модель задаётся через `--model`):
+
+```bash
+mytho build --model bge-m3 --llm gemini25-flash
+```
+
+Быстрый прогон для проверки пайплайна — первая активная embedding-модель и не более 3 текстов:
+
+```bash
+mytho build --sample
 ```
 
 Или по шагам:
