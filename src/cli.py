@@ -1,4 +1,6 @@
 import sys
+import time
+from datetime import timedelta
 
 import click
 
@@ -35,11 +37,34 @@ def mytho():
     setup_logging()
 
 
+def _fmt_elapsed(seconds: float) -> str:
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    return str(timedelta(seconds=round(seconds)))
+
+
+def _fail(name: str, error: Exception) -> None:
+    """Report a failed step on stderr and exit non-zero (no bare traceback)."""
+    click.echo(click.style(f"[fail]  {name}: {error}", fg="red"), err=True)
+    sys.exit(1)
+
+
+def _run(name: str, fn, /, **kwargs) -> None:
+    """Run a pipeline step with timing; on failure report cleanly and exit non-zero."""
+    click.echo(click.style(f"[start] {name}", fg="cyan", bold=True))
+    start = time.monotonic()
+    try:
+        fn(**kwargs)
+    except Exception as e:
+        _fail(name, e)
+    click.echo(click.style(f"[done]  {name}", fg="green") + f" ({_fmt_elapsed(time.monotonic() - start)})")
+
+
 @mytho.command()
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing files.")
 def corpus(force: bool):
     """Download and build the text corpus."""
-    _build_corpus(force=force)
+    _run("Corpus", _build_corpus, force=force)
 
 
 @mytho.command()
@@ -47,7 +72,7 @@ def corpus(force: bool):
 @click.option("--force", "-f", is_flag=True, help="Regenerate even if collection exists.")
 def embeddings(model: str | None, force: bool):
     """Generate embeddings for the corpus."""
-    _build_embeddings(model=model, force=force)
+    _run("Embeddings", _build_embeddings, model=model, force=force)
 
 
 @mytho.command()
@@ -56,7 +81,7 @@ def embeddings(model: str | None, force: bool):
 @click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
 def projections(model: str | None, motifs: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
-    _build_projections(model=model, motif_analysis=motifs, force=force)
+    _run("Projections", _build_projections, model=model, motif_analysis=motifs, force=force)
 
 
 @mytho.command()
@@ -64,7 +89,7 @@ def projections(model: str | None, motifs: bool, force: bool):
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing graph outputs.")
 def graphs(model: str | None, force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    _build_graphs(llm=model, force=force)
+    _run("Graphs", _build_graphs, llm=model, force=force)
 
 
 @mytho.command()
@@ -106,29 +131,12 @@ def build(model, llm, force, sample):
         ("Graphs", _build_graphs, {"llm": llm, "force": force, "max_texts": max_texts}),
     ]
 
-    import time
-    from datetime import timedelta
-
-    def _fmt_elapsed(seconds: float) -> str:
-        td = timedelta(seconds=round(seconds))
-        if seconds < 60:
-            return f"{seconds:.1f}s"
-        return str(td)
-
     start_all = time.monotonic()
     for name, fn, kwargs in steps:
-        click.echo(click.style(f"[start] {name}", fg="cyan", bold=True))
-        start = time.monotonic()
-        try:
-            fn(**kwargs)
-            elapsed = time.monotonic() - start
-            click.echo(click.style(f"[done]  {name}", fg="green") + f" ({_fmt_elapsed(elapsed)})")
-        except Exception as e:
-            click.echo(click.style(f"[fail]  {name}: {e}", fg="red"), err=True)
-            sys.exit(1)
+        _run(name, fn, **kwargs)
 
     total = time.monotonic() - start_all
-    click.echo(click.style(f"\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(total)})")
+    click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(total)})")
 
 
 def _build_corpus(force: bool = False, max_texts: int | None = None):
@@ -232,6 +240,13 @@ def _header(name: str, size: int):
 @click.option("--apply", is_flag=True, help="Actually delete orphan files (default is dry run).")
 def clean(apply: bool):
     """Find and remove orphan files not used by the pipeline."""
+    try:
+        _clean(apply)
+    except Exception as e:
+        _fail("Clean", e)
+
+
+def _clean(apply: bool):
     import shutil
 
     from pipeline_inspect import (
