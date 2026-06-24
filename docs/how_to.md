@@ -72,7 +72,7 @@ mytho clean
 
 ## corpus
 
-Модуль сборки корпуса из `config/download_list.json`. Тексты с Project Gutenberg автоматически очищаются от лицензионных заголовков и хвостов при скачивании.
+Модуль сборки корпуса из `config/corpus.json` (каталог источников). Тексты с Project Gutenberg автоматически очищаются от лицензионных заголовков и хвостов при скачивании.
 
 Основные файлы:
 - `src/corpus/downloader.py` скачивает источники.
@@ -105,8 +105,7 @@ mytho corpus --force
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
-- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции).
-- `src/embeddings/builder.py` читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
+- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции); читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
 - `src/embeddings/chunking.py` разбивает тексты на чанки с перекрытием (используется и для embeddings, и для graphs).
 - `src/embeddings/chroma_manager.py` хранилище ChromaDB: module-level функции (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
 - `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей (`EmbeddingEncoder`).
@@ -253,6 +252,7 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/corpus/traditions` | Традиции с координатами |
 | GET | `/api/graphs/{text_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
 | GET | `/api/similarity/models` | Список embedding-моделей |
+| GET | `/api/similarity/methods` | Список методов проекций |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
 | GET | `/api/similarity/points/{model}/{text_id}` | Информация о точке (+ соседи через `?chunk_index=N&top_k=N`) |
 | POST | `/api/similarity/search` | Семантический поиск |
