@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 import chromadb
@@ -5,6 +6,8 @@ import numpy as np
 
 from model_registry import model_to_key
 from settings import settings
+
+logger = logging.getLogger(__name__)
 
 _client = None
 
@@ -92,13 +95,8 @@ def delete_collection(model_name: str) -> bool:
     try:
         _get_client().delete_collection(name=model_to_key(model_name))
         return True
-    except Exception as error:
-        msg = str(error).lower()
-        if "does not exist" in msg or "doesn't exist" in msg or "not found" in msg:
-            return False
-        if "readonly database" in msg or "read-only database" in msg:
-            raise RuntimeError(
-                "Chroma database is read-only. Move chroma_path to a writable directory "
-                "or fix permissions for the Chroma DB files."
-            ) from error
-        raise
+    except Exception as e:
+        code = getattr(e, "status_code", None) or getattr(e, "code", None)
+        message = getattr(e, "message", None) or str(e)
+        logger.error(f"Failed to delete collection {model_name!r} (code={code}): {message}")
+        return False
