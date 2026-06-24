@@ -75,8 +75,7 @@ class TestSimilarityEndpoints:
         assert response.status_code == 404
 
     def test_search_without_embedding_models_returns_503(self):
-        # viewer build: collection exists but torch / embedding models are absent,
-        # so encoding a free-text query raises ImportError -> graceful 503.
+        # collection exists, but text encoding (torch) is missing -> 503, not 500.
         from unittest.mock import patch
 
         with patch("server.api.similarity._available_models", return_value=["m"]), \
