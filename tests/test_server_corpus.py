@@ -61,13 +61,10 @@ class TestGetCatalogDocuments:
         assert docs[0]["title"] == "Iliad"
         assert docs[0]["color"] == "#ff0000"
 
-    def test_missing_corpus_json_raises(self, tmp_path, monkeypatch):
+    def test_missing_corpus_json_returns_empty(self, tmp_path, monkeypatch):
         _patch_corpus(monkeypatch, tmp_path)
 
-        import pytest
-
-        with pytest.raises(FileNotFoundError):
-            get_catalog_documents()
+        assert get_catalog_documents() == []
 
     def test_sorted_by_tradition(self, tmp_path, monkeypatch):
         metadata = [

@@ -57,7 +57,7 @@ class TestCorpusDocumentEndpoint:
         response = client.get(
             "/api/corpus/documents",
             params={
-                "id": "nonexistent_xyz",
+                "title": "nonexistent_xyz",
                 "major_tradition": "none",
                 "tradition": "none",
             },

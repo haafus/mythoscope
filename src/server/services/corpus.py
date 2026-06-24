@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 def get_catalog_documents() -> list[dict]:
     metadata_path = settings.corpus_dir / "corpus.json"
+    if not metadata_path.exists():
+        return []
 
     with metadata_path.open("r", encoding="utf-8") as handle:
         metadata_rows = json.load(handle)
