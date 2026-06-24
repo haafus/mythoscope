@@ -42,9 +42,6 @@ def build_embeddings(
             encoder.load(model)
             logger.info(f"   Model: {model}")
             _save_corpus_to_chroma(encoder)
-    except Exception as e:
-        logger.error(f"Embedding generation error: {e}")
-        raise
     finally:
         encoder.unload()
 

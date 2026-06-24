@@ -20,9 +20,8 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
     prompts_path = Path("config/graphs_prompts.json")
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
-    except Exception:
-        logger.exception("Failed to load prompts from %s", prompts_path)
-        return
+    except Exception as e:
+        raise RuntimeError(f"Failed to load prompts from {prompts_path}: {e}") from e
 
     graphs_cfg = settings.graphs
     processor = LLMProcessor(
