@@ -32,7 +32,9 @@ pip install --upgrade pip
 | **search** | `pip install -e ".[search]"` | ~5 ГБ (или ~640 МБ с CPU-torch) | то же + **семантический поиск по текстовому запросу** (тянет torch и модели эмбеддингов) |
 | **all** (сборка/разработка) | `pip install -e ".[all,dev]"` | ~5 ГБ | весь пайплайн: скачивание корпуса, эмбеддинги, проекции, графы + тесты/линтеры |
 
-Профили вложены: `viewer ⊂ search ⊂ all`. Низкоуровневые extras (`server`, `vectorstore`, `embeddings`, `analysis`, `corpus`, `graphs`, `dev`) можно ставить и по отдельности.
+Профили вложены: `viewer ⊂ search ⊂ all`. Низкоуровневые extras-кирпичики (`vectorstore`, `embeddings`, `analysis`, `corpus`, `graphs`) можно ставить и по отдельности.
+
+`dev` (pytest, ruff, mypy) — инструменты разработчика, не входит в `all`. Добавляй его явно при работе над кодом: `pip install -e ".[all,dev]"` (или `".[viewer,dev]"` и т.п.).
 
 - **viewer** не требует torch и скрейпинг-либ — это гарантируется тестом `tests/test_viewer_imports.py`. Эндпоинт `/api/similarity/search` (текст-поиск) в этом профиле отвечает `503`; поиск соседей по точкам и остальные страницы работают.
 - **search** добавляет текст-поиск: при первом запросе модель эмбеддингов скачивается с HuggingFace (нужен доступ к `huggingface.co`).
