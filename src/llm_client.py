@@ -33,45 +33,48 @@ class LLMProcessor:
         self.client = OpenAI(**kwargs)
 
     def ask_text(self, system_prompt: str, user_content: str) -> str:
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_content},
-                ],
-                temperature=self.temperature,
-            )
-            return response.choices[0].message.content.strip()
-        except Exception:
-            logger.exception("LLM call failed")
-            return ""
+        content = self._complete(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+        )
+        return content or ""
 
     def ask_json(self, system_prompt: str, user_content: str) -> list[dict]:
-        try:
-            kwargs: dict = {
-                "model": self.model_name,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": system_prompt
-                        + "\nOutput strictly valid JSON with a 'data' key containing the list of objects.",
-                    },
-                    {"role": "user", "content": user_content},
-                ],
-                "temperature": self.temperature,
-            }
-
-            if self.use_json_mode:
-                kwargs["response_format"] = {"type": "json_object"}
-
-            response = self.client.chat.completions.create(**kwargs)
-            raw_content = response.choices[0].message.content.strip()
-            return self._parse_json_list(raw_content)
-
-        except Exception:
-            logger.exception("LLM call failed")
+        content = self._complete(
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt
+                    + "\nOutput strictly valid JSON with a 'data' key containing the list of objects.",
+                },
+                {"role": "user", "content": user_content},
+            ],
+            response_format={"type": "json_object"} if self.use_json_mode else None,
+        )
+        if content is None:
             return []
+        return self._parse_json_list(content)
+
+    def _complete(self, messages: list[dict], response_format: dict | None = None) -> str | None:
+        """Run a chat completion, returning the message content or None on failure."""
+        kwargs: dict = {
+            "model": self.model_name,
+            "messages": messages,
+            "temperature": self.temperature,
+        }
+        if response_format is not None:
+            kwargs["response_format"] = response_format
+
+        try:
+            response = self.client.chat.completions.create(**kwargs)
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            code = getattr(e, "status_code", None) or getattr(e, "code", None)
+            message = getattr(e, "message", None) or str(e)
+            logger.error(f"LLM call failed (model={self.model_name}, code={code}): {message}")
+            return None
 
     @staticmethod
     def _parse_json_list(raw: str) -> list[dict]:
