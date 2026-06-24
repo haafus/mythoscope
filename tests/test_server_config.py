@@ -28,5 +28,5 @@ class TestServerPaths:
         assert settings.web_root == Path("src/server/web")
 
     def test_web_root_is_regular_field(self):
-        assert "web_root" in settings.model_fields
+        assert "web_root" in type(settings).model_fields
 
