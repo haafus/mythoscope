@@ -139,6 +139,12 @@ mytho projections
 mytho projections --model bge-m3
 ```
 
+Дополнительно построить motif-UMAP из LLM-саммари сюжетов:
+
+```bash
+mytho projections --motifs
+```
+
 ## graphs
 
 Модуль извлечения персонажей, отношений, мест и времени через LLM и генерации графов.
@@ -323,6 +329,18 @@ mytho server
 
 ```bash
 mytho build --model bge-m3
+```
+
+Указать отдельную LLM-модель для шага graphs (embedding-модель задаётся через `--model`):
+
+```bash
+mytho build --model bge-m3 --llm gemini25-flash
+```
+
+Быстрый прогон для проверки пайплайна — первая активная embedding-модель и не более 3 текстов:
+
+```bash
+mytho build --sample
 ```
 
 Или по шагам:
