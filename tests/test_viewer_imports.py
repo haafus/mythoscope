@@ -1,16 +1,7 @@
-"""Guard for the lightweight `viewer` install profile.
+"""Guard: the viewer profile must import and serve without torch or scraping libs.
 
-The read-only web server (browsing texts/graphs/projections plus point-neighbor
-search) must import and serve without the heavy / build-only dependencies:
-torch and the embedding models, and the corpus scraping stack. chromadb is
-intentionally allowed — the viewer ships with it for neighbor search.
-
-If someone hoists ``from embeddings.model_manager import ...`` to a router's top
-level, or adds a scraping import to ``corpus/__init__``, this test fails before
-the regression reaches a slim deployment.
-
-Runs in a subprocess so the blocking is hermetic: inside the pytest process
-torch is already imported by other tests, which would defeat the check.
+Runs in a subprocess so blocking is hermetic — in-process, torch is already
+imported by other tests.
 """
 
 import os
@@ -20,7 +11,6 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
 
-# Build-only / heavy deps the read-only viewer must not need at import time.
 # chromadb is deliberately NOT blocked (it is part of the viewer profile).
 _BLOCKED = [
     "torch",
