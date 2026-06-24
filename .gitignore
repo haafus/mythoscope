@@ -16,3 +16,12 @@ outputs/
 .venv/
 venv/
 *.egg-info/
+
+# tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# build artifacts
+build/
+dist/
