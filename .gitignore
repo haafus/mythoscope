@@ -9,7 +9,6 @@ outputs/
 # data formats that should not be in git
 *.npy
 *.pkl
-*.lock
 
 # environment
 .env
