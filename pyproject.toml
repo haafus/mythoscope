@@ -21,14 +21,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# --- building blocks ---
 server = [
     "fastapi>=0.110.0,<0.140.0",
     "uvicorn[standard]>=0.27.0",
 ]
+vectorstore = [
+    "chromadb>=1.0.0",
+]
 embeddings = [
+    "mythoscope[vectorstore]",
     "sentence-transformers>=2.2.0",
     "torch>=2.0.0,<3.0.0",
-    "chromadb>=1.0.0",
 ]
 analysis = [
     "umap-learn>=0.5.5",
@@ -52,6 +56,16 @@ dev = [
     "ruff>=0.4.0",
     "mypy>=1.10.0",
 ]
+# --- use-case bundles ---
+# viewer: lightweight read-only server (browse data + point-neighbor search), no torch
+viewer = [
+    "mythoscope[server,vectorstore]",
+]
+# search: viewer + semantic text-query search (pulls torch / embedding models)
+search = [
+    "mythoscope[viewer,embeddings]",
+]
+# all: full pipeline — build data and serve it
 all = [
     "mythoscope[server,embeddings,analysis,corpus,graphs]",
 ]

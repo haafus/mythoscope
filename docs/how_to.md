@@ -20,8 +20,27 @@ python -m venv .venv
 source .venv/bin/activate   # Linux/macOS
 # .\.venv\Scripts\Activate.ps1   # Windows PowerShell
 pip install --upgrade pip
-pip install -e ".[all,dev]"
 ```
+
+Дальше выбери профиль установки под свой сценарий — они отличаются весом на порядки.
+
+### Сценарии установки
+
+| Профиль | Команда | Вес | Что умеет |
+|---|---|---|---|
+| **viewer** | `pip install -e ".[viewer]"` | ~300 МБ | поднять веб-сервер на уже готовых данных: тексты, графы, проекции **+ поиск соседей по точкам**. Без torch. |
+| **search** | `pip install -e ".[search]"` | ~5 ГБ (или ~640 МБ с CPU-torch) | то же + **семантический поиск по текстовому запросу** (тянет torch и модели эмбеддингов) |
+| **all** (сборка/разработка) | `pip install -e ".[all,dev]"` | ~5 ГБ | весь пайплайн: скачивание корпуса, эмбеддинги, проекции, графы + тесты/линтеры |
+
+Профили вложены: `viewer ⊂ search ⊂ all`. Низкоуровневые extras (`server`, `vectorstore`, `embeddings`, `analysis`, `corpus`, `graphs`, `dev`) можно ставить и по отдельности.
+
+- **viewer** не требует torch и скрейпинг-либ — это гарантируется тестом `tests/test_viewer_imports.py`. Эндпоинт `/api/similarity/search` (текст-поиск) в этом профиле отвечает `503`; поиск соседей по точкам и остальные страницы работают.
+- **search** добавляет текст-поиск: при первом запросе модель эмбеддингов скачивается с HuggingFace (нужен доступ к `huggingface.co`).
+- Если GPU нет, для `search`/`all` ставь CPU-only torch, чтобы не тянуть ~3.4 ГБ CUDA-библиотек:
+  ```bash
+  pip install torch --index-url https://download.pytorch.org/whl/cpu
+  pip install -e ".[search]"   # или ".[all,dev]"
+  ```
 
 Часть команд скачивает модели, обращается к внешним сайтам или пишет большие артефакты в `outputs/embeddings/`, `outputs/projections/`, `outputs/corpus/`, `outputs/graphs/` и `outputs/logs/`.
 

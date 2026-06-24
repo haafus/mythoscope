@@ -32,7 +32,15 @@ def list_models() -> dict:
 @router.post("/search", response_model=list[SearchResult])
 def search(request: SearchRequest):
     _require_collection(request.model)
-    return similarity_service.search(request.model, request.query, request.top_k)
+    try:
+        return similarity_service.search(request.model, request.query, request.top_k)
+    except ImportError as e:
+        # The viewer build ships without torch / embedding models; encoding a
+        # free-text query needs them. Point-neighbor search still works.
+        raise HTTPException(
+            status_code=503,
+            detail="Text-query search is unavailable in this build (embedding models not installed)",
+        ) from e
 
 
 @router.get("/points/{model}/{text_id}", response_model=list[SearchResult])
