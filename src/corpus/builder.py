@@ -11,13 +11,13 @@ from .clean_gutenberg import clean_gutenberg_in_builder
 from .downloader import download_file, load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .utils import (
-    text_path,
     count_sentences,
     count_words,
     ensure_dir,
     get_tradition_color,
     md5,
     normalize_text,
+    text_path,
 )
 
 logger = logging.getLogger(__name__)

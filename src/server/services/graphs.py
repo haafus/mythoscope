@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from corpus.utils import normalize_catalog_id
 from settings import settings

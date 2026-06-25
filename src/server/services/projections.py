@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from projections import PROJECTION_KEYS
 from settings import settings

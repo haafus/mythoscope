@@ -1,6 +1,6 @@
 import json
 
-from corpus.utils import read_traditions, read_document
+from corpus.utils import read_document, read_traditions
 from server.services.corpus import get_catalog_documents
 from settings import settings
 

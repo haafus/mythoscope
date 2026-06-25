@@ -2,8 +2,6 @@ import json
 import sys
 import types
 
-import pytest
-
 for stub in ["pymupdf", "trafilatura", "bs4", "fake_useragent"]:
     sys.modules.setdefault(stub, types.ModuleType(stub))
 bs4_mod = sys.modules["bs4"]
@@ -23,7 +21,6 @@ if not hasattr(fu_mod, "UserAgent"):
 from datetime import datetime
 
 from corpus.builder import _build_metadata, _update_traditions
-
 
 _BASE_ITEM = {
     "major_tradition": "Greek",

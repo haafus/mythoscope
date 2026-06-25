@@ -5,11 +5,10 @@ from pathlib import Path
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from corpus.iterator import iter_files
+from embeddings.chunking import chunk_text
 from json_utils import save_json
 from llm_client import LLMProcessor
 from settings import settings
-
-from embeddings.chunking import chunk_text
 
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
 from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph

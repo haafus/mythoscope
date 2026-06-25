@@ -6,7 +6,6 @@ import click
 
 from log_setup import setup_logging
 
-
 COMMAND_SECTIONS = [
     ("Pipeline", ["corpus", "embeddings", "projections", "graphs"]),
     ("Management", ["build", "status", "clean", "server"]),

@@ -154,7 +154,7 @@ def embeddings_orphan_chunks(settings, *, skip_collections: set[str] | None = No
                 continue
             all_meta = col.get(include=["metadatas"])
             orphan_ids = []
-            for doc_id, meta in zip(all_meta["ids"], all_meta["metadatas"]):
+            for doc_id, meta in zip(all_meta["ids"], all_meta["metadatas"], strict=True):
                 text_id = (meta or {}).get("text_id")
                 if text_id and text_id not in known_text_ids:
                     orphan_ids.append(doc_id)

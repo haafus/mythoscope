@@ -5,7 +5,6 @@ import numpy as np
 from tqdm import tqdm
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
-from settings import settings
 
 logger = logging.getLogger(__name__)
 

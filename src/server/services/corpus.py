@@ -4,7 +4,7 @@ import logging
 import zipfile
 from pathlib import Path
 
-from corpus.utils import text_path, read_traditions, read_document, sanitize_filename
+from corpus.utils import read_traditions, sanitize_filename, text_path
 from settings import settings
 
 logger = logging.getLogger(__name__)
