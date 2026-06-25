@@ -13,7 +13,7 @@ COMMAND_SECTIONS = [
 ]
 
 # Number of texts processed by `build --sample` (quick smoke run).
-SAMPLE_MAX_TEXTS = 1
+SAMPLE_MAX_TEXTS = 2
 
 
 class OrderedGroup(click.Group):
