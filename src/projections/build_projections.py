@@ -78,6 +78,8 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_motif: b
 
 
 def _generate_motif_plot(model_data: ModelData) -> None:
+    from llm_client import FatalLLMError
+
     from .motif_analysis import run_motif_analysis
 
     logger.info("Generating Motif UMAP projection (LLM summaries)...")
@@ -87,5 +89,7 @@ def _generate_motif_plot(model_data: ModelData) -> None:
             output_dir=model_data.output_dir,
             embedding_model=model_data.model_name,
         )
+    except FatalLLMError:
+        raise
     except Exception:
         logger.exception("Error creating Motif UMAP plot")
