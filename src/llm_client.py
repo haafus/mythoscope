@@ -72,7 +72,11 @@ class LLMProcessor:
             return response.choices[0].message.content.strip()
         except Exception as e:
             code = getattr(e, "status_code", None) or getattr(e, "code", None)
-            message = getattr(e, "message", None) or str(e)
+            body = getattr(e, "body", None)
+            if isinstance(body, dict):
+                message = (body.get("error") or {}).get("message") or str(e)
+            else:
+                message = getattr(e, "message", None) or str(e)
             logger.error(f"LLM call failed (model={self.model_name}, code={code}): {message}")
             return None
 
