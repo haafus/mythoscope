@@ -77,7 +77,12 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
 
     logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
 
-    with tqdm(desc="Embedding", unit="chunk") as pbar:
+    total = sum(
+        sum(1 for c in chunk_text(fi.read_text(), emb.chunk_size, emb.chunk_overlap) if c.strip())
+        for fi in files_info
+    )
+
+    with tqdm(total=total, desc="Embedding", unit="chunk") as pbar:
         for file_info in files_info:
             content = file_info.read_text()
             chunks = [c for c in chunk_text(content, emb.chunk_size, emb.chunk_overlap) if c.strip()]
