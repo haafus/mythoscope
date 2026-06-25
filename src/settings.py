@@ -1,7 +1,13 @@
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
+
+# Load .env into os.environ so non-MYTHO_ keys (OPENAI_API_KEY, HF_TOKEN, …)
+# reach the SDKs; real environment variables take precedence (override=False).
+for _env_file in (".env", "config/.env"):
+    load_dotenv(_env_file)
 
 # ---------------------------------------------------------------------------
 # Sub-models (BaseModel — not BaseSettings, nested inside Settings)
