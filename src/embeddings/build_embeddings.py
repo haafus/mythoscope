@@ -140,6 +140,8 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
             except Exception:
                 logger.exception("Error processing %s", file_info.filename)
 
+            encoder.release_cache()
+
     collection.modify(metadata={
         "model": model_name,
         "chunk_size": emb.chunk_size,

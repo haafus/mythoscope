@@ -59,6 +59,16 @@ class EmbeddingEncoder:
             raise RuntimeError("No model loaded. Call load() first.")
         return self._model.encode(texts, **kwargs)
 
+    def release_cache(self) -> None:
+        """Return cached device memory to the OS (MPS bloats shared RAM over a run).
+
+        CUDA keeps its separate VRAM cache (clearing only adds overhead); CPU has
+        no device cache. So only MPS is emptied here.
+        """
+        gc.collect()
+        if self._model is not None and str(self._model.device) == "mps":
+            torch.mps.empty_cache()
+
     def unload(self) -> None:
         if self._model is None:
             return
