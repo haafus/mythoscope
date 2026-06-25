@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from chunk_cache import append_cache, chunk_hash, load_cache
+from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -21,12 +21,15 @@ SUMMARY_PROMPT = (
 def generate_motif_summaries(
     data: list[dict],
     output_dir: Path,
+    force: bool = False,
 ) -> list[str]:
     from llm_client import LLMProcessor
 
     llm = LLMProcessor(use_json_mode=False)
 
     cache_path = output_dir / "motif_summaries.jsonl"
+    if force:
+        clear_cache(cache_path)
     cache = load_cache(cache_path)
     summaries: list[str] = []
     new_count = 0
@@ -74,10 +77,11 @@ def run_motif_analysis(
     data: list[dict],
     output_dir: Path,
     embedding_model: str,
+    force: bool = False,
 ) -> None:
     from .visualization import generate_scatter
 
-    summaries = generate_motif_summaries(data, output_dir)
+    summaries = generate_motif_summaries(data, output_dir, force=force)
 
     empty_count = sum(1 for s in summaries if not s.strip())
     if empty_count > len(summaries) * 0.5:

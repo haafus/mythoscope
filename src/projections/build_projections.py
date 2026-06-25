@@ -57,7 +57,7 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_motif: b
             if not force and output_path.exists():
                 logger.info("Skipping %s (already exists)", label)
                 continue
-            _generate_motif_plot(model_data)
+            _generate_motif_plot(model_data, force)
             continue
 
         if not force and output_path.exists():
@@ -77,7 +77,7 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_motif: b
     logger.info("Visualizations for %s: %s", model_data.model_name, model_data.output_dir)
 
 
-def _generate_motif_plot(model_data: ModelData) -> None:
+def _generate_motif_plot(model_data: ModelData, force: bool) -> None:
     from llm_client import FatalLLMError
 
     from .motif_analysis import run_motif_analysis
@@ -88,6 +88,7 @@ def _generate_motif_plot(model_data: ModelData) -> None:
             model_data.data,
             output_dir=model_data.output_dir,
             embedding_model=model_data.model_name,
+            force=force,
         )
     except FatalLLMError:
         raise
