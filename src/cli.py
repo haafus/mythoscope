@@ -12,6 +12,9 @@ COMMAND_SECTIONS = [
     ("Management", ["build", "status", "clean", "server"]),
 ]
 
+# Number of texts processed by `build --sample` (quick smoke run).
+SAMPLE_MAX_TEXTS = 1
+
 
 class OrderedGroup(click.Group):
     def format_help(self, ctx, formatter):
@@ -119,7 +122,7 @@ def build(model, llm, force, sample):
     if sample:
         from model_registry import active_embedding_models
         model = model or active_embedding_models()[0]
-        max_texts = 3
+        max_texts = SAMPLE_MAX_TEXTS
         click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
     else:
         max_texts = None
