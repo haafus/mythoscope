@@ -54,7 +54,6 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     corpus_dir = settings.corpus_dir
     batch_size = emb.batch_size
 
-    t0 = time.monotonic()
     files_info = list(iter_files(corpus_dir))
 
     if not files_info:
@@ -82,6 +81,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
         for fi in files_info
     )
 
+    t0 = time.monotonic()
     with tqdm(total=total, desc="Embedding", unit="chunk") as pbar:
         for file_info in files_info:
             content = file_info.read_text()
