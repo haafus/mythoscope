@@ -1,11 +1,10 @@
-import hashlib
-import json
 import logging
 from pathlib import Path
 
 import numpy as np
 from tqdm import tqdm
 
+from chunk_cache import append_cache, chunk_hash, load_cache
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -19,28 +18,6 @@ SUMMARY_PROMPT = (
 )
 
 
-def _cache_path(output_dir: Path) -> Path:
-    return output_dir / "motif_summaries.json"
-
-
-def _chunk_hash(text: str) -> str:
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
-
-
-def _load_cache(path: Path) -> dict[str, str]:
-    if path.exists():
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            logger.warning("Corrupted motif cache, starting fresh")
-    return {}
-
-
-def _save_cache(path: Path, cache: dict[str, str]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
-
-
 def generate_motif_summaries(
     data: list[dict],
     output_dir: Path,
@@ -49,14 +26,14 @@ def generate_motif_summaries(
 
     llm = LLMProcessor(use_json_mode=False)
 
-    cache_file = _cache_path(output_dir)
-    cache = _load_cache(cache_file)
+    cache_path = output_dir / "motif_summaries.jsonl"
+    cache = load_cache(cache_path)
     summaries: list[str] = []
     new_count = 0
 
     for item in tqdm(data, desc="Generating motif summaries", unit="chunk"):
         text = item.get("text", "")
-        key = _chunk_hash(text)
+        key = chunk_hash(text)
 
         if key in cache:
             summaries.append(cache[key])
@@ -67,13 +44,10 @@ def generate_motif_summaries(
         new_count += 1
 
         if summary:
+            append_cache(cache_path, key, summary)
             cache[key] = summary
 
-        if new_count % 50 == 0:
-            _save_cache(cache_file, cache)
-
     if new_count > 0:
-        _save_cache(cache_file, cache)
         logger.info(f"Generated {new_count} new summaries, {len(summaries) - new_count} from cache")
     else:
         logger.info(f"All {len(summaries)} summaries loaded from cache")
