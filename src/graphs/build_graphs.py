@@ -101,7 +101,6 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
             generate_beings_graph(all_beings, all_relations, book_out_dir)
             generate_realms_graph(all_locations, book_out_dir)
             generate_ages_graph(all_times, book_out_dir)
-            clear_cache(cache_path)
 
         except Exception:
             logger.exception("Error saving files or generating graph for %s", text_id)
