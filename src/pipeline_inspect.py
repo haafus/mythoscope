@@ -5,19 +5,27 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from graphs.completion import is_book_complete
 from projections import PROJECTION_KEYS
 
 logger = logging.getLogger(__name__)
+
+GRAPHS_CACHE = "extraction_cache.jsonl"
+MOTIF_CACHE = "motif_summaries.jsonl"
 
 
 # ---------------------------------------------------------------------------
 # Size helpers
 # ---------------------------------------------------------------------------
 
-def dir_size(path: Path) -> int:
+def dir_size(path: Path, exclude_names: tuple[str, ...] = ()) -> int:
     if not path.exists():
         return 0
-    return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+    return sum(
+        f.stat().st_size
+        for f in path.rglob("*")
+        if f.is_file() and f.name not in exclude_names
+    )
 
 
 def file_size(path: Path) -> int:
@@ -183,7 +191,7 @@ def projections_status(settings) -> dict[str, Any]:
     proj_dir = Path(settings.projections_dir)
     result: dict[str, Any] = {
         "exists": proj_dir.exists(),
-        "total_size": dir_size(proj_dir),
+        "total_size": dir_size(proj_dir, exclude_names=(MOTIF_CACHE,)),
         "models": [],
     }
     if not proj_dir.exists():
@@ -196,7 +204,7 @@ def projections_status(settings) -> dict[str, Any]:
             "path": model_dir,
             "plots_done": len(existing),
             "plots_total": len(PROJECTION_PLOTS),
-            "size": dir_size(model_dir),
+            "size": dir_size(model_dir, exclude_names=(MOTIF_CACHE,)),
         })
 
     return result
@@ -224,15 +232,15 @@ def graphs_status(settings) -> dict[str, Any]:
     graphs_dir = Path(settings.graphs_dir)
     result: dict[str, Any] = {
         "exists": graphs_dir.exists(),
-        "total_size": dir_size(graphs_dir),
+        "total_size": dir_size(graphs_dir, exclude_names=(GRAPHS_CACHE,)),
         "count": 0,
     }
     if not graphs_dir.exists():
         return result
 
-    subdirs = [d for d in graphs_dir.iterdir() if d.is_dir()]
+    complete = [d for d in graphs_dir.iterdir() if d.is_dir() and is_book_complete(d)]
     html_files = list(graphs_dir.glob("*.html"))
-    result["count"] = len(subdirs) + len(html_files)
+    result["count"] = len(complete) + len(html_files)
     return result
 
 
@@ -262,3 +270,19 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
             orphans.append((item, dir_size(item)))
 
     return orphans
+
+
+# ---------------------------------------------------------------------------
+# Resumable caches (graphs extraction + motif summaries)
+# ---------------------------------------------------------------------------
+
+def cache_files(settings) -> list[tuple[Path, int]]:
+    """All resumable cache files (graphs + motif), with sizes."""
+    result: list[tuple[Path, int]] = []
+    for base, name in (
+        (Path(settings.graphs_dir), GRAPHS_CACHE),
+        (Path(settings.projections_dir), MOTIF_CACHE),
+    ):
+        if base.exists():
+            result.extend((p, file_size(p)) for p in base.rglob(name))
+    return result

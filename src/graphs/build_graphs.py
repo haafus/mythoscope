@@ -10,6 +10,7 @@ from json_utils import save_json
 from llm_client import LLMProcessor
 from settings import settings
 
+from .completion import is_book_complete
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
 from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph
 
@@ -41,8 +42,8 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
-        if (book_out_dir / "beings.json").exists() and not force:
-            logger.info(f"--- Skipping: {text_id} (already exists) ---")
+        if is_book_complete(book_out_dir) and not force:
+            logger.info(f"--- Skipping: {text_id} (already complete) ---")
             continue
 
         text = file_info.read_text()

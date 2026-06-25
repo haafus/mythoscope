@@ -239,19 +239,21 @@ def _header(name: str, size: int):
 
 
 @mytho.command()
-@click.option("--apply", is_flag=True, help="Actually delete orphan files (default is dry run).")
-def clean(apply: bool):
-    """Find and remove orphan files not used by the pipeline."""
+@click.option("--apply", is_flag=True, help="Actually delete files (default is dry run).")
+@click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/motif); needs --apply to delete.")
+def clean(apply: bool, caches: bool):
+    """Find and remove orphan files (and, with --caches, resumable caches)."""
     try:
-        _clean(apply)
+        _clean(apply, caches)
     except Exception as e:
         _fail("Clean", e)
 
 
-def _clean(apply: bool):
+def _clean(apply: bool, caches: bool):
     import shutil
 
     from pipeline_inspect import (
+        cache_files,
         corpus_orphans,
         embeddings_orphan_chunks,
         embeddings_orphan_collections,
@@ -323,11 +325,33 @@ def _clean(apply: bool):
                 shutil.rmtree(path)
         click.echo()
 
+    # Caches (always shown; removed only with --caches --apply)
+    cache_list = cache_files(settings)
+    if cache_list:
+        cache_bytes = sum(s for _, s in cache_list)
+        _header("Caches", cache_bytes)
+        outputs_root = settings.graphs_dir.parent
+        for path, size in cache_list:
+            try:
+                label = str(path.relative_to(outputs_root))
+            except ValueError:
+                label = str(path)
+            click.echo(f"  {label:<50} {format_size(size):>8}")
+        if caches:
+            total_items += len(cache_list)
+            total_bytes += cache_bytes
+            if apply:
+                for path, _ in cache_list:
+                    path.unlink(missing_ok=True)
+        else:
+            click.echo(click.style(f"  {format_size(cache_bytes)} reclaimable — add --caches to remove", fg="yellow"))
+        click.echo()
+
     if total_items == 0:
-        click.echo(click.style("No orphans found.", fg="green"))
+        click.echo(click.style("Nothing to remove.", fg="green"))
         return
 
-    summary = f"{total_items} orphan items"
+    summary = f"{total_items} items"
     if total_bytes:
         summary += f", {format_size(total_bytes)} on disk"
 

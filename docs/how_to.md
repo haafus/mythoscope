@@ -218,7 +218,7 @@ mytho graphs --force
 mytho status
 ```
 
-Вывод содержит секции Corpus, Embeddings, Projections, Graphs с итоговым размером.
+Вывод содержит секции Corpus, Embeddings, Projections, Graphs с итоговым размером. В Graphs «готовыми» считаются только книги со всеми тремя графами (`beings.json`, `realms.json`, `ages.json`). Размеры показываются **без** resumable-кэшей (их размер виден в `clean`).
 
 ## clean
 
@@ -230,10 +230,17 @@ mytho status
 mytho clean
 ```
 
-Удалить:
+Удалить орфаны:
 
 ```bash
 mytho clean --apply
+```
+
+Resumable-кэши (`extraction_cache.jsonl`, `motif_summaries.jsonl`) **показываются всегда** с размером, но удаляются только по явному `--caches` (они хранят оплаченные LLM-результаты и позволяют дешёвую пересборку):
+
+```bash
+mytho clean --caches            # dry run: показать кэши
+mytho clean --caches --apply    # удалить орфаны И все кэши
 ```
 
 ## server
