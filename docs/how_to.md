@@ -180,7 +180,7 @@ mytho projections --motifs
 - `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, агрегация.
 - `src/graphs/extraction.py` извлекает сущности через LLM и дедуплицирует их.
 - `src/embeddings/chunking.py` разбивает тексты на чанки (общий модуль).
-- `src/graphs/checkpointing.py` сохранение/загрузка промежуточных результатов.
+- `src/chunk_cache.py` content-hash кэш чанков (JSONL): возобновление по содержимому, общий для graphs и motif.
 - `src/graphs/graph_generator.py` строит граф через NetworkX и сохраняет JSON.
 - `src/llm_client.py` вызывает OpenAI-compatible API (`LLMProcessor`).
 
