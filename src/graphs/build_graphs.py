@@ -3,13 +3,14 @@ import logging
 from itertools import islice
 from pathlib import Path
 
+from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from corpus.iterator import iter_files
+from json_utils import save_json
 from llm_client import LLMProcessor
 from settings import settings
 
 from embeddings.chunking import chunk_text
 
-from .checkpointing import clear_checkpoint, load_checkpoint, save_checkpoint
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
 from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph
 
@@ -59,22 +60,29 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
             "time": prompts.get("time", "Extract time..."),
         }
 
-        results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
-        start_chunk = 0
+        cache_path = book_out_dir / "extraction_cache.jsonl"
+        if force:
+            clear_cache(cache_path)
+        cache = load_cache(cache_path)
 
-        checkpoint = None if force else load_checkpoint(book_out_dir)
-        if checkpoint and checkpoint["next_chunk"] <= len(chunks):
-            start_chunk = checkpoint["next_chunk"]
-            for key in results:
-                results[key] = checkpoint.get(key, [])
-            logger.info(f"Resuming from chunk {start_chunk + 1}/{len(chunks)} (checkpoint found).")
+        cached = sum(1 for c in chunks if chunk_hash(c) in cache)
+        if cached:
+            logger.info(f"Resuming: {cached}/{len(chunks)} chunks from cache.")
 
-        for i in range(start_chunk, len(chunks)):
+        for i, chunk in enumerate(chunks):
+            key = chunk_hash(chunk)
+            if key in cache:
+                continue
             logger.info(f"  [Chunk {i + 1}/{len(chunks)}] Extracting entities...")
-            chunk_results = extract_from_chunk(processor, chunks[i], chunk_prompts)
-            for key in results:
-                results[key].extend(chunk_results[key])
-            save_checkpoint(book_out_dir, i + 1, results)
+            chunk_results = extract_from_chunk(processor, chunk, chunk_prompts)
+            append_cache(cache_path, key, chunk_results)
+            cache[key] = chunk_results
+
+        results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
+        for chunk in chunks:
+            chunk_results = cache[chunk_hash(chunk)]
+            for k in results:
+                results[k].extend(chunk_results.get(k, []))
 
         all_beings = deduplicate_entities(results["beings"])
         all_relations = deduplicate_relations(results["relations"])
@@ -85,22 +93,15 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         )
 
         try:
-            with open(book_out_dir / "raw_beings.json", "w", encoding="utf-8") as f:
-                json.dump(all_beings, f, ensure_ascii=False, indent=2)
-
-            with open(book_out_dir / "relations.json", "w", encoding="utf-8") as f:
-                json.dump(all_relations, f, ensure_ascii=False, indent=2)
-
-            with open(book_out_dir / "locations.json", "w", encoding="utf-8") as f:
-                json.dump(all_locations, f, ensure_ascii=False, indent=2)
-
-            with open(book_out_dir / "times.json", "w", encoding="utf-8") as f:
-                json.dump(all_times, f, ensure_ascii=False, indent=2)
+            save_json(book_out_dir / "raw_beings.json", all_beings, indent=2)
+            save_json(book_out_dir / "relations.json", all_relations, indent=2)
+            save_json(book_out_dir / "locations.json", all_locations, indent=2)
+            save_json(book_out_dir / "times.json", all_times, indent=2)
 
             generate_beings_graph(all_beings, all_relations, book_out_dir)
             generate_realms_graph(all_locations, book_out_dir)
             generate_ages_graph(all_times, book_out_dir)
-            clear_checkpoint(book_out_dir)
+            clear_cache(cache_path)
 
         except Exception:
             logger.exception("Error saving files or generating graph for %s", text_id)

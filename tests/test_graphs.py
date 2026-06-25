@@ -27,14 +27,12 @@ def _load_module(name: str, filename: str):
 
 
 _extraction = _load_module("graphs.extraction", "extraction.py")
-_checkpointing = _load_module("graphs.checkpointing", "checkpointing.py")
+
+from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache  # noqa: E402
 
 deduplicate_entities = _extraction.deduplicate_entities
 deduplicate_relations = _extraction.deduplicate_relations
 extract_from_chunk = _extraction.extract_from_chunk
-load_checkpoint = _checkpointing.load_checkpoint
-save_checkpoint = _checkpointing.save_checkpoint
-clear_checkpoint = _checkpointing.clear_checkpoint
 
 
 class TestDeduplicateEntities:
@@ -81,31 +79,35 @@ class TestDeduplicateRelations:
         assert len(result) == 1
 
 
-class TestCheckpoint:
+class TestChunkCache:
     def test_roundtrip(self, tmp_path):
-        results = {"beings": [{"Name": "Zeus"}], "relations": [], "locations": [], "times": []}
-        save_checkpoint(tmp_path, 3, results)
+        p = tmp_path / "cache.jsonl"
+        append_cache(p, "h1", {"beings": [{"Name": "Zeus"}]})
+        append_cache(p, "h2", {"beings": []})
+        cache = load_cache(p)
+        assert cache["h1"] == {"beings": [{"Name": "Zeus"}]}
+        assert set(cache) == {"h1", "h2"}
 
-        cp = load_checkpoint(tmp_path)
-        assert cp["next_chunk"] == 3
-        assert cp["beings"] == [{"Name": "Zeus"}]
+    def test_missing_returns_empty(self, tmp_path):
+        assert load_cache(tmp_path / "nope.jsonl") == {}
 
-    def test_missing_returns_none(self, tmp_path):
-        assert load_checkpoint(tmp_path) is None
-
-    def test_corrupt_returns_none(self, tmp_path):
-        (tmp_path / "checkpoint.json").write_text("{not json")
-        assert load_checkpoint(tmp_path) is None
-
-    def test_missing_next_chunk_returns_none(self, tmp_path):
-        (tmp_path / "checkpoint.json").write_text('{"characters": []}')
-        assert load_checkpoint(tmp_path) is None
+    def test_skips_torn_last_line(self, tmp_path):
+        p = tmp_path / "cache.jsonl"
+        append_cache(p, "h1", 1)
+        with open(p, "a", encoding="utf-8") as f:
+            f.write('{"hash": "h2", "value": ')  # crash mid-write, no newline
+        assert load_cache(p) == {"h1": 1}
 
     def test_clear_is_idempotent(self, tmp_path):
-        save_checkpoint(tmp_path, 1, {})
-        clear_checkpoint(tmp_path)
-        assert load_checkpoint(tmp_path) is None
-        clear_checkpoint(tmp_path)
+        p = tmp_path / "cache.jsonl"
+        append_cache(p, "h1", 1)
+        clear_cache(p)
+        assert load_cache(p) == {}
+        clear_cache(p)
+
+    def test_hash_is_deterministic(self):
+        assert chunk_hash("abc") == chunk_hash("abc")
+        assert chunk_hash("abc") != chunk_hash("abd")
 
 
 class _FakeLLM:
