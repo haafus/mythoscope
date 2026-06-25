@@ -33,10 +33,29 @@ class FatalLLMError(Exception):
     """Unrecoverable LLM error (quota, auth, missing model) — stops the whole run."""
 
 
-def _error_message(e: Exception) -> str:
+def _error_body(e: Exception) -> dict:
+    """The error body as a dict — from e.body, or the response if the SDK typed it."""
     body = getattr(e, "body", None)
     if isinstance(body, dict):
-        return (body.get("error") or {}).get("message") or str(e)
+        return body
+    response = getattr(e, "response", None)
+    if response is not None:
+        try:
+            data = response.json()
+        except Exception:
+            data = None
+        if isinstance(data, dict):
+            return data
+    return {}
+
+
+def _error_message(e: Exception) -> str:
+    body = _error_body(e)
+    err = body.get("error")
+    if isinstance(err, dict) and err.get("message"):
+        return err["message"]
+    if body.get("message"):
+        return body["message"]
     return getattr(e, "message", None) or str(e)
 
 
@@ -46,10 +65,9 @@ def _error_codes(e: Exception) -> set:
     OpenAI nests them as body["error"]["code"], so e.code can be None.
     """
     codes = {getattr(e, attr, None) for attr in ("code", "type")}
-    body = getattr(e, "body", None)
-    if isinstance(body, dict):
-        src = body.get("error") if isinstance(body.get("error"), dict) else body
-        codes |= {src.get("code"), src.get("type")}
+    body = _error_body(e)
+    src = body.get("error") if isinstance(body.get("error"), dict) else body
+    codes |= {src.get("code"), src.get("type")}
     return {c for c in codes if c}
 
 
