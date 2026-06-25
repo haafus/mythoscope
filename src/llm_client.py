@@ -1,9 +1,82 @@
 import json
 import logging
+import time
 
-from openai import OpenAI
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    AuthenticationError,
+    InternalServerError,
+    NotFoundError,
+    OpenAI,
+    PermissionDeniedError,
+    RateLimitError,
+)
 
 logger = logging.getLogger(__name__)
+
+# Account/config-level failures: every subsequent call fails identically,
+# so abort the run instead of retrying or skipping chunk by chunk.
+_FATAL_CODES = {
+    "insufficient_quota",
+    "billing_hard_limit_reached",
+    "invalid_api_key",
+    "account_deactivated",
+    "organization_restricted",
+    "model_not_found",
+    "model_not_available",
+    "model_terminated",
+}
+
+
+class FatalLLMError(Exception):
+    """Unrecoverable LLM error (quota, auth, missing model) — stops the whole run."""
+
+
+def _error_message(e: Exception) -> str:
+    body = getattr(e, "body", None)
+    if isinstance(body, dict):
+        return (body.get("error") or {}).get("message") or str(e)
+    return getattr(e, "message", None) or str(e)
+
+
+def _error_codes(e: Exception) -> set:
+    """Identifier strings (code/type) from the error, wherever the SDK placed them.
+
+    OpenAI nests them as body["error"]["code"], so e.code can be None.
+    """
+    codes = {getattr(e, attr, None) for attr in ("code", "type")}
+    body = getattr(e, "body", None)
+    if isinstance(body, dict):
+        src = body.get("error") if isinstance(body.get("error"), dict) else body
+        codes |= {src.get("code"), src.get("type")}
+    return {c for c in codes if c}
+
+
+def _classify(e: Exception) -> str:
+    """Classify an exception as 'fatal', 'transient', or 'permanent'."""
+    fatal_code = bool(_error_codes(e) & _FATAL_CODES)
+    if isinstance(e, RateLimitError):
+        return "fatal" if fatal_code else "transient"
+    if isinstance(e, (APITimeoutError, APIConnectionError, InternalServerError)):
+        return "transient"
+    if isinstance(e, (AuthenticationError, PermissionDeniedError, NotFoundError)):
+        return "fatal"
+    if fatal_code:
+        return "fatal"
+    return "permanent"
+
+
+def _retry_delay(e: Exception, attempt: int) -> float:
+    response = getattr(e, "response", None)
+    if response is not None:
+        retry_after = response.headers.get("retry-after")
+        if retry_after:
+            try:
+                return float(retry_after)
+            except ValueError:
+                pass
+    return min(2.0 ** attempt, 30.0)
 
 
 class LLMProcessor:
@@ -22,11 +95,12 @@ class LLMProcessor:
         self.model_name = provider["model"]
         self.use_json_mode = use_json_mode
         self.temperature = cfg.temperature
+        self.max_retries = cfg.max_retries
 
         kwargs: dict = {
             "base_url": provider["base_url"],
             "timeout": request_timeout,
-            "max_retries": cfg.max_retries,
+            "max_retries": 0,  # retries handled in _complete (error-type aware)
         }
         if provider.get("api_key"):
             kwargs["api_key"] = provider["api_key"]
@@ -67,18 +141,30 @@ class LLMProcessor:
         if response_format is not None:
             kwargs["response_format"] = response_format
 
-        try:
-            response = self.client.chat.completions.create(**kwargs)
-            return response.choices[0].message.content.strip()
-        except Exception as e:
-            code = getattr(e, "status_code", None) or getattr(e, "code", None)
-            body = getattr(e, "body", None)
-            if isinstance(body, dict):
-                message = (body.get("error") or {}).get("message") or str(e)
-            else:
-                message = getattr(e, "message", None) or str(e)
-            logger.error(f"LLM call failed (model={self.model_name}, code={code}): {message}")
-            return None
+        for attempt in range(self.max_retries + 1):
+            try:
+                response = self.client.chat.completions.create(**kwargs)
+                return response.choices[0].message.content.strip()
+            except Exception as e:
+                kind = _classify(e)
+                code = getattr(e, "status_code", None) or getattr(e, "code", None)
+                message = _error_message(e)
+
+                if kind == "fatal":
+                    raise FatalLLMError(f"{message} (model={self.model_name}, code={code})") from e
+
+                if kind == "transient" and attempt < self.max_retries:
+                    delay = _retry_delay(e, attempt)
+                    logger.warning(
+                        f"LLM call failed (model={self.model_name}, code={code}); "
+                        f"retry {attempt + 1}/{self.max_retries} in {delay:.1f}s: {message}"
+                    )
+                    time.sleep(delay)
+                    continue
+
+                logger.error(f"LLM call failed (model={self.model_name}, code={code}): {message}")
+                return None
+        return None
 
     @staticmethod
     def _parse_json_list(raw: str) -> list[dict]:

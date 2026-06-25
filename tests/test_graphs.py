@@ -13,6 +13,7 @@ for stub_name in ["networkx", "openai"]:
 
 _llm_stub = types.ModuleType("llm_client")
 _llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
+_llm_stub.FatalLLMError = type("FatalLLMError", (Exception,), {})  # type: ignore[attr-defined]
 sys.modules["llm_client"] = _llm_stub
 
 

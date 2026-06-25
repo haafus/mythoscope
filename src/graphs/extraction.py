@@ -3,7 +3,7 @@ import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 
-from llm_client import LLMProcessor
+from llm_client import FatalLLMError, LLMProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,8 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
 
         try:
             chars = chars_future.result(timeout=600)
+        except FatalLLMError:
+            raise
         except Exception:
             logger.exception("Failed to extract beings from chunk")
             chars = []
@@ -33,12 +35,16 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str
 
         try:
             locs = locs_future.result(timeout=600)
+        except FatalLLMError:
+            raise
         except Exception:
             logger.exception("Failed to extract locations from chunk")
             locs = []
 
         try:
             times = times_future.result(timeout=600)
+        except FatalLLMError:
+            raise
         except Exception:
             logger.exception("Failed to extract time from chunk")
             times = []
