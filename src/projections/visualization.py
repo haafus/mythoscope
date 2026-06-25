@@ -63,6 +63,9 @@ def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 
     le = LabelEncoder()
     y = le.fit_transform(traditions)
     n_classes = len(le.classes_)
+    if n_classes < 2:
+        logger.warning("RLACE/INLP needs >=2 traditions; got %d, returning embeddings unchanged.", n_classes)
+        return embeddings
     chance = 1.0 / n_classes
 
     X = embeddings.astype(np.float64)
@@ -182,7 +185,7 @@ def generate_distribution(
     for item in data:
         trad = item.get("tradition", "unknown")
         tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
-        tradition_docs.setdefault(trad, set()).add(item["title"])
+        tradition_docs.setdefault(trad, set()).add(item.get("id"))
 
     sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
     total_chunks = sum(c for _, c in sorted_traditions)
