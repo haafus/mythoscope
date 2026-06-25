@@ -1,6 +1,7 @@
 import concurrent.futures
 import json
 import logging
+import statistics
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
@@ -190,8 +191,11 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     logger.info("Corpus build complete. Total: %d texts", len(metadata))
 
     if metadata:
-        total_words = sum(m.get("word_count", 0) for m in metadata)
+        counts = [m.get("word_count", 0) for m in metadata]
         total_sentences = sum(m.get("sentence_count", 0) for m in metadata)
-        logger.info(f"  Total words: {total_words}")
+        logger.info(f"  Total words: {sum(counts)}")
         logger.info(f"  Total sentences: {total_sentences}")
-        logger.info(f"  Average words per text: {total_words / len(metadata):.1f}")
+        logger.info(
+            f"  Median words per text: {int(statistics.median(counts))} "
+            f"(min {min(counts)}, max {max(counts)})"
+        )
