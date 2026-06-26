@@ -3,7 +3,7 @@ from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import TypeVar
 
-from rate_limiter import DailyLimitReached
+from .rate_limiter import DailyLimitReached
 
 logger = logging.getLogger(__name__)
 

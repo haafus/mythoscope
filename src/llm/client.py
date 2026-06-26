@@ -13,7 +13,7 @@ from openai import (
     RateLimitError,
 )
 
-from rate_limiter import DailyLimitReached
+from .rate_limiter import DailyLimitReached
 
 logger = logging.getLogger(__name__)
 
@@ -117,8 +117,9 @@ class LLMProcessor:
         request_timeout: float = 120.0,
     ):
         from model_registry import resolve_llm_provider
-        from rate_limiter import get_governor
         from settings import settings
+
+        from .rate_limiter import get_governor
 
         cfg = settings.llm
         provider = resolve_llm_provider(model_alias or cfg.model)

@@ -86,6 +86,7 @@ include = [
     "embedding*",
     "graphs*",
     "server*",
+    "llm*",
 ]
 
 [tool.ruff]

@@ -1,38 +1,5 @@
-import importlib.util
-import os
-import sys
-import types
-
-_parent = os.path.join(os.path.dirname(__file__), "..", "src", "graphs")
-
-_stubs_added: list[str] = []
-for stub_name in ["networkx", "openai"]:
-    if stub_name not in sys.modules:
-        sys.modules[stub_name] = types.ModuleType(stub_name)
-        _stubs_added.append(stub_name)
-
-_llm_stub = types.ModuleType("llm_client")
-_llm_stub.LLMProcessor = type("LLMProcessor", (), {})  # type: ignore[attr-defined]
-_llm_stub.FatalLLMError = type("FatalLLMError", (Exception,), {})  # type: ignore[attr-defined]
-sys.modules["llm_client"] = _llm_stub
-
-
-def _load_module(name: str, filename: str):
-    spec = importlib.util.spec_from_file_location(name, os.path.join(_parent, filename))
-    assert spec is not None and spec.loader is not None
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
-
-
-_extraction = _load_module("graphs.extraction", "extraction.py")
-
-from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache  # noqa: E402
-
-deduplicate_entities = _extraction.deduplicate_entities
-deduplicate_relations = _extraction.deduplicate_relations
-extract_from_chunk = _extraction.extract_from_chunk
+from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
+from graphs.extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
 
 
 class TestDeduplicateEntities:

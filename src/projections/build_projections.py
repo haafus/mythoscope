@@ -78,7 +78,7 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_motif: b
 
 
 def _generate_motif_plot(model_data: ModelData, force: bool) -> None:
-    from llm_client import FatalLLMError
+    from llm import FatalLLMError
 
     from .motif_analysis import run_motif_analysis
 

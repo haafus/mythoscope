@@ -4,11 +4,10 @@ from itertools import islice
 from pathlib import Path
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
-from concurrency import map_concurrent
 from corpus.iterator import iter_files
 from embeddings.chunking import chunk_text
 from json_utils import save_json
-from llm_client import LLMProcessor
+from llm import LLMProcessor, map_concurrent
 from settings import settings
 
 from .completion import is_book_complete

@@ -1,6 +1,6 @@
 import pytest
 
-from rate_limiter import DailyLimitReached, RateGovernor, TokenBucket, get_governor
+from llm.rate_limiter import DailyLimitReached, RateGovernor, TokenBucket, get_governor
 
 
 class TestTokenBucket:

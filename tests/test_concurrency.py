@@ -1,7 +1,7 @@
 import pytest
 
-from concurrency import map_concurrent
-from rate_limiter import DailyLimitReached
+from llm.concurrency import map_concurrent
+from llm.rate_limiter import DailyLimitReached
 
 
 def test_empty_returns_completed():

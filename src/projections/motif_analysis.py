@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
-from concurrency import map_concurrent
+from llm import map_concurrent
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def generate_motif_summaries(
     output_dir: Path,
     force: bool = False,
 ) -> list[str]:
-    from llm_client import LLMProcessor
+    from llm import LLMProcessor
 
     llm = LLMProcessor(use_json_mode=False)
 
