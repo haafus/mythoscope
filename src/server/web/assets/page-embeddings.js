@@ -1,6 +1,6 @@
 import {
     api, app, state,
-    buildCorpusApiUrl, ensureModels,
+    ensureModels,
     escapeAttribute, escapeHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
@@ -104,16 +104,6 @@ export async function renderEmbeddingsAnalysis() {
                 </div>
             </div>
 
-            <div id="readerModal">
-                <div class="modal-content-reader">
-                    <div class="card-header">
-                        <strong id="modalTitle">Book</strong>
-                        <button class="btn" id="close-reader-modal" type="button">Close</button>
-                    </div>
-                    <div class="modal-body-reader" id="modalBody"></div>
-                </div>
-            </div>
-
             <div id="searchModal">
                 <div class="modal-content-reader search-modal-content">
                     <div class="card-header">
@@ -165,9 +155,6 @@ function bindEmbeddingsControls() {
 
     document.getElementById("enter-fullscreen").addEventListener("click", toggleFullscreen);
     document.getElementById("exit-fullscreen").addEventListener("click", toggleFullscreen);
-    document.getElementById("close-reader-modal").addEventListener("click", () => {
-        document.getElementById("readerModal").style.display = "none";
-    });
     document.getElementById("close-search-modal").addEventListener("click", closeSearchModal);
 
     state.keydownHandler = (event) => {
@@ -315,25 +302,7 @@ async function initializeAnalysisLibrary() {
     const container = document.getElementById("tree-container");
     if (!container) return;
 
-    container.addEventListener("book-select", (e) => openBookReader(e.detail.doc));
     await renderLibraryTree(container);
-}
-
-async function openBookReader(doc) {
-    const modal = document.getElementById("readerModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalBody = document.getElementById("modalBody");
-    if (!modal || !modalTitle || !modalBody) return;
-
-    modalTitle.textContent = doc.title;
-    modalBody.textContent = "Loading...";
-    modal.style.display = "block";
-
-    try {
-        modalBody.textContent = await api(buildCorpusApiUrl(doc));
-    } catch {
-        modalBody.textContent = "Load error.";
-    }
 }
 
 async function performAnalysisSearch() {
