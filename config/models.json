@@ -4,7 +4,10 @@
       "gpt4o-mini": {
         "base_url": "https://api.openai.com/v1",
         "model": "gpt-4o-mini",
-        "env_key": "OPENAI_API_KEY"
+        "env_key": "OPENAI_API_KEY",
+        "rpm": 500,
+        "tpm": 200000,
+        "rpd": 10000
       },
       "gpt4o": {
         "base_url": "https://api.openai.com/v1",
