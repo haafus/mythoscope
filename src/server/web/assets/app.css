@@ -1027,7 +1027,6 @@ body.route-embeddings {
     flex-grow: 1;
 }
 
-.analysis-page #readerModal,
 .analysis-page #searchModal {
     display: none;
     position: fixed;
@@ -1048,15 +1047,6 @@ body.route-embeddings {
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-}
-
-.analysis-page .modal-body-reader {
-    padding: 40px;
-    overflow-y: auto;
-    font-family: Georgia, serif;
-    font-size: 18px;
-    line-height: 1.6;
-    white-space: pre-wrap;
 }
 
 .analysis-page .search-modal-content {
