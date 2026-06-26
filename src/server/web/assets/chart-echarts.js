@@ -1,5 +1,5 @@
 
-import { escapeHtml, normalizePreviewText } from "./core.js";
+import { bookTitleFromId, escapeHtml, normalizePreviewText } from "./core.js";
 
 let chartInstance = null;
 
@@ -77,7 +77,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
             formatter: (params) => {
                 const d = params.data;
                 return `<div style="font-weight:700;color:#111827;margin-bottom:4px">${escapeHtml(d._tradition || "Unknown")}</div>`
-                    + `<div style="color:#6c757d;margin-bottom:7px">ID: ${escapeHtml(d._id || "")} | Chunk: ${escapeHtml(d._chunk ?? 0)}</div>`
+                    + `<div style="color:#6c757d;margin-bottom:7px">${escapeHtml(bookTitleFromId(d._id))} | Chunk: ${escapeHtml(d._chunk ?? 0)}</div>`
                     + `<div style="color:#343a40">${escapeHtml(d._text || "No preview available.")}</div>`;
             },
         },

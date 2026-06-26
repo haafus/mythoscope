@@ -1,5 +1,5 @@
 
-import { escapeHtml, normalizePreviewText } from "./core.js";
+import { bookTitleFromId, escapeHtml, normalizePreviewText } from "./core.js";
 
 let activeChart = null;
 let tooltipHandlers = null;
@@ -176,7 +176,7 @@ function bindTooltip(plotEl) {
         const custom = Array.isArray(point.customdata) ? point.customdata : [];
         tooltip.innerHTML = `
             <div class="plot-hover-title">${escapeHtml(custom[1] || "Unknown")}</div>
-            <div class="plot-hover-meta">ID: ${escapeHtml(custom[0] || "")} | Chunk: ${escapeHtml(custom[2] ?? 0)}</div>
+            <div class="plot-hover-meta">${escapeHtml(bookTitleFromId(custom[0]))} | Chunk: ${escapeHtml(custom[2] ?? 0)}</div>
             <div class="plot-hover-text">${escapeHtml(normalizePreviewText(custom[3]) || "No preview available.")}</div>
         `;
         tooltip.classList.add("visible");

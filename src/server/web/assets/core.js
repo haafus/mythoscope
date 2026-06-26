@@ -109,6 +109,12 @@ export function normalizePreviewText(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
+// A point/chunk id is the book title with spaces turned into underscores
+// (normalize_catalog_id), so the title is recovered by reversing that.
+export function bookTitleFromId(value) {
+    return String(value || "").replace(/\.txt$/i, "").replace(/_/g, " ").trim();
+}
+
 export function escapeAttribute(value) {
     return escapeHtml(value);
 }

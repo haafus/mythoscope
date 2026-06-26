@@ -1,6 +1,6 @@
 import {
     api, app, state,
-    ensureModels,
+    bookTitleFromId, ensureModels,
     escapeAttribute, escapeHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
@@ -272,7 +272,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
         let html = `
             <div class="badge">${escapeHtml(point.tradition)}</div>
             <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
-            <div class="text-preview"><strong>ID:</strong> ${escapeHtml(point.id)}<br><br>${escapeHtml(point.text)}</div>
+            <div class="text-preview"><strong>${escapeHtml(bookTitleFromId(point.id))}</strong><br><br>${escapeHtml(point.text)}</div>
             <h4 style="margin: 16px 0 8px; font-size:14px; color:#111;">Nearest neighbors:</h4>
         `;
 

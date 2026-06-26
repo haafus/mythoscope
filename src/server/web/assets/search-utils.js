@@ -1,4 +1,4 @@
-import { api, escapeHtml, escapeAttribute, escapeRegex, state } from "./core.js";
+import { api, bookTitleFromId, escapeHtml, escapeAttribute, escapeRegex, state } from "./core.js";
 
 export function scoreClass(similarityScore) {
     const percent = Math.round(Number(similarityScore || 0) * 100);
@@ -8,14 +8,8 @@ export function scoreClass(similarityScore) {
     return {percent, cls};
 }
 
-export function normalizeBookTitle(value) {
-    return String(value || "")
-        .replace(/\.txt$/i, "")
-        .trim();
-}
-
 export function resultBookTitle(item) {
-    return normalizeBookTitle(item.filename || item.id || "Unknown book");
+    return bookTitleFromId(item.filename || item.id) || "Unknown book";
 }
 
 export function chunkMetaLine(item) {
