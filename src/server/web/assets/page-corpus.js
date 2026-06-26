@@ -10,9 +10,6 @@ export async function renderCorpus() {
         <main class="corpus-page container">
             <div class="workspace">
                 <aside class="panel library-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Literature</div>
-                    </div>
                     <div id="libraryTree">Loading...</div>
                 </aside>
 

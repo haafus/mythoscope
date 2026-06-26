@@ -5,7 +5,7 @@ import {
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
-import { destroyChart, resizeChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
+import { destroyChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
 import {
     bindSearchResultClicks, chunkMetaLine, chunkTextHtml,
     fetchPointWithNeighbors, renderSearchResultItem,
@@ -56,29 +56,20 @@ export async function renderEmbeddingsAnalysis() {
                     <label>Model:</label>
                     <select id="global-model-select"><option value="">Loading models...</option></select>
                 </div>
+                <div class="form-group">
+                    <label>Method:</label>
+                    <select id="viz-select"><option value="">Loading...</option></select>
+                </div>
                 <span id="model-status" class="status-badge">Waiting for selection...</span>
             </div>
 
             <div class="main-content">
                 <div class="tree-sidebar">
-                    <div class="tree-header">
-                        <div class="tree-title">Corpus Chunks</div>
-                    </div>
                     <div id="tree-container">Loading...</div>
                 </div>
 
                 <div class="plot-area">
                     <div class="card plot-container" id="plotContainer">
-                        <div class="card-header">
-                            <div class="form-group">
-                                <label>Method:</label>
-                                <select id="viz-select"><option value="">Loading...</option></select>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-outline enter-fullscreen" type="button" id="enter-fullscreen">Enter Fullscreen</button>
-                                <button class="btn btn-outline exit-fullscreen" type="button" id="exit-fullscreen">Exit Fullscreen</button>
-                            </div>
-                        </div>
                         <div class="plot-canvas" id="plotCanvas">
                             <div class="loading-placeholder" id="loadingPlaceholder">Loading visualization...</div>
                             <div id="scatter-plot" style="width: 100%; height: 100%; display: none;"></div>
@@ -144,7 +135,6 @@ function bindEmbeddingsControls() {
     const vizSelect = document.getElementById("viz-select");
     const searchText = document.getElementById("search-text");
     const searchBtn = document.getElementById("search-btn");
-    const plotContainer = document.getElementById("plotContainer");
 
     modelSelect.addEventListener("change", triggerModelChange);
     vizSelect.addEventListener("change", loadVisualization);
@@ -153,16 +143,7 @@ function bindEmbeddingsControls() {
     });
     searchBtn.addEventListener("click", performAnalysisSearch);
 
-    document.getElementById("enter-fullscreen").addEventListener("click", toggleFullscreen);
-    document.getElementById("exit-fullscreen").addEventListener("click", toggleFullscreen);
     document.getElementById("close-search-modal").addEventListener("click", closeSearchModal);
-
-    state.keydownHandler = (event) => {
-        if (event.key === "Escape" && plotContainer && plotContainer.classList.contains("fullscreen")) {
-            toggleFullscreen();
-        }
-    };
-    document.addEventListener("keydown", state.keydownHandler);
 }
 
 async function loadSimilarityMethods() {
@@ -213,14 +194,6 @@ function updateStatus(text, type = "loaded") {
     if (!status) return;
     status.textContent = text;
     status.className = `status-badge ${type}`;
-}
-
-function toggleFullscreen() {
-    const plotContainer = document.getElementById("plotContainer");
-    if (!plotContainer) return;
-
-    plotContainer.classList.toggle("fullscreen");
-    resizeChart(document.getElementById("scatter-plot"));
 }
 
 async function loadVisualization() {

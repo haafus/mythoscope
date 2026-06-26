@@ -19,7 +19,6 @@ export async function renderGraphPage(graphType) {
     app.innerHTML = `
         <main class="graph-page container">
             <div class="graph-sidebar">
-                <div class="graph-sidebar-header">Books</div>
                 <div id="graphBookList">Loading...</div>
             </div>
             <div class="graph-area">
