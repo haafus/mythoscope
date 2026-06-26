@@ -7,6 +7,11 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
+# Exact betweenness is O(V·E) and dominates graph generation on large books.
+# Above this node count we sample pivots instead — it only feeds a display
+# attribute (not node sizing), so an approximation is fine.
+_BETWEENNESS_SAMPLE_K = 500
+
 
 def _normalize_df(data: list, columns_title_case: bool = True) -> pd.DataFrame:
     df = pd.DataFrame(data)
@@ -41,7 +46,8 @@ def _collect_metadata(df: pd.DataFrame) -> dict[str, dict]:
 
 def _graph_to_json(G: nx.Graph, entity_names: set[str], node_metadata: dict[str, dict], category: str) -> dict:
     degrees = dict(G.degree())
-    betweenness = nx.betweenness_centrality(G)
+    k = _BETWEENNESS_SAMPLE_K if G.number_of_nodes() > _BETWEENNESS_SAMPLE_K else None
+    betweenness = nx.betweenness_centrality(G, k=k, seed=0)
 
     min_deg = min(degrees.values()) if degrees else 0
     max_deg = max(degrees.values()) if degrees else 0
