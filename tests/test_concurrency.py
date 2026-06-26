@@ -44,3 +44,12 @@ def test_other_exceptions_propagate():
 
     with pytest.raises(ValueError, match="boom"):
         map_concurrent([1], fn, 1)
+
+
+def test_keyboard_interrupt_propagates_with_hint(caplog):
+    def fn(x):
+        raise KeyboardInterrupt
+
+    with caplog.at_level("WARNING", logger="llm.concurrency"), pytest.raises(KeyboardInterrupt):
+        map_concurrent([1], fn, 1)
+    assert "Interrupted" in caplog.text

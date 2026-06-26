@@ -45,6 +45,13 @@ def map_concurrent(
                 break
             if on_result is not None:
                 on_result(futures[fut], result)
+    except KeyboardInterrupt:
+        # Pending work is cancelled in finally; in-flight calls can't be killed, so
+        # the process waits for them at exit unless Ctrl+C is pressed again.
+        logger.warning(
+            "Interrupted — cancelling pending work; press Ctrl+C again to skip in-flight requests."
+        )
+        raise
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return completed
