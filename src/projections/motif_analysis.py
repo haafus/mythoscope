@@ -2,9 +2,10 @@ import logging
 from pathlib import Path
 
 import numpy as np
-from tqdm import tqdm
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
+from concurrency import map_concurrent
+from settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,29 +31,32 @@ def generate_motif_summaries(
     if force:
         clear_cache(cache_path)
     cache = load_cache(cache_path)
-    summaries: list[str] = []
-    new_count = 0
 
-    for item in tqdm(data, desc="Generating motif summaries", unit="chunk"):
-        text = item.get("text", "")
-        key = chunk_hash(text)
+    uncached = [item for item in data if chunk_hash(item.get("text", "")) not in cache]
+    if uncached:
+        logger.info(
+            f"Generating {len(uncached)}/{len(data)} summaries "
+            f"(concurrency={settings.projection.max_concurrent})..."
+        )
 
-        if key in cache:
-            summaries.append(cache[key])
-            continue
+        def _store(item: dict, summary: str) -> None:
+            if summary:
+                key = chunk_hash(item.get("text", ""))
+                append_cache(cache_path, key, summary)
+                cache[key] = summary
 
-        summary = llm.ask_text(SUMMARY_PROMPT, text[:4000])
-        summaries.append(summary)
-        new_count += 1
+        completed = map_concurrent(
+            uncached,
+            lambda item: llm.ask_text(SUMMARY_PROMPT, item.get("text", "")[:4000]),
+            settings.projection.max_concurrent,
+            on_result=_store,
+        )
+        if not completed:
+            logger.warning("Daily rate limit reached — some summaries are missing; rerun to resume.")
 
-        if summary:
-            append_cache(cache_path, key, summary)
-            cache[key] = summary
-
-    if new_count > 0:
-        logger.info(f"Generated {new_count} new summaries, {len(summaries) - new_count} from cache")
-    else:
-        logger.info(f"All {len(summaries)} summaries loaded from cache")
+    summaries = [cache.get(chunk_hash(item.get("text", "")), "") for item in data]
+    cached_count = sum(1 for s in summaries if s)
+    logger.info(f"Summaries ready: {cached_count}/{len(summaries)} ({len(uncached)} attempted this run)")
 
     return summaries
 

@@ -4,6 +4,7 @@ from itertools import islice
 from pathlib import Path
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
+from concurrency import map_concurrent
 from corpus.iterator import iter_files
 from embeddings.chunking import chunk_text
 from json_utils import save_json
@@ -15,6 +16,30 @@ from .extraction import deduplicate_entities, deduplicate_relations, extract_fro
 from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph
 
 logger = logging.getLogger(__name__)
+
+
+def _extract_chunks(processor, uncached, chunk_prompts, cache, cache_path, max_concurrent) -> bool:
+    """Extract uncached chunks concurrently, persisting each result to the cache.
+
+    Returns False if the run stopped early on the daily rate limit.
+    """
+    total = len(uncached)
+    done = 0
+
+    def store(chunk: str, chunk_results: dict) -> None:
+        nonlocal done
+        done += 1
+        key = chunk_hash(chunk)
+        append_cache(cache_path, key, chunk_results)
+        cache[key] = chunk_results
+        logger.info(f"  Chunk {done}/{total} extracted.")
+
+    return map_concurrent(
+        uncached,
+        lambda chunk: extract_from_chunk(processor, chunk, chunk_prompts),
+        max_concurrent,
+        on_result=store,
+    )
 
 
 def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None) -> None:
@@ -36,6 +61,7 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
     if max_texts is not None:
         files = islice(files, max_texts)
 
+    stopped = False
     for file_info in files:
         text_id = file_info.text_id
 
@@ -65,18 +91,22 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
             clear_cache(cache_path)
         cache = load_cache(cache_path)
 
-        cached = sum(1 for c in chunks if chunk_hash(c) in cache)
-        if cached:
-            logger.info(f"Resuming: {cached}/{len(chunks)} chunks from cache.")
-
-        for i, chunk in enumerate(chunks):
-            key = chunk_hash(chunk)
-            if key in cache:
-                continue
-            logger.info(f"  [Chunk {i + 1}/{len(chunks)}] Extracting entities...")
-            chunk_results = extract_from_chunk(processor, chunk, chunk_prompts)
-            append_cache(cache_path, key, chunk_results)
-            cache[key] = chunk_results
+        uncached = [c for c in chunks if chunk_hash(c) not in cache]
+        if uncached:
+            logger.info(
+                f"Extracting {len(uncached)}/{len(chunks)} chunks "
+                f"(concurrency={graphs_cfg.max_concurrent})..."
+            )
+            completed = _extract_chunks(
+                processor, uncached, chunk_prompts, cache, cache_path, graphs_cfg.max_concurrent
+            )
+            if not completed:
+                logger.warning(
+                    f"Daily rate limit reached while processing '{text_id}' — stopping. "
+                    "Cached progress is saved; rerun to resume."
+                )
+                stopped = True
+                break
 
         results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
         for chunk in chunks:
@@ -105,4 +135,15 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         except Exception:
             logger.exception("Error saving files or generating graph for %s", text_id)
 
-    logger.info("Graph generation complete.")
+    stats = processor.governor.stats()
+    if stats["requests"]:
+        logger.info(
+            f"LLM usage: {stats['requests']} requests, {stats['tokens']:,} tokens, "
+            f"~{stats['req_per_min']:.0f} req/min, throttled "
+            f"{stats['wait_fraction'] * 100:.0f}% of the time"
+        )
+
+    if stopped:
+        logger.warning("Graph generation stopped early (rate limit); rerun to resume.")
+    else:
+        logger.info("Graph generation complete.")

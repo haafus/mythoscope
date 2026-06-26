@@ -21,7 +21,7 @@ def resolve_embedding_model(name: str) -> str:
     return models.get(name, name)
 
 
-def resolve_llm_provider(name: str) -> dict[str, str | None]:
+def resolve_llm_provider(name: str) -> dict[str, Any]:
     registry = _load_registry()
     models = registry.get("llm", {}).get("models", {})
     if name not in models:
@@ -36,6 +36,10 @@ def resolve_llm_provider(name: str) -> dict[str, str | None]:
         "base_url": entry["base_url"],
         "model": entry["model"],
         "api_key": api_key,
+        # Optional per-model rate limits (None when unset).
+        "rpm": entry.get("rpm"),
+        "tpm": entry.get("tpm"),
+        "rpd": entry.get("rpd"),
     }
 
 

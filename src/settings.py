@@ -44,11 +44,16 @@ class GraphsSettings(BaseModel):
     use_json_mode: bool = True
     chunk_size: int = 4000
     chunk_overlap: int = 1000
+    # Chunks processed in parallel; the rate limiter is the real throttle, this just
+    # bounds in-flight work (each chunk already fans out to ~4 LLM calls internally).
+    max_concurrent: int = 3
 
 
 class ProjectionSettings(BaseModel):
     umap_n_neighbors: int = 15
     umap_min_dist: float = 0.1
+    # Motif summaries processed in parallel (one LLM call each).
+    max_concurrent: int = 5
 
 
 class ServerSettings(BaseModel):

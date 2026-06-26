@@ -13,6 +13,8 @@ from openai import (
     RateLimitError,
 )
 
+from rate_limiter import DailyLimitReached
+
 logger = logging.getLogger(__name__)
 
 # Account/config-level failures: every subsequent call fails identically,
@@ -31,6 +33,16 @@ _FATAL_CODES = {
 
 class FatalLLMError(Exception):
     """Unrecoverable LLM error (quota, auth, missing model) — stops the whole run."""
+
+
+def _estimate_tokens(messages: list[dict], output_estimate: int = 600) -> int:
+    """Rough pre-flight token estimate (~4 chars/token) for the rate limiter.
+
+    Only used to pre-charge the token bucket; the real count from response.usage
+    reconciles it afterwards, so a coarse estimate is fine and provider-agnostic.
+    """
+    chars = sum(len(m.get("content", "")) for m in messages)
+    return chars // 4 + output_estimate
 
 
 def _error_body(e: Exception) -> dict:
@@ -105,6 +117,7 @@ class LLMProcessor:
         request_timeout: float = 120.0,
     ):
         from model_registry import resolve_llm_provider
+        from rate_limiter import get_governor
         from settings import settings
 
         cfg = settings.llm
@@ -114,6 +127,15 @@ class LLMProcessor:
         self.use_json_mode = use_json_mode
         self.temperature = cfg.temperature
         self.max_retries = cfg.max_retries
+
+        # One shared budget per underlying model across all callers (graphs, motifs, …).
+        self.governor = get_governor(
+            f"{provider['base_url']}::{provider['model']}",
+            provider["model"],
+            rpm=provider.get("rpm"),
+            tpm=provider.get("tpm"),
+            rpd=provider.get("rpd"),
+        )
 
         kwargs: dict = {
             "base_url": provider["base_url"],
@@ -159,9 +181,15 @@ class LLMProcessor:
         if response_format is not None:
             kwargs["response_format"] = response_format
 
+        est_tokens = _estimate_tokens(messages)
+
         for attempt in range(self.max_retries + 1):
+            self.governor.acquire(est_tokens)  # raises DailyLimitReached if the breaker tripped
             try:
                 response = self.client.chat.completions.create(**kwargs)
+                usage = getattr(response, "usage", None)
+                self.governor.reconcile(est_tokens, getattr(usage, "total_tokens", 0) or 0)
+                self.governor.note_success()
                 return response.choices[0].message.content.strip()
             except Exception as e:
                 kind = _classify(e)
@@ -179,6 +207,13 @@ class LLMProcessor:
                     )
                     time.sleep(delay)
                     continue
+
+                # Persistent rate limiting (not a transient blip): feed the breaker so
+                # the run stops cleanly instead of grinding every chunk into errors.
+                if isinstance(e, RateLimitError) and self.governor.note_rate_limited():
+                    raise DailyLimitReached(
+                        f"rate limit not recovering (model={self.model_name})"
+                    ) from e
 
                 logger.error(f"LLM call failed (model={self.model_name}, code={code}): {message}")
                 return None
