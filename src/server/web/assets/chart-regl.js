@@ -166,7 +166,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     }));
 
     const canvas = document.createElement("canvas");
-    const showLegend = el.clientWidth >= 720;
+    const showLegend = false; // scatter legend disabled
     canvas.style.width = showLegend ? "calc(100% - 160px)" : "100%";
     canvas.style.height = "100%";
     el.appendChild(canvas);

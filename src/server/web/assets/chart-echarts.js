@@ -34,7 +34,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     el.style.display = "block";
 
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
-    const showLegend = el.clientWidth >= 720;
+    const showLegend = false; // scatter legend disabled
     const chart = initChart(el);
 
     const series = traditions.map((tradition) => {

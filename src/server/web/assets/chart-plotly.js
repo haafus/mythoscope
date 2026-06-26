@@ -29,7 +29,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     el.style.display = "block";
 
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
-    const showLegend = el.clientWidth >= 720;
+    const showLegend = false; // scatter legend disabled
 
     const traces = traditions.map((tradition) => {
         const pts = points.filter((p) => (p.tradition || "Unknown") === tradition);
