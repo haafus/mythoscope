@@ -148,18 +148,23 @@ def _build_corpus(force: bool = False, max_texts: int | None = None):
 
 
 def _build_embeddings(model: str | None, force: bool = False):
+    # Heavy first-time import (torch, transformers, chromadb) — announce it so the
+    # pause before the model loads isn't silent.
+    click.echo(click.style("Loading ML libraries (torch, transformers, chromadb)...", dim=True))
     from embeddings.build_embeddings import build_embeddings
 
     build_embeddings(model_name=model, force=force)
 
 
 def _build_projections(model: str | None, force: bool = False, motif_analysis: bool = False):
+    click.echo(click.style("Loading ML libraries (torch, umap, chromadb)...", dim=True))
     from projections.build_projections import build_projections
 
     build_projections(model_name=model, motif_analysis=motif_analysis, force=force)
 
 
 def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
+    click.echo(click.style("Loading graph libraries...", dim=True))
     from graphs.build_graphs import build_graphs
 
     build_graphs(llm=llm, force=force, max_texts=max_texts)
