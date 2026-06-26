@@ -156,7 +156,12 @@ class LLMProcessor:
         )
         return content or ""
 
-    def ask_json(self, system_prompt: str, user_content: str) -> list[dict]:
+    def ask_json(self, system_prompt: str, user_content: str) -> list[dict] | None:
+        """Return the parsed list, or None if the call produced no usable response.
+
+        None lets callers tell a failed call apart from a valid-but-empty result
+        (so a failure can be retried instead of cached as []).
+        """
         content = self._complete(
             messages=[
                 {
@@ -169,7 +174,7 @@ class LLMProcessor:
             response_format={"type": "json_object"} if self.use_json_mode else None,
         )
         if content is None:
-            return []
+            return None
         return self._parse_json_list(content)
 
     def _complete(self, messages: list[dict], response_format: dict | None = None) -> str | None:

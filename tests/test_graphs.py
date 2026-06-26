@@ -90,12 +90,27 @@ class _FakeLLM:
         return []
 
 
+class _NoneLLM:
+    """ask_json returns None (failed call) for locations, lists otherwise."""
+
+    def ask_json(self, system_prompt, user_content):
+        return None if system_prompt == "l" else []
+
+
 class TestExtractFromChunk:
     def test_collects_all_entity_types(self):
         prompts = {"beings": "c", "relations": "r", "locations": "l", "time": "t"}
-        out = extract_from_chunk(_FakeLLM(), "some text", prompts)
+        out, complete = extract_from_chunk(_FakeLLM(), "some text", prompts)
 
         assert out["beings"] == [{"Name": "Zeus"}]
         assert out["relations"][0]["Subject"] == "Zeus"
         assert out["locations"] == [{"Name": "Olympus"}]
         assert out["times"] == []
+        assert complete is True
+
+    def test_incomplete_when_a_call_fails(self):
+        prompts = {"beings": "c", "relations": "r", "locations": "l", "time": "t"}
+        out, complete = extract_from_chunk(_NoneLLM(), "some text", prompts)
+
+        assert complete is False
+        assert out["locations"] == []  # None normalized to []

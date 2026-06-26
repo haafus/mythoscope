@@ -4,29 +4,34 @@ import json
 from llm import LLMProcessor
 
 
-def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str, list]:
+def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> tuple[dict[str, list], bool]:
     """Extract all entity types from one chunk.
 
     Calls run sequentially (relations depend on extracted characters); chunk-level
     parallelism is handled by the caller, and the LLM client's rate governor is the
-    real throttle. Non-fatal call errors are already turned into empty results by
-    the client, while FatalLLMError / DailyLimitReached propagate to stop the run.
+    real throttle. FatalLLMError / DailyLimitReached propagate to stop the run.
+
+    Returns ``(results, complete)``. ``complete`` is False when any call returned
+    None (a failed, non-fatal call) — the caller should skip caching such a chunk
+    so it is retried on a later run rather than frozen as an empty result.
     """
     chars = llm.ask_json(prompts["beings"], chunk)
     relations_content = (
         f"DOCUMENT 1 (Text):\n{chunk}\n\n"
-        f"DOCUMENT 2 (Characters):\n{json.dumps(chars, ensure_ascii=False)}"
+        f"DOCUMENT 2 (Characters):\n{json.dumps(chars or [], ensure_ascii=False)}"
     )
     rels = llm.ask_json(prompts["relations"], relations_content)
     locs = llm.ask_json(prompts["locations"], chunk)
     times = llm.ask_json(prompts["time"], chunk)
 
-    return {
+    complete = None not in (chars, rels, locs, times)
+    results = {
         "beings": chars if isinstance(chars, list) else [],
         "relations": rels if isinstance(rels, list) else [],
         "locations": locs if isinstance(locs, list) else [],
         "times": times if isinstance(times, list) else [],
     }
+    return results, complete
 
 
 def deduplicate_entities(entities: list[dict]) -> list[dict]:

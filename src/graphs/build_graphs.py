@@ -25,13 +25,16 @@ def _extract_chunks(processor, uncached, chunk_prompts, cache, cache_path, max_c
     total = len(uncached)
     done = 0
 
-    def store(chunk: str, chunk_results: dict) -> None:
+    def store(chunk: str, outcome: tuple[dict, bool]) -> None:
         nonlocal done
         done += 1
-        key = chunk_hash(chunk)
-        append_cache(cache_path, key, chunk_results)
-        cache[key] = chunk_results
-        logger.info(f"  Chunk {done}/{total} extracted.")
+        chunk_results, complete = outcome
+        if complete:
+            key = chunk_hash(chunk)
+            append_cache(cache_path, key, chunk_results)
+            cache[key] = chunk_results
+        suffix = "" if complete else " (incomplete, will retry next run)"
+        logger.info(f"  Chunk {done}/{total} extracted{suffix}.")
 
     return map_concurrent(
         uncached,
@@ -106,6 +109,14 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
                 )
                 stopped = True
                 break
+
+        missing = sum(1 for c in chunks if chunk_hash(c) not in cache)
+        if missing:
+            logger.warning(
+                f"{text_id}: {missing}/{len(chunks)} chunks failed extraction — "
+                "book left incomplete, rerun to retry."
+            )
+            continue
 
         results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
         for chunk in chunks:
