@@ -52,9 +52,18 @@ class TestRealmsGraph:
 
 
 class TestAgesGraph:
-    def test_shared_actor_links_epochs(self, tmp_path):
-        times = [{"Name": "Creation", "KeyActors": "God"}, {"Name": "Flood", "KeyActors": "God, Noah"}]
+    def test_links_consecutive_epochs_in_order(self, tmp_path):
+        times = [{"Name": "Creation"}, {"Name": "Flood"}, {"Name": "Exodus"}]
         generate_ages_graph(times, tmp_path)
         data = _load(tmp_path / "ages.json")
         pairs = {frozenset((e["source"], e["target"])) for e in data["edges"]}
-        assert frozenset(("Creation", "Flood")) in pairs
+        assert pairs == {frozenset(("Creation", "Flood")), frozenset(("Flood", "Exodus"))}
+        assert frozenset(("Creation", "Exodus")) not in pairs  # a chain, not a clique
+        assert all(e["relation"] == "followed by" for e in data["edges"])
+
+    def test_no_betweenness_and_keeps_metadata(self, tmp_path):
+        generate_ages_graph([{"Name": "A", "KeyActors": "God"}, {"Name": "B"}], tmp_path)
+        node = next(n for n in _load(tmp_path / "ages.json")["nodes"] if n["id"] == "A")
+        assert "BetweennessCentrality" not in node
+        assert node["Degree"] == 1
+        assert node["Keyactors"] == "God"  # actor info stays as node metadata

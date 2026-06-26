@@ -86,10 +86,18 @@ def _resolver(display: dict[str, str]):
     return resolve
 
 
-def _to_json(G: nx.Graph, display: dict[str, str], metadata: dict[str, dict], category: str) -> dict:
+def _to_json(
+    G: nx.Graph,
+    display: dict[str, str],
+    metadata: dict[str, dict],
+    category: str,
+    compute_betweenness: bool = True,
+) -> dict:
     degrees = dict(G.degree())
-    k = _BETWEENNESS_SAMPLE_K if G.number_of_nodes() > _BETWEENNESS_SAMPLE_K else None
-    betweenness = nx.betweenness_centrality(G, k=k, seed=0)
+    betweenness: dict = {}
+    if compute_betweenness:
+        k = _BETWEENNESS_SAMPLE_K if G.number_of_nodes() > _BETWEENNESS_SAMPLE_K else None
+        betweenness = nx.betweenness_centrality(G, k=k, seed=0)
 
     min_deg = min(degrees.values()) if degrees else 0
     max_deg = max(degrees.values()) if degrees else 0
@@ -109,9 +117,10 @@ def _to_json(G: nx.Graph, display: dict[str, str], metadata: dict[str, dict], ca
             "Name": name,
             "Category": category if norm in display else "Other",
             "Degree": degrees.get(node_id, 0),
-            "BetweennessCentrality": betweenness.get(node_id, 0.0),
             "size": size(degrees.get(node_id, 0)),
         }
+        if compute_betweenness:
+            node["BetweennessCentrality"] = betweenness.get(node_id, 0.0)
         for label, value in metadata.get(norm, {}).items():
             if label not in node and not _is_empty(value):
                 node[label] = value
@@ -176,30 +185,29 @@ def generate_realms_graph(locations_data: list, output_dir: Path) -> None:
 
 
 def generate_ages_graph(times_data: list, output_dir: Path) -> None:
+    """Build a timeline: epochs linked in first-appearance (narrative) order.
+
+    ``times_data`` arrives in narrative order (aggregated in chunk order, dedup
+    preserves first appearance), so consecutive entries form the sequence. No
+    betweenness — on a chain it is positional and uninformative.
+    """
     display, metadata = _entity_index(times_data)
     resolve = _resolver(display)
 
-    G = nx.Graph()
-    for name in display.values():
-        G.add_node(name)
-
-    actor_to_epochs: dict[str, list[str]] = {}
+    sequence: list[str] = []
+    seen: set[str] = set()
     for t in times_data:
         epoch = resolve(_field(t, "name"))
-        if not epoch:
-            continue
-        for actor in _split_multi(_field(t, "keyactors", "key actors")):
-            actor_to_epochs.setdefault(actor, []).append(epoch)
+        if epoch and epoch not in seen:
+            seen.add(epoch)
+            sequence.append(epoch)
 
-    for actor, epochs in actor_to_epochs.items():
-        for i in range(len(epochs)):
-            for j in range(i + 1, len(epochs)):
-                a, b = epochs[i], epochs[j]
-                if a == b:
-                    continue
-                if G.has_edge(a, b):
-                    G[a][b]["relation"] = f"{G[a][b].get('relation', '')}, {actor}"
-                else:
-                    G.add_edge(a, b, relation=actor)
+    G = nx.Graph()
+    G.add_nodes_from(sequence)
+    for a, b in zip(sequence, sequence[1:], strict=False):
+        G.add_edge(a, b, relation="followed by")
 
-    _save_graph(_to_json(G, display, metadata, "Epoch"), output_dir / "ages.json")
+    _save_graph(
+        _to_json(G, display, metadata, "Epoch", compute_betweenness=False),
+        output_dir / "ages.json",
+    )

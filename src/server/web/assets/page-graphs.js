@@ -11,7 +11,7 @@ const GRAPH_CATEGORY_COLORS = {
 const GRAPH_INFO_FIELDS = {
     beings: ["Name", "Category", "Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"],
     realms: ["Name", "Category", "Description", "Function", "Adjacent To", "Degree", "BetweennessCentrality"],
-    ages: ["Name", "Category", "Description", "Keyactors", "Keyevents", "Degree", "BetweennessCentrality"],
+    ages: ["Name", "Category", "Description", "Keyactors", "Keyevents", "Degree"],
 };
 
 export async function renderGraphPage(graphType) {
