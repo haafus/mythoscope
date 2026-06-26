@@ -133,7 +133,7 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         all_locations = deduplicate_entities(results["locations"])
         all_times = deduplicate_entities(results["times"])
         logger.info(
-            f"Extracted unique items: Beings ({len(all_beings)}), Relations ({len(all_relations)}), Locations ({len(all_locations)}), Times ({len(all_times)})"
+            f"Extracted unique items: Beings ({len(all_beings)}), Relations ({len(all_relations)}), Realms ({len(all_locations)}), Ages ({len(all_times)})"
         )
 
         try:
