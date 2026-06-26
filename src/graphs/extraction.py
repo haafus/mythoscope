@@ -1,53 +1,25 @@
 import copy
 import json
-import logging
-from concurrent.futures import ThreadPoolExecutor
 
-from llm import FatalLLMError, LLMProcessor
-
-logger = logging.getLogger(__name__)
+from llm import LLMProcessor
 
 
 def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> dict[str, list]:
     """Extract all entity types from one chunk.
 
-    Characters, locations and time are independent and run in parallel;
-    relations depend on extracted characters and run afterwards.
+    Calls run sequentially (relations depend on extracted characters); chunk-level
+    parallelism is handled by the caller, and the LLM client's rate governor is the
+    real throttle. Non-fatal call errors are already turned into empty results by
+    the client, while FatalLLMError / DailyLimitReached propagate to stop the run.
     """
-    with ThreadPoolExecutor(max_workers=3) as pool:
-        chars_future = pool.submit(llm.ask_json, prompts["beings"], chunk)
-        locs_future = pool.submit(llm.ask_json, prompts["locations"], chunk)
-        times_future = pool.submit(llm.ask_json, prompts["time"], chunk)
-
-        try:
-            chars = chars_future.result(timeout=600)
-        except FatalLLMError:
-            raise
-        except Exception:
-            logger.exception("Failed to extract beings from chunk")
-            chars = []
-
-        relations_content = (
-            f"DOCUMENT 1 (Text):\n{chunk}\n\n"
-            f"DOCUMENT 2 (Characters):\n{json.dumps(chars, ensure_ascii=False)}"
-        )
-        rels = llm.ask_json(prompts["relations"], relations_content)
-
-        try:
-            locs = locs_future.result(timeout=600)
-        except FatalLLMError:
-            raise
-        except Exception:
-            logger.exception("Failed to extract locations from chunk")
-            locs = []
-
-        try:
-            times = times_future.result(timeout=600)
-        except FatalLLMError:
-            raise
-        except Exception:
-            logger.exception("Failed to extract time from chunk")
-            times = []
+    chars = llm.ask_json(prompts["beings"], chunk)
+    relations_content = (
+        f"DOCUMENT 1 (Text):\n{chunk}\n\n"
+        f"DOCUMENT 2 (Characters):\n{json.dumps(chars, ensure_ascii=False)}"
+    )
+    rels = llm.ask_json(prompts["relations"], relations_content)
+    locs = llm.ask_json(prompts["locations"], chunk)
+    times = llm.ask_json(prompts["time"], chunk)
 
     return {
         "beings": chars if isinstance(chars, list) else [],

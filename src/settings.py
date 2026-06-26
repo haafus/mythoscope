@@ -45,8 +45,9 @@ class GraphsSettings(BaseModel):
     chunk_size: int = 4000
     chunk_overlap: int = 1000
     # Chunks processed in parallel; the rate limiter is the real throttle, this just
-    # bounds in-flight work (each chunk already fans out to ~4 LLM calls internally).
-    max_concurrent: int = 3
+    # bounds in-flight work. Each chunk now makes its 4 LLM calls sequentially, so
+    # concurrency lives entirely here (overshoot is harmless — the buckets throttle).
+    max_concurrent: int = 12
 
 
 class ProjectionSettings(BaseModel):
