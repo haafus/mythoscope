@@ -46,7 +46,6 @@ corpus = [
 graphs = [
     "openai>=1.0.0",
     "networkx>=3.0",
-    "pandas>=2.0.0",
 ]
 dev = [
     "pytest>=7.0.0",

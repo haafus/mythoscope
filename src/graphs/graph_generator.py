@@ -1,9 +1,9 @@
-import json
 import logging
 from pathlib import Path
 
 import networkx as nx
-import pandas as pd
+
+from json_utils import save_json
 
 logger = logging.getLogger(__name__)
 
@@ -13,109 +13,31 @@ logger = logging.getLogger(__name__)
 _BETWEENNESS_SAMPLE_K = 500
 
 
-def _normalize_df(data: list, columns_title_case: bool = True) -> pd.DataFrame:
-    df = pd.DataFrame(data)
-    if not df.empty and columns_title_case:
-        df.rename(columns=lambda x: str(x).strip().title(), inplace=True)
-    return df
+def _norm_key(key) -> str:
+    return str(key).strip().lower().replace(" ", "").replace("_", "")
 
 
-def _extract_names(df: pd.DataFrame) -> set[str]:
-    if df.empty or "Name" not in df.columns:
-        return set()
-    return set(df["Name"].dropna().astype(str).str.strip()) - {""}
+def _field(d: dict, *aliases):
+    """First value whose key matches an alias (case/space/underscore-insensitive)."""
+    targets = {_norm_key(a) for a in aliases}
+    for k, v in d.items():
+        if _norm_key(k) in targets:
+            return v
+    return None
 
 
-def _collect_metadata(df: pd.DataFrame) -> dict[str, dict]:
-    metadata = {}
-    if df.empty or "Name" not in df.columns:
-        return metadata
-    for _, row in df.iterrows():
-        name = str(row["Name"]).strip()
-        if not name:
-            continue
-        meta = {}
-        for col, val in row.items():
-            if isinstance(val, list):
-                meta[col] = ", ".join(map(str, val))
-            else:
-                meta[col] = val
-        metadata[name] = meta
-    return metadata
+def _norm_name(name) -> str:
+    return str(name).strip().lower()
 
 
-def _graph_to_json(G: nx.Graph, entity_names: set[str], node_metadata: dict[str, dict], category: str) -> dict:
-    degrees = dict(G.degree())
-    k = _BETWEENNESS_SAMPLE_K if G.number_of_nodes() > _BETWEENNESS_SAMPLE_K else None
-    betweenness = nx.betweenness_centrality(G, k=k, seed=0)
-
-    min_deg = min(degrees.values()) if degrees else 0
-    max_deg = max(degrees.values()) if degrees else 0
-
-    def map_size(d):
-        if max_deg == min_deg:
-            return 4
-        return 2 + (d - min_deg) * (6 / (max_deg - min_deg))
-
-    nodes = []
-    for node_id in G.nodes():
-        node_id_str = str(node_id)
-        meta = node_metadata.get(node_id_str, {})
-        node_data = {
-            "id": node_id_str,
-            "display_name": node_id_str,
-            "Category": category if node_id_str in entity_names else "Other",
-            "Degree": degrees.get(node_id_str, 0),
-            "BetweennessCentrality": betweenness.get(node_id_str, 0.0),
-            "size": map_size(degrees.get(node_id_str, 0)),
-        }
-        for k, v in meta.items():
-            if k not in node_data and v not in [None, "", [], "nan", "NaN"] and str(v).lower() != "nan":
-                node_data[k] = v
-        nodes.append(node_data)
-
-    edges = [
-        {"source": str(u), "target": str(v), "relation": d.get("relation", "")}
-        for u, v, d in G.edges(data=True)
-    ]
-
-    return {"nodes": nodes, "edges": edges}
+def _is_empty(value) -> bool:
+    if value is None or value == "" or value == []:
+        return True
+    return isinstance(value, str) and value.strip().lower() == "nan"
 
 
-def _save_graph(data: dict, output_path: Path) -> None:
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    logger.info(f"Graph saved: {output_path}")
-
-
-def generate_beings_graph(beings_data: list, relations_data: list, output_dir: Path) -> None:
-    beings = _normalize_df(beings_data)
-    relations = _normalize_df(relations_data)
-
-    G = nx.DiGraph()
-    entity_names = _extract_names(beings)
-    node_metadata = _collect_metadata(beings)
-
-    if not relations.empty and "Subject" in relations.columns and "Object" in relations.columns:
-        relations = relations.dropna(subset=["Subject", "Object"])
-        relations = relations[(relations["Subject"] != "") & (relations["Object"] != "")]
-        for _, row in relations.iterrows():
-            subj = str(row["Subject"]).strip()
-            obj = str(row["Object"]).strip()
-            relation_val = row.get("Relation", row.get("relation", ""))
-            G.add_node(subj)
-            G.add_node(obj)
-            G.add_edge(subj, obj, relation=relation_val)
-    else:
-        logger.warning("No valid relations for beings graph.")
-        for name in entity_names:
-            G.add_node(name)
-
-    data = _graph_to_json(G, entity_names, node_metadata, "Character")
-    _save_graph(data, output_dir / "beings.json")
-
-
-def _parse_adjacent(value) -> list[str]:
+def _split_multi(value) -> list[str]:
+    """Split a list or a ';'/','-separated string into clean items."""
     if isinstance(value, list):
         return [str(v).strip() for v in value if str(v).strip()]
     if isinstance(value, str) and value.strip():
@@ -123,73 +45,161 @@ def _parse_adjacent(value) -> list[str]:
     return []
 
 
-def generate_realms_graph(locations_data: list, output_dir: Path) -> None:
-    locations = _normalize_df(locations_data)
-    G = nx.Graph()
-    entity_names = _extract_names(locations)
-    node_metadata = _collect_metadata(locations)
+def _entity_index(entities: list[dict]) -> tuple[dict[str, str], dict[str, dict]]:
+    """Build {normalized name -> display name} and {normalized name -> metadata}.
 
-    for name in entity_names:
+    Metadata keys are Title-Cased (to match the viewer's field names) and list
+    values joined to a string.
+    """
+    display: dict[str, str] = {}
+    metadata: dict[str, dict] = {}
+    for ent in entities:
+        name = _field(ent, "name")
+        if name is None or not str(name).strip():
+            continue
+        norm = _norm_name(name)
+        display.setdefault(norm, str(name).strip())
+        meta = metadata.setdefault(norm, {})
+        for key, value in ent.items():
+            if _norm_key(key) == "name" or _is_empty(value):
+                continue
+            label = str(key).strip().title()
+            if label not in meta:
+                meta[label] = ", ".join(map(str, value)) if isinstance(value, list) else value
+    return display, metadata
+
+
+def _resolver(display: dict[str, str]):
+    """Map a raw name to a canonical node id.
+
+    Known entity names resolve to their display form; unseen names register their
+    first-seen form so differently-cased duplicates collapse to a single node.
+    """
+    canon = dict(display)
+
+    def resolve(name) -> str | None:
+        text = str(name).strip()
+        if not text:
+            return None
+        return canon.setdefault(_norm_name(text), text)
+
+    return resolve
+
+
+def _to_json(G: nx.Graph, display: dict[str, str], metadata: dict[str, dict], category: str) -> dict:
+    degrees = dict(G.degree())
+    k = _BETWEENNESS_SAMPLE_K if G.number_of_nodes() > _BETWEENNESS_SAMPLE_K else None
+    betweenness = nx.betweenness_centrality(G, k=k, seed=0)
+
+    min_deg = min(degrees.values()) if degrees else 0
+    max_deg = max(degrees.values()) if degrees else 0
+
+    def size(d):
+        if max_deg == min_deg:
+            return 4
+        return 2 + (d - min_deg) * (6 / (max_deg - min_deg))
+
+    nodes = []
+    for node_id in G.nodes():
+        norm = _norm_name(node_id)
+        name = display.get(norm, node_id)
+        node = {
+            "id": node_id,
+            "display_name": name,
+            "Name": name,
+            "Category": category if norm in display else "Other",
+            "Degree": degrees.get(node_id, 0),
+            "BetweennessCentrality": betweenness.get(node_id, 0.0),
+            "size": size(degrees.get(node_id, 0)),
+        }
+        for label, value in metadata.get(norm, {}).items():
+            if label not in node and not _is_empty(value):
+                node[label] = value
+        nodes.append(node)
+
+    edges = [
+        {"source": u, "target": v, "relation": d.get("relation", "")}
+        for u, v, d in G.edges(data=True)
+    ]
+    return {"nodes": nodes, "edges": edges}
+
+
+def _save_graph(data: dict, output_path: Path) -> None:
+    save_json(output_path, data, indent=2)
+    logger.info(f"Graph saved: {output_path}")
+
+
+def generate_beings_graph(beings_data: list, relations_data: list, output_dir: Path) -> None:
+    display, metadata = _entity_index(beings_data)
+    resolve = _resolver(display)
+
+    G = nx.DiGraph()
+    for name in display.values():
         G.add_node(name)
 
-    adj_col = None
-    for col in locations.columns:
-        if col.lower().replace(" ", "") in ("adjacentto", "adjacent"):
-            adj_col = col
-            break
+    edges_added = 0
+    for rel in relations_data:
+        subj = resolve(_field(rel, "subject"))
+        obj = resolve(_field(rel, "object"))
+        if not subj or not obj:
+            continue
+        G.add_node(subj)
+        G.add_node(obj)
+        G.add_edge(subj, obj, relation=_field(rel, "relation") or "")
+        edges_added += 1
 
-    if adj_col and not locations.empty:
-        for _, row in locations.iterrows():
-            name = str(row.get("Name", "")).strip()
-            if not name:
-                continue
-            for neighbor in _parse_adjacent(row.get(adj_col)):
+    if not edges_added:
+        logger.warning("No valid relations for beings graph.")
+
+    _save_graph(_to_json(G, display, metadata, "Character"), output_dir / "beings.json")
+
+
+def generate_realms_graph(locations_data: list, output_dir: Path) -> None:
+    display, metadata = _entity_index(locations_data)
+    resolve = _resolver(display)
+
+    G = nx.Graph()
+    for name in display.values():
+        G.add_node(name)
+
+    for loc in locations_data:
+        name = resolve(_field(loc, "name"))
+        if not name:
+            continue
+        for neighbor_raw in _split_multi(_field(loc, "adjacent to", "adjacent")):
+            neighbor = resolve(neighbor_raw)
+            if neighbor and neighbor != name:
                 G.add_node(neighbor)
                 G.add_edge(name, neighbor, relation="adjacent to")
 
-    data = _graph_to_json(G, entity_names, node_metadata, "Location")
-    _save_graph(data, output_dir / "realms.json")
+    _save_graph(_to_json(G, display, metadata, "Location"), output_dir / "realms.json")
 
 
 def generate_ages_graph(times_data: list, output_dir: Path) -> None:
-    times = _normalize_df(times_data)
-    G = nx.Graph()
-    entity_names = _extract_names(times)
-    node_metadata = _collect_metadata(times)
+    display, metadata = _entity_index(times_data)
+    resolve = _resolver(display)
 
-    for name in entity_names:
+    G = nx.Graph()
+    for name in display.values():
         G.add_node(name)
 
-    actor_col = None
-    for col in times.columns:
-        if col.lower().replace(" ", "") == "keyactors":
-            actor_col = col
-            break
+    actor_to_epochs: dict[str, list[str]] = {}
+    for t in times_data:
+        epoch = resolve(_field(t, "name"))
+        if not epoch:
+            continue
+        for actor in _split_multi(_field(t, "keyactors", "key actors")):
+            actor_to_epochs.setdefault(actor, []).append(epoch)
 
-    if actor_col and not times.empty:
-        actor_to_epochs: dict[str, list[str]] = {}
-        for _, row in times.iterrows():
-            epoch = str(row.get("Name", "")).strip()
-            if not epoch:
-                continue
-            actors_raw = row.get(actor_col)
-            if isinstance(actors_raw, str):
-                actors = [a.strip() for a in actors_raw.replace(";", ",").split(",") if a.strip()]
-            elif isinstance(actors_raw, list):
-                actors = [str(a).strip() for a in actors_raw if str(a).strip()]
-            else:
-                continue
-            for actor in actors:
-                actor_to_epochs.setdefault(actor, []).append(epoch)
+    for actor, epochs in actor_to_epochs.items():
+        for i in range(len(epochs)):
+            for j in range(i + 1, len(epochs)):
+                a, b = epochs[i], epochs[j]
+                if a == b:
+                    continue
+                if G.has_edge(a, b):
+                    G[a][b]["relation"] = f"{G[a][b].get('relation', '')}, {actor}"
+                else:
+                    G.add_edge(a, b, relation=actor)
 
-        for actor, epochs in actor_to_epochs.items():
-            for i in range(len(epochs)):
-                for j in range(i + 1, len(epochs)):
-                    if not G.has_edge(epochs[i], epochs[j]):
-                        G.add_edge(epochs[i], epochs[j], relation=actor)
-                    else:
-                        existing = G[epochs[i]][epochs[j]].get("relation", "")
-                        G[epochs[i]][epochs[j]]["relation"] = f"{existing}, {actor}"
-
-    data = _graph_to_json(G, entity_names, node_metadata, "Epoch")
-    _save_graph(data, output_dir / "ages.json")
+    _save_graph(_to_json(G, display, metadata, "Epoch"), output_dir / "ages.json")
