@@ -39,6 +39,7 @@ class EmbeddingEncoder:
             return
 
         self.unload()
+        logger.info(f"Loading model '{model_name}' into device...")
         self._model = self._load_model(model_name)
         self.model_name = model_name
         device = str(self._model.device)
@@ -73,6 +74,7 @@ class EmbeddingEncoder:
         if self._model is None:
             return
         device = str(self._model.device)
+        logger.info(f"Unloading model from {device}...")
         self._model = None
         self.model_name = None
         gc.collect()
