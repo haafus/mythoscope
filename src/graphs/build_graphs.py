@@ -100,8 +100,8 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         if uncached:
             cached = len(chunks) - len(uncached)
             logger.info(
-                f"Extracting {len(uncached)}/{len(chunks)} chunks "
-                f"(concurrency={graphs_cfg.max_concurrent})..."
+                f"Extracting {len(uncached)} new chunks "
+                f"({cached} cached, {len(chunks)} total, concurrency={graphs_cfg.max_concurrent})..."
             )
             completed = _extract_chunks(
                 processor, uncached, chunk_prompts, cache, cache_path,
