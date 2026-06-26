@@ -6,7 +6,6 @@ from pathlib import Path
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from corpus.iterator import iter_files
 from embeddings.chunking import chunk_text
-from json_utils import save_json
 from llm import LLMProcessor, map_concurrent
 from settings import settings
 
@@ -138,17 +137,12 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         )
 
         try:
-            save_json(book_out_dir / "raw_beings.json", all_beings, indent=2)
-            save_json(book_out_dir / "relations.json", all_relations, indent=2)
-            save_json(book_out_dir / "locations.json", all_locations, indent=2)
-            save_json(book_out_dir / "times.json", all_times, indent=2)
-
             generate_beings_graph(all_beings, all_relations, book_out_dir)
             generate_realms_graph(all_locations, book_out_dir)
             generate_ages_graph(all_times, book_out_dir)
 
         except Exception:
-            logger.exception("Error saving files or generating graph for %s", text_id)
+            logger.exception("Error generating graph for %s", text_id)
 
     if processor.governor.stats()["requests"]:
         logger.info(f"LLM usage: {processor.governor.summary()}")
