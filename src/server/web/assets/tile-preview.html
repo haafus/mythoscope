@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tile layer preview — MythoScope (temporary)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; background: #f5f6f8; color: #222; }
+    header { padding: 16px 20px; border-bottom: 1px solid #e2e6ea; background: #fff; }
+    header h1 { font-size: 18px; margin: 0 0 4px; }
+    header p { margin: 0; color: #666; font-size: 13px; }
+    header code { background: #eef1f4; padding: 1px 5px; border-radius: 3px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 16px; padding: 16px 20px; }
+    .card { background: #fff; border: 1px solid #e2e6ea; border-radius: 8px; overflow: hidden; }
+    .card h2 { font-size: 14px; margin: 0; padding: 10px 12px; border-bottom: 1px solid #eef1f4; }
+    .card .sub { display: block; font-weight: 400; color: #8a9099; font-size: 11px; margin-top: 2px; word-break: break-all; }
+    .map { height: 320px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Leaflet tile layer preview</h1>
+    <p>Temporary page to compare basemaps for the Geography map. Key-free providers only
+       (Stadia/Stamen, Mapbox, Thunderforest need an API key and are omitted).
+       Scroll-zoom is off; use the +/− buttons. URL: <code>/assets/tile-preview.html</code></p>
+  </header>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const LAYERS = [
+      { name: "OpenStreetMap (current)", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: "© OpenStreetMap" },
+      { name: "OSM Humanitarian", url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", attribution: "© OpenStreetMap, HOT" },
+      { name: "CARTO Positron (light)", url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", subdomains: "abcd", attribution: "© OpenStreetMap © CARTO" },
+      { name: "CARTO Positron — no labels", url: "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", subdomains: "abcd", attribution: "© CARTO" },
+      { name: "CARTO Dark Matter", url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", subdomains: "abcd", attribution: "© CARTO" },
+      { name: "CARTO Dark — no labels", url: "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", subdomains: "abcd", attribution: "© CARTO" },
+      { name: "CARTO Voyager", url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", subdomains: "abcd", attribution: "© CARTO" },
+      { name: "Esri World Imagery (satellite)", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attribution: "Esri, Maxar, Earthstar" },
+      { name: "Esri Light Gray Canvas", url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", attribution: "Esri" },
+      { name: "Esri World Topo", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", attribution: "Esri" },
+      { name: "Esri NatGeo World", url: "https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}", attribution: "Esri, National Geographic" },
+      { name: "Esri World Street", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attribution: "Esri" },
+      { name: "Esri Shaded Relief", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}", attribution: "Esri" },
+      { name: "Esri Ocean", url: "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}", attribution: "Esri" },
+      { name: "OpenTopoMap", url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", attribution: "© OpenTopoMap (CC-BY-SA)" },
+    ];
+
+    const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
+
+    async function loadTraditions() {
+      try {
+        const res = await fetch("/api/corpus/traditions");
+        if (!res.ok) return [];
+        const data = await res.json();
+        const traditions = data.traditions || data || {};
+        return Object.entries(traditions).map(([name, info]) => {
+          const c = info && info.coordinates;
+          if (!Array.isArray(c) || c.length < 2) return null;
+          const lat = Number(c[0]); const lon = Number(c[1]);
+          if (!isFinite(lat) || !isFinite(lon)) return null;
+          return { name, lat, lon, color: typeof info.color === "string" ? info.color : "#334155" };
+        }).filter(Boolean);
+      } catch {
+        return [];
+      }
+    }
+
+    function buildMap(containerId, layer, markers) {
+      const map = L.map(containerId, {
+        zoomControl: true,
+        scrollWheelZoom: false,
+        maxBounds: worldBounds,
+        maxBoundsViscosity: 1.0,
+        worldCopyJump: false,
+      }).setView([20, 15], 1);
+
+      L.tileLayer(layer.url, {
+        noWrap: true,
+        bounds: worldBounds,
+        subdomains: layer.subdomains || "abc",
+        attribution: layer.attribution || "",
+        maxZoom: 7,
+      }).addTo(map);
+
+      markers.forEach((m) => {
+        L.circleMarker([m.lat, m.lon], {
+          radius: 5, weight: 1, color: "#fff", fillColor: m.color, fillOpacity: 0.9,
+        }).addTo(map).bindTooltip(m.name);
+      });
+    }
+
+    (async () => {
+      const markers = await loadTraditions();
+      const grid = document.getElementById("grid");
+      LAYERS.forEach((layer, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<h2>${layer.name}<span class="sub">${layer.url}</span></h2><div class="map" id="map-${i}"></div>`;
+        grid.appendChild(card);
+        buildMap(`map-${i}`, layer, markers);
+      });
+    })();
+  </script>
+</body>
+</html>
