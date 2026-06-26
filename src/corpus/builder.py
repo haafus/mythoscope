@@ -175,12 +175,17 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     if to_download:
         new_metadata: list[dict] = []
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers) as executor:
+        # Manage the pool explicitly so Ctrl+C cancels pending downloads instead of
+        # draining the whole queue (shutdown(wait=True) on a `with` exit would block).
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers)
+        try:
             futures = {executor.submit(_download_and_process, item): item for item in to_download}
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
                 if result:
                     new_metadata.append(result)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
         metadata.extend(new_metadata)
         logger.info(f"Downloaded: {len(new_metadata)}, failed: {len(to_download) - len(new_metadata)}")
