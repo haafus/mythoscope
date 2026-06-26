@@ -47,7 +47,8 @@ class GraphsSettings(BaseModel):
     # Chunks processed in parallel; the rate limiter is the real throttle, this just
     # bounds in-flight work. Each chunk now makes its 4 LLM calls sequentially, so
     # concurrency lives entirely here (overshoot is harmless — the buckets throttle).
-    max_concurrent: int = 12
+    # 20 keeps a typical gpt-4o-mini run near its TPM ceiling rather than latency-bound.
+    max_concurrent: int = 20
 
 
 class ProjectionSettings(BaseModel):
