@@ -49,7 +49,7 @@ pip install --upgrade pip
 ## Конфигурация
 
 - **`src/settings.py`** — единый источник путей и параметров. Все директории (`outputs/corpus`, `outputs/embeddings`, …), параметры chunking, LLM, сервера и т.д. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` / `config/.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`). Вложенные параметры через `__`: `MYTHO_LLM__MODEL=gpt4o-mini`. Полный список переменных — в `.env.example`.
-- **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах.
+- **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах. У LLM-провайдера можно задать необязательные лимиты `rpm`/`tpm`/`rpd` (запросов и токенов в минуту, запросов в сутки) — по ним rate-governor троттлит вызовы при параллельном извлечении графов. Без них параллелизм ограничен только `max_concurrent`. `rpd` — справочный (жёсткой остановки по нему нет; см. раздел graphs).
 - **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL).
 - **`config/traditions.json`** — описания традиций и их группировка.
 - **`config/graphs_prompts.json`** — промпты для LLM-извлечения сущностей.
@@ -146,6 +146,7 @@ rm -rf ~/.cache/huggingface/hub/models--BAAI--bge-m3
 Основные файлы:
 - `src/projections/analyzer.py` загружает данные из Chroma и собирает статистику.
 - `src/projections/visualization.py` вычисляет UMAP-проекции, heatmap расстояний и distribution, сохраняет как JSON.
+- `src/projections/motif_analysis.py` строит LLM-саммари сюжетов (параллельно, с кэшем `motif_summaries.jsonl`) и motif-UMAP по ним.
 - `src/projections/build_projections.py` оркестрирует анализ для нескольких моделей.
 
 Возможности:
@@ -177,18 +178,18 @@ mytho projections --motifs
 
 Основные файлы:
 - `config/graphs_prompts.json` содержит промпты для извлечения сущностей.
-- `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, агрегация.
-- `src/graphs/extraction.py` извлекает сущности через LLM и дедуплицирует их.
+- `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, параллельное извлечение, агрегация.
+- `src/graphs/extraction.py` извлекает сущности из чанка через LLM (4 последовательных вызова на чанк) и дедуплицирует их.
 - `src/embeddings/chunking.py` разбивает тексты на чанки (общий модуль).
 - `src/chunk_cache.py` content-hash кэш чанков (JSONL): возобновление по содержимому, общий для graphs и motif.
 - `src/graphs/graph_generator.py` строит граф через NetworkX и сохраняет JSON.
-- `src/llm_client.py` вызывает OpenAI-compatible API (`LLMProcessor`).
+- `src/llm/` — пакет работы с LLM: `client.py` (`LLMProcessor`, вызовы OpenAI-compatible API), `rate_limiter.py` (rate-governor: лимиты RPM/TPM + circuit breaker), `concurrency.py` (`map_concurrent` — параллельный прогон с ранней остановкой).
 
 Возможности:
 - Пройти по книгам из `outputs/corpus/corpus.json`.
 - Извлечь сущности и связи через локальный или внешний LLM.
 - Сохранить три графа на книгу в `outputs/graphs/<text_id>/`:
-  - `characters.json` — персонажи и отношения между ними.
+  - `beings.json` — персонажи и отношения между ними.
   - `realms.json` — локации и связи смежности (поле "Adjacent to").
   - `ages.json` — эпохи, связанные через общих ключевых персонажей (KeyActors).
 
@@ -209,6 +210,17 @@ mytho graphs --model gemini25-flash
 ```bash
 mytho graphs --force
 ```
+
+### Параллелизм и лимиты
+
+Чанки извлекаются параллельно. Настоящий троттл — **rate-governor**: по лимитам `rpm`/`tpm` из `config/models.json` он не даёт превысить квоту провайдера (бюджет общий на модель, считается по фактическому расходу токенов из ответа, поэтому работает и с Gemini/DeepSeek). `max_concurrent` (`settings.py` → `graphs.max_concurrent`, по умолчанию 12) — это **потолок одновременных вызовов**: при заданных лимитах достаточно держать его на уровне насыщения или выше (throughput выше не растёт, лишние потоки просто ждут); без лимитов он становится единственным регулятором нагрузки.
+
+- **Возобновление**: успешно извлечённые чанки кэшируются (`extraction_cache.jsonl`); чанк с нефатальным сбоем вызова **не** кэшируется и повторится на следующем прогоне. Книга финализируется (помечается готовой) только когда извлеклись все её чанки.
+- **Дневной лимит / устойчивый rate-limit**: если ограничение перестаёт восстанавливаться, прогон останавливается штатно (circuit breaker) — кэш сохранён, перезапуск продолжит с места остановки. Жёсткого счётчика по `rpd` нет: дневной лимит ловится по устойчивым 429.
+- **Фатальные ошибки** (нет ключа/квоты/модели) останавливают прогон сразу.
+- В логах периодически печатается утилизация (`% TPM`/`% RPM`, throttled %), и итоговая сводка в конце.
+
+Те же механизмы (governor, `map_concurrent`, кэш) использует и `mytho projections --motifs` для LLM-саммари; его параллелизм — `projection.max_concurrent` (по умолчанию 5).
 
 ## status
 
