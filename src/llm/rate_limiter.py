@@ -168,7 +168,11 @@ class RateGovernor:
             }
 
     def summary(self) -> str:
-        """One-line usage summary; shows %-of-limit utilization where limits are set."""
+        """One-line usage summary; shows %-of-limit utilization where limits are set.
+
+        Rates are cumulative averages since the run started (they ramp up from a free
+        initial bucket and settle), hence the "(cumulative)" tag.
+        """
         s = self.stats()
         parts = [f"{s['requests']} requests", f"{s['tokens']:,} tokens", f"~{s['req_per_min']:.0f} req/min"]
         if self.tpm:
@@ -176,7 +180,7 @@ class RateGovernor:
         if self.rpm:
             parts.append(f"{s['req_per_min'] / self.rpm * 100:.0f}% RPM")
         parts.append(f"throttled {s['wait_fraction'] * 100:.0f}%")
-        return ", ".join(parts)
+        return ", ".join(parts) + " (cumulative)"
 
 
 _governors: dict[str, RateGovernor] = {}
