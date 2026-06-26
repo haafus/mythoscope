@@ -60,6 +60,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
         plot_bgcolor: "#fbfcfd",
         paper_bgcolor: "#fff",
         hovermode: "closest",
+        hoverdistance: 3, // match the marker radius (size 6) so hover triggers only on the point
         hoverlabel: {
             align: "left",
             bgcolor: "#fff",
