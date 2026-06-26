@@ -46,7 +46,18 @@ def _extract_chunks(
     )
 
 
-def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None) -> None:
+def build_graphs(
+    llm: str | None = None,
+    force: bool = False,
+    max_texts: int | None = None,
+    regraph: bool = False,
+) -> None:
+    """Extract entities and build graphs.
+
+    With ``regraph=True`` no LLM is used: graphs are rebuilt from the cached
+    extraction (``extraction_cache.jsonl``) only, overwriting existing outputs.
+    Books whose extraction isn't fully cached are skipped.
+    """
     prompts_path = Path("config/graphs_prompts.json")
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
@@ -54,12 +65,14 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         raise RuntimeError(f"Failed to load prompts from {prompts_path}: {e}") from e
 
     graphs_cfg = settings.graphs
-    processor = LLMProcessor(
-        model_alias=llm,
-        use_json_mode=graphs_cfg.use_json_mode,
-    )
+    # In regraph mode we never call the LLM, so don't construct a client
+    # (it would require an API key even though no request is made).
+    processor = None if regraph else LLMProcessor(model_alias=llm, use_json_mode=graphs_cfg.use_json_mode)
 
-    logger.info(f"Starting graph generation (model={processor.model_name}, force={force})...")
+    if regraph:
+        logger.info("Rebuilding graphs from cached extraction (no LLM calls)...")
+    else:
+        logger.info(f"Starting graph generation (model={processor.model_name}, force={force})...")
 
     files = iter_files(settings.corpus_dir)
     if max_texts is not None:
@@ -72,7 +85,7 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
-        if is_book_complete(book_out_dir) and not force:
+        if is_book_complete(book_out_dir) and not force and not regraph:
             logger.info(f"--- Skipping: {text_id} (already complete) ---")
             continue
 
@@ -96,7 +109,7 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         cache = load_cache(cache_path)
 
         uncached = [c for c in chunks if chunk_hash(c) not in cache]
-        if uncached:
+        if uncached and not regraph:
             cached = len(chunks) - len(uncached)
             logger.info(
                 f"Extracting {len(uncached)} new chunks "
@@ -116,10 +129,16 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
 
         missing = sum(1 for c in chunks if chunk_hash(c) not in cache)
         if missing:
-            logger.warning(
-                f"{text_id}: {missing}/{len(chunks)} chunks failed extraction — "
-                "book left incomplete, rerun to retry."
-            )
+            if regraph:
+                logger.warning(
+                    f"{text_id}: {missing}/{len(chunks)} chunks not in cache — "
+                    "run extraction first; skipping."
+                )
+            else:
+                logger.warning(
+                    f"{text_id}: {missing}/{len(chunks)} chunks failed extraction — "
+                    "book left incomplete, rerun to retry."
+                )
             continue
 
         results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
@@ -144,10 +163,12 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         except Exception:
             logger.exception("Error generating graph for %s", text_id)
 
-    if processor.governor.stats()["requests"]:
+    if processor is not None and processor.governor.stats()["requests"]:
         logger.info(f"LLM usage: {processor.governor.summary()}")
 
     if stopped:
         logger.warning("Graph generation stopped early (rate limit); rerun to resume.")
+    elif regraph:
+        logger.info("Graph rebuild complete.")
     else:
         logger.info("Graph generation complete.")

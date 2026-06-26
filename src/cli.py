@@ -92,9 +92,10 @@ def projections(model: str | None, motifs: bool, force: bool):
 @mytho.command()
 @click.option("--model", "-m", default=None, help="LLM model name from config/models.json registry.")
 @click.option("--force", "-f", is_flag=True, help="Overwrite existing graph outputs.")
-def graphs(model: str | None, force: bool):
+@click.option("--regraph", is_flag=True, help="Rebuild graphs from cached extraction only (no LLM calls).")
+def graphs(model: str | None, force: bool, regraph: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    _run("Graphs", _build_graphs, llm=model, force=force)
+    _run("Graphs", _build_graphs, llm=model, force=force, regraph=regraph)
 
 
 @mytho.command()
@@ -165,11 +166,13 @@ def _build_projections(model: str | None, force: bool = False, motif_analysis: b
     build_projections(model_name=model, motif_analysis=motif_analysis, force=force)
 
 
-def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
+def _build_graphs(
+    llm: str | None = None, force: bool = False, max_texts: int | None = None, regraph: bool = False
+):
     logger.info("Loading graph libraries...")
     from graphs.build_graphs import build_graphs
 
-    build_graphs(llm=llm, force=force, max_texts=max_texts)
+    build_graphs(llm=llm, force=force, max_texts=max_texts, regraph=regraph)
 
 
 @mytho.command()
