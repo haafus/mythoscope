@@ -118,6 +118,7 @@ def embeddings_status(settings) -> dict[str, Any]:
         for col in chroma_manager.list_collections():
             result["collections"].append({
                 "name": col.name,
+                "model": (col.metadata or {}).get("model", col.name),
                 "count": col.count(),
             })
     except Exception as e:
