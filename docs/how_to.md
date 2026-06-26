@@ -13,6 +13,39 @@ tests/           — тесты
 pyproject.toml   — конфигурация проекта, зависимости, ruff, mypy
 ```
 
+## Архитектура
+
+Поток данных линейный, каждый шаг идемпотентен и возобновляем:
+
+```
+CLI (cli.py) ──► settings.py (+ config/*.json, model_registry.py)
+   │
+   ├─ corpus/      ──► outputs/corpus/      (тексты + corpus.json)
+   ├─ embeddings/  ──► outputs/embeddings/  (ChromaDB)
+   ├─ projections/ ──► outputs/projections/ (UMAP/heatmap JSON, motif-UMAP)
+   ├─ graphs/      ──► outputs/graphs/       (beings/realms/ages JSON)
+   └─ server/      ◄── читает outputs/ и отдаёт SPA + REST API
+
+corpus → embeddings → {projections, graphs} → server
+```
+
+Доменные пакеты (`corpus`, `embeddings`, `projections`, `graphs`, `server`) — по шагу пайплайна. Общая инфраструктура, не привязанная к шагу:
+
+- **`llm/`** — работа с LLM: `client.py` (`LLMProcessor` — OpenAI-compatible вызовы, классификация ошибок, ретраи), `rate_limiter.py` (`RateGovernor` — лимиты RPM/TPM + circuit breaker), `concurrency.py` (`map_concurrent` — параллельный фан-аут с быстрой отменой).
+- **`chunk_cache.py`** — append-only content-hash JSONL-кэш (graphs, motifs): возобновление по содержимому.
+- **`json_utils.py`** — атомарная запись JSON (`save_json`).
+- **`model_registry.py`** — резолв алиасов моделей и LLM-провайдеров из `config/models.json`.
+- **`settings.py`** — pydantic-settings, единый источник путей/параметров (env `MYTHO_*`).
+
+Как устроен троттлинг и параллелизм LLM-шагов:
+
+1. Потребитель (graphs/motifs) гонит элементы через `map_concurrent` с `max_concurrent` воркерами.
+2. Каждый вызов идёт через `LLMProcessor` → `RateGovernor` (общий синглтон на модель): два token-bucket'а (RPM/TPM), пред-оплата по оценке токенов и сверка по факту из `usage` ответа.
+3. На устойчивом rate-limit взводится circuit breaker (`DailyLimitReached`) → штатная остановка; фатальные ошибки (`FatalLLMError`) → немедленная.
+4. Результат пишется в content-hash кэш → повторный запуск продолжает с места.
+
+CLI грузит тяжёлые зависимости (torch, transformers, chromadb) **лениво**, в момент запуска шага, поэтому первый запуск шага начинается с паузы на импорт.
+
 ## Подготовка окружения
 
 ```bash
@@ -53,6 +86,42 @@ pip install --upgrade pip
 - **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL).
 - **`config/traditions.json`** — описания традиций и их группировка.
 - **`config/graphs_prompts.json`** — промпты для LLM-извлечения сущностей.
+
+## LLM-провайдеры
+
+Реестр LLM — `config/models.json`, секция `llm`:
+- `models` — активные алиасы (видны в `mytho graphs --model ...`);
+- `inactive` — заготовки (например, локальные модели), не предлагаются, пока не перенесены в `models`.
+
+Запись провайдера:
+
+```json
+"gpt4o-mini": {
+  "base_url": "https://api.openai.com/v1",
+  "model": "gpt-4o-mini",
+  "env_key": "OPENAI_API_KEY",
+  "rpm": 500, "tpm": 200000, "rpd": 10000
+}
+```
+
+- `base_url` — любой **OpenAI-compatible** эндпоинт.
+- `model` — имя модели у провайдера.
+- `env_key` — имя переменной окружения с API-ключом (читается SDK, не pydantic).
+- `rpm`/`tpm`/`rpd` — необязательные лимиты (см. «Тюнинг throughput» в разделе graphs); `rpd` справочный. Без них параллелизм ограничен только `max_concurrent`.
+
+Из коробки: OpenAI (`gpt4o-mini`, `gpt4o`), Gemini через OpenAI-слой (`gemini25-flash`, `gemini25-pro`), DeepSeek (`deepseek-v3`); в `inactive` — локальные через Ollama (`qwen3-8b`, `gemma3-27b`, …).
+
+**API-ключи** — в `.env` / `config/.env` под нужным `env_key`:
+
+```
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=AIza...
+DEEPSEEK_API_KEY=sk-...
+```
+
+**Добавить провайдера** — новая запись в `llm.models` с его OpenAI-compatible `base_url`, именем модели и `env_key`. Выбрать модель: `mytho graphs --model <алиас>` или дефолт `MYTHO_LLM__MODEL`.
+
+**Локальная модель (Ollama)** — перенеси нужный алиас из `inactive` в `models` (или добавь свой) с `base_url: http://localhost:11434/v1`, **без** `env_key` и без лимитов. Приватность: при облачном провайдере текст корпуса уходит в его API — если это нежелательно, используй локальную модель.
 
 ## CLI
 
@@ -222,6 +291,39 @@ mytho graphs --force
 - В логах периодически печатается утилизация (`% TPM`/`% RPM`, throttled %), и итоговая сводка в конце.
 
 Те же механизмы (governor, `map_concurrent`, кэш) использует и `mytho projections --motifs` для LLM-саммари; его параллелизм — `projection.max_concurrent` (по умолчанию 5).
+
+### Тюнинг throughput
+
+Как разогнать (или успокоить) LLM-шаг. Ключ — периодическая строка в логе:
+
+```
+LLM usage [gpt-4o-mini]: 200 requests, 315,901 tokens, ~72 req/min, 57% TPM, 14% RPM, throttled 0%
+```
+
+- `% TPM` / `% RPM` — утилизация заданных лимитов; **биндит та, что выше** (для многословного извлечения обычно TPM).
+- `throttled %` — доля времени, которую вызовы простояли в ожидании лимитера.
+
+Диагностика:
+
+| Что в логе | Значит | Что делать |
+|---|---|---|
+| `throttled ~0%`, `% TPM/RPM` низкие | недогруз: упираешься в латентность, не в лимит | **поднять** `max_concurrent` |
+| `throttled` заметный или `% TPM/RPM` ~100 | насыщение: упёрся в квоту | оставить — выше не разгонится |
+| нет `% TPM/RPM` (лимиты не заданы) | троттла нет, `max_concurrent` — единственный регулятор | крутить по железу/провайдеру |
+
+Насколько поднимать: throughput растёт ~линейно с `max_concurrent`, пока не упрёшься в биндящий лимит. Грубо `новый ≈ текущий × (целевой% / текущий%)`. Пример: 57% TPM при 18 воркерах, цель ~90% → `18 × 90/57 ≈ 28`.
+
+Крутить через env (без правки кода) или дефолты в `settings.py`:
+
+```bash
+MYTHO_GRAPHS__MAX_CONCURRENT=28        # graphs
+MYTHO_PROJECTION__MAX_CONCURRENT=10    # motifs
+```
+
+Нюансы:
+- Перебор безвреден (вёдра троттлят), но стоит потоков/соединений; абсурдно высокое значение повышает риск 429.
+- Точка насыщения плавает с латентностью — держи небольшой запас, а не точное значение.
+- `% TPM` / `throttled` считаются из фактического `usage`, поэтому работают и без заголовков провайдера (Gemini/DeepSeek).
 
 ## status
 
