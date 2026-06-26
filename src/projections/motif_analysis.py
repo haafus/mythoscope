@@ -9,6 +9,9 @@ from settings import settings
 
 logger = logging.getLogger(__name__)
 
+# How often (in summaries) to log a mid-run usage/utilization snapshot.
+USAGE_LOG_EVERY = 50
+
 SUMMARY_PROMPT = (
     "You are a comparative mythology analyst. "
     "Summarize the plot of this text fragment in 2-3 neutral sentences. "
@@ -38,12 +41,18 @@ def generate_motif_summaries(
             f"Generating {len(uncached)}/{len(data)} summaries "
             f"(concurrency={settings.projection.max_concurrent})..."
         )
+        total = len(uncached)
+        done = 0
 
         def _store(item: dict, summary: str) -> None:
+            nonlocal done
+            done += 1
             if summary:
                 key = chunk_hash(item.get("text", ""))
                 append_cache(cache_path, key, summary)
                 cache[key] = summary
+            if done % USAGE_LOG_EVERY == 0:
+                logger.info(f"  {done}/{total} summaries — LLM usage: {llm.governor.summary()}")
 
         completed = map_concurrent(
             uncached,

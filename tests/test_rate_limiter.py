@@ -52,6 +52,17 @@ class TestRateGovernor:
         g.reconcile(500, 800)
         assert g.stats()["tokens"] == 800
 
+    def test_summary_shows_utilization_with_limits(self):
+        g = RateGovernor("m", rpm=500, tpm=200000)
+        g.acquire(1000)
+        g.reconcile(1000, 1500)
+        s = g.summary()
+        assert "requests" in s and "% TPM" in s and "% RPM" in s
+
+    def test_summary_omits_percent_without_limits(self):
+        s = RateGovernor("m").summary()
+        assert "TPM" not in s and "RPM" not in s
+
 
 class TestGetGovernor:
     def test_singleton_per_key(self):

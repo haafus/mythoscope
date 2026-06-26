@@ -160,6 +160,17 @@ class RateGovernor:
                 "est_error": (self._est_tokens - self._tokens) / self._tokens if self._tokens else 0.0,
             }
 
+    def summary(self) -> str:
+        """One-line usage summary; shows %-of-limit utilization where limits are set."""
+        s = self.stats()
+        parts = [f"{s['requests']} requests", f"{s['tokens']:,} tokens", f"~{s['req_per_min']:.0f} req/min"]
+        if self.tpm:
+            parts.append(f"{s['tokens_per_min'] / self.tpm * 100:.0f}% TPM")
+        if self.rpm:
+            parts.append(f"{s['req_per_min'] / self.rpm * 100:.0f}% RPM")
+        parts.append(f"throttled {s['wait_fraction'] * 100:.0f}%")
+        return ", ".join(parts)
+
 
 _governors: dict[str, RateGovernor] = {}
 _governors_lock = threading.Lock()

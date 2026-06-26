@@ -16,6 +16,9 @@ from .graph_generator import generate_ages_graph, generate_beings_graph, generat
 
 logger = logging.getLogger(__name__)
 
+# How often (in chunks) to log a mid-run usage/utilization snapshot.
+USAGE_LOG_EVERY = 25
+
 
 def _extract_chunks(processor, uncached, chunk_prompts, cache, cache_path, max_concurrent) -> bool:
     """Extract uncached chunks concurrently, persisting each result to the cache.
@@ -32,6 +35,8 @@ def _extract_chunks(processor, uncached, chunk_prompts, cache, cache_path, max_c
         append_cache(cache_path, key, chunk_results)
         cache[key] = chunk_results
         logger.info(f"  Chunk {done}/{total} extracted.")
+        if done % USAGE_LOG_EVERY == 0:
+            logger.info(f"  LLM usage: {processor.governor.summary()}")
 
     return map_concurrent(
         uncached,
@@ -134,13 +139,8 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
         except Exception:
             logger.exception("Error saving files or generating graph for %s", text_id)
 
-    stats = processor.governor.stats()
-    if stats["requests"]:
-        logger.info(
-            f"LLM usage: {stats['requests']} requests, {stats['tokens']:,} tokens, "
-            f"~{stats['req_per_min']:.0f} req/min, throttled "
-            f"{stats['wait_fraction'] * 100:.0f}% of the time"
-        )
+    if processor.governor.stats()["requests"]:
+        logger.info(f"LLM usage: {processor.governor.summary()}")
 
     if stopped:
         logger.warning("Graph generation stopped early (rate limit); rerun to resume.")
