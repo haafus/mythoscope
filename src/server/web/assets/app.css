@@ -606,15 +606,21 @@ body.route-geography {
 }
 
 .geography-page.container {
-    width: min(1024px, calc(100% - 40px));
-    margin: 0 auto;
-    padding: 24px 0 32px;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+body.has-main-navbar > .main-navbar + #app > main.geography-page.container {
+    margin-top: 0;
 }
 
 .geography-page .map-frame {
-    height: 600px;
-    max-height: 70vh;
-    min-height: 400px;
+    height: 70vh; /* fallback; JS sizes it to fill the viewport with a 20px gap */
+    max-height: none;
+    min-height: 320px;
     overflow: hidden;
     border: 1px solid #d8dee4;
     border-radius: 8px;

@@ -149,6 +149,14 @@ function initializeGeographyMap(traditions) {
     // The previous ±240° bounds reached 60° past the tiles on each side, which
     // showed up as gray bands beyond the map.
     const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
+    const frame = document.getElementById("geography-map").parentElement;
+
+    // Grow the map to fill the viewport, leaving a 20px gap to the window edges.
+    const sizeFrame = () => {
+        const top = frame.getBoundingClientRect().top;
+        frame.style.height = `${Math.max(320, window.innerHeight - top - 20)}px`;
+    };
+    sizeFrame(); // size before the map reads its container
 
     const map = L.map("geography-map", {
         zoomControl: true,
@@ -158,10 +166,10 @@ function initializeGeographyMap(traditions) {
     });
     state.geographyMap = map;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", {
         noWrap: true,
         bounds: worldBounds,
-        attribution: "&copy; OpenStreetMap contributors",
+        attribution: "Tiles &copy; Esri",
     }).addTo(map);
 
     map.setView([20, 15], 2);
@@ -175,6 +183,9 @@ function initializeGeographyMap(traditions) {
     }
     clampMinZoomToFill();
     map.on("resize", clampMinZoomToFill);
+
+    state.geographyResizeHandler = () => { sizeFrame(); map.invalidateSize(); };
+    window.addEventListener("resize", state.geographyResizeHandler);
 
     renderMarkers(map, traditions);
 }

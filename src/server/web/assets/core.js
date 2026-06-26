@@ -64,6 +64,10 @@ export function cleanupRoute() {
         document.removeEventListener("keydown", state.keydownHandler);
         state.keydownHandler = null;
     }
+    if (state.geographyResizeHandler) {
+        window.removeEventListener("resize", state.geographyResizeHandler);
+        state.geographyResizeHandler = null;
+    }
     if (state.geographyMap) {
         state.geographyMap.remove();
         state.geographyMap = null;
