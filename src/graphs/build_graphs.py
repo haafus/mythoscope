@@ -17,12 +17,15 @@ from .graph_generator import generate_ages_graph, generate_beings_graph, generat
 logger = logging.getLogger(__name__)
 
 
-def _extract_chunks(processor, uncached, chunk_prompts, cache, cache_path, max_concurrent) -> bool:
+def _extract_chunks(
+    processor, uncached, chunk_prompts, cache, cache_path, max_concurrent, total_chunks, cached
+) -> bool:
     """Extract uncached chunks concurrently, persisting each result to the cache.
 
-    Returns False if the run stopped early on the daily rate limit.
+    Progress is reported against the whole file (``cached`` already done +
+    this run's progress, out of ``total_chunks``). Returns False if the run
+    stopped early on the daily rate limit.
     """
-    total = len(uncached)
     done = 0
 
     def store(chunk: str, outcome: tuple[dict, bool]) -> None:
@@ -34,7 +37,7 @@ def _extract_chunks(processor, uncached, chunk_prompts, cache, cache_path, max_c
             append_cache(cache_path, key, chunk_results)
             cache[key] = chunk_results
         suffix = "" if complete else " (incomplete, will retry next run)"
-        logger.info(f"  Chunk {done}/{total} extracted{suffix}.")
+        logger.info(f"  Chunk {cached + done}/{total_chunks} extracted{suffix}.")
 
     return map_concurrent(
         uncached,
@@ -95,12 +98,14 @@ def build_graphs(llm: str | None = None, force: bool = False, max_texts: int | N
 
         uncached = [c for c in chunks if chunk_hash(c) not in cache]
         if uncached:
+            cached = len(chunks) - len(uncached)
             logger.info(
                 f"Extracting {len(uncached)}/{len(chunks)} chunks "
                 f"(concurrency={graphs_cfg.max_concurrent})..."
             )
             completed = _extract_chunks(
-                processor, uncached, chunk_prompts, cache, cache_path, graphs_cfg.max_concurrent
+                processor, uncached, chunk_prompts, cache, cache_path,
+                graphs_cfg.max_concurrent, len(chunks), cached,
             )
             if not completed:
                 logger.warning(
