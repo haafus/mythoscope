@@ -145,26 +145,38 @@ function renderMarkers(map, traditions) {
 }
 
 function initializeGeographyMap(traditions) {
-    const worldBounds = [
-        [-90, -240],
-        [90, 240],
-    ];
+    // Real tile-covered world: ±180° longitude and the web-mercator latitude limit.
+    // The previous ±240° bounds reached 60° past the tiles on each side, which
+    // showed up as gray bands beyond the map.
+    const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
 
-    state.geographyMap = L.map("geography-map", {
+    const map = L.map("geography-map", {
         zoomControl: true,
+        maxZoom: 7,
         maxBounds: worldBounds,
         maxBoundsViscosity: 1.0,
-    }).setView([20, 15], 2);
+    });
+    state.geographyMap = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 7,
-        minZoom: 2,
         noWrap: true,
         bounds: worldBounds,
         attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(state.geographyMap);
+    }).addTo(map);
 
-    renderMarkers(state.geographyMap, traditions);
+    map.setView([20, 15], 2);
+
+    // Don't let the user zoom out below the level where tiles fill the container,
+    // so there are never gray margins. Recompute when the map is resized.
+    function clampMinZoomToFill() {
+        const fillZoom = map.getBoundsZoom(worldBounds, true); // inside=true → cover the view
+        map.setMinZoom(fillZoom);
+        if (map.getZoom() < fillZoom) map.setZoom(fillZoom);
+    }
+    clampMinZoomToFill();
+    map.on("resize", clampMinZoomToFill);
+
+    renderMarkers(map, traditions);
 }
 
 function showGeographyError(message) {
