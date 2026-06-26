@@ -1,4 +1,3 @@
-import copy
 import json
 
 from llm import LLMProcessor
@@ -34,50 +33,54 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> tuple[di
     return results, complete
 
 
+def _is_empty(value) -> bool:
+    if value is None or value == "" or value == []:
+        return True
+    return isinstance(value, str) and value.strip().lower() == "nan"
+
+
+def _flatten_items(value):
+    """Yield individual non-empty items from a scalar or list attribute value."""
+    for item in value if isinstance(value, list) else [value]:
+        if not _is_empty(item):
+            yield item
+
+
 def deduplicate_entities(entities: list[dict]) -> list[dict]:
-    unique_entities = {}
+    """Merge entities sharing a normalized name, collecting distinct attribute values.
+
+    Each attribute accumulates its distinct values (order-preserving) across all
+    copies: one value stays scalar, several become a list. Linear in the number of
+    values — set-based membership, no string concatenation or list scans.
+    """
+    grouped: dict[str, dict] = {}
     for ent in entities:
         name = ent.get("Name") or ent.get("name") or ent.get("NAME")
         if not name:
             continue
-
         norm_name = str(name).strip().lower()
+        rec = grouped.get(norm_name)
+        if rec is None:
+            rec = {"name": str(name).strip(), "attrs": {}}
+            grouped[norm_name] = rec
+        for key, value in ent.items():
+            if str(key).strip().lower() == "name":
+                continue
+            for item in _flatten_items(value):
+                items, seen = rec["attrs"].setdefault(key, ([], set()))
+                marker = item if isinstance(item, (str, int, float, bool)) else str(item)
+                if marker not in seen:
+                    seen.add(marker)
+                    items.append(item)
 
-        if norm_name not in unique_entities:
-            unique_entities[norm_name] = copy.deepcopy(ent)
-        else:
-            existing = unique_entities[norm_name]
-            for key, value in ent.items():
-                if key.lower() in ["name"]:
-                    continue
-
-                if value in [None, "", [], "nan", "NaN"] or str(value).lower() == "nan":
-                    continue
-
-                existing_val = existing.get(key)
-
-                if existing_val in [None, "", [], "nan", "NaN"] or str(existing_val).lower() == "nan":
-                    existing[key] = copy.deepcopy(value)
-                elif isinstance(existing_val, list) and isinstance(value, list):
-                    merged = existing_val.copy()
-                    for item in value:
-                        if item not in merged:
-                            merged.append(item)
-                    existing[key] = merged
-                elif isinstance(existing_val, str) and isinstance(value, str):
-                    if value not in existing_val:
-                        existing[key] = f"{existing_val}; {value}"
-                elif isinstance(existing_val, list) and isinstance(value, str):
-                    if value not in existing_val:
-                        existing[key].append(value)
-                elif isinstance(existing_val, str) and isinstance(value, list):
-                    new_list = [existing_val]
-                    for item in value:
-                        if item not in new_list:
-                            new_list.append(item)
-                    existing[key] = new_list
-
-    return list(unique_entities.values())
+    result = []
+    for rec in grouped.values():
+        out = {"Name": rec["name"]}
+        for key, (items, _seen) in rec["attrs"].items():
+            if items:
+                out[key] = items[0] if len(items) == 1 else items
+        result.append(out)
+    return result
 
 
 def deduplicate_relations(relations: list[dict]) -> list[dict]:

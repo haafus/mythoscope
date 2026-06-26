@@ -24,6 +24,25 @@ class TestDeduplicateEntities:
         result = deduplicate_entities(entities)
         assert len(result) == 1
 
+    def test_merges_multiple_values_into_list(self):
+        entities = [{"name": "Zeus", "role": "king"}, {"name": "Zeus", "role": "warrior"}]
+        result = deduplicate_entities(entities)
+        assert len(result) == 1
+        assert result[0]["role"] == ["king", "warrior"]
+
+    def test_repeated_value_stays_scalar(self):
+        entities = [{"name": "Zeus", "role": "king"}, {"name": "Zeus", "role": "king"}]
+        assert deduplicate_entities(entities)[0]["role"] == "king"
+
+    def test_keeps_distinct_substrings(self):
+        # old substring logic would drop "king"; now both kept
+        entities = [{"name": "Z", "d": "king of Israel"}, {"name": "Z", "d": "king"}]
+        assert deduplicate_entities(entities)[0]["d"] == ["king of Israel", "king"]
+
+    def test_flattens_list_values(self):
+        entities = [{"name": "Z", "roles": ["king", "god"]}, {"name": "Z", "roles": ["god", "judge"]}]
+        assert deduplicate_entities(entities)[0]["roles"] == ["king", "god", "judge"]
+
 
 class TestDeduplicateRelations:
     def test_empty_list(self):
