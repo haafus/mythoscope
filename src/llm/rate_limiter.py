@@ -4,6 +4,9 @@ import time
 
 logger = logging.getLogger(__name__)
 
+# How often (in requests) the governor logs a mid-run usage/utilization snapshot.
+USAGE_LOG_EVERY = 25
+
 
 class DailyLimitReached(Exception):
     """Rate limiting is no longer recovering (likely a daily quota) — stop the run cleanly.
@@ -119,6 +122,10 @@ class RateGovernor:
             self._requests += 1
             self._est_tokens += est_tokens
             self._wait += waited
+            should_log = self._requests % USAGE_LOG_EVERY == 0
+        # summary() takes the same lock, so log outside the critical section.
+        if should_log:
+            logger.info("LLM usage [%s]: %s", self.model, self.summary())
 
     def reconcile(self, est_tokens: int, actual_tokens: int) -> None:
         """Correct the token bucket once the real usage is known."""

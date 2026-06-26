@@ -1,5 +1,8 @@
+import logging
+
 import pytest
 
+from llm import rate_limiter as rl
 from llm.rate_limiter import DailyLimitReached, RateGovernor, TokenBucket, get_governor
 
 
@@ -62,6 +65,13 @@ class TestRateGovernor:
     def test_summary_omits_percent_without_limits(self):
         s = RateGovernor("m").summary()
         assert "TPM" not in s and "RPM" not in s
+
+    def test_acquire_logs_usage_periodically(self, caplog):
+        g = RateGovernor("m", rpm=100000, tpm=100000)
+        with caplog.at_level(logging.INFO, logger="llm.rate_limiter"):
+            for _ in range(rl.USAGE_LOG_EVERY):
+                g.acquire(10)
+        assert "LLM usage" in caplog.text
 
 
 class TestGetGovernor:
