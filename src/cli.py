@@ -283,7 +283,8 @@ def _clean(apply: bool, caches: bool):
         for path, size in orphans:
             total_bytes += size
             total_items += 1
-            click.echo(f"  {path.relative_to(settings.corpus_dir):<50} {format_size(size):>8}")
+            rel = str(path.relative_to(settings.corpus_dir))
+            click.echo(f"  {rel:<50} {format_size(size):>8}")
             if apply:
                 path.unlink(missing_ok=True)
         click.echo()
