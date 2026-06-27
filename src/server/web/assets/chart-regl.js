@@ -1,6 +1,7 @@
 
 import { escapeHtml, normalizePreviewText } from "./core.js";
 import { pointTooltipHtml } from "./search-utils.js";
+import { getTooltip, positionTooltip } from "./chart-tooltip.js";
 
 let scatterInstance = null;
 let pointMeta = null;
@@ -57,33 +58,6 @@ function viridisColor(t) {
     const f = idx - i;
     const a = VIRIDIS[i], b = VIRIDIS[i + 1];
     return `rgb(${Math.round(a[0] + (b[0] - a[0]) * f)},${Math.round(a[1] + (b[1] - a[1]) * f)},${Math.round(a[2] + (b[2] - a[2]) * f)})`;
-}
-
-function positionTooltip(container, tooltip, event) {
-    const rect = container.getBoundingClientRect();
-    const cx = event?.clientX ?? (rect.left + rect.width / 2);
-    const cy = event?.clientY ?? (rect.top + rect.height / 2);
-    const gap = 14, pad = 10;
-    tooltip.style.left = "0px";
-    tooltip.style.top = "0px";
-    const w = tooltip.offsetWidth, h = tooltip.offsetHeight;
-    let left = cx - rect.left + gap, top = cy - rect.top + gap;
-    if (left + w + pad > rect.width) left = cx - rect.left - w - gap;
-    if (top + h + pad > rect.height) top = cy - rect.top - h - gap;
-    tooltip.style.left = `${Math.max(pad, Math.min(left, rect.width - w - pad))}px`;
-    tooltip.style.top = `${Math.max(pad, Math.min(top, rect.height - h - pad))}px`;
-}
-
-function getTooltip() {
-    const plotCanvas = document.getElementById("plotCanvas");
-    if (!plotCanvas) return [null, null];
-    let tip = plotCanvas.querySelector(".plot-hover-tooltip");
-    if (!tip) {
-        tip = document.createElement("div");
-        tip.className = "plot-hover-tooltip";
-        plotCanvas.appendChild(tip);
-    }
-    return [plotCanvas, tip];
 }
 
 function createHiDpiCanvas(el) {

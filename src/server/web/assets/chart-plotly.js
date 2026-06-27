@@ -1,6 +1,7 @@
 
 import { normalizePreviewText } from "./core.js";
 import { pointTooltipHtml } from "./search-utils.js";
+import { getTooltip, positionTooltip } from "./chart-tooltip.js";
 
 let activeChart = null;
 let tooltipHandlers = null;
@@ -157,16 +158,9 @@ export async function renderDistribution(el, data, { colorMap }) {
 }
 
 function bindTooltip(plotEl) {
-    const canvas = document.getElementById("plotCanvas");
+    const [canvas, tooltip] = getTooltip();
     if (!canvas) return;
     clearTooltipHandlers(plotEl);
-
-    let tooltip = canvas.querySelector(".plot-hover-tooltip");
-    if (!tooltip) {
-        tooltip = document.createElement("div");
-        tooltip.className = "plot-hover-tooltip";
-        canvas.appendChild(tooltip);
-    }
 
     const hide = () => { tooltip.classList.remove("visible"); };
 
@@ -210,26 +204,3 @@ function clearTooltipHandlers(plotEl) {
     tooltipHandlers = null;
 }
 
-function positionTooltip(container, tooltip, event) {
-    const rect = container.getBoundingClientRect();
-    const clientX = event?.clientX ?? (rect.left + rect.width / 2);
-    const clientY = event?.clientY ?? (rect.top + rect.height / 2);
-    const gap = 14;
-    const padding = 10;
-
-    tooltip.style.left = "0px";
-    tooltip.style.top = "0px";
-
-    const width = tooltip.offsetWidth;
-    const height = tooltip.offsetHeight;
-    let left = clientX - rect.left + gap;
-    let top = clientY - rect.top + gap;
-
-    if (left + width + padding > rect.width) left = clientX - rect.left - width - gap;
-    if (top + height + padding > rect.height) top = clientY - rect.top - height - gap;
-    left = Math.max(padding, Math.min(left, rect.width - width - padding));
-    top = Math.max(padding, Math.min(top, rect.height - height - padding));
-
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${top}px`;
-}
