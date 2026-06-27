@@ -109,12 +109,13 @@ function getOffsetCoordinate(item, index, total) {
 }
 
 function buildPopupHtml(item) {
-    const books = item.books.length
-        ? item.books.map((book) => {
-            const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
-            return `<li><a class="popup-book-link" href="${escapeAttribute(href)}">${escapeHtml(book)}</a></li>`;
-        }).join("")
-        : "<li>No books listed</li>";
+    const booksHtml = item.books.length
+        ? `<div class="popup-books-title">Books</div>
+           <ul class="popup-books">${item.books.map((book) => {
+               const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
+               return `<li><a class="popup-book-link" href="${escapeAttribute(href)}">${escapeHtml(book)}</a></li>`;
+           }).join("")}</ul>`
+        : "";
 
     return `
         <div class="popup-title">
@@ -122,8 +123,7 @@ function buildPopupHtml(item) {
             <span>${escapeHtml(item.name)}</span>
         </div>
         <div class="popup-description">${escapeHtml(item.description)}</div>
-        <div class="popup-books-title">Books</div>
-        <ul class="popup-books">${books}</ul>
+        ${booksHtml}
     `;
 }
 
