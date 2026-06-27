@@ -62,7 +62,7 @@ export async function renderEmbeddingsAnalysis() {
                 </div>
             </div>
 
-            <div class="main-content">
+            <div class="workspace">
                 <div class="library-sidebar">
                     <div id="tree-container">Loading...</div>
                 </div>

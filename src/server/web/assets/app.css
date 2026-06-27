@@ -13,6 +13,11 @@
        padding top/bottom + 1px border). Pages derive heights from this instead
        of per-column magic numbers. */
     --navbar-h: 67px;
+
+    /* Shared 3-column workspace tokens (rail-left | canvas | rail-right). */
+    --rail-left: minmax(220px, 260px);
+    --rail-right: minmax(280px, 340px);
+    --ws-gap: 18px;
 }
 
 body {
@@ -378,13 +383,7 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 }
 
 .corpus-page .workspace {
-    flex: 1 1 0;
-    height: auto;
-    min-height: 0;
     overflow: hidden;
-    display: grid;
-    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(260px, 330px);
-    gap: 18px;
 }
 
 .corpus-page .panel,
@@ -555,6 +554,19 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 }
 
 .library-sidebar .library-tree {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* Shared 3-column workspace primitive: rail-left | canvas | rail-right.
+   Lives inside a flex-column page container with a definite height, so it
+   fills the remaining space and each column scrolls internally. */
+.workspace {
+    display: grid;
+    grid-template-columns: var(--rail-left) minmax(0, 1fr) var(--rail-right);
+    grid-template-rows: minmax(0, 1fr);
+    gap: var(--ws-gap);
+    align-items: stretch;
     flex: 1 1 auto;
     min-height: 0;
 }
@@ -890,13 +902,20 @@ body.route-embeddings {
     width: min(100%, 1680px);
     max-width: none;
     margin: 0 auto;
-    padding-bottom: 40px;
+    height: calc(100vh - var(--navbar-h));
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.has-main-navbar > .main-navbar + #app > main.analysis-page.container {
+    margin-top: 0;
 }
 
 .analysis-page .controls-panel {
     background: transparent;
-    padding: 4px 0 14px;
-    margin-bottom: 8px;
+    padding: 14px 0;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -932,24 +951,28 @@ body.route-embeddings {
     border-color: #111;
 }
 
-.analysis-page .main-content {
-    display: grid;
-    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
-    gap: 18px;
-    align-items: flex-start;
-}
-
 .analysis-page .plot-area {
-    grid-column: 2;
     min-width: 0;
+    display: flex;
 }
 
 .analysis-page .sidebar {
-    grid-column: 2;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
-    gap: 18px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.analysis-page .sidebar > .card {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.analysis-page .sidebar .card-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .analysis-page .card {
@@ -961,6 +984,10 @@ body.route-embeddings {
 }
 
 .analysis-page .plot-container {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
 
@@ -981,8 +1008,8 @@ body.route-embeddings {
 .analysis-page .plot-canvas {
     position: relative;
     width: 100%;
-    height: clamp(620px, calc(100vh - 156px), 760px);
-    min-height: 560px;
+    flex: 1;
+    min-height: 0;
     background: #fbfcfd;
     overflow: auto;
 }
@@ -1044,8 +1071,6 @@ body.route-embeddings {
 }
 
 .analysis-page .info-content {
-    max-height: 360px;
-    overflow-y: auto;
     font-size: 14px;
 }
 
@@ -1137,11 +1162,6 @@ body.route-embeddings {
     cursor: default;
 }
 
-.analysis-page .library-sidebar {
-    grid-row: 1 / span 2;
-    height: calc(100vh - 156px);
-    min-height: 620px;
-}
 
 .analysis-page #searchModal {
     display: none;
@@ -1398,55 +1418,30 @@ body.route-embeddings {
    Responsive Breakpoints
    ========================================================================== */
 
-@media (min-width: 1180px) {
-    .analysis-page .main-content {
-        grid-template-columns: minmax(220px, 260px) minmax(520px, 1fr) minmax(280px, 340px);
-    }
-
-    .analysis-page .plot-area,
-    .analysis-page .sidebar {
-        grid-column: auto;
-    }
-
-    .analysis-page .sidebar {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .analysis-page .library-sidebar {
-        grid-row: auto;
-    }
-
-    .analysis-page .info-content {
-        max-height: 500px;
-    }
-
-}
-
 @media (max-width: 980px) {
-    .analysis-page .main-content {
-        grid-template-columns: 1fr;
+    .analysis-page.container {
+        height: auto;
+        overflow: visible;
     }
 
-    .analysis-page .plot-area,
-    .analysis-page .sidebar {
-        grid-column: auto;
-    }
-
-    .analysis-page .sidebar {
+    .analysis-page .workspace {
         grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        flex: none;
     }
 
     .analysis-page .library-sidebar {
-        grid-row: auto;
-        height: auto;
         max-height: 420px;
-        min-height: 0;
     }
 
     .analysis-page .plot-canvas {
+        flex: none;
         height: 560px;
         min-height: 480px;
+    }
+
+    .analysis-page .sidebar .card-body {
+        overflow-y: visible;
     }
 }
 
@@ -1459,6 +1454,7 @@ body.route-embeddings {
 
     .corpus-page .workspace {
         grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+        grid-template-rows: auto;
         min-height: 780px;
     }
 
