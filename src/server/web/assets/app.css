@@ -56,10 +56,8 @@ body.has-main-navbar > .main-navbar + #app > main.container {
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
     padding: 10px clamp(16px, 4vw, 40px);
-    background-color: #ffffff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    background-color: transparent;
     z-index: 1200;
-    border-bottom: 1px solid #dee2e6;
     flex: 0 0 auto;
 }
 
