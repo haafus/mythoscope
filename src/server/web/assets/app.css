@@ -18,6 +18,11 @@
     --border: #dee2e6;
     --accent: #2f6fed;
     --accent-strong: #1b4fd1;
+
+    /* Page frame — one set of values for the navbar and every page container. */
+    --content-max: 1680px;
+    --page-gutter: 20px;
+    --page-pad-y: 20px;
 }
 
 body {
@@ -61,10 +66,10 @@ body.has-main-navbar {
     justify-content: space-between;
     align-items: center;
     gap: 16px 28px;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    padding: 10px clamp(16px, 4vw, 40px);
+    width: 100%;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: 10px var(--page-gutter);
     background-color: transparent;
     z-index: 1200;
     flex: 0 0 auto;
@@ -240,11 +245,6 @@ body.route-corpus {
 }
 
 
-.corpus-page.container {
-    width: min(1500px, calc(100% - 48px));
-    margin: 0 auto;
-    padding: 24px 0 30px;
-}
 
 .corpus-page .workspace {
     overflow: hidden;
@@ -436,6 +436,10 @@ body.route-corpus {
 .corpus-page.container,
 .analysis-page.container,
 .graph-page.container {
+    width: 100%;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: var(--page-pad-y) var(--page-gutter);
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
@@ -791,18 +795,12 @@ body.route-geography {
 body.route-embeddings {
     min-height: 100vh;
     color: #212529;
-    padding: 0 16px;
 }
 
-.analysis-page.container {
-    width: min(100%, 1680px);
-    max-width: none;
-    margin: 0 auto;
-}
 
 .analysis-page .controls-panel {
     background: transparent;
-    padding: 14px 0;
+    padding: 0 0 14px;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -1196,10 +1194,6 @@ body.route-embeddings {
    Graphs Page
    ========================================================================== */
 
-.graph-page.container {
-    width: min(100% - 24px, 1600px);
-    padding-top: 16px;
-}
 
 .graph-area {
     position: relative;
@@ -1306,13 +1300,13 @@ body.route-embeddings {
 }
 
 @media (max-width: 760px) {
-    .corpus-page.container {
-        width: min(100% - 24px, 1500px);
-        padding-top: 16px;
+    :root {
+        --page-gutter: 16px;
+        --page-pad-y: 16px;
     }
 
     .geography-page.container {
-        padding-top: 16px;
+        padding: 16px;
     }
 
     .corpus-page .reader-content {
