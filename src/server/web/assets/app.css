@@ -974,18 +974,15 @@ body.route-embeddings {
 }
 
 .analysis-page .neighbor-item {
-    padding: 12px;
-    background: #fff;
-    border: 1px solid var(--border);
+    padding: 10px 8px;
+    margin-bottom: 4px;
     border-radius: 6px;
-    margin-bottom: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.16s ease;
 }
 
 .analysis-page .neighbor-item:hover {
-    border-color: #111;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background: #f8f9fa;
 }
 
 .analysis-page .neighbor-item .fragment-text {
