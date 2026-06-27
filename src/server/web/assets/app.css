@@ -467,6 +467,8 @@ body.route-corpus {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
     padding: 28px 46px 60px;
     color: #111;
     font-family: Georgia, "Times New Roman", serif;
@@ -476,9 +478,7 @@ body.route-corpus {
 }
 
 .corpus-page .reader-placeholder {
-    height: 100%;
-    display: grid;
-    place-items: center;
+    margin: auto;
     color: var(--muted-soft);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 14px;
