@@ -60,7 +60,6 @@ export async function renderEmbeddingsAnalysis() {
                     <label>Method:</label>
                     <select id="viz-select"><option value="">Loading...</option></select>
                 </div>
-                <span id="model-status" class="status-badge">Waiting for selection...</span>
             </div>
 
             <div class="main-content">
@@ -126,7 +125,7 @@ export async function renderEmbeddingsAnalysis() {
             displayPointInfo(pending.id, pending.chunkIndex);
         }
     } catch (error) {
-        updateStatus(error.message, "error");
+        console.error(error);
     }
 }
 
@@ -159,7 +158,6 @@ async function loadSimilarityMethods() {
 }
 
 async function loadModelsIntoSelect() {
-    updateStatus("Loading list...", "loading");
     await ensureModels();
 
     const modelSelect = document.getElementById("global-model-select");
@@ -167,7 +165,6 @@ async function loadModelsIntoSelect() {
 
     modelSelect.innerHTML = renderModelOptions();
     if (!state.models.length) {
-        updateStatus("Error: no models", "error");
         return;
     }
 
@@ -189,13 +186,6 @@ export function triggerModelChange() {
     loadVisualization();
 }
 
-function updateStatus(text, type = "loaded") {
-    const status = document.getElementById("model-status");
-    if (!status) return;
-    status.textContent = text;
-    status.className = `status-badge ${type}`;
-}
-
 async function loadVisualization() {
     if (!state.selectedModel) return;
 
@@ -203,7 +193,6 @@ async function loadVisualization() {
     const scatterPlot = document.getElementById("scatter-plot");
     const loadingPlaceholder = document.getElementById("loadingPlaceholder");
 
-    updateStatus("Loading chart data...", "loading");
     loadingPlaceholder.style.display = "block";
     loadingPlaceholder.textContent = "Loading visualization...";
     document.querySelector(".plot-hover-tooltip")?.classList.remove("visible");
@@ -220,11 +209,9 @@ async function loadVisualization() {
         await CHART_RENDERERS[chartType](scatterPlot, data);
 
         loadingPlaceholder.style.display = "none";
-        updateStatus("Ready", "loaded");
     } catch (error) {
         loadingPlaceholder.innerHTML = `Error: ${escapeHtml(error.message)}`;
         loadingPlaceholder.style.display = "block";
-        updateStatus("Load error", "error");
     }
 }
 

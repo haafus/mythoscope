@@ -780,17 +780,6 @@ body.route-embeddings {
     border-color: #111;
 }
 
-.analysis-page .status-badge {
-    font-size: 13px;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 12px;
-}
-
-.analysis-page .status-badge.loading { background: #fff3cd; color: #856404; }
-.analysis-page .status-badge.loaded { background: #d4edda; color: #155724; }
-.analysis-page .status-badge.error { background: #f8d7da; color: #721c24; }
-
 .analysis-page .main-content {
     display: grid;
     grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
