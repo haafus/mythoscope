@@ -4,7 +4,7 @@ from model_registry import resolve_embedding_model
 
 from . import PROJECTION_METHODS
 from .analyzer import ModelData, load_model_data
-from .visualization import CHART_GENERATORS, SCATTER_TRANSFORMS
+from .visualization import CHART_GENERATORS, SCATTER_METRICS, SCATTER_TRANSFORMS
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +70,7 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_motif: b
             kwargs = {}
             if chart_type == "scatter":
                 kwargs["transform"] = SCATTER_TRANSFORMS[key]
+                kwargs["metric"] = SCATTER_METRICS[key]
             generator(model_data.data, model_data.embeddings, output_path, model_name=model_data.model_name, **kwargs)
         except Exception:
             logger.exception("Error creating %s", label)
