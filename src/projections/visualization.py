@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_distances
-from sklearn.preprocessing import LabelEncoder, Normalizer
+from sklearn.preprocessing import LabelEncoder
 
 from settings import settings
 
@@ -52,11 +52,6 @@ def _compute_tradition_residuals(data: list[dict], embeddings: np.ndarray) -> np
     return residuals
 
 
-def _residual_normalized(data: list[dict], embeddings: np.ndarray) -> np.ndarray:
-    residuals = _compute_tradition_residuals(data, embeddings)
-    return Normalizer(norm="l2").fit_transform(residuals)
-
-
 def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 35) -> np.ndarray:
     """INLP: iteratively project out tradition-predictive directions (Ravfogel et al., ACL 2020)."""
     traditions = [item.get("tradition", "unknown") for item in data]
@@ -98,7 +93,6 @@ def _concept_erasure(data: list[dict], embeddings: np.ndarray, max_iters: int = 
 SCATTER_TRANSFORMS = {
     "umap": _identity,
     "residual_umap": _compute_tradition_residuals,
-    "residual_normalized_umap": _residual_normalized,
     "rlace_umap": _concept_erasure,
     "motif_umap": _identity,
 }
