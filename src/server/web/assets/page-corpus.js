@@ -13,7 +13,7 @@ export async function renderCorpus() {
                     <div id="libraryTree">Loading...</div>
                 </aside>
 
-                <article class="reader">
+                <article class="card reader">
                     <div class="reader-header">
                         <div class="reader-title" id="readerTitle">Select a book to begin reading</div>
                     </div>
@@ -22,7 +22,7 @@ export async function renderCorpus() {
                     </div>
                 </article>
 
-                <aside class="panel info-panel">
+                <aside class="card panel info-panel">
                     <div class="panel-header">
                         <div class="panel-title">Book Info</div>
                     </div>

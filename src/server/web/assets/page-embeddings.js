@@ -76,9 +76,9 @@ export async function renderEmbeddingsAnalysis() {
                     </div>
                 </div>
 
-                <div class="sidebar">
+                <div class="sidebar rail">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body rail-body">
                             <div class="search-panel" id="searchPanel">
                                 <textarea id="search-text" placeholder="Type a text for similarity search…"></textarea>
                                 <button class="btn btn-primary search-btn" id="search-btn" type="button" disabled>Search ›</button>

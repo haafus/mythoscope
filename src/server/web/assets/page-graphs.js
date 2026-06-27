@@ -27,9 +27,9 @@ export async function renderGraphPage(graphType) {
                         <div class="graph-placeholder" id="graphPlaceholder">Select a book to view its graph.</div>
                     </div>
                 </section>
-                <aside class="graph-rail">
+                <aside class="graph-rail rail">
                     <div class="card graph-info-panel" id="graphInfoPanel">
-                        <div id="graphInfoContent">
+                        <div id="graphInfoContent" class="rail-body">
                             <div class="graph-info-empty">Select a node to see its details.</div>
                         </div>
                     </div>
