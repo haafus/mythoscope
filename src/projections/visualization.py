@@ -17,14 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 def _reduce_dimensions_safe(
-    embeddings: np.ndarray, n_components: int = 2, metric: str = "cosine",
+    embeddings: np.ndarray, n_components: int = 2,
 ) -> np.ndarray | None:
     cfg = settings.projection
     try:
         return reduce_dimensions(
             embeddings, n_components=n_components,
             n_neighbors=cfg.umap_n_neighbors, min_dist=cfg.umap_min_dist,
-            metric=metric,
         )
     except Exception:
         logger.exception("Dimension reduction failed")
@@ -104,19 +103,6 @@ SCATTER_TRANSFORMS = {
     "motif_umap": _identity,
 }
 
-# UMAP metric per scatter method. Residual UMAP uses euclidean so the residual
-# magnitude (how far a chunk sits from its tradition centroid) matters; the
-# normalized variant uses cosine on unit-length residuals, i.e. direction only.
-# (Under cosine, L2-normalizing the residuals is a no-op, which is why the two
-# looked identical before.)
-SCATTER_METRICS = {
-    "umap": "cosine",
-    "residual_umap": "euclidean",
-    "residual_normalized_umap": "cosine",
-    "rlace_umap": "cosine",
-    "motif_umap": "cosine",
-}
-
 
 # ---------------------------------------------------------------------------
 # Generators by chart type
@@ -128,10 +114,9 @@ def generate_scatter(
     output_path: Path,
     model_name: str | None = None,
     transform=_identity,
-    metric: str = "cosine",
 ) -> None:
     transformed = transform(data, embeddings)
-    embedding_2d = _reduce_dimensions_safe(transformed, n_components=2, metric=metric)
+    embedding_2d = _reduce_dimensions_safe(transformed, n_components=2)
     if embedding_2d is None:
         return
 
