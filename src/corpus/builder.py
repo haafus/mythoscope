@@ -103,17 +103,39 @@ def _download_and_process(item: dict) -> dict | None:
         return None
 
 
-def _update_traditions(force: bool) -> None:
-    config_path = settings.config_dir / "traditions.json"
-    output_path = settings.corpus_dir / "traditions.json"
+# config/traditions.json is a category tree: major -> {traditions: {tradition -> info}}.
+# major_tradition lives here, once per tradition (not duplicated per book).
+def _load_traditions_config() -> dict:
+    path = settings.config_dir / "traditions.json"
+    if not path.exists():
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        logger.exception("Error reading %s", path)
+        return {}
 
-    static: dict = {}
-    if config_path.exists():
-        try:
-            with open(config_path, encoding="utf-8") as f:
-                static = json.load(f)
-        except Exception:
-            logger.exception("Error reading %s", config_path)
+
+def _flat_tradition_info(tree: dict) -> dict[str, dict]:
+    flat: dict[str, dict] = {}
+    for node in tree.values():
+        for trad, info in (node.get("traditions") or {}).items():
+            flat[trad] = info
+    return flat
+
+
+def _tradition_major_map(tree: dict) -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for major, node in tree.items():
+        for trad in (node.get("traditions") or {}):
+            mapping[trad] = major
+    return mapping
+
+
+def _update_traditions(force: bool) -> None:
+    output_path = settings.corpus_dir / "traditions.json"
+    flat = _flat_tradition_info(_load_traditions_config())
 
     corpus_traditions: set[str] = set()
     corpus_config = settings.config_dir / "corpus.json"
@@ -123,9 +145,11 @@ def _update_traditions(force: bool) -> None:
                 if "tradition" in item:
                     corpus_traditions.add(item["tradition"])
 
+    # Built corpus/traditions.json stays flat (tradition -> info) so nothing
+    # downstream changes; the tree is only the source of truth in config/.
     result: dict = {}
-    for trad in sorted(corpus_traditions | set(static.keys())):
-        info = static.get(trad, {"description": "", "coordinates": []})
+    for trad in sorted(corpus_traditions | set(flat.keys())):
+        info = dict(flat.get(trad, {"description": "", "coordinates": []}))
         info["color"] = get_tradition_color(trad)
         result[trad] = info
 
@@ -154,6 +178,15 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         download_list = download_list[:max_texts]
 
     _update_traditions(force)
+
+    # Books carry only `tradition`; resolve major_tradition from the tree so the
+    # file path and the metadata row keep it (downstream is unchanged).
+    trad_major = _tradition_major_map(_load_traditions_config())
+    for item in download_list:
+        item["major_tradition"] = trad_major.get(item.get("tradition"), "")
+        if not item["major_tradition"]:
+            logger.warning("No major_tradition for tradition %r (title=%r)",
+                           item.get("tradition"), item.get("title"))
 
     existing = {} if force else _load_existing_metadata()
 

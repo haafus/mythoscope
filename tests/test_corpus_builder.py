@@ -78,7 +78,7 @@ class TestUpdateTraditions:
         return corpus_dir
 
     def test_merges_config_with_color(self, tmp_path, monkeypatch):
-        traditions = {"Greek": {"description": "Ancient Greek mythology", "coordinates": [37.9, 23.7]}}
+        traditions = {"Indo-European": {"traditions": {"Greek": {"description": "Ancient Greek mythology", "coordinates": [37.9, 23.7]}}}}
         books = [{"title": "Iliad", "tradition": "Greek"}]
         corpus_dir = self._setup(tmp_path, monkeypatch, books=books, traditions=traditions)
 
@@ -101,7 +101,7 @@ class TestUpdateTraditions:
         assert data["Norse"]["color"].startswith("#")
 
     def test_includes_traditions_from_both_sources(self, tmp_path, monkeypatch):
-        traditions = {"Celtic": {"description": "Celtic myths", "coordinates": [53.1, -7.7]}}
+        traditions = {"Indo-European": {"traditions": {"Celtic": {"description": "Celtic myths", "coordinates": [53.1, -7.7]}}}}
         books = [{"title": "Edda", "tradition": "Norse"}]
         corpus_dir = self._setup(tmp_path, monkeypatch, books=books, traditions=traditions)
 
