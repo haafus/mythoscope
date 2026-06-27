@@ -10,7 +10,6 @@ export const state = {
     corpusCollapsedMajors: new Set(),
     traditionInfo: null,
     geographyMap: null,
-    pendingPoint: null,
     lastAnalysisSearchData: null,
     analysisSearchRequestId: 0,
     keydownHandler: null,

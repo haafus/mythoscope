@@ -112,18 +112,6 @@ export async function renderEmbeddingsAnalysis() {
         await loadSimilarityMethods();
         await loadModelsIntoSelect();
         await initializeAnalysisLibrary();
-        if (state.pendingPoint) {
-            const pending = state.pendingPoint;
-            state.pendingPoint = null;
-            if (pending.model) {
-                const select = document.getElementById("global-model-select");
-                if (select && Array.from(select.options).some((option) => option.value === pending.model)) {
-                    select.value = pending.model;
-                    triggerModelChange();
-                }
-            }
-            displayPointInfo(pending.id, pending.chunkIndex);
-        }
     } catch (error) {
         console.error(error);
     }
