@@ -1,4 +1,4 @@
-import { api, bookTitleFromId, escapeHtml, escapeAttribute, escapeRegex, state } from "./core.js";
+import { api, bookTitleFromId, escapeHtml, escapeAttribute, escapeRegex, normalizePreviewText, state } from "./core.js";
 
 export function scoreClass(similarityScore) {
     const percent = Math.round(Number(similarityScore || 0) * 100);
@@ -14,6 +14,34 @@ export function resultBookTitle(item) {
 
 export function chunkMetaLine(item) {
     return `Book: ${resultBookTitle(item)} | Chunk #${item.chunk_index ?? 0}`;
+}
+
+// Editorial attribution shown under a fragment: "— Tradition, Title" on one
+// line, "chunk N" (optionally ", score 0.76") on the next, muted and
+// right-aligned via the .fragment-attribution styles.
+export function attributionLine(item, { withScore = false } = {}) {
+    const tradition = item.tradition || "Unknown";
+    const title = resultBookTitle(item);
+    let meta = `chunk ${item.chunk_index ?? 0}`;
+    if (withScore && item.similarity_score != null) {
+        meta += `, score ${Number(item.similarity_score).toFixed(2)}`;
+    }
+    return `
+        <div class="fragment-attribution">
+            <span class="fragment-source">— ${escapeHtml(tradition)}, ${escapeHtml(title)}</span>
+            <span class="fragment-chunk">${escapeHtml(meta)}</span>
+        </div>
+    `;
+}
+
+// Hover tooltip content for a scatter point: preview text followed by the
+// shared attribution line, so tooltips read the same way as the right column.
+export function pointTooltipHtml(item) {
+    const text = normalizePreviewText(item.text) || "No preview available.";
+    return `
+        <div class="plot-hover-text">${escapeHtml(text)}</div>
+        ${attributionLine(item)}
+    `;
 }
 
 export function searchResultMetaLine(item) {

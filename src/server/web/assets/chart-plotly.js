@@ -1,5 +1,6 @@
 
-import { bookTitleFromId, escapeHtml, normalizePreviewText } from "./core.js";
+import { normalizePreviewText } from "./core.js";
+import { pointTooltipHtml } from "./search-utils.js";
 
 let activeChart = null;
 let tooltipHandlers = null;
@@ -174,11 +175,12 @@ function bindTooltip(plotEl) {
         if (!point) return hide();
 
         const custom = Array.isArray(point.customdata) ? point.customdata : [];
-        tooltip.innerHTML = `
-            <div class="plot-hover-title">${escapeHtml(custom[1] || "Unknown")}</div>
-            <div class="plot-hover-meta">${escapeHtml(bookTitleFromId(custom[0]))} | Chunk: ${escapeHtml(custom[2] ?? 0)}</div>
-            <div class="plot-hover-text">${escapeHtml(normalizePreviewText(custom[3]) || "No preview available.")}</div>
-        `;
+        tooltip.innerHTML = pointTooltipHtml({
+            id: custom[0],
+            tradition: custom[1],
+            chunk_index: custom[2],
+            text: custom[3],
+        });
         tooltip.classList.add("visible");
         positionTooltip(canvas, tooltip, event.event);
     };

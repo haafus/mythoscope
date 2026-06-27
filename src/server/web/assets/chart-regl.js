@@ -1,5 +1,6 @@
 
-import { bookTitleFromId, escapeHtml, normalizePreviewText } from "./core.js";
+import { escapeHtml, normalizePreviewText } from "./core.js";
+import { pointTooltipHtml } from "./search-utils.js";
 
 let scatterInstance = null;
 let pointMeta = null;
@@ -205,10 +206,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     scatterInstance.subscribe("pointOver", (idx) => {
         if (!tooltip || !pointMeta[idx]) return;
         const m = pointMeta[idx];
-        tooltip.innerHTML = `
-            <div class="plot-hover-title">${escapeHtml(m.tradition || "Unknown")}</div>
-            <div class="plot-hover-meta">${escapeHtml(bookTitleFromId(m.id))} | Chunk: ${escapeHtml(m.chunk_index ?? 0)}</div>
-            <div class="plot-hover-text">${escapeHtml(m.text || "No preview available.")}</div>`;
+        tooltip.innerHTML = pointTooltipHtml(m);
         tooltip.classList.add("visible");
         const [sx, sy] = scatterInstance.getScreenPosition(idx);
         const cr = canvas.getBoundingClientRect();

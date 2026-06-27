@@ -1,5 +1,6 @@
 
-import { bookTitleFromId, escapeHtml, normalizePreviewText } from "./core.js";
+import { escapeHtml, normalizePreviewText } from "./core.js";
+import { pointTooltipHtml } from "./search-utils.js";
 
 let chartInstance = null;
 
@@ -76,9 +77,12 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
             extraCssText: "box-shadow:0 10px 28px rgba(15,23,42,.16);max-width:360px;line-height:1.45;overflow-wrap:anywhere;",
             formatter: (params) => {
                 const d = params.data;
-                return `<div style="font-weight:700;color:#111827;margin-bottom:4px">${escapeHtml(d._tradition || "Unknown")}</div>`
-                    + `<div style="color:#6c757d;margin-bottom:7px">${escapeHtml(bookTitleFromId(d._id))} | Chunk: ${escapeHtml(d._chunk ?? 0)}</div>`
-                    + `<div style="color:#343a40">${escapeHtml(d._text || "No preview available.")}</div>`;
+                return pointTooltipHtml({
+                    id: d._id,
+                    tradition: d._tradition,
+                    chunk_index: d._chunk,
+                    text: d._text,
+                });
             },
         },
         legend: showLegend ? {

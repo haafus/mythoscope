@@ -1,13 +1,13 @@
 import {
     api, app, state,
-    bookTitleFromId, ensureModels,
+    ensureModels,
     escapeAttribute, escapeHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { destroyChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
 import {
-    bindSearchResultClicks, chunkMetaLine, chunkTextHtml,
+    attributionLine, bindSearchResultClicks,
     fetchPointWithNeighbors, renderSearchResultItem,
     resultBookTitle, runSemanticSearch,
     searchResultMetaLine,
@@ -78,17 +78,12 @@ export async function renderEmbeddingsAnalysis() {
 
                 <div class="sidebar">
                     <div class="card">
-                        <div class="card-header"><h3 class="card-title">Point Information</h3></div>
-                        <div class="card-body info-content empty" id="infoContent">
-                            Click any point in the chart to see information
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header"><h3 class="card-title">Semantic Search</h3></div>
                         <div class="card-body">
-                            <textarea id="search-text" placeholder="Enter text to find similar fragments..."></textarea>
-                            <button class="btn btn-primary search-btn" id="search-btn" type="button" disabled>Find Matches</button>
+                            <div class="search-panel" id="searchPanel">
+                                <textarea id="search-text" placeholder="Type a text for similarity search…"></textarea>
+                                <button class="btn btn-primary search-btn" id="search-btn" type="button" disabled>Search ›</button>
+                            </div>
+                            <div class="info-content" id="infoContent" style="display:none;"></div>
                         </div>
                     </div>
                 </div>
@@ -203,14 +198,26 @@ async function loadVisualization() {
     }
 }
 
+const PENCIL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+
+function showSearchPanel() {
+    const searchPanel = document.getElementById("searchPanel");
+    const infoContent = document.getElementById("infoContent");
+    if (searchPanel) searchPanel.style.display = "";
+    if (infoContent) infoContent.style.display = "none";
+    document.getElementById("search-text")?.focus();
+}
+
 export async function displayPointInfo(pointId, chunkIndex = null) {
     if (!state.selectedModel || !pointId) return;
 
     const infoContent = document.getElementById("infoContent");
+    const searchPanel = document.getElementById("searchPanel");
     if (!infoContent) return;
 
+    if (searchPanel) searchPanel.style.display = "none";
+    infoContent.style.display = "";
     infoContent.innerHTML = '<div style="text-align:center; color:#6c757d">Loading...</div>';
-    infoContent.classList.remove("empty");
 
     try {
         const results = await fetchPointWithNeighbors(pointId, chunkIndex);
@@ -218,24 +225,27 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
         const neighbors = results.slice(1);
         if (!point) throw new Error("Point not found");
         let html = `
-            <div class="badge">${escapeHtml(point.tradition)}</div>
-            <div class="search-result-meta">${escapeHtml(chunkMetaLine(point))}</div>
-            <div class="text-preview"><strong>${escapeHtml(bookTitleFromId(point.id))}</strong><br><br>${escapeHtml(point.text)}</div>
-            <h4 style="margin: 16px 0 8px; font-size:14px; color:#111;">Nearest neighbors:</h4>
+            <div class="fragment-detail">
+                <div class="fragment-text">${escapeHtml(point.text)}</div>
+                ${attributionLine(point)}
+                <button class="fragment-edit" id="fragmentEditBtn" type="button" title="New similarity search" aria-label="New similarity search">${PENCIL_ICON}</button>
+            </div>
+            <div class="fragments-divider">Similar fragments</div>
         `;
 
         if (neighbors.length > 0) {
             html += neighbors.map((neighbor) => `
                 <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
-                    <span class="badge" style="background:#dee2e6; color:#212529">${escapeHtml(neighbor.tradition)}</span>
-                    <div class="neighbor-meta">${escapeHtml(chunkMetaLine(neighbor))}</div>
-                    <div class="neighbor-text">${escapeHtml(neighbor.text || "")}</div>
-                    <div class="neighbor-stats">Similarity: ${(Number(neighbor.similarity_score || 0) * 100).toFixed(1)}%</div>
+                    <div class="fragment-text">${escapeHtml(neighbor.text || "")}</div>
+                    ${attributionLine(neighbor, { withScore: true })}
                 </div>
             `).join("");
+        } else {
+            html += '<div class="search-empty">No similar fragments found.</div>';
         }
 
         infoContent.innerHTML = html;
+        document.getElementById("fragmentEditBtn")?.addEventListener("click", showSearchPanel);
         infoContent.querySelectorAll(".neighbor-item").forEach((item) => {
             item.addEventListener("click", () => displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk));
         });
@@ -286,7 +296,7 @@ async function performAnalysisSearch() {
     } finally {
         if (requestId === state.analysisSearchRequestId) {
             searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
-            searchBtn.textContent = "Find Matches";
+            searchBtn.textContent = "Search ›";
         }
     }
 }
