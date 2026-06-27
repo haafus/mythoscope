@@ -18,6 +18,8 @@
     --border: #dee2e6;
     --accent: #2f6fed;
     --accent-strong: #1b4fd1;
+    --muted: #6c757d;
+    --muted-soft: #9299a1;
 
     /* Page frame — one set of values for the navbar and every page container. */
     --content-max: 1680px;
@@ -377,7 +379,7 @@ body.route-corpus {
     border: 0;
     border-radius: 4px;
     background: transparent;
-    color: #9299a1;
+    color: var(--muted-soft);
     cursor: pointer;
     font: inherit;
     font-size: 13px;
@@ -498,7 +500,7 @@ body.route-corpus {
     min-height: 56px;
     padding: 14px 22px;
     border-bottom: 1px solid #e8ecef;
-    color: #7a828c;
+    color: var(--muted);
     font-size: 13px;
 }
 
@@ -527,7 +529,7 @@ body.route-corpus {
     height: 100%;
     display: grid;
     place-items: center;
-    color: #8a929b;
+    color: var(--muted-soft);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 14px;
     text-align: center;
@@ -578,7 +580,7 @@ body.route-corpus {
 
 .corpus-page .stat-label {
     margin-top: 3px;
-    color: #7a828c;
+    color: var(--muted);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -658,7 +660,7 @@ body.route-corpus {
 .corpus-page .empty-state,
 .corpus-page .error-state {
     padding: 18px;
-    color: #7a828c;
+    color: var(--muted);
     font-size: 14px;
 }
 
@@ -906,7 +908,7 @@ body.route-embeddings {
 
 .analysis-page .fragment-attribution {
     margin-top: 8px;
-    color: #8a929b;
+    color: var(--muted-soft);
     font-size: 12px;
     line-height: 1.4;
     text-align: right;
@@ -923,7 +925,7 @@ body.route-embeddings {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #6c757d;
+    color: var(--muted);
     font-size: 14px;
     text-align: center;
     z-index: 10;
@@ -959,7 +961,7 @@ body.route-embeddings {
 
 .analysis-page .fragments-divider {
     margin: 20px 0 14px;
-    color: #9299a1;
+    color: var(--muted-soft);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -1062,14 +1064,14 @@ body.route-embeddings {
     min-height: 220px;
     place-items: center;
     padding: 40px;
-    color: #6c757d;
+    color: var(--muted);
     text-align: center;
 }
 
 .analysis-page .search-loading small,
 .analysis-page .search-empty small {
     display: block;
-    color: #8a929b;
+    color: var(--muted-soft);
 }
 
 .analysis-page .search-summary {
@@ -1083,7 +1085,7 @@ body.route-embeddings {
 }
 
 .analysis-page .search-summary span {
-    color: #7a828c;
+    color: var(--muted);
     font-size: 13px;
 }
 
@@ -1164,7 +1166,7 @@ body.route-embeddings {
 .analysis-page .score-low { background: #f8d7da; color: #721c24; }
 
 .analysis-page .search-result-meta {
-    color: #7a828c;
+    color: var(--muted);
     font-size: 12px;
 }
 
@@ -1216,11 +1218,11 @@ body.route-embeddings {
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #6c757d;
+    color: var(--muted);
     font-size: 14px;
 }
 
-.graph-empty { padding: 16px; color: #6c757d; font-size: 13px; }
+.graph-empty { padding: 16px; color: var(--muted); font-size: 13px; }
 
 /* Node detail panel uses the shared .rail / .card / .rail-body. */
 .graph-rail #graphInfoContent {
@@ -1229,7 +1231,7 @@ body.route-embeddings {
 }
 
 .graph-info-empty {
-    color: #6c757d;
+    color: var(--muted);
     font-size: 13px;
 }
 
