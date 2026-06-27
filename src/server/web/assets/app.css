@@ -73,16 +73,20 @@ body.has-main-navbar > .main-navbar + #app > main.container {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px 28px;
+    gap: 4px 6px;
     flex-wrap: wrap;
 }
 
 .nav-links > a {
     text-decoration: none;
-    color: #495057;
-    font-size: 15px;
-    font-weight: 500;
-    transition: color 0.2s ease;
+    color: #7c828b;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    padding: 7px 13px;
+    border-radius: 6px;
+    transition: color 0.18s ease, background-color 0.18s ease;
     white-space: nowrap;
 }
 
@@ -90,24 +94,30 @@ body.has-main-navbar > .main-navbar + #app > main.container {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    border: 1px solid #adb5bd;
-    border-radius: 50%;
-    font-size: 14px;
-    font-weight: 700;
+    margin-left: 6px;
+    padding: 4px 10px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
     line-height: 1;
 }
 
-.nav-links > a:hover,
-.nav-links > a.active {
+.nav-links > a:hover {
     color: #111;
+}
+
+.nav-links > a.active {
+    color: #2c3440;
+    background: #e9eef5;
 }
 
 .nav-links > a.nav-info:hover,
 .nav-links > a.nav-info.active {
-    border-color: #111;
-    background: #f8f9fa;
+    color: #111;
+    background: transparent;
 }
 
 @media (max-width: 760px) {
