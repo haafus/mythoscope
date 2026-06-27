@@ -28,7 +28,8 @@ export function attributionLine(item, { withScore = false } = {}) {
     }
     return `
         <div class="fragment-attribution">
-            <span class="fragment-source">— ${escapeHtml(tradition)}, ${escapeHtml(title)}</span>
+            <span class="fragment-tradition">— ${escapeHtml(tradition)}</span>
+            <span class="fragment-title">${escapeHtml(title)}</span>
             <span class="fragment-chunk">${escapeHtml(meta)}</span>
         </div>
     `;

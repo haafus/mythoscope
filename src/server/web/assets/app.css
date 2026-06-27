@@ -910,7 +910,8 @@ body.route-embeddings {
     text-align: right;
 }
 
-.analysis-page .fragment-attribution .fragment-source,
+.analysis-page .fragment-attribution .fragment-tradition,
+.analysis-page .fragment-attribution .fragment-title,
 .analysis-page .fragment-attribution .fragment-chunk {
     display: block;
 }
