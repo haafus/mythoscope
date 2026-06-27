@@ -549,6 +549,18 @@ body.route-corpus {
     font-size: 14px;
 }
 
+.corpus-page .original-url {
+    display: block;
+    color: var(--accent);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.corpus-page .original-url:hover {
+    text-decoration: underline;
+}
+
 .corpus-page .actions {
     display: grid;
     gap: 10px;

@@ -54,6 +54,10 @@ function renderBookInfo(doc, isLoading = false) {
     }
 
     const url = buildCorpusApiUrl(doc);
+    const originalUrl = doc.url
+        ? `<div class="description-title">Original URL</div>
+           <a class="original-url" href="${escapeAttribute(doc.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(doc.url)}</a>`
+        : "";
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
@@ -74,6 +78,8 @@ function renderBookInfo(doc, isLoading = false) {
 
         <div class="description-title">Description</div>
         <div class="description-text">${escapeHtml(doc.description || "No description available.")}</div>
+
+        ${originalUrl}
 
         <div class="actions">
             <a class="btn btn-primary${isLoading ? " disabled" : ""}" href="${escapeAttribute(url)}" download="${escapeAttribute(doc.title || "book")}.txt">Download Book</a>
