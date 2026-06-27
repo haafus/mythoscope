@@ -51,20 +51,19 @@ export async function renderEmbeddingsAnalysis() {
     document.title = "Embedding Analysis";
     app.innerHTML = `
         <main class="analysis-page container">
-            <div class="controls-panel">
-                <div class="form-group">
-                    <label>Model:</label>
-                    <select id="global-model-select"><option value="">Loading models...</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Method:</label>
-                    <select id="viz-select"><option value="">Loading...</option></select>
-                </div>
-            </div>
-
             <div class="workspace">
                 <div class="library-sidebar">
                     <div id="tree-container">Loading...</div>
+                    <div class="sidebar-controls">
+                        <div class="form-group">
+                            <label>Model:</label>
+                            <select id="global-model-select"><option value="">Loading models...</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Method:</label>
+                            <select id="viz-select"><option value="">Loading...</option></select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="plot-area">

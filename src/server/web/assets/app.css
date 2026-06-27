@@ -801,28 +801,33 @@ body.route-embeddings {
 }
 
 
-.analysis-page .controls-panel {
-    background: transparent;
-    padding: 0 0 14px;
+/* Model/method controls pinned under the book tree in the left column. */
+.analysis-page .sidebar-controls {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--border);
+    padding: 12px 10px;
     display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .analysis-page .form-group {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
 }
 
 .analysis-page .form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #495057;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
 }
 
 .analysis-page select {
+    width: 100%;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 8px 12px;
@@ -830,7 +835,6 @@ body.route-embeddings {
     color: #212529;
     outline: none;
     transition: border-color 0.2s;
-    min-width: 250px;
     background: #fff;
     cursor: pointer;
 }
