@@ -19,8 +19,15 @@ export function resizeChart(el) {
     }
 }
 
-// Not implemented for this backend yet (plotly is the active one).
-export function highlightTradition() {}
+// Dim every tradition's series except `tradition` (null/"" resets). Series are
+// one per tradition, matched by name.
+export function highlightTradition(el, tradition) {
+    if (!chartInstance) return;
+    const series = (chartInstance.getOption().series || []).map((s) => ({
+        itemStyle: { opacity: (!tradition || s.name === tradition) ? 0.74 : 0.06 },
+    }));
+    chartInstance.setOption({ series });
+}
 
 function initChart(el) {
     if (chartInstance) {

@@ -32,8 +32,20 @@ export function resizeChart(el) {
     }
 }
 
-// Not implemented for this backend yet (plotly is the active one).
-export function highlightTradition() {}
+// Dim every tradition except `tradition` (null/"" resets) via the scatter's
+// select state (opacityInactiveScale dims the unselected points).
+export function highlightTradition(el, tradition) {
+    if (!scatterInstance || !pointMeta) return;
+    if (!tradition) {
+        scatterInstance.deselect({ preventEvent: true });
+        return;
+    }
+    const indices = [];
+    for (let i = 0; i < pointMeta.length; i++) {
+        if ((pointMeta[i].tradition || "Unknown") === tradition) indices.push(i);
+    }
+    scatterInstance.select(indices, { preventEvent: true });
+}
 
 // --- Utilities ---
 

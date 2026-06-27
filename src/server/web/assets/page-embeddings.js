@@ -193,6 +193,11 @@ async function loadVisualization() {
     scatterPlot.style.minHeight = "";
     destroyChart(scatterPlot);
 
+    // The fresh chart renders at full opacity; clear any active tradition so
+    // the list and the plot stay in sync.
+    document.querySelectorAll("#tree-container .tradition-pick.active")
+        .forEach((button) => button.classList.remove("active"));
+
     try {
         const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
 
