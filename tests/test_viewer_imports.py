@@ -37,6 +37,11 @@ for _path in ("/api/corpus/catalog", "/api/corpus/traditions"):
     _status = client.get(_path).status_code
     assert _status == 200, (_path, _status)
 
+# warmup must not pull torch at the route boundary; unknown model -> 404,
+# a real one would -> 503, never an import at module load.
+_warm = client.post("/api/similarity/warmup", json={{"model": "nonexistent"}}).status_code
+assert _warm in (404, 503), _warm
+
 _leaked = [n for n in {blocked!r} if sys.modules.get(n) is not None]
 assert not _leaked, "server pulled heavy deps at import time: " + ", ".join(_leaked)
 print("OK")

@@ -85,3 +85,15 @@ class TestSimilarityEndpoints:
              ):
             response = client.post("/api/similarity/search", json={"query": "hero", "model": "m"})
         assert response.status_code == 503
+
+    def test_warmup_without_embedding_models_returns_503(self):
+        # Same contract as search: missing torch -> 503, not 500.
+        from unittest.mock import patch
+
+        with patch("server.api.similarity._available_models", return_value=["m"]), \
+             patch(
+                 "server.api.similarity.similarity_service.warmup",
+                 side_effect=ModuleNotFoundError("No module named 'torch'"),
+             ):
+            response = client.post("/api/similarity/warmup", json={"model": "m"})
+        assert response.status_code == 503

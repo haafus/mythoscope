@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from embeddings import chroma_manager
 from projections import PROJECTION_METHODS
-from server.schemas import ModelListResponse, SearchRequest, SearchResult
+from server.schemas import ModelListResponse, SearchRequest, SearchResult, WarmupRequest
 from server.services.projections import get_projection_data
 from server.services.similarity import similarity_service
 
@@ -40,6 +40,25 @@ def search(request: SearchRequest):
             status_code=503,
             detail="Text-query search is unavailable in this build (embedding models not installed)",
         ) from e
+
+
+@router.post("/warmup")
+def warmup(request: WarmupRequest) -> dict:
+    """Best-effort preload so the first text search isn't a cold start.
+
+    Called fire-and-forget from the UI on model change; the client ignores the
+    outcome. Mirrors search()'s ImportError -> 503 so the viewer build (no
+    embedding deps) responds cleanly instead of 500.
+    """
+    _require_collection(request.model)
+    try:
+        similarity_service.warmup(request.model)
+    except ImportError as e:
+        raise HTTPException(
+            status_code=503,
+            detail="Warmup is unavailable in this build (embedding models not installed)",
+        ) from e
+    return {"status": "warmed", "model": request.model}
 
 
 @router.get("/points/{model}/{text_id}", response_model=list[SearchResult])

@@ -1,4 +1,5 @@
 import logging
+import threading
 
 import numpy as np
 
@@ -11,6 +12,9 @@ logger = logging.getLogger(__name__)
 class SimilarityService:
     def __init__(self):
         self._encoder = None
+        # Serialize the load+encode path so a background warmup and a real
+        # search don't race into a double model load on a cold process.
+        self._encode_lock = threading.Lock()
 
     def get_point(self, model_key: str, text_id: str, chunk_index: int,
                   top_k: int = 1) -> list[dict]:
@@ -26,6 +30,19 @@ class SimilarityService:
         collection = self._get_collection(model_key)
         embedding = self._encode_query(model_name, query)
         return self._query(collection, embedding.tolist(), top_k)
+
+    def warmup(self, model_key: str) -> None:
+        """Pay the first-search cold-start cost up front: import torch, load
+        the model, run one encode, and warm the collection's HNSW index, so the
+        user's first real text search hits warm caches.
+
+        Raises ImportError in the viewer build (no embedding deps); callers map
+        that to 503 just like search().
+        """
+        model_name = model_name_for_key(model_key)
+        collection = self._get_collection(model_key)
+        embedding = self._encode_query(model_name, "warmup")
+        self._query(collection, embedding.tolist(), 1)
 
     def _get_collection(self, model_key: str):
         from embeddings import chroma_manager
@@ -46,16 +63,19 @@ class SimilarityService:
         ]
 
     def _encode_query(self, model_name: str, query: str) -> np.ndarray:
-        if self._encoder is None:
-            from embeddings.model_manager import EmbeddingEncoder
-            self._encoder = EmbeddingEncoder()
-        self._encoder.load(model_name)
-        raw = self._encoder.encode(
-            [query],
-            normalize_embeddings=True,
-            convert_to_numpy=True,
-            show_progress_bar=False,
-        )
+        # Lazy import keeps the viewer build torch-free; raises ImportError
+        # there, which the API maps to 503.
+        from embeddings.model_manager import EmbeddingEncoder
+        with self._encode_lock:
+            if self._encoder is None:
+                self._encoder = EmbeddingEncoder()
+            self._encoder.load(model_name)
+            raw = self._encoder.encode(
+                [query],
+                normalize_embeddings=True,
+                convert_to_numpy=True,
+                show_progress_bar=False,
+            )
         return np.asarray(raw[0], dtype=np.float32)
 
 
