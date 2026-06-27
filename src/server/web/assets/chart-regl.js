@@ -32,6 +32,9 @@ export function resizeChart(el) {
     }
 }
 
+// Not implemented for this backend yet (plotly is the active one).
+export function highlightTradition() {}
+
 // --- Utilities ---
 
 function hexToRgba(hex, a = 1) {

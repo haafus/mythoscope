@@ -24,6 +24,16 @@ export function resizeChart(el) {
     }
 }
 
+// Dim every tradition except `tradition` (pass null/"" to reset). Traditions
+// are one trace each, in el._traditions order.
+export function highlightTradition(el, tradition) {
+    if (!window.Plotly || el.dataset.plotly !== "1") return;
+    const traditions = el._traditions || [];
+    if (!traditions.length) return;
+    const opacity = traditions.map((t) => (!tradition || t === tradition ? 0.74 : 0.06));
+    Plotly.restyle(el, { "marker.opacity": opacity });
+}
+
 export async function renderScatter(el, data, { colorMap, onPointClick }) {
     const points = Array.isArray(data.points) ? data.points : [];
     if (!window.Plotly || !points.length) throw new Error("Projection data is empty.");
@@ -31,6 +41,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     el.style.display = "block";
 
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
+    el._traditions = traditions; // trace order, for highlightTradition
     const showLegend = false; // scatter legend disabled
 
     const traces = traditions.map((tradition) => {

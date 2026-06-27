@@ -5,14 +5,14 @@ import {
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
-import { destroyChart, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
+import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
 import {
     attributionLine, bindSearchResultClicks,
     fetchPointWithNeighbors, renderSearchResultItem,
     resultBookTitle, runSemanticSearch,
     searchResultMetaLine,
 } from "./search-utils.js";
-import { renderLibraryTree } from "./library-tree.js";
+import { renderTraditionList } from "./tradition-list.js";
 
 function getTraditionColor(name, fallback = "#555") {
     const info = state.traditionInfo || {};
@@ -269,7 +269,11 @@ async function initializeAnalysisLibrary() {
     const container = document.getElementById("tree-container");
     if (!container) return;
 
-    await renderLibraryTree(container);
+    container.addEventListener("tradition-select", (event) => {
+        const scatter = document.getElementById("scatter-plot");
+        if (scatter) highlightTradition(scatter, event.detail.tradition);
+    });
+    await renderTraditionList(container);
 }
 
 async function performAnalysisSearch() {

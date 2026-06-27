@@ -326,6 +326,15 @@ body.route-corpus {
     color: #111;
 }
 
+.library-tree .tradition-pick {
+    grid-template-columns: 10px minmax(0, 1fr);
+}
+
+.library-tree .tradition-pick.active {
+    background: #e2edf0;
+    color: #111;
+}
+
 .library-tree .tradition-dot {
     width: 10px;
     height: 10px;

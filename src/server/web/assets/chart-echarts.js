@@ -19,6 +19,9 @@ export function resizeChart(el) {
     }
 }
 
+// Not implemented for this backend yet (plotly is the active one).
+export function highlightTradition() {}
+
 function initChart(el) {
     if (chartInstance) {
         chartInstance.dispose();
