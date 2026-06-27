@@ -8,6 +8,13 @@
     padding: 0;
 }
 
+:root {
+    /* Single shell-level viewport reference: navbar height (logo 46px + 10px
+       padding top/bottom + 1px border). Pages derive heights from this instead
+       of per-column magic numbers. */
+    --navbar-h: 67px;
+}
+
 body {
     color: #212529;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -16,6 +23,7 @@ body {
 
 #app {
     width: 100%;
+    flex: 1 0 auto;
 }
 
 /* ==========================================================================
@@ -29,6 +37,9 @@ body {
 
 body.has-main-navbar {
     padding-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 body.has-main-navbar > .main-navbar + #app > .container,
@@ -133,6 +144,137 @@ body.has-main-navbar > .main-navbar + #app > main.container {
 }
 
 /* ==========================================================================
+   Footer (shared across all routes)
+   ========================================================================== */
+
+.main-footer {
+    flex: 0 0 auto;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    background: #1c1e22;
+    color: #aeb4bb;
+    border-top: 1px solid #2a2d33;
+}
+
+.footer-inner {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 40px clamp(16px, 4vw, 40px);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 8px 24px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: #c7ccd1;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.18s ease;
+}
+
+.footer-links a:hover {
+    color: #fff;
+}
+
+.footer-social {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 26px;
+}
+
+.footer-social a {
+    color: #7e858d;
+    display: inline-flex;
+    transition: color 0.18s ease;
+}
+
+.footer-social a:hover {
+    color: #fff;
+}
+
+.footer-subscribe {
+    min-width: 260px;
+    max-width: 340px;
+}
+
+.footer-subscribe-title {
+    color: #e7eaee;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.footer-subscribe-note {
+    margin-top: 8px;
+    color: #8b9199;
+    font-size: 13px;
+}
+
+.footer-subscribe-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 4px 4px 4px 14px;
+    border: 1px solid #353941;
+    border-radius: 8px;
+    background: #24272c;
+}
+
+.footer-subscribe-form input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #e7eaee;
+    font: inherit;
+    font-size: 14px;
+}
+
+.footer-subscribe-form input::placeholder {
+    color: #6f757d;
+}
+
+.footer-subscribe-form button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 6px;
+    background: #2f6fed;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.footer-subscribe-form button:hover {
+    background: #1b4fd1;
+}
+
+@media (max-width: 760px) {
+    .footer-inner {
+        flex-direction: column;
+        gap: 28px;
+    }
+}
+
+/* ==========================================================================
    Home Page
    ========================================================================== */
 
@@ -220,19 +362,8 @@ body.route-home {
    ========================================================================== */
 
 body.route-corpus {
-    height: 100vh;
-    overflow: hidden;
     background: #faf9f6;
     color: #212529;
-    display: flex;
-    flex-direction: column;
-}
-
-body.route-corpus #app {
-    flex: 1 1 0;
-    min-height: 0;
-    display: flex;
-    overflow: hidden;
 }
 
 body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container {
@@ -243,10 +374,9 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
     width: min(1500px, calc(100% - 48px));
     margin: 0 auto;
     padding: 24px 0 30px;
-    flex: 1 1 0;
+    height: calc(100vh - var(--navbar-h));
     display: flex;
     flex-direction: column;
-    height: auto;
     min-height: 0;
     overflow: hidden;
 }
@@ -757,13 +887,14 @@ body.route-embeddings {
     min-height: 100vh;
     background-color: #faf9f5;
     color: #212529;
-    padding: 0 16px 40px;
+    padding: 0 16px;
 }
 
 .analysis-page.container {
     width: min(100%, 1680px);
     max-width: none;
     margin: 0 auto;
+    padding-bottom: 40px;
 }
 
 .analysis-page .controls-panel {
@@ -1327,14 +1458,10 @@ body.route-embeddings {
 }
 
 @media (max-width: 1150px) {
-    body.route-corpus {
-        height: auto;
-        min-height: 100vh;
-        overflow: auto;
-    }
-
     .corpus-page.container {
         width: min(100% - 32px, 1500px);
+        height: auto;
+        overflow: visible;
     }
 
     .corpus-page .workspace {
