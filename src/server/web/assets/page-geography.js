@@ -171,15 +171,20 @@ function initializeGeographyMap(traditions) {
     }).addTo(map);
 
     const markerBounds = renderMarkers(map, traditions);
+    const fitPadding = L.point(34, 34);
 
-    // Don't let the user zoom out past the level where tiles fill the container,
-    // so there are never gray margins.
-    function clampMinZoomToFill() {
+    // Min zoom is the lower of "tiles fill the container" and "all markers fit",
+    // so every marker stays reachable without needless gray margins.
+    function recomputeMinZoom() {
         const fillZoom = map.getBoundsZoom(worldBounds, true);
-        map.setMinZoom(fillZoom);
-        if (map.getZoom() < fillZoom) map.setZoom(fillZoom);
+        const markerZoom = markerBounds
+            ? map.getBoundsZoom(markerBounds, false, fitPadding)
+            : fillZoom;
+        const minZoom = Math.min(fillZoom, markerZoom);
+        map.setMinZoom(minZoom);
+        if (map.getZoom() < minZoom) map.setZoom(minZoom);
     }
-    clampMinZoomToFill();
+    recomputeMinZoom();
 
     if (markerBounds) {
         map.fitBounds(markerBounds, { padding: [34, 34], maxZoom: 4 });
@@ -187,7 +192,7 @@ function initializeGeographyMap(traditions) {
         map.setView([20, 15], map.getMinZoom());
     }
 
-    state.geographyResizeHandler = () => { sizeFrame(); map.invalidateSize(); clampMinZoomToFill(); };
+    state.geographyResizeHandler = () => { sizeFrame(); map.invalidateSize(); recomputeMinZoom(); };
     window.addEventListener("resize", state.geographyResizeHandler);
 }
 
