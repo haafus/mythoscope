@@ -18,17 +18,22 @@ export async function renderGraphPage(graphType) {
     document.title = `MythoScope - ${graphType.charAt(0).toUpperCase() + graphType.slice(1)}`;
     app.innerHTML = `
         <main class="graph-page container">
-            <div class="library-sidebar">
-                <div id="graphBookList">Loading...</div>
-            </div>
-            <div class="graph-area">
-                <div class="graph-canvas" id="graphCanvas">
-                    <div class="graph-placeholder" id="graphPlaceholder">Select a book to view its graph.</div>
-                </div>
-                <div class="graph-info-panel" id="graphInfoPanel" style="display:none;">
-                    <button class="close-btn" id="closeGraphInfo">&times;</button>
-                    <div id="graphInfoContent"></div>
-                </div>
+            <div class="workspace">
+                <aside class="library-sidebar">
+                    <div id="graphBookList">Loading...</div>
+                </aside>
+                <section class="graph-area">
+                    <div class="graph-canvas" id="graphCanvas">
+                        <div class="graph-placeholder" id="graphPlaceholder">Select a book to view its graph.</div>
+                    </div>
+                </section>
+                <aside class="graph-rail">
+                    <div class="card graph-info-panel" id="graphInfoPanel">
+                        <div id="graphInfoContent">
+                            <div class="graph-info-empty">Select a node to see its details.</div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </main>
     `;
@@ -171,11 +176,9 @@ function renderCytoscapeGraph(container, data, graphType) {
         tooltipDiv.style.display = "none";
     });
 
-    const infoPanel = document.getElementById("graphInfoPanel");
     const infoContent = document.getElementById("graphInfoContent");
-    document.getElementById("closeGraphInfo").addEventListener("click", () => {
-        infoPanel.style.display = "none";
-    });
+    const infoPlaceholder = '<div class="graph-info-empty">Select a node to see its details.</div>';
+    if (infoContent) infoContent.innerHTML = infoPlaceholder;
 
     cy.on("tap", "node", (evt) => {
         const d = evt.target.data();
@@ -189,6 +192,5 @@ function renderCytoscapeGraph(container, data, graphType) {
         });
         html += "</table>";
         infoContent.innerHTML = html;
-        infoPanel.style.display = "block";
     });
 }

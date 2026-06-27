@@ -18,10 +18,14 @@
     --rail-left: minmax(220px, 260px);
     --rail-right: minmax(280px, 340px);
     --ws-gap: 18px;
+
+    /* Single page background for every route. */
+    --page-bg: #faf9f5;
 }
 
 body {
     color: #212529;
+    background: var(--page-bg);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.5;
 }
@@ -281,7 +285,6 @@ body.has-main-navbar > .main-navbar + #app > main.container {
 
 body.route-home {
     min-height: 100vh;
-    background: #faf9f5;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -363,7 +366,6 @@ body.route-home {
    ========================================================================== */
 
 body.route-corpus {
-    background: #faf9f6;
     color: #212529;
 }
 
@@ -767,7 +769,6 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 
 body.route-geography {
     min-height: 100vh;
-    background: #f4f5f2;
     color: #1f2933;
 }
 
@@ -893,7 +894,6 @@ body.has-main-navbar > .main-navbar + #app > main.geography-page.container {
 
 body.route-embeddings {
     min-height: 100vh;
-    background-color: #faf9f5;
     color: #212529;
     padding: 0 16px;
 }
@@ -1338,30 +1338,30 @@ body.has-main-navbar > .main-navbar + #app > main.analysis-page.container {
 
 .graph-page.container {
     width: min(100% - 24px, 1600px);
-    padding-top: 24px;
-    display: grid;
-    grid-template-columns: minmax(220px, 260px) 1fr;
-    gap: 16px;
-    min-height: calc(100vh - 60px);
+    height: calc(100vh - var(--navbar-h));
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.graph-page .library-sidebar {
-    height: calc(100vh - 90px);
+body.has-main-navbar > .main-navbar + #app > main.graph-page.container {
+    margin-top: 0;
 }
-
 
 .graph-area {
     position: relative;
     background: #fafafa;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    min-height: 600px;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .graph-canvas {
     width: 100%;
     height: 100%;
-    min-height: 600px;
+    min-height: 0;
 }
 
 .graph-placeholder {
@@ -1369,29 +1369,38 @@ body.has-main-navbar > .main-navbar + #app > main.analysis-page.container {
     align-items: center;
     justify-content: center;
     height: 100%;
-    min-height: 600px;
     color: #6c757d;
     font-size: 14px;
 }
 
 .graph-empty { padding: 16px; color: #6c757d; font-size: 13px; }
 
-.graph-info-panel {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 320px;
-    max-height: 80%;
+/* Node detail panel — right rail card, consistent with the other sections. */
+.graph-rail {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.graph-rail .graph-info-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.graph-rail #graphInfoContent {
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     padding: 16px;
     font-size: 13px;
-    border: 1px solid #ddd;
-    backdrop-filter: blur(4px);
-    user-select: text;
-    z-index: 10;
+}
+
+.graph-info-empty {
+    color: #6c757d;
+    font-size: 13px;
 }
 
 .graph-info-panel table { width: 100%; border-collapse: collapse; }
@@ -1399,8 +1408,6 @@ body.has-main-navbar > .main-navbar + #app > main.analysis-page.container {
 .graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; }
 .graph-info-panel td { color: #2c3e50; width: 65%; }
 .graph-info-panel h4 { margin: 0 0 8px 0; color: #5e4b8b; }
-.graph-info-panel .close-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; font-size: 18px; cursor: pointer; color: #888; }
-.graph-info-panel .close-btn:hover { color: #000; }
 
 .graph-edge-tooltip {
     position: absolute;
@@ -1441,6 +1448,29 @@ body.has-main-navbar > .main-navbar + #app > main.analysis-page.container {
     }
 
     .analysis-page .sidebar .card-body {
+        overflow-y: visible;
+    }
+
+    .graph-page.container {
+        height: auto;
+        overflow: visible;
+    }
+
+    .graph-page .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        flex: none;
+    }
+
+    .graph-page .library-sidebar {
+        max-height: 420px;
+    }
+
+    .graph-area {
+        min-height: 560px;
+    }
+
+    .graph-rail #graphInfoContent {
         overflow-y: visible;
     }
 }
