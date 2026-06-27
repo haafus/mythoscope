@@ -16,9 +16,7 @@ export function chunkMetaLine(item) {
     return `Book: ${resultBookTitle(item)} | Chunk #${item.chunk_index ?? 0}`;
 }
 
-// Editorial attribution shown under a fragment: "— Tradition, Title" on one
-// line, "chunk N" (optionally ", score 0.76") on the next, muted and
-// right-aligned via the .fragment-attribution styles.
+// "— Tradition" / "Title" / "chunk N[, score 0.76]" shown under a fragment.
 export function attributionLine(item, { withScore = false } = {}) {
     const tradition = item.tradition || "Unknown";
     const title = resultBookTitle(item);
@@ -35,8 +33,6 @@ export function attributionLine(item, { withScore = false } = {}) {
     `;
 }
 
-// Hover tooltip content for a scatter point: preview text followed by the
-// shared attribution line, so tooltips read the same way as the right column.
 export function pointTooltipHtml(item) {
     const text = normalizePreviewText(item.text) || "No preview available.";
     return `

@@ -9,19 +9,16 @@
 }
 
 :root {
-    /* Shared 3-column workspace tokens (rail-left | canvas | rail-right). */
     --rail-left: minmax(220px, 260px);
     --rail-right: minmax(280px, 340px);
     --ws-gap: 18px;
 
-    /* Palette */
     --border: #dee2e6;
     --accent: #2f6fed;
     --accent-strong: #1b4fd1;
     --muted: #6c757d;
     --muted-soft: #9299a1;
 
-    /* Page frame — one set of values for the navbar and every page container. */
     --content-max: 1680px;
     --page-gutter: 20px;
     --page-pad-y: 20px;
@@ -34,10 +31,6 @@ body {
     line-height: 1.5;
 }
 
-/* App shell: navbar + page fill the viewport; the page fills the space left
-   by the navbar via flex, so no navbar-height constant is needed. The page
-   never scrolls — its columns scroll internally. On narrow screens this flips
-   to ordinary document flow (see the responsive block). */
 body.has-main-navbar {
     padding-top: 0 !important;
     height: 100dvh;
@@ -399,9 +392,6 @@ body.route-corpus {
     font-weight: 600;
 }
 
-/* Unified left book column — identical flat, borderless treatment in every
-   section (corpus, similarity, graphs). Per-page rules only set the height /
-   grid placement; everything visual lives here. */
 .library-sidebar {
     display: flex;
     flex-direction: column;
@@ -419,9 +409,6 @@ body.route-corpus {
     min-height: 0;
 }
 
-/* Shared 3-column workspace primitive: rail-left | canvas | rail-right.
-   Lives inside a flex-column page container with a definite height, so it
-   fills the remaining space and each column scrolls internally. */
 .workspace {
     display: grid;
     grid-template-columns: var(--rail-left) minmax(0, 1fr) var(--rail-right);
@@ -432,9 +419,6 @@ body.route-corpus {
     min-height: 0;
 }
 
-/* Shared app-shell page container: fills the space under the navbar and
-   clips so its workspace/columns scroll internally. Per-page rules add only
-   width/padding. */
 .corpus-page.container,
 .analysis-page.container,
 .graph-page.container {
@@ -449,7 +433,6 @@ body.route-corpus {
     overflow: hidden;
 }
 
-/* Shared white surface (cards, corpus panels, the graph node panel). */
 .card {
     background: #fff;
     border: 1px solid var(--border);
@@ -458,7 +441,6 @@ body.route-corpus {
     overflow: hidden;
 }
 
-/* Shared right rail: a full-height card whose body scrolls internally. */
 .rail {
     display: flex;
     flex-direction: column;
@@ -678,7 +660,6 @@ body.route-geography {
 }
 
 .geography-page.container {
-    /* Full-bleed (no --content-max), but the edge gutter tracks the token. */
     width: auto;
     max-width: none;
     margin: 0;
@@ -801,7 +782,6 @@ body.route-embeddings {
 }
 
 
-/* Model/method controls pinned under the book tree in the left column. */
 .analysis-page .sidebar-controls {
     flex: 0 0 auto;
     border-top: 1px solid var(--border);
@@ -1225,7 +1205,6 @@ body.route-embeddings {
 
 .graph-empty { padding: 16px; color: var(--muted); font-size: 13px; }
 
-/* Node detail panel uses the shared .rail / .card / .rail-body. */
 .graph-rail #graphInfoContent {
     padding: 16px;
     font-size: 13px;
@@ -1259,8 +1238,7 @@ body.route-embeddings {
    ========================================================================== */
 
 @media (max-width: 980px) {
-    /* Narrow: leave the app-shell and fall back to an ordinary scrolling
-       document — one flip for the whole page, shared by every section. */
+    /* Narrow: app-shell becomes an ordinary scrolling document. */
     body.has-main-navbar {
         height: auto;
         overflow: visible;

@@ -169,9 +169,7 @@ export function triggerModelChange() {
     loadVisualization();
 }
 
-// Fire-and-forget: nudge the server to preload the selected model so the first
-// text search isn't a cold start. Outcome is ignored (e.g. 503 in the viewer
-// build), and it overlaps with the projection fetch the user is already awaiting.
+// Fire-and-forget preload so the first text search isn't a cold start.
 function warmupModel(model) {
     if (!model) return;
     api("/api/similarity/warmup", {

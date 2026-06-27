@@ -173,13 +173,12 @@ function initializeGeographyMap(traditions) {
     const markerBounds = renderMarkers(map, traditions);
     const fitPadding = L.point(34, 34);
 
-    // Min zoom is the lower of "tiles fill the container" (no gray margins) and
-    // "all markers fit" — so every marker is always reachable, while we still
-    // avoid zooming out further than needed. Recomputed on resize.
+    // Min zoom: the lower of "tiles fill the container" and "all markers fit",
+    // so every marker stays reachable without needless gray margins.
     function recomputeMinZoom() {
-        const fillZoom = map.getBoundsZoom(worldBounds, true); // inside=true → cover the view
+        const fillZoom = map.getBoundsZoom(worldBounds, true);
         const markerZoom = markerBounds
-            ? map.getBoundsZoom(markerBounds, false, fitPadding) // inside=false → all markers visible
+            ? map.getBoundsZoom(markerBounds, false, fitPadding)
             : fillZoom;
         const minZoom = Math.min(fillZoom, markerZoom);
         map.setMinZoom(minZoom);
@@ -187,7 +186,6 @@ function initializeGeographyMap(traditions) {
     }
 
     recomputeMinZoom();
-    // Default view: fit all markers (capped so a tight cluster isn't over-zoomed).
     if (markerBounds) {
         map.fitBounds(markerBounds, { padding: [34, 34], maxZoom: 4 });
     } else {

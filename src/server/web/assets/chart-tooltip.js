@@ -1,8 +1,5 @@
 // Shared hover-tooltip helpers for the scatter charts (plotly + regl).
-// echarts uses its own built-in tooltip, so it doesn't need these.
 
-// Ensure the floating tooltip element exists inside #plotCanvas.
-// Returns [container, tooltipEl], or [null, null] if the canvas is absent.
 export function getTooltip() {
     const plotCanvas = document.getElementById("plotCanvas");
     if (!plotCanvas) return [null, null];
@@ -15,8 +12,6 @@ export function getTooltip() {
     return [plotCanvas, tip];
 }
 
-// Place the tooltip near the cursor, flipping and clamping so it stays inside
-// the container.
 export function positionTooltip(container, tooltip, event) {
     const rect = container.getBoundingClientRect();
     const cx = event?.clientX ?? (rect.left + rect.width / 2);
