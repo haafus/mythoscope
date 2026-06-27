@@ -1,6 +1,6 @@
 import {
     app, api, state,
-    buildCorpusApiUrl, escapeAttribute, escapeHtml, formatNumber,
+    buildCorpusApiUrl, escapeAttribute, escapeHtml, formatNumber, parseHash,
 } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./library-tree.js";
 
@@ -35,8 +35,22 @@ export async function renderCorpus() {
     libraryTree.addEventListener("book-select", (e) => openCorpusDocument(e.detail.doc));
 
     await renderLibraryTree(libraryTree);
-    if (state.selectedCorpusDoc) setActiveBook(libraryTree, state.selectedCorpusDoc);
-    renderBookInfo(null);
+
+    // Deep link from the geography popups: #/corpus?title=…&tradition=…
+    const params = parseHash().params;
+    const wantedTitle = params.get("title");
+    const wantedTradition = params.get("tradition");
+    const target = wantedTitle
+        ? state.corpusDocuments.find((doc) =>
+            doc.title === wantedTitle && (!wantedTradition || doc.tradition === wantedTradition))
+        : null;
+
+    if (target) {
+        openCorpusDocument(target);
+    } else {
+        if (state.selectedCorpusDoc) setActiveBook(libraryTree, state.selectedCorpusDoc);
+        renderBookInfo(null);
+    }
 }
 
 function renderBookInfo(doc, isLoading = false) {

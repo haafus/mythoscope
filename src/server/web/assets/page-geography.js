@@ -110,7 +110,10 @@ function getOffsetCoordinate(item, index, total) {
 
 function buildPopupHtml(item) {
     const books = item.books.length
-        ? item.books.map((book) => `<li>${escapeHtml(book)}</li>`).join("")
+        ? item.books.map((book) => {
+            const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
+            return `<li><a class="popup-book-link" href="${escapeAttribute(href)}">${escapeHtml(book)}</a></li>`;
+        }).join("")
         : "<li>No books listed</li>";
 
     return `

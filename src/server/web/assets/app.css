@@ -741,13 +741,22 @@ body.route-geography {
 }
 
 .popup-books li {
-    padding: 7px 8px;
     border: 1px solid #e0e5ea;
     border-radius: 6px;
     background: #f8fafb;
-    color: #374151;
     overflow-wrap: anywhere;
     font-size: 13px;
+}
+
+.popup-book-link {
+    display: block;
+    padding: 7px 8px;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.popup-book-link:hover {
+    text-decoration: underline;
 }
 
 .map-error {
