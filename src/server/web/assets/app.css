@@ -255,17 +255,6 @@ body.route-corpus {
     flex-direction: column;
 }
 
-.corpus-page .panel-header {
-    padding: 16px 18px;
-    border-bottom: 1px solid #e8ecef;
-}
-
-.corpus-page .panel-title {
-    color: #111;
-    font-size: 15px;
-    font-weight: 650;
-}
-
 .library-tree {
     overflow: auto;
     padding: 10px 8px 16px;
@@ -472,27 +461,6 @@ body.route-corpus {
     display: flex;
     flex-direction: column;
     min-width: 0;
-}
-
-.corpus-page .reader-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    min-height: 56px;
-    padding: 14px 22px;
-    border-bottom: 1px solid #e8ecef;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.corpus-page .reader-title {
-    overflow: hidden;
-    color: #111;
-    font-size: 15px;
-    font-weight: 650;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .corpus-page .reader-content {
@@ -947,7 +915,6 @@ body.route-embeddings {
     margin: 20px 0 14px;
     color: var(--muted-soft);
     font-size: 11px;
-    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-align: center;

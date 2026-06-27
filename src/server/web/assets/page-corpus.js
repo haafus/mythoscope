@@ -14,18 +14,12 @@ export async function renderCorpus() {
                 </aside>
 
                 <article class="card reader">
-                    <div class="reader-header">
-                        <div class="reader-title" id="readerTitle">Select a book to begin reading</div>
-                    </div>
                     <div class="reader-content" id="readerContent">
                         <div class="reader-placeholder">Choose a title from the literature list.</div>
                     </div>
                 </article>
 
                 <aside class="card panel info-panel">
-                    <div class="panel-header">
-                        <div class="panel-title">Book Info</div>
-                    </div>
                     <div class="book-info" id="bookInfo">
                         <div class="empty-state">Select a book to view words, sentences, description, and download options.</div>
                         <div class="actions">
@@ -94,11 +88,9 @@ async function openCorpusDocument(doc) {
     if (libraryTree) setActiveBook(libraryTree, doc);
     renderBookInfo(doc, true);
 
-    const readerTitle = document.getElementById("readerTitle");
     const readerContent = document.getElementById("readerContent");
-    if (!readerTitle || !readerContent) return;
+    if (!readerContent) return;
 
-    readerTitle.textContent = doc.title;
     readerContent.innerHTML = '<div class="reader-placeholder">Loading book text...</div>';
 
     try {
