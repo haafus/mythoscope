@@ -9,7 +9,7 @@ export async function renderCorpus() {
     app.innerHTML = `
         <main class="corpus-page container">
             <div class="workspace">
-                <aside class="panel library-panel">
+                <aside class="library-sidebar">
                     <div id="libraryTree">Loading...</div>
                 </aside>
 

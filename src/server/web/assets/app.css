@@ -257,7 +257,7 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
     min-height: 0;
     overflow: hidden;
     display: grid;
-    grid-template-columns: minmax(230px, 290px) minmax(0, 1fr) minmax(260px, 330px);
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(260px, 330px);
     gap: 18px;
 }
 
@@ -316,14 +316,14 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
 }
 
 .library-tree .major-title::after {
-    content: "-";
+    content: "\25be"; /* ▾ */
     color: #b0b7be;
-    font-size: 18px;
+    font-size: 11px;
     line-height: 1;
 }
 
 .library-tree .major-section.collapsed .major-title::after {
-    content: "+";
+    content: "\25b8"; /* ▸ */
 }
 
 .library-tree .major-body {
@@ -411,6 +411,26 @@ body.has-main-navbar.route-corpus > .main-navbar + #app > .corpus-page.container
     color: #111;
     background: #e2edf0;
     font-weight: 600;
+}
+
+/* Unified left book column — identical flat, borderless treatment in every
+   section (corpus, similarity, graphs). Per-page rules only set the height /
+   grid placement; everything visual lives here. */
+.library-sidebar {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.library-sidebar .library-tree {
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .corpus-page .info-dot {
@@ -790,7 +810,7 @@ body.route-embeddings {
 
 .analysis-page .main-content {
     display: grid;
-    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
     gap: 18px;
     align-items: flex-start;
 }
@@ -993,21 +1013,10 @@ body.route-embeddings {
     cursor: default;
 }
 
-.analysis-page .tree-sidebar {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
+.analysis-page .library-sidebar {
     grid-row: 1 / span 2;
     height: calc(100vh - 156px);
     min-height: 620px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-}
-
-.analysis-page .tree-sidebar .library-tree {
-    flex-grow: 1;
 }
 
 .analysis-page #searchModal {
@@ -1187,17 +1196,13 @@ body.route-embeddings {
     width: min(100% - 24px, 1600px);
     padding-top: 24px;
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: minmax(220px, 260px) 1fr;
     gap: 16px;
     min-height: calc(100vh - 60px);
 }
 
-.graph-sidebar {
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    overflow-y: auto;
-    max-height: calc(100vh - 90px);
+.graph-page .library-sidebar {
+    height: calc(100vh - 90px);
 }
 
 
@@ -1271,7 +1276,7 @@ body.route-embeddings {
 
 @media (min-width: 1180px) {
     .analysis-page .main-content {
-        grid-template-columns: minmax(230px, 280px) minmax(520px, 1fr) minmax(280px, 340px);
+        grid-template-columns: minmax(220px, 260px) minmax(520px, 1fr) minmax(280px, 340px);
     }
 
     .analysis-page .plot-area,
@@ -1284,7 +1289,7 @@ body.route-embeddings {
         flex-direction: column;
     }
 
-    .analysis-page .tree-sidebar {
+    .analysis-page .library-sidebar {
         grid-row: auto;
     }
 
@@ -1308,7 +1313,7 @@ body.route-embeddings {
         grid-template-columns: 1fr;
     }
 
-    .analysis-page .tree-sidebar {
+    .analysis-page .library-sidebar {
         grid-row: auto;
         height: auto;
         max-height: 420px;
@@ -1333,7 +1338,7 @@ body.route-embeddings {
     }
 
     .corpus-page .workspace {
-        grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+        grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
         min-height: 780px;
     }
 
@@ -1357,11 +1362,12 @@ body.route-embeddings {
     }
 
     .corpus-page .panel,
-    .corpus-page .reader {
+    .corpus-page .reader,
+    .corpus-page .library-sidebar {
         min-height: 360px;
     }
 
-    .corpus-page .library-panel {
+    .corpus-page .library-sidebar {
         max-height: 460px;
     }
 

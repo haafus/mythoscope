@@ -18,7 +18,7 @@ export async function renderGraphPage(graphType) {
     document.title = `MythoScope - ${graphType.charAt(0).toUpperCase() + graphType.slice(1)}`;
     app.innerHTML = `
         <main class="graph-page container">
-            <div class="graph-sidebar">
+            <div class="library-sidebar">
                 <div id="graphBookList">Loading...</div>
             </div>
             <div class="graph-area">
