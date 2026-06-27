@@ -2,6 +2,7 @@
 import { normalizePreviewText } from "./core.js";
 import { pointTooltipHtml } from "./search-utils.js";
 import { getTooltip, positionTooltip } from "./chart-tooltip.js";
+import { dimColor } from "./chart-color.js";
 
 let activeChart = null;
 let tooltipHandlers = null;
@@ -29,9 +30,12 @@ export function resizeChart(el) {
 export function highlightTradition(el, tradition) {
     if (!window.Plotly || el.dataset.plotly !== "1") return;
     const traditions = el._traditions || [];
+    const colors = el._traditionColors || [];
     if (!traditions.length) return;
-    const opacity = traditions.map((t) => (!tradition || t === tradition ? 0.74 : 0.06));
-    Plotly.restyle(el, { "marker.opacity": opacity });
+    const selected = (t) => !tradition || t === tradition;
+    const color = traditions.map((t, i) => (selected(t) ? colors[i] : dimColor(colors[i])));
+    const opacity = traditions.map((t) => (selected(t) ? 0.74 : 0.45));
+    Plotly.restyle(el, { "marker.color": color, "marker.opacity": opacity });
 }
 
 export async function renderScatter(el, data, { colorMap, onPointClick }) {
@@ -42,6 +46,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
 
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
     el._traditions = traditions; // trace order, for highlightTradition
+    el._traditionColors = traditions.map((t) => colorMap[t] || "#888888");
     const showLegend = false; // scatter legend disabled
 
     const traces = traditions.map((tradition) => {

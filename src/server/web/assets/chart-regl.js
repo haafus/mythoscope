@@ -2,6 +2,7 @@
 import { escapeHtml, normalizePreviewText } from "./core.js";
 import { pointTooltipHtml } from "./search-utils.js";
 import { getTooltip, positionTooltip } from "./chart-tooltip.js";
+import { dimRgba } from "./chart-color.js";
 
 let scatterInstance = null;
 let pointMeta = null;
@@ -32,19 +33,16 @@ export function resizeChart(el) {
     }
 }
 
-// Dim every tradition except `tradition` (null/"" resets) via the scatter's
-// select state (opacityInactiveScale dims the unselected points).
+// Dim every tradition except `tradition` (null/"" resets) by recoloring the
+// palette: unselected entries are tinted toward the background instead of
+// faded, so overlapping points don't add up to bright clumps.
 export function highlightTradition(el, tradition) {
-    if (!scatterInstance || !pointMeta) return;
-    if (!tradition) {
-        scatterInstance.deselect({ preventEvent: true });
-        return;
-    }
-    const indices = [];
-    for (let i = 0; i < pointMeta.length; i++) {
-        if ((pointMeta[i].tradition || "Unknown") === tradition) indices.push(i);
-    }
-    scatterInstance.select(indices, { preventEvent: true });
+    if (!scatterInstance) return;
+    const base = el._reglBase || [];
+    const traditions = el._reglTraditions || [];
+    const palette = base.map((c, i) => (!tradition || traditions[i] === tradition) ? c : dimRgba(c));
+    scatterInstance.set({ pointColor: palette });
+    if (el._reglData) scatterInstance.draw(el._reglData);
 }
 
 // --- Utilities ---
@@ -133,6 +131,8 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     traditions.forEach((t, i) => { tradIdx[t] = i; });
 
     const colors = traditions.map((t) => hexToRgba(colorMap[t] || "#888888", 0.85));
+    el._reglBase = colors;
+    el._reglTraditions = traditions;
 
     const xs = points.map((p) => p.x);
     const ys = points.map((p) => p.y);
@@ -147,6 +147,8 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
         ((p.y - yMin) / yRange) * (2 - 2 * pad) - (1 - pad),
         tradIdx[p.tradition || "Unknown"],
     ]);
+
+    el._reglData = ptData;
 
     pointMeta = points.map((p) => ({
         id: p.id,

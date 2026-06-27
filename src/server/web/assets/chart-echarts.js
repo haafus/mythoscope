@@ -1,6 +1,7 @@
 
 import { escapeHtml, normalizePreviewText } from "./core.js";
 import { pointTooltipHtml } from "./search-utils.js";
+import { dimColor } from "./chart-color.js";
 
 let chartInstance = null;
 
@@ -20,12 +21,20 @@ export function resizeChart(el) {
 }
 
 // Dim every tradition's series except `tradition` (null/"" resets). Series are
-// one per tradition, matched by name.
+// one per tradition, matched by name; dimmed ones are tinted toward the
+// background (not just faded) so overlaps don't add up to bright clumps.
 export function highlightTradition(el, tradition) {
     if (!chartInstance) return;
-    const series = (chartInstance.getOption().series || []).map((s) => ({
-        itemStyle: { opacity: (!tradition || s.name === tradition) ? 0.74 : 0.06 },
-    }));
+    const colors = el._traditionColors || {};
+    const series = (chartInstance.getOption().series || []).map((s) => {
+        const selected = !tradition || s.name === tradition;
+        return {
+            itemStyle: {
+                color: selected ? colors[s.name] : dimColor(colors[s.name]),
+                opacity: selected ? 0.74 : 0.45,
+            },
+        };
+    });
     chartInstance.setOption({ series });
 }
 
@@ -45,6 +54,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     el.style.display = "block";
 
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
+    el._traditionColors = Object.fromEntries(traditions.map((t) => [t, colorMap[t] || "#888888"]));
     const showLegend = false; // scatter legend disabled
     const chart = initChart(el);
 
