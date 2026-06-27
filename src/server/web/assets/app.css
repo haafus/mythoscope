@@ -13,6 +13,11 @@
     --rail-left: minmax(220px, 260px);
     --rail-right: minmax(280px, 340px);
     --ws-gap: 18px;
+
+    /* Palette */
+    --border: #dee2e6;
+    --accent: #2f6fed;
+    --accent-strong: #1b4fd1;
 }
 
 body {
@@ -441,7 +446,7 @@ body.route-corpus {
 /* Shared white surface (cards, corpus panels, the graph node panel). */
 .card {
     background: #fff;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border);
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     overflow: hidden;
@@ -630,7 +635,7 @@ body.route-corpus {
 
 .corpus-page .btn-outline,
 .analysis-page .btn-outline {
-    border-color: #dee2e6;
+    border-color: var(--border);
     background: transparent;
     color: #495057;
 }
@@ -849,7 +854,7 @@ body.route-embeddings {
 .analysis-page .card-header {
     min-height: 54px;
     padding: 12px 16px;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--border);
     background: #fff;
     display: flex;
     justify-content: space-between;
@@ -944,13 +949,13 @@ body.route-embeddings {
     padding: 4px;
     border: 0;
     background: transparent;
-    color: #2f6fed;
+    color: var(--accent);
     cursor: pointer;
     transition: color 0.16s ease;
 }
 
 .analysis-page .fragment-edit:hover {
-    color: #1b4fd1;
+    color: var(--accent-strong);
 }
 
 .analysis-page .fragments-divider {
@@ -966,7 +971,7 @@ body.route-embeddings {
 .analysis-page .neighbor-item {
     padding: 12px;
     background: #fff;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border);
     border-radius: 6px;
     margin-bottom: 8px;
     cursor: pointer;
@@ -998,18 +1003,18 @@ body.route-embeddings {
     margin-bottom: 12px;
 }
 
-.analysis-page textarea:focus { border-color: #2f6fed; }
+.analysis-page textarea:focus { border-color: var(--accent); }
 
 .analysis-page .search-btn {
     width: 100%;
     justify-content: center;
-    background: #2f6fed;
-    border-color: #2f6fed;
+    background: var(--accent);
+    border-color: var(--accent);
 }
 
 .analysis-page .search-btn:hover:not(:disabled) {
-    background: #1b4fd1;
-    border-color: #1b4fd1;
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
 }
 
 .analysis-page .search-btn:disabled {
@@ -1102,7 +1107,7 @@ body.route-embeddings {
 .analysis-page .search-detail-text {
     max-height: 360px;
     overflow: auto;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border);
     border-radius: 6px;
     background: #fafbfc;
     color: #2f343b;
@@ -1199,7 +1204,7 @@ body.route-embeddings {
 .graph-area {
     position: relative;
     background: #fafafa;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
     min-height: 0;
