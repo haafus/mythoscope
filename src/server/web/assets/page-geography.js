@@ -139,9 +139,7 @@ function renderMarkers(map, traditions) {
         });
     });
 
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, {padding: [34, 34], maxZoom: 4});
-    }
+    return bounds.length ? L.latLngBounds(bounds) : null;
 }
 
 function initializeGeographyMap(traditions) {
@@ -172,22 +170,32 @@ function initializeGeographyMap(traditions) {
         attribution: "Tiles &copy; Esri",
     }).addTo(map);
 
-    map.setView([20, 15], 2);
+    const markerBounds = renderMarkers(map, traditions);
+    const fitPadding = L.point(34, 34);
 
-    // Don't let the user zoom out below the level where tiles fill the container,
-    // so there are never gray margins. Recompute when the map is resized.
-    function clampMinZoomToFill() {
+    // Min zoom is the lower of "tiles fill the container" (no gray margins) and
+    // "all markers fit" — so every marker is always reachable, while we still
+    // avoid zooming out further than needed. Recomputed on resize.
+    function recomputeMinZoom() {
         const fillZoom = map.getBoundsZoom(worldBounds, true); // inside=true → cover the view
-        map.setMinZoom(fillZoom);
-        if (map.getZoom() < fillZoom) map.setZoom(fillZoom);
+        const markerZoom = markerBounds
+            ? map.getBoundsZoom(markerBounds, false, fitPadding) // inside=false → all markers visible
+            : fillZoom;
+        const minZoom = Math.min(fillZoom, markerZoom);
+        map.setMinZoom(minZoom);
+        if (map.getZoom() < minZoom) map.setZoom(minZoom);
     }
-    clampMinZoomToFill();
-    map.on("resize", clampMinZoomToFill);
 
-    state.geographyResizeHandler = () => { sizeFrame(); map.invalidateSize(); };
+    recomputeMinZoom();
+    // Default view: fit all markers (capped so a tight cluster isn't over-zoomed).
+    if (markerBounds) {
+        map.fitBounds(markerBounds, { padding: [34, 34], maxZoom: 4 });
+    } else {
+        map.setView([20, 15], map.getMinZoom());
+    }
+
+    state.geographyResizeHandler = () => { sizeFrame(); map.invalidateSize(); recomputeMinZoom(); };
     window.addEventListener("resize", state.geographyResizeHandler);
-
-    renderMarkers(map, traditions);
 }
 
 function showGeographyError(message) {
