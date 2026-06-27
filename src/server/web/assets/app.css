@@ -57,16 +57,42 @@ body.has-main-navbar > .main-navbar + #app > main.container {
 .nav-logo a {
     display: flex;
     align-items: center;
+    gap: 12px;
     text-decoration: none;
 }
 
-.nav-logo img {
-    display: block;
-    height: 42px;
-    width: auto;
-    max-width: 190px;
-    object-fit: contain;
-    border-radius: 4px;
+/* The source logo is a vertical lockup; show just its emblem in a round
+   frame and render the wordmark/tagline as text to match the mockup. */
+.nav-emblem {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #f7f3ec url("/assets/logo.jpg") -34px -7px / 117px 88px no-repeat;
+}
+
+.nav-wordmark {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.nav-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1d2430;
+}
+
+.nav-tagline {
+    margin-top: 3px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #9aa0a8;
 }
 
 .nav-links {
