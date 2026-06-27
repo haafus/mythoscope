@@ -1,11 +1,17 @@
 import { app, state, api, escapeHtml, escapeAttribute, loadTraditionInfo } from "./core.js";
+import { renderTraditionList } from "./tradition-list.js";
 
 export async function renderGeography() {
     document.title = "MythoScope - Geography";
     app.innerHTML = `
         <main class="geography-page container">
-            <div class="map-frame">
-                <div id="geography-map"></div>
+            <div class="geo-workspace">
+                <aside class="library-sidebar">
+                    <div id="geographyTraditions">Loading...</div>
+                </aside>
+                <div class="map-frame">
+                    <div id="geography-map"></div>
+                </div>
             </div>
         </main>
     `;
@@ -17,7 +23,20 @@ export async function renderGeography() {
 
     try {
         const traditions = await fetchTraditions();
-        initializeGeographyMap(traditions);
+        const markers = initializeGeographyMap(traditions);
+
+        const listEl = document.getElementById("geographyTraditions");
+        listEl.addEventListener("tradition-select", (event) => {
+            const map = state.geographyMap;
+            if (!map) return;
+            const name = event.detail.tradition;
+            if (!name) { map.closePopup(); return; }
+            const marker = markers.get(name);
+            if (!marker) return;
+            map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 4), { duration: 0.6 });
+            marker.openPopup();
+        });
+        await renderTraditionList(listEl);
     } catch (error) {
         console.error(error);
         showGeographyError("Could not load geography data.");
@@ -117,13 +136,14 @@ function createMarkerIcon(item) {
 
 function renderMarkers(map, traditions) {
     const bounds = [];
+    const markers = new Map();
     const groups = buildCoordinateGroups(traditions);
 
     groups.forEach((group) => {
         group.forEach((item, index) => {
             const position = getOffsetCoordinate(item, index, group.length);
 
-            L.marker(position, {
+            const marker = L.marker(position, {
                 icon: createMarkerIcon(item),
                 keyboard: true,
                 title: item.name,
@@ -135,11 +155,12 @@ function renderMarkers(map, traditions) {
                     maxWidth: 340,
                 });
 
+            markers.set(item.name, marker);
             bounds.push(position);
         });
     });
 
-    return bounds.length ? L.latLngBounds(bounds) : null;
+    return { bounds: bounds.length ? L.latLngBounds(bounds) : null, markers };
 }
 
 function initializeGeographyMap(traditions) {
@@ -147,14 +168,6 @@ function initializeGeographyMap(traditions) {
     // The previous ±240° bounds reached 60° past the tiles on each side, which
     // showed up as gray bands beyond the map.
     const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
-    const frame = document.getElementById("geography-map").parentElement;
-
-    // Grow the map to fill the viewport, leaving a 20px gap to the window edges.
-    const sizeFrame = () => {
-        const top = frame.getBoundingClientRect().top;
-        frame.style.height = `${Math.max(320, window.innerHeight - top - 20)}px`;
-    };
-    sizeFrame(); // size before the map reads its container
 
     const map = L.map("geography-map", {
         zoomControl: true,
@@ -170,7 +183,7 @@ function initializeGeographyMap(traditions) {
         attribution: "Tiles &copy; Esri",
     }).addTo(map);
 
-    const markerBounds = renderMarkers(map, traditions);
+    const { bounds: markerBounds, markers } = renderMarkers(map, traditions);
     const fitPadding = L.point(34, 34);
 
     // Min zoom is the lower of "tiles fill the container" and "all markers fit",
@@ -184,6 +197,8 @@ function initializeGeographyMap(traditions) {
         map.setMinZoom(minZoom);
         if (map.getZoom() < minZoom) map.setZoom(minZoom);
     }
+    // The map fills its grid cell via CSS; make sure Leaflet reads that height.
+    map.invalidateSize();
     recomputeMinZoom();
 
     if (markerBounds) {
@@ -192,8 +207,10 @@ function initializeGeographyMap(traditions) {
         map.setView([20, 15], map.getMinZoom());
     }
 
-    state.geographyResizeHandler = () => { sizeFrame(); map.invalidateSize(); recomputeMinZoom(); };
+    state.geographyResizeHandler = () => { map.invalidateSize(); recomputeMinZoom(); };
     window.addEventListener("resize", state.geographyResizeHandler);
+
+    return markers;
 }
 
 function showGeographyError(message) {

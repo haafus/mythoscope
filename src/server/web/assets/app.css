@@ -419,7 +419,8 @@ body.route-corpus {
 
 .corpus-page.container,
 .analysis-page.container,
-.graph-page.container {
+.graph-page.container,
+.geography-page.container {
     width: 100%;
     max-width: var(--content-max);
     margin: 0 auto;
@@ -648,19 +649,17 @@ body.route-geography {
     color: #1f2933;
 }
 
-.geography-page.container {
-    width: auto;
-    max-width: none;
-    margin: 0;
-    padding: var(--page-gutter);
-    box-sizing: border-box;
+.geography-page .geo-workspace {
+    display: grid;
+    grid-template-columns: var(--rail-left) minmax(0, 1fr);
+    gap: var(--ws-gap);
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
-
 .geography-page .map-frame {
-    height: 70vh; /* fallback; JS sizes it to fill the viewport with a 20px gap */
-    max-height: none;
-    min-height: 320px;
+    height: 100%;
+    min-height: 0;
     overflow: hidden;
     border: 1px solid #d8dee4;
     border-radius: 8px;
@@ -1234,12 +1233,14 @@ body.route-embeddings {
 
     .analysis-page.container,
     .graph-page.container,
-    .corpus-page.container {
+    .corpus-page.container,
+    .geography-page.container {
         flex: none;
         overflow: visible;
     }
 
-    .workspace {
+    .workspace,
+    .geography-page .geo-workspace {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
         flex: none;
@@ -1247,6 +1248,11 @@ body.route-embeddings {
 
     .library-sidebar {
         max-height: 420px;
+    }
+
+    .geography-page .map-frame {
+        height: 70vh;
+        min-height: 360px;
     }
 
     .analysis-page .plot-canvas {
@@ -1278,12 +1284,6 @@ body.route-embeddings {
     .corpus-page .reader-content {
         padding: 22px 22px 44px;
         font-size: 16px;
-    }
-
-    .geography-page .map-frame {
-        height: 480px;
-        max-height: 60vh;
-        min-height: 360px;
     }
 }
 
