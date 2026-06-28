@@ -41,7 +41,7 @@ const CHART_RENDERERS = {
 };
 
 export async function renderEmbeddingsAnalysis() {
-    document.title = "Embedding Analysis";
+    document.title = "MythoScope - Similarity";
     app.innerHTML = `
         <main class="analysis-page container">
             <div class="workspace">
