@@ -13,7 +13,7 @@ const RENDERERS = {
     "/home": renderHome,
     "/corpus": renderCorpus,
     "/geography": renderGeography,
-    "/embeddings_analysis": renderEmbeddingsAnalysis,
+    "/embeddings": renderEmbeddingsAnalysis,
     "/beings": () => renderGraphPage("beings"),
     "/realms": () => renderGraphPage("realms"),
     "/ages": () => renderGraphPage("ages"),

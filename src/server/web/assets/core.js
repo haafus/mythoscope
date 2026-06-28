@@ -37,7 +37,7 @@ const ROUTE_CLASS = {
     "/home": "route-home",
     "/corpus": "route-corpus",
     "/geography": "route-geography",
-    "/embeddings_analysis": "route-embeddings",
+    "/embeddings": "route-embeddings",
     "/beings": "route-graphs",
     "/realms": "route-graphs",
     "/ages": "route-graphs",
@@ -46,7 +46,8 @@ const ROUTE_CLASS = {
 const ROUTE_ALIASES = {
     "/": "/corpus",
     "/sources": "/corpus",
-    "/similarity": "/embeddings_analysis",
+    "/similarity": "/embeddings",
+    "/embeddings_analysis": "/embeddings",
 };
 
 export function normalizeRoute(path) {
