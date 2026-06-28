@@ -742,16 +742,12 @@ body.route-geography {
 }
 
 .popup-books li {
-    border: 1px solid #e0e5ea;
-    border-radius: 6px;
-    background: #f8fafb;
     overflow-wrap: anywhere;
     font-size: 13px;
 }
 
 .popup-book-link {
     display: block;
-    padding: 7px 8px;
     color: var(--accent);
     text-decoration: none;
 }
