@@ -1,7 +1,5 @@
 export const app = document.getElementById("app");
 
-// Shared app data only. Per-page resources (maps, charts, listeners) live in
-// each page's closure and are released via onCleanup, not stashed here.
 export const state = {
     models: [],
     selectedModel: localStorage.getItem("selectedModel") || "",
@@ -58,8 +56,6 @@ export function setActiveNav(path) {
     });
 }
 
-// Per-page teardown registry. A page registers its cleanups while it renders;
-// the router runs them all (and clears the list) when navigating away.
 let routeCleanups = [];
 
 export function onCleanup(fn) {

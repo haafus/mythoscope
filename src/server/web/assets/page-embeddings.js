@@ -95,7 +95,6 @@ export async function renderEmbeddingsAnalysis() {
 
     bindEmbeddingsControls();
 
-    // Keep the chart fitted to its container, and tear it down on navigation.
     const onResize = () => resizeChart(document.getElementById("scatter-plot"));
     window.addEventListener("resize", onResize);
     onCleanup(() => {

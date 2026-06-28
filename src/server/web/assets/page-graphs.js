@@ -1,8 +1,6 @@
 import { app, api, escapeHtml, onCleanup } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
-// The current Cytoscape instance (one graphs page at a time). Kept in the page
-// module, not global state; released via onCleanup on navigation.
 let graphCy = null;
 
 function destroyGraph() {
