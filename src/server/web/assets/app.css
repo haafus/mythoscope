@@ -559,15 +559,12 @@ body.route-corpus {
     font-size: 14px;
 }
 
-.corpus-page .original-url {
+.corpus-page a.original-url-link {
     display: block;
-    color: var(--accent);
-    font-size: 13px;
-    overflow-wrap: anywhere;
     text-decoration: none;
 }
 
-.corpus-page .original-url:hover {
+.corpus-page a.original-url-link:hover {
     text-decoration: underline;
 }
 

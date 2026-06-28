@@ -69,8 +69,7 @@ function renderBookInfo(doc, isLoading = false) {
 
     const url = buildCorpusApiUrl(doc);
     const originalUrl = doc.url
-        ? `<div class="description-title">Original URL</div>
-           <a class="original-url" href="${escapeAttribute(doc.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(doc.url)}</a>`
+        ? `<a class="description-title original-url-link" href="${escapeAttribute(doc.url)}" target="_blank" rel="noopener noreferrer">Original URL</a>`
         : "";
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
