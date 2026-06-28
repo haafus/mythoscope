@@ -1,4 +1,4 @@
-import { app, state, escapeHtml, loadTraditionInfo } from "./core.js";
+import { app, escapeHtml, loadTraditionInfo, onCleanup } from "./core.js";
 import { renderTraditionList } from "./tree-traditions.js";
 
 export async function renderGeography() {
@@ -23,12 +23,10 @@ export async function renderGeography() {
 
     try {
         const traditions = await fetchTraditions();
-        const markers = initializeGeographyMap(traditions);
+        const { map, markers } = initializeGeographyMap(traditions);
 
         const listEl = document.getElementById("geographyTraditions");
         listEl.addEventListener("tradition-select", (event) => {
-            const map = state.geographyMap;
-            if (!map) return;
             const name = event.detail.tradition;
             if (!name) { map.closePopup(); return; }
             const marker = markers.get(name);
@@ -178,7 +176,6 @@ function initializeGeographyMap(traditions) {
         maxBounds: worldBounds,
         maxBoundsViscosity: 1.0,
     });
-    state.geographyMap = map;
 
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", {
         noWrap: true,
@@ -210,10 +207,14 @@ function initializeGeographyMap(traditions) {
         map.setView([20, 15], map.getMinZoom());
     }
 
-    state.geographyResizeHandler = () => { map.invalidateSize(); recomputeMinZoom(); };
-    window.addEventListener("resize", state.geographyResizeHandler);
+    const onResize = () => { map.invalidateSize(); recomputeMinZoom(); };
+    window.addEventListener("resize", onResize);
+    onCleanup(() => {
+        window.removeEventListener("resize", onResize);
+        map.remove();
+    });
 
-    return markers;
+    return { map, markers };
 }
 
 function showGeographyError(message) {

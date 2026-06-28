@@ -1,5 +1,16 @@
-import { app, state, api, escapeHtml } from "./core.js";
+import { app, api, escapeHtml, onCleanup } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
+
+// The current Cytoscape instance (one graphs page at a time). Kept in the page
+// module, not global state; released via onCleanup on navigation.
+let graphCy = null;
+
+function destroyGraph() {
+    if (graphCy) {
+        graphCy.destroy();
+        graphCy = null;
+    }
+}
 
 const GRAPH_CATEGORY_COLORS = {
     Character: "#dcd0ff",
@@ -38,6 +49,8 @@ export async function renderGraphPage(graphType) {
         </main>
     `;
 
+    onCleanup(destroyGraph);
+
     const bookList = document.getElementById("graphBookList");
     bookList.addEventListener("book-select", (e) => {
         setActiveBook(bookList, e.detail.doc);
@@ -54,10 +67,7 @@ async function loadGraphData(bookId, graphType) {
         placeholder.style.display = "block";
     }
 
-    if (state.graphCy) {
-        state.graphCy.destroy();
-        state.graphCy = null;
-    }
+    destroyGraph();
 
     try {
         const data = await api(`/api/graphs/${encodeURIComponent(bookId)}/${encodeURIComponent(graphType)}`);
@@ -84,7 +94,7 @@ function renderCytoscapeGraph(container, data, graphType) {
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
 
-    state.graphCy = cytoscape({
+    graphCy = cytoscape({
         container,
         elements: [...nodes, ...edges],
         style: [
@@ -138,7 +148,7 @@ function renderCytoscapeGraph(container, data, graphType) {
         wheelSensitivity: 0.5,
     });
 
-    const cy = state.graphCy;
+    const cy = graphCy;
 
     let hoveredNode = null;
     cy.on("mouseover", "node", (evt) => {

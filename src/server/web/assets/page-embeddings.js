@@ -1,6 +1,6 @@
 import {
     api, app, state,
-    ensureModels,
+    ensureModels, onCleanup,
     escapeHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
@@ -95,10 +95,13 @@ export async function renderEmbeddingsAnalysis() {
 
     bindEmbeddingsControls();
 
-    // ECharts/regl don't auto-resize on window the way Plotly's responsive mode
-    // does; keep the active chart fitted to its container.
-    state.chartResizeHandler = () => resizeChart(document.getElementById("scatter-plot"));
-    window.addEventListener("resize", state.chartResizeHandler);
+    // Keep the chart fitted to its container, and tear it down on navigation.
+    const onResize = () => resizeChart(document.getElementById("scatter-plot"));
+    window.addEventListener("resize", onResize);
+    onCleanup(() => {
+        window.removeEventListener("resize", onResize);
+        destroyChart(document.getElementById("scatter-plot"));
+    });
 
     try {
         await loadSimilarityMethods();

@@ -2,7 +2,6 @@ import {
     cleanupRoute, parseHash,
     setActiveNav, setBodyClass, DEFAULT_ROUTE,
 } from "./core.js";
-import { destroyChart } from "./chart.js";
 import { renderHome } from "./page-home.js";
 import { renderCorpus } from "./page-corpus.js";
 import { renderGeography } from "./page-geography.js";
@@ -21,8 +20,6 @@ const RENDERERS = {
 
 function render() {
     cleanupRoute();
-    const scatterPlot = document.getElementById("scatter-plot");
-    if (scatterPlot) destroyChart(scatterPlot);
 
     const { path } = parseHash();
     setBodyClass(path);

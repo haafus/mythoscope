@@ -1,5 +1,7 @@
 export const app = document.getElementById("app");
 
+// Shared app data only. Per-page resources (maps, charts, listeners) live in
+// each page's closure and are released via onCleanup, not stashed here.
 export const state = {
     models: [],
     selectedModel: localStorage.getItem("selectedModel") || "",
@@ -9,11 +11,8 @@ export const state = {
     corpusOpenTraditionsInitialized: false,
     corpusCollapsedMajors: new Set(),
     traditionInfo: null,
-    geographyMap: null,
     lastAnalysisSearchData: null,
     analysisSearchRequestId: 0,
-    keydownHandler: null,
-    graphCy: null,
     similarityMethods: [],
 };
 
@@ -59,27 +58,20 @@ export function setActiveNav(path) {
     });
 }
 
+// Per-page teardown registry. A page registers its cleanups while it renders;
+// the router runs them all (and clears the list) when navigating away.
+let routeCleanups = [];
+
+export function onCleanup(fn) {
+    routeCleanups.push(fn);
+}
+
 export function cleanupRoute() {
-    if (state.keydownHandler) {
-        document.removeEventListener("keydown", state.keydownHandler);
-        state.keydownHandler = null;
-    }
-    if (state.geographyResizeHandler) {
-        window.removeEventListener("resize", state.geographyResizeHandler);
-        state.geographyResizeHandler = null;
-    }
-    if (state.chartResizeHandler) {
-        window.removeEventListener("resize", state.chartResizeHandler);
-        state.chartResizeHandler = null;
-    }
-    if (state.geographyMap) {
-        state.geographyMap.remove();
-        state.geographyMap = null;
-    }
-    if (state.graphCy) {
-        state.graphCy.destroy();
-        state.graphCy = null;
-    }
+    const pending = routeCleanups;
+    routeCleanups = [];
+    pending.forEach((fn) => {
+        try { fn(); } catch (error) { console.error(error); }
+    });
 }
 
 export async function api(path, options = {}) {
