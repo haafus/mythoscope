@@ -150,14 +150,14 @@ body.has-main-navbar {
 
 
 /* ==========================================================================
-   Home Page
+   About Page
    ========================================================================== */
 
-body.route-home {
+body.route-about {
     min-height: 100vh;
 }
 
-.home-page {
+.about-page {
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
@@ -168,18 +168,18 @@ body.route-home {
     padding-top: 28px;
 }
 
-.home-page .header-container {
+.about-page .header-container {
     text-align: center;
     margin-bottom: 28px;
 }
 
-.home-page .logo-image {
+.about-page .logo-image {
     max-width: 250px;
     height: auto;
     margin-bottom: 22px;
 }
 
-.home-page .nav-menu {
+.about-page .nav-menu {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -188,7 +188,7 @@ body.route-home {
     color: #333;
 }
 
-.home-page .nav-item {
+.about-page .nav-item {
     padding: 8px 16px;
     cursor: pointer;
     border: none;
@@ -200,17 +200,17 @@ body.route-home {
     transition: background-color 0.2s ease;
 }
 
-.home-page .nav-item.active {
+.about-page .nav-item.active {
     background-color: #e8f0f6;
     font-weight: 600;
 }
 
-.home-page .separator {
+.about-page .separator {
     color: #d0d0d0;
     font-size: 14px;
 }
 
-.home-page .content-container {
+.about-page .content-container {
     max-width: 960px;
     width: calc(100% - 32px);
     padding: 40px;
@@ -220,14 +220,14 @@ body.route-home {
     box-shadow: 0 10px 30px rgba(0,0,0,0.02);
 }
 
-.home-page .tab-content {
+.about-page .tab-content {
     display: none;
     color: #555;
     font-size: 15px;
     line-height: 1.6;
 }
 
-.home-page .tab-content.active {
+.about-page .tab-content.active {
     display: block;
 }
 
@@ -1284,7 +1284,7 @@ body.route-embeddings {
         min-height: 560px;
     }
 
-    .home-page {
+    .about-page {
         flex: none;
         overflow-y: visible;
     }

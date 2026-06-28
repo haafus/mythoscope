@@ -2,7 +2,7 @@ import {
     cleanupRoute, parseHash,
     setActiveNav, setBodyClass, DEFAULT_ROUTE,
 } from "./core.js";
-import { renderHome } from "./page-home.js";
+import { renderAbout } from "./page-about.js";
 import { renderCorpus } from "./page-corpus.js";
 import { renderGeography } from "./page-geography.js";
 import { renderEmbeddingsAnalysis } from "./page-embeddings.js";
@@ -15,7 +15,7 @@ const RENDERERS = {
     "/beings": () => renderGraphPage("beings"),
     "/realms": () => renderGraphPage("realms"),
     "/ages": () => renderGraphPage("ages"),
-    "/about": renderHome,
+    "/about": renderAbout,
 };
 
 function render() {

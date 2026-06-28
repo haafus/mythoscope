@@ -1,9 +1,9 @@
 import { app } from "./core.js";
 
-export function renderHome() {
+export function renderAbout() {
     document.title = "MythoScope - About";
     app.innerHTML = `
-        <main class="home-page">
+        <main class="about-page">
             <div class="header-container">
                 <img src="/assets/logo.jpg" alt="MythoScope Logo" class="logo-image">
 

@@ -35,7 +35,7 @@ const ROUTE_CLASS = {
     "/beings": "route-graphs",
     "/realms": "route-graphs",
     "/ages": "route-graphs",
-    "/about": "route-home",
+    "/about": "route-about",
 };
 
 function routeClass(path) {
