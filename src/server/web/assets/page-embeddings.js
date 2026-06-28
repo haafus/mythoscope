@@ -12,7 +12,7 @@ import {
     resultBookTitle, runSemanticSearch,
     searchResultMetaLine,
 } from "./search-utils.js";
-import { renderTraditionList } from "./tradition-list.js";
+import { renderTraditionList } from "./tree-traditions.js";
 
 function getTraditionColor(name, fallback = "#555") {
     const info = state.traditionInfo || {};

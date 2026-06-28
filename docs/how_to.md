@@ -462,8 +462,9 @@ Vanilla JS SPA на нативных ES-модулях (без бандлера 
 - `index.html` — точка входа, CDN-библиотеки (Plotly, Leaflet, Cytoscape), навигация.
 - `assets/app.js` — роутер и обработчик `hashchange`.
 - `assets/core.js` — общее состояние, API-хелперы, утилиты.
-- `assets/library-tree.js` — переиспользуемый компонент дерева документов (corpus, embeddings, graphs).
-- `assets/tradition-list.js` — переиспользуемый список традиций (major → tradition) для similarity и geography.
+- `assets/tree-scaffold.js` — общий каркас дерева: секции мажоров + сворачивание; листья задают потребители.
+- `assets/tree-sources.js` — дерево документов (corpus, graphs): major → tradition → книги.
+- `assets/tree-traditions.js` — список традиций (major → tradition) для similarity и geography.
 - `assets/search-utils.js` — общие функции семантического поиска и рендеринга результатов.
 - `assets/page-home.js` — главная страница (вкладки Vision / Methodology / …).
 - `assets/page-corpus.js` — библиотека текстов, ридер, информация о книге.

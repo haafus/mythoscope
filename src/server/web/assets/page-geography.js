@@ -1,5 +1,5 @@
 import { app, state, escapeHtml, loadTraditionInfo } from "./core.js";
-import { renderTraditionList } from "./tradition-list.js";
+import { renderTraditionList } from "./tree-traditions.js";
 
 export async function renderGeography() {
     document.title = "MythoScope - Geography";

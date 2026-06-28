@@ -1,5 +1,5 @@
 import { app, state, api, escapeHtml } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./library-tree.js";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
 const GRAPH_CATEGORY_COLORS = {
     Character: "#dcd0ff",

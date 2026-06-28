@@ -2,7 +2,7 @@ import {
     app, api, state,
     buildCorpusApiUrl, escapeHtml, formatNumber, parseHash,
 } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./library-tree.js";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
 export async function renderCorpus() {
     document.title = "MythoScope - Sources";
