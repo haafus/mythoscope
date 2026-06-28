@@ -122,10 +122,6 @@ export function bookTitleFromId(value) {
     return String(value || "").replace(/\.txt$/i, "").replace(/_/g, " ").trim();
 }
 
-export function escapeAttribute(value) {
-    return escapeHtml(value);
-}
-
 export function escapeRegex(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -161,7 +157,7 @@ export async function ensureModels() {
 export function renderModelOptions(selectedKey = state.selectedModel) {
     if (!state.models.length) return '<option value="">No available models</option>';
     return state.models.map((model) => `
-        <option value="${escapeAttribute(model.key)}" ${model.key === selectedKey ? "selected" : ""}>
+        <option value="${escapeHtml(model.key)}" ${model.key === selectedKey ? "selected" : ""}>
             ${escapeHtml(modelLabel(model))}
         </option>
     `).join("");

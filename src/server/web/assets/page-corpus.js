@@ -1,6 +1,6 @@
 import {
     app, api, state,
-    buildCorpusApiUrl, escapeAttribute, escapeHtml, formatNumber, parseHash,
+    buildCorpusApiUrl, escapeHtml, formatNumber, parseHash,
 } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./library-tree.js";
 
@@ -20,12 +20,7 @@ export async function renderCorpus() {
                 </article>
 
                 <aside class="card panel info-panel">
-                    <div class="book-info" id="bookInfo">
-                        <div class="empty-state">Select a book to view words, sentences, description, and download options.</div>
-                        <div class="actions">
-                            <a class="btn btn-outline" href="/api/corpus/archive">Download Full Archive</a>
-                        </div>
-                    </div>
+                    <div class="book-info" id="bookInfo"></div>
                 </aside>
             </div>
         </main>
@@ -33,6 +28,7 @@ export async function renderCorpus() {
 
     const libraryTree = document.getElementById("libraryTree");
     libraryTree.addEventListener("book-select", (e) => openCorpusDocument(e.detail.doc));
+    renderBookInfo(null);
 
     await renderLibraryTree(libraryTree);
 
@@ -47,13 +43,12 @@ export async function renderCorpus() {
 
     if (target) {
         openCorpusDocument(target);
-    } else {
-        if (state.selectedCorpusDoc) setActiveBook(libraryTree, state.selectedCorpusDoc);
-        renderBookInfo(null);
+    } else if (state.selectedCorpusDoc) {
+        setActiveBook(libraryTree, state.selectedCorpusDoc);
     }
 }
 
-function renderBookInfo(doc, isLoading = false) {
+function renderBookInfo(doc) {
     const bookInfo = document.getElementById("bookInfo");
     if (!bookInfo) return;
 
@@ -69,12 +64,12 @@ function renderBookInfo(doc, isLoading = false) {
 
     const url = buildCorpusApiUrl(doc);
     const originalUrl = doc.url
-        ? `<a class="original-url-link" href="${escapeAttribute(doc.url)}" target="_blank" rel="noopener noreferrer">Original URL</a>`
+        ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Original URL</a>`
         : "";
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
-            <span class="info-dot" style="--book-color:${escapeAttribute(doc.color || "#6b7280")}"></span>
+            <span class="info-dot" style="--book-color:${escapeHtml(doc.color || "#6b7280")}"></span>
             <span>${escapeHtml(doc.major_tradition || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
         </div>
 
@@ -95,7 +90,7 @@ function renderBookInfo(doc, isLoading = false) {
         ${originalUrl}
 
         <div class="actions">
-            <a class="btn btn-primary${isLoading ? " disabled" : ""}" href="${escapeAttribute(url)}" download="${escapeAttribute(doc.title || "book")}.txt">Download Book</a>
+            <a class="btn btn-primary" href="${escapeHtml(url)}" download="${escapeHtml(doc.title || "book")}.txt">Download Book</a>
             <a class="btn btn-outline" href="/api/corpus/archive">Download Full Archive</a>
         </div>
     `;
@@ -105,7 +100,7 @@ async function openCorpusDocument(doc) {
     state.selectedCorpusDoc = doc;
     const libraryTree = document.getElementById("libraryTree");
     if (libraryTree) setActiveBook(libraryTree, doc);
-    renderBookInfo(doc, true);
+    renderBookInfo(doc);
 
     const readerContent = document.getElementById("readerContent");
     if (!readerContent) return;
@@ -116,9 +111,7 @@ async function openCorpusDocument(doc) {
         const text = await api(buildCorpusApiUrl(doc));
         readerContent.textContent = text;
         readerContent.scrollTop = 0;
-        renderBookInfo(doc, false);
     } catch (error) {
         readerContent.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
-        renderBookInfo(doc, false);
     }
 }

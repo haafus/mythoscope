@@ -1,6 +1,6 @@
 import {
     state, ensureCorpusDocuments, groupDocuments,
-    corpusTraditionKey, escapeAttribute, escapeHtml,
+    corpusTraditionKey, escapeHtml,
 } from "./core.js";
 
 export async function renderLibraryTree(container) {
@@ -36,7 +36,7 @@ function renderTree(container, documents) {
 
     grouped.forEach((traditions, major) => {
         const isMajorCollapsed = state.corpusCollapsedMajors.has(major);
-        html += `<section class="major-section${isMajorCollapsed ? " collapsed" : ""}" data-major="${escapeAttribute(major)}">
+        html += `<section class="major-section${isMajorCollapsed ? " collapsed" : ""}" data-major="${escapeHtml(major)}">
             <button class="major-title" type="button">${escapeHtml(major)}</button>
             <div class="major-body">`;
 
@@ -46,8 +46,8 @@ function renderTree(container, documents) {
             const color = docs[0] && docs[0].color ? docs[0].color : "#6b7280";
 
             html += `
-                <div class="tradition-group${isOpen ? " open" : ""}" data-tradition="${escapeAttribute(tradition)}">
-                    <button class="tradition-title" type="button" style="--tradition-color:${escapeAttribute(color)}">
+                <div class="tradition-group${isOpen ? " open" : ""}" data-tradition="${escapeHtml(tradition)}">
+                    <button class="tradition-title" type="button" style="--tradition-color:${escapeHtml(color)}">
                         <span class="tradition-dot"></span>
                         <span class="tradition-name">${escapeHtml(tradition)}</span>
                         <span class="tradition-toggle">${isOpen ? "-" : "+"}</span>

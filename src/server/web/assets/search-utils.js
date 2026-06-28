@@ -1,4 +1,4 @@
-import { api, bookTitleFromId, escapeHtml, escapeAttribute, escapeRegex, normalizePreviewText, state } from "./core.js";
+import { api, bookTitleFromId, escapeHtml, escapeRegex, normalizePreviewText, state } from "./core.js";
 
 export function scoreClass(similarityScore) {
     const percent = Math.round(Number(similarityScore || 0) * 100);
@@ -74,7 +74,7 @@ export function chunkTextHtml(item, query = "") {
 export function renderSearchResultItem(result, data) {
     const {percent, cls} = scoreClass(result.similarity_score);
     return `
-        <button class="search-result-item" type="button" data-point-id="${escapeAttribute(result.id)}" data-chunk-index="${escapeAttribute(result.chunk_index)}">
+        <button class="search-result-item" type="button" data-point-id="${escapeHtml(result.id)}" data-chunk-index="${escapeHtml(result.chunk_index)}">
             <span class="search-result-topline">
                 <span class="result-tradition">${escapeHtml(result.tradition)}</span>
                 <span class="result-score ${cls}">${percent}% similarity</span>

@@ -1048,6 +1048,15 @@ body.route-embeddings {
     color: var(--muted-soft);
 }
 
+.analysis-page .info-loading {
+    text-align: center;
+    color: var(--muted);
+}
+
+.analysis-page .info-error {
+    color: #d32f2f;
+}
+
 .analysis-page .search-summary {
     display: flex;
     justify-content: space-between;

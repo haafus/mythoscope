@@ -1,4 +1,4 @@
-import { app, state, api, escapeHtml, escapeAttribute } from "./core.js";
+import { app, state, api, escapeHtml } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./library-tree.js";
 
 const GRAPH_CATEGORY_COLORS = {

@@ -1,4 +1,4 @@
-import { app, state, api, escapeHtml, escapeAttribute, loadTraditionInfo } from "./core.js";
+import { app, state, escapeHtml, loadTraditionInfo } from "./core.js";
 import { renderTraditionList } from "./tradition-list.js";
 
 export async function renderGeography() {
@@ -113,13 +113,13 @@ function buildPopupHtml(item) {
         ? `<div class="popup-books-title">Books</div>
            <ul class="popup-books">${item.books.map((book) => {
                const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
-               return `<li><a class="popup-book-link" href="${escapeAttribute(href)}">${escapeHtml(book)}</a></li>`;
+               return `<li><a class="popup-book-link" href="${escapeHtml(href)}">${escapeHtml(book)}</a></li>`;
            }).join("")}</ul>`
         : "";
 
     return `
         <div class="popup-title">
-            <span class="popup-color" style="background:${escapeAttribute(item.color)}"></span>
+            <span class="popup-color" style="background:${escapeHtml(item.color)}"></span>
             <span>${escapeHtml(item.name)}</span>
         </div>
         <div class="popup-description">${escapeHtml(item.description)}</div>
@@ -130,7 +130,7 @@ function buildPopupHtml(item) {
 function createMarkerIcon(item) {
     return L.divIcon({
         className: "tradition-marker",
-        html: `<button class="map-point" type="button" style="--point-color:${escapeAttribute(item.color)}" aria-label="${escapeAttribute(item.name)}"></button>`,
+        html: `<button class="map-point" type="button" style="--point-color:${escapeHtml(item.color)}" aria-label="${escapeHtml(item.name)}"></button>`,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
         popupAnchor: [0, -11],

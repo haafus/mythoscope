@@ -1,7 +1,7 @@
 import {
     api, app, state,
     ensureModels,
-    escapeAttribute, escapeHtml,
+    escapeHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
@@ -16,14 +16,7 @@ import { renderTraditionList } from "./tradition-list.js";
 
 function getTraditionColor(name, fallback = "#555") {
     const info = state.traditionInfo || {};
-    if (info[name] && info[name].color) return info[name].color;
-
-    const cleanName = String(name || "").toLowerCase().replace(/[_\s-]+/g, "").replace(/[^a-z0-9Ѐ-ӿ]/gi, "");
-    for (const key in info) {
-        const cleanKey = key.toLowerCase().replace(/[_\s-]+/g, "").replace(/[^a-z0-9Ѐ-ӿ]/gi, "");
-        if (cleanName === cleanKey && info[key].color) return info[key].color;
-    }
-    return fallback;
+    return (info[name] && info[name].color) || fallback;
 }
 
 function getColorMap(traditions) {
@@ -139,7 +132,7 @@ async function loadSimilarityMethods() {
     const vizSelect = document.getElementById("viz-select");
     if (vizSelect) {
         vizSelect.innerHTML = state.similarityMethods
-            .map((m) => `<option value="${escapeAttribute(m.key)}">${escapeHtml(m.label)}</option>`)
+            .map((m) => `<option value="${escapeHtml(m.key)}">${escapeHtml(m.label)}</option>`)
             .join("");
     }
 }
@@ -236,7 +229,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
     if (searchPanel) searchPanel.style.display = "none";
     infoContent.style.display = "";
-    infoContent.innerHTML = '<div style="text-align:center; color:#6c757d">Loading...</div>';
+    infoContent.innerHTML = '<div class="info-loading">Loading...</div>';
 
     try {
         const results = await fetchPointWithNeighbors(pointId, chunkIndex);
@@ -254,7 +247,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
         if (neighbors.length > 0) {
             html += neighbors.map((neighbor) => `
-                <div class="neighbor-item" data-neighbor-id="${escapeAttribute(neighbor.id)}" data-neighbor-chunk="${escapeAttribute(neighbor.chunk_index)}">
+                <div class="neighbor-item" data-neighbor-id="${escapeHtml(neighbor.id)}" data-neighbor-chunk="${escapeHtml(neighbor.chunk_index)}">
                     <div class="fragment-text">${escapeHtml(neighbor.text || "")}</div>
                     ${attributionLine(neighbor, { withScore: true })}
                 </div>
@@ -269,7 +262,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
             item.addEventListener("click", () => displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk));
         });
     } catch (error) {
-        infoContent.innerHTML = `<div style="color:#d32f2f">Error: ${escapeHtml(error.message)}</div>`;
+        infoContent.innerHTML = `<div class="info-error">Error: ${escapeHtml(error.message)}</div>`;
     }
 }
 

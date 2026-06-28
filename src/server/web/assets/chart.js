@@ -47,7 +47,6 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
     el._traditions = traditions; // trace order, for highlightTradition
     el._traditionColors = traditions.map((t) => colorMap[t] || "#888888");
-    const showLegend = false; // scatter legend disabled
 
     const traces = traditions.map((tradition) => {
         const pts = points.filter((p) => (p.tradition || "Unknown") === tradition);
@@ -74,7 +73,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     });
 
     const layout = {
-        margin: showLegend ? { l: 50, r: 176, t: 28, b: 48 } : { l: 50, r: 28, t: 28, b: 48 },
+        margin: { l: 50, r: 28, t: 28, b: 48 },
         plot_bgcolor: "#fbfcfd",
         paper_bgcolor: "#fff",
         hovermode: "closest",
@@ -86,17 +85,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
             font: { color: "#212529", size: 12 },
             namelength: 24,
         },
-        showlegend: showLegend,
-        legend: {
-            orientation: "v",
-            x: 1.02, xanchor: "left",
-            y: 1, yanchor: "top",
-            bgcolor: "rgba(255,255,255,0.84)",
-            bordercolor: "rgba(222,226,230,0.9)",
-            borderwidth: 1,
-            font: { size: 11, color: "#495057" },
-            itemwidth: 30,
-        },
+        showlegend: false,
         xaxis: { automargin: true, gridcolor: "#edf1f5", zeroline: false, tickfont: { size: 11, color: "#6c757d" } },
         yaxis: { automargin: true, gridcolor: "#edf1f5", zeroline: false, tickfont: { size: 11, color: "#6c757d" } },
     };

@@ -1,6 +1,6 @@
 import {
     state, ensureCorpusDocuments, groupDocuments,
-    escapeAttribute, escapeHtml,
+    escapeHtml,
 } from "./core.js";
 
 // Same major -> tradition grouping and styling as the book tree, but stops at
@@ -28,14 +28,14 @@ function renderList(container, documents) {
     let html = "";
     grouped.forEach((traditions, major) => {
         const isMajorCollapsed = state.corpusCollapsedMajors.has(major);
-        html += `<section class="major-section${isMajorCollapsed ? " collapsed" : ""}" data-major="${escapeAttribute(major)}">
+        html += `<section class="major-section${isMajorCollapsed ? " collapsed" : ""}" data-major="${escapeHtml(major)}">
             <button class="major-title" type="button">${escapeHtml(major)}</button>
             <div class="major-body">`;
 
         traditions.forEach((docs, tradition) => {
             const color = docs[0] && docs[0].color ? docs[0].color : "#6b7280";
             html += `
-                <button class="tradition-title tradition-pick" type="button" data-tradition="${escapeAttribute(tradition)}" style="--tradition-color:${escapeAttribute(color)}">
+                <button class="tradition-title tradition-pick" type="button" data-tradition="${escapeHtml(tradition)}" style="--tradition-color:${escapeHtml(color)}">
                     <span class="tradition-dot"></span>
                     <span class="tradition-name">${escapeHtml(tradition)}</span>
                 </button>`;
