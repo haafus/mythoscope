@@ -1,7 +1,7 @@
 import { app } from "./core.js";
 
 export function renderHome() {
-    document.title = "MythoScope - Home";
+    document.title = "MythoScope - About";
     app.innerHTML = `
         <main class="home-page">
             <div class="header-container">

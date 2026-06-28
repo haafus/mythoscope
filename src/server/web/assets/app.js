@@ -9,13 +9,13 @@ import { renderEmbeddingsAnalysis } from "./page-embeddings.js";
 import { renderGraphPage } from "./page-graphs.js";
 
 const RENDERERS = {
-    "/home": renderHome,
     "/corpus": renderCorpus,
     "/geography": renderGeography,
     "/embeddings": renderEmbeddingsAnalysis,
     "/beings": () => renderGraphPage("beings"),
     "/realms": () => renderGraphPage("realms"),
     "/ages": () => renderGraphPage("ages"),
+    "/about": renderHome,
 };
 
 function render() {

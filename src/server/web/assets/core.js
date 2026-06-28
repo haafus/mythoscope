@@ -29,13 +29,13 @@ export function parseHash() {
 export const DEFAULT_ROUTE = "/corpus";
 
 const ROUTE_CLASS = {
-    "/home": "route-home",
     "/corpus": "route-corpus",
     "/geography": "route-geography",
     "/embeddings": "route-embeddings",
     "/beings": "route-graphs",
     "/realms": "route-graphs",
     "/ages": "route-graphs",
+    "/about": "route-home",
 };
 
 function routeClass(path) {
