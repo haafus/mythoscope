@@ -91,12 +91,16 @@ export function bindSearchResultClicks(container, handler) {
     });
 }
 
-export function fetchPointWithNeighbors(pointId, chunkIndex, topK = 6) {
+// Returns { point, neighbors }: the API gives the queried point first, then its
+// nearest chunks.
+export async function fetchPointWithNeighbors(pointId, chunkIndex, topK = 6) {
     const params = new URLSearchParams({top_k: String(topK)});
     if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
         params.set("chunk_index", String(chunkIndex));
     }
-    return api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}?${params}`);
+    const [point, ...neighbors] = await api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}?${params}`);
+    if (!point) throw new Error("Point not found");
+    return { point, neighbors };
 }
 
 export async function runSemanticSearch({query, model, topK = 20}) {
