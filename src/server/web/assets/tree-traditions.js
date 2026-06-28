@@ -1,9 +1,8 @@
 import { escapeHtml } from "./core.js";
 import { renderMajorTree } from "./tree-scaffold.js";
 
-// Same major -> tradition grouping and styling as the book tree, but stops at
-// traditions (no book leaves) and emits "tradition-select" (tradition or null
-// when toggled off) instead of opening a book.
+// Tradition leaves (no books); emits "tradition-select" with the tradition, or
+// null when the active one is toggled off.
 export async function renderTraditionList(container) {
     await renderMajorTree(container, {
         emptyMessage: "No traditions found.",

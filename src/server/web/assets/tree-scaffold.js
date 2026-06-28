@@ -1,9 +1,7 @@
 import { state, ensureCorpusDocuments, groupDocuments, escapeHtml } from "./core.js";
 
-// Shared major -> body scaffold for the book tree and the tradition list: loads
-// the catalog, renders collapsible major sections and wires the major toggles.
-// The caller supplies the inner body HTML per major (renderBody) and binds its
-// own leaf interactions (bindLeaves); prepare() builds optional shared context.
+// Shared scaffold for both trees: renders collapsible major sections; the caller
+// fills each major body (renderBody) and wires its leaves (bindLeaves).
 export async function renderMajorTree(container, { emptyMessage, prepare, renderBody, bindLeaves }) {
     container.classList.add("library-tree");
     container.innerHTML = "Loading...";

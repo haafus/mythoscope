@@ -25,9 +25,7 @@ export function parseHash() {
     };
 }
 
-// Single source of truth for routes: canonical path -> body class, plus the
-// aliases that redirect to a canonical path. Anything unknown falls back to
-// DEFAULT_ROUTE.
+// Canonical path -> body class; unknown paths fall back to DEFAULT_ROUTE.
 export const DEFAULT_ROUTE = "/corpus";
 
 const ROUTE_CLASS = {

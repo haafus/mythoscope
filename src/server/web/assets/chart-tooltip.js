@@ -1,5 +1,3 @@
-// Hover-tooltip helpers for the scatter chart.
-
 export function getTooltip() {
     const plotCanvas = document.getElementById("plotCanvas");
     if (!plotCanvas) return [null, null];

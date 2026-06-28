@@ -25,8 +25,7 @@ export function resizeChart(el) {
     }
 }
 
-// Dim every tradition except `tradition` (pass null/"" to reset). Traditions
-// are one trace each, in el._traditions order.
+// null/"" resets. Traces map to el._traditions order.
 export function highlightTradition(el, tradition) {
     if (!window.Plotly || el.dataset.plotly !== "1") return;
     const traditions = el._traditions || [];
