@@ -1,11 +1,11 @@
 import {
     app, api, state,
-    buildCorpusApiUrl, escapeHtml, formatNumber, parseHash,
+    buildCorpusApiUrl, escapeHtml, formatNumber, parseHash, setPageTitle,
 } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
 export async function renderCorpus() {
-    document.title = "MythoScope - Sources";
+    setPageTitle("Sources");
     app.innerHTML = `
         <main class="corpus-page container">
             <div class="workspace">

@@ -46,6 +46,10 @@ export function setBodyClass(path) {
     document.body.className = `has-main-navbar ${routeClass(path)}`;
 }
 
+export function setPageTitle(name) {
+    document.title = `MythoScope - ${name}`;
+}
+
 export function setActiveNav(path) {
     document.querySelectorAll(".nav-links a").forEach((link) => {
         const href = link.getAttribute("href") || "";

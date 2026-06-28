@@ -1,7 +1,7 @@
-import { app } from "./core.js";
+import { app, setPageTitle } from "./core.js";
 
 export function renderHome() {
-    document.title = "MythoScope - Home";
+    setPageTitle("Home");
     app.innerHTML = `
         <main class="home-page">
             <div class="header-container">
