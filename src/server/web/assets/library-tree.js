@@ -1,99 +1,66 @@
-import {
-    state, ensureCorpusDocuments, groupDocuments,
-    corpusTraditionKey, escapeHtml,
-} from "./core.js";
+import { state, groupDocuments, corpusTraditionKey, escapeHtml } from "./core.js";
+import { renderMajorTree } from "./tree-scaffold.js";
 
 export async function renderLibraryTree(container) {
-    container.classList.add("library-tree");
-    container.innerHTML = "Loading...";
-
-    try {
-        const documents = await ensureCorpusDocuments();
-        if (!documents.length) {
-            container.innerHTML = '<div class="empty-state">No literature found.</div>';
-            return;
-        }
-        renderTree(container, documents);
-    } catch (error) {
-        container.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
-    }
+    await renderMajorTree(container, {
+        emptyMessage: "No literature found.",
+        prepare: (documents) => {
+            initOpenTraditions(documents);
+            return { documents, docIndex: new Map(documents.map((doc, i) => [doc, i])) };
+        },
+        renderBody: (traditions, major, ctx) => renderTraditionGroups(traditions, major, ctx.docIndex),
+        bindLeaves: (container, ctx) => bindTreeLeaves(container, ctx.documents),
+    });
 }
 
-function renderTree(container, documents) {
-    const docIndex = new Map(documents.map((doc, i) => [doc, i]));
-    const grouped = groupDocuments(documents);
-
-    if (!state.corpusOpenTraditionsInitialized) {
-        grouped.forEach((traditions, major) => {
-            traditions.forEach((_, tradition) => {
-                state.corpusOpenTraditions.add(corpusTraditionKey(major, tradition));
-            });
+function initOpenTraditions(documents) {
+    if (state.corpusOpenTraditionsInitialized) return;
+    groupDocuments(documents).forEach((traditions, major) => {
+        traditions.forEach((_, tradition) => {
+            state.corpusOpenTraditions.add(corpusTraditionKey(major, tradition));
         });
-        state.corpusOpenTraditionsInitialized = true;
-    }
+    });
+    state.corpusOpenTraditionsInitialized = true;
+}
 
+function renderTraditionGroups(traditions, major, docIndex) {
     let html = "";
+    traditions.forEach((docs, tradition) => {
+        const key = corpusTraditionKey(major, tradition);
+        const isOpen = state.corpusOpenTraditions.has(key);
+        const color = docs[0] && docs[0].color ? docs[0].color : "#6b7280";
 
-    grouped.forEach((traditions, major) => {
-        const isMajorCollapsed = state.corpusCollapsedMajors.has(major);
-        html += `<section class="major-section${isMajorCollapsed ? " collapsed" : ""}" data-major="${escapeHtml(major)}">
-            <button class="major-title" type="button">${escapeHtml(major)}</button>
-            <div class="major-body">`;
-
-        traditions.forEach((docs, tradition) => {
-            const key = corpusTraditionKey(major, tradition);
-            const isOpen = state.corpusOpenTraditions.has(key);
-            const color = docs[0] && docs[0].color ? docs[0].color : "#6b7280";
-
-            html += `
-                <div class="tradition-group${isOpen ? " open" : ""}" data-tradition="${escapeHtml(tradition)}">
-                    <button class="tradition-title" type="button" style="--tradition-color:${escapeHtml(color)}">
-                        <span class="tradition-dot"></span>
-                        <span class="tradition-name">${escapeHtml(tradition)}</span>
-                        <span class="tradition-toggle">${isOpen ? "-" : "+"}</span>
-                    </button>
-                    <ul class="document-list">
-                        ${docs.map((doc) => `
-                            <li>
-                                <button class="document-button" type="button" data-doc-index="${docIndex.get(doc)}">
-                                    ${escapeHtml(doc.title)}
-                                </button>
-                            </li>
-                        `).join("")}
-                    </ul>
-                </div>
-            `;
-        });
-
-        html += "</div></section>";
+        html += `
+            <div class="tradition-group${isOpen ? " open" : ""}" data-tradition="${escapeHtml(tradition)}">
+                <button class="tradition-title" type="button" style="--tradition-color:${escapeHtml(color)}">
+                    <span class="tradition-dot"></span>
+                    <span class="tradition-name">${escapeHtml(tradition)}</span>
+                    <span class="tradition-toggle">${isOpen ? "-" : "+"}</span>
+                </button>
+                <ul class="document-list">
+                    ${docs.map((doc) => `
+                        <li>
+                            <button class="document-button" type="button" data-doc-index="${docIndex.get(doc)}">
+                                ${escapeHtml(doc.title)}
+                            </button>
+                        </li>
+                    `).join("")}
+                </ul>
+            </div>
+        `;
     });
+    return html;
+}
 
-    container.innerHTML = html;
-
-    container.querySelectorAll(".major-title").forEach((button) => {
-        button.addEventListener("click", () => {
-            const section = button.closest(".major-section");
-            section.classList.toggle("collapsed");
-            const major = section.dataset.major || "Other";
-            if (section.classList.contains("collapsed")) {
-                state.corpusCollapsedMajors.add(major);
-            } else {
-                state.corpusCollapsedMajors.delete(major);
-            }
-        });
-    });
-
+function bindTreeLeaves(container, documents) {
     container.querySelectorAll(".tradition-title").forEach((button) => {
         button.addEventListener("click", () => {
             const group = button.closest(".tradition-group");
             group.classList.toggle("open");
             const section = button.closest(".major-section");
             const key = corpusTraditionKey(section?.dataset.major, group.dataset.tradition);
-            if (group.classList.contains("open")) {
-                state.corpusOpenTraditions.add(key);
-            } else {
-                state.corpusOpenTraditions.delete(key);
-            }
+            if (group.classList.contains("open")) state.corpusOpenTraditions.add(key);
+            else state.corpusOpenTraditions.delete(key);
             const toggle = group.querySelector(".tradition-toggle");
             if (toggle) toggle.textContent = group.classList.contains("open") ? "-" : "+";
         });
@@ -103,10 +70,7 @@ function renderTree(container, documents) {
         button.addEventListener("click", () => {
             const doc = documents[Number(button.dataset.docIndex)];
             if (!doc) return;
-            container.dispatchEvent(new CustomEvent("book-select", {
-                detail: { doc },
-                bubbles: true,
-            }));
+            container.dispatchEvent(new CustomEvent("book-select", { detail: { doc }, bubbles: true }));
         });
     });
 }
@@ -114,8 +78,7 @@ function renderTree(container, documents) {
 export function setActiveBook(container, doc) {
     container.querySelectorAll(".document-button").forEach((btn) => btn.classList.remove("active"));
     if (!doc) return;
-    const documents = state.corpusDocuments;
-    const index = documents.indexOf(doc);
+    const index = state.corpusDocuments.indexOf(doc);
     if (index === -1) return;
     const btn = container.querySelector(`.document-button[data-doc-index="${index}"]`);
     if (btn) btn.classList.add("active");

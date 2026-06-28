@@ -1,6 +1,6 @@
 import {
     cleanupRoute, normalizeRoute, parseHash,
-    setActiveNav, setBodyClass,
+    setActiveNav, setBodyClass, DEFAULT_ROUTE,
 } from "./core.js";
 import { destroyChart } from "./chart.js";
 import { renderHome } from "./page-home.js";
@@ -8,6 +8,16 @@ import { renderCorpus } from "./page-corpus.js";
 import { renderGeography } from "./page-geography.js";
 import { renderEmbeddingsAnalysis } from "./page-embeddings.js";
 import { renderGraphPage } from "./page-graphs.js";
+
+const RENDERERS = {
+    "/home": renderHome,
+    "/corpus": renderCorpus,
+    "/geography": renderGeography,
+    "/embeddings_analysis": renderEmbeddingsAnalysis,
+    "/beings": () => renderGraphPage("beings"),
+    "/realms": () => renderGraphPage("realms"),
+    "/ages": () => renderGraphPage("ages"),
+};
 
 function render() {
     cleanupRoute();
@@ -24,14 +34,9 @@ function render() {
         return;
     }
 
-    if (path === "/home") return renderHome();
-    if (path === "/corpus") return renderCorpus();
-    if (path === "/geography") return renderGeography();
-    if (path === "/embeddings_analysis") return renderEmbeddingsAnalysis();
-    const graphType = path.slice(1);
-    if (["beings", "realms", "ages"].includes(graphType)) return renderGraphPage(graphType);
-
-    window.location.hash = "#/corpus";
+    const renderer = RENDERERS[path];
+    if (renderer) return renderer();
+    window.location.hash = `#${DEFAULT_ROUTE}`;
 }
 
 window.addEventListener("hashchange", render);

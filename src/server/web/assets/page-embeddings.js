@@ -220,6 +220,12 @@ function showSearchPanel() {
     document.getElementById("search-text")?.focus();
 }
 
+async function loadPointWithNeighbors(pointId, chunkIndex) {
+    const [point, ...neighbors] = await fetchPointWithNeighbors(pointId, chunkIndex);
+    if (!point) throw new Error("Point not found");
+    return { point, neighbors };
+}
+
 export async function displayPointInfo(pointId, chunkIndex = null) {
     if (!state.selectedModel || !pointId) return;
 
@@ -232,10 +238,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
     infoContent.innerHTML = '<div class="info-loading">Loading...</div>';
 
     try {
-        const results = await fetchPointWithNeighbors(pointId, chunkIndex);
-        const point = results[0];
-        const neighbors = results.slice(1);
-        if (!point) throw new Error("Point not found");
+        const { point, neighbors } = await loadPointWithNeighbors(pointId, chunkIndex);
         let html = `
             <div class="fragment-detail">
                 <div class="fragment-text">${escapeHtml(point.text)}</div>
@@ -364,10 +367,7 @@ async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
     setSearchResults('<div class="search-loading">Loading nearest chunks...</div>');
 
     try {
-        const results = await fetchPointWithNeighbors(pointId, chunkIndex);
-        const point = results[0];
-        const neighbors = results.slice(1);
-        if (!point) throw new Error("Point not found");
+        const { point, neighbors } = await loadPointWithNeighbors(pointId, chunkIndex);
 
         setSearchResults(`
             <div class="search-detail">

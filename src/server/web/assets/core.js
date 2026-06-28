@@ -28,21 +28,33 @@ export function parseHash() {
     };
 }
 
+// Single source of truth for routes: canonical path -> body class, plus the
+// aliases that redirect to a canonical path. Anything unknown falls back to
+// DEFAULT_ROUTE.
+export const DEFAULT_ROUTE = "/corpus";
+
+const ROUTE_CLASS = {
+    "/home": "route-home",
+    "/corpus": "route-corpus",
+    "/geography": "route-geography",
+    "/embeddings_analysis": "route-embeddings",
+    "/beings": "route-graphs",
+    "/realms": "route-graphs",
+    "/ages": "route-graphs",
+};
+
+const ROUTE_ALIASES = {
+    "/": "/corpus",
+    "/sources": "/corpus",
+    "/similarity": "/embeddings_analysis",
+};
+
 export function normalizeRoute(path) {
-    if (path === "/") return "/corpus";
-    if (path === "/sources") return "/corpus";
-    if (path === "/similarity") return "/embeddings_analysis";
-    return path;
+    return ROUTE_ALIASES[path] || path;
 }
 
 function routeClass(path) {
-    if (path === "/home") return "route-home";
-    if (path === "/") return "route-corpus";
-    if (path === "/corpus") return "route-corpus";
-    if (path === "/geography") return "route-geography";
-    if (path === "/embeddings_analysis") return "route-embeddings";
-    if (["/ages", "/realms", "/beings"].includes(path)) return "route-graphs";
-    return "route-corpus";
+    return ROUTE_CLASS[path] || ROUTE_CLASS[DEFAULT_ROUTE];
 }
 
 export function setBodyClass(path) {
