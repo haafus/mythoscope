@@ -77,12 +77,11 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
                 borderWidth: 0.4,
             },
             symbolSize: 6,
-            large: pts.length > 5000,
-            largeThreshold: 5000,
-            emphasis: {
-                focus: "series",
-                blurScope: "coordinateSystem",
-            },
+            large: true,            // batched canvas path for the whole series
+            largeThreshold: 2000,
+            progressive: 4000,      // render in chunks instead of one blocking pass
+            progressiveThreshold: 4000,
+            emphasis: { scale: false }, // no focus:"series" — that re-styles every point on hover
         };
     });
 
@@ -141,8 +140,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
             { type: "inside", xAxisIndex: 0, filterMode: "none" },
             { type: "inside", yAxisIndex: 0, filterMode: "none" },
         ],
-        animation: true,
-        animationDuration: 600,
+        animation: false,
         series,
     });
 
