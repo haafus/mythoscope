@@ -561,6 +561,10 @@ body.route-corpus {
 
 .corpus-page a.original-url-link {
     display: block;
+    margin-top: 18px;
+    color: #4b5563;
+    font-size: 14px;
+    overflow-wrap: anywhere;
     text-decoration: none;
 }
 
