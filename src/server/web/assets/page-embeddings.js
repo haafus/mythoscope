@@ -5,7 +5,7 @@ import {
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
-import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution } from "./chart.js";
+import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js";
 import {
     attributionLine, bindSearchResultClicks,
     fetchPointWithNeighbors, renderSearchResultItem,
@@ -101,6 +101,11 @@ export async function renderEmbeddingsAnalysis() {
     `;
 
     bindEmbeddingsControls();
+
+    // ECharts/regl don't auto-resize on window the way Plotly's responsive mode
+    // does; keep the active chart fitted to its container.
+    state.chartResizeHandler = () => resizeChart(document.getElementById("scatter-plot"));
+    window.addEventListener("resize", state.chartResizeHandler);
 
     try {
         await loadSimilarityMethods();

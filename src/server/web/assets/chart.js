@@ -10,4 +10,4 @@
 //     No CDN needed — loads as ES module from https://esm.sh/regl-scatterplot@1.16.0
 //     Remove the Plotly/ECharts <script> from index.html.
 //
-export { destroyChart, resizeChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution } from "./chart-plotly.js";
+export { destroyChart, resizeChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution } from "./chart-echarts.js";

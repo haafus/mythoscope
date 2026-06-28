@@ -67,6 +67,10 @@ export function cleanupRoute() {
         window.removeEventListener("resize", state.geographyResizeHandler);
         state.geographyResizeHandler = null;
     }
+    if (state.chartResizeHandler) {
+        window.removeEventListener("resize", state.chartResizeHandler);
+        state.chartResizeHandler = null;
+    }
     if (state.geographyMap) {
         state.geographyMap.remove();
         state.geographyMap = null;
