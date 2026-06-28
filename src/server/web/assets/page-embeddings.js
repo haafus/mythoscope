@@ -3,7 +3,7 @@ import {
     ensureModels, onCleanup,
     escapeHtml,
     loadTraditionInfo,
-    persistSelectedModel, renderModelOptions, setPageTitle,
+    persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js";
 import {
@@ -41,7 +41,7 @@ const CHART_RENDERERS = {
 };
 
 export async function renderEmbeddingsAnalysis() {
-    setPageTitle("Similarity");
+    document.title = "MythoScope - Similarity";
     app.innerHTML = `
         <main class="analysis-page container">
             <div class="workspace">

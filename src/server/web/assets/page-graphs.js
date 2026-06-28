@@ -1,4 +1,4 @@
-import { app, api, escapeHtml, onCleanup, setPageTitle } from "./core.js";
+import { app, api, escapeHtml, onCleanup } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
 let graphCy = null;
@@ -24,7 +24,7 @@ const GRAPH_INFO_FIELDS = {
 };
 
 export async function renderGraphPage(graphType) {
-    setPageTitle(graphType.charAt(0).toUpperCase() + graphType.slice(1));
+    document.title = `MythoScope - ${graphType.charAt(0).toUpperCase() + graphType.slice(1)}`;
     app.innerHTML = `
         <main class="graph-page container">
             <div class="workspace">

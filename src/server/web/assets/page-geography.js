@@ -1,8 +1,8 @@
-import { app, escapeHtml, loadTraditionInfo, onCleanup, setPageTitle } from "./core.js";
+import { app, escapeHtml, loadTraditionInfo, onCleanup } from "./core.js";
 import { renderTraditionList } from "./tree-traditions.js";
 
 export async function renderGeography() {
-    setPageTitle("Geography");
+    document.title = "MythoScope - Geography";
     app.innerHTML = `
         <main class="geography-page container">
             <div class="geo-workspace">
