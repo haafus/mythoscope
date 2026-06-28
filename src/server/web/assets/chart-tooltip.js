@@ -1,4 +1,4 @@
-// Shared hover-tooltip helpers for the scatter charts (plotly + regl).
+// Hover-tooltip helpers for the scatter chart.
 
 export function getTooltip() {
     const plotCanvas = document.getElementById("plotCanvas");

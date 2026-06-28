@@ -470,9 +470,8 @@ Vanilla JS SPA на нативных ES-модулях (без бандлера 
 - `assets/page-geography.js` — карта Leaflet с традициями.
 - `assets/page-embeddings.js` — визуализация эмбеддингов, поиск, информация о точке.
 - `assets/page-graphs.js` — графы персонажей / мест / эпох (Cytoscape).
-- `assets/chart.js` — переключатель бэкенда графиков (re-export).
-- `assets/chart-plotly.js`, `chart-echarts.js`, `chart-regl.js` — три взаимозаменяемых бэкенда.
-- `assets/chart-tooltip.js`, `chart-color.js` — общие хелперы бэкендов: тултип точки и тонирование приглушённых традиций.
+- `assets/chart.js` — графики (scatter / heatmap / distribution) на Plotly.
+- `assets/chart-tooltip.js`, `chart-color.js` — хелперы графиков: тултип точки и тонирование приглушённых традиций.
 - `assets/app.css` — все стили (с комментариями-разделителями по секциям).
 
 Запускается через:

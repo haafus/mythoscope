@@ -15,10 +15,3 @@ export function dimColor(hex, ratio = 0.86) {
     const blend = rgb.map((v, i) => Math.round(v + (PLOT_BG[i] - v) * ratio));
     return `rgb(${blend[0]},${blend[1]},${blend[2]})`;
 }
-
-// Same blend for a normalized [r,g,b,a] tuple (regl-scatterplot palette).
-export function dimRgba(rgba, ratio = 0.86, alpha = 0.45) {
-    const bg = PLOT_BG.map((v) => v / 255);
-    const rgb = rgba.slice(0, 3).map((v, i) => v + (bg[i] - v) * ratio);
-    return [rgb[0], rgb[1], rgb[2], alpha];
-}
