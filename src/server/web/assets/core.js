@@ -43,17 +43,6 @@ const ROUTE_CLASS = {
     "/ages": "route-graphs",
 };
 
-const ROUTE_ALIASES = {
-    "/": "/corpus",
-    "/sources": "/corpus",
-    "/similarity": "/embeddings",
-    "/embeddings_analysis": "/embeddings",
-};
-
-export function normalizeRoute(path) {
-    return ROUTE_ALIASES[path] || path;
-}
-
 function routeClass(path) {
     return ROUTE_CLASS[path] || ROUTE_CLASS[DEFAULT_ROUTE];
 }
@@ -63,11 +52,10 @@ export function setBodyClass(path) {
 }
 
 export function setActiveNav(path) {
-    const activePath = path;
     document.querySelectorAll(".nav-links a").forEach((link) => {
         const href = link.getAttribute("href") || "";
-        const hashPath = normalizeRoute((href.split("#")[1] || "/").split("?")[0] || "/");
-        link.classList.toggle("active", hashPath === activePath);
+        const hashPath = (href.split("#")[1] || "/").split("?")[0] || "/";
+        link.classList.toggle("active", hashPath === path);
     });
 }
 

@@ -1,5 +1,5 @@
 import {
-    cleanupRoute, normalizeRoute, parseHash,
+    cleanupRoute, parseHash,
     setActiveNav, setBodyClass, DEFAULT_ROUTE,
 } from "./core.js";
 import { destroyChart } from "./chart.js";
@@ -24,15 +24,9 @@ function render() {
     const scatterPlot = document.getElementById("scatter-plot");
     if (scatterPlot) destroyChart(scatterPlot);
 
-    const parsed = parseHash();
-    const path = normalizeRoute(parsed.path);
+    const { path } = parseHash();
     setBodyClass(path);
     setActiveNav(path);
-
-    if (path !== parsed.path) {
-        window.location.hash = `#${path}`;
-        return;
-    }
 
     const renderer = RENDERERS[path];
     if (renderer) return renderer();
