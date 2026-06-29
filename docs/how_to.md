@@ -71,6 +71,8 @@ pip install --upgrade pip
 
 `dev` (pytest, ruff, mypy) — инструменты разработчика, не входит в `all`. Добавляй его явно при работе над кодом: `pip install -e ".[all,dev]"` (или `".[viewer,dev]"` и т.п.).
 
+Тесты бэка — `pytest`. Юнит-тесты фронта (чистые функции `core.js`/`search-utils.js`) — `npm test` (он же `node --test "tests/js/*.test.mjs"`), без npm-зависимостей: используется встроенный тест-раннер Node ≥18.
+
 - **viewer** не требует torch и скрейпинг-либ — это гарантируется тестом `tests/test_viewer_imports.py`. Эндпоинт `/api/similarity/search` (текст-поиск) в этом профиле отвечает `503`; поиск соседей по точкам и остальные страницы работают.
 - **search** добавляет текст-поиск: при первом запросе модель эмбеддингов скачивается с HuggingFace (нужен доступ к `huggingface.co`).
 - Если GPU нет, для `search`/`all` ставь CPU-only torch, чтобы не тянуть ~3.4 ГБ CUDA-библиотек:

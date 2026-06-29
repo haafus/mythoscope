@@ -1,0 +1,8 @@
+{
+  "name": "mythoscope-web",
+  "private": true,
+  "description": "Frontend unit tests for the MythoScope SPA (no runtime dependencies; uses Node's built-in test runner).",
+  "scripts": {
+    "test": "node --test \"tests/js/*.test.mjs\""
+  }
+}

@@ -20,7 +20,8 @@ if not hasattr(fu_mod, "UserAgent"):
 
 from datetime import datetime
 
-from corpus.builder import _build_metadata, _update_traditions
+from corpus import builder
+from corpus.builder import _build_metadata, _update_traditions, build_corpus
 
 _BASE_ITEM = {
     "major_tradition": "Greek",
@@ -59,6 +60,71 @@ class TestBuildMetadataFields:
         assert meta["description"] == ""
 
 
+
+
+class TestBuildCorpusForce:
+    """Which items build_corpus re-processes vs. reuses from a previous run."""
+
+    def _setup(self, tmp_path, monkeypatch, items, *, existing=None):
+        from settings import settings
+
+        config_dir = tmp_path / "config"
+        config_dir.mkdir()
+        corpus_dir = tmp_path / "corpus"
+        corpus_dir.mkdir()
+        (config_dir / "traditions.json").write_text("{}")
+        monkeypatch.setattr(settings, "config_dir", config_dir)
+        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
+
+        monkeypatch.setattr(builder, "load_download_list", lambda: [dict(i) for i in items])
+        if existing is not None:
+            (corpus_dir / "corpus.json").write_text(json.dumps(existing))
+
+        # Record which titles get (re)processed; write a file so the path check passes.
+        processed = []
+
+        def fake_process(item):
+            processed.append(item["title"])
+            path = corpus_dir / f"{item['title']}.txt"
+            path.write_text("content")
+            return {**item, "path": f"{item['title']}.txt"}
+
+        monkeypatch.setattr(builder, "_download_and_process", fake_process)
+        return corpus_dir, processed
+
+    def test_fresh_build_processes_all(self, tmp_path, monkeypatch):
+        items = [{"title": "Iliad", "tradition": "Greek"}, {"title": "Edda", "tradition": "Norse"}]
+        _, processed = self._setup(tmp_path, monkeypatch, items)
+
+        build_corpus(force=False)
+        assert sorted(processed) == ["Edda", "Iliad"]
+
+    def test_cached_item_with_existing_file_is_skipped(self, tmp_path, monkeypatch):
+        items = [{"title": "Iliad", "tradition": "Greek"}]
+        existing = [{"title": "Iliad", "tradition": "Greek", "path": "Iliad.txt"}]
+        corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+        (corpus_dir / "Iliad.txt").write_text("old")  # the cached file is on disk
+
+        build_corpus(force=False)
+        assert processed == []  # reused, not re-downloaded
+
+    def test_stale_metadata_missing_file_is_reprocessed(self, tmp_path, monkeypatch):
+        # corpus.json references a file that no longer exists -> don't trust it.
+        items = [{"title": "Iliad", "tradition": "Greek"}]
+        existing = [{"title": "Iliad", "tradition": "Greek", "path": "Iliad.txt"}]
+        _, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+
+        build_corpus(force=False)
+        assert processed == ["Iliad"]
+
+    def test_force_reprocesses_even_when_cached(self, tmp_path, monkeypatch):
+        items = [{"title": "Iliad", "tradition": "Greek"}]
+        existing = [{"title": "Iliad", "tradition": "Greek", "path": "Iliad.txt"}]
+        corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+        (corpus_dir / "Iliad.txt").write_text("old")  # present, but force ignores the cache
+
+        build_corpus(force=True)
+        assert processed == ["Iliad"]
 
 
 class TestUpdateTraditions:

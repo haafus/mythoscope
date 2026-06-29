@@ -1,6 +1,31 @@
 import types
 
-from llm.client import LLMProcessor
+import httpx
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    AuthenticationError,
+    InternalServerError,
+    NotFoundError,
+    PermissionDeniedError,
+    RateLimitError,
+)
+
+from llm.client import LLMProcessor, _classify, _retry_delay
+
+
+def _response(status: int, *, headers=None, body=None):
+    return httpx.Response(
+        status,
+        request=httpx.Request("POST", "http://x"),
+        headers=headers or {},
+        json=body if body is not None else {},
+    )
+
+
+def _status_error(cls, status, *, codes=None):
+    body = {"error": {"code": codes}} if codes else {}
+    return cls("boom", response=_response(status, body=body), body=body.get("error") or {})
 
 
 class _NoopGovernor:
@@ -69,6 +94,54 @@ def _processor(content, *, use_json_mode=True):
     completions = types.SimpleNamespace(create=lambda **kwargs: response)
     p.client = types.SimpleNamespace(chat=types.SimpleNamespace(completions=completions))
     return p
+
+
+class TestClassify:
+    def test_rate_limit_is_transient(self):
+        assert _classify(_status_error(RateLimitError, 429)) == "transient"
+
+    def test_rate_limit_with_fatal_code_is_fatal(self):
+        # A 429 whose body carries a quota/billing code is not a passing blip —
+        # retrying never recovers, so it must abort the run, not back off.
+        err = _status_error(RateLimitError, 429, codes="insufficient_quota")
+        assert _classify(err) == "fatal"
+
+    def test_timeout_connection_server_are_transient(self):
+        assert _classify(APITimeoutError(request=httpx.Request("POST", "http://x"))) == "transient"
+        assert _classify(APIConnectionError(request=httpx.Request("POST", "http://x"))) == "transient"
+        assert _classify(_status_error(InternalServerError, 500)) == "transient"
+
+    def test_auth_permission_notfound_are_fatal(self):
+        assert _classify(_status_error(AuthenticationError, 401)) == "fatal"
+        assert _classify(_status_error(PermissionDeniedError, 403)) == "fatal"
+        assert _classify(_status_error(NotFoundError, 404)) == "fatal"
+
+    def test_unknown_error_with_fatal_code_is_fatal(self):
+        err = RuntimeError("nope")
+        err.code = "model_not_found"
+        assert _classify(err) == "fatal"
+
+    def test_plain_error_is_permanent(self):
+        assert _classify(ValueError("malformed")) == "permanent"
+
+
+class TestRetryDelay:
+    def test_honors_retry_after_header(self):
+        err = RuntimeError()
+        err.response = _response(429, headers={"retry-after": "7"})
+        assert _retry_delay(err, attempt=0) == 7.0
+
+    def test_invalid_retry_after_falls_back_to_backoff(self):
+        err = RuntimeError()
+        err.response = _response(429, headers={"retry-after": "soon"})
+        assert _retry_delay(err, attempt=2) == 4.0
+
+    def test_exponential_backoff_without_response(self):
+        assert _retry_delay(ValueError(), attempt=0) == 1.0
+        assert _retry_delay(ValueError(), attempt=3) == 8.0
+
+    def test_backoff_capped_at_30(self):
+        assert _retry_delay(ValueError(), attempt=20) == 30.0
 
 
 class TestNullContent:
