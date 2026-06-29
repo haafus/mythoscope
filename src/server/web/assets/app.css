@@ -1513,6 +1513,13 @@ body.has-main-navbar {
     color: #5b5037;
 }
 
+.motif-area.unresolved {
+    background: #f3f4f6;
+    border-color: #e3e6ea;
+    color: var(--muted-soft);
+    font-variant-numeric: tabular-nums;
+}
+
 .motif-empty { color: var(--muted-soft); }
 
 .motif-note {

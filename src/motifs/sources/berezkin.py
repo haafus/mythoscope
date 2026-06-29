@@ -2,8 +2,14 @@
 
 The whole motif inventory lives in one navigation page (``index-left.html``):
 each ``<li>`` gives a motif code, name, optional internal see-also codes, and a
-trailing list of areal indices. ``areas1.html`` maps those numeric indices to
-ethnic/territorial group names. Per-motif detail pages add a short definition.
+trailing list of areal indices. Per-motif detail pages add a short definition.
+
+Decoding the areal indices into macro-area names: in a detail page the bold
+macro-area headers appear in the same ascending order as the motif's numeric
+area list, so for a "clean" motif (no parenthetical/comparative entries) index i
+aligns 1:1 with header i. Voting these alignments across the whole catalogue
+yields a reliable global ``index -> macro-area`` legend (the per-region legend on
+``areas1.html`` is a finer, differently-numbered ethnos list and does not apply).
 
 Parsing is split from fetching so it can be unit-tested on static fixtures.
 """
@@ -12,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -34,8 +41,6 @@ _ATU_REF_RE = re.compile(r"ATU\s+([0-9][0-9A-Za-z*]*)")
 _CHAPTER_RE = re.compile(r"^\s*([A-Z])\.\s+([А-ЯЁ][А-ЯЁ \-,]+?)\s*$")
 # The trailing areal-index list: preceded by whitespace/comma, may open with "(".
 _AREA_RE = re.compile(r"[\s,]+[.(]*\d[\d.()\s,\-]*$")
-# Numbers / ranges that make up the areal-index list.
-_AREA_NUM_RE = re.compile(r"\d+|-")
 # Plausible upper bound for an areal index (the scheme has a few hundred areas).
 _MAX_AREA = 350
 
@@ -46,33 +51,51 @@ def chapter_of(code: str) -> str:
     return (m.group(0)[0].upper() if m else code[:1]).upper()
 
 
-def _expand_areas(area_text: str) -> list[int]:
-    """Expand a dotted area list (``.43.-.50.52.``) into sorted unique ints.
+def _parse_area_seq(area_text: str) -> list[tuple[int, bool]]:
+    """Parse a dotted area list into ordered ``(index, parenthetical)`` pairs.
 
-    A ``-`` between two numbers denotes an inclusive range; parentheses (motifs
-    not yet in the digital DB) are ignored for expansion.
+    A ``-`` between two numbers denotes an inclusive range; parentheses mark a
+    comparative entry (``(.44.)``) — the flag lets us exclude those when aligning
+    indices to detail-page headers. Implausibly large numbers (a digit that leaked
+    out of a name) are dropped.
     """
-    tokens = _AREA_NUM_RE.findall(area_text)
-    nums: set[int] = set()
+    tokens = re.findall(r"\(|\)|\d+|-", area_text)
+    out: list[tuple[int, bool]] = []
+    depth = 0
     i = 0
+
+    def add(n: int) -> None:
+        if 1 <= n <= _MAX_AREA:
+            out.append((n, depth > 0))
+
     while i < len(tokens):
-        if tokens[i] == "-":
-            i += 1
-            continue
-        start = int(tokens[i])
-        if i + 2 < len(tokens) and tokens[i + 1] == "-" and tokens[i + 2] != "-":
-            end = int(tokens[i + 2])
-            if 0 <= end - start <= 300:
-                nums.update(range(start, end + 1))
-            else:  # defensive: implausible range, keep endpoints only
-                nums.update((start, end))
-            i += 3
+        tok = tokens[i]
+        if tok == "(":
+            depth += 1
+        elif tok == ")":
+            depth = max(0, depth - 1)
+        elif tok == "-":
+            pass
         else:
-            nums.add(start)
-            i += 1
-    # Berezkin's areal scheme has a few hundred areas; anything larger is a
-    # parsing artifact (e.g. a digit that leaked out of a name), so drop it.
-    return sorted(n for n in nums if 1 <= n <= _MAX_AREA)
+            start = int(tok)
+            if i + 2 < len(tokens) and tokens[i + 1] == "-" and tokens[i + 2] not in ("(", ")", "-"):
+                end = int(tokens[i + 2])
+                if 0 <= end - start <= 300:
+                    for k in range(start, end + 1):
+                        add(k)
+                else:
+                    add(start)
+                    add(end)
+                i += 2
+            else:
+                add(start)
+        i += 1
+    return out
+
+
+def _expand_areas(area_text: str) -> list[int]:
+    """Sorted unique areal indices from a dotted area list (faithful numbers)."""
+    return sorted({n for n, _ in _parse_area_seq(area_text)})
 
 
 def parse_motif_entry(text: str, page: str) -> dict | None:
@@ -95,10 +118,12 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
 
     # Trailing areal index list (whitespace/comma-introduced; may open with "(").
     areas: list[int] = []
+    area_seq: list[tuple[int, bool]] = []
     before = rest
     area_match = _AREA_RE.search(rest)
     if area_match:
-        areas = _expand_areas(rest[area_match.start():])
+        area_seq = _parse_area_seq(rest[area_match.start():])
+        areas = sorted({n for n, _ in area_seq})
         before = rest[: area_match.start()].strip()
 
     # What remains is the name plus see-also codes (cross-references to other
@@ -113,6 +138,9 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
         "chapter": chapter_of(code),
         "name": name,
         "areas": areas,
+        # Ordered (index, parenthetical) pairs — used transiently to align with
+        # detail-page headers for the area legend, then dropped before saving.
+        "area_seq": [[n, par] for n, par in area_seq],
         "see_also": see_also,
         "atu_refs": atu_refs,
         "page": page,
@@ -154,30 +182,57 @@ def parse_index(html: str) -> tuple[list[dict], dict[str, str]]:
     return motifs, chapters
 
 
-def parse_areas(html: str) -> dict[str, str]:
-    """Parse ``areas1.html`` into ``{area_number: group_name}``.
+def _norm_area_name(name: str) -> str:
+    """Tidy a macro-area header (strip ``Ср.``/punctuation, collapse a doubling)."""
+    name = re.sub(r"^Ср\.?\s*", "", name).strip(" .,;")
+    # Some headers come through doubled ("Гвиана.Гвиана") — keep one copy.
+    m = re.match(r"^(.*?)[.\s]+\1$", name)
+    if m:
+        name = m.group(1)
+    return name.strip()
 
-    NOTE: areasofmyths numbers areal groups *per region* (each region restarts at
-    1), whereas the motif entries reference a global areal index. The two schemes
-    do not line up, so this legend is **not** used to name motif areas — doing so
-    would mislabel them. Decoding the global index needs Berezkin's official area
-    key; until then motif areas are shown as faithful numeric indices. The parser
-    is kept for that future mapping.
+
+def parse_area_headers(html: str) -> list[tuple[str, bool]]:
+    """Ordered ``(macro_area_name, comparative)`` headers from a detail page.
+
+    Each areal block is a ``<p class="NormalMai">`` opening with a bold region
+    name; a block starting with ``(`` or ``Ср.`` is a comparative entry (not
+    counted in the digital DB) and is flagged so it can be excluded from alignment.
     """
     from bs4 import BeautifulSoup
 
     soup = BeautifulSoup(html, "html.parser")
-    areas: dict[str, str] = {}
-    entry_re = re.compile(r"^\s*(\d+)\.\s+(.+)$", re.DOTALL)
-    for p in soup.find_all("p"):
-        m = entry_re.match(p.get_text(" ", strip=True))
-        if m:
-            num, name = m.group(1), " ".join(m.group(2).split())
-            # Keep the first, primary group name (drop long "incl. ..." tails).
-            name = re.split(r";|\(вкл", name)[0].strip()
-            if num not in areas and name:
-                areas[num] = name
-    return areas
+    out: list[tuple[str, bool]] = []
+    for p in soup.find_all("p", class_="NormalMai"):
+        b = p.find("b")
+        if not b:
+            continue
+        raw = " ".join(b.get_text(" ", strip=True).split())
+        comparative = p.get_text(" ", strip=True).lstrip().startswith("(") or raw.startswith("Ср")
+        name = _norm_area_name(raw)
+        if name:
+            out.append((name, comparative))
+    return out
+
+
+def build_area_legend(motifs: list[dict], headers_by_id: dict[str, list[tuple[str, bool]]]) -> dict[str, str]:
+    """Vote a global ``index -> macro-area`` legend from clean per-motif alignments.
+
+    For a motif whose count of non-parenthetical indices equals its count of
+    non-comparative detail headers, the two align 1:1 in order; we tally those
+    votes across the catalogue and take the majority name per index.
+    """
+    votes: dict[int, Counter] = defaultdict(Counter)
+    for motif in motifs:
+        headers = headers_by_id.get(motif["id"])
+        if not headers:
+            continue
+        plain = [n for n, paren in (motif.get("area_seq") or []) if not paren]
+        names = [name for name, comparative in headers if not comparative]
+        if plain and len(plain) == len(names):
+            for n, name in zip(plain, names, strict=True):
+                votes[n][name] += 1
+    return {str(n): counter.most_common(1)[0][0] for n, counter in votes.items() if counter}
 
 
 def parse_definition(html: str) -> str:
@@ -206,8 +261,15 @@ def build(config: dict, *, force: bool = False) -> dict:
     motifs, chapters = parse_index(index_html)
     logger.info("Berezkin: parsed %d motifs across %d chapters", len(motifs), len({m["chapter"] for m in motifs}))
 
+    areas: dict[str, str] = {}
     if config.get("fetch_details", True) and settings.motifs.berezkin_details:
-        _attach_definitions(motifs, base, cache, encoding, force)
+        headers_by_id = _fetch_details(motifs, base, cache, encoding, force)
+        areas = build_area_legend(motifs, headers_by_id)
+        logger.info("Berezkin: decoded %d areal indices to macro-area names", len(areas))
+
+    # Drop the transient alignment field before persisting.
+    for motif in motifs:
+        motif.pop("area_seq", None)
 
     return {
         "label": config.get("label", "Berezkin"),
@@ -215,32 +277,40 @@ def build(config: dict, *, force: bool = False) -> dict:
         "attribution": config.get("attribution", ""),
         "homepage": config.get("homepage", ""),
         "chapters": chapters,
+        "areas": areas,
         "motifs": motifs,
     }
 
 
-def _attach_definitions(motifs: list[dict], base: str, cache: Path, encoding: str, force: bool) -> None:
+def _fetch_details(
+    motifs: list[dict], base: str, cache: Path, encoding: str, force: bool
+) -> dict[str, list[tuple[str, bool]]]:
+    """Fetch detail pages: attach definitions and return ordered area headers per id."""
     targets = motifs
     if settings.motifs.max_motifs is not None:
         targets = motifs[: settings.motifs.max_motifs]
-    logger.info("Berezkin: fetching %d detail pages for definitions...", len(targets))
+    logger.info("Berezkin: fetching %d detail pages (definitions + area headers)...", len(targets))
 
-    def fetch_one(motif: dict) -> tuple[str, str]:
+    def fetch_one(motif: dict) -> tuple[str, str, list[tuple[str, bool]]]:
         page = motif["page"]
         try:
             html = fetch_text(f"{base}/{page}", cache / page, encoding=encoding, force=force)
-            return motif["id"], parse_definition(html)
+            return motif["id"], parse_definition(html), parse_area_headers(html)
         except Exception as exc:  # a missing/odd page must not abort the whole build
             logger.debug("Berezkin: detail fetch failed for %s: %s", page, exc)
-            return motif["id"], ""
+            return motif["id"], "", []
 
     workers = max(1, settings.motifs.max_workers)
     definitions: dict[str, str] = {}
+    headers_by_id: dict[str, list[tuple[str, bool]]] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for motif_id, definition in pool.map(fetch_one, targets):
+        for motif_id, definition, headers in pool.map(fetch_one, targets):
             if definition:
                 definitions[motif_id] = definition
+            if headers:
+                headers_by_id[motif_id] = headers
 
     for motif in motifs:
         motif["definition"] = definitions.get(motif["id"], "")
     logger.info("Berezkin: attached %d definitions", len(definitions))
+    return headers_by_id

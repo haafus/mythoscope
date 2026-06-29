@@ -221,10 +221,10 @@ function renderDetail(d) {
 
     if (d.index === "berezkin") {
         if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
-        const areas = (d.areas || []).map((a) => `<span class="motif-area">${escapeHtml(a)}</span>`).join("");
-        body += section(`Areal indices (${(d.areas || []).length})`,
-            (areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`) +
-            `<p class="motif-note">Berezkin areal codes. The group-name legend is not yet decoded (per-region numbering); indices are shown verbatim.</p>`);
+        const areas = (d.areas || []).map((a) =>
+            `<span class="motif-area${a.name ? "" : " unresolved"}" title="area ${escapeHtml(a.id)}">${escapeHtml(a.name || a.id)}</span>`).join("");
+        body += section(`Areal distribution (${(d.areas || []).length})`,
+            areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`);
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
     } else if (d.index === "tmi") {

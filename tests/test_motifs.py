@@ -71,6 +71,43 @@ class TestBerezkinAreas:
         assert nums == [5, 7]
 
 
+class TestBerezkinAreaDecode:
+    def test_parse_area_seq_tracks_parens_and_ranges(self):
+        seq = berezkin._parse_area_seq(" .19.21.(.44.).45.-.47.")
+        assert seq == [(19, False), (21, False), (44, True), (45, False), (46, False), (47, False)]
+
+    def test_parse_area_headers_flags_comparative(self):
+        html = (
+            '<p class="NormalMai">( <b>Ср. Бантуязычная Африка.</b> [cmp]: src.</p>'
+            '<p class="NormalMai"><b>Меланезия.</b> <u>Газель</u> [x]: y.</p>'
+        )
+        assert berezkin.parse_area_headers(html) == [
+            ("Бантуязычная Африка", True),
+            ("Меланезия", False),
+        ]
+
+    def test_build_area_legend_aligns_clean_motifs(self):
+        # Parenthetical index (44) and comparative header are both excluded, so the
+        # remaining indices align 1:1 with the remaining headers.
+        motifs = [
+            {"id": "M1", "area_seq": [[19, False], [21, False], [44, True]]},
+            {"id": "M2", "area_seq": [[19, False], [21, False]]},
+        ]
+        headers = {
+            "M1": [("Бантуязычная Африка", False), ("Меланезия", False), ("Cmp", True)],
+            "M2": [("Бантуязычная Африка", False), ("Меланезия", False)],
+        }
+        assert berezkin.build_area_legend(motifs, headers) == {
+            "19": "Бантуязычная Африка",
+            "21": "Меланезия",
+        }
+
+    def test_build_area_legend_skips_count_mismatch(self):
+        motifs = [{"id": "X", "area_seq": [[1, False], [2, False]]}]
+        headers = {"X": [("OnlyOneHeader", False)]}
+        assert berezkin.build_area_legend(motifs, headers) == {}
+
+
 class TestBerezkinIndexHtml:
     def test_parse_index_and_chapters(self):
         html = """
@@ -156,6 +193,7 @@ def tiny_db(tmp_path, monkeypatch):
 
     (tmp_path / "berezkin.json").write_text(json.dumps({
         "label": "Berezkin", "chapters": {"A": "СОЛНЦЕ И ЛУНА"},
+        "areas": {"11": "Бантуязычная Африка", "12": "Западная Африка"},
         "motifs": [
             {"id": "A39A", "chapter": "A", "name": "Двенадцать месяцев", "areas": [11, 12],
              "see_also": [], "atu_refs": ["294"], "definition": "def"},
@@ -200,7 +238,10 @@ class TestService:
 
     def test_berezkin_detail_links(self, tiny_db):
         d = svc.get_motif("berezkin", "A39A")
-        assert d["areas"] == [11, 12]
+        assert d["areas"] == [
+            {"id": 11, "name": "Бантуязычная Африка"},
+            {"id": 12, "name": "Западная Африка"},
+        ]
         assert d["definition"] == "def"
         atu = d["links"]["atu"]
         assert atu[0]["id"] == "294" and atu[0]["name"] == "The Months" and atu[0]["exists"] is True

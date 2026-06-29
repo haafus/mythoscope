@@ -125,10 +125,10 @@ def get_motif(index: str, motif_id: str) -> dict | None:
 
     if index == "berezkin":
         detail["definition"] = rec.get("definition", "")
-        # Faithful numeric areal indices (Berezkin's areal scheme). Names are not
-        # resolved: the published areas1 legend is numbered per region and does
-        # not line up with the motifs' global index (see berezkin.parse_areas).
-        detail["areas"] = rec.get("areas", [])
+        # Areal indices decoded to macro-area names (legend voted from detail-page
+        # headers); name is "" for the few indices not covered by the legend.
+        legend = data.get("areas") or {}
+        detail["areas"] = [{"id": a, "name": legend.get(str(a), "")} for a in rec.get("areas", [])]
         detail["links"]["see_also"] = [_link("berezkin", c) for c in rec.get("see_also", [])]
         detail["links"]["atu"] = [_link("atu", a) for a in rec.get("atu_refs", [])]
 
