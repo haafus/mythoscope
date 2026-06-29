@@ -53,6 +53,9 @@ def generate_summaries(
         if not completed:
             logger.warning("Daily rate limit reached — some summaries are missing; rerun to resume.")
 
+    if llm.governor.stats()["requests"]:
+        logger.info(f"LLM usage: {llm.governor.summary()}")
+
     summaries = [cache.get(chunk_hash(item.get("text", "")), "") for item in data]
     cached_count = sum(1 for s in summaries if s)
     logger.info(f"Summaries ready: {cached_count}/{len(summaries)} ({len(uncached)} attempted this run)")
