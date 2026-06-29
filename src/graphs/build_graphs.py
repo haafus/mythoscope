@@ -136,20 +136,23 @@ def build_graphs(
         missing = sum(1 for c in chunks if chunk_hash(c) not in cache)
         if missing:
             if regraph:
+                # Don't skip: build the graph from whatever chunks are cached.
                 logger.warning(
                     f"{text_id}: {missing}/{len(chunks)} chunks not in cache — "
-                    "run extraction first; skipping."
+                    "building from the cached chunks only."
                 )
             else:
                 logger.warning(
                     f"{text_id}: {missing}/{len(chunks)} chunks failed extraction — "
                     "book left incomplete, rerun to retry."
                 )
-            continue
+                continue
 
         results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
         for chunk in chunks:
-            chunk_results = cache[chunk_hash(chunk)]
+            chunk_results = cache.get(chunk_hash(chunk))
+            if chunk_results is None:  # missing in regraph mode — skip just this chunk
+                continue
             for k in results:
                 results[k].extend(chunk_results.get(k, []))
 
