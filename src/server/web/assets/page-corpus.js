@@ -1,10 +1,10 @@
 import {
     app, api, state,
-    buildCorpusApiUrl, escapeHtml, formatNumber, parseHash,
+    buildCorpusApiUrl, escapeHtml, formatNumber,
 } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
-export async function renderCorpus() {
+export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `
         <main class="corpus-page container">
             <div class="workspace">
@@ -32,7 +32,6 @@ export async function renderCorpus() {
     await renderLibraryTree(libraryTree);
 
     // Deep link from the geography popups: #/corpus?title=…&tradition=…
-    const params = parseHash().params;
     const wantedTitle = params.get("title");
     const wantedTradition = params.get("tradition");
     const target = wantedTitle

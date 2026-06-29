@@ -1,4 +1,4 @@
-import { cleanupRoute, parseHash } from "./core.js";
+import { cleanupRoute } from "./core.js";
 import { renderCorpus } from "./page-corpus.js";
 import { renderEmbeddings } from "./page-embeddings.js";
 import { renderGraphPage } from "./page-graphs.js";
@@ -17,6 +17,17 @@ const ROUTES = {
     "/about": { title: "About", render: renderAbout },
 };
 
+function parseHash() {
+    const raw = window.location.hash.slice(1) || "/";
+    const splitAt = raw.indexOf("?");
+    const path = splitAt === -1 ? raw : raw.slice(0, splitAt);
+    const query = splitAt === -1 ? "" : raw.slice(splitAt + 1);
+    return {
+        path: path || "/",
+        params: new URLSearchParams(query),
+    };
+}
+
 function setActiveNav(path) {
     const current = `#${path}`;
     document.querySelectorAll(".nav-links a").forEach((link) => {
@@ -27,7 +38,7 @@ function setActiveNav(path) {
 function render() {
     cleanupRoute();
 
-    const { path } = parseHash();
+    const { path, params } = parseHash();
     const route = ROUTES[path];
     if (!route) {
         window.location.hash = `#${DEFAULT_ROUTE}`;
@@ -36,7 +47,7 @@ function render() {
 
     document.title = `MythoScope - ${route.title}`;
     setActiveNav(path);
-    route.render();
+    route.render(params);
 }
 
 window.addEventListener("hashchange", render);
