@@ -5,7 +5,6 @@ import {
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js";
 
 export async function renderCorpus() {
-    document.title = "MythoScope - Sources";
     app.innerHTML = `
         <main class="corpus-page container">
             <div class="workspace">

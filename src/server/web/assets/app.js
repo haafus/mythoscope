@@ -8,13 +8,13 @@ import { renderGraphPage } from "./page-graphs.js";
 const DEFAULT_ROUTE = "/corpus";
 
 const ROUTES = {
-    "/corpus": renderCorpus,
-    "/geography": renderGeography,
-    "/embeddings": renderEmbeddingsAnalysis,
-    "/beings": () => renderGraphPage("beings"),
-    "/realms": () => renderGraphPage("realms"),
-    "/ages": () => renderGraphPage("ages"),
-    "/about": renderAbout,
+    "/corpus": { title: "Sources", render: renderCorpus },
+    "/geography": { title: "Geography", render: renderGeography },
+    "/embeddings": { title: "Similarity", render: renderEmbeddingsAnalysis },
+    "/beings": { title: "Beings", render: () => renderGraphPage("beings") },
+    "/realms": { title: "Realms", render: () => renderGraphPage("realms") },
+    "/ages": { title: "Ages", render: () => renderGraphPage("ages") },
+    "/about": { title: "About", render: renderAbout },
 };
 
 function setActiveNav(path) {
@@ -28,14 +28,15 @@ function render() {
     cleanupRoute();
 
     const { path } = parseHash();
-    const renderPage = ROUTES[path];
-    if (!renderPage) {
+    const route = ROUTES[path];
+    if (!route) {
         window.location.hash = `#${DEFAULT_ROUTE}`;
         return;
     }
 
+    document.title = `MythoScope - ${route.title}`;
     setActiveNav(path);
-    renderPage();
+    route.render();
 }
 
 window.addEventListener("hashchange", render);
