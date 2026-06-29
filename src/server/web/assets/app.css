@@ -1507,6 +1507,31 @@ body.has-main-navbar {
     white-space: nowrap;
 }
 
+/* Broad TMI category rows in the list, shown bold. */
+.motifs-item.category { background: #f1f5f7; }
+.motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
+
+/* TMI parent-category breadcrumbs: stacked, broadest first, each step indented. */
+.motif-breadcrumbs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 0 0 16px;
+}
+.motif-crumb { margin-left: calc(var(--depth, 0) * 16px); }
+
+/* TMI narrower-motif subtree. */
+.motif-subtree-list {
+    list-style: none;
+    margin: 0;
+    padding-left: 14px;
+    border-left: 1px solid #e6ebf0;
+}
+.motif-subtree > .motif-subtree-list { padding-left: 0; border-left: 0; }
+.motif-subtree-list li { margin: 4px 0; }
+.motif-subtree-more { margin-top: 8px; font-size: 12px; color: var(--muted-soft); }
+
 .motif-areas {
     display: flex;
     flex-wrap: wrap;

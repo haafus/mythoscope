@@ -11,6 +11,7 @@ from __future__ import annotations
 import csv
 import io
 import logging
+import re
 from pathlib import Path
 
 from settings import settings
@@ -37,6 +38,15 @@ def _read_csv(config: dict, key: str, *, force: bool) -> list[dict]:
     raw = fetch_to_cache(f"{base}/{filename}", cache, force=force)
     text = raw.decode("utf-8", errors="replace")
     return list(csv.DictReader(io.StringIO(text)))
+
+
+_NAT_RE = re.compile(r"\d+|\D+")
+
+
+def tmi_sort_key(motif_id: str) -> list:
+    """Hierarchical key so a parent precedes its descendants and numbers sort
+    numerically: A1 < A1.4 < A10 < A100, C12.5 < C12.5.8."""
+    return [(1, int(t)) if t.isdigit() else (0, t) for t in _NAT_RE.findall(motif_id)]
 
 
 def _tmi_chapters(motifs: list[dict]) -> dict[str, str]:
@@ -131,6 +141,9 @@ def build(config: dict, *, force: bool = False) -> dict:
     """Download and parse the Trilogy CSVs into TMI + ATU store dicts and the seq map."""
     tmi_rows = _read_csv(config, "tmi", force=force)
     tmi = _parse_tmi(tmi_rows)
+    # Hierarchical order so the list shows broader motifs before their narrower
+    # children (A1 before A1.4) instead of raw CSV order.
+    tmi.sort(key=lambda m: tmi_sort_key(m["id"]))
     logger.info("Trilogy: parsed %d TMI motifs", len(tmi))
 
     seq = _parse_atu_seq(_read_csv(config, "atu_seq", force=force))

@@ -143,8 +143,10 @@ function renderList(data) {
     const more = data.total > shown
         ? `<div class="motifs-more">Showing ${formatNumber(shown)} of ${formatNumber(data.total)} — refine your search.</div>`
         : "";
+    // TMI ids without a dot are the broad top-level categories — show them bold.
+    const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}" data-id="${escapeHtml(it.id)}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}" data-id="${escapeHtml(it.id)}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
@@ -198,6 +200,33 @@ function linkChips(links) {
     `).join("");
 }
 
+function motifLink(id, name, extraClass = "", style = "") {
+    return `<a href="#/motifs?index=tmi&id=${encodeURIComponent(id)}"
+           class="motif-link${extraClass}" data-index="tmi" data-id="${escapeHtml(id)}"${style}>
+            <span class="motif-link-id">${escapeHtml(id)}</span>${name ? `<span class="motif-link-name">${escapeHtml(name)}</span>` : ""}
+        </a>`;
+}
+
+// Parent categories, broadest first, each indented a step deeper.
+function renderBreadcrumbs(items) {
+    if (!items || !items.length) return "";
+    const rows = items.map((l, i) =>
+        motifLink(l.id, l.name, " motif-crumb", ` style="--depth:${i}"`)).join("");
+    return `<nav class="motif-breadcrumbs" aria-label="Parent categories">${rows}</nav>`;
+}
+
+// Nested narrower motifs, recursively.
+function subtreeList(nodes) {
+    return `<ul class="motif-subtree-list">${nodes.map((n) => `
+        <li>${motifLink(n.id, n.name)}${n.children && n.children.length ? subtreeList(n.children) : ""}</li>`).join("")}</ul>`;
+}
+
+function renderSubtree(tree) {
+    if (!tree || !(tree.nodes || []).length) return "";
+    const more = tree.truncated ? `<div class="motif-subtree-more">… list truncated</div>` : "";
+    return section("Narrower motifs", `<div class="motif-subtree">${subtreeList(tree.nodes)}${more}</div>`);
+}
+
 function section(title, bodyHtml) {
     return `<div class="motif-section"><div class="motif-section-title">${escapeHtml(title)}</div>${bodyHtml}</div>`;
 }
@@ -225,10 +254,11 @@ function renderDetail(d) {
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
     } else if (d.index === "tmi") {
+        body += renderBreadcrumbs(d.breadcrumbs);
         if (d.chapter_name) body += section("Chapter", `<p class="motif-text">${escapeHtml(d.chapter_name)}</p>`);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
-        if ((links.parent || []).length) body += linkSection("Parent motif", links.parent);
         body += linkSection("Appears in ATU tale types", links.atu);
+        body += renderSubtree(d.subtree);
     } else if (d.index === "atu") {
         if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
         if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);

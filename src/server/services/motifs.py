@@ -29,6 +29,76 @@ def _by_id(index: str) -> dict[str, dict]:
     return store.cached(f"byid:{index}", lambda: {r["id"]: r for r in _records(index)})
 
 
+# --- TMI hierarchy (breadcrumbs + subtree) ------------------------------------
+# The Trilogy `parent` field is empty for ~3% of dotted ids; fall back to
+# trimming the id (A52.0.1 -> A52.0 -> A52) until an existing ancestor is found.
+_SUBTREE_CAP = 300
+
+
+def _tmi_effective_parent(motif_id: str, parent: str, by_id: dict) -> str:
+    if parent:
+        return parent
+    trimmed = motif_id
+    while "." in trimmed:
+        trimmed = trimmed.rsplit(".", 1)[0]
+        if trimmed in by_id:
+            return trimmed
+    return ""
+
+
+def _tmi_children() -> dict[str, list[str]]:
+    """parent id -> child ids, in stored (hierarchical) order."""
+    def build() -> dict[str, list[str]]:
+        by_id = _by_id("tmi")
+        children: dict[str, list[str]] = {}
+        for mid, rec in by_id.items():
+            parent = _tmi_effective_parent(mid, rec.get("parent", ""), by_id)
+            if parent:
+                children.setdefault(parent, []).append(mid)
+        return children
+    return store.cached("tmi:children", build)
+
+
+def _tmi_ancestors(rec: dict) -> list[dict]:
+    """Cross-walk links for every ancestor, broadest first."""
+    by_id = _by_id("tmi")
+    chain: list[str] = []
+    seen = {rec["id"]}
+    cur = rec
+    while True:
+        parent = _tmi_effective_parent(cur["id"], cur.get("parent", ""), by_id)
+        if not parent or parent in seen or parent not in by_id:
+            break
+        seen.add(parent)
+        chain.append(parent)
+        cur = by_id[parent]
+    return [_link("tmi", mid) for mid in reversed(chain)]
+
+
+def _tmi_subtree(root_id: str) -> dict:
+    """Nested narrower motifs under root, capped at _SUBTREE_CAP total nodes."""
+    children = _tmi_children()
+    by_id = _by_id("tmi")
+    state = {"count": 0, "truncated": False}
+
+    def walk(motif_id: str) -> list[dict]:
+        nodes = []
+        for child_id in children.get(motif_id, []):
+            if state["count"] >= _SUBTREE_CAP:
+                state["truncated"] = True
+                break
+            state["count"] += 1
+            rec = by_id.get(child_id, {})
+            nodes.append({
+                "id": child_id,
+                "name": rec.get("name", ""),
+                "children": walk(child_id),
+            })
+        return nodes
+
+    return {"nodes": walk(root_id), "truncated": state["truncated"]}
+
+
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
@@ -131,8 +201,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["chapter_name"] = rec.get("chapter_name", "")
         detail["notes"] = rec.get("notes", "")
         detail["level"] = rec.get("level", 0)
-        if rec.get("parent"):
-            detail["links"]["parent"] = [_link("tmi", rec["parent"])]
+        detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
+        detail["subtree"] = _tmi_subtree(rec["id"])
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
 

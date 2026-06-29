@@ -179,6 +179,11 @@ class TestTrilogy:
         ]
         assert trilogy._tmi_chapters(motifs) == {"A": "Myths", "B": "Animals"}
 
+    def test_tmi_sort_key_parent_before_child_and_numeric(self):
+        ids = ["A10", "A1.4", "A1", "A100", "C12.5.8", "A2", "C12.5"]
+        ordered = sorted(ids, key=trilogy.tmi_sort_key)
+        assert ordered == ["A1", "A1.4", "A2", "A10", "A100", "C12.5", "C12.5.8"]
+
     def test_parse_atu_seq_orders_and_dedups(self):
         rows = [
             {"atu_id": "510A", "motif_order": "2", "motif": "R221"},
@@ -237,8 +242,20 @@ def tiny_db(tmp_path, monkeypatch):
     }, ensure_ascii=False), encoding="utf-8")
     (tmp_path / "tmi.json").write_text(json.dumps({
         "label": "Thompson (TMI)",
-        "motifs": [{"id": "S31", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruel stepmother",
-                    "notes": "", "level": 2, "parent": "S30"}],
+        "chapters": {"S": "Cruelty"},
+        "motifs": [
+            {"id": "S0", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruelty",
+             "notes": "", "level": 0, "parent": ""},
+            {"id": "S30", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruel relatives",
+             "notes": "", "level": 1, "parent": "S0"},
+            {"id": "S31", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruel stepmother",
+             "notes": "", "level": 2, "parent": "S30"},
+            {"id": "S31.1", "chapter": "S", "chapter_name": "Cruelty", "name": "Stepmother kills",
+             "notes": "", "level": 3, "parent": "S31"},
+            # Orphan: empty parent though the id clearly nests under S31 (id-fallback).
+            {"id": "S31.0.1", "chapter": "S", "chapter_name": "Cruelty", "name": "Orphan detail",
+             "notes": "", "level": 0, "parent": ""},
+        ],
     }), encoding="utf-8")
     (tmp_path / "atu.json").write_text(json.dumps({
         "label": "ATU tale types",
@@ -290,6 +307,24 @@ class TestService:
     def test_tmi_detail_back_links(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
         assert sorted(link["id"] for link in d["links"]["atu"]) == ["294", "510A"]
+
+    def test_tmi_breadcrumbs_broadest_first(self, tiny_db):
+        d = svc.get_motif("tmi", "S31")
+        assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30"]
+        assert all(b["exists"] for b in d["breadcrumbs"])
+
+    def test_tmi_breadcrumbs_recover_orphan_via_id_fallback(self, tiny_db):
+        # S31.0.1 has an empty parent; the chain is recovered by trimming the id.
+        d = svc.get_motif("tmi", "S31.0.1")
+        assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30", "S31"]
+
+    def test_tmi_subtree_includes_children_and_fallback_orphan(self, tiny_db):
+        d = svc.get_motif("tmi", "S31")
+        ids = {n["id"] for n in d["subtree"]["nodes"]}
+        assert ids == {"S31.1", "S31.0.1"}  # S31.0.1 reattached via id-fallback
+        assert d["subtree"]["truncated"] is False
+        leaf = svc.get_motif("tmi", "S31.1")
+        assert leaf["subtree"]["nodes"] == []
 
     def test_missing_motif(self, tiny_db):
         assert svc.get_motif("atu", "nope") is None
