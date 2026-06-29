@@ -146,7 +146,7 @@ function renderList(data) {
     // TMI ids without a dot are the broad top-level categories — show them bold.
     const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}" data-id="${escapeHtml(it.id)}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.synthetic ? " synthetic" : ""}" data-id="${escapeHtml(it.id)}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
@@ -260,8 +260,10 @@ function renderDetail(d) {
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
-        const srcLevel = d.source_level !== d.level ? ` <span class="motif-meta-src">(source ${escapeHtml(String(d.source_level))})</span>` : "";
-        body += `<div class="motif-meta">Hierarchy level <strong>${escapeHtml(String(d.level))}</strong>${srcLevel}</div>`;
+        if (d.synthetic) {
+            body += `<p class="motif-synth-note">Grouping node added to hold the <strong>${escapeHtml(d.id)}.*</strong> sub-motifs (not a separate entry in the source index).</p>`;
+        }
+        body += `<div class="motif-meta">Hierarchy level <strong>${escapeHtml(String(d.level))}</strong></div>`;
         body += renderBreadcrumbs(d.breadcrumbs);
         if (d.chapter_name) body += section("Chapter", `<p class="motif-text">${escapeHtml(d.chapter_name)}</p>`);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);

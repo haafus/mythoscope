@@ -190,14 +190,21 @@ class TestTrilogy:
             {"id": "A0", "name": "Creator (alt)", "level": 0, "parent": ""},   # dup code
             {"id": "A52", "name": "Angels", "level": 1, "parent": "A0"},
             {"id": "A52.0.1", "name": "Orphan", "level": 0, "parent": ""},     # dotted, no parent
+            {"id": "A100", "name": "Deity", "level": 0, "parent": ""},
+            {"id": "A110", "name": "Origin", "level": 5, "parent": "A100"},    # odd source level
         ])}
         # duplicate code: first keeps it, second gets a letter sub-index; both flagged
         assert "A0" in out and "A0b" in out
-        assert out["A0"]["duplicate"] and out["A0b"]["duplicate"]
-        assert out["A0b"]["code"] == "A0"
-        # orphan parent recovered by id-trim, level recomputed, source kept
-        assert out["A52.0.1"]["parent"] == "A52"
-        assert out["A52.0.1"]["level"] == 2 and out["A52.0.1"]["source_level"] == 0
+        assert out["A0"]["duplicate"] and out["A0b"]["duplicate"] and out["A0b"]["code"] == "A0"
+        # '.0' grouping node synthesized, named after its base, flagged synthetic
+        assert "A52.0" in out and out["A52.0"]["synthetic"] and out["A52.0"]["name"] == "Angels"
+        # orphan reattached under the synthetic node; level computed for the .0 chain
+        assert out["A52.0.1"]["parent"] == "A52.0"
+        assert out["A52.0"]["level"] == 2 and out["A52.0.1"]["level"] == 3
+        # ordinary motifs keep their source level verbatim (no recomputation)
+        assert out["A110"]["level"] == 5
+        # the duplicate source_level field is gone
+        assert "source_level" not in out["A52.0.1"]
 
     def test_parse_atu_seq_orders_and_dedups(self):
         rows = [
@@ -333,23 +340,23 @@ class TestService:
         assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30"]
         assert all(b["exists"] for b in d["breadcrumbs"])
 
-    def test_tmi_breadcrumbs_recover_orphan_via_id_fallback(self, tiny_db):
-        # S31.0.1 has an empty parent; the chain is recovered by trimming the id.
+    def test_tmi_breadcrumbs_pass_through_synthetic_node(self, tiny_db):
+        # S31.0.1 nests under the synthesized S31.0 grouping node.
         d = svc.get_motif("tmi", "S31.0.1")
-        assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30", "S31"]
+        assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30", "S31", "S31.0"]
 
-    def test_tmi_subtree_includes_children_and_fallback_orphan(self, tiny_db):
+    def test_tmi_subtree_nests_under_synthetic_node(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
         ids = {n["id"] for n in d["subtree"]["nodes"]}
-        assert ids == {"S31.1", "S31.0.1"}  # S31.0.1 reattached via id-fallback
-        assert d["subtree"]["truncated"] is False
-        leaf = svc.get_motif("tmi", "S31.1")
-        assert leaf["subtree"]["nodes"] == []
+        assert ids == {"S31.1", "S31.0"}  # S31.0 grouping node, not S31.0.1 directly
+        synth = svc.get_motif("tmi", "S31.0")
+        assert synth["synthetic"] and {n["id"] for n in synth["subtree"]["nodes"]} == {"S31.0.1"}
 
-    def test_tmi_list_badge_shows_computed_and_source_level(self, tiny_db):
+    def test_tmi_list_badge_is_plain_level(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
-        assert by["S31"]["badge"] == "L2"            # source matches -> no parens
-        assert by["S31.0.1"]["badge"] == "L3 (0)"    # computed 3, source 0
+        assert by["S31"]["badge"] == "L2"
+        assert by["S31.0.1"]["badge"] == "L4"        # .0 chain: S31(2)->S31.0(3)->S31.0.1(4)
+        assert by["S31.0"]["synthetic"] is True
 
     def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}

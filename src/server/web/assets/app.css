@@ -1525,8 +1525,21 @@ body.has-main-navbar {
     border-radius: 8px;
 }
 
+/* Synthesized .0 grouping nodes (not real source entries): muted. */
+.motifs-item.synthetic .motifs-item-id,
+.motifs-item.synthetic .motifs-item-name { color: var(--muted-soft); font-style: italic; }
+
+.motif-synth-note {
+    margin: 0 0 14px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    color: var(--muted);
+    background: #f3f5f7;
+    border: 1px solid #e3e8ee;
+    border-radius: 8px;
+}
+
 .motif-meta { margin: 0 0 14px; font-size: 12.5px; color: var(--muted); }
-.motif-meta-src { color: var(--muted-soft); }
 .motif-source-link { font-size: 12.5px; color: #41506a; word-break: break-all; }
 
 /* TMI parent-category breadcrumbs: stacked, broadest first, each step indented. */

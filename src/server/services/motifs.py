@@ -139,10 +139,9 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
-        level = rec.get("level", 0)
-        source = rec.get("source_level", level)
-        item["badge"] = f"L{level}" + (f" ({source})" if source != level else "")
+        item["badge"] = f"L{rec.get('level', 0)}"
         item["duplicate"] = bool(rec.get("duplicate"))
+        item["synthetic"] = bool(rec.get("synthetic"))
     return item
 
 
@@ -196,9 +195,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["chapter_name"] = rec.get("chapter_name", "")
         detail["notes"] = rec.get("notes", "")
         detail["level"] = rec.get("level", 0)
-        detail["source_level"] = rec.get("source_level", rec.get("level", 0))
         detail["code"] = rec.get("code", rec["id"])
         detail["duplicate"] = bool(rec.get("duplicate"))
+        detail["synthetic"] = bool(rec.get("synthetic"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["subtree"] = _tmi_subtree(rec["id"])
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
