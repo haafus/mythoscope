@@ -7,7 +7,13 @@ from ``outputs/motifs/`` (built by ``mytho motifs``) and cached per process.
 
 from __future__ import annotations
 
+import re
+
 from motifs import INDEX_LABELS, INDEX_ORDER, store
+
+# A standalone Roman numeral token (Latin letters) — kept upper-case when
+# sentence-casing all-caps titles.
+_ROMAN_RE = re.compile(r"\b[IVXLCDM]+\b", re.IGNORECASE)
 
 # Which list key each index stores its records under.
 _RECORDS_KEY = {"berezkin": "motifs", "tmi": "motifs", "atu": "types"}
@@ -111,6 +117,7 @@ def _chapter_label(data: dict, chapter: str) -> str:
     title = (data.get("chapters") or {}).get(chapter, "")
     if title.isupper():  # all-caps source titles (Berezkin) -> sentence case
         title = title[0] + title[1:].lower()
+        title = _ROMAN_RE.sub(lambda m: m.group().upper(), title)  # keep Roman numerals
     return f"{chapter} — {title}" if title else chapter
 
 
