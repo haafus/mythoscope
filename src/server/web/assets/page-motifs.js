@@ -331,7 +331,7 @@ function renderDetail(d) {
         body = head + chapterLine;
         if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
         if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
-        body += linkSection(`Constituent TMI motifs (${(links.tmi || []).length})`, links.tmi);
+        if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
     }

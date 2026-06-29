@@ -341,7 +341,7 @@ class TestService:
         idx = {i["index"]: i for i in svc.list_indexes()}
         assert set(idx) == {"berezkin", "tmi", "atu"}
         assert idx["atu"]["count"] == 2
-        assert idx["berezkin"]["chapters"][0]["label"] == "A — СОЛНЦЕ И ЛУНА"
+        assert idx["berezkin"]["chapters"][0]["label"] == "A — Солнце и луна"  # all-caps -> sentence case
 
     def test_list_filter_and_search(self, tiny_db):
         res = svc.list_motifs("atu", q="cinderella")

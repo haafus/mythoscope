@@ -109,6 +109,8 @@ def _link(index: str, motif_id: str) -> dict:
 
 def _chapter_label(data: dict, chapter: str) -> str:
     title = (data.get("chapters") or {}).get(chapter, "")
+    if title.isupper():  # all-caps source titles (Berezkin) -> sentence case
+        title = title[0] + title[1:].lower()
     return f"{chapter} — {title}" if title else chapter
 
 
