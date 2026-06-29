@@ -22,7 +22,11 @@ def get_catalog_documents() -> list[dict]:
     traditions_info = read_traditions(settings.corpus_dir)
 
     for row in metadata_rows:
-        documents.append({**row, "color": traditions_info[row["tradition"]]["color"]})
+        # A corpus row may reference a tradition missing from traditions.json (or lack
+        # the key entirely); fall back to the default colour rather than 500 the whole
+        # catalog (which also feeds /traditions and /archive).
+        tradition = traditions_info.get(row.get("tradition", ""), {})
+        documents.append({**row, "color": tradition.get("color", "#6b7280")})
 
     documents.sort(
         key=lambda item: (

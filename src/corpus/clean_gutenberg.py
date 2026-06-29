@@ -63,7 +63,12 @@ def _remove_gutenberg_footer_notes_with_count(text: str) -> tuple[str, int]:
     footnote_patterns = [
         (r"\n\nFOOTNOTES:\n.*?(?=\n\n\*\*\* END|\Z)", "FOOTNOTES section"),
         (r"\n\n\*\s*FOOTNOTES?\s*\*\n.*?(?=\n\n\*\*\* END|\Z)", "FOOTNOTES with asterisks"),
-        (r"\n\n\[?\d+\] .*?(?=\n\n\*\*\* END|\Z)", "numbered footnotes"),
+        # A trailing block of bracketed numbered footnotes ("[1] …" paragraphs) that
+        # runs to the end of the text. Anchored to \Z and built from a *run* of
+        # consecutive [n] paragraphs, so a lone inline [1] reference mid-body can no
+        # longer swallow the rest of the document — the previous
+        # `\n\n\[?\d+\] .*?(?=…|\Z)` form matched from the first marker to end-of-text.
+        (r"(?:\n\n\[\d+\][^\n]*(?:\n(?!\n)[^\n]*)*)+\s*\Z", "numbered footnotes"),
     ]
 
     for pattern, description in footnote_patterns:

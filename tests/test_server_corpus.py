@@ -66,6 +66,18 @@ class TestGetCatalogDocuments:
 
         assert get_catalog_documents() == []
 
+    def test_unknown_tradition_falls_back_to_default_color(self, tmp_path, monkeypatch):
+        # A row referencing a tradition absent from traditions.json must not crash
+        # the catalog (which would also break /traditions and /archive).
+        metadata = [{"title": "Orphan", "major_tradition": "X", "tradition": "Nowhere"}]
+        (tmp_path / "corpus.json").write_text(json.dumps(metadata))
+        (tmp_path / "traditions.json").write_text(json.dumps({}))
+        _patch_corpus(monkeypatch, tmp_path)
+
+        docs = get_catalog_documents()
+        assert len(docs) == 1
+        assert docs[0]["color"] == "#6b7280"
+
     def test_sorted_by_tradition(self, tmp_path, monkeypatch):
         metadata = [
             {"title": "B", "major_tradition": "Z", "tradition": "Z"},

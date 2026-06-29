@@ -73,7 +73,10 @@ all = [
 mytho = "cli:mytho"
 
 [tool.setuptools]
-py-modules = ["settings", "main", "cli", "llm_processing"]
+py-modules = [
+    "settings", "main", "cli",
+    "pipeline_inspect", "json_utils", "model_registry", "chunk_cache", "log_setup", "export_bundle",
+]
 
 [tool.setuptools.package-dir]
 "" = "src"
@@ -119,7 +122,7 @@ ignore_missing_imports = true
 exclude = ["docs/"]
 
 [[tool.mypy.overrides]]
-module = ["settings", "corpus.clean_gutenberg", "projection.utils"]
+module = ["settings", "corpus.clean_gutenberg", "projections.utils"]
 disallow_untyped_defs = true
 
 [tool.pytest.ini_options]

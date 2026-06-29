@@ -196,7 +196,12 @@ class LLMProcessor:
                 usage = getattr(response, "usage", None)
                 self.governor.reconcile(est_tokens, getattr(usage, "total_tokens", 0) or 0)
                 self.governor.note_success()
-                return response.choices[0].message.content.strip()
+                # A successful call can still carry null content (refusal / tool-stop /
+                # JSON-mode edge). Treat that as an empty result, not a failed call —
+                # `.strip()` on None would raise and be misclassified as a failure,
+                # so the chunk would never cache and would retry forever.
+                content = response.choices[0].message.content
+                return content.strip() if content else ""
             except Exception as e:
                 kind = _classify(e)
                 code = getattr(e, "status_code", None) or getattr(e, "code", None)

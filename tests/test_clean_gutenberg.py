@@ -1,5 +1,6 @@
 from corpus.clean_gutenberg import (
     _normalize_gutenberg_whitespace,
+    _remove_gutenberg_footer_notes_with_count,
     _remove_header_metadata,
     clean_gutenberg_text,
     is_gutenberg_text,
@@ -90,6 +91,24 @@ class TestCleanGutenbergText:
         result = clean_gutenberg_text(text)
         assert "Content before end marker." in result
         assert "License footer" not in result
+
+
+class TestRemoveFootnotes:
+    def test_strips_trailing_numbered_footnotes(self):
+        text = "Body one.\n\nBody two.\n\n[1] First note.\n\n[2] Second note,\nwrapped line."
+        cleaned, count = _remove_gutenberg_footer_notes_with_count(text)
+        assert "Body one." in cleaned
+        assert "Body two." in cleaned
+        assert "[1]" not in cleaned and "[2]" not in cleaned
+        assert count == 1
+
+    def test_inline_footnote_reference_does_not_truncate_body(self):
+        # Regression: a lone "[1] …" mid-body must NOT delete the rest of the text.
+        text = "Chapter 1.\n\n[1] is a marker but the tale continues.\n\nThe hero set out.\n\nThe end."
+        cleaned, count = _remove_gutenberg_footer_notes_with_count(text)
+        assert "The hero set out." in cleaned
+        assert "The end." in cleaned
+        assert count == 0
 
 
 class TestNormalizeWhitespace:
