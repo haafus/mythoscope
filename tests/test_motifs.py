@@ -170,6 +170,15 @@ class TestTrilogy:
         assert out[0]["parent"] == "A1"
         assert out[0]["chapter"] == "A"
 
+    def test_tmi_chapters_map(self):
+        motifs = [
+            {"chapter": "A", "chapter_name": "Myths"},
+            {"chapter": "A", "chapter_name": "Myths"},  # dup letter -> kept once
+            {"chapter": "B", "chapter_name": "Animals"},
+            {"chapter": "C", "chapter_name": ""},        # no name -> skipped
+        ]
+        assert trilogy._tmi_chapters(motifs) == {"A": "Myths", "B": "Animals"}
+
     def test_parse_atu_seq_orders_and_dedups(self):
         rows = [
             {"atu_id": "510A", "motif_order": "2", "motif": "R221"},

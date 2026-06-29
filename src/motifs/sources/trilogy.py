@@ -39,6 +39,16 @@ def _read_csv(config: dict, key: str, *, force: bool) -> list[dict]:
     return list(csv.DictReader(io.StringIO(text)))
 
 
+def _tmi_chapters(motifs: list[dict]) -> dict[str, str]:
+    """Letter chapter -> name (e.g. ``A`` -> ``Myths``), in first-seen order."""
+    chapters: dict[str, str] = {}
+    for m in motifs:
+        chapter = m["chapter"]
+        if chapter and chapter not in chapters and m["chapter_name"]:
+            chapters[chapter] = m["chapter_name"]
+    return chapters
+
+
 def _parse_tmi(rows: list[dict]) -> list[dict]:
     motifs = []
     for row in rows:
@@ -136,6 +146,7 @@ def build(config: dict, *, force: bool = False) -> dict:
             "long_label": "Thompson Motif-Index of Folk-Literature",
             "attribution": attribution,
             "homepage": homepage,
+            "chapters": _tmi_chapters(tmi),
             "motifs": tmi,
         },
         "atu": {
