@@ -246,8 +246,10 @@ function rootRow(depth, { current = false } = {}) {
 // Chapter row — badge is the chapter's total descendant count; clicking lists its L0 motifs.
 function chapterRow(chapterId, depth, { current = false } = {}) {
     const c = chapterMeta(chapterId);
+    // Show the chapter letter in the code (id) column, the title in the name.
+    const title = c.label.split(" — ").slice(1).join(" — ") || c.label;
     const badge = `<span class="motifs-item-badge">${formatNumber(c.count)}</span>`;
-    const inner = `<span class="motifs-item-name">${escapeHtml(c.label)}</span>${badge}`;
+    const inner = `<span class="motifs-item-id">${escapeHtml(c.id)}</span><span class="motifs-item-name">${escapeHtml(title)}</span>${badge}`;
     if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
     return `<a class="motifs-item motif-tree-row" href="#" data-chapter-root="${escapeHtml(chapterId)}" style="--depth:${depth}">${inner}</a>`;
 }

@@ -1461,7 +1461,7 @@ body.has-main-navbar {
     font-size: 13px;
 }
 
-.motif-section { margin-bottom: 18px; }
+.motif-section { margin: 18px 0; }
 
 .motif-section-title {
     font-size: 12px;
