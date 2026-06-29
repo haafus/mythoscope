@@ -130,7 +130,9 @@ def list_indexes() -> list[dict]:
         ]
         out.append({
             "index": index,
-            "label": data.get("label") or INDEX_LABELS.get(index, index),
+            # Tab label is presentation: take the canonical short name so it can
+            # change without rebuilding the stored data.
+            "label": INDEX_LABELS.get(index) or data.get("label") or index,
             "long_label": data.get("long_label", ""),
             "attribution": data.get("attribution", ""),
             "homepage": data.get("homepage", ""),
@@ -151,6 +153,7 @@ def _list_item(index: str, rec: dict) -> dict:
         n = _tmi_descendant_counts().get(rec["id"], 0)
         item["badge"] = (f"{n} · " if n else "") + f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
+        item["descendant_count"] = n
         item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
