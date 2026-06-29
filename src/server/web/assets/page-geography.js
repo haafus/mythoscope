@@ -112,7 +112,7 @@ function buildPopupHtml(item) {
                const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
                return `<li><a class="popup-book-link" href="${escapeHtml(href)}">${escapeHtml(book)}</a></li>`;
            }).join("")}</ul>`
-        : "";
+        : `<div class="popup-empty">No texts yet</div>`;
 
     return `
         <div class="popup-title">
@@ -127,7 +127,7 @@ function buildPopupHtml(item) {
 function createMarkerIcon(item) {
     return L.divIcon({
         className: "tradition-marker",
-        html: `<button class="map-point" type="button" style="--point-color:${escapeHtml(item.color)}" aria-label="${escapeHtml(item.name)}"></button>`,
+        html: `<button class="map-point${item.books.length ? "" : " empty"}" type="button" style="--point-color:${escapeHtml(item.color)}" aria-label="${escapeHtml(item.name)}${item.books.length ? "" : " (no texts yet)"}"></button>`,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
         popupAnchor: [0, -11],
