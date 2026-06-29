@@ -85,6 +85,7 @@ class MotifListItem(BaseModel):
     chapter: str = ""
     badge: str = ""
     level: int = 0
+    leaf: bool = False
     duplicate: bool = False
 
 

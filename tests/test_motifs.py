@@ -358,6 +358,11 @@ class TestService:
         assert by["S31"]["badge"] == "L2" and by["S31"]["level"] == 2
         assert by["S31.0.1"]["badge"] == "L3"  # .0 chain: S31(2) -> S31.0.1(3)
 
+    def test_tmi_list_flags_leaves(self, tiny_db):
+        by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
+        assert by["S31"]["leaf"] is False        # has children (S31.1, S31.0.1)
+        assert by["S31.1"]["leaf"] is True        # no children
+
     def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
         assert by["S33"]["duplicate"] and by["S33b"]["duplicate"]

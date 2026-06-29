@@ -79,6 +79,7 @@ def _link(index: str, motif_id: str) -> dict:
         "name": rec.get("name", "") if rec else "",
         "exists": rec is not None,
         "level": rec.get("level", 0) if rec else 0,  # for the TMI lineage tree badges
+        "leaf": index == "tmi" and motif_id not in _tmi_children(),
     }
 
 
@@ -125,6 +126,7 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "tmi":
         item["badge"] = f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
+        item["leaf"] = rec["id"] not in _tmi_children()
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
 
