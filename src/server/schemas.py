@@ -86,7 +86,6 @@ class MotifListItem(BaseModel):
     badge: str = ""
     level: int = 0
     duplicate: bool = False
-    synthetic: bool = False
 
 
 class MotifListResponse(BaseModel):

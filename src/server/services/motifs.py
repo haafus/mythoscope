@@ -78,6 +78,7 @@ def _link(index: str, motif_id: str) -> dict:
         "id": motif_id,
         "name": rec.get("name", "") if rec else "",
         "exists": rec is not None,
+        "level": rec.get("level", 0) if rec else 0,  # for the TMI lineage tree badges
     }
 
 
@@ -122,9 +123,9 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
+        item["badge"] = f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
         item["duplicate"] = bool(rec.get("duplicate"))
-        item["synthetic"] = bool(rec.get("synthetic"))
     return item
 
 
@@ -180,7 +181,6 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["level"] = rec.get("level", 0)
         detail["code"] = rec.get("code", rec["id"])
         detail["duplicate"] = bool(rec.get("duplicate"))
-        detail["synthetic"] = bool(rec.get("synthetic"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])

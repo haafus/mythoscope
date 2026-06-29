@@ -196,11 +196,12 @@ class TestTrilogy:
         # duplicate code: first keeps it, second gets a letter sub-index; both flagged
         assert "A0" in out and "A0b" in out
         assert out["A0"]["duplicate"] and out["A0b"]["duplicate"] and out["A0b"]["code"] == "A0"
-        # '.0' grouping node synthesized, named after its base, flagged synthetic
-        assert "A52.0" in out and out["A52.0"]["synthetic"] and out["A52.0"]["name"] == "Angels"
-        # orphan reattached under the synthetic node; level computed for the .0 chain
-        assert out["A52.0.1"]["parent"] == "A52.0"
-        assert out["A52.0"]["level"] == 2 and out["A52.0.1"]["level"] == 3
+        # no synthetic grouping nodes
+        assert "A52.0" not in out
+        assert not any(m.get("synthetic") for m in out.values())
+        # orphan reattached to the nearest existing ancestor; .0 chain level computed
+        assert out["A52.0.1"]["parent"] == "A52"
+        assert out["A52.0.1"]["level"] == 2  # A52 (source 1) + 1
         # ordinary motifs keep their source level verbatim (no recomputation)
         assert out["A110"]["level"] == 5
         # the duplicate source_level field is gone
@@ -340,25 +341,22 @@ class TestService:
         assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30"]
         assert all(b["exists"] for b in d["breadcrumbs"])
 
-    def test_tmi_breadcrumbs_pass_through_synthetic_node(self, tiny_db):
-        # S31.0.1 nests under the synthesized S31.0 grouping node.
+    def test_tmi_breadcrumbs_recovered_via_id_trim(self, tiny_db):
+        # S31.0.1 has an empty parent; the chain is recovered by trimming the id.
         d = svc.get_motif("tmi", "S31.0.1")
-        assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30", "S31", "S31.0"]
+        assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30", "S31"]
 
     def test_tmi_direct_children_one_level(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
         ids = {c["id"] for c in d["children"]}
-        assert ids == {"S31.1", "S31.0"}  # direct children only (incl. synthetic S31.0)
+        assert ids == {"S31.1", "S31.0.1"}  # direct children only, no synthetic node
         assert d["children_truncated"] is False
-        synth = svc.get_motif("tmi", "S31.0")
-        assert synth["synthetic"] and {c["id"] for c in synth["children"]} == {"S31.0.1"}
+        assert not any(m.get("synthetic") for m in svc.list_motifs("tmi")["items"])
 
-    def test_tmi_list_exposes_level_without_badge(self, tiny_db):
+    def test_tmi_list_has_level_badge(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
-        # the textual level badge is gone; level is exposed for tree indentation
-        assert "badge" not in by["S31"] and by["S31"]["level"] == 2
-        assert by["S31.0.1"]["level"] == 4           # .0 chain: S31(2)->S31.0(3)->S31.0.1(4)
-        assert by["S31.0"]["synthetic"] is True
+        assert by["S31"]["badge"] == "L2" and by["S31"]["level"] == 2
+        assert by["S31.0.1"]["badge"] == "L3"  # .0 chain: S31(2) -> S31.0.1(3)
 
     def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}

@@ -146,7 +146,7 @@ function renderList(data) {
     // TMI ids without a dot are the broad top-level categories — show them bold.
     const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.synthetic ? " synthetic" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
@@ -206,19 +206,20 @@ function linkChips(links) {
     `).join("");
 }
 
-function treeRow(id, name, depth, { current = false } = {}) {
-    const inner = `<span class="motifs-item-id">${escapeHtml(id)}</span><span class="motifs-item-name">${escapeHtml(name || "—")}</span>`;
+function treeRow(node, depth, { current = false } = {}) {
+    const badge = `<span class="motifs-item-badge">L${escapeHtml(String(node.level ?? ""))}</span>`;
+    const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badge}`;
     if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row" data-motif-id="${escapeHtml(id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(id)}" style="--depth:${depth}">${inner}</a>`;
+    return `<a class="motifs-item motif-tree-row" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
 }
 
 // One tree: chapter -> every parent -> the motif (highlighted) -> its direct children.
 function renderTmiTree(d) {
     const rows = [`<div class="motifs-item motif-tree-row tree-chapter" style="--depth:0"><span class="motifs-item-name">${escapeHtml(d.chapter_label || d.chapter || "")}</span></div>`];
     let depth = 1;
-    for (const a of d.breadcrumbs || []) rows.push(treeRow(a.id, a.name, depth++));
-    rows.push(treeRow(d.id, d.name, depth, { current: true }));
-    for (const c of d.children || []) rows.push(treeRow(c.id, c.name, depth + 1));
+    for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
+    rows.push(treeRow({ id: d.id, name: d.name, level: d.level }, depth, { current: true }));
+    for (const c of d.children || []) rows.push(treeRow(c, depth + 1));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
     return `<div class="motif-tree">${rows.join("")}</div>`;
 }
@@ -256,10 +257,6 @@ function renderDetail(d) {
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
-        if (d.synthetic) {
-            body += `<p class="motif-synth-note">Grouping node added to hold the <strong>${escapeHtml(d.id)}.*</strong> sub-motifs (not a separate entry in the source index).</p>`;
-        }
-        body += `<div class="motif-meta">Hierarchy level <strong>${escapeHtml(String(d.level))}</strong></div>`;
         body += renderTmiTree(d);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
         body += linkSection("Appears in ATU tale types", links.atu);

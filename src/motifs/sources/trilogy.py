@@ -65,34 +65,6 @@ def _id_trim_parent(code: str, idset: set[str]) -> str:
     return ""
 
 
-def _zero_grouping_nodes(motifs: list[dict]) -> list[dict]:
-    """Synthesize the intermediate ``X.0`` nodes that ``X.0.*`` sub-motifs imply.
-
-    In the Motif-Index a ``.0`` segment is a sub-grouping of the base motif
-    (e.g. A52.0.1..A52.0.8 are sub-variants of A52 "Creation of Angels"), but the
-    ``X.0`` heading itself is never a row. Create it, named after its base, so the
-    hierarchy is A52 -> A52.0 -> A52.0.1 rather than A52 -> A52.0.1.
-    """
-    by_id = {m["id"]: m for m in motifs}
-    needed: set[str] = set()
-    for m in motifs:
-        parts = m["id"].split(".")
-        for i in range(2, len(parts)):
-            prefix = ".".join(parts[:i])
-            if prefix.endswith(".0") and prefix not in by_id:
-                needed.add(prefix)
-    new = []
-    for zid in needed:
-        base = by_id.get(zid.rsplit(".", 1)[0], {})
-        new.append({
-            "id": zid, "code": zid,
-            "chapter": base.get("chapter", ""), "chapter_name": base.get("chapter_name", ""),
-            "name": base.get("name", ""), "notes": "",
-            "level": None, "parent": "", "synthetic": True,
-        })
-    return new
-
-
 def _finalize_tmi(motifs: list[dict]) -> list[dict]:
     """Repair the known Trilogy TMI defects, annotate, and hierarchically sort.
 
@@ -100,10 +72,9 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
       bare code, the rest get a lowercase letter sub-index (Z64 -> Z64, Z64b) so
       they are distinguishable; all are flagged ``duplicate``. ``code`` keeps the
       original. Cross-walk/parent references to the bare code resolve to the first.
-    - Missing ``X.0`` grouping nodes are synthesized (see _zero_grouping_nodes).
     - ``parent`` is corrected to the effective parent (stored, else id-trimmed).
-    - ``level`` is recomputed as the true depth; ``source_level`` keeps the
-      (often wrong) value the dataset shipped.
+    - ``level`` keeps the dataset's place-value value for ordinary motifs; only
+      the broken '.0' interpolations get a depth computed from corrected parents.
     All defects are logged.
     """
     counts = collections.Counter(m["id"] for m in motifs)
@@ -126,25 +97,23 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
                 used.add(cand)
                 m["id"] = cand
 
-    synthetic = _zero_grouping_nodes(motifs)
-    motifs.extend(synthetic)
     idset = {m["id"] for m in motifs}
 
     # Correct parents. The most specific existing dotted ancestor wins (so
-    # A52.0.1 -> A52.0); dot-less codes (A111, whose place-value parent A110
+    # A52.0.1 -> A52); dot-less codes (A111, whose place-value parent A110
     # isn't an id-prefix) fall back to the stored source parent.
     recovered = unresolved = 0
     for m in motifs:
         stored = m.get("parent", "")
         eff = _id_trim_parent(m["code"], idset) or (stored if stored in idset else "")
-        if not stored and not m.get("synthetic"):
+        if not stored:
             recovered += eff != ""
             unresolved += eff == ""
         m["parent"] = eff
 
     # Level: keep the source value for ordinary motifs (the dataset's place-value
-    # level is authoritative). Only the broken '.0' interpolations and the
-    # synthesized grouping nodes get a depth computed from the corrected parents.
+    # level is authoritative). Only the broken '.0' interpolations get a depth
+    # computed from the corrected parents.
     by_id = {m["id"]: m for m in motifs}
     src_level = {m["id"]: m.get("level", 0) for m in motifs}
     memo: dict[str, int] = {}
@@ -153,7 +122,7 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
         if mid in memo:
             return memo[mid]
         m = by_id[mid]
-        if not (m.get("synthetic") or _is_zero_family(m["id"])):
+        if not _is_zero_family(m["id"]):
             memo[mid] = src_level.get(mid, 0)
         else:
             parent = m["parent"]
@@ -165,8 +134,6 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
         m["level"] = resolve_level(m["id"], frozenset())
         m.pop("source_level", None)
 
-    if synthetic:
-        logger.info("TMI: synthesized %d '.0' grouping nodes for interpolated sub-motifs", len(synthetic))
     if dup_codes:
         logger.warning("TMI defect: %d duplicate codes given letter sub-indices: %s",
                        len(dup_codes), ", ".join(sorted(dup_codes)))
