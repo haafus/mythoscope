@@ -73,13 +73,15 @@ def _tmi_direct_children(motif_id: str) -> tuple[list[dict], bool]:
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
+    n_children = len(_tmi_children().get(motif_id, [])) if index == "tmi" else 0
     return {
         "index": index,
         "id": motif_id,
         "name": rec.get("name", "") if rec else "",
         "exists": rec is not None,
         "level": rec.get("level", 0) if rec else 0,  # for the TMI lineage tree badges
-        "leaf": index == "tmi" and motif_id not in _tmi_children(),
+        "leaf": index == "tmi" and n_children == 0,
+        "child_count": n_children,
     }
 
 
@@ -124,9 +126,10 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
-        item["badge"] = f"L{rec.get('level', 0)}"
+        n_children = len(_tmi_children().get(rec["id"], []))
+        item["badge"] = f"L{rec.get('level', 0)}" + (f" · {n_children}" if n_children else "")
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
-        item["leaf"] = rec["id"] not in _tmi_children()
+        item["leaf"] = n_children == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
 

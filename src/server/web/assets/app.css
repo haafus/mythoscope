@@ -1512,10 +1512,11 @@ body.has-main-navbar {
 /* Broad TMI category rows in the list, shown bold. */
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 
-/* Leaf motifs (no children) shown slightly muted. Listed before .duplicate so
-   a duplicate leaf still reads red. */
-.motifs-item.leaf .motifs-item-id { color: #8aa0b8; }
-.motifs-item.leaf .motifs-item-name { color: var(--muted); }
+/* Leaf motifs (no children) shown muted. Listed before .duplicate so a
+   duplicate leaf still reads red. */
+.motifs-item.leaf .motifs-item-id { color: #aebfcf; }
+.motifs-item.leaf .motifs-item-name,
+.motifs-item.leaf .motifs-item-badge { color: var(--muted-soft); }
 
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
 .motifs-item.duplicate .motifs-item-id,
