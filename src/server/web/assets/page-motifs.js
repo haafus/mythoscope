@@ -129,17 +129,11 @@ async function browseChapterLevel0(chapter) {
     try {
         const params = new URLSearchParams({ chapter, level: "0", limit: String(LIST_LIMIT) });
         const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
-        const label = (currentIndex().chapters || []).find((c) => c.id === chapter)?.label || chapter;
-        const rows = [`<div class="motifs-item motif-tree-row tree-chapter current" style="--depth:0"><span class="motifs-item-name">${escapeHtml(label)}</span></div>`];
-        for (const it of data.items) rows.push(treeRow(it, 1));
+        const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
+        for (const it of data.items) rows.push(treeRow(it, 2));
         detail.innerHTML = `<div class="motif-detail-inner"><div class="motif-tree">${rows.join("")}</div></div>`;
         detail.scrollTop = 0;
-        detail.querySelectorAll("[data-motif-id]").forEach((el) => {
-            el.addEventListener("click", (e) => {
-                e.preventDefault();
-                openMotif("tmi", el.dataset.motifId);
-            });
-        });
+        bindTreeLinks(detail);
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -211,18 +205,7 @@ async function openMotif(index, id) {
                 openMotif(a.dataset.index, a.dataset.id);
             });
         });
-        detail.querySelectorAll("[data-motif-id]").forEach((el) => {
-            el.addEventListener("click", (e) => {
-                e.preventDefault();
-                openMotif("tmi", el.dataset.motifId);
-            });
-        });
-        detail.querySelectorAll("[data-chapter-root]").forEach((el) => {
-            el.addEventListener("click", (e) => {
-                e.preventDefault();
-                browseChapterLevel0(el.dataset.chapterRoot);
-            });
-        });
+        bindTreeLinks(detail);
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -248,16 +231,61 @@ function treeRow(node, depth, { current = false } = {}) {
     return `<a class="motifs-item motif-tree-row${leaf}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
 }
 
-// One tree: chapter -> every parent -> the motif (highlighted) -> its direct children.
+function chapterMeta(id) {
+    return (currentIndex().chapters || []).find((c) => c.id === id) || { id, label: id, count: 0 };
+}
+
+// Catalog root "/" — badge is the total motif count; clicking lists the chapters.
+function rootRow(depth, { current = false } = {}) {
+    const badge = `<span class="motifs-item-badge">${formatNumber(currentIndex().count)}</span>`;
+    const inner = `<span class="motifs-item-id">/</span><span class="motifs-item-name">All motifs</span>${badge}`;
+    if (current) return `<div class="motifs-item motif-tree-row tree-root current" style="--depth:${depth}">${inner}</div>`;
+    return `<a class="motifs-item motif-tree-row tree-root" href="#" data-root="1" style="--depth:${depth}">${inner}</a>`;
+}
+
+// Chapter row — badge is the chapter's total descendant count; clicking lists its L0 motifs.
+function chapterRow(chapterId, depth, { current = false } = {}) {
+    const c = chapterMeta(chapterId);
+    const badge = `<span class="motifs-item-badge">${formatNumber(c.count)}</span>`;
+    const inner = `<span class="motifs-item-name">${escapeHtml(c.label)}</span>${badge}`;
+    if (current) return `<div class="motifs-item motif-tree-row tree-chapter current" style="--depth:${depth}">${inner}</div>`;
+    return `<a class="motifs-item motif-tree-row tree-chapter" href="#" data-chapter-root="${escapeHtml(chapterId)}" style="--depth:${depth}">${inner}</a>`;
+}
+
+// One tree: / -> chapter -> every parent -> the motif (highlighted) -> its direct children.
 function renderTmiTree(d) {
-    // Root chapter row is clickable: lists the chapter's level-0 motifs.
-    const rows = [`<a class="motifs-item motif-tree-row tree-chapter" href="#" data-chapter-root="${escapeHtml(d.chapter || "")}" style="--depth:0"><span class="motifs-item-name">${escapeHtml(d.chapter_label || d.chapter || "")}</span></a>`];
-    let depth = 1;
+    const rows = [rootRow(0), chapterRow(d.chapter, 1)];
+    let depth = 2;
     for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
     rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
     return `<div class="motif-tree">${rows.join("")}</div>`;
+}
+
+function bindTreeLinks(detail) {
+    detail.querySelectorAll("[data-motif-id]").forEach((el) => {
+        el.addEventListener("click", (e) => { e.preventDefault(); openMotif("tmi", el.dataset.motifId); });
+    });
+    detail.querySelectorAll("[data-chapter-root]").forEach((el) => {
+        el.addEventListener("click", (e) => { e.preventDefault(); browseChapterLevel0(el.dataset.chapterRoot); });
+    });
+    detail.querySelectorAll("[data-root]").forEach((el) => {
+        el.addEventListener("click", (e) => { e.preventDefault(); browseRoot(); });
+    });
+}
+
+// Catalog root view: "/" (current, total count) + the chapter rows.
+function browseRoot() {
+    const detail = document.getElementById("motifsDetail");
+    if (!detail) return;
+    mState.selectedId = null;
+    markActive(null);
+    const rows = [rootRow(0, { current: true })];
+    for (const c of currentIndex().chapters || []) rows.push(chapterRow(c.id, 1));
+    detail.innerHTML = `<div class="motif-detail-inner"><div class="motif-tree">${rows.join("")}</div></div>`;
+    detail.scrollTop = 0;
+    bindTreeLinks(detail);
 }
 
 function section(title, bodyHtml) {
@@ -270,15 +298,16 @@ function linkSection(title, links) {
 
 function renderDetail(d) {
     const links = d.links || {};
-    let body = `
+    const head = `
         <div class="motif-head">
             <span class="motif-code">${escapeHtml(d.id)}</span>
             <h2 class="motif-name">${escapeHtml(d.name || "—")}</h2>
-        </div>
-        <div class="motif-chapter">${escapeHtml(d.chapter_label || d.chapter || "")}</div>
-    `;
+        </div>`;
+    const chapterLine = `<div class="motif-chapter">${escapeHtml(d.chapter_label || d.chapter || "")}</div>`;
 
+    let body = "";
     if (d.index === "berezkin") {
+        body = head + chapterLine;
         if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
         if (d.source_url) {
             body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} ↗</a>`);
@@ -290,13 +319,16 @@ function renderDetail(d) {
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
     } else if (d.index === "tmi") {
+        // Hierarchy tree first, then all the motif's own information.
+        body = renderTmiTree(d);
+        body += head;
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
-        body += renderTmiTree(d);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
         body += linkSection("Appears in ATU tale types", links.atu);
     } else if (d.index === "atu") {
+        body = head + chapterLine;
         if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
         if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
         body += linkSection(`Constituent TMI motifs (${(links.tmi || []).length})`, links.tmi);
