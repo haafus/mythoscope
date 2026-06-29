@@ -30,29 +30,17 @@ def _by_id(index: str) -> dict[str, dict]:
 
 
 # --- TMI hierarchy (breadcrumbs + subtree) ------------------------------------
-# The Trilogy `parent` field is empty for ~3% of dotted ids; fall back to
-# trimming the id (A52.0.1 -> A52.0 -> A52) until an existing ancestor is found.
+# Parents/levels are corrected at build time (see trilogy._finalize_tmi), so the
+# read side just walks the stored `parent`.
 _SUBTREE_CAP = 300
-
-
-def _tmi_effective_parent(motif_id: str, parent: str, by_id: dict) -> str:
-    if parent:
-        return parent
-    trimmed = motif_id
-    while "." in trimmed:
-        trimmed = trimmed.rsplit(".", 1)[0]
-        if trimmed in by_id:
-            return trimmed
-    return ""
 
 
 def _tmi_children() -> dict[str, list[str]]:
     """parent id -> child ids, in stored (hierarchical) order."""
     def build() -> dict[str, list[str]]:
-        by_id = _by_id("tmi")
         children: dict[str, list[str]] = {}
-        for mid, rec in by_id.items():
-            parent = _tmi_effective_parent(mid, rec.get("parent", ""), by_id)
+        for mid, rec in _by_id("tmi").items():
+            parent = rec.get("parent", "")
             if parent:
                 children.setdefault(parent, []).append(mid)
         return children
@@ -66,7 +54,7 @@ def _tmi_ancestors(rec: dict) -> list[dict]:
     seen = {rec["id"]}
     cur = rec
     while True:
-        parent = _tmi_effective_parent(cur["id"], cur.get("parent", ""), by_id)
+        parent = cur.get("parent", "")
         if not parent or parent in seen or parent not in by_id:
             break
         seen.add(parent)
@@ -151,7 +139,10 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
-        item["badge"] = f"L{rec.get('level', 0)}"
+        level = rec.get("level", 0)
+        source = rec.get("source_level", level)
+        item["badge"] = f"L{level}" + (f" ({source})" if source != level else "")
+        item["duplicate"] = bool(rec.get("duplicate"))
     return item
 
 
@@ -201,6 +192,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["chapter_name"] = rec.get("chapter_name", "")
         detail["notes"] = rec.get("notes", "")
         detail["level"] = rec.get("level", 0)
+        detail["source_level"] = rec.get("source_level", rec.get("level", 0))
+        detail["code"] = rec.get("code", rec["id"])
+        detail["duplicate"] = bool(rec.get("duplicate"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["subtree"] = _tmi_subtree(rec["id"])
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])

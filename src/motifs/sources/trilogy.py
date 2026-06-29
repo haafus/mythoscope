@@ -8,6 +8,7 @@ commonly told together).
 
 from __future__ import annotations
 
+import collections
 import csv
 import io
 import logging
@@ -47,6 +48,93 @@ def tmi_sort_key(motif_id: str) -> list:
     """Hierarchical key so a parent precedes its descendants and numbers sort
     numerically: A1 < A1.4 < A10 < A100, C12.5 < C12.5.8."""
     return [(1, int(t)) if t.isdigit() else (0, t) for t in _NAT_RE.findall(motif_id)]
+
+
+def _id_trim_parent(code: str, idset: set[str]) -> str:
+    """Recover an ancestor by trimming dotted segments (A52.0.1 -> A52.0 -> A52)."""
+    trimmed = code
+    while "." in trimmed:
+        trimmed = trimmed.rsplit(".", 1)[0]
+        if trimmed in idset:
+            return trimmed
+    return ""
+
+
+def _finalize_tmi(motifs: list[dict]) -> list[dict]:
+    """Repair the known Trilogy TMI defects, annotate, and hierarchically sort.
+
+    - Duplicate codes (one code reused for distinct motifs): the first keeps the
+      bare code, the rest get a lowercase letter sub-index (Z64 -> Z64, Z64b) so
+      they are distinguishable; all are flagged ``duplicate``. ``code`` keeps the
+      original. Cross-walk/parent references to the bare code resolve to the first.
+    - ``parent`` is corrected to the effective parent (stored, else id-trimmed).
+    - ``level`` is recomputed as the true depth; ``source_level`` keeps the
+      (often wrong) value the dataset shipped.
+    All defects are logged.
+    """
+    counts = collections.Counter(m["id"] for m in motifs)
+    used = set(counts)
+    dup_codes = {code for code, n in counts.items() if n > 1}
+
+    occ: dict[str, int] = {}
+    for m in motifs:
+        m["code"] = m["id"]
+        if m["id"] in dup_codes:
+            m["duplicate"] = True
+            occ[m["id"]] = occ.get(m["id"], 0) + 1
+            if occ[m["id"]] > 1:  # first keeps the bare code
+                letter = occ[m["id"]] - 1
+                while True:
+                    cand = f"{m['code']}{chr(ord('a') + letter)}"
+                    if cand not in used:
+                        break
+                    letter += 1
+                used.add(cand)
+                m["id"] = cand
+
+    idset = {m["id"] for m in motifs}
+
+    # Correct parents (id-trim fallback for empty/dangling), counting defects.
+    recovered = unresolved = 0
+    for m in motifs:
+        parent = m.get("parent", "")
+        if parent and parent in idset:
+            continue
+        eff = _id_trim_parent(m["code"], idset)
+        if not parent:
+            recovered += eff != ""
+            unresolved += eff == ""
+        m["parent"] = eff
+
+    # Recompute level as depth over corrected parents; keep the source value.
+    parent_of = {m["id"]: m["parent"] for m in motifs}
+    memo: dict[str, int] = {}
+
+    def depth(mid: str, stack: frozenset) -> int:
+        parent = parent_of.get(mid, "")
+        if not parent or parent in stack:
+            return 0
+        if mid not in memo:
+            memo[mid] = 1 + depth(parent, stack | {mid})
+        return memo[mid]
+
+    mismatch = 0
+    for m in motifs:
+        m["source_level"] = m.get("level", 0)
+        m["level"] = depth(m["id"], frozenset())
+        mismatch += m["level"] != m["source_level"]
+
+    if dup_codes:
+        logger.warning("TMI defect: %d duplicate codes given letter sub-indices: %s",
+                       len(dup_codes), ", ".join(sorted(dup_codes)))
+    if recovered or unresolved:
+        logger.warning("TMI defect: %d dotted ids had no parent (recovered %d via id-trim, %d unresolved)",
+                       recovered + unresolved, recovered, unresolved)
+    if mismatch:
+        logger.warning("TMI defect: %d motifs had a source level disagreeing with the computed depth", mismatch)
+
+    motifs.sort(key=lambda m: tmi_sort_key(m["id"]))
+    return motifs
 
 
 def _tmi_chapters(motifs: list[dict]) -> dict[str, str]:
@@ -140,10 +228,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
 def build(config: dict, *, force: bool = False) -> dict:
     """Download and parse the Trilogy CSVs into TMI + ATU store dicts and the seq map."""
     tmi_rows = _read_csv(config, "tmi", force=force)
-    tmi = _parse_tmi(tmi_rows)
-    # Hierarchical order so the list shows broader motifs before their narrower
-    # children (A1 before A1.4) instead of raw CSV order.
-    tmi.sort(key=lambda m: tmi_sort_key(m["id"]))
+    tmi = _finalize_tmi(_parse_tmi(tmi_rows))
     logger.info("Trilogy: parsed %d TMI motifs", len(tmi))
 
     seq = _parse_atu_seq(_read_csv(config, "atu_seq", force=force))

@@ -1511,6 +1511,20 @@ body.has-main-navbar {
 .motifs-item.category { background: #f1f5f7; }
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 
+/* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
+.motifs-item.duplicate .motifs-item-id,
+.motifs-item.duplicate .motifs-item-name { color: #c0392b; }
+
+.motif-dup-note {
+    margin: 0 0 14px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    color: #8a3024;
+    background: #fdecea;
+    border: 1px solid #f5c6c0;
+    border-radius: 8px;
+}
+
 /* TMI parent-category breadcrumbs: stacked, broadest first, each step indented. */
 .motif-breadcrumbs {
     display: flex;

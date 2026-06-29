@@ -146,7 +146,7 @@ function renderList(data) {
     // TMI ids without a dot are the broad top-level categories — show them bold.
     const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}" data-id="${escapeHtml(it.id)}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}" data-id="${escapeHtml(it.id)}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
@@ -254,6 +254,9 @@ function renderDetail(d) {
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
     } else if (d.index === "tmi") {
+        if (d.duplicate) {
+            body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
+        }
         body += renderBreadcrumbs(d.breadcrumbs);
         if (d.chapter_name) body += section("Chapter", `<p class="motif-text">${escapeHtml(d.chapter_name)}</p>`);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);

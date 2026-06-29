@@ -184,6 +184,21 @@ class TestTrilogy:
         ordered = sorted(ids, key=trilogy.tmi_sort_key)
         assert ordered == ["A1", "A1.4", "A2", "A10", "A100", "C12.5", "C12.5.8"]
 
+    def test_finalize_tmi_repairs_defects(self):
+        out = {m["id"]: m for m in trilogy._finalize_tmi([
+            {"id": "A0", "name": "Creator", "level": 0, "parent": ""},
+            {"id": "A0", "name": "Creator (alt)", "level": 0, "parent": ""},   # dup code
+            {"id": "A52", "name": "Angels", "level": 1, "parent": "A0"},
+            {"id": "A52.0.1", "name": "Orphan", "level": 0, "parent": ""},     # dotted, no parent
+        ])}
+        # duplicate code: first keeps it, second gets a letter sub-index; both flagged
+        assert "A0" in out and "A0b" in out
+        assert out["A0"]["duplicate"] and out["A0b"]["duplicate"]
+        assert out["A0b"]["code"] == "A0"
+        # orphan parent recovered by id-trim, level recomputed, source kept
+        assert out["A52.0.1"]["parent"] == "A52"
+        assert out["A52.0.1"]["level"] == 2 and out["A52.0.1"]["source_level"] == 0
+
     def test_parse_atu_seq_orders_and_dedups(self):
         rows = [
             {"atu_id": "510A", "motif_order": "2", "motif": "R221"},
@@ -240,22 +255,25 @@ def tiny_db(tmp_path, monkeypatch):
              "see_also": [], "atu_refs": ["294"], "definition": "def"},
         ],
     }, ensure_ascii=False), encoding="utf-8")
+    # Run the raw rows through the real build-time repair so the stored data
+    # mirrors production (corrected parent/level, disambiguated duplicates).
+    def _tmi(id, name, level, parent, chapter="S"):
+        return {"id": id, "chapter": chapter, "chapter_name": "Cruelty",
+                "name": name, "notes": "", "level": level, "parent": parent}
+
+    tmi_motifs = trilogy._finalize_tmi([
+        _tmi("S0", "Cruelty", 0, ""),
+        _tmi("S30", "Cruel relatives", 1, "S0"),
+        _tmi("S31", "Cruel stepmother", 2, "S30"),
+        _tmi("S31.1", "Stepmother kills", 3, "S31"),
+        # Orphan: empty parent though the id clearly nests under S31 (id-trim).
+        _tmi("S31.0.1", "Orphan detail", 0, ""),
+        # Duplicate code reused for two distinct motifs.
+        _tmi("S33", "Dup one", 2, "S30"),
+        _tmi("S33", "Dup two", 2, "S30"),
+    ])
     (tmp_path / "tmi.json").write_text(json.dumps({
-        "label": "Thompson (TMI)",
-        "chapters": {"S": "Cruelty"},
-        "motifs": [
-            {"id": "S0", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruelty",
-             "notes": "", "level": 0, "parent": ""},
-            {"id": "S30", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruel relatives",
-             "notes": "", "level": 1, "parent": "S0"},
-            {"id": "S31", "chapter": "S", "chapter_name": "Cruelty", "name": "Cruel stepmother",
-             "notes": "", "level": 2, "parent": "S30"},
-            {"id": "S31.1", "chapter": "S", "chapter_name": "Cruelty", "name": "Stepmother kills",
-             "notes": "", "level": 3, "parent": "S31"},
-            # Orphan: empty parent though the id clearly nests under S31 (id-fallback).
-            {"id": "S31.0.1", "chapter": "S", "chapter_name": "Cruelty", "name": "Orphan detail",
-             "notes": "", "level": 0, "parent": ""},
-        ],
+        "label": "Thompson (TMI)", "chapters": {"S": "Cruelty"}, "motifs": tmi_motifs,
     }), encoding="utf-8")
     (tmp_path / "atu.json").write_text(json.dumps({
         "label": "ATU tale types",
@@ -325,6 +343,19 @@ class TestService:
         assert d["subtree"]["truncated"] is False
         leaf = svc.get_motif("tmi", "S31.1")
         assert leaf["subtree"]["nodes"] == []
+
+    def test_tmi_list_badge_shows_computed_and_source_level(self, tiny_db):
+        by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
+        assert by["S31"]["badge"] == "L2"            # source matches -> no parens
+        assert by["S31.0.1"]["badge"] == "L3 (0)"    # computed 3, source 0
+
+    def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
+        by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
+        assert by["S33"]["duplicate"] and by["S33b"]["duplicate"]
+        # both variants are independently openable with their own content
+        assert svc.get_motif("tmi", "S33")["name"] == "Dup one"
+        assert svc.get_motif("tmi", "S33b")["name"] == "Dup two"
+        assert svc.get_motif("tmi", "S33b")["code"] == "S33"
 
     def test_missing_motif(self, tiny_db):
         assert svc.get_motif("atu", "nope") is None

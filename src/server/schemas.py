@@ -84,6 +84,7 @@ class MotifListItem(BaseModel):
     name: str = ""
     chapter: str = ""
     badge: str = ""
+    duplicate: bool = False
 
 
 class MotifListResponse(BaseModel):
