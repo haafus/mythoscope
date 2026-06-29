@@ -139,6 +139,7 @@ mytho server --help
 mytho build --help
 mytho status
 mytho clean
+mytho export --help
 ```
 
 ## corpus
@@ -411,6 +412,33 @@ Resumable-кэши (`extraction_cache.jsonl`, `summaries.jsonl`, а также �
 mytho clean --caches            # dry run: показать кэши
 mytho clean --caches --apply    # удалить орфаны И все кэши
 ```
+
+## export
+
+Упаковывает построенные данные `outputs/` в переносимый zip, чтобы развернуть их на другой машине (без GPU/интернета/LLM, профиль `viewer`). Отдельной команды `import` нет — восстановление это просто распаковка.
+
+```bash
+mytho export            # mythoscope-export-<timestamp>.zip в корне проекта
+mytho export --caches   # дополнительно включить resumable-кэши
+```
+
+Что внутри:
+- **по умолчанию** — продукты `outputs/`: corpus, embeddings (каталог ChromaDB), projections, graphs, motifs; **без** кэшей и логов.
+- **`--caches`** — добавляет resumable-кэши (`extraction_cache.jsonl`, `summaries.jsonl`, `outputs/motifs/raw/`). Логи не включаются никогда.
+
+Члены архива — пути `outputs/...`, поэтому на целевой машине:
+
+```bash
+unzip mythoscope-export-<timestamp>.zip   # из корня проекта → воссоздаст outputs/
+mytho server
+```
+
+Нюансы:
+- **Орфаны не блокируют.** Если в `outputs/` есть осиротевшие данные (коллекции отключённых моделей и чанки удалённых текстов в ChromaDB, осиротевшие тексты/графы/проекции), `export` их **предупредит и всё равно включит** (он ничего не удаляет). Для чистого бандла сначала `mytho clean --apply`.
+- **Версия chromadb.** Каталог ChromaDB копируется как есть и надёжно открывается только при совместимой версии chromadb (пин `chromadb>=1.0,<2`). `export` печатает версию, которой собрана БД, — поставь совместимую на целевой машине.
+- **Текстовый поиск по запросу** офлайн не работает (нужны веса модели, их не везём); просмотр, графики, **поиск соседей по точкам**, графы и мотивы — работают.
+
+Ручной эквивалент (если не нужна команда): `zip -r out.zip outputs -x 'outputs/logs/*' 'outputs/motifs/raw/*' '*/extraction_cache.jsonl' '*/summaries.jsonl'`.
 
 ## server
 

@@ -24,3 +24,6 @@ venv/
 # build artifacts
 build/
 dist/
+
+# data export bundles (mytho export)
+mythoscope-export-*.zip

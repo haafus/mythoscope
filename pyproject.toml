@@ -23,8 +23,10 @@ dependencies = [
 
 [project.optional-dependencies]
 # --- building blocks ---
+# chromadb is pinned to a single major: the on-disk store an export carries must
+# open with the chromadb installed on the target machine.
 vectorstore = [
-    "chromadb>=1.0.0",
+    "chromadb>=1.0,<2",
 ]
 embeddings = [
     "mythoscope[vectorstore]",

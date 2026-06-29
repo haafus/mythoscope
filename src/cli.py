@@ -1,7 +1,7 @@
 import logging
 import sys
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import click
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 COMMAND_SECTIONS = [
     ("Pipeline", ["corpus", "embeddings", "projections", "graphs", "motifs"]),
-    ("Management", ["build", "status", "clean", "server"]),
+    ("Management", ["build", "status", "clean", "export", "server"]),
 ]
 
 # Number of texts processed by `build --sample` (quick smoke run).
@@ -414,6 +414,36 @@ def _clean(apply: bool, caches: bool):
     else:
         click.echo(f"{summary}")
         click.echo(click.style("Dry run. Use --apply to delete.", fg="yellow"))
+
+
+@mytho.command()
+@click.option("--caches", is_flag=True, help="Also include resumable caches (extraction/summaries/motif raw scrape).")
+def export(caches: bool):
+    """Bundle built outputs into a portable zip for another machine."""
+    from export_bundle import export_outputs, orphan_summary
+    from pipeline_inspect import format_size
+
+    try:
+        orphans = orphan_summary()
+        if orphans:
+            click.echo(click.style("[warn] orphans present and INCLUDED — run `mytho clean --apply` for a tidy bundle:", fg="yellow"))
+            for line in orphans:
+                click.echo(f"  {line}")
+
+        result = export_outputs(include_caches=caches, timestamp=datetime.now().strftime("%Y%m%d-%H%M%S"))
+    except Exception as e:
+        _fail("Export", e)
+
+    if result.path is None:
+        click.echo("Nothing to export — build the pipeline first (mytho build).")
+        return
+
+    click.echo(click.style("[done]  Export", fg="green") + f" → {result.path.name} ({format_size(result.total_bytes)}, {result.total_files} files)")
+    for name, size in result.components.items():
+        click.echo(f"  {name:<12} {format_size(size):>10}")
+    if result.chromadb_version:
+        click.echo(f"\n  embeddings built with chromadb {result.chromadb_version} — install a compatible chromadb on the target.")
+    click.echo(f"  Restore: unzip {result.path.name} from the project root, then `mytho server`.")
 
 
 if __name__ == "__main__":
