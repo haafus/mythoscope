@@ -1380,6 +1380,8 @@ body.has-main-navbar {
     gap: 8px;
     width: 100%;
     padding: 8px 10px;
+    /* Indent each hierarchy level to render the list as a tree. */
+    padding-left: calc(10px + var(--depth, 0) * 13px);
     text-align: left;
     background: none;
     border: 0;

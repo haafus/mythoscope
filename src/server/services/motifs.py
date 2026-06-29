@@ -140,6 +140,7 @@ def _list_item(index: str, rec: dict) -> dict:
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
         item["badge"] = f"L{rec.get('level', 0)}"
+        item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
         item["duplicate"] = bool(rec.get("duplicate"))
         item["synthetic"] = bool(rec.get("synthetic"))
     return item

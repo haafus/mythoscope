@@ -357,6 +357,8 @@ class TestService:
         assert by["S31"]["badge"] == "L2"
         assert by["S31.0.1"]["badge"] == "L4"        # .0 chain: S31(2)->S31.0(3)->S31.0.1(4)
         assert by["S31.0"]["synthetic"] is True
+        # level is exposed for the indented sidebar tree
+        assert by["S31"]["level"] == 2 and by["S31.0.1"]["level"] == 4
 
     def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}

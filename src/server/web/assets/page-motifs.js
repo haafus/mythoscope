@@ -146,7 +146,7 @@ function renderList(data) {
     // TMI ids without a dot are the broad top-level categories — show them bold.
     const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.synthetic ? " synthetic" : ""}" data-id="${escapeHtml(it.id)}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.synthetic ? " synthetic" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
