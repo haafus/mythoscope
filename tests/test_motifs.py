@@ -316,7 +316,7 @@ class TestBuildMotifsModes:
         monkeypatch.setattr(settings, "motifs_dir", tmp_path / "out")
         store.clear_cache()
 
-    def test_reprocess_rebuilds_from_cache_force_only_refetches(self, tmp_path, monkeypatch):
+    def test_default_rebuilds_from_cache_force_only_refetches(self, tmp_path, monkeypatch):
         self._setup(tmp_path, monkeypatch)
         fetched = []  # records the `force` (re-fetch) flag passed to the source
 
@@ -326,13 +326,11 @@ class TestBuildMotifsModes:
 
         monkeypatch.setattr(bm.trilogy, "build", fake_build)
 
-        bm.build_motifs()                       # fresh build, reads cache
+        bm.build_motifs()            # rebuild from cache (no re-fetch)
         assert fetched == [False]
-        bm.build_motifs()                       # already built -> skip
-        assert fetched == [False]
-        bm.build_motifs(reprocess=True)         # rebuild from cache, no re-fetch
+        bm.build_motifs()            # rebuilds again — no skip-if-built
         assert fetched == [False, False]
-        bm.build_motifs(force=True)             # re-fetch
+        bm.build_motifs(force=True)  # re-fetch
         assert fetched == [False, False, True]
 
 

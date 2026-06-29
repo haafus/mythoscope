@@ -1,9 +1,10 @@
 import json
 
 
-def test_regraph_rebuilds_from_cache_without_llm(tmp_path, monkeypatch):
-    """regraph=True rebuilds graph files from the extraction cache and makes no
-    LLM call (so it works with no API key / offline)."""
+def test_default_rebuilds_from_cache_without_llm(tmp_path, monkeypatch):
+    """The default build rebuilds graph files from a complete extraction cache and
+    makes no LLM call (the processor is constructed lazily, so it works offline /
+    with no API key when nothing needs extracting)."""
     from chunk_cache import append_cache, chunk_hash
     from corpus.utils import normalize_catalog_id
     from embeddings.chunking import chunk_text
@@ -40,7 +41,7 @@ def test_regraph_rebuilds_from_cache_without_llm(tmp_path, monkeypatch):
 
     from graphs.build_graphs import build_graphs
 
-    build_graphs(regraph=True)  # no LLM constructed, no network
+    build_graphs()  # cache complete -> no LLM constructed, no network
 
     for fname in ("beings.json", "realms.json", "ages.json"):
         assert (book_dir / fname).exists()

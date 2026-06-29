@@ -2,8 +2,8 @@
 
 Reads ``config/motifs.json``, scrapes/downloads each enabled source into the
 resumable raw cache, parses them into per-index JSON, derives the cross-walk and
-writes a manifest. Idempotent: if the database is already built it is skipped
-unless ``force`` is set (which also re-fetches every raw source).
+writes a manifest. Re-parses and regenerates every time it runs, reusing the raw
+cache (downloading only what's missing); ``force`` re-fetches every raw source.
 """
 
 from __future__ import annotations
@@ -28,21 +28,12 @@ def _load_config() -> dict:
     return json.loads(config_file.read_text(encoding="utf-8"))
 
 
-def build_motifs(*, force: bool = False, reprocess: bool = False) -> None:
-    """Build the motif database.
+def build_motifs(*, force: bool = False) -> None:
+    """Build the motif database, always re-parsing/regenerating from the raw cache.
 
-    ``force`` re-fetches every raw source and rebuilds. ``reprocess`` rebuilds
-    from the already-downloaded raw cache without any network calls. Neither set:
-    skip when already built.
+    Missing raw files are fetched on demand; ``force`` additionally re-fetches
+    everything that is already cached.
     """
-    if not (force or reprocess) and store.is_built():
-        logger.info(
-            "Motif database already built at %s "
-            "(use --reprocess to rebuild from cache, --force to re-fetch)",
-            store.motifs_dir(),
-        )
-        return
-
     config = _load_config()
     store.motifs_dir().mkdir(parents=True, exist_ok=True)
 

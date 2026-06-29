@@ -9,7 +9,6 @@ from embeddings.chunking import chunk_text
 from llm import LLMProcessor, map_concurrent
 from settings import settings
 
-from .completion import is_book_complete
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
 from .graph_generator import (
     filter_by_names,
@@ -56,13 +55,13 @@ def build_graphs(
     llm: str | None = None,
     force: bool = False,
     max_texts: int | None = None,
-    regraph: bool = False,
 ) -> None:
-    """Extract entities and build graphs.
+    """Extract entities and (re)build graphs from the cached extraction.
 
-    With ``regraph=True`` no LLM is used: graphs are rebuilt from the cached
-    extraction (``extraction_cache.jsonl``) only, overwriting existing outputs.
-    Books whose extraction isn't fully cached are skipped.
+    Every run rebuilds all graphs from ``extraction_cache.jsonl``; the LLM is
+    only invoked for chunks that aren't cached yet (and is constructed lazily, so
+    rebuilding from a complete cache needs no API key). ``force`` clears each
+    book's cache first, forcing a full re-extraction.
     """
     prompts_path = Path("config/graphs_prompts.json")
     try:
@@ -71,14 +70,10 @@ def build_graphs(
         raise RuntimeError(f"Failed to load prompts from {prompts_path}: {e}") from e
 
     graphs_cfg = settings.graphs
-    # In regraph mode we never call the LLM, so don't construct a client
-    # (it would require an API key even though no request is made).
-    processor = None if regraph else LLMProcessor(model_alias=llm, use_json_mode=graphs_cfg.use_json_mode)
+    # Built lazily on the first uncached chunk so a pure cache rebuild needs no key.
+    processor = None
 
-    if regraph:
-        logger.info("Rebuilding graphs from cached extraction (no LLM calls)...")
-    else:
-        logger.info(f"Starting graph generation (model={processor.model_name}, force={force})...")
+    logger.info(f"Building graphs (force={force})...")
 
     files = iter_files(settings.corpus_dir)
     if max_texts is not None:
@@ -90,10 +85,6 @@ def build_graphs(
 
         book_out_dir = settings.graphs_dir / text_id
         book_out_dir.mkdir(parents=True, exist_ok=True)
-
-        if is_book_complete(book_out_dir) and not force and not regraph:
-            logger.info(f"--- Skipping: {text_id} (already complete) ---")
-            continue
 
         text = file_info.read_text()
 
@@ -115,7 +106,10 @@ def build_graphs(
         cache = load_cache(cache_path)
 
         uncached = [c for c in chunks if chunk_hash(c) not in cache]
-        if uncached and not regraph:
+        if uncached:
+            if processor is None:  # first chunk that actually needs the LLM
+                processor = LLMProcessor(model_alias=llm, use_json_mode=graphs_cfg.use_json_mode)
+                logger.info(f"Extracting with model={processor.model_name}...")
             cached = len(chunks) - len(uncached)
             logger.info(
                 f"Extracting {len(uncached)} new chunks "
@@ -135,23 +129,16 @@ def build_graphs(
 
         missing = sum(1 for c in chunks if chunk_hash(c) not in cache)
         if missing:
-            if regraph:
-                # Don't skip: build the graph from whatever chunks are cached.
-                logger.warning(
-                    f"{text_id}: {missing}/{len(chunks)} chunks not in cache — "
-                    "building from the cached chunks only."
-                )
-            else:
-                logger.warning(
-                    f"{text_id}: {missing}/{len(chunks)} chunks failed extraction — "
-                    "book left incomplete, rerun to retry."
-                )
-                continue
+            # Don't skip: build the graph from whatever chunks are cached.
+            logger.warning(
+                f"{text_id}: {missing}/{len(chunks)} chunks not cached — "
+                "building the graph from the cached chunks only."
+            )
 
         results: dict[str, list] = {"beings": [], "relations": [], "locations": [], "times": []}
         for chunk in chunks:
             chunk_results = cache.get(chunk_hash(chunk))
-            if chunk_results is None:  # missing in regraph mode — skip just this chunk
+            if chunk_results is None:  # not cached — skip just this chunk
                 continue
             for k in results:
                 results[k].extend(chunk_results.get(k, []))
@@ -189,7 +176,5 @@ def build_graphs(
 
     if stopped:
         logger.warning("Graph generation stopped early (rate limit); rerun to resume.")
-    elif regraph:
-        logger.info("Graph rebuild complete.")
     else:
-        logger.info("Graph generation complete.")
+        logger.info("Graph build complete.")

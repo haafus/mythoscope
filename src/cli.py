@@ -92,19 +92,17 @@ def projections(model: str | None, summaries: bool, force: bool):
 
 @mytho.command()
 @click.option("--model", "-m", default=None, help="LLM model name from config/models.json registry.")
-@click.option("--force", "-f", is_flag=True, help="Overwrite existing graph outputs.")
-@click.option("--regraph", is_flag=True, help="Rebuild graphs from cached extraction only (no LLM calls).")
-def graphs(model: str | None, force: bool, regraph: bool):
+@click.option("--force", "-f", is_flag=True, help="Re-extract from scratch (clear caches); default rebuilds from cache.")
+def graphs(model: str | None, force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    _run("Graphs", _build_graphs, llm=model, force=force, regraph=regraph)
+    _run("Graphs", _build_graphs, llm=model, force=force)
 
 
 @mytho.command()
-@click.option("--force", "-f", is_flag=True, help="Rebuild from scratch (re-fetch all sources).")
-@click.option("--reprocess", is_flag=True, help="Rebuild from the downloaded cache, without re-fetching.")
-def motifs(force: bool, reprocess: bool):
+@click.option("--force", "-f", is_flag=True, help="Re-fetch all sources before rebuilding (default reuses the cache).")
+def motifs(force: bool):
     """Build the cross-referenced motif database (Berezkin, TMI, ATU)."""
-    _run("Motifs", _build_motifs, force=force, reprocess=reprocess)
+    _run("Motifs", _build_motifs, force=force)
 
 
 @mytho.command()
@@ -172,19 +170,17 @@ def _build_projections(model: str | None, force: bool = False, summaries: bool =
     build_projections(model_name=model, summaries=summaries, force=force)
 
 
-def _build_graphs(
-    llm: str | None = None, force: bool = False, max_texts: int | None = None, regraph: bool = False
-):
+def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
     logger.info("Loading graph libraries...")
     from graphs.build_graphs import build_graphs
 
-    build_graphs(llm=llm, force=force, max_texts=max_texts, regraph=regraph)
+    build_graphs(llm=llm, force=force, max_texts=max_texts)
 
 
-def _build_motifs(force: bool = False, reprocess: bool = False):
+def _build_motifs(force: bool = False):
     from motifs.build_motifs import build_motifs
 
-    build_motifs(force=force, reprocess=reprocess)
+    build_motifs(force=force)
 
 
 @mytho.command()
