@@ -8,13 +8,13 @@ import { renderGraphPage } from "./page-graphs.js";
 const DEFAULT_ROUTE = "/corpus";
 
 const ROUTES = {
-    "/corpus": { cssClass: "route-corpus", render: renderCorpus },
-    "/geography": { cssClass: "route-geography", render: renderGeography },
-    "/embeddings": { cssClass: "route-embeddings", render: renderEmbeddingsAnalysis },
-    "/beings": { cssClass: "route-graphs", render: () => renderGraphPage("beings") },
-    "/realms": { cssClass: "route-graphs", render: () => renderGraphPage("realms") },
-    "/ages": { cssClass: "route-graphs", render: () => renderGraphPage("ages") },
-    "/about": { cssClass: "route-about", render: renderAbout },
+    "/corpus": renderCorpus,
+    "/geography": renderGeography,
+    "/embeddings": renderEmbeddingsAnalysis,
+    "/beings": () => renderGraphPage("beings"),
+    "/realms": () => renderGraphPage("realms"),
+    "/ages": () => renderGraphPage("ages"),
+    "/about": renderAbout,
 };
 
 function setActiveNav(path) {
@@ -28,15 +28,14 @@ function render() {
     cleanupRoute();
 
     const { path } = parseHash();
-    const route = ROUTES[path];
-    if (!route) {
+    const renderPage = ROUTES[path];
+    if (!renderPage) {
         window.location.hash = `#${DEFAULT_ROUTE}`;
         return;
     }
 
-    document.body.className = `has-main-navbar ${route.cssClass}`;
     setActiveNav(path);
-    route.render();
+    renderPage();
 }
 
 window.addEventListener("hashchange", render);

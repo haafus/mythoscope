@@ -24,9 +24,12 @@
     --page-pad-y: 20px;
 }
 
+html {
+    background: #faf9f5;
+}
+
 body {
     color: #212529;
-    background: #faf9f5;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.5;
 }
@@ -153,10 +156,6 @@ body.has-main-navbar {
    About Page
    ========================================================================== */
 
-body.route-about {
-    min-height: 100vh;
-}
-
 .about-page {
     width: 100%;
     flex: 1 1 auto;
@@ -234,12 +233,6 @@ body.route-about {
 /* ==========================================================================
    Corpus / Sources Page
    ========================================================================== */
-
-body.route-corpus {
-    color: #212529;
-}
-
-
 
 .corpus-page .workspace {
     overflow: hidden;
@@ -645,11 +638,6 @@ body.route-corpus {
    Geography Page
    ========================================================================== */
 
-body.route-geography {
-    min-height: 100vh;
-    color: #1f2933;
-}
-
 .geography-page .geo-workspace {
     display: grid;
     grid-template-columns: var(--rail-left) minmax(0, 1fr);
@@ -769,12 +757,6 @@ body.route-geography {
 /* ==========================================================================
    Embeddings / Analysis Page
    ========================================================================== */
-
-body.route-embeddings {
-    min-height: 100vh;
-    color: #212529;
-}
-
 
 .analysis-page .sidebar-controls {
     flex: 0 0 auto;
