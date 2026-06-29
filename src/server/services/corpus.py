@@ -39,6 +39,19 @@ def get_catalog_documents() -> list[dict]:
     return documents
 
 
+def traditions_with_books() -> dict:
+    """Tradition metadata (from traditions.json) with each tradition's book titles attached."""
+    data = read_traditions(settings.corpus_dir)
+    books_by_tradition: dict[str, list[str]] = {}
+    for doc in get_catalog_documents():
+        trad = doc.get("tradition", "")
+        if trad:
+            books_by_tradition.setdefault(trad, []).append(doc.get("title", ""))
+    for trad, info in data.items():
+        info["books"] = sorted(books_by_tradition.get(trad, []))
+    return data
+
+
 def build_corpus_archive() -> io.BytesIO:
     documents = get_catalog_documents()
     buf = io.BytesIO()

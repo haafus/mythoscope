@@ -1,7 +1,7 @@
 import json
 
 from corpus.utils import read_document, read_traditions
-from server.services.corpus import get_catalog_documents
+from server.services.corpus import get_catalog_documents, traditions_with_books
 from settings import settings
 
 
@@ -91,6 +91,23 @@ class TestGetCatalogDocuments:
         docs = get_catalog_documents()
         assert docs[0]["major_tradition"] == "A"
         assert docs[1]["major_tradition"] == "Z"
+
+
+class TestTraditionsWithBooks:
+    def test_attaches_sorted_book_titles(self, tmp_path, monkeypatch):
+        metadata = [
+            {"title": "Odyssey", "major_tradition": "European", "tradition": "Greek"},
+            {"title": "Iliad", "major_tradition": "European", "tradition": "Greek"},
+            {"title": "Edda", "major_tradition": "Germanic", "tradition": "Norse"},
+        ]
+        traditions = {"Greek": {"color": "#f00"}, "Norse": {"color": "#00f"}}
+        (tmp_path / "corpus.json").write_text(json.dumps(metadata))
+        (tmp_path / "traditions.json").write_text(json.dumps(traditions))
+        _patch_corpus(monkeypatch, tmp_path)
+
+        data = traditions_with_books()
+        assert data["Greek"]["books"] == ["Iliad", "Odyssey"]  # sorted
+        assert data["Norse"]["books"] == ["Edda"]
 
 
 class TestReadTraditions:

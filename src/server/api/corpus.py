@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse, StreamingResponse
 
-from corpus.utils import read_document, read_traditions
+from corpus.utils import read_document
 from server.schemas import CatalogResponse, TraditionsResponse
-from server.services.corpus import build_corpus_archive, get_catalog_documents
+from server.services.corpus import build_corpus_archive, get_catalog_documents, traditions_with_books
 from settings import settings
 
 router = APIRouter(prefix="/api/corpus", tags=["corpus"])
@@ -41,12 +41,5 @@ def archive() -> StreamingResponse:
 
 @router.get("/traditions", response_model=TraditionsResponse)
 def traditions() -> dict:
-    data = read_traditions(settings.corpus_dir)
-    books_by_tradition: dict[str, list[str]] = {}
-    for doc in get_catalog_documents():
-        trad = doc.get("tradition", "")
-        if trad:
-            books_by_tradition.setdefault(trad, []).append(doc.get("title", ""))
-    for trad, info in data.items():
-        info["books"] = sorted(books_by_tradition.get(trad, []))
+    data = traditions_with_books()
     return {"traditions": data, "total": len(data)}
