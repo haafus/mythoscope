@@ -129,7 +129,7 @@ class LLMProcessor:
         self.temperature = cfg.temperature
         self.max_retries = cfg.max_retries
 
-        # One shared budget per underlying model across all callers (graphs, motifs, …).
+        # One shared budget per underlying model across all callers (graphs, summaries, …).
         self.governor = get_governor(
             f"{provider['base_url']}::{provider['model']}",
             provider["model"],

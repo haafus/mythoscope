@@ -18,7 +18,7 @@ SUMMARY_PROMPT = (
 )
 
 
-def generate_motif_summaries(
+def generate_summaries(
     data: list[dict],
     output_dir: Path,
     force: bool = False,
@@ -27,7 +27,7 @@ def generate_motif_summaries(
 
     llm = LLMProcessor(use_json_mode=False)
 
-    cache_path = output_dir / "motif_summaries.jsonl"
+    cache_path = output_dir / "summaries.jsonl"
     if force:
         clear_cache(cache_path)
     cache = load_cache(cache_path)
@@ -75,7 +75,7 @@ def embed_summaries(summaries: list[str], model_name: str) -> np.ndarray:
     return embeddings
 
 
-def run_motif_analysis(
+def run_summaries(
     data: list[dict],
     output_dir: Path,
     embedding_model: str,
@@ -83,20 +83,20 @@ def run_motif_analysis(
 ) -> None:
     from .visualization import generate_scatter
 
-    summaries = generate_motif_summaries(data, output_dir, force=force)
+    summaries = generate_summaries(data, output_dir, force=force)
 
     empty_count = sum(1 for s in summaries if not s.strip())
     if empty_count > len(summaries) * 0.5:
-        logger.error(f"Too many empty summaries ({empty_count}/{len(summaries)}), aborting motif UMAP")
+        logger.error(f"Too many empty summaries ({empty_count}/{len(summaries)}), aborting summaries UMAP")
         return
 
-    motif_embeddings = embed_summaries(summaries, embedding_model)
+    summary_embeddings = embed_summaries(summaries, embedding_model)
 
-    logger.info("Building motif UMAP projection...")
+    logger.info("Building summaries UMAP projection...")
     generate_scatter(
         data,
-        motif_embeddings,
-        output_path=output_dir / "motif_umap.json",
+        summary_embeddings,
+        output_path=output_dir / "summaries_umap.json",
         model_name=embedding_model,
     )
-    logger.info("Motif UMAP projection saved")
+    logger.info("Summary UMAP projection saved")

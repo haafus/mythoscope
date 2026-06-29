@@ -1,7 +1,7 @@
 """Content-addressed per-chunk cache (JSONL).
 
 Resume is keyed by the hash of the chunk text, so it is order-independent and
-robust to re-chunking. Each step keeps its own cache file (graphs and motif use
+robust to re-chunking. Each step keeps its own cache file (graphs and summaries use
 different chunks) — only the mechanism is shared, not the data.
 """
 

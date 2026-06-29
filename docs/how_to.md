@@ -22,7 +22,7 @@ CLI (cli.py) ──► settings.py (+ config/*.json, model_registry.py)
    │
    ├─ corpus/      ──► outputs/corpus/      (тексты + corpus.json)
    ├─ embeddings/  ──► outputs/embeddings/  (ChromaDB)
-   ├─ projections/ ──► outputs/projections/ (UMAP/heatmap JSON, motif-UMAP)
+   ├─ projections/ ──► outputs/projections/ (UMAP/heatmap JSON, summaries-UMAP)
    ├─ graphs/      ──► outputs/graphs/       (beings/realms/ages JSON)
    └─ server/      ◄── читает outputs/ и отдаёт SPA + REST API
 
@@ -32,14 +32,14 @@ corpus → embeddings → {projections, graphs} → server
 Доменные пакеты (`corpus`, `embeddings`, `projections`, `graphs`, `server`) — по шагу пайплайна. Общая инфраструктура, не привязанная к шагу:
 
 - **`llm/`** — работа с LLM: `client.py` (`LLMProcessor` — OpenAI-compatible вызовы, классификация ошибок, ретраи), `rate_limiter.py` (`RateGovernor` — лимиты RPM/TPM + circuit breaker), `concurrency.py` (`map_concurrent` — параллельный фан-аут с быстрой отменой).
-- **`chunk_cache.py`** — append-only content-hash JSONL-кэш (graphs, motifs): возобновление по содержимому.
+- **`chunk_cache.py`** — append-only content-hash JSONL-кэш (graphs, summaries): возобновление по содержимому.
 - **`json_utils.py`** — атомарная запись JSON (`save_json`).
 - **`model_registry.py`** — резолв алиасов моделей и LLM-провайдеров из `config/models.json`.
 - **`settings.py`** — pydantic-settings, единый источник путей/параметров (env `MYTHO_*`).
 
 Как устроен троттлинг и параллелизм LLM-шагов:
 
-1. Потребитель (graphs/motifs) гонит элементы через `map_concurrent` с `max_concurrent` воркерами.
+1. Потребитель (graphs/summaries) гонит элементы через `map_concurrent` с `max_concurrent` воркерами.
 2. Каждый вызов идёт через `LLMProcessor` → `RateGovernor` (общий синглтон на модель): два token-bucket'а (RPM/TPM), пред-оплата по оценке токенов и сверка по факту из `usage` ответа.
 3. На устойчивом rate-limit взводится circuit breaker (`DailyLimitReached`) → штатная остановка; фатальные ошибки (`FatalLLMError`) → немедленная.
 4. Результат пишется в content-hash кэш → повторный запуск продолжает с места.
@@ -215,7 +215,7 @@ rm -rf ~/.cache/huggingface/hub/models--BAAI--bge-m3
 Основные файлы:
 - `src/projections/analyzer.py` загружает данные из Chroma и собирает статистику.
 - `src/projections/visualization.py` вычисляет UMAP-проекции, heatmap расстояний и distribution, сохраняет как JSON.
-- `src/projections/motif_analysis.py` строит LLM-саммари сюжетов (параллельно, с кэшем `motif_summaries.jsonl`) и motif-UMAP по ним.
+- `src/projections/summaries.py` строит LLM-саммари сюжетов (параллельно, с кэшем `summaries.jsonl`) и summaries-UMAP по ним.
 - `src/projections/build_projections.py` оркестрирует анализ для нескольких моделей.
 
 Возможности:
@@ -235,10 +235,10 @@ mytho projections
 mytho projections --model bge-m3
 ```
 
-Дополнительно построить motif-UMAP из LLM-саммари сюжетов:
+Дополнительно построить summaries-UMAP из LLM-саммари сюжетов:
 
 ```bash
-mytho projections --motifs
+mytho projections --summaries
 ```
 
 ## graphs
@@ -250,7 +250,7 @@ mytho projections --motifs
 - `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, параллельное извлечение, агрегация.
 - `src/graphs/extraction.py` извлекает сущности из чанка через LLM (4 последовательных вызова на чанк) и дедуплицирует их.
 - `src/embeddings/chunking.py` разбивает тексты на чанки (общий модуль).
-- `src/chunk_cache.py` content-hash кэш чанков (JSONL): возобновление по содержимому, общий для graphs и motif.
+- `src/chunk_cache.py` content-hash кэш чанков (JSONL): возобновление по содержимому, общий для graphs и summaries.
 - `src/graphs/graph_generator.py` строит граф через NetworkX и сохраняет JSON.
 - `src/llm/` — пакет работы с LLM: `client.py` (`LLMProcessor`, вызовы OpenAI-compatible API), `rate_limiter.py` (rate-governor: лимиты RPM/TPM + circuit breaker), `concurrency.py` (`map_concurrent` — параллельный прогон с ранней остановкой).
 
@@ -307,7 +307,7 @@ mytho graphs --regraph
   Закрытие крышки усыпит всё равно (нет внешнего монитора/питания) — держи крышку открытой.
 - В логах периодически печатается утилизация (`% TPM`/`% RPM`, throttled %), и итоговая сводка в конце.
 
-Те же механизмы (governor, `map_concurrent`, кэш) использует и `mytho projections --motifs` для LLM-саммари; его параллелизм — `projection.max_concurrent` (по умолчанию 5).
+Те же механизмы (governor, `map_concurrent`, кэш) использует и `mytho projections --summaries` для LLM-саммари; его параллелизм — `projection.max_concurrent` (по умолчанию 5).
 
 ### Тюнинг throughput
 
@@ -336,7 +336,7 @@ LLM usage [gpt-4o-mini]: 200 requests, 315,901 tokens, ~72 req/min, 57% TPM, 14%
 
 ```bash
 MYTHO_GRAPHS__MAX_CONCURRENT=28        # graphs
-MYTHO_PROJECTION__MAX_CONCURRENT=10    # motifs
+MYTHO_PROJECTION__MAX_CONCURRENT=10    # summaries
 ```
 
 Нюансы:
@@ -370,7 +370,7 @@ mytho clean
 mytho clean --apply
 ```
 
-Resumable-кэши (`extraction_cache.jsonl`, `motif_summaries.jsonl`) **показываются всегда** с размером, но удаляются только по явному `--caches` (они хранят оплаченные LLM-результаты и позволяют дешёвую пересборку):
+Resumable-кэши (`extraction_cache.jsonl`, `summaries.jsonl`) **показываются всегда** с размером, но удаляются только по явному `--caches` (они хранят оплаченные LLM-результаты и позволяют дешёвую пересборку):
 
 ```bash
 mytho clean --caches            # dry run: показать кэши
@@ -535,7 +535,7 @@ mytho graphs
 mytho server
 ```
 
-Каждый шаг идемпотентен — если результат уже есть, он будет пропущен. Длинные шаги (`corpus`, `graphs`, `projections --motifs`) можно безопасно прервать `Ctrl+C` в любой момент: незавершённая работа отменяется, уже сделанное сохранено (тексты на диске, графы — атомарно, LLM-кэши append-only), и повторный запуск продолжит с места. Для принудительной пересборки:
+Каждый шаг идемпотентен — если результат уже есть, он будет пропущен. Длинные шаги (`corpus`, `graphs`, `projections --summaries`) можно безопасно прервать `Ctrl+C` в любой момент: незавершённая работа отменяется, уже сделанное сохранено (тексты на диске, графы — атомарно, LLM-кэши append-only), и повторный запуск продолжит с места. Для принудительной пересборки:
 
 ```bash
 mytho build --force

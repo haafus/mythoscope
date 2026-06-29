@@ -11,7 +11,7 @@ from projections import PROJECTION_KEYS
 logger = logging.getLogger(__name__)
 
 GRAPHS_CACHE = "extraction_cache.jsonl"
-MOTIF_CACHE = "motif_summaries.jsonl"
+SUMMARIES_CACHE = "summaries.jsonl"
 
 
 # ---------------------------------------------------------------------------
@@ -192,7 +192,7 @@ def projections_status(settings) -> dict[str, Any]:
     proj_dir = Path(settings.projections_dir)
     result: dict[str, Any] = {
         "exists": proj_dir.exists(),
-        "total_size": dir_size(proj_dir, exclude_names=(MOTIF_CACHE,)),
+        "total_size": dir_size(proj_dir, exclude_names=(SUMMARIES_CACHE,)),
         "models": [],
     }
     if not proj_dir.exists():
@@ -205,7 +205,7 @@ def projections_status(settings) -> dict[str, Any]:
             "path": model_dir,
             "plots_done": len(existing),
             "plots_total": len(PROJECTION_PLOTS),
-            "size": dir_size(model_dir, exclude_names=(MOTIF_CACHE,)),
+            "size": dir_size(model_dir, exclude_names=(SUMMARIES_CACHE,)),
         })
 
     return result
@@ -274,15 +274,15 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
 
 
 # ---------------------------------------------------------------------------
-# Resumable caches (graphs extraction + motif summaries)
+# Resumable caches (graphs extraction + summaries)
 # ---------------------------------------------------------------------------
 
 def cache_files(settings) -> list[tuple[Path, int]]:
-    """All resumable cache files (graphs + motif), with sizes."""
+    """All resumable cache files (graphs + summaries), with sizes."""
     result: list[tuple[Path, int]] = []
     for base, name in (
         (Path(settings.graphs_dir), GRAPHS_CACHE),
-        (Path(settings.projections_dir), MOTIF_CACHE),
+        (Path(settings.projections_dir), SUMMARIES_CACHE),
     ):
         if base.exists():
             result.extend((p, file_size(p)) for p in base.rglob(name))

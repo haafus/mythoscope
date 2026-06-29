@@ -94,7 +94,7 @@ SCATTER_TRANSFORMS = {
     "umap": _identity,
     "residual_umap": _compute_tradition_residuals,
     "rlace_umap": _concept_erasure,
-    "motif_umap": _identity,
+    "summaries_umap": _identity,
 }
 
 

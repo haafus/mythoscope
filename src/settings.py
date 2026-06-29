@@ -56,7 +56,7 @@ class GraphsSettings(BaseModel):
 class ProjectionSettings(BaseModel):
     umap_n_neighbors: int = 15
     umap_min_dist: float = 0.1
-    # Motif summaries processed in parallel (one LLM call each).
+    # Summaries processed in parallel (one LLM call each).
     max_concurrent: int = 5
 
 

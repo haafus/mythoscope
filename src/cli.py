@@ -82,11 +82,11 @@ def embeddings(model: str | None, force: bool):
 
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
-@click.option("--motifs", is_flag=True, help="Generate motif UMAP from LLM plot summaries.")
+@click.option("--summaries", is_flag=True, help="Generate summaries UMAP from LLM plot summaries.")
 @click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
-def projections(model: str | None, motifs: bool, force: bool):
+def projections(model: str | None, summaries: bool, force: bool):
     """Generate UMAP projections and embedding visualizations."""
-    _run("Projections", _build_projections, model=model, motif_analysis=motifs, force=force)
+    _run("Projections", _build_projections, model=model, summaries=summaries, force=force)
 
 
 @mytho.command()
@@ -159,11 +159,11 @@ def _build_embeddings(model: str | None, force: bool = False):
     build_embeddings(model_name=model, force=force)
 
 
-def _build_projections(model: str | None, force: bool = False, motif_analysis: bool = False):
+def _build_projections(model: str | None, force: bool = False, summaries: bool = False):
     logger.info("Loading ML libraries (torch, umap, chromadb)...")
     from projections.build_projections import build_projections
 
-    build_projections(model_name=model, motif_analysis=motif_analysis, force=force)
+    build_projections(model_name=model, summaries=summaries, force=force)
 
 
 def _build_graphs(
@@ -250,7 +250,7 @@ def _header(name: str, size: int):
 
 @mytho.command()
 @click.option("--apply", is_flag=True, help="Actually delete files (default is dry run).")
-@click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/motif); needs --apply to delete.")
+@click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/summaries); needs --apply to delete.")
 def clean(apply: bool, caches: bool):
     """Find and remove orphan files (and, with --caches, resumable caches)."""
     try:

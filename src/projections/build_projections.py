@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def build_projections(
     model_name: str | None = None,
     generate_all_plots: bool = True,
-    motif_analysis: bool = False,
+    summaries: bool = False,
     force: bool = False,
 ) -> ModelData | None:
     from embeddings import chroma_manager
@@ -38,26 +38,26 @@ def build_projections(
 
         result = model_data
         if generate_all_plots:
-            _generate_plots(model_data, force=force, include_motif=motif_analysis)
+            _generate_plots(model_data, force=force, include_summaries=summaries)
 
     logger.info("Projection analysis complete.")
     return result
 
 
-def _generate_plots(model_data: ModelData, force: bool = False, include_motif: bool = False) -> None:
+def _generate_plots(model_data: ModelData, force: bool = False, include_summaries: bool = False) -> None:
     for method in PROJECTION_METHODS:
         key = method["key"]
         chart_type = method["chart_type"]
         label = method["label"]
         output_path = model_data.output_dir / f"{key}.json"
 
-        if key == "motif_umap":
-            if not include_motif:
+        if key == "summaries_umap":
+            if not include_summaries:
                 continue
             if not force and output_path.exists():
                 logger.info("Skipping %s (already exists)", label)
                 continue
-            _generate_motif_plot(model_data, force)
+            _generate_summary_plot(model_data, force)
             continue
 
         if not force and output_path.exists():
@@ -77,14 +77,14 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_motif: b
     logger.info("Visualizations for %s: %s", model_data.model_name, model_data.output_dir)
 
 
-def _generate_motif_plot(model_data: ModelData, force: bool) -> None:
+def _generate_summary_plot(model_data: ModelData, force: bool) -> None:
     from llm import FatalLLMError
 
-    from .motif_analysis import run_motif_analysis
+    from .summaries import run_summaries
 
-    logger.info("Generating Motif UMAP projection (LLM summaries)...")
+    logger.info("Generating Summary UMAP projection (LLM summaries)...")
     try:
-        run_motif_analysis(
+        run_summaries(
             model_data.data,
             output_dir=model_data.output_dir,
             embedding_model=model_data.model_name,
@@ -93,4 +93,4 @@ def _generate_motif_plot(model_data: ModelData, force: bool) -> None:
     except FatalLLMError:
         raise
     except Exception:
-        logger.exception("Error creating Motif UMAP plot")
+        logger.exception("Error creating Summary UMAP plot")
