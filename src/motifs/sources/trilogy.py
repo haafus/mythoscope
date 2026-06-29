@@ -248,7 +248,7 @@ def build(config: dict, *, force: bool = False) -> dict:
     homepage = config.get("homepage", "")
     return {
         "tmi": {
-            "label": "Thompson (TMI)",
+            "label": "Thompson",
             "long_label": "Thompson Motif-Index of Folk-Literature",
             "attribution": attribution,
             "homepage": homepage,

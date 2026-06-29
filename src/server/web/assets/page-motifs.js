@@ -6,6 +6,7 @@ const mState = {
     index: "berezkin",
     chapter: "",
     query: "",
+    level: null,   // when set, list shows only motifs of that hierarchy level
     selectedId: null,
 };
 
@@ -93,11 +94,13 @@ function wireControls() {
     search.value = mState.query;
     search.addEventListener("input", () => {
         mState.query = search.value;
+        mState.level = null;
         clearTimeout(searchTimer);
         searchTimer = setTimeout(loadList, 250);
     });
     document.getElementById("motifsChapter").addEventListener("change", (e) => {
         mState.chapter = e.target.value;
+        mState.level = null;
         loadList();
     });
 }
@@ -106,6 +109,7 @@ async function switchIndex(index) {
     mState.index = index;
     mState.chapter = "";
     mState.query = "";
+    mState.level = null;
     const search = document.getElementById("motifsSearch");
     if (search) search.value = "";
     renderTabs();
@@ -118,6 +122,20 @@ function selectIndex(index) {
     switchIndex(index);
 }
 
+// Clicking a chapter root: list that chapter's level-0 (root) motifs.
+function browseChapterLevel0(chapter) {
+    mState.chapter = chapter;
+    mState.level = 0;
+    mState.selectedId = null;
+    const select = document.getElementById("motifsChapter");
+    if (select) select.value = chapter;
+    const detail = document.getElementById("motifsDetail");
+    if (detail) {
+        detail.innerHTML = `<div class="reader-placeholder">Root (level 0) motifs of chapter ${escapeHtml(chapter)} — pick one to drill down.</div>`;
+    }
+    loadList();
+}
+
 async function loadList() {
     const list = document.getElementById("motifsList");
     if (!list) return;
@@ -126,6 +144,7 @@ async function loadList() {
         const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
         if (mState.chapter) params.set("chapter", mState.chapter);
         if (mState.query.trim()) params.set("q", mState.query.trim());
+        if (mState.level != null) params.set("level", String(mState.level));
         const data = await api(`/api/motifs/${mState.index}/motifs?${params.toString()}`);
         renderList(data);
     } catch (error) {
@@ -190,6 +209,12 @@ async function openMotif(index, id) {
                 openMotif("tmi", el.dataset.motifId);
             });
         });
+        detail.querySelectorAll("[data-chapter-root]").forEach((el) => {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                browseChapterLevel0(el.dataset.chapterRoot);
+            });
+        });
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -217,7 +242,8 @@ function treeRow(node, depth, { current = false } = {}) {
 
 // One tree: chapter -> every parent -> the motif (highlighted) -> its direct children.
 function renderTmiTree(d) {
-    const rows = [`<div class="motifs-item motif-tree-row tree-chapter" style="--depth:0"><span class="motifs-item-name">${escapeHtml(d.chapter_label || d.chapter || "")}</span></div>`];
+    // Root chapter row is clickable: lists the chapter's level-0 motifs.
+    const rows = [`<a class="motifs-item motif-tree-row tree-chapter" href="#" data-chapter-root="${escapeHtml(d.chapter || "")}" style="--depth:0"><span class="motifs-item-name">${escapeHtml(d.chapter_label || d.chapter || "")}</span></a>`];
     let depth = 1;
     for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
     rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count }, depth, { current: true }));

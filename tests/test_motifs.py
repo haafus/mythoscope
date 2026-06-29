@@ -391,6 +391,10 @@ class TestService:
         assert by["S31"]["badge"] == "2 · L2" and by["S31"]["level"] == 2
         assert by["S31.0.1"]["badge"] == "L3"  # leaf -> no count
 
+    def test_tmi_list_level_filter(self, tiny_db):
+        res = svc.list_motifs("tmi", chapter="S", level=0)
+        assert [i["id"] for i in res["items"]] == ["S0"]  # only the root
+
     def test_tmi_list_flags_leaves(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
         assert by["S31"]["leaf"] is False        # has children (S31.1, S31.0.1)

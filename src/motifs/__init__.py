@@ -24,7 +24,7 @@ INDEX_ATU = "atu"
 
 INDEX_LABELS = {
     INDEX_BEREZKIN: "Berezkin",
-    INDEX_TMI: "Thompson (TMI)",
+    INDEX_TMI: "Thompson",
     INDEX_ATU: "ATU tale types",
 }
 

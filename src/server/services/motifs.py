@@ -156,12 +156,15 @@ def _list_item(index: str, rec: dict) -> dict:
     return item
 
 
-def list_motifs(index: str, *, chapter: str = "", q: str = "", limit: int = 200, offset: int = 0) -> dict:
+def list_motifs(index: str, *, chapter: str = "", q: str = "", level: int | None = None,
+                limit: int = 200, offset: int = 0) -> dict:
     """Filtered, paginated motif list for one index."""
     records = _records(index)
     query = q.strip().lower()
     if chapter:
         records = [r for r in records if r.get("chapter", "") == chapter]
+    if level is not None:
+        records = [r for r in records if r.get("level", 0) == level]
     if query:
         records = [
             r for r in records
