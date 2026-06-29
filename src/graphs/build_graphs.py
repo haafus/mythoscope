@@ -168,12 +168,10 @@ def build_graphs(
         def _kept(total, keep):
             return total if keep is None else len(keep)
 
-        logger.info(
-            f"Entities — Beings: {len(all_beings)} found, kept {_kept(len(all_beings), keep_beings)}; "
-            f"Realms: {len(all_locations)} found, kept {_kept(len(all_locations), keep_realms)}; "
-            f"Ages: {len(all_times)} found, kept {_kept(len(all_times), keep_ages)} "
-            f"(Relations: {len(all_relations)})"
-        )
+        logger.info(f"Beings:    {len(all_beings)} found, kept {_kept(len(all_beings), keep_beings)}")
+        logger.info(f"Realms:    {len(all_locations)} found, kept {_kept(len(all_locations), keep_realms)}")
+        logger.info(f"Ages:      {len(all_times)} found, kept {_kept(len(all_times), keep_ages)}")
+        logger.info(f"Relations: {len(all_relations)} found")
 
         try:
             generate_beings_graph(all_beings, all_relations, book_out_dir, keep=keep_beings)
