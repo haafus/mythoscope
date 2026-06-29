@@ -89,6 +89,11 @@ def run_summaries(
     if empty_count > len(summaries) * 0.5:
         logger.error(f"Too many empty summaries ({empty_count}/{len(summaries)}), aborting summaries UMAP")
         return
+    if empty_count:
+        logger.warning(
+            f"{empty_count}/{len(summaries)} summaries are empty (failed or not yet generated) "
+            "and enter the UMAP as degenerate points — rerun to fill them in."
+        )
 
     summary_embeddings = embed_summaries(summaries, embedding_model)
 
