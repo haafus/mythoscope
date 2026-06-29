@@ -7,6 +7,7 @@ sys.modules.pop("bs4", None)
 import bs4  # noqa: E402,F401
 import pytest  # noqa: E402
 
+from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
 from motifs.sources import berezkin, trilogy
 from server.services import motifs as svc
@@ -302,6 +303,37 @@ def tiny_db(tmp_path, monkeypatch):
     (tmp_path / "meta.json").write_text(json.dumps({"counts": {"berezkin": 1, "tmi": 1, "atu": 2}}), encoding="utf-8")
     yield tmp_path
     store.clear_cache()
+
+
+class TestBuildMotifsModes:
+    def _setup(self, tmp_path, monkeypatch):
+        from settings import settings
+        config_dir = tmp_path / "config"
+        config_dir.mkdir()
+        (config_dir / "motifs.json").write_text(json.dumps(
+            {"berezkin": {"enabled": False}, "trilogy": {"enabled": True}}))
+        monkeypatch.setattr(settings, "config_dir", config_dir)
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path / "out")
+        store.clear_cache()
+
+    def test_reprocess_rebuilds_from_cache_force_only_refetches(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        fetched = []  # records the `force` (re-fetch) flag passed to the source
+
+        def fake_build(cfg, *, force=False):
+            fetched.append(force)
+            return {"tmi": {"motifs": []}, "atu": {"types": []}, "atu_seq": {}}
+
+        monkeypatch.setattr(bm.trilogy, "build", fake_build)
+
+        bm.build_motifs()                       # fresh build, reads cache
+        assert fetched == [False]
+        bm.build_motifs()                       # already built -> skip
+        assert fetched == [False]
+        bm.build_motifs(reprocess=True)         # rebuild from cache, no re-fetch
+        assert fetched == [False, False]
+        bm.build_motifs(force=True)             # re-fetch
+        assert fetched == [False, False, True]
 
 
 class TestService:

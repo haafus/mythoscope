@@ -101,9 +101,10 @@ def graphs(model: str | None, force: bool, regraph: bool):
 
 @mytho.command()
 @click.option("--force", "-f", is_flag=True, help="Rebuild from scratch (re-fetch all sources).")
-def motifs(force: bool):
+@click.option("--reprocess", is_flag=True, help="Rebuild from the downloaded cache, without re-fetching.")
+def motifs(force: bool, reprocess: bool):
     """Build the cross-referenced motif database (Berezkin, TMI, ATU)."""
-    _run("Motifs", _build_motifs, force=force)
+    _run("Motifs", _build_motifs, force=force, reprocess=reprocess)
 
 
 @mytho.command()
@@ -180,10 +181,10 @@ def _build_graphs(
     build_graphs(llm=llm, force=force, max_texts=max_texts, regraph=regraph)
 
 
-def _build_motifs(force: bool = False):
+def _build_motifs(force: bool = False, reprocess: bool = False):
     from motifs.build_motifs import build_motifs
 
-    build_motifs(force=force)
+    build_motifs(force=force, reprocess=reprocess)
 
 
 @mytho.command()

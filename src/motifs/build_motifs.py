@@ -28,9 +28,19 @@ def _load_config() -> dict:
     return json.loads(config_file.read_text(encoding="utf-8"))
 
 
-def build_motifs(*, force: bool = False) -> None:
-    if not force and store.is_built():
-        logger.info("Motif database already built at %s (use --force to rebuild)", store.motifs_dir())
+def build_motifs(*, force: bool = False, reprocess: bool = False) -> None:
+    """Build the motif database.
+
+    ``force`` re-fetches every raw source and rebuilds. ``reprocess`` rebuilds
+    from the already-downloaded raw cache without any network calls. Neither set:
+    skip when already built.
+    """
+    if not (force or reprocess) and store.is_built():
+        logger.info(
+            "Motif database already built at %s "
+            "(use --reprocess to rebuild from cache, --force to re-fetch)",
+            store.motifs_dir(),
+        )
         return
 
     config = _load_config()
