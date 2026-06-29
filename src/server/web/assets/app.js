@@ -1,19 +1,19 @@
 import { cleanupRoute, parseHash } from "./core.js";
-import { renderAbout } from "./page-about.js";
 import { renderCorpus } from "./page-corpus.js";
-import { renderGeography } from "./page-geography.js";
 import { renderEmbeddingsAnalysis } from "./page-embeddings.js";
 import { renderGraphPage } from "./page-graphs.js";
+import { renderGeography } from "./page-geography.js";
+import { renderAbout } from "./page-about.js";
 
 const DEFAULT_ROUTE = "/corpus";
 
 const ROUTES = {
     "/corpus": { title: "Sources", render: renderCorpus },
-    "/geography": { title: "Geography", render: renderGeography },
     "/embeddings": { title: "Similarity", render: renderEmbeddingsAnalysis },
-    "/beings": { title: "Beings", render: () => renderGraphPage("beings") },
-    "/realms": { title: "Realms", render: () => renderGraphPage("realms") },
     "/ages": { title: "Ages", render: () => renderGraphPage("ages") },
+    "/realms": { title: "Realms", render: () => renderGraphPage("realms") },
+    "/beings": { title: "Beings", render: () => renderGraphPage("beings") },
+    "/geography": { title: "Geography", render: renderGeography },
     "/about": { title: "About", render: renderAbout },
 };
 

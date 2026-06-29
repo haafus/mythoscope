@@ -466,11 +466,11 @@ Vanilla JS SPA на нативных ES-модулях (без бандлера 
 - `assets/tree-sources.js` — дерево документов (corpus, graphs): major → tradition → книги.
 - `assets/tree-traditions.js` — список традиций (major → tradition) для similarity и geography.
 - `assets/search-utils.js` — общие функции семантического поиска и рендеринга результатов.
-- `assets/page-about.js` — страница About (вкладки Vision / Methodology / …).
 - `assets/page-corpus.js` — библиотека текстов, ридер, информация о книге.
-- `assets/page-geography.js` — карта Leaflet с традициями.
 - `assets/page-embeddings.js` — визуализация эмбеддингов, поиск, информация о точке.
 - `assets/page-graphs.js` — графы персонажей / мест / эпох (Cytoscape).
+- `assets/page-geography.js` — карта Leaflet с традициями.
+- `assets/page-about.js` — страница About (вкладки Vision / Methodology / …).
 - `assets/chart.js` — графики (scatter / heatmap / distribution) на Plotly.
 - `assets/chart-tooltip.js`, `chart-color.js` — хелперы графиков: тултип точки и тонирование приглушённых традиций.
 - `assets/app.css` — все стили (с комментариями-разделителями по секциям).
