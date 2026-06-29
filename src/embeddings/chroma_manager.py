@@ -63,8 +63,14 @@ class ChromaCollection:
     def load_data(self) -> tuple[list[dict[str, Any]], np.ndarray]:
         results = self._collection.get(include=["embeddings", "metadatas", "documents"])
 
+        # Rename text_id -> id without mutating the metadata dicts Chroma returned,
+        # and without raising if a record lacks text_id (foreign/older collection).
         records = [
-            {**meta, "id": meta.pop("text_id"), "text": doc}
+            {
+                **{k: v for k, v in (meta or {}).items() if k != "text_id"},
+                "id": (meta or {}).get("text_id", ""),
+                "text": doc,
+            }
             for meta, doc in zip(results["metadatas"], results["documents"], strict=True)
         ]
         embeddings = np.array(results["embeddings"], dtype=np.float32) if records else np.empty((0, 0), dtype=np.float32)
