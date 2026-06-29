@@ -925,7 +925,24 @@ body.has-main-navbar {
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.analysis-page .cross-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0;
+    text-transform: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.analysis-page .cross-toggle input {
+    cursor: pointer;
 }
 
 .analysis-page .neighbor-item {

@@ -67,10 +67,11 @@ def point_info(
     text_id: str,
     chunk_index: int = Query(...),
     top_k: int = Query(1, ge=1, le=100),
+    cross_tradition: bool = Query(False),
 ):
     _require_collection(model)
     return similarity_service.get_point(
-        model, text_id, chunk_index, top_k=top_k,
+        model, text_id, chunk_index, top_k=top_k, cross_tradition=cross_tradition,
     )
 
 

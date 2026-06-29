@@ -221,6 +221,10 @@ function showSearchPanel() {
     document.getElementById("search-text")?.focus();
 }
 
+// Persisted across point clicks: when on, "Similar fragments" lists only
+// neighbors from other traditions (cross-cultural parallels).
+let crossTradition = false;
+
 export async function displayPointInfo(pointId, chunkIndex = null) {
     if (!state.selectedModel || !pointId) return;
 
@@ -233,14 +237,17 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
     infoContent.innerHTML = '<div class="info-loading">Loading...</div>';
 
     try {
-        const { point, neighbors } = await fetchPointWithNeighbors(pointId, chunkIndex);
+        const { point, neighbors } = await fetchPointWithNeighbors(pointId, chunkIndex, 6, crossTradition);
         let html = `
             <div class="fragment-detail">
                 <div class="fragment-text">${escapeHtml(point.text)}</div>
                 ${attributionLine(point)}
                 <button class="fragment-edit" id="fragmentEditBtn" type="button" title="New similarity search" aria-label="New similarity search">${PENCIL_ICON}</button>
             </div>
-            <div class="fragments-divider">Similar fragments</div>
+            <div class="fragments-divider">
+                <span>Similar fragments</span>
+                <label class="cross-toggle"><input type="checkbox" id="crossTraditionToggle"${crossTradition ? " checked" : ""}> only other traditions</label>
+            </div>
         `;
 
         if (neighbors.length > 0) {
@@ -256,6 +263,10 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
         infoContent.innerHTML = html;
         document.getElementById("fragmentEditBtn")?.addEventListener("click", showSearchPanel);
+        document.getElementById("crossTraditionToggle")?.addEventListener("change", (e) => {
+            crossTradition = e.target.checked;
+            displayPointInfo(pointId, chunkIndex);
+        });
         infoContent.querySelectorAll(".neighbor-item").forEach((item) => {
             item.addEventListener("click", () => displayPointInfo(item.dataset.neighborId, item.dataset.neighborChunk));
         });

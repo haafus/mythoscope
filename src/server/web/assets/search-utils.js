@@ -93,11 +93,12 @@ export function bindSearchResultClicks(container, handler) {
 
 // Returns { point, neighbors }: the API gives the queried point first, then its
 // nearest chunks.
-export async function fetchPointWithNeighbors(pointId, chunkIndex, topK = 6) {
+export async function fetchPointWithNeighbors(pointId, chunkIndex, topK = 6, crossTradition = false) {
     const params = new URLSearchParams({top_k: String(topK)});
     if (chunkIndex !== null && chunkIndex !== undefined && chunkIndex !== "") {
         params.set("chunk_index", String(chunkIndex));
     }
+    if (crossTradition) params.set("cross_tradition", "true");
     const [point, ...neighbors] = await api(`/api/similarity/points/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(pointId)}?${params}`);
     if (!point) throw new Error("Point not found");
     return { point, neighbors };

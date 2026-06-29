@@ -17,13 +17,23 @@ class SimilarityService:
         self._encode_lock = threading.Lock()
 
     def get_point(self, model_key: str, text_id: str, chunk_index: int,
-                  top_k: int = 1) -> list[dict]:
+                  top_k: int = 1, cross_tradition: bool = False) -> list[dict]:
         collection = self._get_collection(model_key)
         cid = chunk_id(text_id, chunk_index)
-        point = collection.get(ids=[cid], include=["embeddings"])
+        point = collection.get(ids=[cid], include=["embeddings", "metadatas", "documents"])
         if not point["ids"]:
             return []
-        return self._query(collection, point["embeddings"][0], top_k)
+        embedding = point["embeddings"][0]
+        if not cross_tradition:
+            return self._query(collection, embedding, top_k)
+        # Keep the clicked chunk as the head; pull neighbors only from other
+        # traditions so the list surfaces cross-cultural parallels.
+        meta = dict(point["metadatas"][0])
+        tradition = meta.get("tradition")
+        head = {**meta, "id": meta.pop("text_id"), "text": point["documents"][0],
+                "similarity_score": 1.0}
+        where = {"tradition": {"$ne": tradition}} if tradition else None
+        return [head, *self._query(collection, embedding, top_k, where=where)]
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         model_name = model_name_for_key(model_key)
@@ -48,10 +58,11 @@ class SimilarityService:
         from embeddings import chroma_manager
         return chroma_manager.get_collection(model_name_for_key(model_key))
 
-    def _query(self, collection, embedding, top_k: int) -> list[dict]:
+    def _query(self, collection, embedding, top_k: int, where=None) -> list[dict]:
         raw = collection.query(
             query_embeddings=[embedding], n_results=top_k,
             include=["metadatas", "documents", "distances"],
+            **({"where": where} if where else {}),
         )
         return [
             {**meta, "id": meta.pop("text_id"), "text": doc,
