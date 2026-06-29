@@ -30,6 +30,6 @@ def create_app() -> FastAPI:
     return app
 
 
-def run_server() -> None:
+def run_server(host: str | None = None, port: int | None = None) -> None:
     srv = settings.server
-    uvicorn.run("main:app", host=srv.host, port=srv.port, reload=False)
+    uvicorn.run("main:app", host=host or srv.host, port=port or srv.port, reload=False)

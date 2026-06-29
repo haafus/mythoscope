@@ -111,16 +111,9 @@ def motifs(force: bool):
 @click.option("--port", "-p", default=None, type=int, help="Port (default from config).")
 def server(host: str | None, port: int | None):
     """Start the web UI server."""
-    import uvicorn
+    from server.run_server import run_server
 
-    from settings import settings
-
-    uvicorn.run(
-        "main:app",
-        host=host or settings.server.host,
-        port=port or settings.server.port,
-        reload=False,
-    )
+    run_server(host, port)
 
 
 @mytho.command()
