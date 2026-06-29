@@ -7,30 +7,15 @@ import { renderGraphPage } from "./page-graphs.js";
 
 const DEFAULT_ROUTE = "/corpus";
 
-// Canonical path -> body class; unknown paths fall back to DEFAULT_ROUTE.
-const ROUTE_CLASS = {
-    "/corpus": "route-corpus",
-    "/geography": "route-geography",
-    "/embeddings": "route-embeddings",
-    "/beings": "route-graphs",
-    "/realms": "route-graphs",
-    "/ages": "route-graphs",
-    "/about": "route-about",
+const ROUTES = {
+    "/corpus": { cssClass: "route-corpus", render: renderCorpus },
+    "/geography": { cssClass: "route-geography", render: renderGeography },
+    "/embeddings": { cssClass: "route-embeddings", render: renderEmbeddingsAnalysis },
+    "/beings": { cssClass: "route-graphs", render: () => renderGraphPage("beings") },
+    "/realms": { cssClass: "route-graphs", render: () => renderGraphPage("realms") },
+    "/ages": { cssClass: "route-graphs", render: () => renderGraphPage("ages") },
+    "/about": { cssClass: "route-about", render: renderAbout },
 };
-
-const RENDERERS = {
-    "/corpus": renderCorpus,
-    "/geography": renderGeography,
-    "/embeddings": renderEmbeddingsAnalysis,
-    "/beings": () => renderGraphPage("beings"),
-    "/realms": () => renderGraphPage("realms"),
-    "/ages": () => renderGraphPage("ages"),
-    "/about": renderAbout,
-};
-
-function setBodyClass(path) {
-    document.body.className = `has-main-navbar ${ROUTE_CLASS[path] || ROUTE_CLASS[DEFAULT_ROUTE]}`;
-}
 
 function setActiveNav(path) {
     const current = `#${path}`;
@@ -43,12 +28,15 @@ function render() {
     cleanupRoute();
 
     const { path } = parseHash();
-    setBodyClass(path);
-    setActiveNav(path);
+    const route = ROUTES[path];
+    if (!route) {
+        window.location.hash = `#${DEFAULT_ROUTE}`;
+        return;
+    }
 
-    const renderer = RENDERERS[path];
-    if (renderer) return renderer();
-    window.location.hash = `#${DEFAULT_ROUTE}`;
+    document.body.className = `has-main-navbar ${route.cssClass}`;
+    setActiveNav(path);
+    route.render();
 }
 
 window.addEventListener("hashchange", render);
