@@ -203,6 +203,9 @@ class LLMProcessor:
                 content = response.choices[0].message.content
                 return content.strip() if content else ""
             except Exception as e:
+                # This attempt spent no usable tokens; return its pre-charged estimate
+                # so retries don't compound the TPM charge (reconcile only runs on success).
+                self.governor.refund(est_tokens)
                 kind = _classify(e)
                 code = getattr(e, "status_code", None) or getattr(e, "code", None)
                 message = _error_message(e)

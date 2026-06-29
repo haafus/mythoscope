@@ -43,11 +43,27 @@ class TestRateGovernor:
         with pytest.raises(DailyLimitReached):
             g.acquire(1)
 
-    def test_success_resets_breaker(self):
+    def test_success_decays_breaker(self):
         g = RateGovernor("m", breaker_threshold=2)
         g.note_rate_limited()
         g.note_success()
-        assert g.note_rate_limited() is False  # counter was reset, not tripped
+        assert g.note_rate_limited() is False  # pressure decayed below threshold
+
+    def test_breaker_trips_despite_interleaved_successes(self):
+        # A steady 429 wall must still trip even if some requests succeed in between;
+        # a hard reset-on-success would never trip here.
+        g = RateGovernor("m", breaker_threshold=4)
+        for _ in range(3):
+            g.note_rate_limited()  # pressure 3
+        g.note_success()  # decay -> 2 (a reset would drop to 0)
+        assert g.note_rate_limited() is False  # 3
+        assert g.note_rate_limited() is True  # 4 -> trips
+
+    def test_refund_returns_token_estimate(self):
+        g = RateGovernor("m", tpm=1000)
+        g.acquire(800)
+        g.refund(800)  # estimate returned; bucket back near capacity
+        assert g._tok_bucket.acquire(900) == 0.0  # would wait if the 800 weren't refunded
 
     def test_reconcile_tracks_tokens(self):
         g = RateGovernor("m", tpm=100000)

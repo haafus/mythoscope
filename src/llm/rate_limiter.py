@@ -88,7 +88,12 @@ class RateGovernor:
         self._breaker_threshold = breaker_threshold
 
         self._lock = threading.Lock()
-        self._consecutive_rl = 0
+        # Net rate-limit "pressure": each retry-exhausted 429 raises it, each success
+        # lowers it. The breaker trips when pressure reaches the threshold — so a steady
+        # 429 wall trips even if a few requests succeed in between (a hard reset-on-any-
+        # success never tripped under concurrency), while occasional 429s amid healthy
+        # traffic decay back to 0 and don't.
+        self._rl_pressure = 0
         self._tripped = False
 
         # metrics
@@ -135,9 +140,22 @@ class RateGovernor:
             with self._lock:
                 self._tokens += actual_tokens
 
+    def refund(self, est_tokens: int) -> None:
+        """Return a failed attempt's pre-charged token estimate (no tokens were spent).
+
+        `acquire` pre-charges the token bucket on every attempt but `reconcile` only
+        runs on success, so without this a retried call re-charges its estimate each
+        attempt and progressively over-throttles TPM. The request charge is kept (the
+        attempt did hit the provider).
+        """
+        if est_tokens and self._tok_bucket is not None:
+            self._tok_bucket.adjust(-est_tokens)
+        with self._lock:
+            self._est_tokens -= est_tokens
+
     def note_success(self) -> None:
         with self._lock:
-            self._consecutive_rl = 0
+            self._rl_pressure = max(0, self._rl_pressure - 1)
 
     def note_rate_limited(self) -> bool:
         """Record a call that exhausted its retries on a rate-limit error.
@@ -145,12 +163,12 @@ class RateGovernor:
         Returns True if this tripped the breaker.
         """
         with self._lock:
-            self._consecutive_rl += 1
-            if not self._tripped and self._consecutive_rl >= self._breaker_threshold:
+            self._rl_pressure += 1
+            if not self._tripped and self._rl_pressure >= self._breaker_threshold:
                 self._tripped = True
                 logger.warning(
-                    "Rate limit not recovering after %d calls for %s; stopping run",
-                    self._consecutive_rl,
+                    "Rate limit not recovering (pressure %d) for %s; stopping run",
+                    self._rl_pressure,
                     self.model,
                 )
             return self._tripped
