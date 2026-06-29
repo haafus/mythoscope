@@ -1543,9 +1543,6 @@ body.has-main-navbar {
     overflow: hidden;
 }
 .motif-tree-row { text-decoration: none; color: inherit; }
-.motif-tree-row.tree-chapter,
-.motif-tree-row.tree-root { color: var(--muted); font-weight: 700; background: #f8fafb; }
-.motif-tree-row.tree-root .motifs-item-id { color: var(--muted); }
 .motif-tree-row.current { background: #e2edf0; }
 .motif-tree-row.current .motifs-item-id,
 .motif-tree-row.current .motifs-item-name { font-weight: 700; color: #1f3a4d; }

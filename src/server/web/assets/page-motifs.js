@@ -239,8 +239,8 @@ function chapterMeta(id) {
 function rootRow(depth, { current = false } = {}) {
     const badge = `<span class="motifs-item-badge">${formatNumber(currentIndex().count)}</span>`;
     const inner = `<span class="motifs-item-id">/</span><span class="motifs-item-name">All motifs</span>${badge}`;
-    if (current) return `<div class="motifs-item motif-tree-row tree-root current" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row tree-root" href="#" data-root="1" style="--depth:${depth}">${inner}</a>`;
+    if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
+    return `<a class="motifs-item motif-tree-row" href="#" data-root="1" style="--depth:${depth}">${inner}</a>`;
 }
 
 // Chapter row — badge is the chapter's total descendant count; clicking lists its L0 motifs.
@@ -248,8 +248,8 @@ function chapterRow(chapterId, depth, { current = false } = {}) {
     const c = chapterMeta(chapterId);
     const badge = `<span class="motifs-item-badge">${formatNumber(c.count)}</span>`;
     const inner = `<span class="motifs-item-name">${escapeHtml(c.label)}</span>${badge}`;
-    if (current) return `<div class="motifs-item motif-tree-row tree-chapter current" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row tree-chapter" href="#" data-chapter-root="${escapeHtml(chapterId)}" style="--depth:${depth}">${inner}</a>`;
+    if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
+    return `<a class="motifs-item motif-tree-row" href="#" data-chapter-root="${escapeHtml(chapterId)}" style="--depth:${depth}">${inner}</a>`;
 }
 
 // One tree: / -> chapter -> every parent -> the motif (highlighted) -> its direct children.
