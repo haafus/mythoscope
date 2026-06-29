@@ -456,12 +456,15 @@ Caddy сам получит TLS-сертификат, настроит реди�
 
 ## server/web
 
-Vanilla JS SPA на нативных ES-модулях (без бандлера и фреймворков).
+Vanilla JS SPA на нативных ES-модулях (без бандлера и фреймворков). Hash-роутинг:
+смена `#/path` (`hashchange`) перерисовывает страницу. Каждая страница — функция
+`render`, которая строит DOM и регистрирует свою уборку через `onCleanup`; роутер
+вызывает её при уходе с роута.
 
 Файлы:
-- `index.html` — точка входа, CDN-библиотеки (Plotly, Leaflet, Cytoscape), навигация.
-- `assets/app.js` — роутер и обработчик `hashchange`.
-- `assets/core.js` — общее состояние, API-хелперы, утилиты.
+- `index.html` — точка входа, CDN-библиотеки (Plotly, Leaflet, Cytoscape) с `defer`, навбар.
+- `assets/app.js` — роутер: таблица `ROUTES` (path → title + render-функция), `hashchange`/`DOMContentLoaded`, активный пункт навбара.
+- `assets/core.js` — сгруппирован по секциям: общее состояние, роутинг-примитивы (`parseHash`, `onCleanup`/`cleanupRoute`), `api`, утилиты, data-хелперы (модели/корпус/традиции).
 - `assets/tree-scaffold.js` — общий каркас дерева: секции мажоров + сворачивание; листья задают потребители.
 - `assets/tree-sources.js` — дерево документов (corpus, graphs): major → tradition → книги.
 - `assets/tree-traditions.js` — список традиций (major → tradition) для similarity и geography.
