@@ -184,6 +184,12 @@ async function openMotif(index, id) {
                 openMotif(a.dataset.index, a.dataset.id);
             });
         });
+        detail.querySelectorAll("[data-motif-id]").forEach((el) => {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                openMotif("tmi", el.dataset.motifId);
+            });
+        });
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -200,31 +206,21 @@ function linkChips(links) {
     `).join("");
 }
 
-function motifLink(id, name, extraClass = "", style = "") {
-    return `<a href="#/motifs?index=tmi&id=${encodeURIComponent(id)}"
-           class="motif-link${extraClass}" data-index="tmi" data-id="${escapeHtml(id)}"${style}>
-            <span class="motif-link-id">${escapeHtml(id)}</span>${name ? `<span class="motif-link-name">${escapeHtml(name)}</span>` : ""}
-        </a>`;
+function treeRow(id, name, depth, { current = false } = {}) {
+    const inner = `<span class="motifs-item-id">${escapeHtml(id)}</span><span class="motifs-item-name">${escapeHtml(name || "—")}</span>`;
+    if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
+    return `<a class="motifs-item motif-tree-row" data-motif-id="${escapeHtml(id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(id)}" style="--depth:${depth}">${inner}</a>`;
 }
 
-// Parent categories, broadest first, each indented a step deeper.
-function renderBreadcrumbs(items) {
-    if (!items || !items.length) return "";
-    const rows = items.map((l, i) =>
-        motifLink(l.id, l.name, " motif-crumb", ` style="--depth:${i}"`)).join("");
-    return `<nav class="motif-breadcrumbs" aria-label="Parent categories">${rows}</nav>`;
-}
-
-// Nested narrower motifs, recursively.
-function subtreeList(nodes) {
-    return `<ul class="motif-subtree-list">${nodes.map((n) => `
-        <li>${motifLink(n.id, n.name)}${n.children && n.children.length ? subtreeList(n.children) : ""}</li>`).join("")}</ul>`;
-}
-
-function renderSubtree(tree) {
-    if (!tree || !(tree.nodes || []).length) return "";
-    const more = tree.truncated ? `<div class="motif-subtree-more">… list truncated</div>` : "";
-    return section("Narrower motifs", `<div class="motif-subtree">${subtreeList(tree.nodes)}${more}</div>`);
+// One tree: chapter -> every parent -> the motif (highlighted) -> its direct children.
+function renderTmiTree(d) {
+    const rows = [`<div class="motifs-item motif-tree-row tree-chapter" style="--depth:0"><span class="motifs-item-name">${escapeHtml(d.chapter_label || d.chapter || "")}</span></div>`];
+    let depth = 1;
+    for (const a of d.breadcrumbs || []) rows.push(treeRow(a.id, a.name, depth++));
+    rows.push(treeRow(d.id, d.name, depth, { current: true }));
+    for (const c of d.children || []) rows.push(treeRow(c.id, c.name, depth + 1));
+    if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
+    return `<div class="motif-tree">${rows.join("")}</div>`;
 }
 
 function section(title, bodyHtml) {
@@ -264,11 +260,9 @@ function renderDetail(d) {
             body += `<p class="motif-synth-note">Grouping node added to hold the <strong>${escapeHtml(d.id)}.*</strong> sub-motifs (not a separate entry in the source index).</p>`;
         }
         body += `<div class="motif-meta">Hierarchy level <strong>${escapeHtml(String(d.level))}</strong></div>`;
-        body += renderBreadcrumbs(d.breadcrumbs);
-        if (d.chapter_name) body += section("Chapter", `<p class="motif-text">${escapeHtml(d.chapter_name)}</p>`);
+        body += renderTmiTree(d);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
         body += linkSection("Appears in ATU tale types", links.atu);
-        body += renderSubtree(d.subtree);
     } else if (d.index === "atu") {
         if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
         if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);

@@ -32,7 +32,7 @@ def _by_id(index: str) -> dict[str, dict]:
 # --- TMI hierarchy (breadcrumbs + subtree) ------------------------------------
 # Parents/levels are corrected at build time (see trilogy._finalize_tmi), so the
 # read side just walks the stored `parent`.
-_SUBTREE_CAP = 300
+_CHILDREN_CAP = 500
 
 
 def _tmi_children() -> dict[str, list[str]]:
@@ -63,28 +63,11 @@ def _tmi_ancestors(rec: dict) -> list[dict]:
     return [_link("tmi", mid) for mid in reversed(chain)]
 
 
-def _tmi_subtree(root_id: str) -> dict:
-    """Nested narrower motifs under root, capped at _SUBTREE_CAP total nodes."""
-    children = _tmi_children()
-    by_id = _by_id("tmi")
-    state = {"count": 0, "truncated": False}
-
-    def walk(motif_id: str) -> list[dict]:
-        nodes = []
-        for child_id in children.get(motif_id, []):
-            if state["count"] >= _SUBTREE_CAP:
-                state["truncated"] = True
-                break
-            state["count"] += 1
-            rec = by_id.get(child_id, {})
-            nodes.append({
-                "id": child_id,
-                "name": rec.get("name", ""),
-                "children": walk(child_id),
-            })
-        return nodes
-
-    return {"nodes": walk(root_id), "truncated": state["truncated"]}
+def _tmi_direct_children(motif_id: str) -> tuple[list[dict], bool]:
+    """Immediate child links (one level down), capped at _CHILDREN_CAP."""
+    kids = _tmi_children().get(motif_id, [])
+    shown = [_link("tmi", c) for c in kids[:_CHILDREN_CAP]]
+    return shown, len(kids) > _CHILDREN_CAP
 
 
 def _link(index: str, motif_id: str) -> dict:
@@ -139,7 +122,6 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
-        item["badge"] = f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
         item["duplicate"] = bool(rec.get("duplicate"))
         item["synthetic"] = bool(rec.get("synthetic"))
@@ -200,7 +182,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["duplicate"] = bool(rec.get("duplicate"))
         detail["synthetic"] = bool(rec.get("synthetic"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
-        detail["subtree"] = _tmi_subtree(rec["id"])
+        detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
 

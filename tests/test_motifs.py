@@ -345,20 +345,20 @@ class TestService:
         d = svc.get_motif("tmi", "S31.0.1")
         assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30", "S31", "S31.0"]
 
-    def test_tmi_subtree_nests_under_synthetic_node(self, tiny_db):
+    def test_tmi_direct_children_one_level(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
-        ids = {n["id"] for n in d["subtree"]["nodes"]}
-        assert ids == {"S31.1", "S31.0"}  # S31.0 grouping node, not S31.0.1 directly
+        ids = {c["id"] for c in d["children"]}
+        assert ids == {"S31.1", "S31.0"}  # direct children only (incl. synthetic S31.0)
+        assert d["children_truncated"] is False
         synth = svc.get_motif("tmi", "S31.0")
-        assert synth["synthetic"] and {n["id"] for n in synth["subtree"]["nodes"]} == {"S31.0.1"}
+        assert synth["synthetic"] and {c["id"] for c in synth["children"]} == {"S31.0.1"}
 
-    def test_tmi_list_badge_is_plain_level(self, tiny_db):
+    def test_tmi_list_exposes_level_without_badge(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
-        assert by["S31"]["badge"] == "L2"
-        assert by["S31.0.1"]["badge"] == "L4"        # .0 chain: S31(2)->S31.0(3)->S31.0.1(4)
+        # the textual level badge is gone; level is exposed for tree indentation
+        assert "badge" not in by["S31"] and by["S31"]["level"] == 2
+        assert by["S31.0.1"]["level"] == 4           # .0 chain: S31(2)->S31.0(3)->S31.0.1(4)
         assert by["S31.0"]["synthetic"] is True
-        # level is exposed for the indented sidebar tree
-        assert by["S31"]["level"] == 2 and by["S31.0.1"]["level"] == 4
 
     def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}

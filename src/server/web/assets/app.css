@@ -1510,7 +1510,6 @@ body.has-main-navbar {
 }
 
 /* Broad TMI category rows in the list, shown bold. */
-.motifs-item.category { background: #f1f5f7; }
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
@@ -1544,26 +1543,20 @@ body.has-main-navbar {
 .motif-meta { margin: 0 0 14px; font-size: 12.5px; color: var(--muted); }
 .motif-source-link { font-size: 12.5px; color: #41506a; word-break: break-all; }
 
-/* TMI parent-category breadcrumbs: stacked, broadest first, each step indented. */
-.motif-breadcrumbs {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    margin: 0 0 16px;
+/* TMI lineage tree on the detail page: chapter -> parents -> motif -> children,
+   reusing the sidebar row look (.motifs-item) with per-level indentation. */
+.motif-tree {
+    margin: 0 0 18px;
+    border: 1px solid #eef1f4;
+    border-radius: 8px;
+    overflow: hidden;
 }
-.motif-crumb { margin-left: calc(var(--depth, 0) * 16px); }
-
-/* TMI narrower-motif subtree. */
-.motif-subtree-list {
-    list-style: none;
-    margin: 0;
-    padding-left: 14px;
-    border-left: 1px solid #e6ebf0;
-}
-.motif-subtree > .motif-subtree-list { padding-left: 0; border-left: 0; }
-.motif-subtree-list li { margin: 4px 0; }
-.motif-subtree-more { margin-top: 8px; font-size: 12px; color: var(--muted-soft); }
+.motif-tree-row { text-decoration: none; color: inherit; }
+.motif-tree-row.tree-chapter { color: var(--muted); font-weight: 700; background: #f8fafb; }
+.motif-tree-row.current { background: #e2edf0; }
+.motif-tree-row.current .motifs-item-id,
+.motif-tree-row.current .motifs-item-name { font-weight: 700; color: #1f3a4d; }
+.motif-subtree-more { padding: 6px 10px; font-size: 12px; color: var(--muted-soft); }
 
 .motif-areas {
     display: flex;
