@@ -78,18 +78,39 @@ def chunk_text(text: str, chunk_size: int, chunk_overlap: int) -> list[str]:
             chunks.append(current_chunk)
         return _merge_small_chunks(chunks, chunk_size)
 
-    def _merge_small_chunks(chunks: list[str], min_size: int) -> list[str]:
+    def _overlap_len(cur: str, nxt: str) -> int:
+        """How much of nxt's start duplicates the end of cur (the prepended overlap).
+
+        Capped at chunk_overlap: on repetitive text a longer suffix==prefix match is
+        coincidental, not real overlap, so stripping it would delete content (the cap
+        means we may leave a little overlap rather than ever over-strip).
+        """
+        if chunk_overlap <= 0:
+            return 0
+        cap = min(len(cur), len(nxt), chunk_overlap)
+        for k in range(cap, 0, -1):
+            if cur[-k:] == nxt[:k]:
+                return k
+        return 0
+
+    def _merge_small_chunks(chunks: list[str], max_size: int) -> list[str]:
+        """Absorb a too-small chunk into its predecessor, staying within max_size.
+
+        The next chunk still begins with the overlap tail of the previous one, so the
+        duplicated prefix is stripped before joining — otherwise the merged chunk would
+        contain that overlap twice. Merging is skipped when the join would exceed
+        max_size (the bound is the chunk budget, not a soft 1.2x of it).
+        """
         if not chunks:
             return []
-        merged, current = [], chunks[0]
-        for i in range(1, len(chunks)):
-            next_chunk = chunks[i]
-            if len(current) + len(next_chunk) <= min_size * 1.2:
-                current += next_chunk
+        merged = [chunks[0]]
+        for nxt in chunks[1:]:
+            cur = merged[-1]
+            body = nxt[_overlap_len(cur, nxt):]
+            if len(cur) + len(body) <= max_size:
+                merged[-1] = cur + body
             else:
-                merged.append(current)
-                current = next_chunk
-        merged.append(current)
+                merged.append(nxt)
         return merged
 
     return _split_recursive(text, SEPARATORS)

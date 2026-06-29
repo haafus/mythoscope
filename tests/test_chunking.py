@@ -31,7 +31,21 @@ class TestChunkText:
         text = "A " * 500
         chunks = chunk_text(text.strip(), chunk_size=100, chunk_overlap=10)
         for chunk in chunks:
-            assert len(chunk) <= 120  # allow small overrun from merge
+            assert len(chunk) <= 100  # merge no longer overruns the chunk budget
+
+    def test_merge_does_not_duplicate_overlap(self):
+        # Distinct fixed-width tokens: a mid-token truncation yields a fragment that is
+        # never a whole token, so any in-chunk repeat is a genuine duplicated overlap.
+        import itertools
+        import string
+
+        tokens = ["".join(t) for t in itertools.product(string.ascii_lowercase, repeat=3)][:200]
+        for size, overlap in [(60, 15), (80, 20), (50, 12)]:
+            chunks = chunk_text(" ".join(tokens), chunk_size=size, chunk_overlap=overlap)
+            for chunk in chunks:
+                words = chunk.split()
+                assert len(words) == len(set(words)), f"duplicated overlap in chunk: {chunk!r}"
+                assert len(chunk) <= size
 
     def test_overlap_produces_more_chunks(self):
         text = "Word " * 100
