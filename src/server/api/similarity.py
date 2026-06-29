@@ -2,7 +2,15 @@ from fastapi import APIRouter, HTTPException, Query
 
 from embeddings import chroma_manager
 from projections import PROJECTION_METHODS
-from server.schemas import ModelListResponse, SearchRequest, SearchResult, WarmupRequest
+from server.schemas import (
+    ModelListResponse,
+    ProjectionData,
+    ProjectionMethod,
+    SearchRequest,
+    SearchResult,
+    WarmupRequest,
+    WarmupResponse,
+)
 from server.services.projections import get_projection_data
 from server.services.similarity import similarity_service
 
@@ -42,7 +50,7 @@ def search(request: SearchRequest):
         ) from e
 
 
-@router.post("/warmup")
+@router.post("/warmup", response_model=WarmupResponse)
 def warmup(request: WarmupRequest) -> dict:
     """Best-effort preload so the first text search isn't a cold start.
 
@@ -75,12 +83,12 @@ def point_info(
     )
 
 
-@router.get("/methods")
+@router.get("/methods", response_model=list[ProjectionMethod])
 def methods() -> list[dict]:
     return PROJECTION_METHODS
 
 
-@router.get("/projections/{model}/{method}")
+@router.get("/projections/{model}/{method}", response_model=ProjectionData)
 def projection(model: str, method: str) -> dict:
     data = get_projection_data(model, method)
     if not data:

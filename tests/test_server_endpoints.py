@@ -74,6 +74,26 @@ class TestSimilarityEndpoints:
         response = client.get("/api/similarity/projections/fake_model/umap")
         assert response.status_code == 404
 
+    def test_methods_match_schema(self):
+        response = client.get("/api/similarity/methods")
+        assert response.status_code == 200
+        methods = response.json()
+        assert methods and all({"key", "label", "chart_type"} <= set(m) for m in methods)
+
+    def test_projection_response_keeps_chart_specific_fields(self):
+        # The ProjectionData schema is extra="allow"; the chart-specific payload
+        # (here `points`) must survive response_model serialization, not be dropped.
+        from unittest.mock import patch
+
+        payload = {"method": "umap", "points": [{"x": 1, "y": 2}], "labels": ["a"]}
+        with patch("server.api.similarity.get_projection_data", return_value=payload):
+            response = client.get("/api/similarity/projections/m/umap")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["method"] == "umap"
+        assert data["points"] == [{"x": 1, "y": 2}]
+        assert data["labels"] == ["a"]
+
     def test_search_without_embedding_models_returns_503(self):
         # collection exists, but text encoding (torch) is missing -> 503, not 500.
         from unittest.mock import patch

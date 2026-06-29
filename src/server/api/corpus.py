@@ -30,7 +30,12 @@ def document(
         raise HTTPException(status_code=404, detail="Document not found") from exc
 
 
-@router.get("/archive")
+@router.get(
+    "/archive",
+    # Binary zip stream, not JSON: declare the content type for OpenAPI instead
+    # of a response_model.
+    responses={200: {"content": {"application/zip": {}}}},
+)
 def archive() -> StreamingResponse:
     return StreamingResponse(
         build_corpus_archive(),

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from motifs import INDEX_LABELS
-from server.schemas import MotifIndexesResponse, MotifListResponse
+from server.schemas import MotifDetail, MotifIndexesResponse, MotifListResponse
 from server.services import motifs as svc
 
 router = APIRouter(prefix="/api/motifs", tags=["motifs"])
@@ -36,7 +36,7 @@ def list_motifs(
     return svc.list_motifs(index, chapter=chapter, q=q, limit=limit, offset=offset)
 
 
-@router.get("/{index}/motif")
+@router.get("/{index}/motif", response_model=MotifDetail)
 def motif(index: str, id: str = Query(..., min_length=1)) -> dict:
     _require_built()
     _require_index(index)
