@@ -326,7 +326,7 @@ function renderDetail(d) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
-        body += linkSection("Appears in ATU tale types", links.atu);
+        if ((links.atu || []).length) body += linkSection("Appears in ATU tale types", links.atu);
     } else if (d.index === "atu") {
         body = head + chapterLine;
         if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
