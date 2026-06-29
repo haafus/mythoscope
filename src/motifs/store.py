@@ -64,6 +64,17 @@ def _load_cached(key: str, path: Path) -> Any:
     return _cache[key]
 
 
+def cached(key: str, factory) -> Any:
+    """Memoize a derived value in the per-process cache (reset by ``clear_cache``).
+
+    Lets callers stash values built from loaded indexes without reaching into
+    ``_cache`` directly, so the store stays the single owner of cache lifetime.
+    """
+    if key not in _cache:
+        _cache[key] = factory()
+    return _cache[key]
+
+
 def load_index(index: str) -> dict | None:
     """Load one index file (``{"motifs"/"types": [...], ...}``) or None."""
     if index not in INDEX_FILES:

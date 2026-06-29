@@ -26,12 +26,7 @@ def _records(index: str) -> list[dict]:
 
 def _by_id(index: str) -> dict[str, dict]:
     """Cached id -> record map for an index (for cross-link name resolution)."""
-    key = f"byid:{index}"
-    cached = store._cache.get(key)
-    if cached is None:
-        cached = {r["id"]: r for r in _records(index)}
-        store._cache[key] = cached
-    return cached
+    return store.cached(f"byid:{index}", lambda: {r["id"]: r for r in _records(index)})
 
 
 def _link(index: str, motif_id: str) -> dict:
