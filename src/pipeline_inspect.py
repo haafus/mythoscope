@@ -274,6 +274,37 @@ def graphs_orphans(settings) -> list[tuple[Path, int]]:
 
 
 # ---------------------------------------------------------------------------
+# Motifs inspection
+# ---------------------------------------------------------------------------
+
+def motifs_status(settings) -> dict[str, Any]:
+    motifs_dir = Path(settings.motifs_dir)
+    meta_path = motifs_dir / "meta.json"
+    # Built artifacts are the top-level JSON files; the raw scrape cache is
+    # reported separately (and only removed via `clean --caches`).
+    built_size = sum(file_size(p) for p in motifs_dir.glob("*.json")) if motifs_dir.exists() else 0
+    result: dict[str, Any] = {
+        "exists": motifs_dir.exists(),
+        "built": meta_path.exists(),
+        "total_size": built_size,
+        "counts": {},
+    }
+    if meta_path.exists():
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        result["counts"] = meta.get("counts", {})
+        result["built_at"] = meta.get("built_at", "")
+    return result
+
+
+def motifs_raw_cache(settings) -> tuple[Path, int] | None:
+    """The Berezkin/Trilogy raw scrape cache as a single (dir, size), or None."""
+    raw = Path(settings.motifs_dir) / "raw"
+    if not raw.exists():
+        return None
+    return (raw, dir_size(raw))
+
+
+# ---------------------------------------------------------------------------
 # Resumable caches (graphs extraction + summaries)
 # ---------------------------------------------------------------------------
 

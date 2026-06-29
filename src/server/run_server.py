@@ -4,7 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from server.api import corpus, graphs, similarity
+from server.api import corpus, graphs, motifs, similarity
 from settings import settings
 
 
@@ -16,6 +16,7 @@ def create_app() -> FastAPI:
 
     app.include_router(corpus.router)
     app.include_router(graphs.router)
+    app.include_router(motifs.router)
     app.include_router(similarity.router)
 
     assets_dir = settings.web_root / "assets"

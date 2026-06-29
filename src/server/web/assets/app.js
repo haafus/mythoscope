@@ -3,6 +3,7 @@ import { renderCorpus } from "./page-corpus.js";
 import { renderEmbeddings } from "./page-embeddings.js";
 import { renderGraphPage } from "./page-graphs.js";
 import { renderGeography } from "./page-geography.js";
+import { renderMotifs } from "./page-motifs.js";
 import { renderAbout } from "./page-about.js";
 
 const DEFAULT_ROUTE = "/corpus";
@@ -14,6 +15,7 @@ const ROUTES = {
     "/realms": { title: "Realms", render: () => renderGraphPage("realms") },
     "/beings": { title: "Beings", render: () => renderGraphPage("beings") },
     "/geography": { title: "Geography", render: renderGeography },
+    "/motifs": { title: "Motifs", render: renderMotifs },
     "/about": { title: "About", render: renderAbout },
 };
 

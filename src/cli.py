@@ -10,7 +10,7 @@ from log_setup import setup_logging
 logger = logging.getLogger(__name__)
 
 COMMAND_SECTIONS = [
-    ("Pipeline", ["corpus", "embeddings", "projections", "graphs"]),
+    ("Pipeline", ["corpus", "embeddings", "projections", "graphs", "motifs"]),
     ("Management", ["build", "status", "clean", "server"]),
 ]
 
@@ -99,6 +99,13 @@ def graphs(model: str | None, force: bool, regraph: bool):
 
 
 @mytho.command()
+@click.option("--force", "-f", is_flag=True, help="Rebuild from scratch (re-fetch all sources).")
+def motifs(force: bool):
+    """Build the cross-referenced motif database (Berezkin, TMI, ATU)."""
+    _run("Motifs", _build_motifs, force=force)
+
+
+@mytho.command()
 @click.option("--host", "-h", default=None, help="Bind address (default from config).")
 @click.option("--port", "-p", default=None, type=int, help="Port (default from config).")
 def server(host: str | None, port: int | None):
@@ -124,8 +131,11 @@ def build(model, llm, force, sample):
     """Run the full analysis pipeline end-to-end."""
     if sample:
         from model_registry import active_embedding_models
+        from settings import settings
         model = model or active_embedding_models()[0]
         max_texts = SAMPLE_MAX_TEXTS
+        # Keep the motif scrape light on a smoke run: only a handful of detail pages.
+        settings.motifs.max_motifs = SAMPLE_MAX_TEXTS
         click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
     else:
         max_texts = None
@@ -135,6 +145,7 @@ def build(model, llm, force, sample):
         ("Embeddings", _build_embeddings, {"model": model, "force": force}),
         ("Projections", _build_projections, {"model": model, "force": force}),
         ("Graphs", _build_graphs, {"llm": llm, "force": force, "max_texts": max_texts}),
+        ("Motifs", _build_motifs, {"force": force}),
     ]
 
     start_all = time.monotonic()
@@ -175,6 +186,12 @@ def _build_graphs(
     build_graphs(llm=llm, force=force, max_texts=max_texts, regraph=regraph)
 
 
+def _build_motifs(force: bool = False):
+    from motifs.build_motifs import build_motifs
+
+    build_motifs(force=force)
+
+
 @mytho.command()
 def status():
     """Show the current state of the data pipeline."""
@@ -183,6 +200,7 @@ def status():
         embeddings_status,
         format_size,
         graphs_status,
+        motifs_status,
         projections_status,
     )
     from settings import settings
@@ -240,6 +258,20 @@ def status():
         click.echo(f"  {info['count']} graph files")
     click.echo()
 
+    # Motifs
+    info = motifs_status(settings)
+    total += info["total_size"]
+    _header("Motifs", info["total_size"])
+    if not info["built"]:
+        click.echo("  No motif database")
+    else:
+        counts = info["counts"]
+        if counts:
+            click.echo("  " + ", ".join(f"{k}: {v}" for k, v in counts.items()))
+        else:
+            click.echo("  Built (no counts recorded)")
+    click.echo()
+
     click.echo(f"Total: {format_size(total)}")
 
 
@@ -269,6 +301,7 @@ def _clean(apply: bool, caches: bool):
         embeddings_orphan_collections,
         format_size,
         graphs_orphans,
+        motifs_raw_cache,
         projections_orphans,
     )
     from settings import settings
@@ -336,10 +369,12 @@ def _clean(apply: bool, caches: bool):
                 shutil.rmtree(path)
         click.echo()
 
-    # Caches (always shown; removed only with --caches --apply)
+    # Caches (always shown; removed only with --caches --apply). The motif raw
+    # scrape cache is a directory, removed wholesale rather than file-by-file.
     cache_list = cache_files(settings)
-    if cache_list:
-        cache_bytes = sum(s for _, s in cache_list)
+    motifs_cache = motifs_raw_cache(settings)
+    if cache_list or motifs_cache:
+        cache_bytes = sum(s for _, s in cache_list) + (motifs_cache[1] if motifs_cache else 0)
         _header("Caches", cache_bytes)
         outputs_root = settings.graphs_dir.parent
         for path, size in cache_list:
@@ -348,12 +383,20 @@ def _clean(apply: bool, caches: bool):
             except ValueError:
                 label = str(path)
             click.echo(f"  {label:<50} {format_size(size):>8}")
+        if motifs_cache:
+            try:
+                label = str(motifs_cache[0].relative_to(outputs_root))
+            except ValueError:
+                label = str(motifs_cache[0])
+            click.echo(f"  {label + '/':<50} {format_size(motifs_cache[1]):>8}")
         if caches:
-            total_items += len(cache_list)
+            total_items += len(cache_list) + (1 if motifs_cache else 0)
             total_bytes += cache_bytes
             if apply:
                 for path, _ in cache_list:
                     path.unlink(missing_ok=True)
+                if motifs_cache:
+                    shutil.rmtree(motifs_cache[0], ignore_errors=True)
         else:
             click.echo(click.style(f"  {format_size(cache_bytes)} reclaimable — add --caches to remove", fg="yellow"))
         click.echo()

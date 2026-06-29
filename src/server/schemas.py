@@ -54,3 +54,39 @@ class CatalogResponse(BaseModel):
 class TraditionsResponse(BaseModel):
     traditions: dict[str, Any]
     total: int
+
+
+# --- Motifs ---
+
+class MotifChapter(BaseModel):
+    id: str
+    label: str
+    count: int
+
+
+class MotifIndexSummary(BaseModel):
+    index: str
+    label: str
+    long_label: str = ""
+    attribution: str = ""
+    homepage: str = ""
+    count: int
+    chapters: list[MotifChapter] = []
+
+
+class MotifIndexesResponse(BaseModel):
+    indexes: list[MotifIndexSummary]
+
+
+class MotifListItem(BaseModel):
+    index: str
+    id: str
+    name: str = ""
+    chapter: str = ""
+    badge: str = ""
+
+
+class MotifListResponse(BaseModel):
+    index: str
+    total: int
+    items: list[MotifListItem]

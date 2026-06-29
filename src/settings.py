@@ -53,6 +53,17 @@ class GraphsSettings(BaseModel):
     max_entities: int | None = 100
 
 
+class MotifsSettings(BaseModel):
+    # Concurrent HTTP fetches when scraping Berezkin detail pages.
+    max_workers: int = 10
+    # Fetch + parse Berezkin per-motif detail pages (definitions). The motif
+    # backbone (codes, names, areas) is always built from the single index page;
+    # details add the short definition at the cost of one request per motif.
+    berezkin_details: bool = True
+    # Cap motifs whose detail pages are fetched (None = all). Used by `build --sample`.
+    max_motifs: int | None = None
+
+
 class ProjectionSettings(BaseModel):
     umap_n_neighbors: int = 15
     umap_min_dist: float = 0.1
@@ -77,6 +88,7 @@ class Settings(BaseSettings):
     embeddings_dir: Path = Path("outputs/embeddings")
     projections_dir: Path = Path("outputs/projections")
     graphs_dir: Path = Path("outputs/graphs")
+    motifs_dir: Path = Path("outputs/motifs")
     logs_dir: Path = Path("outputs/logs")
     web_root: Path = Path("src/server/web")
 
@@ -87,6 +99,7 @@ class Settings(BaseSettings):
     embedding: EmbeddingSettings = EmbeddingSettings()
     llm: LLMSettings = LLMSettings()
     graphs: GraphsSettings = GraphsSettings()
+    motifs: MotifsSettings = MotifsSettings()
     projection: ProjectionSettings = ProjectionSettings()
     server: ServerSettings = ServerSettings()
 

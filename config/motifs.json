@@ -1,0 +1,27 @@
+{
+  "berezkin": {
+    "enabled": true,
+    "label": "Berezkin",
+    "long_label": "Berezkin & Duvakin — Thematic classification and areal distribution of folklore-mythological motifs",
+    "attribution": "Ю.Е. Березкин, Е.Н. Дувакин. Тематическая классификация и распределение фольклорно-мифологических мотивов по ареалам. Аналитический каталог.",
+    "homepage": "http://areasofmyths.com",
+    "base_url": "http://areasofmyths.com",
+    "index_page": "index-left.html",
+    "encoding": "windows-1251",
+    "fetch_details": true
+  },
+  "trilogy": {
+    "enabled": true,
+    "label": "Trilogy",
+    "long_label": "Trilogy — tidy data of Thompson Motif Index and Aarne-Thompson-Uther tale types",
+    "attribution": "j-hagedorn/trilogy (CC-BY-SA 4.0); Thompson Motif-Index and Aarne-Thompson-Uther tale-type index.",
+    "homepage": "https://github.com/j-hagedorn/trilogy",
+    "base_url": "https://raw.githubusercontent.com/j-hagedorn/trilogy/master/data",
+    "files": {
+      "tmi": "tmi.csv",
+      "atu_df": "atu_df.csv",
+      "atu_seq": "atu_seq.csv",
+      "atu_combos": "atu_combos.csv"
+    }
+  }
+}

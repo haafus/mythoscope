@@ -1,0 +1,244 @@
+import { app, api, escapeHtml, formatNumber } from "./core.js";
+
+// Module-local navigation state (index, chapter filter, query, selection).
+const mState = {
+    indexes: null,
+    index: "berezkin",
+    chapter: "",
+    query: "",
+    selectedId: null,
+};
+
+const LIST_LIMIT = 300;
+let searchTimer = null;
+
+export async function renderMotifs(params = new URLSearchParams()) {
+    app.innerHTML = `
+        <main class="motifs-page container">
+            <div class="workspace">
+                <aside class="library-sidebar motifs-sidebar">
+                    <div class="motifs-tabs" id="motifsTabs">Loading...</div>
+                    <input type="text" class="motifs-search" id="motifsSearch" placeholder="Search id or name...">
+                    <select class="motifs-chapter" id="motifsChapter"></select>
+                    <div class="motifs-list" id="motifsList"></div>
+                </aside>
+
+                <article class="card reader motifs-detail" id="motifsDetail">
+                    <div class="reader-placeholder">Select a motif to see its description and cross-index links.</div>
+                </article>
+            </div>
+        </main>
+    `;
+
+    try {
+        const data = await api("/api/motifs/indexes");
+        mState.indexes = data.indexes || [];
+    } catch (error) {
+        const msg = /not built/i.test(error.message)
+            ? "Motif database not built yet. Run <code>mytho motifs</code> to build it."
+            : escapeHtml(error.message);
+        app.querySelector(".workspace").innerHTML = `<div class="empty-state">${msg}</div>`;
+        return;
+    }
+
+    if (!mState.indexes.length) {
+        app.querySelector(".workspace").innerHTML = `<div class="empty-state">No motif indexes available.</div>`;
+        return;
+    }
+
+    // Honour deep links: #/motifs?index=atu&id=510A
+    const wantIndex = params.get("index");
+    if (wantIndex && mState.indexes.some((i) => i.index === wantIndex)) mState.index = wantIndex;
+    else if (!mState.indexes.some((i) => i.index === mState.index)) mState.index = mState.indexes[0].index;
+
+    renderTabs();
+    renderChapters();
+    wireControls();
+    await loadList();
+
+    const wantId = params.get("id");
+    if (wantId) openMotif(mState.index, wantId);
+    else if (mState.selectedId) openMotif(mState.index, mState.selectedId);
+}
+
+function currentIndex() {
+    return mState.indexes.find((i) => i.index === mState.index) || mState.indexes[0];
+}
+
+function renderTabs() {
+    const tabs = document.getElementById("motifsTabs");
+    tabs.innerHTML = mState.indexes.map((i) => `
+        <button class="motifs-tab${i.index === mState.index ? " active" : ""}"
+                data-index="${escapeHtml(i.index)}" title="${escapeHtml(i.long_label || i.label)}">
+            ${escapeHtml(i.label)} <span class="motifs-tab-count">${formatNumber(i.count)}</span>
+        </button>
+    `).join("");
+    tabs.querySelectorAll(".motifs-tab").forEach((btn) => {
+        btn.addEventListener("click", () => selectIndex(btn.dataset.index));
+    });
+}
+
+function renderChapters() {
+    const select = document.getElementById("motifsChapter");
+    const chapters = currentIndex().chapters || [];
+    select.innerHTML =
+        `<option value="">All chapters (${formatNumber(currentIndex().count)})</option>` +
+        chapters.map((c) => `<option value="${escapeHtml(c.id)}"${c.id === mState.chapter ? " selected" : ""}>
+            ${escapeHtml(c.label)} (${formatNumber(c.count)})
+        </option>`).join("");
+}
+
+function wireControls() {
+    const search = document.getElementById("motifsSearch");
+    search.value = mState.query;
+    search.addEventListener("input", () => {
+        mState.query = search.value;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(loadList, 250);
+    });
+    document.getElementById("motifsChapter").addEventListener("change", (e) => {
+        mState.chapter = e.target.value;
+        loadList();
+    });
+}
+
+function selectIndex(index) {
+    if (index === mState.index) return;
+    mState.index = index;
+    mState.chapter = "";
+    mState.query = "";
+    const search = document.getElementById("motifsSearch");
+    if (search) search.value = "";
+    renderTabs();
+    renderChapters();
+    loadList();
+}
+
+async function loadList() {
+    const list = document.getElementById("motifsList");
+    if (!list) return;
+    list.innerHTML = `<div class="motifs-loading">Loading...</div>`;
+    try {
+        const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
+        if (mState.chapter) params.set("chapter", mState.chapter);
+        if (mState.query.trim()) params.set("q", mState.query.trim());
+        const data = await api(`/api/motifs/${mState.index}/motifs?${params.toString()}`);
+        renderList(data);
+    } catch (error) {
+        list.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function renderList(data) {
+    const list = document.getElementById("motifsList");
+    if (!data.items.length) {
+        list.innerHTML = `<div class="empty-state">No motifs match.</div>`;
+        return;
+    }
+    const shown = data.items.length;
+    const more = data.total > shown
+        ? `<div class="motifs-more">Showing ${formatNumber(shown)} of ${formatNumber(data.total)} — refine your search.</div>`
+        : "";
+    list.innerHTML = data.items.map((it) => `
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}" data-id="${escapeHtml(it.id)}">
+            <span class="motifs-item-id">${escapeHtml(it.id)}</span>
+            <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
+            <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
+        </button>
+    `).join("") + more;
+    list.querySelectorAll(".motifs-item").forEach((btn) => {
+        btn.addEventListener("click", () => openMotif(mState.index, btn.dataset.id));
+    });
+}
+
+function markActive(id) {
+    document.querySelectorAll(".motifs-item").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.id === id);
+    });
+}
+
+async function openMotif(index, id) {
+    // Following a cross-link can switch indexes; keep the sidebar in sync.
+    if (index !== mState.index) {
+        mState.index = index;
+        mState.chapter = "";
+        mState.query = "";
+        renderTabs();
+        renderChapters();
+        const search = document.getElementById("motifsSearch");
+        if (search) search.value = "";
+        await loadList();
+    }
+    mState.selectedId = id;
+    markActive(id);
+
+    const detail = document.getElementById("motifsDetail");
+    detail.innerHTML = `<div class="reader-placeholder">Loading...</div>`;
+    try {
+        const params = new URLSearchParams({ id });
+        const data = await api(`/api/motifs/${index}/motif?${params.toString()}`);
+        detail.innerHTML = renderDetail(data);
+        detail.scrollTop = 0;
+        detail.querySelectorAll(".motif-link").forEach((a) => {
+            a.addEventListener("click", (e) => {
+                e.preventDefault();
+                openMotif(a.dataset.index, a.dataset.id);
+            });
+        });
+    } catch (error) {
+        detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function linkChips(links) {
+    if (!links || !links.length) return `<span class="motif-empty">—</span>`;
+    return links.map((l) => `
+        <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
+           class="motif-link${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
+           title="${escapeHtml(l.name || l.id)}${l.exists ? "" : " (not in this database)"}">
+            <span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}
+        </a>
+    `).join("");
+}
+
+function section(title, bodyHtml) {
+    return `<div class="motif-section"><div class="motif-section-title">${escapeHtml(title)}</div>${bodyHtml}</div>`;
+}
+
+function linkSection(title, links) {
+    return section(title, `<div class="motif-links">${linkChips(links)}</div>`);
+}
+
+function renderDetail(d) {
+    const links = d.links || {};
+    let body = `
+        <div class="motif-head">
+            <span class="motif-code">${escapeHtml(d.id)}</span>
+            <h2 class="motif-name">${escapeHtml(d.name || "—")}</h2>
+        </div>
+        <div class="motif-chapter">${escapeHtml(d.chapter_label || d.chapter || "")}</div>
+    `;
+
+    if (d.index === "berezkin") {
+        if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
+        const areas = (d.areas || []).map((a) => `<span class="motif-area">${escapeHtml(a)}</span>`).join("");
+        body += section(`Areal indices (${(d.areas || []).length})`,
+            (areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`) +
+            `<p class="motif-note">Berezkin areal codes. The group-name legend is not yet decoded (per-region numbering); indices are shown verbatim.</p>`);
+        if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
+        if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
+    } else if (d.index === "tmi") {
+        if (d.chapter_name) body += section("Chapter", `<p class="motif-text">${escapeHtml(d.chapter_name)}</p>`);
+        if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
+        if ((links.parent || []).length) body += linkSection("Parent motif", links.parent);
+        body += linkSection("Appears in ATU tale types", links.atu);
+    } else if (d.index === "atu") {
+        if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
+        if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
+        body += linkSection(`Constituent TMI motifs (${(links.tmi || []).length})`, links.tmi);
+        if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
+        if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+    }
+
+    return `<div class="motif-detail-inner">${body}</div>`;
+}

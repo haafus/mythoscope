@@ -24,12 +24,14 @@ CLI (cli.py) ──► settings.py (+ config/*.json, model_registry.py)
    ├─ embeddings/  ──► outputs/embeddings/  (ChromaDB)
    ├─ projections/ ──► outputs/projections/ (UMAP/heatmap JSON, summaries-UMAP)
    ├─ graphs/      ──► outputs/graphs/       (beings/realms/ages JSON)
+   ├─ motifs/      ──► outputs/motifs/       (berezkin/tmi/atu JSON + crosswalk)
    └─ server/      ◄── читает outputs/ и отдаёт SPA + REST API
 
 corpus → embeddings → {projections, graphs} → server
+motifs (независим от корпуса) → server
 ```
 
-Доменные пакеты (`corpus`, `embeddings`, `projections`, `graphs`, `server`) — по шагу пайплайна. Общая инфраструктура, не привязанная к шагу:
+Доменные пакеты (`corpus`, `embeddings`, `projections`, `graphs`, `motifs`, `server`) — по шагу пайплайна. Общая инфраструктура, не привязанная к шагу:
 
 - **`llm/`** — работа с LLM: `client.py` (`LLMProcessor` — OpenAI-compatible вызовы, классификация ошибок, ретраи), `rate_limiter.py` (`RateGovernor` — лимиты RPM/TPM + circuit breaker), `concurrency.py` (`map_concurrent` — параллельный фан-аут с быстрой отменой).
 - **`chunk_cache.py`** — append-only content-hash JSONL-кэш (graphs, summaries): возобновление по содержимому.
@@ -344,6 +346,35 @@ MYTHO_PROJECTION__MAX_CONCURRENT=10    # summaries
 - Точка насыщения плавает с латентностью — держи небольшой запас, а не точное значение.
 - `% TPM` / `throttled` считаются из фактического `usage`, поэтому работают и без заголовков провайдера (Gemini/DeepSeek).
 
+## motifs
+
+Строит **базу мотивов** — машиночитаемый, перекрёстно связанный слой традиционных фольклорных индексов — и кладёт её в `outputs/motifs/`. Независим от корпуса: можно запускать отдельно.
+
+Источники (`config/motifs.json`):
+- **Berezkin** — аналитический каталог Ю. Е. Березкина и Е. Н. Дувакина (areasofmyths.com): скрейп одной навигационной страницы даёт все ~3 500 мотивов (код, название, ареальные индексы, внутренние see-also и ссылки `ATU NNN`); по детальным страницам добираются краткие определения.
+- **Trilogy** (`j-hagedorn/trilogy`, CC-BY-SA 4.0) — TMI (~46 000 мотивов Томпсона с иерархией) и ATU (~2 250 типов сказок, каждый с упорядоченным списком мотивов TMI из `atu_seq`).
+
+Основные файлы:
+- `src/motifs/build_motifs.py` — оркестратор шага (идемпотентный, возобновляемый, `--force` пересобирает с нуля).
+- `src/motifs/sources/berezkin.py` — скрейп + парсинг каталога Березкина (парсинг отделён от загрузки и покрыт тестами).
+- `src/motifs/sources/trilogy.py` — загрузка и разбор CSV Trilogy (TMI, ATU, `atu_seq`, `atu_combos`).
+- `src/motifs/sources/fetch.py` — загрузка-в-кэш (`outputs/motifs/raw/`): повторный запуск не ходит в сеть.
+- `src/motifs/crosswalk.py` — cross-walk: ATU↔TMI (из `atu_seq`) и Berezkin→ATU (из ссылок `ATU NNN` в названиях).
+- `src/motifs/store.py` — раскладка файлов и чтение (кэш на процесс), общий с сервером.
+
+Выход (`outputs/motifs/`): `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `meta.json` и кэш сырья `raw/`.
+
+**Воспроизводимость и перезапуск.** Сырьё кэшируется в `raw/`, поэтому повторный запуск дёшев и безопасен к прерыванию (прерванный прогон без `meta.json` продолжится с места по кэшу). Шаг идемпотентен: если база уже построена, повторный `mytho motifs` её пропускает. `--force` перезагружает все источники и пересобирает с нуля.
+
+```bash
+mytho motifs           # построить (пропустит, если уже построено)
+mytho motifs --force   # пересобрать с нуля (заново скачать источники)
+```
+
+Тюнинг скрейпа Березкина — через env (см. `.env.example`): `MYTHO_MOTIFS__MAX_WORKERS` (параллельные загрузки детальных страниц), `MYTHO_MOTIFS__BEREZKIN_DETAILS` (тянуть ли определения), `MYTHO_MOTIFS__MAX_MOTIFS` (ограничить число детальных страниц — используется `build --sample`).
+
+**Об ареалах.** Ареальные индексы Березкина сохраняются как есть (числа) — это достоверные данные источника. Названия ареальных групп **не** подставляются: легенда на areasofmyths нумеруется по регионам и не совпадает с глобальным индексом мотивов; корректное декодирование требует официального ключа ареалов Березкина (задел на будущее, парсер `parse_areas` оставлен под него). Cross-walk Berezkin↔TMI намеренно отсутствует: каталог не содержит систематических кодов Томпсона (нужен опубликованный конкорданс). Подробный разбор источников — в [motif-index-data-sources.md](motif-index-data-sources.md).
+
 ## status
 
 Показывает текущее состояние пайплайна: что построено, чего не хватает, размеры на диске.
@@ -352,7 +383,7 @@ MYTHO_PROJECTION__MAX_CONCURRENT=10    # summaries
 mytho status
 ```
 
-Вывод содержит секции Corpus, Embeddings, Projections, Graphs с итоговым размером. В Graphs «готовыми» считаются только книги со всеми тремя графами (`beings.json`, `realms.json`, `ages.json`). Размеры показываются **без** resumable-кэшей (их размер виден в `clean`).
+Вывод содержит секции Corpus, Embeddings, Projections, Graphs, Motifs с итоговым размером. В Graphs «готовыми» считаются только книги со всеми тремя графами (`beings.json`, `realms.json`, `ages.json`). В Motifs показываются счётчики по индексам (berezkin/tmi/atu). Размеры показываются **без** resumable-кэшей (их размер виден в `clean`).
 
 ## clean
 
@@ -370,7 +401,7 @@ mytho clean
 mytho clean --apply
 ```
 
-Resumable-кэши (`extraction_cache.jsonl`, `summaries.jsonl`) **показываются всегда** с размером, но удаляются только по явному `--caches` (они хранят оплаченные LLM-результаты и позволяют дешёвую пересборку):
+Resumable-кэши (`extraction_cache.jsonl`, `summaries.jsonl`, а также сырьё мотивов `outputs/motifs/raw/`) **показываются всегда** с размером, но удаляются только по явному `--caches` (они хранят оплаченные LLM-результаты и скачанные источники, позволяя дешёвую пересборку):
 
 ```bash
 mytho clean --caches            # dry run: показать кэши
@@ -385,6 +416,7 @@ FastAPI-сервер и SPA-интерфейс.
 - `src/server/run_server.py` создание приложения, middleware, статика.
 - `src/server/api/corpus.py` каталог текстов, чтение документов, архив, традиции.
 - `src/server/api/graphs.py` данные графов (персонажи, связи).
+- `src/server/api/motifs.py` индексы мотивов, список/детали мотивов, cross-walk.
 - `src/server/api/similarity.py` модели, семантический поиск, точки, проекции.
 - `src/server/schemas.py` Pydantic-схемы запросов и ответов.
 - `src/server/services/` сервисный слой (каталог, ZIP-архив, проекции, поиск).
@@ -398,6 +430,9 @@ FastAPI-сервер и SPA-интерфейс.
 | GET | `/api/corpus/archive` | ZIP-архив корпуса |
 | GET | `/api/corpus/traditions` | Традиции с координатами |
 | GET | `/api/graphs/{text_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
+| GET | `/api/motifs/indexes` | Индексы мотивов (berezkin/tmi/atu) + главы и счётчики |
+| GET | `/api/motifs/{index}/motifs` | Список мотивов (фильтры `?chapter=&q=&limit=&offset=`) |
+| GET | `/api/motifs/{index}/motif?id=…` | Детали мотива + связи cross-walk |
 | GET | `/api/similarity/models` | Список embedding-моделей |
 | GET | `/api/similarity/methods` | Список методов проекций |
 | GET | `/api/similarity/projections/{model}/{method}` | JSON-данные проекции |
@@ -475,6 +510,7 @@ Vanilla JS SPA на нативных ES-модулях (без бандлера 
 - `assets/page-embeddings.js` — визуализация эмбеддингов, поиск, информация о точке.
 - `assets/page-graphs.js` — графы персонажей / мест / эпох (Cytoscape).
 - `assets/page-geography.js` — карта Leaflet с традициями.
+- `assets/page-motifs.js` — раздел Motifs: выбор индекса, главы, поиск, список и детали мотива с кликабельными cross-walk-ссылками между индексами.
 - `assets/page-about.js` — страница About (вкладки Vision / Methodology / …).
 - `assets/chart.js` — графики (scatter / heatmap / distribution) на Plotly.
 - `assets/chart-tooltip.js`, `chart-color.js` — хелперы графиков: тултип точки и тонирование приглушённых традиций.
@@ -494,6 +530,7 @@ mytho server
 - `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
 - `outputs/projections/` — результаты анализа: JSON-данные проекций (UMAP, heatmap, distribution). Создается через `mytho projections`.
 - `outputs/graphs/` — JSON-графы (characters, realms, ages) для каждого текста. Создается через `mytho graphs`.
+- `outputs/motifs/` — база мотивов: `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `meta.json` + кэш сырья `raw/`. Создается через `mytho motifs`.
 - `outputs/logs/` — логи всех пайплайнов.
 
 ## Типовой пайплайн
@@ -531,7 +568,10 @@ mytho projections
 # 4. Извлечь графы персонажей через LLM
 mytho graphs
 
-# 5. Запустить веб-интерфейс
+# 5. Построить базу мотивов (Berezkin + TMI + ATU); независим от шагов 1-4
+mytho motifs
+
+# 6. Запустить веб-интерфейс
 mytho server
 ```
 

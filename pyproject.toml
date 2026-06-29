@@ -83,6 +83,7 @@ include = [
     "projection*",
     "embedding*",
     "graphs*",
+    "motifs*",
     "server*",
     "llm*",
 ]
