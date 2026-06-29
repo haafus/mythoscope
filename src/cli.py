@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import click
 
 from log_setup import setup_logging
+from pipeline_inspect import format_size
 
 logger = logging.getLogger(__name__)
 
@@ -198,7 +199,6 @@ def status():
     from pipeline_inspect import (
         corpus_status,
         embeddings_status,
-        format_size,
         graphs_status,
         motifs_status,
         projections_status,
@@ -276,7 +276,6 @@ def status():
 
 
 def _header(name: str, size: int):
-    from pipeline_inspect import format_size
     click.echo(f"{name}:  {format_size(size)}")
 
 
@@ -299,7 +298,6 @@ def _clean(apply: bool, caches: bool):
         corpus_orphans,
         embeddings_orphan_chunks,
         embeddings_orphan_collections,
-        format_size,
         graphs_orphans,
         motifs_raw_cache,
         projections_orphans,
@@ -421,7 +419,6 @@ def _clean(apply: bool, caches: bool):
 def export(caches: bool):
     """Bundle built outputs into a portable zip for another machine."""
     from export_bundle import export_outputs, orphan_summary
-    from pipeline_inspect import format_size
 
     try:
         orphans = orphan_summary()
