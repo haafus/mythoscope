@@ -355,8 +355,9 @@ class TestService:
 
     def test_tmi_list_has_level_badge(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
-        assert by["S31"]["badge"] == "L2 · 2" and by["S31"]["level"] == 2  # 2 children
-        assert by["S31.0.1"]["badge"] == "L3"  # .0 chain, leaf -> no count
+        # recursive descendant count first, then level (S31 -> S31.1, S31.0.1)
+        assert by["S31"]["badge"] == "2 · L2" and by["S31"]["level"] == 2
+        assert by["S31.0.1"]["badge"] == "L3"  # leaf -> no count
 
     def test_tmi_list_flags_leaves(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}

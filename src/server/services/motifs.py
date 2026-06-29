@@ -63,6 +63,28 @@ def _tmi_ancestors(rec: dict) -> list[dict]:
     return [_link("tmi", mid) for mid in reversed(chain)]
 
 
+def _tmi_descendant_counts() -> dict[str, int]:
+    """id -> total number of descendants (recursively, down to the leaves)."""
+    def build() -> dict[str, int]:
+        children = _tmi_children()
+        counts: dict[str, int] = {}
+
+        def count(mid: str, stack: frozenset) -> int:
+            if mid in counts:
+                return counts[mid]
+            total = 0
+            for child in children.get(mid, []):
+                total += 1 + (count(child, stack | {mid}) if child not in stack else 0)
+            counts[mid] = total
+            return total
+
+        for mid in children:
+            count(mid, frozenset())
+        return counts
+
+    return store.cached("tmi:descendants", build)
+
+
 def _tmi_direct_children(motif_id: str) -> tuple[list[dict], bool]:
     """Immediate child links (one level down), capped at _CHILDREN_CAP."""
     kids = _tmi_children().get(motif_id, [])
@@ -73,15 +95,15 @@ def _tmi_direct_children(motif_id: str) -> tuple[list[dict], bool]:
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
-    n_children = len(_tmi_children().get(motif_id, [])) if index == "tmi" else 0
+    n = _tmi_descendant_counts().get(motif_id, 0) if index == "tmi" else 0
     return {
         "index": index,
         "id": motif_id,
         "name": rec.get("name", "") if rec else "",
         "exists": rec is not None,
         "level": rec.get("level", 0) if rec else 0,  # for the TMI lineage tree badges
-        "leaf": index == "tmi" and n_children == 0,
-        "child_count": n_children,
+        "leaf": index == "tmi" and n == 0,
+        "descendant_count": n,
     }
 
 
@@ -126,10 +148,10 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
-        n_children = len(_tmi_children().get(rec["id"], []))
-        item["badge"] = f"L{rec.get('level', 0)}" + (f" · {n_children}" if n_children else "")
+        n = _tmi_descendant_counts().get(rec["id"], 0)
+        item["badge"] = (f"{n} · " if n else "") + f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
-        item["leaf"] = n_children == 0
+        item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
 
@@ -188,6 +210,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["duplicate"] = bool(rec.get("duplicate"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
+        detail["descendant_count"] = _tmi_descendant_counts().get(rec["id"], 0)
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
 

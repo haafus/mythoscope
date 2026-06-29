@@ -207,8 +207,8 @@ function linkChips(links) {
 }
 
 function treeRow(node, depth, { current = false } = {}) {
-    const count = node.child_count ? ` · ${node.child_count}` : "";
-    const badge = `<span class="motifs-item-badge">L${escapeHtml(String(node.level ?? ""))}${count}</span>`;
+    const count = node.descendant_count ? `${node.descendant_count} · ` : "";
+    const badge = `<span class="motifs-item-badge">${count}L${escapeHtml(String(node.level ?? ""))}</span>`;
     const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badge}`;
     const leaf = (!current && node.leaf) ? " leaf" : "";
     if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
@@ -220,7 +220,7 @@ function renderTmiTree(d) {
     const rows = [`<div class="motifs-item motif-tree-row tree-chapter" style="--depth:0"><span class="motifs-item-name">${escapeHtml(d.chapter_label || d.chapter || "")}</span></div>`];
     let depth = 1;
     for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
-    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, child_count: (d.children || []).length }, depth, { current: true }));
+    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
     return `<div class="motif-tree">${rows.join("")}</div>`;
