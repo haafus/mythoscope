@@ -85,7 +85,7 @@ py-modules = [
 where = ["src"]
 include = [
     "corpus*",
-    "projection*",
+    "projections*",
     "embedding*",
     "graphs*",
     "motifs*",

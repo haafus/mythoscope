@@ -64,7 +64,7 @@ class MotifsSettings(BaseModel):
     max_motifs: int | None = None
 
 
-class ProjectionSettings(BaseModel):
+class ProjectionsSettings(BaseModel):
     umap_n_neighbors: int = 15
     umap_min_dist: float = 0.1
     # Summaries processed in parallel (one LLM call each).
@@ -100,7 +100,7 @@ class Settings(BaseSettings):
     llm: LLMSettings = LLMSettings()
     graphs: GraphsSettings = GraphsSettings()
     motifs: MotifsSettings = MotifsSettings()
-    projection: ProjectionSettings = ProjectionSettings()
+    projections: ProjectionsSettings = ProjectionsSettings()
     server: ServerSettings = ServerSettings()
 
     model_config = {

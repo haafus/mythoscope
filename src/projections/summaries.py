@@ -36,7 +36,7 @@ def generate_summaries(
     if uncached:
         logger.info(
             f"Generating {len(uncached)}/{len(data)} summaries "
-            f"(concurrency={settings.projection.max_concurrent})..."
+            f"(concurrency={settings.projections.max_concurrent})..."
         )
         def _store(item: dict, summary: str) -> None:
             if summary:
@@ -47,7 +47,7 @@ def generate_summaries(
         completed = map_concurrent(
             uncached,
             lambda item: llm.ask_text(SUMMARY_PROMPT, item.get("text", "")[:4000]),
-            settings.projection.max_concurrent,
+            settings.projections.max_concurrent,
             on_result=_store,
         )
         if not completed:

@@ -341,7 +341,7 @@ LLM usage [gpt-4o-mini]: 200 requests, 315,901 tokens, ~72 req/min, 57% TPM, 14%
 
 ```bash
 MYTHO_GRAPHS__MAX_CONCURRENT=28        # graphs
-MYTHO_PROJECTION__MAX_CONCURRENT=10    # summaries
+MYTHO_PROJECTIONS__MAX_CONCURRENT=10   # summaries
 ```
 
 Нюансы:
