@@ -146,7 +146,7 @@ export function buildCorpusApiUrl(doc) {
 }
 
 export function corpusTraditionKey(major, tradition) {
-    return `${major || "Other"}\u0000${tradition || "Unknown"}`;
+    return `${major || "Other"}|${tradition || "Unknown"}`;
 }
 
 export function groupDocuments(items) {
