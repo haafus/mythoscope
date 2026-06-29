@@ -11,7 +11,13 @@ from settings import settings
 
 from .completion import is_book_complete
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
-from .graph_generator import generate_ages_graph, generate_beings_graph, generate_realms_graph
+from .graph_generator import (
+    filter_by_names,
+    generate_ages_graph,
+    generate_beings_graph,
+    generate_realms_graph,
+    top_mentioned_names,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -151,14 +157,28 @@ def build_graphs(
         all_relations = deduplicate_relations(results["relations"])
         all_locations = deduplicate_entities(results["locations"])
         all_times = deduplicate_entities(results["times"])
+
+        # Keep only the N most-mentioned entities in each graph (None = keep all).
+        max_entities = graphs_cfg.max_entities
+        keep_beings = top_mentioned_names(all_beings, results["beings"], max_entities)
+        keep_realms = top_mentioned_names(all_locations, results["locations"], max_entities)
+        keep_ages = top_mentioned_names(all_times, results["times"], max_entities)
+        top_times = filter_by_names(all_times, keep_ages)
+
+        def _kept(total, keep):
+            return total if keep is None else len(keep)
+
         logger.info(
-            f"Extracted unique items: Beings ({len(all_beings)}), Relations ({len(all_relations)}), Realms ({len(all_locations)}), Ages ({len(all_times)})"
+            f"Entities — Beings: {len(all_beings)} found, kept {_kept(len(all_beings), keep_beings)}; "
+            f"Realms: {len(all_locations)} found, kept {_kept(len(all_locations), keep_realms)}; "
+            f"Ages: {len(all_times)} found, kept {_kept(len(all_times), keep_ages)} "
+            f"(Relations: {len(all_relations)})"
         )
 
         try:
-            generate_beings_graph(all_beings, all_relations, book_out_dir)
-            generate_realms_graph(all_locations, book_out_dir)
-            generate_ages_graph(all_times, book_out_dir)
+            generate_beings_graph(all_beings, all_relations, book_out_dir, keep=keep_beings)
+            generate_realms_graph(all_locations, book_out_dir, keep=keep_realms)
+            generate_ages_graph(top_times, book_out_dir)
 
         except Exception:
             logger.exception("Error generating graph for %s", text_id)

@@ -4,6 +4,7 @@ from graphs.graph_generator import (
     generate_ages_graph,
     generate_beings_graph,
     generate_realms_graph,
+    top_mentioned_names,
 )
 
 
@@ -39,6 +40,29 @@ class TestBeingsGraph:
         )
         edges = _load(tmp_path / "beings.json")["edges"]
         assert edges == [{"source": "A", "target": "B", "relation": "loves"}]
+
+
+class TestTopMentioned:
+    def test_picks_most_mentioned(self):
+        unique = [{"Name": "Zeus"}, {"Name": "Hera"}, {"Name": "Minor"}]
+        raw = ([{"Name": "Zeus"}] * 3) + ([{"Name": "Hera"}] * 2) + [{"Name": "Minor"}]
+        assert top_mentioned_names(unique, raw, 2) == {"zeus", "hera"}
+
+    def test_none_when_no_limit_or_already_small(self):
+        unique = [{"Name": "A"}, {"Name": "B"}]
+        assert top_mentioned_names(unique, unique, None) is None
+        assert top_mentioned_names(unique, unique, 5) is None
+
+    def test_keep_restricts_beings_graph(self, tmp_path):
+        beings = [{"Name": "Zeus"}, {"Name": "Hera"}, {"Name": "Minor"}]
+        relations = [
+            {"Subject": "Zeus", "Object": "Hera", "Relation": "married"},
+            {"Subject": "Zeus", "Object": "Minor", "Relation": "knows"},
+        ]
+        generate_beings_graph(beings, relations, tmp_path, keep={"zeus", "hera"})
+        data = _load(tmp_path / "beings.json")
+        assert {n["id"] for n in data["nodes"]} == {"Zeus", "Hera"}  # Minor dropped
+        assert data["edges"] == [{"source": "Zeus", "target": "Hera", "relation": "married"}]
 
 
 class TestRealmsGraph:

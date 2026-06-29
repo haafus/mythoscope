@@ -49,6 +49,8 @@ class GraphsSettings(BaseModel):
     # concurrency lives entirely here (overshoot is harmless — the buckets throttle).
     # 18 keeps a typical gpt-4o-mini run near its TPM ceiling rather than latency-bound.
     max_concurrent: int = 18
+    # Keep only the N most-mentioned entities in each graph (None = keep all).
+    max_entities: int | None = None
 
 
 class ProjectionSettings(BaseModel):

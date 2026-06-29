@@ -1,4 +1,5 @@
 import logging
+from collections import Counter
 from pathlib import Path
 
 import networkx as nx
@@ -86,6 +87,31 @@ def _resolver(display: dict[str, str]):
     return resolve
 
 
+def _entity_name(entity: dict) -> str:
+    return _norm_name(_field(entity, "name") or "")
+
+
+def top_mentioned_names(unique: list[dict], raw: list[dict], n: int | None) -> set[str] | None:
+    """Normalized names of the n entities most mentioned in the raw (pre-dedup)
+    list. Returns None (= keep all) when n is None or already <= n."""
+    if n is None or len(unique) <= n:
+        return None
+    counts: Counter = Counter()
+    for ent in raw:
+        name = _field(ent, "name")
+        if name and str(name).strip():
+            counts[_norm_name(name)] += 1
+    ranked = sorted(unique, key=lambda e: counts.get(_entity_name(e), 0), reverse=True)
+    return {_entity_name(e) for e in ranked[:n]}
+
+
+def filter_by_names(entities: list[dict], keep: set[str] | None) -> list[dict]:
+    """Keep only entities whose name is in `keep`, preserving order. None = keep all."""
+    if keep is None:
+        return entities
+    return [e for e in entities if _entity_name(e) in keep]
+
+
 def _to_json(
     G: nx.Graph,
     display: dict[str, str],
@@ -138,7 +164,15 @@ def _save_graph(data: dict, output_path: Path) -> None:
     logger.info(f"Graph saved: {output_path}")
 
 
-def generate_beings_graph(beings_data: list, relations_data: list, output_dir: Path) -> None:
+def _keep_subgraph(G, keep: set[str] | None):
+    """Restrict the graph to the kept entities (and edges among them). None = all."""
+    if keep is None:
+        return G
+    return G.subgraph([n for n in G.nodes if _norm_name(n) in keep])
+
+
+def generate_beings_graph(beings_data: list, relations_data: list, output_dir: Path,
+                          keep: set[str] | None = None) -> None:
     display, metadata = _entity_index(beings_data)
     resolve = _resolver(display)
 
@@ -160,10 +194,11 @@ def generate_beings_graph(beings_data: list, relations_data: list, output_dir: P
     if not edges_added:
         logger.warning("No valid relations for beings graph.")
 
-    _save_graph(_to_json(G, display, metadata, "Character"), output_dir / "beings.json")
+    _save_graph(_to_json(_keep_subgraph(G, keep), display, metadata, "Character"), output_dir / "beings.json")
 
 
-def generate_realms_graph(locations_data: list, output_dir: Path) -> None:
+def generate_realms_graph(locations_data: list, output_dir: Path,
+                          keep: set[str] | None = None) -> None:
     display, metadata = _entity_index(locations_data)
     resolve = _resolver(display)
 
@@ -181,7 +216,7 @@ def generate_realms_graph(locations_data: list, output_dir: Path) -> None:
                 G.add_node(neighbor)
                 G.add_edge(name, neighbor, relation="adjacent to")
 
-    _save_graph(_to_json(G, display, metadata, "Location"), output_dir / "realms.json")
+    _save_graph(_to_json(_keep_subgraph(G, keep), display, metadata, "Location"), output_dir / "realms.json")
 
 
 def generate_ages_graph(times_data: list, output_dir: Path) -> None:
