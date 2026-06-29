@@ -47,10 +47,9 @@ export function setBodyClass(path) {
 }
 
 export function setActiveNav(path) {
+    const current = `#${path}`;
     document.querySelectorAll(".nav-links a").forEach((link) => {
-        const href = link.getAttribute("href") || "";
-        const hashPath = (href.split("#")[1] || "/").split("?")[0] || "/";
-        link.classList.toggle("active", hashPath === path);
+        link.classList.toggle("active", link.getAttribute("href") === current);
     });
 }
 
