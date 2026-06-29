@@ -101,12 +101,14 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
 
     # Correct parents. The most specific existing dotted ancestor wins (so
     # A52.0.1 -> A52); dot-less codes (A111, whose place-value parent A110
-    # isn't an id-prefix) fall back to the stored source parent.
+    # isn't an id-prefix) fall back to the stored source parent. A dotted id with
+    # no source parent is a real defect (the dataset dropped its level path);
+    # a dot-less one with no parent is just a root (A0, A100, …) — not a defect.
     recovered = unresolved = 0
     for m in motifs:
         stored = m.get("parent", "")
         eff = _id_trim_parent(m["code"], idset) or (stored if stored in idset else "")
-        if not stored:
+        if not stored and "." in m["code"]:
             recovered += eff != ""
             unresolved += eff == ""
         m["parent"] = eff
@@ -138,7 +140,7 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
         logger.warning("TMI defect: %d duplicate codes given letter sub-indices: %s",
                        len(dup_codes), ", ".join(sorted(dup_codes)))
     if recovered or unresolved:
-        logger.warning("TMI defect: %d dotted ids had no parent (recovered %d via id-trim, %d unresolved)",
+        logger.warning("TMI defect: %d dotted ids had no source parent — reattached %d via id-trim, %d unresolved",
                        recovered + unresolved, recovered, unresolved)
 
     motifs.sort(key=lambda m: tmi_sort_key(m["id"]))
