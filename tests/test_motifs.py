@@ -141,12 +141,14 @@ class TestBerezkinIndexHtml:
         html = """
         <ul><p>A. СОЛНЦЕ И ЛУНА</p>
           <li><a target="right" href="a1.html">A1. Древнее солнце. .19.21.</a></li>
+          <ul><b>K. ПРИКЛЮЧЕНИЯ I(1): ДЕЯНИЯ ГЕРОЕВ</b>
           <li><a target="right" href="b1.html">B1. Двое создателей. A50. .13.</a></li>
           <li><a href="other.htm">junk</a></li>
         </ul>
         """
         motifs, chapters = berezkin.parse_index(html)
-        assert chapters == {"A": "СОЛНЦЕ И ЛУНА"}
+        # headers in both <p> and <b>, names may carry colons/parens
+        assert chapters == {"A": "СОЛНЦЕ И ЛУНА", "K": "ПРИКЛЮЧЕНИЯ I(1): ДЕЯНИЯ ГЕРОЕВ"}
         assert [m["id"] for m in motifs] == ["A1", "B1"]
 
     def test_definition(self):

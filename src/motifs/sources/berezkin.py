@@ -42,8 +42,10 @@ _ATU_CLAUSE_RE = re.compile(r"ATU\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 _BARE_ATU_RE = re.compile(r"(?<![A-Za-z0-9])(\d{2,4}[A-Za-z][A-Za-z0-9]*\*?)")
 # Leftover Thompson notation ("… Th .1.4.1; .2.2", "… Th") — stripped from names.
 _THOMPSON_RE = re.compile(r"\bTh\b[\s.,;0-9]*")
-# A chapter header in the nav, e.g. "A. СОЛНЦЕ И ЛУНА".
-_CHAPTER_RE = re.compile(r"^\s*([A-Z])\.\s+([А-ЯЁ][А-ЯЁ \-,]+?)\s*$")
+# A chapter header in the nav, e.g. "A. СОЛНЦЕ И ЛУНА" or
+# "K. ПРИКЛЮЧЕНИЯ I(1): ДЕЯНИЯ ГЕРОЕВ" — name starts with a Cyrillic capital,
+# then anything (colon/parens/roman numerals appear in some headers).
+_CHAPTER_RE = re.compile(r"^\s*([A-Z])\.\s+([А-ЯЁ].+?)\s*$")
 # The trailing areal-index list: preceded by whitespace/comma, may open with "(".
 _AREA_RE = re.compile(r"[\s,]+[.(]*\d[\d.()\s,\-]*$")
 # Berezkin groups societies into ~70 areal units; anything well above that is a
@@ -211,9 +213,11 @@ def parse_index(html: str) -> tuple[list[dict], dict[str, str]]:
 
     soup = BeautifulSoup(html, "html.parser")
 
+    # Chapter headers are inconsistently marked up: "A." sits in a <p>, the rest
+    # ("C. КАТАСТРОФЫ" …) in <b>. Scan both.
     chapters: dict[str, str] = {}
-    for p in soup.find_all("p"):
-        cm = _CHAPTER_RE.match(p.get_text(" ", strip=True))
+    for tag in soup.find_all(["p", "b"]):
+        cm = _CHAPTER_RE.match(tag.get_text(" ", strip=True))
         if cm:
             chapters[cm.group(1)] = cm.group(2).strip()
 
