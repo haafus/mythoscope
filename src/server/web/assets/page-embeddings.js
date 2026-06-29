@@ -40,7 +40,7 @@ const CHART_RENDERERS = {
     },
 };
 
-export async function renderEmbeddingsAnalysis() {
+export async function renderEmbeddings() {
     app.innerHTML = `
         <main class="analysis-page container">
             <div class="workspace">
