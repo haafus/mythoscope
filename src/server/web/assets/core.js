@@ -1,3 +1,5 @@
+// ===== App root & shared state =====
+
 export const app = document.getElementById("app");
 
 export const state = {
@@ -14,6 +16,8 @@ export const state = {
     similarityMethods: [],
 };
 
+// ===== Routing (shared with pages) =====
+
 export function parseHash() {
     const raw = window.location.hash.slice(1) || "/";
     const splitAt = raw.indexOf("?");
@@ -23,34 +27,6 @@ export function parseHash() {
         path: path || "/",
         params: new URLSearchParams(query),
     };
-}
-
-// Canonical path -> body class; unknown paths fall back to DEFAULT_ROUTE.
-export const DEFAULT_ROUTE = "/corpus";
-
-const ROUTE_CLASS = {
-    "/corpus": "route-corpus",
-    "/geography": "route-geography",
-    "/embeddings": "route-embeddings",
-    "/beings": "route-graphs",
-    "/realms": "route-graphs",
-    "/ages": "route-graphs",
-    "/about": "route-about",
-};
-
-function routeClass(path) {
-    return ROUTE_CLASS[path] || ROUTE_CLASS[DEFAULT_ROUTE];
-}
-
-export function setBodyClass(path) {
-    document.body.className = `has-main-navbar ${routeClass(path)}`;
-}
-
-export function setActiveNav(path) {
-    const current = `#${path}`;
-    document.querySelectorAll(".nav-links a").forEach((link) => {
-        link.classList.toggle("active", link.getAttribute("href") === current);
-    });
 }
 
 let routeCleanups = [];
@@ -66,6 +42,8 @@ export function cleanupRoute() {
         try { fn(); } catch (error) { console.error(error); }
     });
 }
+
+// ===== HTTP =====
 
 export async function api(path, options = {}) {
     const headers = {...(options.headers || {})};
@@ -89,6 +67,8 @@ export async function api(path, options = {}) {
     return response.text();
 }
 
+// ===== Utilities =====
+
 export function escapeHtml(value) {
     return String(value ?? "")
         .replace(/&/g, "&amp;")
@@ -102,12 +82,6 @@ export function normalizePreviewText(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
-// A point/chunk id is the book title with spaces turned into underscores
-// (normalize_catalog_id), so the title is recovered by reversing that.
-export function bookTitleFromId(value) {
-    return String(value || "").replace(/\.txt$/i, "").replace(/_/g, " ").trim();
-}
-
 export function escapeRegex(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -116,6 +90,8 @@ export function formatNumber(value) {
     const number = Number(value || 0);
     return Number.isFinite(number) ? number.toLocaleString("en-US") : "0";
 }
+
+// ===== Models =====
 
 function modelLabel(model) {
     return (model.name || model.key || "").replace(/_/g, "/");
@@ -149,6 +125,8 @@ export function renderModelOptions(selectedKey = state.selectedModel) {
     `).join("");
 }
 
+// ===== Corpus =====
+
 export async function ensureCorpusDocuments() {
     if (!state.corpusDocuments.length) {
         const data = await api("/api/corpus/catalog");
@@ -171,17 +149,6 @@ export function corpusTraditionKey(major, tradition) {
     return `${major || "Other"}\u0000${tradition || "Unknown"}`;
 }
 
-export async function loadTraditionInfo() {
-    if (state.traditionInfo) return state.traditionInfo;
-    try {
-        const data = await api("/api/corpus/traditions");
-        state.traditionInfo = data.traditions || {};
-    } catch {
-        state.traditionInfo = {};
-    }
-    return state.traditionInfo;
-}
-
 export function groupDocuments(items) {
     const grouped = new Map();
 
@@ -196,4 +163,23 @@ export function groupDocuments(items) {
     });
 
     return grouped;
+}
+
+// A point/chunk id is the book title with spaces turned into underscores
+// (normalize_catalog_id), so the title is recovered by reversing that.
+export function bookTitleFromId(value) {
+    return String(value || "").replace(/\.txt$/i, "").replace(/_/g, " ").trim();
+}
+
+// ===== Traditions =====
+
+export async function loadTraditionInfo() {
+    if (state.traditionInfo) return state.traditionInfo;
+    try {
+        const data = await api("/api/corpus/traditions");
+        state.traditionInfo = data.traditions || {};
+    } catch {
+        state.traditionInfo = {};
+    }
+    return state.traditionInfo;
 }
