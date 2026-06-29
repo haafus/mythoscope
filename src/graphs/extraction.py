@@ -2,6 +2,8 @@ import json
 
 from llm import LLMProcessor
 
+from .normalize import is_empty, norm_name
+
 
 def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> tuple[dict[str, list], bool]:
     """Extract all entity types from one chunk.
@@ -33,16 +35,10 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> tuple[di
     return results, complete
 
 
-def _is_empty(value) -> bool:
-    if value is None or value == "" or value == []:
-        return True
-    return isinstance(value, str) and value.strip().lower() == "nan"
-
-
 def _flatten_items(value):
     """Yield individual non-empty items from a scalar or list attribute value."""
     for item in value if isinstance(value, list) else [value]:
-        if not _is_empty(item):
+        if not is_empty(item):
             yield item
 
 
@@ -58,13 +54,13 @@ def deduplicate_entities(entities: list[dict]) -> list[dict]:
         name = ent.get("Name") or ent.get("name") or ent.get("NAME")
         if not name:
             continue
-        norm_name = str(name).strip().lower()
-        rec = grouped.get(norm_name)
+        norm = norm_name(name)
+        rec = grouped.get(norm)
         if rec is None:
             rec = {"name": str(name).strip(), "attrs": {}}
-            grouped[norm_name] = rec
+            grouped[norm] = rec
         for key, value in ent.items():
-            if str(key).strip().lower() == "name":
+            if norm_name(key) == "name":
                 continue
             for item in _flatten_items(value):
                 items, seen = rec["attrs"].setdefault(key, ([], set()))
@@ -87,9 +83,9 @@ def deduplicate_relations(relations: list[dict]) -> list[dict]:
     unique_relations = set()
     deduplicated = []
     for rel in relations:
-        subj = str(rel.get("Subject", rel.get("subject", ""))).strip().lower()
-        obj = str(rel.get("Object", rel.get("object", ""))).strip().lower()
-        r_type = str(rel.get("Relation", rel.get("relation", ""))).strip().lower()
+        subj = norm_name(rel.get("Subject", rel.get("subject", "")))
+        obj = norm_name(rel.get("Object", rel.get("object", "")))
+        r_type = norm_name(rel.get("Relation", rel.get("relation", "")))
 
         if not subj or not obj:
             continue

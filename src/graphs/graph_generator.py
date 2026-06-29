@@ -6,6 +6,8 @@ import networkx as nx
 
 from json_utils import save_json
 
+from .normalize import is_empty, norm_name
+
 logger = logging.getLogger(__name__)
 
 # Exact betweenness is O(V·E) and dominates graph generation on large books.
@@ -25,16 +27,6 @@ def _field(d: dict, *aliases):
         if _norm_key(k) in targets:
             return v
     return None
-
-
-def _norm_name(name) -> str:
-    return str(name).strip().lower()
-
-
-def _is_empty(value) -> bool:
-    if value is None or value == "" or value == []:
-        return True
-    return isinstance(value, str) and value.strip().lower() == "nan"
 
 
 def _split_multi(value) -> list[str]:
@@ -58,11 +50,11 @@ def _entity_index(entities: list[dict]) -> tuple[dict[str, str], dict[str, dict]
         name = _field(ent, "name")
         if name is None or not str(name).strip():
             continue
-        norm = _norm_name(name)
+        norm = norm_name(name)
         display.setdefault(norm, str(name).strip())
         meta = metadata.setdefault(norm, {})
         for key, value in ent.items():
-            if _norm_key(key) == "name" or _is_empty(value):
+            if _norm_key(key) == "name" or is_empty(value):
                 continue
             label = str(key).strip().title()
             if label not in meta:
@@ -82,13 +74,13 @@ def _resolver(display: dict[str, str]):
         text = str(name).strip()
         if not text:
             return None
-        return canon.setdefault(_norm_name(text), text)
+        return canon.setdefault(norm_name(text), text)
 
     return resolve
 
 
 def _entity_name(entity: dict) -> str:
-    return _norm_name(_field(entity, "name") or "")
+    return norm_name(_field(entity, "name") or "")
 
 
 def top_mentioned_names(unique: list[dict], raw: list[dict], n: int | None) -> set[str] | None:
@@ -100,7 +92,7 @@ def top_mentioned_names(unique: list[dict], raw: list[dict], n: int | None) -> s
     for ent in raw:
         name = _field(ent, "name")
         if name and str(name).strip():
-            counts[_norm_name(name)] += 1
+            counts[norm_name(name)] += 1
     ranked = sorted(unique, key=lambda e: counts.get(_entity_name(e), 0), reverse=True)
     return {_entity_name(e) for e in ranked[:n]}
 
@@ -135,7 +127,7 @@ def _to_json(
 
     nodes = []
     for node_id in G.nodes():
-        norm = _norm_name(node_id)
+        norm = norm_name(node_id)
         name = display.get(norm, node_id)
         node = {
             "id": node_id,
@@ -148,7 +140,7 @@ def _to_json(
         if compute_betweenness:
             node["BetweennessCentrality"] = betweenness.get(node_id, 0.0)
         for label, value in metadata.get(norm, {}).items():
-            if label not in node and not _is_empty(value):
+            if label not in node and not is_empty(value):
                 node[label] = value
         nodes.append(node)
 
@@ -168,7 +160,7 @@ def _keep_subgraph(G, keep: set[str] | None):
     """Restrict the graph to the kept entities (and edges among them). None = all."""
     if keep is None:
         return G
-    return G.subgraph([n for n in G.nodes if _norm_name(n) in keep])
+    return G.subgraph([n for n in G.nodes if norm_name(n) in keep])
 
 
 def generate_beings_graph(beings_data: list, relations_data: list, output_dir: Path,
