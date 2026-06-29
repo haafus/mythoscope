@@ -102,8 +102,7 @@ function wireControls() {
     });
 }
 
-function selectIndex(index) {
-    if (index === mState.index) return;
+async function switchIndex(index) {
     mState.index = index;
     mState.chapter = "";
     mState.query = "";
@@ -111,7 +110,12 @@ function selectIndex(index) {
     if (search) search.value = "";
     renderTabs();
     renderChapters();
-    loadList();
+    await loadList();
+}
+
+function selectIndex(index) {
+    if (index === mState.index) return;
+    switchIndex(index);
 }
 
 async function loadList() {
@@ -160,14 +164,7 @@ function markActive(id) {
 async function openMotif(index, id) {
     // Following a cross-link can switch indexes; keep the sidebar in sync.
     if (index !== mState.index) {
-        mState.index = index;
-        mState.chapter = "";
-        mState.query = "";
-        renderTabs();
-        renderChapters();
-        const search = document.getElementById("motifsSearch");
-        if (search) search.value = "";
-        await loadList();
+        await switchIndex(index);
     }
     mState.selectedId = id;
     markActive(id);
