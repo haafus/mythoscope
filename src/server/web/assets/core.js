@@ -15,7 +15,7 @@ export const state = {
 };
 
 export function parseHash() {
-    const raw = (window.location.hash || "#/").slice(1) || "/";
+    const raw = window.location.hash.slice(1) || "/";
     const splitAt = raw.indexOf("?");
     const path = splitAt === -1 ? raw : raw.slice(0, splitAt);
     const query = splitAt === -1 ? "" : raw.slice(splitAt + 1);
