@@ -51,6 +51,27 @@ class TestBerezkinEntry:
         assert e["see_also"] == ["A700", "A714", "A741"]
         assert e["areas"] == [10, 12]
 
+    def test_atu_comma_list_does_not_leak_into_areas(self):
+        # "ATU 311, 312" — both are refs; 312 must not become an area index.
+        e = berezkin.parse_motif_entry("L4. Разоблаченный убийца. ATU 311, 312. .10.11.", "l4.html")
+        assert e["atu_refs"] == ["311", "312"]
+        assert e["areas"] == [10, 11]
+        assert e["name"] == "Разоблаченный убийца"
+
+    def test_bare_tale_type_refs_captured(self):
+        e = berezkin.parse_motif_entry("J47A. Боб до неба. , 804A. .10.12.", "j47a.html")
+        assert e["atu_refs"] == ["804A"]
+        assert e["name"] == "Боб до неба"
+        assert e["areas"] == [10, 12]
+
+    def test_thompson_notation_stripped(self):
+        e = berezkin.parse_motif_entry("H49. Убитый пес. Th .1.4.1; .2.2. .27.", "h49.html")
+        assert e["name"] == "Убитый пес"
+
+    def test_latin_homoglyph_fixed(self):
+        e = berezkin.parse_motif_entry("E30A. Cупруг-эрзац заменен настоящим. .27.28.", "e30a.html")
+        assert e["name"] == "Супруг-эрзац заменен настоящим"
+
     def test_no_code_returns_none(self):
         assert berezkin.parse_motif_entry("Not a motif line", "x.html") is None
 
@@ -105,6 +126,12 @@ class TestBerezkinAreaDecode:
     def test_build_area_legend_skips_count_mismatch(self):
         motifs = [{"id": "X", "area_seq": [[1, False], [2, False]]}]
         headers = {"X": [("OnlyOneHeader", False)]}
+        assert berezkin.build_area_legend(motifs, headers) == {}
+
+    def test_build_area_legend_drops_single_vote(self):
+        # An index seen in only one clean motif lacks corroboration -> dropped.
+        motifs = [{"id": "M", "area_seq": [[5, False]]}]
+        headers = {"M": [("Lone area", False)]}
         assert berezkin.build_area_legend(motifs, headers) == {}
 
 

@@ -35,14 +35,49 @@ _LEADING_CODE_RE = re.compile(rf"^({_CODE})\.\s*")
 # A see-also reference to another Berezkin motif (uppercase-initial code). Some
 # codes trail a stray ".I"/".I.I" artifact in the source — consumed but dropped.
 _SEE_ALSO_RE = re.compile(r"\b([A-Z][A-Za-z]*[0-9][A-Za-z0-9]*)(?:\.I+)*")
-# An ATU tale-type cross-reference embedded in a title, e.g. "ATU 328A*".
-_ATU_REF_RE = re.compile(r"ATU\s+([0-9][0-9A-Za-z*]*)")
+# An "ATU …" clause, possibly a comma-separated list ("ATU 311, 312", "ATU 328A*").
+_ATU_CLAUSE_RE = re.compile(r"ATU\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
+# A bare tale-type reference left in a title ("…, 804A", "–653B"): digits followed
+# by a letter (so it can't be confused with an areal index, which is pure digits).
+_BARE_ATU_RE = re.compile(r"(?<![A-Za-z0-9])(\d{2,4}[A-Za-z][A-Za-z0-9]*\*?)")
+# Leftover Thompson notation ("… Th .1.4.1; .2.2", "… Th") — stripped from names.
+_THOMPSON_RE = re.compile(r"\bTh\b[\s.,;0-9]*")
 # A chapter header in the nav, e.g. "A. СОЛНЦЕ И ЛУНА".
 _CHAPTER_RE = re.compile(r"^\s*([A-Z])\.\s+([А-ЯЁ][А-ЯЁ \-,]+?)\s*$")
 # The trailing areal-index list: preceded by whitespace/comma, may open with "(".
 _AREA_RE = re.compile(r"[\s,]+[.(]*\d[\d.()\s,\-]*$")
-# Plausible upper bound for an areal index (the scheme has a few hundred areas).
-_MAX_AREA = 350
+# Berezkin groups societies into ~70 areal units; anything well above that is a
+# parsing artifact (e.g. a digit that leaked out of a name or a tale-type code).
+_MAX_AREA = 150
+
+# Latin letters that are visual twins of Cyrillic ones — the source occasionally
+# types the Latin form inside a Cyrillic word ("Cупруг" for "Супруг").
+_HOMOGLYPHS = {
+    "A": "А", "a": "а", "B": "В", "C": "С", "c": "с", "E": "Е", "e": "е",
+    "H": "Н", "K": "К", "k": "к", "M": "М", "O": "О", "o": "о", "P": "Р",
+    "p": "р", "T": "Т", "X": "Х", "x": "х", "y": "у",
+}
+
+
+def _is_cyrillic(ch: str) -> bool:
+    return bool(ch) and ("Ѐ" <= ch <= "ӿ")
+
+
+def _fix_homoglyphs(name: str) -> str:
+    """Replace a Latin letter with its Cyrillic twin when it sits in Cyrillic text."""
+    chars = list(name)
+    for i, ch in enumerate(chars):
+        twin = _HOMOGLYPHS.get(ch)
+        if twin and (_is_cyrillic(name[i - 1] if i else "") or _is_cyrillic(name[i + 1] if i + 1 < len(name) else "")):
+            chars[i] = twin
+    name = "".join(chars)
+    # A lone Latin homoglyph word between Cyrillic words (e.g. the preposition
+    # "c" typed Latin in "Существо c четным") — both neighbours are Cyrillic.
+    return re.sub(
+        r"(?<=[А-Яа-яЁё] )([A-Za-z])(?= [А-Яа-яЁё])",
+        lambda mt: _HOMOGLYPHS.get(mt.group(1), mt.group(1)),
+        name,
+    )
 
 
 def chapter_of(code: str) -> str:
@@ -112,9 +147,13 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
     code = m.group(1)
     rest = text[m.end():].strip()
 
-    # ATU tale-type cross-references embedded in the title ("... ATU 328A*").
-    atu_refs = _dedup(r.rstrip(".,") for r in _ATU_REF_RE.findall(rest))
-    rest = _ATU_REF_RE.sub("", rest)
+    # ATU tale-type cross-references in the title — "ATU 294", "ATU 328A*", or a
+    # comma-separated list "ATU 311, 312". Capturing the whole clause keeps the
+    # trailing numbers from leaking into the areal-index list.
+    atu_refs: list[str] = []
+    for clause in _ATU_CLAUSE_RE.findall(rest):
+        atu_refs.extend(part.strip().rstrip(".,") for part in clause.split(","))
+    rest = _ATU_CLAUSE_RE.sub("", rest)
 
     # Trailing areal index list (whitespace/comma-introduced; may open with "(").
     areas: list[int] = []
@@ -126,12 +165,21 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
         areas = sorted({n for n, _ in area_seq})
         before = rest[: area_match.start()].strip()
 
+    # Bare tale-type references the source wrote without the "ATU" prefix
+    # ("…, 804A", "–653B") — digits + a letter, so never an areal index.
+    atu_refs = _dedup(atu_refs + _BARE_ATU_RE.findall(before))
+
     # What remains is the name plus see-also codes (cross-references to other
     # Berezkin motifs). Codes are latin; the name is Cyrillic, so pulling the code
-    # tokens out leaves a clean name.
+    # tokens out — along with bare refs and leftover Thompson notation — leaves a
+    # clean name. A latin glyph glued to Cyrillic is then de-homoglyphed.
     see_also = _dedup(c for c in _SEE_ALSO_RE.findall(before) if c != code)
-    name = _SEE_ALSO_RE.sub("", before)
-    name = re.sub(r"\s+", " ", name).strip(" .,;").strip()
+    name = _THOMPSON_RE.sub(" ", before)
+    name = _BARE_ATU_RE.sub(" ", name)
+    name = _SEE_ALSO_RE.sub(" ", name)
+    name = _fix_homoglyphs(name)
+    name = re.sub(r"\(\s*\)", " ", name)
+    name = re.sub(r"\s+", " ", name).strip(" .,;–-").strip()
 
     return {
         "id": code,
@@ -232,7 +280,14 @@ def build_area_legend(motifs: list[dict], headers_by_id: dict[str, list[tuple[st
         if plain and len(plain) == len(names):
             for n, name in zip(plain, names, strict=True):
                 votes[n][name] += 1
-    return {str(n): counter.most_common(1)[0][0] for n, counter in votes.items() if counter}
+    # Require corroboration: a single stray alignment (one vote) is more likely a
+    # drift artifact than a real area, so keep only names backed by >= 2 motifs.
+    legend = {}
+    for n, counter in votes.items():
+        name, count = counter.most_common(1)[0]
+        if count >= 2:
+            legend[str(n)] = name
+    return legend
 
 
 def parse_definition(html: str) -> str:
