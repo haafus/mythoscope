@@ -247,6 +247,9 @@ function renderDetail(d) {
 
     if (d.index === "berezkin") {
         if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
+        if (d.source_url) {
+            body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} ↗</a>`);
+        }
         const areas = (d.areas || []).map((a) =>
             `<span class="motif-area${a.name ? "" : " unresolved"}" title="area ${escapeHtml(a.id)}">${escapeHtml(a.name || a.id)}</span>`).join("");
         body += section(`Areal distribution (${(d.areas || []).length})`,
@@ -257,6 +260,8 @@ function renderDetail(d) {
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
+        const srcLevel = d.source_level !== d.level ? ` <span class="motif-meta-src">(source ${escapeHtml(String(d.source_level))})</span>` : "";
+        body += `<div class="motif-meta">Hierarchy level <strong>${escapeHtml(String(d.level))}</strong>${srcLevel}</div>`;
         body += renderBreadcrumbs(d.breadcrumbs);
         if (d.chapter_name) body += section("Chapter", `<p class="motif-text">${escapeHtml(d.chapter_name)}</p>`);
         if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);

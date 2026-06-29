@@ -181,6 +181,10 @@ def get_motif(index: str, motif_id: str) -> dict | None:
 
     if index == "berezkin":
         detail["definition"] = rec.get("definition", "")
+        # Link back to the source catalog page the motif was scraped from.
+        page, home = rec.get("page", ""), data.get("homepage", "")
+        if page and home:
+            detail["source_url"] = f"{home.rstrip('/')}/{page}"
         # Areal indices decoded to macro-area names (legend voted from detail-page
         # headers); name is "" for the few indices not covered by the legend.
         legend = data.get("areas") or {}

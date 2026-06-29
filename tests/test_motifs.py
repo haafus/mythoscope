@@ -249,10 +249,11 @@ def tiny_db(tmp_path, monkeypatch):
 
     (tmp_path / "berezkin.json").write_text(json.dumps({
         "label": "Berezkin", "chapters": {"A": "СОЛНЦЕ И ЛУНА"},
+        "homepage": "http://areasofmyths.com",
         "areas": {"11": "Бантуязычная Африка", "12": "Западная Африка"},
         "motifs": [
             {"id": "A39A", "chapter": "A", "name": "Двенадцать месяцев", "areas": [11, 12],
-             "see_also": [], "atu_refs": ["294"], "definition": "def"},
+             "see_also": [], "atu_refs": ["294"], "definition": "def", "page": "a39a.html"},
         ],
     }, ensure_ascii=False), encoding="utf-8")
     # Run the raw rows through the real build-time repair so the stored data
@@ -314,6 +315,7 @@ class TestService:
             {"id": 12, "name": "Западная Африка"},
         ]
         assert d["definition"] == "def"
+        assert d["source_url"] == "http://areasofmyths.com/a39a.html"
         atu = d["links"]["atu"]
         assert atu[0]["id"] == "294" and atu[0]["name"] == "The Months" and atu[0]["exists"] is True
 
