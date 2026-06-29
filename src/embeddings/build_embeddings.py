@@ -29,7 +29,6 @@ def build_embeddings(
         models_to_run = models or active_embedding_models()
 
     encoder = EmbeddingEncoder()
-    encoder.load(models_to_run[0])
 
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")

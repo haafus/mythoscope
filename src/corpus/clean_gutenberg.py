@@ -13,14 +13,12 @@ def clean_gutenberg_text(text: str, filename: str | None = None) -> str:
 
     start_patterns = [
         (r"\*\*\* START OF (?:THE |THIS )?PROJECT GUTENBERG EBOOK[^*]*\*\*\*", "START OF PROJECT GUTENBERG"),
-        (r"\*\*\* START OF THIS PROJECT GUTENBERG EBOOK[^*]*\*\*\*", "START OF THIS PROJECT GUTENBERG"),
         (r"\*\*\*THE PROJECT GUTENBERG EBOOK[^*]*\*\*\*", "THE PROJECT GUTENBERG EBOOK"),
         (r"Produced by .*?\n{2,}", "Produced by"),
     ]
 
     end_patterns = [
         (r"\*\*\* END OF (?:THE |THIS )?PROJECT GUTENBERG EBOOK[^*]*\*\*\*", "END OF PROJECT GUTENBERG"),
-        (r"\*\*\* END OF THIS PROJECT GUTENBERG EBOOK[^*]*\*\*\*", "END OF THIS PROJECT GUTENBERG"),
         (r"End of (?:the )?Project Gutenberg[^\n]*", "End of Project Gutenberg"),
     ]
 

@@ -37,7 +37,7 @@ def format_size(nbytes: int) -> str:
         return f"{nbytes} B"
     for unit in ("KB", "MB", "GB"):
         nbytes /= 1024
-        if nbytes < 1024 or unit == "GB":
+        if nbytes < 1024:
             return f"{nbytes:.1f} {unit}"
     return f"{nbytes:.1f} GB"
 

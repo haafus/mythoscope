@@ -619,11 +619,6 @@ body.has-main-navbar {
     color: #111;
 }
 
-.corpus-page .btn.disabled {
-    pointer-events: none;
-    opacity: 0.45;
-}
-
 .corpus-page .empty-state,
 .corpus-page .error-state {
     padding: 18px;
@@ -1221,8 +1216,6 @@ body.has-main-navbar {
     font-size: 14px;
 }
 
-.graph-empty { padding: 16px; color: var(--muted); font-size: 13px; }
-
 .graph-rail #graphInfoContent {
     padding: 16px;
     font-size: 13px;
@@ -1537,20 +1530,3 @@ body.has-main-navbar {
 }
 
 .motif-empty { color: var(--muted-soft); }
-
-.motif-note {
-    margin: 8px 0 0;
-    font-size: 11.5px;
-    color: var(--muted-soft);
-    font-style: italic;
-}
-
-/* ==========================================================================
-   Animations
-   ========================================================================== */
-
-@keyframes fadeOut {
-    0% { opacity: 1; }
-    70% { opacity: 1; }
-    100% { opacity: 0; visibility: hidden; }
-}
