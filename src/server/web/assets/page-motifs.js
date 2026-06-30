@@ -475,7 +475,11 @@ function drawCharts(s, attempt = 0) {
     // decimates labels when many bars are crammed into a fixed height).
     const hbar = (id, rows, label, val, extra) => P.newPlot(id,
         [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color: ACC } }],
-        lay(Object.assign({ height: Math.max(240, rows.length * 19 + 24), margin: { l: 160, r: 12, t: 8, b: 30 } }, extra)), cfg);
+        lay(Object.assign({
+            height: Math.max(240, rows.length * 19 + 24), margin: { l: 160, r: 12, t: 8, b: 30 },
+            // Hold the tick labels off the bars so they don't read as glued to them.
+            yaxis: { ticklabelstandoff: 8 },
+        }, extra)), cfg);
 
     if (s.index === "tmi") {
         P.newPlot("ovComposition", [{
