@@ -14,10 +14,13 @@ import re
 # The bibliography opens at the earliest of these; the prose before it (if any)
 # is the definition. Covers the '--' block separator, a motif/type/source ref,
 # and a culture label anchored to a group boundary.
-# A culture label can carry parenthetical qualifiers before its colon
-# (``S. Am. Indian (Paressi):``, ``Indian (Hindu):``) — tolerate any of them so
-# the label is still recognised as the bibliography boundary.
-_LABEL_HEAD = r"[A-Z][A-Za-z. ]{1,26}?(?:\s*\([^)]*\))*"
+# Latin letters incl. Latin-1 diacritics, so a label like ``Guarayú`` or
+# ``Métis`` is recognised. A culture label can also carry parenthetical
+# qualifiers before its colon (``S. Am. Indian (Paressi):``, ``Indian (Hindu):``)
+# — tolerate any of them so the label is still seen as the bibliography boundary.
+_UC = r"A-ZÀ-ÖØ-Þ"          # uppercase, incl. accented
+_LC = r"A-Za-zÀ-ÖØ-öø-ÿ"    # any Latin letter, incl. accented
+_LABEL_HEAD = rf"[{_UC}][{_LC}. ]{{1,26}}?(?:\s*\([^)]*\))*"
 _BIB_START = re.compile(
     r"\s--|†|\bTypes?\b|\*[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*" + _LABEL_HEAD + r":"
 )
@@ -28,7 +31,7 @@ _DAGGER = re.compile(r"([Cc]f\.\s*)?†\s*([A-Z]\d[\dA-Za-z.]*)")
 _TYPE = re.compile(r"\bTypes?\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 # A culture/region label heading a citation group, anchored to a group boundary
 # (start, ';', ' --') so a colon inside a source title isn't taken for a label.
-_LABEL = re.compile(r"(?:^|;|\s--)\s*([A-Z][A-Za-z. ]*?(?:\s*\([^)]*\))*)\s*:\s*")
+_LABEL = re.compile(rf"(?:^|;|\s--)\s*([{_UC}][{_LC}. ]*?(?:\s*\([^)]*\))*)\s*:\s*")
 _GROUP_SPLIT = re.compile(r";|\s--")
 # A '†' cross-reference, with any leading '(Cf.' and trailing ')'. Stripped from
 # the text before parsing the definition/bibliography (it lives in see_also), so
