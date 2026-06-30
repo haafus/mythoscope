@@ -205,6 +205,14 @@ class TestTrilogy:
         assert out["cultures"]["Greek"] == ["Fox 4"]
         assert out["cultures"]["India"] == ["*Thompson-Balys"]
 
+    def test_notes_culture_label_with_parenthetical(self):
+        # A culture label with a sub-area in parens must still be a citation, not
+        # leak into the definition (A1.2 'Grandfather As Creator').
+        out = tmi_notes.parse_notes(
+            "S. Am. Indian (Paressi): Métraux BBAE CXLIII (3) 359, (Guarayú): Métraux RMLP XXXIII 147.")
+        assert out["definition"] == ""
+        assert "S. Am. Indian (Paressi)" in out["cultures"]
+
     def test_notes_extracts_see_also_and_cf(self):
         out = tmi_notes.parse_notes("Hero deceives the ogre. (Cf. †A116.2). See †K1611.")
         assert out["see_also"]["cf"] == ["A116.2"]

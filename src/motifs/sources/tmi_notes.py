@@ -14,8 +14,12 @@ import re
 # The bibliography opens at the earliest of these; the prose before it (if any)
 # is the definition. Covers the '--' block separator, a motif/type/source ref,
 # and a culture label anchored to a group boundary.
+# A culture label can carry parenthetical qualifiers before its colon
+# (``S. Am. Indian (Paressi):``, ``Indian (Hindu):``) — tolerate any of them so
+# the label is still recognised as the bibliography boundary.
+_LABEL_HEAD = r"[A-Z][A-Za-z. ]{1,26}?(?:\s*\([^)]*\))*"
 _BIB_START = re.compile(
-    r"\s--|†|\bTypes?\b|\*[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*[A-Z][A-Za-z. ]{1,26}?:"
+    r"\s--|†|\bTypes?\b|\*[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*" + _LABEL_HEAD + r":"
 )
 
 # A '†' motif cross-reference, optionally introduced by 'Cf.' ("compare").
@@ -24,7 +28,7 @@ _DAGGER = re.compile(r"([Cc]f\.\s*)?†\s*([A-Z]\d[\dA-Za-z.]*)")
 _TYPE = re.compile(r"\bTypes?\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 # A culture/region label heading a citation group, anchored to a group boundary
 # (start, ';', ' --') so a colon inside a source title isn't taken for a label.
-_LABEL = re.compile(r"(?:^|;|\s--)\s*([A-Z][A-Za-z. ]*?(?:\([^)]*\))?)\s*:\s*")
+_LABEL = re.compile(r"(?:^|;|\s--)\s*([A-Z][A-Za-z. ]*?(?:\s*\([^)]*\))*)\s*:\s*")
 _GROUP_SPLIT = re.compile(r";|\s--")
 # A '†' cross-reference, with any leading '(Cf.' and trailing ')'. Stripped from
 # the text before parsing the definition/bibliography (it lives in see_also), so
@@ -35,7 +39,10 @@ _XREF = re.compile(r"\(?\s*(?:[Cc]f\.\s*)?†\s*[A-Z]\d[\dA-Za-z.]*\.?\s*\)?")
 def parse_notes(notes: str | None) -> dict:
     """Decompose a ``notes`` string into definition + structured references."""
     notes = (notes or "").strip()
-    definition, biblio = _split_definition(_strip_xrefs(notes))
+    # A leading '--' is just the bibliography-intro dash (no definition); drop it
+    # so the first culture label sits at a boundary the parser recognises.
+    cleaned = _strip_xrefs(notes).lstrip("-– ").strip()
+    definition, biblio = _split_definition(cleaned)
     return {
         "definition": definition,
         "cultures": _cultures(biblio),
@@ -57,7 +64,7 @@ def _is_prose(head: str) -> bool:
     """True if a leading fragment reads as a definition, not a stray citation."""
     if len(head.split()) < 4 or head[:1] in "*(":
         return False
-    if re.match(r"^[A-Z][A-Za-z. ]{1,26}:", head):  # 'Greek: …' is a citation
+    if re.match(rf"^{_LABEL_HEAD}:", head):  # 'Greek: …' / 'S. Am. Indian (Paressi): …' is a citation
         return False
     return not head.lower().startswith(("for a ", "for the ", "see "))  # meta-biblio
 
