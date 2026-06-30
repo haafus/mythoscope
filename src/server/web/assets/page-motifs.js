@@ -243,13 +243,12 @@ function linkChips(links) {
     `).join("");
 }
 
-// The tree-row badge: an optional "substantive" check, then notes size, recursive
-// descendant count, and hierarchy level — each part carrying its own tooltip.
+// The tree-row badge: an optional "substantive" check, then notes size and the
+// recursive descendant count — each part carrying its own tooltip.
 function badgeHtml(node) {
     const parts = [];
     if (node.notes_size) parts.push(`<span title="Size of the source notes (definition + bibliography)">${escapeHtml(node.notes_size)}</span>`);
     if (node.descendant_count) parts.push(`<span title="Descendant motifs, counted recursively down to the leaves">${node.descendant_count}</span>`);
-    parts.push(`<span title="Depth in the TMI place-value hierarchy">L${escapeHtml(String(node.level ?? ""))}</span>`);
     const check = node.has_definition
         ? `<span class="badge-check" title="Has an extracted definition">✓</span> `
         : "";

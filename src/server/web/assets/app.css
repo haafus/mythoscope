@@ -1512,16 +1512,9 @@ body.has-main-navbar {
 /* Broad TMI category rows in the list, shown bold. */
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 
-/* Leaf motifs (no children) shown muted. Listed before .duplicate so a
-   duplicate leaf still reads red. */
-.motifs-item.leaf .motifs-item-id { color: #aebfcf; }
-.motifs-item.leaf .motifs-item-name,
-.motifs-item.leaf .motifs-item-badge { color: var(--muted-soft); }
-
-/* Substantive motifs: badge in a brighter accent (kept brighter even on muted
-   leaf rows). Motifs with a definition get a ✓ instead (see badge-check). */
-.motifs-item-badge.is-sub,
-.motifs-item.leaf .motifs-item-badge.is-sub { color: var(--accent); font-weight: 600; }
+/* Substantive motifs: badge in a brighter accent. Motifs with a definition get a
+   ✓ instead (see badge-check). */
+.motifs-item-badge.is-sub { color: var(--accent); font-weight: 600; }
 
 /* Control bar above a tree: filter dropdown + "Flat list" toggle. */
 .motif-controls { display: flex; align-items: center; gap: 14px; margin: 2px 0 12px; }
