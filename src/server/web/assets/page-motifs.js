@@ -186,7 +186,7 @@ function renderList(data) {
     // TMI ids without a dot are the broad top-level categories — show them bold.
     const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.leaf ? " leaf" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge${it.substantive ? " is-sub" : ""}">${escapeHtml(it.badge || "")}</span>
@@ -258,7 +258,6 @@ function badgeHtml(node) {
 
 function treeRow(node, depth, { current = false, filterable = false } = {}) {
     const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badgeHtml(node)}`;
-    const leaf = (!current && node.leaf) ? " leaf" : "";
     // Filterable rows (children / browse lists) can be hidden by the motif
     // filter, tagged with the tiers they belong to; ancestors and the current
     // motif are never filtered (they form the path).
@@ -268,8 +267,8 @@ function treeRow(node, depth, { current = false, filterable = false } = {}) {
     const tags = filterable
         ? ` filterable${node.def_subtree ? " f-def" : ""}${node.sub_subtree ? " f-sub" : ""}${node.atu_subtree ? " f-atu" : ""}`
         : "";
-    if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row${leaf}${tags}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
+    if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
+    return `<a class="motifs-item motif-tree-row${tags}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
 }
 
 // Motif-filter dropdown shown above a tree in the main panel; counts are
