@@ -468,6 +468,7 @@ function drawCharts(s, attempt = 0) {
     const lay = (e = {}) => Object.assign({
         margin: { l: 44, r: 12, t: 8, b: 34 }, height: 240, font: { size: 11 },
         paper_bgcolor: "transparent", plot_bgcolor: "transparent", showlegend: false,
+        hoverlabel: { bgcolor: "#000", bordercolor: "#000", font: { color: "#fff" } },
     }, e);
     const vbar = (id, rows, xk, yk, extra) => P.newPlot(id,
         [{ type: "bar", x: rows.map((r) => r[xk]), y: rows.map((r) => r[yk]), marker: { color: ACC } }], lay(extra), cfg);
