@@ -59,8 +59,8 @@ Thompson-Balys/India, Neuman/Jewish, Boberg/Icelandic, Rotunda/Italian). The
 | Motifs | 46,230 |
 | Chapters (letters) | 23 (`A`–`Z`, skipping `I`/`O`/`Y`) |
 | With non-empty notes | 41,959 (90.8%) |
-| With an extracted definition | 10,230 (22%) |
-| With culture-tagged citations | 30,426 |
+| With an extracted definition | 8,456 (18%) |
+| With culture-tagged citations | 32,470 |
 | With `†` motif cross-references | 7,017 |
 | With inline ATU `Type` references | 2,912 |
 
@@ -142,8 +142,11 @@ separates them, keeping the raw `notes` as the source of truth.
   reliable; short one-line "definitions" are the noisy edge.
 - **cultures** — citations are tagged by a geographic/linguistic/corpus label
   (`India:`, `Irish myth:`, `Jewish:`). Anchored to a group boundary so a colon
-  inside a title is not mistaken for a label. Nested sub-areas
-  (`Africa (Angola): …`) stay inline.
+  inside a title is not mistaken for a label. A label may carry parenthetical
+  qualifiers before its colon (`S. Am. Indian (Paressi):`, `Indian (Hindu):`) —
+  these are tolerated so the label is still recognised (and not mistaken for a
+  definition); a leading `--` bibliography dash is stripped. Nested sub-areas
+  (`Africa (Angola): …`) stay inline; the canonical name drops the parens.
 - **references** — the bibliography split on `;` / ` --`; the general
   (non-culture-tagged) segments are shown separately on the motif page.
 - **see_also** — `†` cross-references to other motifs, split into direct `ref`
@@ -166,13 +169,13 @@ bracketed place/year. These remain inside the citation strings.
 stored `culture_legend` (two layers):
 
 - **inventory** — every distinct label with the number of motifs it tags
-  (868 canonical labels).
+  (905 canonical labels).
 - **normalized** — obvious variants merged to a canonical name (`Icel. →
   Icelandic`, `England → English`) and tagged with a broad **region**
   (Europe, Near East, South Asia, Oceania, …). Curated for the common labels
   (~110 cover ~94% of uses); parenthetical sub-areas are collected per culture.
 
-Exposed at `GET /api/motifs/tmi/cultures`. The long tail (763 labels) keeps
+Exposed at `GET /api/motifs/tmi/cultures`. The long tail (800 labels) keeps
 region `""` but is still counted. Sub-areas are raw parenthetical text and carry
 some noise (orthographic variants, multi-ethnos strings).
 
@@ -233,7 +236,7 @@ Decided empirically (the full dialogue is summarised here):
 - **`T = 150` bytes** sits at the histogram shoulder (median notes is only 34
   bytes).
 
-Result: a **substantive core of 5,322 motifs (~12%)**; ~88% is scaffolding +
+Result: a **substantive core of 5,344 motifs (~12%)**; ~88% is scaffolding +
 variations. Major motifs are always retained (an absolute floor never drops a
 big node). The boundary is intentionally a single tunable constant
 (`_SUBSTANTIVE_MIN_NOTES`).
@@ -251,11 +254,12 @@ definition, colour = substantive — two independent signals.)
 
 **Motif filter.** A dropdown above every main-panel tree (catalog root, chapter
 browse, motif detail) offers four tiers with index-wide counts: *Full index*
-(46,230), *With definitions* (10,230), *Substantive only* (5,322), *With ATU
-types* (4,752). Selecting a tier hides the non-matching filterable rows
-(children, chapter contents, and whole chapters with none of that tier), while
-ancestors and the current motif always stay. Root and chapter badges show the
-selected tier's count (e.g. chapter A: 5,810 → 627 under *Substantive*).
+(46,230), *With definitions* (8,456), *Substantive only* (5,344), *With ATU
+types* (4,752). Selecting a tier lists the chapter's matching motifs at any
+depth (so the list isn't empty when the broad level-0 categories have none),
+and on the root/detail trees hides non-matching rows while ancestors and the
+current motif stay. Root and chapter badges show the selected tier's count
+(e.g. chapter A: 5,810 → 633 under *Substantive*).
 
 **Overview dashboard.** `GET /api/motifs/{index}/stats` aggregates the index in
 one cached pass; the section landing renders it as a stat-card strip plus a
@@ -282,9 +286,9 @@ not motif-to-motif links (see the culture dictionary, §7).
 ## 12. Known limitations
 
 - The definition / culture split is heuristic (~85–90%); short one-line
-  definitions are over-flagged, colon-less region labels (`--Oceanic Dixon …`)
+  definitions are over-flagged, and colon-less region labels (`--Oceanic Dixon …`)
   merge into the previous culture.
-- Culture sub-areas and the 763-label tail carry parse noise.
+- Culture sub-areas and the 800-label tail carry parse noise.
 - Bibliography links cover ~71% of citation uses; foreign long-tail and
   author-in-journal citations are not linked to the exact edition.
 - `substantive`, `definition`, region tags and citation links are interpretive
