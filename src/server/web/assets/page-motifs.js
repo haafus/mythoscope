@@ -8,7 +8,9 @@ const mState = {
     query: "",
     selectedId: null,
     motifFilter: "all",  // "all" | "def" | "sub" | "atu"
+    flatList: false,     // browse as a flat list (no parent categories) instead of drill-down
     browseChapter: null, // chapter currently shown in the main-panel browse, if any
+    browseView: null,    // "root" | "chapter" | null (detail/overview)
 };
 
 const LIST_LIMIT = 300;
@@ -131,15 +133,23 @@ async function browseChapterLevel0(chapter) {
     if (!detail) return;
     mState.selectedId = null;
     mState.browseChapter = chapter;
+    mState.browseView = "chapter";
     markActive(null);
     try {
-        // Always the immediate child level (L0); the filter hides L0 categories
-        // whose subtree holds no match (deeper matches still count, via f-* tags).
-        const params = new URLSearchParams({ chapter, level: "0", limit: String(LIST_LIMIT) });
-        const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
-        for (const it of data.items) rows.push(treeRow(it, 2, { filterable: true }));
-        detail.innerHTML = `<div class="motif-detail-inner">${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
+        if (mState.flatList) {
+            // Flat: the chapter's matching motifs at any depth, no categories.
+            const data = await fetchFlat(chapter);
+            for (const it of data.items) rows.push(treeRow(it, 2));
+            if (data.total > data.items.length) rows.push(moreRow(data.total - data.items.length, 2));
+        } else {
+            // Drill-down: just the immediate child level (L0); the filter hides L0
+            // categories whose subtree holds no match (deeper matches still count).
+            const params = new URLSearchParams({ chapter, level: "0", limit: String(LIST_LIMIT) });
+            const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
+            for (const it of data.items) rows.push(treeRow(it, 2, { filterable: true }));
+        }
+        detail.innerHTML = `<div class="motif-detail-inner">${controls(true)}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
         detail.scrollTop = 0;
         bindTreeLinks(detail);
     } catch (error) {
@@ -199,6 +209,7 @@ async function openMotif(index, id) {
     }
     mState.selectedId = id;
     mState.browseChapter = null;
+    mState.browseView = null;
     markActive(id);
 
     const detail = document.getElementById("motifsDetail");
@@ -283,6 +294,28 @@ function filterClass() {
         : mState.motifFilter === "atu" ? " filter-atu" : "";
 }
 
+// The control bar above a tree: filter dropdown, plus the "Flat list" toggle in
+// the browse views (root / chapter).
+function controls(withFlat) {
+    const flat = withFlat
+        ? `<label class="flat-toggle"><input type="checkbox" class="flat-cb"${mState.flatList ? " checked" : ""}> Flat list</label>`
+        : "";
+    return `<div class="motif-controls">${filterSelect()}${flat}</div>`;
+}
+
+function moreRow(n, depth) {
+    return `<div class="motif-subtree-more" style="--depth:${depth}">… ${formatNumber(n)} more</div>`;
+}
+
+// Flat motif list for the current filter (matching motifs only, no categories);
+// no tier = the whole scope expanded flat.
+async function fetchFlat(chapter) {
+    const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
+    if (chapter) params.set("chapter", chapter);
+    if (mState.motifFilter !== "all") params.set("tier", mState.motifFilter);
+    return api(`/api/motifs/tmi/motifs?${params.toString()}`);
+}
+
 function chapterMeta(id) {
     return (currentIndex().chapters || []).find((c) => c.id === id) || { id, label: id, count: 0 };
 }
@@ -328,7 +361,7 @@ function renderTmiTree(d) {
     rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size, has_definition: d.has_definition, substantive: d.substantive }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1, { filterable: true }));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
-    return `${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div>`;
+    return `${controls(false)}<div class="motif-tree${filterClass()}">${rows.join("")}</div>`;
 }
 
 function bindTreeLinks(detail) {
@@ -341,29 +374,54 @@ function bindTreeLinks(detail) {
     detail.querySelectorAll("[data-root]").forEach((el) => {
         el.addEventListener("click", (e) => { e.preventDefault(); browseRoot(); });
     });
+    const reRenderBrowse = () => {
+        if (mState.browseView === "root") { browseRoot(); return true; }
+        if (mState.browseView === "chapter") { browseChapterLevel0(mState.browseChapter); return true; }
+        return false;
+    };
     const sel = detail.querySelector(".motif-filter");
     if (sel) sel.addEventListener("change", () => {
         mState.motifFilter = sel.value;
+        // Browse views re-render (the row set depends on the filter); the detail
+        // lineage just toggles the hide/badge classes on its built tree.
+        if (reRenderBrowse()) return;
         detail.querySelectorAll(".motif-tree").forEach((t) => {
             t.classList.toggle("filter-def", sel.value === "def");
             t.classList.toggle("filter-sub", sel.value === "sub");
             t.classList.toggle("filter-atu", sel.value === "atu");
         });
     });
+    const flat = detail.querySelector(".flat-cb");
+    if (flat) flat.addEventListener("change", () => {
+        mState.flatList = flat.checked;
+        reRenderBrowse();
+    });
 }
 
 // Catalog root view: "/" (current, total count) + the chapter rows.
-function browseRoot() {
+async function browseRoot() {
     const detail = document.getElementById("motifsDetail");
     if (!detail) return;
     mState.selectedId = null;
     mState.browseChapter = null;
+    mState.browseView = "root";
     markActive(null);
-    const rows = [rootRow(0, { current: true })];
-    for (const c of currentIndex().chapters || []) rows.push(chapterRow(c.id, 1, { filterable: true }));
-    detail.innerHTML = `<div class="motif-detail-inner">${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
-    detail.scrollTop = 0;
-    bindTreeLinks(detail);
+    try {
+        const rows = [rootRow(0, { current: true })];
+        if (mState.flatList) {
+            // Flat: every (matching) motif of the index, no chapters/categories.
+            const data = await fetchFlat("");
+            for (const it of data.items) rows.push(treeRow(it, 1));
+            if (data.total > data.items.length) rows.push(moreRow(data.total - data.items.length, 1));
+        } else {
+            for (const c of currentIndex().chapters || []) rows.push(chapterRow(c.id, 1, { filterable: true }));
+        }
+        detail.innerHTML = `<div class="motif-detail-inner">${controls(true)}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
+        detail.scrollTop = 0;
+        bindTreeLinks(detail);
+    } catch (error) {
+        detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+    }
 }
 
 // --- index overview dashboard ------------------------------------------------
@@ -373,6 +431,7 @@ async function renderOverview() {
     if (!detail) return;
     mState.selectedId = null;
     mState.browseChapter = null;
+    mState.browseView = null;
     markActive(null);
     detail.innerHTML = `<div class="reader-placeholder">Loading overview…</div>`;
     try {
