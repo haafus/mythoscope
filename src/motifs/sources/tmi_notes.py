@@ -20,7 +20,14 @@ import re
 # — tolerate any of them so the label is still seen as the bibliography boundary.
 _UC = r"A-ZÀ-ÖØ-Þ"          # uppercase, incl. accented
 _LC = r"A-Za-zÀ-ÖØ-öø-ÿ"    # any Latin letter, incl. accented
-_LABEL_HEAD = rf"[{_UC}][{_LC}. ]{{1,26}}?(?:\s*\([^)]*\))*"
+# A culture label is an uppercase-initial run of letters, dots, spaces, commas and
+# hyphens — so a multi-culture list (``Mono-Alu, Fauru, Buin``) or a hyphenated
+# name (``Finno-Ugric``) reads as one label. The length cap is what keeps a label
+# from swallowing its neighbours: a sentence boundary, a run-on, or the ``--``
+# separator all sit beyond ~26 chars from the colon, so the (lazy, capped) match
+# stops before reaching across them and the prose before stays the definition.
+_LBL = rf"{_LC},. \-"
+_LABEL_HEAD = rf"[{_UC}][{_LBL}]{{1,26}}?(?:\s*\([^)]*\))*"
 _BIB_START = re.compile(
     r"\s--|†|\bTypes?\b|\*[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*" + _LABEL_HEAD + r":"
 )
@@ -31,7 +38,7 @@ _DAGGER = re.compile(r"([Cc]f\.\s*)?†\s*([A-Z]\d[\dA-Za-z.]*)")
 _TYPE = re.compile(r"\bTypes?\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 # A culture/region label heading a citation group, anchored to a group boundary
 # (start, ';', ' --') so a colon inside a source title isn't taken for a label.
-_LABEL = re.compile(rf"(?:^|;|\s--)\s*([{_UC}][{_LC}. ]*?(?:\s*\([^)]*\))*)\s*:\s*")
+_LABEL = re.compile(rf"(?:^|;|\s--)\s*([{_UC}][{_LBL}]*?(?:\s*\([^)]*\))*)\s*:\s*")
 _GROUP_SPLIT = re.compile(r";|\s--")
 # A '†' cross-reference, with any leading '(Cf.' and trailing ')'. Stripped from
 # the text before parsing the definition/bibliography (it lives in see_also), so

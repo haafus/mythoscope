@@ -196,6 +196,20 @@ class TestTrilogy:
         assert out["definition"] == ""
         assert "S. Am. Indian (Paressi)" in out["cultures"]
 
+    def test_notes_culture_label_with_hyphen_and_comma_list(self):
+        # A multi-culture label with a hyphenated name must be recognised as a
+        # citation, not leak into the definition (A13.4.1 'Snake As Creator').
+        out = tmi_notes.parse_notes("Mono-Alu, Fauru, Buin: Wheeler 67.")
+        assert out["definition"] == ""
+        assert out["cultures"]["Mono-Alu, Fauru, Buin"] == ["Wheeler 67"]
+
+    def test_notes_run_on_after_definition_keeps_prose(self):
+        # A missing space gluing a label to the prose ('growing. Lithuanian:') must
+        # not let the label swallow the sentence — the definition is preserved.
+        out = tmi_notes.parse_notes(
+            "Devil sows stones; God sends cold to prevent their growing. Lithuanian: Balys.")
+        assert out["definition"] == "Devil sows stones; God sends cold to prevent their growing"
+
     def test_notes_extracts_see_also_and_cf(self):
         out = tmi_notes.parse_notes("Hero deceives the ogre. (Cf. †A116.2). See †K1611.")
         assert out["see_also"]["cf"] == ["A116.2"]
