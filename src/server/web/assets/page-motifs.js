@@ -298,6 +298,30 @@ function linkSection(title, links) {
     return section(title, `<div class="motif-links">${linkChips(links)}</div>`);
 }
 
+// A citation: linked to its source book when the server resolved one.
+function citeHtml(c) {
+    const text = escapeHtml(c.text || "");
+    if (!c.url) return `<span class="motif-cite">${text}</span>`;
+    return `<a class="motif-cite linked" href="${escapeHtml(c.url)}" target="_blank" rel="noopener"
+               title="${escapeHtml(c.title || c.url)}">${text} ↗</a>`;
+}
+
+function citeList(items) {
+    return `<ul class="motif-cites">${items.map((c) => `<li>${citeHtml(c)}</li>`).join("")}</ul>`;
+}
+
+// Attestations grouped by culture label (with its broad region) -> citations.
+function culturesHtml(cultures) {
+    return `<div class="motif-cultures">` + cultures.map((c) => `
+        <div class="motif-culture">
+            <div class="motif-culture-head">
+                <span class="motif-culture-label">${escapeHtml(c.label)}</span>
+                ${c.region ? `<span class="motif-culture-region">${escapeHtml(c.region)}</span>` : ""}
+            </div>
+            ${citeList(c.citations || [])}
+        </div>`).join("") + `</div>`;
+}
+
 function renderDetail(d) {
     const links = d.links || {};
     const head = `
@@ -321,14 +345,21 @@ function renderDetail(d) {
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
     } else if (d.index === "tmi") {
-        // Hierarchy tree first, then all the motif's own information.
+        // Hierarchy tree first, then all the motif's own information, and the raw
+        // source `notes` verbatim at the very end.
         body = renderTmiTree(d);
         body += head;
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
-        if (d.notes) body += section("Notes", `<p class="motif-text">${escapeHtml(d.notes)}</p>`);
+        if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
+        if ((links.see_also || []).length) body += linkSection("See also", links.see_also);
+        if ((links.see_also_cf || []).length) body += linkSection("Compare (cf.)", links.see_also_cf);
         if ((links.atu || []).length) body += linkSection("Appears in ATU tale types", links.atu);
+        if ((links.atu_inline || []).length) body += linkSection("Referenced tale types (Type …)", links.atu_inline);
+        if ((d.cultures || []).length) body += section(`Attestations by culture (${d.cultures.length})`, culturesHtml(d.cultures));
+        if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
+        if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
         body = head + chapterLine;
         if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);

@@ -1,0 +1,4523 @@
+{
+  "source_url": "https://folkmasa.org/motiv/motif_bib.htm",
+  "series": {
+    "FFC": "FF Communications (Folklore Fellows). Helsinki, 1910 ff.",
+    "JAFL": "Journal of American Folk-Lore. 1888 ff.",
+    "MAFLS": "Memoirs of the American Folk-Lore Society.",
+    "BBAE": "Bulletin of the Bureau of American Ethnology (Smithsonian).",
+    "RBAE": "Annual Report of the Bureau of American Ethnology.",
+    "BAM": "Bulletin of the American Museum of Natural History.",
+    "PMLA": "Publications of the Modern Language Association of America.",
+    "RTP": "Revue des traditions populaires. Paris, 1886–1919.",
+    "RMLP": "Revista do Museu Paulista. São Paulo.",
+    "ET": "Wienert, Ethische Typen (see Wienert FFC 56).",
+    "ST": "Wienert, Stofftypen (see Wienert FFC 56).",
+    "DF": "Danmarks Folkeminder. Copenhagen, 1908 ff.",
+    "MSFO": "Mémoires de la Société Finno-Ougrienne. Helsinki.",
+    "BMB": "Bernice P. Bishop Museum Bulletin. Honolulu.",
+    "JE": "Publications of the Jesup North Pacific Expedition (Mem. AMNH).",
+    "FL": "Folk-Lore. London, 1890 ff.",
+    "CColl": "Colorado College Publication, Language Series.",
+    "MAGW": "Mitteilungen der Anthropologischen Gesellschaft in Wien."
+  },
+  "entries": [
+    {
+      "keys": [
+        "Type"
+      ],
+      "citation": "Type = Aarne , A. and Thompson, Stith . The Types of the Folk-Tale (FFC 74). Helsinki, 1928. U",
+      "urls": [],
+      "uses": 2445,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "BP"
+      ],
+      "citation": "Bolte, J. & Polívka, G. Anmerkungen zu den Kinder- und Hausmärchen der Brüder Grimm. 5 vols. Leipzig, 1913–32.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/AnmerkungenZuDenKinder-UndHausmaerchenDerGebruederGrimm1",
+          "label": ""
+        }
+      ],
+      "uses": 1586,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Beckwith"
+      ],
+      "citation": "Beckwith, Martha. Hawaiian Mythology. New Haven, 1940",
+      "urls": [
+        {
+          "url": "http://sacred-texts.com/pac/hm/index.htm",
+          "label": ""
+        }
+      ],
+      "uses": 987,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Balys"
+      ],
+      "citation": "Balys , Jonas. *Ghosts and Men , Lithuanian Folk Legends about the Dead (Sub-title: A Treasury of Lithuanian Folklore I). Bloomington, Indiana, 1951",
+      "urls": [],
+      "uses": 857,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Balys"
+      ],
+      "citation": "Balys , Jonas. Lithuanian Historical Legends, Chicago, 1949",
+      "urls": [],
+      "uses": 857,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Balys"
+      ],
+      "citation": "Balys , Jonas Motif-Index of Lithuanian Narrative Folklore. Tautosakos Darbai Vol. II, Publication of the Lithuanian Folklore Archives. Kaunas, 1936",
+      "urls": [],
+      "uses": 857,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Balys"
+      ],
+      "citation": "Balys , Jonas Lithuanian Folk Legends. Publication of the Lithuanian Folklore Archives I. Kaunas, 1940",
+      "urls": [],
+      "uses": 857,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Balys Index",
+        "Balys"
+      ],
+      "citation": "Balys, J. Motif-Index of Lithuanian Narrative Folk-Lore (Tautosakos Darbai II). Kaunas, 1936.",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Balys+Motif-Index+Lithuanian",
+          "label": ""
+        }
+      ],
+      "uses": 857,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "MacCulloch"
+      ],
+      "citation": "MacCulloch , J. A. *Celtic Mythology (The Mythology of all Races III). Boston, 1918",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra03gray#page/n7/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 780,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MacCulloch"
+      ],
+      "citation": "MacCulloch , J. A. *The Childhood of Fiction. London, 1905",
+      "urls": [
+        {
+          "url": "https://archive.org/details/childhoodofficti00maccrich",
+          "label": ""
+        }
+      ],
+      "uses": 780,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MacCulloch"
+      ],
+      "citation": "MacCulloch , J. A. * Eddic Mythology (The Mythology of all Races II). Boston, 1930",
+      "urls": [],
+      "uses": 780,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Chauvin"
+      ],
+      "citation": "Chauvin, V. Bibliographie des ouvrages arabes ou relatifs aux Arabes publiés dans l'Europe chrétienne de 1810 à 1885. 12 vols. Liège, 1892–1922.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/bibliographiedes05chauuoft",
+          "label": ""
+        }
+      ],
+      "uses": 773,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Penzer"
+      ],
+      "citation": "Penzer , N. M. The Ocean of Story: being C. H. Tawney's translation of Somadeva's Kathā Sarit Sāgara . 10 vols. London, 1923 ff. See also Tawney . Poison-Damsels and other essays in Folklore and Anthropology. London, 1952",
+      "urls": [
+        {
+          "url": "https://archive.org/details/oceanofstorybein01somauoft",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein02somauoft",
+          "label": "Vol. II"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein03somauoft",
+          "label": "Vol. III"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein04somauoft",
+          "label": "Vol. IV"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein05somauoft",
+          "label": "Vol. V"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein06somauoft",
+          "label": "Vol. VI"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein07somauoft",
+          "label": "Vol. VII"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein08somauoft",
+          "label": "Vol. VIII"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein09somauoft",
+          "label": "Vol. IX"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein10somauoft",
+          "label": "Vol. X"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=75",
+          "label": "Vol. I – editable text"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=76",
+          "label": "Vol. II – editable text"
+        }
+      ],
+      "uses": 733,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dh"
+      ],
+      "citation": "Dähnhardt, O. Natursagen: eine Sammlung naturdeutender Sagen, Märchen, Fabeln und Legenden. 4 vols. Leipzig, 1907–12.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/natursageneinesa01dhuoft",
+          "label": ""
+        }
+      ],
+      "uses": 708,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Thompson"
+      ],
+      "citation": "Thompson, Stith . European Tales among the North American Indians ( CColl II). Colorado Springs, 1919",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=inu.39000005803577;view=1up;seq=1",
+          "label": ""
+        }
+      ],
+      "uses": 650,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thompson"
+      ],
+      "citation": "Thompson, Stith . Tales of the North American Indians. Cambridge (Mass.), 1929",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/nam/tnai/",
+          "label": ""
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=37",
+          "label": ""
+        }
+      ],
+      "uses": 650,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thompson"
+      ],
+      "citation": "Thompson, Stith . The Folktale. New York, 1946",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/The_Folktale.pdf",
+          "label": ""
+        }
+      ],
+      "uses": 650,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thompson"
+      ],
+      "citation": "Thompson, Stith . The Star-Husband Tale ( Studia Septentrionalia IV). Oslo, 1952",
+      "urls": [],
+      "uses": 650,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Malalasekera"
+      ],
+      "citation": "Malalasekera , George Peiris . Dictionary of Pali Proper Names. 2 vols. London, 1937",
+      "urls": [],
+      "uses": 610,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Aarne"
+      ],
+      "citation": "Aarne, A. Comparative folktale-type monographs in FF Communications (e.g. FFC 8, 23, 25, 33).",
+      "urls": [
+        {
+          "url": "https://www.folklorefellows.fi/ffc-catalogue/",
+          "label": ""
+        }
+      ],
+      "uses": 591,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Eberhard"
+      ],
+      "citation": "Eberhard , Wolfram. Chinese Fairy Tales and Folk Tales. London, 1937",
+      "urls": [],
+      "uses": 508,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Eberhard"
+      ],
+      "citation": "Eberhard, W. & Boratav, P. N. Typen türkischer Volksmärchen (FFC). — and Eberhard, Typen chinesischer Volksmärchen (FFC 120).",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Eberhard+Typen+chinesischer+Volksm%C3%A4rchen",
+          "label": ""
+        }
+      ],
+      "uses": 508,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Wesselski Hodscha Nasreddin",
+        "Wesselski"
+      ],
+      "citation": "Wesselski, A. Der Hodscha Nasreddin. 2 vols. Weimar, 1911.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/derhodschanasred01wess",
+          "label": ""
+        }
+      ],
+      "uses": 491,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Loomis"
+      ],
+      "citation": "Loomis, C. Grant. White Magic: an Introduction to the Folklore of Christian Legend. Cambridge (Mass.), 1948",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=uc1.32106016839596;view=1up;seq=11",
+          "label": ""
+        }
+      ],
+      "uses": 476,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Loomis"
+      ],
+      "citation": "Loomis, R. S. Celtic Myth and Arthurian Romance. New York, 1927",
+      "urls": [],
+      "uses": 476,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. Apollodorus : the Library (Loeb Classical Library). London and New York, 1921",
+      "urls": [
+        {
+          "url": "https://archive.org/details/librarywithengli01apoluoft",
+          "label": ""
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. The Belief in Immortality and the Worship of the Dead. 2 vols. London, 1913",
+      "urls": [
+        {
+          "url": "https://archive.org/details/beliefinimmortal00frazuoft",
+          "label": ""
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. The Fasti of Ovid. 5 vols. London, 1929",
+      "urls": [
+        {
+          "url": "https://archive.org/details/ovidsfasti00oviduoft",
+          "label": ""
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. Folklore in the Old Testament. 3 vols. London, 1918",
+      "urls": [
+        {
+          "url": "https://archive.org/details/folkloreinoldte00frazgoog",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/folkloreintheold027451mbp",
+          "label": "Vol II"
+        },
+        {
+          "url": "https://archive.org/details/folkloreinoldtes03fraziala",
+          "label": "Vol. III"
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. The Golden Bough. 3d edition. 12 vols. London, 1907–15.  ( Vol I – The Magic Art and the Evolution of Kings, Part I )",
+      "urls": [
+        {
+          "url": "https://archive.org/details/goldenboughstudy02frazuoft",
+          "label": "Vol II – The Magic Art and the Evolution of Kings, Part II"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstud03fraz",
+          "label": "Vol. III – Taboo and the Perils of the Soul"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy04fraz",
+          "label": "Vol. IV – The Dying God"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy05frazuoft",
+          "label": "Vol. V – Adonis, Attis, Osiris, Part I"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy06frazuoft",
+          "label": "Vol. VI – Adonis, Attis, Osiris , Part II"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy07fraz",
+          "label": "Vol. VII – Spirits of the Corn and of the Wild , Part I"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy08fraz",
+          "label": "Vol. VIII – Spirits of the Corn and of the Wild , Part II"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy09fraz",
+          "label": "Vol. IX – The Scapegoat"
+        },
+        {
+          "url": "https://archive.org/details/1913goldenboughs10fraz",
+          "label": "Vol. X – Balder the Beautiful, Part I"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy11fraz",
+          "label": "Vol. XI – Balder the Beautiful, Part II"
+        },
+        {
+          "url": "https://archive.org/details/goldenboughstudy12fraz",
+          "label": "Vol. XII – Bibliography and General Index"
+        },
+        {
+          "url": "https://ebooks.adelaide.edu.au/f/frazer/james/golden/index.html",
+          "label": "In one volume"
+        },
+        {
+          "url": "https://archive.org/details/TheGoldenBough-Part1-TheMagicArtAndTheEvolutionOfKingsVol.1",
+          "label": ""
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. Myths of the Origin of Fire. London, 1930",
+      "urls": [
+        {
+          "url": "http://www.dli.ernet.in/data15/Kerala_Sahitya_Academi/English/1792/814_W_O.pdf",
+          "label": ""
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Frazer"
+      ],
+      "citation": "Frazer, J. G. Pousanias's Description of Greece. 6 vols. London, 1898. G",
+      "urls": [
+        {
+          "url": "https://archive.org/details/pausaniassdescri01pausuoft",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/pausaniassdescri04pausuoft",
+          "label": "Vol. IV"
+        },
+        {
+          "url": "https://archive.org/details/pausaniassdescri05pausuoft",
+          "label": "Vol. V"
+        }
+      ],
+      "uses": 463,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Werner"
+      ],
+      "citation": "Werner, Alice. African Mythology (The Mythology of all Races VII). Boston, 1925",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal07alexuoft#page/n9/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 459,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Werner"
+      ],
+      "citation": "Werner, E. T. C. Myths and Legends of China. London, 1922",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/15250/15250-h/15250-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 459,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Bolte"
+      ],
+      "citation": "Bolte, J. — co-author of BP (Bolte & Polívka); see BP.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/AnmerkungenZuDenKinder-UndHausmaerchenDerGebruederGrimm1",
+          "label": ""
+        }
+      ],
+      "uses": 458,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Wienert"
+      ],
+      "citation": "Wienert, W. Die Typen der griechisch-römischen Fabel (FFC 56). Helsinki, 1925. — source of the ET (Ethische Typen) and ST (Stofftypen) numbers.",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Wienert+Typen+griechisch-r%C3%B6mischen+Fabel",
+          "label": ""
+        }
+      ],
+      "uses": 430,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Fox"
+      ],
+      "citation": "Fox, William S. Greek and Roman Mythology (Mythology of all Races I). Boston, 1916",
+      "urls": [
+        {
+          "url": "https://archive.org/stream/mythologyallrac04maccgoog#page/n8/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 415,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dixon"
+      ],
+      "citation": "Dixon, Roland B. Oceanic Mythology (The Mythology of all Races IX). Boston, 1916",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofall09gray#page/n7/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 399,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Espinosa"
+      ],
+      "citation": "Espinosa, A. M. Cuentos populares españoles. 3 vols. Stanford, 1923–26.",
+      "urls": [
+        {
+          "url": "https://onlinebooks.library.upenn.edu/webbin/book/lookupid?key=ha000869997",
+          "label": ""
+        }
+      ],
+      "uses": 377,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Espinosa Jr.",
+        "Espinosa"
+      ],
+      "citation": "Espinosa, J. M. Spanish Folk-Tales from New Mexico (MAFLS 30). 1937.",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Espinosa+Spanish+Folk-Tales+New+Mexico",
+          "label": ""
+        }
+      ],
+      "uses": 377,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Rasmussen"
+      ],
+      "citation": "Rasmussen, K. Report of the Fifth Thule Expedition 1921–24 (Intellectual Culture of the Iglulik / Netsilik / Copper Eskimos). Copenhagen, 1929–32.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/intellectualcult00rasm",
+          "label": ""
+        }
+      ],
+      "uses": 372,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Alexander N. Am.",
+        "Alexander"
+      ],
+      "citation": "Alexander N. Am. = Alexander, H. B. North American Mythology (The Mythology of all Races X). Boston, 1916",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal10alexuoft#page/n11/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 357,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Boggs"
+      ],
+      "citation": "Boggs, R. S. Index of Spanish Folktales (FFC 90). Helsinki, 1930.",
+      "urls": [
+        {
+          "url": "https://en.wikisource.org/wiki/Index_of_Spanish_Folktales",
+          "label": ""
+        }
+      ],
+      "uses": 351,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Child"
+      ],
+      "citation": "Child, Francis James. The English and Scottish Popular Ballads. 5 vols in 10. Boston, 1882–98",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/neu/eng/child/",
+          "label": ""
+        }
+      ],
+      "uses": 336,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Boas"
+      ],
+      "citation": "Boas, F. Tsimshian Mythology (RBAE 31), 1916; The Eskimo of Baffin Land and Hudson Bay (BAM XV), 1901–07; and many papers in JAFL/BAM/RBAE.",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Boas+Tsimshian+Mythology",
+          "label": ""
+        }
+      ],
+      "uses": 319,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Halm Aesop",
+        "Halm"
+      ],
+      "citation": "Halm, K. Fabulae Aesopicae Collectae. Leipzig, 1875.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/fabulaeaesopica00aesogoog",
+          "label": ""
+        }
+      ],
+      "uses": 317,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Grimm"
+      ],
+      "citation": "Grimm, J. & W. Kinder- und Hausmärchen (cited by tale number). Berlin, 1857.",
+      "urls": [
+        {
+          "url": "https://www.gutenberg.org/ebooks/2591",
+          "label": ""
+        }
+      ],
+      "uses": 304,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Beal"
+      ],
+      "citation": "Beal = Bealoideas : Journal of the Folklore of Ireland Society",
+      "urls": [],
+      "uses": 293,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kittredge"
+      ],
+      "citation": "Kittredge, G. L. Arthur and Gorlagon (Harvard Studies and Notes in Philology and Literature VIII). Boston, 1903",
+      "urls": [
+        {
+          "url": "https://archive.org/details/cu31924027098072",
+          "label": ""
+        }
+      ],
+      "uses": 292,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kittredge"
+      ],
+      "citation": "Kittredge, G. L. *A Study of Gawain and the Green Knight. Cambridge (Mass.), 1916",
+      "urls": [
+        {
+          "url": "https://archive.org/details/astudygawainand00unkngoog",
+          "label": ""
+        }
+      ],
+      "uses": 292,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kittredge"
+      ],
+      "citation": "Kittredge, G. L. *Witchcraft in Old and New England. Cambridge (Mass.), 1929",
+      "urls": [],
+      "uses": 292,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Alphabet"
+      ],
+      "citation": "Alphabet = Banks, M. M. An Alphabet of Tales, an English 15th century translation of the Alphabetum Narrationum of Etienne de Besançon (EETS Nos. 126, 127). 2 vols. London, 1904–05",
+      "urls": [
+        {
+          "url": "https://archive.org/details/alphabetoftalese01londuoft",
+          "label": ""
+        }
+      ],
+      "uses": 273,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hartland"
+      ],
+      "citation": "Hartland, E. S. The Legend of Perseus . 3 vols. London, 1894 ff",
+      "urls": [
+        {
+          "url": "https://archive.org/details/legendofperseuss01hart",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/legendofperseuss02hart",
+          "label": "Vol. II"
+        },
+        {
+          "url": "https://archive.org/details/legendofperseuss03hart",
+          "label": "Vol. III"
+        }
+      ],
+      "uses": 263,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hartland"
+      ],
+      "citation": "Hartland, E. S.*Primitive Paternity. 2 vols. London, 1909",
+      "urls": [
+        {
+          "url": "https://archive.org/details/primitivepaterni01hart",
+          "label": ""
+        }
+      ],
+      "uses": 263,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hartland"
+      ],
+      "citation": "Hartland, E. S.*The Science of Fairy Tales. London, 1891",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/24614/24614-h/24614-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 263,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Basile"
+      ],
+      "citation": "Basile , G. The Pentamerone (trans. and edited by Benedetto Croce and N. M. Penzer ). 2 vols. London, 1932",
+      "urls": [
+        {
+          "url": "http://burtoniana.org/books/1893-Pentamerone/index.html",
+          "label": "Richard Burton's translation"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=13",
+          "label": "Stories from the Pentamerone . E. F. Strange, editor. Warwick Goble, illustrator. London: Macmillan & Co., 1911. The text of this book is based on John Edward Taylor's translation from 1847)."
+        }
+      ],
+      "uses": 258,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Grote"
+      ],
+      "citation": "Grote, George. History of Greece. 3 vols. London, 1888",
+      "urls": [
+        {
+          "url": "http://onlinebooks.library.upenn.edu/webbin/metabook?id=grotegreece",
+          "label": ""
+        }
+      ],
+      "uses": 258,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "O'Suilleabhain"
+      ],
+      "citation": "O'Suilleabhain , S. Scealta Craibhtheacha . Dublin, 1952. P",
+      "urls": [],
+      "uses": 258,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MAFLS"
+      ],
+      "citation": "MAFLS = Memoirs of the American Folk-Lore Society",
+      "urls": [],
+      "uses": 257,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jegerlehner Oberwallis",
+        "Jegerlehner"
+      ],
+      "citation": "Jegerlehner, J. Sagen und Märchen aus dem Oberwallis. Basel, 1913.",
+      "urls": [
+        {
+          "url": "https://catalog.hathitrust.org/Record/001675073",
+          "label": ""
+        }
+      ],
+      "uses": 253,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Gaster"
+      ],
+      "citation": "Gaster , Moses.The Exempla of the Rabbis. London, Leipzig, 1924",
+      "urls": [],
+      "uses": 243,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gaster"
+      ],
+      "citation": "Gaster , Moses.Studies and Texts in Folklore, Magic, Medieval Romance, Hebrew Apocrypha and Samaritan Archaeology. 3 vols. London, 1925–28",
+      "urls": [],
+      "uses": 243,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gaster"
+      ],
+      "citation": "Gaster , Theodor H. The Oldest Stories in the World. New York, 1952",
+      "urls": [],
+      "uses": 243,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gaster"
+      ],
+      "citation": "Gaster , Theodor H. Thespis. New York, 1950. Gautreks Saga (ed. W. Ranisch , Palaestra XI). 1900",
+      "urls": [
+        {
+          "url": "http://www.vsnrweb-publications.org.uk/Saga-Book%20XI.pdf",
+          "label": ""
+        }
+      ],
+      "uses": 243,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Rink"
+      ],
+      "citation": "Rink, Henry. Tales and Traditions of the Eskimo. Edinburgh, 1875",
+      "urls": [
+        {
+          "url": "http://sacred-texts.com/nam/inu/tte/index.htm",
+          "label": ""
+        }
+      ],
+      "uses": 242,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Talbot"
+      ],
+      "citation": "Talbot, P. A. In the Shadow of the Bush. New York and London, 1912",
+      "urls": [
+        {
+          "url": "https://archive.org/details/inshadowofbush00perc",
+          "label": ""
+        }
+      ],
+      "uses": 241,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Sob"
+      ],
+      "citation": "Zong In-Sob. Folk Tales from Korea. London, 1952. (cited as 'Korean: Zong in-Sob')",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Zong+In-Sob+Folk+Tales+from+Korea",
+          "label": ""
+        }
+      ],
+      "uses": 238,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Wells"
+      ],
+      "citation": "Wells, John Edwin. A Manual of Writings in Middle English. New Haven, 1916",
+      "urls": [
+        {
+          "url": "https://archive.org/details/manualofwritings00welluoft",
+          "label": ""
+        }
+      ],
+      "uses": 235,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Flowers"
+      ],
+      "citation": "Flowers, Helen L. A Classification of the Folktales of the West Indies by Types and Motifs. (Indiana University Ph. D. thesis, 1952.) Microfilm Service, Ann Arbor, Michigan, 1953",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/000725392",
+          "label": ""
+        }
+      ],
+      "uses": 227,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Wessman"
+      ],
+      "citation": "Wessman, V. E. V. Finlands svenska folkdiktning (FFC / SLS). Helsingfors.",
+      "urls": [
+        {
+          "url": "https://www.folklorefellows.fi/ffc-catalogue/",
+          "label": ""
+        }
+      ],
+      "uses": 225,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Holmberg Siberian",
+        "Holmberg"
+      ],
+      "citation": "Holmberg (Harva), U. Finno-Ugric, Siberian (The Mythology of All Races IV). Boston, 1927.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/finnougricsiberi0000unoh",
+          "label": ""
+        }
+      ],
+      "uses": 214,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Scala Celi",
+        "Scala"
+      ],
+      "citation": "Scala Celi = Johannes Gobii junior. Scala Celi . Lübeck , 1476",
+      "urls": [],
+      "uses": 209,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dickson"
+      ],
+      "citation": "Dickson, Arthur. Valentine and Orson, a study in late Medieval Romance. New York, 1929",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001087502",
+          "label": ""
+        }
+      ],
+      "uses": 208,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Herbert"
+      ],
+      "citation": "Herbert, J. A. Catalogue of Romances in the Department of Manuscripts in the British Museum. London, 1910. (Vol. 3 only; for vols. 1 and 2 see Ward, H. L. D.)",
+      "urls": [
+        {
+          "url": "https://archive.org/details/catalogueromanc00wardgoog",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/catalogueromanc01wardgoog",
+          "label": "Vol. II"
+        },
+        {
+          "url": "https://archive.org/details/catalogueofroman03brit",
+          "label": "Vol. III"
+        }
+      ],
+      "uses": 207,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Newman"
+      ],
+      "citation": "Newman / Neuman, D. Motif-Index of Talmudic-Midrashic Literature. Indiana University, 1954. (variant spelling of Neuman)",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Neuman+Motif-Index+Talmudic",
+          "label": ""
+        }
+      ],
+      "uses": 203,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Parsons"
+      ],
+      "citation": "Parsons, E. C. Folk-Lore of the Sea Islands / Antilles (MAFLS).",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Parsons+Folk-Lore+Antilles+Memoirs",
+          "label": ""
+        }
+      ],
+      "uses": 197,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Andrejev"
+      ],
+      "citation": "Andrejev, N. P. Index of Ukrainian Folktale Types (FFC 69). 1927.",
+      "urls": [
+        {
+          "url": "https://www.folklorefellows.fi/ffc-catalogue/",
+          "label": ""
+        }
+      ],
+      "uses": 195,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Krappe"
+      ],
+      "citation": "Krappe , A. H. Balor with the Evil Eye: Studies in Celtic and French Literature. New York, 1927",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=mdp.39015005669091;view=1up;seq=7",
+          "label": ""
+        }
+      ],
+      "uses": 188,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Krappe"
+      ],
+      "citation": "Krappe , A. H. The Science of Folk-Lore . London, 1930",
+      "urls": [],
+      "uses": 188,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gifford"
+      ],
+      "citation": "Gifford, E. W. Tongan Myths and Tales. BMB VIII. Honolulu 1924",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=uc1.32106006368457;view=1up;seq=9",
+          "label": ""
+        }
+      ],
+      "uses": 181,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Handy"
+      ],
+      "citation": "Handy, E. S. C. Marquesan Legends. BMB LXIX. Honolulu 1930",
+      "urls": [],
+      "uses": 180,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacottet"
+      ],
+      "citation": "Jacottet , E. The Treasury of Basuto Lore. London, 1908",
+      "urls": [],
+      "uses": 179,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Nassau"
+      ],
+      "citation": "Nassau, R. H. Where Animals Talk: West African Folklore Tales. London, 1914",
+      "urls": [
+        {
+          "url": "https://archive.org/details/whereanimalstalk00nass",
+          "label": ""
+        }
+      ],
+      "uses": 172,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Keith"
+      ],
+      "citation": "Keith, A. B. Indian Mythology (The Mythology of all Races VI). Boston, 1917",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal06alexuoft#page/n9/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 168,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Brown"
+      ],
+      "citation": "Brown, A. C. L. Iwain : a Study in the Origins of Arthurian Romance (Harvard Studies and Notes in Philology and Literature VIII). Boston, 1903",
+      "urls": [
+        {
+          "url": "https://archive.org/details/cu31924027271588",
+          "label": ""
+        }
+      ],
+      "uses": 165,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Brown Collection",
+        "Brown"
+      ],
+      "citation": "Brown Collection = The Frank C. Brown Collection of North Carolina Folklore. 5 vols. Durham, N. C, 1952–",
+      "urls": [
+        {
+          "url": "https://archive.org/search.php?query=creator%3A%22Frank+C.+Brown+Collection+of+North+Carolina+Folklore%22",
+          "label": ""
+        }
+      ],
+      "uses": 165,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Crane"
+      ],
+      "citation": "Crane, T. F. Liber de Miraculis Sanctae Dei Genetricis Mariae . Ithaca (N.Y.) and London, 1926. *The Exempla of Jacques de Vitry (PFLS XXVI). London, 1890",
+      "urls": [
+        {
+          "url": "https://archive.org/details/theexempla00vitruoft",
+          "label": ""
+        }
+      ],
+      "uses": 164,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Theal"
+      ],
+      "citation": "Theal , G. M. Kaffir Folk-lore . London, 1886.  *The Yellow and Dark-skinned People of Africa South of the Zambesi . London, 1910",
+      "urls": [
+        {
+          "url": "https://archive.org/details/yellowdarkskinne00thea",
+          "label": ""
+        },
+        {
+          "url": "http://www.sacred-texts.com/afr/xft/",
+          "label": ""
+        }
+      ],
+      "uses": 155,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Callaway"
+      ],
+      "citation": "Callaway, H. Nursery Tales, Traditions , and Histories of the Zulus. Vol. I. Natal and London, 1868",
+      "urls": [
+        {
+          "url": "https://archive.org/details/nurserytalestra00callgoog",
+          "label": ""
+        }
+      ],
+      "uses": 140,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kristensen Danske Sagn",
+        "Kristensen"
+      ],
+      "citation": "Kristensen, E. T. Danske Sagn. 6 vols. Aarhus, 1892–1901.",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Kristensen+Danske+Sagn",
+          "label": ""
+        }
+      ],
+      "uses": 139,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Herrmann Saxo",
+        "Herrmann"
+      ],
+      "citation": "Herrmann, P. Erläuterungen zu den ersten neun Büchern der dänischen Geschichte des Saxo Grammaticus. 2 vols. Leipzig, 1901–22.",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Herrmann+Saxo+Grammaticus+Erl%C3%A4uterungen",
+          "label": ""
+        }
+      ],
+      "uses": 133,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Carnoy"
+      ],
+      "citation": "Carnoy , Albert J. Iranian Mythology (The Mythology of all Races VI). Boston, 1917",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal06alexuoft#page/n9/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 130,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Cox"
+      ],
+      "citation": "Cox, Marian R. Cinderella (PFLS XXXI). London, 1893",
+      "urls": [
+        {
+          "url": "http://www.surlalunefairytales.com/cinderella/marianroalfecox/",
+          "label": ""
+        }
+      ],
+      "uses": 130,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Harris"
+      ],
+      "citation": "Harris, J. R. Boanerges . Cambridge (Eng.), 1913",
+      "urls": [],
+      "uses": 127,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Harris"
+      ],
+      "citation": "Harris, J. R. The Cult of the Heavenly Twins. Cambridge, 1906",
+      "urls": [
+        {
+          "url": "https://archive.org/details/cultheavenlytwi00harrgoog",
+          "label": ""
+        }
+      ],
+      "uses": 127,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Harris"
+      ],
+      "citation": "Harris, J. R. Picus who is also Zeus. Cambridge, 1916",
+      "urls": [
+        {
+          "url": "https://archive.org/details/picuswhoisalsoze00harr",
+          "label": ""
+        }
+      ],
+      "uses": 127,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Harris"
+      ],
+      "citation": "Harris, Joel C. *Uncle Remus : his Songs and Sayings. New York, 1880",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/cache/epub/2306/pg2306-images.html",
+          "label": ""
+        }
+      ],
+      "uses": 127,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Harris"
+      ],
+      "citation": "Harris, Joel C. *Uncle Remus and his Friends. Boston, 1892",
+      "urls": [],
+      "uses": 127,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Harris"
+      ],
+      "citation": "Harris, Joel C. *Nights with Uncle Remus . Boston, 1883",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/24430/24430-h/24430-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 127,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Chatelain"
+      ],
+      "citation": "Chatelain , Heli . Folk-Tales of Angola (MAFLS I). Boston and New York, 1894",
+      "urls": [
+        {
+          "url": "https://archive.org/details/folktalesangola00chatgoog",
+          "label": ""
+        }
+      ],
+      "uses": 125,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Cole"
+      ],
+      "citation": "Cole, Fay Cooper. Traditions of the Tinguian : A Study in Philippine Folk-Lore . FM XIV. Chicago, 1915",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/12545/12545-h/12545-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 125,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Clark"
+      ],
+      "citation": "Clark, Mrs. K. M. Maori Tales and Legends. London, 1896",
+      "urls": [],
+      "uses": 122,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Loorits"
+      ],
+      "citation": "Loorits, O. Estonian folk-narrative monographs in FF Communications.",
+      "urls": [
+        {
+          "url": "https://www.folklorefellows.fi/ffc-catalogue/",
+          "label": ""
+        }
+      ],
+      "uses": 116,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Vries"
+      ],
+      "citation": "de Vries, J. Die Märchen von klugen Rätsellösern (FFC 73). Helsinki, 1928.",
+      "urls": [
+        {
+          "url": "https://www.folklorefellows.fi/ffc-catalogue/",
+          "label": ""
+        }
+      ],
+      "uses": 114,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Anesaki"
+      ],
+      "citation": "Anesaki , Masaharu . Japanese Mythology (The Mythology of all Races VIII). Boston, 1928. Argonautica of Apollonius Rhodius (ed. G. W. Mooney). London, 1912. B",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra08gray#page/n13/mode/2up",
+          "label": ""
+        },
+        {
+          "url": "http://www.gutenberg.org/files/830/830-h/830-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 113,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Clouston"
+      ],
+      "citation": "Clouston , W. A. The Book of Noodles. London, 1888",
+      "urls": [
+        {
+          "url": "http://sacred-texts.com/etc/bon/index.htm",
+          "label": ""
+        }
+      ],
+      "uses": 112,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Clouston"
+      ],
+      "citation": "Clouston , W. A. A Group of Eastern Romances and Stories. Glasgow, 1889",
+      "urls": [
+        {
+          "url": "https://archive.org/details/groupofeasternro00clou",
+          "label": ""
+        }
+      ],
+      "uses": 112,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Clouston"
+      ],
+      "citation": "Clouston , W. A. Popular Tales and Fictions. 2 vols. Edinburgh, London, 1887",
+      "urls": [
+        {
+          "url": "https://archive.org/details/populartalesfict02clouuoft",
+          "label": ""
+        }
+      ],
+      "uses": 112,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jenness"
+      ],
+      "citation": "Jenness , Diamond. Notes and Traditions from Northern Alaska (Report of the Canadian Arctic Expedition, Southern Party, 1913–16, XIII). Ottawa, 1924",
+      "urls": [],
+      "uses": 106,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "FFC"
+      ],
+      "citation": "FFC = FF Communications , published by the Folklore Fellows. Helsinki, 1907 ff",
+      "urls": [],
+      "uses": 96,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gorion Born Judas",
+        "Gorion"
+      ],
+      "citation": "bin Gorion (Berdichevsky), M. J. Der Born Judas. 6 vols. Leipzig, 1916–23.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/derbornjudaslege06berd",
+          "label": ""
+        }
+      ],
+      "uses": 93,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Fansler"
+      ],
+      "citation": "Fansler, D. S. Filipino Popular Tales (MAFLS 12). Lancaster, 1921.",
+      "urls": [
+        {
+          "url": "https://www.gutenberg.org/ebooks/8299",
+          "label": ""
+        }
+      ],
+      "uses": 92,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Patch"
+      ],
+      "citation": "Patch, H. R. *The Goddess Fortuna in Mediaeval Literature. Cambridge (Mass.), 1927",
+      "urls": [],
+      "uses": 90,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Patch"
+      ],
+      "citation": "Patch, H. R. *The Other World According to Descriptions in Medieval Literature. Cambridge (Mass.), 1950",
+      "urls": [],
+      "uses": 90,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Heptameron"
+      ],
+      "citation": "Marguerite de Navarre. The Heptameron.",
+      "urls": [
+        {
+          "url": "https://www.gutenberg.org/ebooks/17701",
+          "label": ""
+        }
+      ],
+      "uses": 88,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Cent Nouvelles Nouvelles",
+        "Cent"
+      ],
+      "citation": "Les Cent Nouvelles Nouvelles (15th-c. French tale collection).",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Cent+Nouvelles+Nouvelles",
+          "label": ""
+        }
+      ],
+      "uses": 87,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "Weeks"
+      ],
+      "citation": "Weeks, John H. *Among Congo Cannibals. London, 1913",
+      "urls": [
+        {
+          "url": "https://archive.org/details/amongcongocannib00weekuoft",
+          "label": ""
+        }
+      ],
+      "uses": 86,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Weeks"
+      ],
+      "citation": "Weeks, John H.*Jungle Life and Jungle Stories. London, 1923",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=inu.30000005477298;view=1up;seq=9",
+          "label": ""
+        }
+      ],
+      "uses": 86,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Weeks"
+      ],
+      "citation": "Weeks, John H. Anthropological Notes on the Bangola of the Upper Congo River (JAI XXXIX, 1909)",
+      "urls": [],
+      "uses": 86,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Weeks"
+      ],
+      "citation": "Weeks, John H. Congo Life and Folklore. 2 parts. London, 1911",
+      "urls": [
+        {
+          "url": "https://archive.org/details/congolifefolklor00week",
+          "label": "Part I"
+        },
+        {
+          "url": "http://library.si.edu/digital-library/book/congolifefolklor00week",
+          "label": ""
+        }
+      ],
+      "uses": 86,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dennett"
+      ],
+      "citation": "Dennett, R. E. The Folk-lore of the Fjort (French Congo) (PFLS XLI). London, 1898",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=42",
+          "label": ""
+        }
+      ],
+      "uses": 85,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Tawney"
+      ],
+      "citation": "Tawney , C. H. Kathā Sarit Sāgara , Ocean of the Streams of Story. 2 vols. Calcutta, 1880–84. See also Penzer",
+      "urls": [
+        {
+          "url": "https://archive.org/details/oceanofstorybein01somauoft",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein02somauoft",
+          "label": "Vol. II"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein03somauoft",
+          "label": "Vol. III"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein04somauoft",
+          "label": "Vol. IV"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein05somauoft",
+          "label": "Vol. V"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein06somauoft",
+          "label": "Vol. VI"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein07somauoft",
+          "label": "Vol. VII"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein08somauoft",
+          "label": "Vol. VIII"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein09somauoft",
+          "label": "Vol. IX"
+        },
+        {
+          "url": "https://archive.org/details/oceanofstorybein10somauoft",
+          "label": "Vol. X"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=75",
+          "label": "Vol. I – editable text"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=76",
+          "label": "Vol. II – editable text"
+        }
+      ],
+      "uses": 79,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ellis"
+      ],
+      "citation": "Ellis, T. P. and Lloyd, J. The Mabinogion . 2 vols. Oxford, 1929",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=114",
+          "label": "Old translation"
+        }
+      ],
+      "uses": 78,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ellis ( Vai )",
+        "Ellis"
+      ],
+      "citation": "Ellis ( Vai ) = Ellis, G. W. Negro Culture in West Africa. New York, 1914",
+      "urls": [
+        {
+          "url": "https://archive.org/details/ocm00833586.4680.emory.edu",
+          "label": ""
+        }
+      ],
+      "uses": 78,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ellis (Yoruba)",
+        "Ellis"
+      ],
+      "citation": "Ellis (Yoruba) = Ellis, A. B. The Yoruba-speaking Peoples of the Slave Coast of West Africa. London, 1894",
+      "urls": [
+        {
+          "url": "http://sacred-texts.com/afr/yor/index.htm",
+          "label": ""
+        }
+      ],
+      "uses": 78,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Spence"
+      ],
+      "citation": "Spence, Lewis. Myths and Legends of Babylonia and Assyria. London, 1916",
+      "urls": [
+        {
+          "url": "https://archive.org/details/mythslegendsofba00speniala",
+          "label": ""
+        }
+      ],
+      "uses": 74,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Saussaye"
+      ],
+      "citation": "Saussaye , P. D. Chantepie de la. The Religion of the Teutons (trans. B. J. Vos). Boston, 1902",
+      "urls": [
+        {
+          "url": "https://archive.org/details/religionofteuton00chan",
+          "label": ""
+        }
+      ],
+      "uses": 72,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Saussaye"
+      ],
+      "citation": "Saussaye , P. D. Chantepie de la. The Religion of the Teutons (trans. B. J. Vos ). Boston, 1902",
+      "urls": [
+        {
+          "url": "https://archive.org/details/religionofteuton00chan",
+          "label": ""
+        }
+      ],
+      "uses": 72,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Wheeler"
+      ],
+      "citation": "Wheeler, Gerald Camden. Mono- Alu Folklore. London, 1926. Tales referred to by number",
+      "urls": [],
+      "uses": 70,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jones"
+      ],
+      "citation": "Jones, Louis C. Spooks of the Valley: ghost stories for boys and girls. Boston, 1948",
+      "urls": [],
+      "uses": 69,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Roberts"
+      ],
+      "citation": "Roberts, Warren E. Aarne -Thompson Type 480 in World Tradition. (Indiana University Ph. D. thesis) Microfilm Service, Ann Arbor, Michigan, 1954",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006808349",
+          "label": ""
+        }
+      ],
+      "uses": 69,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ward"
+      ],
+      "citation": "Ward, H. L. D. Catalogue of Romances in the Department of Manuscripts in the British Museum. London, 1883, 1893. (Vols. 1 and 2 only; for vol. 3 see Herbert, J. A.)",
+      "urls": [],
+      "uses": 69,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs"
+      ],
+      "citation": "Jacobs, Joseph. Book of Wonder Voyages. London, 1896",
+      "urls": [
+        {
+          "url": "https://archive.org/details/bookofwondervoya00jacoiala",
+          "label": ""
+        }
+      ],
+      "uses": 67,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs"
+      ],
+      "citation": "Jacobs, Joseph. *The Fables of Aesop. New York, 1894",
+      "urls": [
+        {
+          "url": "https://ebooks.adelaide.edu.au/a/aesop/a3j/index.html",
+          "label": ""
+        }
+      ],
+      "uses": 67,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs"
+      ],
+      "citation": "Jacobs, Joseph. Celtic Fairy Tales. London, 1892",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=1",
+          "label": ""
+        }
+      ],
+      "uses": 67,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs"
+      ],
+      "citation": "Jacobs, Joseph. More Celtic Fairy Tales. London, 1894",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=9",
+          "label": ""
+        }
+      ],
+      "uses": 67,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs"
+      ],
+      "citation": "Jacobs, Joseph. English Fairy Tales. London, 1890",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=10",
+          "label": ""
+        }
+      ],
+      "uses": 67,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs"
+      ],
+      "citation": "Jacobs, Joseph. More English Fairy Tales. London, 1895",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=11",
+          "label": ""
+        }
+      ],
+      "uses": 67,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lee"
+      ],
+      "citation": "Lee, A. C. The Decameron , its Sources and Analogues. London, 1909",
+      "urls": [],
+      "uses": 65,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Wimberly"
+      ],
+      "citation": "Wimberly , L. C. Folklore in the English and Scottish Ballads. Chicago, 1928",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=mdp.39015038902642;view=1up;seq=7",
+          "label": ""
+        }
+      ],
+      "uses": 63,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ker"
+      ],
+      "citation": "Ker, Anna. Papuan Fairy Tales. London, 1910. Ketilssaga Haengs (FAS II 109 ff.)",
+      "urls": [
+        {
+          "url": "http://www.forgottenbooks.com/readbook_text/Papuan_Fairy_Tales_1000097533/0",
+          "label": ""
+        },
+        {
+          "url": "http://catalog.hathitrust.org/Record/001277156",
+          "label": ""
+        },
+        {
+          "url": "http://www.germanicmythology.com/FORNALDARSAGAS/KetilsSagaChappell.html",
+          "label": ""
+        }
+      ],
+      "uses": 58,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Bleek"
+      ],
+      "citation": "Bleek , W. H. I. Reynard the Fox in South Africa or Hottentot Fables and Tales. London, 1864",
+      "urls": [
+        {
+          "url": "https://archive.org/details/reynardfoxinsou02bleegoog",
+          "label": ""
+        }
+      ],
+      "uses": 57,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Bleek"
+      ],
+      "citation": "Bleek , W. H. I., and Lloyd, L. C. Specimens of Bushman Folklore. London, 1911",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/afr/sbf/",
+          "label": ""
+        }
+      ],
+      "uses": 57,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hibbard"
+      ],
+      "citation": "Hibbard, Laura A. Mediaeval Romance in England. New York, 1924",
+      "urls": [
+        {
+          "url": "https://archive.org/details/medivalromancein00loom",
+          "label": ""
+        }
+      ],
+      "uses": 54,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Campbell-McKay"
+      ],
+      "citation": "Campbell-McKay = John G. McKay, More West Highland Tales, transcribed and translated from the original Gaelic manuscript of John Francis Campbell. Edinburgh and London, 1940",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/000236788",
+          "label": ""
+        }
+      ],
+      "uses": 52,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Campbell"
+      ],
+      "citation": "Campbell, J. F. Popular Tales of the West Highlands. 4 vols. 2d edition. London, 1890–93",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/pt1/index.htm",
+          "label": "vol. I"
+        },
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/pt2/index.htm",
+          "label": "vol. II"
+        },
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/pt3/index.htm",
+          "label": "vol. III"
+        },
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/pt4/index.htm",
+          "label": "vol. IV"
+        }
+      ],
+      "uses": 50,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Campbell"
+      ],
+      "citation": "Campbell, K. The Seven Sages of Rome. Boston, 1907",
+      "urls": [
+        {
+          "url": "https://archive.org/details/sevensagesofrome00camp",
+          "label": ""
+        }
+      ],
+      "uses": 50,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Scott"
+      ],
+      "citation": "Scott, J. G. Indo-Chinese Mythology (The Mythology of all Races XII). Boston, 1918",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal12alexuoft#page/n11/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 48,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Scott"
+      ],
+      "citation": "Scott, Robert D. The Thumb of Knowledge. New York, 1930",
+      "urls": [],
+      "uses": 48,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Meyer"
+      ],
+      "citation": "Meyer, Johann J. Hindu Tales. London, 1909",
+      "urls": [
+        {
+          "url": "http://www.forgottenbooks.com/readbook_text/Hindu_Tales_1000024647/0",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/cu31924022986859",
+          "label": ""
+        }
+      ],
+      "uses": 45,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Meyer"
+      ],
+      "citation": "Meyer, Kuno. The Voyage of Bran, son of Febal to the Land of the Living (with an essay upon the Irish Vision of the Happy Otherworld and the Celtic doctrine of Rebirth by Alfred Nutt). 2 vols . London, 1895, 1897",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/vob/",
+          "label": ""
+        }
+      ],
+      "uses": 45,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Burton"
+      ],
+      "citation": "Burton, R. F. Arabian Nights: The Book of the Thousand Nights and a Night. London, 1894. (SI, SII, etc. refers to Supplementary Volumes)",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=102",
+          "label": "vol. I"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=103",
+          "label": "vol. II"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=104",
+          "label": "vol. III"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=105",
+          "label": "vol. IV"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=106",
+          "label": "vol. V"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=107",
+          "label": "vol. VI"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=109",
+          "label": "vol. VII"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=110",
+          "label": "vol. VIII"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=111",
+          "label": "vol. IX"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=112",
+          "label": "vol. X"
+        }
+      ],
+      "uses": 44,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Burton"
+      ],
+      "citation": "Burton, R. F.Book of the Sword. London, 1884. C",
+      "urls": [
+        {
+          "url": "https://archive.org/details/booksword00unkngoog",
+          "label": ""
+        }
+      ],
+      "uses": 44,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Codrington"
+      ],
+      "citation": "Codrington , R. H. The Melanesians: studies in their Anthropology and Folklore. Oxford, 1891",
+      "urls": [
+        {
+          "url": "https://archive.org/details/melanesiansstudi00codruoft",
+          "label": ""
+        }
+      ],
+      "uses": 42,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ananikian"
+      ],
+      "citation": "Ananikian , Mardiros H. Armenian Mythology (The Mythology of all Races VII). Boston, 1925",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal07alexuoft#page/n9/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 37,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Ferguson"
+      ],
+      "citation": "Ferguson, John C. Chinese Mythology (Mythology of all Races VIII). Boston, 1928",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra08gray#page/n13/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 37,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lloyd"
+      ],
+      "citation": "Lloyd, John W. Aw-aw-tam Indian Nights. Westerfield , N. J., 1911",
+      "urls": [
+        {
+          "url": "http://www.aren.org/prison/documents/american-indian/55/55.pdf",
+          "label": ""
+        }
+      ],
+      "uses": 37,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thomas"
+      ],
+      "citation": "Thomas, Northcote W. Anthropological Report on the Ibo-Speaking Peoples of Nigeria. 2 vols. London, 1913–14",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/012308924",
+          "label": ""
+        }
+      ],
+      "uses": 36,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Smith"
+      ],
+      "citation": "Smith, E. W. and Dale, A. The Ila -speaking Peoples of Northern Rhodesia, vol. 2. London, 1920",
+      "urls": [
+        {
+          "url": "https://archive.org/details/ilaspeakingpeopl02edwi",
+          "label": "Vol. II"
+        }
+      ],
+      "uses": 35,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Smith"
+      ],
+      "citation": "Smith, G. Elliott. The Evolution of the Dragon. London, 1919",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/22038/22038-h/22038-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 35,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Smith"
+      ],
+      "citation": "Smith, W. Robertson. Lectures on the Religion of the Semites. 3d ed. London, 1927. Snorra Edda (in A. G. Brodeur , The Prose Edda , New York, 1916)",
+      "urls": [
+        {
+          "url": "https://archive.org/details/lecturesontherel028530mbp",
+          "label": ""
+        },
+        {
+          "url": "http://www.voluspa.org/proseedda.htm",
+          "label": ""
+        }
+      ],
+      "uses": 35,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Bateman"
+      ],
+      "citation": "Bateman, G. W. Zanzibar Tales. Chicago, 1901",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=81",
+          "label": ""
+        }
+      ],
+      "uses": 34,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Mensa Philosophica",
+        "Mensa"
+      ],
+      "citation": "Mensa Philosophica = T. F. Dunn. The Facetiae of the Mensa Philosophica (Washington University Studies, new series, Lang. and Lit. No. 5). St. Louis, 1934",
+      "urls": [],
+      "uses": 33,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Junod"
+      ],
+      "citation": "Junod , H. A. The Life of a South African Tribe, Vol. II. Neuchatel , 1913. K",
+      "urls": [
+        {
+          "url": "https://archive.org/details/lifeofsouthafric02junouoft",
+          "label": ""
+        }
+      ],
+      "uses": 31,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Benedict"
+      ],
+      "citation": "Benedict, Ruth. Zuñi Mythology . 2 vols. New York, 1935. (All references are to Volume II.) Biblioteca Africana (D. A. Drexel ed.) Innsbruck, 1924–31",
+      "urls": [],
+      "uses": 30,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Malory"
+      ],
+      "citation": "Malory, Sir Thomas. Morte D'Arthur ( many editions ). *Marguerite de Navarre. Heptameron. 3 vols. ( ed . Díllage , Paris, 1879). (Analysis by Sarah C. Pinkney , University of South Carolina)",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/1251/1251-h/1251-h.htm",
+          "label": ""
+        },
+        {
+          "url": "http://digital.library.upenn.edu/women/navarre/heptameron/heptameron.html",
+          "label": ""
+        },
+        {
+          "url": "http://www.gutenberg.org/files/17701/17701-h/17701-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 30,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Mitford"
+      ],
+      "citation": "Mitford, A. B. F. Tales of Old Japan. 3d edition. London, 1876",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/13015/13015-h/13015-h.htm",
+          "label": ""
+        },
+        {
+          "url": "http://archive.org/search.php?query=title%3A%22Tales%20of%20Old%20Japan%22%20AND%20mediatype%3Atexts",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/talesoldjapan01unkngoog",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/cu31924079597930",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/talesoldjapanwi00mitfgoog",
+          "label": ""
+        }
+      ],
+      "uses": 28,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hatt"
+      ],
+      "citation": "Hatt , Gudmund . *Asiatic Influences in American Folklore. København , 1949",
+      "urls": [],
+      "uses": 27,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hatt"
+      ],
+      "citation": "Hatt , Gudmund . The Corn Mother in America and Indonesia. (Anthropos XLVI [1951] pp. 853–914.) Heptameron. See *Marguerite de Navarre. Heptameron. 3 vols. (ed. Díllage , Paris, 1879). (Analysis by Sarah C. Pinkney , University of South Carolina)",
+      "urls": [
+        {
+          "url": "http://digital.library.upenn.edu/women/navarre/heptameron/heptameron.html",
+          "label": ""
+        },
+        {
+          "url": "http://www.gutenberg.org/files/17701/17701-h/17701-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 27,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Basden"
+      ],
+      "citation": "Basden , G. T. Among the Ibos of Nigeria. London, 1921",
+      "urls": [
+        {
+          "url": "https://archive.org/details/amongibosofniger00basd",
+          "label": ""
+        }
+      ],
+      "uses": 26,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "JAFL"
+      ],
+      "citation": "JAFL = Journal of American Folk-Lore . Boston, etc., 1888 ff",
+      "urls": [
+        {
+          "url": "https://muse.jhu.edu/journals/journal_of_american_folklore/",
+          "label": ""
+        }
+      ],
+      "uses": 24,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kidd"
+      ],
+      "citation": "Kidd, D. Savage Childhood: a Study of Kaffir Children. London, 1906",
+      "urls": [],
+      "uses": 23,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Coyajee"
+      ],
+      "citation": "Coyajee , J. C. Some Shahnameh Legends and their Chinese Parallels. JPASB XXIV (1928)",
+      "urls": [],
+      "uses": 22,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Steere"
+      ],
+      "citation": "Steere , E. Swahili Tales as told by the Natives of Zanzibar. London, 1922",
+      "urls": [
+        {
+          "url": "https://archive.org/details/swahilitalesasto00stee",
+          "label": ""
+        }
+      ],
+      "uses": 22,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Hultkrantz"
+      ],
+      "citation": "Hultkrantz , Åke . Conceptions of the Soul Among North American Indians. Stockholm, 1953. I",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001678964",
+          "label": ""
+        }
+      ],
+      "uses": 21,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Oberg"
+      ],
+      "citation": "Oberg, Kalervo . Indian Tribes of Northern Mato Grosso , Brazil (Smithsonian Institution, Institute of Social Anthropology, XV). Washington, 1953",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=inu.30000118569825;view=1up;seq=7",
+          "label": ""
+        }
+      ],
+      "uses": 21,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Davenport"
+      ],
+      "citation": "Davenport, William. Marshallese Folklore Types. The Journal of American Folklore Vol. 66, No. 261 (Jul. - Sep., 1953), pp. 219-237",
+      "urls": [
+        {
+          "url": "http://www.jstor.org/stable/537231?seq=1#page_scan_tab_contents",
+          "label": ""
+        }
+      ],
+      "uses": 20,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Encyc. Rel. Ethics",
+        "Encyc."
+      ],
+      "citation": "Encyc. Rel. Ethics = Hastings, J. Encyclopaedia of Religion and Ethics. 12 vols. New York, 1908–22. Erlebte Erdteile and Fox, Douglas C. African Genesis. New York, 1937. Erlebte Erdteile and Fox, Douglas C. African Genesis. New York, 1937. African Genesis F",
+      "urls": [
+        {
+          "url": "https://archive.org/details/encyclopaediaofr02hast",
+          "label": ""
+        }
+      ],
+      "uses": 20,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Stanley"
+      ],
+      "citation": "Stanley, H. M. My Dark Companions and their Strange Stories. London, 1893",
+      "urls": [
+        {
+          "url": "https://archive.org/details/mydarkcompanions00stan",
+          "label": ""
+        }
+      ],
+      "uses": 20,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Krug"
+      ],
+      "citation": "Krug, Adolph N. Bulu Tales from Kamerun , West Africa (JAFL XXV). L",
+      "urls": [],
+      "uses": 18,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Torday"
+      ],
+      "citation": "Torday , E. On the Trail of the Bushongo . London, 1925",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=uc1.$b303688;view=1up;seq=9",
+          "label": ""
+        }
+      ],
+      "uses": 18,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Swanton"
+      ],
+      "citation": "Swanton, J. R. Myths and Tales of the Southeastern Indians (BBAE LXXXVIII [1929]). T",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/nam/se/mtsi/",
+          "label": ""
+        }
+      ],
+      "uses": 17,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Reinhard"
+      ],
+      "citation": "Reinhard , John R. The Survival of Geis in Mediaeval Romance. Halle a. S., 1933",
+      "urls": [],
+      "uses": 16,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Cowell"
+      ],
+      "citation": "Cowell , E. B. and others. The Jātaka or Stories of the Buddha's Former Births. 6 vols , and index. Cambridge, 1895–1913",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=63",
+          "label": "vol. I"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=64",
+          "label": "vol. II"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=64",
+          "label": "vol. III"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=66",
+          "label": "vol. IV"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=67",
+          "label": "vol. V"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=68",
+          "label": "vol. VI"
+        }
+      ],
+      "uses": 15,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "FL"
+      ],
+      "citation": "FL = Folklore . London, 1890 ff",
+      "urls": [],
+      "uses": 15,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Field"
+      ],
+      "citation": "Field, John E. The Myth of the Pent Cuckoo. London, 1913",
+      "urls": [],
+      "uses": 13,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Milligan"
+      ],
+      "citation": "Milligan, Robert H. *The Fetish Folk of West Africa. Chicago, 1912",
+      "urls": [
+        {
+          "url": "https://archive.org/details/fetishfolkofwest00robe",
+          "label": ""
+        }
+      ],
+      "uses": 12,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Milligan"
+      ],
+      "citation": "Milligan, Robert H. *The Jungle Folk of Africa. New York, 1908",
+      "urls": [
+        {
+          "url": "https://archive.org/details/junglefolkofafri00mill",
+          "label": ""
+        }
+      ],
+      "uses": 12,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Boberg"
+      ],
+      "citation": "Boberg , Inger M. Motif-Index of Early Icelandic Literature ( Biblioteca Arnamagnæana ). København 1956",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006808193",
+          "label": ""
+        }
+      ],
+      "uses": 11,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Curtin"
+      ],
+      "citation": "Curtin, Jeremiah. Seneca Indian Myths. Boston, 1923",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=60",
+          "label": ""
+        }
+      ],
+      "uses": 11,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Cushing"
+      ],
+      "citation": "Cushing, Frank H. Zuñi Folk Tales. New York and London, 1901. D",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=59",
+          "label": ""
+        }
+      ],
+      "uses": 11,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Phaedrus"
+      ],
+      "citation": "Phaedrus = Phaedri Fabulae Aesopiae (ed. J. P. Postgate ). Oxford, 1920. Pliny's Natural History, Translated by H. Rackham, W.H.S. Jones & D.E. Eichholz , From the 10 volume edition, Harvard University Press, Massachusetts, 1949-54",
+      "urls": [
+        {
+          "url": "https://archive.org/details/phaedriaugustil06phaegoog",
+          "label": ""
+        },
+        {
+          "url": "http://catalog.hathitrust.org/Record/009726006",
+          "label": ""
+        },
+        {
+          "url": "http://www.masseiana.org/pliny.htm",
+          "label": ""
+        }
+      ],
+      "uses": 10,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Cross"
+      ],
+      "citation": "Cross = Tom Peete Cross. Motif-Index of Early Irish Literature. Bloomington, Indiana, 1952",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006929790",
+          "label": ""
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dunlop-Wilson"
+      ],
+      "citation": "Dunlop-Wilson = Dunlop, J. History of Prose Fiction. New edition revised by H. Wilson. 2 vols. London, 1888. E",
+      "urls": [
+        {
+          "url": "https://archive.org/details/historyofprosefi01dunl",
+          "label": ""
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Howey"
+      ],
+      "citation": "Howey , M. O. The Horse in Magic and Myth. London, 1923",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/007128675",
+          "label": ""
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Johnson"
+      ],
+      "citation": "Johnson, Sir Harry. George Grenfell and the Congo, Vol. II. London, 1908",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=mdp.39015046823186;view=1up;seq=13",
+          "label": ""
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lang"
+      ],
+      "citation": "Lang, Andrew. The Delectable Tale of the Marriage of Cupid and Psyche, done into English by William Adlington . London, 1886",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001769088",
+          "label": ""
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lang"
+      ],
+      "citation": "Lang, Andrew. Myth, Ritual and Religion. 2 vols. London, 1887",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/2832/2832-h/2832-h.htm",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/mythritualandrel02languoft",
+          "label": "Vol. II"
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Spargo"
+      ],
+      "citation": "Spargo , John Webster. Virgil the Necromancer. Cambridge (Mass.), 1934",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001221683",
+          "label": ""
+        }
+      ],
+      "uses": 9,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "BBAE"
+      ],
+      "citation": "BBAE = Bulletin of the Bureau of American Ethnology",
+      "urls": [
+        {
+          "url": "https://archive.org/details/bulletin1331943smit",
+          "label": ""
+        }
+      ],
+      "uses": 8,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Nutt"
+      ],
+      "citation": "Nutt, Alfred. See Meyer, Kuno . The Voyage of Bran, son of Febal to the Land of the Living (with an essay upon the Irish Vision of the Happy Otherworld and the Celtic doctrine of Rebirth by Alfred Nutt). 2 vols . London, 1895, 1897",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/vob/",
+          "label": ""
+        }
+      ],
+      "uses": 8,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Azov"
+      ],
+      "citation": "Azov, R. F. and D. C. Phillott . \"Some Arab Folktales from Hazramut .\" Journal and Proceedings, Asiatic Society of Bengal (n. s.), II, 399–439; III, 645–680",
+      "urls": [],
+      "uses": 7,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Conzemius"
+      ],
+      "citation": "Conzemius , E. Ethnographical survey of the Miskito and Sumu Indians of Honduras and Nicaragua. BBAE CVI, 1932",
+      "urls": [
+        {
+          "url": "https://archive.org/details/bulletin1061932smit",
+          "label": ""
+        }
+      ],
+      "uses": 7,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gerould"
+      ],
+      "citation": "Gerould, Gordon H. The Grateful Dead (PFLS LX). London, 1908",
+      "urls": [
+        {
+          "url": "http://sacred-texts.com/etc/gd/index.htm",
+          "label": ""
+        }
+      ],
+      "uses": 7,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Leland"
+      ],
+      "citation": "Leland, Charles Godfrey. The Algonquin Legends of New England. Boston, 1884",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/cache/epub/6803/pg6803-images.html",
+          "label": ""
+        }
+      ],
+      "uses": 7,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "PMLA"
+      ],
+      "citation": "PMLA = Publications of the Modern Language Association of America",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/004529018",
+          "label": ""
+        }
+      ],
+      "uses": 7,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Baskerville"
+      ],
+      "citation": "Baskerville, Rosetta Gage. King of the Snakes and other Folklore: Stories from Uganda. London, 1922",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001277120",
+          "label": ""
+        }
+      ],
+      "uses": 6,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Cook"
+      ],
+      "citation": "Cook, A. B. Zeus: A study in ancient religion. 3 vols. Cambridge, 1914 ff. Corpus Poeticum Boreale (edited by G. Vigfússon and F. Y. Powell). 2 vols. Oxford, 1883",
+      "urls": [
+        {
+          "url": "https://archive.org/details/p2zeusstudyinanc02cookuoft",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/corpuspoeticumbo01guuoft",
+          "label": ""
+        }
+      ],
+      "uses": 6,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gray"
+      ],
+      "citation": "Gray, Louis H. Baltic Mythology (Mythology of All Races III). Boston, 1918",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra03gray#page/n7/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 6,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Rattray (Ashanti)",
+        "Rattray"
+      ],
+      "citation": "Rattray (Ashanti) = Rattray , R. Sutherland. Akan -Ashanti Folk Tales. Oxford, 1930",
+      "urls": [],
+      "uses": 6,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Rattray (Hausa)",
+        "Rattray"
+      ],
+      "citation": "Rattray (Hausa) = Rattray , R. Sutherland. Hausa Folk-Lore Customs, Proverbs, etc. 2 vols. Oxford, 1913",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/afr/hausa/",
+          "label": ""
+        }
+      ],
+      "uses": 6,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Schoolcraft"
+      ],
+      "citation": "Schoolcraft, H. R. *The Myth of Hiawatha. Philadelphia and London, 1856. Algic Researches. New York, 1839",
+      "urls": [
+        {
+          "url": "https://archive.org/details/cihm_43244",
+          "label": ""
+        },
+        {
+          "url": "http://archive.org/stream/themythofhiawath21620gut/21620.txt",
+          "label": ""
+        }
+      ],
+      "uses": 6,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Casati"
+      ],
+      "citation": "Casati , Gaetano . Ten Years in Equatoria and the Return with Emin Pasha (London, New York, 1891)",
+      "urls": [
+        {
+          "url": "https://archive.org/details/tenyearsinequat02casagoog",
+          "label": ""
+        }
+      ],
+      "uses": 5,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Grenfell"
+      ],
+      "citation": "Grenfell = Johnson, Sir Harry. George Grenfell and the Congo, II. London, 1908",
+      "urls": [],
+      "uses": 5,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thalbitzer"
+      ],
+      "citation": "Thalbitzer , William. A Phonetic Study of the Eskimo Language. Copenhagen, 1904",
+      "urls": [],
+      "uses": 5,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Willans"
+      ],
+      "citation": "Willans , R. H. K. The Konnoh People (African Society Journal VIII [1908–09])",
+      "urls": [
+        {
+          "url": "http://afraf.oxfordjournals.org/content/VIII/XXX/130.citation",
+          "label": ""
+        },
+        {
+          "url": "http://afraf.oxfordjournals.org/content/VIII/XXXI/288.citation",
+          "label": ""
+        }
+      ],
+      "uses": 5,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Keightley"
+      ],
+      "citation": "Keightley , Thomas. Fairy Mythology. London, 1847",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/41006/41006-h/41006-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 4,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "McKay"
+      ],
+      "citation": "McKay, J. G. More West Highland Tales. Edinburgh and London, 1940",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/000236788",
+          "label": ""
+        }
+      ],
+      "uses": 4,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MPh"
+      ],
+      "citation": "MPh = Modern Philology. Chicago, 1903 ff",
+      "urls": [
+        {
+          "url": "http://archive.org/search.php?query=Modern%20Philology",
+          "label": ""
+        }
+      ],
+      "uses": 4,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Williams"
+      ],
+      "citation": "Williams, C. A. Oriental Affinities of the Legend of the Hairy Anchorite. Urbana (Ill.), 1925",
+      "urls": [],
+      "uses": 4,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Bloomfield"
+      ],
+      "citation": "Bloomfield, Maurice, Studies in Honor of. New Haven, 1920",
+      "urls": [
+        {
+          "url": "https://archive.org/details/studiesinhonorof00bloouoft",
+          "label": ""
+        }
+      ],
+      "uses": 3,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Grinnell"
+      ],
+      "citation": "Grinnell, G. B. Pawnee Hero Stories and Folk-Tales. New York, 1889",
+      "urls": [],
+      "uses": 3,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Irwin"
+      ],
+      "citation": "Irwin, Cecilia Pauze . Summaries of the Stories of Béroalde de Verville's La Moyen de Parvenir . Unpublished M. A. thesis, University of South Carolina, 1953. J",
+      "urls": [],
+      "uses": 3,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "JAOS"
+      ],
+      "citation": "JAOS = Journal of the American Oriental Society. Boston, etc., 1849 ff",
+      "urls": [
+        {
+          "url": "https://archive.org/details/jstor_jameroriesoci",
+          "label": ""
+        }
+      ],
+      "uses": 3,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MSFO"
+      ],
+      "citation": "MSFO = Mémoires de la Société Finno-ougrienne , Helsingfors",
+      "urls": [],
+      "uses": 3,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Barrett"
+      ],
+      "citation": "Barrett, W. E. H. A'Kikuyu Fairy Tales (Man XII, XIII)",
+      "urls": [
+        {
+          "url": "https://archive.org/details/mananth13a14royauoft",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "BMB"
+      ],
+      "citation": "BMB = Bishop Museum Bulletin",
+      "urls": [
+        {
+          "url": "https://archive.org/details/bernicepbishopmu16192223bern",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "FLJ"
+      ],
+      "citation": "FLJ = Folklore Journal . 8 vols. London, 1883–89",
+      "urls": [],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Giles"
+      ],
+      "citation": "Giles, Herbert A. Strange Stories from a Chinese Studio. New York, 1927",
+      "urls": [
+        {
+          "url": "https://archive.org/details/strangestoriesfr00pusuuoft",
+          "label": "Vol. I"
+        },
+        {
+          "url": "http://www.gutenberg.org/files/43628/43628-h/43628-h.htm",
+          "label": "Vol. II"
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Knowles"
+      ],
+      "citation": "Knowles, J. H. Folk-Tales of Kashmir. London, 1893",
+      "urls": [
+        {
+          "url": "https://archive.org/details/folktalesofkashm00knowuoft",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lat. Am.",
+        "Lat."
+      ],
+      "citation": "Lat. Am. = Alexander, H. B. Latin American Mythology (The Mythology of all Races XI). Boston, 1920",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal11alexuoft#page/n9/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MLN"
+      ],
+      "citation": "MLN = Modern Language Notes. Baltimore, 1886 ff",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=chi.78053419;view=1up;seq=7",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Parker"
+      ],
+      "citation": "Parker, Mrs. K. L. Australian Legendary Tales. London, 1896",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/3833/3833-h/3833-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Pease"
+      ],
+      "citation": "Pease, Arthur Stanley. M. Tulli Ciceronis De Divinatione . (University of Illinois Studies in Language and Literature, VI Nos. 2, 3; VIII Nos. 3, 4). Urbana (Ill.), 1920–23",
+      "urls": [
+        {
+          "url": "http://www.thelatinlibrary.com/cicero/divinatione.shtml",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Schlenker"
+      ],
+      "citation": "Schlenker , C. F. A Collection of Temne Traditions, Fables and Proverbs. London, 1861",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=nyp.33433088072636;view=1up;seq=7",
+          "label": ""
+        }
+      ],
+      "uses": 2,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Baring-Gould"
+      ],
+      "citation": "Baring-Gould, S. Curious Myths of the Middle Ages . 2 vols. London, 1868",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/files/36127/36127-h/36127-h.htm",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Broderius"
+      ],
+      "citation": "Broderius , John R. The Giant in Germanic Tradition (University of Chicago dissertation). Chicago, 1933",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "CColl"
+      ],
+      "citation": "CColl = Colorado College Publications, Language Series. Chantepie de la Saussaye . See Saussaye",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Emeneau"
+      ],
+      "citation": "Emeneau , M. B. Kota Texts . 4 vols. Berkeley and Los Angeles, 1944–46",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/000869172",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "FLR"
+      ],
+      "citation": "FLR = Folklore Record . 5 vols. London, 1878–82",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Graham (Chinese)",
+        "Graham"
+      ],
+      "citation": "Graham (Chinese) = Graham, David Crockett. Songs and Stories of the Ch'uan Miao (Smithsonian Miscellaneous Publications CXXIII No. 1). Washington, D. C, 1954",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kalevala"
+      ],
+      "citation": "Kalevala , the land of heroes (W. F. Kirby, tr.). London, 1907",
+      "urls": [
+        {
+          "url": "https://archive.org/stream/kalevalalandofhe01kirbiala#page/n7/mode/2up",
+          "label": ""
+        },
+        {
+          "url": "http://www.gutenberg.org/files/25953/25953-h/25953-h.htm",
+          "label": ""
+        },
+        {
+          "url": "http://catalog.hathitrust.org/Record/000904701",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Keller"
+      ],
+      "citation": "Keller, John Esten . Motif-Index of Mediaeval Spanish Exempla. Knoxville (Tenn.), 1949",
+      "urls": [
+        {
+          "url": "https://archive.org/details/motifindexofmedi00golduoft",
+          "label": ""
+        },
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=mdp.39015008904024;view=1up;seq=9",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Kennedy"
+      ],
+      "citation": "Kennedy, P. Legendary Fictions of the Irish Celts. London, 1866",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/lfic/",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Landtman"
+      ],
+      "citation": "Landtman , G. The Folk-Tales of the Kiwai Papuans ( Acta Societatis Scientiarum Fennicae XLVII). Helsingfors , 1917",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Langdon"
+      ],
+      "citation": "Langdon, S. H. Semitic Mythology (The Mythology of all Races V). Boston, 1931",
+      "urls": [
+        {
+          "url": "https://archive.org/details/MythologyOfAllRacesVolume5",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Parkinson"
+      ],
+      "citation": "Parkinson, John. Yoruba Folklore. (JAS VIII [1908] p. 165 ff.)",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Plummer"
+      ],
+      "citation": "Plummer, Charles. Vitae Sanctorum Hiberniae . 2 vols. Oxford, 1910",
+      "urls": [
+        {
+          "url": "https://archive.org/details/vitaesanctorumhi01plumuoft",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/vitaesanctorumhi02plumuoft",
+          "label": "Vol. II"
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Potter"
+      ],
+      "citation": "Potter, Murray Anthony. Sohrab and Rustem . London, 1902. R",
+      "urls": [
+        {
+          "url": "https://archive.org/details/sohrabrustemepi00pott",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "RBAE"
+      ],
+      "citation": "RBAE = Annual Report of the Bureau of American Ethnology",
+      "urls": [
+        {
+          "url": "http://www.biodiversitylibrary.org/bibliography/38077#/summary",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Stigand"
+      ],
+      "citation": "Stigand , C. H. and Mrs. Black Tales for White Children. London and New York, 1914",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Woodson"
+      ],
+      "citation": "Woodson, Carter Godwin. African Myths. Washington, D. C, 1928. Z Zong in-Sob. Folk Tales from Korea. London, 1952",
+      "urls": [],
+      "uses": 1,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "AA n.s .",
+        "AA"
+      ],
+      "citation": "AA n.s . = American Anthropologist, new series. Washington, 1899 ff",
+      "urls": [
+        {
+          "url": "http://onlinebooks.library.upenn.edu/webbin/serial?id=amanthro",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "AA o.s .",
+        "AA"
+      ],
+      "citation": "AA o.s . = American Anthropologist, old series. 11 vols. Washington, 1888–1898. Africa. London, 1928 ff",
+      "urls": [
+        {
+          "url": "http://onlinebooks.library.upenn.edu/webbin/serial?id=amanthro",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "BAM"
+      ],
+      "citation": "BAM = Bulletin of the American Museum of Natural History (New York)",
+      "urls": [
+        {
+          "url": "http://digitallibrary.amnh.org/handle/2246/7",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Barker"
+      ],
+      "citation": "Barker, W. H. and Sinclair, C. West African Folk -tales. London, 1917",
+      "urls": [
+        {
+          "url": "https://archive.org/details/westafricanfolkt00barkrich",
+          "label": ""
+        },
+        {
+          "url": "http://www.surlalunefairytales.com/books/africa/barker.html",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Baughman"
+      ],
+      "citation": "Baughman, Ernest Warren. A Comparative Study of the Folktales of England and North America. (Indiana University dissertation.) Ann Arbor, Michigan. Microfilm Service. 1954",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Blinkenberg"
+      ],
+      "citation": "Blinkenberg , Chr. The Thunder Weapon in Religion and Folklore. Cambridge, 1911",
+      "urls": [
+        {
+          "url": "https://archive.org/details/cu31924029910951",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Bourhill"
+      ],
+      "citation": "Bourhill , E. J. and Drake, J. B. Fairy Tales from South Africa. London, 1908",
+      "urls": [
+        {
+          "url": "https://archive.org/details/fairytalesfroms00hollgoog",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Caldwell"
+      ],
+      "citation": "Caldwell, J. R. Egar and Grime . Cambridge (Mass.), 1933",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Carrington"
+      ],
+      "citation": "Carrington, Hereward and Fodor, Nandor . Haunted People: Story of the Poltergeist down the Centuries. New York, 1951",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Carrière"
+      ],
+      "citation": "Carrière = J. M. Carrière , Tales from the French Folk-Lore of Missouri. Evanston and Chicago, 1937",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Childers"
+      ],
+      "citation": "Childers, J. W. Motif-Index of the Cuentos of Juan Timoneda . Bloomington, Ind., 1947",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006929789",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "CI"
+      ],
+      "citation": "CI = Publications of the Carnegie Institution of Washington",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Clodd"
+      ],
+      "citation": "Clodd , Edward. Tom-Tit-Tot. London, 1898",
+      "urls": [
+        {
+          "url": "http://www.sacred-texts.com/neu/celt/ttt/",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "CNAE"
+      ],
+      "citation": "CNAE = Contributions to North American Ethnology. Washington, 1877–93",
+      "urls": [
+        {
+          "url": "https://archive.org/details/contributionston31877powe",
+          "label": "Vol I-VII; IX"
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Crawley"
+      ],
+      "citation": "Crawley, Ernest. The Mystic Rose. London, 1902",
+      "urls": [
+        {
+          "url": "https://archive.org/details/mysticrosestudyo00crawuoft",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "CU"
+      ],
+      "citation": "CU = Columbia University Contributions to Anthropology",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dawkins"
+      ],
+      "citation": "Dawkins, Richard M. Forty-five Stories from the Dodekanese . Cambridge (England), 1950",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dawkins"
+      ],
+      "citation": "Dawkins, Richard M. Modern Greek Folktales. Oxford, 1953",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Day"
+      ],
+      "citation": "Day, Lal Behary . Folk-Tales of Bengal. London, 1912. De la Saussaye . See * Saussaye , P. D. Chantepie de la. The Religion of the Teutons (trans. B. J. Vos ). Boston, 1902",
+      "urls": [
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=73",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/religionofteuton00chan",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Dobie"
+      ],
+      "citation": "Dobie, J. Frank. Coronado's Children. Dallas (Texas), 1930",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "EETS"
+      ],
+      "citation": "EETS = Early English Text Society Publications. London, 1864 ff",
+      "urls": [
+        {
+          "url": "http://www.gutenberg.org/wiki/Early_English_Text_Society_(Bookshelf)",
+          "label": ""
+        },
+        {
+          "url": "http://www.gutenberg.org/files/17000/17000-h/17000-h.htm",
+          "label": ""
+        },
+        {
+          "url": "http://www.helsinki.fi/varieng/tfmlibrary/tfm_catalogue.pdf",
+          "label": ""
+        },
+        {
+          "url": "http://piereligion.org/eets.html",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "FM"
+      ],
+      "citation": "FM = Publications of the Field Columbian Museum, Anthropological Series, Chicago, 1895 ff. Folklore Studies (The Catholic University of Peking). 6 vols. Peiping, 1942–47",
+      "urls": [
+        {
+          "url": "https://archive.org/details/jstor_pubfcmanthroser",
+          "label": ""
+        },
+        {
+          "url": "https://nirc.nanzan-u.ac.jp/nfile/1193",
+          "label": "Vol. VI 1947"
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Gayton"
+      ],
+      "citation": "Gayton , A. H. and Newman, Stanley S. Yokuts and Western Mono Myths. Berkeley (Calif.), 1940",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006928702",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "GSCan"
+      ],
+      "citation": "GSCan = Publications of the Geological Survey of Canada, Anthropological Series. H",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Haddon"
+      ],
+      "citation": "Haddon, A. C. Reports of the Cambridge Anthropological Expedition to Torres Straits. 6 vols. Cambridge (Eng.), 1901–35",
+      "urls": [
+        {
+          "url": "https://archive.org/details/reportsofcambrid01hadd",
+          "label": "Vol. I"
+        },
+        {
+          "url": "https://archive.org/details/reportsofcambrid02hadd",
+          "label": "Vol. II"
+        },
+        {
+          "url": "https://archive.org/details/reportsofcambrid03hadd",
+          "label": "Vol. III"
+        },
+        {
+          "url": "https://archive.org/details/reportsofcambrid04hadd",
+          "label": "Vol. IV"
+        },
+        {
+          "url": "https://archive.org/details/reportsofcambrid05hadd",
+          "label": "Vol. V"
+        },
+        {
+          "url": "https://archive.org/details/reportsofcambrid06hadd",
+          "label": "Vol. VI"
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Halpert"
+      ],
+      "citation": "Halpert , Herbert N. Folktales and Legends from the New Jersey Pines. (Indiana University Ph. D. thesis). Typewritten ms. Indiana University Library. Bloomington, Ind., 1947. *Handbook of South American Indians (ed. Julian H. Steward). BBAE CXLIII. 6 vols. Washington, D. C, 1946–50",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "HF"
+      ],
+      "citation": "HF = Hoosier Folklore. Indianapolis, Ind., 1946 ff. *Finno-Ugric Mythology (The Mythology of all Races IV). Boston, 1927. Gudstrons uppkomst . Uppsala, 1917.  *Siberian Mythology (The Mythology of all Races IV). Boston 1927",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/000050298",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/MythologyOfAllRacesVolume4",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/MythologyOfAllRacesVolume4",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jacobs' list",
+        "Jacobs'"
+      ],
+      "citation": "Jacobs' list = Jacobs, Joseph. \"List of Folk-Tale Incidents common to European Folk-Tales\" in Papers and Transactions of the International Folk-lore Congress, 1891. London, 1892",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "JAI"
+      ],
+      "citation": "JAI = Journal of the Royal Anthropological Institute of Great Britain and Ireland. London, 1871 ff",
+      "urls": [
+        {
+          "url": "http://onlinebooks.library.upenn.edu/webbin/serial?id=jroyalanthrogb",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Jansen"
+      ],
+      "citation": "Jansen, William Hugh. Abraham \"Oregon\" Smith: pioneer, folk hero, and tale-teller . (Indiana University Ph. D. thesis.) Typewritten MS. Indiana University Library. Bloomington (Ind.), 1949",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006932014",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "JAS"
+      ],
+      "citation": "JAS = Journal of the African Society. 34 vols. London, 1862–1900. Jātaka . See * Cowell , E. B. and others. The Jātaka or Stories of the Buddha's Former Births. 6 vols , and index. Cambridge, 1895–1913",
+      "urls": [
+        {
+          "url": "https://archive.org/details/journalafricans01socigoog",
+          "label": ""
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=63",
+          "label": "vol. I"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=64",
+          "label": "vol. II"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=64",
+          "label": "vol. III"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=66",
+          "label": "vol. IV"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=67",
+          "label": "vol. V"
+        },
+        {
+          "url": "http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=68",
+          "label": "vol. VI"
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "JE"
+      ],
+      "citation": "JE = Publications of the Jesup North Pacific Expedition. New York, etc., 1898 ff",
+      "urls": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Jesup_North_Pacific_Expedition",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "JPASB"
+      ],
+      "citation": "JPASB = Journal and Proceedings of the Asiatic Society of Bengal",
+      "urls": [
+        {
+          "url": "https://archive.org/details/journalandproce00benggoog",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lawrence"
+      ],
+      "citation": "Lawrence, R. M. The Magic of the Horseshoe. London and Boston, 1898",
+      "urls": [
+        {
+          "url": "https://archive.org/details/magicofhorseshoe98lawr",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Lawrence"
+      ],
+      "citation": "Lawrence, R. M. Duala Fables. JAS IV (1904–05)",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Luomala"
+      ],
+      "citation": "Luomala , Katherine. Maui-of-a-Thousand-Tricks. BMB CXCVIII. Honolulu, 1949. M",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MacDougall"
+      ],
+      "citation": "MacDougall, James, and Calder, George. Folk Tales and Fairy Lore in Gaelic and English. Edinburgh, 1910",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra03gray#page/n7/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MacKay"
+      ],
+      "citation": "MacKay, D. E. The Double Invitation in the Legend of Don Juan. Stanford University, 1943",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra03gray#page/n7/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "MWF"
+      ],
+      "citation": "MWF = Midwest Folklore. Bloomington 1951 ff",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Máchal"
+      ],
+      "citation": "Máchal , J. Slavic Mythology (The Mythology of all Races III). Boston, 1918",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/mythologyofallra03gray#page/n7/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Métraux"
+      ],
+      "citation": "Métraux , Alfred. Ethnology of Easter Island. BMB CLX. Honolulu, 1940",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001635305",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Métraux"
+      ],
+      "citation": "Métraux , Alfred.Myths of the Toba and Pilaga Indians of the Gran Chaco (MAFLS XL, 1946)",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/001631386",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Métraux"
+      ],
+      "citation": "Métraux , Alfred. Myths and Tales of the Matako Indians. Göteborg , 1939",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/006809386",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Müller"
+      ],
+      "citation": "Müller , W. Max. Egyptian Mythology (The Mythology of all Races XII). Boston, 1918. N",
+      "urls": [
+        {
+          "url": "http://archive.org/stream/themythologyofal12alexuoft#page/n11/mode/2up",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Neilson"
+      ],
+      "citation": "Neilson, William A. The Origins and Sources of the Court of Love. Cambridge (Mass.), 1899",
+      "urls": [
+        {
+          "url": "http://babel.hathitrust.org/cgi/pt?id=mdp.39015053684588;view=1up;seq=7",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Neuman"
+      ],
+      "citation": "Neuman , Dov . Motif-index to the Talmudic- Midrashic Literature. (Indiana University Ph. D. thesis). Microfilm Service, Ann Arbor, Michigan, 1954",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Neuman"
+      ],
+      "citation": "Neuman (Noy), D. Motif-Index of Talmudic-Midrashic Literature. Diss., Indiana University, 1954. (cited as 'Jewish: Neuman')",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Neuman+Motif-Index+Talmudic",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "curated"
+    },
+    {
+      "keys": [
+        "NYFQ"
+      ],
+      "citation": "NYFQ = New York Folklore Quarterly. O",
+      "urls": [
+        {
+          "url": "http://www.nyfolklore.org/pubs/nyfq/tocnyfq.html",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "PaAm"
+      ],
+      "citation": "PaAm = Anthropological Papers of the American Museum of Natural History",
+      "urls": [
+        {
+          "url": "http://digitallibrary.amnh.org/handle/2246/6/browse?order=ASC&type=title&starts_with=H",
+          "label": ""
+        },
+        {
+          "url": "http://digitallibrary.amnh.org/handle/2246/5",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "PAES"
+      ],
+      "citation": "PAES = Publications of the American Ethnological Society. Panchatantra (tr. A. Ryder). Chicago, 1925",
+      "urls": [
+        {
+          "url": "https://archive.org/details/rosettaproject_paw_book-1",
+          "label": ""
+        },
+        {
+          "url": "https://archive.org/details/rosettaproject_ojc_book-2",
+          "label": ""
+        },
+        {
+          "url": "http://catalog.hathitrust.org/Record/000518386",
+          "label": ""
+        },
+        {
+          "url": "http://columbia.edu/itc/mealac/pritchett/00litlinks/panchatantra_ryder/index.html",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Paton"
+      ],
+      "citation": "Paton, Lucy A. Studies in the Fairy Mythology of Arthurian Romance (Radcliffe College Monographs No. 13. Cambridge (Mass.), 1903",
+      "urls": [
+        {
+          "url": "https://archive.org/details/studiesinfairym00patogoog",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "PFLS"
+      ],
+      "citation": "PFLS = Publications of the Folklore Society (English)",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Rotunda"
+      ],
+      "citation": "Rotunda, D. P. Motif-Index of the Italian Novella. Bloomington, Indiana, 1942. S",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Róheim"
+      ],
+      "citation": "Róheim , Géza . Animism, Magic, and the Divine King. London, 1930. Romanic Review. New York, 1910 ff",
+      "urls": [
+        {
+          "url": "http://gallica.bnf.fr/ark:/12148/cb34470606s/date.langEN",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Sharp- Karpeles",
+        "Sharp-"
+      ],
+      "citation": "Sharp- Karpeles = Sharp, Cecil and Karpeles , Maud. English Folk Songs from the Southern Appalachians. 2 vols. London, 1932",
+      "urls": [
+        {
+          "url": "http://catalog.hathitrust.org/Record/002558647",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Showerman"
+      ],
+      "citation": "Showerman , Grant. The Great Mother of the Gods. Madison (Wisconsin), 1901",
+      "urls": [
+        {
+          "url": "https://archive.org/details/greatmothergods00showgoog",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Stapleton"
+      ],
+      "citation": "Stapleton, W. H. Comparative Handbook of Congo Languages. Yakusa , Stanley Falls, 1903",
+      "urls": [
+        {
+          "url": "https://archive.org/details/comparativehand00stapgoog",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Stimson"
+      ],
+      "citation": "Stimson, J. F. MS. Collection of Tuamotuan Myths. Unpublished. Peabody Museum, Salem, Mass",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thompson- Balys",
+        "Thompson-"
+      ],
+      "citation": "Thompson- Balys = Thompson, Stith and Balys , Jonas. Motif and Type Index of the Oral Tales of India. Bloomington (Ind.). (In press)",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Tupper"
+      ],
+      "citation": "Tupper, F. and Ogle, M. B. Master Walter Map's Book De Nugis Curialium (Courtiers' Trifles). New York, 1924",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "U Cal Anth Rec."
+      ],
+      "citation": "U Cal Anth Rec. = University of California Anthropological Records",
+      "urls": [
+        {
+          "url": "http://dpg.lib.berkeley.edu/webdb/anthpubs/search?journal=3",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "U Pa"
+      ],
+      "citation": "U Pa = University of Pennsylvania, The University Museum Anthropological Publications",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "U Wash"
+      ],
+      "citation": "U Wash = University of Washington Publications in Anthropology. W",
+      "urls": [
+        {
+          "url": "https://archive.org/details/universityofwash10univuoft",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "UCal"
+      ],
+      "citation": "UCal = University of California Publications in American Archaeology and Ethnology",
+      "urls": [
+        {
+          "url": "https://archive.org/details/universityofcali03univuoft",
+          "label": ""
+        },
+        {
+          "url": "http://dpg.lib.berkeley.edu/webdb/anthpubs/search?journal=1",
+          "label": ""
+        }
+      ],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "WF"
+      ],
+      "citation": "WF = Western Folklore (continuation of California Folklore Quarterly). Berkeley (Cal.), 1942 ff",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Winger"
+      ],
+      "citation": "Winger, Bjorn. A Classification of Motifs in Eskimo Folk-Literature. (Unpublished M. A. thesis. Indiana University Library)",
+      "urls": [],
+      "uses": 0,
+      "source": "folkmasa"
+    }
+  ]
+}

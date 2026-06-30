@@ -7,9 +7,12 @@ from ``outputs/motifs/`` (built by ``mytho motifs``) and cached per process.
 
 from __future__ import annotations
 
+import json
 import re
+from importlib.resources import files as _pkg_files
 
 from motifs import INDEX_LABELS, INDEX_ORDER, store
+from motifs.sources.culture_dict import canonical
 
 # A standalone Roman numeral token (Latin letters) — kept upper-case when
 # sentence-casing all-caps titles.
@@ -156,6 +159,53 @@ def culture_legend(index: str) -> dict:
     return (store.load_index(index) or {}).get("culture_legend", {})
 
 
+def _bibliography_index() -> dict[str, list[dict]]:
+    """Citation key -> [{title, url}] from the packaged TMI bibliography key.
+
+    A key (author surname or abbreviation) can map to several works; the list
+    preserves them so a multi-work author is disambiguated by the short title.
+    """
+    def build() -> dict[str, list[dict]]:
+        try:
+            raw = _pkg_files("motifs").joinpath("data/tmi_bibliography.json").read_text("utf-8")
+        except (FileNotFoundError, ModuleNotFoundError, OSError):
+            return {}
+        index: dict[str, list[dict]] = {}
+        for e in json.loads(raw).get("entries", []):
+            url = e["urls"][0]["url"] if e.get("urls") else ""
+            rec = {"title": e.get("citation", ""), "url": url}
+            for key in e.get("keys", []):
+                index.setdefault(key, []).append(rec)
+        return index
+    return store.cached("tmi:bib", build)
+
+
+# The leading author/abbreviation of a citation (skipping Thompson's '*' marks).
+_CITE_HEAD = re.compile(r"^[*☉\s]*([A-Z][A-Za-z.'\-]+(?:[ -][A-Z][A-Za-z.'\-]+){0,2})")
+
+
+def _resolve_citation(text: str) -> dict:
+    """A citation string + a book link/title when its head matches a known work."""
+    out = {"text": text}
+    m = _CITE_HEAD.match(text)
+    if not m:
+        return out
+    index = _bibliography_index()
+    parts = m.group(1).split()
+    for i in range(len(parts), 0, -1):
+        cands = index.get(" ".join(parts[:i]))
+        if not cands:
+            continue
+        tail = parts[i:]  # short-title tokens after the matched key
+        titled = [c for c in cands if c["url"] and any(t.lower() in c["title"].lower() for t in tail)]
+        linked = [c for c in cands if c["url"]]
+        rec = (titled or linked or cands)[0]  # prefer title-matched, then any linked
+        if rec["url"]:
+            out["url"], out["title"] = rec["url"], rec["title"]
+        break
+    return out
+
+
 def _list_item(index: str, rec: dict) -> dict:
     """A compact record for the scrolling list (index-specific badge included)."""
     item = {"index": index, "id": rec["id"], "name": rec.get("name", ""), "chapter": rec.get("chapter", "")}
@@ -226,8 +276,18 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["chapter_name"] = rec.get("chapter_name", "")
         detail["notes"] = rec.get("notes", "")
         detail["definition"] = rec.get("definition", "")
-        detail["cultures"] = rec.get("cultures", {})
-        detail["references"] = rec.get("references", [])
+        # Cultures with their region, and each citation linked to its source book.
+        raw_cultures = rec.get("cultures") or {}
+        legend = culture_legend("tmi")
+        detail["cultures"] = [
+            {"label": label, "region": (legend.get(canonical(label)[0]) or {}).get("region", ""),
+             "citations": [_resolve_citation(c) for c in cites]}
+            for label, cites in raw_cultures.items()
+        ]
+        # General references = bibliography segments not headed by a culture label.
+        general = [r for r in rec.get("references", [])
+                   if not any(r.startswith(label + ":") for label in raw_cultures)]
+        detail["references"] = [_resolve_citation(r) for r in general]
         detail["level"] = rec.get("level", 0)
         detail["code"] = rec.get("code", rec["id"])
         detail["duplicate"] = bool(rec.get("duplicate"))

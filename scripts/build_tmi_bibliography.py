@@ -25,7 +25,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "outputs" / "motifs" / "raw" / "folkmasa_bibliography.html"
 TMI = ROOT / "outputs" / "motifs" / "tmi.json"
-OUT_JSON = ROOT / "outputs" / "motifs" / "tmi_bibliography.json"
+# Tracked package-data asset so the server can resolve citation links at runtime.
+OUT_JSON = ROOT / "src" / "motifs" / "data" / "tmi_bibliography.json"
 OUT_DOC = ROOT / "docs" / "tmi-bibliography-key.md"
 SOURCE_URL = "https://folkmasa.org/motiv/motif_bib.htm"
 
@@ -278,6 +279,7 @@ def write_doc(data: dict) -> None:
 
 if __name__ == "__main__":
     data = build()
+    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, indent=2))
     write_doc(data)
     n = len(data["entries"])

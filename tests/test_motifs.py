@@ -440,6 +440,18 @@ class TestService:
         d = svc.get_motif("tmi", "S31")
         assert sorted(link["id"] for link in d["links"]["atu"]) == ["294", "510A"]
 
+    def test_tmi_detail_exposes_structured_note_fields(self, tiny_db):
+        d = svc.get_motif("tmi", "S31")
+        assert isinstance(d["cultures"], list)      # enriched: label/region/citations
+        assert isinstance(d["references"], list)    # enriched: {text, url?}
+        assert "see_also" in d["links"] and "atu_inline" in d["links"]
+
+    def test_resolve_citation_links_known_works(self):
+        # Against the packaged bibliography key (src/motifs/data/tmi_bibliography.json).
+        assert "archive.org" in svc._resolve_citation("BP III").get("url", "")
+        assert "Fire" in svc._resolve_citation("**Frazer Fire").get("title", "")  # multi-work author
+        assert "url" not in svc._resolve_citation("Nonexistentauthor 5")
+
     def test_tmi_breadcrumbs_broadest_first(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
         assert [b["id"] for b in d["breadcrumbs"]] == ["S0", "S30"]

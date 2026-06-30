@@ -1534,6 +1534,34 @@ body.has-main-navbar {
 
 .motif-source-link { font-size: 12.5px; color: #41506a; word-break: break-all; }
 
+/* Citations (references + per-culture), each linkable to its source book. */
+.motif-cites { margin: 0; padding-left: 18px; }
+.motif-cites li { line-height: 1.5; color: #2a2f36; }
+.motif-cite.linked { color: #2f6f9f; text-decoration: none; }
+.motif-cite.linked:hover { text-decoration: underline; }
+
+/* Attestations grouped by culture. */
+.motif-cultures { display: flex; flex-direction: column; gap: 10px; }
+.motif-culture-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+.motif-culture-label { font-weight: 700; color: #1f3a4d; }
+.motif-culture-region {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+}
+
+/* Raw source notes shown verbatim at the end — set apart as a quote. */
+.motif-notes-raw {
+    font-size: 12.5px;
+    color: #55606b;
+    white-space: pre-wrap;
+    padding: 8px 11px;
+    background: #f5f7f9;
+    border-left: 3px solid #d7dee5;
+    border-radius: 4px;
+}
+
 /* TMI lineage tree on the detail page: chapter -> parents -> motif -> children,
    reusing the sidebar row look (.motifs-item) with per-level indentation. */
 .motif-tree {
