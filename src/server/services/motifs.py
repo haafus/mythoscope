@@ -141,6 +141,7 @@ def _link(index: str, motif_id: str) -> dict:
         "has_definition": bool(rec.get("definition")) if rec and index == "tmi" else False,
         "substantive": _substantive(rec) if rec and index == "tmi" else True,
         "has_atu": _has_atu(rec) if rec and index == "tmi" else False,
+        **(_subtree_flags(motif_id) if rec and index == "tmi" else {}),
     }
 
 
@@ -408,6 +409,7 @@ def _list_item(index: str, rec: dict) -> dict:
         item["has_definition"] = bool(rec.get("definition"))
         item["substantive"] = _substantive(rec)
         item["has_atu"] = _has_atu(rec)
+        item.update(_subtree_flags(rec["id"]))  # for the drill-down tree filter
         item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
@@ -418,6 +420,31 @@ _TIER_PREDICATE = {
     "sub": _substantive,
     "atu": _has_atu,
 }
+
+
+def _tier_relevant(tier: str) -> set[str]:
+    """TMI ids whose subtree (self or any descendant) holds a tier-matching motif.
+
+    Lets the tree filter keep a category visible when its content sits deeper,
+    so only one child level is shown but deeper matches still count.
+    """
+    def build() -> set[str]:
+        pred = _TIER_PREDICATE[tier]
+        by = _by_id("tmi")
+        relevant: set[str] = set()
+        for r in _records("tmi"):
+            if pred(r):
+                cur = r["id"]
+                while cur and cur in by and cur not in relevant:  # mark self + ancestors
+                    relevant.add(cur)
+                    cur = by[cur].get("parent", "")
+        return relevant
+    return store.cached(f"tmi:relevant:{tier}", build)
+
+
+def _subtree_flags(motif_id: str) -> dict:
+    """Per-tier `<tier>_subtree` flags used by the tree filter (drill-down)."""
+    return {f"{t}_subtree": motif_id in _tier_relevant(t) for t in ("def", "sub", "atu")}
 
 
 def list_motifs(index: str, *, chapter: str = "", q: str = "", level: int | None = None,

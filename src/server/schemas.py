@@ -81,6 +81,7 @@ class MotifIndexesResponse(BaseModel):
 
 
 class MotifListItem(BaseModel):
+    model_config = ConfigDict(extra="allow")  # tmi enrichments: substantive/notes_size/*_subtree/…
     index: str
     id: str
     name: str = ""

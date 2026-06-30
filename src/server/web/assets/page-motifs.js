@@ -134,17 +134,12 @@ async function browseChapterLevel0(chapter) {
     markActive(null);
     detail.innerHTML = `<div class="reader-placeholder">Loading...</div>`;
     try {
-        // No filter: top-level drill-down (L0). A filter: the chapter's matching
-        // motifs at any depth (so the list isn't empty when L0 has none).
-        const params = new URLSearchParams({ chapter, limit: String(LIST_LIMIT) });
-        if (mState.motifFilter === "all") params.set("level", "0");
-        else params.set("tier", mState.motifFilter);
+        // Always the immediate child level (L0); the filter hides L0 categories
+        // whose subtree holds no match (deeper matches still count, via f-* tags).
+        const params = new URLSearchParams({ chapter, level: "0", limit: String(LIST_LIMIT) });
         const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
-        for (const it of data.items) rows.push(treeRow(it, 2));
-        if (data.total > data.items.length) {
-            rows.push(`<div class="motif-subtree-more" style="--depth:2">… ${formatNumber(data.total - data.items.length)} more</div>`);
-        }
+        for (const it of data.items) rows.push(treeRow(it, 2, { filterable: true }));
         detail.innerHTML = `<div class="motif-detail-inner">${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
         detail.scrollTop = 0;
         bindTreeLinks(detail);
@@ -257,8 +252,11 @@ function treeRow(node, depth, { current = false, filterable = false } = {}) {
     // Filterable rows (children / browse lists) can be hidden by the motif
     // filter, tagged with the tiers they belong to; ancestors and the current
     // motif are never filtered (they form the path).
+    // Filter by subtree relevance (self or a descendant matches) so a category
+    // stays visible when its matching content is deeper — only this one level
+    // is shown, deeper levels still count.
     const tags = filterable
-        ? ` filterable${node.has_definition ? " f-def" : ""}${node.substantive ? " f-sub" : ""}${node.has_atu ? " f-atu" : ""}`
+        ? ` filterable${node.def_subtree ? " f-def" : ""}${node.sub_subtree ? " f-sub" : ""}${node.atu_subtree ? " f-atu" : ""}`
         : "";
     if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
     return `<a class="motifs-item motif-tree-row${leaf}${tags}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
@@ -346,9 +344,6 @@ function bindTreeLinks(detail) {
     const sel = detail.querySelector(".motif-filter");
     if (sel) sel.addEventListener("change", () => {
         mState.motifFilter = sel.value;
-        // The chapter browse re-fetches (its rows depend on the tier); root and
-        // detail just toggle the hide/badge classes on their already-built tree.
-        if (mState.browseChapter) { browseChapterLevel0(mState.browseChapter); return; }
         detail.querySelectorAll(".motif-tree").forEach((t) => {
             t.classList.toggle("filter-def", sel.value === "def");
             t.classList.toggle("filter-sub", sel.value === "sub");

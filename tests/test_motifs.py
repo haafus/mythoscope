@@ -463,7 +463,13 @@ class TestService:
     def test_tmi_detail_and_list_expose_substantive(self, tiny_db):
         assert "substantive" in svc.get_motif("tmi", "S31")
         items = svc.list_motifs("tmi", chapter="S")["items"]
-        assert all("substantive" in it for it in items)
+        assert all("substantive" in it and "sub_subtree" in it for it in items)
+
+    def test_tier_subtree_keeps_ancestors(self, tiny_db):
+        # S31 has a substantive descendant chain; its L0 root S0 is subtree-relevant
+        # even though S0 itself isn't substantive.
+        relevant = svc._tier_relevant("sub")
+        assert "S0" in relevant or not any(svc._substantive(r) for r in svc._records("tmi"))
 
     def test_list_motifs_tier_filter(self, tiny_db):
         base = svc.list_motifs("tmi")["total"]
