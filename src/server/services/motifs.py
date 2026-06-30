@@ -120,6 +120,11 @@ def _substantive(rec: dict) -> bool:
             or len(rec.get("cultures") or {}) >= 3)
 
 
+def _has_atu(rec: dict) -> bool:
+    """Linked to an ATU tale type — by inline `Type` ref or the seq cross-walk."""
+    return bool(rec.get("atu_inline")) or rec["id"] in store.load_crosswalk().get("tmi_to_atu", {})
+
+
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
@@ -135,6 +140,7 @@ def _link(index: str, motif_id: str) -> dict:
         "notes_size": _notes_size(rec.get("notes", "")) if rec and index == "tmi" else "",
         "has_definition": bool(rec.get("definition")) if rec and index == "tmi" else False,
         "substantive": _substantive(rec) if rec and index == "tmi" else True,
+        "has_atu": _has_atu(rec) if rec and index == "tmi" else False,
     }
 
 
@@ -176,6 +182,7 @@ def list_indexes() -> list[dict]:
         if index == "tmi":  # tier counts for the motif-filter dropdown
             summary["definition_count"] = sum(1 for r in records if r.get("definition"))
             summary["substantive_count"] = sum(1 for r in records if _substantive(r))
+            summary["atu_count"] = sum(1 for r in records if _has_atu(r))
         out.append(summary)
     return out
 
@@ -248,6 +255,7 @@ def _list_item(index: str, rec: dict) -> dict:
         item["notes_size"] = size  # for the tree-row badge in the chapter browse view
         item["has_definition"] = bool(rec.get("definition"))
         item["substantive"] = _substantive(rec)
+        item["has_atu"] = _has_atu(rec)
         item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
@@ -309,6 +317,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["definition"] = rec.get("definition", "")
         detail["has_definition"] = bool(rec.get("definition"))
         detail["substantive"] = _substantive(rec)
+        detail["has_atu"] = _has_atu(rec)
         # Cultures with their region, and each citation linked to its source book.
         raw_cultures = rec.get("cultures") or {}
         legend = culture_legend("tmi")

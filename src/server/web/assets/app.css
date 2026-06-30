@@ -1535,7 +1535,8 @@ body.has-main-navbar {
     cursor: pointer;
 }
 .motif-tree.filter-def .motifs-item.filterable:not(.f-def),
-.motif-tree.filter-sub .motifs-item.filterable:not(.f-sub) { display: none; }
+.motif-tree.filter-sub .motifs-item.filterable:not(.f-sub),
+.motif-tree.filter-atu .motifs-item.filterable:not(.f-atu) { display: none; }
 
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
 .motifs-item.duplicate .motifs-item-id,

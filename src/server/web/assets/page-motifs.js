@@ -243,7 +243,7 @@ function treeRow(node, depth, { current = false, filterable = false } = {}) {
     // filter, tagged with the tiers they belong to; ancestors and the current
     // motif are never filtered (they form the path).
     const tags = filterable
-        ? ` filterable${node.has_definition ? " f-def" : ""}${node.substantive ? " f-sub" : ""}`
+        ? ` filterable${node.has_definition ? " f-def" : ""}${node.substantive ? " f-sub" : ""}${node.has_atu ? " f-atu" : ""}`
         : "";
     if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
     return `<a class="motifs-item motif-tree-row${leaf}${tags}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
@@ -260,12 +260,14 @@ function filterSelect() {
         ${opt("all", "Full index", idx.count)}
         ${opt("def", "With definitions", idx.definition_count)}
         ${opt("sub", "Substantive only", idx.substantive_count)}
+        ${opt("atu", "With ATU types", idx.atu_count)}
     </select>`;
 }
 
 function filterClass() {
     return mState.motifFilter === "def" ? " filter-def"
-        : mState.motifFilter === "sub" ? " filter-sub" : "";
+        : mState.motifFilter === "sub" ? " filter-sub"
+        : mState.motifFilter === "atu" ? " filter-atu" : "";
 }
 
 function chapterMeta(id) {
@@ -318,6 +320,7 @@ function bindTreeLinks(detail) {
         detail.querySelectorAll(".motif-tree").forEach((t) => {
             t.classList.toggle("filter-def", sel.value === "def");
             t.classList.toggle("filter-sub", sel.value === "sub");
+            t.classList.toggle("filter-atu", sel.value === "atu");
         });
     });
 }
