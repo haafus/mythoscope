@@ -243,10 +243,11 @@ function linkChips(links) {
     `).join("");
 }
 
-// The tree-row badge: an optional "substantive" check, then notes size and the
-// recursive descendant count — each part carrying its own tooltip.
+// The tree-row badge: an optional "definition" check, then notes size and the
+// recursive descendant count — each part dot-separated, carrying its own tooltip.
 function badgeHtml(node) {
     const parts = [];
+    if (node.has_definition) parts.push(`<span class="badge-check" title="Has an extracted definition">✓</span>`);
     if (node.notes_size) parts.push(`<span title="Size of the source notes (definition + bibliography)">${escapeHtml(node.notes_size)}</span>`);
     const dc = node.descendant_counts;
     if (dc && dc.all) {
@@ -256,11 +257,8 @@ function badgeHtml(node) {
     } else if (node.descendant_count) {
         parts.push(`<span title="Descendant motifs, counted recursively down to the leaves">${node.descendant_count}</span>`);
     }
-    const check = node.has_definition
-        ? `<span class="badge-check" title="Has an extracted definition">✓</span> `
-        : "";
     const subTitle = node.substantive ? ` title="Substantive motif: notes ≥ 150 bytes or attested in ≥ 3 cultures"` : "";
-    return `<span class="motifs-item-badge${node.substantive ? " is-sub" : ""}"${subTitle}>${check}${parts.join(" · ")}</span>`;
+    return `<span class="motifs-item-badge${node.substantive ? " is-sub" : ""}"${subTitle}>${parts.join(" · ")}</span>`;
 }
 
 function treeRow(node, depth, { current = false, filterable = false } = {}) {
