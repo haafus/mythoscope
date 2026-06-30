@@ -417,9 +417,9 @@ function overviewHtml(s) {
             ${panel("ovChapters", "Motifs per chapter (all vs substantive)")}
             ${panel("ovRegions", "Motifs by region")}
             ${panel("ovCultures", "Top cultures")}
-            ${panel("ovBreadth", "Cultural breadth (cultures per motif)")}
             ${panel("ovTopNotes", "Most-documented motifs")}
             ${panel("ovHubs", "Most-referenced motifs (cf./†)")}
+            ${panel("ovBreadth", "Cultural breadth (cultures per motif)")}
             ${panel("ovSources", "Top sources (motifs citing)")}
         </div>
     </div>`;
