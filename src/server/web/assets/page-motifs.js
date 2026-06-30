@@ -132,7 +132,6 @@ async function browseChapterLevel0(chapter) {
     mState.selectedId = null;
     mState.browseChapter = chapter;
     markActive(null);
-    detail.innerHTML = `<div class="reader-placeholder">Loading...</div>`;
     try {
         // Always the immediate child level (L0); the filter hides L0 categories
         // whose subtree holds no match (deeper matches still count, via f-* tags).
@@ -203,7 +202,8 @@ async function openMotif(index, id) {
     markActive(id);
 
     const detail = document.getElementById("motifsDetail");
-    detail.innerHTML = `<div class="reader-placeholder">Loading...</div>`;
+    // Keep the current view until the (fast, local) fetch resolves — no "Loading"
+    // flash on link navigation.
     try {
         const params = new URLSearchParams({ id });
         const data = await api(`/api/motifs/${index}/motif?${params.toString()}`);
