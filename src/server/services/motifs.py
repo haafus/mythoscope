@@ -101,6 +101,14 @@ def _tmi_direct_children(motif_id: str) -> tuple[list[dict], bool]:
     return shown, len(kids) > _CHILDREN_CAP
 
 
+def _notes_size(notes: str) -> str:
+    """Byte size of a notes string as a compact badge label: '' / '42b' / '1.2k'."""
+    n = len((notes or "").encode("utf-8"))
+    if not n:
+        return ""
+    return f"{n}b" if n < 100 else f"{n / 1024:.1f}k"
+
+
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
@@ -113,6 +121,7 @@ def _link(index: str, motif_id: str) -> dict:
         "level": rec.get("level", 0) if rec else 0,  # for the TMI lineage tree badges
         "leaf": index == "tmi" and n == 0,
         "descendant_count": n,
+        "notes_size": _notes_size(rec.get("notes", "")) if rec and index == "tmi" else "",
     }
 
 
@@ -215,9 +224,11 @@ def _list_item(index: str, rec: dict) -> dict:
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
         n = _tmi_descendant_counts().get(rec["id"], 0)
-        item["badge"] = (f"{n} · " if n else "") + f"L{rec.get('level', 0)}"
+        size = _notes_size(rec.get("notes", ""))
+        item["badge"] = (f"{size} · " if size else "") + (f"{n} · " if n else "") + f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
         item["descendant_count"] = n
+        item["notes_size"] = size  # for the tree-row badge in the chapter browse view
         item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
@@ -275,6 +286,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     elif index == "tmi":
         detail["chapter_name"] = rec.get("chapter_name", "")
         detail["notes"] = rec.get("notes", "")
+        detail["notes_size"] = _notes_size(rec.get("notes", ""))  # for the tree badge
         detail["definition"] = rec.get("definition", "")
         # Cultures with their region, and each citation linked to its source book.
         raw_cultures = rec.get("cultures") or {}

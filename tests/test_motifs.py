@@ -446,6 +446,13 @@ class TestService:
         assert isinstance(d["references"], list)    # enriched: {text, url?}
         assert "see_also" in d["links"] and "atu_inline" in d["links"]
 
+    def test_notes_size_label(self):
+        assert svc._notes_size("") == ""
+        assert svc._notes_size("x" * 42) == "42b"
+        assert svc._notes_size("x" * 99) == "99b"
+        assert svc._notes_size("x" * 100) == "0.1k"   # >= 100 bytes -> kilobytes
+        assert svc._notes_size("x" * 1259) == "1.2k"
+
     def test_resolve_citation_links_known_works(self):
         # Against the packaged bibliography key (src/motifs/data/tmi_bibliography.json).
         assert "archive.org" in svc._resolve_citation("BP III").get("url", "")
