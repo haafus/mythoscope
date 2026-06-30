@@ -433,7 +433,6 @@ async function renderOverview() {
     mState.browseChapter = null;
     mState.browseView = null;
     markActive(null);
-    detail.innerHTML = `<div class="reader-placeholder">Loading overview…</div>`;
     try {
         const s = await api(`/api/motifs/${mState.index}/stats`);
         detail.innerHTML = overviewHtml(s);

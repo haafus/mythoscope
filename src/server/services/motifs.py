@@ -335,7 +335,7 @@ def _build_berezkin_stats() -> dict:
             regions[reg] += 1
     return {
         "index": "berezkin",
-        "title": (data.get("long_label") or "Berezkin") + " — overview",
+        "title": "Berezkin & Duvakin areal motif catalogue — overview",
         "cards": [
             {"value": len(records), "label": "motifs"},
             {"value": len([c for c in chapters if c]), "label": "chapters"},
