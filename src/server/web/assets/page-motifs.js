@@ -7,7 +7,7 @@ const mState = {
     chapter: "",
     query: "",
     selectedId: null,
-    substantiveOnly: false,
+    motifFilter: "all",  // "all" | "def" | "sub"
 };
 
 const LIST_LIMIT = 300;
@@ -132,7 +132,7 @@ async function browseChapterLevel0(chapter) {
         const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
         for (const it of data.items) rows.push(treeRow(it, 2, { filterable: true }));
-        detail.innerHTML = `<div class="motif-detail-inner">${substToggle()}<div class="motif-tree${mState.substantiveOnly ? " subst-only" : ""}">${rows.join("")}</div></div>`;
+        detail.innerHTML = `<div class="motif-detail-inner">${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
         detail.scrollTop = 0;
         bindTreeLinks(detail);
     } catch (error) {
@@ -239,16 +239,33 @@ function badgeHtml(node) {
 function treeRow(node, depth, { current = false, filterable = false } = {}) {
     const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badgeHtml(node)}`;
     const leaf = (!current && node.leaf) ? " leaf" : "";
-    // Filterable rows (children / browse lists) hide under "Substantive only";
-    // ancestors and the current motif are never filtered (they form the path).
-    const dim = (filterable && !node.substantive) ? " nonsubst" : "";
+    // Filterable rows (children / browse lists) can be hidden by the motif
+    // filter, tagged with the tiers they belong to; ancestors and the current
+    // motif are never filtered (they form the path).
+    const tags = filterable
+        ? ` filterable${node.has_definition ? " f-def" : ""}${node.substantive ? " f-sub" : ""}`
+        : "";
     if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row${leaf}${dim}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
+    return `<a class="motifs-item motif-tree-row${leaf}${tags}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
 }
 
-// "Substantive only" toggle shown above a tree in the main panel.
-function substToggle() {
-    return `<label class="subst-toggle"><input type="checkbox" class="subst-only-cb"${mState.substantiveOnly ? " checked" : ""}> Substantive only</label>`;
+// Motif-filter dropdown shown above a tree in the main panel; counts are
+// index-wide tiers from the index summary.
+function filterSelect() {
+    const idx = currentIndex();
+    const opt = (val, label, n) =>
+        `<option value="${val}"${mState.motifFilter === val ? " selected" : ""}>` +
+        `${label}${n != null ? ` (${formatNumber(n)})` : ""}</option>`;
+    return `<select class="motif-filter" aria-label="Filter motifs">
+        ${opt("all", "Full index", idx.count)}
+        ${opt("def", "With definitions", idx.definition_count)}
+        ${opt("sub", "Substantive only", idx.substantive_count)}
+    </select>`;
+}
+
+function filterClass() {
+    return mState.motifFilter === "def" ? " filter-def"
+        : mState.motifFilter === "sub" ? " filter-sub" : "";
 }
 
 function chapterMeta(id) {
@@ -282,7 +299,7 @@ function renderTmiTree(d) {
     rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size, has_definition: d.has_definition, substantive: d.substantive }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1, { filterable: true }));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
-    return `${substToggle()}<div class="motif-tree${mState.substantiveOnly ? " subst-only" : ""}">${rows.join("")}</div>`;
+    return `${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div>`;
 }
 
 function bindTreeLinks(detail) {
@@ -295,10 +312,13 @@ function bindTreeLinks(detail) {
     detail.querySelectorAll("[data-root]").forEach((el) => {
         el.addEventListener("click", (e) => { e.preventDefault(); browseRoot(); });
     });
-    const cb = detail.querySelector(".subst-only-cb");
-    if (cb) cb.addEventListener("change", () => {
-        mState.substantiveOnly = cb.checked;
-        detail.querySelectorAll(".motif-tree").forEach((t) => t.classList.toggle("subst-only", cb.checked));
+    const sel = detail.querySelector(".motif-filter");
+    if (sel) sel.addEventListener("change", () => {
+        mState.motifFilter = sel.value;
+        detail.querySelectorAll(".motif-tree").forEach((t) => {
+            t.classList.toggle("filter-def", sel.value === "def");
+            t.classList.toggle("filter-sub", sel.value === "sub");
+        });
     });
 }
 

@@ -162,7 +162,7 @@ def list_indexes() -> list[dict]:
             for ch in sorted(chapter_counts)
             if ch
         ]
-        out.append({
+        summary = {
             "index": index,
             # Tab label is presentation: take the canonical short name so it can
             # change without rebuilding the stored data.
@@ -172,7 +172,11 @@ def list_indexes() -> list[dict]:
             "homepage": data.get("homepage", ""),
             "count": len(records),
             "chapters": chapters,
-        })
+        }
+        if index == "tmi":  # tier counts for the motif-filter dropdown
+            summary["definition_count"] = sum(1 for r in records if r.get("definition"))
+            summary["substantive_count"] = sum(1 for r in records if _substantive(r))
+        out.append(summary)
     return out
 
 

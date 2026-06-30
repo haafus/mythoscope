@@ -1523,18 +1523,19 @@ body.has-main-navbar {
 .motifs-item-badge.has-def,
 .motifs-item.leaf .motifs-item-badge.has-def { color: var(--accent); font-weight: 600; }
 
-/* "Substantive only" toggle and the rows it hides. */
-.subst-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+/* Motif-filter dropdown and the rows each tier hides. */
+.motif-filter {
     margin: 2px 0 12px;
+    padding: 4px 8px;
     font-size: 12.5px;
-    color: var(--muted);
+    color: #2a2f36;
+    background: #fff;
+    border: 1px solid #dde5ec;
+    border-radius: 6px;
     cursor: pointer;
 }
-.subst-toggle input { cursor: pointer; }
-.motif-tree.subst-only .motifs-item.nonsubst { display: none; }
+.motif-tree.filter-def .motifs-item.filterable:not(.f-def),
+.motif-tree.filter-sub .motifs-item.filterable:not(.f-sub) { display: none; }
 
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
 .motifs-item.duplicate .motifs-item-id,
