@@ -502,7 +502,7 @@ function drawCharts(s, attempt = 0) {
         hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 12, t: 8, b: 30 } });
     } else if (s.index === "berezkin") {
         vbar("bzChapters", s.chapters, "id", "count");
-        vbar("bzRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 96 }, xaxis: { tickangle: -40 } });
+        hbar("bzRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
         hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
         hbar("bzWidest", s.widest.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
         vbar("bzBreadth", s.breadth, "bucket", "count");
