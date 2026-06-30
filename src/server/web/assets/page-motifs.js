@@ -407,7 +407,7 @@ function overviewHtml(s) {
         card(`${Math.round((100 * t.with_notes) / t.count)}%`, "have notes"),
     ].join("");
     const panel = (id, title) => `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart" id="${id}"></div></div>`;
-    return `<div class="motif-overview">
+    return `<div class="motif-detail-inner motif-overview">
         <h2 class="overview-title">${escapeHtml(currentIndex().long_label || currentIndex().label)} — overview</h2>
         <div class="stat-cards">${cards}</div>
         <div class="chart-grid">
