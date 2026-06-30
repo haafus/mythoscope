@@ -109,6 +109,17 @@ def _notes_size(notes: str) -> str:
     return f"{n}b" if n < 100 else f"{n / 1024:.1f}k"
 
 
+# A TMI node is "substantive" (a real motif, not an empty grouping header or a
+# thin variation) when it carries enough notes or is attested across several
+# cultures. Tuned so the substantive core is ~12% of the catalogue.
+_SUBSTANTIVE_MIN_NOTES = 150
+
+
+def _substantive(rec: dict) -> bool:
+    return (len(rec.get("notes", "").encode("utf-8")) >= _SUBSTANTIVE_MIN_NOTES
+            or len(rec.get("cultures") or {}) >= 3)
+
+
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
@@ -123,6 +134,7 @@ def _link(index: str, motif_id: str) -> dict:
         "descendant_count": n,
         "notes_size": _notes_size(rec.get("notes", "")) if rec and index == "tmi" else "",
         "has_definition": bool(rec.get("definition")) if rec and index == "tmi" else False,
+        "substantive": _substantive(rec) if rec and index == "tmi" else True,
     }
 
 
@@ -231,6 +243,7 @@ def _list_item(index: str, rec: dict) -> dict:
         item["descendant_count"] = n
         item["notes_size"] = size  # for the tree-row badge in the chapter browse view
         item["has_definition"] = bool(rec.get("definition"))
+        item["substantive"] = _substantive(rec)
         item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
@@ -291,6 +304,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["notes_size"] = _notes_size(rec.get("notes", ""))  # for the tree badge
         detail["definition"] = rec.get("definition", "")
         detail["has_definition"] = bool(rec.get("definition"))
+        detail["substantive"] = _substantive(rec)
         # Cultures with their region, and each citation linked to its source book.
         raw_cultures = rec.get("cultures") or {}
         legend = culture_legend("tmi")

@@ -7,6 +7,7 @@ const mState = {
     chapter: "",
     query: "",
     selectedId: null,
+    substantiveOnly: false,
 };
 
 const LIST_LIMIT = 300;
@@ -130,8 +131,8 @@ async function browseChapterLevel0(chapter) {
         const params = new URLSearchParams({ chapter, level: "0", limit: String(LIST_LIMIT) });
         const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
-        for (const it of data.items) rows.push(treeRow(it, 2));
-        detail.innerHTML = `<div class="motif-detail-inner"><div class="motif-tree">${rows.join("")}</div></div>`;
+        for (const it of data.items) rows.push(treeRow(it, 2, { filterable: true }));
+        detail.innerHTML = `<div class="motif-detail-inner">${substToggle()}<div class="motif-tree${mState.substantiveOnly ? " subst-only" : ""}">${rows.join("")}</div></div>`;
         detail.scrollTop = 0;
         bindTreeLinks(detail);
     } catch (error) {
@@ -222,14 +223,32 @@ function linkChips(links) {
     `).join("");
 }
 
-function treeRow(node, depth, { current = false } = {}) {
-    const size = node.notes_size ? `${escapeHtml(node.notes_size)} · ` : "";
-    const count = node.descendant_count ? `${node.descendant_count} · ` : "";
-    const badge = `<span class="motifs-item-badge${node.has_definition ? " has-def" : ""}">${size}${count}L${escapeHtml(String(node.level ?? ""))}</span>`;
-    const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badge}`;
+// The tree-row badge: an optional "substantive" check, then notes size, recursive
+// descendant count, and hierarchy level — each part carrying its own tooltip.
+function badgeHtml(node) {
+    const parts = [];
+    if (node.notes_size) parts.push(`<span title="Size of the source notes (definition + bibliography)">${escapeHtml(node.notes_size)}</span>`);
+    if (node.descendant_count) parts.push(`<span title="Descendant motifs, counted recursively down to the leaves">${node.descendant_count}</span>`);
+    parts.push(`<span title="Depth in the TMI place-value hierarchy">L${escapeHtml(String(node.level ?? ""))}</span>`);
+    const check = node.substantive
+        ? `<span class="badge-check" title="Substantive motif: notes ≥ 150 bytes or attested in ≥ 3 cultures">✓</span> `
+        : "";
+    return `<span class="motifs-item-badge${node.has_definition ? " has-def" : ""}">${check}${parts.join(" · ")}</span>`;
+}
+
+function treeRow(node, depth, { current = false, filterable = false } = {}) {
+    const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badgeHtml(node)}`;
     const leaf = (!current && node.leaf) ? " leaf" : "";
+    // Filterable rows (children / browse lists) hide under "Substantive only";
+    // ancestors and the current motif are never filtered (they form the path).
+    const dim = (filterable && !node.substantive) ? " nonsubst" : "";
     if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row${leaf}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
+    return `<a class="motifs-item motif-tree-row${leaf}${dim}" data-motif-id="${escapeHtml(node.id)}" href="#/motifs?index=tmi&id=${encodeURIComponent(node.id)}" style="--depth:${depth}">${inner}</a>`;
+}
+
+// "Substantive only" toggle shown above a tree in the main panel.
+function substToggle() {
+    return `<label class="subst-toggle"><input type="checkbox" class="subst-only-cb"${mState.substantiveOnly ? " checked" : ""}> Substantive only</label>`;
 }
 
 function chapterMeta(id) {
@@ -260,10 +279,10 @@ function renderTmiTree(d) {
     const rows = [rootRow(0), chapterRow(d.chapter, 1)];
     let depth = 2;
     for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
-    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size, has_definition: d.has_definition }, depth, { current: true }));
-    for (const c of d.children || []) rows.push(treeRow(c, depth + 1));
+    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size, has_definition: d.has_definition, substantive: d.substantive }, depth, { current: true }));
+    for (const c of d.children || []) rows.push(treeRow(c, depth + 1, { filterable: true }));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
-    return `<div class="motif-tree">${rows.join("")}</div>`;
+    return `${substToggle()}<div class="motif-tree${mState.substantiveOnly ? " subst-only" : ""}">${rows.join("")}</div>`;
 }
 
 function bindTreeLinks(detail) {
@@ -275,6 +294,11 @@ function bindTreeLinks(detail) {
     });
     detail.querySelectorAll("[data-root]").forEach((el) => {
         el.addEventListener("click", (e) => { e.preventDefault(); browseRoot(); });
+    });
+    const cb = detail.querySelector(".subst-only-cb");
+    if (cb) cb.addEventListener("change", () => {
+        mState.substantiveOnly = cb.checked;
+        detail.querySelectorAll(".motif-tree").forEach((t) => t.classList.toggle("subst-only", cb.checked));
     });
 }
 

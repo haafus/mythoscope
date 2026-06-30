@@ -446,6 +446,17 @@ class TestService:
         assert isinstance(d["references"], list)    # enriched: {text, url?}
         assert "see_also" in d["links"] and "atu_inline" in d["links"]
 
+    def test_substantive_flag(self):
+        assert svc._substantive({"notes": "x" * 150}) is True       # notes >= 150 bytes
+        assert svc._substantive({"notes": "x" * 149}) is False
+        assert svc._substantive({"cultures": {"a": [], "b": [], "c": []}}) is True  # >= 3 cultures
+        assert svc._substantive({"notes": "x" * 40, "cultures": {"a": []}}) is False
+
+    def test_tmi_detail_and_list_expose_substantive(self, tiny_db):
+        assert "substantive" in svc.get_motif("tmi", "S31")
+        items = svc.list_motifs("tmi", chapter="S")["items"]
+        assert all("substantive" in it for it in items)
+
     def test_notes_size_label(self):
         assert svc._notes_size("") == ""
         assert svc._notes_size("x" * 42) == "42b"
