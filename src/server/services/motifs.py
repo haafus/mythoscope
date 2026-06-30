@@ -151,6 +151,11 @@ def list_indexes() -> list[dict]:
     return out
 
 
+def culture_legend(index: str) -> dict:
+    """The culture dictionary for an index (only TMI has one), or {}."""
+    return (store.load_index(index) or {}).get("culture_legend", {})
+
+
 def _list_item(index: str, rec: dict) -> dict:
     """A compact record for the scrolling list (index-specific badge included)."""
     item = {"index": index, "id": rec["id"], "name": rec.get("name", ""), "chapter": rec.get("chapter", "")}

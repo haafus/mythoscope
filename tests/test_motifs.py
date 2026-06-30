@@ -10,7 +10,7 @@ import pytest  # noqa: E402
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
 from motifs.sources import berezkin, trilogy
-from motifs.sources import tmi_notes
+from motifs.sources import culture_dict, tmi_notes
 from server.services import motifs as svc
 
 # ---------------------------------------------------------------------------
@@ -226,6 +226,24 @@ class TestTrilogy:
         assert out["definition"] == "Both male and female."
         assert out["cultures"] == {"Greek": ["Eisler 396"]}
         assert out["see_also"]["cf"] == ["A1"]
+
+    def test_culture_canonical_merges_alias_and_strips_sub(self):
+        assert culture_dict.canonical("Icel.") == ("Icelandic", "")
+        assert culture_dict.canonical("Africa (Angola)") == ("Africa", "Angola")
+        assert culture_dict.canonical("England") == ("English", "")
+
+    def test_culture_legend_aggregates_aliases_regions_subs(self):
+        motifs = [
+            {"cultures": {"Icelandic": ["a"], "Greek": ["b"]}},
+            {"cultures": {"Icel.": ["c"], "Africa (Angola)": ["d"], "Africa (Ekoi)": ["e"]}},
+        ]
+        legend = culture_dict.build_legend(motifs)
+        assert legend["Icelandic"]["count"] == 2          # merged across alias
+        assert legend["Icelandic"]["aliases"] == ["Icel."]
+        assert legend["Icelandic"]["region"] == "Europe"
+        assert legend["Africa"]["count"] == 1             # counted once per motif
+        assert legend["Africa"]["subs"] == ["Angola", "Ekoi"]
+        assert legend["Greek"]["region"] == "Europe"
 
     def test_tmi_chapters_map(self):
         motifs = [

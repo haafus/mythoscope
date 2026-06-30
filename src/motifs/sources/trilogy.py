@@ -17,6 +17,7 @@ from pathlib import Path
 
 from settings import settings
 
+from .culture_dict import build_legend
 from .fetch import fetch_to_cache
 from .tmi_notes import parse_notes
 
@@ -268,6 +269,7 @@ def build(config: dict, *, force: bool = False) -> dict:
             "attribution": attribution,
             "homepage": homepage,
             "chapters": _tmi_chapters(tmi),
+            "culture_legend": build_legend(tmi),
             "motifs": tmi,
         },
         "atu": {
