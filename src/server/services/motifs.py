@@ -122,6 +122,7 @@ def _link(index: str, motif_id: str) -> dict:
         "leaf": index == "tmi" and n == 0,
         "descendant_count": n,
         "notes_size": _notes_size(rec.get("notes", "")) if rec and index == "tmi" else "",
+        "has_definition": bool(rec.get("definition")) if rec and index == "tmi" else False,
     }
 
 
@@ -229,6 +230,7 @@ def _list_item(index: str, rec: dict) -> dict:
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
         item["descendant_count"] = n
         item["notes_size"] = size  # for the tree-row badge in the chapter browse view
+        item["has_definition"] = bool(rec.get("definition"))
         item["leaf"] = n == 0
         item["duplicate"] = bool(rec.get("duplicate"))
     return item
@@ -288,6 +290,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["notes"] = rec.get("notes", "")
         detail["notes_size"] = _notes_size(rec.get("notes", ""))  # for the tree badge
         detail["definition"] = rec.get("definition", "")
+        detail["has_definition"] = bool(rec.get("definition"))
         # Cultures with their region, and each citation linked to its source book.
         raw_cultures = rec.get("cultures") or {}
         legend = culture_legend("tmi")

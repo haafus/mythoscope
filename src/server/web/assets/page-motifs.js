@@ -170,7 +170,7 @@ function renderList(data) {
         <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.leaf ? " leaf" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
-            <span class="motifs-item-badge">${escapeHtml(it.badge || "")}</span>
+            <span class="motifs-item-badge${it.has_definition ? " has-def" : ""}">${escapeHtml(it.badge || "")}</span>
         </button>
     `).join("") + more;
     list.querySelectorAll(".motifs-item").forEach((btn) => {
@@ -225,7 +225,7 @@ function linkChips(links) {
 function treeRow(node, depth, { current = false } = {}) {
     const size = node.notes_size ? `${escapeHtml(node.notes_size)} · ` : "";
     const count = node.descendant_count ? `${node.descendant_count} · ` : "";
-    const badge = `<span class="motifs-item-badge">${size}${count}L${escapeHtml(String(node.level ?? ""))}</span>`;
+    const badge = `<span class="motifs-item-badge${node.has_definition ? " has-def" : ""}">${size}${count}L${escapeHtml(String(node.level ?? ""))}</span>`;
     const inner = `<span class="motifs-item-id">${escapeHtml(node.id)}</span><span class="motifs-item-name">${escapeHtml(node.name || "—")}</span>${badge}`;
     const leaf = (!current && node.leaf) ? " leaf" : "";
     if (current) return `<div class="motifs-item motif-tree-row current${leaf}" style="--depth:${depth}">${inner}</div>`;
@@ -260,7 +260,7 @@ function renderTmiTree(d) {
     const rows = [rootRow(0), chapterRow(d.chapter, 1)];
     let depth = 2;
     for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
-    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size }, depth, { current: true }));
+    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size, has_definition: d.has_definition }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
     return `<div class="motif-tree">${rows.join("")}</div>`;

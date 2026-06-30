@@ -1518,6 +1518,11 @@ body.has-main-navbar {
 .motifs-item.leaf .motifs-item-name,
 .motifs-item.leaf .motifs-item-badge { color: var(--muted-soft); }
 
+/* Motifs that carry an extracted definition: badge in a brighter accent
+   (kept brighter even on muted leaf rows). */
+.motifs-item-badge.has-def,
+.motifs-item.leaf .motifs-item-badge.has-def { color: var(--accent); font-weight: 600; }
+
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
 .motifs-item.duplicate .motifs-item-id,
 .motifs-item.duplicate .motifs-item-name { color: #c0392b; }
