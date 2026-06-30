@@ -19,6 +19,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
             <div class="workspace">
                 <aside class="library-sidebar motifs-sidebar">
                     <div class="motifs-tabs" id="motifsTabs">Loading...</div>
+                    <button class="motifs-overview-btn" id="motifsOverview">Overview</button>
                     <input type="text" class="motifs-search" id="motifsSearch" placeholder="Search id or name...">
                     <select class="motifs-chapter" id="motifsChapter"></select>
                     <div class="motifs-list" id="motifsList"></div>
@@ -60,6 +61,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
     const wantId = params.get("id");
     if (wantId) openMotif(mState.index, wantId);
     else if (mState.selectedId) openMotif(mState.index, mState.selectedId);
+    else renderOverview();
 }
 
 function currentIndex() {
@@ -101,6 +103,7 @@ function wireControls() {
         mState.chapter = e.target.value;
         loadList();
     });
+    document.getElementById("motifsOverview").addEventListener("click", renderOverview);
 }
 
 async function switchIndex(index) {
@@ -114,9 +117,10 @@ async function switchIndex(index) {
     await loadList();
 }
 
-function selectIndex(index) {
+async function selectIndex(index) {
     if (index === mState.index) return;
-    switchIndex(index);
+    await switchIndex(index);
+    renderOverview();
 }
 
 // Clicking a chapter root shows that chapter's level-0 motifs in the main panel
@@ -336,6 +340,92 @@ function browseRoot() {
     detail.innerHTML = `<div class="motif-detail-inner"><div class="motif-tree">${rows.join("")}</div></div>`;
     detail.scrollTop = 0;
     bindTreeLinks(detail);
+}
+
+// --- index overview dashboard ------------------------------------------------
+
+async function renderOverview() {
+    const detail = document.getElementById("motifsDetail");
+    if (!detail) return;
+    mState.selectedId = null;
+    markActive(null);
+    detail.innerHTML = `<div class="reader-placeholder">Loading overview…</div>`;
+    try {
+        const s = await api(`/api/motifs/${mState.index}/stats`);
+        detail.innerHTML = overviewHtml(s);
+        detail.scrollTop = 0;
+        drawCharts(s);
+    } catch (error) {
+        detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function overviewHtml(s) {
+    if (s.index !== "tmi") {
+        return `<div class="motif-detail-inner"><div class="reader-placeholder">
+            A detailed overview is available for the Thompson index. This index has
+            ${formatNumber(s.totals.count)} entries.</div></div>`;
+    }
+    const t = s.totals;
+    const card = (val, label) => `<div class="stat-card"><div class="stat-num">${val}</div><div class="stat-label">${label}</div></div>`;
+    const cards = [
+        card(formatNumber(t.count), "motifs"),
+        card(formatNumber(t.chapters), "chapters"),
+        card(formatNumber(t.substantive), "substantive"),
+        card(formatNumber(t.definitions), "with definition"),
+        card(formatNumber(t.atu), "ATU-linked"),
+        card(`${Math.round((100 * t.with_notes) / t.count)}%`, "have notes"),
+    ].join("");
+    const panel = (id, title) => `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart" id="${id}"></div></div>`;
+    return `<div class="motif-overview">
+        <h2 class="overview-title">${escapeHtml(currentIndex().long_label || currentIndex().label)} — overview</h2>
+        <div class="stat-cards">${cards}</div>
+        <div class="chart-grid">
+            ${panel("ovComposition", "Composition")}
+            ${panel("ovLevels", "Nodes per hierarchy level")}
+            ${panel("ovNotes", "Notes size (bytes)")}
+            ${panel("ovChapters", "Motifs per chapter (all vs substantive)")}
+            ${panel("ovRegions", "Motifs by region")}
+            ${panel("ovCultures", "Top cultures")}
+            ${panel("ovBreadth", "Cultural breadth (cultures per motif)")}
+            ${panel("ovTopNotes", "Most-documented motifs")}
+            ${panel("ovHubs", "Most-referenced motifs (cf./†)")}
+        </div>
+    </div>`;
+}
+
+function drawCharts(s, attempt = 0) {
+    if (s.index !== "tmi") return;
+    const P = window.Plotly;
+    if (!P) { if (attempt < 25) setTimeout(() => drawCharts(s, attempt + 1), 200); return; }  // CDN still loading
+    const cfg = { displayModeBar: false, responsive: true };
+    const ACC = "#2f6fed", MUT = "#c7d4e0";
+    const lay = (e = {}) => Object.assign({
+        margin: { l: 44, r: 12, t: 8, b: 34 }, height: 240, font: { size: 11 },
+        paper_bgcolor: "transparent", plot_bgcolor: "transparent", showlegend: false,
+    }, e);
+    const vbar = (id, rows, xk, yk, extra) => P.newPlot(id,
+        [{ type: "bar", x: rows.map((r) => r[xk]), y: rows.map((r) => r[yk]), marker: { color: ACC } }], lay(extra), cfg);
+    const hbar = (id, rows, label, val, extra) => P.newPlot(id,
+        [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color: ACC } }],
+        lay(Object.assign({ margin: { l: 160, r: 12, t: 8, b: 30 } }, extra)), cfg);
+
+    P.newPlot("ovComposition", [{
+        type: "pie", hole: 0.55, sort: false, textinfo: "label+percent",
+        labels: s.composition.map((c) => c.label), values: s.composition.map((c) => c.count),
+        marker: { colors: [ACC, "#9bb3c9", "#dde5ec"] },
+    }], lay(), cfg);
+    vbar("ovLevels", s.levels, "level", "count");
+    vbar("ovNotes", s.notes_histogram, "bucket", "count");
+    P.newPlot("ovChapters", [
+        { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.count), marker: { color: MUT }, name: "all" },
+        { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.substantive), marker: { color: ACC }, name: "substantive" },
+    ], lay({ barmode: "overlay", showlegend: true, legend: { orientation: "h", y: 1.18, font: { size: 10 } } }), cfg);
+    vbar("ovRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 84 }, xaxis: { tickangle: -40 } });
+    hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
+    vbar("ovBreadth", s.breadth_histogram, "bucket", "count");
+    hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
+    hbar("ovHubs", s.see_also_hubs.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "indeg");
 }
 
 function section(title, bodyHtml) {

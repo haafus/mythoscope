@@ -457,6 +457,16 @@ class TestService:
         items = svc.list_motifs("tmi", chapter="S")["items"]
         assert all("substantive" in it for it in items)
 
+    def test_stats_overview(self, tiny_db):
+        s = svc.stats("tmi")
+        assert s["totals"]["count"] == len(svc._records("tmi"))
+        assert {c["label"] for c in s["composition"]} == {"substantive", "scaffold", "variation"}
+        assert sum(c["count"] for c in s["composition"]) == s["totals"]["count"]
+        assert [l["level"] for l in s["levels"]] == sorted(l["level"] for l in s["levels"])
+        assert "regions" in s and "top_cultures" in s and "see_also_hubs" in s
+        # non-TMI indexes get a minimal payload
+        assert svc.stats("atu") == {"index": "atu", "totals": {"count": 2}}
+
     def test_notes_size_label(self):
         assert svc._notes_size("") == ""
         assert svc._notes_size("x" * 42) == "42b"

@@ -44,6 +44,13 @@ def cultures(index: str) -> dict:
     return {"index": index, "cultures": svc.culture_legend(index)}
 
 
+@router.get("/{index}/stats")
+def stats(index: str) -> dict:
+    _require_built()
+    _require_index(index)
+    return svc.stats(index)
+
+
 @router.get("/{index}/motif", response_model=MotifDetail)
 def motif(index: str, id: str = Query(..., min_length=1)) -> dict:
     _require_built()

@@ -1538,6 +1538,36 @@ body.has-main-navbar {
 .motif-tree.filter-sub .motifs-item.filterable:not(.f-sub),
 .motif-tree.filter-atu .motifs-item.filterable:not(.f-atu) { display: none; }
 
+/* Index overview dashboard. */
+.motifs-overview-btn {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: #41506a;
+    background: #eef3f7;
+    border: 1px solid #dde5ec;
+    border-radius: 7px;
+    cursor: pointer;
+}
+.motifs-overview-btn:hover { background: #e2edf0; border-color: #c7d9e6; }
+
+.overview-title { font-size: 16px; margin: 2px 0 14px; color: #1f3a4d; }
+.stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.stat-card { padding: 10px 12px; text-align: center; background: #f5f7f9; border: 1px solid #e6ecf1; border-radius: 8px; }
+.stat-num { font-size: 20px; font-weight: 700; color: #1f3a4d; }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.chart-card { padding: 10px 12px; background: #fff; border: 1px solid #e6ecf1; border-radius: 8px; }
+.chart-title { font-size: 12.5px; font-weight: 600; color: #41506a; margin-bottom: 4px; }
+.chart { width: 100%; }
+
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
 .motifs-item.duplicate .motifs-item-id,
 .motifs-item.duplicate .motifs-item-name { color: #c0392b; }

@@ -192,6 +192,103 @@ def culture_legend(index: str) -> dict:
     return (store.load_index(index) or {}).get("culture_legend", {})
 
 
+# --- index overview statistics ------------------------------------------------
+
+# Notes-size histogram buckets (bytes): [lo, hi, label].
+_NOTES_BUCKETS = [
+    (1, 50, "1–49"), (50, 100, "50–99"), (100, 200, "100–199"),
+    (200, 400, "200–399"), (400, 800, "400–799"), (800, 10 ** 9, "800+"),
+]
+
+
+def _breadth_label(n: int) -> str:
+    return ("0", "1", "2", "3–5", "6–10", "11+")[
+        0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
+
+
+def stats(index: str) -> dict:
+    """Aggregate statistics for an index overview dashboard (TMI is full)."""
+    if index != "tmi":
+        recs = _records(index)
+        return {"index": index, "totals": {"count": len(recs)}}
+    return store.cached("tmi:stats", _build_tmi_stats)
+
+
+def _build_tmi_stats() -> dict:
+    import collections
+
+    records = _records("tmi")
+    data = store.load_index("tmi") or {}
+    region_of = {canon: (e.get("region") or "") for canon, e in (data.get("culture_legend") or {}).items()}
+    have_kids = {r["parent"] for r in records if r.get("parent")}
+
+    levels = collections.Counter()
+    notes_hist = collections.Counter()
+    breadth = collections.Counter()
+    chapters: dict[str, list[int]] = {}
+    regions = collections.Counter()
+    cultures = collections.Counter()
+    indeg = collections.Counter()
+    comp = collections.Counter()
+    n_def = n_notes = n_atu = n_sub = 0
+
+    for r in records:
+        nb = len(r.get("notes", "").encode("utf-8"))
+        sub = _substantive(r)
+        levels[r.get("level", 0)] += 1
+        n_notes += bool(r.get("notes", "").strip())
+        n_def += bool(r.get("definition"))
+        n_atu += _has_atu(r)
+        n_sub += sub
+        comp["substantive" if sub else "scaffold" if r["id"] in have_kids else "variation"] += 1
+        for lo, hi, label in _NOTES_BUCKETS:
+            if lo <= nb < hi:
+                notes_hist[label] += 1
+                break
+        cults = r.get("cultures") or {}
+        breadth[_breadth_label(len(cults))] += 1
+        seen_regions = set()
+        for raw in cults:
+            canon = canonical(raw)[0]
+            cultures[canon] += 1
+            if region_of.get(canon):
+                seen_regions.add(region_of[canon])
+        for reg in seen_regions:
+            regions[reg] += 1
+        if (ch := r.get("chapter", "")):
+            row = chapters.setdefault(ch, [0, 0])
+            row[0] += 1
+            row[1] += sub
+        sa = r.get("see_also") or {}
+        for t in sa.get("ref", []) + sa.get("cf", []):
+            indeg[t] += 1
+
+    by = _by_id("tmi")
+    top_notes = sorted(records, key=lambda r: len(r.get("notes", "").encode("utf-8")), reverse=True)[:15]
+    hubs = [(mid, c) for mid, c in indeg.most_common(50) if mid in by][:15]
+    chapter_labels = data.get("chapters") or {}
+
+    return {
+        "index": "tmi",
+        "totals": {
+            "count": len(records), "chapters": len(chapters), "with_notes": n_notes,
+            "definitions": n_def, "substantive": n_sub, "atu": n_atu,
+        },
+        "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
+        "levels": [{"level": f"L{lv}", "count": levels[lv]} for lv in sorted(levels)],
+        "notes_histogram": [{"bucket": label, "count": notes_hist[label]} for _, _, label in _NOTES_BUCKETS],
+        "breadth_histogram": [{"bucket": b, "count": breadth[b]}
+                              for b in ("0", "1", "2", "3–5", "6–10", "11+")],
+        "chapters": [{"id": ch, "label": chapter_labels.get(ch, ch), "count": c, "substantive": s}
+                     for ch, (c, s) in sorted(chapters.items())],
+        "regions": [{"region": reg, "count": n} for reg, n in regions.most_common()],
+        "top_cultures": [{"label": lbl, "count": n} for lbl, n in cultures.most_common(30)],
+        "top_notes": [{"id": r["id"], "name": r.get("name", ""),
+                       "bytes": len(r.get("notes", "").encode("utf-8"))} for r in top_notes],
+        "see_also_hubs": [{"id": mid, "name": by[mid].get("name", ""), "indeg": c} for mid, c in hubs],
+    }
+
+
 def _bibliography_index() -> dict[str, list[dict]]:
     """Citation key -> [{title, url}] from the packaged TMI bibliography key.
 
