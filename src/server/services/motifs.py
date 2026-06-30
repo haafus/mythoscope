@@ -349,10 +349,10 @@ def _build_berezkin_stats() -> dict:
         ],
         "panels": [
             {"id": "bzChapters", "title": "Motifs per chapter"},
+            {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
             {"id": "bzRegions", "title": "Motifs by region"},
             {"id": "bzAreas", "title": "Top areas (most attested)"},
             {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
-            {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
         ],
         "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
