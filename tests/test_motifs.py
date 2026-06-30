@@ -99,42 +99,25 @@ class TestBerezkinAreaDecode:
         seq = berezkin._parse_area_seq(" .19.21.(.44.).45.-.47.")
         assert seq == [(19, False), (21, False), (44, True), (45, False), (46, False), (47, False)]
 
-    def test_parse_area_headers_flags_comparative(self):
-        html = (
-            '<p class="NormalMai">( <b>Ср. Бантуязычная Африка.</b> [cmp]: src.</p>'
-            '<p class="NormalMai"><b>Меланезия.</b> <u>Газель</u> [x]: y.</p>'
-        )
-        assert berezkin.parse_area_headers(html) == [
-            ("Бантуязычная Африка", True),
-            ("Меланезия", False),
-        ]
+    def test_canonical_area_legend_matches_published_key(self):
+        legend = berezkin.canonical_area_legend()
+        # Numbering runs 10–74 (the published intro.html key).
+        assert min(int(k) for k in legend) == 10
+        assert max(int(k) for k in legend) == 74
+        # Each code decodes to a distinct macro-area — no duplicate labels.
+        assert len(set(legend.values())) == len(legend)
+        # Spot-check codes that the old voted legend got wrong (27/28 both "Балканы",
+        # 58/59 both "Гвиана").
+        assert legend["27"] == "Балканы"
+        assert legend["28"] == "Средняя Европа"
+        assert legend["52"] == "Мезоамерика"
+        assert legend["58"] == "Дельта Ориноко"
+        assert legend["59"] == "Гвиана"
 
-    def test_build_area_legend_aligns_clean_motifs(self):
-        # Parenthetical index (44) and comparative header are both excluded, so the
-        # remaining indices align 1:1 with the remaining headers.
-        motifs = [
-            {"id": "M1", "area_seq": [[19, False], [21, False], [44, True]]},
-            {"id": "M2", "area_seq": [[19, False], [21, False]]},
-        ]
-        headers = {
-            "M1": [("Бантуязычная Африка", False), ("Меланезия", False), ("Cmp", True)],
-            "M2": [("Бантуязычная Африка", False), ("Меланезия", False)],
-        }
-        assert berezkin.build_area_legend(motifs, headers) == {
-            "19": "Бантуязычная Африка",
-            "21": "Меланезия",
-        }
-
-    def test_build_area_legend_skips_count_mismatch(self):
-        motifs = [{"id": "X", "area_seq": [[1, False], [2, False]]}]
-        headers = {"X": [("OnlyOneHeader", False)]}
-        assert berezkin.build_area_legend(motifs, headers) == {}
-
-    def test_build_area_legend_drops_single_vote(self):
-        # An index seen in only one clean motif lacks corroboration -> dropped.
-        motifs = [{"id": "M", "area_seq": [[5, False]]}]
-        headers = {"M": [("Lone area", False)]}
-        assert berezkin.build_area_legend(motifs, headers) == {}
+    def test_canonical_legend_is_a_fresh_copy(self):
+        legend = berezkin.canonical_area_legend()
+        legend["27"] = "tampered"
+        assert berezkin.canonical_area_legend()["27"] == "Балканы"
 
 
 class TestBerezkinIndexHtml:

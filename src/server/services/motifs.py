@@ -333,11 +333,9 @@ def _build_berezkin_stats() -> dict:
                 regs.add(reg)
         for reg in regs:
             regions[reg] += 1
-    # Aggregate areas by decoded name (several codes share a name, e.g. 27/28 =
-    # "Балканы") so duplicate labels don't stack into one oversized bar.
-    by_name: collections.Counter = collections.Counter()
-    for code, c in areas.items():
-        by_name[legend.get(str(code), f"#{code}")] += c
+    # Each areal code decodes to a distinct macro-area in the published key, so
+    # we label the top codes directly (no de-duplication of names needed).
+    top_codes = sorted(areas.items(), key=lambda kv: kv[1], reverse=True)[:20]
     widest = sorted(records, key=lambda r: len(r.get("areas", [])), reverse=True)[:15]
     return {
         "index": "berezkin",
@@ -358,7 +356,7 @@ def _build_berezkin_stats() -> dict:
         ],
         "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
-        "top_areas": [{"label": name, "count": c} for name, c in by_name.most_common(20)],
+        "top_areas": [{"label": legend.get(str(code), f"#{code}"), "count": c} for code, c in top_codes],
         "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
                    for r in widest],
         "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],

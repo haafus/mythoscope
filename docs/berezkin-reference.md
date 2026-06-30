@@ -12,8 +12,15 @@ Scraped from **[areasofmyths.com](http://areasofmyths.com)** (windows-1251). The
 site is a frameset; the whole inventory lives in one navigation page,
 `index-left.html` — each `<li>` is a motif (code, name, optional internal
 see-also codes, and a trailing list of areal indices). Per-motif detail pages
-(`a1.html`, `k84.html`, …) add a short definition and the ordered macro-area
-headers used to decode the area legend (§6).
+(`a1.html`, `k84.html`, …) add a short definition. The introduction page
+([`intro.html`](http://areasofmyths.com/intro.html)) carries the licence and the
+authoritative region-code key (§6).
+
+**Licence.** The catalogue's data "can be freely used for non-commercial
+purposes" under **CC BY-NC-SA 4.0**, with mandatory attribution to the source.
+We attribute *Ю.Е. Березкин, Е.Н. Дувакин* and link the homepage; the catalogue
+is "in perpetual progress", so citations should quote a motif's definition or
+name alongside its code.
 
 Parsing is in `src/motifs/sources/berezkin.py`; fetching is split from parsing so
 it can be unit-tested on static fixtures.
@@ -86,14 +93,13 @@ All in `berezkin.py`.
 - **Areal sequence.** `_parse_area_seq` reads the dotted list into ordered
   `(index, parenthetical)` pairs: a `-` is an inclusive range; **parentheses
   mark a comparative entry** (the motif is *not* counted in the correlation for
-  that area) and are flagged so they can be excluded. Implausible numbers (a
-  digit that leaked out of a name) above 150 are dropped.
-- **Area legend (the decoding).** In a clean detail page the bold macro-area
-  headers appear in the same ascending order as the motif's numeric area list,
-  so for a motif whose count of non-parenthetical indices equals its count of
-  non-comparative headers, index *i* aligns 1:1 with header *i*. Voting these
-  alignments across the whole catalogue, and keeping a name only when ≥2 motifs
-  agree, yields the global `index → macro-area` legend (§6).
+  that area). Implausible numbers (a digit that leaked out of a name) above 150
+  are dropped. Only the numeric codes are kept on the record (`areas`); names
+  come from the published key, not from the page.
+- **Area legend (the decoding).** Taken **verbatim from the published key** in
+  `intro.html` ("Цифры соответствуют следующим регионам"), hard-coded as
+  `_CANONICAL_AREAS` / `canonical_area_legend()` (§6). No inference: detail-page
+  fetching now serves only the definitions.
 - **ATU / see-also.** ATU clauses (`ATU 311, 312`) and bare tale-type refs
   (`804A`) are pulled from the title into `atu_refs`; uppercase-initial codes are
   internal `see_also`; leftover Thompson notation (`Th …`) is stripped.
@@ -105,27 +111,27 @@ All in `berezkin.py`.
 
 ## 6. Areal region codes (the key)
 
-The dotted numbers are Berezkin's **areal region codes**. Per the official
-intro, numbering **starts at 10**, and numbers **in parentheses** mark a motif
-*excluded* from the correlation for that area.
+The dotted numbers are Berezkin's **areal region codes**. The catalogue
+[publishes the key in its introduction](http://areasofmyths.com/intro.html)
+("Цифры соответствуют следующим регионам"); numbering **starts at 10** and runs
+to **74**, and numbers **in parentheses** mark a motif *excluded* from the
+correlation for that area.
 
-No clean canonical "number → name" table is published on the reachable pages
-(the numbering is embedded in the catalogue's correlation tables and in the maps
-at [mapsofmyths.com](http://mapsofmyths.com)). So the legend here is **decoded
-empirically** from the site's own detail-page headers (§5) — **65 macro-areas,
-codes 10–74**, stored in `berezkin.json → areas` and served at
-`GET /api/motifs/berezkin/...`:
+We copy that key verbatim into `_CANONICAL_AREAS` (`berezkin.py`); it is stored
+in `berezkin.json → areas` and served at `GET /api/motifs/berezkin/...`. **65
+macro-areas, codes 10–74** (code 58, *Дельта Ориноко*, is defunct — folded into
+59, *Гвиана* — but still tags older entries, so it is kept):
 
 | codes | region group |
 |---|---|
 | 10–14 | Africa — SW, Bantu, West, Sudan–East, North |
 | 15–17 | South / West Europe, Near East |
-| 18–26 | Australia, Melanesia, Micronesia–Polynesia, Tibet/NE India, Burma–Indochina, South Asia, Malaysia–Indonesia, Taiwan–Philippines, China–Korea |
-| 27–40 | Balkans, Caucasus–Asia Minor, Iran–Central Asia, North Europe, Volga–Perm, Turkestan, S. Siberia–Mongolia, W./E. Siberia, Amur–Sakhalin, Japan, NE Asia, Arctic |
-| 41–53 | North America — Subarctic, NW Coast, Coast–Plateau, Northeast, Plains, SE US, California, Great Basin, Greater SW, NW Mexico, Mesoamerica, Honduras–Panama |
-| 54–74 | Caribbean, Andes, Amazonia, Brazil, Chaco, Southern Cone |
+| 18–26 | Australia, Melanesia, Polynesia–Micronesia, Tibet/NE India, Burma–Indochina, South Asia, Malaysia–Indonesia, Taiwan–Philippines, China–Korea |
+| 27–40 | Balkans, **Central Europe**, Caucasus–Asia Minor, Iran–Central Asia, North Europe, Volga–Perm, Turkestan, S. Siberia–Mongolia, W./E. Siberia, Amur–Sakhalin, Japan, NE Asia, Arctic |
+| 41–53 | North America — Subarctic, NW Coast, Coast–Plateau, Midwest, Northeast, Plains, SE US, California, Great Basin, Greater SW, NW Mexico, Mesoamerica, Honduras–Panama |
+| 54–74 | Antilles, Andes, Amazonia, Brazil, Chaco, Southern Cone |
 
-(The full 10→74 list with Russian names is in `berezkin.json`.)
+(The full 10→74 list with Russian names is `_CANONICAL_AREAS` / `berezkin.json`.)
 
 ---
 
@@ -144,13 +150,10 @@ overlay, not motif-to-motif links.
 ## 8. Known limitations
 
 - **Codes 1–9.** Used by ~15 motifs as the leading index (`K84 .1.11.13…`) but
-  below the official start-of-10. Header-voting could not decode them and their
-  alignment is ambiguous — likely parse noise or a few anomalous entries; no
-  online key was found to resolve them.
-- **Voted-legend drift.** A few adjacent codes share a decoded name (`27/28
-  Балканы`, `43/44 Побережье–Плато`, `58/59 Гвиана`) — sub-area splits or
-  off-by-one voting drift; would need manual checking against the maps.
-- **Decoding ≈ 65 of the used codes**; a handful covered by too few clean
-  alignments keep an empty name but are still counted.
-- The areal legend is an inference from the source, not a published canonical
-  table; the raw codes are always retained in `areas`.
+  below the official start-of-10 in the published key, so they have no name and
+  show as the bare number — likely parse noise or a few anomalous entries.
+- **Code 58 (*Дельта Ориноко*)** is officially defunct (folded into 59,
+  *Гвиана*) yet still tags ~180 older entries; it is kept in the key so those
+  motifs decode rather than show a bare number.
+- The areal legend is the catalogue's own published key, copied verbatim; the
+  raw codes are always retained in `areas` as well.

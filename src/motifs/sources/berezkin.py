@@ -4,12 +4,12 @@ The whole motif inventory lives in one navigation page (``index-left.html``):
 each ``<li>`` gives a motif code, name, optional internal see-also codes, and a
 trailing list of areal indices. Per-motif detail pages add a short definition.
 
-Decoding the areal indices into macro-area names: in a detail page the bold
-macro-area headers appear in the same ascending order as the motif's numeric
-area list, so for a "clean" motif (no parenthetical/comparative entries) index i
-aligns 1:1 with header i. Voting these alignments across the whole catalogue
-yields a reliable global ``index -> macro-area`` legend (the per-region legend on
-``areas1.html`` is a finer, differently-numbered ethnos list and does not apply).
+The areal indices decode to the macro-area names published verbatim in the
+catalogue's introduction (``intro.html`` — "Цифры соответствуют следующим
+регионам"). That list is the authoritative key (codes 10–74, with 58 a defunct
+code now folded into 59), so we hard-code it as ``_CANONICAL_AREAS`` rather than
+inferring it. (The finer per-region legend on ``areas1.html`` is a separate,
+differently-numbered ethnos list and does not apply.)
 
 Parsing is split from fetching so it can be unit-tested on static fixtures.
 """
@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import logging
 import re
-from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -51,6 +50,83 @@ _AREA_RE = re.compile(r"[\s,]+[.(]*\d[\d.()\s,\-]*$")
 # Berezkin groups societies into ~70 areal units; anything well above that is a
 # parsing artifact (e.g. a digit that leaked out of a name or a tale-type code).
 _MAX_AREA = 150
+
+# Authoritative areal-index -> macro-area key, copied verbatim from the catalogue
+# introduction (intro.html, "Цифры соответствуют следующим регионам"). Numbering
+# starts at 10; code 58 (Дельта Ориноко) is defunct, now folded into 59 (Гвиана),
+# but it still tags older entries in the inventory, so it is kept here.
+_CANONICAL_AREAS: dict[str, str] = {
+    "10": "ЮЗ Африка",
+    "11": "Бантуязычная Африка",
+    "12": "Западная Африка",
+    "13": "Судан – Восточная Африка",
+    "14": "Северная Африка",
+    "15": "Южная Европа",
+    "16": "Западная Европа",
+    "17": "Передняя Азия",
+    "18": "Австралия",
+    "19": "Меланезия",
+    "20": "Полинезия – Микронезия",
+    "21": "Тибет – Северо-Восток Индии",
+    "22": "Бирма – Индокитай",
+    "23": "Южная Азия",
+    "24": "Малайзия – Индонезия",
+    "25": "Тайвань – Филиппины",
+    "26": "Китай – Корея",
+    "27": "Балканы",
+    "28": "Средняя Европа",
+    "29": "Кавказ – Малая Азия",
+    "30": "Иран – Средняя Азия",
+    "31": "Северная Европа",
+    "32": "Волга – Пермь",
+    "33": "Туркестан",
+    "34": "Южная Сибирь – Монголия",
+    "35": "Западная Сибирь",
+    "36": "Восточная Сибирь",
+    "37": "Амур – Сахалин",
+    "38": "Япония",
+    "39": "СВ Азия",
+    "40": "Арктика",
+    "41": "Субарктика",
+    "42": "СЗ побережье",
+    "43": "Побережье – Плато",
+    "44": "Средний Запад",
+    "45": "Северо-Восток",
+    "46": "Равнины",
+    "47": "Юго-Восток США",
+    "48": "Калифорния",
+    "49": "Большой Бассейн",
+    "50": "Большой Юго-Запад",
+    "51": "СЗ Мексика",
+    "52": "Мезоамерика",
+    "53": "Гондурас – Панама",
+    "54": "Антилы",
+    "55": "Северные Анды",
+    "56": "Льяносы",
+    "57": "Южная Венесуэла",
+    "58": "Дельта Ориноко",
+    "59": "Гвиана",
+    "60": "Эквадор",
+    "61": "Западная Амазония",
+    "62": "СЗ Амазония",
+    "63": "Центральная Амазония",
+    "64": "Восточная Амазония",
+    "65": "Центральные Анды",
+    "66": "Монтанья – Журуа",
+    "67": "Боливия – Гуапоре",
+    "68": "Южная Амазония",
+    "69": "Арагуая",
+    "70": "Восточная Бразилия",
+    "71": "ЮВ Бразилия",
+    "72": "Чако",
+    "73": "Южная Бразилия",
+    "74": "Южный Конус",
+}
+
+
+def canonical_area_legend() -> dict[str, str]:
+    """The published areal-index -> macro-area key (a fresh copy each call)."""
+    return dict(_CANONICAL_AREAS)
 
 # Latin letters that are visual twins of Cyrillic ones — the source occasionally
 # types the Latin form inside a Cyrillic word ("Cупруг" for "Супруг").
@@ -159,12 +235,10 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
 
     # Trailing areal index list (whitespace/comma-introduced; may open with "(").
     areas: list[int] = []
-    area_seq: list[tuple[int, bool]] = []
     before = rest
     area_match = _AREA_RE.search(rest)
     if area_match:
-        area_seq = _parse_area_seq(rest[area_match.start():])
-        areas = sorted({n for n, _ in area_seq})
+        areas = sorted({n for n, _ in _parse_area_seq(rest[area_match.start():])})
         before = rest[: area_match.start()].strip()
 
     # Bare tale-type references the source wrote without the "ATU" prefix
@@ -188,9 +262,6 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
         "chapter": chapter_of(code),
         "name": name,
         "areas": areas,
-        # Ordered (index, parenthetical) pairs — used transiently to align with
-        # detail-page headers for the area legend, then dropped before saving.
-        "area_seq": [[n, par] for n, par in area_seq],
         "see_also": see_also,
         "atu_refs": atu_refs,
         "page": page,
@@ -234,66 +305,6 @@ def parse_index(html: str) -> tuple[list[dict], dict[str, str]]:
     return motifs, chapters
 
 
-def _norm_area_name(name: str) -> str:
-    """Tidy a macro-area header (strip ``Ср.``/punctuation, collapse a doubling)."""
-    name = re.sub(r"^Ср\.?\s*", "", name).strip(" .,;")
-    # Some headers come through doubled ("Гвиана.Гвиана") — keep one copy.
-    m = re.match(r"^(.*?)[.\s]+\1$", name)
-    if m:
-        name = m.group(1)
-    return name.strip()
-
-
-def parse_area_headers(html: str) -> list[tuple[str, bool]]:
-    """Ordered ``(macro_area_name, comparative)`` headers from a detail page.
-
-    Each areal block is a ``<p class="NormalMai">`` opening with a bold region
-    name; a block starting with ``(`` or ``Ср.`` is a comparative entry (not
-    counted in the digital DB) and is flagged so it can be excluded from alignment.
-    """
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(html, "html.parser")
-    out: list[tuple[str, bool]] = []
-    for p in soup.find_all("p", class_="NormalMai"):
-        b = p.find("b")
-        if not b:
-            continue
-        raw = " ".join(b.get_text(" ", strip=True).split())
-        comparative = p.get_text(" ", strip=True).lstrip().startswith("(") or raw.startswith("Ср")
-        name = _norm_area_name(raw)
-        if name:
-            out.append((name, comparative))
-    return out
-
-
-def build_area_legend(motifs: list[dict], headers_by_id: dict[str, list[tuple[str, bool]]]) -> dict[str, str]:
-    """Vote a global ``index -> macro-area`` legend from clean per-motif alignments.
-
-    For a motif whose count of non-parenthetical indices equals its count of
-    non-comparative detail headers, the two align 1:1 in order; we tally those
-    votes across the catalogue and take the majority name per index.
-    """
-    votes: dict[int, Counter] = defaultdict(Counter)
-    for motif in motifs:
-        headers = headers_by_id.get(motif["id"])
-        if not headers:
-            continue
-        plain = [n for n, paren in (motif.get("area_seq") or []) if not paren]
-        names = [name for name, comparative in headers if not comparative]
-        if plain and len(plain) == len(names):
-            for n, name in zip(plain, names, strict=True):
-                votes[n][name] += 1
-    # Require corroboration: a single stray alignment (one vote) is more likely a
-    # drift artifact than a real area, so keep only names backed by >= 2 motifs.
-    legend = {}
-    for n, counter in votes.items():
-        name, count = counter.most_common(1)[0]
-        if count >= 2:
-            legend[str(n)] = name
-    return legend
-
-
 def parse_definition(html: str) -> str:
     """Extract a motif's short definition (first ``NormalLis`` paragraph)."""
     from bs4 import BeautifulSoup
@@ -320,15 +331,8 @@ def build(config: dict, *, force: bool = False) -> dict:
     motifs, chapters = parse_index(index_html)
     logger.info("Berezkin: parsed %d motifs across %d chapters", len(motifs), len({m["chapter"] for m in motifs}))
 
-    areas: dict[str, str] = {}
     if config.get("fetch_details", True) and settings.motifs.berezkin_details:
-        headers_by_id = _fetch_details(motifs, base, cache, encoding, force)
-        areas = build_area_legend(motifs, headers_by_id)
-        logger.info("Berezkin: decoded %d areal indices to macro-area names", len(areas))
-
-    # Drop the transient alignment field before persisting.
-    for motif in motifs:
-        motif.pop("area_seq", None)
+        _fetch_details(motifs, base, cache, encoding, force)
 
     return {
         "label": config.get("label", "Berezkin"),
@@ -336,40 +340,34 @@ def build(config: dict, *, force: bool = False) -> dict:
         "attribution": config.get("attribution", ""),
         "homepage": config.get("homepage", ""),
         "chapters": chapters,
-        "areas": areas,
+        "areas": canonical_area_legend(),
         "motifs": motifs,
     }
 
 
-def _fetch_details(
-    motifs: list[dict], base: str, cache: Path, encoding: str, force: bool
-) -> dict[str, list[tuple[str, bool]]]:
-    """Fetch detail pages: attach definitions and return ordered area headers per id."""
+def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, force: bool) -> None:
+    """Fetch detail pages and attach each motif's short definition in place."""
     targets = motifs
     if settings.motifs.max_motifs is not None:
         targets = motifs[: settings.motifs.max_motifs]
-    logger.info("Berezkin: fetching %d detail pages (definitions + area headers)...", len(targets))
+    logger.info("Berezkin: fetching %d detail pages (definitions)...", len(targets))
 
-    def fetch_one(motif: dict) -> tuple[str, str, list[tuple[str, bool]]]:
+    def fetch_one(motif: dict) -> tuple[str, str]:
         page = motif["page"]
         try:
             html = fetch_text(f"{base}/{page}", cache / page, encoding=encoding, force=force)
-            return motif["id"], parse_definition(html), parse_area_headers(html)
+            return motif["id"], parse_definition(html)
         except Exception as exc:  # a missing/odd page must not abort the whole build
             logger.debug("Berezkin: detail fetch failed for %s: %s", page, exc)
-            return motif["id"], "", []
+            return motif["id"], ""
 
     workers = max(1, settings.motifs.max_workers)
     definitions: dict[str, str] = {}
-    headers_by_id: dict[str, list[tuple[str, bool]]] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for motif_id, definition, headers in pool.map(fetch_one, targets):
+        for motif_id, definition in pool.map(fetch_one, targets):
             if definition:
                 definitions[motif_id] = definition
-            if headers:
-                headers_by_id[motif_id] = headers
 
     for motif in motifs:
         motif["definition"] = definitions.get(motif["id"], "")
     logger.info("Berezkin: attached %d definitions", len(definitions))
-    return headers_by_id
