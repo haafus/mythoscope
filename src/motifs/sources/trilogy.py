@@ -26,10 +26,20 @@ csv.field_size_limit(16 * 1024 * 1024)
 
 _NA = {"", "NA", "N/A", "na"}
 
+# An unclosed `notes` cell in the source CSV (motif A736.1.1) runs on and swallows
+# the serialized text of ~4,200 later rows, each starting with `<code>. †<code>.`.
+# That dagger form never occurs in a genuine note, so we cut at the first one.
+_NOTES_BLEED_RE = re.compile(r"([A-Z]\d[\dA-Za-z.]*)\.\s*†\1\.")
+
 
 def _clean(value: str | None) -> str:
     value = (value or "").strip()
     return "" if value in _NA else value
+
+
+def _strip_notes_bleed(notes: str) -> str:
+    m = _NOTES_BLEED_RE.search(notes)
+    return notes[: m.start()].strip() if m else notes
 
 
 def _read_csv(config: dict, key: str, *, force: bool) -> list[dict]:
@@ -173,7 +183,7 @@ def _parse_tmi(rows: list[dict]) -> list[dict]:
             "chapter": _clean(row.get("chapter_id")) or code[:1],
             "chapter_name": _clean(row.get("chapter_name")),
             "name": _clean(row.get("motif_name")),
-            "notes": _clean(row.get("notes")),
+            "notes": _strip_notes_bleed(_clean(row.get("notes"))),
             "level": level,
             "parent": parent if parent and parent != code else "",
         })

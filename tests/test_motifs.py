@@ -173,6 +173,20 @@ class TestTrilogy:
         assert out[0]["parent"] == "A1"
         assert out[0]["chapter"] == "A"
 
+    def test_parse_tmi_strips_notes_bleed(self):
+        # A736.1.1's notes run on into serialized later rows ("<code>. †<code>.").
+        rows = [{"id": "A736.1.1", "chapter_id": "A", "motif_name": "x", "level": "4",
+                 "notes": "Real note. --Eskimo: Thompson 6; (Chaco): Mé"
+                          "A736.1.2. †A736.1.2. Sun-brother. India: Thompson-Balys."}]
+        out = trilogy._parse_tmi(rows)
+        assert out[0]["notes"] == "Real note. --Eskimo: Thompson 6; (Chaco): Mé"
+
+    def test_parse_tmi_keeps_genuine_dagger_crossref(self):
+        rows = [{"id": "A736.1.3", "chapter_id": "A", "motif_name": "x", "level": "4",
+                 "notes": "(Cf. †A736.1.1.). --India: Thompson-Balys."}]
+        out = trilogy._parse_tmi(rows)
+        assert out[0]["notes"] == "(Cf. †A736.1.1.). --India: Thompson-Balys."
+
     def test_tmi_chapters_map(self):
         motifs = [
             {"chapter": "A", "chapter_name": "Myths"},
