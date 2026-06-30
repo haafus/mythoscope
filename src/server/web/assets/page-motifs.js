@@ -385,43 +385,22 @@ async function renderOverview() {
     }
 }
 
+// Generic dashboard: a stat-card strip + a grid of chart containers, both driven
+// by the server's `cards` and `panels`. drawCharts() fills the containers.
 function overviewHtml(s) {
-    if (s.index !== "tmi") {
-        return `<div class="motif-detail-inner"><div class="reader-placeholder">
-            A detailed overview is available for the Thompson index. This index has
-            ${formatNumber(s.totals.count)} entries.</div></div>`;
+    if (!s.cards) {
+        return `<div class="motif-detail-inner"><div class="reader-placeholder">No overview for this index.</div></div>`;
     }
-    const t = s.totals;
-    const card = (val, label) => `<div class="stat-card"><div class="stat-num">${val}</div><div class="stat-label">${label}</div></div>`;
-    const cards = [
-        card(formatNumber(t.count), "motifs"),
-        card(formatNumber(t.chapters), "chapters"),
-        card(formatNumber(t.substantive), "substantive"),
-        card(formatNumber(t.definitions), "with definition"),
-        card(formatNumber(t.atu), "ATU-linked"),
-        card(`${Math.round((100 * t.with_notes) / t.count)}%`, "have notes"),
-    ].join("");
-    const panel = (id, title) => `<div class="chart-card"><div class="chart-title">${title}</div><div class="chart" id="${id}"></div></div>`;
+    const card = (c) => `<div class="stat-card"><div class="stat-num">${formatNumber(c.value)}${c.suffix || ""}</div><div class="stat-label">${escapeHtml(c.label)}</div></div>`;
+    const panel = (p) => `<div class="chart-card"><div class="chart-title">${escapeHtml(p.title)}</div><div class="chart" id="${escapeHtml(p.id)}"></div></div>`;
     return `<div class="motif-detail-inner motif-overview">
-        <h2 class="overview-title">${escapeHtml(currentIndex().long_label || currentIndex().label)} — overview</h2>
-        <div class="stat-cards">${cards}</div>
-        <div class="chart-grid">
-            ${panel("ovComposition", "Composition")}
-            ${panel("ovLevels", "Nodes per hierarchy level")}
-            ${panel("ovNotes", "Notes size (bytes)")}
-            ${panel("ovChapters", "Motifs per chapter (all vs substantive)")}
-            ${panel("ovRegions", "Motifs by region")}
-            ${panel("ovCultures", "Top cultures")}
-            ${panel("ovTopNotes", "Most-documented motifs")}
-            ${panel("ovHubs", "Most-referenced motifs (cf./†)")}
-            ${panel("ovBreadth", "Cultural breadth (cultures per motif)")}
-            ${panel("ovSources", "Top sources (motifs citing)")}
-        </div>
+        <h2 class="overview-title">${escapeHtml(s.title || "")}</h2>
+        <div class="stat-cards">${(s.cards || []).map(card).join("")}</div>
+        <div class="chart-grid">${(s.panels || []).map(panel).join("")}</div>
     </div>`;
 }
 
 function drawCharts(s, attempt = 0) {
-    if (s.index !== "tmi") return;
     const P = window.Plotly;
     if (!P) { if (attempt < 25) setTimeout(() => drawCharts(s, attempt + 1), 200); return; }  // CDN still loading
     const cfg = { displayModeBar: false, responsive: true };
@@ -436,23 +415,35 @@ function drawCharts(s, attempt = 0) {
         [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color: ACC } }],
         lay(Object.assign({ margin: { l: 160, r: 12, t: 8, b: 30 } }, extra)), cfg);
 
-    P.newPlot("ovComposition", [{
-        type: "pie", hole: 0.55, sort: false, textinfo: "label+percent",
-        labels: s.composition.map((c) => c.label), values: s.composition.map((c) => c.count),
-        marker: { colors: [ACC, "#9bb3c9", "#dde5ec"] },
-    }], lay(), cfg);
-    vbar("ovLevels", s.levels, "level", "count");
-    vbar("ovNotes", s.notes_histogram, "bucket", "count");
-    P.newPlot("ovChapters", [
-        { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.count), marker: { color: MUT }, name: "all" },
-        { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.substantive), marker: { color: ACC }, name: "substantive" },
-    ], lay({ barmode: "overlay", showlegend: true, legend: { orientation: "h", y: 1.18, font: { size: 10 } } }), cfg);
-    vbar("ovRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 84 }, xaxis: { tickangle: -40 } });
-    hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
-    vbar("ovBreadth", s.breadth_histogram, "bucket", "count");
-    hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
-    hbar("ovHubs", s.see_also_hubs.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "indeg");
-    hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 12, t: 8, b: 30 } });
+    if (s.index === "tmi") {
+        P.newPlot("ovComposition", [{
+            type: "pie", hole: 0.55, sort: false, textinfo: "label+percent",
+            labels: s.composition.map((c) => c.label), values: s.composition.map((c) => c.count),
+            marker: { colors: [ACC, "#9bb3c9", "#dde5ec"] },
+        }], lay(), cfg);
+        vbar("ovLevels", s.levels, "level", "count");
+        vbar("ovNotes", s.notes_histogram, "bucket", "count");
+        P.newPlot("ovChapters", [
+            { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.count), marker: { color: MUT }, name: "all" },
+            { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.substantive), marker: { color: ACC }, name: "substantive" },
+        ], lay({ barmode: "overlay", showlegend: true, legend: { orientation: "h", y: 1.18, font: { size: 10 } } }), cfg);
+        vbar("ovRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 84 }, xaxis: { tickangle: -40 } });
+        hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
+        vbar("ovBreadth", s.breadth_histogram, "bucket", "count");
+        hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
+        hbar("ovHubs", s.see_also_hubs.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "indeg");
+        hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 12, t: 8, b: 30 } });
+    } else if (s.index === "berezkin") {
+        vbar("bzChapters", s.chapters, "id", "count");
+        vbar("bzRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 96 }, xaxis: { tickangle: -40 } });
+        hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
+        vbar("bzBreadth", s.breadth, "bucket", "count");
+    } else if (s.index === "atu") {
+        hbar("atChapters", s.chapters.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
+        hbar("atDivisions", s.divisions.slice().reverse(), (r) => r.label.slice(0, 30), "count", { margin: { l: 210, r: 12, t: 8, b: 30 } });
+        vbar("atMotifHist", s.motif_hist, "bucket", "count");
+        hbar("atRich", s.top_rich.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
+    }
 }
 
 function section(title, bodyHtml) {

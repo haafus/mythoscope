@@ -261,12 +261,141 @@ def _top_sources(records: list[dict], limit: int = 15) -> list[dict]:
     return out
 
 
+_STATS_BUILDERS = {}  # filled below once the builders are defined
+
+
 def stats(index: str) -> dict:
-    """Aggregate statistics for an index overview dashboard (TMI is full)."""
-    if index != "tmi":
-        recs = _records(index)
-        return {"index": index, "totals": {"count": len(recs)}}
-    return store.cached("tmi:stats", _build_tmi_stats)
+    """Aggregate statistics for an index overview dashboard."""
+    if index in _STATS_BUILDERS:
+        return store.cached(f"{index}:stats", _STATS_BUILDERS[index])
+    return {"index": index, "totals": {"count": len(_records(index))}}
+
+
+def _areal_breadth_label(n: int) -> str:
+    return ("0", "1–2", "3–5", "6–10", "11–20", "21+")[
+        0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4 if n <= 20 else 5]
+
+
+def _berezkin_region(code: int) -> str:
+    """Group a Berezkin area code (10–74) into a broad region (see docs §6)."""
+    if 10 <= code <= 14:
+        return "Africa"
+    if code in (15, 16, 27, 28, 31):
+        return "Europe"
+    if code in (17, 29, 30):
+        return "Near East"
+    if code in (32, 33):
+        return "Central Asia"
+    if 18 <= code <= 20:
+        return "Oceania"
+    if 21 <= code <= 26:
+        return "Asia"
+    if 34 <= code <= 39:
+        return "Siberia"
+    if code in (40, 41):
+        return "Arctic"
+    if 42 <= code <= 51:
+        return "North America"
+    if 52 <= code <= 54:
+        return "Mesoamerica & Caribbean"
+    if 55 <= code <= 74:
+        return "South America"
+    return ""
+
+
+def _motif_count_label(n: int) -> str:
+    return ("0", "1", "2–3", "4–6", "7–10", "11+")[
+        0 if n == 0 else 1 if n == 1 else 2 if n <= 3 else 3 if n <= 6 else 4 if n <= 10 else 5]
+
+
+def _build_berezkin_stats() -> dict:
+    import collections
+
+    records = _records("berezkin")
+    data = store.load_index("berezkin") or {}
+    legend = data.get("areas") or {}
+    chapters = collections.Counter()
+    areas = collections.Counter()
+    breadth = collections.Counter()
+    regions = collections.Counter()
+    n_def = n_atu = n_see = 0
+    for r in records:
+        chapters[r.get("chapter", "")] += 1
+        n_def += bool(r.get("definition"))
+        n_atu += bool(r.get("atu_refs"))
+        n_see += bool(r.get("see_also"))
+        ars = r.get("areas") or []
+        breadth[_areal_breadth_label(len(ars))] += 1
+        regs = set()
+        for a in ars:
+            areas[a] += 1
+            if (reg := _berezkin_region(a)):
+                regs.add(reg)
+        for reg in regs:
+            regions[reg] += 1
+    return {
+        "index": "berezkin",
+        "title": (data.get("long_label") or "Berezkin") + " — overview",
+        "cards": [
+            {"value": len(records), "label": "motifs"},
+            {"value": len([c for c in chapters if c]), "label": "chapters"},
+            {"value": n_def, "label": "with definition"},
+            {"value": n_atu, "label": "ATU-linked"},
+            {"value": len(legend), "label": "decoded areas"},
+        ],
+        "panels": [
+            {"id": "bzChapters", "title": "Motifs per chapter"},
+            {"id": "bzRegions", "title": "Motifs by region"},
+            {"id": "bzAreas", "title": "Top areas (most attested)"},
+            {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
+        ],
+        "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
+        "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
+        "top_areas": [{"label": legend.get(str(a), f"#{a}"), "count": c} for a, c in areas.most_common(20)],
+        "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
+    }
+
+
+def _build_atu_stats() -> dict:
+    import collections
+
+    types = _records("atu")
+    data = store.load_index("atu") or {}
+    chapters = collections.Counter()
+    divisions = collections.Counter()
+    motif_hist = collections.Counter()
+    n_sum = n_mot = n_combo = 0
+    for t in types:
+        chapters[t.get("chapter", "")] += 1
+        if t.get("division"):
+            divisions[t["division"]] += 1
+        n_sum += bool(t.get("summary"))
+        n_mot += bool(t.get("motifs"))
+        n_combo += bool(t.get("combos"))
+        motif_hist[_motif_count_label(len(t.get("motifs", [])))] += 1
+    top_rich = sorted(types, key=lambda t: len(t.get("motifs", [])), reverse=True)[:15]
+    return {
+        "index": "atu",
+        "title": (data.get("long_label") or "ATU tale types") + " — overview",
+        "cards": [
+            {"value": len(types), "label": "tale types"},
+            {"value": len([c for c in chapters if c]), "label": "chapters"},
+            {"value": n_mot, "label": "with TMI motifs"},
+            {"value": n_combo, "label": "with combos"},
+            {"value": round(100 * n_sum / len(types)) if types else 0, "label": "have summary", "suffix": "%"},
+        ],
+        "panels": [
+            {"id": "atChapters", "title": "Types per chapter"},
+            {"id": "atDivisions", "title": "Top divisions"},
+            {"id": "atMotifHist", "title": "TMI motifs per type"},
+            {"id": "atRich", "title": "Most motif-rich types"},
+        ],
+        "chapters": [{"label": ch, "count": c} for ch, c in chapters.most_common() if ch],
+        "divisions": [{"label": dv, "count": c} for dv, c in divisions.most_common(15)],
+        "motif_hist": [{"bucket": b, "count": motif_hist[b]} for b in ("0", "1", "2–3", "4–6", "7–10", "11+")],
+        "top_rich": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
+                     for t in top_rich],
+    }
 
 
 def _build_tmi_stats() -> dict:
@@ -325,10 +454,31 @@ def _build_tmi_stats() -> dict:
 
     return {
         "index": "tmi",
+        "title": "Thompson Motif-Index of Folk-Literature — overview",
         "totals": {
             "count": len(records), "chapters": len(chapters), "with_notes": n_notes,
             "definitions": n_def, "substantive": n_sub, "atu": n_atu,
         },
+        "cards": [
+            {"value": len(records), "label": "motifs"},
+            {"value": len(chapters), "label": "chapters"},
+            {"value": n_sub, "label": "substantive"},
+            {"value": n_def, "label": "with definition"},
+            {"value": n_atu, "label": "ATU-linked"},
+            {"value": round(100 * n_notes / len(records)) if records else 0, "label": "have notes", "suffix": "%"},
+        ],
+        "panels": [
+            {"id": "ovComposition", "title": "Composition"},
+            {"id": "ovLevels", "title": "Nodes per hierarchy level"},
+            {"id": "ovNotes", "title": "Notes size (bytes)"},
+            {"id": "ovChapters", "title": "Motifs per chapter (all vs substantive)"},
+            {"id": "ovRegions", "title": "Motifs by region"},
+            {"id": "ovCultures", "title": "Top cultures"},
+            {"id": "ovTopNotes", "title": "Most-documented motifs"},
+            {"id": "ovHubs", "title": "Most-referenced motifs (cf./†)"},
+            {"id": "ovBreadth", "title": "Cultural breadth (cultures per motif)"},
+            {"id": "ovSources", "title": "Top sources (motifs citing)"},
+        ],
         "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
         "levels": [{"level": f"L{lv}", "count": levels[lv]} for lv in sorted(levels)],
         "notes_histogram": [{"bucket": label, "count": notes_hist[label]} for _, _, label in _NOTES_BUCKETS],
@@ -343,6 +493,11 @@ def _build_tmi_stats() -> dict:
         "see_also_hubs": [{"id": mid, "name": by[mid].get("name", ""), "indeg": c} for mid, c in hubs],
         "top_sources": _top_sources(records),
     }
+
+
+_STATS_BUILDERS.update({
+    "tmi": _build_tmi_stats, "berezkin": _build_berezkin_stats, "atu": _build_atu_stats,
+})
 
 
 def _bibliography_index() -> dict[str, list[dict]]:

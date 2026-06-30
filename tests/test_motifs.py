@@ -484,8 +484,11 @@ class TestService:
         assert sum(c["count"] for c in s["composition"]) == s["totals"]["count"]
         assert [l["level"] for l in s["levels"]] == sorted(l["level"] for l in s["levels"])
         assert "regions" in s and "top_cultures" in s and "see_also_hubs" in s and "top_sources" in s
-        # non-TMI indexes get a minimal payload
-        assert svc.stats("atu") == {"index": "atu", "totals": {"count": 2}}
+        # Berezkin and ATU have their own dashboards (cards + chart panels).
+        for ix in ("berezkin", "atu"):
+            st = svc.stats(ix)
+            assert st["cards"] and st["panels"]
+            assert all("id" in p and "title" in p for p in st["panels"])
 
     def test_notes_size_label(self):
         assert svc._notes_size("") == ""
