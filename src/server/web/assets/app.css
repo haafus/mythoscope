@@ -1523,10 +1523,6 @@ body.has-main-navbar {
 .motifs-item-badge.has-def,
 .motifs-item.leaf .motifs-item-badge.has-def { color: var(--accent); font-weight: 600; }
 
-/* Leading check on a substantive motif's badge. */
-.badge-check { color: var(--accent); font-weight: 700; }
-.motifs-item.leaf .motifs-item-badge .badge-check { color: var(--accent); }
-
 /* "Substantive only" toggle and the rows it hides. */
 .subst-toggle {
     display: inline-flex;
