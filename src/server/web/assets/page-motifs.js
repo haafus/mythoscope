@@ -278,23 +278,37 @@ function chapterMeta(id) {
     return (currentIndex().chapters || []).find((c) => c.id === id) || { id, label: id, count: 0 };
 }
 
+// A badge whose number follows the active filter tier (all/def/sub/atu) via a
+// CSS content-swap; falls back to a plain count for indexes without tiers.
+function tierBadge(counts) {
+    if (counts.sub == null) return `<span class="motifs-item-badge">${formatNumber(counts.all)}</span>`;
+    return `<span class="motifs-item-badge tier-badge" data-all="${formatNumber(counts.all)}"` +
+        ` data-def="${formatNumber(counts.def)}" data-sub="${formatNumber(counts.sub)}"` +
+        ` data-atu="${formatNumber(counts.atu)}"></span>`;
+}
+
 // Catalog root "/" — badge is the total motif count; clicking lists the chapters.
 function rootRow(depth, { current = false } = {}) {
-    const badge = `<span class="motifs-item-badge">${formatNumber(currentIndex().count)}</span>`;
+    const idx = currentIndex();
+    const badge = tierBadge({ all: idx.count, def: idx.definition_count, sub: idx.substantive_count, atu: idx.atu_count });
     const inner = `<span class="motifs-item-id">/</span><span class="motifs-item-name">All motifs</span>${badge}`;
     if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
     return `<a class="motifs-item motif-tree-row" href="#" data-root="1" style="--depth:${depth}">${inner}</a>`;
 }
 
 // Chapter row — badge is the chapter's total descendant count; clicking lists its L0 motifs.
-function chapterRow(chapterId, depth, { current = false } = {}) {
+function chapterRow(chapterId, depth, { current = false, filterable = false } = {}) {
     const c = chapterMeta(chapterId);
     // Show the chapter letter in the code (id) column, the title in the name.
     const title = c.label.split(" — ").slice(1).join(" — ") || c.label;
-    const badge = `<span class="motifs-item-badge">${formatNumber(c.count)}</span>`;
+    const badge = tierBadge({ all: c.count, def: c.definitions, sub: c.substantive, atu: c.atu });
     const inner = `<span class="motifs-item-id">${escapeHtml(c.id)}</span><span class="motifs-item-name">${escapeHtml(title)}</span>${badge}`;
     if (current) return `<div class="motifs-item motif-tree-row current" style="--depth:${depth}">${inner}</div>`;
-    return `<a class="motifs-item motif-tree-row" href="#" data-chapter-root="${escapeHtml(chapterId)}" style="--depth:${depth}">${inner}</a>`;
+    // A chapter is in a tier if it holds at least one motif of that tier.
+    const tags = filterable
+        ? ` filterable${c.definitions ? " f-def" : ""}${c.substantive ? " f-sub" : ""}${c.atu ? " f-atu" : ""}`
+        : "";
+    return `<a class="motifs-item motif-tree-row${tags}" href="#" data-chapter-root="${escapeHtml(chapterId)}" style="--depth:${depth}">${inner}</a>`;
 }
 
 // One tree: / -> chapter -> every parent -> the motif (highlighted) -> its direct children.
@@ -336,8 +350,8 @@ function browseRoot() {
     mState.selectedId = null;
     markActive(null);
     const rows = [rootRow(0, { current: true })];
-    for (const c of currentIndex().chapters || []) rows.push(chapterRow(c.id, 1));
-    detail.innerHTML = `<div class="motif-detail-inner"><div class="motif-tree">${rows.join("")}</div></div>`;
+    for (const c of currentIndex().chapters || []) rows.push(chapterRow(c.id, 1, { filterable: true }));
+    detail.innerHTML = `<div class="motif-detail-inner">${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
     detail.scrollTop = 0;
     bindTreeLinks(detail);
 }

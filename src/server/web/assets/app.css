@@ -1538,6 +1538,12 @@ body.has-main-navbar {
 .motif-tree.filter-sub .motifs-item.filterable:not(.f-sub),
 .motif-tree.filter-atu .motifs-item.filterable:not(.f-atu) { display: none; }
 
+/* Root/chapter badge counts follow the active tier. */
+.tier-badge::after { content: attr(data-all); }
+.motif-tree.filter-def .tier-badge::after { content: attr(data-def); }
+.motif-tree.filter-sub .tier-badge::after { content: attr(data-sub); }
+.motif-tree.filter-atu .tier-badge::after { content: attr(data-atu); }
+
 /* Index overview dashboard. */
 .motifs-overview-btn {
     width: 100%;

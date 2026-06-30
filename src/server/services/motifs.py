@@ -160,14 +160,26 @@ def list_indexes() -> list[dict]:
         if not data:
             continue
         records = data.get(_RECORDS_KEY.get(index, "motifs"), [])
-        chapter_counts: dict[str, int] = {}
+        is_tmi = index == "tmi"
+        # Per chapter: [count, substantive, definitions, atu] — the tiers also let
+        # the catalog-root chapter rows honour the motif filter.
+        chstats: dict[str, list[int]] = {}
         for r in records:
-            chapter_counts[r.get("chapter", "")] = chapter_counts.get(r.get("chapter", ""), 0) + 1
-        chapters = [
-            {"id": ch, "label": _chapter_label(data, ch), "count": chapter_counts[ch]}
-            for ch in sorted(chapter_counts)
-            if ch
-        ]
+            st = chstats.setdefault(r.get("chapter", ""), [0, 0, 0, 0])
+            st[0] += 1
+            if is_tmi:
+                st[1] += _substantive(r)
+                st[2] += bool(r.get("definition"))
+                st[3] += _has_atu(r)
+        chapters = []
+        for ch in sorted(chstats):
+            if not ch:
+                continue
+            st = chstats[ch]
+            entry = {"id": ch, "label": _chapter_label(data, ch), "count": st[0]}
+            if is_tmi:
+                entry["substantive"], entry["definitions"], entry["atu"] = st[1], st[2], st[3]
+            chapters.append(entry)
         summary = {
             "index": index,
             # Tab label is presentation: take the canonical short name so it can
@@ -179,10 +191,10 @@ def list_indexes() -> list[dict]:
             "count": len(records),
             "chapters": chapters,
         }
-        if index == "tmi":  # tier counts for the motif-filter dropdown
-            summary["definition_count"] = sum(1 for r in records if r.get("definition"))
-            summary["substantive_count"] = sum(1 for r in records if _substantive(r))
-            summary["atu_count"] = sum(1 for r in records if _has_atu(r))
+        if is_tmi:  # index-wide tier counts for the motif-filter dropdown
+            summary["substantive_count"] = sum(st[1] for st in chstats.values())
+            summary["definition_count"] = sum(st[2] for st in chstats.values())
+            summary["atu_count"] = sum(st[3] for st in chstats.values())
         out.append(summary)
     return out
 

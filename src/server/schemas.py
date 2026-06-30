@@ -59,12 +59,14 @@ class TraditionsResponse(BaseModel):
 # --- Motifs ---
 
 class MotifChapter(BaseModel):
+    model_config = ConfigDict(extra="allow")  # per-tier counts (substantive/definitions/atu)
     id: str
     label: str
     count: int
 
 
 class MotifIndexSummary(BaseModel):
+    model_config = ConfigDict(extra="allow")  # tier totals for the motif filter
     index: str
     label: str
     long_label: str = ""
