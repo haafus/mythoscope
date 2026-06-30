@@ -464,7 +464,7 @@ function drawCharts(s, attempt = 0) {
     const P = window.Plotly;
     if (!P) { if (attempt < 25) setTimeout(() => drawCharts(s, attempt + 1), 200); return; }  // CDN still loading
     const cfg = { displayModeBar: false, responsive: true };
-    const ACC = "#2f6fed", MUT = "#c7d4e0";
+    const ACC = "#2a9d8f", MUT = "#bcdcd6";  // teal — distinct from the blue UI accent
     const lay = (e = {}) => Object.assign({
         margin: { l: 44, r: 12, t: 8, b: 34 }, height: 240, font: { size: 11 },
         paper_bgcolor: "transparent", plot_bgcolor: "transparent", showlegend: false,
@@ -481,7 +481,7 @@ function drawCharts(s, attempt = 0) {
         P.newPlot("ovComposition", [{
             type: "pie", hole: 0.55, sort: false, textinfo: "label+percent",
             labels: s.composition.map((c) => c.label), values: s.composition.map((c) => c.count),
-            marker: { colors: [ACC, "#9bb3c9", "#dde5ec"] },
+            marker: { colors: [ACC, "#7cc0b6", "#d4e7e3"] },
         }], lay(), cfg);
         vbar("ovLevels", s.levels, "level", "count");
         vbar("ovNotes", s.notes_histogram, "bucket", "count");
