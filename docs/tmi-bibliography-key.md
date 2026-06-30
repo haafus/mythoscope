@@ -220,6 +220,7 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 12 | `Milligan` | Milligan, Robert H. *The Fetish Folk of West Africa. Chicago, 1912 | [1](https://archive.org/details/fetishfolkofwest00robe) |
 | 12 | `Milligan` | Milligan, Robert H. *The Jungle Folk of Africa. New York, 1908 | [1](https://archive.org/details/junglefolkofafri00mill) |
 | 11 | `Boberg` | Boberg , Inger M. Motif-Index of Early Icelandic Literature ( Biblioteca Arnamagnæana ). København 1956 | [1](http://catalog.hathitrust.org/Record/006808193) |
+| 11 | `Boberg` ✚ | Boberg, I. M. Motif-Index of Early Icelandic Literature (Bibliotheca Arnamagnæana 27). Copenhagen, 1966. (tagged 'Icel.: Boberg') | [1](https://archive.org/search?query=Boberg+Motif-Index+Early+Icelandic) |
 | 11 | `Curtin` | Curtin, Jeremiah. Seneca Indian Myths. Boston, 1923 | [1](http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=60) |
 | 11 | `Cushing` | Cushing, Frank H. Zuñi Folk Tales. New York and London, 1901. D | [1](http://folkmasa.org/yashpeh/mb_bookp.php?mishtane=59) |
 | 10 | `Phaedrus` | Phaedrus = Phaedri Fabulae Aesopiae (ed. J. P. Postgate ). Oxford, 1920. Pliny's Natural History, Translated by H. Rackham, W.H.S. Jones & D.E. Eichholz , From the 10 volume edition, Harvard University Press, Massachusetts, 1949-54 | [1](https://archive.org/details/phaedriaugustil06phaegoog) · [2](http://catalog.hathitrust.org/Record/009726006) · [3](http://www.masseiana.org/pliny.htm) |
@@ -282,6 +283,7 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 1 | `Potter` | Potter, Murray Anthony. Sohrab and Rustem . London, 1902. R | [1](https://archive.org/details/sohrabrustemepi00pott) |
 | 1 | `RBAE` | RBAE = Annual Report of the Bureau of American Ethnology | [1](http://www.biodiversitylibrary.org/bibliography/38077#/summary) |
 | 1 | `Stigand` | Stigand , C. H. and Mrs. Black Tales for White Children. London and New York, 1914 | — |
+| 1 | `Thompson-Balys` ✚ | Thompson, S. & Balys, J. The Oral Tales of India (Indiana University Publications, Folklore Series 10). Bloomington, 1958. | [1](https://archive.org/details/oraltalesofindia0000stit) |
 | 1 | `Woodson` | Woodson, Carter Godwin. African Myths. Washington, D. C, 1928. Z Zong in-Sob. Folk Tales from Korea. London, 1952 | — |
 | 0 | `AA n.s .`, `AA` | AA n.s . = American Anthropologist, new series. Washington, 1899 ff | [1](http://onlinebooks.library.upenn.edu/webbin/serial?id=amanthro) |
 | 0 | `AA o.s .`, `AA` | AA o.s . = American Anthropologist, old series. 11 vols. Washington, 1888–1898. Africa. London, 1928 ff | [1](http://onlinebooks.library.upenn.edu/webbin/serial?id=amanthro) |

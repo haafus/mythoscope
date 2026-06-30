@@ -2771,6 +2771,20 @@
     },
     {
       "keys": [
+        "Boberg"
+      ],
+      "citation": "Boberg, I. M. Motif-Index of Early Icelandic Literature (Bibliotheca Arnamagnæana 27). Copenhagen, 1966. (tagged 'Icel.: Boberg')",
+      "urls": [
+        {
+          "url": "https://archive.org/search?query=Boberg+Motif-Index+Early+Icelandic",
+          "label": ""
+        }
+      ],
+      "uses": 11,
+      "source": "curated"
+    },
+    {
+      "keys": [
         "Curtin"
       ],
       "citation": "Curtin, Jeremiah. Seneca Indian Myths. Boston, 1923",
@@ -3604,6 +3618,20 @@
       "urls": [],
       "uses": 1,
       "source": "folkmasa"
+    },
+    {
+      "keys": [
+        "Thompson-Balys"
+      ],
+      "citation": "Thompson, S. & Balys, J. The Oral Tales of India (Indiana University Publications, Folklore Series 10). Bloomington, 1958.",
+      "urls": [
+        {
+          "url": "https://archive.org/details/oraltalesofindia0000stit",
+          "label": ""
+        }
+      ],
+      "uses": 1,
+      "source": "curated"
     },
     {
       "keys": [

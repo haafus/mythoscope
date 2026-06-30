@@ -123,6 +123,14 @@ CURATED = {
     "Boas": ("Boas, F. Tsimshian Mythology (RBAE 31), 1916; The Eskimo of Baffin "
              "Land and Hudson Bay (BAM XV), 1901–07; and many papers in JAFL/BAM/RBAE.",
              "https://archive.org/search?query=Boas+Tsimshian+Mythology"),
+    # The most-cited source of all (>10,000 motifs, tagged 'India: Thompson-Balys').
+    "Thompson-Balys": (
+        "Thompson, S. & Balys, J. The Oral Tales of India (Indiana University "
+        "Publications, Folklore Series 10). Bloomington, 1958.",
+        "https://archive.org/details/oraltalesofindia0000stit"),
+    "Boberg": ("Boberg, I. M. Motif-Index of Early Icelandic Literature "
+               "(Bibliotheca Arnamagnæana 27). Copenhagen, 1966. (tagged 'Icel.: Boberg')",
+               "https://archive.org/search?query=Boberg+Motif-Index+Early+Icelandic"),
 }
 
 # Series acronyms worth spelling out even when used bare (some are also in the
