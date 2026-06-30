@@ -238,13 +238,36 @@ variations. Major motifs are always retained (an absolute floor never drops a
 big node). The boundary is intentionally a single tunable constant
 (`_SUBSTANTIVE_MIN_NOTES`).
 
-In the UI: substantive tree rows get a leading **✓** badge; a **"Substantive
-only"** checkbox above the main-panel tree hides non-substantive children /
-browse rows (ancestors and the current motif always stay, to keep the path).
+---
+
+## 10. Browsing & overview (UI)
+
+The Motifs section reads everything above through `GET /api/motifs/tmi/*`.
+
+**Tree badges** carry, per motif: a **✓** when it has an extracted definition,
+the **notes size**, recursive **descendant count**, and **level** — each with a
+tooltip. The badge is **accent-coloured when the motif is substantive**. (So ✓ =
+definition, colour = substantive — two independent signals.)
+
+**Motif filter.** A dropdown above every main-panel tree (catalog root, chapter
+browse, motif detail) offers four tiers with index-wide counts: *Full index*
+(46,230), *With definitions* (10,230), *Substantive only* (5,322), *With ATU
+types* (4,752). Selecting a tier hides the non-matching filterable rows
+(children, chapter contents, and whole chapters with none of that tier), while
+ancestors and the current motif always stay. Root and chapter badges show the
+selected tier's count (e.g. chapter A: 5,810 → 627 under *Substantive*).
+
+**Overview dashboard.** `GET /api/motifs/{index}/stats` aggregates the index in
+one cached pass; the section landing renders it as a stat-card strip plus a
+responsive grid of charts: composition, nodes per level, notes-size histogram,
+motifs per chapter (all vs substantive), motifs by region, top cultures,
+cultural breadth, most-documented motifs, most-referenced motifs (see_also
+in-degree), and top sources (motifs citing each work — Thompson-Balys, Cross,
+Neuman, … resolved through the bibliography key, §8).
 
 ---
 
-## 10. Cross-walks
+## 11. Cross-walks
 
 Motif **equivalence** runs through ATU, not geography:
 `tmi → atu` (Trilogy `atu_seq`) and `atu → berezkin`. A motif page shows its ATU
@@ -256,7 +279,7 @@ not motif-to-motif links (see the culture dictionary, §7).
 
 ---
 
-## 11. Known limitations
+## 12. Known limitations
 
 - The definition / culture split is heuristic (~85–90%); short one-line
   definitions are over-flagged, colon-less region labels (`--Oceanic Dixon …`)

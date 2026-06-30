@@ -218,6 +218,48 @@ def _breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
 
 
+def _citation_key(text: str) -> str:
+    """The bibliography key a citation resolves to, or '' (for the source tally)."""
+    m = _CITE_HEAD.match(text)
+    if not m:
+        return ""
+    index = _bibliography_index()
+    parts = m.group(1).split()
+    for i in range(len(parts), 0, -1):
+        key = " ".join(parts[:i])
+        if key in index:
+            return key
+    return ""
+
+
+def _top_sources(records: list[dict], limit: int = 15) -> list[dict]:
+    """Most-cited bibliography sources by number of motifs citing them."""
+    import collections
+
+    bib = _bibliography_index()
+    motifs_per_source: collections.Counter = collections.Counter()
+    for r in records:
+        keys = set()
+        for ref in r.get("references", []):
+            keys.add(_citation_key(ref))
+        for cites in (r.get("cultures") or {}).values():
+            for c in cites:
+                keys.add(_citation_key(c))
+        for k in keys:
+            if k and k not in ("Type", "Types"):  # the ATU marker isn't a source
+                motifs_per_source[k] += 1
+
+    out = []
+    for key, n in motifs_per_source.most_common(limit):
+        cands = bib.get(key) or []
+        out.append({
+            "label": key, "count": n,
+            "title": cands[0]["title"] if cands else key,
+            "url": next((c["url"] for c in cands if c["url"]), ""),
+        })
+    return out
+
+
 def stats(index: str) -> dict:
     """Aggregate statistics for an index overview dashboard (TMI is full)."""
     if index != "tmi":
@@ -298,6 +340,7 @@ def _build_tmi_stats() -> dict:
         "top_notes": [{"id": r["id"], "name": r.get("name", ""),
                        "bytes": len(r.get("notes", "").encode("utf-8"))} for r in top_notes],
         "see_also_hubs": [{"id": mid, "name": by[mid].get("name", ""), "indeg": c} for mid, c in hubs],
+        "top_sources": _top_sources(records),
     }
 
 

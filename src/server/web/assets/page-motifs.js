@@ -175,7 +175,7 @@ function renderList(data) {
         <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}${it.leaf ? " leaf" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
-            <span class="motifs-item-badge${it.has_definition ? " has-def" : ""}">${escapeHtml(it.badge || "")}</span>
+            <span class="motifs-item-badge${it.substantive ? " is-sub" : ""}">${escapeHtml(it.badge || "")}</span>
         </button>
     `).join("") + more;
     list.querySelectorAll(".motifs-item").forEach((btn) => {
@@ -234,10 +234,11 @@ function badgeHtml(node) {
     if (node.notes_size) parts.push(`<span title="Size of the source notes (definition + bibliography)">${escapeHtml(node.notes_size)}</span>`);
     if (node.descendant_count) parts.push(`<span title="Descendant motifs, counted recursively down to the leaves">${node.descendant_count}</span>`);
     parts.push(`<span title="Depth in the TMI place-value hierarchy">L${escapeHtml(String(node.level ?? ""))}</span>`);
-    const check = node.substantive
-        ? `<span class="badge-check" title="Substantive motif: notes ≥ 150 bytes or attested in ≥ 3 cultures">✓</span> `
+    const check = node.has_definition
+        ? `<span class="badge-check" title="Has an extracted definition">✓</span> `
         : "";
-    return `<span class="motifs-item-badge${node.has_definition ? " has-def" : ""}">${check}${parts.join(" · ")}</span>`;
+    const subTitle = node.substantive ? ` title="Substantive motif: notes ≥ 150 bytes or attested in ≥ 3 cultures"` : "";
+    return `<span class="motifs-item-badge${node.substantive ? " is-sub" : ""}"${subTitle}>${check}${parts.join(" · ")}</span>`;
 }
 
 function treeRow(node, depth, { current = false, filterable = false } = {}) {
@@ -404,6 +405,7 @@ function overviewHtml(s) {
             ${panel("ovBreadth", "Cultural breadth (cultures per motif)")}
             ${panel("ovTopNotes", "Most-documented motifs")}
             ${panel("ovHubs", "Most-referenced motifs (cf./†)")}
+            ${panel("ovSources", "Top sources (motifs citing)")}
         </div>
     </div>`;
 }
@@ -440,6 +442,7 @@ function drawCharts(s, attempt = 0) {
     vbar("ovBreadth", s.breadth_histogram, "bucket", "count");
     hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
     hbar("ovHubs", s.see_also_hubs.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "indeg");
+    hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 12, t: 8, b: 30 } });
 }
 
 function section(title, bodyHtml) {

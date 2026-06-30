@@ -463,7 +463,7 @@ class TestService:
         assert {c["label"] for c in s["composition"]} == {"substantive", "scaffold", "variation"}
         assert sum(c["count"] for c in s["composition"]) == s["totals"]["count"]
         assert [l["level"] for l in s["levels"]] == sorted(l["level"] for l in s["levels"])
-        assert "regions" in s and "top_cultures" in s and "see_also_hubs" in s
+        assert "regions" in s and "top_cultures" in s and "see_also_hubs" in s and "top_sources" in s
         # non-TMI indexes get a minimal payload
         assert svc.stats("atu") == {"index": "atu", "totals": {"count": 2}}
 

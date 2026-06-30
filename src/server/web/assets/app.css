@@ -1518,10 +1518,10 @@ body.has-main-navbar {
 .motifs-item.leaf .motifs-item-name,
 .motifs-item.leaf .motifs-item-badge { color: var(--muted-soft); }
 
-/* Motifs that carry an extracted definition: badge in a brighter accent
-   (kept brighter even on muted leaf rows). */
-.motifs-item-badge.has-def,
-.motifs-item.leaf .motifs-item-badge.has-def { color: var(--accent); font-weight: 600; }
+/* Substantive motifs: badge in a brighter accent (kept brighter even on muted
+   leaf rows). Motifs with a definition get a ✓ instead (see badge-check). */
+.motifs-item-badge.is-sub,
+.motifs-item.leaf .motifs-item-badge.is-sub { color: var(--accent); font-weight: 600; }
 
 /* Motif-filter dropdown and the rows each tier hides. */
 .motif-filter {
