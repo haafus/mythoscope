@@ -413,8 +413,15 @@ def _list_item(index: str, rec: dict) -> dict:
     return item
 
 
+_TIER_PREDICATE = {
+    "def": lambda r: bool(r.get("definition")),
+    "sub": _substantive,
+    "atu": _has_atu,
+}
+
+
 def list_motifs(index: str, *, chapter: str = "", q: str = "", level: int | None = None,
-                limit: int = 200, offset: int = 0) -> dict:
+                tier: str = "", limit: int = 200, offset: int = 0) -> dict:
     """Filtered, paginated motif list for one index."""
     records = _records(index)
     query = q.strip().lower()
@@ -422,6 +429,8 @@ def list_motifs(index: str, *, chapter: str = "", q: str = "", level: int | None
         records = [r for r in records if r.get("chapter", "") == chapter]
     if level is not None:
         records = [r for r in records if r.get("level", 0) == level]
+    if index == "tmi" and tier in _TIER_PREDICATE:  # substantive / definitions / ATU
+        records = [r for r in records if _TIER_PREDICATE[tier](r)]
     if query:
         records = [
             r for r in records

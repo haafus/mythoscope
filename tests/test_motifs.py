@@ -457,6 +457,12 @@ class TestService:
         items = svc.list_motifs("tmi", chapter="S")["items"]
         assert all("substantive" in it for it in items)
 
+    def test_list_motifs_tier_filter(self, tiny_db):
+        base = svc.list_motifs("tmi")["total"]
+        sub = svc.list_motifs("tmi", tier="sub")
+        assert sub["total"] <= base
+        assert all(it["substantive"] for it in sub["items"])  # every returned item matches the tier
+
     def test_stats_overview(self, tiny_db):
         s = svc.stats("tmi")
         assert s["totals"]["count"] == len(svc._records("tmi"))

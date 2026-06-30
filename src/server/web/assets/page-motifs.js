@@ -7,7 +7,8 @@ const mState = {
     chapter: "",
     query: "",
     selectedId: null,
-    motifFilter: "all",  // "all" | "def" | "sub"
+    motifFilter: "all",  // "all" | "def" | "sub" | "atu"
+    browseChapter: null, // chapter currently shown in the main-panel browse, if any
 };
 
 const LIST_LIMIT = 300;
@@ -129,13 +130,21 @@ async function browseChapterLevel0(chapter) {
     const detail = document.getElementById("motifsDetail");
     if (!detail) return;
     mState.selectedId = null;
+    mState.browseChapter = chapter;
     markActive(null);
     detail.innerHTML = `<div class="reader-placeholder">Loading...</div>`;
     try {
-        const params = new URLSearchParams({ chapter, level: "0", limit: String(LIST_LIMIT) });
+        // No filter: top-level drill-down (L0). A filter: the chapter's matching
+        // motifs at any depth (so the list isn't empty when L0 has none).
+        const params = new URLSearchParams({ chapter, limit: String(LIST_LIMIT) });
+        if (mState.motifFilter === "all") params.set("level", "0");
+        else params.set("tier", mState.motifFilter);
         const data = await api(`/api/motifs/tmi/motifs?${params.toString()}`);
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
-        for (const it of data.items) rows.push(treeRow(it, 2, { filterable: true }));
+        for (const it of data.items) rows.push(treeRow(it, 2));
+        if (data.total > data.items.length) {
+            rows.push(`<div class="motif-subtree-more" style="--depth:2">… ${formatNumber(data.total - data.items.length)} more</div>`);
+        }
         detail.innerHTML = `<div class="motif-detail-inner">${filterSelect()}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
         detail.scrollTop = 0;
         bindTreeLinks(detail);
@@ -195,6 +204,7 @@ async function openMotif(index, id) {
         await switchIndex(index);
     }
     mState.selectedId = id;
+    mState.browseChapter = null;
     markActive(id);
 
     const detail = document.getElementById("motifsDetail");
@@ -336,6 +346,9 @@ function bindTreeLinks(detail) {
     const sel = detail.querySelector(".motif-filter");
     if (sel) sel.addEventListener("change", () => {
         mState.motifFilter = sel.value;
+        // The chapter browse re-fetches (its rows depend on the tier); root and
+        // detail just toggle the hide/badge classes on their already-built tree.
+        if (mState.browseChapter) { browseChapterLevel0(mState.browseChapter); return; }
         detail.querySelectorAll(".motif-tree").forEach((t) => {
             t.classList.toggle("filter-def", sel.value === "def");
             t.classList.toggle("filter-sub", sel.value === "sub");
@@ -349,6 +362,7 @@ function browseRoot() {
     const detail = document.getElementById("motifsDetail");
     if (!detail) return;
     mState.selectedId = null;
+    mState.browseChapter = null;
     markActive(null);
     const rows = [rootRow(0, { current: true })];
     for (const c of currentIndex().chapters || []) rows.push(chapterRow(c.id, 1, { filterable: true }));
@@ -363,6 +377,7 @@ async function renderOverview() {
     const detail = document.getElementById("motifsDetail");
     if (!detail) return;
     mState.selectedId = null;
+    mState.browseChapter = null;
     markActive(null);
     detail.innerHTML = `<div class="reader-placeholder">Loading overview…</div>`;
     try {
