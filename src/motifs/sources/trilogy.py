@@ -18,6 +18,7 @@ from pathlib import Path
 from settings import settings
 
 from .fetch import fetch_to_cache
+from .tmi_notes import parse_notes
 
 logger = logging.getLogger(__name__)
 
@@ -178,12 +179,14 @@ def _parse_tmi(rows: list[dict]) -> list[dict]:
         except ValueError:
             level = 0
         parent = _clean(row.get(f"level_{level - 1}")) if level > 0 else ""
+        notes = _strip_notes_bleed(_clean(row.get("notes")))
         motifs.append({
             "id": code,
             "chapter": _clean(row.get("chapter_id")) or code[:1],
             "chapter_name": _clean(row.get("chapter_name")),
             "name": _clean(row.get("motif_name")),
-            "notes": _strip_notes_bleed(_clean(row.get("notes"))),
+            "notes": notes,
+            **parse_notes(notes),  # definition, cultures, references, see_also, atu_inline
             "level": level,
             "parent": parent if parent and parent != code else "",
         })

@@ -220,12 +220,21 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     elif index == "tmi":
         detail["chapter_name"] = rec.get("chapter_name", "")
         detail["notes"] = rec.get("notes", "")
+        detail["definition"] = rec.get("definition", "")
+        detail["cultures"] = rec.get("cultures", {})
+        detail["references"] = rec.get("references", [])
         detail["level"] = rec.get("level", 0)
         detail["code"] = rec.get("code", rec["id"])
         detail["duplicate"] = bool(rec.get("duplicate"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
         detail["descendant_count"] = _tmi_descendant_counts().get(rec["id"], 0)
+        # Cross-references parsed from the note text: '†' to other motifs (split
+        # into direct refs and softer 'Cf.' compares) and inline 'Type' to ATU.
+        see_also = rec.get("see_also") or {}
+        detail["links"]["see_also"] = [_link("tmi", m) for m in see_also.get("ref", [])]
+        detail["links"]["see_also_cf"] = [_link("tmi", m) for m in see_also.get("cf", [])]
+        detail["links"]["atu_inline"] = [_link("atu", a) for a in rec.get("atu_inline", [])]
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
 

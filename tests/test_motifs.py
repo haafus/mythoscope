@@ -10,6 +10,7 @@ import pytest  # noqa: E402
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
 from motifs.sources import berezkin, trilogy
+from motifs.sources import tmi_notes
 from server.services import motifs as svc
 
 # ---------------------------------------------------------------------------
@@ -186,6 +187,45 @@ class TestTrilogy:
                  "notes": "(Cf. †A736.1.1.). --India: Thompson-Balys."}]
         out = trilogy._parse_tmi(rows)
         assert out[0]["notes"] == "(Cf. †A736.1.1.). --India: Thompson-Balys."
+
+    def test_notes_splits_definition_and_cultures(self):
+        out = tmi_notes.parse_notes(
+            "The creator is half man and half woman. "
+            "--*Lang Myth I 200f. --Greek: Eisler 396; Egyptian: Maspero 141; "
+            "Indian (Hindu): Keith 75.")
+        assert out["definition"] == "The creator is half man and half woman."
+        assert out["cultures"]["Greek"] == ["Eisler 396"]
+        assert out["cultures"]["Egyptian"] == ["Maspero 141"]
+        assert out["cultures"]["Indian (Hindu)"] == ["Keith 75"]
+        assert "*Lang Myth I 200f" in out["references"]
+
+    def test_notes_no_definition_when_starts_with_citation(self):
+        out = tmi_notes.parse_notes("Greek: Fox 4; India: *Thompson-Balys.")
+        assert out["definition"] == ""
+        assert out["cultures"]["Greek"] == ["Fox 4"]
+        assert out["cultures"]["India"] == ["*Thompson-Balys"]
+
+    def test_notes_extracts_see_also_and_cf(self):
+        out = tmi_notes.parse_notes("Hero deceives the ogre. (Cf. †A116.2). See †K1611.")
+        assert out["see_also"]["cf"] == ["A116.2"]
+        assert out["see_also"]["ref"] == ["K1611"]
+
+    def test_notes_extracts_inline_atu_types(self):
+        out = tmi_notes.parse_notes("Wonder tale. *Types 403, 425, 480; BP I 42ff.")
+        assert out["atu_inline"] == ["403", "425", "480"]
+
+    def test_notes_empty(self):
+        out = tmi_notes.parse_notes("")
+        assert out == {"definition": "", "cultures": {}, "references": [],
+                       "see_also": {"cf": [], "ref": []}, "atu_inline": []}
+
+    def test_parse_tmi_attaches_parsed_note_fields(self):
+        rows = [{"id": "A12", "chapter_id": "A", "motif_name": "x", "level": "2",
+                 "notes": "Both male and female. --Greek: Eisler 396. (Cf. †A1.)"}]
+        out = trilogy._parse_tmi(rows)[0]
+        assert out["definition"] == "Both male and female."
+        assert out["cultures"] == {"Greek": ["Eisler 396"]}
+        assert out["see_also"]["cf"] == ["A1"]
 
     def test_tmi_chapters_map(self):
         motifs = [
