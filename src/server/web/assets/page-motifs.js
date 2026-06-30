@@ -494,7 +494,7 @@ function drawCharts(s, attempt = 0) {
             { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.count), marker: { color: MUT }, name: "all" },
             { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.substantive), marker: { color: ACC }, name: "substantive" },
         ], lay({ barmode: "overlay", showlegend: true, legend: { orientation: "h", y: 1.18, font: { size: 10 } } }), cfg);
-        vbar("ovRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 84 }, xaxis: { tickangle: -40 } });
+        hbar("ovRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 130, r: 12, t: 8, b: 30 } });
         hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
         vbar("ovBreadth", s.breadth_histogram, "bucket", "count");
         hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
