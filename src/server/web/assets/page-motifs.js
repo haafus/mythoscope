@@ -248,7 +248,14 @@ function linkChips(links) {
 function badgeHtml(node) {
     const parts = [];
     if (node.notes_size) parts.push(`<span title="Size of the source notes (definition + bibliography)">${escapeHtml(node.notes_size)}</span>`);
-    if (node.descendant_count) parts.push(`<span title="Descendant motifs, counted recursively down to the leaves">${node.descendant_count}</span>`);
+    const dc = node.descendant_counts;
+    if (dc && dc.all) {
+        // The number swaps with the active filter (all/def/sub/atu) via CSS, like
+        // the tier badge — so it counts only the descendants matching the filter.
+        parts.push(`<span class="desc-count" data-all="${dc.all}" data-def="${dc.def}" data-sub="${dc.sub}" data-atu="${dc.atu}" title="Descendant motifs matching the active filter, counted recursively"></span>`);
+    } else if (node.descendant_count) {
+        parts.push(`<span title="Descendant motifs, counted recursively down to the leaves">${node.descendant_count}</span>`);
+    }
     const check = node.has_definition
         ? `<span class="badge-check" title="Has an extracted definition">✓</span> `
         : "";
@@ -356,7 +363,7 @@ function renderTmiTree(d) {
     const rows = [rootRow(0), chapterRow(d.chapter, 1)];
     let depth = 2;
     for (const a of d.breadcrumbs || []) rows.push(treeRow(a, depth++));
-    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, notes_size: d.notes_size, has_definition: d.has_definition, substantive: d.substantive }, depth, { current: true }));
+    rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, descendant_counts: d.descendant_counts, notes_size: d.notes_size, has_definition: d.has_definition, substantive: d.substantive }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1, { filterable: true }));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
     return `${controls(false)}<div class="motif-tree${filterClass()}">${rows.join("")}</div>`;

@@ -94,6 +94,50 @@ def _tmi_descendant_counts() -> dict[str, int]:
     return store.cached("tmi:descendants", build)
 
 
+_TIERS = ("all", "def", "sub", "atu")
+
+
+def _tmi_descendant_tier_counts() -> dict[str, dict[str, int]]:
+    """id -> {tier: number of descendants matching that tier}, recursively.
+
+    ``all`` is the plain descendant total; ``def``/``sub``/``atu`` count only the
+    descendants that have a definition / are substantive / are ATU-linked. Lets a
+    node's descendant badge follow the active filter.
+    """
+    def build() -> dict[str, dict[str, int]]:
+        children = _tmi_children()
+        by_id = _by_id("tmi")
+        memo: dict[str, dict[str, int]] = {}
+
+        def own(mid: str) -> dict[str, int]:
+            r = by_id.get(mid) or {}
+            return {"all": 1, "def": int(bool(r.get("definition"))),
+                    "sub": int(_substantive(r)), "atu": int(_has_atu(r))}
+
+        def walk(mid: str, stack: frozenset) -> dict[str, int]:
+            if mid in memo:
+                return memo[mid]
+            acc = {t: 0 for t in _TIERS}
+            for child in children.get(mid, []):
+                if child in stack:
+                    continue
+                co, cd = own(child), walk(child, stack | {mid})
+                for t in _TIERS:
+                    acc[t] += co[t] + cd[t]
+            memo[mid] = acc
+            return acc
+
+        for mid in children:
+            walk(mid, frozenset())
+        return memo
+
+    return store.cached("tmi:descendant_tiers", build)
+
+
+def _descendant_counts(motif_id: str) -> dict[str, int]:
+    return _tmi_descendant_tier_counts().get(motif_id, {t: 0 for t in _TIERS})
+
+
 def _tmi_direct_children(motif_id: str) -> tuple[list[dict], bool]:
     """Immediate child links (one level down), capped at _CHILDREN_CAP."""
     kids = _tmi_children().get(motif_id, [])
@@ -128,7 +172,8 @@ def _has_atu(rec: dict) -> bool:
 def _link(index: str, motif_id: str) -> dict:
     """A cross-walk link: id + resolved name + whether the target exists here."""
     rec = _by_id(index).get(motif_id)
-    n = _tmi_descendant_counts().get(motif_id, 0) if index == "tmi" else 0
+    counts = _descendant_counts(motif_id) if index == "tmi" else {t: 0 for t in _TIERS}
+    n = counts["all"]
     return {
         "index": index,
         "id": motif_id,
@@ -137,6 +182,7 @@ def _link(index: str, motif_id: str) -> dict:
         "level": rec.get("level", 0) if rec else 0,  # for the TMI lineage tree badges
         "leaf": index == "tmi" and n == 0,
         "descendant_count": n,
+        "descendant_counts": counts,  # per-tier, for the filter-aware badge
         "notes_size": _notes_size(rec.get("notes", "")) if rec and index == "tmi" else "",
         "has_definition": bool(rec.get("definition")) if rec and index == "tmi" else False,
         "substantive": _substantive(rec) if rec and index == "tmi" else True,
@@ -562,11 +608,13 @@ def _list_item(index: str, rec: dict) -> dict:
     elif index == "atu":
         item["badge"] = f"{len(rec.get('motifs', []))} motifs"
     elif index == "tmi":
-        n = _tmi_descendant_counts().get(rec["id"], 0)
+        counts = _descendant_counts(rec["id"])
+        n = counts["all"]
         size = _notes_size(rec.get("notes", ""))
         item["badge"] = (f"{size} · " if size else "") + (f"{n} · " if n else "") + f"L{rec.get('level', 0)}"
         item["level"] = rec.get("level", 0)  # for the indented tree in the sidebar
         item["descendant_count"] = n
+        item["descendant_counts"] = counts  # per-tier, for the filter-aware tree badge
         item["notes_size"] = size  # for the tree-row badge in the chapter browse view
         item["has_definition"] = bool(rec.get("definition"))
         item["substantive"] = _substantive(rec)
@@ -685,7 +733,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["duplicate"] = bool(rec.get("duplicate"))
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
-        detail["descendant_count"] = _tmi_descendant_counts().get(rec["id"], 0)
+        detail["descendant_counts"] = _descendant_counts(rec["id"])
+        detail["descendant_count"] = detail["descendant_counts"]["all"]
         # Cross-references parsed from the note text: '†' to other motifs (split
         # into direct refs and softer 'Cf.' compares) and inline 'Type' to ATU.
         see_also = rec.get("see_also") or {}
