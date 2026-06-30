@@ -10,10 +10,17 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 
 - **BAM** — Bulletin of the American Museum of Natural History.
 - **BBAE** — Bulletin of the Bureau of American Ethnology (Smithsonian).
+- **BMB** — Bernice P. Bishop Museum Bulletin. Honolulu.
+- **CColl** — Colorado College Publication, Language Series.
+- **DF** — Danmarks Folkeminder. Copenhagen, 1908 ff.
 - **ET** — Wienert, Ethische Typen (see Wienert FFC 56).
 - **FFC** — FF Communications (Folklore Fellows). Helsinki, 1910 ff.
+- **FL** — Folk-Lore. London, 1890 ff.
 - **JAFL** — Journal of American Folk-Lore. 1888 ff.
+- **JE** — Publications of the Jesup North Pacific Expedition (Mem. AMNH).
 - **MAFLS** — Memoirs of the American Folk-Lore Society.
+- **MAGW** — Mitteilungen der Anthropologischen Gesellschaft in Wien.
+- **MSFO** — Mémoires de la Société Finno-Ougrienne. Helsinki.
 - **PMLA** — Publications of the Modern Language Association of America.
 - **RBAE** — Annual Report of the Bureau of American Ethnology.
 - **RMLP** — Revista do Museu Paulista. São Paulo.
@@ -43,6 +50,7 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 650 | `Thompson` | Thompson, Stith . The Folktale. New York, 1946 | [1](http://folkmasa.org/yashpeh/The_Folktale.pdf) |
 | 650 | `Thompson` | Thompson, Stith . The Star-Husband Tale ( Studia Septentrionalia IV). Oslo, 1952 | — |
 | 610 | `Malalasekera` | Malalasekera , George Peiris . Dictionary of Pali Proper Names. 2 vols. London, 1937 | — |
+| 591 | `Aarne` ✚ | Aarne, A. Comparative folktale-type monographs in FF Communications (e.g. FFC 8, 23, 25, 33). | [1](https://www.folklorefellows.fi/ffc-catalogue/) |
 | 508 | `Eberhard` | Eberhard , Wolfram. Chinese Fairy Tales and Folk Tales. London, 1937 | — |
 | 508 | `Eberhard` ✚ | Eberhard, W. & Boratav, P. N. Typen türkischer Volksmärchen (FFC). — and Eberhard, Typen chinesischer Volksmärchen (FFC 120). | [1](https://archive.org/search?query=Eberhard+Typen+chinesischer+Volksm%C3%A4rchen) |
 | 491 | `Wesselski Hodscha Nasreddin`, `Wesselski` ✚ | Wesselski, A. Der Hodscha Nasreddin. 2 vols. Weimar, 1911. | [1](https://archive.org/details/derhodschanasred01wess) |
@@ -57,11 +65,18 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 463 | `Frazer` | Frazer, J. G. Pousanias's Description of Greece. 6 vols. London, 1898. G | [Vol. I](https://archive.org/details/pausaniassdescri01pausuoft) · [Vol. IV](https://archive.org/details/pausaniassdescri04pausuoft) · [Vol. V](https://archive.org/details/pausaniassdescri05pausuoft) |
 | 459 | `Werner` | Werner, Alice. African Mythology (The Mythology of all Races VII). Boston, 1925 | [1](http://archive.org/stream/themythologyofal07alexuoft#page/n9/mode/2up) |
 | 459 | `Werner` | Werner, E. T. C. Myths and Legends of China. London, 1922 | [1](http://www.gutenberg.org/files/15250/15250-h/15250-h.htm) |
+| 458 | `Bolte` ✚ | Bolte, J. — co-author of BP (Bolte & Polívka); see BP. | [1](https://archive.org/details/AnmerkungenZuDenKinder-UndHausmaerchenDerGebruederGrimm1) |
 | 430 | `Wienert` ✚ | Wienert, W. Die Typen der griechisch-römischen Fabel (FFC 56). Helsinki, 1925. — source of the ET (Ethische Typen) and ST (Stofftypen) numbers. | [1](https://archive.org/search?query=Wienert+Typen+griechisch-r%C3%B6mischen+Fabel) |
 | 415 | `Fox` | Fox, William S. Greek and Roman Mythology (Mythology of all Races I). Boston, 1916 | [1](https://archive.org/stream/mythologyallrac04maccgoog#page/n8/mode/2up) |
 | 399 | `Dixon` | Dixon, Roland B. Oceanic Mythology (The Mythology of all Races IX). Boston, 1916 | [1](http://archive.org/stream/mythologyofall09gray#page/n7/mode/2up) |
+| 377 | `Espinosa` ✚ | Espinosa, A. M. Cuentos populares españoles. 3 vols. Stanford, 1923–26. | [1](https://onlinebooks.library.upenn.edu/webbin/book/lookupid?key=ha000869997) |
+| 377 | `Espinosa Jr.`, `Espinosa` ✚ | Espinosa, J. M. Spanish Folk-Tales from New Mexico (MAFLS 30). 1937. | [1](https://archive.org/search?query=Espinosa+Spanish+Folk-Tales+New+Mexico) |
+| 372 | `Rasmussen` ✚ | Rasmussen, K. Report of the Fifth Thule Expedition 1921–24 (Intellectual Culture of the Iglulik / Netsilik / Copper Eskimos). Copenhagen, 1929–32. | [1](https://archive.org/details/intellectualcult00rasm) |
 | 357 | `Alexander N. Am.`, `Alexander` | Alexander N. Am. = Alexander, H. B. North American Mythology (The Mythology of all Races X). Boston, 1916 | [1](http://archive.org/stream/themythologyofal10alexuoft#page/n11/mode/2up) |
+| 351 | `Boggs` ✚ | Boggs, R. S. Index of Spanish Folktales (FFC 90). Helsinki, 1930. | [1](https://en.wikisource.org/wiki/Index_of_Spanish_Folktales) |
 | 336 | `Child` | Child, Francis James. The English and Scottish Popular Ballads. 5 vols in 10. Boston, 1882–98 | [1](http://www.sacred-texts.com/neu/eng/child/) |
+| 319 | `Boas` ✚ | Boas, F. Tsimshian Mythology (RBAE 31), 1916; The Eskimo of Baffin Land and Hudson Bay (BAM XV), 1901–07; and many papers in JAFL/BAM/RBAE. | [1](https://archive.org/search?query=Boas+Tsimshian+Mythology) |
+| 317 | `Halm Aesop`, `Halm` ✚ | Halm, K. Fabulae Aesopicae Collectae. Leipzig, 1875. | [1](https://archive.org/details/fabulaeaesopica00aesogoog) |
 | 304 | `Grimm` ✚ | Grimm, J. & W. Kinder- und Hausmärchen (cited by tale number). Berlin, 1857. | [1](https://www.gutenberg.org/ebooks/2591) |
 | 293 | `Beal` | Beal = Bealoideas : Journal of the Folklore of Ireland Society | — |
 | 292 | `Kittredge` | Kittredge, G. L. Arthur and Gorlagon (Harvard Studies and Notes in Philology and Literature VIII). Boston, 1903 | [1](https://archive.org/details/cu31924027098072) |
@@ -75,17 +90,24 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 258 | `Grote` | Grote, George. History of Greece. 3 vols. London, 1888 | [1](http://onlinebooks.library.upenn.edu/webbin/metabook?id=grotegreece) |
 | 258 | `O'Suilleabhain` | O'Suilleabhain , S. Scealta Craibhtheacha . Dublin, 1952. P | — |
 | 257 | `MAFLS` | MAFLS = Memoirs of the American Folk-Lore Society | — |
+| 253 | `Jegerlehner Oberwallis`, `Jegerlehner` ✚ | Jegerlehner, J. Sagen und Märchen aus dem Oberwallis. Basel, 1913. | [1](https://catalog.hathitrust.org/Record/001675073) |
 | 243 | `Gaster` | Gaster , Moses.The Exempla of the Rabbis. London, Leipzig, 1924 | — |
 | 243 | `Gaster` | Gaster , Moses.Studies and Texts in Folklore, Magic, Medieval Romance, Hebrew Apocrypha and Samaritan Archaeology. 3 vols. London, 1925–28 | — |
 | 243 | `Gaster` | Gaster , Theodor H. The Oldest Stories in the World. New York, 1952 | — |
 | 243 | `Gaster` | Gaster , Theodor H. Thespis. New York, 1950. Gautreks Saga (ed. W. Ranisch , Palaestra XI). 1900 | [1](http://www.vsnrweb-publications.org.uk/Saga-Book%20XI.pdf) |
 | 242 | `Rink` | Rink, Henry. Tales and Traditions of the Eskimo. Edinburgh, 1875 | [1](http://sacred-texts.com/nam/inu/tte/index.htm) |
 | 241 | `Talbot` | Talbot, P. A. In the Shadow of the Bush. New York and London, 1912 | [1](https://archive.org/details/inshadowofbush00perc) |
+| 238 | `Sob` ✚ | Zong In-Sob. Folk Tales from Korea. London, 1952. (cited as 'Korean: Zong in-Sob') | [1](https://archive.org/search?query=Zong+In-Sob+Folk+Tales+from+Korea) |
 | 235 | `Wells` | Wells, John Edwin. A Manual of Writings in Middle English. New Haven, 1916 | [1](https://archive.org/details/manualofwritings00welluoft) |
 | 227 | `Flowers` | Flowers, Helen L. A Classification of the Folktales of the West Indies by Types and Motifs. (Indiana University Ph. D. thesis, 1952.) Microfilm Service, Ann Arbor, Michigan, 1953 | [1](http://catalog.hathitrust.org/Record/000725392) |
+| 225 | `Wessman` ✚ | Wessman, V. E. V. Finlands svenska folkdiktning (FFC / SLS). Helsingfors. | [1](https://www.folklorefellows.fi/ffc-catalogue/) |
+| 214 | `Holmberg Siberian`, `Holmberg` ✚ | Holmberg (Harva), U. Finno-Ugric, Siberian (The Mythology of All Races IV). Boston, 1927. | [1](https://archive.org/details/finnougricsiberi0000unoh) |
 | 209 | `Scala Celi`, `Scala` | Scala Celi = Johannes Gobii junior. Scala Celi . Lübeck , 1476 | — |
 | 208 | `Dickson` | Dickson, Arthur. Valentine and Orson, a study in late Medieval Romance. New York, 1929 | [1](http://catalog.hathitrust.org/Record/001087502) |
 | 207 | `Herbert` | Herbert, J. A. Catalogue of Romances in the Department of Manuscripts in the British Museum. London, 1910. (Vol. 3 only; for vols. 1 and 2 see Ward, H. L. D.) | [Vol. I](https://archive.org/details/catalogueromanc00wardgoog) · [Vol. II](https://archive.org/details/catalogueromanc01wardgoog) · [Vol. III](https://archive.org/details/catalogueofroman03brit) |
+| 203 | `Newman` ✚ | Newman / Neuman, D. Motif-Index of Talmudic-Midrashic Literature. Indiana University, 1954. (variant spelling of Neuman) | [1](https://archive.org/search?query=Neuman+Motif-Index+Talmudic) |
+| 197 | `Parsons` ✚ | Parsons, E. C. Folk-Lore of the Sea Islands / Antilles (MAFLS). | [1](https://archive.org/search?query=Parsons+Folk-Lore+Antilles+Memoirs) |
+| 195 | `Andrejev` ✚ | Andrejev, N. P. Index of Ukrainian Folktale Types (FFC 69). 1927. | [1](https://www.folklorefellows.fi/ffc-catalogue/) |
 | 188 | `Krappe` | Krappe , A. H. Balor with the Evil Eye: Studies in Celtic and French Literature. New York, 1927 | [1](http://babel.hathitrust.org/cgi/pt?id=mdp.39015005669091;view=1up;seq=7) |
 | 188 | `Krappe` | Krappe , A. H. The Science of Folk-Lore . London, 1930 | — |
 | 181 | `Gifford` | Gifford, E. W. Tongan Myths and Tales. BMB VIII. Honolulu 1924 | [1](http://babel.hathitrust.org/cgi/pt?id=uc1.32106006368457;view=1up;seq=9) |
@@ -99,6 +121,7 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 155 | `Theal` | Theal , G. M. Kaffir Folk-lore . London, 1886.  *The Yellow and Dark-skinned People of Africa South of the Zambesi . London, 1910 | [1](https://archive.org/details/yellowdarkskinne00thea) · [2](http://www.sacred-texts.com/afr/xft/) |
 | 140 | `Callaway` | Callaway, H. Nursery Tales, Traditions , and Histories of the Zulus. Vol. I. Natal and London, 1868 | [1](https://archive.org/details/nurserytalestra00callgoog) |
 | 139 | `Kristensen Danske Sagn`, `Kristensen` ✚ | Kristensen, E. T. Danske Sagn. 6 vols. Aarhus, 1892–1901. | [1](https://archive.org/search?query=Kristensen+Danske+Sagn) |
+| 133 | `Herrmann Saxo`, `Herrmann` ✚ | Herrmann, P. Erläuterungen zu den ersten neun Büchern der dänischen Geschichte des Saxo Grammaticus. 2 vols. Leipzig, 1901–22. | [1](https://archive.org/search?query=Herrmann+Saxo+Grammaticus+Erl%C3%A4uterungen) |
 | 130 | `Carnoy` | Carnoy , Albert J. Iranian Mythology (The Mythology of all Races VI). Boston, 1917 | [1](http://archive.org/stream/themythologyofal06alexuoft#page/n9/mode/2up) |
 | 130 | `Cox` | Cox, Marian R. Cinderella (PFLS XXXI). London, 1893 | [1](http://www.surlalunefairytales.com/cinderella/marianroalfecox/) |
 | 127 | `Harris` | Harris, J. R. Boanerges . Cambridge (Eng.), 1913 | — |
@@ -110,14 +133,20 @@ as a curated supplement. `uses` = approximate citation count in the built TMI da
 | 125 | `Chatelain` | Chatelain , Heli . Folk-Tales of Angola (MAFLS I). Boston and New York, 1894 | [1](https://archive.org/details/folktalesangola00chatgoog) |
 | 125 | `Cole` | Cole, Fay Cooper. Traditions of the Tinguian : A Study in Philippine Folk-Lore . FM XIV. Chicago, 1915 | [1](http://www.gutenberg.org/files/12545/12545-h/12545-h.htm) |
 | 122 | `Clark` | Clark, Mrs. K. M. Maori Tales and Legends. London, 1896 | — |
+| 116 | `Loorits` ✚ | Loorits, O. Estonian folk-narrative monographs in FF Communications. | [1](https://www.folklorefellows.fi/ffc-catalogue/) |
+| 114 | `Vries` ✚ | de Vries, J. Die Märchen von klugen Rätsellösern (FFC 73). Helsinki, 1928. | [1](https://www.folklorefellows.fi/ffc-catalogue/) |
 | 113 | `Anesaki` | Anesaki , Masaharu . Japanese Mythology (The Mythology of all Races VIII). Boston, 1928. Argonautica of Apollonius Rhodius (ed. G. W. Mooney). London, 1912. B | [1](http://archive.org/stream/mythologyofallra08gray#page/n13/mode/2up) · [2](http://www.gutenberg.org/files/830/830-h/830-h.htm) |
 | 112 | `Clouston` | Clouston , W. A. The Book of Noodles. London, 1888 | [1](http://sacred-texts.com/etc/bon/index.htm) |
 | 112 | `Clouston` | Clouston , W. A. A Group of Eastern Romances and Stories. Glasgow, 1889 | [1](https://archive.org/details/groupofeasternro00clou) |
 | 112 | `Clouston` | Clouston , W. A. Popular Tales and Fictions. 2 vols. Edinburgh, London, 1887 | [1](https://archive.org/details/populartalesfict02clouuoft) |
 | 106 | `Jenness` | Jenness , Diamond. Notes and Traditions from Northern Alaska (Report of the Canadian Arctic Expedition, Southern Party, 1913–16, XIII). Ottawa, 1924 | — |
 | 96 | `FFC` | FFC = FF Communications , published by the Folklore Fellows. Helsinki, 1907 ff | — |
+| 93 | `Gorion Born Judas`, `Gorion` ✚ | bin Gorion (Berdichevsky), M. J. Der Born Judas. 6 vols. Leipzig, 1916–23. | [1](https://archive.org/details/derbornjudaslege06berd) |
+| 92 | `Fansler` ✚ | Fansler, D. S. Filipino Popular Tales (MAFLS 12). Lancaster, 1921. | [1](https://www.gutenberg.org/ebooks/8299) |
 | 90 | `Patch` | Patch, H. R. *The Goddess Fortuna in Mediaeval Literature. Cambridge (Mass.), 1927 | — |
 | 90 | `Patch` | Patch, H. R. *The Other World According to Descriptions in Medieval Literature. Cambridge (Mass.), 1950 | — |
+| 88 | `Heptameron` ✚ | Marguerite de Navarre. The Heptameron. | [1](https://www.gutenberg.org/ebooks/17701) |
+| 87 | `Cent Nouvelles Nouvelles`, `Cent` ✚ | Les Cent Nouvelles Nouvelles (15th-c. French tale collection). | [1](https://archive.org/search?query=Cent+Nouvelles+Nouvelles) |
 | 86 | `Weeks` | Weeks, John H. *Among Congo Cannibals. London, 1913 | [1](https://archive.org/details/amongcongocannib00weekuoft) |
 | 86 | `Weeks` | Weeks, John H.*Jungle Life and Jungle Stories. London, 1923 | [1](http://babel.hathitrust.org/cgi/pt?id=inu.30000005477298;view=1up;seq=9) |
 | 86 | `Weeks` | Weeks, John H. Anthropological Notes on the Bangola of the Upper Congo River (JAI XXXIX, 1909) | — |

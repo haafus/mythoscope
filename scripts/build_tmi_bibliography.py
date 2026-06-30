@@ -64,6 +64,64 @@ CURATED = {
     "Eberhard": ("Eberhard, W. & Boratav, P. N. Typen türkischer Volksmärchen "
                  "(FFC). — and Eberhard, Typen chinesischer Volksmärchen (FFC 120).",
                  "https://archive.org/search?query=Eberhard+Typen+chinesischer+Volksm%C3%A4rchen"),
+    # --- tail: FFC monographs, regional collections, and classic texts ---
+    "Boggs": ("Boggs, R. S. Index of Spanish Folktales (FFC 90). Helsinki, 1930.",
+              "https://en.wikisource.org/wiki/Index_of_Spanish_Folktales"),
+    "Halm Aesop": ("Halm, K. Fabulae Aesopicae Collectae. Leipzig, 1875.",
+                   "https://archive.org/details/fabulaeaesopica00aesogoog"),
+    "Jegerlehner Oberwallis": (
+        "Jegerlehner, J. Sagen und Märchen aus dem Oberwallis. Basel, 1913.",
+        "https://catalog.hathitrust.org/Record/001675073"),
+    "Sob": ("Zong In-Sob. Folk Tales from Korea. London, 1952. "
+            "(cited as 'Korean: Zong in-Sob')",
+            "https://archive.org/search?query=Zong+In-Sob+Folk+Tales+from+Korea"),
+    "Wessman": ("Wessman, V. E. V. Finlands svenska folkdiktning (FFC / SLS). Helsingfors.",
+                "https://www.folklorefellows.fi/ffc-catalogue/"),
+    "Aarne": ("Aarne, A. Comparative folktale-type monographs in FF Communications "
+              "(e.g. FFC 8, 23, 25, 33).",
+              "https://www.folklorefellows.fi/ffc-catalogue/"),
+    "Rasmussen": ("Rasmussen, K. Report of the Fifth Thule Expedition 1921–24 "
+                  "(Intellectual Culture of the Iglulik / Netsilik / Copper Eskimos). "
+                  "Copenhagen, 1929–32.",
+                  "https://archive.org/details/intellectualcult00rasm"),
+    "Holmberg Siberian": (
+        "Holmberg (Harva), U. Finno-Ugric, Siberian (The Mythology of All Races IV). "
+        "Boston, 1927.",
+        "https://archive.org/details/finnougricsiberi0000unoh"),
+    "Fansler": ("Fansler, D. S. Filipino Popular Tales (MAFLS 12). Lancaster, 1921.",
+                "https://www.gutenberg.org/ebooks/8299"),
+    "Espinosa": ("Espinosa, A. M. Cuentos populares españoles. 3 vols. Stanford, 1923–26.",
+                 "https://onlinebooks.library.upenn.edu/webbin/book/lookupid?key=ha000869997"),
+    "Espinosa Jr.": ("Espinosa, J. M. Spanish Folk-Tales from New Mexico (MAFLS 30). 1937.",
+                     "https://archive.org/search?query=Espinosa+Spanish+Folk-Tales+New+Mexico"),
+    "Gorion Born Judas": (
+        "bin Gorion (Berdichevsky), M. J. Der Born Judas. 6 vols. Leipzig, 1916–23.",
+        "https://archive.org/details/derbornjudaslege06berd"),
+    "Andrejev": ("Andrejev, N. P. Index of Ukrainian Folktale Types (FFC 69). 1927.",
+                 "https://www.folklorefellows.fi/ffc-catalogue/"),
+    "Loorits": ("Loorits, O. Estonian folk-narrative monographs in FF Communications.",
+                "https://www.folklorefellows.fi/ffc-catalogue/"),
+    "Vries": ("de Vries, J. Die Märchen von klugen Rätsellösern (FFC 73). Helsinki, 1928.",
+              "https://www.folklorefellows.fi/ffc-catalogue/"),
+    "Herrmann Saxo": (
+        "Herrmann, P. Erläuterungen zu den ersten neun Büchern der dänischen "
+        "Geschichte des Saxo Grammaticus. 2 vols. Leipzig, 1901–22.",
+        "https://archive.org/search?query=Herrmann+Saxo+Grammaticus+Erl%C3%A4uterungen"),
+    "Parsons": ("Parsons, E. C. Folk-Lore of the Sea Islands / Antilles (MAFLS).",
+                "https://archive.org/search?query=Parsons+Folk-Lore+Antilles+Memoirs"),
+    "Cent Nouvelles Nouvelles": (
+        "Les Cent Nouvelles Nouvelles (15th-c. French tale collection).",
+        "https://archive.org/search?query=Cent+Nouvelles+Nouvelles"),
+    "Heptameron": ("Marguerite de Navarre. The Heptameron.",
+                   "https://www.gutenberg.org/ebooks/17701"),
+    "Bolte": ("Bolte, J. — co-author of BP (Bolte & Polívka); see BP.",
+              "https://archive.org/details/AnmerkungenZuDenKinder-UndHausmaerchenDerGebruederGrimm1"),
+    "Newman": ("Newman / Neuman, D. Motif-Index of Talmudic-Midrashic Literature. "
+               "Indiana University, 1954. (variant spelling of Neuman)",
+               "https://archive.org/search?query=Neuman+Motif-Index+Talmudic"),
+    "Boas": ("Boas, F. Tsimshian Mythology (RBAE 31), 1916; The Eskimo of Baffin "
+             "Land and Hudson Bay (BAM XV), 1901–07; and many papers in JAFL/BAM/RBAE.",
+             "https://archive.org/search?query=Boas+Tsimshian+Mythology"),
 }
 
 # Series acronyms worth spelling out even when used bare (some are also in the
@@ -80,6 +138,13 @@ SERIES = {
     "RMLP": "Revista do Museu Paulista. São Paulo.",
     "ET": "Wienert, Ethische Typen (see Wienert FFC 56).",
     "ST": "Wienert, Stofftypen (see Wienert FFC 56).",
+    "DF": "Danmarks Folkeminder. Copenhagen, 1908 ff.",
+    "MSFO": "Mémoires de la Société Finno-Ougrienne. Helsinki.",
+    "BMB": "Bernice P. Bishop Museum Bulletin. Honolulu.",
+    "JE": "Publications of the Jesup North Pacific Expedition (Mem. AMNH).",
+    "FL": "Folk-Lore. London, 1890 ff.",
+    "CColl": "Colorado College Publication, Language Series.",
+    "MAGW": "Mitteilungen der Anthropologischen Gesellschaft in Wien.",
 }
 
 
