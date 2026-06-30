@@ -471,9 +471,11 @@ function drawCharts(s, attempt = 0) {
     }, e);
     const vbar = (id, rows, xk, yk, extra) => P.newPlot(id,
         [{ type: "bar", x: rows.map((r) => r[xk]), y: rows.map((r) => r[yk]), marker: { color: ACC } }], lay(extra), cfg);
+    // Height scales with the row count so Plotly shows every bar's label (it
+    // decimates labels when many bars are crammed into a fixed height).
     const hbar = (id, rows, label, val, extra) => P.newPlot(id,
         [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color: ACC } }],
-        lay(Object.assign({ margin: { l: 160, r: 12, t: 8, b: 30 } }, extra)), cfg);
+        lay(Object.assign({ height: Math.max(240, rows.length * 19 + 24), margin: { l: 160, r: 12, t: 8, b: 30 } }, extra)), cfg);
 
     if (s.index === "tmi") {
         P.newPlot("ovComposition", [{
