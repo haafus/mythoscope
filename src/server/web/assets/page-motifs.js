@@ -135,6 +135,7 @@ async function browseChapterLevel0(chapter) {
     mState.browseChapter = chapter;
     mState.browseView = "chapter";
     markActive(null);
+    detail.innerHTML = "";
     try {
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
         if (mState.flatList) {
@@ -213,8 +214,7 @@ async function openMotif(index, id) {
     markActive(id);
 
     const detail = document.getElementById("motifsDetail");
-    // Keep the current view until the (fast, local) fetch resolves — no "Loading"
-    // flash on link navigation.
+    detail.innerHTML = "";  // blank intermediate screen during the switch (no "Loading" text)
     try {
         const params = new URLSearchParams({ id });
         const data = await api(`/api/motifs/${index}/motif?${params.toString()}`);
@@ -406,6 +406,7 @@ async function browseRoot() {
     mState.browseChapter = null;
     mState.browseView = "root";
     markActive(null);
+    detail.innerHTML = "";
     try {
         const rows = [rootRow(0, { current: true })];
         if (mState.flatList) {
@@ -433,6 +434,7 @@ async function renderOverview() {
     mState.browseChapter = null;
     mState.browseView = null;
     markActive(null);
+    detail.innerHTML = "";
     try {
         const s = await api(`/api/motifs/${mState.index}/stats`);
         detail.innerHTML = overviewHtml(s);
@@ -495,6 +497,7 @@ function drawCharts(s, attempt = 0) {
         vbar("bzChapters", s.chapters, "id", "count");
         vbar("bzRegions", s.regions, "region", "count", { margin: { l: 44, r: 12, t: 8, b: 96 }, xaxis: { tickangle: -40 } });
         hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
+        hbar("bzWidest", s.widest.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
         vbar("bzBreadth", s.breadth, "bucket", "count");
     } else if (s.index === "atu") {
         hbar("atChapters", s.chapters.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });

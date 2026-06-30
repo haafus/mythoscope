@@ -333,6 +333,12 @@ def _build_berezkin_stats() -> dict:
                 regs.add(reg)
         for reg in regs:
             regions[reg] += 1
+    # Aggregate areas by decoded name (several codes share a name, e.g. 27/28 =
+    # "Балканы") so duplicate labels don't stack into one oversized bar.
+    by_name: collections.Counter = collections.Counter()
+    for code, c in areas.items():
+        by_name[legend.get(str(code), f"#{code}")] += c
+    widest = sorted(records, key=lambda r: len(r.get("areas", [])), reverse=True)[:15]
     return {
         "index": "berezkin",
         "title": "Berezkin & Duvakin areal motif catalogue — overview",
@@ -347,11 +353,14 @@ def _build_berezkin_stats() -> dict:
             {"id": "bzChapters", "title": "Motifs per chapter"},
             {"id": "bzRegions", "title": "Motifs by region"},
             {"id": "bzAreas", "title": "Top areas (most attested)"},
+            {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
             {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
         ],
         "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
-        "top_areas": [{"label": legend.get(str(a), f"#{a}"), "count": c} for a, c in areas.most_common(20)],
+        "top_areas": [{"label": name, "count": c} for name, c in by_name.most_common(20)],
+        "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
+                   for r in widest],
         "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
     }
 
