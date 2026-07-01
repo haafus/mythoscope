@@ -63,19 +63,28 @@ def build_motifs(*, force: bool = False) -> None:
         berezkin_motifs = berezkin_data["motifs"]
         counts["berezkin"] = len(berezkin_motifs)
         sources["berezkin"] = {"homepage": home, "attribution": bz_cfg.get("attribution", "")}
-        logger.info("      %d motifs across %d chapters; %d Russian definitions from detail pages",
-                    len(berezkin_motifs), len([c for c in berezkin_data.get("chapters", {})]),
-                    _applied(berezkin_motifs, lambda m: m.get("definition") and not m.get("definition_rus")))
+        # Base scrape (areasofmyths.com), before any enrichment. "with a definition"
+        # counts a definition from the detail page whether or not English later
+        # replaced it (the original is kept as definition_rus).
+        logger.info("      base scrape (areasofmyths.com): %d motifs, %d chapters, %d with a definition",
+                    len(berezkin_motifs), len(berezkin_data.get("chapters", {})),
+                    _applied(berezkin_motifs, lambda m: m.get("definition") or m.get("definition_rus")))
         if mm.get("skipped"):
-            logger.info("      enrichment from mapsofmyths.com SKIPPED (%s) — Russian names/definitions only", mm["skipped"])
+            logger.info("      + mapsofmyths.com enrichment SKIPPED (%s) — Russian names/definitions only", mm["skipped"])
         else:
-            logger.info("      enriched from mapsofmyths.com: English name ×%d, English definition ×%d, "
-                        "type/group ×%d, direct TMI links ×%d, tradition sets ×%d; tradition catalogue: %d entries",
-                        _applied(berezkin_motifs, lambda m: m.get("name_rus")),
-                        _applied(berezkin_motifs, lambda m: m.get("definition_rus")),
-                        _applied(berezkin_motifs, lambda m: m.get("motif_type")),
-                        _applied(berezkin_motifs, lambda m: m.get("tmi_refs")),
-                        _applied(berezkin_motifs, lambda m: m.get("traditions")),
+            # Each line = how many of the 3488 motifs gained this from mapsofmyths.
+            logger.info("      + mapsofmyths.com enrichment (motifs gaining each field):")
+            logger.info("          English name (Russian kept as subtitle): %d",
+                        _applied(berezkin_motifs, lambda m: m.get("name_rus")))
+            logger.info("          English definition                     : %d",
+                        _applied(berezkin_motifs, lambda m: m.get("definition_rus")))
+            logger.info("          thematic type/group                    : %d",
+                        _applied(berezkin_motifs, lambda m: m.get("motif_type")))
+            logger.info("          direct TMI links                       : %d",
+                        _applied(berezkin_motifs, lambda m: m.get("tmi_refs")))
+            logger.info("          areal tradition sets                   : %d",
+                        _applied(berezkin_motifs, lambda m: m.get("traditions")))
+            logger.info("          (named tradition catalogue pulled: %d traditions)",
                         len(berezkin_data.get("traditions", {})))
 
     # --- [2/3] TMI + [3/3] ATU (from the j-hagedorn/trilogy dataset) ---
