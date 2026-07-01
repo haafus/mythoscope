@@ -18,10 +18,12 @@ const GRAPH_CATEGORY_COLORS = {
 };
 
 const GRAPH_INFO_FIELDS = {
-    beings: ["Name", "Category", "Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"],
-    realms: ["Name", "Category", "Description", "Function", "Adjacent To", "Degree", "BetweennessCentrality"],
-    ages: ["Name", "Category", "Description", "Keyactors", "Keyevents", "Degree"],
+    beings: ["Description", "Roles", "Epithets", "Attributes", "Actions", "Degree", "BetweennessCentrality"],
+    realms: ["Description", "Function", "Adjacent To", "Degree", "BetweennessCentrality"],
+    ages: ["Description", "Keyactors", "Keyevents", "Degree"],
 };
+// Numeric metrics stay as a compact two-column table at the end of the panel.
+const GRAPH_METRIC_FIELDS = new Set(["Degree", "BetweennessCentrality"]);
 
 export async function renderGraphPage(graphType) {
     app.innerHTML = `
@@ -211,14 +213,21 @@ function renderCytoscapeGraph(container, data, graphType) {
 
         const d = evt.target.data();
         const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.beings;
-        let html = `<h4>${escapeHtml(d.display_name || d.Name || d.id)}</h4><table>`;
+        let html = `<h4>${escapeHtml(d.display_name || d.Name || d.id)}</h4>`;
+        let metrics = "";
         fields.forEach((f) => {
-            if (d[f] !== undefined && d[f] !== null && d[f] !== "") {
-                const value = typeof d[f] === "object" ? JSON.stringify(d[f]) : d[f];
-                html += `<tr><th>${escapeHtml(f)}</th><td>${escapeHtml(value)}</td></tr>`;
+            if (d[f] === undefined || d[f] === null || d[f] === "") return;
+            const value = typeof d[f] === "object" ? JSON.stringify(d[f]) : String(d[f]);
+            if (GRAPH_METRIC_FIELDS.has(f)) {
+                metrics += `<tr><th>${escapeHtml(f)}</th><td>${escapeHtml(value)}</td></tr>`;
+            } else if (f === "Description") {
+                html += `<p class="graph-info-desc">${escapeHtml(value)}</p>`;  // no label, straight to text
+            } else {
+                html += `<div class="graph-info-field"><div class="graph-info-label">${escapeHtml(f)}</div>`
+                      + `<div class="graph-info-value">${escapeHtml(value)}</div></div>`;
             }
         });
-        html += "</table>";
+        if (metrics) html += `<table>${metrics}</table>`;
         infoContent.innerHTML = html;
     });
 

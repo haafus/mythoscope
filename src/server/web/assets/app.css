@@ -1199,11 +1199,18 @@ body.has-main-navbar {
     font-size: 13px;
 }
 
-.graph-info-panel table { width: 100%; border-collapse: collapse; }
+.graph-info-panel table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 .graph-info-panel th, .graph-info-panel td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
 .graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; }
 .graph-info-panel td { color: #2c3e50; width: 65%; }
 .graph-info-panel h4 { margin: 0 0 8px 0; color: #5e4b8b; }
+
+/* Text fields stacked single-column: label heading over its value. Description
+   has no label — it leads straight with the text. */
+.graph-info-desc { margin: 0 0 12px; color: #2c3e50; line-height: 1.5; }
+.graph-info-field { margin-bottom: 10px; }
+.graph-info-label { font-weight: 600; color: #4a4a4a; margin-bottom: 2px; }
+.graph-info-value { color: #2c3e50; line-height: 1.45; }
 
 .graph-edge-tooltip {
     position: absolute;
