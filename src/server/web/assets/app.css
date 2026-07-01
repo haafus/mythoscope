@@ -1379,6 +1379,10 @@ body.has-main-navbar {
 
 .motifs-item:hover { background: #f4f6f7; }
 .motifs-item.active { background: #e2edf0; }
+/* Selection is shown by .active; a click leaves a stray focus ring on the old
+   item while ↑/↓ moves .active elsewhere. Drop the ring for mouse focus, keep
+   it for keyboard (Tab) focus. */
+.motifs-item:focus:not(:focus-visible) { outline: none; }
 
 .motifs-item-id {
     flex: 0 0 auto;
