@@ -45,7 +45,7 @@ def build_motifs(*, force: bool = False) -> None:
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
     enrichment: dict[str, dict] = {}
-    logger.info("=== Building the motif database: 3 indexes (Berezkin, TMI, ATU) ===")
+    logger.info("=== Building the motif database: 3 indexes + cross-walk (Berezkin, TMI, ATU) ===")
 
     # --- mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
     #     traditions) — credential-gated; a no-op skips the enrichment. ---
@@ -56,7 +56,7 @@ def build_motifs(*, force: bool = False) -> None:
     bz_cfg = config.get("berezkin", {})
     if bz_cfg.get("enabled", True):
         home = bz_cfg.get("homepage", "areasofmyths.com")
-        logger.info("[1/3] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
+        logger.info("[1/4] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
                     home, bz_cfg.get("index_page", "index page"))
         berezkin_data = berezkin.build(bz_cfg, force=force)
         save_json(store.index_path("berezkin"), berezkin_data)
@@ -87,7 +87,7 @@ def build_motifs(*, force: bool = False) -> None:
         files = tr_cfg.get("files", {})
         # Header before the build so any TMI parse warnings appear under it, not
         # ahead of it (mirrors the [1/3] Berezkin step).
-        logger.info("[2/3] Thompson Motif-Index (TMI) — source: %s (%s)",
+        logger.info("[2/4] Thompson Motif-Index (TMI) — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
         trilogy_data = trilogy.build(tr_cfg, force=force)
         save_json(store.index_path("tmi"), trilogy_data["tmi"])
@@ -111,16 +111,18 @@ def build_motifs(*, force: bool = False) -> None:
         bib = enrichment["bibliography"]
         logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
                     "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
-        logger.info("[3/3] Aarne-Thompson-Uther (ATU) tale types — source: %s (%s)",
+        logger.info("[3/4] Aarne-Thompson-Uther (ATU) tale types — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"),
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
         logger.info("      %d tale types", len(atu_types))
 
-    # --- Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via title refs) ---
+    # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
+    #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
+    logger.info("[4/4] Cross-walk — deriving id links across the three indexes")
     links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids)
     save_json(store.crosswalk_path(), links)
-    logger.info("[cross-walk] derived id links: ATU<->TMI %d/%d, Berezkin<->ATU %d/%d, "
-                "Berezkin<->TMI (direct) %d/%d (%d TMI motifs reachable from a tale type)",
+    logger.info("      ATU<->TMI %d/%d, Berezkin<->ATU %d/%d, Berezkin<->TMI (direct) %d/%d "
+                "(%d TMI motifs reachable from a tale type)",
                 len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
                 len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]),
                 len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]), links["linked_tmi_count"])
