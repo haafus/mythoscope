@@ -38,6 +38,19 @@ def _split_multi(value) -> list[str]:
     return []
 
 
+def _flatten_scalars(value) -> list[str]:
+    """Flatten a metadata value to a list of scalar strings. A dict contributes
+    its values (its keys are attribute categories, e.g. {'Power': 'Strong hand'});
+    lists and nested containers recurse; empty pieces drop out. Keeps a metadata
+    field from rendering a raw "{'k': 'v'}" fragment inside its joined string."""
+    if isinstance(value, dict):
+        return [s for v in value.values() for s in _flatten_scalars(v)]
+    if isinstance(value, (list, tuple)):
+        return [s for v in value for s in _flatten_scalars(v)]
+    s = str(value).strip()
+    return [s] if s and not is_empty(s) else []
+
+
 def _entity_index(entities: list[dict]) -> tuple[dict[str, str], dict[str, dict]]:
     """Build {normalized name -> display name} and {normalized name -> metadata}.
 
@@ -57,8 +70,14 @@ def _entity_index(entities: list[dict]) -> tuple[dict[str, str], dict[str, dict]
             if _norm_key(key) == "name" or is_empty(value):
                 continue
             label = str(key).strip().title()
-            if label not in meta:
-                meta[label] = ", ".join(map(str, value)) if isinstance(value, list) else value
+            if label in meta:
+                continue
+            if isinstance(value, (list, tuple, dict)):
+                joined = ", ".join(_flatten_scalars(value))
+                if joined:
+                    meta[label] = joined
+            else:
+                meta[label] = value
     return display, metadata
 
 

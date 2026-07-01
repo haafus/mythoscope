@@ -48,6 +48,16 @@ class TestBeingsGraph:
         assert "Attributes" not in node  # empty dict must not survive as "{}"
         assert "Epithets" not in node and "Roles" not in node
 
+    def test_dict_metadata_flattened_to_values(self, tmp_path):
+        beings = [{"Name": "God", "Attributes": [
+            "Merciful", {"Power": "Omnipotent", "Promise": "Faithful"}, "Just",
+        ]}]
+        generate_beings_graph(beings, [], tmp_path)
+        node = {n["id"]: n for n in _load(tmp_path / "beings.json")["nodes"]}["God"]
+        # dict elements contribute their values, not a raw "{'Power': ...}" fragment
+        assert node["Attributes"] == "Merciful, Omnipotent, Faithful, Just"
+        assert "{" not in node["Attributes"]
+
 
 class TestTopMentioned:
     def test_picks_most_mentioned(self):
