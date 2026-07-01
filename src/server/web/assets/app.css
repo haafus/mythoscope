@@ -1656,7 +1656,7 @@ body.has-main-navbar {
 .motif-cultures {
     display: grid;
     grid-template-columns: max-content max-content 1fr;
-    column-gap: 24px;
+    column-gap: 34px;
     row-gap: 16px;              /* between region groups */
     align-items: baseline;
     margin-top: 12px;

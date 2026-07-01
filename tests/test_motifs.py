@@ -246,6 +246,13 @@ class TestTrilogy:
             "Devil sows stones; God sends cold to prevent their growing. Lithuanian: Balys.")
         assert out["definition"] == "Devil sows stones; God sends cold to prevent their growing"
 
+    def test_notes_culture_after_leading_xref(self):
+        # A leading '(Cf. †…)' xref, once stripped, leaves a stray '.'; the culture
+        # after it must still parse, not fall through to references (A15.3.1 'Inca').
+        out = tmi_notes.parse_notes("(Cf. †A1.2.). Inca: Rowe BBAE CXLIII (2) 316.")
+        assert out["cultures"] == {"Inca": ["Rowe BBAE CXLIII (2) 316"]}
+        assert out["see_also"]["cf"] == ["A1.2"]
+
     def test_notes_extracts_see_also_and_cf(self):
         out = tmi_notes.parse_notes("Hero deceives the ogre. (Cf. †A116.2). See †K1611.")
         assert out["see_also"]["cf"] == ["A116.2"]

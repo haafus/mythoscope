@@ -53,6 +53,12 @@ def parse_notes(notes: str | None) -> dict:
     # so the first culture label sits at a boundary the parser recognises.
     cleaned = _strip_xrefs(notes).lstrip("-– ").strip()
     definition, biblio = _split_definition(cleaned)
+    # The definition split can land on a '.' boundary (e.g. after a leading
+    # '(Cf. †…)' xref was removed, or a 'definition. Culture:' sentence break),
+    # leaving the bibliography with a stray leading '.'. _LABEL treats ';' and
+    # ' --' as group boundaries but not '.', so the first culture would be missed
+    # — drop the leading dot(s) so it is recognised. (' --' has no leading dot.)
+    biblio = biblio.lstrip(".")
     return {
         "definition": definition,
         "cultures": _cultures(biblio),
