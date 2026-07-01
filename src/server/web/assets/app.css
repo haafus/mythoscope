@@ -1650,8 +1650,17 @@ body.has-main-navbar {
 /* Attestations grouped by macro-region: region header once, then one culture
    per row (label at left, its citation link(s) stacked at right). */
 .motif-cultures { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
-.motif-culture-group { display: flex; flex-direction: column; gap: 3px; }
+/* Grid: column 1 sizes to the widest culture name in the group (+ gap), so the
+   label column is exactly as wide as its names, and citations align in column 2. */
+.motif-culture-group {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 14px;
+    row-gap: 3px;
+    align-items: baseline;
+}
 .motif-culture-region-head {
+    grid-column: 1 / -1;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -1659,9 +1668,9 @@ body.has-main-navbar {
     color: #a8b1ba;
     margin-bottom: 3px;
 }
-.motif-culture-row { display: flex; align-items: baseline; gap: 12px; }
-.motif-culture-label { flex: 0 0 20%; font-weight: 700; font-size: 14px; color: #1f3a4d; }
-.motif-culture-cites { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.motif-culture-row { display: contents; }  /* label & cites become grid cells */
+.motif-culture-label { font-weight: 700; font-size: 14px; color: #1f3a4d; }
+.motif-culture-cites { min-width: 0; display: flex; flex-direction: column; }
 .motif-culture-cite { line-height: 1.5; font-size: 14px; color: #2a2f36; }
 
 /* Raw source notes shown verbatim at the end — set apart as a quote. */
