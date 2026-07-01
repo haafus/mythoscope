@@ -1203,7 +1203,7 @@ body.has-main-navbar {
 .graph-info-panel th, .graph-info-panel td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
 .graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; }
 .graph-info-panel td { color: #2c3e50; width: 65%; }
-.graph-info-panel h4 { margin: 0 0 10px 0; color: #5e4b8b; font-size: 18px; }
+.graph-info-panel h3 { margin: 0 0 10px 0; color: #5e4b8b; }
 
 /* Text fields stacked single-column: label heading over its value. Description
    has no label — it leads straight with the text. */

@@ -210,7 +210,7 @@ function renderCytoscapeGraph(container, data, graphType) {
 
         const d = evt.target.data();
         const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.beings;
-        let html = `<h4>${escapeHtml(d.display_name || d.Name || d.id)}</h4>`;
+        let html = `<h3>${escapeHtml(d.display_name || d.Name || d.id)}</h3>`;
         let metrics = "";
         fields.forEach((f) => {
             if (d[f] === undefined || d[f] === null || d[f] === "") return;

@@ -481,5 +481,7 @@ def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, fo
 
     for motif in motifs:
         motif["definition"] = definitions.get(motif["id"], "")
+    if errors:
+        logger.warning("Berezkin: %d detail-page fetches failed (listed above)", errors)
     logger.info("Berezkin: attached %d definitions (%d pages have no definition, %d fetch errors)",
                 len(definitions), no_definition, errors)
