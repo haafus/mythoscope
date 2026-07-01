@@ -1649,14 +1649,14 @@ body.has-main-navbar {
 
 /* Attestations grouped by macro-region: region header once, then one culture
    per row (label at left, its citation link(s) stacked at right). */
-.motif-cultures { display: flex; flex-direction: column; gap: 16px; }
+.motif-cultures { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
 .motif-culture-group { display: flex; flex-direction: column; gap: 3px; }
 .motif-culture-region-head {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: var(--muted);
+    color: #a8b1ba;
     margin-bottom: 3px;
 }
 .motif-culture-row { display: flex; align-items: baseline; gap: 12px; }
