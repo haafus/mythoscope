@@ -27,6 +27,17 @@ const GRAPH_METRIC_FIELDS = new Set(["Degree", "BetweennessCentrality"]);
 // Display labels for fields whose data key is not presentation-ready.
 const GRAPH_FIELD_LABELS = { BetweennessCentrality: "Betweenness Centrality" };
 
+// Repair metadata joined before dicts were flattened server-side: replace any
+// leftover Python-style "{'k': 'v', ...}" fragment in a string with its values,
+// e.g. "…, {'Power': 'Strong hand', 'Judgment': 'Sees all'}, …" -> "…, Strong
+// hand, Sees all, …". A no-op once the graph is rebuilt (no fragments remain).
+function stripDictFragments(s) {
+    if (s.indexOf("{") === -1) return s;
+    const replaced = s.replace(/\{[^{}]*\}/g, (frag) =>
+        [...frag.matchAll(/:\s*'([^']*)'|:\s*"([^"]*)"/g)].map((m) => m[1] ?? m[2]).join(", "));
+    return replaced.split(",").map((p) => p.trim()).filter(Boolean).join(", ");
+}
+
 // Render a raw field value to a trimmed display string, or "" when it carries no
 // content — an empty object/array, a blank or "nan" string — so the caller can
 // skip the field instead of printing "{}", "[]" or "nan".
@@ -43,7 +54,7 @@ function graphFieldText(raw) {
             .map(([k, v]) => `${k}: ${v}`)
             .join(", ");
     }
-    const s = clean(raw);
+    const s = stripDictFragments(clean(raw));
     return s.toLowerCase() === "nan" ? "" : s;
 }
 
