@@ -697,6 +697,10 @@ def get_motif(index: str, motif_id: str) -> dict | None:
 
     if index == "berezkin":
         detail["definition"] = rec.get("definition", "")
+        # Name/definition are English-preferred (mapsofmyths); the Russian originals
+        # ride along as sub-titles on the motif page.
+        detail["name_rus"] = rec.get("name_rus", "")
+        detail["definition_rus"] = rec.get("definition_rus", "")
         # Link back to the source catalog page the motif was scraped from.
         page, home = rec.get("page", ""), data.get("homepage", "")
         if page and home:

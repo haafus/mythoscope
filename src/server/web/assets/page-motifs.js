@@ -560,8 +560,16 @@ function renderDetail(d) {
 
     let body = "";
     if (d.index === "berezkin") {
-        body = head + chapterLine;
-        if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
+        body = head;
+        if (d.name_rus && d.name_rus !== d.name) body += `<div class="motif-subtitle">${escapeHtml(d.name_rus)}</div>`;
+        body += chapterLine;
+        if (d.definition) {
+            let inner = `<p class="motif-text">${escapeHtml(d.definition)}</p>`;
+            if (d.definition_rus && d.definition_rus !== d.definition) {
+                inner += `<p class="motif-text motif-text-rus">${escapeHtml(d.definition_rus)}</p>`;
+            }
+            body += section("Definition", inner);
+        }
         if (d.source_url) {
             body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} ↗</a>`);
         }

@@ -71,8 +71,10 @@ Each stored motif (`outputs/motifs/berezkin.json → motifs[]`):
 |---|---|
 | `id` | motif code (`B12`) |
 | `chapter` | leading letter |
-| `name` | motif name (Russian), cleaned of codes / refs / Thompson notation |
-| `definition` | short definition from the detail page |
+| `name` | motif name — **English** where available (§9), else the cleaned Russian name |
+| `name_rus` | the Russian original name (only when English replaced it) |
+| `definition` | short definition — **English** where available (§9), else the Russian one |
+| `definition_rus` | the Russian original definition (only when English replaced it) |
 | `areas` | sorted unique region codes (§6) |
 | `see_also` | internal cross-references to other Berezkin motifs |
 | `atu_refs` | ATU tale-type references parsed from the title |
@@ -80,6 +82,28 @@ Each stored motif (`outputs/motifs/berezkin.json → motifs[]`):
 
 Index-level keys: `label, long_label, attribution, homepage, chapters, areas`
 (the region legend).
+
+---
+
+## 9. English names & definitions (mapsofmyths.com)
+
+The sister site **[mapsofmyths.com](http://mapsofmyths.com)** (same authors, same
+motif ids, CC BY-NC-SA 4.0) carries an **English name and English definition** for
+almost every motif. Its `/motifs_full` page lists them as Drupal nodes; we scrape
+those into the tracked data file `src/motifs/data/mapsofmyths_en.json`
+(`{ID_UPPER: {name_eng, definition_eng}}`, ~3,400 entries) via
+`scripts/fetch_mapsofmyths.py` (credentials passed by arg/env, never committed).
+
+At build time `berezkin.py` matches by case-insensitive id (`A7B == a7b`) and
+**prefers the English text**: it becomes the motif's `name` / `definition`, and the
+Russian originals move to `name_rus` / `definition_rus` (shown as sub-titles on the
+motif page). ~96 % of motifs get an English name, ~95 % an English definition;
+motifs with no English match keep their Russian text.
+
+mapsofmyths also exposes, per motif, data we do **not** yet ingest — a
+type/group taxonomy, ATU & Thompson ids, the list of attested traditions with a
+fine areal hierarchy (1,046 traditions), motif-correlation (co-occurrence)
+networks, and distribution maps — all candidates for future enrichment.
 
 ---
 

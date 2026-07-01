@@ -315,6 +315,52 @@ def parse_definition(html: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# English enrichment (mapsofmyths.com)
+# ---------------------------------------------------------------------------
+
+# English motif names + definitions from the sister site mapsofmyths.com, keyed
+# by upper-cased motif id. Refreshed by scripts/fetch_mapsofmyths.py.
+_ENGLISH_DATA = Path(__file__).resolve().parents[1] / "data" / "mapsofmyths_en.json"
+
+
+def load_english() -> dict[str, dict]:
+    """``{ID_UPPER: {name_eng, definition_eng}}`` from the tracked data file."""
+    import json
+
+    try:
+        return json.loads(_ENGLISH_DATA.read_text(encoding="utf-8")).get("motifs", {})
+    except FileNotFoundError:
+        logger.warning("Berezkin: %s missing — no English names/definitions", _ENGLISH_DATA.name)
+        return {}
+
+
+def _attach_english(motifs: list[dict]) -> None:
+    """Prefer the English name/definition from mapsofmyths (case-insensitive id).
+
+    The English text (near-complete coverage) becomes the motif's primary ``name``
+    and ``definition``; the Russian originals are kept as ``name_rus`` /
+    ``definition_rus`` (shown as sub-titles on the motif page). Motifs without an
+    English match keep their Russian text unchanged.
+    """
+    english = load_english()
+    if not english:
+        return
+    hit = 0
+    for motif in motifs:
+        en = english.get(motif["id"].upper())
+        if not en:
+            continue
+        hit += 1
+        if en.get("name_eng"):
+            motif["name_rus"] = motif.get("name", "")
+            motif["name"] = en["name_eng"]
+        if en.get("definition_eng"):
+            motif["definition_rus"] = motif.get("definition", "")
+            motif["definition"] = en["definition_eng"]
+    logger.info("Berezkin: English name/definition preferred for %d/%d motifs (mapsofmyths)", hit, len(motifs))
+
+
+# ---------------------------------------------------------------------------
 # Fetch orchestration
 # ---------------------------------------------------------------------------
 
@@ -333,6 +379,8 @@ def build(config: dict, *, force: bool = False) -> dict:
 
     if config.get("fetch_details", True) and settings.motifs.berezkin_details:
         _fetch_details(motifs, base, cache, encoding, force)
+
+    _attach_english(motifs)
 
     return {
         "label": config.get("label", "Berezkin"),

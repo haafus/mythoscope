@@ -1435,6 +1435,21 @@ body.has-main-navbar {
     font-size: 13px;
 }
 
+/* Russian original name shown as a sub-title under the (English) motif name. */
+.motif-subtitle {
+    margin: -8px 0 4px;
+    color: #4a5563;
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Russian original definition, shown muted below the English one. */
+.motif-text-rus {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.94em;
+}
+
 .motif-section { margin: 18px 0; }
 
 .motif-section-title {
