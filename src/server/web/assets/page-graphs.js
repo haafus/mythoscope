@@ -24,6 +24,28 @@ const GRAPH_INFO_FIELDS = {
 };
 // Numeric metrics stay as a compact two-column table at the end of the panel.
 const GRAPH_METRIC_FIELDS = new Set(["Degree", "BetweennessCentrality"]);
+// Display labels for fields whose data key is not presentation-ready.
+const GRAPH_FIELD_LABELS = { BetweennessCentrality: "Betweenness Centrality" };
+
+// Render a raw field value to a trimmed display string, or "" when it carries no
+// content — an empty object/array, a blank or "nan" string — so the caller can
+// skip the field instead of printing "{}", "[]" or "nan".
+function graphFieldText(raw) {
+    if (raw === undefined || raw === null) return "";
+    if (typeof raw === "number") return String(raw);
+    const clean = (v) => String(v).trim();
+    const kept = (v) => v && v.toLowerCase() !== "nan";
+    if (Array.isArray(raw)) return raw.map(clean).filter(kept).join(", ");
+    if (typeof raw === "object") {
+        return Object.entries(raw)
+            .map(([k, v]) => [k, clean(v)])
+            .filter(([, v]) => kept(v))
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(", ");
+    }
+    const s = clean(raw);
+    return s.toLowerCase() === "nan" ? "" : s;
+}
 
 export async function renderGraphPage(graphType) {
     app.innerHTML = `
@@ -213,14 +235,19 @@ function renderCytoscapeGraph(container, data, graphType) {
         let html = `<h3>${escapeHtml(d.display_name || d.Name || d.id)}</h3>`;
         let metrics = "";
         fields.forEach((f) => {
-            if (d[f] === undefined || d[f] === null || d[f] === "") return;
-            const value = typeof d[f] === "object" ? JSON.stringify(d[f]) : String(d[f]);
+            const value = graphFieldText(d[f]);
+            if (!value) return;  // skip absent/empty fields ({}, [], blank, nan)
+            const label = GRAPH_FIELD_LABELS[f] || f;
             if (GRAPH_METRIC_FIELDS.has(f)) {
-                metrics += `<tr><th>${escapeHtml(f)}</th><td>${escapeHtml(value)}</td></tr>`;
+                // Betweenness is a long float — round to 5 decimals for display.
+                const shown = f === "BetweennessCentrality" && typeof d[f] === "number"
+                    ? String(Math.round(d[f] * 1e5) / 1e5)
+                    : value;
+                metrics += `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(shown)}</td></tr>`;
             } else if (f === "Description") {
                 html += `<p class="graph-info-desc">${escapeHtml(value)}</p>`;  // no label, straight to text
             } else {
-                html += `<div class="graph-info-field"><div class="graph-info-label">${escapeHtml(f)}</div>`
+                html += `<div class="graph-info-field"><div class="graph-info-label">${escapeHtml(label)}</div>`
                       + `<div class="graph-info-value">${escapeHtml(value)}</div></div>`;
             }
         });

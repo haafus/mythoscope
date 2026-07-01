@@ -41,6 +41,13 @@ class TestBeingsGraph:
         edges = _load(tmp_path / "beings.json")["edges"]
         assert edges == [{"source": "A", "target": "B", "relation": "loves"}]
 
+    def test_empty_container_metadata_dropped(self, tmp_path):
+        beings = [{"Name": "A", "Attributes": {}, "Epithets": [], "Roles": "  "}]
+        generate_beings_graph(beings, [], tmp_path)
+        node = {n["id"]: n for n in _load(tmp_path / "beings.json")["nodes"]}["A"]
+        assert "Attributes" not in node  # empty dict must not survive as "{}"
+        assert "Epithets" not in node and "Roles" not in node
+
 
 class TestTopMentioned:
     def test_picks_most_mentioned(self):
