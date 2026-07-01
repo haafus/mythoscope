@@ -1450,6 +1450,26 @@ body.has-main-navbar {
     font-size: 0.94em;
 }
 
+/* mapsofmyths thematic classification (type · group). */
+.motif-taxonomy { color: #3f4650; line-height: 1.5; }
+
+/* Tradition-level distribution: collapsible per-region breakdown. */
+.motif-dist { display: flex; flex-direction: column; gap: 2px; }
+.motif-dist-region > summary {
+    display: flex; justify-content: space-between; gap: 12px; cursor: pointer;
+    padding: 5px 8px; border-radius: 6px; list-style: none;
+}
+.motif-dist-region > summary::-webkit-details-marker { display: none; }
+.motif-dist-region > summary:hover { background: #f3f6f5; }
+.motif-dist-region > summary::before { content: "▸"; color: var(--muted); margin-right: 4px; }
+.motif-dist-region[open] > summary::before { content: "▾"; }
+.motif-dist-name { flex: 1; }
+.motif-dist-count {
+    font-variant-numeric: tabular-nums; color: var(--accent-dark, #1f7a6f);
+    background: #e9f5f3; border-radius: 9px; padding: 1px 8px; font-size: 12px;
+}
+.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 8px 8px 22px; }
+
 .motif-section { margin: 18px 0; }
 
 .motif-section-title {

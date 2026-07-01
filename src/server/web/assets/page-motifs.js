@@ -525,6 +525,18 @@ function linkSection(title, links) {
     return section(title, `<div class="motif-links">${linkChips(links)}</div>`);
 }
 
+// Tradition-level distribution (mapsofmyths): total attesting traditions, broken
+// down by macro-region; each region expands to the named traditions.
+function berezkinDistribution(dist) {
+    if (!dist || !dist.total) return "";
+    const rows = (dist.regions || []).map((r) => `
+        <details class="motif-dist-region">
+            <summary><span class="motif-dist-name">${escapeHtml(r.region)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
+            <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
+        </details>`).join("");
+    return section(`Traditions (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
+}
+
 // A citation: linked to its source book when the server resolved one.
 function citeHtml(c) {
     const text = escapeHtml(c.text || "");
@@ -570,15 +582,21 @@ function renderDetail(d) {
             }
             body += section("Definition", inner);
         }
-        if (d.source_url) {
-            body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} ↗</a>`);
+        if (d.motif_type || d.motif_group) {
+            const parts = [d.motif_type, d.motif_group].filter(Boolean).map(escapeHtml);
+            body += section("Classification", `<div class="motif-taxonomy">${parts.join(" · ")}</div>`);
         }
         const areas = (d.areas || []).map((a) =>
             `<span class="motif-area${a.name ? "" : " unresolved"}" title="area ${escapeHtml(a.id)}">${escapeHtml(a.name || a.id)}</span>`).join("");
-        body += section(`Areal distribution (${(d.areas || []).length})`,
+        body += section(`Macro-areas (${(d.areas || []).length})`,
             areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`);
+        body += berezkinDistribution(d.traditions);
+        if ((links.tmi || []).length) body += linkSection("Thompson motifs (TMI)", links.tmi);
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
+        if (d.source_url) {
+            body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} ↗</a>`);
+        }
     } else if (d.index === "tmi") {
         // Hierarchy tree first, then all the motif's own information, and the raw
         // source `notes` verbatim at the very end.

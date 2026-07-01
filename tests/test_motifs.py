@@ -120,6 +120,42 @@ class TestBerezkinAreaDecode:
         assert berezkin.canonical_area_legend()["27"] == "Балканы"
 
 
+class TestMapsofmythsEnrichment:
+    def test_split_refs(self):
+        assert berezkin._split_refs("516, 565; 505/311") == ["516", "565", "505", "311"]
+        assert berezkin._split_refs("") == []
+
+    def test_attach_nodes_prefers_and_merges(self, monkeypatch):
+        monkeypatch.setattr(berezkin, "load_nodes", lambda: {
+            "A2A": {"type": "Cosmology and etiology", "group": "01 Sun and Moon",
+                    "group_num": "01", "tmi": "*A720.1", "atu": "565",
+                    "traditions": ["6.2.3.1", "26.1.1.1"]},
+        })
+        motifs = [{"id": "A2a", "atu_refs": ["565"]}]  # lowercase id, title already had ATU
+        berezkin._attach_nodes(motifs)
+        m = motifs[0]
+        assert m["motif_type"] == "Cosmology and etiology"
+        assert m["motif_group_num"] == "01"
+        assert m["tmi_refs"] == ["*A720.1"]
+        assert m["atu_refs"] == ["565"]              # merged, de-duplicated
+        assert m["traditions"] == ["6.2.3.1", "26.1.1.1"]
+
+    def test_clean_tmi_ref(self):
+        assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"
+        assert svc._clean_tmi_ref("A1313.3.1.") == "A1313.3.1"
+
+    def test_tradition_distribution_groups_by_region(self):
+        cat = {
+            "6.2.3.1": {"name": "Abor", "areal_path": [["6", "TIBET"], ["6.2", "NE INDIA"]]},
+            "6.2.3.2": {"name": "Adi", "areal_path": [["6", "TIBET"]]},
+            "26.1.1.1": {"name": "Ainu", "areal_path": [["26", "EAST ASIA"]]},
+        }
+        dist = svc._berezkin_tradition_distribution(["6.2.3.1", "6.2.3.2", "26.1.1.1"], cat)
+        assert dist["total"] == 3
+        assert dist["regions"][0] == {"region": "TIBET", "count": 2, "traditions": ["Abor", "Adi"]}
+        assert {r["region"] for r in dist["regions"]} == {"TIBET", "EAST ASIA"}
+
+
 class TestBerezkinIndexHtml:
     def test_parse_index_and_chapters(self):
         html = """

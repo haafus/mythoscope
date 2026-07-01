@@ -318,20 +318,43 @@ def parse_definition(html: str) -> str:
 # English enrichment (mapsofmyths.com)
 # ---------------------------------------------------------------------------
 
-# English motif names + definitions from the sister site mapsofmyths.com, keyed
-# by upper-cased motif id. Refreshed by scripts/fetch_mapsofmyths.py.
-_ENGLISH_DATA = Path(__file__).resolve().parents[1] / "data" / "mapsofmyths_en.json"
+# Enrichment data scraped from the sister site mapsofmyths.com (same motif ids),
+# keyed by upper-cased id. All three files are refreshed by
+# scripts/fetch_mapsofmyths.py.
+_DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+_ENGLISH_DATA = _DATA_DIR / "mapsofmyths_en.json"
+_NODES_DATA = _DATA_DIR / "mapsofmyths_nodes.json"
+_TRADITIONS_DATA = _DATA_DIR / "mapsofmyths_traditions.json"
+
+
+def _load_json(path: Path, key: str) -> dict:
+    import json
+
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get(key, {})
+    except FileNotFoundError:
+        logger.warning("Berezkin: %s missing — skipping that enrichment", path.name)
+        return {}
 
 
 def load_english() -> dict[str, dict]:
     """``{ID_UPPER: {name_eng, definition_eng}}`` from the tracked data file."""
-    import json
+    return _load_json(_ENGLISH_DATA, "motifs")
 
-    try:
-        return json.loads(_ENGLISH_DATA.read_text(encoding="utf-8")).get("motifs", {})
-    except FileNotFoundError:
-        logger.warning("Berezkin: %s missing — no English names/definitions", _ENGLISH_DATA.name)
-        return {}
+
+def load_nodes() -> dict[str, dict]:
+    """``{ID_UPPER: {type, group, atu, tmi, traditions}}`` from mapsofmyths nodes."""
+    return _load_json(_NODES_DATA, "motifs")
+
+
+def load_traditions() -> dict[str, dict]:
+    """``{areal_id: {name, name_rus, areal_path, language}}`` — the tradition catalogue."""
+    return _load_json(_TRADITIONS_DATA, "traditions")
+
+
+def _split_refs(value: str) -> list[str]:
+    """A ``/``, ``,`` or ``;`` separated id field into a clean list."""
+    return [p.strip() for p in re.split(r"[,;/]", value or "") if p.strip()]
 
 
 def _attach_english(motifs: list[dict]) -> None:
@@ -360,6 +383,41 @@ def _attach_english(motifs: list[dict]) -> None:
     logger.info("Berezkin: English name/definition preferred for %d/%d motifs (mapsofmyths)", hit, len(motifs))
 
 
+def _attach_nodes(motifs: list[dict]) -> None:
+    """Attach the per-motif node data from mapsofmyths (case-insensitive id):
+
+    - ``motif_type`` / ``motif_group`` — the 2-level thematic taxonomy;
+    - ``tmi_refs`` — direct Thompson (TMI) motif ids (new: not derivable from ours);
+    - ``atu_refs`` — merged with the ids already parsed from the Russian title;
+    - ``traditions`` — areal ids of the traditions attesting the motif (§ hierarchy
+      in ``mapsofmyths_traditions.json``).
+    """
+    nodes = load_nodes()
+    if not nodes:
+        return
+    n_type = n_tmi = n_trad = 0
+    for motif in motifs:
+        nd = nodes.get(motif["id"].upper())
+        if not nd:
+            continue
+        if nd.get("type"):
+            motif["motif_type"] = nd["type"]
+            n_type += 1
+        if nd.get("group"):
+            motif["motif_group"] = nd["group"]
+            motif["motif_group_num"] = nd.get("group_num", "")
+        if nd.get("tmi"):
+            motif["tmi_refs"] = _split_refs(nd["tmi"])
+            n_tmi += 1
+        if nd.get("atu"):  # union with the title-parsed refs, order-preserving
+            motif["atu_refs"] = _dedup(list(motif.get("atu_refs", [])) + _split_refs(nd["atu"]))
+        if nd.get("traditions"):
+            motif["traditions"] = nd["traditions"]
+            n_trad += 1
+    logger.info("Berezkin: mapsofmyths nodes — type:%d tmi:%d traditions:%d of %d motifs",
+                n_type, n_tmi, n_trad, len(motifs))
+
+
 # ---------------------------------------------------------------------------
 # Fetch orchestration
 # ---------------------------------------------------------------------------
@@ -381,6 +439,7 @@ def build(config: dict, *, force: bool = False) -> dict:
         _fetch_details(motifs, base, cache, encoding, force)
 
     _attach_english(motifs)
+    _attach_nodes(motifs)
 
     return {
         "label": config.get("label", "Berezkin"),
@@ -389,6 +448,7 @@ def build(config: dict, *, force: bool = False) -> dict:
         "homepage": config.get("homepage", ""),
         "chapters": chapters,
         "areas": canonical_area_legend(),
+        "traditions": load_traditions(),  # areal_id -> name/hierarchy/language
         "motifs": motifs,
     }
 

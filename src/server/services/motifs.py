@@ -322,6 +322,33 @@ def _areal_breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4 if n <= 20 else 5]
 
 
+def _clean_tmi_ref(ref: str) -> str:
+    """Normalise a mapsofmyths Thompson id (``*A2211.1``, ``A1313.3.1.``) to our tmi id."""
+    return ref.lstrip("*").rstrip(".").strip()
+
+
+def _berezkin_tradition_distribution(areal_ids: list[str], catalogue: dict) -> dict:
+    """Summarise a motif's attesting traditions (mapsofmyths) by macro-region.
+
+    Returns the total tradition count and a per-top-region breakdown, each with the
+    named traditions — the fine, tradition-level distribution behind the maps.
+    """
+    import collections
+
+    regions: dict[str, dict] = collections.OrderedDict()
+    for aid in areal_ids:
+        trad = catalogue.get(aid)
+        if not trad:
+            continue
+        path = trad.get("areal_path") or []
+        region = path[0][1] if path else "—"
+        bucket = regions.setdefault(region, {"region": region, "count": 0, "traditions": []})
+        bucket["count"] += 1
+        bucket["traditions"].append(trad.get("name", aid))
+    ordered = sorted(regions.values(), key=lambda r: r["count"], reverse=True)
+    return {"total": len(areal_ids), "regions": ordered}
+
+
 def _berezkin_region(code: int) -> str:
     """Group a Berezkin area code (10–74) into a broad region (see docs §6)."""
     if 10 <= code <= 14:
@@ -711,6 +738,12 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["areas"] = [{"id": a, "name": legend.get(str(a), "")} for a in rec.get("areas", [])]
         detail["links"]["see_also"] = [_link("berezkin", c) for c in rec.get("see_also", [])]
         detail["links"]["atu"] = [_link("atu", a) for a in rec.get("atu_refs", [])]
+        # mapsofmyths enrichment: thematic taxonomy, direct Thompson (TMI) links, and
+        # the tradition-level distribution grouped by macro-region.
+        detail["motif_type"] = rec.get("motif_type", "")
+        detail["motif_group"] = rec.get("motif_group", "")
+        detail["links"]["tmi"] = [_link("tmi", _clean_tmi_ref(t)) for t in rec.get("tmi_refs", [])]
+        detail["traditions"] = _berezkin_tradition_distribution(rec.get("traditions", []), data.get("traditions") or {})
 
     elif index == "tmi":
         detail["chapter_name"] = rec.get("chapter_name", "")

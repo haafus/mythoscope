@@ -100,10 +100,31 @@ Russian originals move to `name_rus` / `definition_rus` (shown as sub-titles on 
 motif page). ~96 % of motifs get an English name, ~95 % an English definition;
 motifs with no English match keep their Russian text.
 
-mapsofmyths also exposes, per motif, data we do **not** yet ingest — a
-type/group taxonomy, ATU & Thompson ids, the list of attested traditions with a
-fine areal hierarchy (1,046 traditions), motif-correlation (co-occurrence)
-networks, and distribution maps — all candidates for future enrichment.
+### Node-level enrichment
+
+`scripts/fetch_mapsofmyths.py` also scrapes every motif's `/node/N` page and the
+`/traditions_full` list into two more tracked files, which `berezkin.py` attaches
+by case-insensitive id:
+
+- `src/motifs/data/mapsofmyths_nodes.json` → per motif:
+  - `motif_type` / `motif_group` — the **2-level thematic taxonomy** (2 types → 13
+    groups), a second axis distinct from the letter-chapters;
+  - `tmi_refs` — **direct Thompson (TMI) motif ids** (~226 motifs); this is new — we
+    had no direct Berezkin→TMI link, only an indirect ATU hop. On the motif page
+    they become cross-index links into our TMI catalogue;
+  - `atu_refs` — the ATU id from the node, **merged** with the ids already parsed
+    from the Russian title (largely overlapping — used as corroboration);
+  - `traditions` — the areal ids of every **tradition attesting the motif** (avg ~35,
+    up to 555): the fine, tradition-level distribution behind the maps.
+- `src/motifs/data/mapsofmyths_traditions.json` → the **1,046 traditions**, each with
+  its English + Russian name, a **named 4-level areal hierarchy** (16 mega-regions →
+  59 regions → 228 areas → 1,046 traditions, decoding each `areal_id` like
+  `5.1.3.2`), and its **language family**. Stored index-level as `traditions`.
+
+The motif page renders the classification, the tradition distribution grouped by
+macro-region (each region expandable to the named traditions), and the TMI links.
+Still **not** ingested: the per-motif correlation (co-occurrence) network and the
+distribution maps.
 
 ---
 
