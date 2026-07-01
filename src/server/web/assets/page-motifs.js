@@ -28,9 +28,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
                     <div class="motifs-list" id="motifsList"></div>
                 </aside>
 
-                <article class="card reader motifs-detail" id="motifsDetail">
-                    <div class="reader-placeholder">Select a motif to see its description and cross-index links.</div>
-                </article>
+                <article class="card reader motifs-detail" id="motifsDetail"></article>
             </div>
         </main>
     `;
