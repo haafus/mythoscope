@@ -1520,8 +1520,9 @@ body.has-main-navbar {
     font-variant-numeric: tabular-nums; color: var(--muted);
     font-size: 12px; margin-left: 12px;
 }
-.motif-bib-list { margin: 0; padding: 2px 8px 8px 22px; list-style: none; }
-.motif-bib-list li { font-size: 13px; line-height: 1.5; color: #2a2f36; padding: 1px 0; }
+.motif-bib-list { margin: 0; padding: 2px 40px 10px 22px; list-style: none; }
+.motif-bib-list li { font-size: 13px; line-height: 1.5; color: #2a2f36; margin-bottom: 8px; }
+.motif-bib-list li:last-child { margin-bottom: 0; }
 .motif-bib-author { font-weight: 600; color: #2a3340; }
 .motif-bib-year { color: var(--muted); font-variant-numeric: tabular-nums; }
 .motif-bib-title { color: #55606b; }

@@ -679,8 +679,7 @@ def _berezkin_motif_bibliography(motif_id: str) -> dict:
                 if c["key"] not in seen_un:
                     seen_un.add(c["key"])
                     unattached.append(source(c))
-    areas = sorted(by_area.values(),
-                   key=lambda a: int(a["area_code"]) if a["area_code"].isdigit() else 999)
+    areas = sorted(by_area.values(), key=lambda a: len(a["sources"]), reverse=True)
     for a in areas:
         a.pop("_seen", None)
     return {"by_area": areas, "unattached": unattached}

@@ -565,13 +565,14 @@ function berezkinBibliography(bib) {
     const areas = (bib && bib.by_area) || [];
     const unattached = (bib && bib.unattached) || [];
     if (!areas.length && !unattached.length) return "";
+    // Shared name -> exclusive accordion: opening one collapses the others.
     const block = (label, sources) => `
-        <details class="motif-bib-area">
+        <details class="motif-bib-area" name="motif-bib">
             <summary><span class="motif-bib-region">${escapeHtml(label)}</span><span class="motif-bib-count">${formatNumber(sources.length)}</span></summary>
             <ul class="motif-bib-list">${sources.map(bibSourceHtml).join("")}</ul>
         </details>`;
     let rows = areas.map((a) => block(a.region || a.area_code, a.sources)).join("");
-    if (unattached.length) rows += block("Not tied to a macro-area", unattached);
+    if (unattached.length) rows += block("General references", unattached);
     return section("Bibliography", `<div class="motif-bib">${rows}</div>`);
 }
 
