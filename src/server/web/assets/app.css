@@ -1644,16 +1644,22 @@ body.has-main-navbar {
 .motif-cite.linked { color: #2f6f9f; text-decoration: none; }
 .motif-cite.linked:hover { text-decoration: underline; }
 
-/* Attestations grouped by culture. */
-.motif-cultures { display: flex; flex-direction: column; gap: 10px; }
-.motif-culture-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
-.motif-culture-label { font-weight: 700; color: #1f3a4d; }
-.motif-culture-region {
+/* Attestations grouped by macro-region: region header once, then one culture
+   per row (label at left, its citation link(s) stacked at right). */
+.motif-cultures { display: flex; flex-direction: column; gap: 16px; }
+.motif-culture-group { display: flex; flex-direction: column; gap: 3px; }
+.motif-culture-region-head {
     font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     color: var(--muted);
+    margin-bottom: 3px;
 }
+.motif-culture-row { display: flex; align-items: baseline; gap: 12px; }
+.motif-culture-label { flex: 0 0 38%; font-weight: 700; color: #1f3a4d; }
+.motif-culture-cites { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.motif-culture-cite { line-height: 1.5; color: #2a2f36; }
 
 /* Raw source notes shown verbatim at the end — set apart as a quote. */
 .motif-notes-raw {

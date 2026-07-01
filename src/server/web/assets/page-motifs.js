@@ -559,16 +559,30 @@ function citeList(items) {
     return `<ul class="motif-cites">${items.map((c) => `<li>${citeHtml(c)}</li>`).join("")}</ul>`;
 }
 
-// Attestations grouped by culture label (with its broad region) -> citations.
+// Attestations grouped by macro-region: each region name is printed once, then
+// its cultures — one culture per row (label + its citation link, any further
+// links stacked under the first). Cultures with no region come last, un-headed.
 function culturesHtml(cultures) {
-    return `<div class="motif-cultures">` + cultures.map((c) => `
-        <div class="motif-culture">
-            <div class="motif-culture-head">
-                <span class="motif-culture-label">${escapeHtml(c.label)}</span>
-                ${c.region ? `<span class="motif-culture-region">${escapeHtml(c.region)}</span>` : ""}
-            </div>
-            ${citeList(c.citations || [])}
-        </div>`).join("") + `</div>`;
+    const groups = new Map();  // region -> [culture]; the "" bucket renders last
+    for (const c of cultures) {
+        const key = c.region || "";
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(c);
+    }
+    const regions = [...groups.keys()].filter(Boolean);
+    if (groups.has("")) regions.push("");
+    const row = (c) => `
+        <div class="motif-culture-row">
+            <span class="motif-culture-label">${escapeHtml(c.label)}</span>
+            <div class="motif-culture-cites">${(c.citations || [])
+                .map((cite) => `<div class="motif-culture-cite">${citeHtml(cite)}</div>`).join("")}</div>
+        </div>`;
+    const group = (region) => `
+        <div class="motif-culture-group">
+            ${region ? `<div class="motif-culture-region-head">${escapeHtml(region)}</div>` : ""}
+            ${groups.get(region).map(row).join("")}
+        </div>`;
+    return `<div class="motif-cultures">${regions.map(group).join("")}</div>`;
 }
 
 function renderDetail(d) {
