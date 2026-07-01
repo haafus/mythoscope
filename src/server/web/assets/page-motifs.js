@@ -3,7 +3,7 @@ import { app, api, escapeHtml, formatNumber, onCleanup } from "./core.js";
 // Module-local navigation state (index, chapter filter, query, selection).
 const mState = {
     indexes: null,
-    index: "berezkin",
+    index: "tmi",  // default index on first open (Thompson)
     chapter: "",
     query: "",
     selectedId: null,
