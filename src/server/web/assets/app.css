@@ -1644,6 +1644,9 @@ body.has-main-navbar {
 .motif-cite.linked { color: #2f6f9f; text-decoration: none; }
 .motif-cite.linked:hover { text-decoration: underline; }
 
+/* External-link indicator: smaller and lighter than the link text. */
+.ext-arrow { font-size: 0.75em; color: #9aa7b3; }
+
 /* Attestations grouped by macro-region: region header once, then one culture
    per row (label at left, its citation link(s) stacked at right). */
 .motif-cultures { display: flex; flex-direction: column; gap: 16px; }

@@ -552,7 +552,7 @@ function citeHtml(c) {
     const text = escapeHtml(c.text || "");
     if (!c.url) return `<span class="motif-cite">${text}</span>`;
     return `<a class="motif-cite linked" href="${escapeHtml(c.url)}" target="_blank" rel="noopener"
-               title="${escapeHtml(c.title || c.url)}">${text} ↗</a>`;
+               title="${escapeHtml(c.title || c.url)}">${text} <span class="ext-arrow">↗</span></a>`;
 }
 
 function citeList(items) {
@@ -640,7 +640,7 @@ function renderDetail(d) {
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
         if (d.source_url) {
-            body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} ↗</a>`);
+            body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} <span class="ext-arrow">↗</span></a>`);
         }
     } else if (d.index === "tmi") {
         // Hierarchy tree first, then all the motif's own information, and the raw
