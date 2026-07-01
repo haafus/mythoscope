@@ -85,6 +85,10 @@ def build_motifs(*, force: bool = False) -> None:
     tr_cfg = config.get("trilogy", {})
     if tr_cfg.get("enabled", True):
         files = tr_cfg.get("files", {})
+        # Header before the build so any TMI parse warnings appear under it, not
+        # ahead of it (mirrors the [1/3] Berezkin step).
+        logger.info("[2/3] Thompson Motif-Index (TMI) — source: %s (%s)",
+                    tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
         trilogy_data = trilogy.build(tr_cfg, force=force)
         save_json(store.index_path("tmi"), trilogy_data["tmi"])
         save_json(store.index_path("atu"), trilogy_data["atu"])
@@ -96,8 +100,6 @@ def build_motifs(*, force: bool = False) -> None:
         atu_ids = {t["id"] for t in atu_types}
         atu_seq = trilogy_data["atu_seq"]
         sources["trilogy"] = {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}
-        logger.info("[2/3] Thompson Motif-Index (TMI) — source: %s (%s)",
-                    tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
         logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
                     len(tmi_motifs),
                     _applied(tmi_motifs, lambda m: m.get("definition")),
