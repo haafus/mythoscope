@@ -555,7 +555,10 @@ function bibSourceHtml(s) {
         const title = s.title ? ` — <span class="motif-bib-title">${escapeHtml(s.title)}</span>` : "";
         return `<li><span class="motif-bib-author">${escapeHtml(s.author)}</span>${year}${title}</li>`;
     }
-    const tag = s.status && s.status !== "resolved" ? ` (${escapeHtml(s.status)})` : "";
+    // The status word links to the Berezkin bibliography page so it can be looked up.
+    const tag = s.status && s.status !== "resolved"
+        ? ` <a class="motif-bib-status" href="http://areasofmyths.com/biblio.html" target="_blank" rel="noopener">(${escapeHtml(s.status)})</a>`
+        : "";
     return `<li class="motif-bib-unresolved">${escapeHtml(s.key)}${tag}</li>`;
 }
 

@@ -1527,6 +1527,8 @@ body.has-main-navbar {
 .motif-bib-year { color: var(--muted); font-variant-numeric: tabular-nums; }
 .motif-bib-title { color: #55606b; }
 .motif-bib-unresolved { color: var(--muted); font-style: italic; }
+.motif-bib-status { color: #9aa7b3; text-decoration: none; }
+.motif-bib-status:hover { text-decoration: underline; }
 
 .motif-section { margin: 18px 0; }
 
