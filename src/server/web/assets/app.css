@@ -911,7 +911,6 @@ body.has-main-navbar {
     color: #2f343b;
     font-size: 14px;
     line-height: 1.6;
-    white-space: pre-wrap;
 }
 
 .analysis-page .fragment-edit {
@@ -973,7 +972,15 @@ body.has-main-navbar {
     color: #3f4650;
     font-size: 13px;
     line-height: 1.55;
-    white-space: pre-wrap;
+}
+
+/* Reflowed source paragraphs (see reflowHtml): keep paragraph spacing, let text
+   wrap to the column instead of the source's hard line breaks. */
+.analysis-page .fragment-text .reflow-p {
+    margin: 0 0 0.7em;
+}
+.analysis-page .fragment-text .reflow-p:last-child {
+    margin-bottom: 0;
 }
 
 .analysis-page textarea {

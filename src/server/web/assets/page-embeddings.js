@@ -1,7 +1,7 @@
 import {
     api, app, state,
     ensureModels, onCleanup,
-    escapeHtml,
+    escapeHtml, reflowHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
@@ -239,7 +239,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
         const { point, neighbors } = await fetchPointWithNeighbors(pointId, chunkIndex, 6, crossTradition);
         let html = `
             <div class="fragment-detail">
-                <div class="fragment-text">${escapeHtml(point.text)}</div>
+                <div class="fragment-text">${reflowHtml(point.text)}</div>
                 ${attributionLine(point)}
                 <button class="fragment-edit" id="fragmentEditBtn" type="button" title="New similarity search" aria-label="New similarity search">${PENCIL_ICON}</button>
             </div>
@@ -252,7 +252,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
         if (neighbors.length > 0) {
             html += neighbors.map((neighbor) => `
                 <div class="neighbor-item" data-neighbor-id="${escapeHtml(neighbor.id)}" data-neighbor-chunk="${escapeHtml(neighbor.chunk_index)}">
-                    <div class="fragment-text">${escapeHtml(neighbor.text || "")}</div>
+                    <div class="fragment-text">${reflowHtml(neighbor.text || "")}</div>
                     ${attributionLine(neighbor, { withScore: true })}
                 </div>
             `).join("");

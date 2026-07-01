@@ -70,6 +70,34 @@ export function normalizePreviewText(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
+// A source paragraph is "hard-wrapped" (line breaks inserted at a fixed width,
+// not meaningful) if its lines cluster around one width — as opposed to verse or
+// a list, whose lines are short and uneven. The last line is ignored (it ends the
+// paragraph and is naturally short).
+function isHardWrapped(lines) {
+    if (lines.length < 2) return false;
+    const lens = lines.slice(0, -1).map((l) => l.length).sort((a, b) => a - b);
+    const med = lens[Math.floor(lens.length / 2)];
+    if (med < 40 || med > 90) return false;              // not a wrap width
+    return lens.every((l) => l > med - 18 && l < med + 10);  // uniform enough
+}
+
+// Render source text into paragraphs for a normal (reflowing) column: split on
+// blank lines into <p>, and within each paragraph reflow hard-wrapped lines into
+// running text (so a narrow column doesn't keep the source's line breaks), while
+// preserving intentional line breaks (verse/lists) as <br>. Returns escaped HTML.
+export function reflowHtml(value) {
+    const paras = String(value ?? "").replace(/\r\n?/g, "\n").split(/\n[ \t]*\n+/);
+    return paras.map((para) => {
+        const lines = para.split("\n").filter((l) => l.trim());
+        if (!lines.length) return "";
+        const body = isHardWrapped(lines)
+            ? escapeHtml(lines.join(" ").replace(/[ \t]+/g, " ").trim())
+            : lines.map((l) => escapeHtml(l.trim())).join("<br>");
+        return `<p class="reflow-p">${body}</p>`;
+    }).filter(Boolean).join("");
+}
+
 export function escapeRegex(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
