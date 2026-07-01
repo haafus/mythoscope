@@ -628,6 +628,64 @@ def _bibliography_index() -> dict[str, list[dict]]:
     return store.cached("tmi:bib", build)
 
 
+def _berezkin_bibliography() -> dict:
+    """The whole ``berezkin_bibliography.json`` (bibliography + per-motif tree).
+
+    Produced by ``motifs.sources.berezkin_bibliography``; absent when the
+    catalogue was built without it. Cached per process.
+    """
+    def build() -> dict:
+        path = store.motifs_dir() / "berezkin_bibliography.json"
+        try:
+            return json.loads(path.read_text("utf-8"))
+        except (FileNotFoundError, OSError):
+            return {}
+    return store.cached("berezkin:bib", build)
+
+
+def _berezkin_motif_bibliography(motif_id: str) -> dict:
+    """Per-motif Berezkin sources grouped by macro-area, plus the citations not
+    tied to any areal code. Comparative ``(Ср. …)`` blocks are excluded (they are
+    parallels, not this motif's attestations). Empty when the file is absent."""
+    data = _berezkin_bibliography()
+    tree = (data.get("by_motif") or {}).get(motif_id)
+    if not tree:
+        return {}
+    bib = data.get("bibliography") or {}
+
+    def source(cite: dict) -> dict:
+        e = bib.get(cite["key"], {})
+        return {"key": cite["key"], "author": e.get("author", ""),
+                "year": e.get("year", ""), "title": e.get("title", ""),
+                "status": cite.get("status", "")}
+
+    by_area: dict[str, dict] = {}
+    unattached: list[dict] = []
+    seen_un: set = set()
+    for reg in tree:
+        if reg.get("cf"):
+            continue
+        cites = [c for e in reg.get("ethnos", []) for c in e.get("citations", [])]
+        code = reg.get("area_code") or ""
+        if code:
+            slot = by_area.setdefault(code, {"area_code": code, "region": reg.get("region", ""),
+                                             "sources": [], "_seen": set()})
+            for c in cites:
+                if c["key"] not in slot["_seen"]:
+                    slot["_seen"].add(c["key"])
+                    slot["sources"].append(source(c))
+        else:
+            for c in cites:
+                if c["key"] not in seen_un:
+                    seen_un.add(c["key"])
+                    unattached.append(source(c))
+    areas = sorted(by_area.values(),
+                   key=lambda a: int(a["area_code"]) if a["area_code"].isdigit() else 999)
+    for a in areas:
+        a.pop("_seen", None)
+    return {"by_area": areas, "unattached": unattached}
+
+
 # The leading author/abbreviation of a citation (skipping Thompson's '*' marks).
 _CITE_HEAD = re.compile(r"^[*☉\s]*([A-Z][A-Za-z.'\-]+(?:[ -][A-Z][A-Za-z.'\-]+){0,2})")
 
@@ -771,6 +829,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["motif_group"] = rec.get("motif_group", "")
         detail["links"]["tmi"] = [_link("tmi", _clean_tmi_ref(t)) for t in rec.get("tmi_refs", [])]
         detail["traditions"] = _berezkin_tradition_distribution(rec.get("traditions", []), data.get("traditions") or {})
+        # Source bibliography (areasofmyths.com) grouped by macro-area, + the
+        # citations not tied to an areal code.
+        detail["bibliography"] = _berezkin_motif_bibliography(rec["id"])
 
     elif index == "tmi":
         detail["chapter_name"] = rec.get("chapter_name", "")

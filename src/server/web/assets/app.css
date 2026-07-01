@@ -1504,6 +1504,29 @@ body.has-main-navbar {
    wider right pad keeps the wrapped names off the pane edge. */
 .motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 84px 8px 22px; }
 
+/* Source bibliography (areasofmyths.com): collapsible list per macro-area,
+   reusing the distribution accordion look. */
+.motif-bib { display: flex; flex-direction: column; gap: 2px; }
+.motif-bib-area > summary {
+    display: flex; justify-content: space-between; cursor: pointer;
+    padding: 5px 8px; border-radius: 6px; list-style: none;
+}
+.motif-bib-area > summary::-webkit-details-marker { display: none; }
+.motif-bib-area > summary:hover { background: #f3f6f5; }
+.motif-bib-area > summary::before { content: "▸"; color: var(--muted); display: inline-block; width: 14px; }
+.motif-bib-area[open] > summary::before { content: "▾"; }
+.motif-bib-region { flex: 1; }
+.motif-bib-count {
+    font-variant-numeric: tabular-nums; color: var(--muted);
+    font-size: 12px; margin-left: 12px;
+}
+.motif-bib-list { margin: 0; padding: 2px 8px 8px 22px; list-style: none; }
+.motif-bib-list li { font-size: 13px; line-height: 1.5; color: #2a2f36; padding: 1px 0; }
+.motif-bib-author { font-weight: 600; color: #2a3340; }
+.motif-bib-year { color: var(--muted); font-variant-numeric: tabular-nums; }
+.motif-bib-title { color: #55606b; }
+.motif-bib-unresolved { color: var(--muted); font-style: italic; }
+
 .motif-section { margin: 18px 0; }
 
 .motif-section-title {

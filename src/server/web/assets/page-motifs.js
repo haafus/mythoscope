@@ -547,6 +547,34 @@ function berezkinDistribution(dist) {
     return section(`Traditions (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
 
+// One bibliography source: resolved works show author · year — title; unresolved
+// citations fall back to the raw "surname year" key (muted, with the status).
+function bibSourceHtml(s) {
+    if (s.author) {
+        const year = s.year ? ` <span class="motif-bib-year">${escapeHtml(s.year)}</span>` : "";
+        const title = s.title ? ` — <span class="motif-bib-title">${escapeHtml(s.title)}</span>` : "";
+        return `<li><span class="motif-bib-author">${escapeHtml(s.author)}</span>${year}${title}</li>`;
+    }
+    const tag = s.status && s.status !== "resolved" ? ` (${escapeHtml(s.status)})` : "";
+    return `<li class="motif-bib-unresolved">${escapeHtml(s.key)}${tag}</li>`;
+}
+
+// Berezkin source bibliography (areasofmyths.com): a collapsible list per macro-
+// area, then the citations that weren't tied to any areal code.
+function berezkinBibliography(bib) {
+    const areas = (bib && bib.by_area) || [];
+    const unattached = (bib && bib.unattached) || [];
+    if (!areas.length && !unattached.length) return "";
+    const block = (label, sources) => `
+        <details class="motif-bib-area">
+            <summary><span class="motif-bib-region">${escapeHtml(label)}</span><span class="motif-bib-count">${formatNumber(sources.length)}</span></summary>
+            <ul class="motif-bib-list">${sources.map(bibSourceHtml).join("")}</ul>
+        </details>`;
+    let rows = areas.map((a) => block(a.region || a.area_code, a.sources)).join("");
+    if (unattached.length) rows += block("Not tied to a macro-area", unattached);
+    return section("Bibliography", `<div class="motif-bib">${rows}</div>`);
+}
+
 // A citation: linked to its source book when the server resolved one.
 function citeHtml(c) {
     const text = escapeHtml(c.text || "");
@@ -636,6 +664,7 @@ function renderDetail(d) {
             `<span class="motif-area${a.name ? "" : " unresolved"}" title="area ${escapeHtml(a.id)}">${escapeHtml(a.name || a.id)}</span>`).join("");
         body += section(`Macro-areas (${(d.areas || []).length})`,
             areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`);
+        body += berezkinBibliography(d.bibliography);
         if ((links.tmi || []).length) body += linkSection("Thompson motifs (TMI)", links.tmi);
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
