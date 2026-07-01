@@ -585,7 +585,8 @@ function bibSourceHtml(s) {
 }
 
 // Berezkin source bibliography (areasofmyths.com): a collapsible list per macro-
-// area with its sources, then the citations not tied to any areal code ("Other").
+// area with its sources, then the citations not tied to any areal code (headed
+// "—", matching the Ethne section's no-region bucket).
 function berezkinBibliography(bib) {
     const areas = (bib && bib.by_area) || [];
     const unattached = (bib && bib.unattached) || [];
@@ -600,7 +601,7 @@ function berezkinBibliography(bib) {
     if (unattached.length) {
         rows += `
         <details class="motif-bib-area" name="motif-bib">
-            <summary><span class="motif-bib-region">Other</span><span class="motif-bib-count">${formatNumber(unattached.length)}</span></summary>
+            <summary><span class="motif-bib-region">—</span><span class="motif-bib-count">${formatNumber(unattached.length)}</span></summary>
             <ul class="motif-bib-list">${unattached.map(bibSourceHtml).join("")}</ul>
         </details>`;
     }
