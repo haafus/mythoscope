@@ -168,24 +168,21 @@ function initializeGeographyMap(traditions) {
     }).addTo(map);
 
     const { bounds: markerBounds, markers } = renderMarkers(map, traditions);
-    const fitPadding = L.point(34, 34);
 
-    // Min zoom is the lower of "tiles fill the container" and "all markers fit",
-    // so every marker stays reachable without needless gray margins.
+    // Min zoom = the zoom at which the tiles fill the container, so the map can
+    // never be zoomed (or defaulted) out past full coverage — no gray margins.
     function recomputeMinZoom() {
         const fillZoom = map.getBoundsZoom(worldBounds, true);
-        const markerZoom = markerBounds
-            ? map.getBoundsZoom(markerBounds, false, fitPadding)
-            : fillZoom;
-        const minZoom = Math.min(fillZoom, markerZoom);
-        map.setMinZoom(minZoom);
-        if (map.getZoom() < minZoom) map.setZoom(minZoom);
+        map.setMinZoom(fillZoom);
+        if (map.getZoom() < fillZoom) map.setZoom(fillZoom);
     }
     // The map fills its grid cell via CSS; make sure Leaflet reads that height.
     map.invalidateSize();
     recomputeMinZoom();
 
     if (markerBounds) {
+        // fitBounds is clamped to the min zoom above, so the default view fits the
+        // markers but never zooms out far enough to show gray borders.
         map.fitBounds(markerBounds, { padding: [34, 34], maxZoom: 4 });
     } else {
         map.setView([20, 15], map.getMinZoom());
