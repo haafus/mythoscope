@@ -1687,10 +1687,10 @@ body.has-main-navbar {
 .motif-area {
     padding: 3px 9px;
     font-size: 12px;
-    background: #f5f0e7;
-    border: 1px solid #e9e0cf;
+    background: #f3f1ec;
+    border: 1px solid #e6e1d6;
     border-radius: 12px;
-    color: #7a6c4e;
+    color: #7c715c;
 }
 
 .motif-area.unresolved {

@@ -537,8 +537,10 @@ function berezkinDistribution(dist) {
     if (!dist || !dist.total) return "";
     // Region names arrive as the ALL-CAPS top areal-path label; title-case them.
     // Tradition names are already properly capitalized, so leave them untouched.
+    // A shared name makes the regions an exclusive accordion: opening one
+    // collapses the others (native <details name> behavior).
     const rows = (dist.regions || []).map((r) => `
-        <details class="motif-dist-region">
+        <details class="motif-dist-region" name="motif-dist-region">
             <summary><span class="motif-dist-name">${escapeHtml(titleCase(r.region))}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
             <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
         </details>`).join("");
