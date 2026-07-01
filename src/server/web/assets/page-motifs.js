@@ -601,8 +601,9 @@ function renderDetail(d) {
         }
         // Classification folds in the chapter (letter + name) alongside the
         // mapsofmyths type/group taxonomy.
-        const clsParts = [d.motif_type, d.motif_group, d.chapter_label || d.chapter]
-            .filter(Boolean).map(escapeHtml);
+        const clsParts = [d.motif_type, d.motif_group].filter(Boolean).map(escapeHtml);
+        const chapter = d.chapter_label || d.chapter;
+        if (chapter) clsParts.push(`<span class="motif-taxonomy-chapter">${escapeHtml(chapter)}</span>`);
         if (clsParts.length) {
             body += section("Classification", `<div class="motif-taxonomy">${clsParts.join(" · ")}</div>`);
         }
