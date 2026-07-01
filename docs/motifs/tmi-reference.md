@@ -195,7 +195,7 @@ titles and **live book links**:
   links;
 - annotates each entry with its citation count in the built TMI data.
 
-Output: `docs/tmi-bibliography-key.md` (human) and the tracked package asset
+Output: `docs/motifs/tmi-bibliography-key.md` (human) and the tracked package asset
 `src/motifs/data/tmi_bibliography.json` (machine). **320 works, 236 with a book
 link, covering ~71% of matched citation uses.**
 

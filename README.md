@@ -67,4 +67,4 @@
 3. [Bibliography](docs/bibliography.md)
 4. [Motif induction methods review](docs/motif-induction-review.md)
 5. [Motif induction survey 2018–2026](docs/motif-induction-survey.md)
-6. [Motif index data sources & integration](docs/motif-index-data-sources.md)
+6. [Motif index data sources & integration](docs/motifs/motif-index-data-sources.md)

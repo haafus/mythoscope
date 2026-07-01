@@ -10,7 +10,7 @@ curated supplement of high-frequency foreign works the English list omits, and
 folkmasa page into the resumable raw cache and writes
 ``outputs/motifs/tmi_bibliography.json`` (not committed — the server reads it from
 there). The standalone ``scripts/build_tmi_bibliography.py`` also regenerates the
-human-readable ``docs/tmi-bibliography-key.md``.
+human-readable ``docs/motifs/tmi-bibliography-key.md``.
 """
 
 from __future__ import annotations

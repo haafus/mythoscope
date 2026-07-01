@@ -4,7 +4,7 @@
 The key itself is built by the pipeline (``motifs.sources.bibliography``) into
 ``outputs/motifs/tmi_bibliography.json`` — the same code ``mytho motifs`` runs.
 This wrapper rebuilds it standalone and additionally writes the committed
-``docs/tmi-bibliography-key.md`` (a documentation artifact, not build output).
+``docs/motifs/tmi-bibliography-key.md`` (a documentation artifact, not build output).
 
 Run: ``python scripts/build_tmi_bibliography.py`` (re-fetches the folkmasa page
 unless already cached under ``outputs/motifs/raw/``; needs a built ``tmi.json``).
@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from motifs import store  # noqa: E402
 from motifs.sources import bibliography  # noqa: E402
 
-OUT_DOC = ROOT / "docs" / "tmi-bibliography-key.md"
+OUT_DOC = ROOT / "docs" / "motifs" / "tmi-bibliography-key.md"
 
 
 def write_doc(data: dict) -> None:
