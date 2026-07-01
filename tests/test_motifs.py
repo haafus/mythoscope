@@ -457,11 +457,15 @@ class TestBuildMotifsModes:
         self._setup(tmp_path, monkeypatch)
         fetched = []  # records the `force` (re-fetch) flag passed to the source
 
-        def fake_build(cfg, *, force=False):
+        def fake_tmi(cfg, *, force=False):
             fetched.append(force)
-            return {"tmi": {"motifs": []}, "atu": {"types": []}, "atu_seq": {}}
+            return {"motifs": []}
 
-        monkeypatch.setattr(bm.trilogy, "build", fake_build)
+        def fake_atu(cfg, *, force=False):
+            return {"types": []}, {}
+
+        monkeypatch.setattr(bm.trilogy, "build_tmi", fake_tmi)
+        monkeypatch.setattr(bm.trilogy, "build_atu", fake_atu)
 
         bm.build_motifs()            # rebuild from cache (no re-fetch)
         assert fetched == [False]

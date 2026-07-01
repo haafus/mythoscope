@@ -85,21 +85,16 @@ def build_motifs(*, force: bool = False) -> None:
     tr_cfg = config.get("trilogy", {})
     if tr_cfg.get("enabled", True):
         files = tr_cfg.get("files", {})
-        # Header before the build so any TMI parse warnings appear under it, not
-        # ahead of it (mirrors the [1/3] Berezkin step).
+        sources["trilogy"] = {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}
+
+        # --- [2/4] TMI: header first, so its parse warnings sit under it. ---
         logger.info("[2/4] Thompson Motif-Index (TMI) — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
-        trilogy_data = trilogy.build(tr_cfg, force=force)
-        save_json(store.index_path("tmi"), trilogy_data["tmi"])
-        save_json(store.index_path("atu"), trilogy_data["atu"])
-        tmi_motifs = trilogy_data["tmi"]["motifs"]
-        atu_types = trilogy_data["atu"]["types"]
+        tmi_index = trilogy.build_tmi(tr_cfg, force=force)
+        save_json(store.index_path("tmi"), tmi_index)
+        tmi_motifs = tmi_index["motifs"]
         counts["tmi"] = len(tmi_motifs)
-        counts["atu"] = len(atu_types)
         tmi_ids = {m["id"] for m in tmi_motifs}
-        atu_ids = {t["id"] for t in atu_types}
-        atu_seq = trilogy_data["atu_seq"]
-        sources["trilogy"] = {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}
         logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
                     len(tmi_motifs),
                     _applied(tmi_motifs, lambda m: m.get("definition")),
@@ -111,9 +106,16 @@ def build_motifs(*, force: bool = False) -> None:
         bib = enrichment["bibliography"]
         logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
                     "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
+
+        # --- [3/4] ATU: header before the ATU parse, on par with the other steps. ---
         logger.info("[3/4] Aarne-Thompson-Uther (ATU) tale types — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"),
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
+        atu_index, atu_seq = trilogy.build_atu(tr_cfg, force=force)
+        save_json(store.index_path("atu"), atu_index)
+        atu_types = atu_index["types"]
+        counts["atu"] = len(atu_types)
+        atu_ids = {t["id"] for t in atu_types}
         logger.info("      %d tale types", len(atu_types))
 
     # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via

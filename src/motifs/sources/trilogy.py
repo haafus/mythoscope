@@ -249,35 +249,45 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
     return types
 
 
-def build(config: dict, *, force: bool = False) -> dict:
-    """Download and parse the Trilogy CSVs into TMI + ATU store dicts and the seq map."""
-    tmi_rows = _read_csv(config, "tmi", force=force)
-    tmi = _finalize_tmi(_parse_tmi(tmi_rows))
-    logger.info("Trilogy: parsed %d TMI motifs", len(tmi))
+def build_tmi(config: dict, *, force: bool = False) -> dict:
+    """Download and parse only the Trilogy TMI CSV into the TMI store dict.
 
+    Uses just ``tmi.csv`` — disjoint from the ATU files — so it can be a step of
+    its own (the caller logs the step header before invoking it, keeping any TMI
+    parse warnings under that header).
+    """
+    tmi = _finalize_tmi(_parse_tmi(_read_csv(config, "tmi", force=force)))
+    return {
+        "label": "Thompson",
+        "long_label": "Thompson Motif-Index of Folk-Literature",
+        "attribution": config.get("attribution", ""),
+        "homepage": config.get("homepage", ""),
+        "chapters": _tmi_chapters(tmi),
+        "culture_legend": build_legend(tmi),
+        "motifs": tmi,
+    }
+
+
+def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
+    """Download and parse the Trilogy ATU CSVs into ``(atu store dict, atu_seq)``.
+
+    Uses ``atu_seq``/``atu_combos``/``atu_df`` — disjoint from the TMI file.
+    ``atu_seq`` (tale type -> ordered TMI motif codes) feeds the ATU<->TMI walk.
+    """
     seq = _parse_atu_seq(_read_csv(config, "atu_seq", force=force))
     combos = _parse_atu_combos(_read_csv(config, "atu_combos", force=force))
     atu = _parse_atu(_read_csv(config, "atu_df", force=force), seq, combos)
-    logger.info("Trilogy: parsed %d ATU tale types (%d with motif sequences)", len(atu), len(seq))
-
-    attribution = config.get("attribution", "")
-    homepage = config.get("homepage", "")
     return {
-        "tmi": {
-            "label": "Thompson",
-            "long_label": "Thompson Motif-Index of Folk-Literature",
-            "attribution": attribution,
-            "homepage": homepage,
-            "chapters": _tmi_chapters(tmi),
-            "culture_legend": build_legend(tmi),
-            "motifs": tmi,
-        },
-        "atu": {
-            "label": "ATU tale types",
-            "long_label": "Aarne-Thompson-Uther tale-type index",
-            "attribution": attribution,
-            "homepage": homepage,
-            "types": atu,
-        },
-        "atu_seq": seq,
-    }
+        "label": "ATU tale types",
+        "long_label": "Aarne-Thompson-Uther tale-type index",
+        "attribution": config.get("attribution", ""),
+        "homepage": config.get("homepage", ""),
+        "types": atu,
+    }, seq
+
+
+def build(config: dict, *, force: bool = False) -> dict:
+    """Download and parse the Trilogy CSVs into TMI + ATU store dicts and the seq map."""
+    tmi = build_tmi(config, force=force)
+    atu, seq = build_atu(config, force=force)
+    return {"tmi": tmi, "atu": atu, "atu_seq": seq}
