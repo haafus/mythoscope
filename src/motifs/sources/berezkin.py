@@ -456,31 +456,30 @@ def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, fo
         targets = motifs[: settings.motifs.max_motifs]
     logger.info("Berezkin: fetching %d detail pages (definitions)...", len(targets))
 
-    def fetch_one(motif: dict) -> tuple[str, str, str | None]:
-        page = motif["page"]
+    def fetch_one(motif: dict) -> tuple[dict, str, str | None]:
+        url = f"{base}/{motif['page']}"
         try:
-            html = fetch_text(f"{base}/{page}", cache / page, encoding=encoding, force=force)
-            return motif["id"], parse_definition(html), None
+            html = fetch_text(url, cache / motif["page"], encoding=encoding, force=force)
+            return motif, parse_definition(html), None
         except Exception as exc:  # a missing/odd page must not abort the whole build
-            return motif["id"], "", f"{page}: {exc}"
+            return motif, "", str(exc)
 
     workers = max(1, settings.motifs.max_workers)
     definitions: dict[str, str] = {}
-    errors: list[str] = []
+    errors = 0
     no_definition = 0  # fetched fine, but the page carries no NormalLis definition
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for motif_id, definition, error in pool.map(fetch_one, targets):
+        for motif, definition, error in pool.map(fetch_one, targets):
             if error:
-                errors.append(error)
+                errors += 1
+                logger.warning("Berezkin: detail fetch FAILED — %s %s — %s/%s: %s",
+                               motif["id"], motif.get("name", ""), base, motif["page"], error)
             elif definition:
-                definitions[motif_id] = definition
+                definitions[motif["id"]] = definition
             else:
                 no_definition += 1
 
     for motif in motifs:
         motif["definition"] = definitions.get(motif["id"], "")
     logger.info("Berezkin: attached %d definitions (%d pages have no definition, %d fetch errors)",
-                len(definitions), no_definition, len(errors))
-    if errors:
-        shown = "; ".join(errors[:10]) + (" …" if len(errors) > 10 else "")
-        logger.warning("Berezkin: %d detail-page fetches failed: %s", len(errors), shown)
+                len(definitions), no_definition, errors)
