@@ -643,11 +643,10 @@ def _berezkin_bibliography() -> dict:
     return store.cached("berezkin:bib", build)
 
 
-def _berezkin_motif_bibliography(motif_id: str, traditions: dict) -> dict:
-    """Per-motif Berezkin sources grouped by macro-area → people (ethnos), plus the
-    citations not tied to any areal code. The ethnos name is the mapsofmyths
-    tradition's English name where it matched, else the Russian text name. Comparative
-    ``(Ср. …)`` blocks are excluded. Empty when the file is absent."""
+def _berezkin_motif_bibliography(motif_id: str) -> dict:
+    """Per-motif Berezkin sources grouped by macro-area, plus the citations not tied
+    to any areal code (the "Other" bucket). Comparative ``(Ср. …)`` blocks are
+    excluded. Empty when the file is absent."""
     data = _berezkin_bibliography()
     tree = (data.get("by_motif") or {}).get(motif_id)
     if not tree:
@@ -660,11 +659,12 @@ def _berezkin_motif_bibliography(motif_id: str, traditions: dict) -> dict:
                 "year": e.get("year", ""), "title": e.get("title", ""),
                 "status": cite.get("status", "")}
 
-    def ethnos_name(e: dict) -> str:
-        tid = e.get("tradition_id")
-        if tid and traditions.get(tid, {}).get("name"):
-            return traditions[tid]["name"]      # English name from mapsofmyths
-        return e.get("name") or ""              # Russian text name, or none
+    def region_citations(reg: dict) -> list:
+        # Flat schema (citations per region); tolerate the older ethnos-grouped
+        # schema so the display works before the bibliography is rebuilt.
+        if reg.get("citations") is not None:
+            return reg["citations"]
+        return [c for e in reg.get("ethnos", []) for c in e.get("citations", [])]
 
     by_area: dict[str, dict] = {}
     unattached: list[dict] = []
@@ -674,34 +674,23 @@ def _berezkin_motif_bibliography(motif_id: str, traditions: dict) -> dict:
             continue
         code = reg.get("area_code") or ""
         if not code:  # citations with no recognised macro-area → "Other" bucket
-            for e in reg.get("ethnos", []):
-                for c in e.get("citations", []):
-                    if c["key"] not in seen_un:
-                        seen_un.add(c["key"])
-                        unattached.append(source(c))
+            for c in region_citations(reg):
+                if c["key"] not in seen_un:
+                    seen_un.add(c["key"])
+                    unattached.append(source(c))
             continue
         slot = by_area.setdefault(code, {"area_code": code, "region": reg.get("region", ""),
-                                         "ethnos": [], "_g": {}})
-        for e in reg.get("ethnos", []):
-            label, tid = ethnos_name(e), e.get("tradition_id")
-            gkey = tid or label or "—"
-            grp = slot["_g"].get(gkey)
-            if grp is None:
-                grp = {"name": label, "tradition_id": tid, "sources": [], "_seen": set()}
-                slot["_g"][gkey] = grp
-                slot["ethnos"].append(grp)
-            for c in e.get("citations", []):
-                if c["key"] not in grp["_seen"]:
-                    grp["_seen"].add(c["key"])
-                    grp["sources"].append(source(c))
+                                         "sources": [], "_seen": set()})
+        for c in region_citations(reg):
+            if c["key"] not in slot["_seen"]:
+                slot["_seen"].add(c["key"])
+                slot["sources"].append(source(c))
 
     areas = []
     for a in by_area.values():
-        for g in a["ethnos"]:
-            g.pop("_seen", None)
-        a.pop("_g", None)
+        a.pop("_seen", None)
         areas.append(a)
-    areas.sort(key=lambda a: sum(len(g["sources"]) for g in a["ethnos"]), reverse=True)
+    areas.sort(key=lambda a: len(a["sources"]), reverse=True)
     return {"by_area": areas, "unattached": unattached}
 
 
@@ -850,7 +839,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["traditions"] = _berezkin_tradition_distribution(rec.get("traditions", []), data.get("traditions") or {})
         # Source bibliography (areasofmyths.com) grouped by macro-area, + the
         # citations not tied to an areal code.
-        detail["bibliography"] = _berezkin_motif_bibliography(rec["id"], data.get("traditions") or {})
+        detail["bibliography"] = _berezkin_motif_bibliography(rec["id"])
 
     elif index == "tmi":
         detail["chapter_name"] = rec.get("chapter_name", "")

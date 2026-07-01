@@ -1520,8 +1520,6 @@ body.has-main-navbar {
     font-variant-numeric: tabular-nums; color: var(--muted);
     font-size: 12px; margin-left: 12px;
 }
-.motif-bib-ethnos-list { display: flex; flex-direction: column; gap: 8px; padding: 2px 0 8px; }
-.motif-bib-ethnos { font-weight: 600; color: #3a5e86; font-size: 13px; padding: 0 8px 2px 22px; }
 .motif-bib-list { margin: 0; padding: 2px 40px 4px 22px; list-style: none; }
 .motif-bib-list li { font-size: 13px; line-height: 1.5; color: #2a2f36; margin-bottom: 8px; }
 .motif-bib-list li:last-child { margin-bottom: 0; }
@@ -1534,7 +1532,7 @@ body.has-main-navbar {
 /* Hover a citation for a gray rounded pill; click copies it to the clipboard.
    Negative margins let the pill bleed into the list padding without shifting text. */
 .motif-bib-item { cursor: pointer; border-radius: 6px; padding: 3px 8px; margin-left: -8px; margin-right: -8px; transition: background-color 0.12s ease; }
-.motif-bib-item:hover { background-color: #eceef1; }
+.motif-bib-item:hover { background-color: #f3f6f5; }  /* same as the macro-area hover */
 .motif-bib-item.copied { background-color: #dbe7db; }
 
 .motif-section { margin: 18px 0; }

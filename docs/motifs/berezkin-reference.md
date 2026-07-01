@@ -187,24 +187,26 @@ macro-areas, codes 10–74** (code 58, *Дельта Ориноко*, is defunct
 
 ---
 
-## 6b. Bibliography, linked to regions & ethnos
+## 6b. Bibliography, linked to macro-areas
 
 `berezkin_bibliography.py` pulls the catalogue's own bibliography (`biblio.html`,
-grouped by author → year-leading works, ~9,600 works) and links it to the areal
+grouped by author → year-leading works, ~9,700 works) and links it to the areal
 distribution. Each motif detail page writes its attestations as
 `Region. Ethnos [summary]: Author Year: pages` blocks (`<p class="NormalMai">`);
 the step re-reads the already-cached pages, splits each region block, extracts the
 author-year citations and resolves them against the bibliography (year + surname,
 same-surname collisions flagged `ambiguous`). Every citation is attributed to its
-region (from the area legend, always) and, where the ethnos name matches a
-mapsofmyths tradition (`name_rus`), to that tradition (credential-gated; ~45% of
-citations, region-level otherwise).
+macro-area (from the area legend, always — no credentials needed).
+
+Per-citation *ethnos* linkage was dropped: it matched every region block against
+~1,000 tradition names and cost ~120 s of the build for a level of detail nothing
+displayed. Removing it cut the step from ~180 s to ~60 s.
 
 Output `berezkin_bibliography.json` (gitignored, best-effort): a per-motif
-`region → ethnos → citations` tree plus `source → {regions, tradition_ids, uses}`
-aggregates and reverse `area_index` / `tradition_index`. Current: ~167k citations,
-~88% resolved. Distinct from the mapsofmyths `tmi_refs` cross-walk (§9) and the TMI
-folkmasa bibliography — this is the Berezkin catalogue's own source apparatus.
+`region → citations` tree plus `source → {regions, uses}` aggregates and a reverse
+`area_index`. Current: ~167k citations, ~89% resolved. Distinct from the mapsofmyths
+`tmi_refs` cross-walk (§9) and the TMI folkmasa bibliography — this is the Berezkin
+catalogue's own source apparatus.
 
 ---
 

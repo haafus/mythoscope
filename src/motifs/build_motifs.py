@@ -95,10 +95,10 @@ def build_motifs(*, force: bool = False) -> None:
             logger.info("      + bibliography (areasofmyths.com) SKIPPED (%s)", bb["skipped"])
         else:
             logger.info("      + bibliography (areasofmyths.com): %d works; citations resolved %d/%d (%d%%), "
-                        "ambiguous %d; ethnos-linked %d",
+                        "ambiguous %d",
                         bb["works"], bb["resolved"], bb["citations"],
                         round(100 * bb["resolved"] / bb["citations"]) if bb["citations"] else 0,
-                        bb["ambiguous"], bb["ethnos_linked"])
+                        bb["ambiguous"])
 
     # --- [2/3] TMI + [3/3] ATU (from the j-hagedorn/trilogy dataset) ---
     tmi_ids: set[str] = set()

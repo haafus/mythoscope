@@ -13,12 +13,10 @@ Two artefacts, from the same static site the Berezkin catalogue is scraped from:
 ``refresh()`` re-reads the cached detail pages (no new fetches except biblio.html),
 splits each region block, extracts the author-year citations, resolves them against
 the bibliography (year + surname-in-author, with same-surname collisions flagged
-``ambiguous``), and attributes each to its region (from the canonical area legend)
-and, where the ethnos name matches a mapsofmyths tradition (``name_rus``), to that
-tradition. It writes a machine-readable ``berezkin_bibliography.json`` (per-motif
-region→ethnos→citation tree + source→regions/traditions aggregates) — gitignored,
-best-effort enrichment. Ethnos linkage is credential-gated (needs the mapsofmyths
-tradition catalogue); region linkage always works from the hardcoded area legend.
+``ambiguous``), and attributes each to its macro-area (from the canonical area
+legend). It writes a machine-readable ``berezkin_bibliography.json`` (per-motif
+region→citation tree + source→regions aggregates) — gitignored, best-effort
+enrichment that always works from the hardcoded area legend (no credentials).
 
 Parsing is separated from fetching so it can be unit-tested on static fixtures.
 """
@@ -228,14 +226,11 @@ def _region_of(block: str, index: dict[str, tuple[str, str]]) -> tuple[str, str,
     return (hit[0], hit[1], rest) if hit else ("", "", head)
 
 
-def parse_attestations(html: str, area_index: dict[str, tuple[str, str]],
-                       trad_re: re.Pattern | None, trad_by_name: dict[str, str]) -> list[dict]:
+def parse_attestations(html: str, area_index: dict[str, tuple[str, str]]) -> list[dict]:
     """Parse a motif detail page into region blocks with their citations.
 
-    Each ``NormalMai`` paragraph is one region: ``[{area_code, region, cf, cites:
-    [{pos, surname, year, ethnos, tradition_id}]}]``. Ethnos is the nearest
-    preceding mapsofmyths tradition name (sticky within the block); ``None`` when
-    the catalogue is absent (no credentials) or no name matched.
+    Each ``NormalMai`` paragraph is one region:
+    ``[{area_code, region, cf, cites: [{pos, surname, year}]}]``.
     """
     from bs4 import BeautifulSoup
 
@@ -247,31 +242,11 @@ def parse_attestations(html: str, area_index: dict[str, tuple[str, str]],
             continue
         cf = bool(_CF_PREFIX.match(block)) or block.lstrip().startswith("(")
         code, name, rest = _region_of(block, area_index)
-
-        # Ethnos hits (positions of known tradition names), for nearest-preceding
-        # attribution as we walk the citations left to right.
-        ethnos_hits = ([(mm.start(), mm.group(0), trad_by_name[mm.group(0)])
-                        for mm in trad_re.finditer(rest)] if trad_re else [])
-        cites = []
-        ethnos_i = 0
-        cur_name = cur_tid = None
-        for pos, surname, year in parse_refs(rest):
-            while ethnos_i < len(ethnos_hits) and ethnos_hits[ethnos_i][0] < pos:
-                _, cur_name, cur_tid = ethnos_hits[ethnos_i]
-                ethnos_i += 1
-            cites.append({"pos": pos, "surname": surname, "year": year,
-                          "ethnos": cur_name, "tradition_id": cur_tid})
+        cites = [{"pos": pos, "surname": surname, "year": year}
+                 for pos, surname, year in parse_refs(rest)]
         if cites:
             regions.append({"area_code": code, "region": name, "cf": cf, "cites": cites})
     return regions
-
-
-def _name_regex(names) -> re.Pattern | None:
-    """One alternation matching any tradition name as a whole word (longest-first)."""
-    ordered = sorted((n for n in names if len(n) >= 3), key=len, reverse=True)
-    if not ordered:
-        return None
-    return re.compile(r"(?<!\w)(" + "|".join(re.escape(n) for n in ordered) + r")(?!\w)")
 
 
 # ---------------------------------------------------------------------------
@@ -304,15 +279,10 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         by_year[e["year"][:4]].append((key, _fold(e["author"]), _year_norm(e["year"])))
 
     # Region names (hardcoded legend, normalised for dash/case/order-insensitive
-    # matching) and ethnos names (mapsofmyths, credential-gated — absent =>
-    # region-level only).
+    # matching). Citations are linked to macro-areas only — the far more expensive
+    # ethnos linkage (matching every block against ~1000 tradition names) was
+    # dropped, as nothing displays it.
     area_index = region_index(berezkin.canonical_area_legend())
-    trad_by_name: dict[str, str] = {}
-    for tid, t in berezkin.load_traditions().items():
-        nr = (t.get("name_rus") or "").strip()
-        if nr:
-            trad_by_name.setdefault(nr, tid)
-    trad_re = _name_regex(trad_by_name)
 
     def parse_one(m: dict) -> tuple[str, list[dict]]:
         page = m.get("page")
@@ -325,7 +295,7 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         except Exception as exc:
             logger.debug("Berezkin bibliography: detail read failed for %s: %s", page, exc)
             return m["id"], []
-        return m["id"], parse_attestations(html, area_index, trad_re, trad_by_name)
+        return m["id"], parse_attestations(html, area_index)
 
     workers = max(1, settings.motifs.max_workers)
     with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -335,17 +305,14 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
     by_id = {m["id"]: m for m in motifs}
     per_motif: dict[str, list[dict]] = {}
     src_regions: dict[str, set] = defaultdict(set)
-    src_trads: dict[str, set] = defaultdict(set)
     src_uses: Counter = Counter()
-    area_index: dict[str, set] = defaultdict(set)
-    trad_index: dict[str, set] = defaultdict(set)
-    n_cite = n_res = n_amb = n_eth = 0
+    area_agg: dict[str, set] = defaultdict(set)
+    n_cite = n_res = n_amb = 0
 
     for mid, regions in parsed:
         tree = []
         for reg in regions:
-            groups: dict[tuple, dict] = {}
-            order: list[tuple] = []
+            citations = []
             for c in reg["cites"]:
                 n_cite += 1
                 r = _resolve(c["surname"], c["year"], by_year)
@@ -353,24 +320,15 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
                     n_res += 1
                 elif r["status"] == "ambiguous":
                     n_amb += 1
-                if c["tradition_id"]:
-                    n_eth += 1
-                gk = (c["ethnos"], c["tradition_id"])
-                if gk not in groups:
-                    groups[gk] = {"name": c["ethnos"], "tradition_id": c["tradition_id"], "citations": []}
-                    order.append(gk)
-                groups[gk]["citations"].append({"key": r["key"], "status": r["status"]})
+                citations.append({"key": r["key"], "status": r["status"]})
                 # Aggregates (skip comparative "cf" blocks — not direct attestations).
                 if not reg["cf"]:
                     src_uses[r["key"]] += 1
                     if reg["area_code"]:
                         src_regions[r["key"]].add(reg["area_code"])
-                        area_index[reg["area_code"]].add(r["key"])
-                    if c["tradition_id"]:
-                        src_trads[r["key"]].add(c["tradition_id"])
-                        trad_index[c["tradition_id"]].add(r["key"])
+                        area_agg[reg["area_code"]].add(r["key"])
             tree.append({"area_code": reg["area_code"], "region": reg["region"],
-                         "cf": reg["cf"], "ethnos": [groups[k] for k in order]})
+                         "cf": reg["cf"], "citations": citations})
         if tree:
             per_motif[mid] = tree
         else:  # no citation extracted from this motif's detail page — log it
@@ -381,7 +339,6 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
     sources = {k: {"author": biblio.get(k, {}).get("author", ""),
                    "year": biblio.get(k, {}).get("year", ""),
                    "regions": sorted(src_regions.get(k, ())),
-                   "tradition_ids": sorted(src_trads.get(k, ())),
                    "uses": src_uses[k]}
                for k in src_uses}
 
@@ -390,8 +347,7 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         "bibliography": biblio,
         "by_motif": per_motif,
         "sources": sources,
-        "area_index": {a: sorted(ks) for a, ks in area_index.items()},
-        "tradition_index": {t: sorted(ks) for t, ks in trad_index.items()},
+        "area_index": {a: sorted(ks) for a, ks in area_agg.items()},
     }
     out_path().write_text(json.dumps(payload, ensure_ascii=False, indent=0), encoding="utf-8")
 
@@ -400,8 +356,6 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         "citations": n_cite,
         "resolved": n_res,
         "ambiguous": n_amb,
-        "ethnos_linked": n_eth,
-        "traditions_available": len(trad_by_name),
         "motifs_with_citations": len(per_motif),
         "motifs_without_citations": len(motifs) - len(per_motif),
     }
