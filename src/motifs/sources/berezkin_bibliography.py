@@ -192,18 +192,43 @@ def _resolve(surname: str, year: str, index: dict[str, list[tuple[str, str, str]
 # ---------------------------------------------------------------------------
 
 _CF_PREFIX = re.compile(r"^[(\[]?\s*(ср|см|cf)\.?\s*", re.IGNORECASE)
+_DASH = re.compile(r"[-–—]")
+_WS = re.compile(r"\s+")
 
 
-def _region_of(block: str, area_names: list[tuple[str, str]]) -> tuple[str, str, str]:
-    """``(area_code, area_name, rest)`` — the longest area name the block opens with."""
+def _norm_region(s: str) -> str:
+    """Region name key: lower-cased, dashes → spaces, whitespace collapsed — so
+    'Южная Сибирь - Монголия' matches the legend's 'Южная Сибирь – Монголия', and a
+    two-part name reads the same regardless of the dash form or spacing."""
+    return _WS.sub(" ", _DASH.sub(" ", s.lower())).strip()
+
+
+def region_index(legend: dict[str, str]) -> dict[str, tuple[str, str]]:
+    """``{normalised name: (code, display)}`` from the area legend, also indexing
+    the reversed form of two-part names ('Микронезия – Полинезия' ↔ the legend's
+    'Полинезия – Микронезия')."""
+    idx: dict[str, tuple[str, str]] = {}
+    for code, name in legend.items():
+        if not name:
+            continue
+        idx.setdefault(_norm_region(name), (code, name))
+        parts = re.split(r"\s*[-–—]\s*", name)
+        if len(parts) == 2:
+            idx.setdefault(_norm_region(f"{parts[1]} {parts[0]}"), (code, name))
+    return idx
+
+
+def _region_of(block: str, index: dict[str, tuple[str, str]]) -> tuple[str, str, str]:
+    """``(area_code, area_name, rest)`` — the region header (up to the first '. ',
+    which no area name contains) matched against the normalised legend index."""
     head = _CF_PREFIX.sub("", block).lstrip("([ ")
-    for name, code in area_names:  # pre-sorted longest-first
-        if head.startswith(name):
-            return code, name, head[len(name):]
-    return "", "", head
+    i = head.find(". ")
+    candidate, rest = (head[:i], head[i:]) if i != -1 else (head, "")
+    hit = index.get(_norm_region(candidate))
+    return (hit[0], hit[1], rest) if hit else ("", "", head)
 
 
-def parse_attestations(html: str, area_names: list[tuple[str, str]],
+def parse_attestations(html: str, area_index: dict[str, tuple[str, str]],
                        trad_re: re.Pattern | None, trad_by_name: dict[str, str]) -> list[dict]:
     """Parse a motif detail page into region blocks with their citations.
 
@@ -221,7 +246,7 @@ def parse_attestations(html: str, area_names: list[tuple[str, str]],
         if not block:
             continue
         cf = bool(_CF_PREFIX.match(block)) or block.lstrip().startswith("(")
-        code, name, rest = _region_of(block, area_names)
+        code, name, rest = _region_of(block, area_index)
 
         # Ethnos hits (positions of known tradition names), for nearest-preceding
         # attribution as we walk the citations left to right.
@@ -278,10 +303,10 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
     for key, e in biblio.items():
         by_year[e["year"][:4]].append((key, _fold(e["author"]), _year_norm(e["year"])))
 
-    # Region names (hardcoded legend, longest-first) and ethnos names (mapsofmyths,
-    # credential-gated — absent => region-level only).
-    area_names = sorted(((name, code) for code, name in berezkin.canonical_area_legend().items() if name),
-                        key=lambda nc: len(nc[0]), reverse=True)
+    # Region names (hardcoded legend, normalised for dash/case/order-insensitive
+    # matching) and ethnos names (mapsofmyths, credential-gated — absent =>
+    # region-level only).
+    area_index = region_index(berezkin.canonical_area_legend())
     trad_by_name: dict[str, str] = {}
     for tid, t in berezkin.load_traditions().items():
         nr = (t.get("name_rus") or "").strip()
@@ -300,7 +325,7 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         except Exception as exc:
             logger.debug("Berezkin bibliography: detail read failed for %s: %s", page, exc)
             return m["id"], []
-        return m["id"], parse_attestations(html, area_names, trad_re, trad_by_name)
+        return m["id"], parse_attestations(html, area_index, trad_re, trad_by_name)
 
     workers = max(1, settings.motifs.max_workers)
     with ThreadPoolExecutor(max_workers=workers) as pool:

@@ -439,16 +439,22 @@ class TestBerezkinBibliography:
         assert bbib._resolve("Kroeber", "1903", index)["status"] == "resolved"
 
     def test_parse_attestations_region_ethnos_and_cf(self):
-        area_names = sorted([("Меланезия", "19"), ("Бантуязычная Африка", "11")],
-                            key=lambda nc: len(nc[0]), reverse=True)
+        idx = bbib.region_index({"19": "Меланезия", "11": "Бантуязычная Африка"})
         trad_by_name = {"Апатани": "6.2.1"}
         trad_re = bbib._name_regex(trad_by_name)
         html = ('<p class="NormalMai">Меланезия. Апатани [сюжет]: Elwin 1958a: 38.</p>'
                 '<p class="NormalMai">(Ср. Бантуязычная Африка. Фьоти [сюжет]: Pechuël-Loesche 1907: 135)</p>')
-        regs = bbib.parse_attestations(html, area_names, trad_re, trad_by_name)
+        regs = bbib.parse_attestations(html, idx, trad_re, trad_by_name)
         assert regs[0]["area_code"] == "19" and regs[0]["cf"] is False
         assert regs[0]["cites"][0]["tradition_id"] == "6.2.1"     # ethnos matched to tradition
         assert regs[1]["cf"] is True and regs[1]["area_code"] == "11"  # comparative "(Ср. …)" block
+
+    def test_region_of_normalizes_dash_case_and_order(self):
+        idx = bbib.region_index({"34": "Южная Сибирь – Монголия", "20": "Полинезия – Микронезия"})
+        # hyphen instead of en-dash
+        assert bbib._region_of("Южная Сибирь - Монголия. Алтайцы: X 1990", idx)[0] == "34"
+        # reversed word order
+        assert bbib._region_of("Микронезия – Полинезия. Палау: Y 1991", idx)[0] == "20"
 
 
 # Cross-walk
