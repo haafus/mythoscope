@@ -21,7 +21,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
         <main class="motifs-page container">
             <div class="workspace">
                 <aside class="library-sidebar motifs-sidebar">
-                    <div class="motifs-tabs" id="motifsTabs">Loading...</div>
+                    <div class="motifs-tabs" id="motifsTabs">${tabsPlaceholder()}</div>
                     <button class="motifs-overview-btn" id="motifsOverview">Overview</button>
                     <input type="text" class="motifs-search" id="motifsSearch" placeholder="Search id or name...">
                     <select class="motifs-chapter" id="motifsChapter"></select>
@@ -69,9 +69,24 @@ function currentIndex() {
     return mState.indexes.find((i) => i.index === mState.index) || mState.indexes[0];
 }
 
+// Fixed tab order and labels — lets us paint the buttons at their final size
+// before the index summaries load, so only the count fills in (no "Loading",
+// no height jump). Thompson sits before Berezkin.
+const TAB_ORDER = ["tmi", "berezkin", "atu"];
+const TAB_LABELS = { tmi: "Thompson", berezkin: "Berezkin", atu: "ATU tale types" };
+
+function tabsPlaceholder() {
+    return TAB_ORDER.map((idx) => `
+        <button class="motifs-tab" disabled>
+            ${escapeHtml(TAB_LABELS[idx])} <span class="motifs-tab-count">&nbsp;</span>
+        </button>`).join("");
+}
+
 function renderTabs() {
     const tabs = document.getElementById("motifsTabs");
-    tabs.innerHTML = mState.indexes.map((i) => `
+    const ordered = [...mState.indexes].sort(
+        (a, b) => TAB_ORDER.indexOf(a.index) - TAB_ORDER.indexOf(b.index));
+    tabs.innerHTML = ordered.map((i) => `
         <button class="motifs-tab${i.index === mState.index ? " active" : ""}"
                 data-index="${escapeHtml(i.index)}" title="${escapeHtml(i.long_label || i.label)}">
             ${escapeHtml(i.label)} <span class="motifs-tab-count">${formatNumber(i.count)}</span>
