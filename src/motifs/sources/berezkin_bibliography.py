@@ -28,6 +28,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import unicodedata
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -138,11 +139,22 @@ def parse_refs(text: str) -> list[tuple[int, str, str]]:
     return out
 
 
-def _resolve(surname: str, year: str, by_year: dict[str, list[tuple[str, str]]]) -> dict:
-    """Resolve a citation to a bibliography key. ``status`` is resolved / ambiguous
-    / unresolved; ``ambiguous`` = same surname+year for several authors."""
-    hits = [key for key, full in by_year.get(year, ())
-            if re.search(rf"(?<!-)\b{re.escape(surname)}\b(?!-)", full, re.IGNORECASE)]
+def _fold(s: str) -> str:
+    """Diacritic-insensitive key: drop combining marks and unify ё/ë → е, so
+    "Galvão"/"Fernández"/"Лёбите" match their plain-letter bibliography forms."""
+    s = s.replace("ё", "е").replace("Ё", "Е").replace("ë", "е").replace("Ë", "Е")
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+
+
+def _resolve(surname: str, year: str, index: dict[str, list[tuple[str, str, str]]]) -> dict:
+    """Resolve a citation to a bibliography key. ``index`` maps a 4-digit year to
+    ``[(key, folded_author, exact_year)]``. Matching is diacritic-insensitive and,
+    when the exact year (incl. suffix) misses, falls back to any work of the same
+    4-digit year. ``status`` is resolved / ambiguous / unresolved."""
+    pat = re.compile(rf"(?<!-)\b{re.escape(_fold(surname))}\b(?!-)", re.IGNORECASE)
+    cands = index.get(year[:4], ())
+    exact = [k for k, fa, ey in cands if ey == year and pat.search(fa)]
+    hits = list(dict.fromkeys(exact or [k for k, fa, ey in cands if pat.search(fa)]))
     if len(hits) == 1:
         return {"key": hits[0], "status": "resolved"}
     if len(hits) > 1:
@@ -236,9 +248,10 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         return {"skipped": "no-bibliography"}
 
     biblio = parse_bibliography(biblio_html)
-    by_year: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    # Resolution index: 4-digit year -> [(key, folded author, exact year)].
+    by_year: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
     for key, e in biblio.items():
-        by_year[e["year"]].append((key, e["author"]))
+        by_year[e["year"][:4]].append((key, _fold(e["author"]), e["year"]))
 
     # Region names (hardcoded legend, longest-first) and ethnos names (mapsofmyths,
     # credential-gated — absent => region-level only).

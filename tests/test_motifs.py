@@ -397,13 +397,27 @@ class TestBerezkinBibliography:
         assert ("Meier", "1909") in pairs and ("Luomala", "1940") in pairs  # nested "в" -> both
         assert all(a != "ATU" for a, _ in pairs)
 
+    def _index(self, *entries):
+        idx = {}
+        for key, author, year in entries:
+            idx.setdefault(year[:4], []).append((key, bbib._fold(author), year))
+        return idx
+
     def test_resolve_status(self):
-        by_year = {"1907": [("Pechuël-Loesche 1907", "Pechuël-Loesche, Eduard")],
-                   "1986": [("Сем 1986", "Сем, Юрий Александрович"),
-                            ("Сем 1986#2", "Сем, Татьяна Юрьевна")]}
-        assert bbib._resolve("Pechuël-Loesche", "1907", by_year)["status"] == "resolved"
-        assert bbib._resolve("Сем", "1986", by_year)["status"] == "ambiguous"
-        assert bbib._resolve("Nobody", "1999", by_year)["status"] == "unresolved"
+        index = self._index(("Pechuël-Loesche 1907", "Pechuël-Loesche, Eduard", "1907"),
+                            ("Сем 1986", "Сем, Юрий Александрович", "1986"),
+                            ("Сем 1986#2", "Сем, Татьяна Юрьевна", "1986"))
+        assert bbib._resolve("Pechuël-Loesche", "1907", index)["status"] == "resolved"
+        assert bbib._resolve("Сем", "1986", index)["status"] == "ambiguous"
+        assert bbib._resolve("Nobody", "1999", index)["status"] == "unresolved"
+
+    def test_resolve_diacritics_and_year_suffix(self):
+        index = self._index(("Galvão 1949", "Galvão, Eduardo", "1949"),
+                            ("Ганиева 2011b", "Ганиева, Фатима Абдулаевна", "2011b"))
+        # citation carries a plain-letter surname; the bibliography has diacritics
+        assert bbib._resolve("Galvao", "1949", index)["status"] == "resolved"
+        # citation year has no suffix; the bibliography's is 2011b (same 4-digit year)
+        assert bbib._resolve("Ганиева", "2011", index)["status"] == "resolved"
 
     def test_parse_attestations_region_ethnos_and_cf(self):
         area_names = sorted([("Меланезия", "19"), ("Бантуязычная Африка", "11")],
