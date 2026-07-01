@@ -7,10 +7,9 @@ import {
 } from "./core.js";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js";
 import {
-    attributionLine, bindSearchResultClicks,
+    attributionLine,
     fetchPointWithNeighbors, renderSearchResultItem,
-    resultBookTitle, runSemanticSearch,
-    searchResultMetaLine,
+    runSemanticSearch,
 } from "./search-utils.js";
 import { renderTraditionList } from "./tree-traditions.js";
 
@@ -347,7 +346,6 @@ function setSearchResults(html) {
 
 function displayAnalysisSearchResults(data) {
     const results = Array.isArray(data.results) ? data.results : [];
-    state.lastAnalysisSearchData = data;
     if (!results.length) {
         setSearchResults('<div class="search-empty">Nothing found. Try changing the query.</div>');
         return;
@@ -362,41 +360,4 @@ function displayAnalysisSearchResults(data) {
             ${results.map((result) => renderSearchResultItem(result, data)).join("")}
         </div>
     `);
-
-    bindSearchResultClicks(document.getElementById("searchResults"), displaySearchModalPointInfo);
-}
-
-async function displaySearchModalPointInfo(pointId, chunkIndex = null) {
-    if (!state.selectedModel || !pointId) return;
-
-    openSearchModal("Chunk Details");
-    setSearchResults('<div class="search-loading">Loading nearest chunks...</div>');
-
-    try {
-        const { point, neighbors } = await fetchPointWithNeighbors(pointId, chunkIndex);
-
-        setSearchResults(`
-            <div class="search-detail">
-                <button class="btn btn-outline" type="button" id="backToSearchResults">Back to results</button>
-                <div class="search-result-topline">
-                    <span class="result-tradition">${escapeHtml(point.tradition)}</span>
-                    <span class="search-result-meta">${escapeHtml(searchResultMetaLine(point))}</span>
-                </div>
-                <div class="search-detail-text">${escapeHtml(point.text)}</div>
-            </div>
-            <div class="search-summary">
-                <strong>Nearest neighbors</strong>
-                <span>${escapeHtml(resultBookTitle(point))}</span>
-            </div>
-            <div class="search-result-list">
-                ${neighbors.length ? neighbors.map((neighbor) => renderSearchResultItem(neighbor, {query: ""})).join("") : '<div class="search-empty">No nearest chunks found.</div>'}
-            </div>
-        `);
-
-        const back = document.getElementById("backToSearchResults");
-        if (back) back.addEventListener("click", () => displayAnalysisSearchResults(state.lastAnalysisSearchData || {results: []}));
-        bindSearchResultClicks(document.getElementById("searchResults"), displaySearchModalPointInfo);
-    } catch (error) {
-        setSearchResults(`<div class="search-empty">Load error: ${escapeHtml(error.message)}</div>`);
-    }
 }

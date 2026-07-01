@@ -74,21 +74,15 @@ export function chunkTextHtml(item, query = "") {
 export function renderSearchResultItem(result, data) {
     const {percent, cls} = scoreClass(result.similarity_score);
     return `
-        <button class="search-result-item" type="button" data-point-id="${escapeHtml(result.id)}" data-chunk-index="${escapeHtml(result.chunk_index)}">
+        <div class="search-result-item">
             <span class="search-result-topline">
                 <span class="result-tradition">${escapeHtml(result.tradition)}</span>
                 <span class="result-score ${cls}">${percent}% similarity</span>
             </span>
             <span class="search-result-meta">${escapeHtml(searchResultMetaLine(result))}</span>
             <span class="result-text chunk-text">${chunkTextHtml(result, data.query)}</span>
-        </button>
+        </div>
     `;
-}
-
-export function bindSearchResultClicks(container, handler) {
-    container.querySelectorAll(".search-result-item").forEach((item) => {
-        item.addEventListener("click", () => handler(item.dataset.pointId, item.dataset.chunkIndex));
-    });
 }
 
 // Returns { point, neighbors }: the API gives the queried point first, then its

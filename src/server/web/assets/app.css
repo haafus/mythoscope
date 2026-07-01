@@ -1087,48 +1087,15 @@ body.has-main-navbar {
     display: grid;
 }
 
-.analysis-page .search-detail {
-    display: grid;
-    gap: 14px;
-    padding: 18px;
-    border-bottom: 1px solid #e8ecef;
-    background: #fff;
-}
-
-.analysis-page .search-detail .btn {
-    justify-self: start;
-}
-
-.analysis-page .search-detail-text {
-    max-height: 360px;
-    overflow: auto;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: #fafbfc;
-    color: #2f343b;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 15px;
-    line-height: 1.65;
-    padding: 14px;
-    white-space: pre-wrap;
-}
-
 .analysis-page .search-result-item {
     display: grid;
     gap: 8px;
     width: 100%;
-    border: 0;
     border-bottom: 1px solid #e8ecef;
     background: #fff;
     color: inherit;
-    cursor: pointer;
-    font: inherit;
     padding: 16px 18px;
     text-align: left;
-}
-
-.analysis-page .search-result-item:hover {
-    background: #f8f9fa;
 }
 
 .analysis-page .search-result-topline {

@@ -11,7 +11,6 @@ export const state = {
     corpusOpenTraditionsInitialized: false,
     corpusCollapsedMajors: new Set(),
     traditionInfo: null,
-    lastAnalysisSearchData: null,
     analysisSearchRequestId: 0,
     similarityMethods: [],
 };
