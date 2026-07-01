@@ -57,8 +57,10 @@ _SEE_MARKER_RE = re.compile(r"(?:^|[\s,;(])см\.\s*(.+)$", re.IGNORECASE)
 # "K. ПРИКЛЮЧЕНИЯ I(1): ДЕЯНИЯ ГЕРОЕВ" — name starts with a Cyrillic capital,
 # then anything (colon/parens/roman numerals appear in some headers).
 _CHAPTER_RE = re.compile(r"^\s*([A-Z])\.\s+([А-ЯЁ].+?)\s*$")
-# The trailing areal-index list: preceded by whitespace/comma, may open with "(".
-_AREA_RE = re.compile(r"[\s,]+[.(]*\d[\d.()\s,\-]*$")
+# The trailing areal-index list: preceded by whitespace/comma, may open with "("
+# or be wrapped in "[…]" (an editorial bracket around the whole distribution —
+# transparent for parsing; the inner "(…)" still marks comparative entries).
+_AREA_RE = re.compile(r"[\s,]+[.(\[]*\d[\d.()\[\]\s,\-]*$")
 # Berezkin groups societies into ~70 areal units; anything well above that is a
 # parsing artifact (e.g. a digit that leaked out of a name or a tale-type code).
 _MAX_AREA = 150

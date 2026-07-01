@@ -90,6 +90,13 @@ class TestBerezkinEntry:
         e = berezkin.parse_motif_entry("H49. Убитый пес. Th .1.4.1; .2.2. .27.", "h49.html")
         assert e["name"] == "Убитый пес"
 
+    def test_bracketed_area_list(self):
+        # A distribution wrapped in "[…]" parses transparently: the inner "(…)"
+        # still marks a comparative area and the name stays clean.
+        e = berezkin.parse_motif_entry("A32de. Безголовый на луне. [(.21.).31.32.35.36.)]", "a32de.html")
+        assert e["name"] == "Безголовый на луне"
+        assert e["areas"] == [21, 31, 32, 35, 36]
+
     def test_latin_homoglyph_fixed(self):
         e = berezkin.parse_motif_entry("E30A. Cупруг-эрзац заменен настоящим. .27.28.", "e30a.html")
         assert e["name"] == "Супруг-эрзац заменен настоящим"
