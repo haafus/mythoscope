@@ -562,20 +562,34 @@ function bibSourceHtml(s) {
     return `<li class="motif-bib-unresolved">${escapeHtml(s.key)}${tag}</li>`;
 }
 
+// One people (ethnos) group: an English/Russian name label over its sources.
+function bibEthnosHtml(e) {
+    const label = e.name ? `<div class="motif-bib-ethnos">${escapeHtml(e.name)}</div>` : "";
+    return `${label}<ul class="motif-bib-list">${(e.sources || []).map(bibSourceHtml).join("")}</ul>`;
+}
+
 // Berezkin source bibliography (areasofmyths.com): a collapsible list per macro-
-// area, then the citations that weren't tied to any areal code.
+// area, its sources grouped by people (ethnos); then the citations not tied to
+// any areal code.
 function berezkinBibliography(bib) {
     const areas = (bib && bib.by_area) || [];
     const unattached = (bib && bib.unattached) || [];
     if (!areas.length && !unattached.length) return "";
+    const areaCount = (a) => (a.ethnos || []).reduce((n, e) => n + (e.sources || []).length, 0);
     // Shared name -> exclusive accordion: opening one collapses the others.
-    const block = (label, sources) => `
+    const areaBlock = (a) => `
         <details class="motif-bib-area" name="motif-bib">
-            <summary><span class="motif-bib-region">${escapeHtml(label)}</span><span class="motif-bib-count">${formatNumber(sources.length)}</span></summary>
-            <ul class="motif-bib-list">${sources.map(bibSourceHtml).join("")}</ul>
+            <summary><span class="motif-bib-region">${escapeHtml(a.region || a.area_code)}</span><span class="motif-bib-count">${formatNumber(areaCount(a))}</span></summary>
+            <div class="motif-bib-ethnos-list">${(a.ethnos || []).map(bibEthnosHtml).join("")}</div>
         </details>`;
-    let rows = areas.map((a) => block(a.region || a.area_code, a.sources)).join("");
-    if (unattached.length) rows += block("General references", unattached);
+    let rows = areas.map(areaBlock).join("");
+    if (unattached.length) {
+        rows += `
+        <details class="motif-bib-area" name="motif-bib">
+            <summary><span class="motif-bib-region">General references</span><span class="motif-bib-count">${formatNumber(unattached.length)}</span></summary>
+            <ul class="motif-bib-list">${unattached.map(bibSourceHtml).join("")}</ul>
+        </details>`;
+    }
     return section("Bibliography", `<div class="motif-bib">${rows}</div>`);
 }
 
