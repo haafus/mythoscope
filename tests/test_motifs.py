@@ -28,12 +28,30 @@ class TestBerezkinEntry:
         assert e["atu_refs"] == []
         assert e["page"] == "a1.html"
 
-    def test_see_also_before_areas(self):
-        # "A50." is a see-also code, not part of the name or the area list.
+    def test_bare_title_code_is_foreign_not_see_also(self):
+        # A bare "A50." in a title is a Thompson equivalence (carried by tmi_refs),
+        # not a Berezkin see-also: stripped from the name, never captured.
         e = berezkin.parse_motif_entry("B1. Двое создателей. A50. .13.16.20.", "b1.html")
         assert e["name"] == "Двое создателей"
-        assert e["see_also"] == ["A50"]
+        assert e["see_also"] == []
         assert e["areas"] == [13, 16, 20]
+
+    def test_thompson_ref_in_title_stripped_cleanly(self):
+        # "A736.2" is a Thompson id — its stem must not become a see-also, nor its
+        # ".2" tail be left glued to the name.
+        e = berezkin.parse_motif_entry("A4. Солнце-женщина, A736.2. .10.52.", "a4.html")
+        assert e["name"] == "Солнце-женщина"
+        assert e["see_also"] == []
+
+    def test_cyrillic_homoglyph_thompson_ref_stripped(self):
+        e = berezkin.parse_motif_entry("K20. Смертный желает звезду, С15.1, C15.1.1. .10.11.", "k20.html")
+        assert e["name"] == "Смертный желает звезду"
+        assert e["see_also"] == []
+
+    def test_see_also_only_from_marker(self):
+        # Berezkin's own cross-refs are marked "см."; those codes are captured.
+        e = berezkin.parse_motif_entry("A99. Мотив, см. A6, L121. .10.11.", "a99.html")
+        assert e["see_also"] == ["A6", "L121"]
 
     def test_atu_reference_in_title(self):
         e = berezkin.parse_motif_entry("A8A. Освобождение солнца. ATU 328A*, .27.28.", "a8a.html")
@@ -47,10 +65,12 @@ class TestBerezkinEntry:
         assert e["atu_refs"] == ["294"]
         assert e["areas"] == [11, 12, 15, 16, 17]
 
-    def test_multiple_see_also_with_artifacts(self):
+    def test_foreign_ref_list_stripped_from_name(self):
+        # A run of Thompson equivalences (with ".I" artifacts) is cleared from the
+        # name and, lacking a "см." marker, contributes no see-also.
         e = berezkin.parse_motif_entry("A21. Светила заброшены в небо. A700.I. A714. A741., .10.12.", "a21.html")
         assert e["name"] == "Светила заброшены в небо"
-        assert e["see_also"] == ["A700", "A714", "A741"]
+        assert e["see_also"] == []
         assert e["areas"] == [10, 12]
 
     def test_atu_comma_list_does_not_leak_into_areas(self):

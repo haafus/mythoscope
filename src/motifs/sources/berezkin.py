@@ -42,6 +42,17 @@ _ATU_CLAUSE_RE = re.compile(r"ATU\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 _BARE_ATU_RE = re.compile(r"(?<![A-Za-z0-9])(\d{2,4}[A-Za-z][A-Za-z0-9]*\*?)")
 # Leftover Thompson notation ("… Th .1.4.1; .2.2", "… Th") — stripped from names.
 _THOMPSON_RE = re.compile(r"\bTh\b[\s.,;0-9]*")
+# A Thompson (TMI) motif id in a title — a code carrying a dotted sub-number
+# ("A736.2", "A736.2."), which the source appends as a cross-reference. Berezkin's
+# own ids never use a dotted sub-number, so stripping this never eats a real
+# see-also; the ref itself is captured via the mapsofmyths cross-walk (tmi_refs).
+# The lead letter may be a Cyrillic homoglyph (the source sometimes types "С15.1"
+# with a Cyrillic С); the dotted sub-number keeps that from matching plain words.
+_THOMPSON_ID_RE = re.compile(r"\b[A-ZА-Я]\d[A-Za-z0-9]*(?:\.\d+)+\.?")
+# Berezkin's own see-also marker in a title: the literal abbreviation "см." ("see"),
+# at a token boundary so it isn't matched inside words like "смерти"/"Смоляная".
+# Captures the rest of the title, from which the cross-referenced codes are pulled.
+_SEE_MARKER_RE = re.compile(r"(?:^|[\s,;(])см\.\s*(.+)$", re.IGNORECASE)
 # A chapter header in the nav, e.g. "A. СОЛНЦЕ И ЛУНА" or
 # "K. ПРИКЛЮЧЕНИЯ I(1): ДЕЯНИЯ ГЕРОЕВ" — name starts with a Cyrillic capital,
 # then anything (colon/parens/roman numerals appear in some headers).
@@ -250,7 +261,14 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
     # Berezkin motifs). Codes are latin; the name is Cyrillic, so pulling the code
     # tokens out — along with bare refs and leftover Thompson notation — leaves a
     # clean name. A latin glyph glued to Cyrillic is then de-homoglyphed.
-    see_also = _dedup(c for c in _SEE_ALSO_RE.findall(before) if c != code)
+    # Drop Thompson (TMI) cross-refs like "A736.2" first: their code stem must not
+    # be read as a Berezkin see-also, nor their ".2" tail left glued to the name.
+    before = _THOMPSON_ID_RE.sub(" ", before)
+    # A title's trailing codes are foreign (Thompson) equivalences — already carried
+    # by the mapsofmyths cross-walk (tmi_refs). Berezkin's own see-also references
+    # are the ones marked "см." ("see"); take see-also codes only from that clause.
+    m_see = _SEE_MARKER_RE.search(before)
+    see_also = _dedup(c for c in _SEE_ALSO_RE.findall(m_see.group(1)) if c != code) if m_see else []
     name = _THOMPSON_RE.sub(" ", before)
     name = _BARE_ATU_RE.sub(" ", name)
     name = _SEE_ALSO_RE.sub(" ", name)
