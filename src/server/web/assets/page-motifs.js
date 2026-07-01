@@ -139,14 +139,24 @@ function stepMotif(delta) {
     openMotif(mState.index, btn.dataset.id);
 }
 
+// Cycle to the previous/next index (wrapping), following the tab order.
+function stepIndex(delta) {
+    const order = TAB_ORDER.filter((id) => mState.indexes.some((i) => i.index === id));
+    if (order.length < 2) return;
+    const cur = order.indexOf(mState.index);
+    selectIndex(order[(cur + delta + order.length) % order.length]);
+}
+
 function onMotifsKeydown(e) {
-    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+    if (!arrows.includes(e.key)) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (!document.getElementById("motifsList")) return;  // only on the motifs page
     const tag = (e.target.tagName || "").toLowerCase();
     if (tag === "input" || tag === "textarea" || tag === "select") return;  // don't hijack typing
     e.preventDefault();
-    stepMotif(e.key === "ArrowDown" ? 1 : -1);
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") stepMotif(e.key === "ArrowDown" ? 1 : -1);
+    else stepIndex(e.key === "ArrowRight" ? 1 : -1);  // Left/Right cycle indexes
 }
 
 async function switchIndex(index) {
