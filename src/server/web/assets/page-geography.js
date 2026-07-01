@@ -1,13 +1,9 @@
 import { app, escapeHtml, loadTraditionInfo, onCleanup } from "./core.js";
-import { renderTraditionList } from "./tree-traditions.js";
 
 export async function renderGeography() {
     app.innerHTML = `
         <main class="geography-page container">
             <div class="geo-workspace">
-                <aside class="library-sidebar">
-                    <div id="geographyTraditions">Loading...</div>
-                </aside>
                 <div class="map-frame">
                     <div id="geography-map"></div>
                 </div>
@@ -22,18 +18,7 @@ export async function renderGeography() {
 
     try {
         const traditions = await fetchTraditions();
-        const { map, markers } = initializeGeographyMap(traditions);
-
-        const listEl = document.getElementById("geographyTraditions");
-        listEl.addEventListener("tradition-select", (event) => {
-            const name = event.detail.tradition;
-            if (!name) { map.closePopup(); return; }
-            const marker = markers.get(name);
-            if (!marker) return;
-            map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 4), { duration: 0.6 });
-            marker.openPopup();
-        });
-        await renderTraditionList(listEl);
+        initializeGeographyMap(traditions);
     } catch (error) {
         console.error(error);
         showGeographyError("Could not load geography data.");
