@@ -591,9 +591,9 @@ function renderDetail(d) {
                 </div>
             </div>`;
         if (d.definition) {
-            let inner = `<p class="motif-text">${escapeHtml(d.definition)}</p>`;
+            let inner = `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`;
             if (d.definition_rus && d.definition_rus !== d.definition) {
-                inner += `<p class="motif-text motif-text-rus">${escapeHtml(d.definition_rus)}</p>`;
+                inner += `<p class="motif-text motif-def motif-text-rus">${escapeHtml(d.definition_rus)}</p>`;
             }
             body += section("Definition", inner);
         }
@@ -623,7 +623,7 @@ function renderDetail(d) {
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
-        if (d.definition) body += section("Definition", `<p class="motif-text">${escapeHtml(d.definition)}</p>`);
+        if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.see_also || []).length) body += linkSection("See also", links.see_also);
         if ((links.see_also_cf || []).length) body += linkSection("Compare (cf.)", links.see_also_cf);
         if ((links.atu || []).length) body += linkSection("Appears in ATU tale types", links.atu);

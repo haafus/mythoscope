@@ -1274,6 +1274,10 @@ body.has-main-navbar {
         flex: none;
         overflow-y: visible;
     }
+
+    .motif-def {
+        max-width: none;
+    }
 }
 
 @media (max-width: 760px) {
@@ -1445,19 +1449,24 @@ body.has-main-navbar {
     gap: 2px;
 }
 
-/* Russian original name shown as a muted sub-title under the (English) name. */
+/* Russian original name shown as a faint sub-title under the (English) name. */
 .motif-subtitle {
-    color: var(--muted);
+    color: #a2abb4;
     font-size: 16px;
     font-style: italic;
 }
 
-/* Russian original definition, shown muted below the English one. The compound
-   selector out-specifies `.motif-text` (declared later), so the mute sticks. */
+/* Russian original definition, shown faint below the English one. The compound
+   selector out-specifies `.motif-text` (declared later), so the color sticks. */
 .motif-text.motif-text-rus {
-    color: var(--muted);
+    color: #a2abb4;
     font-style: italic;
     font-size: 0.94em;
+}
+
+/* Motif definitions read better at a limited measure: cap at 2/3 of the pane. */
+.motif-def {
+    max-width: 66%;
 }
 
 /* mapsofmyths thematic classification (type · group). */
