@@ -146,7 +146,12 @@ separates them, keeping the raw `notes` as the source of truth.
   qualifiers before its colon (`S. Am. Indian (Paressi):`, `Indian (Hindu):`) —
   these are tolerated so the label is still recognised (and not mistaken for a
   definition); a leading `--` bibliography dash is stripped. Nested sub-areas
-  (`Africa (Angola): …`) stay inline; the canonical name drops the parens.
+  (`Africa (Angola): …`) stay inline; the canonical name drops the parens. A
+  label is kept only if at least one of its citations looks source-like (a
+  page/volume/year digit, a capitalised author, `*`, or `ibid.`/`cf.`); this
+  drops prose that a capitalised word before a colon leaked in (`Answer:`,
+  `Decision:`), plus a small stop-list of genre words that head real citations
+  (`Fable`, `Answer`, `Countertask`).
 - **references** — the bibliography split on `;` / ` --`; the general
   (non-culture-tagged) segments are shown separately on the motif page.
 - **see_also** — `†` cross-references to other motifs, split into direct `ref`
@@ -169,15 +174,19 @@ bracketed place/year. These remain inside the citation strings.
 stored `culture_legend` (two layers):
 
 - **inventory** — every distinct label with the number of motifs it tags
-  (905 canonical labels).
-- **normalized** — obvious variants merged to a canonical name (`Icel. →
-  Icelandic`, `England → English`) and tagged with a broad **region**
-  (Europe, Near East, South Asia, Oceania, …). Curated for the common labels
-  (~110 cover ~94% of uses); parenthetical sub-areas are collected per culture.
+  (~1,090 canonical labels).
+- **normalized** — variants merged to a canonical name (`Icel. → Icelandic`,
+  `England → English`), a leading `Cf.` compare-prefix stripped (`Cf. Greek →
+  Greek`), demonym/case variants folded (`China → Chinese`, `Irish Myth → Irish
+  myth`), and the canonical tagged with a broad **region** (Europe, Near East,
+  South Asia, Oceania, …). Curated for the common labels (~150 cover ~96% of
+  uses); parenthetical sub-areas are collected per culture.
 
-Exposed at `GET /api/motifs/tmi/cultures`. The long tail (800 labels) keeps
-region `""` but is still counted. Sub-areas are raw parenthetical text and carry
-some noise (orthographic variants, multi-ethnos strings).
+Exposed at `GET /api/motifs/tmi/cultures`. The long tail (~940 labels) keeps
+region `""` but is still counted — mostly rare single cultures plus the
+unsplit compound labels (`England, U.S.`, `Finnish-Swedish`), which are not
+broken on commas (a comma is also a page-list separator). Sub-areas are raw
+parenthetical text and carry some noise (orthographic variants).
 
 ---
 
@@ -288,7 +297,10 @@ not motif-to-motif links (see the culture dictionary, §7).
 - The definition / culture split is heuristic (~85–90%); short one-line
   definitions are over-flagged, and colon-less region labels (`--Oceanic Dixon …`)
   merge into the previous culture.
-- Culture sub-areas and the 800-label tail carry parse noise.
+- Culture sub-areas carry parse noise; the region-less tail is mostly rare
+  cultures plus unsplit compound labels (`England, U.S.`) — see
+  `troubleshooting.md`. The broad **region** tags themselves are one of four
+  non-aligned macro-region schemes (also in `troubleshooting.md`).
 - Bibliography links cover ~71% of citation uses; foreign long-tail and
   author-in-journal citations are not linked to the exact edition.
 - `substantive`, `definition`, region tags and citation links are interpretive

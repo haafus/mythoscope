@@ -189,13 +189,21 @@ macro-areas, codes 10–74** (code 58, *Дельта Ориноко*, is defunct
 
 ## 7. Cross-walks
 
-Geography is the catalogue's own axis, but motif **equivalence** runs through
-ATU: `berezkin → atu` (from `atu_refs`, 485 motifs) and `atu → tmi`. A Berezkin
-motif page shows its ATU tale types and, through them, the Thompson motifs.
+Motif **equivalence** runs two ways:
 
-A direct geographic alignment of **Berezkin areas ↔ TMI cultures** (via a shared
-region taxonomy) is possible but not built — it would be a coarse region-level
-overlay, not motif-to-motif links.
+- **Direct** `berezkin ↔ tmi` — from the curated Thompson ids (`tmi_refs`) that
+  mapsofmyths attaches to each motif (§9), cleaned of `*`/trailing `.` and kept
+  only where the TMI id exists in our index (~190 motifs). This is the exact,
+  hand-curated concordance and is shown first on the motif page.
+- **Via ATU** — `berezkin → atu` (from `atu_refs`, ~485 motifs) and `atu → tmi`.
+  A Berezkin motif page also shows its ATU tale types and, through them, the
+  Thompson motifs. Far more pairs are reachable this way than directly, but they
+  are looser (shared tale-type ≠ same motif), so they are kept separate from the
+  direct concordance.
+
+A direct **geographic** alignment of Berezkin areas ↔ TMI cultures (via a shared
+region taxonomy) is *not* built — the two use non-aligned macro-region schemes;
+see `troubleshooting.md` ("Four competing macro-area schemes").
 
 ---
 
