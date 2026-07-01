@@ -70,16 +70,24 @@ export function normalizePreviewText(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
-// A source paragraph is "hard-wrapped" (line breaks inserted at a fixed width,
-// not meaningful) if its lines cluster around one width — as opposed to verse or
-// a list, whose lines are short and uneven. The last line is ignored (it ends the
-// paragraph and is naturally short).
+// A source paragraph is "hard-wrapped" (line breaks inserted at a fixed margin,
+// not meaningful) when its lines fill to a common width, producing a run of
+// consecutive near-full lines. Verse and lists break by meaning, so even their
+// long lines don't come in runs. Requiring uniformity of *every* line (the old
+// test) failed on prose blocks with ragged short ends — e.g. several footnotes
+// glued together, each ending mid-line. The last line ends the paragraph and is
+// naturally short, so it is ignored.
 function isHardWrapped(lines) {
     if (lines.length < 2) return false;
-    const lens = lines.slice(0, -1).map((l) => l.length).sort((a, b) => a - b);
-    const med = lens[Math.floor(lens.length / 2)];
-    if (med < 40 || med > 90) return false;              // not a wrap width
-    return lens.every((l) => l > med - 18 && l < med + 10);  // uniform enough
+    const body = lines.slice(0, -1).map((l) => l.length);
+    const width = Math.max(...body);
+    if (width < 40 || width > 100) return false;         // too short (verse/list) or not a margin
+    const full = body.map((l) => l >= width - 15);       // reached near the wrap margin
+    const filled = full.filter(Boolean).length / full.length;
+    let run = 0, longestRun = 0;
+    for (const isFull of full) { run = isFull ? run + 1 : 0; longestRun = Math.max(longestRun, run); }
+    if (body.length <= 2) return filled === 1;           // 1–2 wrapped lines: all must be full
+    return longestRun >= 3 && filled >= 0.5;             // prose wraps in runs; verse doesn't
 }
 
 // Render source text into paragraphs for a normal (reflowing) column: split on
