@@ -117,10 +117,11 @@ def build_motifs(*, force: bool = False) -> None:
     # --- Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via title refs) ---
     links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids)
     save_json(store.crosswalk_path(), links)
-    logger.info("[cross-walk] derived id links: ATU->TMI %d, TMI->ATU %d, Berezkin->ATU %d, ATU->Berezkin %d "
-                "(%d TMI motifs reachable from a tale type)",
+    logger.info("[cross-walk] derived id links: ATU<->TMI %d/%d, Berezkin<->ATU %d/%d, "
+                "Berezkin<->TMI (direct) %d/%d (%d TMI motifs reachable from a tale type)",
                 len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
-                len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]), links["linked_tmi_count"])
+                len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]),
+                len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]), links["linked_tmi_count"])
 
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -131,6 +132,8 @@ def build_motifs(*, force: bool = False) -> None:
             "tmi_to_atu": len(links["tmi_to_atu"]),
             "berezkin_to_atu": len(links["berezkin_to_atu"]),
             "atu_to_berezkin": len(links["atu_to_berezkin"]),
+            "berezkin_to_tmi": len(links["berezkin_to_tmi"]),
+            "tmi_to_berezkin": len(links["tmi_to_berezkin"]),
             "linked_tmi_count": links["linked_tmi_count"],
         },
         "sources": sources,

@@ -359,6 +359,15 @@ class TestCrosswalk:
         assert cw["atu_to_berezkin"]["294"] == ["A39A"]
         assert cw["linked_tmi_count"] == 2
 
+    def test_direct_berezkin_tmi(self):
+        # tmi_refs (from mapsofmyths) become a direct Berezkin<->TMI bridge; a ref
+        # is cleaned (*, trailing dot) and kept only if it exists in the TMI index.
+        berezkin = [{"id": "A2A", "tmi_refs": ["*A720.1", "A1052.", "Z999"]}]
+        cw = crosswalk.build({}, {"A720.1", "A1052"}, berezkin, set())
+        assert cw["berezkin_to_tmi"] == {"A2A": ["A720.1", "A1052"]}   # Z999 dropped (not in TMI)
+        assert cw["tmi_to_berezkin"]["A720.1"] == ["A2A"]
+        assert cw["tmi_to_berezkin"]["A1052"] == ["A2A"]
+
 
 # ---------------------------------------------------------------------------
 # Read service (against a tiny on-disk database)

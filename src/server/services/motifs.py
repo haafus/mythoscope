@@ -782,6 +782,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["links"]["atu_inline"] = [_link("atu", a) for a in rec.get("atu_inline", [])]
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
+        # Direct Berezkin motifs that map here (mapsofmyths concordance).
+        detail["links"]["berezkin"] = [_link("berezkin", b) for b in cw.get("tmi_to_berezkin", {}).get(rec["id"], [])]
 
     elif index == "atu":
         detail["division"] = rec.get("division", "")

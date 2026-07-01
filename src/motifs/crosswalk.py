@@ -7,13 +7,19 @@ Two links are built:
   inverse so the UI can jump from a Thompson motif to the tale types that use it.
 - **Berezkin<->ATU** — many Berezkin catalogue titles cite an ATU tale type
   ("... ATU 328A*"); those references give a direct Berezkin->ATU mapping.
+- **Berezkin<->TMI** — the curated Thompson id each Berezkin motif carries
+  (``tmi_refs``, from mapsofmyths); the one *direct* Berezkin<->TMI bridge (the
+  rest go through ATU). Present only when the mapsofmyths enrichment ran.
 
-Berezkin<->TMI is intentionally absent: the catalogue does not embed systematic
-Thompson codes, so that mapping would need Berezkin's published concordance and
-is left as future work. Berezkin's internal see-also links live on the records.
+Berezkin's internal see-also links live on the records themselves.
 """
 
 from __future__ import annotations
+
+
+def _clean_tmi(ref: str) -> str:
+    """Normalise a mapsofmyths Thompson id (``*A2211.1``, ``A1313.3.1.``)."""
+    return ref.lstrip("*").rstrip(".").strip()
 
 
 def build(
@@ -48,6 +54,20 @@ def build(
             if motif["id"] not in atu_to_berezkin[resolved]:
                 atu_to_berezkin[resolved].append(motif["id"])
 
+    # Berezkin -> TMI, direct: the curated Thompson ids on each motif (mapsofmyths
+    # `tmi_refs`), plus the inverse — kept only when the id exists in our TMI index.
+    berezkin_to_tmi: dict[str, list[str]] = {}
+    tmi_to_berezkin: dict[str, list[str]] = {}
+    for motif in berezkin_motifs or []:
+        refs = [r for r in (_clean_tmi(x) for x in (motif.get("tmi_refs") or [])) if r in tmi_ids]
+        if not refs:
+            continue
+        berezkin_to_tmi[motif["id"]] = refs
+        for ref in refs:
+            tmi_to_berezkin.setdefault(ref, [])
+            if motif["id"] not in tmi_to_berezkin[ref]:
+                tmi_to_berezkin[ref].append(motif["id"])
+
     known = sorted(code for code in tmi_to_atu if code in tmi_ids)
 
     return {
@@ -55,5 +75,7 @@ def build(
         "tmi_to_atu": {k: sorted(v) for k, v in tmi_to_atu.items()},
         "berezkin_to_atu": berezkin_to_atu,
         "atu_to_berezkin": {k: sorted(v) for k, v in atu_to_berezkin.items()},
+        "berezkin_to_tmi": berezkin_to_tmi,
+        "tmi_to_berezkin": {k: sorted(v) for k, v in tmi_to_berezkin.items()},
         "linked_tmi_count": len(known),
     }

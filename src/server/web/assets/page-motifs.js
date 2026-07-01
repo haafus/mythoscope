@@ -610,6 +610,7 @@ function renderDetail(d) {
         if ((links.see_also_cf || []).length) body += linkSection("Compare (cf.)", links.see_also_cf);
         if ((links.atu || []).length) body += linkSection("Appears in ATU tale types", links.atu);
         if ((links.atu_inline || []).length) body += linkSection("Referenced tale types (Type …)", links.atu_inline);
+        if ((links.berezkin || []).length) body += linkSection("Berezkin motifs mapping here", links.berezkin);
         if ((d.cultures || []).length) body += section(`Attestations by culture (${d.cultures.length})`, culturesHtml(d.cultures));
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
