@@ -700,11 +700,11 @@ function renderDetail(d) {
         if ((links.tmi || []).length) body += linkSection("Thompson motifs (TMI)", links.tmi);
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
-        body += berezkinDistribution(d.traditions);
         const areas = (d.areas || []).map((a) =>
             `<span class="motif-area${a.name ? "" : " unresolved"}" title="area ${escapeHtml(a.id)}">${escapeHtml(a.name || a.id)}</span>`).join("");
         body += section(`Macro-areas (${(d.areas || []).length})`,
             areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`);
+        body += berezkinDistribution(d.traditions);
         body += berezkinBibliography(d.bibliography);
         if (d.source_url) {
             body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} <span class="ext-arrow">↗</span></a>`);
