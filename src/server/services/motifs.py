@@ -398,12 +398,11 @@ def _build_berezkin_stats() -> dict:
     breadth = collections.Counter()
     regions = collections.Counter()
     groups = collections.Counter()
-    n_def = n_atu = n_see = n_english = n_tmi = 0
+    n_def = n_atu = n_english = n_tmi = 0
     for r in records:
         chapters[r.get("chapter", "")] += 1
         n_def += bool(r.get("definition"))
         n_atu += bool(r.get("atu_refs"))
-        n_see += bool(r.get("see_also"))
         n_english += bool(r.get("name_rus"))  # English name preferred (mapsofmyths)
         n_tmi += bool(r.get("tmi_refs"))       # direct Thompson crosswalk (mapsofmyths)
         if r.get("motif_group"):

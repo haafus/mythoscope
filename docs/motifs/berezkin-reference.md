@@ -57,7 +57,7 @@ it can be unit-tested on static fixtures.
 | Chapters | 14 (`A`–`N`) |
 | With a definition | 3,447 |
 | With areal indices | 3,458 |
-| With internal see-also refs | 184 |
+| With internal see-also refs | ~286 (from the definition text) |
 | With ATU cross-references | 485 |
 | Decoded macro-areas | 65 (codes 10–74) |
 
@@ -76,7 +76,7 @@ Each stored motif (`outputs/motifs/berezkin.json → motifs[]`):
 | `definition` | short definition — **English** where available (§9), else the Russian one |
 | `definition_rus` | the Russian original definition (only when English replaced it) |
 | `areas` | sorted unique region codes (§6) |
-| `see_also` | internal cross-references to other Berezkin motifs |
+| `see_also` | internal cross-references to other Berezkin motifs, from the definition's `см. мотив X` links (kept only when they resolve to a real motif) |
 | `atu_refs` | ATU tale-type references parsed from the title |
 | `page` | source detail-page filename (for the back-link) |
 
@@ -139,9 +139,9 @@ distribution maps.
 
 All in `berezkin.py`.
 
-- **Entry split.** Layout is `CODE. Name. [see-also codes] .area.area.`. The
-  areal list is introduced by a space-dot before the first number, which splits
-  it off without eating the digits of a see-also code.
+- **Entry split.** Layout is `CODE. Name[, Thompson refs] .area.area.`. The
+  areal list is introduced by a space-dot before the first number (it may also be
+  wrapped in `[…]`), which splits it off without eating the digits of a code.
 - **Areal sequence.** `_parse_area_seq` reads the dotted list into ordered
   `(index, parenthetical)` pairs: a `-` is an inclusive range; **parentheses
   mark a comparative entry** (the motif is *not* counted in the correlation for
@@ -152,9 +152,14 @@ All in `berezkin.py`.
   `intro.html` ("Цифры соответствуют следующим регионам"), hard-coded as
   `_CANONICAL_AREAS` / `canonical_area_legend()` (§6). No inference: detail-page
   fetching now serves only the definitions.
-- **ATU / see-also.** ATU clauses (`ATU 311, 312`) and bare tale-type refs
-  (`804A`) are pulled from the title into `atu_refs`; uppercase-initial codes are
-  internal `see_also`; leftover Thompson notation (`Th …`) is stripped.
+- **Title codes.** ATU clauses (`ATU 311, 312`) and bare tale-type refs (`804A`)
+  are pulled from the title into `atu_refs`. The other trailing codes are Thompson
+  (TMI) equivalences (`A736.2`, incl. Cyrillic-homoglyph leads) — carried by the
+  mapsofmyths cross-walk (`tmi_refs`), so they are stripped from the name, not read
+  as see-also. Leftover Thompson notation (`Th …`) is stripped too.
+- **See-also.** Berezkin's own cross-references live in the **definition** as
+  `см. (мотив) X`; `_attach_see_also` reads them and keeps the ids that resolve to
+  a real motif (~286 motifs). The title never yields a see-also.
 - **Homoglyph repair.** The source occasionally types a latin letter inside a
   Cyrillic word (`Cупруг` for `Супруг`); a latin glyph adjacent to Cyrillic is
   swapped for its Cyrillic twin.

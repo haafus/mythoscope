@@ -49,10 +49,11 @@ _THOMPSON_RE = re.compile(r"\bTh\b[\s.,;0-9]*")
 # The lead letter may be a Cyrillic homoglyph (the source sometimes types "С15.1"
 # with a Cyrillic С); the dotted sub-number keeps that from matching plain words.
 _THOMPSON_ID_RE = re.compile(r"\b[A-ZА-Я]\d[A-Za-z0-9]*(?:\.\d+)+\.?")
-# Berezkin's own see-also marker in a title: the literal abbreviation "см." ("see"),
-# at a token boundary so it isn't matched inside words like "смерти"/"Смоляная".
-# Captures the rest of the title, from which the cross-referenced codes are pulled.
-_SEE_MARKER_RE = re.compile(r"(?:^|[\s,;(])см\.\s*(.+)$", re.IGNORECASE)
+# Berezkin's own see-also links, written in the definition as "см. (мотив[ы]) A6[,
+# A7 …]". The marker is the literal "см." (kept off word-internal "см" like
+# "смерти" by the trailing dot); the capture is the run of motif ids after it.
+_SEE_DEF_RE = re.compile(r"[Сс]м\.\s*(?:мотив\w*\s+)?((?:[A-Z]\d[A-Za-z0-9]*[\s,и]*)+)")
+_MOTIF_ID_RE = re.compile(r"[A-Z]\d[A-Za-z0-9]*")
 # A chapter header in the nav, e.g. "A. СОЛНЦЕ И ЛУНА" or
 # "K. ПРИКЛЮЧЕНИЯ I(1): ДЕЯНИЯ ГЕРОЕВ" — name starts with a Cyrillic capital,
 # then anything (colon/parens/roman numerals appear in some headers).
@@ -266,11 +267,9 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
     # Drop Thompson (TMI) cross-refs like "A736.2" first: their code stem must not
     # be read as a Berezkin see-also, nor their ".2" tail left glued to the name.
     before = _THOMPSON_ID_RE.sub(" ", before)
-    # A title's trailing codes are foreign (Thompson) equivalences — already carried
-    # by the mapsofmyths cross-walk (tmi_refs). Berezkin's own see-also references
-    # are the ones marked "см." ("see"); take see-also codes only from that clause.
-    m_see = _SEE_MARKER_RE.search(before)
-    see_also = _dedup(c for c in _SEE_ALSO_RE.findall(m_see.group(1)) if c != code) if m_see else []
+    # A title's trailing codes are foreign (Thompson) equivalences, already carried
+    # by the mapsofmyths cross-walk (tmi_refs) — strip them from the name. Berezkin's
+    # own see-also links live in the definition text and are attached later.
     name = _THOMPSON_RE.sub(" ", before)
     name = _BARE_ATU_RE.sub(" ", name)
     name = _SEE_ALSO_RE.sub(" ", name)
@@ -283,7 +282,7 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
         "chapter": chapter_of(code),
         "name": name,
         "areas": areas,
-        "see_also": see_also,
+        "see_also": [],  # filled from the definition's "см." cross-refs (_attach_see_also)
         "atu_refs": atu_refs,
         "page": page,
     }
@@ -454,6 +453,7 @@ def build(config: dict, *, force: bool = False) -> dict:
     if config.get("fetch_details", True) and settings.motifs.berezkin_details:
         _fetch_details(motifs, base, cache, encoding, force)
 
+    _attach_see_also(motifs)  # from the Russian definition, before English swaps it out
     _attach_english(motifs)
     _attach_nodes(motifs)
 
@@ -467,6 +467,21 @@ def build(config: dict, *, force: bool = False) -> dict:
         "traditions": load_traditions(),  # areal_id -> name/hierarchy/language
         "motifs": motifs,
     }
+
+
+def _attach_see_also(motifs: list[dict]) -> None:
+    """Set each motif's ``see_also`` from the "см. (мотив) X" cross-references Berezkin
+    writes in the definition, keeping only ids that resolve to a real motif (and not
+    the motif itself). Reads ``definition`` (still the Russian text at this point)."""
+    ids = {m["id"] for m in motifs}
+    n = 0
+    for m in motifs:
+        refs: list[str] = []
+        for run in _SEE_DEF_RE.findall(m.get("definition") or ""):
+            refs += [rid for rid in _MOTIF_ID_RE.findall(run) if rid in ids and rid != m["id"]]
+        m["see_also"] = _dedup(refs)
+        n += bool(refs)
+    logger.info("Berezkin: see-also from definitions — %d motifs reference other motifs", n)
 
 
 def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, force: bool) -> None:

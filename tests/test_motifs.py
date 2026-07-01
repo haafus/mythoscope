@@ -48,10 +48,19 @@ class TestBerezkinEntry:
         assert e["name"] == "Смертный желает звезду"
         assert e["see_also"] == []
 
-    def test_see_also_only_from_marker(self):
-        # Berezkin's own cross-refs are marked "см."; those codes are captured.
-        e = berezkin.parse_motif_entry("A99. Мотив, см. A6, L121. .10.11.", "a99.html")
-        assert e["see_also"] == ["A6", "L121"]
+    def test_see_also_from_definition(self):
+        # Berezkin's own cross-refs live in the definition ("см. мотив X"); only ids
+        # that resolve to a real motif (and not the motif itself) are kept.
+        motifs = [
+            {"id": "A4", "definition": "Солнце-женщина (см. мотив A6; ср. A2)."},
+            {"id": "A6", "definition": "нет ссылок"},
+            {"id": "B11", "definition": "как в см. мотивы B12, B13 и B11."},
+            {"id": "B12", "definition": ""}, {"id": "B13", "definition": ""},
+        ]
+        berezkin._attach_see_also(motifs)
+        assert motifs[0]["see_also"] == ["A6"]     # A2 dropped (no such motif); self excluded
+        assert motifs[1]["see_also"] == []
+        assert motifs[2]["see_also"] == ["B12", "B13"]  # self "B11" excluded
 
     def test_atu_reference_in_title(self):
         e = berezkin.parse_motif_entry("A8A. Освобождение солнца. ATU 328A*, .27.28.", "a8a.html")
