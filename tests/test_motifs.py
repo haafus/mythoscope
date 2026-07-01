@@ -9,7 +9,7 @@ import pytest  # noqa: E402
 
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
-from motifs.sources import berezkin, trilogy
+from motifs.sources import berezkin, berezkin_bibliography as bbib, trilogy
 from motifs.sources import culture_dict, tmi_notes
 from server.services import motifs as svc
 
@@ -363,6 +363,61 @@ class TestTrilogy:
 
 
 # ---------------------------------------------------------------------------
+# Berezkin bibliography
+# ---------------------------------------------------------------------------
+
+class TestBerezkinBibliography:
+    BIBLIO = (
+        '<p class="NormalMai">Elwin, Verrier</p>'
+        '<p class="NormalYur1">1958a Myths of the North-East Frontier of India. Shillong. 448 p.</p>'
+        '<p class="NormalYur1">1958b Second work.</p>'
+        '<p class="NormalMai">Pechuël-Loesche, Eduard</p>'
+        '<p class="NormalYur1">1907 Volkskunde von Loango. Stuttgart. 480 p.</p>'
+        '<p class="NormalMai">Сем, Юрий Александрович</p>'
+        '<p class="NormalYur1">1986 Первый.</p>'
+        '<p class="NormalMai">Сем, Татьяна Юрьевна</p>'
+        '<p class="NormalYur1">1986 Второй.</p>'
+    )
+
+    def test_parse_bibliography_author_year_grouping(self):
+        b = bbib.parse_bibliography(self.BIBLIO)
+        assert b["Elwin 1958a"]["author"] == "Elwin, Verrier"
+        assert b["Elwin 1958a"]["title"].startswith("Myths of the North-East")
+        assert "Elwin 1958b" in b
+        assert b["Pechuël-Loesche 1907"]["title"].startswith("Volkskunde")
+
+    def test_parse_bibliography_flags_homonyms(self):
+        # same surname+year for two authors: kept once, collision recorded
+        assert bbib.parse_bibliography(self.BIBLIO)["Сем 1986"].get("homonyms")
+
+    def test_parse_refs_filters_and_keeps_hyphen(self):
+        refs = bbib.parse_refs("Pechuël-Loesche 1907: 135; Meier 1909 в Luomala 1940: 39; ATU 294")
+        pairs = [(a, y) for _, a, y in refs]
+        assert ("Pechuël-Loesche", "1907") in pairs      # hyphenated surname kept whole
+        assert ("Meier", "1909") in pairs and ("Luomala", "1940") in pairs  # nested "в" -> both
+        assert all(a != "ATU" for a, _ in pairs)
+
+    def test_resolve_status(self):
+        by_year = {"1907": [("Pechuël-Loesche 1907", "Pechuël-Loesche, Eduard")],
+                   "1986": [("Сем 1986", "Сем, Юрий Александрович"),
+                            ("Сем 1986#2", "Сем, Татьяна Юрьевна")]}
+        assert bbib._resolve("Pechuël-Loesche", "1907", by_year)["status"] == "resolved"
+        assert bbib._resolve("Сем", "1986", by_year)["status"] == "ambiguous"
+        assert bbib._resolve("Nobody", "1999", by_year)["status"] == "unresolved"
+
+    def test_parse_attestations_region_ethnos_and_cf(self):
+        area_names = sorted([("Меланезия", "19"), ("Бантуязычная Африка", "11")],
+                            key=lambda nc: len(nc[0]), reverse=True)
+        trad_by_name = {"Апатани": "6.2.1"}
+        trad_re = bbib._name_regex(trad_by_name)
+        html = ('<p class="NormalMai">Меланезия. Апатани [сюжет]: Elwin 1958a: 38.</p>'
+                '<p class="NormalMai">(Ср. Бантуязычная Африка. Фьоти [сюжет]: Pechuël-Loesche 1907: 135)</p>')
+        regs = bbib.parse_attestations(html, area_names, trad_re, trad_by_name)
+        assert regs[0]["area_code"] == "19" and regs[0]["cf"] is False
+        assert regs[0]["cites"][0]["tradition_id"] == "6.2.1"     # ethnos matched to tradition
+        assert regs[1]["cf"] is True and regs[1]["area_code"] == "11"  # comparative "(Ср. …)" block
+
+
 # Cross-walk
 # ---------------------------------------------------------------------------
 

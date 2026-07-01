@@ -16,7 +16,7 @@ from json_utils import save_json
 from settings import settings
 
 from . import crosswalk, store
-from .sources import berezkin, bibliography, mapsofmyths, trilogy
+from .sources import berezkin, berezkin_bibliography, bibliography, mapsofmyths, trilogy
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +86,19 @@ def build_motifs(*, force: bool = False) -> None:
                         _applied(berezkin_motifs, lambda m: m.get("traditions")))
             logger.info("          (named tradition catalogue pulled: %d traditions)",
                         len(berezkin_data.get("traditions", {})))
+
+        # Bibliography (areasofmyths.com biblio.html) + citation → region/ethnos
+        # linkage, resolved from the already-cached detail pages.
+        enrichment["berezkin_bibliography"] = berezkin_bibliography.refresh(berezkin_motifs, force=force)
+        bb = enrichment["berezkin_bibliography"]
+        if bb.get("skipped"):
+            logger.info("      + bibliography (areasofmyths.com) SKIPPED (%s)", bb["skipped"])
+        else:
+            logger.info("      + bibliography (areasofmyths.com): %d works; citations resolved %d/%d (%d%%), "
+                        "ambiguous %d; ethnos-linked %d",
+                        bb["works"], bb["resolved"], bb["citations"],
+                        round(100 * bb["resolved"] / bb["citations"]) if bb["citations"] else 0,
+                        bb["ambiguous"], bb["ethnos_linked"])
 
     # --- [2/3] TMI + [3/3] ATU (from the j-hagedorn/trilogy dataset) ---
     tmi_ids: set[str] = set()
