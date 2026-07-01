@@ -45,7 +45,7 @@ def build_motifs(*, force: bool = False) -> None:
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
     enrichment: dict[str, dict] = {}
-    logger.info("=== Building the motif database: 3 indexes + cross-walk (Berezkin, TMI, ATU) ===")
+    logger.info("=== Building the motif database: 3 indexes (Berezkin, TMI, ATU) + cross-walk ===")
 
     # --- mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
     #     traditions) — credential-gated; a no-op skips the enrichment. ---
