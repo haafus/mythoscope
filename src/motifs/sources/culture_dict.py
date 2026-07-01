@@ -35,6 +35,8 @@ _ALIAS = {
     # Handled here rather than by a blanket trailing-"." strip, which would break
     # dotted region keys like "U.S." / "Marshall Is.".
     "Am. Indian": "American Indian", "Am. Indian.": "American Indian",
+    # Bare "Indian" is India in Thompson (native Americans are N./S./Am. Indian).
+    "Indian": "India",
 }
 
 # Canonical label -> broad region. Anything absent keeps region "" but is still
