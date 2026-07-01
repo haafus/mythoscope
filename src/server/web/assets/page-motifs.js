@@ -15,6 +15,34 @@ const mState = {
 
 const LIST_LIMIT = 300;
 let searchTimer = null;
+// True while renderMotifs is restoring state from the URL, to suppress the URL
+// writes that the view functions would otherwise make (avoids feedback/loops).
+let restoring = false;
+
+// The current filter/display/selection state as a URL query.
+function stateParams() {
+    const p = new URLSearchParams();
+    p.set("index", mState.index);
+    if (mState.chapter) p.set("chapter", mState.chapter);
+    if (mState.query.trim()) p.set("q", mState.query.trim());
+    if (mState.motifFilter && mState.motifFilter !== "all") p.set("filter", mState.motifFilter);
+    if (mState.flatList) p.set("flat", "1");
+    if (mState.selectedId) p.set("id", mState.selectedId);
+    else if (mState.browseView === "root") p.set("view", "root");
+    else if (mState.browseView === "chapter" && mState.browseChapter) p.set("view", mState.browseChapter);
+    return p;
+}
+
+// Reflect the current state in the URL. push=true adds a history entry (deliberate
+// navigation); push=false replaces it (continuous tweaks like typing). No-op while
+// restoring or when the URL is already current.
+function syncUrl(push) {
+    if (restoring) return;
+    const url = `#/motifs?${stateParams().toString()}`;
+    if (url === window.location.hash) return;
+    if (push) history.pushState(null, "", url);
+    else history.replaceState(null, "", url);
+}
 
 export async function renderMotifs(params = new URLSearchParams()) {
     app.innerHTML = `
@@ -49,20 +77,35 @@ export async function renderMotifs(params = new URLSearchParams()) {
         return;
     }
 
-    // Honour deep links: #/motifs?index=atu&id=510A
+    // Restore all filter/display/selection state from the URL (deep links, refresh,
+    // back/forward). Guard the view functions from writing the URL while we do.
+    restoring = true;
     const wantIndex = params.get("index");
     if (wantIndex && mState.indexes.some((i) => i.index === wantIndex)) mState.index = wantIndex;
     else if (!mState.indexes.some((i) => i.index === mState.index)) mState.index = mState.indexes[0].index;
+    mState.chapter = params.get("chapter") || "";
+    mState.query = params.get("q") || "";
+    mState.motifFilter = params.get("filter") || "all";
+    mState.flatList = params.get("flat") === "1";
 
     renderTabs();
     renderChapters();
     wireControls();
     await loadList();
 
+    // The URL is the source of truth for the main view — reset the selection so a
+    // stale one doesn't re-open on back/forward.
     const wantId = params.get("id");
-    if (wantId) openMotif(mState.index, wantId);
-    else if (mState.selectedId) openMotif(mState.index, mState.selectedId);
-    else renderOverview();
+    const wantView = params.get("view");
+    mState.selectedId = wantId || null;
+    mState.browseChapter = null;
+    mState.browseView = null;
+    if (wantId) await openMotif(mState.index, wantId);
+    else if (wantView === "root") await browseRoot();
+    else if (wantView) await browseChapterLevel0(wantView);
+    else await renderOverview();
+    restoring = false;
+    syncUrl(false);  // normalise the URL to the restored state (no new history entry)
 }
 
 function currentIndex() {
@@ -113,11 +156,12 @@ function wireControls() {
     search.addEventListener("input", () => {
         mState.query = search.value;
         clearTimeout(searchTimer);
-        searchTimer = setTimeout(loadList, 250);
+        searchTimer = setTimeout(() => { loadList(); syncUrl(false); }, 250);  // typing → replace
     });
     document.getElementById("motifsChapter").addEventListener("change", (e) => {
         mState.chapter = e.target.value;
         loadList();
+        syncUrl(true);
     });
     document.getElementById("motifsOverview").addEventListener("click", renderOverview);
     // ↑/↓ step through the sidebar list (same handler ref → no duplicates on re-render).
@@ -136,7 +180,7 @@ function stepMotif(delta) {
     if (next === cur) return;
     const btn = items[next];
     btn.scrollIntoView({ block: "nearest" });
-    openMotif(mState.index, btn.dataset.id);
+    openMotif(mState.index, btn.dataset.id, false);  // stepping → replace, don't flood history
 }
 
 // Cycle to the previous/next index (wrapping), following the tab order.
@@ -185,6 +229,7 @@ async function browseChapterLevel0(chapter) {
     mState.browseChapter = chapter;
     mState.browseView = "chapter";
     markActive(null);
+    syncUrl(true);
     detail.innerHTML = "";
     try {
         const rows = [rootRow(0), chapterRow(chapter, 1, { current: true })];
@@ -253,7 +298,7 @@ function markActive(id) {
     });
 }
 
-async function openMotif(index, id) {
+async function openMotif(index, id, push = true) {
     // Following a cross-link can switch indexes; keep the sidebar in sync.
     if (index !== mState.index) {
         await switchIndex(index);
@@ -262,6 +307,7 @@ async function openMotif(index, id) {
     mState.browseChapter = null;
     mState.browseView = null;
     markActive(id);
+    syncUrl(push);
 
     const detail = document.getElementById("motifsDetail");
     detail.innerHTML = "";  // blank intermediate screen during the switch (no "Loading" text)
@@ -455,19 +501,20 @@ function bindTreeLinks(detail) {
     const sel = detail.querySelector(".motif-filter");
     if (sel) sel.addEventListener("change", () => {
         mState.motifFilter = sel.value;
-        // Browse views re-render (the row set depends on the filter); the detail
-        // lineage just toggles the hide/badge classes on its built tree.
+        // Browse views re-render (the row set depends on the filter, and that
+        // re-render syncs the URL); the detail lineage just toggles classes.
         if (reRenderBrowse()) return;
         detail.querySelectorAll(".motif-tree").forEach((t) => {
             t.classList.toggle("filter-def", sel.value === "def");
             t.classList.toggle("filter-sub", sel.value === "sub");
             t.classList.toggle("filter-atu", sel.value === "atu");
         });
+        syncUrl(true);
     });
     const flat = detail.querySelector(".flat-cb");
     if (flat) flat.addEventListener("change", () => {
         mState.flatList = flat.checked;
-        reRenderBrowse();
+        reRenderBrowse();  // flat only applies to browse views, which sync the URL
     });
 }
 
@@ -479,6 +526,7 @@ async function browseRoot() {
     mState.browseChapter = null;
     mState.browseView = "root";
     markActive(null);
+    syncUrl(true);
     detail.innerHTML = "";
     try {
         const rows = [rootRow(0, { current: true })];
@@ -507,6 +555,7 @@ async function renderOverview() {
     mState.browseChapter = null;
     mState.browseView = null;
     markActive(null);
+    syncUrl(true);
     detail.innerHTML = "";
     try {
         const s = await api(`/api/motifs/${mState.index}/stats`);
