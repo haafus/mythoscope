@@ -1480,14 +1480,16 @@ body.has-main-navbar {
 }
 .motif-dist-region > summary::-webkit-details-marker { display: none; }
 .motif-dist-region > summary:hover { background: #f3f6f5; }
-.motif-dist-region > summary::before { content: "▸"; color: var(--muted); margin-right: 4px; }
+.motif-dist-region > summary::before { content: "▸"; color: var(--muted); display: inline-block; width: 14px; }
 .motif-dist-region[open] > summary::before { content: "▾"; }
 .motif-dist-name { flex: 1; }
 .motif-dist-count {
     font-variant-numeric: tabular-nums; color: var(--accent-dark, #1f7a6f);
     background: #e9f5f3; border-radius: 9px; padding: 1px 8px; font-size: 12px;
 }
-.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 8px 8px; }
+/* Left pad = summary padding-left (8px) + marker box (14px), so the tradition
+   list lines up with the start of the region label text, not the marker. */
+.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 8px 8px 22px; }
 
 .motif-section { margin: 18px 0; }
 
