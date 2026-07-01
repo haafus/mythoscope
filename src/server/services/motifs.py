@@ -390,12 +390,17 @@ def _build_berezkin_stats() -> dict:
     areas = collections.Counter()
     breadth = collections.Counter()
     regions = collections.Counter()
-    n_def = n_atu = n_see = 0
+    groups = collections.Counter()
+    n_def = n_atu = n_see = n_english = n_tmi = 0
     for r in records:
         chapters[r.get("chapter", "")] += 1
         n_def += bool(r.get("definition"))
         n_atu += bool(r.get("atu_refs"))
         n_see += bool(r.get("see_also"))
+        n_english += bool(r.get("name_rus"))  # English name preferred (mapsofmyths)
+        n_tmi += bool(r.get("tmi_refs"))       # direct Thompson crosswalk (mapsofmyths)
+        if r.get("motif_group"):
+            groups[r["motif_group"]] += 1
         ars = r.get("areas") or []
         breadth[_areal_breadth_label(len(ars))] += 1
         regs = set()
@@ -409,23 +414,37 @@ def _build_berezkin_stats() -> dict:
     # we label the top codes directly (no de-duplication of names needed).
     top_codes = sorted(areas.items(), key=lambda kv: kv[1], reverse=True)[:20]
     widest = sorted(records, key=lambda r: len(r.get("areas", [])), reverse=True)[:15]
-    return {
+
+    # The mapsofmyths enrichment (English text, thematic groups, TMI links) is
+    # credential-gated, so the cards/panels that surface it appear only when the
+    # data is actually present — the overview stays valid without credentials.
+    cards = [
+        {"value": len(records), "label": "motifs"},
+        {"value": len([c for c in chapters if c]), "label": "chapters"},
+        {"value": n_def, "label": "with definition"},
+    ]
+    if n_english:
+        cards.append({"value": n_english, "label": "English name"})
+    cards.append({"value": n_atu, "label": "ATU-linked"})
+    if n_tmi:
+        cards.append({"value": n_tmi, "label": "TMI-linked"})
+    cards.append({"value": len(legend), "label": "decoded areas"})
+
+    panels = [{"id": "bzChapters", "title": "Motifs per chapter"}]
+    if groups:
+        panels.append({"id": "bzGroups", "title": "Motifs by thematic group"})
+    panels += [
+        {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
+        {"id": "bzRegions", "title": "Motifs by region"},
+        {"id": "bzAreas", "title": "Top areas (most attested)"},
+        {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
+    ]
+
+    stats = {
         "index": "berezkin",
         "title": "Berezkin & Duvakin areal motif catalogue — overview",
-        "cards": [
-            {"value": len(records), "label": "motifs"},
-            {"value": len([c for c in chapters if c]), "label": "chapters"},
-            {"value": n_def, "label": "with definition"},
-            {"value": n_atu, "label": "ATU-linked"},
-            {"value": len(legend), "label": "decoded areas"},
-        ],
-        "panels": [
-            {"id": "bzChapters", "title": "Motifs per chapter"},
-            {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
-            {"id": "bzRegions", "title": "Motifs by region"},
-            {"id": "bzAreas", "title": "Top areas (most attested)"},
-            {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
-        ],
+        "cards": cards,
+        "panels": panels,
         "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
         "top_areas": [{"label": legend.get(str(code), f"#{code}"), "count": c} for code, c in top_codes],
@@ -433,6 +452,12 @@ def _build_berezkin_stats() -> dict:
                    for r in widest],
         "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
     }
+    if groups:
+        # Group labels are long ("03 Cosmogony, the earth and the sky, ..."); keep
+        # the leading number + first segment for a readable axis label.
+        stats["groups"] = [{"label": g.split(",")[0].strip(), "count": c}
+                           for g, c in groups.most_common()]
+    return stats
 
 
 def _build_atu_stats() -> dict:

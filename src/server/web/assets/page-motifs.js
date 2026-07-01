@@ -505,6 +505,8 @@ function drawCharts(s, attempt = 0) {
         hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 12, t: 8, b: 30 } });
     } else if (s.index === "berezkin") {
         vbar("bzChapters", s.chapters, "id", "count");
+        // mapsofmyths thematic groups — only present when the enrichment ran.
+        if (s.groups) hbar("bzGroups", s.groups.slice().reverse(), (r) => r.label.slice(0, 34), "count", { margin: { l: 220, r: 12, t: 8, b: 30 } });
         hbar("bzRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
         hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
         hbar("bzWidest", s.widest.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
