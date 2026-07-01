@@ -400,7 +400,7 @@ class TestBerezkinBibliography:
     def _index(self, *entries):
         idx = {}
         for key, author, year in entries:
-            idx.setdefault(year[:4], []).append((key, bbib._fold(author), year))
+            idx.setdefault(year[:4], []).append((key, bbib._fold(author), bbib._year_norm(year)))
         return idx
 
     def test_resolve_status(self):
@@ -411,13 +411,32 @@ class TestBerezkinBibliography:
         assert bbib._resolve("Сем", "1986", index)["status"] == "ambiguous"
         assert bbib._resolve("Nobody", "1999", index)["status"] == "unresolved"
 
-    def test_resolve_diacritics_and_year_suffix(self):
-        index = self._index(("Galvão 1949", "Galvão, Eduardo", "1949"),
-                            ("Ганиева 2011b", "Ганиева, Фатима Абдулаевна", "2011b"))
+    def test_resolve_diacritics(self):
+        index = self._index(("Galvão 1949", "Galvão, Eduardo", "1949"))
         # citation carries a plain-letter surname; the bibliography has diacritics
         assert bbib._resolve("Galvao", "1949", index)["status"] == "resolved"
-        # citation year has no suffix; the bibliography's is 2011b (same 4-digit year)
-        assert bbib._resolve("Ганиева", "2011", index)["status"] == "resolved"
+
+    def test_resolve_latin_cyrillic_year_suffix(self):
+        # citation "2011b" (Latin b) resolves the bibliography's Cyrillic "2011б"
+        index = self._index(("Ганиева 2011а", "Ганиева, Ф.А.", "2011а"),
+                            ("Ганиева 2011б", "Ганиева, Ф.А.", "2011б"))
+        r = bbib._resolve("Ганиева", "2011b", index)
+        assert r["status"] == "resolved" and r["key"] == "Ганиева 2011б"
+
+    def test_parse_bibliography_keeps_colliding_multiauthor_work(self):
+        # two different works share surname+year; a citation of the second author
+        # (Kroeber) must resolve, not be shadowed by the solo Dorsey entry.
+        html = (
+            '<p class="NormalMai">Dorsey, George Amos</p>'
+            '<p class="NormalYur1">1903 The Arapaho Sun Dance. Chicago.</p>'
+            '<p class="NormalMai">Dorsey, George A., and Alfred Luis Kroeber</p>'
+            '<p class="NormalYur1">1903 Traditions of the Arapaho. Chicago.</p>'
+        )
+        b = bbib.parse_bibliography(html)
+        assert "Dorsey 1903" in b and "Dorsey 1903 #2" in b
+        index = {"1903": [(k, bbib._fold(e["author"]), bbib._year_norm(e["year"]))
+                          for k, e in b.items()]}
+        assert bbib._resolve("Kroeber", "1903", index)["status"] == "resolved"
 
     def test_parse_attestations_region_ethnos_and_cf(self):
         area_names = sorted([("Меланезия", "19"), ("Бантуязычная Африка", "11")],

@@ -113,8 +113,16 @@ def parse_bibliography(html: str) -> dict[str, dict]:
         key = f"{surname} {year}"
         if key not in out:
             out[key] = {"author": author, "year": year, "title": title}
-        elif out[key]["author"] != author:
+        elif out[key]["author"] != author and author not in out[key].get("homonyms", []):
+            # A different work under the same surname+year (e.g. a multi-author
+            # "Dorsey … Kroeber" vs a same-year "Dorsey" solo): keep it as its own
+            # entry under a "#n" key so its authors stay searchable, and flag the
+            # collision on the primary.
             out[key].setdefault("homonyms", []).append(author)
+            n = 2
+            while f"{key} #{n}" in out:
+                n += 1
+            out[f"{key} #{n}"] = {"author": author, "year": year, "title": title}
     return out
 
 
@@ -146,15 +154,32 @@ def _fold(s: str) -> str:
     return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
 
 
+# Cyrillic disambiguating-suffix letters -> Latin, so a citation's "2011b" matches
+# the bibliography's Cyrillic "2011б" (and vice versa).
+_SUFFIX_TR = {"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ж": "j",
+              "з": "z", "и": "i", "к": "k", "л": "l", "м": "m", "н": "n", "о": "o",
+              "п": "p", "р": "r", "с": "s", "т": "t", "у": "u", "ф": "f", "х": "h"}
+
+
+def _year_norm(year: str) -> str:
+    """4-digit year + a script-normalised suffix letter (Cyrillic → Latin)."""
+    m = re.match(r"(\d{4})([a-zа-яё]?)", year.lower())
+    if not m:
+        return year.lower()
+    return m.group(1) + _SUFFIX_TR.get(m.group(2), m.group(2))
+
+
 def _resolve(surname: str, year: str, index: dict[str, list[tuple[str, str, str]]]) -> dict:
     """Resolve a citation to a bibliography key. ``index`` maps a 4-digit year to
-    ``[(key, folded_author, exact_year)]``. Matching is diacritic-insensitive and,
-    when the exact year (incl. suffix) misses, falls back to any work of the same
-    4-digit year. ``status`` is resolved / ambiguous / unresolved."""
+    ``[(key, folded_author, normalised_year)]``. Matching is diacritic-insensitive;
+    the year suffix is script-normalised, and when it still misses we fall back to
+    any work of the same 4-digit year. ``status`` is resolved / ambiguous /
+    unresolved."""
     pat = re.compile(rf"(?<!-)\b{re.escape(_fold(surname))}\b(?!-)", re.IGNORECASE)
     cands = index.get(year[:4], ())
-    exact = [k for k, fa, ey in cands if ey == year and pat.search(fa)]
-    hits = list(dict.fromkeys(exact or [k for k, fa, ey in cands if pat.search(fa)]))
+    yn = _year_norm(year)
+    exact = [k for k, fa, ny in cands if ny == yn and pat.search(fa)]
+    hits = list(dict.fromkeys(exact or [k for k, fa, ny in cands if pat.search(fa)]))
     if len(hits) == 1:
         return {"key": hits[0], "status": "resolved"}
     if len(hits) > 1:
@@ -248,10 +273,10 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         return {"skipped": "no-bibliography"}
 
     biblio = parse_bibliography(biblio_html)
-    # Resolution index: 4-digit year -> [(key, folded author, exact year)].
+    # Resolution index: 4-digit year -> [(key, folded author, normalised year)].
     by_year: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
     for key, e in biblio.items():
-        by_year[e["year"][:4]].append((key, _fold(e["author"]), e["year"]))
+        by_year[e["year"][:4]].append((key, _fold(e["author"]), _year_norm(e["year"])))
 
     # Region names (hardcoded legend, longest-first) and ethnos names (mapsofmyths,
     # credential-gated — absent => region-level only).
