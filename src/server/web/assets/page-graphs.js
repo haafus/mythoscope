@@ -137,6 +137,10 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {width: 0.4, "line-color": "#ffaa00", "target-arrow-color": "#ffaa00"},
             },
             {
+                selector: "node.pinned",
+                style: {"border-width": 0.6, "border-color": "#ff8800", "overlay-opacity": 0.35, "overlay-color": "#ffaa00", "overlay-padding": "1px"},
+            },
+            {
                 selector: ".faded",
                 style: {opacity: 0.1},
             },
@@ -148,16 +152,27 @@ function renderCytoscapeGraph(container, data, graphType) {
     const cy = graphCy;
 
     let hoveredNode = null;
+    let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
+
+    const highlightNode = (node) => {
+        const set = node.union(node.neighborhood().nodes()).union(node.connectedEdges());
+        cy.elements().removeClass("faded hover-highlight");
+        cy.elements().not(set).addClass("faded");
+        set.addClass("hover-highlight");
+    };
+    const restoreHighlight = () => {
+        if (pinnedNode) highlightNode(pinnedNode);
+        else cy.elements().removeClass("faded hover-highlight");
+    };
+
     cy.on("mouseover", "node", (evt) => {
         if (hoveredNode === evt.target) return;
         hoveredNode = evt.target;
-        const highlightSet = hoveredNode.union(hoveredNode.neighborhood().nodes()).union(hoveredNode.connectedEdges());
-        cy.elements().not(highlightSet).addClass("faded");
-        highlightSet.addClass("hover-highlight");
+        highlightNode(hoveredNode);
     });
     cy.on("mouseout", "node", () => {
         hoveredNode = null;
-        cy.elements().removeClass("faded hover-highlight");
+        restoreHighlight();  // fall back to the pinned node, if any
     });
 
     const tooltipDiv = document.createElement("div");
@@ -188,6 +203,12 @@ function renderCytoscapeGraph(container, data, graphType) {
     if (infoContent) infoContent.innerHTML = infoPlaceholder;
 
     cy.on("tap", "node", (evt) => {
+        // Pin the selection on this node until the next click elsewhere.
+        cy.nodes().removeClass("pinned");
+        pinnedNode = evt.target;
+        pinnedNode.addClass("pinned");
+        highlightNode(pinnedNode);
+
         const d = evt.target.data();
         const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.beings;
         let html = `<h4>${escapeHtml(d.display_name || d.Name || d.id)}</h4><table>`;
@@ -199,5 +220,14 @@ function renderCytoscapeGraph(container, data, graphType) {
         });
         html += "</table>";
         infoContent.innerHTML = html;
+    });
+
+    // A tap on empty canvas clears the pinned selection.
+    cy.on("tap", (evt) => {
+        if (evt.target !== cy) return;  // background only (node taps handled above)
+        pinnedNode = null;
+        cy.nodes().removeClass("pinned");
+        if (hoveredNode === null) cy.elements().removeClass("faded hover-highlight");
+        if (infoContent) infoContent.innerHTML = infoPlaceholder;
     });
 }
