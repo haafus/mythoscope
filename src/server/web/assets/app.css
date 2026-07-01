@@ -1475,7 +1475,7 @@ body.has-main-navbar {
 /* Tradition-level distribution: collapsible per-region breakdown. */
 .motif-dist { display: flex; flex-direction: column; gap: 2px; }
 .motif-dist-region > summary {
-    display: flex; justify-content: space-between; gap: 12px; cursor: pointer;
+    display: flex; justify-content: space-between; cursor: pointer;
     padding: 5px 8px; border-radius: 6px; list-style: none;
 }
 .motif-dist-region > summary::-webkit-details-marker { display: none; }
@@ -1486,6 +1486,7 @@ body.has-main-navbar {
 .motif-dist-count {
     font-variant-numeric: tabular-nums; color: var(--accent-dark, #1f7a6f);
     background: #e9f5f3; border-radius: 9px; padding: 1px 8px; font-size: 12px;
+    margin-left: 12px;
 }
 /* Left pad = summary padding-left (8px) + marker box (14px), so the tradition
    list lines up with the start of the region label text, not the marker. */
