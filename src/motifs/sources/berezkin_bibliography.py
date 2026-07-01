@@ -307,6 +307,7 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         parsed = list(pool.map(parse_one, motifs))
 
     # Resolve + aggregate.
+    by_id = {m["id"]: m for m in motifs}
     per_motif: dict[str, list[dict]] = {}
     src_regions: dict[str, set] = defaultdict(set)
     src_trads: dict[str, set] = defaultdict(set)
@@ -347,6 +348,10 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
                          "cf": reg["cf"], "ethnos": [groups[k] for k in order]})
         if tree:
             per_motif[mid] = tree
+        else:  # no citation extracted from this motif's detail page — log it
+            m = by_id.get(mid, {})
+            logger.warning("Berezkin bibliography: no citations extracted — %s %s — %s/%s",
+                           mid, m.get("name", ""), BASE, m.get("page", ""))
 
     sources = {k: {"author": biblio.get(k, {}).get("author", ""),
                    "year": biblio.get(k, {}).get("year", ""),
@@ -373,4 +378,5 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         "ethnos_linked": n_eth,
         "traditions_available": len(trad_by_name),
         "motifs_with_citations": len(per_motif),
+        "motifs_without_citations": len(motifs) - len(per_motif),
     }
