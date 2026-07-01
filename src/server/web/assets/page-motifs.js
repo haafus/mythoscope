@@ -599,7 +599,7 @@ function renderDetail(d) {
         }
         // Classification folds in the chapter (letter + name) alongside the
         // mapsofmyths type/group taxonomy.
-        const clsParts = [d.chapter_label || d.chapter, d.motif_type, d.motif_group]
+        const clsParts = [d.motif_type, d.motif_group, d.chapter_label || d.chapter]
             .filter(Boolean).map(escapeHtml);
         if (clsParts.length) {
             body += section("Classification", `<div class="motif-taxonomy">${clsParts.join(" · ")}</div>`);
