@@ -707,6 +707,7 @@ _CITE_HEAD = re.compile(r"^[*☉\s]*([A-Z][A-Za-z.'\-]+(?:[ -][A-Z][A-Za-z.'\-]+
 
 def _resolve_citation(text: str) -> dict:
     """A citation string + a book link/title when its head matches a known work."""
+    text = re.sub(r"^\s*\*+\s*", "", text)  # drop Thompson's leading */** source markers
     out = {"text": text}
     m = _CITE_HEAD.match(text)
     if not m:

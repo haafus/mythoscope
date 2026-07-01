@@ -686,6 +686,11 @@ class TestService:
         assert svc._notes_size("x" * 100) == "0.1k"   # >= 100 bytes -> kilobytes
         assert svc._notes_size("x" * 1259) == "1.2k"
 
+    def test_resolve_citation_strips_leading_stars(self):
+        assert svc._resolve_citation("*Thompson-Balys")["text"] == "Thompson-Balys"
+        assert svc._resolve_citation("** Bolte-Polivka")["text"] == "Bolte-Polivka"
+        assert svc._resolve_citation("Fox 4")["text"] == "Fox 4"  # unchanged
+
     def test_resolve_citation_links_known_works(self):
         # Against the built bibliography key (outputs/motifs/tmi_bibliography.json),
         # produced by the pipeline; skip when the DB hasn't been built.
