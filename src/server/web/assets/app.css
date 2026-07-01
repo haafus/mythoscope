@@ -1640,7 +1640,7 @@ body.has-main-navbar {
 
 /* Citations (references + per-culture), each linkable to its source book. */
 .motif-cites { margin: 0; padding-left: 18px; }
-.motif-cites li { line-height: 1.5; color: #2a2f36; }
+.motif-cites li { line-height: 1.5; font-size: 14px; color: #2a2f36; }
 .motif-cite.linked { color: #2f6f9f; text-decoration: none; }
 .motif-cite.linked:hover { text-decoration: underline; }
 
@@ -1649,14 +1649,22 @@ body.has-main-navbar {
 
 /* Attestations grouped by macro-region: region header once, then one culture
    per row (label at left, its citation link(s) stacked at right). */
-.motif-cultures { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
-/* Grid: column 1 sizes to the widest culture name in the group (+ gap), so the
-   label column is exactly as wide as its names, and citations align in column 2. */
-.motif-culture-group {
+/* One grid for the whole list: column 1 is max-content, so the label column is
+   exactly as wide as the widest culture name across ALL groups (+ gap). Each
+   region group is a subgrid sharing that column, so widths line up list-wide. */
+.motif-cultures {
     display: grid;
     grid-template-columns: max-content 1fr;
-    column-gap: 14px;
-    row-gap: 3px;
+    column-gap: 24px;
+    row-gap: 16px;              /* between region groups */
+    align-items: baseline;
+    margin-top: 12px;
+}
+.motif-culture-group {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    row-gap: 3px;              /* between rows within a group */
     align-items: baseline;
 }
 .motif-culture-region-head {
