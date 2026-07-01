@@ -106,7 +106,7 @@ _REGION = {
     "Buriat": "Siberia", "Cheremis": "Siberia",
     "Assyrian": "Near East",
     "Mexican Indian": "Mesoamerica",
-    "Guarayú": "South America",
+    "Guarayú": "South America", "Paressi": "South America", "Ackawoi": "South America",
     "Mono-Alu": "Oceania",  # single Solomon Islands people, despite the hyphen
 }
 
