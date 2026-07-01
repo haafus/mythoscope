@@ -10,9 +10,10 @@ and decoded in this project. Companion file: [`tmi-reference.md`](tmi-reference.
 
 Scraped from **[areasofmyths.com](http://areasofmyths.com)** (windows-1251). The
 site is a frameset; the whole inventory lives in one navigation page,
-`index-left.html` — each `<li>` is a motif (code, name, optional internal
-see-also codes, and a trailing list of areal indices). Per-motif detail pages
-(`a1.html`, `k84.html`, …) add a short definition. The introduction page
+`index-left.html` — each `<li>` is a motif (code, name, optional Thompson-id
+equivalences, and a trailing list of areal indices). Per-motif detail pages
+(`a1.html`, `k84.html`, …) add a short definition (and the internal see-also
+`см.` links parsed from it). The introduction page
 ([`intro.html`](http://areasofmyths.com/intro.html)) carries the licence and the
 authoritative region-code key (§6).
 

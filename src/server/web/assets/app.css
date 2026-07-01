@@ -1531,7 +1531,7 @@ body.has-main-navbar {
 .motif-bib-year { color: var(--muted); font-variant-numeric: tabular-nums; }
 .motif-bib-title { color: #55606b; }
 .motif-bib-unresolved { color: var(--muted); font-style: italic; }
-.motif-bib-status { color: #9aa7b3; text-decoration: none; }
+.motif-bib-status { color: #5b82b3; text-decoration: none; }
 .motif-bib-status:hover { text-decoration: underline; }
 /* Hover a citation for a gray rounded pill; click copies it to the clipboard.
    Negative margins let the pill bleed into the list padding without shifting text. */
