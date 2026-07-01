@@ -569,7 +569,9 @@ function culturesHtml(cultures) {
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(c);
     }
-    const regions = [...groups.keys()].filter(Boolean);
+    // Regions ordered by how many cultures they hold (most first); no-region last.
+    const regions = [...groups.keys()].filter(Boolean)
+        .sort((a, b) => groups.get(b).length - groups.get(a).length);
     if (groups.has("")) regions.push("");
     const row = (c) => `
         <div class="motif-culture-row">
