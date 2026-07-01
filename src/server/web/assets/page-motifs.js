@@ -1,4 +1,4 @@
-import { app, api, escapeHtml, formatNumber } from "./core.js";
+import { app, api, escapeHtml, formatNumber, onCleanup } from "./core.js";
 
 // Module-local navigation state (index, chapter filter, query, selection).
 const mState = {
@@ -105,6 +105,33 @@ function wireControls() {
         loadList();
     });
     document.getElementById("motifsOverview").addEventListener("click", renderOverview);
+    // ↑/↓ step through the sidebar list (same handler ref → no duplicates on re-render).
+    document.addEventListener("keydown", onMotifsKeydown);
+    onCleanup(() => document.removeEventListener("keydown", onMotifsKeydown));
+}
+
+// Move the selection to the previous/next motif in the sidebar list and open it.
+function stepMotif(delta) {
+    const items = Array.from(document.querySelectorAll(".motifs-item"));
+    if (!items.length) return;
+    const cur = items.findIndex((b) => b.dataset.id === mState.selectedId);
+    const next = cur === -1
+        ? (delta > 0 ? 0 : items.length - 1)         // nothing selected yet → first/last
+        : Math.min(items.length - 1, Math.max(0, cur + delta));
+    if (next === cur) return;
+    const btn = items[next];
+    btn.scrollIntoView({ block: "nearest" });
+    openMotif(mState.index, btn.dataset.id);
+}
+
+function onMotifsKeydown(e) {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!document.getElementById("motifsList")) return;  // only on the motifs page
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") return;  // don't hijack typing
+    e.preventDefault();
+    stepMotif(e.key === "ArrowDown" ? 1 : -1);
 }
 
 async function switchIndex(index) {
