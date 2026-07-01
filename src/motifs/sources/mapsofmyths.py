@@ -117,10 +117,11 @@ def parse_traditions_full(html: str) -> dict[str, dict]:
 # --- pipeline step ---------------------------------------------------------
 
 def _auth() -> tuple[str, str] | None:
-    # Plain env vars (loaded from .env by dotenv, like the API keys) — not a
-    # MYTHO_-prefixed pydantic setting.
-    u, p = os.environ.get("MAPSOFMYTHS_USER"), os.environ.get("MAPSOFMYTHS_PASS")
-    return (u, p) if u and p else None
+    # A single ``user:pass`` env var (loaded from .env by dotenv, like the API
+    # keys) — split on the first colon, curl-style.
+    raw = os.environ.get("MAPSOFMYTHS_AUTH", "")
+    user, sep, password = raw.partition(":")
+    return (user, password) if sep and user and password else None
 
 
 def data_dir() -> Path:
@@ -140,7 +141,7 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
     """
     auth = auth or _auth()
     if not auth:
-        logger.warning("mapsofmyths: no credentials (MAPSOFMYTHS_USER/MAPSOFMYTHS_PASS in .env) — "
+        logger.warning("mapsofmyths: no credentials (MAPSOFMYTHS_AUTH=user:pass in .env) — "
                        "skipping English/taxonomy/TMI/traditions enrichment")
         return {"skipped": "no-credentials"}
 
