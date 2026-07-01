@@ -1464,9 +1464,9 @@ body.has-main-navbar {
     font-size: 0.94em;
 }
 
-/* Motif definitions read better at a limited measure: cap at 2/3 of the pane. */
+/* Motif definitions read better at a limited measure: cap at 3/4 of the pane. */
 .motif-def {
-    max-width: 66%;
+    max-width: 75%;
 }
 
 /* mapsofmyths thematic classification (type · group). */
@@ -1498,7 +1498,7 @@ body.has-main-navbar {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #1f7a6f;
+    color: #5aa89e;
     margin-bottom: 7px;
 }
 
