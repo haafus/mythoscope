@@ -4,8 +4,8 @@ Two layers:
   * inventory  — every distinct label with the number of motifs it tags, built
                  automatically from the parsed ``cultures`` field;
   * normalized — obvious variants merged to a canonical name and tagged with a
-                 broad region. Curated for the common labels (the ~110 here
-                 cover ~94% of all uses); the long tail stays region "".
+                 broad region. Curated for the common labels (the ~150 here
+                 cover ~96% of all uses); the long tail stays region "".
 
 ``build_legend`` produces the stored ``culture_legend``: canonical label ->
 count, region, merged aliases, and any parenthetical sub-areas seen.
@@ -24,6 +24,13 @@ _ALIAS = {
     "Am. Negro": "American Negro", "Indonesian": "Indonesia",
     "Melanesian": "Melanesia", "African": "Africa", "Greek myth": "Greek",
     "Filipino": "Philippine",
+    # Demonyms / spellings that fold into an already-regioned canonical.
+    "China": "Chinese", "Hawaiian": "Hawaii", "Arab": "Arabian",
+    "Polynesian": "Polynesia",
+    # Case variants (canonical() is case-sensitive) of existing canonicals.
+    "Irish Myth": "Irish myth", "Buddhist Myth": "Buddhist myth",
+    "Italian novella": "Italian Novella", "English Romance": "English romance",
+    "Gold coast": "Gold Coast",
 }
 
 # Canonical label -> broad region. Anything absent keeps region "" but is still
@@ -71,6 +78,27 @@ _REGION = {
     "New Guinea": "Oceania", "New Hebrides": "Oceania",
     "Cook Islands": "Oceania", "Marshall Is.": "Oceania", "Fiji": "Oceania",
     "New Zealand": "Oceania", "Australian": "Oceania",
+    # Long-tail single cultures, curated from the region-less inventory.
+    "Ibo": "Africa", "Madagascar": "Africa", "Zulu": "Africa",
+    "Kaffir": "Africa", "Liberian": "Africa", "Mpongwe": "Africa",
+    "Angola": "Africa", "Zanzibar": "Africa", "South Africa": "Africa",
+    "East Africa": "Africa", "Fjort": "Africa",
+    "Mono": "Oceania", "Buin": "Oceania", "New Britain": "Oceania",
+    "German New Guinea": "Oceania", "Hivaoa": "Oceania", "Mangaia": "Oceania",
+    "Banks Is.": "Oceania", "Society Islands": "Oceania",
+    "Zuñi": "North America", "Seneca": "North America", "Pueblo": "North America",
+    "Sinkyone": "North America", "Louisiana Creole": "North America",
+    "Quiché": "Mesoamerica", "Mixtec": "Mesoamerica",
+    "Chile": "South America", "Chibcha": "South America", "Inca": "South America",
+    "Haiti": "Caribbean", "Jamaica Negro": "Caribbean", "Carib": "Caribbean",
+    "Celtic": "Europe", "Lettish": "Europe", "Austrian": "Europe",
+    "Czech": "Europe", "Scandinavian": "Europe", "Hungarian": "Europe",
+    "Sicilian": "Europe",
+    "Borneo": "Southeast Asia", "Sumatra": "Southeast Asia",
+    "Burmese": "Southeast Asia", "Batak": "Southeast Asia",
+    "Malay": "Southeast Asia", "Java": "Southeast Asia",
+    "Buriat": "Siberia", "Cheremis": "Siberia",
+    "Assyrian": "Near East",
 }
 
 _SUB_RE = re.compile(r"\s*\(([^)]*)\)")
