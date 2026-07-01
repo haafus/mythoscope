@@ -66,7 +66,7 @@ def build_motifs(*, force: bool = False) -> None:
         # Base scrape (areasofmyths.com), before any enrichment. "with a definition"
         # counts a definition from the detail page whether or not English later
         # replaced it (the original is kept as definition_rus).
-        logger.info("      base scrape (areasofmyths.com): %d motifs, %d chapters, %d with a definition",
+        logger.info("      + base scrape (areasofmyths.com): %d motifs, %d chapters, %d with a definition",
                     len(berezkin_motifs), len(berezkin_data.get("chapters", {})),
                     _applied(berezkin_motifs, lambda m: m.get("definition") or m.get("definition_rus")))
         if mm.get("skipped"):
