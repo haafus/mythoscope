@@ -1487,7 +1487,7 @@ body.has-main-navbar {
     font-variant-numeric: tabular-nums; color: var(--accent-dark, #1f7a6f);
     background: #e9f5f3; border-radius: 9px; padding: 1px 8px; font-size: 12px;
 }
-.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 8px 8px 22px; }
+.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 8px 8px; }
 
 .motif-section { margin: 18px 0; }
 
