@@ -1493,7 +1493,7 @@ body.has-main-navbar {
 /* Left pad = summary padding-left (8px) + marker box (14px), so the tradition
    list lines up with the start of the region label text, not the marker. A
    wider right pad keeps the wrapped names off the pane edge. */
-.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 28px 8px 22px; }
+.motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 84px 8px 22px; }
 
 .motif-section { margin: 18px 0; }
 
