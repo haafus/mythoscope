@@ -1437,16 +1437,24 @@ body.has-main-navbar {
     font-size: 13px;
 }
 
-/* Russian original name shown as a sub-title under the (English) motif name. */
+/* English name + Russian sub-title stacked as one column, so the sub-title's
+   left edge lines up with the name (not the code chip). */
+.motif-name-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Russian original name shown as a muted sub-title under the (English) name. */
 .motif-subtitle {
-    margin: -8px 0 4px;
-    color: #4a5563;
+    color: var(--muted);
     font-size: 16px;
     font-style: italic;
 }
 
-/* Russian original definition, shown muted below the English one. */
-.motif-text-rus {
+/* Russian original definition, shown muted below the English one. The compound
+   selector out-specifies `.motif-text` (declared later), so the mute sticks. */
+.motif-text.motif-text-rus {
     color: var(--muted);
     font-style: italic;
     font-size: 0.94em;

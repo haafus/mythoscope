@@ -527,12 +527,18 @@ function linkSection(title, links) {
 
 // Tradition-level distribution (mapsofmyths): total attesting traditions, broken
 // down by macro-region; each region expands to the named traditions.
+// Capitalize an ALL-CAPS source name as a proper name (first letter of each
+// word, keeping the rest lower-case): "MONO-ALU" -> "Mono-Alu".
+function titleCase(s) {
+    return s.toLowerCase().replace(/(^|[\s\-–—'’/(])(\p{L})/gu, (m, sep, ch) => sep + ch.toUpperCase());
+}
+
 function berezkinDistribution(dist) {
     if (!dist || !dist.total) return "";
     const rows = (dist.regions || []).map((r) => `
         <details class="motif-dist-region">
             <summary><span class="motif-dist-name">${escapeHtml(r.region)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
-            <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
+            <div class="motif-dist-traditions">${(r.traditions || []).map((t) => escapeHtml(titleCase(t))).join(", ")}</div>
         </details>`).join("");
     return section(`Traditions (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
@@ -572,9 +578,18 @@ function renderDetail(d) {
 
     let body = "";
     if (d.index === "berezkin") {
-        body = head;
-        if (d.name_rus && d.name_rus !== d.name) body += `<div class="motif-subtitle">${escapeHtml(d.name_rus)}</div>`;
-        body += chapterLine;
+        // The Russian original name rides under the English one, left-aligned with
+        // it (inside the name column) and muted.
+        const subtitle = d.name_rus && d.name_rus !== d.name
+            ? `<div class="motif-subtitle">${escapeHtml(d.name_rus)}</div>` : "";
+        body = `
+            <div class="motif-head">
+                <span class="motif-code">${escapeHtml(d.id)}</span>
+                <div class="motif-name-col">
+                    <h2 class="motif-name">${escapeHtml(d.name || "—")}</h2>
+                    ${subtitle}
+                </div>
+            </div>`;
         if (d.definition) {
             let inner = `<p class="motif-text">${escapeHtml(d.definition)}</p>`;
             if (d.definition_rus && d.definition_rus !== d.definition) {
@@ -582,15 +597,18 @@ function renderDetail(d) {
             }
             body += section("Definition", inner);
         }
-        if (d.motif_type || d.motif_group) {
-            const parts = [d.motif_type, d.motif_group].filter(Boolean).map(escapeHtml);
-            body += section("Classification", `<div class="motif-taxonomy">${parts.join(" · ")}</div>`);
+        // Classification folds in the chapter (letter + name) alongside the
+        // mapsofmyths type/group taxonomy.
+        const clsParts = [d.chapter_label || d.chapter, d.motif_type, d.motif_group]
+            .filter(Boolean).map(escapeHtml);
+        if (clsParts.length) {
+            body += section("Classification", `<div class="motif-taxonomy">${clsParts.join(" · ")}</div>`);
         }
+        body += berezkinDistribution(d.traditions);
         const areas = (d.areas || []).map((a) =>
             `<span class="motif-area${a.name ? "" : " unresolved"}" title="area ${escapeHtml(a.id)}">${escapeHtml(a.name || a.id)}</span>`).join("");
         body += section(`Macro-areas (${(d.areas || []).length})`,
             areas ? `<div class="motif-areas">${areas}</div>` : `<span class="motif-empty">—</span>`);
-        body += berezkinDistribution(d.traditions);
         if ((links.tmi || []).length) body += linkSection("Thompson motifs (TMI)", links.tmi);
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
         if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
