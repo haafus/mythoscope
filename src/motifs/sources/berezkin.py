@@ -456,22 +456,31 @@ def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, fo
         targets = motifs[: settings.motifs.max_motifs]
     logger.info("Berezkin: fetching %d detail pages (definitions)...", len(targets))
 
-    def fetch_one(motif: dict) -> tuple[str, str]:
+    def fetch_one(motif: dict) -> tuple[str, str, str | None]:
         page = motif["page"]
         try:
             html = fetch_text(f"{base}/{page}", cache / page, encoding=encoding, force=force)
-            return motif["id"], parse_definition(html)
+            return motif["id"], parse_definition(html), None
         except Exception as exc:  # a missing/odd page must not abort the whole build
-            logger.debug("Berezkin: detail fetch failed for %s: %s", page, exc)
-            return motif["id"], ""
+            return motif["id"], "", f"{page}: {exc}"
 
     workers = max(1, settings.motifs.max_workers)
     definitions: dict[str, str] = {}
+    errors: list[str] = []
+    no_definition = 0  # fetched fine, but the page carries no NormalLis definition
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for motif_id, definition in pool.map(fetch_one, targets):
-            if definition:
+        for motif_id, definition, error in pool.map(fetch_one, targets):
+            if error:
+                errors.append(error)
+            elif definition:
                 definitions[motif_id] = definition
+            else:
+                no_definition += 1
 
     for motif in motifs:
         motif["definition"] = definitions.get(motif["id"], "")
-    logger.info("Berezkin: attached %d definitions", len(definitions))
+    logger.info("Berezkin: attached %d definitions (%d pages have no definition, %d fetch errors)",
+                len(definitions), no_definition, len(errors))
+    if errors:
+        shown = "; ".join(errors[:10]) + (" …" if len(errors) > 10 else "")
+        logger.warning("Berezkin: %d detail-page fetches failed: %s", len(errors), shown)
