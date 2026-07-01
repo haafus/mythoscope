@@ -102,8 +102,33 @@ def _atu_inline(notes: str) -> list[str]:
     return _dedup(out)
 
 
+# Genre/structural words that head a genuine citation block but are not cultures
+# ("Fable: Aesop …", "Answer: he-goat. *Type 812 …"). The source-like test cannot
+# catch these (their citations are real), so they are listed explicitly.
+_NONCULTURE = {"Fable", "Answer", "Countertask"}
+
+
+def _sourcelike(cite: str) -> bool:
+    """True if a citation carries a source token — a page/volume/year digit, an
+    author surname or index marker (capital / ``*``), or an ``ibid.``/``cf.`` back-
+    reference. A "citation" that is none of these is prose that a stray capitalised
+    word (``Answer:``, ``Decision:``) dragged in as a false culture label.
+    """
+    c = cite.strip()
+    if not c:
+        return False
+    if any(ch.isdigit() for ch in c) or c[0] == "*" or c[0].isupper():
+        return True
+    return bool(re.match(r"(?:ibid|cf)\b", c, re.I))
+
+
 def _cultures(biblio: str) -> dict[str, list[str]]:
-    """``{label: [citation strings]}``; nested sub-areas stay inline."""
+    """``{label: [citation strings]}``; nested sub-areas stay inline.
+
+    A label is kept only if at least one of its citations looks like a real
+    source — this drops prose fragments (``Answer:``, ``Tabu: …``) that a
+    capitalised word before a colon leaked in as a spurious culture.
+    """
     bounds = [(m.end(), m.group(1)) for m in _LABEL.finditer(biblio)]
     starts = [m.start() for m in _LABEL.finditer(biblio)] + [len(biblio)]
     out: dict[str, list[str]] = {}
@@ -111,7 +136,8 @@ def _cultures(biblio: str) -> dict[str, list[str]]:
         cite = biblio[end: starts[i + 1]].strip(" .,;-")
         if cite:
             out.setdefault(re.sub(r"\s+", " ", label).strip(), []).append(cite)
-    return out
+    return {lbl: cs for lbl, cs in out.items()
+            if lbl not in _NONCULTURE and any(_sourcelike(c) for c in cs)}
 
 
 def _references(biblio: str) -> list[str]:

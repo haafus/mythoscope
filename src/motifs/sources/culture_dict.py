@@ -31,6 +31,10 @@ _ALIAS = {
     "Irish Myth": "Irish myth", "Buddhist Myth": "Buddhist myth",
     "Italian novella": "Italian Novella", "English Romance": "English romance",
     "Gold coast": "Gold Coast",
+    # "Am. Indian" abbreviation (and its trailing-dot variant) -> American Indian.
+    # Handled here rather than by a blanket trailing-"." strip, which would break
+    # dotted region keys like "U.S." / "Marshall Is.".
+    "Am. Indian": "American Indian", "Am. Indian.": "American Indian",
 }
 
 # Canonical label -> broad region. Anything absent keeps region "" but is still
@@ -108,6 +112,7 @@ def canonical(label: str) -> tuple[str, str]:
     """``(canonical macro label, sub-area or "")`` for a raw culture label."""
     sub = _SUB_RE.search(label)
     macro = _SUB_RE.sub("", label).strip()
+    macro = re.sub(r"(?i)^cf\.\s+", "", macro).strip()  # drop a leading 'Cf.' compare prefix
     return _ALIAS.get(macro, macro), (sub.group(1).strip() if sub else "")
 
 

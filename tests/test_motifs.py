@@ -268,10 +268,23 @@ class TestTrilogy:
         assert out["cultures"] == {"Greek": ["Eisler 396"]}
         assert out["see_also"]["cf"] == ["A1"]
 
+    def test_notes_drops_prose_and_genre_noise(self):
+        # A capitalised prose word before a colon whose "citation" carries no
+        # source token is not a culture and must be dropped ('Answer', 'Decision').
+        out = tmi_notes.parse_notes(
+            "Greek: Frazer 12; Decision: he must guess the riddle correctly.")
+        assert out["cultures"] == {"Greek": ["Frazer 12"]}
+        # A genre label heading a real citation block is dropped by name.
+        out = tmi_notes.parse_notes("Fable: Halm Aesop No. 173; BP III 290.")
+        assert out["cultures"] == {}
+
     def test_culture_canonical_merges_alias_and_strips_sub(self):
         assert culture_dict.canonical("Icel.") == ("Icelandic", "")
         assert culture_dict.canonical("Africa (Angola)") == ("Africa", "Angola")
         assert culture_dict.canonical("England") == ("English", "")
+        # A leading 'Cf.' compare-prefix is stripped, folding into the real culture.
+        assert culture_dict.canonical("Cf. Greek") == ("Greek", "")
+        assert culture_dict.canonical("Am. Indian.") == ("American Indian", "")
 
     def test_culture_legend_aggregates_aliases_regions_subs(self):
         motifs = [
