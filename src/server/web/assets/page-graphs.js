@@ -61,10 +61,7 @@ export async function renderGraphPage(graphType) {
 async function loadGraphData(bookId, graphType) {
     const placeholder = document.getElementById("graphPlaceholder");
     const canvas = document.getElementById("graphCanvas");
-    if (placeholder) {
-        placeholder.textContent = "Loading graph...";
-        placeholder.style.display = "block";
-    }
+    if (placeholder) placeholder.style.display = "none";  // blank while loading — no "Loading graph…" flash
 
     destroyGraph();
 
