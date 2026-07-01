@@ -701,7 +701,7 @@ def _berezkin_motif_bibliography(motif_id: str) -> dict:
 
 
 # The leading author/abbreviation of a citation (skipping Thompson's '*' marks).
-_CITE_HEAD = re.compile(r"^[*☉\s]*([A-Z][A-Za-z.'\-]+(?:[ -][A-Z][A-Za-z.'\-]+){0,2})")
+_CITE_HEAD = re.compile(r"^[*\s]*([A-Z][A-Za-z.'\-]+(?:[ -][A-Z][A-Za-z.'\-]+){0,2})")
 
 
 def _resolve_citation(text: str) -> dict:

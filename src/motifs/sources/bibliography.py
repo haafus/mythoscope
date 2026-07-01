@@ -168,7 +168,7 @@ def parse_entries(html: str) -> list[dict]:
     paras = [p for p in paras if p]
 
     is_url = re.compile(r"^https?://")
-    is_new = re.compile(r"^[*☉]?\s*[A-ZÀ-Ý][A-Za-zÀ-ý.'\-]+\s*,| = ")
+    is_new = re.compile(r"^\*?\s*[A-ZÀ-Ý][A-Za-zÀ-ý.'\-]+\s*,| = ")
     entries: list[dict] = []
     cur: dict | None = None
     for p in paras:
@@ -184,10 +184,10 @@ def parse_entries(html: str) -> list[dict]:
     url_token = re.compile(r"https?://\S+")
     for e in entries:
         inline = url_token.findall(e["text"])
-        text = url_token.sub("", e["text"]).lstrip("*☉ ").strip(" .")
+        text = url_token.sub("", e["text"]).lstrip("* ").strip(" .")
         keys = []
         if " = " in text:
-            keys.append(text.split(" = ", 1)[0].strip(" *☉"))
+            keys.append(text.split(" = ", 1)[0].strip(" *"))
         m = re.match(r"^([A-ZÀ-Ý][A-Za-zÀ-ý.'\-]+)", text)
         if m and m.group(1) not in keys:
             keys.append(m.group(1))
