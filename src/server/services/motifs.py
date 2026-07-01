@@ -321,8 +321,15 @@ def _areal_breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4 if n <= 20 else 5]
 
 
+# A dotted sub-segment the source rendered as a Roman/stick "I" is the digit 1.
+_TMI_ROMAN_RE = re.compile(r"(?<=\.)(I+)(?=\.|$|\+)")
+
+
 def _clean_tmi_ref(ref: str) -> str:
-    """Normalise a mapsofmyths Thompson id (``*A2211.1``, ``A1313.3.1.``) to our tmi id."""
+    """Normalise a mapsofmyths Thompson id (``*A2211.1``, ``A1313.3.1.``) to our tmi id.
+    A dotted sub-segment written with a Roman/stick "I" is the digit 1, so its link
+    resolves (``A700.I`` → ``A700.1``, ``A724.I.I.`` → ``A724.1.1.``)."""
+    ref = _TMI_ROMAN_RE.sub(lambda m: "1" * len(m.group(1)), ref)
     return ref.lstrip("*").rstrip(".").strip()
 
 

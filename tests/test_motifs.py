@@ -163,6 +163,10 @@ class TestMapsofmythsEnrichment:
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"
         assert svc._clean_tmi_ref("A1313.3.1.") == "A1313.3.1"
+        # A Roman/stick "I" in a dotted sub-segment is the digit 1.
+        assert svc._clean_tmi_ref("A700.I") == "A700.1"
+        assert svc._clean_tmi_ref("A724.I.I.") == "A724.1.1"
+        assert svc._clean_tmi_ref("I72A") == "I72A"  # chapter letter left alone
 
     def test_tradition_distribution_groups_by_region(self):
         cat = {
