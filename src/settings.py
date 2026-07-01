@@ -50,7 +50,7 @@ class GraphsSettings(BaseModel):
     # 18 keeps a typical gpt-4o-mini run near its TPM ceiling rather than latency-bound.
     max_concurrent: int = 18
     # Keep only the N most-mentioned entities in each graph (None = keep all).
-    max_entities: int | None = 100
+    max_entities: int | None = 50
 
 
 class MotifsSettings(BaseModel):
