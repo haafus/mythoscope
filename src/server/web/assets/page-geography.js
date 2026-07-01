@@ -169,12 +169,14 @@ function initializeGeographyMap(traditions) {
 
     const { bounds: markerBounds, markers } = renderMarkers(map, traditions);
 
-    // Min zoom = the zoom at which the tiles fill the container, so the map can
-    // never be zoomed (or defaulted) out past full coverage — no gray margins.
+    // Floor the zoom a little below full tile coverage: the fill zoom felt too
+    // tight, so allow half a level of zoom-out (a thin gray frame at most) while
+    // still keeping the map from pulling way out into gray.
+    const ZOOM_OUT_SLACK = 0.5;
     function recomputeMinZoom() {
-        const fillZoom = map.getBoundsZoom(worldBounds, true);
-        map.setMinZoom(fillZoom);
-        if (map.getZoom() < fillZoom) map.setZoom(fillZoom);
+        const floor = map.getBoundsZoom(worldBounds, true) - ZOOM_OUT_SLACK;
+        map.setMinZoom(floor);
+        if (map.getZoom() < floor) map.setZoom(floor);
     }
     // The map fills its grid cell via CSS; make sure Leaflet reads that height.
     map.invalidateSize();
