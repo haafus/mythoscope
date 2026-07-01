@@ -225,9 +225,29 @@ async function openMotif(index, id) {
             });
         });
         bindTreeLinks(detail);
+        bindBibCopy(detail);
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
+}
+
+// Click a bibliography entry to copy its citation to the clipboard. Delegated so
+// it covers every entry (macro-area groups and "Other") in one listener; clicks
+// on the inner status link are left to open that link.
+function bindBibCopy(detail) {
+    detail.querySelectorAll(".motif-bib-item").forEach((li) => {
+        li.addEventListener("click", (e) => {
+            if (e.target.closest("a")) return;  // let the status link work
+            const text = li.dataset.copy || li.textContent.trim();
+            const flash = () => {
+                li.classList.add("copied");
+                setTimeout(() => li.classList.remove("copied"), 700);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(flash, () => {});
+            }
+        });
+    });
 }
 
 function linkChips(links) {
@@ -553,13 +573,15 @@ function bibSourceHtml(s) {
     if (s.author) {
         const year = s.year ? ` <span class="motif-bib-year">${escapeHtml(s.year)}</span>` : "";
         const title = s.title ? ` — <span class="motif-bib-title">${escapeHtml(s.title)}</span>` : "";
-        return `<li><span class="motif-bib-author">${escapeHtml(s.author)}</span>${year}${title}</li>`;
+        // Plain-text form copied to the clipboard on click.
+        const copy = [s.author, s.year].filter(Boolean).join(" ") + (s.title ? ` — ${s.title}` : "");
+        return `<li class="motif-bib-item" data-copy="${escapeHtml(copy)}" title="Click to copy"><span class="motif-bib-author">${escapeHtml(s.author)}</span>${year}${title}</li>`;
     }
     // The status word links to the Berezkin bibliography page so it can be looked up.
     const tag = s.status && s.status !== "resolved"
         ? ` <a class="motif-bib-status" href="http://areasofmyths.com/biblio.html" target="_blank" rel="noopener">(${escapeHtml(s.status)})</a>`
         : "";
-    return `<li class="motif-bib-unresolved">${escapeHtml(s.key)}${tag}</li>`;
+    return `<li class="motif-bib-item motif-bib-unresolved" data-copy="${escapeHtml(s.key)}" title="Click to copy">${escapeHtml(s.key)}${tag}</li>`;
 }
 
 // One people (ethnos) group: an English/Russian name label over its sources.
