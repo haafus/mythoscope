@@ -527,18 +527,20 @@ function linkSection(title, links) {
 
 // Tradition-level distribution (mapsofmyths): total attesting traditions, broken
 // down by macro-region; each region expands to the named traditions.
-// Capitalize an ALL-CAPS source name as a proper name (first letter of each
-// word, keeping the rest lower-case): "MONO-ALU" -> "Mono-Alu".
+// Title-case an ALL-CAPS label as a proper name (first letter of each word,
+// rest lower-case): "SOUTHWEST AND CENTRAL ASIA" -> "Southwest And Central Asia".
 function titleCase(s) {
     return s.toLowerCase().replace(/(^|[\s\-–—'’/(])(\p{L})/gu, (m, sep, ch) => sep + ch.toUpperCase());
 }
 
 function berezkinDistribution(dist) {
     if (!dist || !dist.total) return "";
+    // Region names arrive as the ALL-CAPS top areal-path label; title-case them.
+    // Tradition names are already properly capitalized, so leave them untouched.
     const rows = (dist.regions || []).map((r) => `
         <details class="motif-dist-region">
-            <summary><span class="motif-dist-name">${escapeHtml(r.region)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
-            <div class="motif-dist-traditions">${(r.traditions || []).map((t) => escapeHtml(titleCase(t))).join(", ")}</div>
+            <summary><span class="motif-dist-name">${escapeHtml(titleCase(r.region))}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
+            <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
         </details>`).join("");
     return section(`Traditions (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
