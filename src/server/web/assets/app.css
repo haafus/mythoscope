@@ -1498,7 +1498,7 @@ body.has-main-navbar {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--muted);
+    color: #1f7a6f;
     margin-bottom: 7px;
 }
 
