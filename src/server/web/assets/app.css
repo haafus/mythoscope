@@ -1471,8 +1471,8 @@ body.has-main-navbar {
 
 /* mapsofmyths thematic classification (type · group). */
 .motif-taxonomy { color: #3f4650; line-height: 1.5; }
-/* Chapter trails the taxonomy, shown muted. */
-.motif-taxonomy-chapter { color: var(--muted); }
+/* Chapter trails the taxonomy, faded to match the Russian name/definition. */
+.motif-taxonomy-chapter { color: #a2abb4; }
 
 /* Tradition-level distribution: collapsible per-region breakdown. */
 .motif-dist { display: flex; flex-direction: column; gap: 2px; }
