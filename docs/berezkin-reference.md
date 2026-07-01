@@ -96,7 +96,7 @@ almost every motif. Its `/motifs_full` page lists them as Drupal nodes.
 (`outputs/motifs/raw/mapsofmyths/`) and writes the parsed files next to the index
 JSONs (`outputs/motifs/mapsofmyths_*.json`). **Neither the cache nor the parsed
 files are committed** — only the code is. The step is **credential-gated** (HTTP
-basic auth via `MYTHO_MOTIFS__MAPSOFMYTHS_USER` / `_PASS`); without credentials it
+basic auth via `MAPSOFMYTHS_USER` / `MAPSOFMYTHS_PASS`); without credentials it
 logs a warning and the catalogue is built without the enrichment. `mytho status`
 reports the per-source enrichment counts. `scripts/fetch_mapsofmyths.py` is a thin
 wrapper around the same step for a standalone refresh.

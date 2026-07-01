@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -116,7 +117,9 @@ def parse_traditions_full(html: str) -> dict[str, dict]:
 # --- pipeline step ---------------------------------------------------------
 
 def _auth() -> tuple[str, str] | None:
-    u, p = settings.motifs.mapsofmyths_user, settings.motifs.mapsofmyths_pass
+    # Plain env vars (loaded from .env by dotenv, like the API keys) — not a
+    # MYTHO_-prefixed pydantic setting.
+    u, p = os.environ.get("MAPSOFMYTHS_USER"), os.environ.get("MAPSOFMYTHS_PASS")
     return (u, p) if u and p else None
 
 
@@ -137,7 +140,7 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
     """
     auth = auth or _auth()
     if not auth:
-        logger.warning("mapsofmyths: no credentials (MYTHO_MOTIFS__MAPSOFMYTHS_USER/_PASS) — "
+        logger.warning("mapsofmyths: no credentials (MAPSOFMYTHS_USER/MAPSOFMYTHS_PASS in .env) — "
                        "skipping English/taxonomy/TMI/traditions enrichment")
         return {"skipped": "no-credentials"}
 

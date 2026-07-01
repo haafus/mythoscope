@@ -62,11 +62,6 @@ class MotifsSettings(BaseModel):
     berezkin_details: bool = True
     # Cap motifs whose detail pages are fetched (None = all). Used by `build --sample`.
     max_motifs: int | None = None
-    # HTTP basic-auth for mapsofmyths.com (English names/definitions + node data).
-    # Without them the pipeline reuses the committed enrichment cache and skips the
-    # (credential-gated) refresh. Set via MYTHO_MOTIFS__MAPSOFMYTHS_USER / _PASS.
-    mapsofmyths_user: str | None = None
-    mapsofmyths_pass: str | None = None
 
 
 class ProjectionsSettings(BaseModel):
