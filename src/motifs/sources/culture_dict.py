@@ -103,6 +103,9 @@ _REGION = {
     "Malay": "Southeast Asia", "Java": "Southeast Asia",
     "Buriat": "Siberia", "Cheremis": "Siberia",
     "Assyrian": "Near East",
+    "Mexican Indian": "Mesoamerica",
+    "Guarayú": "South America",
+    "Mono-Alu": "Oceania",  # single Solomon Islands people, despite the hyphen
 }
 
 _SUB_RE = re.compile(r"\s*\(([^)]*)\)")
