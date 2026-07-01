@@ -16,7 +16,7 @@ from json_utils import save_json
 from settings import settings
 
 from . import crosswalk, store
-from .sources import berezkin, trilogy
+from .sources import berezkin, bibliography, mapsofmyths, trilogy
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +39,13 @@ def build_motifs(*, force: bool = False) -> None:
 
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
+    enrichment: dict[str, dict] = {}
 
-    # --- Berezkin (areal catalogue) ---
+    # --- mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
+    #     traditions) — credential-gated; a no-op skips the enrichment. ---
+    enrichment["mapsofmyths"] = mapsofmyths.refresh(force=force)
+
+    # --- Berezkin (areal catalogue; reads the mapsofmyths enrichment above) ---
     berezkin_motifs: list[dict] = []
     bz_cfg = config.get("berezkin", {})
     if bz_cfg.get("enabled", True):
@@ -65,6 +70,9 @@ def build_motifs(*, force: bool = False) -> None:
         atu_ids = {t["id"] for t in trilogy_data["atu"]["types"]}
         atu_seq = trilogy_data["atu_seq"]
         sources["trilogy"] = {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}
+        # TMI citation-key (folkmasa bibliography + curated), annotated with the
+        # per-source usage counts from the just-built TMI notes.
+        enrichment["bibliography"] = bibliography.refresh(trilogy_data["tmi"]["motifs"], force=force)
 
     # --- Cross-walk (ATU <-> TMI, Berezkin -> ATU) ---
     links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids)
@@ -73,6 +81,7 @@ def build_motifs(*, force: bool = False) -> None:
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "counts": counts,
+        "enrichment": enrichment,  # per-source enrichment counts (what was added)
         "crosswalk": {
             "atu_to_tmi": len(links["atu_to_tmi"]),
             "tmi_to_atu": len(links["tmi_to_atu"]),

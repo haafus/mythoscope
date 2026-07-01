@@ -67,7 +67,7 @@ def load_download_list() -> list[dict]:
     return filtered
 
 
-def download_file(url: str) -> bytes:
+def download_file(url: str, auth: tuple[str, str] | None = None) -> bytes:
     logger.info(f"Downloading: {url}")
     headers = {
         "User-Agent": _get_user_agent().random,
@@ -80,6 +80,6 @@ def download_file(url: str) -> bytes:
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "none",
     }
-    response = _get_http_session().get(url, headers=headers, timeout=(settings.corpus.timeout_connect, settings.corpus.timeout_read))
+    response = _get_http_session().get(url, headers=headers, auth=auth, timeout=(settings.corpus.timeout_connect, settings.corpus.timeout_read))
     response.raise_for_status()
     return response.content

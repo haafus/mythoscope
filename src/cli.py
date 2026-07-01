@@ -260,6 +260,11 @@ def status():
             click.echo("  " + ", ".join(f"{k}: {v}" for k, v in counts.items()))
         else:
             click.echo("  Built (no counts recorded)")
+        for source, e in (info.get("enrichment") or {}).items():
+            if e.get("skipped"):
+                click.echo(f"  {source}: skipped ({e['skipped']})")
+            elif e:
+                click.echo(f"  {source}: " + ", ".join(f"{k} {v}" for k, v in e.items()))
     click.echo()
 
     click.echo(f"Total: {format_size(total)}")

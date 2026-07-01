@@ -13,21 +13,24 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def fetch_to_cache(url: str, cache_file: Path, *, force: bool = False) -> bytes:
+def fetch_to_cache(url: str, cache_file: Path, *, force: bool = False,
+                   auth: tuple[str, str] | None = None) -> bytes:
     """Return the bytes for ``url``, reading/writing ``cache_file``.
 
-    A non-empty cached file short-circuits the request unless ``force``.
+    A non-empty cached file short-circuits the request unless ``force``. ``auth`` is
+    an optional ``(user, password)`` for HTTP basic auth (e.g. mapsofmyths.com).
     """
     if not force and cache_file.exists() and cache_file.stat().st_size > 0:
         return cache_file.read_bytes()
 
     from corpus.downloader import download_file  # lazy: requests lives in the corpus extra
 
-    content = download_file(url)
+    content = download_file(url, auth=auth)
     cache_file.parent.mkdir(parents=True, exist_ok=True)
     cache_file.write_bytes(content)
     return content
 
 
-def fetch_text(url: str, cache_file: Path, *, encoding: str = "utf-8", force: bool = False) -> str:
-    return fetch_to_cache(url, cache_file, force=force).decode(encoding, errors="replace")
+def fetch_text(url: str, cache_file: Path, *, encoding: str = "utf-8", force: bool = False,
+               auth: tuple[str, str] | None = None) -> str:
+    return fetch_to_cache(url, cache_file, force=force, auth=auth).decode(encoding, errors="replace")

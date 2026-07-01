@@ -531,7 +531,10 @@ class TestService:
         assert svc._notes_size("x" * 1259) == "1.2k"
 
     def test_resolve_citation_links_known_works(self):
-        # Against the packaged bibliography key (src/motifs/data/tmi_bibliography.json).
+        # Against the built bibliography key (outputs/motifs/tmi_bibliography.json),
+        # produced by the pipeline; skip when the DB hasn't been built.
+        if not svc._bibliography_index():
+            pytest.skip("bibliography key not built (run `mytho motifs`)")
         assert "archive.org" in svc._resolve_citation("BP III").get("url", "")
         assert "Fire" in svc._resolve_citation("**Frazer Fire").get("title", "")  # multi-work author
         assert "url" not in svc._resolve_citation("Nonexistentauthor 5")

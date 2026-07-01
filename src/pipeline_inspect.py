@@ -293,6 +293,7 @@ def motifs_status(settings) -> dict[str, Any]:
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         result["counts"] = meta.get("counts", {})
         result["built_at"] = meta.get("built_at", "")
+        result["enrichment"] = meta.get("enrichment", {})
     return result
 
 

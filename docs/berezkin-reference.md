@@ -89,11 +89,19 @@ Index-level keys: `label, long_label, attribution, homepage, chapters, areas`
 
 The sister site **[mapsofmyths.com](http://mapsofmyths.com)** (same authors, same
 motif ids, CC BY-NC-SA 4.0) carries an **English name and English definition** for
-almost every motif. Its `/motifs_full` page lists them as Drupal nodes; we scrape
-those into the tracked data file `src/motifs/data/mapsofmyths_en.json`
-(`{ID_UPPER: {name_eng, definition_eng}}`, ~3,400 entries) via
-`scripts/fetch_mapsofmyths.py` (credentials passed by arg/env, never committed).
+almost every motif. Its `/motifs_full` page lists them as Drupal nodes.
 
+**Pipeline step.** `motifs.sources.mapsofmyths.refresh()` runs as part of
+`mytho motifs`: it fetches the pages into the resumable raw cache
+(`outputs/motifs/raw/mapsofmyths/`) and writes the parsed files next to the index
+JSONs (`outputs/motifs/mapsofmyths_*.json`). **Neither the cache nor the parsed
+files are committed** — only the code is. The step is **credential-gated** (HTTP
+basic auth via `MYTHO_MOTIFS__MAPSOFMYTHS_USER` / `_PASS`); without credentials it
+logs a warning and the catalogue is built without the enrichment. `mytho status`
+reports the per-source enrichment counts. `scripts/fetch_mapsofmyths.py` is a thin
+wrapper around the same step for a standalone refresh.
+
+`mapsofmyths_en.json` is `{ID_UPPER: {name_eng, definition_eng}}` (~3,400 entries).
 At build time `berezkin.py` matches by case-insensitive id (`A7B == a7b`) and
 **prefers the English text**: it becomes the motif's `name` / `definition`, and the
 Russian originals move to `name_rus` / `definition_rus` (shown as sub-titles on the
@@ -102,11 +110,11 @@ motifs with no English match keep their Russian text.
 
 ### Node-level enrichment
 
-`scripts/fetch_mapsofmyths.py` also scrapes every motif's `/node/N` page and the
-`/traditions_full` list into two more tracked files, which `berezkin.py` attaches
-by case-insensitive id:
+The same step also scrapes every motif's `/node/N` page and the `/traditions_full`
+list into two more files under `outputs/motifs/`, which `berezkin.py` attaches by
+case-insensitive id:
 
-- `src/motifs/data/mapsofmyths_nodes.json` → per motif:
+- `mapsofmyths_nodes.json` → per motif:
   - `motif_type` / `motif_group` — the **2-level thematic taxonomy** (2 types → 13
     groups), a second axis distinct from the letter-chapters;
   - `tmi_refs` — **direct Thompson (TMI) motif ids** (~226 motifs); this is new — we
@@ -116,10 +124,10 @@ by case-insensitive id:
     from the Russian title (largely overlapping — used as corroboration);
   - `traditions` — the areal ids of every **tradition attesting the motif** (avg ~35,
     up to 555): the fine, tradition-level distribution behind the maps.
-- `src/motifs/data/mapsofmyths_traditions.json` → the **1,046 traditions**, each with
-  its English + Russian name, a **named 4-level areal hierarchy** (16 mega-regions →
-  59 regions → 228 areas → 1,046 traditions, decoding each `areal_id` like
-  `5.1.3.2`), and its **language family**. Stored index-level as `traditions`.
+- `mapsofmyths_traditions.json` → the **1,046 traditions**, each with its English +
+  Russian name, a **named 4-level areal hierarchy** (16 mega-regions → 59 regions →
+  228 areas → 1,046 traditions, decoding each `areal_id` like `5.1.3.2`), and its
+  **language family**. Stored index-level in `berezkin.json` as `traditions`.
 
 The motif page renders the classification, the tradition distribution grouped by
 macro-region (each region expandable to the named traditions), and the TMI links.

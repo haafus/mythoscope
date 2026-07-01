@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import re
-from importlib.resources import files as _pkg_files
 
 from motifs import INDEX_LABELS, INDEX_ORDER, store
 from motifs.sources.culture_dict import canonical
@@ -581,15 +580,18 @@ _STATS_BUILDERS.update({
 
 
 def _bibliography_index() -> dict[str, list[dict]]:
-    """Citation key -> [{title, url}] from the packaged TMI bibliography key.
+    """Citation key -> [{title, url}] from the built TMI bibliography key.
 
     A key (author surname or abbreviation) can map to several works; the list
-    preserves them so a multi-work author is disambiguated by the short title.
+    preserves them so a multi-work author is disambiguated by the short title. The
+    key is produced by the pipeline (motifs.sources.bibliography) into
+    ``outputs/motifs/tmi_bibliography.json``; absent when built without network.
     """
     def build() -> dict[str, list[dict]]:
+        path = store.motifs_dir() / "tmi_bibliography.json"
         try:
-            raw = _pkg_files("motifs").joinpath("data/tmi_bibliography.json").read_text("utf-8")
-        except (FileNotFoundError, ModuleNotFoundError, OSError):
+            raw = path.read_text("utf-8")
+        except (FileNotFoundError, OSError):
             return {}
         index: dict[str, list[dict]] = {}
         for e in json.loads(raw).get("entries", []):
