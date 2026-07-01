@@ -544,7 +544,7 @@ function berezkinDistribution(dist) {
             <summary><span class="motif-dist-name">${escapeHtml(titleCase(r.region))}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
             <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
         </details>`).join("");
-    return section(`Traditions (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
+    return section(`Ethne (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
 
 // One bibliography source: resolved works show author · year — title; unresolved
@@ -586,7 +586,7 @@ function berezkinBibliography(bib) {
     if (unattached.length) {
         rows += `
         <details class="motif-bib-area" name="motif-bib">
-            <summary><span class="motif-bib-region">General references</span><span class="motif-bib-count">${formatNumber(unattached.length)}</span></summary>
+            <summary><span class="motif-bib-region">Other</span><span class="motif-bib-count">${formatNumber(unattached.length)}</span></summary>
             <ul class="motif-bib-list">${unattached.map(bibSourceHtml).join("")}</ul>
         </details>`;
     }

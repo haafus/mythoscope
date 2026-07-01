@@ -673,7 +673,7 @@ def _berezkin_motif_bibliography(motif_id: str, traditions: dict) -> dict:
         if reg.get("cf"):
             continue
         code = reg.get("area_code") or ""
-        if not code:  # citations with no recognised region → General references
+        if not code:  # citations with no recognised macro-area → "Other" bucket
             for e in reg.get("ethnos", []):
                 for c in e.get("citations", []):
                     if c["key"] not in seen_un:
