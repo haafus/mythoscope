@@ -604,7 +604,11 @@ function berezkinBibliography(bib) {
             <ul class="motif-bib-list">${unattached.map(bibSourceHtml).join("")}</ul>
         </details>`;
     }
-    return section("Bibliography", `<div class="motif-bib">${rows}</div>`);
+    // Distinct books across the whole motif (a work can span several macro-areas).
+    const bookKeys = new Set();
+    areas.forEach((a) => (a.sources || []).forEach((s) => bookKeys.add(s.key)));
+    unattached.forEach((s) => bookKeys.add(s.key));
+    return section(`Bibliography (${formatNumber(bookKeys.size)})`, `<div class="motif-bib">${rows}</div>`);
 }
 
 // A citation: linked to its source book when the server resolved one.
