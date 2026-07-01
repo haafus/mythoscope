@@ -98,8 +98,7 @@ JSONs (`outputs/motifs/mapsofmyths_*.json`). **Neither the cache nor the parsed
 files are committed** — only the code is. The step is **credential-gated** (HTTP
 basic auth via `MAPSOFMYTHS_AUTH=user:pass`); without credentials it
 logs a warning and the catalogue is built without the enrichment. `mytho status`
-reports the per-source enrichment counts. `scripts/fetch_mapsofmyths.py` is a thin
-wrapper around the same step for a standalone refresh.
+reports the per-source enrichment counts.
 
 `mapsofmyths_en.json` is `{ID_UPPER: {name_eng, definition_eng}}` (~3,400 entries).
 At build time `berezkin.py` matches by case-insensitive id (`A7B == a7b`) and
