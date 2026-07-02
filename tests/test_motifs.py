@@ -197,6 +197,22 @@ class TestAtuStructure:
         assert by["313A"]["parent"] == "313"
         assert by["313A"]["division"] == "Supernatural Adversaries"  # filled from the range containing 313
 
+    def test_apparatus_fields_and_mojibake(self):
+        rows = [
+            {"atu_id": "1", "chapter": "Animal", "division": "Wild Animals 1-99",
+             "tale_name": "x", "tale_type": "y",
+             "litvar": "Krohn 1889, 46ï¿½54; Dï¿½hnhardt 1907ff. IV, 225ï¿½230",
+             "provenance": "Finnish: Rausmaa 1982ff. V, Nos. 1ï¿½6; German: Moser-Rath 1964",
+             "remarks": "Documented 1178 in the Roman de Renart."},
+        ]
+        t = trilogy._parse_atu(rows, {}, {})[0]
+        # digit–digit mojibake becomes an en-dash; a lost diacritic becomes a single
+        # replacement char; the triple garbage never survives.
+        assert t["references"] == "Krohn 1889, 46–54; D�hnhardt 1907ff. IV, 225–230"
+        assert t["attestations"].startswith("Finnish: Rausmaa 1982ff. V, Nos. 1–6;")
+        assert t["remarks"] == "Documented 1178 in the Roman de Renart."
+        assert "ï¿½" not in (t["references"] + t["attestations"])
+
     def test_wikidata_parse_bindings(self):
         from motifs.sources import atu_wikidata as wd
         rows = [

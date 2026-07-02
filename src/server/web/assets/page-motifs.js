@@ -417,6 +417,18 @@ function atuWikipedia(wiki, wikidata) {
     return section("Wikipedia", `<ul class="motif-wiki-list">${items}${wd}</ul>`);
 }
 
+// Uther's per-type apparatus: `references`/`attestations` are semicolon-delimited
+// citation strings (rendered as a list); `remarks` is prose (a paragraph).
+function atuProse(title, text, split) {
+    if (!text) return "";
+    if (split) {
+        const items = text.split(/\s*;\s*/).filter(Boolean)
+            .map((s) => `<li>${escapeHtml(s)}</li>`).join("");
+        return section(title, `<ul class="motif-cite-list">${items}</ul>`);
+    }
+    return section(title, `<p class="motif-text">${escapeHtml(text)}</p>`);
+}
+
 function linkChips(links) {
     if (!links || !links.length) return `<span class="motif-empty">—</span>`;
     return links.map((l) => `
@@ -918,6 +930,9 @@ function renderDetail(d) {
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+        body += atuProse("Literature", d.references, true);
+        body += atuProse("Attestations by tradition", d.attestations, true);
+        body += atuProse("Notes", d.remarks, false);
         body += atuWikipedia(d.wikipedia, d.wikidata);
     }
 

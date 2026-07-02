@@ -901,6 +901,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["concordances"] = rec.get("concordances") or {}  # {KHM|AaTh|Perry|…: [codes]}
         detail["summary"] = rec.get("summary", "")
         detail["summary_html"] = _atu_summary_html(rec.get("summary", ""))
+        detail["references"] = rec.get("references", "")      # Uther litvar (key literature)
+        detail["attestations"] = rec.get("attestations", "")  # Uther provenance (by tradition)
+        detail["remarks"] = rec.get("remarks", "")            # Uther remarks (historical notes)
         detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []
         detail["links"]["subtypes"] = [_link("atu", s) for s in rec.get("subtypes", [])]
         detail["links"]["tmi"] = [_link("tmi", m) for m in rec.get("motifs", [])]

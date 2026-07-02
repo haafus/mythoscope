@@ -34,6 +34,22 @@ _NA = {"", "NA", "N/A", "na"}
 _NOTES_BLEED_RE = re.compile(r"([A-Z]\d[\dA-Za-z.]*)\.\s*†\1\.")
 
 
+# The Trilogy ATU cells carry a baked-in mojibake: a lost character shows up as
+# the 3-char sequence "ï¿½" (an upstream U+FFFD that was latin1-decoded then
+# re-UTF-8-encoded). The original char is unrecoverable; between digits it is
+# almost always a page-range en-dash, elsewhere a lost diacritic — mark the rest
+# with a single proper replacement char rather than leaving the triple garbage.
+_MOJIBAKE = "ï¿½"  # ï¿½
+_MOJIBAKE_RANGE = re.compile(rf"(?<=\d){re.escape(_MOJIBAKE)}(?=\d)")
+
+
+def _fix_mojibake(value: str) -> str:
+    if _MOJIBAKE not in value:
+        return value
+    value = _MOJIBAKE_RANGE.sub("–", value)  # digit–digit → en-dash
+    return value.replace(_MOJIBAKE, "�")
+
+
 def _clean(value: str | None) -> str:
     value = (value or "").strip()
     return "" if value in _NA else value
@@ -303,6 +319,12 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             "division_range": [start, end] if start is not None else None,
             "name": _clean(row.get("tale_name")),
             "summary": _clean(row.get("tale_type")),
+            # Uther's per-type apparatus (mojibake-cleaned): key scholarly
+            # references (litvar), attestations by tradition (provenance) and
+            # historical/textual notes (remarks).
+            "references": _fix_mojibake(_clean(row.get("litvar"))),
+            "attestations": _fix_mojibake(_clean(row.get("provenance"))),
+            "remarks": _fix_mojibake(_clean(row.get("remarks"))),
             "motifs": seq.get(atu_id, []),
             "combos": combos.get(atu_id, []),
         })

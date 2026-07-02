@@ -1565,6 +1565,9 @@ body.has-main-navbar {
 .motif-wiki-list li { font-size: 13px; margin-bottom: 4px; }
 .motif-wiki-list a { color: #3a5e86; text-decoration: none; }
 .motif-wiki-list a:hover { text-decoration: underline; }
+/* ATU Uther apparatus: litvar / provenance citation lists. */
+.motif-cite-list { margin: 0; padding-left: 18px; }
+.motif-cite-list li { line-height: 1.5; font-size: 13px; color: #2a2f36; margin-bottom: 3px; }
 .motif-wiki-wd a { color: var(--muted); }
 .motif-wiki-lang { color: var(--muted); font-size: 11px; text-transform: uppercase; }
 .motif-image { margin: 0 0 14px; }
