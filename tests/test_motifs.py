@@ -307,6 +307,17 @@ class TestAtuStructure:
         t = trilogy._parse_atu(rows_df, {}, {}, tales)[0]
         assert len(t["tales"]) == 2
 
+    def test_repair_atu_name_mid_bracket(self):
+        r = trilogy._repair_atu_name
+        # name truncated inside "[Cat, Frog, etc.]" — tail rejoined, re-split outside brackets
+        n, s = r("The Animal Bride (previously The Mouse [Cat, Frog, etc", "] as Bride). A father decides.")
+        assert n == "The Animal Bride (previously The Mouse [Cat, Frog, etc.] as Bride)"
+        assert s == "A father decides."
+        # a balanced name is left untouched
+        assert r("The Theft of Fish", "A fox steals.") == ("The Theft of Fish", "A fox steals.")
+        # source brackets themselves unbalanced (no depth-0 period) → left as-is, no mangling
+        assert r("A (b (c", "no close here") == ("A (b (c", "no close here")
+
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})

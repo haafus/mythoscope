@@ -382,6 +382,30 @@ def _atu_sort_key(atu_id: str) -> tuple:
     return (int(m.group(1)) if m else 1 << 30, atu_id[m.end():] if m else atu_id)
 
 
+def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
+    """Repair a tale name Trilogy truncated mid-bracket.
+
+    Trilogy split ``tale_name`` at the first period, which sometimes lands inside a
+    bracketed aside (``The Mouse [Cat, Frog, etc.] as Bride``): the name is cut at
+    ``etc`` and the tail (``] as Bride).``) leaks into the summary. When the name has
+    an unbalanced ``[`` or ``(``, rejoin name + summary and re-split at the first
+    period that sits outside all brackets."""
+    if name.count("[") == name.count("]") and name.count("(") == name.count(")"):
+        return name, summary
+    if not summary:
+        return name, summary
+    full = f"{name}.{summary}"
+    depth = 0
+    for i, ch in enumerate(full):
+        if ch in "[(":
+            depth += 1
+        elif ch in "])":
+            depth = max(0, depth - 1)
+        elif ch == "." and depth == 0:
+            return full[:i].strip(), full[i + 1:].strip()
+    return name, summary
+
+
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
     """'Supernatural Adversaries 300-399' -> ('Supernatural Adversaries', 300, 399)."""
     m = _ATU_RANGE.match(s or "")
@@ -429,18 +453,20 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
         if not atu_id:
             continue
         num = _atu_num(atu_id)
-        name, start, end = _split_division(_clean(row.get("division")))
+        div_name, start, end = _split_division(_clean(row.get("division")))
         sub_name, sub_start, sub_end = _split_division(_clean(row.get("sub_division")))
+        tale_name, tale_summary = _repair_atu_name(
+            _clean(row.get("tale_name")), _clean(row.get("tale_type")))
         types.append({
             "id": atu_id,
             "num": num,
             "chapter": _atu_chapter(num),   # derived from the number, not the CSV column
-            "division": name,
+            "division": div_name,
             "division_range": [start, end] if start is not None else None,
             "sub_division": sub_name,       # optional finer level below division
             "sub_division_range": [sub_start, sub_end] if sub_start is not None else None,
-            "name": _clean(row.get("tale_name")),
-            "summary": _clean(row.get("tale_type")),
+            "name": tale_name,
+            "summary": tale_summary,
             # Uther's per-type apparatus (mojibake-cleaned): key scholarly
             # references (litvar), attestations by tradition (provenance) and
             # historical/textual notes (remarks).
