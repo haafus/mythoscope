@@ -964,6 +964,7 @@ function renderDetail(d) {
         // summary_html is pre-escaped on the server with motif/type links injected.
         if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
+        body += atuProse("Notes", d.remarks, false);
         if ((links.parent || []).length) body += linkSection("Base type", links.parent);
         if ((links.subtypes || []).length) body += linkSection(`Subtypes (${links.subtypes.length})`, links.subtypes);
         if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
@@ -971,7 +972,6 @@ function renderDetail(d) {
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
         body += atuProse("Literature", d.references, true);
         body += atuProse("Attestations by tradition", d.attestations, true);
-        body += atuProse("Notes", d.remarks, false);
         body += atuTales(d.tales);
         body += atuWikipedia(d.wikipedia, d.wikidata);
     }
