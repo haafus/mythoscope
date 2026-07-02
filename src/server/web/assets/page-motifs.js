@@ -831,8 +831,15 @@ function renderDetail(d) {
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
         body = head + chapterLine;
-        if (d.division) body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}</p>`);
-        if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
+        if (d.division) {
+            const range = d.division_range ? ` <span class="motif-range">(${d.division_range[0]}–${d.division_range[1]})</span>` : "";
+            body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}${range}</p>`);
+        }
+        // summary_html is pre-escaped on the server with motif/type links injected.
+        if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
+        else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
+        if ((links.parent || []).length) body += linkSection("Base type", links.parent);
+        if ((links.subtypes || []).length) body += linkSection(`Subtypes (${links.subtypes.length})`, links.subtypes);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);

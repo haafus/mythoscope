@@ -7,6 +7,7 @@ from ``outputs/motifs/`` (built by ``mytho motifs``) and cached per process.
 
 from __future__ import annotations
 
+import html
 import json
 import re
 
@@ -888,10 +889,44 @@ def get_motif(index: str, motif_id: str) -> dict | None:
 
     elif index == "atu":
         detail["division"] = rec.get("division", "")
+        detail["division_range"] = rec.get("division_range")
         detail["summary"] = rec.get("summary", "")
+        detail["summary_html"] = _atu_summary_html(rec.get("summary", ""))
+        detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []
+        detail["links"]["subtypes"] = [_link("atu", s) for s in rec.get("subtypes", [])]
         detail["links"]["tmi"] = [_link("tmi", m) for m in rec.get("motifs", [])]
         detail["links"]["combos"] = [_link("atu", c) for c in rec.get("combos", [])]
         bz = cw.get("atu_to_berezkin", {}).get(rec["id"], [])
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in bz]
 
     return detail
+
+
+# A TMI motif token (letter + digits + dotted sub-numbers) and a "Type N[, M]"
+# clause in an ATU summary — linked to the existing motif/type they name.
+_SUMMARY_MOTIF = re.compile(r"\b[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*")
+_SUMMARY_TYPE = re.compile(r"\b(Types?\s+)(\d+[A-Za-z*]*(?:\s*,\s*\d+[A-Za-z*]*)*)")
+
+
+def _inline_link(index: str, ref: str) -> str:
+    return (f'<a class="motif-link" href="#/motifs?index={index}&id={ref}" '
+            f'data-index="{index}" data-id="{ref}">{ref}</a>')
+
+
+def _atu_summary_html(text: str) -> str:
+    """Escape the summary, then linkify the TMI motif codes and ATU 'Type N' refs it
+    names — only those that resolve to a real motif/type. Tokens are alphanumeric, so
+    injecting them raw after escaping the surrounding prose is safe."""
+    if not text:
+        return ""
+    tmi, atu = _by_id("tmi"), _by_id("atu")
+    esc = html.escape(text, quote=False)
+    esc = _SUMMARY_MOTIF.sub(
+        lambda m: _inline_link("tmi", m.group(0)) if m.group(0) in tmi else m.group(0), esc)
+    esc = _SUMMARY_TYPE.sub(
+        lambda m: m.group(1) + re.sub(
+            r"\d+[A-Za-z*]*",
+            lambda mm: _inline_link("atu", mm.group(0)) if mm.group(0) in atu else mm.group(0),
+            m.group(2)),
+        esc)
+    return esc

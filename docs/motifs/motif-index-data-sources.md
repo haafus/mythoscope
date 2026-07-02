@@ -74,7 +74,11 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
   (разобранная иерархия). Из `notes` мы дополнительно вытаскиваем определение,
   культурные аттестации, ссылки (`†`, `Type`) — см. `tmi-reference.md`.
 - **`atu_df.csv`** — типы ATU: `atu_id`, `chapter`/`division`, `tale_name`,
-  `tale_type` (краткое содержание), `combos`.
+  `tale_type` (краткое содержание), `combos`. Из этого выводим: `division` →
+  чистое имя + `division_range` [start, end] (диапазон номера) + иерархию
+  `chapter → division → type`; **семьи подтипов** (`313A` → базовый `313`, `parent`/
+  `subtypes`); а `summary` на странице типа делает **кликабельными** упомянутые
+  мотивы TMI (`[B261]`) и типы (`Type 400`) — линкуются только реально существующие.
 - **`atu_seq.csv`** — мост: `atu_id` × `motif` (код TMI) × `motif_order`. Даёт
   упорядоченную последовательность мотивов на тип → основа cross-walk ATU↔TMI.
 - **`atu_combos.csv`** — часто комбинируемые типы.

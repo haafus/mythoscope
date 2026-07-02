@@ -176,6 +176,37 @@ class TestMapsofmythsEnrichment:
         assert m["atu_refs"] == ["565"]              # merged, de-duplicated
         assert m["traditions"] == ["6.2.3.1", "26.1.1.1"]
 
+
+class TestAtuStructure:
+    def test_division_parse(self):
+        assert trilogy._split_division("Supernatural Adversaries 300-399") == ("Supernatural Adversaries", 300, 399)
+        assert trilogy._split_division("No range here") == ("No range here", None, None)
+        assert trilogy._atu_sort_key("313A") > trilogy._atu_sort_key("313")
+
+    def test_families_and_division_fill(self):
+        rows = [
+            {"atu_id": "313", "chapter": "Magic", "division": "Supernatural Adversaries 300-399",
+             "tale_name": "x", "tale_type": "y"},
+            {"atu_id": "313A", "chapter": "Magic", "division": "", "tale_name": "x", "tale_type": "y"},
+            {"atu_id": "1525", "chapter": "Realistic", "division": "Stories 1525-1724",
+             "tale_name": "x", "tale_type": "y"},
+        ]
+        by = {t["id"]: t for t in trilogy._parse_atu(rows, {}, {})}
+        assert by["313"]["division"] == "Supernatural Adversaries" and by["313"]["division_range"] == [300, 399]
+        assert by["313"]["parent"] is None and "313A" in by["313"]["subtypes"]
+        assert by["313A"]["parent"] == "313"
+        assert by["313A"]["division"] == "Supernatural Adversaries"  # filled from the range containing 313
+
+    def test_summary_html_linkifies(self, monkeypatch):
+        monkeypatch.setattr(svc, "_by_id",
+                            lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})
+        out = svc._atu_summary_html("War [B261] then Type 400, Cf. Type 537; also X999 and Type 999. Tom & Jerry")
+        assert 'data-index="tmi" data-id="B261"' in out
+        assert 'data-index="atu" data-id="400"' in out and 'data-index="atu" data-id="537"' in out
+        assert "X999" in out and 'data-id="X999"' not in out   # unknown motif → plain text
+        assert 'data-id="999"' not in out                      # unknown type → plain text
+        assert "&amp;" in out                                  # prose is escaped
+
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"
         assert svc._clean_tmi_ref("A1313.3.1.") == "A1313.3.1"

@@ -231,22 +231,86 @@ def _parse_atu_combos(rows: list[dict]) -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in combos.items()}
 
 
+# An ATU id is a number, optional letter suffix(es), optional "*" (313, 313A, 1861*).
+_ATU_NUM = re.compile(r"^(\d+)")
+# A division label carries its number range: "Supernatural Adversaries 300-399".
+_ATU_RANGE = re.compile(r"^(.*?)\s*(\d+)\s*-\s*(\d+)\s*$")
+
+
+def _atu_num(atu_id: str) -> int | None:
+    m = _ATU_NUM.match(atu_id)
+    return int(m.group(1)) if m else None
+
+
+def _atu_sort_key(atu_id: str) -> tuple:
+    """(number, suffix) so 313 < 313A < 313A* < 1861."""
+    m = _ATU_NUM.match(atu_id)
+    return (int(m.group(1)) if m else 1 << 30, atu_id[m.end():] if m else atu_id)
+
+
+def _split_division(s: str) -> tuple[str, int | None, int | None]:
+    """'Supernatural Adversaries 300-399' -> ('Supernatural Adversaries', 300, 399)."""
+    m = _ATU_RANGE.match(s or "")
+    return (m.group(1).strip(), int(m.group(2)), int(m.group(3))) if m else ((s or "").strip(), None, None)
+
+
 def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str, list[str]]) -> list[dict]:
     types = []
     for row in df_rows:
         atu_id = _clean(row.get("atu_id"))
         if not atu_id:
             continue
+        name, start, end = _split_division(_clean(row.get("division")))
         types.append({
             "id": atu_id,
+            "num": _atu_num(atu_id),
             "chapter": _clean(row.get("chapter")),
-            "division": _clean(row.get("division")),
+            "division": name,
+            "division_range": [start, end] if start is not None else None,
             "name": _clean(row.get("tale_name")),
             "summary": _clean(row.get("tale_type")),
             "motifs": seq.get(atu_id, []),
             "combos": combos.get(atu_id, []),
         })
+
+    # Fill an unlabelled division from the number range that contains the type.
+    ranges = {(t["division"], *t["division_range"]) for t in types if t["division_range"]}
+    for t in types:
+        if t["division"] or t["num"] is None:
+            continue
+        for nm, s, e in ranges:
+            if s <= t["num"] <= e:
+                t["division"], t["division_range"] = nm, [s, e]
+                break
+
+    # Subtype families: a subtype (313A) hangs off its base number type (313), when
+    # that base type exists; the base lists its subtypes (natural-sorted).
+    by_id = {t["id"]: t for t in types}
+    for t in types:
+        base = str(t["num"]) if t["num"] is not None else ""
+        t["parent"] = base if base and base != t["id"] and base in by_id else None
+        t["subtypes"] = []
+    for t in types:
+        if t["parent"]:
+            by_id[t["parent"]]["subtypes"].append(t["id"])
+    for t in types:
+        t["subtypes"].sort(key=_atu_sort_key)
     return types
+
+
+def _atu_divisions(types: list[dict]) -> list[dict]:
+    """Ordered chapter -> division hierarchy: [{chapter, name, start, end, count}]."""
+    chapter_order: dict[str, int] = {}
+    for t in types:
+        chapter_order.setdefault(t["chapter"], len(chapter_order))
+    counts: collections.Counter = collections.Counter()
+    for t in types:
+        if t["division_range"]:
+            counts[(t["chapter"], t["division"], *t["division_range"])] += 1
+    rows = [{"chapter": ch, "name": nm, "start": s, "end": e, "count": c}
+            for (ch, nm, s, e), c in counts.items()]
+    rows.sort(key=lambda r: (chapter_order.get(r["chapter"], 1 << 30), r["start"]))
+    return rows
 
 
 def build_tmi(config: dict, *, force: bool = False) -> dict:
@@ -282,6 +346,7 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
         "long_label": "Aarne-Thompson-Uther tale-type index",
         "attribution": config.get("attribution", ""),
         "homepage": config.get("homepage", ""),
+        "divisions": _atu_divisions(atu),
         "types": atu,
     }, seq
 

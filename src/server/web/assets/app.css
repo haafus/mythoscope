@@ -1556,6 +1556,7 @@ body.has-main-navbar {
     line-height: 1.55;
     color: #2a2f36;
 }
+.motif-range { color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .motif-links {
     display: flex;
