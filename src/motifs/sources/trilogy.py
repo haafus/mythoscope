@@ -277,6 +277,16 @@ def _atu_chapter(num: int | None) -> str:
     return ""
 
 
+# Canonical ATU sub-divisions the CSV omits entirely, so their types would carry
+# no division. These fill the gaps: 700-749 (Tales Of Magic) and 750-779
+# (Religious Tales) — standard Uther (2004) range labels — used only as a last
+# resort after the CSV's own labelled ranges.
+_ATU_CANON_DIVISIONS = [
+    (700, 749, "Other Tales Of The Supernatural"),
+    (750, 779, "God Rewards And Punishes"),
+]
+
+
 def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str, list[str]]) -> list[dict]:
     types = []
     for row in df_rows:
@@ -297,8 +307,11 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             "combos": combos.get(atu_id, []),
         })
 
-    # Fill an unlabelled division from the number range that contains the type.
+    # Fill an unlabelled division from the number range that contains the type —
+    # first from the CSV's own labelled ranges, then from the canonical fallback
+    # table for the sub-divisions the CSV omits (700-749, 750-779).
     ranges = {(t["division"], *t["division_range"]) for t in types if t["division_range"]}
+    ranges |= {(nm, s, e) for s, e, nm in _ATU_CANON_DIVISIONS}
     for t in types:
         if t["division"] or t["num"] is None:
             continue
