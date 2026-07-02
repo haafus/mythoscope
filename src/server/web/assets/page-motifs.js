@@ -829,7 +829,6 @@ function renderDetail(d) {
             <span class="motif-code">${escapeHtml(d.id)}</span>
             <h2 class="motif-name">${escapeHtml(d.name || "—")}</h2>
         </div>`;
-    const chapterLine = `<div class="motif-chapter">${escapeHtml(d.chapter_label || d.chapter || "")}</div>`;
 
     let body = "";
     if (d.index === "berezkin") {
@@ -899,11 +898,16 @@ function renderDetail(d) {
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
-        body = head + chapterLine + atuImage(d.image);
+        body = head + atuImage(d.image);
+        // Classification folds chapter and division (with its number range) into one
+        // line, as in the Berezkin index.
+        const cls = [];
+        if (d.chapter) cls.push(escapeHtml(d.chapter_label || d.chapter));
         if (d.division) {
             const range = d.division_range ? ` <span class="motif-range">(${d.division_range[0]}–${d.division_range[1]})</span>` : "";
-            body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}${range}</p>`);
+            cls.push(escapeHtml(d.division) + range);
         }
+        if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
         body += atuNames(d.names);
         body += atuConcordances(d.concordances);
         // summary_html is pre-escaped on the server with motif/type links injected.
