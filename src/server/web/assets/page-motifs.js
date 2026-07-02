@@ -373,6 +373,16 @@ function bindBibCopy(detail) {
     });
 }
 
+// Full labels for the concordance catalogues (Wikidata).
+const CONC_LABELS = { KHM: "Grimm (KHM)", AaTh: "Aarne–Thompson (AaTh)",
+                      Aesop: "Aesop (Fabulae)", Perry: "Aesop (Perry Index)", Child: "Child ballad" };
+
+// An illustrative Commons image for the type (P18), as a thumbnail.
+function atuImage(image) {
+    if (!image) return "";
+    return `<figure class="motif-image"><img src="${escapeHtml(image)}?width=320" alt="" loading="lazy"></figure>`;
+}
+
 // ATU multilingual names (Wikidata): one row per language.
 function atuNames(names) {
     const langs = Object.keys(names || {});
@@ -383,10 +393,23 @@ function atuNames(names) {
     return section("Also known as", `<div class="motif-altnames">${rows}</div>`);
 }
 
-// Wikipedia articles for the type (Wikidata), plus a Wikidata link.
+// Concordances to other catalogues (Grimm/KHM, Aarne-Thompson, Aesop, Child).
+function atuConcordances(conc) {
+    const cats = Object.keys(conc || {});
+    if (!cats.length) return "";
+    const rows = cats.map((cat) =>
+        `<div class="motif-altname"><span class="motif-altname-lang">${escapeHtml(CONC_LABELS[cat] || cat)}</span>`
+        + ` ${(conc[cat] || []).map(escapeHtml).join(", ")}</div>`).join("");
+    return section("Also catalogued as", `<div class="motif-altnames">${rows}</div>`);
+}
+
+// Wikipedia articles for the type (Wikidata), each tagged with its language, plus
+// a Wikidata link. Tolerates the old en-only shape ({title, url} without lang).
 function atuWikipedia(wiki, wikidata) {
-    const items = (wiki || []).map((w) =>
-        `<li><a href="${escapeHtml(w.url)}" target="_blank" rel="noopener">${escapeHtml(w.title)} <span class="ext-arrow">↗</span></a></li>`).join("");
+    const items = (wiki || []).map((w) => {
+        const lang = w.lang ? ` <span class="motif-wiki-lang">${escapeHtml(w.lang)}</span>` : "";
+        return `<li><a href="${escapeHtml(w.url)}" target="_blank" rel="noopener">${escapeHtml(w.title)} <span class="ext-arrow">↗</span></a>${lang}</li>`;
+    }).join("");
     if (!items && !wikidata) return "";
     const wd = wikidata
         ? `<li class="motif-wiki-wd"><a href="https://www.wikidata.org/wiki/${escapeHtml(wikidata)}" target="_blank" rel="noopener">Wikidata ${escapeHtml(wikidata)} <span class="ext-arrow">↗</span></a></li>`
@@ -876,12 +899,13 @@ function renderDetail(d) {
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
-        body = head + chapterLine;
+        body = head + chapterLine + atuImage(d.image);
         if (d.division) {
             const range = d.division_range ? ` <span class="motif-range">(${d.division_range[0]}–${d.division_range[1]})</span>` : "";
             body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}${range}</p>`);
         }
         body += atuNames(d.names);
+        body += atuConcordances(d.concordances);
         // summary_html is pre-escaped on the server with motif/type links injected.
         if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);

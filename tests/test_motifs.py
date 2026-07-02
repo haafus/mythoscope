@@ -202,9 +202,12 @@ class TestAtuStructure:
         rows = [
             {"atu": {"value": "510A"}, "item": {"value": "http://www.wikidata.org/entity/Q11841"},
              "isType": {"value": "true"}, "l_de": {"value": "Aschenputtel"}, "l_ru": {"value": "Золушка"},
-             "art": {"value": "https://en.wikipedia.org/wiki/Cinderella"}},
+             "image": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/Cinderella.jpg"},
+             "arts": {"value": "en=https://en.wikipedia.org/wiki/Cinderella|ru=https://ru.wikipedia.org/wiki/Золушка"},
+             "cats": {"value": "Grimms' fairy tales=KHM 21|The Types of the Folktale=510A"}},
             {"atu": {"value": "510A"}, "item": {"value": "http://www.wikidata.org/entity/Q999"},
-             "isType": {"value": "false"}, "art": {"value": "https://en.wikipedia.org/wiki/Katie_Woodencloak"}},
+             "isType": {"value": "false"},
+             "arts": {"value": "en=https://en.wikipedia.org/wiki/Katie_Woodencloak"}},
             {"atu": {"value": "99999"}, "item": {"value": "x"}, "isType": {"value": "true"},
              "l_en": {"value": "Not in our index"}},
         ]
@@ -213,7 +216,10 @@ class TestAtuStructure:
         e = out["510A"]
         assert e["names"]["de"] == ["Aschenputtel"] and e["names"]["ru"] == ["Золушка"]
         assert e["wikidata"] == "Q11841"                            # from the tale-type item
-        assert [w["title"] for w in e["wikipedia"]] == ["Cinderella", "Katie Woodencloak"]  # any item
+        assert e["image"].startswith("https://commons.wikimedia.org")   # http → https
+        titles = {(w["lang"], w["title"]) for w in e["wikipedia"]}
+        assert {("en", "Cinderella"), ("ru", "Золушка"), ("en", "Katie Woodencloak")} <= titles
+        assert e["concordances"] == {"KHM": ["21"]}                 # prefix stripped; AaTh==id dropped
         assert wd._norm_atu("283В*") == "283B*"                     # Cyrillic homoglyph folded
 
     def test_list_filters_by_division(self, monkeypatch):

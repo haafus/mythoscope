@@ -1566,6 +1566,10 @@ body.has-main-navbar {
 .motif-wiki-list a { color: #3a5e86; text-decoration: none; }
 .motif-wiki-list a:hover { text-decoration: underline; }
 .motif-wiki-wd a { color: var(--muted); }
+.motif-wiki-lang { color: var(--muted); font-size: 11px; text-transform: uppercase; }
+.motif-image { margin: 0 0 14px; }
+.motif-image img { max-width: 320px; max-height: 240px; width: auto; height: auto;
+    border-radius: 8px; border: 1px solid var(--border); display: block; }
 
 .motif-links {
     display: flex;
