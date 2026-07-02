@@ -461,9 +461,9 @@ function atuTales(tales) {
 function atuProse(title, text, split) {
     if (!text) return "";
     if (split) {
-        const items = text.split(/\s*;\s*/).filter(Boolean)
-            .map((s) => `<li>${escapeHtml(s)}</li>`).join("");
-        return section(title, `<ul class="motif-cite-list">${items}</ul>`);
+        const parts = text.split(/\s*;\s*/).filter(Boolean);
+        const items = parts.map((s) => `<li>${escapeHtml(s)}</li>`).join("");
+        return section(`${title} (${parts.length})`, `<ul class="motif-cite-list">${items}</ul>`);
     }
     return section(title, `<p class="motif-text">${escapeHtml(text)}</p>`);
 }
@@ -966,7 +966,7 @@ function renderDetail(d) {
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
         if ((links.parent || []).length) body += linkSection("Base type", links.parent);
         if ((links.subtypes || []).length) body += linkSection(`Subtypes (${links.subtypes.length})`, links.subtypes);
-        if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
+        if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
         body += atuProse("Literature", d.references, true);
