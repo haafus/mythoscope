@@ -93,9 +93,31 @@ _MOJIBAKE_REPAIRS_TEMPLATE = {
     "Gabr#ek": "Gabršček", "#a#elj": "Šašelj", "#mits": "Šmits",
     "#akryl": "Šakryl", "epenkov/Penu#liski": "Cepenkov/Penušliski",
     "Penu#liski": "Penušliski",
+    # German (extended tail)
+    "Koch-Gr#nberg": "Koch-Grünberg", "Bar#ske": "Barüske", "Tr#mpy": "Trümpy",
+    "B#nker": "Bünker", "Wigstr#m": "Wigström", "F#hnrich": "Fähnrich",
+    "P#ge-Alder": "Pöge-Alder", "Sz#v#rffy": "Szövérffy", "W#rtlich": "Wörtlich",
+    "Sch#ne": "Schöne", "G#nter": "Günter", "gef#hrliche": "gefährliche",
+    # Hungarian (extended tail)
+    "K#nos": "Kúnos", "G#czi": "Géczi", "G#r#g-Karady": "Görög-Karady",
+    "Kosov#-Kole#nyi": "Kosová-Kolečányi",
+    # French (extended tail)
+    "Bl#court": "Blécourt", "Tch#raz": "Tchéraz", "Courri#re": "Courrière",
+    "D#jeux": "Déjeux", "Dum#zil": "Dumézil", "J#sus": "Jésus", "#sope": "Ésope",
+    "S#urs": "Sœurs",
+    # Spanish/Portuguese/Basque (extended tail)
+    "R#o": "Río", "An#barro": "Añibarro", "Cust#dio": "Custódio",
+    # Slavic/Baltic (extended tail)
+    "K#har": "Kühar", "Kaba#nikau": "Kabašnikau", "#r#mkov#": "Šrámková",
+    "#lekonyt": "Šlekonyt",
+    # Nordic (extended tail)
+    "Asbj#rnsen": "Asbjørnsen", "Gr#nborg": "Grønborg",
+    "Set#l#/Kyr#l#": "Setälä/Kyrölä",
+    # Irish / Italian apostrophe (extended tail)
+    "O#Faolain": "O'Faolain", "D#Aronco": "D'Aronco",
     # Journals
     "Laogr#phia": "Laographia", "B#aloideas": "Béaloideas",
-    "Pa#catantra": "Pañcatantra",
+    "Pa#catantra": "Pañcatantra", "Krypt#dia": "Kryptádia", "M#lusine": "Mélusine",
 }
 _MOJIBAKE_REPAIRS = sorted(
     ((k.replace("#", _MOJIBAKE), v) for k, v in _MOJIBAKE_REPAIRS_TEMPLATE.items()),
