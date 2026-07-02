@@ -129,8 +129,24 @@ _MOJIBAKE_REPAIRS = sorted(
     key=lambda kv: len(kv[0]), reverse=True,  # longest key first
 )
 
+# A related corruption drops a name's leading diacritic capital outright (no
+# marker): "Ėrgis" -> "rgis", "Čajkanović" -> "ajkanovi". These surface as a
+# lowercase-initial surname in citation position. Repaired as whole words only
+# (\b…\b), so a fragment inside a real word is never touched.
+_BARE_NAME_REPAIRS = {
+    "rgis": "Ėrgis",           # Ėrgis (Yakut)
+    "ajkanovi": "Čajkanović",  # Čajkanović (Serbian)
+    "liasov": "Ėliasov",       # Ėliasov (Buryat)
+    "epenkov": "Cepenkov",     # Cepenkov (Macedonian)
+    "istov": "Čistov",         # Čistov (Karelian/Russian)
+    "etkarev": "Četkarev",     # Četkarev (Mari)
+}
+_BARE_NAME_RE = re.compile(r"\b(" + "|".join(map(re.escape, _BARE_NAME_REPAIRS)) + r")\b")
+
 
 def _fix_mojibake(value: str) -> str:
+    if _BARE_NAME_RE.search(value):  # dropped-leading-capital names (no mojibake marker)
+        value = _BARE_NAME_RE.sub(lambda m: _BARE_NAME_REPAIRS[m.group(0)], value)
     if _MOJIBAKE not in value:
         return value
     for mangled, fixed in _MOJIBAKE_REPAIRS:

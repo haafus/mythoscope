@@ -227,6 +227,10 @@ class TestAtuStructure:
         assert f(f"III, XI{M}XXVIII, IV") == "III, XI–XXVIII, IV"  # roman-numeral range
         assert f(f"(S. R{M}hle)") == "(S. R�hle)"                  # lost diacritic in a name → marker
         assert f(f"unknown {M} name") == "unknown � name"          # unrecognised → marker
+        # dropped leading capital (no marker), repaired only as a whole word
+        assert f("Yakut: rgis 1967") == "Yakut: Ėrgis 1967"
+        assert f("Serbian: ajkanovi 1927") == "Serbian: Čajkanović 1927"
+        assert f("Bergisch 1900") == "Bergisch 1900"               # substring never touched
 
     def test_wikidata_parse_bindings(self):
         from motifs.sources import atu_wikidata as wd
