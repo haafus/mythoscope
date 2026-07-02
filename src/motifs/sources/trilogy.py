@@ -211,7 +211,12 @@ def _parse_tmi(rows: list[dict]) -> list[dict]:
 
 
 def _parse_atu_seq(rows: list[dict]) -> dict[str, list[str]]:
-    """Group ``atu_seq`` rows into ``{atu_id: [ordered unique TMI motif codes]}``."""
+    """Group ``atu_seq`` rows into ``{atu_id: [ordered unique TMI motif codes]}``.
+
+    (``atu_seq`` also carries a ``tale_variant`` column, but it is not a clean set
+    of documented variants — a couple of catch-all types expand into tens of
+    thousands of synthetic sequences — so we collapse across variants and keep only
+    the ordered unique motif set per type.)"""
     ordered: dict[str, list[tuple[float, str]]] = {}
     for row in rows:
         atu_id = _clean(row.get("atu_id"))
@@ -311,12 +316,15 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             continue
         num = _atu_num(atu_id)
         name, start, end = _split_division(_clean(row.get("division")))
+        sub_name, sub_start, sub_end = _split_division(_clean(row.get("sub_division")))
         types.append({
             "id": atu_id,
             "num": num,
             "chapter": _atu_chapter(num),   # derived from the number, not the CSV column
             "division": name,
             "division_range": [start, end] if start is not None else None,
+            "sub_division": sub_name,       # optional finer level below division
+            "sub_division_range": [sub_start, sub_end] if sub_start is not None else None,
             "name": _clean(row.get("tale_name")),
             "summary": _clean(row.get("tale_type")),
             # Uther's per-type apparatus (mojibake-cleaned): key scholarly
@@ -372,6 +380,20 @@ def _atu_divisions(types: list[dict]) -> list[dict]:
     return rows
 
 
+def _atu_subdivisions(types: list[dict]) -> list[dict]:
+    """Sub-division hierarchy (the optional level below division), ascending by
+    range: [{chapter, division, name, start, end, count}]. Only ~37% of types
+    carry one, so this is sparse."""
+    counts: collections.Counter = collections.Counter()
+    for t in types:
+        if t["sub_division_range"]:
+            counts[(t["chapter"], t["division"], t["sub_division"], *t["sub_division_range"])] += 1
+    rows = [{"chapter": ch, "division": dv, "name": nm, "start": s, "end": e, "count": c}
+            for (ch, dv, nm, s, e), c in counts.items()]
+    rows.sort(key=lambda r: r["start"])
+    return rows
+
+
 def build_tmi(config: dict, *, force: bool = False) -> dict:
     """Download and parse only the Trilogy TMI CSV into the TMI store dict.
 
@@ -406,6 +428,7 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
         "attribution": config.get("attribution", ""),
         "homepage": config.get("homepage", ""),
         "divisions": _atu_divisions(atu),
+        "subdivisions": _atu_subdivisions(atu),
         "types": atu,
     }, seq
 

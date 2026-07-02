@@ -242,8 +242,9 @@ def list_indexes() -> list[dict]:
             summary["substantive_count"] = sum(st[1] for st in chstats.values())
             summary["definition_count"] = sum(st[2] for st in chstats.values())
             summary["atu_count"] = sum(st[3] for st in chstats.values())
-        if index == "atu":  # chapter → division hierarchy for the browse dropdown
+        if index == "atu":  # chapter → division → sub_division hierarchy for the browse dropdown
             summary["divisions"] = data.get("divisions", [])
+            summary["subdivisions"] = data.get("subdivisions", [])
         out.append(summary)
     return out
 
@@ -787,8 +788,9 @@ def _subtree_flags(motif_id: str) -> dict:
     return {f"{t}_subtree": motif_id in _tier_relevant(t) for t in ("def", "sub", "atu")}
 
 
-def list_motifs(index: str, *, chapter: str = "", division: str = "", q: str = "",
-                level: int | None = None, tier: str = "", limit: int = 200, offset: int = 0) -> dict:
+def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_division: str = "",
+                q: str = "", level: int | None = None, tier: str = "",
+                limit: int = 200, offset: int = 0) -> dict:
     """Filtered, paginated motif list for one index."""
     records = _records(index)
     query = q.strip().lower()
@@ -796,6 +798,8 @@ def list_motifs(index: str, *, chapter: str = "", division: str = "", q: str = "
         records = [r for r in records if r.get("chapter", "") == chapter]
     if division:  # ATU browse level (chapter → division → type)
         records = [r for r in records if r.get("division", "") == division]
+    if sub_division:  # ATU finer level (division → sub_division → type)
+        records = [r for r in records if r.get("sub_division", "") == sub_division]
     if level is not None:
         records = [r for r in records if r.get("level", 0) == level]
     if index == "tmi" and tier in _TIER_PREDICATE:  # substantive / definitions / ATU
@@ -894,6 +898,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     elif index == "atu":
         detail["division"] = rec.get("division", "")
         detail["division_range"] = rec.get("division_range")
+        detail["sub_division"] = rec.get("sub_division", "")
+        detail["sub_division_range"] = rec.get("sub_division_range")
         detail["names"] = rec.get("names") or {}                # multilingual names (Wikidata)
         detail["wikipedia"] = rec.get("wikipedia") or []        # [{lang, title, url}]
         detail["wikidata"] = rec.get("wikidata", "")

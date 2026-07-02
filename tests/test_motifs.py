@@ -247,6 +247,31 @@ class TestAtuStructure:
         out = svc.list_motifs("atu", division="Supernatural Adversaries")
         assert [i["id"] for i in out["items"]] == ["300"] and out["total"] == 1
 
+    def test_sub_division_hierarchy(self):
+        rows = [
+            {"atu_id": "1", "chapter": "Animal", "division": "Wild Animals 1-99",
+             "sub_division": "The Clever Fox (Other Animal) 1-69", "tale_name": "x", "tale_type": "y"},
+            {"atu_id": "300", "chapter": "Magic", "division": "Supernatural Adversaries 300-399",
+             "sub_division": "", "tale_name": "x", "tale_type": "y"},
+        ]
+        types = trilogy._parse_atu(rows, {}, {})
+        by = {t["id"]: t for t in types}
+        assert by["1"]["sub_division"] == "The Clever Fox (Other Animal)"
+        assert by["1"]["sub_division_range"] == [1, 69]
+        assert by["300"]["sub_division"] == "" and by["300"]["sub_division_range"] is None
+        subs = trilogy._atu_subdivisions(types)
+        assert subs == [{"chapter": "Animal Tales", "division": "Wild Animals",
+                         "name": "The Clever Fox (Other Animal)", "start": 1, "end": 69, "count": 1}]
+
+    def test_list_filters_by_sub_division(self, monkeypatch):
+        monkeypatch.setattr(svc, "_records", lambda idx: [
+            {"id": "1", "sub_division": "The Clever Fox (Other Animal)", "name": "a"},
+            {"id": "70", "sub_division": "Other Wild Animals", "name": "b"},
+        ])
+        monkeypatch.setattr(svc, "_list_item", lambda idx, r: {"id": r["id"]})
+        out = svc.list_motifs("atu", sub_division="Other Wild Animals")
+        assert [i["id"] for i in out["items"]] == ["70"] and out["total"] == 1
+
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})

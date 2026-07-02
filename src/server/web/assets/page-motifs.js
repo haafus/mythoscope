@@ -5,7 +5,8 @@ const mState = {
     indexes: null,
     index: "tmi",  // default index on first open (Thompson)
     chapter: "",
-    division: "",  // ATU browse level (chapter → division → type)
+    division: "",      // ATU browse level (chapter → division → type)
+    subdivision: "",   // ATU finer level (division → sub_division → type)
     query: "",
     selectedId: null,
     motifFilter: "all",  // "all" | "def" | "sub" | "atu"
@@ -26,6 +27,7 @@ function stateParams() {
     p.set("index", mState.index);
     if (mState.chapter) p.set("chapter", mState.chapter);
     if (mState.division) p.set("division", mState.division);
+    if (mState.subdivision) p.set("subdivision", mState.subdivision);
     if (mState.query.trim()) p.set("q", mState.query.trim());
     if (mState.motifFilter && mState.motifFilter !== "all") p.set("filter", mState.motifFilter);
     if (mState.flatList) p.set("flat", "1");
@@ -87,6 +89,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
     else if (!mState.indexes.some((i) => i.index === mState.index)) mState.index = mState.indexes[0].index;
     mState.chapter = params.get("chapter") || "";
     mState.division = params.get("division") || "";
+    mState.subdivision = params.get("subdivision") || "";
     mState.query = params.get("q") || "";
     mState.motifFilter = params.get("filter") || "all";
     mState.flatList = params.get("flat") === "1";
@@ -151,16 +154,28 @@ function renderChapters() {
     // ATU browses by division (finer than the 7 chapters), grouped under them and
     // ordered by ascending number range (so the chapters/divisions read 1 → 2399).
     if (mState.index === "atu" && (idx.divisions || []).length) {
+        // Sub-divisions (optional 3rd level) nest under their division, indented.
+        const subsByDiv = new Map();
+        for (const s of [...(idx.subdivisions || [])].sort((a, b) => a.start - b.start)) {
+            if (!subsByDiv.has(s.division)) subsByDiv.set(s.division, []);
+            subsByDiv.get(s.division).push(s);
+        }
         const byChapter = new Map();
         for (const d of [...idx.divisions].sort((a, b) => a.start - b.start)) {
             if (!byChapter.has(d.chapter)) byChapter.set(d.chapter, []);
             byChapter.get(d.chapter).push(d);
         }
+        const divOption = (d) => {
+            const sel = d.name === mState.division && !mState.subdivision ? " selected" : "";
+            let html = `<option value="d:${escapeHtml(d.name)}"${sel}>${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})</option>`;
+            for (const s of subsByDiv.get(d.name) || []) {
+                const ssel = s.name === mState.subdivision ? " selected" : "";
+                html += `<option value="sd:${escapeHtml(s.name)}"${ssel}>&nbsp;&nbsp;↳ ${escapeHtml(s.name)} ${s.start}–${s.end} (${formatNumber(s.count)})</option>`;
+            }
+            return html;
+        };
         select.innerHTML = all + [...byChapter].map(([ch, divs]) => `
-            <optgroup label="${escapeHtml(ch)}">${divs.map((d) => `
-                <option value="d:${escapeHtml(d.name)}"${d.name === mState.division ? " selected" : ""}>
-                    ${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})
-                </option>`).join("")}</optgroup>`).join("");
+            <optgroup label="${escapeHtml(ch)}">${divs.map(divOption).join("")}</optgroup>`).join("");
         return;
     }
     const chapters = idx.chapters || [];
@@ -180,9 +195,10 @@ function wireControls() {
     });
     document.getElementById("motifsChapter").addEventListener("change", (e) => {
         const v = e.target.value;
-        // ATU division options carry a "d:" prefix; everything else is a chapter.
-        if (v.startsWith("d:")) { mState.division = v.slice(2); mState.chapter = ""; }
-        else { mState.chapter = v; mState.division = ""; }
+        // ATU options: "sd:" a sub-division, "d:" a division; everything else a chapter.
+        if (v.startsWith("sd:")) { mState.subdivision = v.slice(3); mState.division = ""; mState.chapter = ""; }
+        else if (v.startsWith("d:")) { mState.division = v.slice(2); mState.subdivision = ""; mState.chapter = ""; }
+        else { mState.chapter = v; mState.division = ""; mState.subdivision = ""; }
         loadList();
         syncUrl(true);
     });
@@ -230,6 +246,7 @@ async function switchIndex(index) {
     mState.index = index;
     mState.chapter = "";
     mState.division = "";
+    mState.subdivision = "";
     mState.query = "";
     const search = document.getElementById("motifsSearch");
     if (search) search.value = "";
@@ -285,6 +302,7 @@ async function loadList() {
         const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
         if (mState.chapter) params.set("chapter", mState.chapter);
         if (mState.division) params.set("division", mState.division);
+        if (mState.subdivision) params.set("sub_division", mState.subdivision);
         if (mState.query.trim()) params.set("q", mState.query.trim());
         const data = await api(`/api/motifs/${mState.index}/motifs?${params.toString()}`);
         renderList(data);
@@ -911,14 +929,14 @@ function renderDetail(d) {
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
         body = head + atuImage(d.image);
-        // Classification folds chapter and division (with its number range) into one
-        // line, as in the Berezkin index.
+        // Classification folds chapter, division and sub_division (each with its
+        // number range) into one line, as in the Berezkin index.
         const cls = [];
+        const withRange = (name, range) => escapeHtml(name)
+            + (range ? ` <span class="motif-range">(${range[0]}–${range[1]})</span>` : "");
         if (d.chapter) cls.push(escapeHtml(d.chapter_label || d.chapter));
-        if (d.division) {
-            const range = d.division_range ? ` <span class="motif-range">(${d.division_range[0]}–${d.division_range[1]})</span>` : "";
-            cls.push(escapeHtml(d.division) + range);
-        }
+        if (d.division) cls.push(withRange(d.division, d.division_range));
+        if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
         body += atuNames(d.names);
         body += atuConcordances(d.concordances);
