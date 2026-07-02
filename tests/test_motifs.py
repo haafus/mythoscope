@@ -222,6 +222,10 @@ class TestAtuStructure:
         assert f(f"O{M}Sullivan") == "O'Sullivan"                  # apostrophe
         assert f(f"Ga{M}par{M}kov{M}") == "Gašparíková"            # multi-diacritic
         assert f(f"pp. 998{M}1005") == "pp. 998–1005"              # page range → en-dash
+        assert f(f"Nos. 400A{M}C") == "Nos. 400A–C"                # type-id range → en-dash
+        assert f(f"400A{M}400D") == "400A–400D"                    # type-id range (both sides)
+        assert f(f"III, XI{M}XXVIII, IV") == "III, XI–XXVIII, IV"  # roman-numeral range
+        assert f(f"(S. R{M}hle)") == "(S. R�hle)"                  # lost diacritic in a name → marker
         assert f(f"unknown {M} name") == "unknown � name"          # unrecognised → marker
 
     def test_wikidata_parse_bindings(self):

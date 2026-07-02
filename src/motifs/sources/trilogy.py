@@ -41,7 +41,12 @@ _NOTES_BLEED_RE = re.compile(r"([A-Z]\d[\dA-Za-z.]*)\.\s*†\1\.")
 # page-range en-dash, (3) anything left → a single replacement char (a genuinely
 # lost diacritic we won't guess).
 _MOJIBAKE = "ï¿½"  # ï¿½
-_MOJIBAKE_RANGE = re.compile(rf"(?<=\d){re.escape(_MOJIBAKE)}(?=\d)")
+# Range en-dashes the mojibake swallowed: between numbers/type-ids (998ï¿½1005,
+# 400Aï¿½C, 400Aï¿½400D, 851A*ï¿½C*) or between roman numerals (XIï¿½XXVIII). Both
+# sides must be a proper range endpoint, so a lost diacritic inside a name
+# (Rï¿½hle) is never mistaken for a dash.
+_MOJIBAKE_TYPE_RANGE = re.compile(rf"(\d+[A-Z]*\*?){re.escape(_MOJIBAKE)}(\d+[A-Z]*\*?|[A-Z]+\*?)")
+_MOJIBAKE_ROMAN_RANGE = re.compile(rf"\b([IVXLCDM]+){re.escape(_MOJIBAKE)}([IVXLCDM]+)\b")
 
 # Keys use "#" for the lost character so the exact mojibake code points are
 # substituted in (never mistyped); each key always contains the mojibake, so as a
@@ -131,8 +136,9 @@ def _fix_mojibake(value: str) -> str:
     for mangled, fixed in _MOJIBAKE_REPAIRS:
         if mangled in value:
             value = value.replace(mangled, fixed)
-    value = _MOJIBAKE_RANGE.sub("–", value)  # digit–digit → en-dash
-    return value.replace(_MOJIBAKE, "�")      # residual: a genuinely lost char
+    value = _MOJIBAKE_TYPE_RANGE.sub(r"\1–\2", value)   # number/type-id range → en-dash
+    value = _MOJIBAKE_ROMAN_RANGE.sub(r"\1–\2", value)  # roman-numeral range → en-dash
+    return value.replace(_MOJIBAKE, "�")                # residual: a genuinely lost char
 
 
 def _clean(value: str | None) -> str:
