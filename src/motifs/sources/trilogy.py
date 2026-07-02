@@ -295,6 +295,9 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             by_id[t["parent"]]["subtypes"].append(t["id"])
     for t in types:
         t["subtypes"].sort(key=_atu_sort_key)
+    # The atu_df rows aren't globally ordered by number; sort so the sidebar list
+    # reads 1 → 2399 (and ascending within a division).
+    types.sort(key=lambda t: _atu_sort_key(t["id"]))
     return types
 
 
