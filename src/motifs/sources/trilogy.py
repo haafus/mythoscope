@@ -254,17 +254,41 @@ def _split_division(s: str) -> tuple[str, int | None, int | None]:
     return (m.group(1).strip(), int(m.group(2)), int(m.group(3))) if m else ((s or "").strip(), None, None)
 
 
+# Canonical ATU top-level chapters (Uther 2004), keyed by number range. The CSV's
+# own `chapter` column is unreliable — it promotes sub-groups ("Other Animals And
+# Objects", "Other Tales Of The Supernatural") to chapters and lumps Religious +
+# Realistic + Stupid-Ogre into one — so we derive the chapter from the type number.
+_ATU_CHAPTERS = [
+    (1, 299, "Animal Tales"),
+    (300, 749, "Tales Of Magic"),
+    (750, 849, "Religious Tales"),
+    (850, 999, "Realistic Tales"),
+    (1000, 1199, "Tales Of The Stupid Ogre"),
+    (1200, 1999, "Anecdotes And Jokes"),
+    (2000, 2399, "Formula Tales"),
+    (2400, 2499, "Unclassified"),
+]
+
+
+def _atu_chapter(num: int | None) -> str:
+    for lo, hi, name in _ATU_CHAPTERS:
+        if num is not None and lo <= num <= hi:
+            return name
+    return ""
+
+
 def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str, list[str]]) -> list[dict]:
     types = []
     for row in df_rows:
         atu_id = _clean(row.get("atu_id"))
         if not atu_id:
             continue
+        num = _atu_num(atu_id)
         name, start, end = _split_division(_clean(row.get("division")))
         types.append({
             "id": atu_id,
-            "num": _atu_num(atu_id),
-            "chapter": _clean(row.get("chapter")),
+            "num": num,
+            "chapter": _atu_chapter(num),   # derived from the number, not the CSV column
             "division": name,
             "division_range": [start, end] if start is not None else None,
             "name": _clean(row.get("tale_name")),
