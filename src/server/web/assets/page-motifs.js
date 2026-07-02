@@ -435,6 +435,27 @@ function atuWikipedia(wiki, wikidata) {
     return section("Wikipedia", `<ul class="motif-wiki-list">${items}${wd}</ul>`);
 }
 
+// Example folktales of an ATU type (Ashliman AFT), metadata only: title, a
+// provenance chip, and the bibliographic source. Full texts are not stored; the
+// section footer attributes the corpus (the only real link available).
+const AFT_HOME = "https://www.pitt.edu/~dash/folktexts.html";
+
+function atuTales(tales) {
+    if (!tales || !tales.length) return "";
+    const rows = tales.map((t) => `
+        <li class="motif-tale">
+            <div class="motif-tale-head">
+                <span class="motif-tale-title">${escapeHtml(t.title)}</span>
+                ${t.provenance ? `<span class="motif-tale-prov">${escapeHtml(t.provenance)}</span>` : ""}
+            </div>
+            ${t.source ? `<div class="motif-tale-source">${escapeHtml(t.source)}</div>` : ""}
+            ${t.notes ? `<div class="motif-tale-source">${escapeHtml(t.notes)}</div>` : ""}
+        </li>`).join("");
+    const attr = `<div class="motif-tales-attr">Texts from
+        <a href="${AFT_HOME}" target="_blank" rel="noopener">Ashliman's Folktexts <span class="ext-arrow">↗</span></a></div>`;
+    return section(`Example tales (${tales.length})`, `<ul class="motif-tales">${rows}</ul>${attr}`);
+}
+
 // Uther's per-type apparatus: `references`/`attestations` are semicolon-delimited
 // citation strings (rendered as a list); `remarks` is prose (a paragraph).
 function atuProse(title, text, split) {
@@ -951,6 +972,7 @@ function renderDetail(d) {
         body += atuProse("Literature", d.references, true);
         body += atuProse("Attestations by tradition", d.attestations, true);
         body += atuProse("Notes", d.remarks, false);
+        body += atuTales(d.tales);
         body += atuWikipedia(d.wikipedia, d.wikidata);
     }
 

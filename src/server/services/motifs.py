@@ -910,6 +910,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["references"] = rec.get("references", "")      # Uther litvar (key literature)
         detail["attestations"] = rec.get("attestations", "")  # Uther provenance (by tradition)
         detail["remarks"] = rec.get("remarks", "")            # Uther remarks (historical notes)
+        detail["tales"] = rec.get("tales", [])                # Ashliman AFT example tales (metadata)
         detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []
         detail["links"]["subtypes"] = [_link("atu", s) for s in rec.get("subtypes", [])]
         detail["links"]["tmi"] = [_link("tmi", m) for m in rec.get("motifs", [])]

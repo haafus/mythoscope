@@ -38,7 +38,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 ```
 [1/4] Berezkin  — scrape areasofmyths + обогащение mapsofmyths
 [2/4] TMI       — parse Trilogy tmi.csv + библиография folkmasa
-[3/4] ATU       — parse Trilogy atu_df/atu_seq/atu_combos
+[3/4] ATU       — parse Trilogy atu_df/atu_seq/atu_combos/aft + Wikidata enrich
 [4/4] Cross-walk — id-связи между тремя индексами
 ```
 
@@ -60,7 +60,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 
 | Источник | Что даёт | Формат / доступ | Лицензия | Роль |
 |---|---|---|---|---|
-| **Trilogy** (`j-hagedorn/trilogy`) | TMI + ATU + мост `atu_seq` + комбо | CSV с raw GitHub | CC-BY-SA 4.0 | Ядро TMI/ATU |
+| **Trilogy** (`j-hagedorn/trilogy`) | TMI + ATU + мост `atu_seq` + комбо + примеры сказок (`aft`) | CSV с raw GitHub | CC-BY-SA 4.0 (тексты `aft` — © Ashliman) | Ядро TMI/ATU |
 | **areasofmyths.com** (Берёзкин) | Коды, русские названия/определения, ареалы, ATU-ссылки | Статичный HTML, windows-1251 | © Берёзкин & Дувакин | Каталог Берёзкина |
 | **mapsofmyths.com** (Берёзкин) | Англ. названия/определения, type/group, TMI/ATU-id, 1 046 традиций | HTTP под кредами | CC BY-NC-SA 4.0 | Обогащение Берёзкина |
 | **folkmasa.org** | Английская библиография сокращений TMI | HTML, windows-1255 | публичный текст | Ключ библиографии TMI |
@@ -68,7 +68,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 
 ### Trilogy — ядро TMI/ATU
 
-Из `data/` берутся **четыре** файла (`config/motifs.json → trilogy.files`):
+Из `data/` берутся **пять** файлов (`config/motifs.json → trilogy.files`):
 
 - **`tmi.csv`** — Thompson Motif-Index: `id`, `chapter_id`/`chapter_name`,
   `motif_name`, `notes` (библиография/комментарии), `level` и `level_0…level_6`
@@ -111,8 +111,16 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
   сигналом значимости. Схлопываем по вариантам и держим только упорядоченный
   уникальный набор мотивов на тип.
 - **`atu_combos.csv`** — часто комбинируемые типы.
+- **`aft.csv`** — Ashliman **Annotated Folk Tales**: 1518 полных текстов сказок,
+  каждый с проставленным `atu_id`. Берём **только метаданные** (`tale_title`,
+  `provenance`, `source`, `notes`) → раздел «Example tales» на странице типа (есть у
+  182 типов). **Полный `text` намеренно не сохраняем** — во-первых, лицензия текстов
+  Ashliman отдельная от CC-BY-SA репозитория; во-вторых, это держит индекс лёгким.
+  Атрибуция — ссылкой на корпус Ashliman (`pitt.edu/~dash/folktexts.html`); пер-текстовых
+  URL в данных нет.
 
-(`aft.csv`, `propp.csv`, `*.graphml` из репозитория **не используются** — см. ниже.)
+(`propp.csv` — 33 функции Проппа-справочник, без разметки к нашим типам; `*.graphml` —
+готовые сети, у нас свой cross-walk — из репозитория **не используются**, см. ниже.)
 
 **Обогащение ATU из Wikidata** (`atu_wikidata.py`, открытый SPARQL, best-effort):
 по свойству ATU-номера **P2540** для каждого типа собираем по всем его элементам:
@@ -178,9 +186,10 @@ degradation); сырой ответ кэшируется в `raw/wikidata/`.
   же TMI с разобранной иерархией; полезен как сверочный источник, не подключён.
 - **ATU-тезаурус TemaTres** (`vocabularyserver.com/atu`, SKOS/RDF) — канонический
   многоязычный словарь типов с линками на DBpedia; не подключён (хватает `atu_df`).
-- **Missouri LibGuides**, **`aft.csv`/`propp.csv`/`*.graphml`** из Trilogy — это
-  размеченный корпус текст↔тип↔мотив и готовые сети для задач индукции/оценки
-  мотивов; к сборке трёх индексов не относятся и здесь не используются.
+- **Missouri LibGuides**, **`propp.csv`/`*.graphml`** из Trilogy — справочник функций
+  Проппа (без разметки к нашим типам) и готовые сети для задач индукции/оценки;
+  к сборке трёх индексов не относятся и здесь не используются. (`aft.csv` теперь
+  используется — метаданные примеров сказок, см. выше.)
 - **`folkloredatabase.com`** — коммерческое зеркало; его условия запрещают
   text/data mining. Мы его **не используем** (запрет касался именно этого зеркала,
   не открытого `areasofmyths` и не лицензированного `mapsofmyths`).

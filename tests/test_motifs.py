@@ -272,6 +272,26 @@ class TestAtuStructure:
         out = svc.list_motifs("atu", sub_division="Other Wild Animals")
         assert [i["id"] for i in out["items"]] == ["70"] and out["total"] == 1
 
+    def test_aft_example_tales(self):
+        rows = [
+            {"atu_id": "275", "tale_title": "The Hare and the Tortoise", "provenance": "Greece",
+             "source": "Aesop", "notes": "NA", "text": "Once upon a time…"},
+            {"atu_id": "275", "tale_title": "A Race", "provenance": "England",
+             "source": "Jacobs 1894", "notes": "", "text": "…"},
+            {"atu_id": "999", "tale_title": "", "provenance": "x", "source": "y", "text": "z"},
+        ]
+        tales = trilogy._parse_aft(rows)
+        assert "999" not in tales                                     # no title → dropped
+        assert [t["title"] for t in tales["275"]] == ["A Race", "The Hare and the Tortoise"]  # by provenance
+        assert tales["275"][0]["provenance"] == "England"
+        assert "text" not in tales["275"][0]                         # full text never stored
+        assert tales["275"][1]["notes"] == ""                        # "NA" cleaned to empty
+        # wired onto the type via _parse_atu
+        rows_df = [{"atu_id": "275", "chapter": "Animal", "division": "Wild Animals 1-99",
+                    "tale_name": "x", "tale_type": "y"}]
+        t = trilogy._parse_atu(rows_df, {}, {}, tales)[0]
+        assert len(t["tales"]) == 2
+
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})
