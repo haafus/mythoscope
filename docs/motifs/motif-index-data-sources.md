@@ -100,9 +100,11 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
       заметки, 923). Полного ключа автор-год у ATU нет (в отличие от TMI/`folkmasa`),
       поэтому конкретные цитаты показываются **как есть**; но повторяющиеся
       аббревиатуры справочников/каталогов (`EM`, `BP`, `Tubach`, `Perry`, `SUS`,
-      `BFP`…) курируемым мини-ключом разворачиваются в тултип с полным названием и,
-      где есть, ссылку на сам труд (De Gruyter, Google Books, ruthenia, Cambridge
-      Core…). В этих ячейках
+      `BFP`…) **и знаменитые сборники/авторы** (Gesta Romanorum, Decameron,
+      Pentamerone, Roman de Renart, Pauli, Bebel, Aesop, 1001 Nights…) курируемым
+      мини-ключом разворачиваются в тултип с полным названием и, где есть, ссылку на
+      сам труд — полный текст, где доступен (Wikisource, Gutenberg, Fordham,
+      ruthenia), иначе De Gruyter/Google Books/Cambridge Core/Wikipedia. В этих ячейках
       источника впечён мойбейк — потерянный символ в виде `ï¿½`; лечим в три прохода:
       (1) **курируемый словарь** повторяющихся фамилий фольклористов и журналов,
       которые он ломает (`Ténèze`, `Köhler`, `Polívka`, `Ó Súilleabháin`, `Bârlea`,

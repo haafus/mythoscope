@@ -476,14 +476,50 @@ const ATU_ABBR = {
     HDS: { name: "Handwörterbuch der deutschen Sage" },
     MNK: { name: "Magyar Népmesekatalógus (Hungarian Folktale Catalogue)" },
 };
-const ATU_ABBR_RE = new RegExp(
-    "\\b(" + Object.keys(ATU_ABBR).sort((a, b) => b.length - a.length).join("|") + ")\\b", "g");
+// Famous named collections / authors that recur by name in the apparatus, each
+// with a full title and a link to the work (full text preferred where it exists).
+const ATU_WORKS = {
+    "Gesta Romanorum": { name: "Gesta Romanorum (medieval Latin tale collection)", url: "https://en.wikisource.org/wiki/Gesta_Romanorum" },
+    "Roman de Renart": { name: "Roman de Renart (the Reynard the Fox cycle)", url: "https://en.wikipedia.org/wiki/Reynard_the_Fox" },
+    "Disciplina clericalis": { name: "Petrus Alfonsi, Disciplina clericalis", url: "https://en.wikipedia.org/wiki/Disciplina_Clericalis" },
+    "Till Eulenspiegel": { name: "Till Eulenspiegel", url: "https://en.wikipedia.org/wiki/Till_Eulenspiegel" },
+    Eulenspiegel: { name: "Till Eulenspiegel", url: "https://en.wikipedia.org/wiki/Till_Eulenspiegel" },
+    "1001 Nights": { name: "One Thousand and One Nights (Arabian Nights)", url: "https://en.wikipedia.org/wiki/One_Thousand_and_One_Nights" },
+    "Legenda aurea": { name: "Jacobus de Voragine, Legenda aurea (Golden Legend)", url: "https://sourcebooks.fordham.edu/basis/goldenlegend/" },
+    "Marie de France": { name: "Marie de France (Fables / Lais)", url: "https://en.wikipedia.org/wiki/Marie_de_France" },
+    Decameron: { name: "Giovanni Boccaccio, Decameron", url: "https://www.gutenberg.org/ebooks/23700" },
+    Boccaccio: { name: "Giovanni Boccaccio, Decameron", url: "https://www.gutenberg.org/ebooks/23700" },
+    Pentamerone: { name: "Giambattista Basile, Pentamerone (Lo cunto de li cunti)", url: "https://en.wikipedia.org/wiki/Pentamerone" },
+    Basile: { name: "Giambattista Basile, Pentamerone", url: "https://en.wikipedia.org/wiki/Giambattista_Basile" },
+    Metamorphoses: { name: "Ovid, Metamorphoses", url: "https://www.gutenberg.org/ebooks/26073" },
+    Ovid: { name: "Ovid, Metamorphoses", url: "https://www.gutenberg.org/ebooks/26073" },
+    Pauli: { name: "Johannes Pauli, Schimpf und Ernst", url: "https://de.wikipedia.org/wiki/Schimpf_und_Ernst" },
+    Bebel: { name: "Heinrich Bebel, Facetiae", url: "https://en.wikipedia.org/wiki/Heinrich_Bebel" },
+    Kirchhof: { name: "Hans Wilhelm Kirchhof, Wendunmuth", url: "https://de.wikipedia.org/wiki/Hans_Wilhelm_Kirchhof" },
+    Montanus: { name: "Martin Montanus (Schwankbücher)", url: "https://de.wikipedia.org/wiki/Martin_Montanus" },
+    Poggio: { name: "Poggio Bracciolini, Facetiae", url: "https://en.wikipedia.org/wiki/Poggio_Bracciolini" },
+    Straparola: { name: "Giovan Francesco Straparola, Le piacevoli notti", url: "https://en.wikipedia.org/wiki/Giovanni_Francesco_Straparola" },
+    Sercambi: { name: "Giovanni Sercambi, Novelle", url: "https://en.wikipedia.org/wiki/Giovanni_Sercambi" },
+    Sacchetti: { name: "Franco Sacchetti, Il Trecentonovelle", url: "https://en.wikipedia.org/wiki/Franco_Sacchetti" },
+    Aesop: { name: "Aesop's Fables", url: "https://en.wikipedia.org/wiki/Aesop%27s_Fables" },
+    Grimm: { name: "Brothers Grimm, Kinder- und Hausmärchen (KHM)", url: "https://en.wikipedia.org/wiki/Grimms%27_Fairy_Tales" },
+    Perrault: { name: "Charles Perrault, Histoires ou contes du temps passé", url: "https://en.wikipedia.org/wiki/Charles_Perrault" },
+    Kathasaritsagara: { name: "Somadeva, Kathāsaritsāgara", url: "https://en.wikipedia.org/wiki/Kathasaritsagara" },
+    Somadeva: { name: "Somadeva, Kathāsaritsāgara", url: "https://en.wikipedia.org/wiki/Kathasaritsagara" },
+    Herodotus: { name: "Herodotus, Histories", url: "https://en.wikipedia.org/wiki/Histories_(Herodotus)" },
+    Morlini: { name: "Girolamo Morlini, Novellae" },
+};
 
-// Linkify the known abbreviations in already-escaped citation text: a link where
-// the work has a page, otherwise an <abbr> that just shows the full name on hover.
+const ATU_REF = Object.assign({}, ATU_ABBR, ATU_WORKS);
+const ATU_ABBR_RE = new RegExp(
+    "\\b(" + Object.keys(ATU_REF).sort((a, b) => b.length - a.length)
+        .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\b", "g");
+
+// Linkify the known abbreviations / works in already-escaped citation text: a link
+// where the work has a page, otherwise an <abbr> that shows the full name on hover.
 function abbrLinkify(escaped) {
     return escaped.replace(ATU_ABBR_RE, (m) => {
-        const a = ATU_ABBR[m];
+        const a = ATU_REF[m];
         const title = escapeHtml(a.name);
         return a.url
             ? `<a class="motif-abbr" href="${a.url}" target="_blank" rel="noopener" title="${title}">${m}</a>`
