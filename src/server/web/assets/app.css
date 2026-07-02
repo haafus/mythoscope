@@ -1568,6 +1568,11 @@ body.has-main-navbar {
 /* ATU Uther apparatus: litvar / provenance citation lists. */
 .motif-cite-list { margin: 0; padding-left: 18px; }
 .motif-cite-list li { line-height: 1.5; font-size: 13px; color: #2a2f36; margin-bottom: 3px; }
+/* Decoded reference-work abbreviations: link where a page exists, else a hover tooltip. */
+.motif-abbr { text-decoration: none; border-bottom: 1px dotted #9bb0c2; cursor: help; }
+abbr.motif-abbr { color: inherit; }
+a.motif-abbr { color: #3a5e86; cursor: pointer; }
+a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* ATU example tales (Ashliman AFT), metadata only. */
 .motif-tales { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .motif-tale-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }

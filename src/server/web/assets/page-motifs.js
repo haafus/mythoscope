@@ -456,16 +456,51 @@ function atuTales(tales) {
     return section(`Example tales (${tales.length})`, `<ul class="motif-tales">${rows}</ul>${attr}`);
 }
 
+// Recurring reference-work / journal abbreviations in the Uther apparatus, with
+// their full name (always, as a tooltip) and a link to the work where one exists.
+// The per-type bibliography has no key of its own (unlike TMI), so this decodes
+// only the standard series/catalogue abbreviations, not individual author-year
+// citations (that would need Uther's full bibliography).
+const ATU_ABBR = {
+    EM: { name: "Enzyklopädie des Märchens", url: "https://en.wikipedia.org/wiki/Enzyklop%C3%A4die_des_M%C3%A4rchens" },
+    BP: { name: "Bolte & Polívka, Anmerkungen zu den Kinder- und Hausmärchen", url: "https://en.wikipedia.org/wiki/Ji%C5%99%C3%AD_Pol%C3%ADvka" },
+    HDA: { name: "Handwörterbuch des deutschen Aberglaubens", url: "https://de.wikipedia.org/wiki/Handw%C3%B6rterbuch_des_deutschen_Aberglaubens" },
+    Perry: { name: "Perry Index (B. E. Perry, Aesopica)", url: "https://en.wikipedia.org/wiki/Perry_Index" },
+    JAFL: { name: "Journal of American Folklore", url: "https://en.wikipedia.org/wiki/Journal_of_American_Folklore" },
+    ZDMG: { name: "Zeitschrift der Deutschen Morgenländischen Gesellschaft", url: "https://menadoc.bibliothek.uni-halle.de/dmg/" },
+    RTP: { name: "Revue des traditions populaires", url: "https://fr.wikipedia.org/wiki/Revue_des_traditions_populaires" },
+    Tubach: { name: "F. C. Tubach, Index Exemplorum", url: "https://books.google.com/books/about/Index_Exemplorum.html?id=fz17jgEACAAJ" },
+    HDM: { name: "Handwörterbuch des deutschen Märchens", url: "https://www.degruyter.com/serial/hwbdv2-b/html?lang=en" },
+    BFP: { name: "Bâlgarski folkloren prikazen katalog (Bulgarian Folktale Catalogue)", url: "https://www.cambridge.org/core/journals/slavic-review/article/abs/bulgarski-folklorni-prikazki-katalog-ed-l-daskalovaperkovska-d-dobreva-j-koceva-e-miceva-sofia-univ-izdatelstvo-sv-kliment-okhridski-1994-825-pp-120-lv/B75A1FE922F3344D24C1C6A869DCBBFD" },
+    SUS: { name: "Sravnitel'nyj ukazatel' sjužetov (East Slavic Folktale Catalogue)", url: "https://www.ruthenia.ru/folklore/sus/index.htm" },
+    HDS: { name: "Handwörterbuch der deutschen Sage" },
+    MNK: { name: "Magyar Népmesekatalógus (Hungarian Folktale Catalogue)" },
+};
+const ATU_ABBR_RE = new RegExp(
+    "\\b(" + Object.keys(ATU_ABBR).sort((a, b) => b.length - a.length).join("|") + ")\\b", "g");
+
+// Linkify the known abbreviations in already-escaped citation text: a link where
+// the work has a page, otherwise an <abbr> that just shows the full name on hover.
+function abbrLinkify(escaped) {
+    return escaped.replace(ATU_ABBR_RE, (m) => {
+        const a = ATU_ABBR[m];
+        const title = escapeHtml(a.name);
+        return a.url
+            ? `<a class="motif-abbr" href="${a.url}" target="_blank" rel="noopener" title="${title}">${m}</a>`
+            : `<abbr class="motif-abbr" title="${title}">${m}</abbr>`;
+    });
+}
+
 // Uther's per-type apparatus: `references`/`attestations` are semicolon-delimited
 // citation strings (rendered as a list); `remarks` is prose (a paragraph).
 function atuProse(title, text, split) {
     if (!text) return "";
     if (split) {
         const parts = text.split(/\s*;\s*/).filter(Boolean);
-        const items = parts.map((s) => `<li>${escapeHtml(s)}</li>`).join("");
+        const items = parts.map((s) => `<li>${abbrLinkify(escapeHtml(s))}</li>`).join("");
         return section(`${title} (${parts.length})`, `<ul class="motif-cite-list">${items}</ul>`);
     }
-    return section(title, `<p class="motif-text">${escapeHtml(text)}</p>`);
+    return section(title, `<p class="motif-text">${abbrLinkify(escapeHtml(text))}</p>`);
 }
 
 function linkChips(links) {
