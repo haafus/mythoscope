@@ -333,8 +333,8 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
             per_motif[mid] = tree
         else:  # no citation extracted from this motif's detail page — log it
             m = by_id.get(mid, {})
-            logger.warning("Berezkin bibliography: no citations extracted — %s %s — %s/%s",
-                           mid, m.get("name", ""), BASE, m.get("page", ""))
+            logger.warning("Berezkin bibliography: no citations extracted — %s/%s",
+                           BASE, m.get("page", ""))
 
     sources = {k: {"author": biblio.get(k, {}).get("author", ""),
                    "year": biblio.get(k, {}).get("year", ""),
