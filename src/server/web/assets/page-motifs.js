@@ -5,6 +5,7 @@ const mState = {
     indexes: null,
     index: "tmi",  // default index on first open (Thompson)
     chapter: "",
+    division: "",  // ATU browse level (chapter → division → type)
     query: "",
     selectedId: null,
     motifFilter: "all",  // "all" | "def" | "sub" | "atu"
@@ -24,6 +25,7 @@ function stateParams() {
     const p = new URLSearchParams();
     p.set("index", mState.index);
     if (mState.chapter) p.set("chapter", mState.chapter);
+    if (mState.division) p.set("division", mState.division);
     if (mState.query.trim()) p.set("q", mState.query.trim());
     if (mState.motifFilter && mState.motifFilter !== "all") p.set("filter", mState.motifFilter);
     if (mState.flatList) p.set("flat", "1");
@@ -84,6 +86,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
     if (wantIndex && mState.indexes.some((i) => i.index === wantIndex)) mState.index = wantIndex;
     else if (!mState.indexes.some((i) => i.index === mState.index)) mState.index = mState.indexes[0].index;
     mState.chapter = params.get("chapter") || "";
+    mState.division = params.get("division") || "";
     mState.query = params.get("q") || "";
     mState.motifFilter = params.get("filter") || "all";
     mState.flatList = params.get("flat") === "1";
@@ -142,9 +145,24 @@ function renderTabs() {
 
 function renderChapters() {
     const select = document.getElementById("motifsChapter");
-    const chapters = currentIndex().chapters || [];
-    select.innerHTML =
-        `<option value="">All chapters (${formatNumber(currentIndex().count)})</option>` +
+    const idx = currentIndex();
+    const all = `<option value="">All ${mState.index === "atu" ? "tale types" : "chapters"} (${formatNumber(idx.count)})</option>`;
+    // ATU browses by division (finer than the 7 chapters), grouped under them.
+    if (mState.index === "atu" && (idx.divisions || []).length) {
+        const byChapter = new Map();
+        for (const d of idx.divisions) {
+            if (!byChapter.has(d.chapter)) byChapter.set(d.chapter, []);
+            byChapter.get(d.chapter).push(d);
+        }
+        select.innerHTML = all + [...byChapter].map(([ch, divs]) => `
+            <optgroup label="${escapeHtml(ch)}">${divs.map((d) => `
+                <option value="d:${escapeHtml(d.name)}"${d.name === mState.division ? " selected" : ""}>
+                    ${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})
+                </option>`).join("")}</optgroup>`).join("");
+        return;
+    }
+    const chapters = idx.chapters || [];
+    select.innerHTML = all +
         chapters.map((c) => `<option value="${escapeHtml(c.id)}"${c.id === mState.chapter ? " selected" : ""}>
             ${escapeHtml(c.label)} (${formatNumber(c.count)})
         </option>`).join("");
@@ -159,7 +177,10 @@ function wireControls() {
         searchTimer = setTimeout(() => { loadList(); syncUrl(false); }, 250);  // typing → replace
     });
     document.getElementById("motifsChapter").addEventListener("change", (e) => {
-        mState.chapter = e.target.value;
+        const v = e.target.value;
+        // ATU division options carry a "d:" prefix; everything else is a chapter.
+        if (v.startsWith("d:")) { mState.division = v.slice(2); mState.chapter = ""; }
+        else { mState.chapter = v; mState.division = ""; }
         loadList();
         syncUrl(true);
     });
@@ -206,6 +227,7 @@ function onMotifsKeydown(e) {
 async function switchIndex(index) {
     mState.index = index;
     mState.chapter = "";
+    mState.division = "";
     mState.query = "";
     const search = document.getElementById("motifsSearch");
     if (search) search.value = "";
@@ -260,6 +282,7 @@ async function loadList() {
     try {
         const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
         if (mState.chapter) params.set("chapter", mState.chapter);
+        if (mState.division) params.set("division", mState.division);
         if (mState.query.trim()) params.set("q", mState.query.trim());
         const data = await api(`/api/motifs/${mState.index}/motifs?${params.toString()}`);
         renderList(data);

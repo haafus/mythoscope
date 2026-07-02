@@ -242,6 +242,8 @@ def list_indexes() -> list[dict]:
             summary["substantive_count"] = sum(st[1] for st in chstats.values())
             summary["definition_count"] = sum(st[2] for st in chstats.values())
             summary["atu_count"] = sum(st[3] for st in chstats.values())
+        if index == "atu":  # chapter → division hierarchy for the browse dropdown
+            summary["divisions"] = data.get("divisions", [])
         out.append(summary)
     return out
 
@@ -785,13 +787,15 @@ def _subtree_flags(motif_id: str) -> dict:
     return {f"{t}_subtree": motif_id in _tier_relevant(t) for t in ("def", "sub", "atu")}
 
 
-def list_motifs(index: str, *, chapter: str = "", q: str = "", level: int | None = None,
-                tier: str = "", limit: int = 200, offset: int = 0) -> dict:
+def list_motifs(index: str, *, chapter: str = "", division: str = "", q: str = "",
+                level: int | None = None, tier: str = "", limit: int = 200, offset: int = 0) -> dict:
     """Filtered, paginated motif list for one index."""
     records = _records(index)
     query = q.strip().lower()
     if chapter:
         records = [r for r in records if r.get("chapter", "") == chapter]
+    if division:  # ATU browse level (chapter → division → type)
+        records = [r for r in records if r.get("division", "") == division]
     if level is not None:
         records = [r for r in records if r.get("level", 0) == level]
     if index == "tmi" and tier in _TIER_PREDICATE:  # substantive / definitions / ATU

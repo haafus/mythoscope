@@ -197,6 +197,15 @@ class TestAtuStructure:
         assert by["313A"]["parent"] == "313"
         assert by["313A"]["division"] == "Supernatural Adversaries"  # filled from the range containing 313
 
+    def test_list_filters_by_division(self, monkeypatch):
+        monkeypatch.setattr(svc, "_records", lambda idx: [
+            {"id": "300", "chapter": "Magic", "division": "Supernatural Adversaries", "name": "a"},
+            {"id": "1200", "chapter": "Jokes", "division": "Stories About A Fool", "name": "b"},
+        ])
+        monkeypatch.setattr(svc, "_list_item", lambda idx, r: {"id": r["id"]})
+        out = svc.list_motifs("atu", division="Supernatural Adversaries")
+        assert [i["id"] for i in out["items"]] == ["300"] and out["total"] == 1
+
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})

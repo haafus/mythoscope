@@ -27,6 +27,7 @@ def indexes():
 def list_motifs(
     index: str,
     chapter: str = Query(""),
+    division: str = Query(""),
     q: str = Query(""),
     level: int | None = Query(None, ge=0),
     tier: str = Query(""),
@@ -35,7 +36,8 @@ def list_motifs(
 ):
     _require_built()
     _require_index(index)
-    return svc.list_motifs(index, chapter=chapter, q=q, level=level, tier=tier, limit=limit, offset=offset)
+    return svc.list_motifs(index, chapter=chapter, division=division, q=q,
+                           level=level, tier=tier, limit=limit, offset=offset)
 
 
 @router.get("/{index}/cultures")
