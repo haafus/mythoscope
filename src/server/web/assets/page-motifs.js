@@ -120,6 +120,7 @@ function currentIndex() {
 // no height jump). Thompson sits before Berezkin.
 const TAB_ORDER = ["tmi", "berezkin", "atu"];
 const TAB_LABELS = { tmi: "Thompson", berezkin: "Berezkin", atu: "ATU tale types" };
+const LANG_NAMES = { en: "English", de: "German", ru: "Russian", fr: "French", es: "Spanish", it: "Italian" };
 
 function tabsPlaceholder() {
     return TAB_ORDER.map((idx) => `
@@ -369,6 +370,27 @@ function bindBibCopy(detail) {
             }
         });
     });
+}
+
+// ATU multilingual names (Wikidata): one row per language.
+function atuNames(names) {
+    const langs = Object.keys(names || {});
+    if (!langs.length) return "";
+    const rows = langs.map((lang) =>
+        `<div class="motif-altname"><span class="motif-altname-lang">${escapeHtml(LANG_NAMES[lang] || lang)}</span>`
+        + ` ${(names[lang] || []).map(escapeHtml).join(", ")}</div>`).join("");
+    return section("Also known as", `<div class="motif-altnames">${rows}</div>`);
+}
+
+// Wikipedia articles for the type (Wikidata), plus a Wikidata link.
+function atuWikipedia(wiki, wikidata) {
+    const items = (wiki || []).map((w) =>
+        `<li><a href="${escapeHtml(w.url)}" target="_blank" rel="noopener">${escapeHtml(w.title)} <span class="ext-arrow">↗</span></a></li>`).join("");
+    if (!items && !wikidata) return "";
+    const wd = wikidata
+        ? `<li class="motif-wiki-wd"><a href="https://www.wikidata.org/wiki/${escapeHtml(wikidata)}" target="_blank" rel="noopener">Wikidata ${escapeHtml(wikidata)} <span class="ext-arrow">↗</span></a></li>`
+        : "";
+    return section("Wikipedia", `<ul class="motif-wiki-list">${items}${wd}</ul>`);
 }
 
 function linkChips(links) {
@@ -858,6 +880,7 @@ function renderDetail(d) {
             const range = d.division_range ? ` <span class="motif-range">(${d.division_range[0]}–${d.division_range[1]})</span>` : "";
             body += section("Division", `<p class="motif-text">${escapeHtml(d.division)}${range}</p>`);
         }
+        body += atuNames(d.names);
         // summary_html is pre-escaped on the server with motif/type links injected.
         if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
@@ -866,6 +889,7 @@ function renderDetail(d) {
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+        body += atuWikipedia(d.wikipedia, d.wikidata);
     }
 
     return `<div class="motif-detail-inner">${body}</div>`;

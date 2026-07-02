@@ -894,6 +894,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     elif index == "atu":
         detail["division"] = rec.get("division", "")
         detail["division_range"] = rec.get("division_range")
+        detail["names"] = rec.get("names") or {}          # multilingual names (Wikidata)
+        detail["wikipedia"] = rec.get("wikipedia") or []  # [{title, url}]
+        detail["wikidata"] = rec.get("wikidata", "")
         detail["summary"] = rec.get("summary", "")
         detail["summary_html"] = _atu_summary_html(rec.get("summary", ""))
         detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []

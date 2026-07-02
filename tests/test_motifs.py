@@ -197,6 +197,25 @@ class TestAtuStructure:
         assert by["313A"]["parent"] == "313"
         assert by["313A"]["division"] == "Supernatural Adversaries"  # filled from the range containing 313
 
+    def test_wikidata_parse_bindings(self):
+        from motifs.sources import atu_wikidata as wd
+        rows = [
+            {"atu": {"value": "510A"}, "item": {"value": "http://www.wikidata.org/entity/Q11841"},
+             "isType": {"value": "true"}, "l_de": {"value": "Aschenputtel"}, "l_ru": {"value": "Золушка"},
+             "art": {"value": "https://en.wikipedia.org/wiki/Cinderella"}},
+            {"atu": {"value": "510A"}, "item": {"value": "http://www.wikidata.org/entity/Q999"},
+             "isType": {"value": "false"}, "art": {"value": "https://en.wikipedia.org/wiki/Katie_Woodencloak"}},
+            {"atu": {"value": "99999"}, "item": {"value": "x"}, "isType": {"value": "true"},
+             "l_en": {"value": "Not in our index"}},
+        ]
+        out = wd.parse_bindings(rows, {"510A"})
+        assert "99999" not in out                                   # unknown id dropped
+        e = out["510A"]
+        assert e["names"]["de"] == ["Aschenputtel"] and e["names"]["ru"] == ["Золушка"]
+        assert e["wikidata"] == "Q11841"                            # from the tale-type item
+        assert [w["title"] for w in e["wikipedia"]] == ["Cinderella", "Katie Woodencloak"]  # any item
+        assert wd._norm_atu("283В*") == "283B*"                     # Cyrillic homoglyph folded
+
     def test_list_filters_by_division(self, monkeypatch):
         monkeypatch.setattr(svc, "_records", lambda idx: [
             {"id": "300", "chapter": "Magic", "division": "Supernatural Adversaries", "name": "a"},

@@ -1557,6 +1557,15 @@ body.has-main-navbar {
     color: #2a2f36;
 }
 .motif-range { color: var(--muted); font-variant-numeric: tabular-nums; }
+/* ATU Wikidata enrichment: multilingual names + Wikipedia links. */
+.motif-altnames { display: flex; flex-direction: column; gap: 4px; }
+.motif-altname { font-size: 13px; color: #2a2f36; }
+.motif-altname-lang { display: inline-block; min-width: 74px; color: var(--muted); font-size: 12px; }
+.motif-wiki-list { margin: 0; padding: 0 0 0 2px; list-style: none; }
+.motif-wiki-list li { font-size: 13px; margin-bottom: 4px; }
+.motif-wiki-list a { color: #3a5e86; text-decoration: none; }
+.motif-wiki-list a:hover { text-decoration: underline; }
+.motif-wiki-wd a { color: var(--muted); }
 
 .motif-links {
     display: flex;

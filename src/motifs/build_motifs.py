@@ -16,7 +16,7 @@ from json_utils import save_json
 from settings import settings
 
 from . import crosswalk, store
-from .sources import berezkin, berezkin_bibliography, bibliography, mapsofmyths, trilogy
+from .sources import atu_wikidata, berezkin, berezkin_bibliography, bibliography, mapsofmyths, trilogy
 
 logger = logging.getLogger(__name__)
 
@@ -134,11 +134,19 @@ def build_motifs(*, force: bool = False) -> None:
                     tr_cfg.get("homepage", "trilogy"),
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
         atu_index, atu_seq = trilogy.build_atu(tr_cfg, force=force)
+        # Multilingual names + Wikipedia links from Wikidata (open, best-effort).
+        enrichment["atu_wikidata"] = atu_wikidata.refresh(atu_index["types"], force=force)
         save_json(store.index_path("atu"), atu_index)
         atu_types = atu_index["types"]
         counts["atu"] = len(atu_types)
         atu_ids = {t["id"] for t in atu_types}
         logger.info("      %d tale types", len(atu_types))
+        wd = enrichment["atu_wikidata"]
+        if wd.get("skipped"):
+            logger.info("      + Wikidata enrichment SKIPPED (%s)", wd["skipped"])
+        else:
+            logger.info("      + Wikidata: %d types with multilingual names, %d with Wikipedia links",
+                        wd["types_with_names"], wd["types_with_wikipedia"])
 
     # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---

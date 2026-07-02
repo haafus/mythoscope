@@ -64,6 +64,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 | **areasofmyths.com** (Берёзкин) | Коды, русские названия/определения, ареалы, ATU-ссылки | Статичный HTML, windows-1251 | © Берёзкин & Дувакин | Каталог Берёзкина |
 | **mapsofmyths.com** (Берёзкин) | Англ. названия/определения, type/group, TMI/ATU-id, 1 046 традиций | HTTP под кредами | CC BY-NC-SA 4.0 | Обогащение Берёзкина |
 | **folkmasa.org** | Английская библиография сокращений TMI | HTML, windows-1255 | публичный текст | Ключ библиографии TMI |
+| **Wikidata** (`query.wikidata.org`) | Мультиязычные названия типов ATU + ссылки на Wikipedia | SPARQL, JSON | CC0 | Обогащение ATU |
 
 ### Trilogy — ядро TMI/ATU
 
@@ -84,6 +85,13 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 - **`atu_combos.csv`** — часто комбинируемые типы.
 
 (`aft.csv`, `propp.csv`, `*.graphml` из репозитория **не используются** — см. ниже.)
+
+**Обогащение ATU из Wikidata** (`atu_wikidata.py`, открытый SPARQL, best-effort):
+по свойству ATU-номера **P2540** для каждого типа берём мультиязычные названия его
+*type*-элементов (`P31 = wd:Q47451145`, чтобы конкретные сказки не выдавались за
+названия) и ссылки на статьи Wikipedia всех его элементов. Сейчас: ~481 типа с
+мультиязычными названиями, ~241 с Wikipedia. Сетевой сбой просто пропускает шаг
+(graceful degradation); сырой ответ кэшируется в `raw/wikidata/`.
 
 ### Берёзкин — areasofmyths + mapsofmyths
 
