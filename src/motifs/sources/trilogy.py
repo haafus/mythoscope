@@ -299,17 +299,14 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
 
 
 def _atu_divisions(types: list[dict]) -> list[dict]:
-    """Ordered chapter -> division hierarchy: [{chapter, name, start, end, count}]."""
-    chapter_order: dict[str, int] = {}
-    for t in types:
-        chapter_order.setdefault(t["chapter"], len(chapter_order))
+    """Division hierarchy, ascending by number range: [{chapter, name, start, end, count}]."""
     counts: collections.Counter = collections.Counter()
     for t in types:
         if t["division_range"]:
             counts[(t["chapter"], t["division"], *t["division_range"])] += 1
     rows = [{"chapter": ch, "name": nm, "start": s, "end": e, "count": c}
             for (ch, nm, s, e), c in counts.items()]
-    rows.sort(key=lambda r: (chapter_order.get(r["chapter"], 1 << 30), r["start"]))
+    rows.sort(key=lambda r: r["start"])  # ascending by number range (1 → 2399)
     return rows
 
 

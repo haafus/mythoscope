@@ -148,10 +148,11 @@ function renderChapters() {
     const select = document.getElementById("motifsChapter");
     const idx = currentIndex();
     const all = `<option value="">All ${mState.index === "atu" ? "tale types" : "chapters"} (${formatNumber(idx.count)})</option>`;
-    // ATU browses by division (finer than the 7 chapters), grouped under them.
+    // ATU browses by division (finer than the 7 chapters), grouped under them and
+    // ordered by ascending number range (so the chapters/divisions read 1 → 2399).
     if (mState.index === "atu" && (idx.divisions || []).length) {
         const byChapter = new Map();
-        for (const d of idx.divisions) {
+        for (const d of [...idx.divisions].sort((a, b) => a.start - b.start)) {
             if (!byChapter.has(d.chapter)) byChapter.set(d.chapter, []);
             byChapter.get(d.chapter).push(d);
         }
