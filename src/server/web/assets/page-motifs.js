@@ -966,8 +966,8 @@ function renderDetail(d) {
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
         if ((links.parent || []).length) body += linkSection("Base type", links.parent);
         if ((links.subtypes || []).length) body += linkSection(`Subtypes (${links.subtypes.length})`, links.subtypes);
-        if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.combos || []).length) body += linkSection("Combined with", links.combos);
+        if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
         body += atuProse("Literature", d.references, true);
         body += atuProse("Attestations by tradition", d.attestations, true);
