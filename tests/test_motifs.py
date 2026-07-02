@@ -206,12 +206,23 @@ class TestAtuStructure:
              "remarks": "Documented 1178 in the Roman de Renart."},
         ]
         t = trilogy._parse_atu(rows, {}, {})[0]
-        # digit–digit mojibake becomes an en-dash; a lost diacritic becomes a single
-        # replacement char; the triple garbage never survives.
-        assert t["references"] == "Krohn 1889, 46–54; D�hnhardt 1907ff. IV, 225–230"
+        # digit–digit mojibake becomes an en-dash; a known scholar name is repaired
+        # from the dictionary (Dähnhardt); the triple garbage never survives.
+        assert t["references"] == "Krohn 1889, 46–54; Dähnhardt 1907ff. IV, 225–230"
         assert t["attestations"].startswith("Finnish: Rausmaa 1982ff. V, Nos. 1–6;")
         assert t["remarks"] == "Documented 1178 in the Roman de Renart."
         assert "ï¿½" not in (t["references"] + t["attestations"])
+
+    def test_mojibake_dictionary_repairs(self):
+        f = trilogy._fix_mojibake
+        M = trilogy._MOJIBAKE
+        assert f(f"Delarue/Ten{M}ze") == "Delarue/Ténèze"          # French è
+        assert f(f"K{M}hler/Bolte") == "Köhler/Bolte"              # German ö
+        assert f(f"Pol{M}vka") == "Polívka"                        # Czech í
+        assert f(f"O{M}Sullivan") == "O'Sullivan"                  # apostrophe
+        assert f(f"Ga{M}par{M}kov{M}") == "Gašparíková"            # multi-diacritic
+        assert f(f"pp. 998{M}1005") == "pp. 998–1005"              # page range → en-dash
+        assert f(f"unknown {M} name") == "unknown � name"          # unrecognised → marker
 
     def test_wikidata_parse_bindings(self):
         from motifs.sources import atu_wikidata as wd

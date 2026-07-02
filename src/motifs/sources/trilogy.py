@@ -36,18 +36,81 @@ _NOTES_BLEED_RE = re.compile(r"([A-Z]\d[\dA-Za-z.]*)\.\s*†\1\.")
 
 # The Trilogy ATU cells carry a baked-in mojibake: a lost character shows up as
 # the 3-char sequence "ï¿½" (an upstream U+FFFD that was latin1-decoded then
-# re-UTF-8-encoded). The original char is unrecoverable; between digits it is
-# almost always a page-range en-dash, elsewhere a lost diacritic — mark the rest
-# with a single proper replacement char rather than leaving the triple garbage.
+# re-UTF-8-encoded). We heal it in three passes: (1) a curated dictionary of the
+# recurring folklore-scholar names / journals it corrupts, (2) digit–digit → a
+# page-range en-dash, (3) anything left → a single replacement char (a genuinely
+# lost diacritic we won't guess).
 _MOJIBAKE = "ï¿½"  # ï¿½
 _MOJIBAKE_RANGE = re.compile(rf"(?<=\d){re.escape(_MOJIBAKE)}(?=\d)")
+
+# Keys use "#" for the lost character so the exact mojibake code points are
+# substituted in (never mistyped); each key always contains the mojibake, so as a
+# plain substring it only ever matches damaged text. Applied longest-key-first.
+_MOJIBAKE_REPAIRS_TEMPLATE = {
+    # German (ä/ö/ü/ß)
+    "K#hler-Z#lch": "Köhler-Zölch", "K#hler": "Köhler", "R#hrich": "Röhrich",
+    "R#th": "Röth", "R#lleke": "Rölleke", "D#hnhardt": "Dähnhardt",
+    "Grubm#ller": "Grubmüller", "M#ller": "Müller", "M#nchhausen": "Münchhausen",
+    "B#rger": "Bürger", "Hen#en": "Henßen", "Lang-Reitst#tter": "Lang-Reitstätter",
+    "B#chli": "Büchli", "L#thi": "Lüthi", "Bl#mml": "Blümml", "B#hme": "Böhme",
+    "Bergstr#sser": "Bergsträsser", "L#wis": "Löwis", "H#ger": "Höger",
+    "Pr#hle": "Pröhle", "P#gl": "Pögl", "M#derndorfer": "Möderndorfer",
+    "L#ders": "Lüders", "Gr#ner": "Grüner", "Sch#tz": "Schütz",
+    "Br#ckner": "Brückner", "W#nsche": "Wünsche", "J#lg": "Jülg",
+    "Str#hl": "Strähl", "Schwerh#riger": "Schwerhöriger",
+    "Schwerh#rigkeit": "Schwerhörigkeit", "Preu#": "Preuß", "f#r": "für",
+    # Hungarian
+    "Kecskem#ti": "Kecskeméti", "D#m#t#r": "Dömötör", "Gy#rgy": "György",
+    "Kov#cs": "Kovács", "R#dei": "Rédei", "M#sz#ros": "Mészáros",
+    "D#gh": "Dégh", "Ban#": "Banó", "Ga#l": "Gaál",
+    "Munk#csi": "Munkácsi", "Erd#sz": "Erdész",
+    # Czech/Slovak
+    "Pol#vka": "Polívka", "Dvo#k": "Dvořák", "Kl#mov#": "Klímová",
+    "Ga#par#kov#": "Gašparíková", "Filov#": "Filová", "Sirov#tka": "Sirovátka",
+    "Jarn#k": "Jarník", "Hor#lek": "Horálek", "Hor#k": "Horák",
+    # French
+    "Ten#ze": "Ténèze", "S#billot": "Sébillot", "Blad#": "Bladé",
+    "B#dier": "Bédier", "Carri#re": "Carrière", "Lacourci#re": "Lacourcière",
+    "P#riers": "Périers", "R#cr#ations": "Récréations", "Mouli#ras": "Mouliéras",
+    # Spanish/Portuguese
+    "Gonz#lez": "González", "Pe#alosa": "Peñalosa", "Alb#n": "Albán",
+    "V#lez": "Vélez", "Palac#n": "Palacín", "Jim#nez": "Jiménez", "P#rez": "Pérez",
+    # Italian / Romanian
+    "Pitr#": "Pitrè", "B#rlea": "Bârlea", "Rivi#re": "Rivière",
+    "To#ev": "Tošev", "M#llenhoff": "Müllenhoff",
+    # Irish / English apostrophe
+    "S#illeabh#in": "Súilleabháin", "O#Sullivan": "O'Sullivan",
+    "O#Connor": "O'Connor",
+    # Nordic
+    "B#dker": "Bødker", "S#ve": "Säve", "Eir#ksson": "Eiríksson",
+    # East-Slavic soft sign / apostrophe
+    "Afanas#ev": "Afanas'ev", "Sidel#nikov": "Sidel'nikov",
+    "Dobrovol#skij": "Dobrovol'skij", "Rozenfel#d": "Rozenfel'd",
+    "Pu#kareva": "Puškareva",
+    # South-Slavic / Baltic (š/ć/đ)
+    "Bo#kovi-Stulli": "Bošković-Stulli", "Milo#evi": "Milošević",
+    "jorjevi/Milo#evi-jorjevi": "Đorđević/Milošević-Đorđević",
+    "Gabr#ek": "Gabršček", "#a#elj": "Šašelj", "#mits": "Šmits",
+    "#akryl": "Šakryl", "epenkov/Penu#liski": "Cepenkov/Penušliski",
+    "Penu#liski": "Penušliski",
+    # Journals
+    "Laogr#phia": "Laographia", "B#aloideas": "Béaloideas",
+    "Pa#catantra": "Pañcatantra",
+}
+_MOJIBAKE_REPAIRS = sorted(
+    ((k.replace("#", _MOJIBAKE), v) for k, v in _MOJIBAKE_REPAIRS_TEMPLATE.items()),
+    key=lambda kv: len(kv[0]), reverse=True,  # longest key first
+)
 
 
 def _fix_mojibake(value: str) -> str:
     if _MOJIBAKE not in value:
         return value
+    for mangled, fixed in _MOJIBAKE_REPAIRS:
+        if mangled in value:
+            value = value.replace(mangled, fixed)
     value = _MOJIBAKE_RANGE.sub("–", value)  # digit–digit → en-dash
-    return value.replace(_MOJIBAKE, "�")
+    return value.replace(_MOJIBAKE, "�")      # residual: a genuinely lost char
 
 
 def _clean(value: str | None) -> str:
