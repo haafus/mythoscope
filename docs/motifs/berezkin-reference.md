@@ -228,7 +228,8 @@ Motif **equivalence** runs two ways:
   A Berezkin motif page also shows its ATU tale types and, through them, the
   Thompson motifs. Far more pairs are reachable this way than directly, but they
   are looser (shared tale-type ≠ same motif), so they are kept separate from the
-  direct concordance.
+  direct concordance. The ATU side is documented in
+  [`atu-reference.md`](atu-reference.md).
 
 A direct **geographic** alignment of Berezkin areas ↔ TMI cultures (via a shared
 region taxonomy) is *not* built — the two use non-aligned macro-region schemes;

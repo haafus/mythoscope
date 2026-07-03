@@ -283,8 +283,11 @@ Neuman, … resolved through the bibliography key, §8).
 ## 11. Cross-walks
 
 Motif **equivalence** runs through ATU, not geography:
-`tmi → atu` (Trilogy `atu_seq`) and `atu → berezkin`. A motif page shows its ATU
-tale types (crosswalk + inline `Type`), and from ATU the Berezkin areal motifs.
+`tmi → atu` (Trilogy `atu_seq`) and `atu → berezkin`. A motif page merges its ATU
+tale types (constituent from `atu_seq` + inline `Type` from the note) into one
+**Related ATU tale types** section with ⇐/⇒/⇔ markers; inline `Type` numbers are
+AaTh and are remapped to ATU 2004 where possible — see
+[`atu-reference.md`](atu-reference.md) §9.
 
 A **geographic** alignment (TMI cultures ↔ Berezkin areas, via a shared region
 taxonomy) is possible but not built — it would be a coarse region-level overlay,
