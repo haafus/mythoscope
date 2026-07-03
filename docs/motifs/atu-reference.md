@@ -103,6 +103,7 @@ Each stored type (`outputs/motifs/atu.json → types[]`):
 | `name` / `summary` | tale name / plot summary (both repaired, §5) |
 | `references` | Uther key literature (`litvar`, mojibake-healed §5) |
 | `attestations` | attestations by tradition (`provenance`) |
+| `attestations_grouped` | the same, parsed into peoples & macro-regions (§7) |
 | `remarks` | historical/textual notes |
 | `motifs` | constituent TMI motif codes (`atu_seq`) |
 | `combos` | frequently combined type ids |
@@ -201,6 +202,26 @@ so individual citations are shown as-is. But on the type page:
   as phrases; word boundaries prevent false hits (`\bGrimm\b` ≠ *Grimms*).
 - Ambiguous abbreviations (`Speculum` journal vs work; `Facetiae` for two
   authors) are deliberately **not** linked.
+
+### Attestations by people & region
+
+The `provenance` prose is `People: citation; People, People: citation; …` — a
+nationality/ethnonym before each colon. `atu_regions.py` parses it into
+`(people, citation)` entries, canonicalises the people label (folding spelling
+variants — `Iclandic → Icelandic`, `Indian → India`, dropping citation fragments
+that carry a digit), and maps it to a **macro-region**. The region set matches
+TMI/Berezkin plus **Central Asia** (ATU carries a real mass of Uzbek/Tadzhik/
+Kazakh… material the other two don't distinguish); ~260 curated labels cover
+~100% of the ~45k people-mentions, the rest landing in a "—" bucket.
+
+Stored per type as `attestations_grouped` (`{total, regions: [{region, count,
+entries}]}`) and aggregated across the index into `culture_legend` (people →
+types-attesting, region). On the type page the section renders as a region
+accordion; the overview gains **Attestations by region**, **Top peoples**, and a
+**regional-breadth** histogram. This is illustrative-free — every count is real,
+parsed from Uther's own apparatus. The one caveat is the region map itself: a
+first-pass curation (e.g. Maghreb folded into "Near East", Volga-Finnic into
+"Europe") that can be refined.
 
 ---
 
