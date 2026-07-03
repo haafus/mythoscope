@@ -260,10 +260,25 @@ def status():
             click.echo("  " + ", ".join(f"{k}: {v}" for k, v in counts.items()))
         else:
             click.echo("  Built (no counts recorded)")
-        for source, e in (info.get("enrichment") or {}).items():
-            if e.get("skipped"):
+        enr = info.get("enrichment") or {}
+        # Each enrichment is owned by an index; when that index is built but its
+        # enrichment key is absent from meta, the meta is stale/partial — flag it
+        # so "no data" (e.g. missing Wikipedia links) is diagnosable, not silent.
+        expected = [("mapsofmyths", "berezkin"), ("berezkin_bibliography", "berezkin"),
+                    ("bibliography", "tmi"), ("atu_wikidata", "atu")]
+        seen = set()
+        for source, owner in expected:
+            e = enr.get(source)
+            seen.add(source)
+            if e is None:
+                if owner in counts:
+                    click.echo(f"  {source}: not recorded (stale meta — rebuild to refresh)")
+            elif e.get("skipped"):
                 click.echo(f"  {source}: skipped ({e['skipped']})")
             elif e:
+                click.echo(f"  {source}: " + ", ".join(f"{k} {v}" for k, v in e.items()))
+        for source, e in enr.items():  # any future enrichment not in the list above
+            if source not in seen and e:
                 click.echo(f"  {source}: " + ", ".join(f"{k} {v}" for k, v in e.items()))
     click.echo()
 
