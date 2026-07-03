@@ -259,6 +259,16 @@ class TestAshliman:
         toc = ashliman.parse_toc(self.TOC_HTML)
         assert ashliman.resolve_anchor("Some Unrelated Tale", toc) is None
 
+    def test_attach_target(self):
+        known = {"170", "333", "47A", "47B", "433B", "20A", "20C", "778", "779J*"}
+        assert ashliman.attach_target("170A", known) == "170"     # subtype -> parent present
+        assert ashliman.attach_target("333A", known) == "333"
+        assert ashliman.attach_target("47E", known) == "47A"      # parent absent -> lowest sibling
+        assert ashliman.attach_target("433C", known) == "433B"
+        assert ashliman.attach_target("20", known) == "20A"       # base absent, children present
+        assert ashliman.attach_target("778J", known) == "778"
+        assert ashliman.attach_target("676", known) is None       # orphan: no relative indexed
+
 
 class TestAtuRegions:
     def test_canonical_folds_variants(self):

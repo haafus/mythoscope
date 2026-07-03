@@ -95,6 +95,33 @@ def resolve_anchor(title: str, toc: list[tuple[str, str, str]]) -> str | None:
     return cands[0][2]
 
 
+_BASE = re.compile(r"^(\d+)")
+
+
+def _base(atu_id: str) -> str | None:
+    """The bare base number of an ATU id: ``333A`` / ``333A*`` -> ``333``."""
+    m = _BASE.match(atu_id or "")
+    return m.group(1) if m else None
+
+
+def attach_target(atu_id: str, known_ids: set[str]) -> str | None:
+    """The existing type an *off-index* Ashliman type attaches to.
+
+    Ashliman lists ATU types the trilogy catalogue omits. Such a type is linked
+    to a relative already in the index — its **parent** (the bare base number)
+    when present, else the **lowest sibling** sharing the same base number.
+    Returns ``None`` for a genuine orphan: no indexed type shares its base.
+    The link is hierarchical (parent/family), not equivalence.
+    """
+    b = _base(atu_id)
+    if not b:
+        return None
+    if b in known_ids:                       # a subtype whose parent is indexed
+        return b
+    family = [i for i in known_ids if _base(i) == b]
+    return min(family) if family else None    # lowest sibling, else orphan
+
+
 def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     """Attach ``url`` to each example tale in place. Best-effort: a missing page
     (starred/absent types) leaves its tales unlinked; if every fetch fails the
