@@ -254,6 +254,15 @@ class TestAtuRegions:
         grouped = atu_regions.group_by_region(atu_regions.parse("Klingon: X 1; German: Y 2"))
         assert grouped["regions"][-1]["region"] == "—"
 
+    def test_period_glued_peoples_split_when_both_mapped(self):
+        # A period-glued pair of mapped peoples becomes two entries sharing the cite.
+        parsed = atu_regions.parse("Palestinian. Iraqi: El-Shamy 2004")
+        assert [(e["people"], e["region"], e["cite"]) for e in parsed] == [
+            ("Palestinian", "Near East", "El-Shamy 2004"),
+            ("Iraqi", "Near East", "El-Shamy 2004")]
+        # Not split when a half is unmapped: "No. 65" stays one "—" entry.
+        assert [e["people"] for e in atu_regions.parse("No. 65: x")] == ["No. 65"]
+
     def test_build_legend_counts_types(self):
         types = [
             {"attestations_grouped": atu_regions.group_by_region(

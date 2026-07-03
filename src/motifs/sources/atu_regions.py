@@ -176,13 +176,26 @@ def region(canon: str) -> str:
     return _REGION.get(canon, "")
 
 
+def _split_head_part(raw: str) -> list[str]:
+    """One comma-separated head token, split further on a period **only** when it
+    glues two region-mapped peoples ('Palestinian. Iraqi' -> two). Citation noise
+    ('No. 65') and a lone 'cf.' stay whole, since one of their halves is unmapped."""
+    name = _LEAD_CF.sub("", raw.strip().lstrip(".").strip()).strip()
+    if ". " in name:
+        parts = [p.strip() for p in name.split(". ") if p.strip()]
+        if len(parts) >= 2 and all(region(canonical(p)) for p in parts):
+            return parts
+    return [name] if name else []
+
+
 def parse(text: str) -> list[dict]:
     """Parse the ``provenance`` prose into ``[{people, canon, region, cite}]``.
 
-    Splits on ``;`` into ``head: citation`` groups; a head may be a comma-list of
-    peoples sharing the citation, each emitted as its own entry. Segments with no
-    colon are continuations of the previous citation (a citation that itself held
-    a ``;``), so they are appended to it.
+    Splits on ``;`` into ``head: citation`` groups; a head may be a comma-list
+    (or a period-glued pair, see ``_split_head_part``) of peoples sharing the
+    citation, each emitted as its own entry. Segments with no colon are
+    continuations of the previous citation (a citation that itself held a ``;``),
+    so they are appended to it.
     """
     entries: list[dict] = []
     for seg in text.split(";"):
@@ -193,11 +206,11 @@ def parse(text: str) -> list[dict]:
         head, cite = seg.split(":", 1)
         cite = cite.strip()
         for raw in head.split(","):
-            people = raw.strip()
-            canon = canonical(people)
-            if not canon:
-                continue
-            entries.append({"people": canon, "canon": canon, "region": region(canon), "cite": cite})
+            for people in _split_head_part(raw):
+                canon = canonical(people)
+                if not canon:
+                    continue
+                entries.append({"people": canon, "canon": canon, "region": region(canon), "cite": cite})
     return entries
 
 
