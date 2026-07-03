@@ -259,6 +259,14 @@ class TestAshliman:
         toc = ashliman.parse_toc(self.TOC_HTML)
         assert ashliman.resolve_anchor("Some Unrelated Tale", toc) is None
 
+    def test_canon(self):
+        assert ashliman.canon("0510a") == "510A"     # leading zeros stripped, upper-cased
+        assert ashliman.canon("1") == "1"
+        assert ashliman.canon("779J*") == "779J*"     # letter + star kept
+        assert ashliman.canon("1585*") == "1585*"     # star is significant…
+        assert ashliman.canon("1585") == "1585"       # …so 1585 != 1585*
+        assert ashliman.canon("") is None
+
     def test_attach_target(self):
         known = {"170", "333", "47A", "47B", "433B", "20A", "20C", "778", "779J*"}
         assert ashliman.attach_target("170A", known) == "170"     # subtype -> parent present

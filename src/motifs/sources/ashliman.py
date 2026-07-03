@@ -95,6 +95,22 @@ def resolve_anchor(title: str, toc: list[tuple[str, str, str]]) -> str | None:
     return cands[0][2]
 
 
+def canon(atu_id: str) -> str | None:
+    """Normalise an ATU id for cross-source matching: strip leading zeros of the
+    numeric prefix and upper-case, **keeping** any letters and ``*`` — both are
+    significant (``1585`` and ``1585*`` are distinct types, so never strip the
+    star here). Returns ``None`` only for empty input; a non-numeric id is
+    returned upper-cased unchanged (never dropped).
+
+    Caveat: Ashliman page URLs cannot carry a ``*``, so when matching a *site*
+    number against catalogue ids, compare the star-stripped forms of both —
+    ``canon`` alone will not equate site ``779J`` with catalogue ``779J*``.
+    """
+    s = (atu_id or "").strip().upper()
+    m = re.match(r"^0*(\d+)(.*)$", s)
+    return f"{int(m.group(1))}{m.group(2)}" if m else (s or None)
+
+
 _BASE = re.compile(r"^(\d+)")
 
 
