@@ -123,7 +123,8 @@ body.has-main-navbar {
 }
 
 .nav-links > a:hover {
-    color: #111;
+    color: #fff;
+    background: #4f7096;
 }
 
 .nav-links > a.active {
@@ -131,7 +132,10 @@ body.has-main-navbar {
     background: #e9eef5;
 }
 
-.nav-links > a.nav-info:hover,
+.nav-links > a.nav-info:hover {
+    color: #fff;
+    background: #4f7096;
+}
 .nav-links > a.nav-info.active {
     color: #111;
     background: transparent;
@@ -1335,6 +1339,7 @@ body.has-main-navbar {
     border-radius: 6px;
     cursor: pointer;
     line-height: 1.2;
+    transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .motifs-tab.active {
@@ -1342,6 +1347,14 @@ body.has-main-navbar {
     background: #e2edf0;
     border-color: #c7d9e6;
 }
+
+/* Contrasting hover, matching the motif-link chips. */
+.motifs-tab:hover {
+    color: #fff;
+    background: #4f7096;
+    border-color: #4f7096;
+}
+.motifs-tab:hover .motifs-tab-count { color: #fff; opacity: 0.85; }
 
 .motifs-tab-count {
     display: block;
