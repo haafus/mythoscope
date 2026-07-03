@@ -963,7 +963,7 @@ function attestationsSection(grouped) {
     if (!grouped || !grouped.total) return "";
     const openAll = grouped.total <= 15;
     const rows = (grouped.regions || []).map((r) => {
-        const label = r.region === "—" ? "Unattributed" : r.region;
+        const label = r.region;  // "—" for the unmapped bucket, matching Berezkin & the data
         const items = (r.entries || []).map((e) =>
             `<li class="motif-att-item"><span class="motif-att-people">${escapeHtml(e.label)}</span>${e.cite ? `: <span class="motif-att-cite">${e.cite}</span>` : ""}</li>`).join("");
         return `
