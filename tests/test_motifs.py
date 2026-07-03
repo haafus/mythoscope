@@ -277,6 +277,13 @@ class TestAshliman:
         assert ashliman.attach_target("778J", known) == "778"
         assert ashliman.attach_target("676", known) is None       # orphan: no relative indexed
 
+    def test_probe_filename_and_atu_range(self):
+        assert ashliman._probe_filename("510A") == "type0510A.html"
+        assert ashliman._probe_filename("1") == "type0001.html"
+        assert ashliman._probe_filename("779J*") == "type0779J.html"   # star never in a filename
+        assert ashliman._atu_range("676") is True
+        assert ashliman._atu_range("3000") is False                    # Christiansen migratory legend
+
 
 class TestAtuRegions:
     def test_canonical_folds_variants(self):

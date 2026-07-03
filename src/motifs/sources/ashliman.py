@@ -13,6 +13,7 @@ tested on a static fixture.
 
 from __future__ import annotations
 
+import concurrent.futures
 import html
 import logging
 import re
@@ -173,3 +174,79 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
                 pages_ok, pages_missing, anchored, page_level)
     return {"pages": pages_ok, "pages_missing": pages_missing,
             "tales_anchored": anchored, "tales_page_level": page_level}
+
+
+# ---------------------------------------------------------------------------
+# Site-coverage discovery: which ATU types does Ashliman actually carry?
+# ---------------------------------------------------------------------------
+_INDEX_PAGES = ("folktexts.html", "folktexts2.html")
+_HREF = re.compile(r'href="([a-z0-9_]+\.html)"', re.I)
+_TYPE_DECL = re.compile(r"\btypes?\s+(\d{1,4}[A-Za-z]?)", re.I)
+
+
+def _fetch_page(page: str, force: bool) -> str | None:
+    cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
+    try:
+        return fetch_text(f"{BASE}/{page}", cache, force=force)
+    except Exception:                       # 404 / network — treat as absent
+        cache.unlink(missing_ok=True)
+        return None
+
+
+def _atu_range(cid: str) -> bool:
+    m = re.match(r"\d+", cid or "")
+    return bool(m) and int(m.group()) < 3000   # >=3000 = Christiansen migratory legends
+
+
+def _probe_filename(cid: str) -> str | None:
+    m = re.match(r"^(\d+)([A-Za-z]*)", cid or "")
+    return f"type{int(m.group(1)):04d}{m.group(2)}.html" if m else None
+
+
+def discover_site_types(known_ids, *, force: bool = False, workers: int = 12) -> dict:
+    """The ATU types Ashliman's Folktexts covers, found two complementary ways:
+
+    * **contents walk** — the index pages (folktexts.html / folktexts2.html) give
+      the type-numbered page links, and every *themed* page they link declares the
+      ATU type(s) it covers; this finds types even when absent from ``known_ids``.
+    * **direct probe** — GET ``type{NNNN}.html`` for each id in ``known_ids``,
+      catching pages that exist on the server but that no index links.
+
+    Only the ATU range (<3000; higher numbers are Christiansen migratory legends)
+    is kept. Returns canon-id sets ``{contents, probed, all}`` plus their counts.
+    """
+    slugs: set[str] = set()
+    for idx in _INDEX_PAGES:
+        slugs.update(_HREF.findall(_fetch_page(idx, force) or ""))
+    contents: set[str] = set()
+    for s in slugs:                             # type-numbered page filenames
+        m = re.match(r"^type(\d+)([a-z]?)\.html$", s)
+        if m:
+            contents.add(canon(f"{m.group(1)}{m.group(2)}"))
+    themed = [s for s in slugs
+              if not re.match(r"^type\d", s) and not s.startswith("folktexts")]
+
+    def _declared(slug: str) -> set[str]:
+        return {canon(x) for x in _TYPE_DECL.findall(_fetch_page(slug, force) or "")}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+        for nums in ex.map(_declared, themed):
+            contents |= {c for c in nums if c}
+    contents = {c for c in contents if _atu_range(c)}
+
+    probe_ids = sorted({c for i in known_ids if (c := canon(i)) and _atu_range(c)})
+
+    def _exists(cid: str) -> str | None:
+        page = _probe_filename(cid)
+        return cid if page and _fetch_page(page, force) is not None else None
+
+    probed: set[str] = set()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+        for hit in ex.map(_exists, probe_ids):
+            if hit:
+                probed.add(hit)
+
+    both = contents | probed
+    logger.info("Ashliman site coverage: %d types (contents-walk %d, direct-probe %d, "
+                "probe-only +%d)", len(both), len(contents), len(probed), len(probed - contents))
+    return {"contents": contents, "probed": probed, "all": both}
