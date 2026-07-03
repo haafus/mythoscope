@@ -1455,10 +1455,13 @@ body.has-main-navbar {
     display: flex;
     align-items: baseline;
     gap: 12px;
-    flex-wrap: wrap;
+    /* A long name wraps within its own column, staying right of the code —
+       never dropping onto a line below it. */
+    flex-wrap: nowrap;
 }
 
 .motif-code {
+    flex: 0 0 auto;   /* the code keeps its width; the name yields */
     font-weight: 700;
     font-size: 18px;
     color: #3a5e86;
@@ -1468,6 +1471,8 @@ body.has-main-navbar {
 }
 
 .motif-name {
+    flex: 1 1 auto;   /* TMI/ATU: take the remaining width and wrap inside it */
+    min-width: 0;
     margin: 0;
     font-size: 22px;
     color: #2a3340;
@@ -1482,6 +1487,8 @@ body.has-main-navbar {
 /* English name + Russian sub-title stacked as one column, so the sub-title's
    left edge lines up with the name (not the code chip). */
 .motif-name-col {
+    flex: 1 1 auto;   /* Berezkin: same wrapping column, holds name + subtitle */
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
