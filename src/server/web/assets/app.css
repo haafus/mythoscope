@@ -1754,7 +1754,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .chart { width: 100%; }
 
 /* Pure-CSS "by region" bars (region palette; no Plotly). */
-.csbars { display: flex; flex-direction: column; gap: 5px; padding: 6px 2px 2px; }
+.csbars { display: flex; flex-direction: column; gap: 3px; padding: 6px 2px 2px; }
 .csbar-row { display: grid; grid-template-columns: 148px 1fr 50px; align-items: center; gap: 9px; font-size: 11.5px; }
 .csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; }
