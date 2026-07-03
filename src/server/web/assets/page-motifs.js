@@ -471,7 +471,7 @@ function atuTales(tales) {
     const rows = tales.map((t) => t.url
         ? `<li class="motif-tale"><a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.title)} <span class="ext-arrow">↗</span></a></li>`
         : `<li class="motif-tale">${escapeHtml(t.title)}</li>`).join("");
-    return section(`Example tales (${tales.length})`, `<ul class="motif-tales">${rows}</ul>`);
+    return section(`Ashliman (${tales.length})`, `<ul class="motif-tales">${rows}</ul>`);
 }
 
 // Recurring reference-work / journal abbreviations in the Uther apparatus, with

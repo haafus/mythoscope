@@ -1738,7 +1738,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .ov-meta-k { color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; font-size: 10.5px; }
 .ov-cite { color: #3a4652; }
 .ov-cite em { font-style: italic; }
-.ov-srcs { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.ov-srcs { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .ov-src { color: var(--accent, #2a9d8f); text-decoration: none; }
 .ov-src:hover { text-decoration: underline; }
 
