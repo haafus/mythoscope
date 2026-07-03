@@ -160,10 +160,13 @@ _LEAD_CF = re.compile(r"(?i)^cf\.\s+")
 
 
 def canonical(label: str) -> str:
-    """Canonical people label for a raw attestation head, or "" if it is not a
-    people (blank, or a citation fragment carrying a digit)."""
+    """Cleaned, alias-folded people label, or "" only for a blank token.
+
+    Fragments that are not really peoples (a stray citation like ``No. 65``) are
+    kept as-is here and fall into the unmapped "—" bucket via ``region()`` — we
+    surface them rather than silently drop them."""
     name = _LEAD_CF.sub("", label.strip().lstrip(".").strip()).strip()
-    if not name or any(ch.isdigit() for ch in name):
+    if not name:
         return ""
     return _ALIAS.get(name, name)
 

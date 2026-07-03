@@ -222,12 +222,14 @@ class TestAtuStructure:
 
 
 class TestAtuRegions:
-    def test_canonical_folds_variants_and_drops_noise(self):
+    def test_canonical_folds_variants(self):
         assert atu_regions.canonical("Indian") == "India"          # bare Indian = India in Uther
         assert atu_regions.canonical("cf. Japanese") == "Japanese"  # drop compare prefix
         assert atu_regions.canonical(".Australian") == "Australian"  # strip stray dot
-        assert atu_regions.canonical("No. 65") == ""                # citation fragment, not a people
-        assert atu_regions.canonical("György 1934") == ""
+        assert atu_regions.canonical("") == ""                      # blank token → dropped
+        # A citation fragment is kept (not a people, so unmapped → "—" bucket).
+        assert atu_regions.canonical("No. 65") == "No. 65"
+        assert atu_regions.region(atu_regions.canonical("No. 65")) == ""
 
     def test_region_mapping(self):
         assert atu_regions.region("Uzbek") == "Central Asia"
@@ -239,13 +241,14 @@ class TestAtuRegions:
     def test_parse_and_group(self):
         text = "Finnish: Aaa 1; German, Dutch: Bbb 2; Uzbek: Ccc 3; No. 9: junk"
         parsed = atu_regions.parse(text)
+        # The citation fragment "No. 9" is kept as an unmapped entry, not dropped.
         assert [(e["people"], e["region"]) for e in parsed] == [
             ("Finnish", "Europe"), ("German", "Europe"),
-            ("Dutch", "Europe"), ("Uzbek", "Central Asia")]
+            ("Dutch", "Europe"), ("Uzbek", "Central Asia"), ("No. 9", "")]
         grouped = atu_regions.group_by_region(parsed)
-        assert grouped["total"] == 4
+        assert grouped["total"] == 5
         assert [(r["region"], r["count"]) for r in grouped["regions"]] == [
-            ("Europe", 3), ("Central Asia", 1)]
+            ("Europe", 3), ("Central Asia", 1), ("—", 1)]
 
     def test_unmapped_sorts_to_dash_bucket_last(self):
         grouped = atu_regions.group_by_region(atu_regions.parse("Klingon: X 1; German: Y 2"))

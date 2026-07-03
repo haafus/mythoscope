@@ -208,8 +208,11 @@ so individual citations are shown as-is. But on the type page:
 The `provenance` prose is `People: citation; People, People: citation; …` — a
 nationality/ethnonym before each colon. `atu_regions.py` parses it into
 `(people, citation)` entries, canonicalises the people label (folding spelling
-variants — `Iclandic → Icelandic`, `Indian → India`, dropping citation fragments
-that carry a digit), and maps it to a **macro-region**. The region set matches
+variants — `Iclandic → Icelandic`, `Indian → India`), and maps it to a
+**macro-region**. Nothing is discarded: the handful of stray citation fragments
+that leak into a people slot (`No. 65`, `György 1934`) are kept as unmapped
+entries in the "—" bucket rather than dropped, so the section stays faithful to
+the source. The region set matches
 TMI/Berezkin plus **Central Asia** (ATU carries a real mass of Uzbek/Tadzhik/
 Kazakh… material the other two don't distinguish); ~260 curated labels cover
 ~100% of the ~45k people-mentions, the rest landing in a "—" bucket.
