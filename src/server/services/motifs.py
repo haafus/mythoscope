@@ -558,10 +558,13 @@ def _build_atu_stats() -> dict:
 
     types = _records("atu")
     data = store.load_index("atu") or {}
+    legend = data.get("culture_legend") or {}
     chapters = collections.Counter()
     divisions = collections.Counter()
     motif_hist = collections.Counter()
-    n_sum = n_mot = n_combo = 0
+    reg_breadth = collections.Counter()   # how many macro-regions a type spans
+    region_att = collections.Counter()    # attestation mentions per region (all types)
+    n_sum = n_mot = n_combo = n_att = 0
     for t in types:
         chapters[t.get("chapter", "")] += 1
         if t.get("division"):
@@ -570,19 +573,32 @@ def _build_atu_stats() -> dict:
         n_mot += bool(t.get("motifs"))
         n_combo += bool(t.get("combos"))
         motif_hist[_motif_count_label(len(t.get("motifs", [])))] += 1
+        grouped = t.get("attestations_grouped") or {}
+        named = [r for r in grouped.get("regions", []) if r["region"] != "—"]
+        if grouped.get("total"):
+            n_att += 1
+            reg_breadth[_areal_breadth_label(len(named))] += 1
+            for r in named:
+                region_att[r["region"]] += r["count"]
     top_rich = sorted(types, key=lambda t: len(t.get("motifs", [])), reverse=True)[:15]
+    # Peoples: types attesting each canonical people (culture_legend counts).
+    top_peoples = sorted(legend.items(), key=lambda kv: kv[1]["count"], reverse=True)[:18]
     return {
         "index": "atu",
         "title": (data.get("long_label") or "ATU tale types") + " — overview",
         "cards": [
             {"value": len(types), "label": "tale types"},
             {"value": len([c for c in chapters if c]), "label": "chapters"},
+            {"value": n_att, "label": "with attestations"},
+            {"value": len(legend), "label": "peoples"},
             {"value": n_mot, "label": "with TMI motifs"},
-            {"value": n_combo, "label": "with combos"},
             {"value": round(100 * n_sum / len(types)) if types else 0, "label": "have summary", "suffix": "%"},
         ],
         "panels": [
             {"id": "atChapters", "title": "Types per chapter"},
+            {"id": "atRegions", "title": "Attestations by region"},
+            {"id": "atPeoples", "title": "Top peoples (types attesting)"},
+            {"id": "atRegBreadth", "title": "Regional breadth (regions per type)"},
             {"id": "atDivisions", "title": "Top divisions"},
             {"id": "atMotifHist", "title": "TMI motifs per type"},
             {"id": "atRich", "title": "Most motif-rich types"},
@@ -592,6 +608,10 @@ def _build_atu_stats() -> dict:
         "motif_hist": [{"bucket": b, "count": motif_hist[b]} for b in ("0", "1", "2–3", "4–6", "7–10", "11+")],
         "top_rich": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
                      for t in top_rich],
+        "regions": [{"region": reg, "count": c} for reg, c in region_att.most_common()],
+        "top_peoples": [{"label": canon, "count": e["count"]} for canon, e in top_peoples],
+        "reg_breadth": [{"bucket": b, "count": reg_breadth[b]}
+                        for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
     }
 
 
@@ -994,6 +1014,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["summary_html"] = _atu_summary_html(rec.get("summary", ""))
         detail["references"] = rec.get("references", "")      # Uther litvar (key literature)
         detail["attestations"] = rec.get("attestations", "")  # Uther provenance (by tradition)
+        detail["attestations_grouped"] = rec.get("attestations_grouped") or {}  # by macro-region
         detail["remarks"] = rec.get("remarks", "")            # Uther remarks (historical notes)
         detail["tales"] = rec.get("tales", [])                # Ashliman AFT example tales (metadata)
         detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []

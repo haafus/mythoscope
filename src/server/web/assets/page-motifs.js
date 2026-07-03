@@ -849,6 +849,9 @@ function drawCharts(s, attempt = 0) {
         vbar("bzBreadth", s.breadth, "bucket", "count");
     } else if (s.index === "atu") {
         hbar("atChapters", s.chapters.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
+        if (s.regions) hbar("atRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
+        if (s.top_peoples) hbar("atPeoples", s.top_peoples.slice().reverse(), (r) => r.label, "count", { margin: { l: 130, r: 12, t: 8, b: 30 } });
+        if (s.reg_breadth) vbar("atRegBreadth", s.reg_breadth, "bucket", "count");
         hbar("atDivisions", s.divisions.slice().reverse(), (r) => r.label.slice(0, 30), "count", { margin: { l: 210, r: 12, t: 8, b: 30 } });
         vbar("atMotifHist", s.motif_hist, "bucket", "count");
         hbar("atRich", s.top_rich.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
@@ -883,6 +886,24 @@ function berezkinDistribution(dist) {
             <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
         </details>`).join("");
     return section(`Attestations by culture (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
+}
+
+// ATU attestations (Uther provenance) grouped by macro-region: an accordion of
+// regions, each listing its "People: citation" entries. Falls back to the raw
+// prose when the parsed grouping is absent.
+function atuAttestations(grouped, raw) {
+    if (!grouped || !grouped.total) return atuProse("Attestations by culture", raw, true);
+    const rows = (grouped.regions || []).map((r) => {
+        const label = r.region === "—" ? "Unattributed" : r.region;
+        const items = (r.entries || []).map((e) =>
+            `<li class="motif-att-item"><span class="motif-att-people">${escapeHtml(e.people)}</span>${e.cite ? `: <span class="motif-att-cite">${abbrLinkify(escapeHtml(e.cite))}</span>` : ""}</li>`).join("");
+        return `
+        <details class="motif-dist-region" name="motif-att-region">
+            <summary><span class="motif-dist-name">${escapeHtml(label)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
+            <ul class="motif-att-list">${items}</ul>
+        </details>`;
+    }).join("");
+    return section(`Attestations by culture (${formatNumber(grouped.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
 
 // One bibliography source: resolved works show author · year — title; unresolved
@@ -1066,7 +1087,7 @@ function renderDetail(d) {
         if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
-        body += atuProse("Attestations by culture", d.attestations, true);
+        body += atuAttestations(d.attestations_grouped, d.attestations);
         body += atuProse("References", d.references, true);
         body += atuTales(d.tales);
         body += atuWikipedia(d.wikipedia, d.wikidata);

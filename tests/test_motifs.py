@@ -9,7 +9,7 @@ import pytest  # noqa: E402
 
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
-from motifs.sources import berezkin, culture_dict, tmi_notes, trilogy
+from motifs.sources import atu_regions, berezkin, culture_dict, tmi_notes, trilogy
 from motifs.sources import berezkin_bibliography as bbib
 from server.services import motifs as svc
 
@@ -212,6 +212,55 @@ class TestAtuStructure:
         assert t["attestations"].startswith("Finnish: Rausmaa 1982ff. V, Nos. 1–6;")
         assert t["remarks"] == "Documented 1178 in the Roman de Renart."
         assert "ï¿½" not in (t["references"] + t["attestations"])
+        # Attestations are parsed into a per-region grouping (Finnish + German -> Europe).
+        g = t["attestations_grouped"]
+        assert g["total"] == 2
+        assert g["regions"] == [{"region": "Europe", "count": 2, "entries": [
+            {"people": "Finnish", "cite": "Rausmaa 1982ff. V, Nos. 1–6"},
+            {"people": "German", "cite": "Moser-Rath 1964"},
+        ]}]
+
+
+class TestAtuRegions:
+    def test_canonical_folds_variants_and_drops_noise(self):
+        assert atu_regions.canonical("Indian") == "India"          # bare Indian = India in Uther
+        assert atu_regions.canonical("cf. Japanese") == "Japanese"  # drop compare prefix
+        assert atu_regions.canonical(".Australian") == "Australian"  # strip stray dot
+        assert atu_regions.canonical("No. 65") == ""                # citation fragment, not a people
+        assert atu_regions.canonical("György 1934") == ""
+
+    def test_region_mapping(self):
+        assert atu_regions.region("Uzbek") == "Central Asia"
+        assert atu_regions.region("Egyptian") == "Near East"
+        assert atu_regions.region("Yakut") == "Siberia"
+        assert atu_regions.region("Latvian") == "Europe"
+        assert atu_regions.region("Nonexistent") == ""
+
+    def test_parse_and_group(self):
+        text = "Finnish: Aaa 1; German, Dutch: Bbb 2; Uzbek: Ccc 3; No. 9: junk"
+        parsed = atu_regions.parse(text)
+        assert [(e["people"], e["region"]) for e in parsed] == [
+            ("Finnish", "Europe"), ("German", "Europe"),
+            ("Dutch", "Europe"), ("Uzbek", "Central Asia")]
+        grouped = atu_regions.group_by_region(parsed)
+        assert grouped["total"] == 4
+        assert [(r["region"], r["count"]) for r in grouped["regions"]] == [
+            ("Europe", 3), ("Central Asia", 1)]
+
+    def test_unmapped_sorts_to_dash_bucket_last(self):
+        grouped = atu_regions.group_by_region(atu_regions.parse("Klingon: X 1; German: Y 2"))
+        assert grouped["regions"][-1]["region"] == "—"
+
+    def test_build_legend_counts_types(self):
+        types = [
+            {"attestations_grouped": atu_regions.group_by_region(
+                atu_regions.parse("German: A 1; Uzbek: B 2"))},
+            {"attestations_grouped": atu_regions.group_by_region(
+                atu_regions.parse("German: C 3"))},
+        ]
+        legend = atu_regions.build_legend(types)
+        assert legend["German"] == {"count": 2, "region": "Europe"}
+        assert legend["Uzbek"] == {"count": 1, "region": "Central Asia"}
 
     def test_mojibake_dictionary_repairs(self):
         f = trilogy._fix_mojibake

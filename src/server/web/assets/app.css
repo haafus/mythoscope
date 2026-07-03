@@ -1516,6 +1516,13 @@ body.has-main-navbar {
    wider right pad keeps the wrapped names off the pane edge. */
 .motif-dist-traditions { color: var(--muted); font-size: 13px; line-height: 1.5; padding: 2px 84px 8px 22px; }
 
+/* ATU attestations grouped by region: one "People: citation" per line, aligned
+   under the region label (same left pad as the tradition list above). */
+.motif-att-list { list-style: none; margin: 0; padding: 2px 40px 8px 22px; }
+.motif-att-item { font-size: 13px; line-height: 1.55; color: var(--muted); }
+.motif-att-people { color: var(--text, #2a2f36); font-weight: 600; }
+.motif-att-cite { color: var(--muted); }
+
 /* Source bibliography (areasofmyths.com): collapsible list per macro-area,
    reusing the distribution accordion look. */
 .motif-bib { display: flex; flex-direction: column; gap: 2px; }

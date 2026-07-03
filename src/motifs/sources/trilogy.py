@@ -17,6 +17,7 @@ from pathlib import Path
 
 from settings import settings
 
+from . import atu_regions
 from .culture_dict import build_legend
 from .fetch import fetch_to_cache
 from .tmi_notes import parse_notes
@@ -497,7 +498,11 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             # references (litvar), attestations by tradition (provenance) and
             # historical/textual notes (remarks).
             "references": _fix_mojibake(_clean(row.get("litvar"))),
-            "attestations": _fix_mojibake(_clean(row.get("provenance"))),
+            "attestations": (attestations := _fix_mojibake(_clean(row.get("provenance")))),
+            # Peoples parsed out of the attestation prose, grouped by macro-region
+            # (see atu_regions) — powers the per-type region breakdown and the
+            # overview's people/region distributions.
+            "attestations_grouped": atu_regions.group_by_region(atu_regions.parse(attestations)),
             "remarks": _fix_mojibake(_clean(row.get("remarks"))),
             "motifs": seq.get(atu_id, []),
             "combos": combos.get(atu_id, []),
@@ -598,6 +603,7 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
         "homepage": config.get("homepage", ""),
         "divisions": _atu_divisions(atu),
         "subdivisions": _atu_subdivisions(atu),
+        "culture_legend": atu_regions.build_legend(atu),
         "types": atu,
     }, seq
 
