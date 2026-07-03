@@ -222,7 +222,9 @@ Kazakh… material the other two don't distinguish); ~260 curated labels cover
 Stored per type as `attestations_grouped` (`{total, regions: [{region, count,
 entries}]}`) and aggregated across the index into `culture_legend` (people →
 types-attesting, region). On the type page the section renders as a region
-accordion; the overview gains **Attestations by region**, **Top peoples**, and a
+accordion; the overview gains **Types by region** (types present per region,
+each type counted once — matching TMI/Berezkin "Motifs by region"), **Top
+peoples**, and a
 **regional-breadth** histogram. This is illustrative-free — every count is real,
 parsed from Uther's own apparatus. The one caveat is the region map itself: a
 first-pass curation (e.g. Maghreb folded into "Near East", Volga-Finnic into

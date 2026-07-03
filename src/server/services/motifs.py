@@ -628,7 +628,7 @@ def _build_atu_stats() -> dict:
     divisions = collections.Counter()
     motif_hist = collections.Counter()
     reg_breadth = collections.Counter()   # how many macro-regions a type spans
-    region_att = collections.Counter()    # attestation mentions per region (all types)
+    region_types = collections.Counter()  # types present per region (each type once/region)
     n_sum = n_mot = n_combo = n_att = 0
     for t in types:
         chapters[t.get("chapter", "")] += 1
@@ -644,7 +644,7 @@ def _build_atu_stats() -> dict:
             n_att += 1
             reg_breadth[_areal_breadth_label(len(named))] += 1
             for r in named:
-                region_att[r["region"]] += r["count"]
+                region_types[r["region"]] += 1
     top_rich = sorted(types, key=lambda t: len(t.get("motifs", [])), reverse=True)[:15]
     top_families = sorted((t for t in types if t.get("subtypes")),
                           key=lambda t: len(t["subtypes"]), reverse=True)[:15]
@@ -665,7 +665,7 @@ def _build_atu_stats() -> dict:
         ],
         "panels": [
             {"id": "atChapters", "title": "Types per chapter"},
-            {"id": "atRegions", "title": "Attestations by region"},
+            {"id": "atRegions", "title": "Types by region"},
             {"id": "atPeoples", "title": "Top peoples (types attesting)"},
             {"id": "atRegBreadth", "title": "Regional breadth (regions per type)"},
             {"id": "atDivisions", "title": "Top divisions"},
@@ -683,7 +683,7 @@ def _build_atu_stats() -> dict:
                      for t in top_families],
         "combos": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("combos", []))}
                    for t in top_combos],
-        "regions": [{"region": reg, "count": c} for reg, c in region_att.most_common()],
+        "regions": [{"region": reg, "count": c} for reg, c in region_types.most_common()],
         "top_peoples": [{"label": canon, "count": e["count"]} for canon, e in top_peoples],
         "reg_breadth": [{"bucket": b, "count": reg_breadth[b]}
                         for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
