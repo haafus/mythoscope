@@ -158,6 +158,20 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
 
     ids = {t["id"] for t in atu_types}
     mapping = parse_bindings(rows, ids)
+
+    # A live endpoint always returns some sitelinks and P18 images across the
+    # matched tale-type items; a substantial response with zero of *both* is a
+    # degraded reply (WDQS timing out the heavy OPTIONALs during an outage, while
+    # cheap rdfs:label lookups still return). Don't accept or cache it as success
+    # — that would poison offline re-runs with names-only, zero Wikipedia links.
+    if len(rows) >= 50 and not any(m["wikipedia"] for m in mapping.values()) \
+            and not any(m["image"] for m in mapping.values()):
+        logger.warning("ATU Wikidata: %d rows but zero sitelinks/images — degraded "
+                       "response (WDQS outage?); not caching. Re-run with --force after "
+                       "the endpoint recovers.", len(rows))
+        cache.unlink(missing_ok=True)
+        return {"skipped": "degraded-no-sitelinks"}
+
     n_names = n_wiki = n_img = n_conc = 0
     for t in atu_types:
         m = mapping.get(t["id"])
