@@ -58,6 +58,11 @@ The catalogue nests **chapter → division → sub_division → type**:
 The read service exposes the `divisions`/`subdivisions` trees for the browse
 dropdown (nested by chapter, ascending by number range).
 
+The **plot summary is linkified** on the type page (`_atu_summary_html`): after
+escaping the prose, `[B261]`-style TMI motif tokens and `Type N` ATU references
+are turned into links — but only for ids that actually exist in the index (a
+missing one stays plain text).
+
 ---
 
 ## 3. Composition
