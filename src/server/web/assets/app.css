@@ -1621,6 +1621,8 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+/* Direction marker (⇔ ⇐ ⇒) on merged motif↔ATU relation chips. */
+.motif-link-rel { flex: none; color: #8a97a6; font-weight: 700; cursor: help; }
 /* Provenance badge on a link resolved via the AaTh->ATU concordance. */
 .motif-link-src {
     flex: none;

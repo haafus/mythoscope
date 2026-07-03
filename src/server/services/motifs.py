@@ -213,6 +213,40 @@ def _aath_to_atu() -> dict[str, list[str]]:
     return store.cached("aath_to_atu", build)
 
 
+_ATU_NUM_RE = re.compile(r"^(\d+)")
+
+
+def _atu_num_key(atu_id: str) -> tuple:
+    """(number, suffix) so 301 < 301A < 301D* < 1542 sort numerically."""
+    m = _ATU_NUM_RE.match(atu_id)
+    return (int(m.group(1)) if m else 1 << 30, atu_id[m.end():] if m else atu_id)
+
+
+def _merge_atu_relations(appears: list[str], referenced: list[dict]) -> list[dict]:
+    """Merge the two motif↔ATU relations into one deduplicated list, each link
+    tagged ``rel``: ``appears`` (⇐ constituent, from atu_seq), ``cited`` (⇒ named
+    in the note) or ``both`` (⇔). Ordered: ⇔ first (corroborated by two
+    independent sources), then ascending by tale-type number."""
+    chips: dict[str, dict] = {}
+    for aid in appears:  # ⇐ constituent
+        if aid not in chips:
+            link = _link("atu", aid)
+            link["rel"] = "appears"
+            chips[aid] = link
+    for rl in referenced:  # ⇒ cited (resolved real ATU, or orphan AaTh)
+        key = rl["id"]
+        if rl.get("exists") and key in chips:
+            chips[key]["rel"] = "both"
+            if rl.get("aath") and not chips[key].get("aath"):
+                chips[key]["aath"] = rl["aath"]
+        elif key not in chips:
+            link = dict(rl)
+            link["rel"] = "cited"
+            chips[key] = link
+    return sorted(chips.values(),
+                  key=lambda l: (0 if l["rel"] == "both" else 1, _atu_num_key(l["id"])))
+
+
 def _resolve_atu_inline(refs: list[str]) -> list[dict]:
     """Resolve the inline 'Type N' refs a TMI note cites. The note predates ATU
     2004, so these are AaTh numbers: link straight through if the number still
@@ -938,9 +972,11 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         see_also = rec.get("see_also") or {}
         detail["links"]["see_also"] = [_link("tmi", m) for m in see_also.get("ref", [])]
         detail["links"]["see_also_cf"] = [_link("tmi", m) for m in see_also.get("cf", [])]
-        detail["links"]["atu_inline"] = _resolve_atu_inline(rec.get("atu_inline", []))
+        # One merged section: tale types this motif is a constituent of (⇐, from
+        # atu_seq) and those its note references (⇒, AaTh-resolved); ⇔ = both.
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
-        detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
+        detail["links"]["atu_related"] = _merge_atu_relations(
+            atu_ids, _resolve_atu_inline(rec.get("atu_inline", [])))
         # Direct Berezkin motifs that map here (mapsofmyths concordance).
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in cw.get("tmi_to_berezkin", {}).get(rec["id"], [])]
 

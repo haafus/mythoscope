@@ -545,9 +545,20 @@ const MISSING_REASON = {
     tmi_gap: "Motif code not present in the Trilogy TMI index",
 };
 
+// Direction marker for the merged motif↔ATU relations (from the TMI motif's view).
+const REL_MARK = { both: "⇔", appears: "⇐", cited: "⇒" };
+const REL_TITLE = {
+    both: "Both: a constituent of this tale type and named in the motif's note",
+    appears: "This motif is a constituent of the tale type (from atu_seq)",
+    cited: "The tale type is referenced in this motif's note",
+};
+
 function linkChips(links) {
     if (!links || !links.length) return `<span class="motif-empty">—</span>`;
     return links.map((l) => {
+        const rel = l.rel
+            ? `<span class="motif-link-rel" title="${escapeHtml(REL_TITLE[l.rel] || "")}">${REL_MARK[l.rel] || ""}</span>`
+            : "";
         // A resolved-via-concordance link carries the original AaTh number it came from.
         const src = l.aath
             ? `<span class="motif-link-src" title="From Aarne-Thompson type ${escapeHtml(l.aath)}, renumbered in ATU 2004">AaTh ${escapeHtml(l.aath)}</span>`
@@ -559,7 +570,7 @@ function linkChips(links) {
         <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
            class="motif-link${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
            title="${escapeHtml(title)}">
-            <span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}${src}
+            ${rel}<span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}${src}
         </a>
     `;
     }).join("");
@@ -1028,8 +1039,7 @@ function renderDetail(d) {
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.see_also || []).length) body += linkSection("See also", links.see_also);
         if ((links.see_also_cf || []).length) body += linkSection("Compare (cf.)", links.see_also_cf);
-        if ((links.atu || []).length) body += linkSection("Appears in ATU tale types", links.atu);
-        if ((links.atu_inline || []).length) body += linkSection("Referenced tale types (Type …)", links.atu_inline);
+        if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
         if ((links.berezkin || []).length) body += linkSection("Berezkin motifs mapping here", links.berezkin);
         if ((d.cultures || []).length) body += section(`Attestations by culture (${d.cultures.length})`, culturesHtml(d.cultures));
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));

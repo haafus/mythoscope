@@ -338,6 +338,18 @@ class TestAtuStructure:
         assert out[1]["id"] == "330" and out[1]["aath"] == "330A"                   # remapped via concordance
         assert out[2]["id"] == "999" and out[2]["missing_reason"] == "aath"         # orphan AaTh number
 
+    def test_merge_atu_relations(self):
+        # 300: appears + cited -> both; 314: cited only (with aath); 301A: appears only
+        ref = [
+            {"index": "atu", "id": "300", "exists": True, "name": "A"},
+            {"index": "atu", "id": "314", "exists": True, "name": "C", "aath": "532"},
+        ]
+        out = svc._merge_atu_relations(["301A", "300"], ref)
+        rels = [(l["rel"], l["id"]) for l in out]
+        # ⇔ (both) first, then ascending by number
+        assert rels == [("both", "300"), ("appears", "301A"), ("cited", "314")]
+        assert next(l for l in out if l["id"] == "314")["aath"] == "532"
+
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})
@@ -816,13 +828,13 @@ class TestService:
 
     def test_tmi_detail_back_links(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
-        assert sorted(link["id"] for link in d["links"]["atu"]) == ["294", "510A"]
+        assert sorted(link["id"] for link in d["links"]["atu_related"]) == ["294", "510A"]
 
     def test_tmi_detail_exposes_structured_note_fields(self, tiny_db):
         d = svc.get_motif("tmi", "S31")
         assert isinstance(d["cultures"], list)      # enriched: label/region/citations
         assert isinstance(d["references"], list)    # enriched: {text, url?}
-        assert "see_also" in d["links"] and "atu_inline" in d["links"]
+        assert "see_also" in d["links"] and "atu_related" in d["links"]
 
     def test_substantive_flag(self):
         assert svc._substantive({"notes": "x" * 150}) is True       # notes >= 150 bytes
