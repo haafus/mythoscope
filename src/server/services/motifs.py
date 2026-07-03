@@ -1025,12 +1025,14 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         legend = data.get("areas") or {}
         detail["areas"] = [{"id": a, "name": legend.get(str(a), "")} for a in rec.get("areas", [])]
         detail["links"]["see_also"] = [_link("berezkin", c) for c in rec.get("see_also", [])]
-        detail["links"]["atu"] = [_link("atu", a) for a in rec.get("atu_refs", [])]
+        # Cross-index links are outgoing references (this motif -> the target),
+        # tagged rel="out" so the frontend shows a ⇒ direction marker.
+        detail["links"]["atu"] = [{**_link("atu", a), "rel": "out"} for a in rec.get("atu_refs", [])]
         # mapsofmyths enrichment: thematic taxonomy, direct Thompson (TMI) links, and
         # the tradition-level distribution grouped by macro-region.
         detail["motif_type"] = rec.get("motif_type", "")
         detail["motif_group"] = rec.get("motif_group", "")
-        detail["links"]["tmi"] = [_link("tmi", _clean_tmi_ref(t)) for t in rec.get("tmi_refs", [])]
+        detail["links"]["tmi"] = [{**_link("tmi", _clean_tmi_ref(t)), "rel": "out"} for t in rec.get("tmi_refs", [])]
         detail["traditions"] = _berezkin_tradition_distribution(rec.get("traditions", []), data.get("traditions") or {})
         # Source bibliography (areasofmyths.com) grouped by macro-area, + the
         # citations not tied to an areal code.
