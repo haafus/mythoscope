@@ -1398,8 +1398,17 @@ body.has-main-navbar {
     font-size: 13px;
 }
 
-.motifs-item:hover { background: #f4f6f7; }
 .motifs-item.active { background: #e2edf0; }
+/* Contrast hover, matching the nav tabs and link chips: the whole row flips to
+   the accent blue with white text (overrides .active, same specificity). The
+   :hover compound on the name beats the .category / .duplicate name colours. */
+.motifs-item:hover { background: #4f7096; }
+.motifs-item:hover .motifs-item-id,
+.motifs-item:hover .motifs-item-name,
+.motifs-item.category:hover .motifs-item-name,
+.motifs-item.duplicate:hover .motifs-item-name,
+.motifs-item:hover .motifs-item-badge { color: #fff; }
+.motifs-item:hover .motifs-item-badge { opacity: 0.85; }
 /* Selection is shown by .active; a click leaves a stray focus ring on the old
    item while ↑/↓ moves .active elsewhere. Drop the ring for mouse focus, keep
    it for keyboard (Tab) focus. */
