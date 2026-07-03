@@ -240,7 +240,8 @@ function onMotifsKeydown(e) {
     else stepIndex(e.key === "ArrowRight" ? 1 : -1);  // Left/Right cycle indexes
 }
 
-async function switchIndex(index) {
+// Reset filters/search to a fresh index and repaint the tabs + chapter select.
+function resetIndexFilters(index) {
     mState.index = index;
     mState.chapter = "";
     mState.division = "";
@@ -250,6 +251,10 @@ async function switchIndex(index) {
     if (search) search.value = "";
     renderTabs();
     renderChapters();
+}
+
+async function switchIndex(index) {
+    resetIndexFilters(index);
     await loadList();
 }
 
@@ -260,8 +265,28 @@ async function selectIndex(index) {
         renderOverview();
         return;
     }
-    await switchIndex(index);
-    renderOverview();
+    resetIndexFilters(index);
+    mState.selectedId = null;
+    mState.browseChapter = null;
+    mState.browseView = null;
+    markActive(null);
+    syncUrl(true);
+    const list = document.getElementById("motifsList");
+    const detail = document.getElementById("motifsDetail");
+    if (list) list.innerHTML = "";
+    if (detail) detail.innerHTML = "";
+    // Fetch the list and the overview in parallel, then paint both in the same
+    // tick so the sidebar and the dashboard appear together, not one then the other.
+    try {
+        const [listData, stats] = await Promise.all([
+            api(`/api/motifs/${index}/motifs?${listParams()}`),
+            api(`/api/motifs/${index}/stats`),
+        ]);
+        renderList(listData);
+        renderOverviewFrom(stats);
+    } catch (error) {
+        if (detail) detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+    }
 }
 
 // Clicking a chapter root shows that chapter's level-0 motifs in the main panel
@@ -297,18 +322,21 @@ async function browseChapterLevel0(chapter) {
     }
 }
 
+function listParams() {
+    const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
+    if (mState.chapter) params.set("chapter", mState.chapter);
+    if (mState.division) params.set("division", mState.division);
+    if (mState.subdivision) params.set("sub_division", mState.subdivision);
+    if (mState.query.trim()) params.set("q", mState.query.trim());
+    return params;
+}
+
 async function loadList() {
     const list = document.getElementById("motifsList");
     if (!list) return;
-    list.innerHTML = `<div class="motifs-loading">Loading...</div>`;
+    list.innerHTML = "";  // empty space while loading — no "Loading" flicker
     try {
-        const params = new URLSearchParams({ limit: String(LIST_LIMIT) });
-        if (mState.chapter) params.set("chapter", mState.chapter);
-        if (mState.division) params.set("division", mState.division);
-        if (mState.subdivision) params.set("sub_division", mState.subdivision);
-        if (mState.query.trim()) params.set("q", mState.query.trim());
-        const data = await api(`/api/motifs/${mState.index}/motifs?${params.toString()}`);
-        renderList(data);
+        renderList(await api(`/api/motifs/${mState.index}/motifs?${listParams()}`));
     } catch (error) {
         list.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -768,6 +796,15 @@ async function browseRoot() {
 
 // --- index overview dashboard ------------------------------------------------
 
+// Paint the overview dashboard from already-fetched stats (no network).
+function renderOverviewFrom(s) {
+    const detail = document.getElementById("motifsDetail");
+    if (!detail) return;
+    detail.innerHTML = overviewHtml(s);
+    detail.scrollTop = 0;
+    drawOverviewCharts(s);   // all overview charts — pure CSS/SVG (Plotly stays for similarity)
+}
+
 async function renderOverview() {
     const detail = document.getElementById("motifsDetail");
     if (!detail) return;
@@ -778,10 +815,7 @@ async function renderOverview() {
     syncUrl(true);
     detail.innerHTML = "";
     try {
-        const s = await api(`/api/motifs/${mState.index}/stats`);
-        detail.innerHTML = overviewHtml(s);
-        detail.scrollTop = 0;
-        drawOverviewCharts(s);   // all overview charts — pure CSS/SVG (Plotly stays for similarity)
+        renderOverviewFrom(await api(`/api/motifs/${mState.index}/stats`));
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
