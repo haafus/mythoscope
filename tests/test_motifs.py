@@ -372,7 +372,8 @@ class TestAtuStructure:
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}} if idx == "tmi" else {})
         out3 = svc._atu_summary_html("the judgements [B261ff]")
-        assert 'data-id="B261"' in out3 and out3.endswith("ff]")
+        # the motif-only bracket is unwrapped; base motif links, 'ff' stays as text
+        assert 'data-id="B261"' in out3 and "[" not in out3 and out3.endswith("ff")
 
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"

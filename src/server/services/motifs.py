@@ -1012,6 +1012,19 @@ _SUMMARY_MOTIF = re.compile(r"\b[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*")
 _SUMMARY_TYPE = re.compile(
     r"\b(Types?\s+)(\d+[A-Za-z*]*(?:(?:\s*,\s*|\s+and\s+|\s*&\s*)\d+[A-Za-z*]*)*)")
 
+# A bracketed motif reference like `[S31, L55]` or `[J758.1, cf. J341.1]`. Uther
+# wraps motif codes in square brackets, but since we render them as links the
+# brackets are redundant, so we unwrap groups whose content is only motif codes.
+_BRACKET_GROUP = re.compile(r"\[([^\]]*)\]")
+_MOTIF_ONLY = re.compile(r"[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*f{0,2}")
+
+
+def _is_motif_group(content: str) -> bool:
+    parts = [p.strip() for p in content.split(",") if p.strip()]
+    if not parts:
+        return False
+    return all(_MOTIF_ONLY.fullmatch(re.sub(r"^cf\.\s*", "", p).rstrip(".")) for p in parts)
+
 
 def _inline_link(index: str, ref: str) -> str:
     return (f'<a class="motif-link" href="#/motifs?index={index}&id={ref}" '
@@ -1026,6 +1039,8 @@ def _atu_summary_html(text: str) -> str:
         return ""
     tmi, atu = _by_id("tmi"), _by_id("atu")
     esc = html.escape(text, quote=False)
+    # Drop the square brackets around motif-only groups (the chips carry the cue).
+    esc = _BRACKET_GROUP.sub(lambda m: m.group(1) if _is_motif_group(m.group(1)) else m.group(0), esc)
 
     def _motif(m):
         tok = m.group(0)
