@@ -882,7 +882,7 @@ function berezkinDistribution(dist) {
             <summary><span class="motif-dist-name">${escapeHtml(titleCase(r.region))}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
             <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
         </details>`).join("");
-    return section(`Ethne (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
+    return section(`Attestations by tradition (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
 
 // One bibliography source: resolved works show author · year — title; unresolved
@@ -904,7 +904,7 @@ function bibSourceHtml(s) {
 
 // Berezkin source bibliography (areasofmyths.com): a collapsible list per macro-
 // area with its sources, then the citations not tied to any areal code (headed
-// "—", matching the Ethne section's no-region bucket).
+// "—", matching the attestations section's no-region bucket).
 function berezkinBibliography(bib) {
     const areas = (bib && bib.by_area) || [];
     const unattached = (bib && bib.unattached) || [];
@@ -927,7 +927,7 @@ function berezkinBibliography(bib) {
     const bookKeys = new Set();
     areas.forEach((a) => (a.sources || []).forEach((s) => bookKeys.add(s.key)));
     unattached.forEach((s) => bookKeys.add(s.key));
-    return section(`Bibliography (${formatNumber(bookKeys.size)})`, `<div class="motif-bib">${rows}</div>`);
+    return section(`References (${formatNumber(bookKeys.size)})`, `<div class="motif-bib">${rows}</div>`);
 }
 
 // A citation: linked to its source book when the server resolved one.
@@ -1066,8 +1066,8 @@ function renderDetail(d) {
         if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
-        body += atuProse("Literature", d.references, true);
         body += atuProse("Attestations by tradition", d.attestations, true);
+        body += atuProse("References", d.references, true);
         body += atuTales(d.tales);
         body += atuWikipedia(d.wikipedia, d.wikidata);
     }
