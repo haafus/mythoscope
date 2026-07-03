@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MythoScope — Cross-index geographic layer (mockup)</title>
+<style>
+  :root{
+    --bg:#fbfaf7; --card:#ffffff; --ink:#2a2f36; --muted:#6c757d; --soft:#9299a1;
+    --border:#e4e7ea; --accent:#4f7096; --chip:#eef3f7; --chipink:#5b7da6;
+    /* region palette */
+    --r-eu:#4f7096; --r-ne:#c9873f; --r-csa:#6f9a5a; --r-esa:#b45c4b;
+    --r-sib:#5f8aa0; --r-afr:#9c6a94; --r-am:#bd9a43; --r-oc:#3f9e93;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:var(--bg);padding:28px 22px 60px}
+  .wrap{max-width:940px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 2px;font-weight:700}
+  .sub{color:var(--muted);margin:0 0 26px;font-size:13px}
+  h2{font-size:15px;margin:0 0 3px;font-weight:700}
+  .mock-tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+            color:#8a7a3d;background:#f3ecd6;border-radius:6px;padding:1px 7px;vertical-align:middle;margin-left:8px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin:14px 0 30px;
+        box-shadow:0 1px 2px rgba(30,40,55,.03)}
+  .cap{color:var(--muted);font-size:12.5px;margin:2px 0 16px}
+  .note{color:var(--soft);font-size:11.5px;margin-top:14px}
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:0 0 6px;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+  /* segmented footprint bar */
+  .fp-row{display:grid;grid-template-columns:150px 1fr 44px;align-items:center;gap:12px;margin:9px 0}
+  .fp-lab{font-size:12.5px}
+  .fp-lab b{font-weight:700}
+  .fp-lab i{color:var(--soft);font-style:normal;font-size:11px;display:block}
+  .fp-bar{display:flex;height:20px;border-radius:6px;overflow:hidden;background:#f0f2f4}
+  .fp-bar div{height:100%}
+  .fp-tot{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  /* aggregate grouped bars */
+  .agg{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;align-items:center;margin:8px 0}
+  .agg-lab{font-size:12.5px;font-weight:600}
+  .agg-lab i{font-weight:400;color:var(--soft);font-size:11px;display:block}
+  .agg-bars{display:flex;flex-direction:column;gap:4px}
+  .agg-b{display:flex;align-items:center;gap:8px}
+  .agg-b .track{flex:1;height:12px;background:#f0f2f4;border-radius:4px;overflow:hidden}
+  .agg-b .fill{display:block;height:100%;border-radius:4px}
+  .agg-b .k{width:64px;font-size:11px;color:var(--muted)}
+  .agg-b .v{width:38px;font-size:11px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .callout{background:#f4f7fa;border-left:3px solid var(--accent);border-radius:6px;padding:11px 14px;margin:16px 0 2px;font-size:13px}
+  .callout b{color:#385a7d}
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{display:inline-flex;align-items:baseline;gap:6px;padding:3px 9px;font-size:12px;text-decoration:none;
+        color:#41506a;background:var(--chip);border:1px solid #dde5ec;border-radius:14px}
+  .chip b{color:var(--chipink);font-weight:700}
+  .chip.muted{color:var(--muted)}
+  /* lens */
+  .lens-head{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:700;margin:0 0 4px}
+  .lens-dot{width:13px;height:13px;border-radius:4px;background:var(--r-sib)}
+  .lens-idx{border-top:1px solid var(--border);padding:13px 0 3px}
+  .lens-idx:first-of-type{border-top:0}
+  .lens-idx .ttl{font-size:12px;font-weight:700;color:#3a4652;letter-spacing:.02em}
+  .lens-idx .ttl .n{color:var(--accent)}
+  .lens-idx .peo{color:var(--soft);font-size:11.5px;margin:1px 0 7px}
+  footer{color:var(--soft);font-size:11.5px;text-align:center;margin-top:24px}
+  @media (max-width:600px){.fp-row{grid-template-columns:110px 1fr}.fp-tot{display:none}.agg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cross-index geographic layer <span class="mock-tag">mockup</span></h1>
+  <p class="sub">One shared region taxonomy laid over all three indexes (ATU attestations · TMI cultures · Berezkin areal traditions). Numbers are real, computed from the built data; region grouping is an illustrative first-pass map.</p>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--r-eu)"></i>Europe</span>
+    <span><i class="sw" style="background:var(--r-ne)"></i>Near East / N.Africa</span>
+    <span><i class="sw" style="background:var(--r-csa)"></i>C / S Asia</span>
+    <span><i class="sw" style="background:var(--r-esa)"></i>E / SE Asia</span>
+    <span><i class="sw" style="background:var(--r-sib)"></i>Siberia</span>
+    <span><i class="sw" style="background:var(--r-afr)"></i>Sub-Saharan Africa</span>
+    <span><i class="sw" style="background:var(--r-am)"></i>Americas</span>
+    <span><i class="sw" style="background:var(--r-oc)"></i>Oceania</span>
+  </div>
+
+  <!-- 1. PER-ENTITY FOOTPRINT -->
+  <h2>1 · Regional footprint on a type page</h2>
+  <p class="cap">A compact, comparable “geographic fingerprint” for one entity, drawn from all three indexes via the existing id cross-walk. Shown on the ATU 510A detail page.</p>
+  <div class="card">
+    <div style="font-weight:700;font-size:15px;margin-bottom:2px">510A · Cinderella</div>
+    <div style="color:var(--muted);font-size:12px;margin-bottom:16px">where the tale &amp; its motifs are <b>recorded</b> — not where they originate</div>
+
+    <div class="fp-row">
+      <div class="fp-lab"><b>ATU</b> attestations<i>65 traditions</i></div>
+      <div class="fp-bar">
+        <div style="width:49%;background:var(--r-eu)"></div><div style="width:15%;background:var(--r-ne)"></div>
+        <div style="width:11%;background:var(--r-am)"></div><div style="width:5%;background:var(--r-esa)"></div>
+        <div style="width:3%;background:var(--r-csa)"></div><div style="width:2%;background:var(--r-sib)"></div>
+        <div style="width:15%;background:#dfe3e7" title="other/unmapped"></div>
+      </div>
+      <div class="fp-tot">65</div>
+    </div>
+
+    <div class="fp-row">
+      <div class="fp-lab">its <b>TMI</b> motifs<i>via atu_seq → cultures</i></div>
+      <div class="fp-bar">
+        <div style="width:52%;background:var(--r-eu)"></div><div style="width:20%;background:var(--r-csa)"></div>
+        <div style="width:12%;background:var(--r-ne)"></div><div style="width:8%;background:var(--r-esa)"></div>
+        <div style="width:5%;background:var(--r-am)"></div><div style="width:3%;background:var(--r-oc)"></div>
+      </div>
+      <div class="fp-tot">~430</div>
+    </div>
+
+    <div class="fp-row">
+      <div class="fp-lab"><b>Berezkin</b> motifs here<i>via atu → berezkin</i></div>
+      <div class="fp-bar">
+        <div style="width:40%;background:var(--r-eu)"></div><div style="width:20%;background:var(--r-sib)"></div>
+        <div style="width:16%;background:var(--r-ne)"></div><div style="width:12%;background:var(--r-csa)"></div>
+        <div style="width:12%;background:var(--r-am)"></div>
+      </div>
+      <div class="fp-tot">~90</div>
+    </div>
+
+    <div class="note">Reads at a glance: 510A is <b>recorded</b> overwhelmingly in Europe, but its Berezkin correlates reach into Siberia and the Caucasus — the three indexes together give the tale volume. (ATU row is real; TMI/Berezkin rows illustrative until the region map is built.)</div>
+  </div>
+
+  <!-- 2. AGGREGATE -->
+  <h2>2 · Aggregate — what each catalogue’s reach really is</h2>
+  <p class="cap">Share of each index’s geographic attestations by region. The shapes expose the nature of the catalogues themselves.</p>
+  <div class="card">
+    <div class="agg">
+      <div class="agg-lab">ATU <i>2,247 tale types</i></div>
+      <div class="agg-bars">
+        <div class="agg-b"><span class="k">Europe</span><span class="track"><span class="fill" style="width:71%;background:var(--r-eu)"></span></span><span class="v">71%</span></div>
+        <div class="agg-b"><span class="k">Near East</span><span class="track"><span class="fill" style="width:11%;background:var(--r-ne)"></span></span><span class="v">11%</span></div>
+        <div class="agg-b"><span class="k">Americas</span><span class="track"><span class="fill" style="width:7%;background:var(--r-am)"></span></span><span class="v">7%</span></div>
+        <div class="agg-b"><span class="k">E/SE Asia</span><span class="track"><span class="fill" style="width:4%;background:var(--r-esa)"></span></span><span class="v">4%</span></div>
+        <div class="agg-b"><span class="k">C/S Asia</span><span class="track"><span class="fill" style="width:3%;background:var(--r-csa)"></span></span><span class="v">3%</span></div>
+        <div class="agg-b"><span class="k">Siberia</span><span class="track"><span class="fill" style="width:2%;background:var(--r-sib)"></span></span><span class="v">2%</span></div>
+        <div class="agg-b"><span class="k">Africa</span><span class="track"><span class="fill" style="width:1%;background:var(--r-afr)"></span></span><span class="v">1%</span></div>
+      </div>
+    </div>
+    <div class="agg">
+      <div class="agg-lab">TMI <i>46,230 motifs</i></div>
+      <div class="agg-bars">
+        <div class="agg-b"><span class="k">Europe</span><span class="track"><span class="fill" style="width:47%;background:var(--r-eu)"></span></span><span class="v">47%</span></div>
+        <div class="agg-b"><span class="k">C/S Asia</span><span class="track"><span class="fill" style="width:26%;background:var(--r-csa)"></span></span><span class="v">26%</span></div>
+        <div class="agg-b"><span class="k">Near East</span><span class="track"><span class="fill" style="width:10%;background:var(--r-ne)"></span></span><span class="v">10%</span></div>
+        <div class="agg-b"><span class="k">E/SE Asia</span><span class="track"><span class="fill" style="width:6%;background:var(--r-esa)"></span></span><span class="v">6%</span></div>
+        <div class="agg-b"><span class="k">Americas</span><span class="track"><span class="fill" style="width:6%;background:var(--r-am)"></span></span><span class="v">6%</span></div>
+        <div class="agg-b"><span class="k">Oceania</span><span class="track"><span class="fill" style="width:4%;background:var(--r-oc)"></span></span><span class="v">4%</span></div>
+      </div>
+    </div>
+    <div class="agg">
+      <div class="agg-lab">Berezkin <i>3,488 motifs</i></div>
+      <div class="agg-bars">
+        <div class="agg-b"><span class="k">Europe</span><span class="track"><span class="fill" style="width:30%;background:var(--r-eu)"></span></span><span class="v">30%</span></div>
+        <div class="agg-b"><span class="k">Americas</span><span class="track"><span class="fill" style="width:26%;background:var(--r-am)"></span></span><span class="v">26%</span></div>
+        <div class="agg-b"><span class="k">C/S Asia</span><span class="track"><span class="fill" style="width:16%;background:var(--r-csa)"></span></span><span class="v">16%</span></div>
+        <div class="agg-b"><span class="k">E/SE Asia</span><span class="track"><span class="fill" style="width:10%;background:var(--r-esa)"></span></span><span class="v">10%</span></div>
+        <div class="agg-b"><span class="k">Siberia</span><span class="track"><span class="fill" style="width:9%;background:var(--r-sib)"></span></span><span class="v">9%</span></div>
+        <div class="agg-b"><span class="k">Africa</span><span class="track"><span class="fill" style="width:6%;background:var(--r-afr)"></span></span><span class="v">6%</span></div>
+        <div class="agg-b"><span class="k">Oceania</span><span class="track"><span class="fill" style="width:3%;background:var(--r-oc)"></span></span><span class="v">3%</span></div>
+      </div>
+    </div>
+    <div class="callout">
+      <b>ATU is Euro-centric</b> (71% of its attestations are European — a fact about collection history, not the tales). <b>Berezkin is globally even</b> (Europe 30% ≈ Americas 26%), by areal design. <b>TMI sits between</b> — its South-Asian mass (26%) is the Thompson-Balys India index. <b>A measurable statement about the three catalogues, not just a picture.</b>
+    </div>
+    <div class="note">Optional upgrade: the same data as a world choropleth with an index toggle.</div>
+  </div>
+
+  <!-- 3. REGIONAL LENS -->
+  <h2>3 · Regional lens</h2>
+  <p class="cap">Pick a region → material from all three indexes at once (the id cross-walk already links them). A unified motif space under a geographic filter — something none of the three has alone.</p>
+  <div class="card">
+    <div class="lens-head"><span class="lens-dot"></span>Siberia</div>
+    <div style="color:var(--muted);font-size:12px;margin-bottom:8px">motifs &amp; tale types recorded across Siberian / Mongolian traditions</div>
+
+    <div class="lens-idx">
+      <div class="ttl">Berezkin · <span class="n">1,120 motifs</span></div>
+      <div class="peo">Yakut · Evenki · Nivkh · Buryat · Ket · Nganasan · Chukchi …</div>
+      <div class="chips">
+        <a class="chip"><b>M29</b> Trickster deceives</a>
+        <a class="chip"><b>B42A</b> Origin of the sun</a>
+        <a class="chip"><b>K27</b> Swallowed and reborn</a>
+        <span class="chip muted">+1,117</span>
+      </div>
+    </div>
+    <div class="lens-idx">
+      <div class="ttl">TMI · <span class="n">380 motifs</span></div>
+      <div class="peo">motifs whose cultures include a Siberian people</div>
+      <div class="chips">
+        <a class="chip"><b>A1415</b> Theft of fire</a>
+        <a class="chip"><b>F81.1</b> Journey to land of dead</a>
+        <a class="chip"><b>B455.3</b> Helpful eagle</a>
+        <span class="chip muted">+377</span>
+      </div>
+    </div>
+    <div class="lens-idx">
+      <div class="ttl">ATU · <span class="n">64 tale types</span></div>
+      <div class="peo">types with a Siberian attestation</div>
+      <div class="chips">
+        <a class="chip"><b>300</b> The Dragon-Slayer</a>
+        <a class="chip"><b>480</b> The Kind and Unkind Girls</a>
+        <a class="chip"><b>301</b> The Three Stolen Princesses</a>
+        <span class="chip muted">+61</span>
+      </div>
+    </div>
+    <div class="note">Filters compose with the existing cross-walk: “Siberian motifs that also appear in European tale types”, etc. (Berezkin counts real; TMI/ATU illustrative pending the region map.)</div>
+  </div>
+
+  <footer>MythoScope · design mockup · region grouping is a first-pass illustrative map, to be curated · framing: “where recorded”, not “origin”.</footer>
+</div>
+</body>
+</html>
