@@ -781,15 +781,14 @@ async function renderOverview() {
         const s = await api(`/api/motifs/${mState.index}/stats`);
         detail.innerHTML = overviewHtml(s);
         detail.scrollTop = 0;
-        drawCssCharts(s);   // region bars — pure CSS, render without waiting on Plotly
-        drawCharts(s);      // the rest — Plotly (retries until its CDN is ready)
+        drawOverviewCharts(s);   // all overview charts — pure CSS/SVG (Plotly stays for similarity)
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
 }
 
 // Generic dashboard: a stat-card strip + a grid of chart containers, both driven
-// by the server's `cards` and `panels`. drawCharts() fills the containers.
+// by the server's `cards` and `panels`. drawOverviewCharts() fills the containers.
 function overviewHtml(s) {
     if (!s.cards) {
         return `<div class="motif-detail-inner"><div class="reader-placeholder">No overview for this index.</div></div>`;
@@ -835,89 +834,88 @@ const REGION_COLORS = {
 const _FALLBACK_COLORS = ["#4f7096", "#c9873f", "#6f9a5a", "#b45c4b", "#5f8aa0", "#9c6a94", "#bd9a43", "#3f9e93"];
 function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLORS[i % _FALLBACK_COLORS.length]; }
 
-// A pure-CSS horizontal bar list (label · coloured bar · value). Used for the
-// "by region" panels — no Plotly dependency, so it renders instantly and reuses
-// the region palette. Rows are drawn largest-first (already sorted server-side).
-function cssBars(id, rows, labelFn, colorFn) {
+// The overview is a dashboard of ranked bars, histograms, a part-to-whole and a
+// two-series comparison — all rendered as pure CSS/SVG. No Plotly here (it stays
+// for the similarity page's interactive scatter/heatmap): these marks render
+// instantly, carry direct labels, and reuse the region palette. Value keys vary
+// (count/bytes/indeg), hence the valFn.
+const ACC = "#2a9d8f", HIST_C = "#6b7aa1", COMPO_C = ["#2a9d8f", "#7cc0b6", "#d4e7e3"];
+
+function cssBars(id, rows, labelFn, colorFn, valFn = (r) => r.count) {
     const el = document.getElementById(id);
     if (!el || !rows || !rows.length) return;
-    const max = Math.max(1, ...rows.map((r) => r.count));
+    const max = Math.max(1, ...rows.map(valFn));
     el.innerHTML = `<div class="csbars">` + rows.map((r, i) => {
-        const lab = labelFn(r);
-        return `<div class="csbar-row">
-            <span class="csbar-lab" title="${escapeHtml(lab)}">${escapeHtml(lab)}</span>
-            <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:${colorFn(r, i)}"></span></span>
-            <span class="csbar-val">${formatNumber(r.count)}</span>
+        const lab = labelFn(r), v = valFn(r);
+        return `<div class="csbar-row" title="${escapeHtml(lab)}: ${formatNumber(v)}">
+            <span class="csbar-lab">${escapeHtml(lab)}</span>
+            <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * v / max))}%;background:${colorFn(r, i)}"></span></span>
+            <span class="csbar-val">${formatNumber(v)}</span>
         </div>`;
     }).join("") + `</div>`;
 }
 
-// Region panels for every index — rendered up front, independent of Plotly.
-function drawCssCharts(s) {
-    if (s.regions) cssBars(s.index === "atu" ? "atRegions" : s.index === "berezkin" ? "bzRegions" : "ovRegions",
-        s.regions, (r) => r.region, (r, i) => regionColor(r.region, i));
+// A single 100% stacked bar for a part-to-whole (composition), with a legend.
+function cssStacked(id, rows, colors) {
+    const el = document.getElementById(id);
+    if (!el || !rows || !rows.length) return;
+    const total = rows.reduce((a, r) => a + r.count, 0) || 1;
+    const segs = rows.map((r, i) => `<span class="csstack-seg" style="width:${(100 * r.count / total).toFixed(1)}%;background:${colors[i % colors.length]}" title="${escapeHtml(r.label)}: ${formatNumber(r.count)}"></span>`).join("");
+    const leg = rows.map((r, i) => `<span><i style="background:${colors[i % colors.length]}"></i>${escapeHtml(r.label)} <b>${Math.round(100 * r.count / total)}%</b></span>`).join("");
+    el.innerHTML = `<div class="csstack">${segs}</div><div class="cslegend">${leg}</div>`;
 }
 
-function drawCharts(s, attempt = 0) {
-    const P = window.Plotly;
-    if (!P) { if (attempt < 25) setTimeout(() => drawCharts(s, attempt + 1), 200); return; }  // CDN still loading
-    const cfg = { displayModeBar: false, responsive: true };
-    const ACC = "#2a9d8f", MUT = "#bcdcd6", HIST = "#6b7aa1";  // teal accent; slate for distribution histograms
-    const lay = (e = {}) => Object.assign({
-        margin: { l: 44, r: 24, t: 8, b: 34 }, height: 240, font: { size: 11 },
-        paper_bgcolor: "transparent", plot_bgcolor: "transparent", showlegend: false,
-        hoverlabel: { bgcolor: "#000", bordercolor: "#000", font: { color: "#fff" } },
-    }, e);
-    // Value labels drawn just past each bar — the single biggest readability win.
-    const labels = (vals) => ({ text: vals.map((v) => formatNumber(v)), textposition: "outside",
-        cliponaxis: false, textfont: { size: 10, color: "#6b7280" } });
-    const vbar = (id, rows, xk, yk, extra, color = ACC) => P.newPlot(id,
-        [{ type: "bar", x: rows.map((r) => r[xk]), y: rows.map((r) => r[yk]), marker: { color }, ...labels(rows.map((r) => r[yk])) }], lay(extra), cfg);
-    // Height scales with the row count so Plotly shows every bar's label (it
-    // decimates labels when many bars are crammed into a fixed height).
-    const hbar = (id, rows, label, val, extra, color = ACC) => P.newPlot(id,
-        [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color }, ...labels(rows.map((r) => r[val])) }],
-        lay(Object.assign({
-            height: Math.max(240, rows.length * 19 + 24), margin: { l: 160, r: 32, t: 8, b: 30 },
-            yaxis: { ticklabelstandoff: 8 },
-        }, extra)), cfg);
+// Two-series comparison: a muted "all" bar with the "substantive" subset overlaid
+// (bullet style). Both scaled to the same max so the subset reads as a fraction.
+function cssBullet(id, rows, labelFn) {
+    const el = document.getElementById(id);
+    if (!el || !rows || !rows.length) return;
+    const max = Math.max(1, ...rows.map((r) => r.count));
+    el.innerHTML = `<div class="csbars">` + rows.map((r) => `
+        <div class="csbar-row" title="${escapeHtml(labelFn(r))}: ${formatNumber(r.substantive || 0)} / ${formatNumber(r.count)}">
+            <span class="csbar-lab">${escapeHtml(labelFn(r))}</span>
+            <span class="csbar-track">
+                <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#bcdcd6"></span>
+                <span class="csbar-fill csbar-over" style="width:${Math.max(0, Math.round(100 * (r.substantive || 0) / max))}%;background:${ACC}"></span>
+            </span>
+            <span class="csbar-val">${formatNumber(r.substantive || 0)}</span>
+        </div>`).join("") + `</div>
+        <div class="cslegend"><span><i style="background:${ACC}"></i>substantive</span><span><i style="background:#bcdcd6"></i>all</span></div>`;
+}
 
+// Single dispatcher for the whole overview (replaces the old Plotly path).
+function drawOverviewCharts(s) {
+    const bars = (id, rows, labelFn, valFn) => cssBars(id, rows, labelFn, () => ACC, valFn);
+    const hist = (id, rows, labelFn) => cssBars(id, rows, labelFn, () => HIST_C);
+    if (s.regions) {
+        const rid = s.index === "atu" ? "atRegions" : s.index === "berezkin" ? "bzRegions" : "ovRegions";
+        cssBars(rid, s.regions, (r) => r.region, (r, i) => regionColor(r.region, i));
+    }
     if (s.index === "tmi") {
-        P.newPlot("ovComposition", [{
-            type: "pie", hole: 0.55, sort: false, textinfo: "label+percent",
-            labels: s.composition.map((c) => c.label), values: s.composition.map((c) => c.count),
-            marker: { colors: [ACC, "#7cc0b6", "#d4e7e3"] },
-        }], lay(), cfg);
-        vbar("ovLevels", s.levels, "level", "count", {}, HIST);
-        vbar("ovNotes", s.notes_histogram, "bucket", "count", {}, HIST);
-        P.newPlot("ovChapters", [
-            { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.count), marker: { color: MUT }, name: "all" },
-            { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.substantive), marker: { color: ACC }, name: "substantive" },
-        ], lay({ barmode: "overlay", showlegend: true, legend: { orientation: "h", y: 1.18, font: { size: 10 } } }), cfg);
-        // ovRegions is drawn by drawCssCharts (region palette, no Plotly).
-        hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 32, t: 8, b: 30 } });
-        vbar("ovBreadth", s.breadth_histogram, "bucket", "count", {}, HIST);
-        hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
-        hbar("ovHubs", s.see_also_hubs.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "indeg");
-        hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 32, t: 8, b: 30 } });
+        cssStacked("ovComposition", s.composition, COMPO_C);
+        hist("ovLevels", s.levels, (r) => `L${r.level}`);
+        hist("ovNotes", s.notes_histogram, (r) => r.bucket);
+        cssBullet("ovChapters", s.chapters, (r) => r.id);
+        bars("ovCultures", s.top_cultures.slice(0, 15), (r) => r.label);
+        hist("ovBreadth", s.breadth_histogram, (r) => r.bucket);
+        bars("ovTopNotes", s.top_notes, (r) => `${r.id} ${r.name}`, (r) => r.bytes);
+        bars("ovHubs", s.see_also_hubs, (r) => `${r.id} ${r.name}`, (r) => r.indeg);
+        bars("ovSources", s.top_sources || [], (r) => r.label);
     } else if (s.index === "berezkin") {
-        vbar("bzChapters", s.chapters, "id", "count");
-        // mapsofmyths thematic groups — only present when the enrichment ran.
-        if (s.groups) hbar("bzGroups", s.groups.slice().reverse(), (r) => r.label.slice(0, 34), "count", { margin: { l: 220, r: 32, t: 8, b: 30 } });
-        // bzRegions is drawn by drawCssCharts (region palette, no Plotly).
-        hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 32, t: 8, b: 30 } });
-        hbar("bzWidest", s.widest.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
-        vbar("bzBreadth", s.breadth, "bucket", "count", {}, HIST);
+        bars("bzChapters", s.chapters, (r) => r.id);
+        if (s.groups) bars("bzGroups", s.groups, (r) => r.label);
+        bars("bzAreas", s.top_areas, (r) => r.label);
+        bars("bzWidest", s.widest, (r) => r.label);
+        hist("bzBreadth", s.breadth, (r) => r.bucket);
     } else if (s.index === "atu") {
-        hbar("atChapters", s.chapters.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 32, t: 8, b: 30 } });
-        // atRegions is drawn by drawCssCharts (region palette, no Plotly).
-        if (s.top_peoples) hbar("atPeoples", s.top_peoples.slice().reverse(), (r) => r.label, "count", { margin: { l: 130, r: 32, t: 8, b: 30 } });
-        if (s.reg_breadth) vbar("atRegBreadth", s.reg_breadth, "bucket", "count", {}, HIST);
-        hbar("atDivisions", s.divisions.slice().reverse(), (r) => r.label.slice(0, 30), "count", { margin: { l: 210, r: 32, t: 8, b: 30 } });
-        vbar("atMotifHist", s.motif_hist, "bucket", "count", {}, HIST);
-        hbar("atRich", s.top_rich.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
-        if (s.families) hbar("atFamilies", s.families.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
-        if (s.combos) hbar("atCombos", s.combos.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
+        bars("atChapters", s.chapters, (r) => r.label);
+        if (s.top_peoples) bars("atPeoples", s.top_peoples, (r) => r.label);
+        if (s.reg_breadth) hist("atRegBreadth", s.reg_breadth, (r) => r.bucket);
+        bars("atDivisions", s.divisions, (r) => r.label);
+        hist("atMotifHist", s.motif_hist, (r) => r.bucket);
+        bars("atRich", s.top_rich, (r) => r.label);
+        if (s.families) bars("atFamilies", s.families, (r) => r.label);
+        if (s.combos) bars("atCombos", s.combos, (r) => r.label);
     }
 }
 
