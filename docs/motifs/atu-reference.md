@@ -242,9 +242,10 @@ link to its in-page anchor. Tale records store only `{title, url}`.
 **`ashliman.refresh` (best-effort, §9-style enrichment).**
 1. **Discover** every ATU type the site carries (`discover_site_types`): walk the
    index/contents pages (type-numbered page links + types declared on themed
-   pages) **and** directly probe `type{NNNN}.html` for each catalogue id (catching
-   pages that exist but no index links). ATU range only (<3000; higher =
-   Christiansen migratory legends). Pages cached under `raw/ashliman/`.
+   pages) **and** add the curated `_TYPE_PAGES` set — the numbered pages a one-time
+   full probe of every catalogue code found, kept so no per-build brute-force is
+   needed (`probe=True` re-runs it to regenerate the set). ATU range only (<3000;
+   higher = Christiansen migratory legends). Pages cached under `raw/ashliman/`.
 2. **Map** each site type to a catalogue type: itself when present, else a parent
    or lowest sibling sharing its base number (`attach_target`, hierarchical — so a
    site-only subtype like `333A` folds into `333`); genuine orphans (`676`, `828`,

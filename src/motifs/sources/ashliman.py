@@ -149,7 +149,7 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
         by_base.setdefault(canon(t["id"]).rstrip("*"), t["id"])
         t.pop("tales", None)                       # start from a clean slate
 
-    site = discover_site_types(known, force=force)
+    site = discover_site_types(force=force)   # curated numbered pages + contents walk
     if not site["all"]:
         logger.warning("Ashliman: site discovery found nothing — unreachable?; skipping")
         return {"skipped": "unreachable"}
@@ -204,6 +204,28 @@ _INDEX_PAGES = ("folktexts.html", "folktexts2.html")
 _HREF = re.compile(r'href="([a-z0-9_]+\.html)"', re.I)
 _TYPE_DECL = re.compile(r"\btypes?\s+(\d{1,4}[A-Za-z]?)", re.I)
 
+# Numbered `type{NNNN}.html` pages found to exist by a one-time full probe of
+# every catalogue code (canon ids). Used in place of re-probing on each build;
+# regenerate by calling ``discover_site_types(known_ids, probe=True)`` and pasting
+# its ``numbered`` set here.
+_TYPE_PAGES = frozenset({
+    "1", "2", "15", "47A", "50", "57", "63", "66A", "68A", "91", "92", "101", "103", "105",
+    "112", "122E", "122F", "123B", "124", "130", "150", "154", "155", "156", "160", "173",
+    "175", "178A", "207C", "214A", "225", "231", "237", "243A", "244", "247", "275", "278",
+    "278A", "280A", "295", "298", "303", "306", "310", "311", "312", "326", "327", "332", "333",
+    "335", "361", "365", "366", "402", "410", "425C", "451", "480", "500", "501", "502", "503",
+    "505", "510A", "510B", "545B", "555", "562", "563", "565", "570", "571B", "592", "613",
+    "650A", "670", "675", "700", "703", "704", "706", "709", "720", "726", "737", "750A", "753",
+    "756", "763", "777", "779", "780", "782", "800", "845", "850", "882", "888", "898", "900",
+    "901", "910B", "910F", "920E", "926", "955", "980", "980D", "981", "982", "990", "1030",
+    "1157", "1161", "1174", "1175", "1176", "1191", "1215", "1287", "1288A", "1317", "1319",
+    "1335A", "1342", "1351", "1353", "1362", "1375", "1377", "1381", "1381D", "1383", "1415",
+    "1422", "1423", "1430", "1451", "1540", "1548", "1558", "1562A", "1586", "1592", "1592B",
+    "1620", "1626", "1641", "1641C", "1645", "1645B", "1655", "1675", "1676", "1678", "1696",
+    "1730", "1741", "1791", "1889B", "1889F", "1965", "1967", "2015", "2022", "2025", "2030",
+    "2031C", "2032", "2035", "2043", "2250",
+})
+
 
 def _fetch_page(page: str, force: bool) -> str | None:
     cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
@@ -224,17 +246,19 @@ def _probe_filename(cid: str) -> str | None:
     return f"type{int(m.group(1)):04d}{m.group(2)}.html" if m else None
 
 
-def discover_site_types(known_ids, *, force: bool = False, workers: int = 12) -> dict:
+def discover_site_types(known_ids=None, *, force: bool = False, workers: int = 12,
+                        probe: bool = False) -> dict:
     """The ATU types Ashliman's Folktexts covers, found two complementary ways:
 
     * **contents walk** — the index pages (folktexts.html / folktexts2.html) give
       the type-numbered page links, and every *themed* page they link declares the
-      ATU type(s) it covers; this finds types even when absent from ``known_ids``.
-    * **direct probe** — GET ``type{NNNN}.html`` for each id in ``known_ids``,
-      catching pages that exist on the server but that no index links.
+      ATU type(s) it covers; this finds types even when absent from the catalogue.
+    * **numbered pages** — the curated ``_TYPE_PAGES`` set (numbered pages a
+      one-time full probe found), so no per-build probing. Pass ``probe=True`` with
+      ``known_ids`` to re-run the brute-force probe instead (to regenerate the set).
 
     Only the ATU range (<3000; higher numbers are Christiansen migratory legends)
-    is kept. Returns canon-id sets ``{contents, probed, all}`` plus their counts.
+    is kept. Returns canon-id sets ``{contents, numbered, all}``.
     """
     slugs: set[str] = set()
     for idx in _INDEX_PAGES:
@@ -255,19 +279,22 @@ def discover_site_types(known_ids, *, force: bool = False, workers: int = 12) ->
             contents |= {c for c in nums if c}
     contents = {c for c in contents if _atu_range(c)}
 
-    probe_ids = sorted({c for i in known_ids if (c := canon(i)) and _atu_range(c)})
+    if probe:                                   # brute-force (only to regenerate _TYPE_PAGES)
+        probe_ids = sorted({c for i in (known_ids or ()) if (c := canon(i)) and _atu_range(c)})
 
-    def _exists(cid: str) -> str | None:
-        page = _probe_filename(cid)
-        return cid if page and _fetch_page(page, force) is not None else None
+        def _exists(cid: str) -> str | None:
+            page = _probe_filename(cid)
+            return cid if page and _fetch_page(page, force) is not None else None
 
-    probed: set[str] = set()
-    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-        for hit in ex.map(_exists, probe_ids):
-            if hit:
-                probed.add(hit)
+        numbered = set()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+            for hit in ex.map(_exists, probe_ids):
+                if hit:
+                    numbered.add(hit)
+    else:
+        numbered = {c for c in _TYPE_PAGES if _atu_range(c)}
 
-    both = contents | probed
-    logger.info("Ashliman site coverage: %d types (contents-walk %d, direct-probe %d, "
-                "probe-only +%d)", len(both), len(contents), len(probed), len(probed - contents))
-    return {"contents": contents, "probed": probed, "all": both}
+    both = contents | numbered
+    logger.info("Ashliman site coverage: %d types (contents-walk %d, numbered pages %d%s)",
+                len(both), len(contents), len(numbered), ", brute-force probed" if probe else " curated")
+    return {"contents": contents, "numbered": numbered, "all": both}
