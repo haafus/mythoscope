@@ -152,9 +152,16 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
         raw = fetch_text(query_url(), cache, force=force)
         rows = json.loads(raw)["results"]["bindings"]
     except Exception as exc:  # open enrichment — never fatal to the build
-        logger.warning("ATU Wikidata: could not fetch/parse SPARQL (%s) — skipping", exc)
+        # Name the failure so the log and meta/status say *what* went wrong: an
+        # HTTP status (429 = WDQS rate-limiting/outage) when the response carried
+        # one, else a generic fetch/parse error.
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        reason = f"http-{status}" if status else "fetch-error"
+        logger.warning("ATU Wikidata: SPARQL fetch/parse failed [%s] (%s) — skipping this "
+                       "enrichment; re-run with --force once query.wikidata.org recovers",
+                       reason, exc)
         cache.unlink(missing_ok=True)
-        return {"skipped": "no-wikidata"}
+        return {"skipped": reason}
 
     ids = {t["id"] for t in atu_types}
     mapping = parse_bindings(rows, ids)
