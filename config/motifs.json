@@ -21,8 +21,7 @@
       "tmi": "tmi.csv",
       "atu_df": "atu_df.csv",
       "atu_seq": "atu_seq.csv",
-      "atu_combos": "atu_combos.csv",
-      "aft": "aft.csv"
+      "atu_combos": "atu_combos.csv"
     }
   }
 }

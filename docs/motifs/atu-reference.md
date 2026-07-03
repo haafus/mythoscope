@@ -82,7 +82,7 @@ missing one stays plain text).
 | With combinations (`combos`) | 729 types / 4,696 links |
 | With Wikidata names / Wikipedia / image | 481 / 265 / 176 |
 | With catalogue concordances | 328 |
-| With example tales (Ashliman AFT) | 182 types / 1,518 tales |
+| With example tales (crawled from Ashliman) | ~172 types / ~1,457 variants |
 
 The atu_df rows are ordered alphabetically by chapter name, so the raw file
 "starts" mid-index (`Anecdotes…` 1850–1874); we re-sort types ascending by id.
@@ -107,7 +107,7 @@ Each stored type (`outputs/motifs/atu.json → types[]`):
 | `remarks` | historical/textual notes |
 | `motifs` | constituent TMI motif codes (`atu_seq`) |
 | `combos` | frequently combined type ids |
-| `tales` | example folktales (AFT metadata, §8) |
+| `tales` | example tales `{title, url}`, crawled from Ashliman (§8) |
 | `names` / `wikipedia` / `wikidata` / `image` / `concordances` | Wikidata (§6) |
 
 Index-level keys: `label, long_label, attribution, homepage, divisions,
@@ -232,27 +232,34 @@ first-pass curation (e.g. Maghreb folded into "Near East", Volga-Finnic into
 
 ---
 
-## 8. Example tales (Ashliman AFT)
+## 8. Example tales (crawled from Ashliman's Folktexts)
 
-`aft.csv` (Ashliman's *Annotated Folk Tales*, fetched from the trilogy dataset —
-not ours, not bundled) is 1,518 folktale texts labelled with an ATU type. We
-store only the **`title`** (dropping the full `text` — separate licence — and the
-unused `source`/`notes`/`provenance`). The type page shows an "Ashliman" section
-(182 types) as a plain **list of links to each variant's text**.
+Tales are **sourced live from Ashliman's site**, not from the `aft.csv` dataset
+(dropped — a 2021 snapshot with no per-tale URLs). The type page shows an
+"Ashliman" section: a plain **list of links to each variant's text**, each a deep
+link to its in-page anchor. Tale records store only `{title, url}`.
 
-**Deep links (`ashliman.refresh`, best-effort, §9-style enrichment).** The AFT
-data carries no per-tale URL, so links are resolved at build time from Ashliman's
-site: each type has a page `pitt.edu/~dash/type{NNNN}[letter].html` whose table of
-contents maps a variant's title to an in-page anchor. We fetch the page (cached
-under `raw/ashliman/`), match each tale's title against the TOC — same-titled
-variants (only 2 across the corpus) are told apart by the title's own parenthetical
-against the TOC's country column — and set `tale["url"]` to `…type{NNNN}.html#anchor`, else
-the page itself, else nothing. A curated `_PAGE_OVERRIDES` map covers famous types
-that live on a themed slug page instead of a numbered one — but only pages that
-actually **list variants** (a table of contents of several tales): `954→alibaba`,
-`325→magicbook`, `958E*→hand`, `1408→tradingplaces`. Single-text or two-edition
-comparison pages are excluded (e.g. `440`/frogking.html, `779J*`/friday.html have
-no variant list), and starred/absent types with no page degrade to no link. A full pass anchors ~1,285 tales, page-links ~132, over ~169 pages.
+**`ashliman.refresh` (best-effort, §9-style enrichment).**
+1. **Discover** every ATU type the site carries (`discover_site_types`): walk the
+   index/contents pages (type-numbered page links + types declared on themed
+   pages) **and** directly probe `type{NNNN}.html` for each catalogue id (catching
+   pages that exist but no index links). ATU range only (<3000; higher =
+   Christiansen migratory legends). Pages cached under `raw/ashliman/`.
+2. **Map** each site type to a catalogue type: itself when present, else a parent
+   or lowest sibling sharing its base number (`attach_target`, hierarchical — so a
+   site-only subtype like `333A` folds into `333`); genuine orphans (`676`, `828`,
+   `1066`, `2033`) are dropped.
+3. **Parse** each mapped page's table of contents into `{title, url}` variants
+   (`parse_variants`), removing nav/footnote/cross-type-link noise (~5% of TOC
+   entries), and set them as the type's `tales`, deduped by title.
+
+A curated `_PAGE_OVERRIDES` handles types living on a themed slug page instead of
+a numbered one — but only pages that **list variants**: `954→alibaba`,
+`325→magicbook`, `958E*→hand`, `1408→tradingplaces`. Single-text / edition-
+comparison pages are excluded (`440`/frogking.html, `779J*`/friday.html), so those
+types get no tales. A full pass yields ~**172 types / ~1,457 variants** from ~183
+pages (vs the dataset's 182 types / 1,518 — trading a few dead-page types for
+live-site growth and folded-in subtypes).
 
 ---
 

@@ -13,6 +13,7 @@ tested on a static fixture.
 
 from __future__ import annotations
 
+import collections
 import concurrent.futures
 import html
 import logging
@@ -140,41 +141,99 @@ def attach_target(atu_id: str, known_ids: set[str]) -> str | None:
     return min(family) if family else None    # lowest sibling, else orphan
 
 
+# Noise in a page's table of contents that is not a tale variant: navigation /
+# meta links, footnote markers, and links out to other type pages. (Filtering
+# tuned on the full crawl; note 'version' is NOT a stop-word — it appears in real
+# titles like "… version 1".)
+_NAV = re.compile(r"\b(links?|related|additional\s+\w+\s+tales?|sites?|contents?|"
+                  r"return|index|home|printer|e-?mail|copyright|revised|back to|top of)\b", re.I)
+_FOOTNOTE = re.compile(r"^\{?\s*footnote", re.I)
+_XTYPE = re.compile(r"^\s*tales?\s+of\s+types?\b|\btype\s+\d", re.I)
+
+
+def _display_title(title_html: str) -> str:
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", title_html or ""))).strip()
+
+
+def _is_noise(title: str) -> bool:
+    return bool(_NAV.search(title) or _FOOTNOTE.match(title) or _XTYPE.search(title))
+
+
+def parse_variants(page_html: str, base_url: str) -> list[dict]:
+    """``[{title, url}]`` — a page's table-of-contents tale entries as display
+    title + anchored deep link, with nav/footnote/cross-type noise removed and
+    anchors de-duplicated."""
+    out, seen = [], set()
+    for anchor, title_html, _country in _TOC.findall(page_html):
+        title = _display_title(title_html)
+        if not title or anchor.lower() == "contents" or anchor in seen or _is_noise(title):
+            continue
+        seen.add(anchor)
+        out.append({"title": title, "url": f"{base_url}#{anchor}"})
+    return out
+
+
 def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
-    """Attach ``url`` to each example tale in place. Best-effort: a missing page
-    (starred/absent types) leaves its tales unlinked; if every fetch fails the
-    site is unreachable and the step is skipped."""
-    pages_ok = pages_missing = anchored = page_level = tried = 0
+    """Source each type's example tales straight from Ashliman's site — no aft
+    dataset. Crawl the site (``discover_site_types``); for every site ATU type
+    that maps to a catalogue type (itself, or a parent/family via
+    ``attach_target``) parse its page's table of contents into ``{title, url}``
+    variants (noise filtered) and set them as that type's ``tales`` (deduped by
+    title). Genuine-orphan site types are dropped. Best-effort: on total site
+    failure nothing is set and the step is skipped."""
+    known = {t["id"] for t in atu_types}
+    by_id = {t["id"]: t for t in atu_types}
+    by_base = {}                                   # starless canon -> catalogue id
     for t in atu_types:
-        tales = t.get("tales")
-        if not tales:
-            continue
-        page = _type_page(t["id"])
-        if not page:
-            continue
-        tried += 1
-        cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
-        try:
-            page_html = fetch_text(f"{BASE}/{page}", cache, force=force)
-        except Exception:  # 404 for starred/absent types is expected, not fatal
-            cache.unlink(missing_ok=True)
-            pages_missing += 1
-            continue
-        pages_ok += 1
-        toc = parse_toc(page_html)
-        base_url = f"{BASE}/{page}"
-        for tale in tales:
-            anchor = resolve_anchor(tale["title"], toc)
-            tale["url"] = f"{base_url}#{anchor}" if anchor else base_url
-            anchored += bool(anchor)
-            page_level += not anchor
-    if tried and pages_ok == 0:
-        logger.warning("Ashliman: %d type pages tried, none fetched — site unreachable?; skipping", tried)
+        by_base.setdefault(canon(t["id"]).rstrip("*"), t["id"])
+        t.pop("tales", None)                       # start from a clean slate
+
+    site = discover_site_types(known, force=force)
+    if not site["all"]:
+        logger.warning("Ashliman: site discovery found nothing — unreachable?; skipping")
         return {"skipped": "unreachable"}
-    logger.info("Ashliman: %d pages (%d missing), %d tales anchored, %d page-level links",
-                pages_ok, pages_missing, anchored, page_level)
-    return {"pages": pages_ok, "pages_missing": pages_missing,
-            "tales_anchored": anchored, "tales_page_level": page_level}
+
+    # site type (canon) -> the catalogue type its variants attach to, and the
+    # page to read them from (its own page, direct or via attach_target's child).
+    page_targets: dict[str, set[str]] = collections.defaultdict(set)
+    orphans = 0
+    for cid in site["all"]:
+        base = cid.rstrip("*")
+        target = by_base.get(base)                 # a catalogue type as-is
+        source = target
+        if target is None:                         # off-catalogue: attach to a relative
+            target = attach_target(base, known)
+            source = base
+            if target is None:
+                orphans += 1
+                continue
+        page = _type_page(source)
+        if page:
+            page_targets[target].add(page)
+
+    pages_read = 0
+    n_types = n_variants = 0
+    for tid, pages in page_targets.items():
+        variants, seen = [], set()
+        for page in sorted(pages):
+            page_html = _fetch_page(page, force)
+            if page_html is None:
+                continue
+            pages_read += 1
+            for v in parse_variants(page_html, f"{BASE}/{page}"):
+                key = v["title"].lower()
+                if key not in seen:
+                    seen.add(key)
+                    variants.append(v)
+        if variants:
+            by_id[tid]["tales"] = variants
+            n_types += 1
+            n_variants += len(variants)
+
+    logger.info("Ashliman: %d types carry %d tale variants (from %d pages; %d orphan site types dropped)",
+                n_types, n_variants, pages_read, orphans)
+    return {"types_with_tales": n_types, "variants": n_variants,
+            "pages": pages_read, "orphans_dropped": orphans}
 
 
 # ---------------------------------------------------------------------------

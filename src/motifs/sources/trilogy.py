@@ -367,27 +367,6 @@ def _parse_atu_combos(rows: list[dict]) -> dict[str, list[str]]:
     return {k: sorted(v) for k, v in combos.items()}
 
 
-def _parse_aft(rows: list[dict]) -> dict[str, list[dict]]:
-    """Group ``aft.csv`` (Ashliman's Annotated Folk Tales) into example tales per
-    type: ``{atu_id: [{title}]}``. Only the title is kept — it is both what the
-    page shows and the key the Ashliman enrichment matches on (same-titled
-    variants are told apart by the title's own parenthetical, so provenance is
-    not needed). The full ``text`` and the long ``source``/``notes``/``provenance``
-    are dropped (licensing / lean index / unused). Sorted by title for a stable read.
-    Provenance is still read for the sort, then discarded."""
-    tales: dict[str, list[dict]] = {}
-    for row in rows:
-        atu_id = _clean(row.get("atu_id"))
-        title = _fix_mojibake(_clean(row.get("tale_title")))
-        if not atu_id or not title:
-            continue
-        prov = _fix_mojibake(_clean(row.get("provenance")))
-        tales.setdefault(atu_id, []).append({"title": title, "_prov": prov})
-    for entries in tales.values():
-        entries.sort(key=lambda t: (t.pop("_prov").lower(), t["title"].lower()))
-    return tales
-
-
 # An ATU id is a number, optional letter suffix(es), optional "*" (313, 313A, 1861*).
 _ATU_NUM = re.compile(r"^(\d+)")
 # A division label carries its number range: "Supernatural Adversaries 300-399".
@@ -468,8 +447,7 @@ _ATU_CANON_DIVISIONS = [
 ]
 
 
-def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str, list[str]],
-               tales: dict[str, list[dict]] | None = None) -> list[dict]:
+def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str, list[str]]) -> list[dict]:
     types = []
     for row in df_rows:
         atu_id = _clean(row.get("atu_id"))
@@ -505,8 +483,8 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             "remarks": _fix_mojibake(_clean(row.get("remarks"))),
             "motifs": seq.get(atu_id, []),
             "combos": combos.get(atu_id, []),
-            # Example folktales of this type (Ashliman AFT), metadata only.
-            "tales": (tales or {}).get(atu_id, []),
+            # Example folktales are sourced later, straight from Ashliman's site
+            # (ashliman.refresh), not from a dataset.
         })
 
     # Fill an unlabelled division from the number range that contains the type —
@@ -593,8 +571,7 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
     """
     seq = _parse_atu_seq(_read_csv(config, "atu_seq", force=force))
     combos = _parse_atu_combos(_read_csv(config, "atu_combos", force=force))
-    tales = _parse_aft(_read_csv(config, "aft", force=force)) if "aft" in config.get("files", {}) else {}
-    atu = _parse_atu(_read_csv(config, "atu_df", force=force), seq, combos, tales)
+    atu = _parse_atu(_read_csv(config, "atu_df", force=force), seq, combos)
     return {
         "label": "ATU tale types",
         "long_label": "Aarne-Thompson-Uther tale-type index",

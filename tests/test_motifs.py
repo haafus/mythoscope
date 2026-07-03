@@ -259,6 +259,23 @@ class TestAshliman:
         toc = ashliman.parse_toc(self.TOC_HTML)
         assert ashliman.resolve_anchor("Some Unrelated Tale", toc) is None
 
+    def test_parse_variants_filters_noise_and_dedupes(self):
+        html = (
+            '<a href="#contents">table of contents</a>'
+            '<a href="#grimm">Cinderella</a> (Germany) '
+            '<a href="#birch">The Wonderful Birch</a> (Russia) '
+            '<a href="#jack">How Jack Went to Seek His Fortune, version 1</a> '  # 'version' is NOT noise
+            '<a href="#links">Links to related sites</a> '                       # nav noise
+            '<a href="#f1">{footnote 1}</a> '                                    # footnote noise
+            '<a href="#xt">Tales of types 243A and 1422</a> '                    # cross-type noise
+            '<a href="#grimm">Cinderella</a>'                                    # duplicate anchor
+        )
+        out = ashliman.parse_variants(html, "https://x/type0510A.html")
+        titles = [v["title"] for v in out]
+        assert titles == ["Cinderella", "The Wonderful Birch",
+                          "How Jack Went to Seek His Fortune, version 1"]
+        assert out[0]["url"] == "https://x/type0510A.html#grimm"
+
     def test_canon(self):
         assert ashliman.canon("0510a") == "510A"     # leading zeros stripped, upper-cased
         assert ashliman.canon("1") == "1"
@@ -420,24 +437,6 @@ class TestAtuRegions:
         monkeypatch.setattr(svc, "_list_item", lambda idx, r: {"id": r["id"]})
         out = svc.list_motifs("atu", sub_division="Other Wild Animals")
         assert [i["id"] for i in out["items"]] == ["70"] and out["total"] == 1
-
-    def test_aft_example_tales(self):
-        rows = [
-            {"atu_id": "275", "tale_title": "The Hare and the Tortoise", "provenance": "Greece",
-             "source": "Aesop", "notes": "NA", "text": "Once upon a time…"},
-            {"atu_id": "275", "tale_title": "A Race", "provenance": "England",
-             "source": "Jacobs 1894", "notes": "", "text": "…"},
-            {"atu_id": "999", "tale_title": "", "provenance": "x", "source": "y", "text": "z"},
-        ]
-        tales = trilogy._parse_aft(rows)
-        assert "999" not in tales                                     # no title → dropped
-        assert [t["title"] for t in tales["275"]] == ["A Race", "The Hare and the Tortoise"]  # sorted by provenance
-        assert tales["275"][0] == {"title": "A Race"}                 # title only; text/source/notes/provenance dropped
-        # wired onto the type via _parse_atu
-        rows_df = [{"atu_id": "275", "chapter": "Animal", "division": "Wild Animals 1-99",
-                    "tale_name": "x", "tale_type": "y"}]
-        t = trilogy._parse_atu(rows_df, {}, {}, tales)[0]
-        assert len(t["tales"]) == 2
 
     def test_repair_atu_name_mid_bracket(self):
         r = trilogy._repair_atu_name
