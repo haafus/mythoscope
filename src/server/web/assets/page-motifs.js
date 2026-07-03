@@ -882,7 +882,7 @@ function berezkinDistribution(dist) {
             <summary><span class="motif-dist-name">${escapeHtml(titleCase(r.region))}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
             <div class="motif-dist-traditions">${(r.traditions || []).map(escapeHtml).join(", ")}</div>
         </details>`).join("");
-    return section(`Attestations by tradition (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
+    return section(`Attestations by culture (${formatNumber(dist.total)})`, `<div class="motif-dist">${rows}</div>`);
 }
 
 // One bibliography source: resolved works show author · year — title; unresolved
@@ -1066,7 +1066,7 @@ function renderDetail(d) {
         if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
-        body += atuProse("Attestations by tradition", d.attestations, true);
+        body += atuProse("Attestations by culture", d.attestations, true);
         body += atuProse("References", d.references, true);
         body += atuTales(d.tales);
         body += atuWikipedia(d.wikipedia, d.wikidata);
