@@ -1615,6 +1615,12 @@ abbr.motif-abbr { color: inherit; }
 a.motif-abbr { color: #3a5e86; cursor: pointer; }
 a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* ATU example tales (Ashliman AFT), metadata only. */
+/* Also-known-as / Wikipedia / Ashliman as up-to-three equal columns at the page
+   foot; an absent section drops out and the rest grow to fill its place. */
+.motif-cols { display: flex; gap: 24px; align-items: flex-start; margin-top: 34px; }
+.motif-col { flex: 1 1 0; min-width: 0; }
+.motif-col .motif-section-title { margin-top: 0; }
+
 .motif-tales { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
 .motif-tale { font-size: 13.5px; }
 .motif-tale a { color: #3a5e86; text-decoration: none; }
