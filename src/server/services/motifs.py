@@ -395,6 +395,52 @@ def _top_sources(records: list[dict], limit: int = 15) -> list[dict]:
 
 _STATS_BUILDERS = {}  # filled below once the builders are defined
 
+# Short scholarly header shown at the top of each index overview: one-paragraph
+# description, authorship, the academic citation for the source work, and the
+# concrete data sources used here (with links). Kept server-side so the three
+# overviews stay consistent.
+_INTRO = {
+    "tmi": {
+        "blurb": "The Thompson Motif-Index breaks world folk narrative into ~46,000 numbered "
+                 "<em>motifs</em> — the smallest reusable story elements (an act, a character, an "
+                 "object) — in a place-value hierarchy under 23 lettered chapters. It is the "
+                 "reference grid the other two indexes point back to.",
+        "author": "Stith Thompson (1885–1976)",
+        "citation": "Thompson, Stith. <em>Motif-Index of Folk-Literature</em>. 6 vols. "
+                    "Bloomington: Indiana University Press, 1955–58.",
+        "sources": [
+            {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
+            {"label": "folkmasa.org — citation-abbreviation decoding", "url": "https://folkmasa.org/motiv/motif.htm"},
+        ],
+    },
+    "atu": {
+        "blurb": "The Aarne-Thompson-Uther index catalogues ~2,250 <em>tale types</em> — recurrent "
+                 "international plots such as 510A Cinderella — each with a summary, its constituent "
+                 "TMI motifs, a key-literature apparatus, and attestations across the traditions that "
+                 "have recorded it. Hans-Jörg Uther's 2004 revision of the older Aarne-Thompson system.",
+        "author": "Hans-Jörg Uther, after Antti Aarne & Stith Thompson",
+        "citation": "Uther, Hans-Jörg. <em>The Types of International Folktales</em>. 3 vols. "
+                    "FF Communications 284–286. Helsinki: Academia Scientiarum Fennica, 2004.",
+        "sources": [
+            {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
+            {"label": "Wikidata — images, concordances, multilingual names", "url": "https://www.wikidata.org"},
+        ],
+    },
+    "berezkin": {
+        "blurb": "The Berezkin & Duvakin catalogue classifies world mythological and folklore motifs "
+                 "by their <em>areal distribution</em> — which of the world's traditions carry each "
+                 "motif — rather than by narrative type. That design makes it the most geographically "
+                 "even of the three indexes, reaching deep into Siberia and the Americas.",
+        "author": "Ю. Е. Березкин & Е. Н. Дувакин (Yuri Berezkin & Evgeny Duvakin)",
+        "citation": "Березкин, Ю. Е., Дувакин, Е. Н. <em>Тематическая классификация и распределение "
+                    "фольклорно-мифологических мотивов по ареалам</em> (The Analytical Catalogue of "
+                    "World Mythology and Folklore).",
+        "sources": [
+            {"label": "areasofmyths.com (CC BY-NC-SA 4.0)", "url": "http://areasofmyths.com"},
+        ],
+    },
+}
+
 
 def stats(index: str) -> dict:
     """Aggregate statistics for an index overview dashboard."""
@@ -535,6 +581,7 @@ def _build_berezkin_stats() -> dict:
 
     stats = {
         "index": "berezkin",
+        "intro": _INTRO["berezkin"],
         "title": "Berezkin & Duvakin areal motif catalogue — overview",
         "cards": cards,
         "panels": panels,
@@ -585,6 +632,7 @@ def _build_atu_stats() -> dict:
     top_peoples = sorted(legend.items(), key=lambda kv: kv[1]["count"], reverse=True)[:18]
     return {
         "index": "atu",
+        "intro": _INTRO["atu"],
         "title": (data.get("long_label") or "ATU tale types") + " — overview",
         "cards": [
             {"value": len(types), "label": "tale types"},
@@ -671,6 +719,7 @@ def _build_tmi_stats() -> dict:
 
     return {
         "index": "tmi",
+        "intro": _INTRO["tmi"],
         "title": "Thompson Motif-Index of Folk-Literature — overview",
         "totals": {
             "count": len(records), "chapters": len(chapters), "with_notes": n_notes,

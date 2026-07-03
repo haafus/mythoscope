@@ -794,8 +794,28 @@ function overviewHtml(s) {
     const panel = (p) => `<div class="chart-card"><div class="chart-title">${escapeHtml(p.title)}</div><div class="chart" id="${escapeHtml(p.id)}"></div></div>`;
     return `<div class="motif-detail-inner motif-overview">
         <h2 class="overview-title">${escapeHtml(s.title || "")}</h2>
+        ${introHtml(s.intro)}
         <div class="stat-cards">${(s.cards || []).map(card).join("")}</div>
         <div class="chart-grid">${(s.panels || []).map(panel).join("")}</div>
+    </div>`;
+}
+
+// Scholarly header: one-paragraph description, authorship, the source-work
+// citation, and the concrete data sources (links). blurb/citation are trusted
+// server constants that carry intentional <em>, so they are injected as-is;
+// author and source labels are plain text and escaped.
+function introHtml(intro) {
+    if (!intro) return "";
+    const sources = (intro.sources || []).map((x) =>
+        `<a class="ov-src" href="${escapeHtml(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.label)} <span class="ext-arrow">↗</span></a>`).join("");
+    const row = (k, v) => v ? `<div class="ov-meta-row"><span class="ov-meta-k">${k}</span><span>${v}</span></div>` : "";
+    return `<div class="overview-intro">
+        <p class="ov-blurb">${intro.blurb || ""}</p>
+        <div class="ov-meta">
+            ${row("Author", escapeHtml(intro.author || ""))}
+            ${row("Source work", intro.citation ? `<span class="ov-cite">${intro.citation}</span>` : "")}
+            ${row("Data sources", sources ? `<span class="ov-srcs">${sources}</span>` : "")}
+        </div>
     </div>`;
 }
 

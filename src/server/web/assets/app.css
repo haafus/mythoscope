@@ -1715,6 +1715,23 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motifs-overview-btn:hover { background: #e2edf0; border-color: #c7d9e6; }
 
 .overview-title { font-size: 16px; margin: 2px 0 14px; color: #1f3a4d; }
+
+/* Scholarly header above the stat cards: description + authorship + sources. */
+.overview-intro {
+    background: #f7faf9; border: 1px solid #e6ecf1; border-left: 3px solid var(--accent, #2a9d8f);
+    border-radius: 8px; padding: 13px 16px; margin: 0 0 18px;
+}
+.ov-blurb { font-size: 13px; line-height: 1.55; color: #2f3d47; margin: 0 0 10px; }
+.ov-blurb em { font-style: italic; color: #1f6b60; }
+.ov-meta { display: flex; flex-direction: column; gap: 4px; }
+.ov-meta-row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 12px; align-items: baseline; }
+.ov-meta-k { color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; font-size: 10.5px; }
+.ov-cite { color: #3a4652; }
+.ov-cite em { font-style: italic; }
+.ov-srcs { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.ov-src { color: var(--accent, #2a9d8f); text-decoration: none; }
+.ov-src:hover { text-decoration: underline; }
+
 .stat-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
