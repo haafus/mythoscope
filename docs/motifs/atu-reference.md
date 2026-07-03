@@ -248,10 +248,11 @@ under `raw/ashliman/`), match each tale's title against the TOC — same-titled
 variants (only 2 across the corpus) are told apart by the title's own parenthetical
 against the TOC's country column — and set `tale["url"]` to `…type{NNNN}.html#anchor`, else
 the page itself, else nothing. A curated `_PAGE_OVERRIDES` map covers famous types
-that live on a themed slug page instead of a numbered one (verified by the page's
-own declared type): `440→frogking`, `954→alibaba`, `325→magicbook`, `779J*→friday`,
-`958E*→hand`, `1408→tradingplaces`. Starred/absent types (no page) degrade to no
-link. A full pass anchors ~1,285 tales, page-links ~132, over ~169 pages.
+that live on a themed slug page instead of a numbered one — but only pages that
+actually **list variants** (a table of contents of several tales): `954→alibaba`,
+`325→magicbook`, `958E*→hand`, `1408→tradingplaces`. Single-text or two-edition
+comparison pages are excluded (e.g. `440`/frogking.html, `779J*`/friday.html have
+no variant list), and starred/absent types with no page degrade to no link. A full pass anchors ~1,285 tales, page-links ~132, over ~169 pages.
 
 ---
 

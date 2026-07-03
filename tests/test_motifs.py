@@ -236,7 +236,7 @@ class TestAshliman:
         assert ashliman._type_page("1") == "type0001.html"
         assert ashliman._type_page("510A") == "type0510A.html"
         assert ashliman._type_page("954") == "alibaba.html"      # curated override
-        assert ashliman._type_page("779J*") == "friday.html"     # override wins over star
+        assert ashliman._type_page("779J*") == "type0779J.html"  # override removed -> derived, star dropped
         assert ashliman._type_page("2034F") == "type2034F.html"  # star dropped, no override
 
     def test_toc_parsed_without_contents_backlink(self):

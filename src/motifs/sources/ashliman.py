@@ -31,10 +31,11 @@ BASE = "https://www.pitt.edu/~dash"
 # themed page. Curated by crawling the site: each page's own text declares this
 # type (e.g. friday.html says "type 779J"). Keyed by the ATU id as stored
 # (asterisk kept), value is the page filename.
+# Only pages that actually *list variants* (a table of contents of several
+# tales) belong here — a single-text or two-edition-comparison page yields no
+# anchors and misrepresents a "variant", so it is excluded (see 440/779J*).
 _PAGE_OVERRIDES = {
     "325": "magicbook.html",        # The Magician and his Pupil ("Magic Books")
-    "440": "frogking.html",         # The Frog King or Iron Henry
-    "779J*": "friday.html",         # Breaking the Sabbath ("Friday")
     "954": "alibaba.html",          # The Forty Thieves ("Ali Baba")
     "958E*": "hand.html",           # Deep Sleep Brought on by a Robber
     "1408": "tradingplaces.html",   # The Man who Does his Wife's Work
