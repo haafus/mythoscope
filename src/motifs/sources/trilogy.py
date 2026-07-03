@@ -123,9 +123,10 @@ _MOJIBAKE_REPAIRS_TEMPLATE = {
     "Set#l#/Kyr#l#": "Setälä/Kyrölä",
     # Irish / Italian apostrophe (extended tail)
     "O#Faolain": "O'Faolain", "D#Aronco": "D'Aronco",
-    # German / Swedish / French (residual tail)
+    # German / Nordic / Baltic / French (residual tail)
     "Scheinbu#e": "Scheinbuße", "Taufschw#nke": "Taufschwänke",
-    "B#ckstr#m": "Bäckström", "H#rodote": "Hérodote",
+    "B#ckstr#m": "Bäckström", "H#rodote": "Hérodote", "K#stlin": "Köstlin",
+    "J#rv": "Järv", "M#giste": "Mägiste",
     # Journals
     "Laogr#phia": "Laographia", "B#aloideas": "Béaloideas",
     "Pa#catantra": "Pañcatantra", "Krypt#dia": "Kryptádia", "M#lusine": "Mélusine",
