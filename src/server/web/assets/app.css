@@ -1702,13 +1702,11 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 
 /* Index overview dashboard. */
 
-.overview-title { font-size: 16px; margin: 2px 0 14px; color: #1f3a4d; }
+.overview-title { font-size: 21px; font-weight: 700; margin: 2px 0 12px; color: #1f3a4d; }
 
-/* Scholarly header above the stat cards: description + authorship + sources. */
-.overview-intro {
-    background: #f7faf9; border: 1px solid #e6ecf1; border-left: 3px solid var(--accent, #2a9d8f);
-    border-radius: 8px; padding: 13px 16px; margin: 0 0 18px;
-}
+/* Scholarly header above the stat cards: description + authorship + sources.
+   Plain — no panel; it sits on the page background. */
+.overview-intro { margin: 0 0 20px; }
 .ov-blurb { font-size: 13px; line-height: 1.55; color: #2f3d47; margin: 0 0 10px; }
 .ov-blurb em { font-style: italic; color: #1f6b60; }
 .ov-meta { display: flex; flex-direction: column; gap: 4px; }

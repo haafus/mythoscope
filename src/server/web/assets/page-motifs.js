@@ -796,7 +796,7 @@ function overviewHtml(s) {
     const card = (c) => `<div class="stat-card"><div class="stat-num">${formatNumber(c.value)}${c.suffix || ""}</div><div class="stat-label">${escapeHtml(c.label)}</div></div>`;
     const panel = (p) => `<div class="chart-card"><div class="chart-title">${escapeHtml(p.title)}</div><div class="chart" id="${escapeHtml(p.id)}"></div></div>`;
     return `<div class="motif-detail-inner motif-overview">
-        <h2 class="overview-title">${escapeHtml(s.title || "")}</h2>
+        <h1 class="overview-title">${escapeHtml(s.title || "")}</h1>
         ${introHtml(s.intro)}
         <div class="stat-cards">${(s.cards || []).map(card).join("")}</div>
         <div class="chart-grid">${(s.panels || []).map(panel).join("")}</div>

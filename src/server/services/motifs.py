@@ -424,6 +424,7 @@ _INTRO = {
         "sources": [
             {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
             {"label": "Wikidata — images, concordances, multilingual names", "url": "https://www.wikidata.org"},
+            {"label": "Ashliman's Folktexts (AFT) — example tales", "url": "https://www.pitt.edu/~dash/folktexts.html"},
         ],
     },
     "berezkin": {
@@ -436,7 +437,8 @@ _INTRO = {
                     "фольклорно-мифологических мотивов по ареалам</em> (The Analytical Catalogue of "
                     "World Mythology and Folklore).",
         "sources": [
-            {"label": "areasofmyths.com (CC BY-NC-SA 4.0)", "url": "http://areasofmyths.com"},
+            {"label": "areasofmyths.com — the catalogue (CC BY-NC-SA 4.0)", "url": "http://areasofmyths.com"},
+            {"label": "mapsofmyths.com — English names, thematic groups & concordances (CC BY-NC-SA 4.0)", "url": "https://mapsofmyths.com/motifs"},
         ],
     },
 }
