@@ -1170,7 +1170,7 @@ function renderDetail(d) {
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
-        if ((links.berezkin || []).length) body += linkSection("Berezkin motifs mapping here", links.berezkin);
+        if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
