@@ -1014,7 +1014,7 @@ body.has-main-navbar {
     cursor: default;
 }
 
-/* Shown instead of the text-search box when text search is disabled (viewer build). */
+/* Replaces the search box in the viewer build. */
 .analysis-page .search-panel-hint {
     color: var(--muted);
     font-size: 13px;

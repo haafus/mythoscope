@@ -15,23 +15,22 @@ class TestModelsEndpoint:
     def test_list_models(self):
         from unittest.mock import patch
 
-        with patch("server.api.similarity.chroma_manager") as mock_cm:
+        with patch("server.api.similarity.chroma_manager") as mock_cm, \
+                patch("server.api.similarity._text_search_available", return_value=True):
             mock_cm.get_available_models.return_value = []
             response = client.get("/api/similarity/models")
         assert response.status_code == 200
         data = response.json()
         assert "models" in data
         assert isinstance(data["models"], list)
-        # text_search flag rides on this existing response; defaults on.
+        # text_search capability rides on this existing response.
         assert data["text_search"] is True
 
-    def test_list_models_reflects_text_search_setting(self):
+    def test_list_models_hides_text_search_without_embedding_stack(self):
         from unittest.mock import patch
 
-        from settings import settings
-
         with patch("server.api.similarity.chroma_manager") as mock_cm, \
-                patch.object(settings.server, "text_search", False):
+                patch("server.api.similarity._text_search_available", return_value=False):
             mock_cm.get_available_models.return_value = []
             response = client.get("/api/similarity/models")
         assert response.status_code == 200

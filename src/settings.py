@@ -75,11 +75,6 @@ class ServerSettings(BaseModel):
     host: str = "127.0.0.1"
     port: int = 8000
     gzip_minimum_size: int = 1024
-    # Semantic text-query search needs the embedding model stack (the
-    # `search`/`all` extras). Read-only `viewer` deployments have no such stack,
-    # so set MYTHO_SERVER__TEXT_SEARCH=false there to hide the search box up
-    # front instead of offering a control that only 503s.
-    text_search: bool = True
 
 
 # ---------------------------------------------------------------------------

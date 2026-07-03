@@ -1,3 +1,5 @@
+import importlib.util
+
 from fastapi import APIRouter, HTTPException, Query
 
 from embeddings import chroma_manager
@@ -13,9 +15,16 @@ from server.schemas import (
 )
 from server.services.projections import get_projection_data
 from server.services.similarity import similarity_service
-from settings import settings
 
 router = APIRouter(prefix="/api/similarity", tags=["similarity"])
+
+
+def _text_search_available() -> bool:
+    """True if the embedding stack for text-query search is installed (absent in the viewer build)."""
+    return all(
+        importlib.util.find_spec(name) is not None
+        for name in ("sentence_transformers", "torch")
+    )
 
 
 def _available_models() -> list[str]:
@@ -35,7 +44,7 @@ def _require_collection(model: str) -> None:
 @router.get("/models", response_model=ModelListResponse)
 def list_models() -> dict:
     models = [{"name": key, "key": key} for key in _available_models()]
-    return {"models": models, "text_search": settings.server.text_search}
+    return {"models": models, "text_search": _text_search_available()}
 
 
 @router.post("/search", response_model=list[SearchResult])

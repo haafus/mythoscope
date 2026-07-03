@@ -40,10 +40,8 @@ const CHART_RENDERERS = {
 };
 
 export async function renderEmbeddings() {
-    // Load models first so state.textSearch (carried on that response) is known
-    // before we build the rail — no flash of a search box that then vanishes.
-    // Fail-open: if the call errors, keep the box rather than hide a working one.
-    try { await ensureModels(); } catch { /* handled again in loadModelsIntoSelect */ }
+    // Load models first so state.textSearch is known before we build the rail.
+    try { await ensureModels(); } catch { /* retried in loadModelsIntoSelect */ }
     const textSearch = state.textSearch;
     const searchPanelHtml = textSearch
         ? `<div class="search-panel" id="searchPanel">
@@ -128,8 +126,7 @@ function bindEmbeddingsControls() {
 
     modelSelect.addEventListener("change", triggerModelChange);
     vizSelect.addEventListener("change", loadVisualization);
-    // searchText/searchBtn are absent when text search is disabled.
-    if (searchText && searchBtn) {
+    if (searchText && searchBtn) { // absent when text search is off
         searchText.addEventListener("input", () => {
             searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
         });
@@ -251,7 +248,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
     try {
         const { point, neighbors } = await fetchPointWithNeighbors(pointId, chunkIndex, 6, crossTradition);
-        // The pencil reopens the text-search box, absent when text search is off.
+        // Pencil reopens the search box — omit when text search is off.
         const editButton = state.textSearch
             ? `<button class="fragment-edit" id="fragmentEditBtn" type="button" title="New similarity search" aria-label="New similarity search">${PENCIL_ICON}</button>`
             : "";

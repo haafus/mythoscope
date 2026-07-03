@@ -13,8 +13,7 @@ export const state = {
     traditionInfo: null,
     analysisSearchRequestId: 0,
     similarityMethods: [],
-    // Set from /api/similarity/models; false hides text search (viewer build).
-    textSearch: true,
+    textSearch: true, // from /api/similarity/models; false hides text search
 };
 
 // ===== Route teardown =====
