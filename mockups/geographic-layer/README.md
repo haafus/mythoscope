@@ -8,10 +8,12 @@ Open `index.html` in a browser. Three views:
 
 1. **Regional footprint** — a compact "geographic fingerprint" for one entity
    (ATU 510A), drawn from all three indexes via the existing id cross-walk.
-2. **Aggregate** — share of each index's attestations by region. The shapes
+2. **Aggregate** — share of each index's attestations by region, same region
+   order for all, plus a fourth **All three** row (equal-weight mean of the
+   three shares — a raw count-sum would just echo TMI's 46k motifs). The shapes
    expose the catalogues themselves: ATU is Euro-centric (71% European),
    Berezkin is globally even, TMI sits between (its South-Asian mass is
-   Thompson-Balys India).
+   Thompson-Balys India); pooled, Europe leads at only 49%.
 3. **Regional lens** — pick a region → material from all three indexes at once.
 
 **Data:** the ATU/TMI/Berezkin aggregate profiles and ATU 510A footprint are

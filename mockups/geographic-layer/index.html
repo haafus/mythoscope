@@ -38,7 +38,8 @@
   .fp-bar div{height:100%}
   .fp-tot{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
   /* aggregate grouped bars */
-  .agg{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;align-items:center;margin:8px 0}
+  .agg{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;align-items:center;margin:0 0 24px}
+  .agg.combined{border-top:2px solid var(--border);padding-top:20px;margin-top:4px}
   .agg-lab{font-size:12.5px;font-weight:600}
   .agg-lab i{font-weight:400;color:var(--soft);font-size:11px;display:block}
   .agg-bars{display:flex;flex-direction:column;gap:4px}
@@ -94,8 +95,8 @@
       <div class="fp-lab"><b>ATU</b> attestations<i>65 traditions</i></div>
       <div class="fp-bar">
         <div style="width:58%;background:var(--r-eu)"></div><div style="width:18%;background:var(--r-ne)"></div>
-        <div style="width:13%;background:var(--r-am)"></div><div style="width:5%;background:var(--r-esa)"></div>
-        <div style="width:4%;background:var(--r-csa)"></div><div style="width:2%;background:var(--r-sib)"></div>
+        <div style="width:4%;background:var(--r-csa)"></div><div style="width:5%;background:var(--r-esa)"></div>
+        <div style="width:2%;background:var(--r-sib)"></div><div style="width:13%;background:var(--r-am)"></div>
       </div>
       <div class="fp-tot">65</div>
     </div>
@@ -103,8 +104,8 @@
     <div class="fp-row">
       <div class="fp-lab">its <b>TMI</b> motifs<i>via atu_seq → cultures</i></div>
       <div class="fp-bar">
-        <div style="width:52%;background:var(--r-eu)"></div><div style="width:20%;background:var(--r-csa)"></div>
-        <div style="width:12%;background:var(--r-ne)"></div><div style="width:8%;background:var(--r-esa)"></div>
+        <div style="width:52%;background:var(--r-eu)"></div><div style="width:12%;background:var(--r-ne)"></div>
+        <div style="width:20%;background:var(--r-csa)"></div><div style="width:8%;background:var(--r-esa)"></div>
         <div style="width:5%;background:var(--r-am)"></div><div style="width:3%;background:var(--r-oc)"></div>
       </div>
       <div class="fp-tot">~430</div>
@@ -113,8 +114,8 @@
     <div class="fp-row">
       <div class="fp-lab"><b>Berezkin</b> motifs here<i>via atu → berezkin</i></div>
       <div class="fp-bar">
-        <div style="width:40%;background:var(--r-eu)"></div><div style="width:20%;background:var(--r-sib)"></div>
-        <div style="width:16%;background:var(--r-ne)"></div><div style="width:12%;background:var(--r-csa)"></div>
+        <div style="width:40%;background:var(--r-eu)"></div><div style="width:16%;background:var(--r-ne)"></div>
+        <div style="width:12%;background:var(--r-csa)"></div><div style="width:20%;background:var(--r-sib)"></div>
         <div style="width:12%;background:var(--r-am)"></div>
       </div>
       <div class="fp-tot">~90</div>
@@ -166,14 +167,30 @@
         <div class="agg-b"><span class="k">Oceania</span><span class="track"><span class="fill" style="width:3%;background:var(--r-oc)"></span></span><span class="v">3%</span></div>
       </div>
     </div>
+    <div class="agg combined">
+      <div class="agg-lab">All three <i>equal-weight mean</i></div>
+      <div class="agg-bars">
+        <div class="agg-b"><span class="k">Europe</span><span class="track"><span class="fill" style="width:49%;background:var(--r-eu)"></span></span><span class="v">49%</span></div>
+        <div class="agg-b"><span class="k">Near East</span><span class="track"><span class="fill" style="width:7%;background:var(--r-ne)"></span></span><span class="v">7%</span></div>
+        <div class="agg-b"><span class="k">C/S Asia</span><span class="track"><span class="fill" style="width:15%;background:var(--r-csa)"></span></span><span class="v">15%</span></div>
+        <div class="agg-b"><span class="k">E/SE Asia</span><span class="track"><span class="fill" style="width:7%;background:var(--r-esa)"></span></span><span class="v">7%</span></div>
+        <div class="agg-b"><span class="k">Siberia</span><span class="track"><span class="fill" style="width:4%;background:var(--r-sib)"></span></span><span class="v">4%</span></div>
+        <div class="agg-b"><span class="k">Africa</span><span class="track"><span class="fill" style="width:3%;background:var(--r-afr)"></span></span><span class="v">3%</span></div>
+        <div class="agg-b"><span class="k">Americas</span><span class="track"><span class="fill" style="width:13%;background:var(--r-am)"></span></span><span class="v">13%</span></div>
+        <div class="agg-b"><span class="k">Oceania</span><span class="track"><span class="fill" style="width:2%;background:var(--r-oc)"></span></span><span class="v">2%</span></div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:-14px">Combined = mean of the three shares, each catalogue weighted equally. A raw count-sum would be swamped by TMI’s 46k motifs and just re-draw its shape; averaging normalises for catalogue size. Europe still leads (49%) but far below its 71% in ATU alone — pooled, the field’s reach is genuinely broad (Americas + C/S Asia together ≈ 28%).</div>
+
     <div class="callout">
       <b>ATU is Euro-centric</b> (71% of its attestations are European — a fact about collection history, not the tales). <b>Berezkin is globally even</b> (Europe 30% ≈ Americas 26%), by areal design. <b>TMI sits between</b> — its South-Asian mass (26%) is the Thompson-Balys India index. <b>A measurable statement about the three catalogues, not just a picture.</b>
     </div>
-    <div class="note">Same region order across all three, so the profiles line up column-by-column. Optional upgrade: the same data as a world choropleth with an index toggle. <br>* Berezkin’s Near-Eastern material is folded into “C/S Asia” by the first-pass macro-area map (its “Southwest &amp; Central Asia” area) — to be split when the map is curated.</div>
+    <div class="note">Same region order across all three (and in the footprints above), so the profiles line up column-by-column. Optional upgrade: the same data as a world choropleth with an index toggle.
+      <br>Empty cells are <b>not lost data</b>: <b>ATU · Oceania ≈ 0</b> is structural — Uther’s scope is the European–West-Asian–Indian area, Oceanian oral traditions were never in it. <b>Berezkin · Near East (*)</b> is folded into “C/S Asia” by the first-pass macro-area map (its “Southwest &amp; Central Asia” area) — the data is there, just under another label. <b>TMI · Siberia (&lt;1%)</b> is the one to verify: Thompson does cite Siberian collectors, so a near-zero here more likely reflects the provisional culture→region map than a real absence.</div>
   </div>
 
   <!-- 3. REGIONAL LENS -->
-  <h2>3 · Regional lens</h2>
+  <h2 id="lens">3 · Regional lens</h2>
   <p class="cap">Pick a region → material from all three indexes at once (the id cross-walk already links them). A unified motif space under a geographic filter — something none of the three has alone.</p>
   <div class="card">
     <div class="lens-head"><span class="lens-dot"></span>Siberia</div>
