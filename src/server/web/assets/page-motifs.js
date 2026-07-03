@@ -952,19 +952,57 @@ function berezkinDistribution(dist) {
 // ATU attestations (Uther provenance) grouped by macro-region: an accordion of
 // regions, each listing its "People: citation" entries. Falls back to the raw
 // prose when the parsed grouping is absent.
-function atuAttestations(grouped, raw) {
-    if (!grouped || !grouped.total) return atuProse("Attestations by culture", raw, true);
+// Shared "Attestations by culture" renderer for TMI cultures and ATU peoples:
+// region groups (colour dot · name · count), each entry "Label: citation". The
+// collapse adapts to volume — all regions open when there are few entries, an
+// exclusive accordion (one region at a time) when there are many — so TMI's
+// typical single culture isn't hidden behind a click and ATU's 100-people types
+// don't become a wall. Citation HTML is pre-rendered by the caller (TMI links to
+// its bibliography; ATU linkifies work abbreviations).
+function attestationsSection(grouped) {
+    if (!grouped || !grouped.total) return "";
+    const openAll = grouped.total <= 15;
     const rows = (grouped.regions || []).map((r) => {
         const label = r.region === "—" ? "Unattributed" : r.region;
         const items = (r.entries || []).map((e) =>
-            `<li class="motif-att-item"><span class="motif-att-people">${escapeHtml(e.people)}</span>${e.cite ? `: <span class="motif-att-cite">${abbrLinkify(escapeHtml(e.cite))}</span>` : ""}</li>`).join("");
+            `<li class="motif-att-item"><span class="motif-att-people">${escapeHtml(e.label)}</span>${e.cite ? `: <span class="motif-att-cite">${e.cite}</span>` : ""}</li>`).join("");
         return `
-        <details class="motif-dist-region" name="motif-att-region">
+        <details class="motif-dist-region"${openAll ? " open" : ` name="motif-att-region"`}>
             <summary><span class="region-dot" style="background:${regionColor(r.region)}"></span><span class="motif-dist-name">${escapeHtml(label)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
             <ul class="motif-att-list">${items}</ul>
         </details>`;
     }).join("");
     return section(`Attestations by culture (${formatNumber(grouped.total)})`, `<div class="motif-dist">${rows}</div>`);
+}
+
+// ATU peoples: already region-grouped server-side; linkify the citation prose.
+function atuAttestations(grouped, raw) {
+    if (!grouped || !grouped.total) return atuProse("Attestations by culture", raw, true);
+    return attestationsSection({
+        total: grouped.total,
+        regions: (grouped.regions || []).map((r) => ({
+            region: r.region, count: r.count,
+            entries: (r.entries || []).map((e) => ({
+                label: e.people, cite: e.cite ? abbrLinkify(escapeHtml(e.cite)) : "",
+            })),
+        })),
+    });
+}
+
+// TMI cultures: each carries a region and bibliography-linked citations; group
+// them into the shared shape (regions by size, the unmapped "—" bucket last).
+function tmiAttestations(cultures) {
+    if (!cultures || !cultures.length) return "";
+    const byRegion = new Map();
+    for (const c of cultures) {
+        const key = c.region || "—";
+        if (!byRegion.has(key)) byRegion.set(key, []);
+        byRegion.get(key).push({ label: c.label, cite: (c.citations || []).map(citeHtml).join(", ") });
+    }
+    const regions = [...byRegion.entries()]
+        .map(([region, entries]) => ({ region, count: entries.length, entries }))
+        .sort((a, b) => (a.region === "—") - (b.region === "—") || b.count - a.count);
+    return attestationsSection({ total: cultures.length, regions });
 }
 
 // One bibliography source: resolved works show author · year — title; unresolved
@@ -1027,31 +1065,6 @@ function citeList(items) {
 // Attestations grouped by macro-region: each region name is printed once, then
 // its cultures — one culture per row (label + its citation link, any further
 // links stacked under the first). Cultures with no region come last, un-headed.
-function culturesHtml(cultures) {
-    const groups = new Map();  // region -> [culture]; the "" bucket renders last
-    for (const c of cultures) {
-        const key = c.region || "";
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(c);
-    }
-    // Regions ordered by how many cultures they hold (most first); no-region last.
-    const regions = [...groups.keys()].filter(Boolean)
-        .sort((a, b) => groups.get(b).length - groups.get(a).length);
-    if (groups.has("")) regions.push("");
-    const row = (c) => `
-        <div class="motif-culture-row">
-            <span class="motif-culture-label">${escapeHtml(c.label)}</span>
-            <div class="motif-culture-cites">${(c.citations || [])
-                .map((cite) => `<div class="motif-culture-cite">${citeHtml(cite)}</div>`).join("")}</div>
-        </div>`;
-    const group = (region) => `
-        <div class="motif-culture-group">
-            ${region ? `<div class="motif-culture-region-head">${escapeHtml(region)}</div>` : ""}
-            ${groups.get(region).map(row).join("")}
-        </div>`;
-    return `<div class="motif-cultures">${regions.map(group).join("")}</div>`;
-}
-
 function renderDetail(d) {
     const links = d.links || {};
     const head = `
@@ -1123,7 +1136,7 @@ function renderDetail(d) {
         if ((links.see_also_cf || []).length) body += linkSection("Compare (cf.)", links.see_also_cf);
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
         if ((links.berezkin || []).length) body += linkSection("Berezkin motifs mapping here", links.berezkin);
-        if ((d.cultures || []).length) body += section(`Attestations by culture (${d.cultures.length})`, culturesHtml(d.cultures));
+        if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {

@@ -1789,40 +1789,6 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* External-link indicator: smaller and lighter than the link text. */
 .ext-arrow { font-size: 0.75em; color: #9aa7b3; }
 
-/* Attestations grouped by macro-region: region header once, then one culture
-   per row (label at left, its citation link(s) stacked at right). */
-/* One grid for the whole list, three columns — macro-region | culture | citations.
-   The first two are max-content (sized to the widest name list-wide); each region
-   group is a subgrid sharing those columns. The region name sits in column 1 at
-   the top of its group instead of a separating header. */
-.motif-cultures {
-    display: grid;
-    grid-template-columns: max-content max-content 1fr;
-    column-gap: 34px;
-    row-gap: 16px;              /* between region groups */
-    align-items: baseline;
-    margin-top: 12px;
-}
-.motif-culture-group {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: subgrid;
-    row-gap: 3px;              /* between rows within a group */
-    align-items: baseline;
-}
-.motif-culture-region-head {
-    grid-column: 1;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: #a8b1ba;
-}
-.motif-culture-row { display: contents; }  /* label & cites become grid cells */
-.motif-culture-label { grid-column: 2; font-weight: 700; font-size: 14px; color: #1f3a4d; }
-.motif-culture-cites { grid-column: 3; min-width: 0; display: flex; flex-direction: column; }
-.motif-culture-cite { line-height: 1.5; font-size: 14px; color: #2a2f36; }
-
 /* Raw source notes shown verbatim at the end — set apart as a quote. */
 .motif-notes-raw {
     font-size: 12.5px;
