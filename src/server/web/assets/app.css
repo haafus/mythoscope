@@ -1612,7 +1612,6 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-tales-attr { margin-top: 8px; font-size: 12px; color: var(--muted); }
 .motif-tales-attr a { color: #3a5e86; text-decoration: none; }
 .motif-tales-attr a:hover { text-decoration: underline; }
-.motif-wiki-wd a { color: var(--muted); }
 .motif-wiki-lang { color: var(--muted); font-size: 11px; text-transform: uppercase; }
 .motif-image { margin: 0 0 14px; }
 .motif-image img { max-width: 320px; max-height: 240px; width: auto; height: auto;

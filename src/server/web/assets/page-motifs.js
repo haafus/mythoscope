@@ -454,16 +454,13 @@ function atuConcordances(conc) {
 
 // Wikipedia articles for the type (Wikidata), each tagged with its language, plus
 // a Wikidata link. Tolerates the old en-only shape ({title, url} without lang).
-function atuWikipedia(wiki, wikidata) {
+function atuWikipedia(wiki) {
     const items = (wiki || []).map((w) => {
         const lang = w.lang ? ` <span class="motif-wiki-lang">${escapeHtml(w.lang)}</span>` : "";
         return `<li><a href="${escapeHtml(w.url)}" target="_blank" rel="noopener">${escapeHtml(w.title)} <span class="ext-arrow">↗</span></a>${lang}</li>`;
     }).join("");
-    if (!items && !wikidata) return "";
-    const wd = wikidata
-        ? `<li class="motif-wiki-wd"><a href="https://www.wikidata.org/wiki/${escapeHtml(wikidata)}" target="_blank" rel="noopener">Wikidata ${escapeHtml(wikidata)} <span class="ext-arrow">↗</span></a></li>`
-        : "";
-    return section("Wikipedia", `<ul class="motif-wiki-list">${items}${wd}</ul>`);
+    if (!items) return "";
+    return section("Wikipedia", `<ul class="motif-wiki-list">${items}</ul>`);
 }
 
 // Example folktales of an ATU type (Ashliman AFT), metadata only: title, a
@@ -1198,7 +1195,7 @@ function renderDetail(d) {
         body += atuAttestations(d.attestations_grouped, d.attestations);
         body += atuProse("References", d.references, true);
         body += atuTales(d.tales);
-        body += atuWikipedia(d.wikipedia, d.wikidata);
+        body += atuWikipedia(d.wikipedia);
     }
 
     return `<div class="motif-detail-inner">${body}</div>`;
