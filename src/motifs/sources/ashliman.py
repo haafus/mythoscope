@@ -57,45 +57,6 @@ def _type_page(atu_id: str) -> str | None:
 
 # A table-of-contents entry: <a href="#anchor">Title</a> optionally (Country).
 _TOC = re.compile(r'<a\s+href="#([^"]+)"\s*>(.*?)</a>\s*(?:\(([^)]*)\))?', re.I | re.S)
-_SUFFIX = re.compile(r"\s*\(([^)]*)\)\s*$")   # a trailing "(Grimm)" disambiguator
-
-
-def _norm(text: str) -> str:
-    """Fold a title to a match key: strip tags/entities, lowercase, drop a
-    leading 'the', collapse to single-spaced alphanumerics."""
-    s = html.unescape(re.sub(r"<[^>]+>", "", text)).lower()
-    s = re.sub(r"[^a-z0-9]+", " ", s).strip()
-    return re.sub(r"^the\s+", "", s)
-
-
-def parse_toc(page_html: str) -> list[tuple[str, str, str]]:
-    """``[(norm_title, country_lower, anchor)]`` from the page's contents list."""
-    out: list[tuple[str, str, str]] = []
-    for anchor, title, country in _TOC.findall(page_html):
-        nt = _norm(title)
-        if nt and anchor.lower() != "contents":
-            out.append((nt, (country or "").lower(), anchor))
-    return out
-
-
-def resolve_anchor(title: str, toc: list[tuple[str, str, str]]) -> str | None:
-    """The anchor for a tale, matched by title against the TOC. Same-titled
-    variants (rare) are told apart by the title's own parenthetical against the
-    TOC's country column. ``None`` when no title matches."""
-    base = _SUFFIX.sub("", title)
-    suffix_m = _SUFFIX.search(title)
-    cands = [t for t in toc if t[0] == _norm(base)]
-    if not cands:
-        cands = [t for t in toc if t[0] == _norm(title)]
-    if not cands:
-        return None
-    if len(cands) == 1:
-        return cands[0][2]
-    for word in _norm(suffix_m.group(1) if suffix_m else "").split():
-        for _nt, country, anchor in cands:
-            if word and word in country:
-                return anchor
-    return cands[0][2]
 
 
 def canon(atu_id: str) -> str | None:
