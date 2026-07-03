@@ -265,7 +265,7 @@ def status():
         # enrichment key is absent from meta, the meta is stale/partial — flag it
         # so "no data" (e.g. missing Wikipedia links) is diagnosable, not silent.
         expected = [("mapsofmyths", "berezkin"), ("berezkin_bibliography", "berezkin"),
-                    ("bibliography", "tmi"), ("atu_wikidata", "atu")]
+                    ("bibliography", "tmi"), ("atu_wikidata", "atu"), ("ashliman", "atu")]
         seen = set()
         for source, owner in expected:
             e = enr.get(source)

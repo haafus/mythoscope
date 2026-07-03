@@ -9,7 +9,7 @@ import pytest  # noqa: E402
 
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
-from motifs.sources import atu_regions, berezkin, culture_dict, tmi_notes, trilogy
+from motifs.sources import ashliman, atu_regions, berezkin, culture_dict, tmi_notes, trilogy
 from motifs.sources import berezkin_bibliography as bbib
 from server.services import motifs as svc
 
@@ -221,6 +221,46 @@ class TestAtuStructure:
         ]}]
 
 
+class TestAshliman:
+    # A minimal type-page table of contents: two tales share the title
+    # "Cinderella" and are told apart by country; one has a "The" prefix.
+    TOC_HTML = (
+        '<a href="#contents">table of contents</a>'
+        '<a href="#perrault">Cinderella; or, The Little Glass Slipper</a> (France) '
+        '<a href="#grimm">Cinderella</a> (Germany, Jacob and Wilhelm Grimm) '
+        '<a href="#italy">Cinderella</a> (Italy) '
+        '<a href="#woodencloak">Katie Woodencloak</a> (Norway)'
+    )
+
+    def test_type_page_padding_override_and_star(self):
+        assert ashliman._type_page("1") == "type0001.html"
+        assert ashliman._type_page("510A") == "type0510A.html"
+        assert ashliman._type_page("954") == "alibaba.html"      # curated override
+        assert ashliman._type_page("779J*") == "friday.html"     # override wins over star
+        assert ashliman._type_page("2034F") == "type2034F.html"  # star dropped, no override
+
+    def test_toc_parsed_without_contents_backlink(self):
+        toc = ashliman.parse_toc(self.TOC_HTML)
+        assert ("contents" not in [a for *_, a in toc])
+        assert ("katie woodencloak", "norway", "woodencloak") in toc
+
+    def test_resolve_unique_title(self):
+        toc = ashliman.parse_toc(self.TOC_HTML)
+        assert ashliman.resolve_anchor("Katie Woodencloak", "Norway", toc) == "woodencloak"
+
+    def test_resolve_duplicate_title_by_provenance(self):
+        toc = ashliman.parse_toc(self.TOC_HTML)
+        # AFT disambiguates same-titled variants in the title's parenthetical…
+        assert ashliman.resolve_anchor("Cinderella (Grimm)", "", toc) == "grimm"
+        assert ashliman.resolve_anchor("Cinderella (Italy)", "", toc) == "italy"
+        # …or falls back to the provenance column.
+        assert ashliman.resolve_anchor("Cinderella", "Italy", toc) == "italy"
+
+    def test_resolve_no_match_returns_none(self):
+        toc = ashliman.parse_toc(self.TOC_HTML)
+        assert ashliman.resolve_anchor("Some Unrelated Tale", "Nowhere", toc) is None
+
+
 class TestAtuRegions:
     def test_canonical_folds_variants(self):
         assert atu_regions.canonical("Indian") == "India"          # bare Indian = India in Uther
@@ -370,7 +410,8 @@ class TestAtuRegions:
         assert [t["title"] for t in tales["275"]] == ["A Race", "The Hare and the Tortoise"]  # by provenance
         assert tales["275"][0]["provenance"] == "England"
         assert "text" not in tales["275"][0]                         # full text never stored
-        assert tales["275"][1]["notes"] == ""                        # "NA" cleaned to empty
+        assert "notes" not in tales["275"][0]                        # source/notes dropped (UI unused)
+        assert "source" not in tales["275"][0]
         # wired onto the type via _parse_atu
         rows_df = [{"atu_id": "275", "chapter": "Animal", "division": "Wild Animals 1-99",
                     "tale_name": "x", "tale_type": "y"}]

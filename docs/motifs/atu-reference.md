@@ -235,12 +235,23 @@ first-pass curation (e.g. Maghreb folded into "Near East", Volga-Finnic into
 ## 8. Example tales (Ashliman AFT)
 
 `aft.csv` (Ashliman's *Annotated Folk Tales*) is 1,518 folktale texts labelled
-with an ATU type. We ingest **metadata only** — `title`, `provenance`, `source`,
-`notes` — and deliberately **drop the full `text`**: the Ashliman texts carry
-their own licence separate from the repo's CC-BY-SA, and it keeps the index lean.
-The type page shows an "Example tales" section (present for 182 types) with a
-per-tale title, provenance chip and bibliographic source, plus one corpus-level
-attribution link to Ashliman's Folktexts (no per-tale URLs exist in the data).
+with an ATU type. We store only **`title` + `provenance`** (dropping the full
+`text` — separate licence — and the long `source`/`notes`, unused on the UI).
+The type page shows an "Example tales" section (182 types) as a plain **list of
+links to each variant's text**, plus a corpus attribution to Ashliman's Folktexts.
+
+**Deep links (`ashliman.refresh`, best-effort, §9-style enrichment).** The AFT
+data carries no per-tale URL, so links are resolved at build time from Ashliman's
+site: each type has a page `pitt.edu/~dash/type{NNNN}[letter].html` whose table of
+contents maps a variant's title to an in-page anchor. We fetch the page (cached
+under `raw/ashliman/`), match each tale's title against the TOC — disambiguating
+same-titled variants by the title's parenthetical or the provenance against the
+TOC's country column — and set `tale["url"]` to `…type{NNNN}.html#anchor`, else
+the page itself, else nothing. A curated `_PAGE_OVERRIDES` map covers famous types
+that live on a themed slug page instead of a numbered one (verified by the page's
+own declared type): `440→frogking`, `954→alibaba`, `325→magicbook`, `779J*→friday`,
+`958E*→hand`, `1408→tradingplaces`. Starred/absent types (no page) degrade to no
+link. A full pass anchors ~1,285 tales, page-links ~132, over ~169 pages.
 
 ---
 
@@ -296,7 +307,8 @@ have 1–3.
   rather than guessed.
 - AaTh→ATU remaps only ~16% of the orphaned TMI-note references; the rest are
   types ATU deleted or renumbered with no Wikidata concordance.
-- Example tales are metadata only (no full text); coverage is 182/2,247 types.
+- Example tales are titles + resolved deep links (no full text); coverage is
+  182/2,247 types, and ~13 star/absent types resolve no Ashliman page.
 - All repairs (chapter, division fill, name split, mojibake, name dictionaries)
   and enrichments (Wikidata, abbreviation/work links, AaTh remap) are interpretive
   layers on top of the source; the raw fields remain the source of truth.

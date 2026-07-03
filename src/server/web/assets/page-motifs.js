@@ -463,22 +463,16 @@ function atuWikipedia(wiki) {
     return section("Wikipedia", `<ul class="motif-wiki-list">${items}</ul>`);
 }
 
-// Example folktales of an ATU type (Ashliman AFT), metadata only: title, a
-// provenance chip, and the bibliographic source. Full texts are not stored; the
-// section footer attributes the corpus (the only real link available).
+// Example folktales of an ATU type (Ashliman AFT): a plain list of links to each
+// variant's text (deep-linked to its anchor where resolved, else the type page;
+// unresolved tales show as plain titles). The footer attributes the corpus.
 const AFT_HOME = "https://www.pitt.edu/~dash/folktexts.html";
 
 function atuTales(tales) {
     if (!tales || !tales.length) return "";
-    const rows = tales.map((t) => `
-        <li class="motif-tale">
-            <div class="motif-tale-head">
-                <span class="motif-tale-title">${escapeHtml(t.title)}</span>
-                ${t.provenance ? `<span class="motif-tale-prov">${escapeHtml(t.provenance)}</span>` : ""}
-            </div>
-            ${t.source ? `<div class="motif-tale-source">${escapeHtml(t.source)}</div>` : ""}
-            ${t.notes ? `<div class="motif-tale-source">${escapeHtml(t.notes)}</div>` : ""}
-        </li>`).join("");
+    const rows = tales.map((t) => t.url
+        ? `<li class="motif-tale"><a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.title)} <span class="ext-arrow">↗</span></a></li>`
+        : `<li class="motif-tale">${escapeHtml(t.title)}</li>`).join("");
     const attr = `<div class="motif-tales-attr">Texts from
         <a href="${AFT_HOME}" target="_blank" rel="noopener">Ashliman's Folktexts <span class="ext-arrow">↗</span></a></div>`;
     return section(`Example tales (${tales.length})`, `<ul class="motif-tales">${rows}</ul>${attr}`);

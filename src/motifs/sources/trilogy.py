@@ -369,8 +369,10 @@ def _parse_atu_combos(rows: list[dict]) -> dict[str, list[str]]:
 
 def _parse_aft(rows: list[dict]) -> dict[str, list[dict]]:
     """Group ``aft.csv`` (Ashliman's Annotated Folk Tales) into example tales per
-    type: ``{atu_id: [{title, provenance, source, notes}]}``. Metadata only — the
-    full ``text`` is deliberately dropped (licensing; keeps the index lean).
+    type: ``{atu_id: [{title, provenance}]}``. Title is what the page shows;
+    provenance is kept to disambiguate same-titled variants when the Ashliman
+    enrichment resolves each tale's deep link. The full ``text`` and the long
+    ``source``/``notes`` are dropped (licensing / lean index / unused on the UI).
     Ordered by provenance then title for a stable read."""
     tales: dict[str, list[dict]] = {}
     for row in rows:
@@ -381,8 +383,6 @@ def _parse_aft(rows: list[dict]) -> dict[str, list[dict]]:
         tales.setdefault(atu_id, []).append({
             "title": title,
             "provenance": _fix_mojibake(_clean(row.get("provenance"))),
-            "source": _fix_mojibake(_clean(row.get("source"))),
-            "notes": _fix_mojibake(_clean(row.get("notes"))),
         })
     for entries in tales.values():
         entries.sort(key=lambda t: (t["provenance"].lower(), t["title"].lower()))

@@ -16,7 +16,15 @@ from json_utils import save_json
 from settings import settings
 
 from . import crosswalk, store
-from .sources import atu_wikidata, berezkin, berezkin_bibliography, bibliography, mapsofmyths, trilogy
+from .sources import (
+    ashliman,
+    atu_wikidata,
+    berezkin,
+    berezkin_bibliography,
+    bibliography,
+    mapsofmyths,
+    trilogy,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +144,8 @@ def build_motifs(*, force: bool = False) -> None:
         atu_index, atu_seq = trilogy.build_atu(tr_cfg, force=force)
         # Multilingual names + Wikipedia links from Wikidata (open, best-effort).
         enrichment["atu_wikidata"] = atu_wikidata.refresh(atu_index["types"], force=force)
+        # Deep links into Ashliman's Folktexts for each example tale (best-effort).
+        enrichment["ashliman"] = ashliman.refresh(atu_index["types"], force=force)
         save_json(store.index_path("atu"), atu_index)
         atu_types = atu_index["types"]
         counts["atu"] = len(atu_types)
@@ -147,6 +157,12 @@ def build_motifs(*, force: bool = False) -> None:
         else:
             logger.info("      + Wikidata: %d types with multilingual names, %d with Wikipedia links",
                         wd["types_with_names"], wd["types_with_wikipedia"])
+        ash = enrichment["ashliman"]
+        if ash.get("skipped"):
+            logger.info("      + Ashliman deep links SKIPPED (%s)", ash["skipped"])
+        else:
+            logger.info("      + Ashliman: %d tales deep-linked, %d page-level (across %d pages, %d missing)",
+                        ash["tales_anchored"], ash["tales_page_level"], ash["pages"], ash["pages_missing"])
 
     # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
