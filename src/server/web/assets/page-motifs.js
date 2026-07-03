@@ -778,7 +778,8 @@ async function renderOverview() {
         const s = await api(`/api/motifs/${mState.index}/stats`);
         detail.innerHTML = overviewHtml(s);
         detail.scrollTop = 0;
-        drawCharts(s);
+        drawCssCharts(s);   // region bars — pure CSS, render without waiting on Plotly
+        drawCharts(s);      // the rest — Plotly (retries until its CDN is ready)
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -819,25 +820,62 @@ function introHtml(intro) {
     </div>`;
 }
 
+// Shared macro-region palette (echoes the geographic-layer mockup) so a region
+// reads the same colour in the overview bars and the per-type accordion.
+const REGION_COLORS = {
+    "Europe": "#4f7096", "Near East": "#c9873f", "Central Asia": "#8a7f4e",
+    "South Asia": "#6f9a5a", "East Asia": "#b45c4b", "Southeast Asia": "#4f9d8a",
+    "Asia": "#6f9a5a", "Siberia": "#5f8aa0", "Arctic": "#8fb0c4", "Africa": "#9c6a94",
+    "North America": "#7d84b8", "Mesoamerica": "#c47a5a", "Mesoamerica & Caribbean": "#c47a5a",
+    "South America": "#bd9a43", "Caribbean": "#59a3b0", "Oceania": "#3f9e93", "—": "#b7c0c7",
+};
+const _FALLBACK_COLORS = ["#4f7096", "#c9873f", "#6f9a5a", "#b45c4b", "#5f8aa0", "#9c6a94", "#bd9a43", "#3f9e93"];
+function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLORS[i % _FALLBACK_COLORS.length]; }
+
+// A pure-CSS horizontal bar list (label · coloured bar · value). Used for the
+// "by region" panels — no Plotly dependency, so it renders instantly and reuses
+// the region palette. Rows are drawn largest-first (already sorted server-side).
+function cssBars(id, rows, labelFn, colorFn) {
+    const el = document.getElementById(id);
+    if (!el || !rows || !rows.length) return;
+    const max = Math.max(1, ...rows.map((r) => r.count));
+    el.innerHTML = `<div class="csbars">` + rows.map((r, i) => {
+        const lab = labelFn(r);
+        return `<div class="csbar-row">
+            <span class="csbar-lab" title="${escapeHtml(lab)}">${escapeHtml(lab)}</span>
+            <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:${colorFn(r, i)}"></span></span>
+            <span class="csbar-val">${formatNumber(r.count)}</span>
+        </div>`;
+    }).join("") + `</div>`;
+}
+
+// Region panels for every index — rendered up front, independent of Plotly.
+function drawCssCharts(s) {
+    if (s.regions) cssBars(s.index === "atu" ? "atRegions" : s.index === "berezkin" ? "bzRegions" : "ovRegions",
+        s.regions, (r) => r.region, (r, i) => regionColor(r.region, i));
+}
+
 function drawCharts(s, attempt = 0) {
     const P = window.Plotly;
     if (!P) { if (attempt < 25) setTimeout(() => drawCharts(s, attempt + 1), 200); return; }  // CDN still loading
     const cfg = { displayModeBar: false, responsive: true };
-    const ACC = "#2a9d8f", MUT = "#bcdcd6";  // teal — distinct from the blue UI accent
+    const ACC = "#2a9d8f", MUT = "#bcdcd6", HIST = "#6b7aa1";  // teal accent; slate for distribution histograms
     const lay = (e = {}) => Object.assign({
-        margin: { l: 44, r: 12, t: 8, b: 34 }, height: 240, font: { size: 11 },
+        margin: { l: 44, r: 24, t: 8, b: 34 }, height: 240, font: { size: 11 },
         paper_bgcolor: "transparent", plot_bgcolor: "transparent", showlegend: false,
         hoverlabel: { bgcolor: "#000", bordercolor: "#000", font: { color: "#fff" } },
     }, e);
-    const vbar = (id, rows, xk, yk, extra) => P.newPlot(id,
-        [{ type: "bar", x: rows.map((r) => r[xk]), y: rows.map((r) => r[yk]), marker: { color: ACC } }], lay(extra), cfg);
+    // Value labels drawn just past each bar — the single biggest readability win.
+    const labels = (vals) => ({ text: vals.map((v) => formatNumber(v)), textposition: "outside",
+        cliponaxis: false, textfont: { size: 10, color: "#6b7280" } });
+    const vbar = (id, rows, xk, yk, extra, color = ACC) => P.newPlot(id,
+        [{ type: "bar", x: rows.map((r) => r[xk]), y: rows.map((r) => r[yk]), marker: { color }, ...labels(rows.map((r) => r[yk])) }], lay(extra), cfg);
     // Height scales with the row count so Plotly shows every bar's label (it
     // decimates labels when many bars are crammed into a fixed height).
-    const hbar = (id, rows, label, val, extra) => P.newPlot(id,
-        [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color: ACC } }],
+    const hbar = (id, rows, label, val, extra, color = ACC) => P.newPlot(id,
+        [{ type: "bar", orientation: "h", x: rows.map((r) => r[val]), y: rows.map(label), marker: { color }, ...labels(rows.map((r) => r[val])) }],
         lay(Object.assign({
-            height: Math.max(240, rows.length * 19 + 24), margin: { l: 160, r: 12, t: 8, b: 30 },
-            // Hold the tick labels off the bars so they don't read as glued to them.
+            height: Math.max(240, rows.length * 19 + 24), margin: { l: 160, r: 32, t: 8, b: 30 },
             yaxis: { ticklabelstandoff: 8 },
         }, extra)), cfg);
 
@@ -847,34 +885,36 @@ function drawCharts(s, attempt = 0) {
             labels: s.composition.map((c) => c.label), values: s.composition.map((c) => c.count),
             marker: { colors: [ACC, "#7cc0b6", "#d4e7e3"] },
         }], lay(), cfg);
-        vbar("ovLevels", s.levels, "level", "count");
-        vbar("ovNotes", s.notes_histogram, "bucket", "count");
+        vbar("ovLevels", s.levels, "level", "count", {}, HIST);
+        vbar("ovNotes", s.notes_histogram, "bucket", "count", {}, HIST);
         P.newPlot("ovChapters", [
             { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.count), marker: { color: MUT }, name: "all" },
             { type: "bar", x: s.chapters.map((c) => c.id), y: s.chapters.map((c) => c.substantive), marker: { color: ACC }, name: "substantive" },
         ], lay({ barmode: "overlay", showlegend: true, legend: { orientation: "h", y: 1.18, font: { size: 10 } } }), cfg);
-        hbar("ovRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 130, r: 12, t: 8, b: 30 } });
-        hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
-        vbar("ovBreadth", s.breadth_histogram, "bucket", "count");
+        // ovRegions is drawn by drawCssCharts (region palette, no Plotly).
+        hbar("ovCultures", s.top_cultures.slice(0, 15).reverse(), (r) => r.label, "count", { margin: { l: 110, r: 32, t: 8, b: 30 } });
+        vbar("ovBreadth", s.breadth_histogram, "bucket", "count", {}, HIST);
         hbar("ovTopNotes", s.top_notes.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "bytes");
         hbar("ovHubs", s.see_also_hubs.slice().reverse(), (r) => `${r.id} ${r.name}`.slice(0, 26), "indeg");
-        hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 12, t: 8, b: 30 } });
+        hbar("ovSources", (s.top_sources || []).slice().reverse(), (r) => r.label, "count", { margin: { l: 120, r: 32, t: 8, b: 30 } });
     } else if (s.index === "berezkin") {
         vbar("bzChapters", s.chapters, "id", "count");
         // mapsofmyths thematic groups — only present when the enrichment ran.
-        if (s.groups) hbar("bzGroups", s.groups.slice().reverse(), (r) => r.label.slice(0, 34), "count", { margin: { l: 220, r: 12, t: 8, b: 30 } });
-        hbar("bzRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
-        hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
-        hbar("bzWidest", s.widest.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
-        vbar("bzBreadth", s.breadth, "bucket", "count");
+        if (s.groups) hbar("bzGroups", s.groups.slice().reverse(), (r) => r.label.slice(0, 34), "count", { margin: { l: 220, r: 32, t: 8, b: 30 } });
+        // bzRegions is drawn by drawCssCharts (region palette, no Plotly).
+        hbar("bzAreas", s.top_areas.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 32, t: 8, b: 30 } });
+        hbar("bzWidest", s.widest.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
+        vbar("bzBreadth", s.breadth, "bucket", "count", {}, HIST);
     } else if (s.index === "atu") {
-        hbar("atChapters", s.chapters.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 12, t: 8, b: 30 } });
-        if (s.regions) hbar("atRegions", s.regions.slice().reverse(), (r) => r.region, "count", { margin: { l: 110, r: 12, t: 8, b: 30 } });
-        if (s.top_peoples) hbar("atPeoples", s.top_peoples.slice().reverse(), (r) => r.label, "count", { margin: { l: 130, r: 12, t: 8, b: 30 } });
-        if (s.reg_breadth) vbar("atRegBreadth", s.reg_breadth, "bucket", "count");
-        hbar("atDivisions", s.divisions.slice().reverse(), (r) => r.label.slice(0, 30), "count", { margin: { l: 210, r: 12, t: 8, b: 30 } });
-        vbar("atMotifHist", s.motif_hist, "bucket", "count");
-        hbar("atRich", s.top_rich.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 12, t: 8, b: 30 } });
+        hbar("atChapters", s.chapters.slice().reverse(), (r) => r.label.slice(0, 22), "count", { margin: { l: 150, r: 32, t: 8, b: 30 } });
+        // atRegions is drawn by drawCssCharts (region palette, no Plotly).
+        if (s.top_peoples) hbar("atPeoples", s.top_peoples.slice().reverse(), (r) => r.label, "count", { margin: { l: 130, r: 32, t: 8, b: 30 } });
+        if (s.reg_breadth) vbar("atRegBreadth", s.reg_breadth, "bucket", "count", {}, HIST);
+        hbar("atDivisions", s.divisions.slice().reverse(), (r) => r.label.slice(0, 30), "count", { margin: { l: 210, r: 32, t: 8, b: 30 } });
+        vbar("atMotifHist", s.motif_hist, "bucket", "count", {}, HIST);
+        hbar("atRich", s.top_rich.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
+        if (s.families) hbar("atFamilies", s.families.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
+        if (s.combos) hbar("atCombos", s.combos.slice().reverse(), (r) => r.label.slice(0, 26), "count", { margin: { l: 170, r: 32, t: 8, b: 30 } });
     }
 }
 
@@ -919,7 +959,7 @@ function atuAttestations(grouped, raw) {
             `<li class="motif-att-item"><span class="motif-att-people">${escapeHtml(e.people)}</span>${e.cite ? `: <span class="motif-att-cite">${abbrLinkify(escapeHtml(e.cite))}</span>` : ""}</li>`).join("");
         return `
         <details class="motif-dist-region" name="motif-att-region">
-            <summary><span class="motif-dist-name">${escapeHtml(label)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
+            <summary><span class="region-dot" style="background:${regionColor(r.region)}"></span><span class="motif-dist-name">${escapeHtml(label)}</span><span class="motif-dist-count">${formatNumber(r.count)}</span></summary>
             <ul class="motif-att-list">${items}</ul>
         </details>`;
     }).join("");

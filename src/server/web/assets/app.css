@@ -1747,6 +1747,16 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .chart-title { font-size: 12.5px; font-weight: 600; color: #41506a; margin-bottom: 4px; }
 .chart { width: 100%; }
 
+/* Pure-CSS "by region" bars (region palette; no Plotly). */
+.csbars { display: flex; flex-direction: column; gap: 5px; padding: 6px 2px 2px; }
+.csbar-row { display: grid; grid-template-columns: 104px 1fr 40px; align-items: center; gap: 9px; font-size: 11.5px; }
+.csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.csbar-track { height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; }
+.csbar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.35s ease; }
+.csbar-val { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* Region colour dot on the per-type attestation accordion. */
+.region-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; margin-right: 8px; flex: 0 0 auto; align-self: center; }
+
 /* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
 .motifs-item.duplicate .motifs-item-id,
 .motifs-item.duplicate .motifs-item-name { color: #c0392b; }

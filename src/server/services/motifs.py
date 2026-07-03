@@ -628,6 +628,9 @@ def _build_atu_stats() -> dict:
             for r in named:
                 region_att[r["region"]] += r["count"]
     top_rich = sorted(types, key=lambda t: len(t.get("motifs", [])), reverse=True)[:15]
+    top_families = sorted((t for t in types if t.get("subtypes")),
+                          key=lambda t: len(t["subtypes"]), reverse=True)[:15]
+    top_combos = sorted(types, key=lambda t: len(t.get("combos", [])), reverse=True)[:15]
     # Peoples: types attesting each canonical people (culture_legend counts).
     top_peoples = sorted(legend.items(), key=lambda kv: kv[1]["count"], reverse=True)[:18]
     return {
@@ -650,12 +653,18 @@ def _build_atu_stats() -> dict:
             {"id": "atDivisions", "title": "Top divisions"},
             {"id": "atMotifHist", "title": "TMI motifs per type"},
             {"id": "atRich", "title": "Most motif-rich types"},
+            {"id": "atFamilies", "title": "Largest subtype families"},
+            {"id": "atCombos", "title": "Most-combined types"},
         ],
         "chapters": [{"label": ch, "count": c} for ch, c in chapters.most_common() if ch],
         "divisions": [{"label": dv, "count": c} for dv, c in divisions.most_common(15)],
         "motif_hist": [{"bucket": b, "count": motif_hist[b]} for b in ("0", "1", "2–3", "4–6", "7–10", "11+")],
         "top_rich": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
                      for t in top_rich],
+        "families": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t["subtypes"])}
+                     for t in top_families],
+        "combos": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("combos", []))}
+                   for t in top_combos],
         "regions": [{"region": reg, "count": c} for reg, c in region_att.most_common()],
         "top_peoples": [{"label": canon, "count": e["count"]} for canon, e in top_peoples],
         "reg_breadth": [{"bucket": b, "count": reg_breadth[b]}
