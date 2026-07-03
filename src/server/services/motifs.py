@@ -454,6 +454,7 @@ _INTRO = {
                     "World Mythology and Folklore).",
         "sources": [
             {"label": "areasofmyths.com — the catalogue (CC BY-NC-SA 4.0)", "url": "http://areasofmyths.com"},
+            {"label": "areasofmyths.com/biblio — the source bibliography (CC BY-NC-SA 4.0)", "url": "http://areasofmyths.com/biblio.html"},
             {"label": "mapsofmyths.com — English names, thematic groups & concordances (CC BY-NC-SA 4.0)", "url": "https://mapsofmyths.com/motifs"},
         ],
     },
