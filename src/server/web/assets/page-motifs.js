@@ -591,6 +591,11 @@ function linkChips(links) {
         const src = l.aath
             ? `<span class="motif-link-src" title="From Aarne-Thompson type ${escapeHtml(l.aath)}, renumbered in ATU 2004">AaTh ${escapeHtml(l.aath)}</span>`
             : "";
+        // The minority of '†' cross-references that are bare direct redirects
+        // rather than Thompson's 'Cf.' compares.
+        const sa = l.see_also
+            ? `<span class="motif-link-src" title="A direct 'see also' redirect, not a 'Cf.' compare">see also</span>`
+            : "";
         const title = l.exists
             ? (l.aath ? `${l.name || l.id} — from Aarne-Thompson type ${l.aath}` : (l.name || l.id))
             : (MISSING_REASON[l.missing_reason] || `${l.name || l.id} (not in this database)`);
@@ -598,7 +603,7 @@ function linkChips(links) {
         <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
            class="motif-link${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
            title="${escapeHtml(title)}">
-            ${rel}<span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}${src}
+            ${rel}<span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}${src}${sa}
         </a>
     `;
     }).join("");
@@ -1163,8 +1168,7 @@ function renderDetail(d) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
-        if ((links.see_also || []).length) body += linkSection("See also", links.see_also);
-        if ((links.see_also_cf || []).length) body += linkSection("Compare (cf.)", links.see_also_cf);
+        if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
         if ((links.berezkin || []).length) body += linkSection("Berezkin motifs mapping here", links.berezkin);
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);

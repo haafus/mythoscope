@@ -247,6 +247,22 @@ def _merge_atu_relations(appears: list[str], referenced: list[dict]) -> list[dic
                   key=lambda c: (0 if c["rel"] == "both" else 1, _atu_num_key(c["id"])))
 
 
+def _merge_tmi_related(cf: list[str], ref: list[str]) -> list[dict]:
+    """One '†' cross-reference list: 'Cf.' compares (the majority, unmarked)
+    followed by the bare '†X' redirects not already among them, each flagged
+    ``see_also`` so the frontend can tag that minority."""
+    out = [_link("tmi", m) for m in cf]
+    seen = {m for m in cf}
+    for m in ref:
+        if m in seen:
+            continue
+        seen.add(m)
+        link = _link("tmi", m)
+        link["see_also"] = True
+        out.append(link)
+    return out
+
+
 def _resolve_atu_inline(refs: list[str]) -> list[dict]:
     """Resolve the inline 'Type N' refs a TMI note cites. The note predates ATU
     2004, so these are AaTh numbers: link straight through if the number still
@@ -1047,11 +1063,12 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
         detail["descendant_counts"] = _descendant_counts(rec["id"])
         detail["descendant_count"] = detail["descendant_counts"]["all"]
-        # Cross-references parsed from the note text: '†' to other motifs (split
-        # into direct refs and softer 'Cf.' compares) and inline 'Type' to ATU.
+        # '†' cross-references parsed from the note text, in one list: Thompson's
+        # 'Cf.' compares are the default; the rarer bare '†X' direct redirects
+        # carry a ``see_also`` flag so the frontend can mark that minority.
         see_also = rec.get("see_also") or {}
-        detail["links"]["see_also"] = [_link("tmi", m) for m in see_also.get("ref", [])]
-        detail["links"]["see_also_cf"] = [_link("tmi", m) for m in see_also.get("cf", [])]
+        detail["links"]["related"] = _merge_tmi_related(
+            see_also.get("cf", []), see_also.get("ref", []))
         # One merged section: tale types this motif is a constituent of (⇐, from
         # atu_seq) and those its note references (⇒, AaTh-resolved); ⇔ = both.
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])

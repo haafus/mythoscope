@@ -32,8 +32,9 @@ _BIB_START = re.compile(
     r"\s--|†|\bTypes?\b|\*[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*" + _LABEL_HEAD + r":"
 )
 
-# A '†' motif cross-reference, optionally introduced by 'Cf.' ("compare").
-_DAGGER = re.compile(r"([Cc]f\.\s*)?†\s*([A-Z]\d[\dA-Za-z.]*)")
+# A '†' motif cross-reference, optionally introduced by 'Cf.' ("compare"); the
+# 'Cf.' may carry a footnote-style '[b]' marker before the dagger.
+_DAGGER = re.compile(r"([Cc]f\.\s*(?:\[[a-z]\]\s*)?)?†\s*([A-Z]\d[\dA-Za-z.]*)")
 # An inline ATU reference, possibly a comma list ("Type 803", "Types 403, 425").
 _TYPE = re.compile(r"\bTypes?\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 # A culture/region label heading a citation group, anchored to a group boundary
@@ -94,8 +95,12 @@ def _split_definition(notes: str) -> tuple[str, str]:
     return (head, notes[m.start():]) if _is_prose(head) else ("", notes)
 
 
-# Comma/whitespace only — a †ref that continues an open 'Cf. †…, †…' list.
-_CF_CONT = re.compile(r"[\s,]*")
+# The connector between two †refs of one open 'Cf. †A, †B and †C / †A--†D' list:
+# commas, 'and', a range dash — anything else breaks the list.
+_CF_CONT = re.compile(r"(?:[\s,]|and|[-–])*")
+# A '†X' glued to a citation as '… Smith (†X)' is a bibliographic tag, not a
+# cross-reference — the '(' sits right after a word char.
+_CITE_TAG = re.compile(r"[A-Za-z0-9]\s*\(\s*$")
 
 
 def _see_also(notes: str) -> dict:
@@ -104,10 +109,14 @@ def _see_also(notes: str) -> dict:
     prev_end = None
     for m in _DAGGER.finditer(notes):
         mid = m.group(2).rstrip(".")
+        if not m.group(1) and _CITE_TAG.search(notes[:m.start()]):
+            carry = False                     # '… (†X)' citation tag — skip entirely
+            prev_end = m.end()
+            continue
         if m.group(1):                        # explicit 'Cf.' introduces (or re-opens) the list
             is_cf = carry = True
         elif carry and prev_end is not None and _CF_CONT.fullmatch(notes[prev_end:m.start()]):
-            is_cf = True                      # comma-continuation of the open 'Cf.' list
+            is_cf = True                      # continuation of the open 'Cf.' list
         else:                                 # a bare '†X' (see also), or a break in the list
             is_cf = carry = False
         (cf if is_cf else ref).append(mid)

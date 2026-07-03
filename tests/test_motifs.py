@@ -545,6 +545,20 @@ class TestTrilogy:
         assert out["see_also"]["ref"] == ["A1"]
         assert out["see_also"]["cf"] == ["B2", "C3"]
 
+    def test_notes_dagger_glued_to_citation_is_dropped(self):
+        # A '†X' glued to a source as '… Ursule (†B211.20)' is a bibliographic
+        # tag, not a cross-reference — it must not leak into see_also (B211.2.2).
+        out = tmi_notes.parse_notes(
+            "German: Grimm No. 60; French-Canadian: Gautier (†B211.20); Moreno: Esdras (†B211.15).")
+        assert out["see_also"] == {"cf": [], "ref": []}
+
+    def test_notes_cf_list_continues_across_and_and_range(self):
+        # A 'Cf.' list stays "compare" across an 'and' connector, a range dash,
+        # and a '[b]' footnote marker on the Cf.
+        out = tmi_notes.parse_notes("Cf. [b] †A1--†A2 and †A3")
+        assert out["see_also"]["cf"] == ["A1", "A2", "A3"]
+        assert out["see_also"]["ref"] == []
+
     def test_notes_culture_label_with_hyphen_and_comma_list(self):
         # A multi-culture label with a hyphenated name must be recognised as a
         # citation, not leak into the definition (A13.4.1 'Snake As Creator').
@@ -923,7 +937,7 @@ class TestService:
         d = svc.get_motif("tmi", "S31")
         assert isinstance(d["cultures"], list)      # enriched: label/region/citations
         assert isinstance(d["references"], list)    # enriched: {text, url?}
-        assert "see_also" in d["links"] and "atu_related" in d["links"]
+        assert "related" in d["links"] and "atu_related" in d["links"]
 
     def test_substantive_flag(self):
         assert svc._substantive({"notes": "x" * 150}) is True       # notes >= 150 bytes
