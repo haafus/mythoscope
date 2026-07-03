@@ -122,7 +122,6 @@ function currentIndex() {
 // no height jump). Thompson sits before Berezkin.
 const TAB_ORDER = ["tmi", "berezkin", "atu"];
 const TAB_LABELS = { tmi: "Thompson", berezkin: "Berezkin", atu: "ATU tale types" };
-const LANG_NAMES = { en: "English", de: "German", ru: "Russian", fr: "French", es: "Spanish", it: "Italian" };
 
 function tabsPlaceholder() {
     return TAB_ORDER.map((idx) => `
@@ -436,9 +435,11 @@ function atuImage(image) {
 function atuNames(names) {
     const langs = Object.keys(names || {});
     if (!langs.length) return "";
+    // Language shown the same way as in the Wikipedia section: a small uppercase
+    // code tag trailing the name(s).
     const rows = langs.map((lang) =>
-        `<div class="motif-altname"><span class="motif-altname-lang">${escapeHtml(LANG_NAMES[lang] || lang)}</span>`
-        + ` ${(names[lang] || []).map(escapeHtml).join(", ")}</div>`).join("");
+        `<div class="motif-altname">${(names[lang] || []).map(escapeHtml).join(", ")} `
+        + `<span class="motif-wiki-lang">${escapeHtml(lang)}</span></div>`).join("");
     return section("Also known as", `<div class="motif-altnames">${rows}</div>`);
 }
 
@@ -455,12 +456,13 @@ function atuConcordances(conc) {
 // Wikipedia articles for the type (Wikidata), each tagged with its language, plus
 // a Wikidata link. Tolerates the old en-only shape ({title, url} without lang).
 function atuWikipedia(wiki) {
-    const items = (wiki || []).map((w) => {
+    const list = wiki || [];
+    if (!list.length) return "";
+    const items = list.map((w) => {
         const lang = w.lang ? ` <span class="motif-wiki-lang">${escapeHtml(w.lang)}</span>` : "";
         return `<li><a href="${escapeHtml(w.url)}" target="_blank" rel="noopener">${escapeHtml(w.title)} <span class="ext-arrow">↗</span></a>${lang}</li>`;
     }).join("");
-    if (!items) return "";
-    return section("Wikipedia", `<ul class="motif-wiki-list">${items}</ul>`);
+    return section(`Wikipedia (${list.length})`, `<ul class="motif-wiki-list">${items}</ul>`);
 }
 
 // Example folktales of an ATU type (Ashliman AFT): a plain list of links to each
