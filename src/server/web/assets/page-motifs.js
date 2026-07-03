@@ -539,15 +539,30 @@ function atuProse(title, text, split) {
     return section(title, `<p class="motif-text">${abbrLinkify(escapeHtml(text))}</p>`);
 }
 
+// Why a cross-link couldn't resolve, for a clear tooltip instead of a bare gray chip.
+const MISSING_REASON = {
+    aath: "Aarne-Thompson (AaTh) tale-type number — no equivalent in ATU 2004",
+    tmi_gap: "Motif code not present in the Trilogy TMI index",
+};
+
 function linkChips(links) {
     if (!links || !links.length) return `<span class="motif-empty">—</span>`;
-    return links.map((l) => `
+    return links.map((l) => {
+        // A resolved-via-concordance link carries the original AaTh number it came from.
+        const src = l.aath
+            ? `<span class="motif-link-src" title="From Aarne-Thompson type ${escapeHtml(l.aath)}, renumbered in ATU 2004">AaTh ${escapeHtml(l.aath)}</span>`
+            : "";
+        const title = l.exists
+            ? (l.aath ? `${l.name || l.id} — from Aarne-Thompson type ${l.aath}` : (l.name || l.id))
+            : (MISSING_REASON[l.missing_reason] || `${l.name || l.id} (not in this database)`);
+        return `
         <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
            class="motif-link${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
-           title="${escapeHtml(l.name || l.id)}${l.exists ? "" : " (not in this database)"}">
-            <span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}
+           title="${escapeHtml(title)}">
+            <span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}${src}
         </a>
-    `).join("");
+    `;
+    }).join("");
 }
 
 // The tree-row badge: an optional "definition" check, then notes size and the

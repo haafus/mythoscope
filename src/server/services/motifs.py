@@ -191,6 +191,55 @@ def _link(index: str, motif_id: str) -> dict:
     }
 
 
+def _mark_missing(link: dict, reason: str) -> dict:
+    """Tag a link that failed to resolve with why, for a clearer tooltip."""
+    if not link["exists"]:
+        link["missing_reason"] = reason
+    return link
+
+
+def _aath_to_atu() -> dict[str, list[str]]:
+    """Aarne-Thompson (AaTh) tale-type number -> ATU 2004 id(s), inverted from the
+    Wikidata concordance carried on each ATU type. Uther renumbered many AaTh types
+    (and split some across several ATU types), so this is one-to-many in places."""
+    def build() -> dict[str, list[str]]:
+        out: dict[str, list[str]] = {}
+        for t in _records("atu"):
+            for code in (t.get("concordances") or {}).get("AaTh", []):
+                out.setdefault(code, [])
+                if t["id"] not in out[code]:
+                    out[code].append(t["id"])
+        return {k: sorted(v) for k, v in out.items()}
+    return store.cached("aath_to_atu", build)
+
+
+def _resolve_atu_inline(refs: list[str]) -> list[dict]:
+    """Resolve the inline 'Type N' refs a TMI note cites. The note predates ATU
+    2004, so these are AaTh numbers: link straight through if the number still
+    exists in ATU, else remap via the AaTh->ATU concordance (tagging the original
+    number), else keep it as a missing link flagged as an orphaned AaTh number."""
+    atu_index = _by_id("atu")
+    conc = _aath_to_atu()
+    out: list[dict] = []
+    seen: set[tuple] = set()
+    for a in refs:
+        if a in atu_index:
+            out.append(_link("atu", a))
+        elif a in conc:
+            for atu_id in conc[a]:
+                if (atu_id, a) in seen:
+                    continue
+                seen.add((atu_id, a))
+                link = _link("atu", atu_id)
+                link["aath"] = a  # the AaTh number the note actually cited
+                out.append(link)
+        else:
+            link = _link("atu", a)
+            link["missing_reason"] = "aath"  # AaTh number, no ATU 2004 equivalent
+            out.append(link)
+    return out
+
+
 def _chapter_label(data: dict, chapter: str) -> str:
     title = (data.get("chapters") or {}).get(chapter, "")
     if title.isupper():  # all-caps source titles (Berezkin) -> sentence case
@@ -889,7 +938,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         see_also = rec.get("see_also") or {}
         detail["links"]["see_also"] = [_link("tmi", m) for m in see_also.get("ref", [])]
         detail["links"]["see_also_cf"] = [_link("tmi", m) for m in see_also.get("cf", [])]
-        detail["links"]["atu_inline"] = [_link("atu", a) for a in rec.get("atu_inline", [])]
+        detail["links"]["atu_inline"] = _resolve_atu_inline(rec.get("atu_inline", []))
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu"] = [_link("atu", a) for a in atu_ids]
         # Direct Berezkin motifs that map here (mapsofmyths concordance).
@@ -913,7 +962,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["tales"] = rec.get("tales", [])                # Ashliman AFT example tales (metadata)
         detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []
         detail["links"]["subtypes"] = [_link("atu", s) for s in rec.get("subtypes", [])]
-        detail["links"]["tmi"] = [_link("tmi", m) for m in rec.get("motifs", [])]
+        detail["links"]["tmi"] = [_mark_missing(_link("tmi", m), "tmi_gap") for m in rec.get("motifs", [])]
         detail["links"]["combos"] = [_link("atu", c) for c in rec.get("combos", [])]
         bz = cw.get("atu_to_berezkin", {}).get(rec["id"], [])
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in bz]

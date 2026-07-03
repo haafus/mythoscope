@@ -322,6 +322,22 @@ class TestAtuStructure:
         # source brackets themselves unbalanced (no depth-0 period) → left as-is, no mangling
         assert r("A (b (c", "no close here") == ("A (b (c", "no close here")
 
+    def test_atu_inline_aath_concordance(self, monkeypatch):
+        atu_types = [
+            {"id": "330", "name": "The Smith and the Devil", "concordances": {"AaTh": ["330A"]}},
+            {"id": "531", "name": "The Clever Horse", "concordances": {}},
+        ]
+        by = {t["id"]: t for t in atu_types}
+        monkeypatch.setattr(svc.store, "cached", lambda key, factory: factory())
+        monkeypatch.setattr(svc, "_records", lambda idx: atu_types if idx == "atu" else [])
+        monkeypatch.setattr(svc, "_by_id", lambda idx: by if idx == "atu" else {})
+        monkeypatch.setattr(svc, "_link", lambda idx, mid: {
+            "index": idx, "id": mid, "exists": mid in by, "name": by.get(mid, {}).get("name", "")})
+        out = svc._resolve_atu_inline(["531", "330A", "999"])
+        assert out[0]["id"] == "531" and out[0]["exists"] and "aath" not in out[0]  # real ATU id
+        assert out[1]["id"] == "330" and out[1]["aath"] == "330A"                   # remapped via concordance
+        assert out[2]["id"] == "999" and out[2]["missing_reason"] == "aath"         # orphan AaTh number
+
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
                             lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})
