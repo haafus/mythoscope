@@ -22,6 +22,20 @@ class TestModelsEndpoint:
         data = response.json()
         assert "models" in data
         assert isinstance(data["models"], list)
+        # text_search flag rides on this existing response; defaults on.
+        assert data["text_search"] is True
+
+    def test_list_models_reflects_text_search_setting(self):
+        from unittest.mock import patch
+
+        from settings import settings
+
+        with patch("server.api.similarity.chroma_manager") as mock_cm, \
+                patch.object(settings.server, "text_search", False):
+            mock_cm.get_available_models.return_value = []
+            response = client.get("/api/similarity/models")
+        assert response.status_code == 200
+        assert response.json()["text_search"] is False
 
 
 class TestCorpusCatalog:

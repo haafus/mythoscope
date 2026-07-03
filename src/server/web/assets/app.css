@@ -1014,6 +1014,14 @@ body.has-main-navbar {
     cursor: default;
 }
 
+/* Shown instead of the text-search box when text search is disabled (viewer build). */
+.analysis-page .search-panel-hint {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 4px 2px;
+}
+
 
 .analysis-page #searchModal {
     display: none;

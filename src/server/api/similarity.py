@@ -13,6 +13,7 @@ from server.schemas import (
 )
 from server.services.projections import get_projection_data
 from server.services.similarity import similarity_service
+from settings import settings
 
 router = APIRouter(prefix="/api/similarity", tags=["similarity"])
 
@@ -34,7 +35,7 @@ def _require_collection(model: str) -> None:
 @router.get("/models", response_model=ModelListResponse)
 def list_models() -> dict:
     models = [{"name": key, "key": key} for key in _available_models()]
-    return {"models": models}
+    return {"models": models, "text_search": settings.server.text_search}
 
 
 @router.post("/search", response_model=list[SearchResult])

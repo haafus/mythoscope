@@ -13,6 +13,8 @@ export const state = {
     traditionInfo: null,
     analysisSearchRequestId: 0,
     similarityMethods: [],
+    // Set from /api/similarity/models; false hides text search (viewer build).
+    textSearch: true,
 };
 
 // ===== Route teardown =====
@@ -130,6 +132,7 @@ export async function ensureModels() {
     if (!state.models.length) {
         const data = await api("/api/similarity/models");
         state.models = Array.isArray(data.models) ? data.models : [];
+        state.textSearch = data.text_search !== false;
     }
 
     const keys = state.models.map((model) => model.key);

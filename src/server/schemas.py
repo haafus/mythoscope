@@ -10,6 +10,9 @@ class ModelSummary(BaseModel):
 
 class ModelListResponse(BaseModel):
     models: list[ModelSummary]
+    # Whether this build can serve semantic text-query search; the frontend
+    # hides the search box when false (viewer deployments have no embedding stack).
+    text_search: bool = True
 
 
 class SearchRequest(BaseModel):

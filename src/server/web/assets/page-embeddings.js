@@ -40,6 +40,20 @@ const CHART_RENDERERS = {
 };
 
 export async function renderEmbeddings() {
+    // Load models first so state.textSearch (carried on that response) is known
+    // before we build the rail — no flash of a search box that then vanishes.
+    // Fail-open: if the call errors, keep the box rather than hide a working one.
+    try { await ensureModels(); } catch { /* handled again in loadModelsIntoSelect */ }
+    const textSearch = state.textSearch;
+    const searchPanelHtml = textSearch
+        ? `<div class="search-panel" id="searchPanel">
+                                <textarea id="search-text" placeholder="Type a text for similarity search…"></textarea>
+                                <button class="btn btn-primary search-btn" id="search-btn" type="button" disabled>Search ›</button>
+                            </div>`
+        : `<div class="search-panel search-panel-hint" id="searchPanel">
+                                Click a point in the plot to explore its nearest neighbours.
+                            </div>`;
+
     app.innerHTML = `
         <main class="analysis-page container">
             <div class="workspace">
@@ -69,10 +83,7 @@ export async function renderEmbeddings() {
                 <div class="sidebar rail">
                     <div class="card">
                         <div class="card-body rail-body">
-                            <div class="search-panel" id="searchPanel">
-                                <textarea id="search-text" placeholder="Type a text for similarity search…"></textarea>
-                                <button class="btn btn-primary search-btn" id="search-btn" type="button" disabled>Search ›</button>
-                            </div>
+                            ${searchPanelHtml}
                             <div class="info-content" id="infoContent" style="display:none;"></div>
                         </div>
                     </div>
@@ -117,10 +128,13 @@ function bindEmbeddingsControls() {
 
     modelSelect.addEventListener("change", triggerModelChange);
     vizSelect.addEventListener("change", loadVisualization);
-    searchText.addEventListener("input", () => {
-        searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
-    });
-    searchBtn.addEventListener("click", performAnalysisSearch);
+    // searchText/searchBtn are absent when text search is disabled.
+    if (searchText && searchBtn) {
+        searchText.addEventListener("input", () => {
+            searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
+        });
+        searchBtn.addEventListener("click", performAnalysisSearch);
+    }
 
     document.getElementById("close-search-modal").addEventListener("click", closeSearchModal);
 }
@@ -169,7 +183,7 @@ export function triggerModelChange() {
 
 // Fire-and-forget preload so the first text search isn't a cold start.
 function warmupModel(model) {
-    if (!model) return;
+    if (!model || !state.textSearch) return;
     api("/api/similarity/warmup", {
         method: "POST",
         body: JSON.stringify({ model }),
@@ -237,11 +251,15 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
     try {
         const { point, neighbors } = await fetchPointWithNeighbors(pointId, chunkIndex, 6, crossTradition);
+        // The pencil reopens the text-search box, absent when text search is off.
+        const editButton = state.textSearch
+            ? `<button class="fragment-edit" id="fragmentEditBtn" type="button" title="New similarity search" aria-label="New similarity search">${PENCIL_ICON}</button>`
+            : "";
         let html = `
             <div class="fragment-detail">
                 <div class="fragment-text">${reflowHtml(point.text)}</div>
                 ${attributionLine(point)}
-                <button class="fragment-edit" id="fragmentEditBtn" type="button" title="New similarity search" aria-label="New similarity search">${PENCIL_ICON}</button>
+                ${editButton}
             </div>
             <div class="fragments-divider">
                 <span>Similar fragments</span>
