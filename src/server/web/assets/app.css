@@ -103,7 +103,6 @@ body.has-main-navbar {
     text-transform: uppercase;
     padding: 7px 13px;
     border-radius: 6px;
-    transition: color 0.18s ease, background-color 0.18s ease;
     white-space: nowrap;
 }
 
@@ -1339,7 +1338,6 @@ body.has-main-navbar {
     border-radius: 6px;
     cursor: pointer;
     line-height: 1.2;
-    transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .motifs-tab.active {
