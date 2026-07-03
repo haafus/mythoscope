@@ -234,19 +234,19 @@ first-pass curation (e.g. Maghreb folded into "Near East", Volga-Finnic into
 
 ## 8. Example tales (Ashliman AFT)
 
-`aft.csv` (Ashliman's *Annotated Folk Tales*) is 1,518 folktale texts labelled
-with an ATU type. We store only **`title` + `provenance`** (dropping the full
-`text` — separate licence — and the long `source`/`notes`, unused on the UI).
-The type page shows an "Example tales" section (182 types) as a plain **list of
-links to each variant's text**, plus a corpus attribution to Ashliman's Folktexts.
+`aft.csv` (Ashliman's *Annotated Folk Tales*, fetched from the trilogy dataset —
+not ours, not bundled) is 1,518 folktale texts labelled with an ATU type. We
+store only the **`title`** (dropping the full `text` — separate licence — and the
+unused `source`/`notes`/`provenance`). The type page shows an "Ashliman" section
+(182 types) as a plain **list of links to each variant's text**.
 
 **Deep links (`ashliman.refresh`, best-effort, §9-style enrichment).** The AFT
 data carries no per-tale URL, so links are resolved at build time from Ashliman's
 site: each type has a page `pitt.edu/~dash/type{NNNN}[letter].html` whose table of
 contents maps a variant's title to an in-page anchor. We fetch the page (cached
-under `raw/ashliman/`), match each tale's title against the TOC — disambiguating
-same-titled variants by the title's parenthetical or the provenance against the
-TOC's country column — and set `tale["url"]` to `…type{NNNN}.html#anchor`, else
+under `raw/ashliman/`), match each tale's title against the TOC — same-titled
+variants (only 2 across the corpus) are told apart by the title's own parenthetical
+against the TOC's country column — and set `tale["url"]` to `…type{NNNN}.html#anchor`, else
 the page itself, else nothing. A curated `_PAGE_OVERRIDES` map covers famous types
 that live on a themed slug page instead of a numbered one (verified by the page's
 own declared type): `440→frogking`, `954→alibaba`, `325→magicbook`, `779J*→friday`,

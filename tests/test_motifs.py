@@ -246,19 +246,18 @@ class TestAshliman:
 
     def test_resolve_unique_title(self):
         toc = ashliman.parse_toc(self.TOC_HTML)
-        assert ashliman.resolve_anchor("Katie Woodencloak", "Norway", toc) == "woodencloak"
+        assert ashliman.resolve_anchor("Katie Woodencloak", toc) == "woodencloak"
 
-    def test_resolve_duplicate_title_by_provenance(self):
+    def test_resolve_duplicate_title_by_parenthetical(self):
         toc = ashliman.parse_toc(self.TOC_HTML)
-        # AFT disambiguates same-titled variants in the title's parenthetical…
-        assert ashliman.resolve_anchor("Cinderella (Grimm)", "", toc) == "grimm"
-        assert ashliman.resolve_anchor("Cinderella (Italy)", "", toc) == "italy"
-        # …or falls back to the provenance column.
-        assert ashliman.resolve_anchor("Cinderella", "Italy", toc) == "italy"
+        # Same-titled variants are told apart by the title's own parenthetical
+        # matched against the TOC's country column.
+        assert ashliman.resolve_anchor("Cinderella (Grimm)", toc) == "grimm"
+        assert ashliman.resolve_anchor("Cinderella (Italy)", toc) == "italy"
 
     def test_resolve_no_match_returns_none(self):
         toc = ashliman.parse_toc(self.TOC_HTML)
-        assert ashliman.resolve_anchor("Some Unrelated Tale", "Nowhere", toc) is None
+        assert ashliman.resolve_anchor("Some Unrelated Tale", toc) is None
 
 
 class TestAtuRegions:
@@ -407,11 +406,8 @@ class TestAtuRegions:
         ]
         tales = trilogy._parse_aft(rows)
         assert "999" not in tales                                     # no title → dropped
-        assert [t["title"] for t in tales["275"]] == ["A Race", "The Hare and the Tortoise"]  # by provenance
-        assert tales["275"][0]["provenance"] == "England"
-        assert "text" not in tales["275"][0]                         # full text never stored
-        assert "notes" not in tales["275"][0]                        # source/notes dropped (UI unused)
-        assert "source" not in tales["275"][0]
+        assert [t["title"] for t in tales["275"]] == ["A Race", "The Hare and the Tortoise"]  # sorted by provenance
+        assert tales["275"][0] == {"title": "A Race"}                 # title only; text/source/notes/provenance dropped
         # wired onto the type via _parse_atu
         rows_df = [{"atu_id": "275", "chapter": "Animal", "division": "Wild Animals 1-99",
                     "tale_name": "x", "tale_type": "y"}]

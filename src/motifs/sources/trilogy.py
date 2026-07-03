@@ -369,23 +369,22 @@ def _parse_atu_combos(rows: list[dict]) -> dict[str, list[str]]:
 
 def _parse_aft(rows: list[dict]) -> dict[str, list[dict]]:
     """Group ``aft.csv`` (Ashliman's Annotated Folk Tales) into example tales per
-    type: ``{atu_id: [{title, provenance}]}``. Title is what the page shows;
-    provenance is kept to disambiguate same-titled variants when the Ashliman
-    enrichment resolves each tale's deep link. The full ``text`` and the long
-    ``source``/``notes`` are dropped (licensing / lean index / unused on the UI).
-    Ordered by provenance then title for a stable read."""
+    type: ``{atu_id: [{title}]}``. Only the title is kept — it is both what the
+    page shows and the key the Ashliman enrichment matches on (same-titled
+    variants are told apart by the title's own parenthetical, so provenance is
+    not needed). The full ``text`` and the long ``source``/``notes``/``provenance``
+    are dropped (licensing / lean index / unused). Sorted by title for a stable read.
+    Provenance is still read for the sort, then discarded."""
     tales: dict[str, list[dict]] = {}
     for row in rows:
         atu_id = _clean(row.get("atu_id"))
         title = _fix_mojibake(_clean(row.get("tale_title")))
         if not atu_id or not title:
             continue
-        tales.setdefault(atu_id, []).append({
-            "title": title,
-            "provenance": _fix_mojibake(_clean(row.get("provenance"))),
-        })
+        prov = _fix_mojibake(_clean(row.get("provenance")))
+        tales.setdefault(atu_id, []).append({"title": title, "_prov": prov})
     for entries in tales.values():
-        entries.sort(key=lambda t: (t["provenance"].lower(), t["title"].lower()))
+        entries.sort(key=lambda t: (t.pop("_prov").lower(), t["title"].lower()))
     return tales
 
 

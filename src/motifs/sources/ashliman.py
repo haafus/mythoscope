@@ -75,9 +75,9 @@ def parse_toc(page_html: str) -> list[tuple[str, str, str]]:
     return out
 
 
-def resolve_anchor(title: str, provenance: str, toc: list[tuple[str, str, str]]) -> str | None:
-    """The anchor for a tale, matched by title against the TOC; duplicate titles
-    are disambiguated by the title's parenthetical or the provenance against the
+def resolve_anchor(title: str, toc: list[tuple[str, str, str]]) -> str | None:
+    """The anchor for a tale, matched by title against the TOC. Same-titled
+    variants (rare) are told apart by the title's own parenthetical against the
     TOC's country column. ``None`` when no title matches."""
     base = _SUFFIX.sub("", title)
     suffix_m = _SUFFIX.search(title)
@@ -88,11 +88,10 @@ def resolve_anchor(title: str, provenance: str, toc: list[tuple[str, str, str]])
         return None
     if len(cands) == 1:
         return cands[0][2]
-    for key in (suffix_m.group(1) if suffix_m else "", provenance):
-        for word in _norm(key).split():
-            for _nt, country, anchor in cands:
-                if word and word in country:
-                    return anchor
+    for word in _norm(suffix_m.group(1) if suffix_m else "").split():
+        for _nt, country, anchor in cands:
+            if word and word in country:
+                return anchor
     return cands[0][2]
 
 
@@ -120,7 +119,7 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
         toc = parse_toc(page_html)
         base_url = f"{BASE}/{page}"
         for tale in tales:
-            anchor = resolve_anchor(tale["title"], tale.get("provenance", ""), toc)
+            anchor = resolve_anchor(tale["title"], toc)
             tale["url"] = f"{base_url}#{anchor}" if anchor else base_url
             anchored += bool(anchor)
             page_level += not anchor
