@@ -1701,18 +1701,6 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-tree.filter-atu .desc-count::after { content: attr(data-atu); }
 
 /* Index overview dashboard. */
-.motifs-overview-btn {
-    width: 100%;
-    margin-bottom: 8px;
-    padding: 7px 10px;
-    font-size: 13px;
-    color: #41506a;
-    background: #eef3f7;
-    border: 1px solid #dde5ec;
-    border-radius: 7px;
-    cursor: pointer;
-}
-.motifs-overview-btn:hover { background: #e2edf0; border-color: #c7d9e6; }
 
 .overview-title { font-size: 16px; margin: 2px 0 14px; color: #1f3a4d; }
 

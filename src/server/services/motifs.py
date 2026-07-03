@@ -582,7 +582,7 @@ def _build_berezkin_stats() -> dict:
     stats = {
         "index": "berezkin",
         "intro": _INTRO["berezkin"],
-        "title": "Berezkin & Duvakin areal motif catalogue — overview",
+        "title": "Berezkin & Duvakin Areal Motif Catalogue",
         "cards": cards,
         "panels": panels,
         "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
@@ -636,7 +636,7 @@ def _build_atu_stats() -> dict:
     return {
         "index": "atu",
         "intro": _INTRO["atu"],
-        "title": (data.get("long_label") or "ATU tale types") + " — overview",
+        "title": "Aarne-Thompson-Uther Tale-Type Index",
         "cards": [
             {"value": len(types), "label": "tale types"},
             {"value": len([c for c in chapters if c]), "label": "chapters"},
@@ -729,7 +729,7 @@ def _build_tmi_stats() -> dict:
     return {
         "index": "tmi",
         "intro": _INTRO["tmi"],
-        "title": "Thompson Motif-Index of Folk-Literature — overview",
+        "title": "Thompson Motif-Index of Folk-Literature",
         "totals": {
             "count": len(records), "chapters": len(chapters), "with_notes": n_notes,
             "definitions": n_def, "substantive": n_sub, "atu": n_atu,

@@ -54,7 +54,6 @@ export async function renderMotifs(params = new URLSearchParams()) {
             <div class="workspace">
                 <aside class="library-sidebar motifs-sidebar">
                     <div class="motifs-tabs" id="motifsTabs">${tabsPlaceholder()}</div>
-                    <button class="motifs-overview-btn" id="motifsOverview">Overview</button>
                     <input type="text" class="motifs-search" id="motifsSearch" placeholder="Search id or name...">
                     <select class="motifs-chapter" id="motifsChapter"></select>
                     <div class="motifs-list" id="motifsList"></div>
@@ -202,7 +201,6 @@ function wireControls() {
         loadList();
         syncUrl(true);
     });
-    document.getElementById("motifsOverview").addEventListener("click", renderOverview);
     // ↑/↓ step through the sidebar list (same handler ref → no duplicates on re-render).
     document.addEventListener("keydown", onMotifsKeydown);
     onCleanup(() => document.removeEventListener("keydown", onMotifsKeydown));
@@ -256,7 +254,12 @@ async function switchIndex(index) {
 }
 
 async function selectIndex(index) {
-    if (index === mState.index) return;
+    // Clicking the index tab is now the way back to its overview — re-render it
+    // even when the tab is already active (the old dedicated Overview button).
+    if (index === mState.index) {
+        renderOverview();
+        return;
+    }
     await switchIndex(index);
     renderOverview();
 }
