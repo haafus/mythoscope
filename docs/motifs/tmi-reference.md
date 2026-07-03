@@ -154,10 +154,17 @@ separates them, keeping the raw `notes` as the source of truth.
   (`Fable`, `Answer`, `Countertask`).
 - **references** — the bibliography split on `;` / ` --`; the general
   (non-culture-tagged) segments are shown separately on the motif page.
-- **see_also** — `†` cross-references to other motifs, split into direct `ref`
-  and softer `cf` ("compare"). 94.8% resolve to a real id. `†` tokens are
-  stripped from the text *before* definition/culture parsing so they cannot
-  bleed into a neighbouring citation.
+- **see_also** — `†` cross-references to other motifs, split into `cf`
+  (Thompson's `Cf.` "compare" — the majority) and bare-`†` direct `ref`
+  redirects (the minority). A single `Cf.` governs its whole list, so every
+  ref after it is a compare, not just the first; the list continues across a
+  comma, `and`, a range dash (`†A1--†A2`), or a `[b]` footnote marker on the
+  `Cf.`, and breaks on anything else. A `†` glued to a citation as a
+  bibliographic tag (`… Ursule (†B211.20)`) is dropped, not treated as a
+  cross-reference. 94.8% resolve to a real id. `†` tokens are stripped from the
+  text *before* definition/culture parsing so they cannot bleed into a
+  neighbouring citation. (The serve layer merges `cf` + `ref` into one
+  **Related motifs** list, §11.)
 - **atu_inline** — inline `Type N` / `Types N, M` references to ATU tale types.
 
 ### What else lives in notes (not extracted as fields)
@@ -288,6 +295,12 @@ tale types (constituent from `atu_seq` + inline `Type` from the note) into one
 **Related ATU tale types** section with ⇐/⇒/⇔ markers; inline `Type` numbers are
 AaTh and are remapped to ATU 2004 where possible — see
 [`atu-reference.md`](atu-reference.md) §9.
+
+The note's own `†` cross-references (§6) are served as one **Related motifs**
+list (`links.related`): the `Cf.` compares are the unmarked default and the
+rarer bare-`†` redirects carry a small **see also** tag. The two are thin and
+asymmetric enough that separate sections added noise, not signal, so they are
+merged with the minority marked rather than split.
 
 A **geographic** alignment (TMI cultures ↔ Berezkin areas, via a shared region
 taxonomy) is possible but not built — it would be a coarse region-level overlay,
