@@ -1726,8 +1726,8 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 
 /* Scholarly header above the stat cards: description + authorship + sources.
    Plain — no panel; it sits on the page background. */
-.overview-intro { margin: 0 0 20px; }
-.ov-blurb { font-size: 13px; line-height: 1.55; color: #2f3d47; margin: 0 0 10px; }
+.overview-intro { margin: 0 0 32px; }
+.ov-blurb { font-size: 13px; line-height: 1.55; color: #2f3d47; margin: 0 0 18px; }
 .ov-blurb em { font-style: italic; color: #1f6b60; }
 .ov-meta { display: flex; flex-direction: column; gap: 4px; }
 .ov-meta-row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; font-size: 12px; align-items: baseline; }
