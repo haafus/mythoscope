@@ -1611,7 +1611,10 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
     border-radius: 14px;
 }
 
-.motif-link:hover { background: #e2edf0; border-color: #c7d9e6; }
+.motif-link:hover { background: #4f7096; border-color: #4f7096; color: #fff; }
+.motif-link:hover .motif-link-id,
+.motif-link:hover .motif-link-name,
+.motif-link:hover .motif-link-rel { color: #fff; }
 .motif-link.missing { opacity: 0.55; }
 
 .motif-link-id { font-weight: 700; color: #5b7da6; }
