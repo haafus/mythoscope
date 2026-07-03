@@ -15,6 +15,10 @@ Open `index.html` in a browser. Three views:
    Berezkin is globally even, TMI sits between (its South-Asian mass is
    Thompson-Balys India); pooled, Europe leads at only 49%.
 3. **Regional lens** — pick a region → material from all three indexes at once.
+   Index order throughout is Thompson → Berezkin → ATU. The region name opens a
+   **region page** (`region-siberia.html`); each index header / "+N" chip opens
+   that index's **filtered list** (`list-{tmi,berezkin,atu}-siberia.html`) with
+   compose-filters over the cross-walk. Entity chips open the detail pages.
 
 **Data:** the ATU/TMI/Berezkin aggregate profiles and ATU 510A footprint are
 real (computed from the built `outputs/motifs/*.json`). The region grouping is a
