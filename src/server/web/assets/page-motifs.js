@@ -1147,7 +1147,7 @@ function renderDetail(d) {
         // Cross-references to other motifs and indexes come before the distribution.
         if ((links.tmi || []).length) body += linkSection("Thompson motifs (TMI)", links.tmi);
         if ((links.atu || []).length) body += linkSection("ATU tale types", links.atu);
-        if ((links.see_also || []).length) body += linkSection("See also (Berezkin)", links.see_also);
+        if ((links.see_also || []).length) body += linkSection(`Related motifs (${links.see_also.length})`, links.see_also);
         // Macro-areas: hide the whole section when the motif has none.
         if ((d.areas || []).length) {
             const areas = d.areas.map((a) =>
