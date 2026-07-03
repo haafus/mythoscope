@@ -140,7 +140,7 @@ introduced several defects. Each is repaired at build time (`trilogy.py`).
   file is valid UTF-8): the original diacritic → `U+FFFD` → latin1-decoded → `ï¿½`
   → re-UTF-8-encoded, all in Trilogy's extraction. The original char is destroyed
   in the published file, so no re-download helps. We heal in three passes:
-  1. a **curated dictionary** (~135 entries) of the recurring folklore-scholar
+  1. a **curated dictionary** (~140 entries) of the recurring folklore-scholar
      names and journals it corrupts (`Ténèze`, `Köhler`, `Polívka`,
      `Ó Súilleabháin`, `Bârlea`, `Pitrè`, `Röhrich`, `Béaloideas`, `Pañcatantra`…);
   2. **range → en-dash**: numbers/pages (`998ï¿½1005`), letter-suffixed type
@@ -148,8 +148,9 @@ introduced several defects. Each is repaired at build time (`trilogy.py`).
      proper range endpoint so a diacritic inside a name (`Rï¿½hle`) is never turned
      into a dash;
   3. the residue → a single `�` (a genuinely lost diacritic we won't guess).
-  Result: **~89%** of occurrences healed (~93% of the recoverable ones). The
-  remainder is 730 standalone `ï¿½` and a long tail of rare/ambiguous names.
+  Result: **~94%** of occurrences healed. The remainder (~900) is a long tail of
+  rare or genuinely ambiguous names (`Böcker`, `Führmann`), plus just 19 standalone
+  `ï¿½`.
 - **Dropped leading capital.** A related corruption deletes a name's leading
   diacritic capital outright, no marker (`Ėrgis → rgis`, `Čajkanović → ajkanovi`).
   These surface as a lowercase-initial surname in citation position and are
@@ -262,7 +263,7 @@ have 1–3.
 - The scholarly apparatus is only partly decoded: series abbreviations and famous
   works get names/links, but individual author-year citations cannot be expanded
   without Uther's full bibliography (copyrighted, not machine-readable).
-- Mojibake healing is ~89%; the residual `�` marks a genuinely lost diacritic, and
+- Mojibake healing is ~94%; the residual `�` marks a genuinely lost diacritic, and
   a few ambiguous names (`Böcker`, `Führmann`, `Hüllen`) are left as markers
   rather than guessed.
 - AaTh→ATU remaps only ~16% of the orphaned TMI-note references; the rest are

@@ -45,7 +45,8 @@ _MOJIBAKE = "ï¿½"  # ï¿½
 # 400Aï¿½C, 400Aï¿½400D, 851A*ï¿½C*) or between roman numerals (XIï¿½XXVIII). Both
 # sides must be a proper range endpoint, so a lost diacritic inside a name
 # (Rï¿½hle) is never mistaken for a dash.
-_MOJIBAKE_TYPE_RANGE = re.compile(rf"(\d+[A-Z]*\*?){re.escape(_MOJIBAKE)}(\d+[A-Z]*\*?|[A-Z]+\*?)")
+_MOJIBAKE_TYPE_RANGE = re.compile(
+    rf"(\*?\d+[A-Za-z]*\*?){re.escape(_MOJIBAKE)}(\*?\d+[A-Za-z]*\*?|\*?[A-Za-z]{{1,3}}\*?)")
 _MOJIBAKE_ROMAN_RANGE = re.compile(rf"\b([IVXLCDM]+){re.escape(_MOJIBAKE)}([IVXLCDM]+)\b")
 
 # Keys use "#" for the lost character so the exact mojibake code points are
@@ -83,7 +84,9 @@ _MOJIBAKE_REPAIRS_TEMPLATE = {
     # Italian / Romanian
     "Pitr#": "Pitrè", "B#rlea": "Bârlea", "Rivi#re": "Rivière",
     "To#ev": "Tošev", "M#llenhoff": "Müllenhoff",
-    # Irish / English apostrophe
+    # Irish / English apostrophe — the standalone leading Ó is lost too; the longer
+    # key wins over "S#illeabh#in" via longest-first, healing both mojibakes at once.
+    "# S#illeabh#in": "Ó Súilleabháin",
     "S#illeabh#in": "Súilleabháin", "O#Sullivan": "O'Sullivan",
     "O#Connor": "O'Connor",
     # Nordic
@@ -120,6 +123,9 @@ _MOJIBAKE_REPAIRS_TEMPLATE = {
     "Set#l#/Kyr#l#": "Setälä/Kyrölä",
     # Irish / Italian apostrophe (extended tail)
     "O#Faolain": "O'Faolain", "D#Aronco": "D'Aronco",
+    # German / Swedish / French (residual tail)
+    "Scheinbu#e": "Scheinbuße", "Taufschw#nke": "Taufschwänke",
+    "B#ckstr#m": "Bäckström", "H#rodote": "Hérodote",
     # Journals
     "Laogr#phia": "Laographia", "B#aloideas": "Béaloideas",
     "Pa#catantra": "Pañcatantra", "Krypt#dia": "Kryptádia", "M#lusine": "Mélusine",

@@ -227,6 +227,11 @@ class TestAtuStructure:
         assert f(f"III, XI{M}XXVIII, IV") == "III, XI–XXVIII, IV"  # roman-numeral range
         assert f(f"(S. R{M}hle)") == "(S. R�hle)"                  # lost diacritic in a name → marker
         assert f(f"unknown {M} name") == "unknown � name"          # unrecognised → marker
+        # a standalone leading Ó lost too: the longer key heals both mojibakes
+        assert f(f"Irish: {M} S{M}illeabh{M}in") == "Irish: Ó Súilleabháin"
+        assert f(f"S{M}illeabh{M}in") == "Súilleabháin"     # bare form still handled
+        assert f(f"Nos. *1855B{M}*1855F") == "Nos. *1855B–*1855F"  # starred type range
+        assert f(f"168a{M}b") == "168a–b"                   # lowercase type range
         # dropped leading capital (no marker), repaired only as a whole word
         assert f("Yakut: rgis 1967") == "Yakut: Ėrgis 1967"
         assert f("Serbian: ajkanovi 1927") == "Serbian: Čajkanović 1927"
