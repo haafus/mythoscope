@@ -9,8 +9,8 @@ import pytest  # noqa: E402
 
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, store  # noqa: E402
-from motifs.sources import berezkin, berezkin_bibliography as bbib, trilogy
-from motifs.sources import culture_dict, tmi_notes
+from motifs.sources import berezkin, culture_dict, tmi_notes, trilogy
+from motifs.sources import berezkin_bibliography as bbib
 from server.services import motifs as svc
 
 # ---------------------------------------------------------------------------
@@ -350,10 +350,10 @@ class TestAtuStructure:
             {"index": "atu", "id": "314", "exists": True, "name": "C", "aath": "532"},
         ]
         out = svc._merge_atu_relations(["301A", "300"], ref)
-        rels = [(l["rel"], l["id"]) for l in out]
+        rels = [(r["rel"], r["id"]) for r in out]
         # ⇔ (both) first, then ascending by number
         assert rels == [("both", "300"), ("appears", "301A"), ("cited", "314")]
-        assert next(l for l in out if l["id"] == "314")["aath"] == "532"
+        assert next(r for r in out if r["id"] == "314")["aath"] == "532"
 
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
@@ -879,7 +879,7 @@ class TestService:
         assert s["totals"]["count"] == len(svc._records("tmi"))
         assert {c["label"] for c in s["composition"]} == {"substantive", "scaffold", "variation"}
         assert sum(c["count"] for c in s["composition"]) == s["totals"]["count"]
-        assert [l["level"] for l in s["levels"]] == sorted(l["level"] for l in s["levels"])
+        assert [lv["level"] for lv in s["levels"]] == sorted(lv["level"] for lv in s["levels"])
         assert "regions" in s and "top_cultures" in s and "see_also_hubs" in s and "top_sources" in s
         # Berezkin and ATU have their own dashboards (cards + chart panels).
         for ix in ("berezkin", "atu"):

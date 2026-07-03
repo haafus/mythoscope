@@ -244,7 +244,7 @@ def _merge_atu_relations(appears: list[str], referenced: list[dict]) -> list[dic
             link["rel"] = "cited"
             chips[key] = link
     return sorted(chips.values(),
-                  key=lambda l: (0 if l["rel"] == "both" else 1, _atu_num_key(l["id"])))
+                  key=lambda c: (0 if c["rel"] == "both" else 1, _atu_num_key(c["id"])))
 
 
 def _resolve_atu_inline(refs: list[str]) -> list[dict]:

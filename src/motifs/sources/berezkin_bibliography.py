@@ -105,7 +105,7 @@ def parse_bibliography(html: str) -> dict[str, dict]:
                 author = f"{author} {text}"
             continue
 
-        surname = re.split(r"[,\s]", author, 1)[0].strip()
+        surname = re.split(r"[,\s]", author, maxsplit=1)[0].strip()
         if not surname:
             continue
         key = f"{surname} {year}"

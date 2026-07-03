@@ -58,7 +58,7 @@ _QUERY = """SELECT ?atu ?item ?isType (SAMPLE(?img) AS ?image) (SAMPLE(?perry) A
   OPTIONAL { ?item p:P528 ?st . ?st ps:P528 ?code ; pq:P972 ?ci .
              ?ci rdfs:label ?catL FILTER(lang(?catL)="en") }
 %s
-} GROUP BY ?atu ?item ?isType""" % (
+} GROUP BY ?atu ?item ?isType""" % (  # noqa: UP031 — %-format keeps SPARQL braces unescaped
     " ".join(f"(SAMPLE(?l_{lang}) AS ?l_{lang})" for lang in _LANGS),
     ", ".join(f'"{w}"' for w in _WIKIS),
     "\n".join(f'  OPTIONAL {{ ?item rdfs:label ?l_{lang} FILTER(lang(?l_{lang})="{lang}") }}'
