@@ -94,10 +94,24 @@ def _split_definition(notes: str) -> tuple[str, str]:
     return (head, notes[m.start():]) if _is_prose(head) else ("", notes)
 
 
+# Comma/whitespace only — a †ref that continues an open 'Cf. †…, †…' list.
+_CF_CONT = re.compile(r"[\s,]*")
+
+
 def _see_also(notes: str) -> dict:
     cf, ref = [], []
-    for is_cf, mid in _DAGGER.findall(notes):
-        (cf if is_cf else ref).append(mid.rstrip("."))
+    carry = False        # inside an open 'Cf. †A, †B, …' list?
+    prev_end = None
+    for m in _DAGGER.finditer(notes):
+        mid = m.group(2).rstrip(".")
+        if m.group(1):                        # explicit 'Cf.' introduces (or re-opens) the list
+            is_cf = carry = True
+        elif carry and prev_end is not None and _CF_CONT.fullmatch(notes[prev_end:m.start()]):
+            is_cf = True                      # comma-continuation of the open 'Cf.' list
+        else:                                 # a bare '†X' (see also), or a break in the list
+            is_cf = carry = False
+        (cf if is_cf else ref).append(mid)
+        prev_end = m.end()
     return {"cf": _dedup(cf), "ref": _dedup(ref)}
 
 

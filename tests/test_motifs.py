@@ -532,6 +532,19 @@ class TestTrilogy:
         assert out["definition"] == ""
         assert "S. Am. Indian (Paressi)" in out["cultures"]
 
+    def test_notes_cf_propagates_across_the_whole_list(self):
+        # A single 'Cf.' introduces the whole comma-list, so every ref is
+        # "compare", not just the first (TMI Q227 regression).
+        out = tmi_notes.parse_notes("(Cf. †Q286.1, †Q421.2, †Q428.3)")
+        assert out["see_also"]["cf"] == ["Q286.1", "Q421.2", "Q428.3"]
+        assert out["see_also"]["ref"] == []
+
+    def test_notes_bare_dagger_is_see_also_not_cf(self):
+        # A bare '†X' (no Cf.) is "see also"; a following 'Cf. †…' list is compare.
+        out = tmi_notes.parse_notes("†A1. Cf. †B2, †C3")
+        assert out["see_also"]["ref"] == ["A1"]
+        assert out["see_also"]["cf"] == ["B2", "C3"]
+
     def test_notes_culture_label_with_hyphen_and_comma_list(self):
         # A multi-culture label with a hyphenated name must be recognised as a
         # citation, not leak into the definition (A13.4.1 'Snake As Creator').
