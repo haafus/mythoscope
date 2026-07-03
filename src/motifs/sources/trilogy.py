@@ -480,6 +480,9 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
         sub_name, sub_start, sub_end = _split_division(_clean(row.get("sub_division")))
         tale_name, tale_summary = _repair_atu_name(
             _clean(row.get("tale_name")), _clean(row.get("tale_type")))
+        # A doubled apostrophe is always a source artifact (a closing quote rendered
+        # as '', or a lost accented letter): collapse it to a single apostrophe.
+        tale_name, tale_summary = tale_name.replace("''", "'"), tale_summary.replace("''", "'")
         types.append({
             "id": atu_id,
             "num": num,

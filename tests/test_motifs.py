@@ -357,13 +357,17 @@ class TestAtuStructure:
 
     def test_summary_html_linkifies(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id",
-                            lambda idx: {"B261": {}, "S222": {}} if idx == "tmi" else {"400": {}, "537": {}})
+                            lambda idx: {"B261": {}, "S222": {}} if idx == "tmi"
+                            else {"400": {}, "537": {}, "510A": {}, "510B": {}})
         out = svc._atu_summary_html("War [B261] then Type 400, Cf. Type 537; also X999 and Type 999. Tom & Jerry")
         assert 'data-index="tmi" data-id="B261"' in out
         assert 'data-index="atu" data-id="400"' in out and 'data-index="atu" data-id="537"' in out
         assert "X999" in out and 'data-id="X999"' not in out   # unknown motif → plain text
         assert 'data-id="999"' not in out                      # unknown type → plain text
         assert "&amp;" in out                                  # prose is escaped
+        # a "Types N and M" list (not just comma-separated) linkifies every member
+        out2 = svc._atu_summary_html("See esp. Types 510A and 510B.")
+        assert 'data-id="510A"' in out2 and 'data-id="510B"' in out2
 
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"

@@ -1009,7 +1009,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
 # A TMI motif token (letter + digits + dotted sub-numbers) and a "Type N[, M]"
 # clause in an ATU summary — linked to the existing motif/type they name.
 _SUMMARY_MOTIF = re.compile(r"\b[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*")
-_SUMMARY_TYPE = re.compile(r"\b(Types?\s+)(\d+[A-Za-z*]*(?:\s*,\s*\d+[A-Za-z*]*)*)")
+_SUMMARY_TYPE = re.compile(
+    r"\b(Types?\s+)(\d+[A-Za-z*]*(?:(?:\s*,\s*|\s+and\s+|\s*&\s*)\d+[A-Za-z*]*)*)")
 
 
 def _inline_link(index: str, ref: str) -> str:
