@@ -1026,8 +1026,19 @@ def _atu_summary_html(text: str) -> str:
         return ""
     tmi, atu = _by_id("tmi"), _by_id("atu")
     esc = html.escape(text, quote=False)
-    esc = _SUMMARY_MOTIF.sub(
-        lambda m: _inline_link("tmi", m.group(0)) if m.group(0) in tmi else m.group(0), esc)
+
+    def _motif(m):
+        tok = m.group(0)
+        if tok in tmi:
+            return _inline_link("tmi", tok)
+        # "J1141ff" / "J21f" is the "and following" shorthand — link the base motif,
+        # keep the trailing f/ff as plain text.
+        base = tok.rstrip("f")
+        if base != tok and base in tmi:
+            return _inline_link("tmi", base) + tok[len(base):]
+        return tok
+
+    esc = _SUMMARY_MOTIF.sub(_motif, esc)
     esc = _SUMMARY_TYPE.sub(
         lambda m: m.group(1) + re.sub(
             r"\d+[A-Za-z*]*",

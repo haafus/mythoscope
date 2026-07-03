@@ -368,6 +368,11 @@ class TestAtuStructure:
         # a "Types N and M" list (not just comma-separated) linkifies every member
         out2 = svc._atu_summary_html("See esp. Types 510A and 510B.")
         assert 'data-id="510A"' in out2 and 'data-id="510B"' in out2
+        # "J1141ff" ('and following') links the base motif, keeps the ff as text
+        monkeypatch.setattr(svc, "_by_id",
+                            lambda idx: {"B261": {}} if idx == "tmi" else {})
+        out3 = svc._atu_summary_html("the judgements [B261ff]")
+        assert 'data-id="B261"' in out3 and out3.endswith("ff]")
 
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"
