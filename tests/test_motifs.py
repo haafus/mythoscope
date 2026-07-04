@@ -974,6 +974,32 @@ class TestCrosswalk:
         # old number 403C resolves to the current type 480 via the alias map
         assert cw["atu_to_berezkin"]["480"] == ["M1"]
 
+    def test_inline_note_and_summary_maps_are_symmetric(self):
+        # Both inline relations are stored in both directions so an edge shows on
+        # both indexes' pages.
+        tmi_ids = {"J2066", "K550", "Z81"}
+        atu_ids = {"115", "122"}
+        # A TMI note cites "Type N": 115 straight through, 900 is a pre-2004 number
+        # remapped via the AaTh concordance, 9999 is an orphan (no edge).
+        tmi_notes = {"K550": ["122", "900"], "J2066": ["115"], "Z81": ["9999"]}
+        aath_to_atu = {"900": ["122"]}
+        # ATU summaries name TMI codes in prose (with the "ff" shorthand on 122).
+        atu_summaries = {"115": "The fox waits [J2066] in vain.",
+                         "122": "Escape by naming K550ff; cf. missing X999."}
+        cw = crosswalk.build({}, tmi_ids, [], atu_ids, {}, {},
+                             tmi_notes, aath_to_atu, atu_summaries)
+        # notes: forward + inverse
+        assert cw["tmi_to_atu_note"]["K550"] == ["122"]         # 900→122 dedups with direct 122
+        assert cw["tmi_to_atu_note"]["J2066"] == ["115"]
+        assert "Z81" not in cw["tmi_to_atu_note"]                # orphan 9999 dropped
+        assert cw["atu_to_tmi_note"]["122"] == ["K550"]
+        assert cw["atu_to_tmi_note"]["115"] == ["J2066"]
+        # summaries: forward + inverse; ff shorthand resolves to the base code
+        assert cw["atu_to_tmi_summary"]["115"] == ["J2066"]
+        assert cw["atu_to_tmi_summary"]["122"] == ["K550"]      # K550ff → K550; X999 not in TMI
+        assert cw["tmi_to_atu_summary"]["J2066"] == ["115"]
+        assert cw["tmi_to_atu_summary"]["K550"] == ["122"]
+
     def test_direct_berezkin_tmi(self):
         # tmi_refs (from mapsofmyths) become a direct Berezkin<->TMI bridge; a ref
         # is cleaned (*, trailing dot) and kept only if it exists in the TMI index.

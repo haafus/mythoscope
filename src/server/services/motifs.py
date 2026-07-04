@@ -1093,6 +1093,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         # Tale types this motif *defines* (Uther's heading motif) — a distinct link
         # from the constituent one above.
         detail["links"]["atu_defines"] = [_link("atu", a) for a in cw.get("tmi_to_atu_defining", {}).get(rec["id"], [])]
+        # Tale types whose summary prose names this motif — the inverse of the
+        # inline TMI links the ATU summary renders, so the edge shows both ways.
+        detail["links"]["atu_summary_refs"] = [_link("atu", a) for a in cw.get("tmi_to_atu_summary", {}).get(rec["id"], [])]
         # Direct Berezkin motifs that map here (mapsofmyths concordance).
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in cw.get("tmi_to_berezkin", {}).get(rec["id"], [])]
 
@@ -1117,6 +1120,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["links"]["subtypes"] = [_link("atu", s) for s in rec.get("subtypes", [])]
         detail["links"]["defining"] = [_mark_missing(_link("tmi", m), "tmi_gap") for m in rec.get("defining_motifs", [])]
         detail["links"]["tmi"] = [_mark_missing(_link("tmi", m), "tmi_gap") for m in rec.get("motifs", [])]
+        # TMI motifs whose notes cite this tale type ("Type N") — the inverse of the
+        # ⇒ "cited" relation shown on the motif page, so the edge shows both ways.
+        detail["links"]["tmi_via_notes"] = [_link("tmi", m) for m in cw.get("atu_to_tmi_note", {}).get(rec["id"], [])]
         detail["links"]["combos"] = [_link("atu", c) for c in rec.get("combos", [])]
         bz = cw.get("atu_to_berezkin", {}).get(rec["id"], [])
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in bz]

@@ -114,6 +114,9 @@ def build_motifs(*, force: bool = False) -> None:
     atu_seq: dict[str, list[str]] = {}
     atu_defining: dict[str, list[str]] = {}
     atu_aliases: dict[str, str] = {}
+    tmi_notes: dict[str, list[str]] = {}
+    atu_summaries: dict[str, str] = {}
+    aath_to_atu: dict[str, list[str]] = {}
     tr_cfg = config.get("trilogy", {})
     if tr_cfg.get("enabled", True):
         files = tr_cfg.get("files", {})
@@ -127,6 +130,8 @@ def build_motifs(*, force: bool = False) -> None:
         tmi_motifs = tmi_index["motifs"]
         counts["tmi"] = len(tmi_motifs)
         tmi_ids = {m["id"] for m in tmi_motifs}
+        # Inline "Type N" citations in TMI notes → feed the (inverse) note cross-walk.
+        tmi_notes = {m["id"]: m["atu_inline"] for m in tmi_motifs if m.get("atu_inline")}
         logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
                     len(tmi_motifs),
                     _applied(tmi_motifs, lambda m: m.get("definition")),
@@ -154,6 +159,14 @@ def build_motifs(*, force: bool = False) -> None:
         atu_ids = {t["id"] for t in atu_types}
         atu_defining = {t["id"]: t["defining_motifs"] for t in atu_types if t.get("defining_motifs")}
         atu_aliases = atu_index.get("aliases", {})
+        atu_summaries = {t["id"]: t["summary"] for t in atu_types if t.get("summary")}
+        # AaTh tale-type number → ATU 2004 id(s), from the Wikidata concordance each
+        # type carries; resolves the pre-2004 numbers TMI notes cite.
+        for t in atu_types:
+            for code in (t.get("concordances") or {}).get("AaTh", []):
+                aath_to_atu.setdefault(code, [])
+                if t["id"] not in aath_to_atu[code]:
+                    aath_to_atu[code].append(t["id"])
         logger.info("      %d tale types", len(atu_types))
         wd = enrichment["atu_wikidata"]
         if wd.get("skipped"):
@@ -171,7 +184,8 @@ def build_motifs(*, force: bool = False) -> None:
     # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
     logger.info("[4/4] Cross-walk — deriving id links across the three indexes")
-    links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining, atu_aliases)
+    links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining,
+                            atu_aliases, tmi_notes, aath_to_atu, atu_summaries)
     save_json(store.crosswalk_path(), links)
     logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI), Berezkin<->ATU %d/%d, "
                 "Berezkin<->TMI (direct) %d/%d (%d TMI motifs reachable from a tale type)",
@@ -179,6 +193,9 @@ def build_motifs(*, force: bool = False) -> None:
                 len(links["atu_to_tmi_defining"]), len(links["tmi_to_atu_defining"]),
                 len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]),
                 len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]), links["linked_tmi_count"])
+    logger.info("      + inline relations (each stored both ways): TMI notes → %d ATU types, "
+                "ATU summaries → %d TMI motifs",
+                len(links["atu_to_tmi_note"]), len(links["tmi_to_atu_summary"]))
 
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),

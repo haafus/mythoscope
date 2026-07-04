@@ -297,6 +297,9 @@ live-site growth and folded-in subtypes).
   two relationships barely overlap: a TMI motif page surfaces it as **Defines ATU
   tale type(s)**, distinct from *Related ATU tale types*. Only codes present in
   the TMI index are linked.
+- **ATU ↔ TMI (inline)** — two free-text relations (a TMI note citing `Type N`;
+  a TMI code named in an ATU summary), each stored both ways so the edge shows on
+  both pages. See *Symmetric inline relations* below.
 - **ATU → Berezkin** — from `atu_refs` parsed in Berezkin titles (see
   `berezkin-reference.md`). A cited number that is a pre-2004 (renumbered/merged)
   type is resolved to the current type through the ATU `aliases` map before the
@@ -333,6 +336,23 @@ constituent (from `atu_seq`), **⇒** referenced (named in the note, AaTh-resolv
 **⇔** both. Ordered ⇔ first (corroborated by two independent sources), then
 ascending by tale-type number. Max 48 types on one motif (`L161`); ~97% of motifs
 have 1–3.
+
+### Symmetric inline relations
+
+The two *inline* free-text relations used to show on one index's page only; they
+are now stored in both directions (`crosswalk.build`) so each edge appears on both
+pages:
+
+- **TMI note → ATU** (`tmi_to_atu_note` / `atu_to_tmi_note`) — the ⇒ "cited"
+  half above. The tale-type page gains **Referenced by TMI motifs (via notes)**,
+  the inverse of a note's resolved `Type N` citations (straight-through, else via
+  the AaTh→ATU concordance; orphan AaTh numbers produce no edge). ~800 types.
+- **ATU summary → TMI** (`atu_to_tmi_summary` / `tmi_to_atu_summary`) — the TMI
+  codes the summary prose names and renders as links. The motif page gains **Named
+  in ATU summaries**, listing the types whose summary cites it. ~1,665 types.
+
+The curated structural links (constituent `atu_seq`, `defining_motifs`) were
+already symmetric — each is stored with its inverse.
 
 ---
 
