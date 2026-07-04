@@ -1601,7 +1601,7 @@ body.has-main-navbar {
 /* ATU Wikidata enrichment: multilingual names + Wikipedia links. */
 .motif-altnames { display: flex; flex-direction: column; gap: 4px; }
 .motif-altname { font-size: 13px; color: #2a2f36; }
-.motif-altname-lang { display: inline-block; min-width: 74px; color: var(--muted); font-size: 12px; }
+.motif-altname-lang { display: inline-block; min-width: 74px; color: var(--muted); font-size: 11px; }
 .motif-altname-lang[title] { cursor: help; text-decoration: underline dotted var(--border);
     text-underline-offset: 3px; }
 .motif-altname-lang[title]:hover, .motif-altname-lang[title]:focus {
