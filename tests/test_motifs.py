@@ -425,6 +425,12 @@ class TestAtuRegions:
         assert r("'No", "' A king rules.") == ("'No.'", "A king rules.")
         # doubled apostrophe (source artifact) collapsed before quote detection
         assert r("The Hen ''What was I''", "A note.") == ("The Hen 'What was I'", "A note.")
+        # balanced one-line title with no plot period → reunited, summary empty
+        assert r("St", "Christopher and the Christ Child") == ("St. Christopher and the Christ Child", "")
+        # unclosed '(' in the source (425D): no depth-0 boundary exists, so the raw
+        # column split is preserved rather than collapsing everything into the title
+        assert r("The Vanished Husband (previously Learned of (Bath-house)", "The animal [T68] marries.") \
+            == ("The Vanished Husband (previously Learned of (Bath-house)", "The animal [T68] marries.")
 
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [

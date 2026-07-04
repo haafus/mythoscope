@@ -393,21 +393,23 @@ _CLOSE_QUOTE = re.compile(r"'(?=\s|$|[.!?,;:])")
 _TRAIL_WORD = re.compile(r"([A-Za-z]+)$")
 
 
-def _split_title(text: str) -> tuple[str, str]:
+def _split_title(text: str) -> tuple[str, str | None]:
     """Split Uther's run-on ``<title>. <description>`` into ``(title, description)``.
 
     Two title shapes:
 
       * a **quoted catch-phrase** (jokes, anecdotes, formula tales) — the leading
         ``'…'``; the closing quote is a ``'`` followed by whitespace/end/punctuation
-        (apostrophes in ``'s``/``'t`` are skipped). An opening quote that never closes
-        (malformed source) makes the whole string the title;
+        (apostrophes in ``'s``/``'t`` are skipped);
       * otherwise the **label up to the first sentence period** at bracket-depth 0
         (over ``()`` and ``[]``) that is neither an abbreviation (``St.``, ``etc.``…)
         nor a decimal inside a code (``digit.digit``).
 
-    Trailing apparatus — ``(previously …)``, ``(Including …)``, ``[codes]`` — is left
-    on whichever side the boundary falls; it is never pulled back onto the title."""
+    ``description`` is ``None`` when no boundary was found — an opening quote that
+    never closes, or a period scan that never hit depth 0 (an unclosed bracket in
+    the source); the caller decides what to do with a boundary-less entry. Trailing
+    apparatus — ``(previously …)``, ``(Including …)``, ``[codes]`` — is left on
+    whichever side the boundary falls; it is never pulled back onto the title."""
     text = text.strip()
     if not text:
         return "", ""
@@ -416,7 +418,7 @@ def _split_title(text: str) -> tuple[str, str]:
         m = _CLOSE_QUOTE.search(body)
         if m:
             return f"'{body[:m.start()].strip()}'", body[m.end():].strip()
-        return text, ""              # unterminated opening quote: all title
+        return text, None            # unterminated opening quote: no boundary
     depth = 0
     for i, ch in enumerate(text):
         if ch in "[(":
@@ -432,7 +434,7 @@ def _split_title(text: str) -> tuple[str, str]:
             if word and word.group(1).lower() in _TITLE_ABBREV:
                 continue
             return text[:i].strip(), text[i + 1:].strip()
-    return text, ""
+    return text, None                # no sentence boundary found
 
 
 def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
@@ -452,13 +454,24 @@ def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
     inside a token — the summary then resumes on a digit / ``)`` / ``]`` / closing
     quote (``[J2066`` + ``1]``, ``…1810A*`` + ``)``, ``'No`` + ``' A king``) and a
     space would be spurious. A real word/clause boundary (``St`` + ``Peter``) keeps
-    its space."""
+    its space.
+
+    When ``_split_title`` finds no boundary we keep the reunited one-line title only
+    if the brackets balance (a genuine title with no plot, ``St. Peter…``); when they
+    don't, the depth scan was defeated by an unclosed bracket in the source (``425D``
+    is missing a ``)``), so we fall back to Trilogy's raw column split untouched."""
+    name, summary = name.replace("''", "'"), summary.replace("''", "'")
     if not summary:
         full = name
     else:
         gap = "" if summary[0] in "0123456789)]'" else " "
         full = f"{name}.{gap}{summary}"
-    return _split_title(full.replace("''", "'"))
+    title, description = _split_title(full)
+    if description is None:
+        if full.count("(") != full.count(")") or full.count("[") != full.count("]"):
+            return name, summary          # unclosed bracket — keep the raw split
+        return title, ""                  # balanced one-line title, no plot text
+    return title, description
 
 
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
