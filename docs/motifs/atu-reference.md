@@ -288,6 +288,10 @@ live-site growth and folded-in subtypes).
 
 ## 9. Cross-walks
 
+*The complete cross-index reference — all six relations, both directions, the
+repair machinery and storage keys — is in [`cross-walk.md`](cross-walk.md); this
+section summarises the ATU end.*
+
 - **ATU ↔ TMI** — `atu_seq` gives each type's constituent motif codes (the bridge
   that powers the whole cross-walk); inverted, it tells a TMI motif which types it
   builds.
