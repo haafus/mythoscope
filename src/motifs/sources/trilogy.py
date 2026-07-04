@@ -725,7 +725,27 @@ _ATU_CANON_DIVISIONS = [
 ]
 
 
-def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str, list[str]]) -> list[dict]:
+# A degenerate "See/Cf Type X" pointer entry — no real name or plot, just a redirect
+# to X. Folded into the alias map and dropped as a page.
+_STUB = re.compile(r"^(?:See|Cf\.?)\s+Type\s+(\d[\dA-Z*]*)", re.I)
+
+
+def _atu_aliases(types: list[dict], stub_targets: dict[str, str]) -> dict[str, str]:
+    """``{old_id: current_id}`` from ``former_ids`` (+ See/Cf stub redirects). Only ids
+    that are NOT a live type map; an old id claimed by two types is dropped (ambiguous)."""
+    live = {t["id"] for t in types}
+    claims: dict[str, set[str]] = {}
+    for t in types:
+        for old in t.get("former_ids", []):
+            if old not in live:
+                claims.setdefault(old, set()).add(t["id"])
+    for stub, target in stub_targets.items():
+        claims.setdefault(stub, set()).add(target)
+    return {old: next(iter(tg)) for old, tg in claims.items() if len(tg) == 1}
+
+
+def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]],
+               combos: dict[str, list[str]]) -> tuple[list[dict], dict[str, str]]:
     types = []
     for row in df_rows:
         atu_id = _clean(row.get("atu_id"))
@@ -773,6 +793,12 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             # (ashliman.refresh), not from a dataset.
         })
 
+    # Drop See/Cf pointer stubs, recording their redirect. Done *before* the subtype
+    # pass so its `base in by_id` guard naturally leaves no link dangling to a removed
+    # stub (e.g. the live 1876* whose base 1876 is a stub).
+    stub_targets = {t["id"]: m.group(1) for t in types if (m := _STUB.match(t["name"]))}
+    types = [t for t in types if t["id"] not in stub_targets]
+
     # Fill an unlabelled division from the number range that contains the type —
     # first from the CSV's own labelled ranges, then from the canonical fallback
     # table for the sub-divisions the CSV omits (700-749, 750-779).
@@ -801,7 +827,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
     # The atu_df rows aren't globally ordered by number; sort so the sidebar list
     # reads 1 → 2399 (and ascending within a division).
     types.sort(key=lambda t: _atu_sort_key(t["id"]))
-    return types
+    return types, _atu_aliases(types, stub_targets)
 
 
 def _atu_divisions(types: list[dict]) -> list[dict]:
@@ -857,7 +883,7 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
     """
     seq = _parse_atu_seq(_read_csv(config, "atu_seq", force=force))
     combos = _parse_atu_combos(_read_csv(config, "atu_combos", force=force))
-    atu = _parse_atu(_read_csv(config, "atu_df", force=force), seq, combos)
+    atu, aliases = _parse_atu(_read_csv(config, "atu_df", force=force), seq, combos)
     return {
         "label": "ATU tale types",
         "long_label": "Aarne-Thompson-Uther tale-type index",
@@ -866,6 +892,7 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
         "divisions": _atu_divisions(atu),
         "subdivisions": _atu_subdivisions(atu),
         "culture_legend": atu_regions.build_legend(atu),
+        "aliases": aliases,          # {old ATU number: current type id} — redirects
         "types": atu,
     }, seq
 

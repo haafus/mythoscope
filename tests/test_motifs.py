@@ -191,7 +191,7 @@ class TestAtuStructure:
             {"atu_id": "1525", "chapter": "Realistic", "division": "Stories 1525-1724",
              "tale_name": "x", "tale_type": "y"},
         ]
-        by = {t["id"]: t for t in trilogy._parse_atu(rows, {}, {})}
+        by = {t["id"]: t for t in trilogy._parse_atu(rows, {}, {})[0]}
         assert by["313"]["division"] == "Supernatural Adversaries" and by["313"]["division_range"] == [300, 399]
         assert by["313"]["parent"] is None and "313A" in by["313"]["subtypes"]
         assert by["313A"]["parent"] == "313"
@@ -205,7 +205,7 @@ class TestAtuStructure:
              "provenance": "Finnish: Rausmaa 1982ff. V, Nos. 1ï¿½6; German: Moser-Rath 1964",
              "remarks": "Documented 1178 in the Roman de Renart."},
         ]
-        t = trilogy._parse_atu(rows, {}, {})[0]
+        t = trilogy._parse_atu(rows, {}, {})[0][0]
         # digit–digit mojibake becomes an en-dash; a known scholar name is repaired
         # from the dictionary (Dähnhardt); the triple garbage never survives.
         assert t["references"] == "Krohn 1889, 46–54; Dähnhardt 1907ff. IV, 225–230"
@@ -388,7 +388,7 @@ class TestAtuRegions:
             {"atu_id": "300", "chapter": "Magic", "division": "Supernatural Adversaries 300-399",
              "sub_division": "", "tale_name": "x", "tale_type": "y"},
         ]
-        types = trilogy._parse_atu(rows, {}, {})
+        types = trilogy._parse_atu(rows, {}, {})[0]
         by = {t["id"]: t for t in types}
         assert by["1"]["sub_division"] == "The Clever Fox (Other Animal)"
         assert by["1"]["sub_division_range"] == [1, 69]
@@ -513,6 +513,22 @@ class TestAtuRegions:
         # an unbalanced "(previously …" (source defect) is left untouched
         assert a("(previously Learned by Keeping Inn (Bath-house). A couple adopts.") \
             == ("(previously Learned by Keeping Inn (Bath-house). A couple adopts.", "", [])
+
+    def test_atu_aliases_and_stubs(self):
+        def d(i, nm, tt):
+            return {"atu_id": i, "chapter": "x", "division": "d", "tale_name": nm, "tale_type": tt}
+        rows = [
+            d("1699A", "Cf. Type 1699", ""),                          # a stub → alias + dropped
+            d("1699", "Clever X", "(previously Type 1699A.) A plot."),  # its target
+            d("223", "Live Type", "A plot."),                         # a live type…
+            d("1", "The Theft", "(Previously Type 223.) A fox."),     # …referenced as previously
+        ]
+        types, aliases = trilogy._parse_atu(rows, {}, {})
+        ids = {t["id"] for t in types}
+        assert "1699A" not in ids               # stub is dropped as a page
+        assert aliases["1699A"] == "1699"        # …and folded into the redirect map
+        assert "223" not in aliases              # a live type is never aliased away
+        assert "1699A" not in aliases.values()   # (target is the current id, not the stub)
 
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [
@@ -809,7 +825,7 @@ class TestTrilogy:
                "tale_type": "summary"}]
         seq = {"510A": ["S31"]}
         combos = {"510A": ["510B"]}
-        out = trilogy._parse_atu(df, seq, combos)
+        out = trilogy._parse_atu(df, seq, combos)[0]
         assert out[0]["motifs"] == ["S31"]
         assert out[0]["combos"] == ["510B"]
         assert out[0]["name"] == "Cinderella"
