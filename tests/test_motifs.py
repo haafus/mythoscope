@@ -408,29 +408,39 @@ class TestAtuRegions:
 
     def test_repair_atu_name(self):
         r = trilogy._repair_atu_name
-        # name truncated inside "[Cat, Frog, etc.]" — the period there is bracket-depth>0,
-        # so the split falls at the first depth-0 sentence period (subsumes the old patch)
-        assert r("The Animal Bride (previously The Mouse [Cat, Frog, etc", "] as Bride). A father decides.") \
-            == ("The Animal Bride (previously The Mouse [Cat, Frog, etc.] as Bride)", "A father decides.")
-        # a clean label splits at the first sentence period; apparatus stays in the summary
+        # a clean label splits at the first sentence period
         assert r("The Theft of Fish", "A fox steals.") == ("The Theft of Fish", "A fox steals.")
         # abbreviation Trilogy wrongly split on ("St.") — reunited, not a boundary
         assert r("St", "Peter and the Nuts. A tale.") == ("St. Peter and the Nuts", "A tale.")
+        # "etc" is not an abbreviation: at depth 0 its period ends the title (type 572*)
+        assert r("The Striking Axe, etc", "A man acts.") == ("The Striking Axe, etc", "A man acts.")
         # decimal inside a motif code is not a boundary; the seam re-inserts no space
         assert r("The Great Kettle [X1030", "1]. Cf.") == ("The Great Kettle [X1030.1]", "Cf.")
+        # the label ends where a (previously …) apparatus block begins — it drops to
+        # the summary, even for a period-class title
+        assert r("The Animal Bride (previously The Mouse [Cat, Frog, etc", "] as Bride). A father decides.") \
+            == ("The Animal Bride", "(previously The Mouse [Cat, Frog, etc.] as Bride). A father decides.")
+        # (Including … Type N) merge-note (capital I + a type id) also ends the label
+        assert r("The String of Chickens (Including the previous Type 1876", ") A husband acts.") \
+            == ("The String of Chickens", "(Including the previous Type 1876.) A husband acts.")
+        # a word-variant "(Jackal)" is not apparatus and does not cut
+        assert r("The Fox (Jackal) as Schoolmaster", "He teaches.") \
+            == ("The Fox (Jackal) as Schoolmaster", "He teaches.")
+        # lowercase prose "(including …)" is not a merge-note and does not cut
+        assert r("Wedding Feast (including honey)", "Guests arrive.") \
+            == ("Wedding Feast (including honey)", "Guests arrive.")
         # quoted catch-phrase title: prose after the closing quote drops to the summary
-        assert r("'The Barn is Burning!' A master acts", "") \
-            == ("'The Barn is Burning!'", "A master acts")
+        assert r("'The Barn is Burning!' A master acts", "") == ("'The Barn is Burning!'", "A master acts")
         # declarative quoted title whose closing quote Trilogy orphaned into the summary
         assert r("'No", "' A king rules.") == ("'No.'", "A king rules.")
         # doubled apostrophe (source artifact) collapsed before quote detection
         assert r("The Hen ''What was I''", "A note.") == ("The Hen 'What was I'", "A note.")
         # balanced one-line title with no plot period → reunited, summary empty
         assert r("St", "Christopher and the Christ Child") == ("St. Christopher and the Christ Child", "")
-        # unclosed '(' in the source (425D): no depth-0 boundary exists, so the raw
-        # column split is preserved rather than collapsing everything into the title
-        assert r("The Vanished Husband (previously Learned of (Bath-house)", "The animal [T68] marries.") \
-            == ("The Vanished Husband (previously Learned of (Bath-house)", "The animal [T68] marries.")
+        # unclosed '(' with no apparatus keyword and no depth-0 period: no boundary
+        # exists, so Trilogy's raw column split is preserved untouched
+        assert r("A Tale (see note", "with no ending period") \
+            == ("A Tale (see note", "with no ending period")
 
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [

@@ -395,25 +395,34 @@ _TITLE_ABBREV = frozenset({"st", "mt", "dr", "mrs", "mr", "ms", "vs", "cf",
 # A closing quote (vs. an apostrophe in ``'s``/``'t``): followed by space/end/punct.
 _CLOSE_QUOTE = re.compile(r"'(?=\s|$|[.!?,;:])")
 _TRAIL_WORD = re.compile(r"([A-Za-z]+)$")
+# Apparatus blocks that always FOLLOW the complete label, so the label ends where
+# they begin. ``(previously …)`` (either case) is the former name or number.
+# ``(Including … Type N)`` is a merge-note — keyed on a capital ``I`` *and* a type
+# id, which distinguishes it from lowercase prose ``(including honey)``.
+_APP_PREV = re.compile(r"\(previously\b", re.I)
+_APP_INCL = re.compile(r"\(Including\b[^)]*\bTypes?\s+\d")
 
 
 def _split_title(text: str) -> tuple[str, str | None]:
     """Split Uther's run-on ``<title>. <description>`` into ``(title, description)``.
 
-    Two title shapes:
+    The label ends at the EARLIEST of:
 
-      * a **quoted catch-phrase** (jokes, anecdotes, formula tales) — the leading
-        ``'…'``; the closing quote is a ``'`` followed by whitespace/end/punctuation
+      * a **quoted catch-phrase** — if the text opens with ``'…'`` (jokes, anecdotes,
+        formula tales); the closing quote is a ``'`` before whitespace/end/punctuation
         (apostrophes in ``'s``/``'t`` are skipped);
-      * otherwise the **label up to the first sentence period** at bracket-depth 0
-        (over ``()`` and ``[]``) that is neither an abbreviation (``St.``, ``Cf.``…)
-        nor a decimal inside a code (``digit.digit``).
+      * an **apparatus block** at bracket-depth 0 — ``(previously …)`` or
+        ``(Including … Type N)``. These always trail the complete label, so cutting
+        before them drops the whole apparatus into the summary. A word-variant
+        ``(Jackal)`` and lowercase prose ``(including honey)`` are not apparatus and
+        do not cut;
+      * the first **sentence period** at bracket-depth 0 (over ``()`` and ``[]``)
+        that is neither an abbreviation (``St.``, ``Cf.``…) nor a decimal in a code.
 
-    ``description`` is ``None`` when no boundary was found — an opening quote that
-    never closes, or a period scan that never hit depth 0 (an unclosed bracket in
-    the source); the caller decides what to do with a boundary-less entry. Trailing
-    apparatus — ``(previously …)``, ``(Including …)``, ``[codes]`` — is left on
-    whichever side the boundary falls; it is never pulled back onto the title."""
+    ``description`` is ``None`` when none is found — an opening quote that never
+    closes, or a scan that never reaches depth 0 (an unclosed bracket in the source);
+    the caller decides. A heading motif code ``[K123]`` is left on whichever side the
+    boundary falls — it is not apparatus and is never moved."""
     text = text.strip()
     if not text:
         return "", ""
@@ -425,6 +434,8 @@ def _split_title(text: str) -> tuple[str, str | None]:
         return text, None            # unterminated opening quote: no boundary
     depth = 0
     for i, ch in enumerate(text):
+        if ch == "(" and depth == 0 and (_APP_PREV.match(text, i) or _APP_INCL.match(text, i)):
+            return text[:i].strip(), text[i:].strip()
         if ch in "[(":
             depth += 1
         elif ch in "])":
@@ -449,10 +460,12 @@ def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
     abbreviation (``St.``), a bracketed aside (``[Cat, etc.]``), or, for quoted
     catch-phrase titles, deep in the prose — leaking one side into the other. We
     rejoin the two columns and re-split with a boundary rule (``_split_title``) that
-    understands quotes, abbreviations, decimals and bracket depth, which subsumes the
-    old unbalanced-bracket patch. A doubled apostrophe is always a source artifact
-    (a doubled quote mark, or a lost accented letter) — collapsed first so the quote
-    detection is reliable.
+    understands quotes, apparatus blocks, abbreviations, decimals and bracket depth,
+    which subsumes the old unbalanced-bracket patch. Because the label ends at the
+    first ``(previously …)`` / ``(Including … Type N)`` apparatus block, that
+    apparatus lands uniformly in the summary (not stranded in the title). A doubled
+    apostrophe is always a source artifact (a doubled quote mark, or a lost accented
+    letter) — collapsed first so the quote detection is reliable.
 
     The seam re-inserts the consumed period plus a space, EXCEPT where the cut fell
     inside a token — the summary then resumes on a digit / ``)`` / ``]`` / closing
