@@ -32,6 +32,7 @@ INDEX_FILES = {
     "atu": "atu.json",
 }
 CROSSWALK_FILE = "crosswalk.json"
+PARALLELS_FILE = "parallels.json"
 META_FILE = "meta.json"
 
 
@@ -41,6 +42,10 @@ def index_path(index: str) -> Path:
 
 def crosswalk_path() -> Path:
     return motifs_dir() / CROSSWALK_FILE
+
+
+def parallels_path() -> Path:
+    return motifs_dir() / PARALLELS_FILE
 
 
 def meta_path() -> Path:
@@ -80,6 +85,10 @@ def load_index(index: str) -> dict | None:
 
 def load_crosswalk() -> dict:
     return _load_cached("crosswalk", crosswalk_path()) or {}
+
+
+def load_parallels() -> dict:
+    return _load_cached("parallels", parallels_path()) or {}
 
 
 def load_meta() -> dict:

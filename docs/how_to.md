@@ -358,9 +358,10 @@ MYTHO_PROJECTIONS__MAX_CONCURRENT=10   # summaries
 - `src/motifs/sources/trilogy.py` — загрузка и разбор CSV Trilogy (TMI, ATU, `atu_seq`, `atu_combos`).
 - `src/motifs/sources/fetch.py` — загрузка-в-кэш (`outputs/motifs/raw/`): повторный запуск не ходит в сеть.
 - `src/motifs/crosswalk.py` — cross-walk: ATU↔TMI (constituent из `atu_seq`, defining, и два inline — заметки TMI и summary ATU), Berezkin↔ATU (из ссылок `ATU NNN` в названиях) и прямой Berezkin↔TMI. Полный справочник — [cross-walk.md](motifs/cross-walk.md).
+- `src/motifs/parallels.py` — эвристические текстовые параллели (шаг `[5/5]`): лексические двойники мотивов без записанной связи, как подсказки на страницах. Разбор — [cross-walk.md §8](motifs/cross-walk.md) и папка [crosswalk/](motifs/crosswalk/).
 - `src/motifs/store.py` — раскладка файлов и чтение (кэш на процесс), общий с сервером.
 
-Выход (`outputs/motifs/`): `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `meta.json` и кэш сырья `raw/`.
+Выход (`outputs/motifs/`): `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `parallels.json`, `meta.json` и кэш сырья `raw/`.
 
 **Воспроизводимость и перезапуск.** Сырьё кэшируется в `raw/`, поэтому повторный запуск дёшев и безопасен к прерыванию. По умолчанию `mytho motifs` **каждый раз заново парсит и генерирует** данные из кэша `raw/` (недостающее докачивает); `--force` дополнительно перезагружает все источники.
 
@@ -561,7 +562,7 @@ mytho server
 - `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
 - `outputs/projections/` — результаты анализа: JSON-данные проекций (UMAP, heatmap, distribution). Создается через `mytho projections`.
 - `outputs/graphs/` — JSON-графы (characters, realms, ages) для каждого текста. Создается через `mytho graphs`.
-- `outputs/motifs/` — база мотивов: `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `meta.json` + кэш сырья `raw/`. Создается через `mytho motifs`.
+- `outputs/motifs/` — база мотивов: `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `parallels.json`, `meta.json` + кэш сырья `raw/`. Создается через `mytho motifs`.
 - `outputs/logs/` — логи всех пайплайнов.
 
 ## Типовой пайплайн

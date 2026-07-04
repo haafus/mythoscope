@@ -39,10 +39,11 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 `mytho motifs` собирает базу в четыре шага (`src/motifs/build_motifs.py`):
 
 ```
-[1/4] Berezkin  — scrape areasofmyths + обогащение mapsofmyths
-[2/4] TMI       — parse Trilogy tmi.csv + библиография folkmasa
-[3/4] ATU       — parse Trilogy atu_df/atu_seq/atu_combos/aft + Wikidata enrich
-[4/4] Cross-walk — id-связи между тремя индексами
+[1/5] Berezkin  — scrape areasofmyths + обогащение mapsofmyths
+[2/5] TMI       — parse Trilogy tmi.csv + библиография folkmasa
+[3/5] ATU       — parse Trilogy atu_df/atu_seq/atu_combos/aft + Wikidata enrich
+[4/5] Cross-walk — id-связи между тремя индексами
+[5/5] Parallels — эвристические текстовые параллели (подсказки без записанных связей)
 ```
 
 **Model B — только код в репозитории, не данные:**
@@ -171,6 +172,11 @@ Wikidata (`330A → ATU 330`, бейдж `AaTh 330A`), иначе — серым
 отдельными разделами. Прямой Берёзкин↔TMI — точная ручная конкорданс-таблица; через
 ATU достижимо больше пар, но они слабее, поэтому держатся отдельно
 (`berezkin-reference.md §7`).
+
+Отдельный шаг `[5/5]` строит **эвристические текстовые параллели** (`parallels.py` →
+`parallels.json`): лексические двойники мотивов **без записанной связи**, показанные
+на страницах разделом «Possible parallels» как подсказки для проверки, а не
+утверждённые рёбра. Метод и данные — `cross-walk.md §8` и папка `crosswalk/`.
 
 ## Просмотрено, но не используется
 

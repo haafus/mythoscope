@@ -977,6 +977,26 @@ function linkSection(title, links) {
     return section(title, `<div class="motif-links">${linkChips(links)}</div>`);
 }
 
+// Heuristic textual parallels: look-alike motifs in the *other* indexes that carry
+// no recorded cross-walk link. A clearly-labelled suggestion layer (not asserted
+// links) — each chip tags the target index and its title-similarity score.
+const PARALLEL_TAG = { berezkin: "BZ", tmi: "TMI", atu: "ATU" };
+function parallelsSection(parallels) {
+    if (!parallels || !parallels.length) return "";
+    const chips = parallels.map((l) => {
+        const pct = Math.round((l.title_sim || 0) * 100);
+        const tip = `${l.name || l.id} — title similarity ${l.title_sim}, description ${l.doc_sim}, ${l.shared} shared words`;
+        return `
+        <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
+           class="motif-link motif-parallel${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
+           title="${escapeHtml(tip)}">
+            <span class="motif-link-src">${PARALLEL_TAG[l.index] || escapeHtml(l.index)}</span><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}<span class="motif-parallel-sim" title="${escapeHtml(tip)}">~${pct}%</span>
+        </a>`;
+    }).join("");
+    const note = `<div class="motif-parallel-note">Look-alike motifs in other indexes with no recorded cross-walk link — heuristic text matches to review, not confirmed links.</div>`;
+    return section(`Possible parallels (${parallels.length})`, note + `<div class="motif-links">${chips}</div>`);
+}
+
 // Tradition-level distribution (mapsofmyths): total attesting traditions, broken
 // down by macro-region; each region expands to the named traditions.
 // Title-case an ALL-CAPS label as a proper name (first letter of each word,
@@ -1243,6 +1263,10 @@ function renderDetail(d) {
             body += `<div class="motif-cols">${endCols.map((c) => `<div class="motif-col">${c}</div>`).join("")}</div>`;
         }
     }
+
+    // Suggested textual parallels (all indexes) — a heuristic layer at the foot,
+    // after the curated cross-walk links.
+    body += parallelsSection(d.parallels);
 
     // An old ATU number the user navigated to is served as the current type.
     const redirect = d.redirected_from

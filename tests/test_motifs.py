@@ -8,7 +8,7 @@ import bs4  # noqa: E402,F401
 import pytest  # noqa: E402
 
 from motifs import build_motifs as bm  # noqa: E402
-from motifs import crosswalk, store  # noqa: E402
+from motifs import crosswalk, parallels, store  # noqa: E402
 from motifs.sources import ashliman, atu_regions, berezkin, culture_dict, tmi_notes, trilogy
 from motifs.sources import berezkin_bibliography as bbib
 from server.services import motifs as svc
@@ -1008,6 +1008,37 @@ class TestCrosswalk:
         assert cw["berezkin_to_tmi"] == {"A2A": ["A720.1", "A1052"]}   # Z999 dropped (not in TMI)
         assert cw["tmi_to_berezkin"]["A720.1"] == ["A2A"]
         assert cw["tmi_to_berezkin"]["A1052"] == ["A2A"]
+
+
+# Textual parallels (heuristic suggestion layer)
+# ---------------------------------------------------------------------------
+
+class TestParallels:
+    def test_build_finds_unlinked_lookalikes(self):
+        bz = [{"id": "B1", "name": "The Clever Fox", "definition": "The fox is clever."},
+              {"id": "B9", "name": "The Distant Star", "definition": "A distant star shines."}]
+        tmi = [{"id": "K1", "name": "Clever Fox", "definition": "A fox is clever."},
+               {"id": "K2", "name": "Clever Wolf", "definition": "A wolf is clever."},
+               {"id": "Z9", "name": "Distant Star", "definition": "A distant star."}]
+        atu = [{"id": "1", "name": "The Clever Fox", "summary": "A clever fox tricks a wolf."},
+               {"id": "9", "name": "The Distant Star", "summary": "A distant star shines above."}]
+        # ATU 1 <-> TMI K1 is already a recorded cross-walk link -> must be subtracted.
+        cw = {"atu_to_tmi": {"1": ["K1"]}, "tmi_to_atu": {"K1": ["1"]}}
+        par = parallels.build(bz, tmi, atu, cw)
+        assert par is not None
+        adj = par["adjacency"]
+        # Berezkin B1 is parallel to both ATU 1 and TMI K1 (neither linked to B1).
+        b1 = {(e["index"], e["id"]) for e in adj["berezkin"].get("B1", [])}
+        assert ("atu", "1") in b1 and ("tmi", "K1") in b1
+        # The already-linked ATU 1 <-> K1 pair is excluded from the suggestions,
+        # but the unlinked Berezkin parallel to K1 remains.
+        k1 = {(e["index"], e["id"]) for e in adj["tmi"].get("K1", [])}
+        assert ("atu", "1") not in k1
+        assert ("berezkin", "B1") in k1
+        # A three-way parallel is detected, with the two missing legs flagged.
+        tri = [t for t in par["triangles"]
+               if t["berezkin"] == "B1" and t["tmi"] == "K1" and t["atu"] == "1"]
+        assert tri and set(tri[0]["missing"]) == {"berezkin-tmi", "berezkin-atu"}
 
 
 # ---------------------------------------------------------------------------

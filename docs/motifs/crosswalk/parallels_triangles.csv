@@ -1,0 +1,40 @@
+BZ_id,BZ_title,TMI_id,TMI_title,ATU_id,ATU_title,atu_tmi_title_sim,atu_tmi_doc_sim,missing_links
+M29z1,The Bald-headed,J1442.9,The Cynic And The Bald-Headed Man,1871D,The Cynic and the Bald-headed Man,1.000,0.707,BZ-TMI BZ-ATU
+A32D,Man in the Moon,A751.10.1,Joshua As Man In The Moon,751E*,Man in the Moon,1.000,0.283,BZ-TMI BZ-ATU ATU-TMI
+I87c1,A mouse makes a boat,B295.1,Mouse Makes Boat Of Bread-Crust,135*,The Mouse Makes a Boat of a Bread-crust,1.000,0.992,BZ-TMI BZ-ATU
+B105,She daughter-in-law is transformed,P262.1,Bad Relations Between Mother-In-Law And Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.895,0.741,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,P262.1,Bad Relations Between Mother-In-Law And Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.895,0.741,BZ-TMI BZ-ATU ATU-TMI
+A2,Several suns,F961.1.3,Several Suns In Sky,1334**,Two Suns,0.830,0.178,BZ-TMI BZ-ATU ATU-TMI
+A32D,Man in the Moon,X1851,Man In Moon Lets Himself Down,751E*,Man in the Moon,0.805,0.284,BZ-TMI BZ-ATU ATU-TMI
+I37D,Mushrooms are excrements,A2794.1,Why Mushrooms Are Slimy,297B,The War of the Mushrooms,0.801,0.652,BZ-TMI BZ-ATU ATU-TMI
+A32D,Man in the Moon,A751.4,Man In The Moon: Tarring Of The Moon,751E*,Man in the Moon,0.766,0.398,BZ-TMI BZ-ATU
+A32D,Man in the Moon,A751.10.2,Jacob As Man In The Moon,751E*,Man in the Moon,0.746,0.294,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,P262,Mother-In-Law,903C*,Mother-in-law and Daughter-in-law,0.702,0.594,BZ-TMI BZ-ATU ATU-TMI
+K119d,Puss in boots,B582.1.1,Animal Wins Wife For His Master (Puss In Boots),545B,Puss in Boots,0.670,0.246,BZ-TMI BZ-ATU
+A32D,Man in the Moon,A751.10,Particular Individual Is Man In The Moon,751E*,Man in the Moon,0.659,0.234,BZ-TMI BZ-ATU ATU-TMI
+A32D,Man in the Moon,A751.5,Man In The Moon From Scratches Or Paint,751E*,Man in the Moon,0.636,0.264,BZ-TMI BZ-ATU ATU-TMI
+M199e,Carrying the horse,K72,Deceptive Contest In Carrying A Horse,1201,Carrying the Horse,0.628,0.259,BZ-TMI BZ-ATU ATU-TMI
+B105,She daughter-in-law is transformed,S51.1,Cruel Mother-In-Law Plans Death Of Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.626,0.433,BZ-TMI BZ-ATU ATU-TMI
+L108G,To wash a black one,J1909.6,Numskull Tries To Wash Black Hen White,1312*,Trying to Wash Black Animal White,0.619,0.615,BZ-TMI BZ-ATU
+K56a4c,To wash something black making it white,J1909.6,Numskull Tries To Wash Black Hen White,1312*,Trying to Wash Black Animal White,0.619,0.615,BZ-TMI BZ-ATU
+B105,She daughter-in-law is transformed,S54,Cruel Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.618,0.410,BZ-TMI BZ-ATU ATU-TMI
+A32D,Man in the Moon,Q235.1,Man Put In Moon For Cursing God,751E*,Man in the Moon,0.608,0.234,BZ-TMI BZ-ATU ATU-TMI
+B125A,Nightingale and blindworm,A2241.5,Nightingale Borrows Blindworm's Eye,234,The Nightingale and the Blindworm,0.605,0.627,BZ-TMI BZ-ATU
+D2,Woman gives birth to the fire,T554,Woman Gives Birth To Animal,299,The Mountain Gives Birth to a Mouse,0.583,0.335,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,T554.10,Woman Gives Birth To A Bird,299,The Mountain Gives Birth to a Mouse,0.574,0.386,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,T554.7,Woman Gives Birth To A Snake,299,The Mountain Gives Birth to a Mouse,0.565,0.323,BZ-TMI BZ-ATU ATU-TMI
+A8,"The Sun, the Moon and the Star are three siblings",R9.1.3,Sun And Moon Imprison Each Other,328A*,"Three Brothers Steal Back the Sun, Moon, and Star",0.563,0.394,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,T556,Woman Gives Birth To A Demon,299,The Mountain Gives Birth to a Mouse,0.558,0.369,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,T554.8.1,Woman Gives Birth To Toad,299,The Mountain Gives Birth to a Mouse,0.549,0.367,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,A1234.4,Earth Gives Birth To Woman,299,The Mountain Gives Birth to a Mouse,0.539,0.358,BZ-TMI BZ-ATU ATU-TMI
+B105,She daughter-in-law is transformed,C173,Daughter-In-Law Tabu,903C*,Mother-in-law and Daughter-in-law,0.534,0.401,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,T555.1.1,Woman Gives Birth To Pumpkin,299,The Mountain Gives Birth to a Mouse,0.531,0.353,BZ-TMI BZ-ATU ATU-TMI
+B105,She daughter-in-law is transformed,J1111.3,Clever Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.518,0.390,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,C171,Mother-In-Law Tabu,903C*,Mother-in-law and Daughter-in-law,0.518,0.381,BZ-TMI BZ-ATU ATU-TMI
+B105,She daughter-in-law is transformed,K2214.2,Treacherous Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.513,0.346,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,S51,Cruel Mother-In-Law,903C*,Mother-in-law and Daughter-in-law,0.503,0.331,BZ-TMI BZ-ATU ATU-TMI
+B105,She daughter-in-law is transformed,G79.2,Woman Eats Daughter-In-Law,903C*,Mother-in-law and Daughter-in-law,0.499,0.348,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,T417.1,Mother-In-Law Seduces Son-In-Law,903C*,Mother-in-law and Daughter-in-law,0.492,0.404,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,T417,Son-In-Law Seduces Mother-In-Law,903C*,Mother-in-law and Daughter-in-law,0.492,0.306,BZ-TMI BZ-ATU ATU-TMI
+D2,Woman gives birth to the fire,T554.11,Supernaturally Impregnated Woman Gives Birth To Dragon,299,The Mountain Gives Birth to a Mouse,0.433,0.324,BZ-TMI BZ-ATU ATU-TMI
+D1A,Mother-in-law is the Fire,N365.4,Man Unwittingly Lies With Mother-In-Law,903C*,Mother-in-law and Daughter-in-law,0.401,0.271,BZ-TMI BZ-ATU ATU-TMI

@@ -1127,7 +1127,22 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         bz = cw.get("atu_to_berezkin", {}).get(rec["id"], [])
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in bz]
 
+    # Heuristic textual parallels — look-alike motifs in the other indexes with no
+    # recorded cross-walk link. A separate, clearly-labelled *suggestion* layer.
+    detail["parallels"] = _parallels(index, rec["id"])
+
     return detail
+
+
+def _parallels(index: str, motif_id: str) -> list[dict]:
+    """Resolve the suggested textual parallels for a motif into display links."""
+    entries = store.load_parallels().get("adjacency", {}).get(index, {}).get(motif_id, [])
+    out = []
+    for e in entries:
+        link = _link(e["index"], e["id"])
+        link["title_sim"], link["doc_sim"], link["shared"] = e["title_sim"], e["doc_sim"], e["shared"]
+        out.append(link)
+    return out
 
 
 # A TMI motif token (letter + digits + dotted sub-numbers) and a "Type N[, M]"

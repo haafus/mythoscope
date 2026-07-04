@@ -1,0 +1,30 @@
+tier,BZ_id,BZ_title,ATU_id,ATU_title,title_sim,doc_sim,shared
+A,B125A,Nightingale and blindworm,234,The Nightingale and the Blindworm,1.000,0.653,2
+A,K27T,Climbing contest,1073,Climbing Contest,1.000,0.583,2
+A,K119d,Puss in boots,545B,Puss in Boots,1.000,0.351,2
+A,K167,The children's king,892,The Children of the King,1.000,0.356,2
+A,M101A,Animals learn to fear men,157,Animals Learn to Fear Men,1.000,0.510,3
+A,M199e,Carrying the horse,1201,Carrying the Horse,1.000,0.381,2
+A,K40,One will be eaten today and another tomorrow,1541***,"'Today for Money, Tomorrow for None'",0.809,0.377,2
+A,B104B,Woman is changed in a woodpecker,751A,The Farmwife is Changed into a Woodpecker,0.806,0.353,2
+A,K56a4c,To wash something black making it white,1312*,Trying to Wash Black Animal White,0.800,0.468,3
+A,L108G,To wash a black one,1312*,Trying to Wash Black Animal White,0.792,0.438,2
+A,K11B,Reeds from bird’s bones,984,Palace from Bird Bones,0.737,0.354,2
+A,A8,"The Sun, the Moon and the Star are three siblings",328A*,"Three Brothers Steal Back the Sun, Moon, and Star",0.724,0.465,3
+A,D1A,Mother-in-law is the Fire,903C*,Mother-in-law and Daughter-in-law,0.702,0.484,2
+A,I87c1,A mouse makes a boat,135*,The Mouse Makes a Boat of a Bread-crust,0.687,0.526,3
+A,M74E,To divide the cheese biting from both parts,51***,The Fox as Umpire to Divide Cheese,0.668,0.435,2
+A,M29z1,The Bald-headed,1871D,The Cynic and the Bald-headed Man,0.663,0.425,2
+A,B105,She daughter-in-law is transformed,903C*,Mother-in-law and Daughter-in-law,0.640,0.397,2
+A,K27q1,Lion’s milk in the lion’s skin,214B,The Donkey in Lion's Skin,0.565,0.359,2
+A,I39,Rainbow road or bridge,1005,A Bridge (Road) of Carcasses,0.555,0.353,2
+A,M38a2,The hen cooks her eggs,219E**,The Hen that Laid the Golden Eggs,0.547,0.359,2
+A,M187,Snail is a participant of the race,275C*,The Race of Frog and Snail,0.525,0.371,2
+B,A2,Several suns,1334**,Two Suns,1.000,0.354,1
+B,A32D,Man in the Moon,751E*,Man in the Moon,1.000,0.473,1
+B,F46A,Woman in a tree,1369,The Woman's Tree,1.000,0.466,1
+B,K143,Hero is a fowler,233D,The Birds and the Fowler,0.766,0.377,1
+B,M39a2e,The forgotten name,1687,The Forgotten Word,0.692,0.352,1
+B,D2,Woman gives birth to the fire,299,The Mountain Gives Birth to a Mouse,0.609,0.371,1
+B,I37D,Mushrooms are excrements,297B,The War of the Mushrooms,0.601,0.441,1
+B,N8,Storyteller instead of a cannonball,1880,Riding on the Cannonball,0.512,0.453,1

@@ -1,0 +1,603 @@
+tier,ATU_id,ATU_title,TMI_id,TMI_title,title_sim,doc_sim,shared
+A,277,The King of the Frogs,B245.1,King Of Frogs,1.000,0.628,2
+A,750B,Hospitality Rewarded,Q45,Hospitality Rewarded,1.000,0.388,2
+A,1824,Parody Sermon,K1961.1.2.1,Parody Sermon,1.000,0.694,2
+A,159B,Enmity of Lion and Man,A2494.7.3,Enmity Between Lion And Man,1.000,0.533,2
+A,335,Death's Messengers,Z111.6,Death's Messengers,1.000,0.592,2
+A,709A,The Sister of Nine Brothers,P253.0.4,One Sister And Ten Brothers,1.000,0.461,2
+A,709A,The Sister of Nine Brothers,P253.0.2,One Sister And Two Brothers,1.000,0.461,2
+A,709A,The Sister of Nine Brothers,P253.0.3,One Sister And Three (Four) Brothers,1.000,0.461,2
+A,836,Pride is Punished,Q331,Pride Punished,1.000,0.627,2
+A,952*,A Sausage and a Revolver,K437.3,Sausage As Revolver,1.000,0.741,2
+A,986,The Lazy Husband,W111.4,Lazy Husband,1.000,0.396,2
+A,1448*,Burned and Underbaked Bread,S54.1,Burned And Underbaked Bread,1.000,0.739,3
+A,1575*,The Clever Shepherd,J1115.9,Clever Shepherd,1.000,0.529,2
+A,1641D,The Sham Physician,K1955,Sham Physician,1.000,0.428,2
+A,1833E,God Is Dead,A108.1,God Of The Dead,1.000,0.604,2
+A,2260,The Golden Key,F886.1,Golden Key,1.000,0.563,2
+A,545A,The Cat Castle,F771.4.2,Cat Castle,1.000,0.358,2
+A,546,The Clever Parrot,J1118.1,Clever Parrot,1.000,0.691,2
+A,594*,The Magic Bridle,D1209.1,Magic Bridle,1.000,0.579,2
+A,756E*,Charity Rewarded,V410,Charity Rewarded,1.000,0.514,2
+A,910N,The Magic Box,D1174,Magic Box,1.000,0.488,2
+A,1319G*,Boot Mistaken for an Axe-sheath,J1772.11,Boot Mistaken For An Axe-Sheath,1.000,0.956,4
+A,1420,The Lover's Gift Regained,K1357,Lover's Gift Regained,1.000,0.685,3
+A,1693,The Literal Fool,J2450,Literal Fool,1.000,0.652,2
+A,1889H,Submarine Otherworld,F133,Submarine Otherworld,1.000,0.446,2
+A,1890B*,Fatal Bread,J1824,Fatal Bread,1.000,0.600,2
+A,200B,Why Dogs Sniff at One Another,A2471.1.1,Why Dogs Sniff At One Another,1.000,0.538,2
+A,760,The Unquiet Grave,E410,The Unquiet Grave,1.000,0.365,2
+A,1577,Blind Men Duped into Fighting,K1081,Blind Men Duped Into Fighting,1.000,0.705,4
+A,875A,Girl's Riddling Answer Betrays a Theft,H582.1,Riddling Answer Betrays Theft,0.977,0.521,4
+A,180,The Rebounding Bow,N335.3,Death By Rebounding Bow,0.959,0.691,2
+A,300,The Dragon-Slayer,B11.11.7,Woman As Dragon-Slayer,0.956,0.351,2
+A,368C*,The Death of the Cruel Stepmother,S31,Cruel Stepmother,0.948,0.551,2
+A,820A,The Devil Mows with a Magic Sickle,D1206.1,Magic Sickle,0.947,0.422,2
+A,1348*,The Boy with Active Imagination,W211,Active Imagination,0.945,0.629,2
+A,1288**,The Long Nose,G303.4.1.4.1,Devil Has A Long Nose,0.942,0.417,2
+A,1525G,The Thief in Disguise,K311.15,Thief In Disguise As God,0.941,0.469,2
+A,122F,'Wait till I Am Fat Enough.',K553.0.1,"""Wait Till I Am Fat Enough To Race You",0.938,0.597,3
+A,1418,The Equivocal Oath,K550.1,Escape By Equivocal Oath,0.936,0.418,2
+A,513,The Extraordinary Companions,F601.7,Animals As Extraordinary Companions,0.935,0.417,2
+A,113B,The Cat as Sham Holy Man,K1961.1.5,Sham Holy Man,0.934,0.467,2
+A,369,The Youth on a Quest for his Lost Father,H1385.7,Quest For Lost Father,0.928,0.474,3
+A,1693,The Literal Fool,J2490,Literal Fool -- Miscellaneous,0.927,0.567,2
+A,1525H,1525H4 The Youth in the Bee Hive,A2432.8,Bee's Hive,0.920,0.414,2
+A,1319*,Other Mistaken Identities,J1809,Other Things With Mistaken Identities,0.917,0.696,2
+A,1420,The Lover's Gift Regained,K1581.7,Lover's Gift Regained: Anser Venalis (Goose As Gift),0.914,0.518,3
+A,244,The Raven in Borrowed Feathers,K1041,Borrowed Feathers,0.904,0.509,2
+A,1575A*,God Speaks,A182.3.0.5,God Speaks From Mountain,0.903,0.376,2
+A,1095,Scratching Contest,K83,Deceptive Scratching Contest,0.903,0.389,2
+A,1925,Contest in Wishing,H507.3.1,Three Brothers Contest In Wishing,0.901,0.457,2
+A,1080*,Laughing Contest,K87,Deceptive Laughing Contest,0.900,0.449,2
+A,903C*,Mother-in-law and Daughter-in-law,P262.1,Bad Relations Between Mother-In-Law And Daughter-In-Law,0.895,0.741,3
+A,891C*,'The Pig Eats the Money.',W151.7,Eats Up The Money,0.889,0.351,2
+A,1420,The Lover's Gift Regained,K1581.6,Lover's Gift Regained: Jewelry As Gift,0.885,0.453,3
+A,775,Midas' Short-sighted Wish,J2072,Short-Sighted Wish,0.884,0.502,3
+A,1811,Jokes about Religious Vows,M183,Religious Vows,0.882,0.711,2
+A,1355A*,Unfaithful Wife as Judge,T92.1.2,Would-Be Unfaithful Wife,0.874,0.512,2
+A,1556,The Double Pension (Burial Money),K441.1,The Double Pension,0.872,0.462,2
+A,361*,The Wolf with an Iron Head,F511.0.3.1,Person With Iron Head,0.866,0.428,2
+A,1525,The Master Thief,K302,Female Master Thief,0.863,0.403,2
+A,1840B,The Stolen Ham (Goat),K306.1,The Stolen And Restolen Ham,0.861,0.429,2
+A,1785C,The Sexton's Wasp nest,A2432.2,Why Wasp Has Nest,0.861,0.606,2
+A,1871A,Star Gazer Falls into Well,F642.1,Remarkable Star-Gazer,0.859,0.565,2
+A,779,Miscellaneous Divine Rewards and Punishments,Q0,Rewards And Punishments,0.851,0.564,2
+A,1577,Blind Men Duped into Fighting,K1081.2,Blind Men Duped Into Fighting: Stolen Meat,0.848,0.532,4
+A,513,The Extraordinary Companions,F601.4,Extraordinary Companions Rescue Hero,0.839,0.354,2
+A,233A,The Birds Escape by Shamming Death,K522,Escape By Shamming Death,0.838,0.573,3
+A,201D*,The Dog Barks at the Thieves,A2426.1.5,Why Dog Barks After Thief,0.835,0.543,2
+A,1074,Race Won by Deception: Relatives as Helpers,K11,Race Won By Deception,0.831,0.537,3
+A,116,The Bear on the Hay-Wagon,J1411,The Hay Wagon And The Gate,0.828,0.478,2
+A,924,Discussion in Sign Language,Z175,Sign Language,0.827,0.470,2
+A,1288**,The Long Nose,A2335.3.2,Why Tapir Has Long Nose,0.821,0.507,2
+A,222A,The Bat in War between Birds and Quadrupeds,B261,War Of Birds And Quadrupeds,0.821,0.517,3
+A,1441B*,Godfather and Godmother,Q242.1,Cohabitation Of Godfather And Godmother Punished,0.820,0.399,2
+A,1351,The Silence Wager,J2511.2,Numskulls Make Silence Wager,0.814,0.421,2
+A,1420,The Lover's Gift Regained,K1581.8,Lover's Gift Regained: Refusal To Leave Bed,0.812,0.467,3
+A,75*,The Wolf and the Nurse,B535.0.9,She-Wolf As Nurse For Child,0.810,0.484,2
+A,815*,The Shoemaker who Made Shoes for the Devil,G303.3.1.18,Devil As Shoemaker,0.810,0.371,2
+A,1851,Anecdotes about Devout Women,X438.1,All Devout Women In Hell,0.810,0.586,2
+A,1832F*,Invitation to Dinner,J425.2,Buffalo Refuses Tiger's Invitation To Dinner,0.805,0.455,2
+A,1187*,Unfinished Work,E606.2,Reincarnation To Complete Unfinished Work,0.800,0.430,2
+A,3*,The Wolf Supplies Food for the Fox,D1472.1.27,Magic Well Supplies Food,0.798,0.352,2
+A,1420,The Lover's Gift Regained,K1581.5,Lover's Gift Regained: Piece Of Cloth As Gift,0.796,0.458,3
+A,1577,Blind Men Duped into Fighting,K1081.3,Blind Men Duped Into Fighting: Strings Leading To Water Removed,0.796,0.531,4
+A,513,The Extraordinary Companions,F601.3,Extraordinary Companions Betray Hero,0.796,0.397,2
+A,1693,The Literal Fool,J2469.5,Literal Fool -- Something You Have Never Experienced,0.796,0.446,2
+A,1172,All Stones from the Stream or the Field,D1641.2.5,Stones Go Down To Stream To Drink,0.796,0.552,2
+A,1525C,Fishing in the Street,J1149.2,Cheater Discovered By Fishing In The Street,0.791,0.473,2
+A,1282,House Burned Down to Rid it of Insects,J2102.7,Crop Burned To Rid It Of Insects,0.788,0.662,3
+A,1701,Echo Answers,D1611.15,Magic Echo Answers For Fugitive,0.785,0.502,2
+A,885A,Woman Feigns Death,N343.3,Woman Feigns Death To Meet Exiled Lover,0.782,0.403,2
+A,1785C,The Sexton's Wasp nest,J2102.5,Burning The Wasp Nest,0.781,0.441,2
+A,1641D,The Sham Physician,K1955.6,The Sham Physician And The Devil In Partnership,0.780,0.354,2
+A,1820,Bride and Groom at Wedding Ceremony,T135.14,Wedding-Canopy Over Bride And Groom,0.777,0.499,3
+A,1321,Fools Frightened,J2614.2,Fools Frightened At The Flight Of A Quail,0.777,0.609,2
+A,1892,The Trained Horse Rolls in the Field,X1241.2,Well-Trained Horse,0.776,0.454,2
+A,1335*,Setting Sun (Rising Moon) Mistaken for Fire,A725,Man Controls Rising And Setting Of Sun,0.769,0.511,3
+A,1278,Marking the Place on the Boat,J1922,Marking The Place,0.768,0.353,2
+A,926A,The Clever Judge and the Demon in the Pot,P192.2,Fool As Clever Judge,0.762,0.355,2
+A,1282,House Burned Down to Rid it of Insects,J2102.4.1,House Burned Down To Get Rid Of Lizard,0.760,0.593,3
+A,122,Animal Loses his Prey because his Victim Can Escape by False Plea,K579,Escape By False Plea -- Miscellaneous,0.760,0.562,3
+A,283,The Spider and the Fly,A2494.14.1,Enmity Between Spider And Fly,0.759,0.465,2
+A,775,Midas' Short-sighted Wish,J2072.3,Short-Sighted Wish: All He Pulls On Will Follow,0.756,0.407,3
+A,1282,House Burned Down to Rid it of Insects,J2103.3,House Burned Down To Get Rid Of Rats,0.748,0.646,3
+A,1334*,The Old Moon and the Stars,J2271.2,What Becomes Of The Old Moon?,0.747,0.412,2
+A,650C,The Youth who Bathed himself in the Blood of a Dragon,B11.2.13,Blood Of Dragon,0.746,0.574,2
+A,1633,Joint Ownership of the Cow,J1905.3,Divided Ownership Of Cow,0.745,0.388,2
+A,672,The Serpent's Crown,D1361.9,Serpent's Crown Renders Invisible,0.740,0.350,2
+A,1920D,The Liar Reduces the Size of his Lie,X904,The Teller Reduces The Size Of His Lie,0.738,0.501,3
+A,1641D,The Sham Physician,K1955.9.1,Sham Physician Hands Out Prescriptions Haphazard,0.736,0.352,2
+A,1420,The Lover's Gift Regained,K1581.10,Lover's Gift Regained: Payment With Worthless Money,0.735,0.434,3
+A,1575A*,God Speaks,V510.1,God Speaks In Vision To Devotee,0.734,0.350,2
+A,298,The Contest of Wind and Sun,L351.1,Contest Between Wind (Rain) And Sun,0.734,0.461,3
+A,1575A*,God Speaks,A182.3.0.1,God Speaks To Moses From Bush,0.732,0.356,2
+A,513,The Extraordinary Companions,F601.6,Extraordinary Companions Are Transformed Animals,0.729,0.366,2
+A,1890,The Lucky Shot,N621,Lucky Shot With Arrow -- Foot And Ear Of Deer,0.729,0.365,2
+A,1288**,The Long Nose,F543.1,Remarkably Long Nose,0.726,0.402,2
+A,1359,Husband Outwits Adulteress and Lover,K1550,Husband Outwits Adulteress And Paramour,0.726,0.448,3
+A,1881,The Man Carried through the Air by Geese,N814.1,Man Carried Through Air By Angel,0.725,0.381,2
+A,1282,House Burned Down to Rid it of Insects,J2102.6,Clothes Burned To Rid Them Of Insects,0.724,0.493,3
+A,1374*,Woman who Doesn't Know how to Bake Bread,F271.10,Fairies Bake Bread,0.724,0.389,2
+A,887A*,Precious Stones in Bricks,F782.2,Door Of Precious Stones,0.724,0.404,2
+A,1525H,1525H4 The Youth in the Bee Hive,H1332.7,Quest For Honey From The Royal Bee-Hive,0.724,0.373,2
+A,480D*,Tales of Kind and Unkind Girls,Q2,Kind And Unkind,0.723,0.407,2
+A,1889G,Man Swallowed by Fish,X1723.1.2,Lie: Man Swallowed By Fish And Later Rescued Alive,0.722,0.448,2
+A,1281,Getting Rid of the Unknown Animal,F381,Getting Rid Of Fairies,0.719,0.441,2
+A,775,Midas' Short-sighted Wish,J2072.2,Short-Sighted Wish: Grain To Grow Without Beards,0.716,0.404,3
+A,1856,Children by Day and by Night,Z73,A Day And A Night,0.715,0.412,2
+A,1856,Children by Day and by Night,K2314,One Day And One Night,0.715,0.351,2
+A,403C,The Substituted Bride,K1911,The False Bride (Substituted Bride),0.713,0.394,2
+A,1580A*,Mounting the Horse,T133.5,Mounting Upon Horse To Fetc Bride,0.711,0.493,2
+A,1820,Bride and Groom at Wedding Ceremony,T135,Wedding Ceremony,0.710,0.450,2
+A,1264*,The Boiling of the Porridge Pot,X431,The Hungry Parson And The Porridge-Pot,0.707,0.411,2
+A,1264*,The Boiling of the Porridge Pot,C916.3,Magic Porridge-Pot Keeps Cooking,0.706,0.449,2
+A,1963,Boat without Bottom Sails Sea,F911.5.1,Man Builds Boat And Sails About In Giant's Belly,0.705,0.521,2
+A,925*,The Most Beautiful in the Garden,H1199.1,Task: Planting Beautiful Garden,0.704,0.393,2
+A,1174,Making a Rope of Sand,H1021.1.1,Task: Making A Rope Of Sand; Countertask: First Showing The Pattern,0.702,0.423,3
+A,1455,The Hard-hearted Fiancée,Q291.2,Punishment Of Hard-Hearted Masters In Other World,0.702,0.469,2
+A,903C*,Mother-in-law and Daughter-in-law,P262,Mother-In-Law,0.702,0.594,2
+A,1425,Putting the Devil into Hell,G303.8.3,The Devil In Hell,0.701,0.391,2
+A,1121,The Ogre's Wife Burned in Her Own Oven,G512.3.2,Ogre Burned In His Own Oven,0.700,0.533,3
+A,1455,The Hard-hearted Fiancée,Q415.2,Mice Devour Hard-Hearted Man,0.700,0.469,2
+A,1698B*,Refusal to Eat,F1041.21.3,Refusal To Eat From Excessive Grief,0.700,0.483,2
+A,815*,The Shoemaker who Made Shoes for the Devil,G303.4.5.1.2,Devil's Shoes Are Empty,0.699,0.421,2
+A,1137,The Blinded Ogre,G511,Ogre Blinded,0.698,0.410,2
+A,1578A*,The Drinking Cup,Q491.5,Skull Used As Drinking Cup,0.698,0.362,2
+A,530A,The Pig with the Golden Bristles,B101.2.1,Boar With Golden Bristles,0.697,0.445,2
+A,667,The Wood Spirit's Foster-Son,F441,Wood-Spirit,0.697,0.412,2
+A,1546,The Lump of Gold,N529.1,Lump Of Gold Appears In Arabia At Christ's Birth,0.696,0.362,2
+A,1857,Painting the Red Sea,F711.3.2,Red Sea,0.694,0.499,2
+A,887A*,Precious Stones in Bricks,F774.1,Pillars Of Precious Stones,0.694,0.356,2
+A,1820,Bride and Groom at Wedding Ceremony,T135.11,Bride And Groom Drink From Same Cup As Part Of Ceremony,0.692,0.461,3
+A,767,Food for the Crucifix,Q32,Reward For Offering Food To Crucifix (Madonna),0.691,0.487,2
+A,735A,Bad Luck Imprisoned,N134.1,Persons Bring Bad Luck,0.690,0.356,2
+A,1785C,The Sexton's Wasp nest,K1023,Getting Honey From The Wasp-Nest,0.688,0.454,2
+A,207B,Hard-hearted Horse and Donkey,Q291.2,Punishment Of Hard-Hearted Masters In Other World,0.686,0.453,2
+A,705A*,The Banished Wife,S411,Wife Banished,0.685,0.596,2
+A,207B,Hard-hearted Horse and Donkey,Q415.2,Mice Devour Hard-Hearted Man,0.685,0.453,2
+A,1290B*,Sleeping on a Feather,C735.2.7,Tabu: Sleeping On Feather Bed,0.681,0.397,2
+A,1321,Fools Frightened,J2614,Fools Frightened By Stirring Of An Animal,0.681,0.457,2
+A,882A*,Suitors at the Spinning Wheel,F876,Golden Spinning-Wheel,0.679,0.367,2
+A,1693,The Literal Fool,J2499,Literal Fool -- Additional Motifs,0.678,0.374,2
+A,775,Midas' Short-sighted Wish,J2199.4,Short-Sighted Economy,0.678,0.379,2
+A,293C*,The Flies in the Country and in Town,J1703,Town (Country) Of Fools,0.677,0.387,2
+A,1278,Marking the Place on the Boat,J1922.2,Marking The Place Under The Cloud,0.677,0.375,2
+A,1676C,Voices from the Graveyard,E401,Voices Of Dead Heard From Graveyard,0.676,0.525,2
+A,159A,Animals Warm Selves at Charcoal Burner's Fire,K2262,Treacherous Charcoal-Burner,0.676,0.607,2
+A,1820,Bride and Groom at Wedding Ceremony,T135.4,Groom's Sword Makes Vermillion Mark On Bride's Forehead As Wedding Ceremony,0.674,0.430,4
+A,1120,The Ogre's Wife Thrown into the Water,S432,Cast-Off Wife Thrown Into Water,0.673,0.394,3
+A,735A,Bad Luck Imprisoned,N250,Persistent Bad Luck,0.673,0.390,2
+A,178,The Faithful Animal Rashly Killed,B335.5,Faithful Animal Killed In Battle,0.673,0.478,2
+A,1420D,Accidental Discovery of Identity,N610,Accidental Discovery Of Crime,0.672,0.524,2
+A,1479*,The Old Maid on the Roof,S223.3,An Old Maid Promises The Devil Her First Born,0.670,0.399,2
+A,1820,Bride and Groom at Wedding Ceremony,A1555.1,Origin Of Wedding Ceremony,0.670,0.424,2
+A,1710,Boots Sent by Telegraph,J1935,Articles Sent By Telegraph,0.670,0.396,2
+A,1920F*,Skillful Hounds,F679.5.1,Skillful Hunter Manages Hounds,0.670,0.405,2
+A,882A*,Suitors at the Spinning Wheel,H383.2.1,Bride Test: Spinning -- Girl Cannot Use Spinning-Wheel,0.670,0.432,2
+A,1147*,Thunder-God,A284,God Of Thunder,0.668,0.440,2
+A,1573*,The Clever Servant as Trouble Maker,J1114,Clever Servant,0.667,0.413,2
+A,826,List of Sins on Cowhide,V29.6.1,List Of Sins: Schedule Is Returned Miraculously Cleansed Of All His Sins,0.666,0.481,2
+A,1074,Race Won by Deception: Relatives as Helpers,K11.4,Race Won By Deception: Chariot Disabled,0.664,0.367,3
+A,1074,Race Won by Deception: Relatives as Helpers,K11.2,Race Won By Deception: Riding On The Back,0.663,0.414,3
+A,278,The Frog and the Mouse Tied Together,B284.1.1,Wedding Of Frog And Mouse,0.662,0.452,2
+A,1325*,Bird's Dung Falls on Record Books,D1026.1,Magic Bird Dung,0.662,0.353,2
+A,248A,The Elephant and the Lark,L315.5,Lark Causes Elephant To Fall Over Precipice,0.660,0.546,2
+A,1148B,Thunder's Instruments,A162.3.1,Devil (Ogre) Steals Thunder's Instruments,0.660,0.542,2
+A,72,Rabbit Rides Fox A-courting,B557.13,Jackal Rides On Fox,0.660,0.444,2
+A,1639*,The Royal Order Concerning Clothing,T122,Marriage By Royal Order,0.659,0.352,2
+A,1960K,The Great Loaf of Bread,F991.3.1,Bleeding Loaf Of Bread,0.659,0.401,2
+A,244A*,The Crane and the Heron,U125.1,Heron (Crane) Loses Interest In Heaven If There Are No Snails,0.658,0.591,2
+A,751B*,The Old Man with the Live Coals,F541.1.3,Eyes Of Live Coals,0.657,0.386,2
+A,926C*,The Betrothed Children,T61.5,Children Born On Same Night Betrothed,0.657,0.429,2
+A,860B*,The Abducted Wife,R165.3,Abducted Wife Brought Back By Fakir,0.656,0.371,2
+A,1007,Other Means of Killing or Maiming Livestock,K800,Killing Or Maiming By Deception,0.655,0.419,2
+A,1488,Miscellaneous Tales of Old Maids,X750,Jokes On Old Maids,0.654,0.535,2
+A,233A,The Birds Escape by Shamming Death,K522.1,Escape By Shamming Death: Blood And Brains,0.654,0.387,3
+A,821A,Thief Rescued by the Devil,G303.16.6,Man Is Rescued From Devil By Baptism,0.653,0.366,2
+A,1180,Catching Water in a Sieve,G241.4.3,Witch Travels Over Water In A Sieve Or A Riddle,0.651,0.469,2
+A,775,Midas' Short-sighted Wish,J2072.5,Short-Sighted Wish: Camel Wishes A Long Neck,0.649,0.397,3
+A,1365,The Obstinate Wife,T255.4.1,The Obstinate Wife: Insists On Eating Three Of The Five Eggs,0.649,0.383,2
+A,1820,Bride and Groom at Wedding Ceremony,T135.9,Wedding Ceremony In Church,0.648,0.360,2
+A,1463,Finger-drying Contest Won by Deception,K33,Harpooning Contest Won By Deception,0.647,0.463,3
+A,1463,Finger-drying Contest Won by Deception,K10,Athletic Contest Won By Deception,0.647,0.463,3
+A,967,The Man Saved by a Spider Web,H1355.1,Quest For Garment Of Spider Web,0.647,0.391,2
+A,882A*,Suitors at the Spinning Wheel,J1881.1.5,Spinning Wheel Is Sent Home By Itself,0.647,0.361,2
+A,49A,The Wasp Nest as King's Drum,A2432.2,Why Wasp Has Nest,0.645,0.408,2
+A,1425B*,Why the Seventh Child Has Red Hair,F482.1.1,Brownie With Red Hair,0.645,0.494,2
+A,1567H,The Big and the Small Fish,B470.1,Small Fish As Helper,0.645,0.511,2
+A,1200A,Sowing the Seed in One Place,J1932.5,Sowing Needles (Like Seed),0.644,0.572,2
+A,1334*,The Old Moon and the Stars,J2271.2.1,Lightning Made From The Old Moon,0.642,0.481,2
+A,726,The Three Old Men,A2861,Why Men Become Old,0.640,0.435,2
+A,779,Miscellaneous Divine Rewards and Punishments,Z78,Testament Willing Rewards And Punishments,0.640,0.374,2
+A,1488,Miscellaneous Tales of Old Maids,E613.0.3,Reincarnation Of Old Maids As Birds,0.639,0.379,2
+A,1288**,The Long Nose,F543.1.1,Long Nose Used As Poker,0.638,0.357,2
+A,735A,Bad Luck Imprisoned,N250.4,Bad Luck Banished And Freed,0.638,0.379,2
+A,585,"Spindle, Shuttle, and Needle",H1022.7,Task: Making Boat From Splinters Of A Spindle And Shuttle,0.638,0.468,2
+A,1074,Race Won by Deception: Relatives as Helpers,K11.8,Race Won By Deception: Bow And Arrow,0.638,0.374,3
+A,1420,The Lover's Gift Regained,K1581.9,Lover's Gift Regained: Spending Money To Purchase Lover's Worthless Goods,0.636,0.401,3
+A,1272*,Drying Snow on the Stove,J1947,Drying Snow To Make Salt,0.636,0.411,2
+A,1168,Various Ways of Exorcising Devils,V61,Various Ways Of Disposing Of Dead,0.636,0.413,2
+A,821A*,Devil's Trickery Separates Married Couples and Friends,J1713,Foolish Married Couples,0.635,0.474,2
+A,1546,The Lump of Gold,B103.4.2.1,Grateful Snake Spits Out Lump Of Gold For His Rescuer,0.635,0.372,2
+A,1122,The Ogre's Wife Killed Through Other Tricks,G519,Ogre Killed Through Other Tricks,0.634,0.539,3
+A,1503*,The Daughter-in-law and the Real Daughter,S54,Cruel Daughter-In-Law,0.632,0.394,2
+A,1384,The Husband Hunts Three Persons as Stupid as his Wife,J1701,Stupid Wife,0.631,0.411,2
+A,1856,Children by Day and by Night,H722,Riddle Of The Day And Night,0.629,0.420,2
+A,1139,Carrying a Sham-Dead Person,K482,Money Received To Bury Sham-Dead Person,0.629,0.460,3
+A,809**,Old Man Repaid for Good Deeds,J1605,One Wrong And Five Hundred Good Deeds,0.629,0.391,2
+A,1365A,Wife Falls into a Stream,A425.1.1,Stream Is Wife Of Deity,0.628,0.376,2
+A,1804*,The Eel Filled with Sand,S165.4,Eyes Torn Out And Filled With Sand,0.628,0.420,2
+A,708,The Wonder Child,V229.2.4,Baptism Of A Wonder Child Is Accompanied By A Variety Of Phenomena,0.627,0.360,2
+A,903C*,Mother-in-law and Daughter-in-law,S51.1,Cruel Mother-In-Law Plans Death Of Daughter-In-Law,0.626,0.433,3
+A,1455,The Hard-hearted Fiancée,D444.1,Transformation: Money Of The Hard-Hearted To Scorpions,0.626,0.368,2
+A,920C,Shooting at the Father's Corpse as a Test of Paternity,H486,Test Of Paternity,0.625,0.352,2
+A,1935,Topsy Turvy Land,A1099.3,World Turned Topsy-Turvy And Eaten By An Earthworm,0.625,0.422,2
+A,1960C,The Great Catch of Fish,F986.1,Clerics Catch Fish With Regularity,0.624,0.379,2
+A,122M*,The Ram Runs Straight into the Wolf's Stomach,A2356.2.2,Why Wolf Has Straight Back,0.623,0.610,2
+A,250,Swimming Match of the Fish,K1761,Bluff: Provisions For The Swimming Match,0.623,0.393,2
+A,1920E*,Seeing (Hearing) Enormous Distance,F642.8,Person Sees Enormous Distance,0.621,0.429,2
+A,1968,Severed Head Freezes to Body,E783.2,Severed Head Regrows,0.621,0.354,2
+A,111,The Cat and the Mouse Converse,A2494.1.1,Enmity Between Cat And Mouse,0.620,0.363,2
+A,1577,Blind Men Duped into Fighting,K1082.0.1,Enemies Duped Into Fighting Each Other,0.619,0.396,2
+A,903C*,Mother-in-law and Daughter-in-law,S54,Cruel Daughter-In-Law,0.618,0.410,2
+A,1968,Severed Head Freezes to Body,F1096.3,Severed Head Bites Earth,0.617,0.418,2
+A,1422,Parrot Reports Wife's Adultery,K1591,Seventy Tales Of A Parrot Prevent A Wife's Adultery,0.616,0.360,3
+A,576,The Magic Knife,G512.1.1,Giant Killed With Magic Knife,0.616,0.384,2
+A,221,The Election of King of Birds,B236.2,Election Of King Of Fishes,0.615,0.429,2
+A,967,The Man Saved by a Spider Web,F989.18,Boar Hung In Spider's Web,0.614,0.374,2
+A,122F,'Wait till I Am Fat Enough.',K553.0.2,"Calf: ""Wait Till I Grow Up",0.614,0.429,2
+A,678,The King Transfers his Soul to a Parrot,E715.1.3,Separable Soul In Parrot,0.613,0.369,2
+A,207B,Hard-hearted Horse and Donkey,D444.1,Transformation: Money Of The Hard-Hearted To Scorpions,0.612,0.356,2
+A,1703,Anecdotes about Near-sighted Men,J2341,Near-Sighted Man Persuaded By Doctor That He Can See,0.611,0.465,2
+A,1968,Severed Head Freezes to Body,E783.3,Severed Head Reddens And Whitens,0.610,0.397,2
+A,107,Struggle between Dogs and Wolves,A165.2.1.1.1,Wolves As God's Dogs,0.529,0.610,2
+A,706C,The Father who Wanted to Marry his Daughter,S322.1.1,Father Who Wanted Son Exposes (Murders) Daughter,0.610,0.391,3
+A,368C*,The Death of the Cruel Stepmother,T154,Cruel Stepmother Enchants Stepdaughter On Eve Of Wedding,0.609,0.406,2
+A,1856,Children by Day and by Night,D621.0.1,One Shape By Day; Another By Night,0.608,0.358,2
+A,467,The Quest for the Wonderful Flower (Jewel),H1333.5.0.4,Quest For Wonderful But Man-Killing Flower,0.607,0.364,3
+A,111,The Cat and the Mouse Converse,A2493.9,Friendship Of Cat And Mouse,0.606,0.426,2
+A,327G,The Brothers at the Witch's House,G269.7,Witch Estranges Brothers,0.606,0.392,2
+A,1525L,Creditor Falsely Reported Insane when he Demands Money,K1265,Man Falsely Reported Insane,0.605,0.442,3
+A,1325*,Bird's Dung Falls on Record Books,D1500.1.33.3.1,Magic Bird Dung Cures,0.604,0.361,2
+A,1351,The Silence Wager,J2511.1.2,Silence Wager: Man And Wife Taken For Dead,0.602,0.366,2
+A,283B*,The House of the Fly,K1967,Juggler Promises To Fly From One House To Another,0.601,0.383,2
+A,1881*,Parrots Fly Away with Tree,A2442.1.2,Why Parrots Fly High,0.600,0.416,2
+A,1175,Straightening Curly Hair,A1661.3,Why Canaanites Have Curly Hair,0.597,0.444,2
+A,1282,House Burned Down to Rid it of Insects,Z51.1,The House Is Burned Down,0.597,0.354,2
+A,667,The Wood Spirit's Foster-Son,F441.5,Size Of Wood-Spirit,0.596,0.355,2
+A,920B*,The Lineage of the King's Three Sons,P30.1,King's Sons Called Kings,0.595,0.424,2
+A,1325*,Bird's Dung Falls on Record Books,E64.19,Resuscitation From Bird Dung,0.593,0.352,2
+A,1168C,The Virgin Mary Saves a Woman Sold to the Devil,K218.5,The Picture Of The Virgin Mary Saves The Priest,0.593,0.459,3
+A,1479*,The Old Maid on the Roof,X755,The Wolf Steals The Old Maid,0.592,0.359,2
+A,750B,Hospitality Rewarded,Q45.3.1,Hospitality To Monk Rewarded,0.592,0.379,2
+A,1321,Fools Frightened,J2614.1,Fools Are Frightened At The Humming Of Bees,0.591,0.472,2
+A,650B,The Quest for a Strong Companion,H1225,Quest For A Strong Adversary,0.589,0.384,2
+A,1408B,Fault-finding Husband Nonplussed,Q312,Fault-Finding Punished,0.587,0.382,2
+A,897,The Orphan Girl and her Cruel Sisters-in-Law,H939.3,Tasks Set By Cruel Sisters-In-Law To Get Tigress,0.587,0.441,3
+A,882A*,Suitors at the Spinning Wheel,E534,Phantom Spinning-Wheel Makes Noise,0.586,0.411,2
+A,887A*,Precious Stones in Bricks,A661.0.7,Self-Illuminating Precious Stones In Heaven,0.585,0.376,2
+A,765,The Mother who Wants to Kill her Children,S342,Mother Induced By Rival To Kill Her Children,0.585,0.415,3
+A,233A,The Birds Escape by Shamming Death,K523,Escape By Shamming Illness,0.584,0.402,2
+A,1238,The Roof in Good and Bad Weather,B81.7,Mermaid Warns Of Bad Weather,0.583,0.356,2
+A,1087,Rowing Contest,K14.1,Rowing Contest Won By Deception: Magic Boat,0.568,0.582,2
+A,1463,Finger-drying Contest Won by Deception,K0,Contest Won By Deception -- General,0.578,0.416,3
+A,1163,The Devil is Tricked into Revealing a Secret,J1141.15,The Thief Is Tricked Into Revealing Himself In Church,0.578,0.363,2
+A,750B,Hospitality Rewarded,Q45.3,Hospitality To Ascetic Rewarded,0.578,0.368,2
+A,1485A*,Old Maid Wants to Attract Attention,K1836.4,Disguise As A Weeping Woman To Attract Attention,0.578,0.403,2
+A,958F*,Test of Sex: Catching an Apple,H1578,Test Of Sex: To Discover Person Masking As Of Other Sex,0.577,0.371,2
+A,1932,Church Built of Cheese,Q273.4,Church Built By Usurer's Money Made To Collapse By Devil,0.577,0.380,2
+A,1335*,Setting Sun (Rising Moon) Mistaken for Fire,H1049.3,Task: Setting Back Sun,0.577,0.417,2
+A,233A,The Birds Escape by Shamming Death,K523.2,Escape By Shamming Leprosy,0.577,0.395,2
+A,253,The Fish in the Net,J321.2,Little Fish In The Net Kept Rather Than Wait For Uncertainty Of Greater Catch,0.576,0.419,2
+A,875E,The Unjust Decision: The Oil Press Gives Birth to a Foal,A1446.5.6,Origin Of The Oil-Press,0.575,0.352,2
+A,1463,Finger-drying Contest Won by Deception,K40,Labor Contest Won By Deception,0.574,0.410,3
+A,1562A*,Deceptive Bargain: Fasting Together,K174.1,Deceptive Bargain: As Much Grain As Will Go In A Rope,0.574,0.384,2
+A,1968,Severed Head Freezes to Body,D1654.14,Severed Head Cannot Be Moved From Helmet,0.573,0.376,2
+A,250A,The Flounder's Crooked Mouth,A2341.1,Why Flounder's Mouth Is Crooked,0.572,0.488,3
+A,1408B,Fault-finding Husband Nonplussed,J1545.3.2,Where Are The Shoes? Fault-Finding Husband Threatens To Hit Wife With Shoes,0.571,0.383,3
+A,967,The Man Saved by a Spider Web,F535.2.3,Man So Small He Dances In Spider Web,0.569,0.420,2
+A,1163,The Devil is Tricked into Revealing a Secret,C426,Tabu: Revealing Secret Song,0.569,0.356,2
+A,2031B,Abraham Learns to Worship God,V1.1.1,Worship Of One God,0.568,0.429,2
+A,1168C,The Virgin Mary Saves a Woman Sold to the Devil,V252.2,Virgin Mary Saves Criminal From Fire At Stake,0.568,0.435,3
+A,1360,Man Hidden in the Roof,K1271.1.4.2,Man Hidden In Roof (Or Elsewhere) Sees Girl And Lover: Blows Horn,0.566,0.360,2
+A,219F*,The Dog and the Sow Argue,E601.1,Man By Magic Sees His Wives In Their Former Incarnations As Dog And Sow,0.566,0.449,2
+A,1463,Finger-drying Contest Won by Deception,K50,Endurance Contest Won By Deception,0.565,0.404,3
+A,1362A*,The Three Months' Child,T585.2.1,Child Two Months Old Speaks,0.565,0.429,2
+A,1844,The Clergyman Visits the Sick,A185.17,God Visits Sick Mortal,0.564,0.362,2
+A,133*,The Goat Carries the Snake over a Stream,X1244.1,Lie: Goat Carries One Hundred Cartloads Of Grease,0.564,0.382,2
+A,1260**,Jumping into the Sea for Fish,R216.1,Escape From Ship By Jumping Into The Sea,0.564,0.502,2
+A,594*,The Magic Bridle,G241.2.1.1,Witch Transforms Person By Means Of Magic Bridle,0.563,0.363,2
+A,328A*,"Three Brothers Steal Back the Sun, Moon, and Star",R9.1.3,Sun And Moon Imprison Each Other,0.563,0.394,2
+A,1180,Catching Water in a Sieve,H1023.2.0.1,Task: Carrying Water In Sieve; Sieve Filled With Moss,0.563,0.379,2
+A,1074,Race Won by Deception: Relatives as Helpers,K11.7,Race Won By Deception: Blinding Opponent By Spitting Pepper Into Face,0.561,0.366,3
+A,136,The Wolf Surprises the Pig in an Apple Tree,D950.10,Magic Apple Tree,0.560,0.355,2
+A,1890F,Shot causes a Series of Lucky or Unlucky Accidents,N380,Other Unlucky Accidents,0.560,0.427,2
+A,1890F,Shot causes a Series of Lucky or Unlucky Accidents,N300,Unlucky Accidents,0.560,0.427,2
+A,1264*,The Boiling of the Porridge Pot,X142.1,Dwarf King Falls Into Porridge-Pot At Court Of Human King,0.560,0.390,2
+A,1540A*,Lady Sends Pig as Wedding Hostess,B281.6,Wedding Of Pig,0.558,0.429,2
+A,1420D,Accidental Discovery of Identity,H575,Accidental Discovery Of Answer To Riddle,0.558,0.438,2
+A,780C,The Tell-tale Calf's Head,F511.0.9.2,Person With Calf's Head,0.558,0.424,2
+A,1639*,The Royal Order Concerning Clothing,C878,Tabu Concerning Clothing,0.557,0.385,2
+A,1139,Carrying a Sham-Dead Person,H248.5,Sham Dead Detected By Batting Eyes,0.556,0.416,2
+A,1920E,Greatest Liar Gets his Supper Free,X905.2,Greatest Liar Made King Of Schlaraffenland,0.555,0.379,2
+A,1310*,The Crab Is Thought to Be the Devil,J1785.1,Grasshopper Thought To Be The Devil,0.554,0.407,2
+A,1294,Getting the Calf's Head out of the Pot,F511.0.9.2,Person With Calf's Head,0.554,0.417,2
+A,750E,Flight to Egypt,B563.5,Wild Leopards Guide Jesus And The Holy Family Through Wilderness In Flight To Egypt,0.552,0.351,2
+A,1463,Finger-drying Contest Won by Deception,K32,Trapping Contest Won By Deception,0.552,0.393,3
+A,1296A,"Fools Go to Buy Good Weather (storm, spring)",U148,Good Weather For One Is Foul For Another,0.551,0.424,2
+A,920B*,The Lineage of the King's Three Sons,T586.2.1,King With Fifty Sons (Daughters),0.550,0.398,2
+A,1932,Church Built of Cheese,V111.3,Place Where A Church Must Be Built Miraculously Indicated,0.550,0.392,2
+A,1294A*,Child with Head Caught in Jar,J2131.5,Numskull Gets His Head Caught,0.550,0.440,2
+A,1857,Painting the Red Sea,K1013.3,"""Painting"" With A Red Hot Iron",0.549,0.368,2
+A,1408B,Fault-finding Husband Nonplussed,Q312.4,Fault-Finding With God's Handling Of Weather,0.548,0.355,2
+A,1525L*,Theft Committed while Tale Is Told,J2372,The Judge Wants To Know How The Theft Was Committed,0.548,0.401,2
+A,165B*,The Wolf Punished by Being Married,J1863.2,Wolf Punished For His Father's Misdeeds,0.547,0.363,2
+A,1476B,Old Maid Married to a Devil,G303.12.5.1,Girl Married To A Devil,0.546,0.418,2
+A,1503*,The Daughter-in-law and the Real Daughter,C173,Daughter-In-Law Tabu,0.546,0.385,2
+A,1890F,Shot causes a Series of Lucky or Unlucky Accidents,N680.2,Series Of Lucky Successes,0.546,0.457,2
+A,1425B*,Why the Seventh Child Has Red Hair,A2364.1,Why Wolverine Has Red Hair On Loins,0.546,0.418,2
+A,122,Animal Loses his Prey because his Victim Can Escape by False Plea,K551.23,Escape By False Plea: Jackal Asks To Be Able To Clasp Tree Before Crocodile Kills It,0.545,0.393,3
+A,1463A*,Foolish Bride Gives away her Dowry,J2463,The Foolish Bride,0.543,0.354,2
+A,1174,Making a Rope of Sand,X1757,Rope Of Sand (Chaff),0.543,0.521,2
+A,1326,Moving the Church,J2104.1,Cleaning The Church By Moving It,0.543,0.389,2
+A,1525K*,Awarding the Stolen Property,F482.5.4.2,"Brownie Restores Stolen Property, Gives Thief A Twitch In Eyelid",0.542,0.359,2
+A,1379,Wife Deceives Husband with Substituted Bedmate,K1844,Husband Deceives Wife With Substituted Bedmate,0.536,0.371,5
+A,1174,Making a Rope of Sand,H1021.2,Task: Making A Rope Of Chaff,0.535,0.356,2
+A,903C*,Mother-in-law and Daughter-in-law,C173,Daughter-In-Law Tabu,0.534,0.401,2
+A,90,"The Needle, the Glove, and the Squirrel",A2281.2,Squirrel Steals Dog's Needle: Enmity Between Them,0.533,0.367,2
+A,1355A*,Unfaithful Wife as Judge,J882,Man With Unfaithful Wife Comforted,0.532,0.355,2
+A,402A*,The Princess Transformed into a Toad,B645.1,Marriage Of Person To Transformed Toad,0.532,0.443,2
+A,221,The Election of King of Birds,B242.1.9,Swan As King Of Birds,0.532,0.379,2
+A,705A*,The Banished Wife,S411.2,Wife Banished For Some Small Fault,0.532,0.364,2
+A,1355A*,Unfaithful Wife as Judge,K1549.5,Unfaithful Wife Communicates With Lover By Pouring Milk Into Stream,0.531,0.390,2
+A,2036,A Drop of Honey Causes Chain of Accidents,N381.1,Ant Pinching Frog Causes Chain Of Accidents,0.530,0.382,3
+A,1895,A Man Wading in Water Catches Many Fish in his Boots,N626,Ass Falls Into Water And Catches Fish In His Ear,0.530,0.364,3
+A,1140,Sleeping with Open Eyes,A2461.1,Hare Sleeps With Open Eyes As Defense,0.530,0.410,2
+A,1503*,The Daughter-in-law and the Real Daughter,J1111.3,Clever Daughter-In-Law,0.530,0.375,2
+A,650C,The Youth who Bathed himself in the Blood of a Dragon,B11.2.13.1,Blood Of Dragon Venomous,0.529,0.362,2
+A,872*,Brother and Sister,P253,Sister And Brother,0.502,0.527,2
+A,1131,Hot Porridge in the Ogre's Throat,J2421,The Fool Spits In The Hot Porridge,0.527,0.386,2
+A,873,The King Discovers his Unknown Son,H921,King (Father) Assigns Tasks To His Unknown Son,0.527,0.366,3
+A,1282,House Burned Down to Rid it of Insects,J2102,Expensive Means Of Being Rid Of Insects,0.526,0.466,2
+A,209,The Donkeys Decide to Kill the Saddler,J215.2,"Oxen Decide Not To Kill Butchers, Since Inexpert Killers Might Replace Them",0.522,0.362,2
+A,1463,Finger-drying Contest Won by Deception,K98,Beauty Contest Won By Deception,0.521,0.374,3
+A,667,The Wood Spirit's Foster-Son,F611.1.15,Strong Hero Son Of Wood-Spirit,0.520,0.358,3
+A,920B*,The Lineage of the King's Three Sons,P173,Captive King's Sons Made Slaves,0.508,0.518,2
+A,903C*,Mother-in-law and Daughter-in-law,J1111.3,Clever Daughter-In-Law,0.518,0.390,2
+A,1260**,Jumping into the Sea for Fish,B541.1,Escape From Sea On Fish's Back,0.516,0.383,2
+A,214B,The Donkey in Lion's Skin,W121.2.4,Dogs Tear Up Lion Skin: Fear Living Lion,0.515,0.358,2
+A,62A,Peace between Wolves and Sheep,F989.5.1,Sheep Kill Wolves,0.514,0.454,2
+A,1315*,The Steamship Thought to Be the Devil,J1785.1,Grasshopper Thought To Be The Devil,0.512,0.367,2
+A,1140,Sleeping with Open Eyes,W111.1.1.3,Man Too Lazy To Open Eyes To See Where Fire Is Burning,0.512,0.368,2
+A,737,"Who Will Be her Future Husband On New Year's Eve (Christmas Eve) a young woman foresees her future husband [D1825.1], a soldier",F451.9.3,Dwarfs Emigrate New Year's Eve Of 1800 To Return New Year's Eve Of 1900,0.509,0.371,3
+A,1833C,'Where Was Christ when he Was Neither in Heaven nor on Earth',V211.2,Christ On Earth,0.509,0.427,2
+A,293,The Debate of the Belly and the Members,A1391,Why Other Members Must Serve Belly,0.508,0.491,2
+A,1860A,Lawyers in Hell,X316,Nero Has Reserved Place In Hell For Lawyers,0.508,0.424,2
+A,201,The Lean Dog Prefers Liberty to Abundant Food and a Chain,F166.11,Abundant Food In Otherworld,0.508,0.445,2
+A,804B*,The Tavern at Heaven's Gate,A661.0.1,Gate Of Heaven,0.507,0.387,2
+A,1562D*,The Boy Goes to Sleep on his Job,K499.10,"Fox Pretends To Go To Work, But Goes Out To Sleep",0.506,0.354,2
+A,809**,Old Man Repaid for Good Deeds,D1799.6,Magic Results From Performing Good Deeds,0.504,0.385,2
+A,1282,House Burned Down to Rid it of Insects,Q486.1,Criminal's House Burned Down,0.502,0.380,2
+A,903C*,Mother-in-law and Daughter-in-law,K1945.1.1,"Mother-In-Law's Head Is Shaven, Face Blackened And She Is Led Around City On Ass-Back As Only Cure For Malady Of Daughter-In-Law",0.502,0.410,3
+B,532*,The Magic Ox,B184.2.2,Magic Ox,1.000,0.669,1
+B,532*,The Magic Ox,B184.2.4,Magic Ox,1.000,0.669,1
+B,246,Two Birds,A2434.1.1,Why Birds Are Everywhere,1.000,0.524,1
+B,920D,The Four Princes,P30,Princes,1.000,0.605,1
+B,1265*,Two for the Price of One,J2083.4,Ten For The Price Of Nine,1.000,0.360,1
+B,1321D,Pickling the Grandmother,P292,Grandmother,1.000,0.422,1
+B,1560**,'Is it Still Raining',J2716,How To Find If It Is Raining,1.000,0.615,1
+B,1651A*,The Accidental Heiress,N310,Accidental Separations,1.000,0.479,1
+B,1738D*,Alone in Heaven,F962.2,Fire From Heaven,1.000,0.435,1
+B,1738D*,Alone in Heaven,A661,Heaven,1.000,0.383,1
+B,1478,Nibbling the Nails,D1252.1.2,Magic Nails,0.918,0.435,1
+B,178,The Faithful Animal Rashly Killed,B301,Faithful Animal,0.911,0.647,1
+B,362*,The Devil's Kindness,W10,Kindness,0.874,0.369,1
+B,803,The Devil in Chains,F863.2,Chains Of Fire,0.867,0.357,1
+B,1464D*,Nothing to Cook,G303.3.1.13,Devil As Cook,0.867,0.500,1
+B,231*,Animals Eat Each Other,A2435.2.1,Why Animals Eat Everything Without Salt,0.863,0.415,1
+B,883C,The Boys with Extraordinary Names,X1506,The Extraordinary Names,0.855,0.412,1
+B,406,The Cannibal,G11.5,Water Cannibal,0.837,0.380,1
+B,779E*,The Dancers of Kolbeck,A166,Dancers Of The Gods,0.834,0.375,1
+B,179A*,The Bear Pursues the Man,E261.4,Ghost Pursues Man,0.830,0.513,1
+B,2204,The Dog's Cigar,D1261,Magic Cigar,0.829,0.589,1
+B,1702A*,A Laconic Conversation,E545.1,Conversation Between The Dead,0.829,0.374,1
+B,1468,Money in the Bible,V136,Bible,0.819,0.388,1
+B,921E*,The Potter,K1816.4,Disguise As Potter,0.819,0.351,1
+B,1835B*,The Pasted Bible Leaves,V136,Bible,0.811,0.393,1
+B,406,The Cannibal,G11.2,Cannibal Giant,0.805,0.362,1
+B,1178**,The Devil at the Grindstone,A1446.5.3,Origin Of The Grindstone,0.802,0.673,1
+B,297B,The War of the Mushrooms,A2794.1,Why Mushrooms Are Slimy,0.801,0.652,1
+B,910E,'Find the Treasure in our Vineyard!',D962,Magic Vineyard,0.799,0.476,1
+B,406,The Cannibal,A711.2,Sun As A Cannibal,0.798,0.359,1
+B,285B*,The Snake Stays in the Man's Stomach,J2072.4,A Man Without A Stomach,0.784,0.353,1
+B,111A*,A Drunkard's Promise,J1321,The Unrepentant Drunkard,0.783,0.418,1
+B,1702A*,A Laconic Conversation,F497.1,Conversation Of Two Fire-Spirits,0.779,0.402,1
+B,1178**,The Devil at the Grindstone,A714.5,Sun As Grindstone Full Of Fire,0.779,0.659,1
+B,1464D*,Nothing to Cook,K2254,Treacherous Cook,0.774,0.432,1
+B,1464D*,Nothing to Cook,N842,Cook As Helper,0.767,0.433,1
+B,1542**,The Maiden's Honor,W45,Honor,0.761,0.413,1
+B,760***,Salvation in the Cradle,V520,Salvation,0.758,0.376,1
+B,1651A*,The Accidental Heiress,N660,Accidental Escapes,0.741,0.374,1
+B,1892*,Wolf Made into Cheese,D1036.1,Magic Cheese,0.740,0.403,1
+B,1453A,The Fast Weaver,P445,Weaver,0.740,0.356,1
+B,244B*,The Two Starving Sparrows,K2351.1,Sparrows Of Cirencester,0.735,0.361,1
+B,1823,Jokes about Baptism,V81,Baptism,0.733,0.373,1
+B,1443*,The Pillow too High,D1154.5,Magic Pillow,0.731,0.397,1
+B,1579**,A Hundred Animals,F911.2,Animals Swallow Animals,0.730,0.412,0
+B,77**,Wolf at School,B234,School Of Animals,0.730,0.399,1
+B,1960,The Great Animal or Great Object,X1201,Lie: The Great Animal,0.727,0.397,1
+B,1702A*,A Laconic Conversation,T42,Conversation Of Lovers,0.726,0.463,1
+B,1822,Equivocal Blessings,Q195,Blessings,0.724,0.442,1
+B,842C*,Floating Coins,H585.1,The Four Coins,0.714,0.529,1
+B,883C,The Boys with Extraordinary Names,F703,Lands With Extraordinary Names,0.712,0.415,1
+B,860,Nuts of 'Ay ay ay!',H1185.1,"Task: Buying A Coin's Worth Of Eggs And Another Of ""Ay, Ay",0.711,0.531,0
+B,1855C,The Rescuer's Sabbath,V71,Sabbath,0.710,0.513,1
+B,227*,The Crow and the Crayfish,A2171.1,Origin Of Crayfish,0.705,0.480,1
+B,1855,Anecdotes about Jews,P715.1,Jews,0.701,0.379,1
+B,1372*,The Wife's Disease,A478,God Of Disease,0.694,0.362,1
+B,1698H,The Deaf Man in the Tree,X111.5,Deaf Man On The Bridge,0.693,0.487,1
+B,1702A*,A Laconic Conversation,F967.3,Conversation Between Clouds,0.693,0.442,1
+B,1372*,The Wife's Disease,A1337,Origin Of Disease,0.688,0.355,1
+B,231,The Heron and the Fish,B463.2,Helpful Heron,0.688,0.385,1
+B,935*,The Stepson Mariner,P282.3,Stepmother In Love With Stepson,0.687,0.395,1
+B,275,The Race between Two Animals,A2252.1,Race Of Animals To See Where Each Shall Live,0.685,0.392,1
+B,151*,The Lion in Love,W161,Love Of Publicity,0.685,0.356,1
+B,151*,The Lion in Love,T24,The Symptoms Of Love,0.685,0.356,1
+B,1429*,Remedy for Quarrelsomeness,Q306,Quarrelsomeness Punished,0.679,0.415,1
+B,1811B,The Patience of Job,W26,Patience,0.678,0.376,1
+B,231,The Heron and the Fish,A2411.2.5.2,Color Of Heron,0.674,0.377,1
+B,1083A,Duel with Bayonet and Pitchfork,G303.4.8.7,Devil With Pitchfork,0.674,0.498,1
+B,920E,The Three Rings,J462.3.1.1,Father Gives Son Three Rings,0.671,0.385,1
+B,231,The Heron and the Fish,E613.9,Reincarnation As Heron,0.670,0.373,1
+B,880*,The Gambler's Wife,N9.1,Gambler Loses Everything,0.668,0.430,1
+B,1876*,The Successful Hunter,P414,Hunter,0.667,0.401,1
+B,182,The Helpful Animal and the Snake,B341,Helpful Animal's Injunctions Disobeyed,0.666,0.498,1
+B,182,The Helpful Animal and the Snake,B300,Helpful Animal,0.666,0.397,1
+B,1470,Miscellaneous Bride Tests,H425,Tests For Cuckolds,0.666,0.406,1
+B,1216*,The Lost Prescription,J2469.2,Taking The Prescription,0.665,0.424,1
+B,293G*,"The Hedgehog, the Shilling, and the Gentleman",A2426.1.4,The Hedgehog's Cry,0.664,0.450,1
+B,1871,Anecdotes about Philosophers,P485.1,Treacherous Philosophers,0.646,0.662,1
+B,244B*,The Two Starving Sparrows,B242.2.7,King Of Sparrows,0.661,0.494,1
+B,1686*,The Price of Wood,U66.1,Every Woman Has Her Price,0.659,0.370,1
+B,168A,The Old Woman and the Wolf Fall into the Pit Together,F571.3,Very Old Woman,0.657,0.371,1
+B,248A,The Elephant and the Lark,B451.1,Helpful Lark,0.656,0.375,1
+B,248A,The Elephant and the Lark,A1911,Creation Of Lark,0.654,0.373,1
+B,231**,The Falcon and the Doves,B242.2.2,King Of Doves,0.649,0.525,1
+B,759E,The Miller of Sans Souci,P443,Miller,0.645,0.383,1
+B,231,The Heron and the Fish,A2431.2.2,Why Heron Has No Nest,0.644,0.365,1
+B,1848D,The Clergyman Forgets Easter,V75,Easter,0.643,0.354,1
+B,231,The Heron and the Fish,B291.1.7,Heron As Messenger,0.639,0.360,1
+B,1339,Strange Foods,F183,Foods In Otherworld,0.638,0.414,1
+B,1168A,The Demon and the Mirror,F493.1.2,Demon Of Colic,0.633,0.355,1
+B,1447A*,Selling Wine to Each Other,F718.3,Well Of Wine,0.632,0.381,1
+B,159*,Quarrel over the Stag,A132.4,Stag-God,0.631,0.366,1
+B,1680,The Man Seeking a Midwife,Q583.3,Man Seeking To Flee Saint Paralyzed,0.630,0.371,1
+B,1202,The Dangerous Sickle,E772,Sickle With Life In It,0.630,0.380,1
+B,1354D*,Fertile Weather,J1041.1,Weather To Please One Only,0.629,0.366,1
+B,1853,Anecdotes about Millers,X213,Why No Millers In Hell,0.625,0.354,1
+B,1706E,Drunk Man in the Mine,J1063.2,Drunk Man Makes Sport Of Another Man For Being Drunk,0.625,0.359,1
+B,1542*,Sailor Substitute,K2259.4,Treacherous Sailor,0.624,0.390,1
+B,280A,The Ant and the Cricket,B486.2,Helpful Cricket,0.621,0.381,1
+B,280A,The Ant and the Cricket,A2063,Creation Of Cricket,0.618,0.379,1
+B,1262*,Spitting into the Porridge,A1399.3,Origin Of Spitting,0.616,0.404,1
+B,242,The Crow's Oath,B279.2,Attitudes Of Animals Toward Oath,0.613,0.394,1
+B,244A*,The Crane and the Heron,B463.2,Helpful Heron,0.611,0.395,1
+B,150A*,The Frog's Counsels,A2412.5.2.1,Why Frog Is Spotty All Over,0.609,0.455,1
+B,182,The Helpful Animal and the Snake,B312.3,Helpful Animal(S) Bequeathed To Hero,0.606,0.374,1
+B,280A,The Ant and the Cricket,B285.2,Wedding Of Cricket,0.605,0.377,1
+B,1349M*,The Answered Prayer,V58.4,Handwashing Before Prayer,0.603,0.370,1
+B,1349M*,The Answered Prayer,V50,Prayer,0.603,0.370,1
+B,179A*,The Bear Pursues the Man,R262,Magic Eel Pursues Man Over Land,0.602,0.389,1
+B,186,The Monkey and the Nut,F813.3,Extraordinary Nut,0.602,0.411,1
+B,1855C,The Rescuer's Sabbath,R169.16,Death As Rescuer,0.601,0.380,1
+B,157B,The Sparrow and his Sons,B451.7,Helpful Sparrow,0.601,0.422,1
+B,297B,The War of the Mushrooms,P552.4,War-Machines,0.599,0.477,1
+B,244A*,The Crane and the Heron,A2411.2.5.2,Color Of Heron,0.599,0.387,1
+B,157B,The Sparrow and his Sons,A1927,Creation Of Sparrow,0.598,0.420,1
+B,219H*,The Rooster and the Pearl,N529.2,Pearl Found In Fish,0.598,0.432,1
+B,1162,The Iron Man and the Ogre,D94,Transformation: Man To Ogre,0.597,0.352,1
+B,1864,Anecdotes about Madmen,X540,Jokes On Madmen,0.596,0.437,1
+B,244A*,The Crane and the Heron,E613.9,Reincarnation As Heron,0.595,0.382,1
+B,231**,The Falcon and the Doves,X1256,Lies About Doves,0.591,0.428,1
+B,157B,The Sparrow and his Sons,B211.3.7,Speaking Sparrow,0.588,0.413,1
+B,157B,The Sparrow and his Sons,A2411.2.1.11,Color Of Sparrow,0.587,0.412,1
+B,1288B,The Stolen Donkey,E611.1.2,Reincarnation As Donkey,0.586,0.389,1
+B,179A*,The Bear Pursues the Man,E261.1,Wandering Skull Pursues Man,0.585,0.408,1
+B,910M,Prayers for the Tyrant,J1281,"""If I Were A Tyrant You Would Not Say So",0.583,0.386,1
+B,1485*,Pretty Lips,F531.1.4,Lips Of Giant,0.583,0.431,1
+B,299,The Mountain Gives Birth to a Mouse,A955.9,Goddess Gives Birth To Islands,0.583,0.430,1
+B,1830,Producing the Weather,A1135,Origin Of Wintry Weather,0.583,0.350,1
+B,1177**,Fetching the Woman's Grindstone,A1446.5.3,Origin Of The Grindstone,0.581,0.487,1
+B,1701,Echo Answers,A497,Echo,0.581,0.470,1
+B,1698H,The Deaf Man in the Tree,X111.6,The Deaf Man And The Proud Nobleman,0.580,0.356,1
+B,186,The Monkey and the Nut,D1610.22,Speaking Nut,0.579,0.395,1
+B,1276*,Prayer for a Change of Wind,V58.4,Handwashing Before Prayer,0.577,0.398,1
+B,1276*,Prayer for a Change of Wind,V50,Prayer,0.577,0.398,1
+B,1897,The Pike Caught by the Fox,B475,Helpful Pike,0.577,0.417,1
+B,182,The Helpful Animal and the Snake,B320,Reward Of Helpful Animal,0.576,0.356,1
+B,1526A**,Waiting until the Tower Falls,F772.2.5,Dolorous Tower,0.575,0.360,1
+B,103,War between Wild Animals and Domestic Animals,B845,Wild Animals Herded,0.575,0.354,1
+B,1897,The Pike Caught by the Fox,A2111,Creation Of Pike,0.574,0.415,1
+B,299,The Mountain Gives Birth to a Mouse,T554.10,Woman Gives Birth To A Bird,0.574,0.386,1
+B,244A*,The Crane and the Heron,A2431.2.2,Why Heron Has No Nest,0.572,0.374,1
+B,1262*,Spitting into the Porridge,D1610.31.1,Speaking Porridge,0.571,0.404,1
+B,130A,Animals Build Themselves a House,B299.8,Animals Build Bridge,0.570,0.364,1
+B,1853,Anecdotes about Millers,X210,Jokes About Millers,0.569,0.428,1
+B,238,The Dove and the Frog Boast to Each Other,A2426.2.8,Why Dove Coos,0.568,0.447,1
+B,244A*,The Crane and the Heron,B291.1.7,Heron As Messenger,0.568,0.369,1
+B,325**,Sorcerer Punished,F721.2.3,Sorcerer And Books In Mountain,0.566,0.351,1
+B,231**,The Falcon and the Doves,B872.3,Giant Falcon,0.566,0.414,1
+B,1013,Bathing (Warming) Grandmother,P292,Grandmother,0.565,0.404,1
+B,1177**,Fetching the Woman's Grindstone,A714.5,Sun As Grindstone Full Of Fire,0.564,0.477,1
+B,325*,The Sorcerer's Apprentice,D1711.0.1,Magician's Apprentice,0.563,0.367,1
+B,750E*,Hospitality and Sin,H1564,Test Of Hospitality,0.562,0.390,1
+B,813B,The Accursed Grandson,S25,Cruel Grandson,0.560,0.361,1
+B,299,The Mountain Gives Birth to a Mouse,T556,Woman Gives Birth To A Demon,0.558,0.369,1
+B,1871D,The Cynic and the Bald-headed Man,F511.0.2.4,Six-Headed Man,0.558,0.352,1
+B,293G*,"The Hedgehog, the Shilling, and the Gentleman",G211.2.9,Witch As Hedgehog,0.557,0.376,1
+B,774N,St. Peter's Gluttony,W125,Gluttony,0.555,0.447,1
+B,1321B,Fools Afraid of their own Shadow,J1700,Fools,0.554,0.553,1
+B,219H*,The Rooster and the Pearl,F707.4,Kingdom Where Everything Is Of Pearl,0.553,0.399,1
+B,2034F,The Clever Animal and the Fortunate Exchanges,L450,Proud Animal Less Fortunate Than Humble,0.552,0.375,1
+B,813C,The Perjured Man and the Devil,G303.1.3.1,The Devil Is Developed From Man,0.530,0.551,1
+B,1555A,Paying for Bread with Beer,D1045,Magic Beer,0.550,0.412,1
+B,299,The Mountain Gives Birth to a Mouse,T554.8.1,Woman Gives Birth To Toad,0.549,0.367,1
+B,231**,The Falcon and the Doves,B455.2,Helpful Falcon,0.548,0.396,1
+B,1485*,Pretty Lips,F544.1,Remarkable Lips,0.548,0.399,1
+B,186,The Monkey and the Nut,A132.2,Monkey As God,0.547,0.371,1
+B,1897,The Pike Caught by the Fox,A2493.33,Friendship Between Pike And Crawfish,0.546,0.392,1
+B,325**,Sorcerer Punished,Q211.2,Matricide Punished,0.546,0.371,1
+B,325**,Sorcerer Punished,Q272,Avarice Punished,0.546,0.371,1
+B,325**,Sorcerer Punished,Q388,Freemasonry Punished,0.546,0.371,1
+B,325**,Sorcerer Punished,Q387,Jesting Punished,0.546,0.371,1
+B,325**,Sorcerer Punished,Q253.2,Homosexuality Punished,0.546,0.371,1
+B,325**,Sorcerer Punished,Q393.2,Gossiping Punished,0.546,0.371,1
+B,325**,Sorcerer Punished,Q280,Unkindness Punished,0.546,0.371,1
+B,929A,Uneducated Father,J1803,Learned Words Misunderstood By Uneducated,0.545,0.463,1
+B,182,The Helpful Animal and the Snake,B310,Acquisition Of Helpful Animal,0.544,0.405,1
+B,1321,Fools Frightened,J1700,Fools,0.543,0.429,1
+B,1698H,The Deaf Man in the Tree,D215,Transformation: Man To Tree,0.542,0.359,1
+B,1390*,The Dish he Hates,D1610.13,Speaking Dish,0.541,0.360,1
+B,234A*,The Birds Brew Beer,D1045,Magic Beer,0.540,0.477,1
+B,299,The Mountain Gives Birth to a Mouse,A1234.4,Earth Gives Birth To Woman,0.539,0.358,1
+B,1485*,Pretty Lips,F544.1.3,Lips On Side Of Face,0.538,0.400,1
+B,1288B,The Stolen Donkey,B19.11,Mythical Donkey,0.538,0.358,1
+B,1390*,The Dish he Hates,E633,Reincarnation As Dish,0.537,0.358,1
+B,80,The Hedgehog in the Badger's Den,B433.2,Helpful Badger,0.535,0.364,1
+B,1208*,The Belled Salmon,A2125,Origin Of Salmon,0.534,0.388,1
+B,750E*,Hospitality and Sin,U230,The Nature Of Sin,0.534,0.376,1
+B,1861,Anecdotes about Judges,P421.1,Jackals As Judges,0.534,0.398,1
+B,112**,The Mice and the Rooster,B221.5,Land Of Mice,0.529,0.368,1
+B,1641B*,Who Stole from the Church,P120,Church Dignitaries,0.527,0.361,1
+B,168A,The Old Woman and the Wolf Fall into the Pit Together,R39.2,Abduction By Old Woman,0.526,0.371,1
+B,767,Food for the Crucifix,G303.3.2.1.1,Devil As Crucifix,0.525,0.365,1
+B,275C*,The Race of Frog and Snail,A2411.5.3,Color Of Snail,0.525,0.378,1
+B,750E*,Hospitality and Sin,P320.2,Hospitality For (Three) Years,0.525,0.373,1
+B,1354D*,Fertile Weather,A1135,Origin Of Wintry Weather,0.524,0.363,1
+B,1950A,Help in Idleness,J2243,Fool Sleeps So As To Avoid Idleness,0.524,0.389,1
+B,1200A,Sowing the Seed in One Place,A1425,Origin Of Seed,0.523,0.445,1
+B,1894,A Man Shoots a Ramrod Full of Ducks,G303.25.7,Man Shoots The Devil With A Silver Gun,0.522,0.412,1
+B,186,The Monkey and the Nut,F813.3.2,Gigantic Nut,0.520,0.353,1
+B,1230*,The Pilgrimage Vow,V535,Pilgrimage To Jerusalem,0.520,0.356,1
+B,168A,The Old Woman and the Wolf Fall into the Pit Together,M301.2,Old Woman As Prophet,0.518,0.366,1
+B,1208*,The Belled Salmon,B874.4,Giant Salmon,0.518,0.380,1
+B,920E,The Three Rings,K476.4,False Set Of Rings To Offset Genuine,0.517,0.377,1
+B,150A*,The Frog's Counsels,J163.4,Good Counsels Bought,0.515,0.384,1
+B,178,The Faithful Animal Rashly Killed,B301.3,Faithful Animal Plans Suicide When It Thinks Master Dead,0.515,0.383,1
+B,214A,Singing Donkey and Dancing Camel,A2356.2.13,Why Camel Has Humped Back,0.514,0.351,1
+B,112**,The Mice and the Rooster,X1226,Lies About Mice,0.513,0.359,1
+B,182,The Helpful Animal and the Snake,B312.4,Helpful Animal Purchased,0.511,0.380,1
+B,182,The Helpful Animal and the Snake,D659.4,Transformation To Act As Helpful Animal,0.511,0.354,1
+B,2204,The Dog's Cigar,D1364.19,Cigar Causes Magic Sleep,0.510,0.366,1
+B,804C,Unsuitable for Hell,A671.2.10,Griffins In Hell,0.510,0.414,1
+B,804C,Unsuitable for Hell,A671.3,Frigidity Of Hell,0.510,0.414,1
+B,1701,Echo Answers,A1195,Origin Of Echo,0.509,0.411,1
+B,293D*,The Hops and the Turnips Quarrel,A2441.2.1,Why Raven Hops,0.509,0.444,1
+B,1897,The Pike Caught by the Fox,D179.2,Transformation: Man To Pike,0.507,0.366,1
+B,1804C,Poem for Poem,P427.7.8,Poet Rewarded For Poem,0.506,0.487,1
+B,231**,The Falcon and the Doves,B291.1.4,Falcon As Messenger,0.506,0.367,1
+B,1804**,Tales about Payment for Absolution,P537,Payment Of Stipend,0.505,0.374,1
+B,238,The Dove and the Frog Boast to Each Other,A2412.5.2.1,Why Frog Is Spotty All Over,0.503,0.394,1
+B,1208*,The Belled Salmon,B474,Helpful Salmon,0.501,0.365,1

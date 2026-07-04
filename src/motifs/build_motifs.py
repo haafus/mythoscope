@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from json_utils import save_json
 from settings import settings
 
-from . import crosswalk, store
+from . import crosswalk, parallels, store
 from .sources import (
     ashliman,
     atu_wikidata,
@@ -64,7 +64,7 @@ def build_motifs(*, force: bool = False) -> None:
     bz_cfg = config.get("berezkin", {})
     if bz_cfg.get("enabled", True):
         home = bz_cfg.get("homepage", "areasofmyths.com")
-        logger.info("[1/4] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
+        logger.info("[1/5] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
                     home, bz_cfg.get("index_page", "index page"))
         berezkin_data = berezkin.build(bz_cfg, force=force)
         save_json(store.index_path("berezkin"), berezkin_data)
@@ -111,6 +111,8 @@ def build_motifs(*, force: bool = False) -> None:
     # --- [2/3] TMI + [3/3] ATU (from the j-hagedorn/trilogy dataset) ---
     tmi_ids: set[str] = set()
     atu_ids: set[str] = set()
+    tmi_motifs: list[dict] = []
+    atu_types: list[dict] = []
     atu_seq: dict[str, list[str]] = {}
     atu_defining: dict[str, list[str]] = {}
     atu_aliases: dict[str, str] = {}
@@ -122,8 +124,8 @@ def build_motifs(*, force: bool = False) -> None:
         files = tr_cfg.get("files", {})
         sources["trilogy"] = {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}
 
-        # --- [2/4] TMI: header first, so its parse warnings sit under it. ---
-        logger.info("[2/4] Thompson Motif-Index (TMI) — source: %s (%s)",
+        # --- [2/5] TMI: header first, so its parse warnings sit under it. ---
+        logger.info("[2/5] Thompson Motif-Index (TMI) — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
         tmi_index = trilogy.build_tmi(tr_cfg, force=force)
         save_json(store.index_path("tmi"), tmi_index)
@@ -144,8 +146,8 @@ def build_motifs(*, force: bool = False) -> None:
         logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
                     "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
 
-        # --- [3/4] ATU: header before the ATU parse, on par with the other steps. ---
-        logger.info("[3/4] Aarne-Thompson-Uther (ATU) tale types — source: %s (%s)",
+        # --- [3/5] ATU: header before the ATU parse, on par with the other steps. ---
+        logger.info("[3/5] Aarne-Thompson-Uther (ATU) tale types — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"),
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
         atu_index, atu_seq = trilogy.build_atu(tr_cfg, force=force)
@@ -181,9 +183,9 @@ def build_motifs(*, force: bool = False) -> None:
             logger.info("      + Ashliman: %d types carry %d tale variants (from %d pages, %d orphan site types dropped)",
                         ash["types_with_tales"], ash["variants"], ash["pages"], ash["orphans_dropped"])
 
-    # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
+    # --- [4/5] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
-    logger.info("[4/4] Cross-walk — deriving id links across the three indexes")
+    logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
     links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining,
                             atu_aliases, tmi_notes, aath_to_atu, atu_summaries)
     save_json(store.crosswalk_path(), links)
@@ -196,6 +198,22 @@ def build_motifs(*, force: bool = False) -> None:
     logger.info("      + inline relations (each stored both ways): TMI notes → %d ATU types, "
                 "ATU summaries → %d TMI motifs",
                 len(links["atu_to_tmi_note"]), len(links["tmi_to_atu_summary"]))
+
+    # --- [5/5] Textual parallels: a heuristic suggestion layer (lexical title +
+    #     description matching) surfacing look-alike motifs with *no* recorded
+    #     cross-walk link — hints for review, kept apart from the curated links. ---
+    logger.info("[5/5] Textual parallels — lexical look-alikes with no recorded link")
+    par = parallels.build(berezkin_motifs, tmi_motifs, atu_types, links)
+    if par is None:
+        logger.info("      SKIPPED (no TMI/ATU, or scikit-learn unavailable)")
+        par_counts = {}
+    else:
+        save_json(store.parallels_path(), par)
+        par_counts = par["counts"]
+        logger.info("      candidates (unlinked, high-confidence): ATU~TMI %d, Berezkin~TMI %d, "
+                    "Berezkin~ATU %d; three-way parallels %d",
+                    par_counts.get("atu_tmi", 0), par_counts.get("berezkin_tmi", 0),
+                    par_counts.get("berezkin_atu", 0), par_counts.get("triangles", 0))
 
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -210,6 +228,7 @@ def build_motifs(*, force: bool = False) -> None:
             "tmi_to_berezkin": len(links["tmi_to_berezkin"]),
             "linked_tmi_count": links["linked_tmi_count"],
         },
+        "parallels": par_counts,  # heuristic look-alikes with no recorded link
         "sources": sources,
     }
     save_json(store.meta_path(), meta)
