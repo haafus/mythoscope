@@ -442,6 +442,19 @@ class TestAtuRegions:
         assert r("A Tale (see note", "with no ending period") \
             == ("A Tale (see note", "with no ending period")
 
+    def test_apply_title_override(self):
+        o = trilogy._apply_title_override
+        # run-on label cut at the curated title; leaked tail folds to the summary front
+        assert o("66A*", "The Fox Buys himself a Pipe and goes into the barn to smoke",
+                 "The hay begins to burn.") \
+            == ("The Fox Buys himself a Pipe", "and goes into the barn to smoke. The hay begins to burn.")
+        # all-in-name case (summary empty): the whole tail becomes the summary
+        assert o("860", "Nuts of 'Ay ay ay!' A princess is offered nuts.", "") \
+            == ("Nuts of 'Ay ay ay!'", "A princess is offered nuts.")
+        # an id not in the table, or a name that doesn't start with the label: untouched
+        assert o("510A", "Cinderella", "A young woman.") == ("Cinderella", "A young woman.")
+        assert o("66A*", "Some other name", "x") == ("Some other name", "x")
+
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [
             {"id": "330", "name": "The Smith and the Devil", "concordances": {"AaTh": ["330A"]}},

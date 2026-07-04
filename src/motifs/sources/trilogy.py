@@ -491,6 +491,32 @@ def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
     return title, description
 
 
+# A curated label for the handful of types whose real title runs, in the source,
+# straight into the plot with no separating period, apparatus or quote — so no
+# boundary rule can find where the label ends ("The Fox Buys himself a Pipe" |
+# "and goes into the barn to smoke. The hay begins to burn…"). Cut points verified
+# against the run-on text; the leaked tail folds back to the front of the summary.
+_TITLE_OVERRIDES = {
+    "66A*": "The Fox Buys himself a Pipe",
+    "132": "The Goat Admires his Horns in the Water",
+    "232C*": "Which Bird Is Father",
+    "285A*": "The Adder Poisons the Children's Food",
+    "860": "Nuts of 'Ay ay ay!'",
+    "1832B*": "What Kind of Dung",
+    "1641B*": "Who Stole from the Church",
+}
+
+
+def _apply_title_override(atu_id: str, name: str, summary: str) -> tuple[str, str]:
+    """Replace a run-on ``name`` with its curated label, folding the leaked tail
+    (the plot that had merged into the title) back to the front of the summary."""
+    title = _TITLE_OVERRIDES.get(atu_id)
+    if not title or not name.startswith(title):
+        return name, summary
+    tail = name[len(title):].lstrip(" ,.")     # drop only the leading separator
+    return title, ". ".join(p for p in (tail, summary) if p)
+
+
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
     """'Supernatural Adversaries 300-399' -> ('Supernatural Adversaries', 300, 399)."""
     m = _ATU_RANGE.match(s or "")
@@ -541,6 +567,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
         sub_name, sub_start, sub_end = _split_division(_clean(row.get("sub_division")))
         tale_name, tale_summary = _repair_atu_name(
             _clean(row.get("tale_name")), _clean(row.get("tale_type")))
+        tale_name, tale_summary = _apply_title_override(atu_id, tale_name, tale_summary)
         types.append({
             "id": atu_id,
             "num": num,
