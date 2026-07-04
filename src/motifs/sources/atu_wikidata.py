@@ -6,7 +6,6 @@ Open SPARQL endpoint (`query.wikidata.org`), matched on the ATU-number property
   * multilingual **names** — from its *tale-type* items (``P31 = wd:Q47451145``, so
     specific tale instances don't masquerade as names);
   * **Wikipedia** articles (en/ru/de/fr);
-  * an illustrative **image** (P18), preferring a tale-type item's;
   * **concordances** to other catalogues — Grimm/KHM, Aarne-Thompson (AaTh), Perry
     (Aesop), Child ballads — from ``P528`` catalog codes (+ ``P972`` catalog) and the
     Perry-Index property ``P1852``.
@@ -45,13 +44,12 @@ _CATALOG = {
 _CONCORDANCE_ORDER = ["KHM", "AaTh", "Aesop", "Perry", "Child"]
 
 # wd:Q47451145 = "tale type"; only those items name the type itself.
-_QUERY = """SELECT ?atu ?item ?isType (SAMPLE(?img) AS ?image) (SAMPLE(?perry) AS ?perry)
+_QUERY = """SELECT ?atu ?item ?isType (SAMPLE(?perry) AS ?perry)
   (GROUP_CONCAT(DISTINCT CONCAT(STR(?lang),"=",STR(?art)); separator="|") AS ?arts)
   (GROUP_CONCAT(DISTINCT CONCAT(?catL,"=",?code); separator="|") AS ?cats)
   %s WHERE {
   ?item wdt:P2540 ?atu .
   BIND(EXISTS { ?item wdt:P31 wd:Q47451145 } AS ?isType)
-  OPTIONAL { ?item wdt:P18 ?img }
   OPTIONAL { ?item wdt:P1852 ?perry }
   OPTIONAL { ?art schema:about ?item ; schema:inLanguage ?lang ;
              schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] . FILTER(?lang IN (%s)) }
@@ -78,10 +76,6 @@ def _wiki_title(url: str) -> str:
     return unquote(url.rsplit("/", 1)[-1]).replace("_", " ")
 
 
-def _https(url: str) -> str:
-    return url.replace("http://", "https://", 1)
-
-
 def query_url() -> str:
     return f"{WDQS}?" + urlencode({"format": "json", "query": _QUERY})
 
@@ -101,17 +95,17 @@ def _add_concordance(entry: dict, catalog: str, code: str, atu: str) -> None:
 
 
 def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
-    """SPARQL bindings -> ``{atu_id: {names, wikipedia, wikidata, image, concordances}}``.
+    """SPARQL bindings -> ``{atu_id: {names, wikipedia, wikidata, concordances}}``.
 
-    Aggregated across a number's items; names come only from tale-type items, the
-    image prefers a tale-type item's. Only ids in ``atu_ids`` are kept."""
+    Aggregated across a number's items; names come only from tale-type items.
+    Only ids in ``atu_ids`` are kept."""
     out: dict[str, dict] = {}
     for r in rows:
         atu = _norm_atu(r.get("atu", {}).get("value", ""))
         if atu not in atu_ids:
             continue
         e = out.setdefault(atu, {"names": {}, "wikipedia": [], "wikidata": None,
-                                 "image": None, "concordances": {}, "_seen": set()})
+                                 "concordances": {}, "_seen": set()})
         is_type = r.get("isType", {}).get("value") == "true"
         if is_type:
             if e["wikidata"] is None:
@@ -122,9 +116,6 @@ def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
                     names = e["names"].setdefault(lang, [])
                     if name not in names:
                         names.append(name)
-        img = r.get("image", {}).get("value")
-        if img and (e["image"] is None or is_type):  # prefer a tale-type item's image
-            e["image"] = _https(img)
         for piece in filter(None, r.get("arts", {}).get("value", "").split("|")):
             lang, _, url = piece.partition("=")
             if url and url not in e["_seen"]:
@@ -145,7 +136,7 @@ def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
 
 
 def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
-    """Fetch Wikidata and attach ``names`` / ``wikipedia`` / ``wikidata`` / ``image`` /
+    """Fetch Wikidata and attach ``names`` / ``wikipedia`` / ``wikidata`` /
     ``concordances`` to each type, in place. ``{"skipped": ...}`` if the fetch failed."""
     cache = Path(settings.motifs_dir) / OUT
     try:
@@ -166,20 +157,19 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     ids = {t["id"] for t in atu_types}
     mapping = parse_bindings(rows, ids)
 
-    # A live endpoint always returns some sitelinks and P18 images across the
-    # matched tale-type items; a substantial response with zero of *both* is a
-    # degraded reply (WDQS timing out the heavy OPTIONALs during an outage, while
-    # cheap rdfs:label lookups still return). Don't accept or cache it as success
-    # — that would poison offline re-runs with names-only, zero Wikipedia links.
-    if len(rows) >= 50 and not any(m["wikipedia"] for m in mapping.values()) \
-            and not any(m["image"] for m in mapping.values()):
-        logger.warning("ATU Wikidata: %d rows but zero sitelinks/images — degraded "
-                       "response (WDQS outage?); not caching. Re-run with --force after "
-                       "the endpoint recovers.", len(rows))
+    # A live endpoint always returns some Wikipedia sitelinks across the matched
+    # tale-type items; a substantial response with zero of them is a degraded
+    # reply (WDQS timing out the heavy OPTIONALs during an outage, while cheap
+    # rdfs:label lookups still return). Don't accept or cache it as success —
+    # that would poison offline re-runs with names-only, zero Wikipedia links.
+    if len(rows) >= 50 and not any(m["wikipedia"] for m in mapping.values()):
+        logger.warning("ATU Wikidata: %d rows but zero sitelinks — degraded response "
+                       "(WDQS outage?); not caching. Re-run with --force after the "
+                       "endpoint recovers.", len(rows))
         cache.unlink(missing_ok=True)
         return {"skipped": "degraded-no-sitelinks"}
 
-    n_names = n_wiki = n_img = n_conc = 0
+    n_names = n_wiki = n_conc = 0
     for t in atu_types:
         m = mapping.get(t["id"])
         if not m:
@@ -193,15 +183,12 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
         if m["wikipedia"]:
             t["wikipedia"] = m["wikipedia"]
             n_wiki += 1
-        if m["image"]:
-            t["image"] = m["image"]
-            n_img += 1
         if m["concordances"]:
             t["concordances"] = m["concordances"]
             n_conc += 1
         if m["wikidata"]:
             t["wikidata"] = m["wikidata"]
-    logger.info("ATU Wikidata: names %d, Wikipedia %d, image %d, concordances %d (of %d types)",
-                n_names, n_wiki, n_img, n_conc, len(atu_types))
+    logger.info("ATU Wikidata: names %d, Wikipedia %d, concordances %d (of %d types)",
+                n_names, n_wiki, n_conc, len(atu_types))
     return {"types_with_names": n_names, "types_with_wikipedia": n_wiki,
-            "types_with_image": n_img, "types_with_concordances": n_conc, "rows": len(rows)}
+            "types_with_concordances": n_conc, "rows": len(rows)}

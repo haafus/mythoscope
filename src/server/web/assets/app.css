@@ -1602,6 +1602,10 @@ body.has-main-navbar {
 .motif-altnames { display: flex; flex-direction: column; gap: 4px; }
 .motif-altname { font-size: 13px; color: #2a2f36; }
 .motif-altname-lang { display: inline-block; min-width: 74px; color: var(--muted); font-size: 12px; }
+.motif-altname-lang[title] { cursor: help; text-decoration: underline dotted var(--border);
+    text-underline-offset: 3px; }
+.motif-altname-lang[title]:hover, .motif-altname-lang[title]:focus {
+    color: var(--text); text-decoration-color: var(--muted); outline: none; }
 .motif-wiki-list { margin: 0; padding: 0 0 0 2px; list-style: none; }
 .motif-wiki-list li { font-size: 13px; margin-bottom: 4px; }
 .motif-wiki-list a { color: #3a5e86; text-decoration: none; }
@@ -1626,9 +1630,6 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-tale a { color: #3a5e86; text-decoration: none; }
 .motif-tale a:hover { text-decoration: underline; }
 .motif-wiki-lang { color: var(--muted); font-size: 11px; text-transform: uppercase; }
-.motif-image { margin: 0 0 14px; }
-.motif-image img { max-width: 320px; max-height: 240px; width: auto; height: auto;
-    border-radius: 8px; border: 1px solid var(--border); display: block; }
 
 .motif-links {
     display: flex;

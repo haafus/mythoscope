@@ -439,7 +439,7 @@ _INTRO = {
                     "FF Communications 284–286. Helsinki: Academia Scientiarum Fennica, 2004.",
         "sources": [
             {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
-            {"label": "Wikidata — images, concordances, multilingual names", "url": "https://www.wikidata.org"},
+            {"label": "Wikidata — concordances, multilingual names", "url": "https://www.wikidata.org"},
             {"label": "Ashliman's Folktexts (AFT) — example tales", "url": "https://www.pitt.edu/~dash/folktexts.html"},
         ],
     },
@@ -1086,7 +1086,6 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["sub_division_range"] = rec.get("sub_division_range")
         detail["names"] = rec.get("names") or {}                # multilingual names (Wikidata)
         detail["wikipedia"] = rec.get("wikipedia") or []        # [{lang, title, url}]
-        detail["image"] = rec.get("image", "")                  # Commons illustration (P18)
         detail["concordances"] = rec.get("concordances") or {}  # {KHM|AaTh|Perry|…: [codes]}
         detail["summary"] = rec.get("summary", "")
         detail["summary_html"] = _atu_summary_html(rec.get("summary", ""))

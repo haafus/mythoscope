@@ -354,7 +354,6 @@ class TestAtuRegions:
         rows = [
             {"atu": {"value": "510A"}, "item": {"value": "http://www.wikidata.org/entity/Q11841"},
              "isType": {"value": "true"}, "l_de": {"value": "Aschenputtel"}, "l_ru": {"value": "Золушка"},
-             "image": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/Cinderella.jpg"},
              "arts": {"value": "en=https://en.wikipedia.org/wiki/Cinderella|ru=https://ru.wikipedia.org/wiki/Золушка"},
              "cats": {"value": "Grimms' fairy tales=KHM 21|The Types of the Folktale=510A"}},
             {"atu": {"value": "510A"}, "item": {"value": "http://www.wikidata.org/entity/Q999"},
@@ -368,7 +367,6 @@ class TestAtuRegions:
         e = out["510A"]
         assert e["names"]["de"] == ["Aschenputtel"] and e["names"]["ru"] == ["Золушка"]
         assert e["wikidata"] == "Q11841"                            # from the tale-type item
-        assert e["image"].startswith("https://commons.wikimedia.org")   # http → https
         titles = {(w["lang"], w["title"]) for w in e["wikipedia"]}
         assert {("en", "Cinderella"), ("ru", "Золушка"), ("en", "Katie Woodencloak")} <= titles
         assert e["concordances"] == {"KHM": ["21"]}                 # prefix stripped; AaTh==id dropped

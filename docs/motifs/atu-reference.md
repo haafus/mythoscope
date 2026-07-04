@@ -80,7 +80,7 @@ missing one stays plain text).
 | With remarks | 923 |
 | With constituent TMI motifs (`atu_seq`) | 1,642 types / 4,573 links |
 | With combinations (`combos`) | 729 types / 4,696 links |
-| With Wikidata names / Wikipedia / image | 481 / 265 / 176 |
+| With Wikidata names / Wikipedia | 481 / 265 |
 | With catalogue concordances | 328 |
 | With example tales (crawled from Ashliman) | ~172 types / ~1,457 variants |
 
@@ -108,7 +108,7 @@ Each stored type (`outputs/motifs/atu.json → types[]`):
 | `motifs` | constituent TMI motif codes (`atu_seq`) |
 | `combos` | frequently combined type ids |
 | `tales` | example tales `{title, url}`, crawled from Ashliman (§8) |
-| `names` / `wikipedia` / `wikidata` / `image` / `concordances` | Wikidata (§6) |
+| `names` / `wikipedia` / `wikidata` / `concordances` | Wikidata (§6) |
 
 Index-level keys: `label, long_label, attribution, homepage, divisions,
 subdivisions, types`.
@@ -176,7 +176,7 @@ property **P2540** it attaches, per type:
 
 - **multilingual names** of the *tale-type* items (`P31 = Q47451145`, so a
   specific tale isn't mistaken for the type name);
-- **Wikipedia** articles (en/ru/de/fr), a Commons **image** (`P18`);
+- **Wikipedia** articles (en/ru/de/fr);
 - **concordances** to other catalogues — Grimm/**KHM**, Aarne-Thompson (**AaTh**),
   Aesop (**Perry**), Child ballads — from `P528` (+ `P972`) and `P1852`.
 

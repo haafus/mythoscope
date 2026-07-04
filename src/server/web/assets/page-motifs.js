@@ -425,11 +425,22 @@ function bindBibCopy(detail) {
 const CONC_LABELS = { KHM: "Grimm (KHM)", AaTh: "Aarne–Thompson (AaTh)",
                       Aesop: "Aesop (Fabulae)", Perry: "Aesop (Perry Index)", Child: "Child ballad" };
 
-// An illustrative Commons image for the type (P18), as a thumbnail.
-function atuImage(image) {
-    if (!image) return "";
-    return `<figure class="motif-image"><img src="${escapeHtml(image)}?width=320" alt="" loading="lazy"></figure>`;
-}
+// Full bibliographic imprint for each catalogue, shown as a tooltip on the label so
+// a reader can track the referenced numbering back to its source edition.
+const CONC_CITATIONS = {
+    KHM: "Jacob & Wilhelm Grimm, Kinder- und Hausmärchen (Children's and Household Tales). "
+        + "7th edition, 3 vols. Göttingen: Verlag der Dieterichschen Buchhandlung, 1857. "
+        + "Codes are the standard KHM tale numbers.",
+    AaTh: "Antti Aarne & Stith Thompson, The Types of the Folktale: A Classification and "
+        + "Bibliography. FF Communications No. 184, 2nd revision. Helsinki: Academia "
+        + "Scientiarum Fennica, 1961.",
+    Aesop: "Carl Halm (ed.), Fabulae Aesopicae Collectae. Leipzig: B. G. Teubner, 1852. "
+        + "Codes are the Halm fable numbers.",
+    Perry: "Ben Edwin Perry, Aesopica: A Series of Texts Relating to Aesop, vol. 1. "
+        + "Urbana: University of Illinois Press, 1952. Codes are Perry Index numbers.",
+    Child: "Francis James Child, The English and Scottish Popular Ballads. 5 vols. "
+        + "Boston & New York: Houghton, Mifflin and Company, 1882–1898.",
+};
 
 // ATU multilingual names (Wikidata): one row per language.
 function atuNames(names) {
@@ -447,9 +458,13 @@ function atuNames(names) {
 function atuConcordances(conc) {
     const cats = Object.keys(conc || {});
     if (!cats.length) return "";
-    const rows = cats.map((cat) =>
-        `<div class="motif-altname"><span class="motif-altname-lang">${escapeHtml(CONC_LABELS[cat] || cat)}</span>`
-        + ` ${(conc[cat] || []).map(escapeHtml).join(", ")}</div>`).join("");
+    const rows = cats.map((cat) => {
+        const cite = CONC_CITATIONS[cat];
+        const title = cite ? ` title="${escapeHtml(cite)}"` : "";
+        return `<div class="motif-altname"><span class="motif-altname-lang" tabindex="0"${title}>`
+            + `${escapeHtml(CONC_LABELS[cat] || cat)}</span>`
+            + ` ${(conc[cat] || []).map(escapeHtml).join(", ")}</div>`;
+    }).join("");
     return section("Also catalogued as", `<div class="motif-altnames">${rows}</div>`);
 }
 
@@ -1169,7 +1184,7 @@ function renderDetail(d) {
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
-        body = head + atuImage(d.image);
+        body = head;
         // Classification folds chapter, division and sub_division (each with its
         // number range) into one line, as in the Berezkin index.
         const cls = [];
