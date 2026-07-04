@@ -384,9 +384,13 @@ def _atu_sort_key(atu_id: str) -> tuple:
     return (int(m.group(1)) if m else 1 << 30, atu_id[m.end():] if m else atu_id)
 
 
-# Tokens that carry a period but do NOT end the title sentence: title-final
-# abbreviations Trilogy's naive "cut at first period" wrongly split on.
-_TITLE_ABBREV = frozenset({"etc", "st", "mt", "dr", "mrs", "mr", "ms", "vs", "cf",
+# Abbreviations that carry a period mid-title but do NOT end the title sentence,
+# so Trilogy's naive "cut at first period" wrongly split on them (``St. Peter``).
+# ``etc`` is deliberately absent: at bracket-depth 0 ``…, etc.`` closes a list and
+# its period IS a real boundary; the only place ``etc.`` should be skipped is
+# inside a bracketed aside (``[Cat, Frog, etc.]``), which the depth check already
+# handles — keeping ``etc`` here instead over-absorbed the summary (type 572*).
+_TITLE_ABBREV = frozenset({"st", "mt", "dr", "mrs", "mr", "ms", "vs", "cf",
                            "no", "nos", "ca", "fig", "sr", "jr", "op", "al", "ff", "viz"})
 # A closing quote (vs. an apostrophe in ``'s``/``'t``): followed by space/end/punct.
 _CLOSE_QUOTE = re.compile(r"'(?=\s|$|[.!?,;:])")
@@ -402,7 +406,7 @@ def _split_title(text: str) -> tuple[str, str | None]:
         ``'…'``; the closing quote is a ``'`` followed by whitespace/end/punctuation
         (apostrophes in ``'s``/``'t`` are skipped);
       * otherwise the **label up to the first sentence period** at bracket-depth 0
-        (over ``()`` and ``[]``) that is neither an abbreviation (``St.``, ``etc.``…)
+        (over ``()`` and ``[]``) that is neither an abbreviation (``St.``, ``Cf.``…)
         nor a decimal inside a code (``digit.digit``).
 
     ``description`` is ``None`` when no boundary was found — an opening quote that
