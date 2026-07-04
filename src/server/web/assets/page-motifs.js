@@ -1184,7 +1184,17 @@ function renderDetail(d) {
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
-        body = head;
+        // The pre-2004 Uther name rides under the title as a muted subtitle.
+        const sub = d.former_name
+            ? `<div class="motif-subtitle">previously ${escapeHtml(d.former_name)}</div>` : "";
+        body = `
+            <div class="motif-head">
+                <span class="motif-code">${escapeHtml(d.id)}</span>
+                <div class="motif-name-col">
+                    <h2 class="motif-name">${escapeHtml(d.name || "—")}</h2>
+                    ${sub}
+                </div>
+            </div>`;
         // Classification folds chapter, division and sub_division (each with its
         // number range) into one line, as in the Berezkin index.
         const cls = [];
@@ -1194,6 +1204,12 @@ function renderDetail(d) {
         if (d.division) cls.push(withRange(d.division, d.division_range));
         if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
+        // Old ATU numbers this type was renumbered from / absorbed (Uther). Shown as
+        // plain badges — they are pre-2004 numbers, not live types to link to.
+        if ((d.former_ids || []).length) {
+            const badges = d.former_ids.map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("");
+            body += section("Earlier ATU numbers", `<div class="motif-oldids">${badges}</div>`);
+        }
         // The TMI motif(s) Uther names as defining the type — distinct from the
         // constituent motifs (atu_seq) further down.
         if ((links.defining || []).length) {

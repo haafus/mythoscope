@@ -569,8 +569,11 @@ _DEFINING_OVERRIDES = {"1446", "860"}
 
 
 def _clean_gap(text: str) -> str:
-    """Tidy the seam left after removing a bracketed code from mid-text."""
-    return re.sub(r"\s{2,}", " ", re.sub(r"\s+([.,;:])", r"\1", text)).strip()
+    """Tidy the seam left after removing a bracketed code / apparatus block: collapse
+    spaces, drop a space before punctuation, and strip a separator orphaned at the
+    front (the other caller starts with a paren or a word, so it is unaffected)."""
+    text = re.sub(r"\s{2,}", " ", re.sub(r"\s+([.,;:])", r"\1", text)).strip()
+    return text.lstrip(" .,;:")
 
 
 def _extract_defining_motifs(atu_id: str, name: str, summary: str) -> tuple[str, str, list[str]]:
@@ -590,6 +593,97 @@ def _extract_defining_motifs(atu_id: str, name: str, summary: str) -> tuple[str,
 
 def _split_ids(group: str) -> list[str]:
     return [c.strip() for c in group.split(",") if c.strip()]
+
+
+# Provenance apparatus in the summary: (previously <Name>) / (previously Type X) /
+# (Including … Type X). The Including anchor needs a capital ``I`` *and* a type id,
+# to skip lowercase prose ``(including honey)``.
+_APP_START = re.compile(r"\((?:previously|Previously|Including)\b")
+_PREV_CODE = re.compile(r"^(?:also\s+)?Types?\s+\d", re.I)   # a (previously) that names a number
+_ATU_ID_TOKEN = re.compile(r"\d[\dA-Z*]*")                   # 64, 1810A*, 1525H2, 1316***
+
+
+def _balanced_end(text: str, start: int) -> int | None:
+    """Index just past the ``)`` closing the ``(`` at ``start`` (handles nesting),
+    or ``None`` if it never closes."""
+    depth = 0
+    for j in range(start, len(text)):
+        if text[j] == "(":
+            depth += 1
+        elif text[j] == ")":
+            depth -= 1
+            if depth == 0:
+                return j + 1
+    return None
+
+
+def _apparatus_spans(text: str) -> list[tuple[int, int, str]]:
+    """``(start, end, content)`` for each balanced ``(previously …)`` / ``(Including
+    … Type N)`` block; unbalanced blocks (a source defect) are skipped."""
+    spans, pos = [], 0
+    for m in _APP_START.finditer(text):
+        if m.start() < pos:                      # inside a block already taken
+            continue
+        end = _balanced_end(text, m.start())
+        if end is None:                          # unclosed — leave it in place
+            continue
+        content = text[m.start() + 1:end - 1]
+        if content.startswith("Including") and not re.search(r"\bTypes?\s+\d", content):
+            continue                             # prose "(including honey)"
+        spans.append((m.start(), end, content))
+        pos = end
+    return spans
+
+
+def _parse_type_ids(content: str) -> list[str]:
+    """Old type ids named after ``Type``/``Types`` — dropping a ``cf. Type …``
+    cross-reference and any bracketed motif code."""
+    content = re.split(r"\bcf\.", content, flags=re.I)[0]
+    content = re.sub(r"\[[^\]]*\]", "", content)
+    return _ATU_ID_TOKEN.findall(content)
+
+
+def _extract_apparatus(summary: str) -> tuple[str, str, list[str]]:
+    """Pull provenance apparatus out of the summary into ``(summary, former_name,
+    former_ids)``. Old numbers (from ``previously Type X`` and ``Including Type X``)
+    are collected wherever they sit; the single former **name** comes from the first
+    ``(previously <Name>)``. Only apparatus at the **edges** (a leading run or a pure
+    trailing note) is stripped from the summary — a block embedded mid-sentence is
+    part-level context (and often wraps an inline code), so it stays in place."""
+    spans = _apparatus_spans(summary)
+    if not spans:
+        return summary.lstrip(" .,;:"), "", []      # tidy a rare orphaned leading separator
+    former_name, former_ids = "", []
+    for _start, _end, content in spans:
+        if content.startswith("Including"):
+            former_ids += _parse_type_ids(content)
+        else:                                                # previously
+            body = content[len("previously"):].strip()
+            if _PREV_CODE.match(body):
+                former_ids += _parse_type_ids(body)
+            elif not former_name:
+                former_name = body.rstrip(".").strip()
+    # Strip a leading run of apparatus, and a pure trailing note; keep mid blocks.
+    # Consecutive blocks are separated by ". ", so the gap may carry punctuation.
+    _GAP = r"[\s.,;:]*"
+    lead_end = 0
+    for start, end, _ in spans:
+        if re.fullmatch(_GAP, summary[lead_end:start]):
+            lead_end = end
+        else:
+            break
+    trail_start = len(summary)
+    for start, end, _ in reversed(spans):
+        if re.fullmatch(_GAP, summary[end:trail_start]):
+            trail_start = start
+        else:
+            break
+    summary = _clean_gap(summary[lead_end:max(lead_end, trail_start)])
+    seen, ids = set(), []
+    for x in former_ids:                                     # dedup, keep order
+        if x not in seen:
+            seen.add(x); ids.append(x)
+    return summary, former_name, ids
 
 
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
@@ -645,6 +739,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
         tale_name, tale_summary = _apply_title_override(atu_id, tale_name, tale_summary)
         tale_name, tale_summary = _heal_accents(tale_name), _heal_accents(tale_summary)
         tale_name, tale_summary, defining = _extract_defining_motifs(atu_id, tale_name, tale_summary)
+        tale_summary, former_name, former_ids = _extract_apparatus(tale_summary)
         types.append({
             "id": atu_id,
             "num": num,
@@ -658,6 +753,10 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             # The defining TMI motif(s) Uther names right after the label (distinct
             # from the constituent `motifs` from atu_seq; see atu_regions/docs).
             "defining_motifs": defining,
+            # Provenance apparatus pulled from the summary: the pre-2004 name and the
+            # old ATU numbers this type was renumbered from / absorbed (Uther).
+            "former_name": former_name,
+            "former_ids": former_ids,
             # Uther's per-type apparatus (mojibake-cleaned): key scholarly
             # references (litvar), attestations by tradition (provenance) and
             # historical/textual notes (remarks).

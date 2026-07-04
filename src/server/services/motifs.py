@@ -1087,6 +1087,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["names"] = rec.get("names") or {}                # multilingual names (Wikidata)
         detail["wikipedia"] = rec.get("wikipedia") or []        # [{lang, title, url}]
         detail["concordances"] = rec.get("concordances") or {}  # {KHM|AaTh|Perry|…: [codes]}
+        detail["former_name"] = rec.get("former_name", "")       # pre-2004 Uther name → subtitle
+        detail["former_ids"] = rec.get("former_ids") or []       # old ATU numbers → this type
         detail["summary"] = rec.get("summary", "")
         detail["summary_html"] = _atu_summary_html(rec.get("summary", ""))
         detail["references"] = rec.get("references", "")      # Uther litvar (key literature)

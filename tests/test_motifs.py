@@ -490,6 +490,30 @@ class TestAtuRegions:
         assert e("2D", "The New Tail [Bear]", "A wolf turns.") \
             == ("The New Tail [Bear]", "A wolf turns.", [])
 
+    def test_extract_apparatus(self):
+        a = trilogy._extract_apparatus
+        # leading name + merge note stripped; name → former_name, ids → former_ids
+        assert a("(previously The Buried Tail). (Including the previous Type 64.) A fox flees.") \
+            == ("A fox flees.", "The Buried Tail", ["64"])
+        # a trailing "(Previously Type X)" note is stripped, its id kept
+        assert a("A man demands payment [J1551.10]. (Previously Type 1804A.)") \
+            == ("A man demands payment [J1551.10].", "", ["1804A"])
+        # a block embedded mid-sentence stays in place, but its id is still collected
+        assert a("Fools carry light in a sieve (previously Type 1245*) or a sack.") \
+            == ("Fools carry light in a sieve (previously Type 1245*) or a sack.", "", ["1245*"])
+        # "cf. Type Y" inside a block is a cross-ref, not a former id
+        assert a("(Previously Type 1*, cf. Type 223.) A fox pretends to be dead.") \
+            == ("A fox pretends to be dead.", "", ["1*"])
+        # a nested paren in the old name is handled by the balanced scanner
+        assert a("(previously The Doves (etc.)). A thrush teaches.") \
+            == ("A thrush teaches.", "The Doves (etc.)", [])
+        # "Types X and Y" list; "(including honey)" prose is not apparatus
+        assert a("(Including the previous Types 924A and 924B.) A feast (including honey).") \
+            == ("A feast (including honey).", "", ["924A", "924B"])
+        # an unbalanced "(previously …" (source defect) is left untouched
+        assert a("(previously Learned by Keeping Inn (Bath-house). A couple adopts.") \
+            == ("(previously Learned by Keeping Inn (Bath-house). A couple adopts.", "", [])
+
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [
             {"id": "330", "name": "The Smith and the Devil", "concordances": {"AaTh": ["330A"]}},

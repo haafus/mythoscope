@@ -1630,6 +1630,9 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-tale a { color: #3a5e86; text-decoration: none; }
 .motif-tale a:hover { text-decoration: underline; }
 .motif-wiki-lang { color: var(--muted-soft); font-size: 13px; text-transform: uppercase; }
+.motif-oldids { display: flex; flex-wrap: wrap; gap: 6px; }
+.motif-oldid { font-size: 12px; color: var(--muted); background: var(--surface-2, #f1f3f5);
+    border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; }
 
 .motif-links {
     display: flex;
