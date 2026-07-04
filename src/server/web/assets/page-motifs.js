@@ -1110,6 +1110,24 @@ function citeList(items) {
 // Attestations grouped by macro-region: each region name is printed once, then
 // its cultures — one culture per row (label + its citation link, any further
 // links stacked under the first). Cultures with no region come last, un-headed.
+// Split a trailing balanced parenthetical off a title, e.g.
+// "Torn-off Tails (previously The Buried Tail)" -> {main, sub}. The paren must
+// close the string and leave a non-empty main title; otherwise no split.
+function splitTrailingParen(name) {
+    const s = (name || "").trim();
+    if (!s.endsWith(")")) return { main: s, sub: "" };
+    let depth = 0;
+    for (let i = s.length - 1; i >= 0; i--) {
+        if (s[i] === ")") depth++;
+        else if (s[i] === "(" && --depth === 0) {
+            const main = s.slice(0, i).trim();
+            const sub = s.slice(i + 1, -1).trim();
+            return main && sub ? { main, sub } : { main: s, sub: "" };
+        }
+    }
+    return { main: s, sub: "" };
+}
+
 function renderDetail(d) {
     const links = d.links || {};
     const head = `
@@ -1184,7 +1202,18 @@ function renderDetail(d) {
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
-        body = head;
+        // A trailing parenthetical (usually Uther's former name for the type)
+        // drops to a muted subtitle under the name, as in the Berezkin index.
+        const { main, sub } = splitTrailingParen(d.name);
+        const subtitle = sub ? `<div class="motif-subtitle">${escapeHtml(sub)}</div>` : "";
+        body = `
+            <div class="motif-head">
+                <span class="motif-code">${escapeHtml(d.id)}</span>
+                <div class="motif-name-col">
+                    <h2 class="motif-name">${escapeHtml(main || "—")}</h2>
+                    ${subtitle}
+                </div>
+            </div>`;
         // Classification folds chapter, division and sub_division (each with its
         // number range) into one line, as in the Berezkin index.
         const cls = [];
