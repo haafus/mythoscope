@@ -1194,7 +1194,6 @@ function renderDetail(d) {
         if (d.division) cls.push(withRange(d.division, d.division_range));
         if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
-        body += atuConcordances(d.concordances);
         // summary_html is pre-escaped on the server with motif/type links injected.
         if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
@@ -1207,8 +1206,10 @@ function renderDetail(d) {
         body += atuAttestations(d.attestations_grouped, d.attestations);
         body += atuProse("References", d.references, true);
         // Also-known-as / Wikipedia / Ashliman as up-to-three equal columns at
-        // the foot; absent ones drop out and the rest fill the row.
-        const endCols = [atuNames(d.names), atuWikipedia(d.wikipedia), atuTales(d.tales)].filter(Boolean);
+        // the foot; absent ones drop out and the rest fill the row. The first
+        // column stacks names then catalogue concordances ("Also catalogued as").
+        const namesCol = atuNames(d.names) + atuConcordances(d.concordances);
+        const endCols = [namesCol, atuWikipedia(d.wikipedia), atuTales(d.tales)].filter(Boolean);
         if (endCols.length) {
             body += `<div class="motif-cols">${endCols.map((c) => `<div class="motif-col">${c}</div>`).join("")}</div>`;
         }
