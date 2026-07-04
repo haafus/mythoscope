@@ -101,6 +101,9 @@ Each stored type (`outputs/motifs/atu.json → types[]`):
 | `sub_division` / `sub_division_range` | optional finer level |
 | `parent` / `subtypes` | subtype family links |
 | `name` / `summary` | tale name / plot summary (both repaired, §5) |
+| `former_name` | pre-2004 Uther name, from a `(previously …)` block (§5) |
+| `former_ids` | old ATU numbers renumbered from / absorbed (`previously Type X` + `Including Type X`) |
+| `defining_motifs` | the defining TMI motif(s) Uther names at the label (distinct from `motifs`) |
 | `references` | Uther key literature (`litvar`, mojibake-healed §5) |
 | `attestations` | attestations by tradition (`provenance`) |
 | `attestations_grouped` | the same, parsed into peoples & macro-regions (§7) |
@@ -111,7 +114,11 @@ Each stored type (`outputs/motifs/atu.json → types[]`):
 | `names` / `wikipedia` / `wikidata` / `concordances` | Wikidata (§6) |
 
 Index-level keys: `label, long_label, attribution, homepage, divisions,
-subdivisions, types`.
+subdivisions, aliases, types`. `aliases` is `{old ATU number: current type id}` —
+built from every type's `former_ids` (dead-only, ambiguous ones dropped) plus the
+five folded `See/Cf Type X` pointer stubs, which are removed as pages. The server
+resolves an unknown id through it (`redirected_from`), and search matches
+`former_name`/`former_ids`.
 
 ---
 
