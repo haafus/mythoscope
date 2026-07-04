@@ -1090,6 +1090,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         atu_ids = cw.get("tmi_to_atu", {}).get(rec["id"], [])
         detail["links"]["atu_related"] = _merge_atu_relations(
             atu_ids, _resolve_atu_inline(rec.get("atu_inline", [])))
+        # Tale types this motif *defines* (Uther's heading motif) — a distinct link
+        # from the constituent one above.
+        detail["links"]["atu_defines"] = [_link("atu", a) for a in cw.get("tmi_to_atu_defining", {}).get(rec["id"], [])]
         # Direct Berezkin motifs that map here (mapsofmyths concordance).
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in cw.get("tmi_to_berezkin", {}).get(rec["id"], [])]
 

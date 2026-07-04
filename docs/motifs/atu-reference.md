@@ -291,8 +291,16 @@ live-site growth and folded-in subtypes).
 - **ATU ↔ TMI** — `atu_seq` gives each type's constituent motif codes (the bridge
   that powers the whole cross-walk); inverted, it tells a TMI motif which types it
   builds.
+- **ATU ↔ TMI (defining)** — a *separate* map from the defining motif(s) Uther
+  names at the label (`defining_motifs` → `atu_to_tmi_defining` and its inverse
+  `tmi_to_atu_defining`). Kept apart from the constituent link above because the
+  two relationships barely overlap: a TMI motif page surfaces it as **Defines ATU
+  tale type(s)**, distinct from *Related ATU tale types*. Only codes present in
+  the TMI index are linked.
 - **ATU → Berezkin** — from `atu_refs` parsed in Berezkin titles (see
-  `berezkin-reference.md`).
+  `berezkin-reference.md`). A cited number that is a pre-2004 (renumbered/merged)
+  type is resolved to the current type through the ATU `aliases` map before the
+  link is stored.
 - **Combinations** — `atu_combos.csv` is Uther's own "Combinations" field, parsed
   and range-expanded into individual type ids (informative, not derived); 4,667 of
   4,696 resolve, 29 overshoot the range expansion (shown grey).

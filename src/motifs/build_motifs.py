@@ -112,6 +112,8 @@ def build_motifs(*, force: bool = False) -> None:
     tmi_ids: set[str] = set()
     atu_ids: set[str] = set()
     atu_seq: dict[str, list[str]] = {}
+    atu_defining: dict[str, list[str]] = {}
+    atu_aliases: dict[str, str] = {}
     tr_cfg = config.get("trilogy", {})
     if tr_cfg.get("enabled", True):
         files = tr_cfg.get("files", {})
@@ -150,6 +152,8 @@ def build_motifs(*, force: bool = False) -> None:
         atu_types = atu_index["types"]
         counts["atu"] = len(atu_types)
         atu_ids = {t["id"] for t in atu_types}
+        atu_defining = {t["id"]: t["defining_motifs"] for t in atu_types if t.get("defining_motifs")}
+        atu_aliases = atu_index.get("aliases", {})
         logger.info("      %d tale types", len(atu_types))
         wd = enrichment["atu_wikidata"]
         if wd.get("skipped"):
@@ -167,11 +171,12 @@ def build_motifs(*, force: bool = False) -> None:
     # --- [4/4] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
     logger.info("[4/4] Cross-walk — deriving id links across the three indexes")
-    links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids)
+    links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining, atu_aliases)
     save_json(store.crosswalk_path(), links)
-    logger.info("      ATU<->TMI %d/%d, Berezkin<->ATU %d/%d, Berezkin<->TMI (direct) %d/%d "
-                "(%d TMI motifs reachable from a tale type)",
+    logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI), Berezkin<->ATU %d/%d, "
+                "Berezkin<->TMI (direct) %d/%d (%d TMI motifs reachable from a tale type)",
                 len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
+                len(links["atu_to_tmi_defining"]), len(links["tmi_to_atu_defining"]),
                 len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]),
                 len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]), links["linked_tmi_count"])
 

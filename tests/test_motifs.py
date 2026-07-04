@@ -953,6 +953,27 @@ class TestCrosswalk:
         assert cw["atu_to_berezkin"]["294"] == ["A39A"]
         assert cw["linked_tmi_count"] == 2
 
+    def test_defining_maps_and_alias_resolution(self):
+        # Defining motifs give a separate ATU<->TMI link (kept apart from the
+        # constituent one) — only codes present in the TMI index are linked.
+        seq = {"115": ["J2066"]}
+        tmi_ids = {"J2066", "J2066.1", "Q2"}
+        atu_ids = {"115", "480"}
+        atu_defining = {"115": ["J2066.1"], "480": ["Q2", "GONE"]}  # GONE not in TMI
+        # A Berezkin ref to a pre-2004 number is resolved through the alias map.
+        berezkin_motifs = [{"id": "M1", "atu_refs": ["403C"]}]
+        aliases = {"403C": "480"}
+        cw = crosswalk.build(seq, tmi_ids, berezkin_motifs, atu_ids,
+                             atu_defining, aliases)
+        assert cw["atu_to_tmi_defining"]["115"] == ["J2066.1"]
+        assert cw["atu_to_tmi_defining"]["480"] == ["Q2"]      # GONE filtered out
+        assert cw["tmi_to_atu_defining"]["J2066.1"] == ["115"]
+        # constituent and defining stay distinct
+        assert cw["tmi_to_atu"]["J2066"] == ["115"]
+        assert "J2066" not in cw["tmi_to_atu_defining"]
+        # old number 403C resolves to the current type 480 via the alias map
+        assert cw["atu_to_berezkin"]["480"] == ["M1"]
+
     def test_direct_berezkin_tmi(self):
         # tmi_refs (from mapsofmyths) become a direct Berezkin<->TMI bridge; a ref
         # is cleaned (*, trailing dot) and kept only if it exists in the TMI index.

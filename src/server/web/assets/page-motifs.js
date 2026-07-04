@@ -1184,6 +1184,7 @@ function renderDetail(d) {
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
+        if ((links.atu_defines || []).length) body += linkSection(`Defines ATU tale type${links.atu_defines.length > 1 ? "s" : ""} (${links.atu_defines.length})`, links.atu_defines);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
