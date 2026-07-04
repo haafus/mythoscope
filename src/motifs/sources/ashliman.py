@@ -1,6 +1,6 @@
 """Deep links into Ashliman's Folktexts for ATU tale types with example tales.
 
-Most types have a page at ``pitt.edu/~dash/type{NNNN}[letter].html`` whose table
+Most types have a page at ``sites.pitt.edu/~dash/type{NNNN}[letter].html`` whose table
 of contents maps each variant's title to an in-page anchor; a curated handful of
 famous types live on a themed page instead (``_PAGE_OVERRIDES`` — each verified
 by the page's own text declaring that type). This best-effort enrichment fetches
@@ -26,7 +26,9 @@ from .fetch import fetch_text
 
 logger = logging.getLogger(__name__)
 
-BASE = "https://www.pitt.edu/~dash"
+# Ashliman's Folktexts moved from www.pitt.edu/~dash to sites.pitt.edu/~dash (the
+# old host now 301-redirects there); point at the canonical home directly.
+BASE = "https://sites.pitt.edu/~dash"
 
 # Types whose ``type{NNNN}.html`` page does not exist but whose tales sit on a
 # themed page. Curated by crawling the site: each page's own text declares this
@@ -228,11 +230,17 @@ _TYPE_PAGES = frozenset({
 
 
 def _fetch_page(page: str, force: bool) -> str | None:
+    """Fetch a page, cached under ``raw/ashliman/`` — a cached copy is reused without
+    a network call unless ``force`` (as elsewhere in the pipeline). Returns ``None``
+    when the page is absent or unreachable; only a definitive 404 drops the cache, so
+    a transient network error during a ``--force`` rebuild can't wipe a good copy."""
     cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
     try:
         return fetch_text(f"{BASE}/{page}", cache, force=force)
-    except Exception:                       # 404 / network — treat as absent
-        cache.unlink(missing_ok=True)
+    except Exception as exc:
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        if status == 404:
+            cache.unlink(missing_ok=True)
         return None
 
 

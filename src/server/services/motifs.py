@@ -440,7 +440,7 @@ _INTRO = {
         "sources": [
             {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
             {"label": "Wikidata — concordances, multilingual names", "url": "https://www.wikidata.org"},
-            {"label": "Ashliman's Folktexts (AFT) — example tales", "url": "https://www.pitt.edu/~dash/folktexts.html"},
+            {"label": "Ashliman's Folktexts (AFT) — example tales", "url": "https://sites.pitt.edu/~dash/folktexts.html"},
         ],
     },
     "berezkin": {
