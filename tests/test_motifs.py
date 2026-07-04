@@ -381,6 +381,19 @@ class TestAtuRegions:
         out = svc.list_motifs("atu", division="Supernatural Adversaries")
         assert [i["id"] for i in out["items"]] == ["300"] and out["total"] == 1
 
+    def test_search_matches_former_name_and_ids(self, monkeypatch):
+        monkeypatch.setattr(svc, "_records", lambda idx: [
+            {"id": "1891", "name": "Catching a Rabbit",
+             "former_name": "The Great Rabbit-Catch", "former_ids": ["1891A*", "1893"]},
+            {"id": "300", "name": "The Dragon-Slayer", "former_name": "", "former_ids": []},
+        ])
+        monkeypatch.setattr(svc, "_list_item", lambda idx, r: {"id": r["id"]})
+        def hits(q):
+            return [i["id"] for i in svc.list_motifs("atu", q=q)["items"]]
+        assert hits("great rabbit") == ["1891"]      # by the pre-2004 name
+        assert hits("1891a*") == ["1891"]            # by an old number
+        assert hits("dragon") == ["300"]             # ordinary name match still works
+
     def test_sub_division_hierarchy(self):
         rows = [
             {"atu_id": "1", "chapter": "Animal", "division": "Wild Animals 1-99",

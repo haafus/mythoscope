@@ -387,6 +387,11 @@ async function openMotif(index, id, push = true) {
     try {
         const params = new URLSearchParams({ id });
         const data = await api(`/api/motifs/${index}/motif?${params.toString()}`);
+        if (data.redirected_from && data.id !== id) {   // an old ATU number → current type
+            mState.selectedId = data.id;
+            markActive(data.id);
+            syncUrl(false);                             // replace the URL with the real id
+        }
         detail.innerHTML = renderDetail(data);
         detail.scrollTop = 0;
         detail.querySelectorAll(".motif-link").forEach((a) => {
@@ -1236,5 +1241,9 @@ function renderDetail(d) {
         }
     }
 
-    return `<div class="motif-detail-inner">${body}</div>`;
+    // An old ATU number the user navigated to is served as the current type.
+    const redirect = d.redirected_from
+        ? `<div class="motif-redirect">Redirected from old type <strong>${escapeHtml(d.redirected_from)}</strong></div>`
+        : "";
+    return `<div class="motif-detail-inner">${redirect}${body}</div>`;
 }

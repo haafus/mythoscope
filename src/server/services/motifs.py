@@ -987,6 +987,10 @@ def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_divisi
         records = [
             r for r in records
             if query in r.get("id", "").lower() or query in r.get("name", "").lower()
+            # ATU aliases: the pre-2004 name and old numbers also match (find 1891 by
+            # searching "The Great Rabbit-Catch" or "1891A*").
+            or query in (r.get("former_name") or "").lower()
+            or any(query in fid.lower() for fid in r.get("former_ids", []))
         ]
     total = len(records)
     page = records[offset: offset + limit]
@@ -994,16 +998,26 @@ def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_divisi
 
 
 def get_motif(index: str, motif_id: str) -> dict | None:
-    """Full detail for one motif with resolved cross-walk links, or None."""
+    """Full detail for one motif with resolved cross-walk links, or None.
+
+    For ATU, an id that is an old (pre-2004) number resolves to the current type it
+    was renumbered to / merged into, flagged with ``redirected_from``."""
     rec = _by_id(index).get(motif_id)
+    data = store.load_index(index) or {}
+    redirected_from = ""
+    if rec is None and index == "atu":
+        target = (data.get("aliases") or {}).get(motif_id)
+        if target:
+            rec = _by_id(index).get(target)
+            redirected_from = motif_id
     if rec is None:
         return None
 
     cw = store.load_crosswalk()
-    data = store.load_index(index) or {}
     detail: dict = {
         "index": index,
         "id": rec["id"],
+        "redirected_from": redirected_from,
         "name": rec.get("name", ""),
         "chapter": rec.get("chapter", ""),
         "chapter_label": _chapter_label(data, rec.get("chapter", "")),
