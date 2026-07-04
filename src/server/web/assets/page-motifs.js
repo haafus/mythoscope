@@ -1194,6 +1194,11 @@ function renderDetail(d) {
         if (d.division) cls.push(withRange(d.division, d.division_range));
         if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
+        // The TMI motif(s) Uther names as defining the type — distinct from the
+        // constituent motifs (atu_seq) further down.
+        if ((links.defining || []).length) {
+            body += linkSection(links.defining.length > 1 ? "Defining motifs" : "Defining motif", links.defining);
+        }
         // summary_html is pre-escaped on the server with motif/type links injected.
         if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);

@@ -557,6 +557,41 @@ def _heal_accents(text: str) -> str:
     return text
 
 
+# One or more comma-separated TMI motif codes (``J2066.1``, ``B296, F1025``). The
+# leading ``[A-Z]\d`` distinguishes a code from a word-variant aside (``[Bear]``).
+_DEF_CODE = r"[A-Z]\d[\dA-Z.]*(?:,\s*[A-Z]\d[\dA-Z.]*)*"
+_TRAIL_CODE = re.compile(r"\s*\[(" + _DEF_CODE + r")\]\s*$")           # trailing the label
+_LEAD_CODE = re.compile(r"^((?:\([^)]*\)\s*)*)\[(" + _DEF_CODE + r")\]")  # after apparatus, in summary
+# Types whose defining code sits at the very end of the summary (quote-class jokes),
+# positionally indistinguishable from an inline plot code — extracted by this explicit
+# list rather than a heuristic, to keep auto-extraction free of false positives.
+_DEFINING_OVERRIDES = {"1446", "860"}
+
+
+def _clean_gap(text: str) -> str:
+    """Tidy the seam left after removing a bracketed code from mid-text."""
+    return re.sub(r"\s{2,}", " ", re.sub(r"\s+([.,;:])", r"\1", text)).strip()
+
+
+def _extract_defining_motifs(atu_id: str, name: str, summary: str) -> tuple[str, str, list[str]]:
+    """Pull the **defining** motif code(s) — the ``[code]`` group *adjacent to the
+    label* (trailing the name, or leading the summary after any apparatus) — into a
+    list, leaving inline plot codes untouched. A short curated set whose code trails
+    a quote-class summary is handled explicitly (``_DEFINING_OVERRIDES``)."""
+    if m := _TRAIL_CODE.search(name):                      # trailing the label
+        return name[:m.start()].rstrip(), summary, _split_ids(m.group(1))
+    if m := _LEAD_CODE.match(summary):                     # leading the summary
+        rest = _clean_gap(summary[:m.end(1)] + summary[m.end():])
+        return name, rest, _split_ids(m.group(2))
+    if atu_id in _DEFINING_OVERRIDES and (m := _TRAIL_CODE.search(summary)):
+        return name, summary[:m.start()].rstrip(), _split_ids(m.group(1))
+    return name, summary, []
+
+
+def _split_ids(group: str) -> list[str]:
+    return [c.strip() for c in group.split(",") if c.strip()]
+
+
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
     """'Supernatural Adversaries 300-399' -> ('Supernatural Adversaries', 300, 399)."""
     m = _ATU_RANGE.match(s or "")
@@ -609,6 +644,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             _clean(row.get("tale_name")), _clean(row.get("tale_type")))
         tale_name, tale_summary = _apply_title_override(atu_id, tale_name, tale_summary)
         tale_name, tale_summary = _heal_accents(tale_name), _heal_accents(tale_summary)
+        tale_name, tale_summary, defining = _extract_defining_motifs(atu_id, tale_name, tale_summary)
         types.append({
             "id": atu_id,
             "num": num,
@@ -619,6 +655,9 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
             "sub_division_range": [sub_start, sub_end] if sub_start is not None else None,
             "name": tale_name,
             "summary": tale_summary,
+            # The defining TMI motif(s) Uther names right after the label (distinct
+            # from the constituent `motifs` from atu_seq; see atu_regions/docs).
+            "defining_motifs": defining,
             # Uther's per-type apparatus (mojibake-cleaned): key scholarly
             # references (litvar), attestations by tradition (provenance) and
             # historical/textual notes (remarks).

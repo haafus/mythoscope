@@ -467,6 +467,29 @@ class TestAtuRegions:
         assert h("Peau d'asne") == "Peau d'asne"                       # archaic spelling, not damage
         assert h("no apostrophe here") == "no apostrophe here"
 
+    def test_extract_defining_motifs(self):
+        e = trilogy._extract_defining_motifs
+        # code trailing the label → extracted, name cleaned
+        assert e("115", "The Hungry Fox Waits [J2066.1]", "The fox is told.") \
+            == ("The Hungry Fox Waits", "The fox is told.", ["J2066.1"])
+        # multiple codes in one bracket → a list
+        assert e("210", "Rooster and Needle [B296, F1025]", "They journey.") \
+            == ("Rooster and Needle", "They journey.", ["B296", "F1025"])
+        # code leading the summary after apparatus → extracted, summary tidied
+        assert e("1336A", "Not Recognizing Own Reflection",
+                 "(previously Man does not Recognize [Mirror]) [J1791.7]. A man.") \
+            == ("Not Recognizing Own Reflection",
+                "(previously Man does not Recognize [Mirror]). A man.", ["J1791.7"])
+        # an inline code (after prose, no heading code) is left in place
+        assert e("931A", "Parricide", "A man kills his parents [Q211.1, S22]") \
+            == ("Parricide", "A man kills his parents [Q211.1, S22]", [])
+        # a quote-class end-of-summary code is extracted only for the curated ids
+        assert e("1446", "'Let them Eat Cake!'", "The queen answered [J2227]") \
+            == ("'Let them Eat Cake!'", "The queen answered", ["J2227"])
+        # a word-variant aside "[Bear]" is not a code and is never extracted
+        assert e("2D", "The New Tail [Bear]", "A wolf turns.") \
+            == ("The New Tail [Bear]", "A wolf turns.", [])
+
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [
             {"id": "330", "name": "The Smith and the Devil", "concordances": {"AaTh": ["330A"]}},

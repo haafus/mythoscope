@@ -1096,6 +1096,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["tales"] = rec.get("tales", [])                # Ashliman AFT example tales (metadata)
         detail["links"]["parent"] = [_link("atu", rec["parent"])] if rec.get("parent") else []
         detail["links"]["subtypes"] = [_link("atu", s) for s in rec.get("subtypes", [])]
+        detail["links"]["defining"] = [_mark_missing(_link("tmi", m), "tmi_gap") for m in rec.get("defining_motifs", [])]
         detail["links"]["tmi"] = [_mark_missing(_link("tmi", m), "tmi_gap") for m in rec.get("motifs", [])]
         detail["links"]["combos"] = [_link("atu", c) for c in rec.get("combos", [])]
         bz = cw.get("atu_to_berezkin", {}).get(rec["id"], [])
