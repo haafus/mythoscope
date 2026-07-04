@@ -501,6 +501,7 @@ _TITLE_OVERRIDES = {
     "132": "The Goat Admires his Horns in the Water",
     "232C*": "Which Bird Is Father",
     "285A*": "The Adder Poisons the Children's Food",
+    "410": "Sleeping Beauty",           # alt-names + "…a daughter is born…" prose → summary
     "860": "Nuts of 'Ay ay ay!'",
     "1832B*": "What Kind of Dung",
     "1641B*": "Who Stole from the Church",
@@ -515,6 +516,45 @@ def _apply_title_override(atu_id: str, name: str, summary: str) -> tuple[str, st
         return name, summary
     tail = name[len(title):].lstrip(" ,.")     # drop only the leading separator
     return title, ". ".join(p for p in (tail, summary) if p)
+
+
+# Accented letters the extraction flattened to a bare apostrophe — a variant of the
+# ``ï¿½`` mojibake where the diacritic collapsed to ``'`` (``Fianc'e`` → ``Fiancée``,
+# ``Dornr'schen`` → ``Dornröschen``). ``_fix_mojibake`` keys on the ``ï¿½`` marker,
+# which never appears in the tale name/summary; and a bare ``'`` is ambiguous with a
+# contraction/possessive, so we heal a curated set of the specific damaged foreign
+# words rather than touching ``'`` blindly. Substring replacement; entries are
+# distinctive enough not to collide, and inflections fall out (``fianc'es`` →
+# ``fiancées`` via the ``fianc'e`` rule).
+_ACCENT_REPAIRS = {
+    "Fianc'e": "Fiancée", "fianc'e": "fiancée",
+    "M'nchhausen": "Münchhausen",
+    "Dornr'schen": "Dornröschen",
+    "Rotk'ppchen": "Rotkäppchen",
+    "Sch'pfer": "Schöpfer",
+    "Geschw'tzigkeit": "Geschwätzigkeit",
+    "v'llig": "völlig",
+    "auff'llig": "auffällig",
+    "schlie'lich": "schließlich",
+    "Kecskem'ti": "Kecskeméti",
+    "K'mmernis": "Kümmernis",
+    "Milo'evi": "Milošević",
+    "Tepeg'z": "Tepegöz",
+    "T'nd'r": "Tündér",
+    "Anu'irwn": "Anushirwan",
+    "Peau d'ne": "Peau d'âne",
+}
+
+
+def _heal_accents(text: str) -> str:
+    """Repair accented letters the extraction flattened to a bare apostrophe, from
+    the curated ``_ACCENT_REPAIRS`` word list. A no-op when ``text`` has no ``'``."""
+    if "'" not in text:
+        return text
+    for bad, good in _ACCENT_REPAIRS.items():
+        if bad in text:
+            text = text.replace(bad, good)
+    return text
 
 
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
@@ -568,6 +608,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
         tale_name, tale_summary = _repair_atu_name(
             _clean(row.get("tale_name")), _clean(row.get("tale_type")))
         tale_name, tale_summary = _apply_title_override(atu_id, tale_name, tale_summary)
+        tale_name, tale_summary = _heal_accents(tale_name), _heal_accents(tale_summary)
         types.append({
             "id": atu_id,
             "num": num,

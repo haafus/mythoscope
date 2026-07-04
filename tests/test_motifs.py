@@ -455,6 +455,18 @@ class TestAtuRegions:
         assert o("510A", "Cinderella", "A young woman.") == ("Cinderella", "A young woman.")
         assert o("66A*", "Some other name", "x") == ("Some other name", "x")
 
+    def test_heal_accents(self):
+        h = trilogy._heal_accents
+        # accented letters flattened to a bare apostrophe, from the curated list
+        assert h("The Hard-hearted Fianc'e") == "The Hard-hearted Fiancée"
+        assert h("M'nchhausen Tales") == "Münchhausen Tales"
+        assert h("Sleeping Beauty (Dornr'schen)") == "Sleeping Beauty (Dornröschen)"
+        assert h("the two fianc'es meet") == "the two fiancées meet"   # inflection via substring
+        # a genuine apostrophe (possessive / old-French elision) is left untouched
+        assert h("The Emperor's New Clothes") == "The Emperor's New Clothes"
+        assert h("Peau d'asne") == "Peau d'asne"                       # archaic spelling, not damage
+        assert h("no apostrophe here") == "no apostrophe here"
+
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [
             {"id": "330", "name": "The Smith and the Devil", "concordances": {"AaTh": ["330A"]}},
