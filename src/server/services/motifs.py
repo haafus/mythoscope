@@ -1130,6 +1130,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     # Heuristic textual parallels — look-alike motifs in the other indexes with no
     # recorded cross-walk link. A separate, clearly-labelled *suggestion* layer.
     detail["parallels"] = _parallels(index, rec["id"])
+    # Curated conceptual parallels found by reasoning (same mytheme, different label).
+    detail["reasoned_parallels"] = _reasoned_parallels(index, rec["id"])
 
     return detail
 
@@ -1142,6 +1144,20 @@ def _parallels(index: str, motif_id: str) -> list[dict]:
         link = _link(e["index"], e["id"])
         link["title_sim"], link["doc_sim"], link["shared"] = e["title_sim"], e["doc_sim"], e["shared"]
         out.append(link)
+    return out
+
+
+def _reasoned_parallels(index: str, motif_id: str) -> list[dict]:
+    """The curated conceptual-parallel groups this motif belongs to, each with the
+    *other* members resolved into links (see ``motifs.reasoned_parallels``)."""
+    from motifs import reasoned_parallels as rp
+    adj = store.cached("reasoned_parallels_adj", rp.adjacency)
+    out = []
+    for gi in adj.get(index, {}).get(motif_id, []):
+        g = rp.GROUPS[gi]
+        links = [_link(idx, mid) for idx, mid in g["members"] if not (idx == index and mid == motif_id)]
+        out.append({"theme": g["theme"], "title": g["title"], "note": g["note"],
+                    "confidence": g["confidence"], "links": links})
     return out
 
 

@@ -1041,6 +1041,36 @@ class TestParallels:
         assert tri and set(tri[0]["missing"]) == {"berezkin-tmi", "berezkin-atu"}
 
 
+class TestReasonedParallels:
+    def test_groups_are_wellformed(self):
+        from motifs import reasoned_parallels as rp
+        seen = set()
+        for g in rp.GROUPS:
+            assert g["confidence"] in {"high", "medium"}
+            assert g["title"] and g["note"]
+            idxs = {i for i, _ in g["members"]}
+            assert idxs <= {"berezkin", "tmi", "atu"}
+            assert len(idxs) >= 2 and len(g["members"]) >= 2     # spans ≥2 indexes
+            for m in g["members"]:
+                assert m not in seen, f"member {m} appears in two groups"
+                seen.add(m)
+        adj = rp.adjacency()
+        assert adj["tmi"].get("A812")          # a known member maps back to its group
+        assert set(adj) == {"berezkin", "tmi", "atu"}
+
+    def test_member_ids_exist_when_built(self):
+        from motifs import reasoned_parallels as rp
+        if not store.load_index("tmi"):
+            pytest.skip("indexes not built")
+        for index in ("berezkin", "tmi", "atu"):
+            data = store.load_index(index)
+            ids = {r["id"] for r in data["types" if index == "atu" else "motifs"]}
+            for g in rp.GROUPS:
+                for i, mid in g["members"]:
+                    if i == index:
+                        assert mid in ids, f"{index}:{mid} not in index"
+
+
 # ---------------------------------------------------------------------------
 # Read service (against a tiny on-disk database)
 # ---------------------------------------------------------------------------

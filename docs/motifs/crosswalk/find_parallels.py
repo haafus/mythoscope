@@ -23,9 +23,10 @@ import csv
 import re
 from pathlib import Path
 
-from motifs import store
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
+
+from motifs import store
 
 OUT = Path(__file__).parent
 T_TITLE, T_DOC_HIGH, T_TITLE_SOFT, T_DOC_FLOOR, K = 0.50, 0.72, 0.30, 0.35, 8
@@ -114,7 +115,7 @@ def main():
         with open(OUT / f"parallels_{A}_{B}.csv", "w", newline="") as f:
             w = csv.writer(f)
             w.writerow(["tier", f"{A}_id", f"{A}_title", f"{B}_id", f"{B}_title", "title_sim", "doc_sim", "shared"])
-            for (aid, bid), (sc, ts, ds, i, j, sh, tier) in rows:
+            for (aid, bid), (_sc, ts, ds, i, j, sh, tier) in rows:
                 w.writerow([tier, aid, DOCS[A][i]["title"], bid, DOCS[B][j]["title"], f"{ts:.3f}", f"{ds:.3f}", sh])
         nA = sum(1 for v in results[(A, B)].values() if v[6] == "A")
         print(f"{A}~{B}: {len(results[(A, B)])} candidates ({nA} tier-A)")

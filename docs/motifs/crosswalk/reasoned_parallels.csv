@@ -1,0 +1,85 @@
+theme,title,confidence,index,id,motif_title,spans
+earth-diver,Earth-diver cosmogony,high,berezkin,C6,Valuables brought from the lower world,Berezkin+TMI
+earth-diver,Earth-diver cosmogony,high,berezkin,C6A,The diver is turtle or frog,Berezkin+TMI
+earth-diver,Earth-diver cosmogony,high,berezkin,C6B,"The diver is muskrat (otter, beaver)",Berezkin+TMI
+earth-diver,Earth-diver cosmogony,high,berezkin,C6C,The diver is a bird,Berezkin+TMI
+earth-diver,Earth-diver cosmogony,high,berezkin,C6c3,The loon is successful diver,Berezkin+TMI
+earth-diver,Earth-diver cosmogony,high,tmi,A812,Earth Diver,Berezkin+TMI
+earth-diver,Earth-diver cosmogony,high,tmi,A812.1,Devil As Earth Diver,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,berezkin,B42,Cosmic hunt,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,berezkin,B42B,Sky hunters pursue an ungulate,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,berezkin,B42C,Sky hunters pursue a bear,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,berezkin,B42D,Sky hunters pursue a tapir,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,berezkin,B42E,Sky hunters pursue a rhea,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,berezkin,B42H,"The Belt of Orion is the game, other star is the hunter",Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,tmi,A766,Origin Of Constellations,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,tmi,A771,Origin Of The Great Bear (Ursa Major),Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,tmi,A772,Origin Of Orion,Berezkin+TMI
+cosmic-hunt,Cosmic hunt (origin of constellations),high,tmi,A773,Origin Of The Pleiades,Berezkin+TMI
+star-spouse,Star husband / star wife,high,berezkin,K19A,Star-wife,Berezkin+TMI
+star-spouse,Star husband / star wife,high,berezkin,K19B,Star-husband,Berezkin+TMI
+star-spouse,Star husband / star wife,high,berezkin,K20,Wish for star-husband or wife realized,Berezkin+TMI
+star-spouse,Star husband / star wife,high,tmi,A762.1,Star-Husband,Berezkin+TMI
+star-spouse,Star husband / star wife,high,tmi,C15.1,Wish For Star-Husband Realized,Berezkin+TMI
+star-spouse,Star husband / star wife,high,tmi,C15.1.1,Wish For Star Wife Realized,Berezkin+TMI
+star-spouse,Star husband / star wife,high,tmi,T111.2.1.1,Star-Wife Gives Birth To A Human Baby,Berezkin+TMI
+theft-of-fire,Theft / origin of fire,high,berezkin,D4A,Theft of fire,Berezkin+TMI
+theft-of-fire,Theft / origin of fire,high,berezkin,D4D,Opossum steals fire,Berezkin+TMI
+theft-of-fire,Theft / origin of fire,high,berezkin,D4H,Swallow obtains fire,Berezkin+TMI
+theft-of-fire,Theft / origin of fire,high,tmi,A1415,Theft Of Fire,Berezkin+TMI
+theft-of-daylight,Theft / recovery of the daylight,medium,berezkin,A13A,Raven hides the Sun,ATU+Berezkin+TMI
+theft-of-daylight,Theft / recovery of the daylight,medium,tmi,A721.1,Theft Of Sun,ATU+Berezkin+TMI
+theft-of-daylight,Theft / recovery of the daylight,medium,tmi,A1411,Theft Of Light,ATU+Berezkin+TMI
+theft-of-daylight,Theft / recovery of the daylight,medium,atu,328A*,"Three Brothers Steal Back the Sun, Moon, and Star",ATU+Berezkin+TMI
+arrow-chain-ascent,Ascent to the sky on an arrow-chain,high,berezkin,J58,The arrow ladder,Berezkin+TMI
+arrow-chain-ascent,Ascent to the sky on an arrow-chain,high,berezkin,J58C,Bridge of arrows,Berezkin+TMI
+arrow-chain-ascent,Ascent to the sky on an arrow-chain,high,tmi,F53,Ascent To Upper World On Arrow Chain,Berezkin+TMI
+arrow-chain-ascent,Ascent to the sky on an arrow-chain,high,tmi,D469.3,Transformation: Chain Of Arrows To Bridge,Berezkin+TMI
+sun-moon-siblings,Sun and Moon as siblings; the Moon's spots,medium,berezkin,A31,The incestuous Moon,Berezkin+TMI
+sun-moon-siblings,Sun and Moon as siblings; the Moon's spots,medium,berezkin,A35C,Scars and wounds on the Moon’s face,Berezkin+TMI
+sun-moon-siblings,Sun and Moon as siblings; the Moon's spots,medium,tmi,A736.3,Sun And Moon As Brothers,Berezkin+TMI
+sun-moon-siblings,Sun and Moon as siblings; the Moon's spots,medium,tmi,A751,Man In The Moon,Berezkin+TMI
+death-false-message,Origin of death from a falsified message,high,berezkin,H36A,Origin of death from the falsified message,ATU+Berezkin+TMI
+death-false-message,Origin of death from a falsified message,high,tmi,A1335.1,Origin Of Death From Falsified Message,ATU+Berezkin+TMI
+death-false-message,Origin of death from a falsified message,high,tmi,A1335.1.1,Origin Of Death: Wrong Messenger Goes To God,ATU+Berezkin+TMI
+death-false-message,Origin of death from a falsified message,high,atu,934H,The Origin of Death,ATU+Berezkin+TMI
+vagina-dentata,Vagina dentata,high,berezkin,F9A,Vagina dentata,Berezkin+TMI
+vagina-dentata,Vagina dentata,high,tmi,F547.1.1,Vagina Dentata,Berezkin+TMI
+vagina-dentata,Vagina dentata,high,tmi,A1313.3.1,Vaginal Teeth Broken,Berezkin+TMI
+dual-creators,Dualism: two / hostile creators,medium,berezkin,B1C,One creator deceives another,Berezkin+TMI
+dual-creators,Dualism: two / hostile creators,medium,berezkin,B5A,Two creators: a dialogue,Berezkin+TMI
+dual-creators,Dualism: two / hostile creators,medium,tmi,A50,Conflict Of Good And Evil Creators,Berezkin+TMI
+dual-creators,Dualism: two / hostile creators,medium,tmi,A902.1,Two Creators Go By Different Route To Establish Features Of The Earth,Berezkin+TMI
+dual-creators,Dualism: two / hostile creators,medium,tmi,P251.5.3,Hostile Brothers,Berezkin+TMI
+cosmic-egg,Cosmic egg,high,berezkin,B79,Cosmic egg,Berezkin+TMI
+cosmic-egg,Cosmic egg,high,tmi,A641,Cosmic Egg,Berezkin+TMI
+cosmic-egg,Cosmic egg,high,tmi,A641.1,Heaven And Earth From Egg,Berezkin+TMI
+deluge,The deluge,medium,berezkin,B52,Waters of deluge create the mountains,Berezkin+TMI
+deluge,The deluge,medium,berezkin,C2,Deluge and conflagration combined,Berezkin+TMI
+deluge,The deluge,medium,tmi,A1010,Deluge,Berezkin+TMI
+deluge,The deluge,medium,tmi,A1021,Deluge: Escape In Boat (Ark),Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,berezkin,L72,The obstacle flight,ATU+Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,berezkin,L72C,Obstacle flight: the thrown mirror,ATU+Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,berezkin,L72D,Obstacle flight: the thrown scissors,ATU+Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,berezkin,L72G,Obstacle flight: the thrown salt,ATU+Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,tmi,D670,Magic Flight,ATU+Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,tmi,D672,Obstacle Flight,ATU+Berezkin+TMI
+magic-flight,Magic flight / obstacle flight,high,atu,313,The Magic Flight,ATU+Berezkin+TMI
+swan-maiden,Swan maiden / the lost supernatural wife,high,berezkin,E9i1,Swan-wife,ATU+Berezkin+TMI
+swan-maiden,Swan maiden / the lost supernatural wife,high,berezkin,K25a5,Two brothers and the swan-maidens,ATU+Berezkin+TMI
+swan-maiden,Swan maiden / the lost supernatural wife,high,tmi,D361.1,Swan Maiden,ATU+Berezkin+TMI
+swan-maiden,Swan maiden / the lost supernatural wife,high,tmi,B652.1,Marriage To Swan-Maiden,ATU+Berezkin+TMI
+swan-maiden,Swan maiden / the lost supernatural wife,high,atu,400,The Man on a Quest for his Lost Wife,ATU+Berezkin+TMI
+dragon-slayer,The dragon-slayer,high,berezkin,K38F,The dragon-slayer,ATU+Berezkin+TMI
+dragon-slayer,The dragon-slayer,high,tmi,B11.11,Fight With Dragon,ATU+Berezkin+TMI
+dragon-slayer,The dragon-slayer,high,tmi,B11.11.7,Woman As Dragon-Slayer,ATU+Berezkin+TMI
+dragon-slayer,The dragon-slayer,high,atu,300,The Dragon-Slayer,ATU+Berezkin+TMI
+blinded-ogre,Blinding the ogre (Polyphemus),high,berezkin,K64,Escape from Polyphemos’ cave,ATU+Berezkin+TMI
+blinded-ogre,Blinding the ogre (Polyphemus),high,berezkin,K64a,Blinded cyclopes,ATU+Berezkin+TMI
+blinded-ogre,Blinding the ogre (Polyphemus),high,tmi,G511,Ogre Blinded,ATU+Berezkin+TMI
+blinded-ogre,Blinding the ogre (Polyphemus),high,tmi,K603,Escape Under Ram's Belly,ATU+Berezkin+TMI
+blinded-ogre,Blinding the ogre (Polyphemus),high,tmi,G121,Blind Giant Ogre,ATU+Berezkin+TMI
+blinded-ogre,Blinding the ogre (Polyphemus),high,atu,1137,The Blinded Ogre,ATU+Berezkin+TMI
+nightingale-blindworm,The nightingale and the blindworm,high,berezkin,B125A,Nightingale and blindworm,ATU+Berezkin+TMI
+nightingale-blindworm,The nightingale and the blindworm,high,tmi,A2241.5,Nightingale Borrows Blindworm's Eye,ATU+Berezkin+TMI
+nightingale-blindworm,The nightingale and the blindworm,high,atu,234,The Nightingale and the Blindworm,ATU+Berezkin+TMI

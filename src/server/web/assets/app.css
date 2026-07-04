@@ -1696,6 +1696,14 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-parallel:hover .motif-parallel-sim { color: #e8e2f2; }
 .motif-parallel-note { margin: 0 0 8px; font-size: 11.5px; color: #8792a0; font-style: italic; }
 
+/* Curated reasoned-parallel groups: a theme heading + a confidence tag over each
+   chip row. */
+.motif-parallel-group { margin-bottom: 12px; }
+.motif-parallel-theme { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12.5px; font-weight: 600; color: #4a4066; }
+.motif-parallel-conf { flex: none; padding: 0 7px; font-size: 10px; font-weight: 600; line-height: 15px; border-radius: 8px; cursor: help; letter-spacing: 0.02em; }
+.motif-parallel-conf.conf-high { color: #3f6b4a; background: #dcecdf; }
+.motif-parallel-conf.conf-medium { color: #7a6a3f; background: #efe7d2; }
+
 /* Broad TMI category rows in the list, shown bold. */
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 

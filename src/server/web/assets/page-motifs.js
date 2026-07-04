@@ -997,6 +997,27 @@ function parallelsSection(parallels) {
     return section(`Possible parallels (${parallels.length})`, note + `<div class="motif-links">${chips}</div>`);
 }
 
+// Curated conceptual parallels found by reasoning — the same mytheme under
+// different labels across indexes. Grouped by theme, each with a confidence tag
+// (hover for the rationale). Distinct from the lexical "Possible parallels".
+function reasonedParallelsSection(groups) {
+    if (!groups || !groups.length) return "";
+    const blocks = groups.map((g) => {
+        const chips = g.links.map((l) => `
+        <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
+           class="motif-link motif-parallel${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
+           title="${escapeHtml(l.name || l.id)}">
+            <span class="motif-link-src">${PARALLEL_TAG[l.index] || escapeHtml(l.index)}</span><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}
+        </a>`).join("");
+        return `<div class="motif-parallel-group">
+            <div class="motif-parallel-theme">${escapeHtml(g.title)}<span class="motif-parallel-conf conf-${escapeHtml(g.confidence)}" title="${escapeHtml(g.note)}">${escapeHtml(g.confidence)}</span></div>
+            <div class="motif-links">${chips}</div>
+        </div>`;
+    }).join("");
+    const note = `<div class="motif-parallel-note">The same mytheme catalogued under different labels across indexes — a curated comparison by reasoning (rationale on each confidence tag; full write-up in the docs).</div>`;
+    return section(`Parallels by reasoning (${groups.length})`, note + blocks);
+}
+
 // Tradition-level distribution (mapsofmyths): total attesting traditions, broken
 // down by macro-region; each region expands to the named traditions.
 // Title-case an ALL-CAPS label as a proper name (first letter of each word,
@@ -1264,8 +1285,9 @@ function renderDetail(d) {
         }
     }
 
-    // Suggested textual parallels (all indexes) — a heuristic layer at the foot,
-    // after the curated cross-walk links.
+    // Cross-index parallels at the foot: first the curated conceptual groups
+    // (reasoning), then the heuristic lexical look-alikes.
+    body += reasonedParallelsSection(d.reasoned_parallels);
     body += parallelsSection(d.parallels);
 
     // An old ATU number the user navigated to is served as the current type.
