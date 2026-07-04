@@ -406,16 +406,25 @@ class TestAtuRegions:
         out = svc.list_motifs("atu", sub_division="Other Wild Animals")
         assert [i["id"] for i in out["items"]] == ["70"] and out["total"] == 1
 
-    def test_repair_atu_name_mid_bracket(self):
+    def test_repair_atu_name(self):
         r = trilogy._repair_atu_name
-        # name truncated inside "[Cat, Frog, etc.]" — tail rejoined, re-split outside brackets
-        n, s = r("The Animal Bride (previously The Mouse [Cat, Frog, etc", "] as Bride). A father decides.")
-        assert n == "The Animal Bride (previously The Mouse [Cat, Frog, etc.] as Bride)"
-        assert s == "A father decides."
-        # a balanced name is left untouched
+        # name truncated inside "[Cat, Frog, etc.]" — the period there is bracket-depth>0,
+        # so the split falls at the first depth-0 sentence period (subsumes the old patch)
+        assert r("The Animal Bride (previously The Mouse [Cat, Frog, etc", "] as Bride). A father decides.") \
+            == ("The Animal Bride (previously The Mouse [Cat, Frog, etc.] as Bride)", "A father decides.")
+        # a clean label splits at the first sentence period; apparatus stays in the summary
         assert r("The Theft of Fish", "A fox steals.") == ("The Theft of Fish", "A fox steals.")
-        # source brackets themselves unbalanced (no depth-0 period) → left as-is, no mangling
-        assert r("A (b (c", "no close here") == ("A (b (c", "no close here")
+        # abbreviation Trilogy wrongly split on ("St.") — reunited, not a boundary
+        assert r("St", "Peter and the Nuts. A tale.") == ("St. Peter and the Nuts", "A tale.")
+        # decimal inside a motif code is not a boundary; the seam re-inserts no space
+        assert r("The Great Kettle [X1030", "1]. Cf.") == ("The Great Kettle [X1030.1]", "Cf.")
+        # quoted catch-phrase title: prose after the closing quote drops to the summary
+        assert r("'The Barn is Burning!' A master acts", "") \
+            == ("'The Barn is Burning!'", "A master acts")
+        # declarative quoted title whose closing quote Trilogy orphaned into the summary
+        assert r("'No", "' A king rules.") == ("'No.'", "A king rules.")
+        # doubled apostrophe (source artifact) collapsed before quote detection
+        assert r("The Hen ''What was I''", "A note.") == ("The Hen 'What was I'", "A note.")
 
     def test_atu_inline_aath_concordance(self, monkeypatch):
         atu_types = [

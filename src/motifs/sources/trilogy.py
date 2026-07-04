@@ -384,28 +384,81 @@ def _atu_sort_key(atu_id: str) -> tuple:
     return (int(m.group(1)) if m else 1 << 30, atu_id[m.end():] if m else atu_id)
 
 
-def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
-    """Repair a tale name Trilogy truncated mid-bracket.
+# Tokens that carry a period but do NOT end the title sentence: title-final
+# abbreviations Trilogy's naive "cut at first period" wrongly split on.
+_TITLE_ABBREV = frozenset({"etc", "st", "mt", "dr", "mrs", "mr", "ms", "vs", "cf",
+                           "no", "nos", "ca", "fig", "sr", "jr", "op", "al", "ff", "viz"})
+# A closing quote (vs. an apostrophe in ``'s``/``'t``): followed by space/end/punct.
+_CLOSE_QUOTE = re.compile(r"'(?=\s|$|[.!?,;:])")
+_TRAIL_WORD = re.compile(r"([A-Za-z]+)$")
 
-    Trilogy split ``tale_name`` at the first period, which sometimes lands inside a
-    bracketed aside (``The Mouse [Cat, Frog, etc.] as Bride``): the name is cut at
-    ``etc`` and the tail (``] as Bride).``) leaks into the summary. When the name has
-    an unbalanced ``[`` or ``(``, rejoin name + summary and re-split at the first
-    period that sits outside all brackets."""
-    if name.count("[") == name.count("]") and name.count("(") == name.count(")"):
-        return name, summary
-    if not summary:
-        return name, summary
-    full = f"{name}.{summary}"
+
+def _split_title(text: str) -> tuple[str, str]:
+    """Split Uther's run-on ``<title>. <description>`` into ``(title, description)``.
+
+    Two title shapes:
+
+      * a **quoted catch-phrase** (jokes, anecdotes, formula tales) — the leading
+        ``'…'``; the closing quote is a ``'`` followed by whitespace/end/punctuation
+        (apostrophes in ``'s``/``'t`` are skipped). An opening quote that never closes
+        (malformed source) makes the whole string the title;
+      * otherwise the **label up to the first sentence period** at bracket-depth 0
+        (over ``()`` and ``[]``) that is neither an abbreviation (``St.``, ``etc.``…)
+        nor a decimal inside a code (``digit.digit``).
+
+    Trailing apparatus — ``(previously …)``, ``(Including …)``, ``[codes]`` — is left
+    on whichever side the boundary falls; it is never pulled back onto the title."""
+    text = text.strip()
+    if not text:
+        return "", ""
+    if text.startswith("'"):
+        body = text[1:]
+        m = _CLOSE_QUOTE.search(body)
+        if m:
+            return f"'{body[:m.start()].strip()}'", body[m.end():].strip()
+        return text, ""              # unterminated opening quote: all title
     depth = 0
-    for i, ch in enumerate(full):
+    for i, ch in enumerate(text):
         if ch in "[(":
             depth += 1
         elif ch in "])":
             depth = max(0, depth - 1)
         elif ch == "." and depth == 0:
-            return full[:i].strip(), full[i + 1:].strip()
-    return name, summary
+            prev = text[i - 1] if i else ""
+            nxt = text[i + 1] if i + 1 < len(text) else ""
+            if prev.isdigit() and nxt.isdigit():     # decimal in a motif/type code
+                continue
+            word = _TRAIL_WORD.search(text[:i])
+            if word and word.group(1).lower() in _TITLE_ABBREV:
+                continue
+            return text[:i].strip(), text[i + 1:].strip()
+    return text, ""
+
+
+def _repair_atu_name(name: str, summary: str) -> tuple[str, str]:
+    """Recover the title/description boundary from Trilogy's two ATU columns.
+
+    Trilogy cut Uther's single ``<title>. <description>`` run-on at the first period
+    (consuming exactly ``". "``), which frequently lands *inside* the title — an
+    abbreviation (``St.``), a bracketed aside (``[Cat, etc.]``), or, for quoted
+    catch-phrase titles, deep in the prose — leaking one side into the other. We
+    rejoin the two columns and re-split with a boundary rule (``_split_title``) that
+    understands quotes, abbreviations, decimals and bracket depth, which subsumes the
+    old unbalanced-bracket patch. A doubled apostrophe is always a source artifact
+    (a doubled quote mark, or a lost accented letter) — collapsed first so the quote
+    detection is reliable.
+
+    The seam re-inserts the consumed period plus a space, EXCEPT where the cut fell
+    inside a token — the summary then resumes on a digit / ``)`` / ``]`` / closing
+    quote (``[J2066`` + ``1]``, ``…1810A*`` + ``)``, ``'No`` + ``' A king``) and a
+    space would be spurious. A real word/clause boundary (``St`` + ``Peter``) keeps
+    its space."""
+    if not summary:
+        full = name
+    else:
+        gap = "" if summary[0] in "0123456789)]'" else " "
+        full = f"{name}.{gap}{summary}"
+    return _split_title(full.replace("''", "'"))
 
 
 def _split_division(s: str) -> tuple[str, int | None, int | None]:
@@ -458,9 +511,6 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]], combos: dict[str,
         sub_name, sub_start, sub_end = _split_division(_clean(row.get("sub_division")))
         tale_name, tale_summary = _repair_atu_name(
             _clean(row.get("tale_name")), _clean(row.get("tale_type")))
-        # A doubled apostrophe is always a source artifact (a closing quote rendered
-        # as '', or a lost accented letter): collapse it to a single apostrophe.
-        tale_name, tale_summary = tale_name.replace("''", "'"), tale_summary.replace("''", "'")
         types.append({
             "id": atu_id,
             "num": num,

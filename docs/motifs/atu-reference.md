@@ -130,12 +130,27 @@ introduced several defects. Each is repaired at build time (`trilogy.py`).
   Tales). Empty divisions are filled from the range containing the type — first
   from the CSV's own labelled ranges, then from a canonical fallback
   (`700–749 Other Tales Of The Supernatural`, `750–779 God Rewards And Punishes`).
-- **Tale name truncated mid-bracket.** Trilogy split `tale_name` at the first
-  period, which for **54 types** lands inside a bracketed aside (`402`: *The Mouse
-  [Cat, Frog, etc.] as Bride*) — cutting the name at `etc` and leaking the tail
-  into the summary. When a name has an unbalanced `[`/`(`, we rejoin name +
-  summary and re-split at the first period **outside all brackets** (fixes 52/54;
-  2 have a closing bracket missing in the source itself, left untouched).
+- **Title/description boundary.** Trilogy split Uther's single
+  `<title>. <description>` run-on into `tale_name`/`tale_type` at the **first
+  period** (`tale_name` provably never keeps a real sentence period). That period
+  often falls *inside* the title, leaking one side into the other:
+  - an **abbreviation** — `St. Peter…` cut down to `St`;
+  - a **bracketed aside** — `The Mouse [Cat, Frog, etc.] as Bride` cut at `etc`;
+  - deep in the **prose**, for quoted catch-phrase titles (jokes/anecdotes/formula
+    tales, `1200–2200`) whose name is a spoken line — `'The Barn is Burning!'`
+    swallowing the plot summary; when the line ends in a period the closing quote
+    is orphaned to the front of the summary instead (`'No` | `' A king…`).
+
+  We rejoin the two columns (re-inserting the consumed period; a space only where
+  the seam is a real word boundary, not inside a `[code]` or a token) and re-split
+  with one boundary rule: a leading `'…'` catch-phrase, else the first period at
+  bracket-depth 0 that is neither an abbreviation (`St., etc., e.g.…`) nor a
+  decimal in a code (`X1030.1`). This **subsumes** the old unbalanced-bracket
+  patch. Trailing apparatus — `(previously …)`, `(Including … Type …)`, `[codes]`
+  — is left wherever the boundary puts it (not pulled back onto the title). A
+  **doubled apostrophe** (`''`, a source artifact: a doubled quote mark or a lost
+  accent — 8 records) is collapsed first so quote detection is reliable. Net on
+  rebuild: ~86 titles change, all in these classes.
 - **Baked-in mojibake `ï¿½`.** A lost character shows up as the 3-char sequence
   `ï¿½`. **Proven upstream** (our cached CSV is byte-identical to GitHub, and the
   file is valid UTF-8): the original diacritic → `U+FFFD` → latin1-decoded → `ï¿½`
