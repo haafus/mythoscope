@@ -1244,6 +1244,11 @@ def tiny_db(tmp_path, monkeypatch):
         "berezkin_to_atu": {"A39A": ["294"]},
         "atu_to_berezkin": {"294": ["A39A"]},
     }), encoding="utf-8")
+    (tmp_path / "semantic_parallels.json").write_text(json.dumps({
+        "adjacency": {
+            "tmi": {"S31": [{"index": "berezkin", "id": "A39A", "sim": 0.81, "also_lexical": False}]},
+            "berezkin": {"A39A": [{"index": "tmi", "id": "S31", "sim": 0.81, "also_lexical": False}]},
+        }}), encoding="utf-8")
     (tmp_path / "meta.json").write_text(json.dumps({"counts": {"berezkin": 1, "tmi": 1, "atu": 2}}), encoding="utf-8")
     yield tmp_path
     store.clear_cache()
@@ -1283,6 +1288,29 @@ class TestBuildMotifsModes:
 
 
 class TestService:
+    def test_semantic_parallels_resolved(self, tiny_db):
+        # The precomputed BGE-M3 layer is resolved to display links with similarity.
+        sp = svc.get_motif("tmi", "S31")["semantic_parallels"]
+        assert len(sp) == 1
+        assert sp[0]["index"] == "berezkin" and sp[0]["id"] == "A39A"
+        assert sp[0]["sim"] == 0.81 and sp[0]["name"]  # resolved against the real record
+
+    def test_semantic_parallels_copied_from_committed(self, tmp_path, monkeypatch):
+        # When the output copy is absent, the committed data file is copied in.
+        from settings import settings
+        data_dir = tmp_path / "committed"
+        data_dir.mkdir()
+        (data_dir / store.SEMANTIC_PARALLELS_FILE).write_text(
+            json.dumps({"adjacency": {"tmi": {"X1": [{"index": "atu", "id": "9", "sim": 0.7}]}}}))
+        monkeypatch.setattr(store, "DATA_DIR", data_dir)
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path / "out")
+        store.clear_cache()
+        assert not store.semantic_parallels_path().exists()
+        loaded = store.load_semantic_parallels()
+        assert store.semantic_parallels_path().exists()          # copied into outputs
+        assert loaded["adjacency"]["tmi"]["X1"][0]["id"] == "9"
+        store.clear_cache()
+
     def test_indexes(self, tiny_db):
         idx = {i["index"]: i for i in svc.list_indexes()}
         assert set(idx) == {"berezkin", "tmi", "atu"}

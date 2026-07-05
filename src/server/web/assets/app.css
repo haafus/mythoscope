@@ -1732,6 +1732,16 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-inferred-via { flex: none; font-size: 10px; font-weight: 600; color: #7a95a0; cursor: help; }
 .motif-inferred:hover .motif-inferred-via { color: #dcecef; }
 
+/* Semantic (embedding) look-alikes: solid indigo edge marks the BGE-M3 layer. */
+.motif-parallel.motif-parallel-sem { background: #eaecfa; border-style: solid; border-color: #c8ccef; color: #3b3f75; }
+.motif-parallel.motif-parallel-sem:hover { background: #4a4f96; border-color: #4a4f96; color: #fff; }
+.motif-parallel-sem .motif-link-id { color: #4a4f96; }
+.motif-parallel-sem:hover .motif-link-id,
+.motif-parallel-sem:hover .motif-link-name { color: #fff; }
+.motif-parallel-sem .motif-link-src { color: #4a4f96; background: #dcdef5; }
+.motif-parallel-sem .motif-parallel-sim { color: #8085b8; }
+.motif-parallel-sem:hover .motif-parallel-sim { color: #e6e8f7; }
+
 /* An ATU summary's "(1)…(N)" forms rendered as an ordered list. */
 .motif-summary-list { margin: 6px 0 0; padding-left: 22px; }
 .motif-summary-list li { margin-bottom: 6px; }

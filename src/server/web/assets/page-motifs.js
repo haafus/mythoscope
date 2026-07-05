@@ -1200,9 +1200,37 @@ function citeList(items) {
 // The derived / hypothesis cross-link sections, in descending confidence:
 // inferred (transitive closure) → reasoned (curated) → the three lexical bands.
 // Placed after the direct cross-links of each index, before the distribution.
+// Semantic look-alikes by BGE-M3 embeddings — share meaning, not necessarily words
+// (so distinct from the lexical parallels). Deduped against every pair already shown
+// elsewhere on the page, so this section carries only what nothing else surfaced.
+function semanticParallelsSection(list, shown) {
+    const fresh = (list || []).filter((l) => !shown.has(`${l.index}:${l.id}`));
+    if (!fresh.length) return "";
+    const chips = fresh.map((l) => {
+        const pct = Math.round((l.sim || 0) * 100);
+        const tip = `${l.name || l.id} — embedding similarity ${l.sim}`;
+        return `
+        <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
+           class="motif-link motif-parallel motif-parallel-sem${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
+           title="${escapeHtml(tip)}">
+            <span class="motif-link-src">${PARALLEL_TAG[l.index] || escapeHtml(l.index)}</span><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}<span class="motif-parallel-sim" title="${escapeHtml(tip)}">~${pct}%</span>
+        </a>`;
+    }).join("");
+    return section(`Semantic parallels (${fresh.length})`,
+        `<div class="motif-parallel-note">Nearest look-alikes by meaning (BGE-M3 embeddings) in the other indexes with no recorded link — they share sense, not necessarily words. Hints to review, not asserted links.</div><div class="motif-links">${chips}</div>`);
+}
+
 function crossLinkExtras(d) {
     let out = inferredSection(d.inferred);
     out += reasonedParallelsSection(d.reasoned_parallels);
+    // Everything already shown on the page (confirmed links, inferred, reasoned,
+    // lexical) — so the semantic section never repeats a pair seen above it.
+    const shown = new Set();
+    Object.values(d.links || {}).forEach((arr) => (arr || []).forEach((l) => l && l.id && shown.add(`${l.index}:${l.id}`)));
+    (d.inferred || []).forEach((l) => shown.add(`${l.index}:${l.id}`));
+    (d.reasoned_parallels || []).forEach((g) => (g.links || []).forEach((l) => shown.add(`${l.index}:${l.id}`)));
+    (d.parallels || []).forEach((l) => shown.add(`${l.index}:${l.id}`));
+    out += semanticParallelsSection(d.semantic_parallels, shown);
     const pAll = d.parallels || [];
     const strong = pAll.filter((p) => p.tier !== "B");
     // "Near-identical" = titles share (almost) all their content words, not merely

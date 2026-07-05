@@ -8,6 +8,7 @@ server reads them back. Read helpers cache parsed JSON in module state so the
 from __future__ import annotations
 
 import logging
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,11 @@ from json_utils import load_json_optional
 from settings import settings
 
 logger = logging.getLogger(__name__)
+
+# Committed data shipped with the package (precomputed artefacts that are expensive
+# to regenerate, e.g. the BGE-M3 semantic parallels). Copied into the (git-ignored)
+# outputs dir on first read so the running app needs neither the model nor its deps.
+DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
 def motifs_dir() -> Path:
@@ -33,6 +39,7 @@ INDEX_FILES = {
 }
 CROSSWALK_FILE = "crosswalk.json"
 PARALLELS_FILE = "parallels.json"
+SEMANTIC_PARALLELS_FILE = "semantic_parallels.json"
 META_FILE = "meta.json"
 
 
@@ -46,6 +53,10 @@ def crosswalk_path() -> Path:
 
 def parallels_path() -> Path:
     return motifs_dir() / PARALLELS_FILE
+
+
+def semantic_parallels_path() -> Path:
+    return motifs_dir() / SEMANTIC_PARALLELS_FILE
 
 
 def meta_path() -> Path:
@@ -89,6 +100,17 @@ def load_crosswalk() -> dict:
 
 def load_parallels() -> dict:
     return _load_cached("parallels", parallels_path()) or {}
+
+
+def load_semantic_parallels() -> dict:
+    dst = semantic_parallels_path()
+    if not dst.exists():
+        src = DATA_DIR / SEMANTIC_PARALLELS_FILE   # committed precomputed copy
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(src, dst)
+            logger.info("Copied committed %s into %s", SEMANTIC_PARALLELS_FILE, dst.parent)
+    return _load_cached("semantic_parallels", dst) or {}
 
 
 def load_meta() -> dict:

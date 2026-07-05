@@ -1133,6 +1133,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     # Heuristic textual parallels — look-alike motifs in the other indexes with no
     # recorded cross-walk link. A separate, clearly-labelled *suggestion* layer.
     detail["parallels"] = _parallels(index, rec["id"])
+    # Semantic parallels — nearest look-alikes by BGE-M3 embeddings (share meaning,
+    # not necessarily words); another suggestion layer, precomputed offline.
+    detail["semantic_parallels"] = _semantic_parallels(index, rec["id"])
     # Curated conceptual parallels found by reasoning (same mytheme, different label).
     detail["reasoned_parallels"] = _reasoned_parallels(index, rec["id"])
     # Transitively inferred cross-links (triangle closure through a low-fan-out
@@ -1164,6 +1167,18 @@ def _parallels(index: str, motif_id: str) -> list[dict]:
         link = _link(e["index"], e["id"])
         link["title_sim"], link["doc_sim"], link["shared"] = e["title_sim"], e["doc_sim"], e["shared"]
         link["tier"] = e.get("tier", "A")
+        out.append(link)
+    return out
+
+
+def _semantic_parallels(index: str, motif_id: str) -> list[dict]:
+    """Resolve the BGE-M3 semantic look-alikes for a motif into display links."""
+    entries = store.load_semantic_parallels().get("adjacency", {}).get(index, {}).get(motif_id, [])
+    out = []
+    for e in entries:
+        link = _link(e["index"], e["id"])
+        link["sim"] = e["sim"]
+        link["also_lexical"] = e.get("also_lexical", False)
         out.append(link)
     return out
 
