@@ -622,14 +622,21 @@ body.has-main-navbar {
     color: #111;
 }
 
-.corpus-page .empty-state,
-.corpus-page .error-state {
-    padding: 18px;
+/* ==========================================================================
+   Block states — shared empty / error placeholders
+   One look for every block that has no data yet or whose load failed (list &
+   detail panes, corpus/graph trees, motif catalog). Page rules may refine.
+   ========================================================================== */
+.empty-state,
+.error-state {
+    padding: 24px 20px;
     color: var(--muted);
     font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
 }
 
-.corpus-page .error-state {
+.error-state {
     color: #a33b35;
 }
 
