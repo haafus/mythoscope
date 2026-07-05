@@ -8,6 +8,7 @@ cache (downloading only what's missing); ``force`` re-fetches every raw source.
 
 from __future__ import annotations
 
+import itertools
 import json
 import logging
 from datetime import datetime, timezone
@@ -15,7 +16,7 @@ from datetime import datetime, timezone
 from json_utils import save_json
 from settings import settings
 
-from . import crosswalk, parallels, store
+from . import crosswalk, parallels, reasoned_parallels, store
 from .sources import (
     ashliman,
     atu_wikidata,
@@ -272,15 +273,23 @@ def _log_summary(counts: dict, links: dict, par_counts: dict) -> None:
                 else:
                     bt.add(edge); inf["bt"] += 1
     grand = len(at) + len(ba) + len(bt)
+    inferred_total = inf["at"] + inf["ba"] + inf["bt"]
     lex_a = sum(par_counts.get(f"{k}_A", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
     lex_b = sum(par_counts.get(f"{k}_B", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
+    triangles = par_counts.get("triangles", 0)
+    reasoned_pairs = {frozenset((a, b))
+                      for g in reasoned_parallels.GROUPS
+                      for a, b in itertools.combinations(g["members"], 2) if a[0] != b[0]}
 
     logger.info("=== ИТОГ: motif database built ===")
     logger.info("  indexes: %s", ", ".join(f"{k}={v}" for k, v in counts.items()) or "none")
-    logger.info("  confirmed cross-index links (union per pair, incl. inferred):")
+    logger.info("  confirmed cross-index links (union per pair, incl. %d inferred):", inferred_total)
     logger.info("      ATU <-> TMI      %5d  (+%d inferred)", len(at), inf["at"])
     logger.info("      Berezkin <-> ATU %5d  (+%d inferred)", len(ba), inf["ba"])
     logger.info("      Berezkin <-> TMI %5d  (+%d inferred)", len(bt), inf["bt"])
     logger.info("      TOTAL confirmed  %5d", grand)
-    logger.info("  suggestion layers (not confirmed): lexical parallels %d (A) + %d (B); "
-                "reasoned parallels are curated static data", lex_a, lex_b)
+    logger.info("  hypothesis / suggestion layers (NOT confirmed, shown apart on the page):")
+    logger.info("      reasoned parallels (curated) : %d groups / %d pairs",
+                len(reasoned_parallels.GROUPS), len(reasoned_pairs))
+    logger.info("      lexical parallels (heuristic): %d tier-A + %d tier-B, %d three-way",
+                lex_a, lex_b, triangles)
