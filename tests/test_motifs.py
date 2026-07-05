@@ -616,18 +616,39 @@ class TestAtuRegions:
         # the motif-only bracket is unwrapped; base motif links, 'ff' stays as text
         assert 'data-id="B261"' in out3 and "[" not in out3 and out3.endswith("ff</p>")
 
-    def test_summary_blocks_wraps_enumeration_as_ordered_list(self):
+    def test_summary_blocks_wraps_enumeration_as_ordered_list(self, monkeypatch):
+        monkeypatch.setattr(svc, "_by_id", lambda idx: {})
         # A "(1)…(N)" run becomes preamble + <ol>; the markers turn into the list
         # numbering and every bit of item text (incl. apparatus) is kept.
-        out = svc._summary_blocks("Exists in forms: (1) first form. (2) second one. "
-                                  "(3) third (Previously Type 9*.)")
+        out = svc._atu_summary_html("Exists in forms: (1) first form. (2) second one. "
+                                    "(3) third (Previously Type 9*.)")
         assert "<ol" in out and out.count("<li>") == 3
         assert '<p class="motif-text">Exists in forms:</p>' in out
         assert "<li>first form.</li>" in out and "(Previously Type 9*.)" in out
         assert "(1)" not in out and "(3)" not in out          # markers → numbering
         # a lone / non-sequential marker is NOT a list — stays inline as text
-        plain = svc._summary_blocks("On the (7) th day only.")
+        plain = svc._atu_summary_html("On the (7) th day only.")
         assert "<ol" not in plain and "(7)" in plain and plain.startswith('<p class="motif-text">')
+
+    def test_summary_blocks_multiple_lists_and_trailing_text(self, monkeypatch):
+        monkeypatch.setattr(svc, "_by_id", lambda idx: {})
+        # Several runs (each restarting at "(1)") each become their own <ol>, with
+        # the prose between them kept in a paragraph (period-joined items).
+        multi = svc._atu_summary_html(
+            "Heads: (1) alpha. (2) beta. Then a turn of events. "
+            "Tails: (1) gamma. (2) delta.")
+        assert multi.count("<ol") == 2
+        assert "<li>alpha.</li>" in multi and "<li>gamma.</li>" in multi
+        # the inter-run prose survives (glued to the run's last item, losslessly)
+        assert "Then a turn of events." in multi
+        # A comma-joined list (single sentence) peels its trailing prose into a
+        # following paragraph, so the last item doesn't swallow the rest.
+        trail = svc._atu_summary_html(
+            "He meets: (1) a wolf, (2) a fish, (3) a river. "
+            "God answers and he is rewarded.")
+        assert trail.count("<ol") == 1 and trail.count("<li>") == 3
+        assert "<li>a river.</li>" in trail
+        assert '<p class="motif-text">God answers and he is rewarded.</p>' in trail
 
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"

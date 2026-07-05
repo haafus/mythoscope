@@ -1209,12 +1209,10 @@ def _inline_link(index: str, ref: str) -> str:
             f'data-index="{index}" data-id="{ref}">{ref}</a>')
 
 
-def _atu_summary_html(text: str) -> str:
-    """Escape the summary, then linkify the TMI motif codes and ATU 'Type N' refs it
-    names — only those that resolve to a real motif/type. Tokens are alphanumeric, so
-    injecting them raw after escaping the surrounding prose is safe."""
-    if not text:
-        return ""
+def _linkify_summary(text: str) -> str:
+    """Escape one summary fragment, then linkify the TMI motif codes and ATU 'Type N'
+    refs it names — only those that resolve to a real motif/type. Tokens are
+    alphanumeric, so injecting them raw after escaping the surrounding prose is safe."""
     tmi, atu = _by_id("tmi"), _by_id("atu")
     esc = html.escape(text, quote=False)
     # Drop the square brackets around motif-only groups (the chips carry the cue).
@@ -1238,24 +1236,112 @@ def _atu_summary_html(text: str) -> str:
             lambda mm: _inline_link("atu", mm.group(0)) if mm.group(0) in atu else mm.group(0),
             m.group(2)),
         esc)
-    return _summary_blocks(esc)
+    return esc
 
 
-def _summary_blocks(esc: str) -> str:
-    """Turn a leading ``(1)…(N)`` enumeration into an ``<ol>`` (the preamble stays a
-    paragraph before it); otherwise a single paragraph. Nothing is dropped — the
-    ``(k)`` markers just become the list numbering, and each item keeps all its
-    text (motif links, any ``(Previously Type X)`` provenance, etc.)."""
-    marks, expect = [], 1
-    for m in _SUMMARY_ENUM.finditer(esc):
-        if int(m.group(1)) == expect:  # only the leading strictly-sequential run
-            marks.append((m.start(), m.end()))
+def _atu_summary_html(text: str) -> str:
+    """Render an ATU summary, turning inline ``(1)…(N)`` enumerations into ``<ol>``
+    lists. A summary may hold several runs (each restarting at ``(1)``, as in type
+    910A) with prose between and after them, and a run may be followed by trailing
+    text (type 460A); every run becomes its own list and all surrounding prose stays
+    in ``<p>`` blocks. Structure is parsed on the raw text (where brackets/parens are
+    intact) and each piece is linkified independently — nothing is dropped."""
+    if not text:
+        return ""
+    blocks = _summary_blocks(text)
+    if blocks is None:
+        return f'<p class="motif-text">{_linkify_summary(text)}</p>'
+    parts = []
+    for kind, payload in blocks:
+        if kind == "p":
+            parts.append(f'<p class="motif-text">{_linkify_summary(payload)}</p>')
+        else:
+            lis = "".join(f"<li>{_linkify_summary(it)}</li>" for it in payload)
+            parts.append(f'<ol class="motif-text motif-summary-list">{lis}</ol>')
+    return "".join(parts)
+
+
+def _first_sentence_end(s: str) -> int | None:
+    """Index just past the first sentence terminator at bracket/paren depth 0 (so
+    ``s[:idx]`` keeps the punctuation), or ``None``. Decimal points inside numbers and
+    terminators nested in ``(…)``/``[…]`` are skipped; a ``.`` counts only when it ends
+    the string or is followed by whitespace and a capital / opening quote or bracket."""
+    depth = 0
+    for i, ch in enumerate(s):
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth = max(0, depth - 1)
+        elif depth == 0 and ch in ".!?":
+            if ch == "." and i > 0 and s[i - 1].isdigit() and i + 1 < len(s) and s[i + 1].isdigit():
+                continue  # decimal point, not a sentence end
+            j = i + 1
+            while j < len(s) and s[j] == " ":
+                j += 1
+            if j >= len(s) or s[j].isupper() or s[j] in "([\"'":
+                return i + 1
+    return None
+
+
+def _enum_runs(text: str) -> list[list[re.Match]]:
+    """Group the ``(k)`` enumeration markers into runs, each a maximal strictly
+    ascending ``1,2,3,…`` sequence. Markers that don't extend the current run (a stray
+    ``(3)`` in prose) are ignored and stay as literal text. Runs of length one aren't
+    lists and are discarded."""
+    runs: list[list[re.Match]] = []
+    cur: list[re.Match] = []
+    expect = 0
+    for m in _SUMMARY_ENUM.finditer(text):
+        v = int(m.group(1))
+        if v == 1:
+            if len(cur) >= 2:
+                runs.append(cur)
+            cur, expect = [m], 2
+        elif cur and v == expect:
+            cur.append(m)
             expect += 1
-    if len(marks) < 2:
-        return f'<p class="motif-text">{esc}</p>'
-    items = [esc[end:(marks[i + 1][0] if i + 1 < len(marks) else len(esc))].strip()
-             for i, (start, end) in enumerate(marks)]
-    lis = "".join(f"<li>{it}</li>" for it in items)
-    preamble = esc[:marks[0][0]].strip()
-    head = f'<p class="motif-text">{preamble}</p>' if preamble else ""
-    return f'{head}<ol class="motif-text motif-summary-list">{lis}</ol>'
+    if len(cur) >= 2:
+        runs.append(cur)
+    return runs
+
+
+def _comma_style(text: str, run: list[re.Match]) -> bool:
+    """True when a run's items are comma-joined fragments of a single sentence (no
+    sentence terminator between markers), as opposed to items that are whole
+    sentences. Only comma-style runs have their last item split from trailing prose —
+    a period-style item may legitimately span several sentences."""
+    return all(_first_sentence_end(text[run[i].end():run[i + 1].start()]) is None
+               for i in range(len(run) - 1))
+
+
+def _summary_blocks(text: str) -> list[tuple[str, object]] | None:
+    """Parse a raw ATU summary into an ordered list of blocks — ``("p", prose)`` and
+    ``("ol", [items])`` — around its ``(1)…(N)`` enumeration runs. Returns ``None`` when
+    there is no run to list. The ``(k)`` markers become the list numbering; every
+    other character is preserved in exactly one block."""
+    runs = _enum_runs(text)
+    if not runs:
+        return None
+    blocks: list[tuple[str, object]] = []
+    pre = text[:runs[0][0].start()].strip()
+    if pre:
+        blocks.append(("p", pre))
+    for ri, run in enumerate(runs):
+        next_start = runs[ri + 1][0].start() if ri + 1 < len(runs) else len(text)
+        comma = len(run) >= 2 and _comma_style(text, run)
+        items: list[str] = []
+        tail = ""
+        for mi, mk in enumerate(run):
+            last = mi + 1 == len(run)
+            chunk = text[mk.end():(next_start if last else run[mi + 1].start())]
+            if last and comma:
+                cut = _first_sentence_end(chunk)
+                if cut is not None:
+                    items.append(chunk[:cut].strip())
+                    tail = chunk[cut:].strip()
+                    continue
+            items.append(chunk.strip())
+        blocks.append(("ol", items))
+        if tail:
+            blocks.append(("p", tail))
+    return blocks

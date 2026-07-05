@@ -64,13 +64,23 @@ are turned into links — but only for ids that actually exist in the index (a
 missing one stays plain text).
 
 Uther also lists a tale's variant **forms inline as `(1)…(N)`** (175 types, e.g.
-"exists chiefly in four different forms: (1)… (2)…"). `_summary_blocks` renders a
-leading strictly-sequential `1..K` run as an `<ol>` (the preamble stays a
-paragraph before it), **losing nothing**: the `(k)` markers just become the list
-numbering and each item keeps all its text — motif links and any per-form
-`(Previously Type X)` provenance included. Lone or non-sequential `(k)` (e.g. a
-stray `(7)`) stay inline as text; the run is 100 % sequential across all 175, so
-there are no false lists.
+"exists chiefly in four different forms: (1)… (2)…"). `_summary_blocks` parses the
+raw summary into blocks — `("p", prose)` and `("ol", items)` — around its
+enumeration runs, and `_atu_summary_html` linkifies and assembles each block,
+**losing nothing**: the `(k)` markers just become the list numbering and each item
+keeps all its text — motif links and any per-form `(Previously Type X)` provenance
+included. Lone or non-sequential `(k)` (e.g. a stray `(7)`) stay inline as text, so
+there are no false lists. Two structural cases are handled beyond a single run:
+
+- **Several runs in one summary** — each restarts at `(1)` and becomes its own
+  `<ol>`, with the prose between runs kept in place (type 910A has three runs:
+  precepts `1..10`, misfortunes `1..10`, resolutions `1..8`).
+- **Trailing text after a list** — when the items are comma-joined fragments of a
+  single sentence (type 460A: "(1) a wolf…, (2) a tree…, … (6) a river…"), the
+  final item is split at the sentence end and the prose that follows ("God answers
+  the questions…") is emitted as a paragraph after the `<ol>` rather than swallowed
+  into the last item. Period-joined items (whole sentences, e.g. type 672) may span
+  several sentences, so they are kept whole.
 
 ---
 
