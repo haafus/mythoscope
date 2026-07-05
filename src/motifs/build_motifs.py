@@ -56,17 +56,18 @@ def build_motifs(*, force: bool = False) -> None:
     enrichment: dict[str, dict] = {}
     logger.info("=== Building the motif database: 3 indexes (Berezkin, TMI, ATU) + cross-walk ===")
 
-    # --- mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
-    #     traditions) — credential-gated; a no-op skips the enrichment. ---
-    mm = enrichment["mapsofmyths"] = mapsofmyths.refresh(force=force)
-
     # --- [1/3] Berezkin (areal catalogue; folds in the mapsofmyths enrichment) ---
     berezkin_motifs: list[dict] = []
+    mm: dict = {}
     bz_cfg = config.get("berezkin", {})
     if bz_cfg.get("enabled", True):
         home = bz_cfg.get("homepage", "areasofmyths.com")
         logger.info("[1/5] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
                     home, bz_cfg.get("index_page", "index page"))
+        # mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
+        # traditions) — part of building the Berezkin index, so downloaded under
+        # this step; credential-gated, a no-op skips the enrichment.
+        mm = enrichment["mapsofmyths"] = mapsofmyths.refresh(force=force)
         berezkin_data = berezkin.build(bz_cfg, force=force)
         save_json(store.index_path("berezkin"), berezkin_data)
         berezkin_motifs = berezkin_data["motifs"]
