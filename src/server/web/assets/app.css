@@ -18,6 +18,7 @@
     --accent-strong: #1b4fd1;
     --muted: #6c757d;
     --muted-soft: #9299a1;
+    --error: #a33b35;   /* one red for every failed-to-load / error placeholder */
 
     --content-max: 1680px;
     --page-gutter: 20px;
@@ -637,7 +638,7 @@ body.has-main-navbar {
 }
 
 .error-state {
-    color: #a33b35;
+    color: var(--error);
 }
 
 /* ==========================================================================
@@ -770,7 +771,7 @@ body.has-main-navbar {
     place-items: center;
     height: 100%;
     padding: 24px;
-    color: #9a3412;
+    color: var(--error);
     text-align: center;
     font-size: 14px;
 }
@@ -1089,7 +1090,7 @@ body.has-main-navbar {
 }
 
 .analysis-page .info-error {
-    color: #d32f2f;
+    color: var(--error);
 }
 
 .analysis-page .search-summary {
@@ -1174,7 +1175,7 @@ body.has-main-navbar {
 }
 
 .analysis-page .chunk-text-empty {
-    color: #9a3412;
+    color: var(--error);
     font-style: italic;
 }
 
@@ -1214,7 +1215,7 @@ body.has-main-navbar {
 
 .graph-info-empty {
     color: var(--muted);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .graph-info-panel table { width: 100%; border-collapse: collapse; margin-top: 6px; }
