@@ -1304,8 +1304,9 @@ function renderDetail(d) {
         if ((links.defining || []).length) {
             body += linkSection(links.defining.length > 1 ? "Defining motifs" : "Defining motif", links.defining);
         }
-        // summary_html is pre-escaped on the server with motif/type links injected.
-        if (d.summary_html) body += section("Summary", `<p class="motif-text">${d.summary_html}</p>`);
+        // summary_html is pre-escaped on the server with motif/type links injected
+        // and already block-wrapped (a <p>, or a preamble + <ol> for "(1)…(N)" lists).
+        if (d.summary_html) body += section("Summary", d.summary_html);
         else if (d.summary) body += section("Summary", `<p class="motif-text">${escapeHtml(d.summary)}</p>`);
         body += atuProse("Notes", d.remarks, false);
         if ((links.parent || []).length) body += linkSection("Base type", links.parent);

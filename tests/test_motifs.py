@@ -614,7 +614,20 @@ class TestAtuRegions:
                             lambda idx: {"B261": {}} if idx == "tmi" else {})
         out3 = svc._atu_summary_html("the judgements [B261ff]")
         # the motif-only bracket is unwrapped; base motif links, 'ff' stays as text
-        assert 'data-id="B261"' in out3 and "[" not in out3 and out3.endswith("ff")
+        assert 'data-id="B261"' in out3 and "[" not in out3 and out3.endswith("ff</p>")
+
+    def test_summary_blocks_wraps_enumeration_as_ordered_list(self):
+        # A "(1)…(N)" run becomes preamble + <ol>; the markers turn into the list
+        # numbering and every bit of item text (incl. apparatus) is kept.
+        out = svc._summary_blocks("Exists in forms: (1) first form. (2) second one. "
+                                  "(3) third (Previously Type 9*.)")
+        assert "<ol" in out and out.count("<li>") == 3
+        assert '<p class="motif-text">Exists in forms:</p>' in out
+        assert "<li>first form.</li>" in out and "(Previously Type 9*.)" in out
+        assert "(1)" not in out and "(3)" not in out          # markers → numbering
+        # a lone / non-sequential marker is NOT a list — stays inline as text
+        plain = svc._summary_blocks("On the (7) th day only.")
+        assert "<ol" not in plain and "(7)" in plain and plain.startswith('<p class="motif-text">')
 
     def test_clean_tmi_ref(self):
         assert svc._clean_tmi_ref("*A2211.1") == "A2211.1"

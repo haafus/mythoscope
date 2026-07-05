@@ -1187,6 +1187,8 @@ def _reasoned_parallels(index: str, motif_id: str) -> list[dict]:
 _SUMMARY_MOTIF = re.compile(r"\b[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*")
 _SUMMARY_TYPE = re.compile(
     r"\b(Types?\s+)(\d+[A-Za-z*]*(?:(?:\s*,\s*|\s+and\s+|\s*&\s*)\d+[A-Za-z*]*)*)")
+# An inline "(k)" enumeration marker (Uther lists a tale's forms as "(1)… (2)…").
+_SUMMARY_ENUM = re.compile(r"\((\d{1,2})\)")
 
 # A bracketed motif reference like `[S31, L55]` or `[J758.1, cf. J341.1]`. Uther
 # wraps motif codes in square brackets, but since we render them as links the
@@ -1236,4 +1238,24 @@ def _atu_summary_html(text: str) -> str:
             lambda mm: _inline_link("atu", mm.group(0)) if mm.group(0) in atu else mm.group(0),
             m.group(2)),
         esc)
-    return esc
+    return _summary_blocks(esc)
+
+
+def _summary_blocks(esc: str) -> str:
+    """Turn a leading ``(1)…(N)`` enumeration into an ``<ol>`` (the preamble stays a
+    paragraph before it); otherwise a single paragraph. Nothing is dropped — the
+    ``(k)`` markers just become the list numbering, and each item keeps all its
+    text (motif links, any ``(Previously Type X)`` provenance, etc.)."""
+    marks, expect = [], 1
+    for m in _SUMMARY_ENUM.finditer(esc):
+        if int(m.group(1)) == expect:  # only the leading strictly-sequential run
+            marks.append((m.start(), m.end()))
+            expect += 1
+    if len(marks) < 2:
+        return f'<p class="motif-text">{esc}</p>'
+    items = [esc[end:(marks[i + 1][0] if i + 1 < len(marks) else len(esc))].strip()
+             for i, (start, end) in enumerate(marks)]
+    lis = "".join(f"<li>{it}</li>" for it in items)
+    preamble = esc[:marks[0][0]].strip()
+    head = f'<p class="motif-text">{preamble}</p>' if preamble else ""
+    return f'{head}<ol class="motif-text motif-summary-list">{lis}</ol>'

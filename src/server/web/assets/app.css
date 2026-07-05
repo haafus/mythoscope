@@ -1724,6 +1724,11 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-inferred-via { flex: none; font-size: 10px; font-weight: 600; color: #7a95a0; cursor: help; }
 .motif-inferred:hover .motif-inferred-via { color: #dcecef; }
 
+/* An ATU summary's "(1)…(N)" forms rendered as an ordered list. */
+.motif-summary-list { margin: 6px 0 0; padding-left: 22px; }
+.motif-summary-list li { margin-bottom: 6px; }
+.motif-summary-list li:last-child { margin-bottom: 0; }
+
 /* Broad TMI category rows in the list, shown bold. */
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 

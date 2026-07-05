@@ -63,6 +63,15 @@ escaping the prose, `[B261]`-style TMI motif tokens and `Type N` ATU references
 are turned into links — but only for ids that actually exist in the index (a
 missing one stays plain text).
 
+Uther also lists a tale's variant **forms inline as `(1)…(N)`** (175 types, e.g.
+"exists chiefly in four different forms: (1)… (2)…"). `_summary_blocks` renders a
+leading strictly-sequential `1..K` run as an `<ol>` (the preamble stays a
+paragraph before it), **losing nothing**: the `(k)` markers just become the list
+numbering and each item keeps all its text — motif links and any per-form
+`(Previously Type X)` provenance included. Lone or non-sequential `(k)` (e.g. a
+stray `(7)`) stay inline as text; the run is 100 % sequential across all 175, so
+there are no false lists.
+
 ---
 
 ## 3. Composition
