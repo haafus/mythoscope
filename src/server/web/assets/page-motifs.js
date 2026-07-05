@@ -1281,10 +1281,9 @@ function renderDetail(d) {
             body += section("Source", `<a class="motif-source-link" href="${escapeHtml(d.source_url)}" target="_blank" rel="noopener">${escapeHtml(d.source_url)} <span class="ext-arrow">↗</span></a>`);
         }
     } else if (d.index === "tmi") {
-        // Hierarchy tree first, then all the motif's own information, and the raw
-        // source `notes` verbatim at the very end.
-        body = renderTmiTree(d);
-        body += head;
+        // The motif's own information first, then the raw source `notes`, and the
+        // filter + hierarchy tree at the very bottom.
+        body = head;
         if (d.duplicate) {
             body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
         }
@@ -1298,6 +1297,7 @@ function renderDetail(d) {
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
+        body += renderTmiTree(d);   // filter + hierarchy tree at the bottom
     } else if (d.index === "atu") {
         // The pre-2004 Uther name rides under the title as a muted subtitle.
         const sub = d.former_name
