@@ -7,6 +7,7 @@ Run from repo root:  python mockups/06-per-index-biclusters/build_data.py
 """
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -15,8 +16,42 @@ from scipy import sparse
 from sklearn.cluster import SpectralCoclustering
 from sklearn.feature_extraction.text import TfidfTransformer
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _geo import SUBREGION, gaz_coord  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent / "data.js"
+
+
+def jitter(label):
+    h = abs(hash(label))
+    return ((h % 1000) / 1000 - 0.5) * 6, ((h // 1000 % 1000) / 1000 - 0.5) * 4
+
+
+def coord_resolver(index):
+    """label -> (lon, lat) or None, per index."""
+    if index == "brz":
+        bz = load("berezkin.json")
+        name2sub = {}
+        for v in bz["traditions"].values():
+            ap = v.get("areal_path") or []
+            if len(ap) >= 2:
+                name2sub[canon(v.get("name") or "")] = ap[1][1].upper()
+        def r(label):
+            sub = name2sub.get(label)
+            c = SUBREGION.get(sub) if sub else None
+            if c:
+                dx, dy = jitter(label)
+                return [round(c[0] + dx, 1), round(c[1] + dy, 1)]
+            return None
+        return r
+    def r(label):
+        c = gaz_coord(label)
+        if c:
+            dx, dy = jitter(label)
+            return [round(c[0] + dx, 1), round(c[1] + dy, 1)]
+        return None
+    return r
 
 # per-index tuning: (K clusters, MIN_DF, MAX_DF_FRAC, MIN_CULT-per-motif)
 CFG = {
@@ -101,12 +136,24 @@ def bicluster(index):
         clusters.append({
             "traditions": sorted(cnames, key=lambda c: -df[c])[:50],
             "n_trad": len(cnames), "n_motif": len(mrows),
+            "_all": sorted(cnames, key=lambda c: -df[c]),
             "motifs": [{"c": motifs[m][0], "n": motifs[m][1],
                         "t": sorted([c for c in motifs[m][2] if c in cnames],
                                     key=lambda c: -df.get(c, 0))[:5]} for m in mem[:80]],
         })
     clusters.sort(key=lambda c: -c["n_motif"])
-    return {"n_motifs": len(kept), "n_traditions": len(cvocab), "clusters": clusters}
+
+    # map points: each cluster's traditions placed by coordinate, coloured by cluster
+    resolve = coord_resolver(index)
+    points, placed = [], 0
+    for k, c in enumerate(clusters):
+        for label in c.pop("_all"):
+            xy = resolve(label)
+            if xy:
+                points.append({"t": label, "x": xy[0], "y": xy[1], "k": k})
+                placed += 1
+    return {"n_motifs": len(kept), "n_traditions": len(cvocab),
+            "clusters": clusters, "points": points, "placed": placed}
 
 
 def main():

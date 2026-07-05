@@ -9,6 +9,7 @@ Run from repo root:  python mockups/05-tradition-motif-mapping/build_data.py
 """
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -17,9 +18,17 @@ from scipy import sparse
 from sklearn.cluster import SpectralCoclustering
 from sklearn.feature_extraction.text import TfidfTransformer
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from _geo import SUBREGION, gaz_coord  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent / "data.js"
 K, MIN_DF, MIN_CULT, MAX_DF_FRAC = 16, 25, 2, 0.33
+
+
+def jitter(label):
+    h = abs(hash(label))
+    return ((h % 1000) / 1000 - 0.5) * 6, ((h // 1000 % 1000) / 1000 - 0.5) * 4
 
 
 def load(n):
@@ -102,7 +111,7 @@ def main():
         mem_sorted = sorted(mem, key=score, reverse=True)
         by = Counter(motifs[m][0] for m in mem)
         clusters.append({
-            "traditions": cul_sorted[:60],
+            "traditions": cul_sorted[:60], "_all": cul_sorted,
             "n_trad": len(cul), "n_motif": len(mem),
             "by_index": dict(by),
             "motifs": [{"x": motifs[m][0], "c": motifs[m][1], "n": motifs[m][2],
@@ -112,11 +121,29 @@ def main():
         })
     clusters.sort(key=lambda c: -c["n_motif"])
 
-    # tradition lookup: for each kept tradition, its cluster + top distinctive motifs
+    # map points: place each cluster's traditions (Berezkin subregion, else gazetteer)
+    bz = load("berezkin.json")
+    name2sub = {canon(v.get("name") or ""): (v["areal_path"][1][1].upper())
+                for v in bz["traditions"].values() if len(v.get("areal_path") or []) >= 2}
+
+    def coord(label):
+        c = SUBREGION.get(name2sub.get(label)) or gaz_coord(label)
+        if c:
+            dx, dy = jitter(label)
+            return [round(c[0] + dx, 1), round(c[1] + dy, 1)]
+        return None
+
+    points = []
+    for k, c in enumerate(clusters):
+        for lab in c.pop("_all"):
+            xy = coord(lab)
+            if xy:
+                points.append({"t": lab, "x": xy[0], "y": xy[1], "k": k})
+
     data = {
         "n_motifs_total": len(kept_ids), "n_traditions": len(cvocab),
         "by_index_total": dict(Counter(motifs[m][0] for m in kept_ids)),
-        "clusters": clusters,
+        "clusters": clusters, "points": points, "placed": len(points),
     }
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")
     print(f"motifs(kept)={len(kept_ids)} traditions(kept)={len(cvocab)} clusters={len(clusters)}")

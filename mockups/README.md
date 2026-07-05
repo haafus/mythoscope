@@ -74,6 +74,13 @@ across indexes: some are ATU tale-type blocks spanning European peoples, some Be
 areal ethnic groups (Amazonia, NW-coast North America, Turkic), some TMI literary
 traditions — the source composition is shown as a colour bar on each.
 
+Both #05 and #06 also plot the clustered traditions on a **world map**, coloured by
+cluster (click a cluster to highlight its traditions; click a dot to open its
+cluster). There are no coordinates in the source data, so `_geo.py` resolves each
+tradition to an approximate centroid — Berezkin traditions via their areal subregion
+(nearly all placed), TMI/ATU labels via a small country/people gazetteer (the common
+labels; the long tail is dropped, and coverage is shown on the map).
+
 ### 06 · Per-index tradition → motif biclusters
 Same biclustering as #05, but run **separately for each catalogue** — Berezkin only,
 Thompson only, ATU only — with a tab switcher, so you can compare the cultural
