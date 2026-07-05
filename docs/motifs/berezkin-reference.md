@@ -167,9 +167,17 @@ All in `berezkin.py`.
   id-shaped (`the last episode`). This recovered ~16 live cross-walk edges and
   removed ~93 dangling ones (106 → 13). The 13 that remain are genuine ATU types
   absent from our Trilogy source — shown grey, not guessed.
+- **TMI-ref cleaning (`_clean_tmi_refs`).** The mapsofmyths `tmi` field is free
+  text, so its Thompson ids arrive with `†`/`*` markers, a trailing dot or `+`
+  joins (`*A1115`, `A736.2.`, `†A2219.2.`, `D1565.1+E30.1`). Each is normalised to
+  a canonical id (star/dagger/dot stripped, `+`-combos split), non-id junk dropped.
+  This dropped ~93 dangling refs (111 → 18) and cleaned the record; the 18 that
+  remain are genuine Thompson motifs absent from the Trilogy `tmi.csv`.
 - **See-also.** Berezkin's own cross-references live in the **definition** as
-  `см. (мотив) X`; `_attach_see_also` reads them and keeps the ids that resolve to
-  a real motif (~286 motifs). The title never yields a see-also.
+  `см. (мотив) X`; `_attach_see_also` reads them (from the Russian text, before the
+  English swap) and keeps only ids that resolve to a real Berezkin motif — so a
+  Thompson equivalence code in the definition never leaks in as a see-also. The
+  title never yields a see-also.
 - **Homoglyph repair.** The source occasionally types a latin letter inside a
   Cyrillic word (`Cупруг` for `Супруг`); a latin glyph adjacent to Cyrillic is
   swapped for its Cyrillic twin.

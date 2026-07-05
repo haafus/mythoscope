@@ -307,6 +307,24 @@ def _dedup(items) -> list[str]:
 _ATU_ID_SHAPE = re.compile(r"^\d{1,4}[A-Z]{0,3}\d{0,2}\*{0,3}$")
 
 
+_TMI_ID_SHAPE = re.compile(r"^[A-Z]\d[A-Za-z0-9.]*$")
+
+
+def _clean_tmi_refs(refs) -> list[str]:
+    """Normalise Thompson (TMI) motif ids from the free-text mapsofmyths ``tmi``
+    field: strip ``†``/``*`` markers and a trailing dot, split ``+``-joined
+    combinations (``D1565.1+E30.1``), and keep only id-shaped tokens (``*A1115`` ->
+    ``A1115``, ``A736.2.`` -> ``A736.2``). Junk and stray notation are dropped."""
+    out: list[str] = []
+    for ref in refs or []:
+        s = str(ref).strip().lstrip("†*").strip()
+        for part in re.split(r"\+", s):
+            p = part.strip().lstrip("†*").strip().rstrip(".").strip()
+            if _TMI_ID_SHAPE.match(p) and p not in out:
+                out.append(p)
+    return out
+
+
 def _clean_atu_refs(refs) -> list[str]:
     out: list[str] = []
     for ref in refs or []:
@@ -446,7 +464,7 @@ def _attach_nodes(motifs: list[dict]) -> None:
             motif["motif_group"] = nd["group"]
             motif["motif_group_num"] = nd.get("group_num", "")
         if nd.get("tmi"):
-            motif["tmi_refs"] = _split_refs(nd["tmi"])
+            motif["tmi_refs"] = _clean_tmi_refs(_split_refs(nd["tmi"]))
             n_tmi += 1
         if nd.get("atu"):  # union with the title-parsed refs, order-preserving + cleaned
             motif["atu_refs"] = _clean_atu_refs(list(motif.get("atu_refs", [])) + _split_refs(nd["atu"]))

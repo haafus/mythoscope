@@ -362,6 +362,8 @@ def _parse_atu_combos(rows: list[dict]) -> dict[str, list[str]]:
     for row in rows:
         atu_id = _clean(row.get("atu_id"))
         combo = _clean(row.get("combos") or row.get("combo"))
+        # a stray space inside a type id ("130 B" -> "130B") leaves it un-linkable
+        combo = re.sub(r"(?<=\d) +(?=[A-Za-z]\b)", "", combo)
         if atu_id and combo:
             combos.setdefault(atu_id, set()).add(combo)
     return {k: sorted(v) for k, v in combos.items()}

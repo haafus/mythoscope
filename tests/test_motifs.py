@@ -63,6 +63,16 @@ class TestBerezkinEntry:
         assert clean(["the last episode"]) == []             # pure junk dropped
         assert clean(["825", "(825)"]) == ["825"]            # dedup after cleaning
 
+    def test_clean_tmi_refs_normalises_and_drops_junk(self):
+        clean = berezkin._clean_tmi_refs
+        assert clean(["*A1115"]) == ["A1115"]                 # strip star prefix
+        assert clean(["A736.2."]) == ["A736.2"]               # strip trailing dot
+        assert clean(["†A2219.2."]) == ["A2219.2"]       # strip dagger + dot
+        assert clean(["* A1195"]) == ["A1195"]                # star + space
+        assert clean(["D1565.1+E30.1"]) == ["D1565.1", "E30.1"]  # split "+" combo
+        assert clean(["A812"]) == ["A812"]                    # a clean id is untouched
+        assert clean(["the note"]) == []                      # non-id junk dropped
+
     def test_see_also_from_definition(self):
         # Berezkin's own cross-refs live in the definition ("см. мотив X"); only ids
         # that resolve to a real motif (and not the motif itself) are kept.
@@ -187,7 +197,7 @@ class TestMapsofmythsEnrichment:
         m = motifs[0]
         assert m["motif_type"] == "Cosmology and etiology"
         assert m["motif_group_num"] == "01"
-        assert m["tmi_refs"] == ["*A720.1"]
+        assert m["tmi_refs"] == ["A720.1"]           # cleaned: the "*" prefix stripped
         assert m["atu_refs"] == ["565"]              # merged, de-duplicated
         assert m["traditions"] == ["6.2.3.1", "26.1.1.1"]
 
