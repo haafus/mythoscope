@@ -277,7 +277,9 @@ def _log_summary(counts: dict, links: dict, par_counts: dict) -> None:
     inferred_total = inf["at"] + inf["ba"] + inf["bt"]
     lex_a = sum(par_counts.get(f"{k}_A", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
     lex_b = sum(par_counts.get(f"{k}_B", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
+    lex_near = sum(par_counts.get(f"{k}_near", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
     triangles = par_counts.get("triangles", 0)
+    sem = store.load_semantic_parallels().get("counts", {})
     reasoned_pairs = {frozenset((a, b))
                       for g in reasoned_parallels.GROUPS
                       for a, b in itertools.combinations(g["members"], 2) if a[0] != b[0]}
@@ -292,5 +294,10 @@ def _log_summary(counts: dict, links: dict, par_counts: dict) -> None:
     logger.info("  hypothesis / suggestion layers (NOT confirmed, shown apart on the page):")
     logger.info("      reasoned parallels (curated) : %d groups / %d pairs",
                 len(reasoned_parallels.GROUPS), len(reasoned_pairs))
-    logger.info("      lexical parallels (heuristic): %d tier-A + %d tier-B, %d three-way",
-                lex_a, lex_b, triangles)
+    logger.info("      lexical parallels (heuristic): %d tier-A (%d near-identical) + %d tier-B, %d three-way",
+                lex_a, lex_near, lex_b, triangles)
+    if sem:
+        logger.info("      semantic parallels (BGE-M3)  : %d pairs (%d new beyond lexical) [precomputed]",
+                    sem.get("pairs", 0), sem.get("novel_only", 0))
+    else:
+        logger.info("      semantic parallels (BGE-M3)  : none — run scripts/build_semantic_parallels.py")

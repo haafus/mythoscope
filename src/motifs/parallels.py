@@ -131,12 +131,16 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
                     continue
                 if linked(a_side, b_side, A[i]["id"], B[j]["id"]):
                     continue
-                sh = len(content_tokens(A[i]["title"]) & content_tokens(B[j]["title"]))
+                ta, tb = content_tokens(A[i]["title"]), content_tokens(B[j]["title"])
+                sh = len(ta & tb)
                 # tier A = ≥2 shared content words (or a very strong doc match);
                 # tier B = single-word title echoes (lower confidence, kept too).
                 tier = "A" if (sh >= 2 or ds >= 0.75) else "B"
+                # near-identical = titles share almost all their words (the page's
+                # ">=0.6 title Jaccard" band, a tier-A subset) — near-certain equivalences.
+                near = tier == "A" and sh / (len(ta | tb) or 1) >= 0.6
                 out[(A[i]["id"], B[j]["id"])] = {
-                    "a": A[i]["id"], "b": B[j]["id"], "tier": tier,
+                    "a": A[i]["id"], "b": B[j]["id"], "tier": tier, "near": near,
                     "title_sim": round(ts, 3), "doc_sim": round(ds, 3), "shared": sh,
                     "score": round(max(ts, ds), 3)}
         return out
@@ -202,6 +206,7 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
     for (a, b), cs in pairs.items():
         counts[f"{a}_{b}_A"] = tier_count(cs, "A")
         counts[f"{a}_{b}_B"] = tier_count(cs, "B")
+        counts[f"{a}_{b}_near"] = sum(1 for c in cs.values() if c.get("near"))
 
     return {
         "params": {"title_gate": T_TITLE, "doc_high": T_DOC_HIGH, "cap_per_motif": MAX_PER_MOTIF},
