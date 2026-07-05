@@ -44,12 +44,35 @@ vectoriser in `build_data.py` (sentence-transformers / an embeddings API) for
 production quality. All 11k vectors + the projection matrix ship quantised (int8) so
 the query is embedded and searched entirely in the browser.
 
+### 04 · Semantic parallels on BGE-M3 (vs LSA)
+The same corpus as #02, embedded with **real transformer vectors** (`BAAI/bge-m3`,
+1024-d) beside the LSA stand-in, for a direct A/B. Pick a motif → its nearest
+neighbours in the other two indexes, computed by **BGE-M3 (left) and LSA (right)**
+side by side, each tagged known/novel. The header shows **recall@k of the confirmed
+cross-walk links** for both methods, so the quality gap is a number, not a hunch.
+
+Neighbours are precomputed in `build_data.py` (a browser can't run BGE-M3, and there
+is no live free-text mode here for the same reason). BGE embeddings are cached to
+`bge_emb.npy`; first build downloads the ~2 GB model and encodes ~11k docs (slow on
+CPU, minutes-to-an-hour; instant thereafter).
+
 ### 03 · Geographically co-occurring motif clusters
 Uses Berezkin's areal data: every motif carries a set of ethnic **traditions**, each
 placed in an areal hierarchy (17 English macro-regions). Motifs are clustered by the
 shape of their areal footprint (subregion, rarity-weighted k-means). Browse clusters
 (dominant regions shown as a colour bar) or pick a motif to see what **co-distributes**
 with it (tradition-set Jaccard) — motifs that "travel together" culturally.
+
+### 05 · Tradition → motif mapping (data-driven, no fixed grid)
+Instead of a fixed macro-area grid, this takes the **culture/tradition labels the
+sources actually list** on each motif across all three indexes — TMI `cultures`
+(parsed from the notes + bibliographic citations), ATU attestation `people`, Berezkin
+`traditions` — builds a motif × tradition incidence matrix, and **co-clusters** it
+(`SpectralCoclustering`). Each bicluster pairs a *group of traditions* with the *group
+of motifs* characteristic of them ("for these peoples, these myths"). Clusters emerge
+across indexes: some are ATU tale-type blocks spanning European peoples, some Berezkin
+areal ethnic groups (Amazonia, NW-coast North America, Turkic), some TMI literary
+traditions — the source composition is shown as a colour bar on each.
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded

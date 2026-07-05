@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semantic parallels · BGE-M3 vs LSA — mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+         color: #212529; background: #faf9f5; }
+  header { padding: 12px 20px; border-bottom: 1px solid #dee2e6; background: #fff; }
+  header h1 { font-size: 15px; margin: 0 0 2px; }
+  header .sub { color: #6c757d; font-size: 12px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 16px 20px 60px; }
+  .evalbar { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; background: #fff;
+             border: 1px solid #dee2e6; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12.5px; }
+  .evalbar b { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6c757d; }
+  .ev { display: flex; gap: 6px; align-items: baseline; }
+  .ev .m { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bge { color: #6d3bb8; } .lsa { color: #8a7a20; }
+  input.q { width: 100%; padding: 11px 13px; font-size: 14px; border: 1px solid #dee2e6; border-radius: 8px; }
+  #ac { position: absolute; z-index: 20; background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+        max-height: 320px; overflow-y: auto; box-shadow: 0 6px 18px rgba(0,0,0,.09); display: none; }
+  #ac div { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+  #ac div:hover { background: #eef4fb; }
+  .seed { border: 1px solid #dee2e6; border-radius: 10px; padding: 12px 14px; background: #fff; margin: 14px 0 6px; }
+  .grp { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; font-weight: 700; margin: 20px 2px 8px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .col > .ch { font-size: 12px; font-weight: 700; margin-bottom: 6px; padding: 3px 8px; border-radius: 6px; display: inline-block; }
+  .col.bgecol > .ch { background: #efe6fb; color: #6d3bb8; }
+  .col.lsacol > .ch { background: #f4efd6; color: #8a7a20; }
+  .card { border: 1px solid #dee2e6; border-radius: 9px; padding: 9px 11px; background: #fff; margin-bottom: 8px; }
+  .sim { float: right; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; vertical-align: middle; }
+  .code { font-weight: 700; } .name { font-weight: 600; font-size: 13px; }
+  .snip { color: #6c757d; font-size: 11.5px; margin-top: 3px; line-height: 1.4; }
+  .tag { font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 5px; margin-left: 5px; }
+  .tag.known { background: #e5efe6; color: #2f6a3b; } .tag.novel { background: #f6ecdc; color: #8a5a12; }
+  .hint { color: #9299a1; font-size: 12px; margin: 8px 2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Semantic parallels · BGE-M3 vs LSA</h1>
+  <div class="sub">Real transformer embeddings (BAAI/bge-m3, 1024-d) beside the TF-IDF+SVD stand-in, on the same 11k-motif corpus · nearest neighbours precomputed (a browser can't run BGE-M3)</div>
+</header>
+<div class="wrap">
+  <div class="evalbar" id="evalbar"></div>
+  <div style="position:relative"><input class="q" id="q" placeholder="Search a motif by id or name…" autocomplete="off"><div id="ac"></div></div>
+  <div class="hint">Pick a motif — its nearest neighbours in the other two indexes, computed by BGE-M3 (left) and LSA (right), each tagged ✓ known link or ✨ novel.</div>
+  <div id="out"></div>
+</div>
+<script src="data.js"></script>
+<script>
+const IDX = { tmi:{c:"#2a9d8f",l:"TMI"}, atu:{c:"#3a6ea5",l:"ATU"}, brz:{c:"#b5651d",l:"Berezkin"} };
+const D = DATA, N = D.n;
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// eval header
+const E = D.eval;
+document.getElementById("evalbar").innerHTML =
+  `<b>recall of confirmed links (${E.n_pairs} pairs)</b>`+
+  ["@1","@5","@10","@20"].map(k=>`<span class="ev">${k}: `+
+    `<span class="m bge">${(E.bge[k]*100).toFixed(0)}%</span><span style="color:#c9ced6">/</span>`+
+    `<span class="m lsa">${(E.lsa[k]*100).toFixed(0)}%</span></span>`).join("")+
+  `<span style="color:#9299a1">(<span class="bge">BGE</span> / <span class="lsa">LSA</span>)</span>`;
+
+function card(entry, seedI){
+  const [j, sim, kn] = entry, d=D.docs[j], k=IDX[d.x];
+  const tag = kn ? `<span class="tag known">✓ known</span>` : `<span class="tag novel">✨ novel</span>`;
+  return `<div class="card"><span class="sim" style="color:${k.c}">${(sim*100).toFixed(0)}%</span>`+
+    `<span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
+    `<span class="code" style="color:${k.c}">${esc(d.c)}</span>${tag}<div class="name">${esc(d.n)}</div>`+
+    `<div class="snip">${esc(d.s)}</div></div>`;
+}
+function seedCard(i){ const d=D.docs[i],k=IDX[d.x];
+  return `<div class="seed"><span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
+    `<span class="code" style="color:${k.c}">${esc(d.c)}</span> <span class="name">${esc(d.n)}</span>`+
+    `<div class="snip">${esc(d.s)}</div></div>`; }
+
+function show(i){
+  let html = seedCard(i);
+  const bge=D.bge[i], lsa=D.lsa[i];
+  for (const x of ["tmi","atu","brz"]){
+    if (x===D.docs[i].x) continue;
+    const nb=(bge[x]||[]).filter(e=>!e[2]).length, nl=(lsa[x]||[]).filter(e=>!e[2]).length;
+    html += `<div class="grp">Nearest ${IDX[x].l}</div><div class="cols">`+
+      `<div class="col bgecol"><span class="ch">BGE-M3 · ${nb} novel</span>${(bge[x]||[]).map(e=>card(e,i)).join("")}</div>`+
+      `<div class="col lsacol"><span class="ch">LSA · ${nl} novel</span>${(lsa[x]||[]).map(e=>card(e,i)).join("")}</div></div>`;
+  }
+  document.getElementById("out").innerHTML = html;
+}
+
+const q=document.getElementById("q"), ac=document.getElementById("ac");
+q.addEventListener("input",()=>{ const s=q.value.trim().toLowerCase(); if(s.length<2){ac.style.display="none";return;}
+  const hits=[]; for(let i=0;i<N;i++){ const d=D.docs[i];
+    if(d.c.toLowerCase().startsWith(s)||d.n.toLowerCase().includes(s)){hits.push(i); if(hits.length>=40)break;} }
+  ac.innerHTML=hits.map(i=>{const d=D.docs[i],k=IDX[d.x];
+    return `<div data-i="${i}"><span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> <b style="color:${k.c}">${esc(d.c)}</b> — ${esc(d.n)}</div>`;}).join("")||`<div style="color:#9299a1">no match</div>`;
+  const r=q.getBoundingClientRect(); ac.style.left=r.left+"px"; ac.style.top=(r.bottom+4)+"px"; ac.style.width=r.width+"px"; ac.style.display="block"; });
+ac.addEventListener("click",e=>{const d=e.target.closest("[data-i]"); if(!d)return; ac.style.display="none"; q.value=D.docs[+d.dataset.i].c+" — "+D.docs[+d.dataset.i].n; show(+d.dataset.i);});
+document.addEventListener("click",e=>{ if(!ac.contains(e.target)&&e.target!==q) ac.style.display="none"; });
+</script>
+</body>
+</html>

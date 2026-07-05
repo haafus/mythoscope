@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tradition → motif mapping — mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+         color: #212529; background: #faf9f5; }
+  header { padding: 12px 20px; border-bottom: 1px solid #dee2e6; background: #fff; }
+  header h1 { font-size: 15px; margin: 0 0 2px; }
+  header .sub { color: #6c757d; font-size: 12px; }
+  .grid { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 16px; max-width: 1240px;
+          margin: 0 auto; padding: 16px 20px 60px; align-items: start; }
+  .panel { border: 1px solid #dee2e6; border-radius: 10px; background: #fff; }
+  .panel h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d;
+              margin: 0; padding: 11px 13px; border-bottom: 1px solid #f1f3f5; }
+  .clu { padding: 10px 13px; border-bottom: 1px solid #f1f3f5; cursor: pointer; }
+  .clu:hover { background: #f7f9fb; } .clu.active { background: #eef4fb; }
+  .clu .lab { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+  .comp { display: flex; gap: 3px; margin-top: 6px; height: 7px; border-radius: 4px; overflow: hidden; background: #eef1f4; }
+  .comp > i { height: 100%; }
+  .clu .cnt { color: #9299a1; font-size: 11px; }
+  #search { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px; }
+  #ac { position: absolute; z-index: 20; background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+        max-height: 320px; overflow-y: auto; box-shadow: 0 6px 18px rgba(0,0,0,.09); display: none; }
+  #ac div { padding: 6px 11px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+  #ac div:hover { background: #eef4fb; }
+  .sec { padding: 13px 15px; border-bottom: 1px solid #f1f3f5; }
+  .sec .h { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; font-weight: 700; margin-bottom: 8px; }
+  .chip { display: inline-block; font-size: 12px; padding: 3px 9px; margin: 0 5px 5px 0; border-radius: 13px;
+          background: #eef2f6; color: #37414b; }
+  .chip.hi { background: #fff2d6; color: #7a5600; font-weight: 600; }
+  .m { padding: 8px 15px; border-bottom: 1px solid #f6f8fa; }
+  .m .code { font-weight: 700; } .m .nm { font-size: 13px; }
+  .m .tt { color: #9299a1; font-size: 11px; margin-top: 1px; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; vertical-align: middle; }
+  .idxrow { display: flex; gap: 14px; font-size: 12px; color: #495057; margin-top: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Tradition → motif mapping (data-driven, no fixed grid)</h1>
+  <div class="sub" id="sub"></div>
+</header>
+<div class="grid">
+  <div>
+    <div style="position:relative"><input id="search" placeholder="Find a tradition / people…" autocomplete="off"><div id="ac"></div></div>
+    <div class="panel"><h2>Co-clusters · tradition group ↔ motif group</h2><div id="clusters"></div></div>
+  </div>
+  <div class="panel" id="right"><h2 id="rtitle">Select a co-cluster</h2>
+    <div id="rbody" style="padding:14px;color:#9299a1;font-size:13px">Each co-cluster pairs a group of traditions the sources actually name with the group of motifs characteristic of them — biclustered from the motif × tradition table across TMI, ATU and Berezkin (traditions come from each motif's own culture list, incl. the bibliographic citations).</div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script>
+const D = DATA;
+const IDX = { tmi:{c:"#2a9d8f",l:"TMI"}, atu:{c:"#3a6ea5",l:"ATU"}, brz:{c:"#b5651d",l:"Berezkin"} };
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("sub").textContent =
+  `${D.n_motifs_total.toLocaleString()} motifs · ${D.n_traditions.toLocaleString()} traditions · ${D.clusters.length} co-clusters · sources: TMI ${D.by_index_total.tmi||0}, ATU ${D.by_index_total.atu||0}, Berezkin ${D.by_index_total.brz||0}`;
+
+function comp(by){ const tot=(by.tmi||0)+(by.atu||0)+(by.brz||0)||1;
+  return `<div class="comp">`+["tmi","atu","brz"].map(x=>by[x]?`<i style="width:${100*by[x]/tot}%;background:${IDX[x].c}" title="${IDX[x].l} ${by[x]}"></i>`:"").join("")+`</div>`; }
+function label(c){ return c.traditions.slice(0,3).map(esc).join(" · "); }
+
+document.getElementById("clusters").innerHTML = D.clusters.map((c,i)=>
+  `<div class="clu" data-c="${i}"><span class="cnt" style="float:right">${c.n_motif}</span>`+
+  `<div class="lab">${label(c)}</div>${comp(c.by_index)}</div>`).join("");
+
+const rtitle=document.getElementById("rtitle"), rbody=document.getElementById("rbody"), right=document.getElementById("right");
+function show(i){
+  document.querySelectorAll(".clu").forEach(e=>e.classList.toggle("active",+e.dataset.c===i));
+  const c=D.clusters[i]; rtitle.textContent=`Co-cluster — ${c.n_trad} traditions, ${c.n_motif} motifs`;
+  rbody.style.padding="0"; rbody.style.color="";
+  const trads = c.traditions.map((t,j)=>`<span class="chip${j<6?' hi':''}">${esc(t)}</span>`).join("");
+  const idxrow = ["tmi","atu","brz"].filter(x=>c.by_index[x]).map(x=>
+    `<span><span class="badge" style="background:${IDX[x].c}22;color:${IDX[x].c}">${IDX[x].l}</span> ${c.by_index[x]}</span>`).join("");
+  const mot = c.motifs.map(m=>{const k=IDX[m.x];
+    return `<div class="m"><span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
+      `<span class="code" style="color:${k.c}">${esc(m.c)}</span> <span class="nm">${esc(m.n)}</span>`+
+      (m.t&&m.t.length?`<div class="tt">${m.t.map(esc).join(" · ")}</div>`:"")+`</div>`;}).join("");
+  rbody.innerHTML =
+    `<div class="sec"><div class="h">Characteristic traditions (${c.n_trad})</div>${trads}<div class="idxrow">${idxrow}</div></div>`+
+    `<div class="sec" style="border:0;padding-bottom:2px"><div class="h">Characteristic motifs — top ${c.motifs.length} of ${c.n_motif}</div></div>${mot}`;
+}
+document.getElementById("clusters").addEventListener("click",e=>{const c=e.target.closest("[data-c]"); if(c)show(+c.dataset.c);});
+
+// search a tradition -> jump to the cluster that owns it
+const clusterOf = new Map();
+D.clusters.forEach((c,i)=>c.traditions.forEach(t=>{ if(!clusterOf.has(t.toLowerCase())) clusterOf.set(t.toLowerCase(), i); }));
+const allTrad = [...new Set(D.clusters.flatMap(c=>c.traditions))].sort();
+const search=document.getElementById("search"), ac=document.getElementById("ac");
+search.addEventListener("input",()=>{ const s=search.value.trim().toLowerCase(); if(s.length<2){ac.style.display="none";return;}
+  const hits=allTrad.filter(t=>t.toLowerCase().includes(s)).slice(0,40);
+  ac.innerHTML=hits.map(t=>`<div data-t="${esc(t)}">${esc(t)} <span style="color:#9299a1">→ cluster ${clusterOf.get(t.toLowerCase())+1}</span></div>`).join("")||`<div style="color:#9299a1">no match</div>`;
+  const r=search.getBoundingClientRect(); ac.style.left=r.left+"px"; ac.style.top=(r.bottom+4)+"px"; ac.style.width=r.width+"px"; ac.style.display="block"; });
+ac.addEventListener("click",e=>{const d=e.target.closest("[data-t]"); if(!d)return; ac.style.display="none"; search.value=d.dataset.t;
+  show(clusterOf.get(d.dataset.t.toLowerCase())); });
+document.addEventListener("click",e=>{ if(!ac.contains(e.target)&&e.target!==search) ac.style.display="none"; });
+
+show(0);
+</script>
+</body>
+</html>
