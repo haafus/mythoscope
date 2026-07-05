@@ -26,7 +26,7 @@ Thompson Motif-Index (**TMI**), Aarne–Thompson–Uther (**ATU**) и ареал
 | 1.2 | **ATU ↔ TMI — defining** | `defining_motifs` (мотив у метки типа) | `atu_to_tmi_defining` / `tmi_to_atu_defining` | 62 типа → 74 мотива | ATU: «Defining motif(s)»; TMI: «Defines ATU tale type(s)» |
 | 1.3 | **ATU ↔ TMI — note (inline)** | `atu_inline` — цитаты `Type N` в заметках TMI, разрешённые к ATU | `tmi_to_atu_note` / `atu_to_tmi_note` | 2 602 мотива → 802 типа | TMI: «Related ATU tale types» (⇒); ATU: «Referenced by TMI motifs (via notes)» |
 | 1.4 | **ATU ↔ TMI — summary (inline)** | коды TMI, названные в тексте `summary` типа | `atu_to_tmi_summary` / `tmi_to_atu_summary` | 1 665 типов → 3 603 мотива | ATU: ссылки внутри «Summary»; TMI: «Named in ATU summaries» |
-| 2 | **Берёзкин ↔ ATU** | `atu_refs` из титулов Берёзкина (+ alias-rescue, +чистка) | `berezkin_to_atu` / `atu_to_berezkin` | 509 мотивов → 485 типов | Берёзкин: «Related ATU tale types»; ATU: «Referenced by Berezkin motifs» |
+| 2 | **Берёзкин ↔ ATU** | `atu_refs` из титулов Берёзкина (+ alias-rescue, +чистка) | `berezkin_to_atu` / `atu_to_berezkin` | 509 мотивов → 485 типов (472 существуют) | Берёзкин: «Related ATU tale types»; ATU: «Referenced by Berezkin motifs» |
 | 3 | **Берёзкин ↔ TMI (прямой)** | `tmi_refs` (кураторские Thompson-id из mapsofmyths, парсим+чистим) | `berezkin_to_tmi` / `tmi_to_berezkin` | 193 мотива → 212 мотивов | Берёзкин: прямые TMI-ссылки; TMI: «Referenced by Berezkin motifs» |
 
 `linked_tmi_count` (= 3 765) — сколько мотивов TMI, достижимых из типа через
