@@ -26,7 +26,7 @@ Thompson Motif-Index (**TMI**), Aarne–Thompson–Uther (**ATU**) и ареал
 | 1.2 | **ATU ↔ TMI — defining** | `defining_motifs` (мотив у метки типа) | `atu_to_tmi_defining` / `tmi_to_atu_defining` | 62 типа → 74 мотива | ATU: «Defining motif(s)»; TMI: «Defines ATU tale type(s)» |
 | 1.3 | **ATU ↔ TMI — note (inline)** | `atu_inline` — цитаты `Type N` в заметках TMI, разрешённые к ATU | `tmi_to_atu_note` / `atu_to_tmi_note` | 2 602 мотива → 802 типа | TMI: «Related ATU tale types» (⇒); ATU: «Referenced by TMI motifs (via notes)» |
 | 1.4 | **ATU ↔ TMI — summary (inline)** | коды TMI, названные в тексте `summary` типа | `atu_to_tmi_summary` / `tmi_to_atu_summary` | 1 665 типов → 3 603 мотива | ATU: ссылки внутри «Summary»; TMI: «Named in ATU summaries» |
-| 2 | **Берёзкин ↔ ATU** | `atu_refs` из титулов Берёзкина (+ alias-rescue) | `berezkin_to_atu` / `atu_to_berezkin` | 510 мотивов → 567 типов | Берёзкин: «Related ATU tale types»; ATU: «Referenced by Berezkin motifs» |
+| 2 | **Берёзкин ↔ ATU** | `atu_refs` из титулов Берёзкина (+ alias-rescue, +чистка) | `berezkin_to_atu` / `atu_to_berezkin` | 509 мотивов → 485 типов | Берёзкин: «Related ATU tale types»; ATU: «Referenced by Berezkin motifs» |
 | 3 | **Берёзкин ↔ TMI (прямой)** | `tmi_refs` (кураторские Thompson-id из mapsofmyths, парсим+чистим) | `berezkin_to_tmi` / `tmi_to_berezkin` | 193 мотива → 212 мотивов | Берёзкин: прямые TMI-ссылки; TMI: «Referenced by Berezkin motifs» |
 
 `linked_tmi_count` (= 3 765) — сколько мотивов TMI, достижимых из типа через
@@ -128,7 +128,7 @@ mapsofmyths приходит в скобках, с хвостовыми «(ко�
 разбить `+`-склейки), оставляя только существующие в индексе TMI коды. Не готовый
 словарь, а разбираемый текст; показывается первой на странице мотива Берёзкина.
 
-- Охват: **~230** рёбер Берёзкин↔TMI (после чистки; было ~206). Полный учёт по
+- Охват: **230** рёбер Берёзкин↔TMI (после чистки; было ~206). Полный учёт по
   всем подходам — в [`crosswalk/link-accounting.md`](crosswalk/link-accounting.md).
 - Присутствует **только** при отработавшем обогащении mapsofmyths (под кредами);
   без него шаг деградирует и карта пуста.
@@ -282,11 +282,11 @@ linked_tmi_count      int — мотивов TMI, достижимых из ти
 
 | Замыкание | Через | Даёт | Сейчас |
 |---|---|---|---|
-| **A** | мотив Берёзкина (концорданс в обе стороны) | ATU ↔ TMI | ~20 рёбер |
-| **D** | TMI-мотив в ≤2 типах | Берёзкин ↔ ATU | ~42 ребра |
-| **C** | defining-мотив типа ATU (~1:1) | Берёзкин ↔ TMI | ~18 рёбер |
+| **A** | мотив Берёзкина (концорданс в обе стороны) | ATU ↔ TMI | 12 рёбер |
+| **D** | TMI-мотив в ≤2 типах | Берёзкин ↔ ATU | 42 ребра |
+| **C** | defining-мотив типа ATU (~1:1) | Берёзкин ↔ TMI | 18 рёбер |
 
-Итого **~80** выведенных рёбер. Пример: `ATU 1137 (Blinded Ogre) ↔ TMI K603 (Escape
+Итого **72** выведенных ребра. Пример: `ATU 1137 (Blinded Ogre) ↔ TMI K603 (Escape
 Under Ram's Belly)` — выведено через мотив Берёзкина `K64`; и вся семья `Man in the
 Moon` (`BZ A32x ↔ ATU 751E*`) через мотивы TMI `A751.x`. Замыкание через **тип** или
 фан-аутный мотив (constituent) намеренно **не** делается (+2 777 / +69 слабых рёбер).
