@@ -249,7 +249,7 @@ def _edge_set(fwd: dict) -> set:
 
 
 def _log_summary(counts: dict, links: dict, par_counts: dict) -> None:
-    """Final ``итог``: confirmed cross-index links per pair (union of every
+    """Final summary: confirmed cross-index links per pair (union of every
     relation, deduplicated) and the grand total, plus the suggestion layers."""
     at = (_edge_set(links.get("atu_to_tmi")) | _edge_set(links.get("atu_to_tmi_defining"))
           | _edge_set(links.get("atu_to_tmi_note")) | _edge_set(links.get("atu_to_tmi_summary")))
@@ -282,7 +282,7 @@ def _log_summary(counts: dict, links: dict, par_counts: dict) -> None:
                       for g in reasoned_parallels.GROUPS
                       for a, b in itertools.combinations(g["members"], 2) if a[0] != b[0]}
 
-    logger.info("=== ИТОГ: motif database built ===")
+    logger.info("=== SUMMARY: motif database built ===")
     logger.info("  indexes: %s", ", ".join(f"{k}={v}" for k, v in counts.items()) or "none")
     logger.info("  confirmed cross-index links (union per pair, incl. %d inferred):", inferred_total)
     logger.info("      ATU <-> TMI      %5d  (+%d inferred)", len(at), inf["at"])
