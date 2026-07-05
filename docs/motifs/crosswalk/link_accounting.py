@@ -75,6 +75,7 @@ def main():
         return s
     lex_a = par_edges(lambda e: e.get("tier") == "A")
     lex_b = par_edges(lambda e: e.get("tier") == "B")
+    triangles = par.get("counts", {}).get("triangles", 0)
     reasoned = set()
     for g in rp.GROUPS:
         for (ia, ma), (ib, mb) in itertools.combinations(g["members"], 2):
@@ -143,13 +144,17 @@ def main():
 - **Ещё применяли:** конкорданс **AaTh→ATU** (Wikidata) — резолвит номера AaTh в
   заметках TMI (внутри шага 3); нормализация имён/мойбейка — рёбер не даёт.
 
-## Слои-подсказки (кандидаты, не подтверждённые связи)
+## Слои-гипотез / подсказок (НЕ подтверждённые связи, отдельными слоями на странице)
 
-| Подход | Пар |
+| Слой | Объём |
 |---|---|
-| эвристика лексическая, tier A | {len(lex_a)} |
-| эвристика лексическая, tier B | {len(lex_b)} |
-| рассуждениями (reasoned parallels) | {len(reasoned)} |
+| рассуждениями (reasoned parallels, кураторские) | {len(rp.GROUPS)} групп / {len(reasoned)} пар |
+| лексические, tier A (near-identical + possible) | {len(lex_a)} пар |
+| лексические, tier B (weaker) | {len(lex_b)} пар |
+| из tier A — трёхсторонние (triangles) | {triangles} |
+
+Порядок надёжности на странице мотива (сверху вниз): подтверждённые прямые →
+inferred (замыкание) → reasoning → near-identical → possible → weaker.
 
 ## Итоги по трём парам: было → стало
 
