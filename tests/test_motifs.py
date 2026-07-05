@@ -738,6 +738,25 @@ class TestTrilogy:
         assert out["cultures"]["Greek"] == ["Fox 4"]
         assert out["cultures"]["India"] == ["*Thompson-Balys"]
 
+    def test_notes_no_definition_when_starts_with_culture_less_citation(self):
+        # A citation without a culture label heads the bibliography, so _BIB_START
+        # skips it — but a bibliographic locus (No. 7, roman+page, ff., a bare
+        # 'Author Work Page') marks it as a citation, not a definition (J21.22,
+        # A941.1, A139.7). The whole note is then bibliography.
+        out = tmi_notes.parse_notes("Nouvelles de Sens No. 7; Irish myth: *Cross; Italian: Rotunda.")
+        assert out["definition"] == ""
+        assert "Nouvelles de Sens No. 7" in out["references"]
+        assert out["cultures"]["Irish myth"] == ["*Cross"]
+        assert tmi_notes.parse_notes(
+            "Malten Jahrb. d. kaiserlichen deutschen archäologischen Inst. XXIX 185.")["definition"] == ""
+        assert tmi_notes.parse_notes("Gaster Thespis 211, 389, 397.")["definition"] == ""
+        # A real prose definition with an incidental number, or a trailing citation,
+        # is NOT mistaken for a citation — the prose stays.
+        assert tmi_notes.parse_notes(
+            "At 300 miles all women miscarry.")["definition"] == "At 300 miles all women miscarry."
+        assert tmi_notes.parse_notes(
+            "Braved the wolf, who tore his legs. Dh III 46.")["definition"].startswith("Braved the wolf")
+
     def test_notes_culture_label_with_parenthetical(self):
         # A culture label with a sub-area in parens must still be a citation, not
         # leak into the definition (A1.2 'Grandfather As Creator').

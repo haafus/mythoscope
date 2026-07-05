@@ -86,13 +86,52 @@ def _is_prose(head: str) -> bool:
     return not head.lower().startswith(("for a ", "for the ", "see "))  # meta-biblio
 
 
+# A bibliographic locus token — a page/volume/No./year/footnote marker that only
+# ever sits inside a citation, never in a prose definition. Used to spot a
+# *culture-less* citation (one with no 'Label:' prefix, so _BIB_START skips it and
+# the splitter would otherwise read it as the definition — e.g. J21.22's leading
+# "Nouvelles de Sens No. 7").
+_LOCUS = re.compile(
+    r"\bNos?\.\s*\*?\d|\bpp?\.\s*\d|\b[IVXLC]{2,}\s+\d|\b\d+\s*ff\b\.?"
+    r"|\(\s*\d{4}\s*\)|\bvol\.?\s*\d|\bibid\b|\bn\.\s*\d", re.I)
+# English function/verb/pronoun words: present in a real (English) definition,
+# absent from a name-only or foreign-language ("Jahrb. d. kaiserlichen deutschen
+# …") citation. Used only to tell a prose clause apart from a citation, so a
+# trailing citation glued to a real definition is not mistaken for a leading one.
+_PROSE_WORD = re.compile(
+    r"\b(?:the|an?|and|or|but|of|in|on|to|with|for|as|at|from|is|are|was|were|be|been|being"
+    r"|has|have|had|do|does|did|he|she|it|they|we|him|her|them|his|its|their|our|who|whom"
+    r"|which|that|this|these|those|when|where|why|how|what|while|because|so|then|comes?|came"
+    r"|becomes?|became|makes?|made|gives?|gave|given|falls?|fell|creates?|created|goes?|went"
+    r"|sees?|saw|takes?|took|tells?|told|says?|said|kills?|killed|brings?|brought|finds?|found"
+    r"|lives?|lived|puts?|sends?|sent|wants?|tries|cannot|will|would|must|should)\b", re.I)
+_CAP_INIT = re.compile(r"^[\"'(*.,;\-\s]*[A-ZÀ-ÖØ-Þ]")
+
+
+def _is_leading_citation(head: str) -> bool:
+    """True if the candidate definition is really a culture-less citation that opens
+    the bibliography (so it should be dropped, not shown as a definition). A citation
+    either carries a bibliographic locus with no prose clause before it, or is a short
+    ``Author Work Page`` run whose numbers no lowercase word precedes."""
+    m = _LOCUS.search(head)
+    if m:
+        region = head[: m.start()]           # what sits before the first locus
+        if len(region.split()) <= 12 and not _PROSE_WORD.search(region):
+            return True                      # citation leads the field (no prose ahead of it)
+    if _CAP_INIT.match(head) and len(head.split()) <= 9 and not _PROSE_WORD.search(head):
+        d = re.search(r"\d", head)
+        if d and not re.search(r"\b[a-zà-öø-ÿ]{2,}\b", head[: d.start()]):
+            return True                      # 'Gaster Thespis 211, 389, 397.'
+    return False
+
+
 def _split_definition(notes: str) -> tuple[str, str]:
     m = _BIB_START.search(notes)
-    if not m:
-        head = notes.strip(" -")
-        return (head, "") if _is_prose(head) else ("", notes)
-    head = notes[: m.start()].strip(" -")
-    return (head, notes[m.start():]) if _is_prose(head) else ("", notes)
+    head = (notes[: m.start()] if m else notes).strip(" -")
+    biblio = notes[m.start():] if m else ""
+    if _is_prose(head) and not _is_leading_citation(head):
+        return head, biblio
+    return "", notes
 
 
 # The connector between two †refs of one open 'Cf. †A, †B and †C / †A--†D' list:
