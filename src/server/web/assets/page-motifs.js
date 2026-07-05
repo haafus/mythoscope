@@ -1197,6 +1197,30 @@ function citeList(items) {
 // Attestations grouped by macro-region: each region name is printed once, then
 // its cultures — one culture per row (label + its citation link, any further
 // links stacked under the first). Cultures with no region come last, un-headed.
+// The derived / hypothesis cross-link sections, in descending confidence:
+// inferred (transitive closure) → reasoned (curated) → the three lexical bands.
+// Placed after the direct cross-links of each index, before the distribution.
+function crossLinkExtras(d) {
+    let out = inferredSection(d.inferred);
+    out += reasonedParallelsSection(d.reasoned_parallels);
+    const pAll = d.parallels || [];
+    const strong = pAll.filter((p) => p.tier !== "B");
+    // "Near-identical" = titles share (almost) all their content words, not merely
+    // a high TF-IDF cosine — so generic sun/moon-style artefacts stay in "Possible".
+    const isNear = (p) => _titleJaccard(d.name, p.name) >= 0.6;
+    out += parallelsSection(strong.filter(isNear),
+        "Near-identical parallels",
+        "Essentially the same motif under a different label — the titles share almost all their words. Near-certain equivalences, strong candidates for an actual cross-walk link.",
+        " motif-parallel-near");
+    out += parallelsSection(strong.filter((p) => !isNear(p)),
+        "Possible parallels",
+        "Look-alike motifs in other indexes with no recorded cross-walk link — heuristic text matches to review, not confirmed links.");
+    out += parallelsSection(pAll.filter((p) => p.tier === "B"),
+        "Weaker parallels",
+        "Lower-confidence matches sharing a single title word — more noise, review needed.");
+    return out;
+}
+
 function renderDetail(d) {
     const links = d.links || {};
     const head = `
@@ -1244,6 +1268,7 @@ function renderDetail(d) {
         if ((links.tmi || []).length) body += linkSection(`Related Thompson motifs (${links.tmi.length})`, links.tmi);
         if ((links.atu || []).length) body += linkSection(`Related ATU tale types (${links.atu.length})`, links.atu);
         if ((links.see_also || []).length) body += linkSection(`Related motifs (${links.see_also.length})`, links.see_also);
+        body += crossLinkExtras(d);
         // Macro-areas: hide the whole section when the motif has none.
         if ((d.areas || []).length) {
             const areas = d.areas.map((a) =>
@@ -1269,6 +1294,7 @@ function renderDetail(d) {
         if ((links.atu_defines || []).length) body += linkSection(`Defines ATU tale type${links.atu_defines.length > 1 ? "s" : ""} (${links.atu_defines.length})`, links.atu_defines);
         if ((links.atu_summary_refs || []).length) body += linkSection(`Named in ATU summaries (${links.atu_summary_refs.length})`, links.atu_summary_refs);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+        body += crossLinkExtras(d);
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
@@ -1293,12 +1319,6 @@ function renderDetail(d) {
         if (d.division) cls.push(withRange(d.division, d.division_range));
         if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
-        // Old ATU numbers this type was renumbered from / absorbed (Uther). Shown as
-        // plain badges — they are pre-2004 numbers, not live types to link to.
-        if ((d.former_ids || []).length) {
-            const badges = d.former_ids.map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("");
-            body += section("Earlier ATU numbers", `<div class="motif-oldids">${badges}</div>`);
-        }
         // The TMI motif(s) Uther names as defining the type — distinct from the
         // constituent motifs (atu_seq) further down.
         if ((links.defining || []).length) {
@@ -1315,38 +1335,23 @@ function renderDetail(d) {
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.tmi_via_notes || []).length) body += linkSection(`Referenced by TMI motifs (via notes) (${links.tmi_via_notes.length})`, links.tmi_via_notes);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+        body += crossLinkExtras(d);
         body += atuAttestations(d.attestations_grouped, d.attestations);
         body += atuProse("References", d.references, true);
-        // Also-known-as / Wikipedia / Ashliman as up-to-three equal columns at
-        // the foot; absent ones drop out and the rest fill the row. The first
-        // column stacks names then catalogue concordances ("Also catalogued as").
-        const namesCol = atuNames(d.names) + atuConcordances(d.concordances);
+        // Also-known-as / Wikipedia / Ashliman as up-to-three equal columns at the
+        // foot; absent ones drop out and the rest fill the row. The first column
+        // stacks names, the pre-2004 "Earlier ATU numbers" (plain badges, not live
+        // types), then catalogue concordances ("Also catalogued as").
+        const earlierAtu = (d.former_ids || []).length
+            ? section("Earlier ATU numbers",
+                `<div class="motif-oldids">${d.former_ids.map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("")}</div>`)
+            : "";
+        const namesCol = atuNames(d.names) + earlierAtu + atuConcordances(d.concordances);
         const endCols = [namesCol, atuWikipedia(d.wikipedia), atuTales(d.tales)].filter(Boolean);
         if (endCols.length) {
             body += `<div class="motif-cols">${endCols.map((c) => `<div class="motif-col">${c}</div>`).join("")}</div>`;
         }
     }
-
-    // Cross-index parallels at the foot: first the curated conceptual groups
-    // (reasoning), then the heuristic lexical look-alikes in three confidence
-    // bands — near-identical titles, then the rest of tier A, then tier B.
-    body += reasonedParallelsSection(d.reasoned_parallels);
-    body += inferredSection(d.inferred);
-    const pAll = d.parallels || [];
-    const strong = pAll.filter((p) => p.tier !== "B");
-    // "Near-identical" = titles share (almost) all their content words, not merely
-    // a high TF-IDF cosine — so generic sun/moon-style artefacts stay in "Possible".
-    const isNear = (p) => _titleJaccard(d.name, p.name) >= 0.6;
-    body += parallelsSection(strong.filter(isNear),
-        "Near-identical parallels",
-        "Essentially the same motif under a different label — the titles share almost all their words. Near-certain equivalences, strong candidates for an actual cross-walk link.",
-        " motif-parallel-near");
-    body += parallelsSection(strong.filter((p) => !isNear(p)),
-        "Possible parallels",
-        "Look-alike motifs in other indexes with no recorded cross-walk link — heuristic text matches to review, not confirmed links.");
-    body += parallelsSection(pAll.filter((p) => p.tier === "B"),
-        "Weaker parallels",
-        "Lower-confidence matches sharing a single title word — more noise, review needed.");
 
     // An old ATU number the user navigated to is served as the current type.
     const redirect = d.redirected_from
