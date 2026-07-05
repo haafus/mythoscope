@@ -14,7 +14,9 @@ Thompson Motif-Index (**TMI**), Aarne–Thompson–Uther (**ATU**) и ареал
 [`berezkin-reference.md`](berezkin-reference.md).
 
 Числа ниже — на текущей сборке (**46 230** мотивов TMI, **2 242** типа ATU,
-**3 488** мотивов Берёзкина).
+**3 488** мотивов Берёзкина). Итоговый **учёт всех связей по подходам** (сколько
+установил каждый, сколько новых, было→стало по трём парам) —
+[`crosswalk/link-accounting.md`](crosswalk/link-accounting.md).
 
 ## Обзорная таблица
 
@@ -25,7 +27,7 @@ Thompson Motif-Index (**TMI**), Aarne–Thompson–Uther (**ATU**) и ареал
 | 1.3 | **ATU ↔ TMI — note (inline)** | `atu_inline` — цитаты `Type N` в заметках TMI, разрешённые к ATU | `tmi_to_atu_note` / `atu_to_tmi_note` | 2 602 мотива → 802 типа | TMI: «Related ATU tale types» (⇒); ATU: «Referenced by TMI motifs (via notes)» |
 | 1.4 | **ATU ↔ TMI — summary (inline)** | коды TMI, названные в тексте `summary` типа | `atu_to_tmi_summary` / `tmi_to_atu_summary` | 1 665 типов → 3 603 мотива | ATU: ссылки внутри «Summary»; TMI: «Named in ATU summaries» |
 | 2 | **Берёзкин ↔ ATU** | `atu_refs` из титулов Берёзкина (+ alias-rescue) | `berezkin_to_atu` / `atu_to_berezkin` | 510 мотивов → 567 типов | Берёзкин: «Related ATU tale types»; ATU: «Referenced by Berezkin motifs» |
-| 3 | **Берёзкин ↔ TMI (прямой)** | `tmi_refs` (кураторские Thompson-id из mapsofmyths) | `berezkin_to_tmi` / `tmi_to_berezkin` | 189 мотивов → 206 мотивов | Берёзкин: прямые TMI-ссылки; TMI: «Referenced by Berezkin motifs» |
+| 3 | **Берёзкин ↔ TMI (прямой)** | `tmi_refs` (кураторские Thompson-id из mapsofmyths, парсим+чистим) | `berezkin_to_tmi` / `tmi_to_berezkin` | 193 мотива → 212 мотивов | Берёзкин: прямые TMI-ссылки; TMI: «Referenced by Berezkin motifs» |
 
 `linked_tmi_count` (= 3 765) — сколько мотивов TMI, достижимых из типа через
 `atu_seq`, реально существуют в нашем индексе (отдельный сводный счётчик в
@@ -120,13 +122,14 @@ mapsofmyths приходит в скобках, с хвостовыми «(ко�
 
 ## 3. Берёзкин ↔ TMI (прямой) — `tmi_refs`
 
-Единственный **прямой** мост Берёзкин↔TMI: кураторские Thompson-id, которые
-mapsofmyths вешает на каждый мотив (`tmi_refs`). Чистятся от `*` и хвостовой `.`,
-оставляются только существующие в индексе TMI коды. Это точная ручная конкорданс-
-таблица, показывается первой на странице мотива Берёзкина.
+Единственный **прямой** мост Берёзкин↔TMI (в отличие от косвенного через ATU):
+кураторские Thompson-id, которые mapsofmyths хранит в **free-text поле узла** —
+мы их **парсим и чистим** (`_clean_tmi_refs`: снять `†`/`*`, хвостовую `.`,
+разбить `+`-склейки), оставляя только существующие в индексе TMI коды. Не готовый
+словарь, а разбираемый текст; показывается первой на странице мотива Берёзкина.
 
-- Охват: **189** мотивов Берёзкина имеют живой TMI-код → **206** мотивов TMI в
-  инверсии `tmi_to_berezkin`.
+- Охват: **~230** рёбер Берёзкин↔TMI (после чистки; было ~206). Полный учёт по
+  всем подходам — в [`crosswalk/link-accounting.md`](crosswalk/link-accounting.md).
 - Присутствует **только** при отработавшем обогащении mapsofmyths (под кредами);
   без него шаг деградирует и карта пуста.
 - Через ATU (Берёзкин→ATU→TMI) достижимо гораздо больше пар, но они слабее

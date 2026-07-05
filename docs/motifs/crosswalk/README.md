@@ -41,6 +41,8 @@ Tier B есть ложные совпадения.
 | `reasoned_parallels.csv` | Плоский список кураторских параллелей (одна строка на участника). |
 | `reasoned_parallels_triads.csv` | Трёхсторонние группы Берёзкин↔TMI↔ATU. |
 | `build_reasoned_lists.py` | Генератор двух файлов выше из `src/motifs/reasoned_parallels.py`. |
+| `link-accounting.md` | **Учёт всех связей**: сколько установил каждый подход, сколько новых, итоги по трём парам. |
+| `link_accounting.py` | Генератор `link-accounting.md` из `crosswalk.json` / `parallels.json` / `reasoned_parallels.py`. |
 
 Колонки CSV: `tier`, id + название каждой стороны, `title_sim`, `doc_sim`,
 `shared` (число общих значимых слов в названии). Отсортировано: сначала Tier A,

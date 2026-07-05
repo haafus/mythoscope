@@ -158,8 +158,8 @@ degradation); сырой ответ кэшируется в `raw/wikidata/`.
 | ATU ↔ TMI — defining | `defining_motifs` у метки типа | `atu_to_tmi_defining` | 62 / 74 |
 | ATU ↔ TMI — note (inline) | цитаты `Type N` в заметках TMI (AaTh→ATU) | `tmi_to_atu_note` | 2 602 / 802 |
 | ATU ↔ TMI — summary (inline) | коды TMI в тексте `summary` типа | `atu_to_tmi_summary` | 1 665 / 3 603 |
-| Берёзкин ↔ ATU | ссылки на ATU в титулах (`atu_refs`, alias-resolved) | `berezkin_to_atu` | 510 / 567 |
-| Берёзкин ↔ TMI (прямо) | кураторские Thompson-id из mapsofmyths (`tmi_refs`) | `berezkin_to_tmi` | 189 / 206 |
+| Берёзкин ↔ ATU | ссылки на ATU в титулах (`atu_refs`, alias-resolved, +чистка) | `berezkin_to_atu` | 509 / 485 |
+| Берёзкин ↔ TMI (прямо) | кураторские Thompson-id из mapsofmyths (`tmi_refs`, парсим+чистим) | `berezkin_to_tmi` | 193 / 212 |
 
 Inline-ссылки `Type N` из заметок Томпсона — номера **AaTh** (заметки старше
 ATU-2004): резолвятся в прямой ATU-id, иначе через **конкорданс AaTh→ATU** из
