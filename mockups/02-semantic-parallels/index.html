@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semantic parallels — mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+         color: #212529; background: #faf9f5; }
+  header { padding: 12px 20px; border-bottom: 1px solid #dee2e6; background: #fff; }
+  header h1 { font-size: 15px; margin: 0 0 2px; }
+  header .sub { color: #6c757d; font-size: 12px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 18px 20px 60px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tab { padding: 7px 14px; font-size: 13px; font-weight: 600; border: 1px solid #dee2e6;
+         background: #fff; border-radius: 7px; cursor: pointer; color: #6c757d; }
+  .tab.active { color: #23507e; background: #e7f0fb; border-color: #b9d3ef; }
+  input.q { width: 100%; padding: 11px 13px; font-size: 14px; border: 1px solid #dee2e6; border-radius: 8px; }
+  #ac { position: absolute; z-index: 20; background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+        max-height: 320px; overflow-y: auto; box-shadow: 0 6px 18px rgba(0,0,0,.09); display: none; }
+  #ac div { padding: 7px 12px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+  #ac div:hover { background: #eef4fb; }
+  .hint { color: #9299a1; font-size: 12px; margin: 8px 2px; }
+  .seed { border: 1px solid #dee2e6; border-radius: 10px; padding: 12px 14px; background: #fff; margin: 14px 0 6px; }
+  .grp-title { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d;
+               font-weight: 700; margin: 20px 2px 8px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+  .card { border: 1px solid #dee2e6; border-radius: 10px; padding: 11px 13px; background: #fff; }
+  .badge { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 5px;
+           vertical-align: middle; }
+  .code { font-weight: 700; }
+  .name { font-weight: 600; }
+  .snip { color: #6c757d; font-size: 12px; margin-top: 5px; line-height: 1.45; }
+  .sim { float: right; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px; }
+  .tag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 6px; }
+  .tag.known { background: #e5efe6; color: #2f6a3b; }
+  .tag.novel { background: #f6ecdc; color: #8a5a12; }
+  .bar { height: 3px; border-radius: 2px; background: #eef1f4; margin-top: 8px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: #3a6ea5; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Semantic parallels across TMI · ATU · Berezkin</h1>
+  <div class="sub">LSA embeddings (TF-IDF + SVD) as an offline stand-in for transformer vectors · finds look-alikes the crosswalk may miss</div>
+</header>
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="motif">Parallels for a motif</div>
+    <div class="tab" data-tab="text">Free-text search</div>
+  </div>
+  <div style="position:relative">
+    <input class="q" id="q" placeholder="Search a motif by id or name…" autocomplete="off">
+    <div id="ac"></div>
+  </div>
+  <div class="hint" id="hint">Pick a motif — you'll get its nearest neighbours in the other two indexes, tagged ✓ known link or ✨ novel.</div>
+  <div id="out"></div>
+</div>
+<script src="data.js"></script>
+<script>
+const IDX = { tmi:{c:"#2a9d8f",l:"TMI"}, atu:{c:"#3a6ea5",l:"ATU"}, brz:{c:"#b5651d",l:"Berezkin"} };
+const D = DATA, N = D.n, DIM = D.dim;
+
+// ---- unpack int8 buffers ----
+function unb64(s){ const bin=atob(s), a=new Int8Array(bin.length); for(let i=0;i<bin.length;i++)a[i]=(bin.charCodeAt(i)<<24)>>24; return a; }
+const VQ = unb64(D.vecs), COMP = unb64(D.comp), NF = D.nfeat;
+// dequantise + renormalise each doc vector
+const VEC = new Float32Array(N*DIM);
+for (let i=0;i<N;i++){ let s=0; for(let d=0;d<DIM;d++){ const v=VQ[i*DIM+d]*D.vscale; VEC[i*DIM+d]=v; s+=v*v; }
+  s=Math.sqrt(s)||1; for(let d=0;d<DIM;d++) VEC[i*DIM+d]/=s; }
+const VOCAB = new Map(D.vocab.map((t,i)=>[t,i]));
+const STOP = new Set(D.stop);
+const KNOWN = new Set(D.pairs.map(([a,b])=>a+"|"+b));
+function known(i,j){ return KNOWN.has((i<j?i:j)+"|"+(i<j?j:i)); }
+
+function cosTo(vec){ // vec: Float32Array(DIM) unit; returns array of {i,s}
+  const out = new Array(N);
+  for (let i=0;i<N;i++){ let s=0; const off=i*DIM; for(let d=0;d<DIM;d++) s+=VEC[off+d]*vec[d]; out[i]={i,s}; }
+  return out;
+}
+function docVec(i){ const v=new Float32Array(DIM); for(let d=0;d<DIM;d++) v[d]=VEC[i*DIM+d]; return v; }
+
+// ---- free-text -> LSA vector (mirrors sklearn TF-IDF + SVD projection) ----
+function embedQuery(text){
+  const toks = (text.toLowerCase().match(/\b\w\w+\b/g)||[]).filter(t=>!STOP.has(t));
+  const grams = [];
+  for (let i=0;i<toks.length;i++){ grams.push(toks[i]); if(i+1<toks.length) grams.push(toks[i]+" "+toks[i+1]); }
+  const tf = new Map();
+  for (const g of grams){ const c=VOCAB.get(g); if(c!==undefined) tf.set(c,(tf.get(c)||0)+1); }
+  if (!tf.size) return null;
+  // tf-idf (sublinear) then l2-normalise the sparse row
+  let norm=0; const w=new Map();
+  for (const [c,n] of tf){ const v=(1+Math.log(n))*D.idf[c]; w.set(c,v); norm+=v*v; }
+  norm=Math.sqrt(norm)||1;
+  // project: qvec[d] = sum_c w[c]/norm * COMP[d][c] * cscale
+  const q=new Float32Array(DIM);
+  for (const [c,v] of w){ const wc=v/norm; for(let d=0;d<DIM;d++) q[d]+=wc*COMP[d*NF+c]*D.cscale; }
+  let s=0; for(let d=0;d<DIM;d++) s+=q[d]*q[d]; s=Math.sqrt(s)||1; for(let d=0;d<DIM;d++) q[d]/=s;
+  return q;
+}
+
+// ---- rendering ----
+const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function card(i, sim, seedI){
+  const d=D.docs[i], k=IDX[d.x];
+  const tag = seedI!=null ? (known(i,seedI)?`<span class="tag known">✓ known link</span>`:`<span class="tag novel">✨ novel</span>`) : "";
+  return `<div class="card"><span class="sim" style="color:${k.c}">${(sim*100).toFixed(0)}%</span>`+
+    `<span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
+    `<span class="code" style="color:${k.c}">${esc(d.c)}</span> ${tag}<div class="name">${esc(d.n)}</div>`+
+    `<div class="snip">${esc(d.s)}</div><div class="bar"><i style="width:${(sim*100).toFixed(0)}%;background:${k.c}"></i></div></div>`;
+}
+function seedCard(i){ const d=D.docs[i],k=IDX[d.x];
+  return `<div class="seed"><span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
+    `<span class="code" style="color:${k.c}">${esc(d.c)}</span> <span class="name">${esc(d.n)}</span>`+
+    `<div class="snip">${esc(d.s)}</div></div>`; }
+
+function showMotif(i){
+  const scored = cosTo(docVec(i));
+  let html = seedCard(i);
+  for (const x of ["tmi","atu","brz"]){
+    if (x===D.docs[i].x) continue;
+    const top = scored.filter(o=>o.i!==i && D.docs[o.i].x===x).sort((a,b)=>b.s-a.s).slice(0,6);
+    const nNovel = top.filter(o=>!known(o.i,i)).length;
+    html += `<div class="grp-title">Nearest ${IDX[x].l} — ${nNovel} novel of ${top.length}</div>`+
+      `<div class="cards">${top.map(o=>card(o.i,o.s,i)).join("")}</div>`;
+  }
+  document.getElementById("out").innerHTML = html;
+}
+function showText(qtext){
+  const q=embedQuery(qtext);
+  const out=document.getElementById("out");
+  if(!q){ out.innerHTML=`<div class="hint">No known terms in the query.</div>`; return; }
+  const top = cosTo(q).sort((a,b)=>b.s-a.s).slice(0,18);
+  out.innerHTML = `<div class="grp-title">Top matches across all indexes</div><div class="cards">${top.map(o=>card(o.i,o.s,null)).join("")}</div>`;
+}
+
+// ---- input wiring ----
+let mode="motif";
+const q=document.getElementById("q"), ac=document.getElementById("ac"), hint=document.getElementById("hint");
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active");
+  mode=t.dataset.tab; ac.style.display="none"; q.value=""; document.getElementById("out").innerHTML="";
+  q.placeholder = mode==="motif" ? "Search a motif by id or name…" : "Describe a motif, e.g. “theft of fire from the gods”…";
+  hint.textContent = mode==="motif" ? "Pick a motif — you'll get its nearest neighbours in the other two indexes, tagged ✓ known link or ✨ novel."
+    : "Type any description; ranked motifs from all three indexes by meaning, not exact words."; q.focus();
+}));
+q.addEventListener("input",()=>{
+  if (mode==="text"){ ac.style.display="none"; return; }
+  const s=q.value.trim().toLowerCase(); if(s.length<2){ac.style.display="none";return;}
+  const hits=[]; for(let i=0;i<N;i++){ const d=D.docs[i];
+    if(d.c.toLowerCase().startsWith(s)||d.n.toLowerCase().includes(s)){ hits.push(i); if(hits.length>=40)break; } }
+  ac.innerHTML=hits.map(i=>{const d=D.docs[i],k=IDX[d.x];
+    return `<div data-i="${i}"><span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> <b style="color:${k.c}">${esc(d.c)}</b> — ${esc(d.n)}</div>`;}).join("")||`<div style="color:#9299a1">no match</div>`;
+  const r=q.getBoundingClientRect(); ac.style.left=r.left+"px"; ac.style.top=(r.bottom+4)+"px"; ac.style.width=r.width+"px"; ac.style.display="block";
+});
+q.addEventListener("keydown",e=>{ if(e.key==="Enter"&&mode==="text"){ ac.style.display="none"; showText(q.value); } });
+ac.addEventListener("click",e=>{ const d=e.target.closest("[data-i]"); if(!d)return;
+  ac.style.display="none"; q.value=D.docs[+d.dataset.i].c+" — "+D.docs[+d.dataset.i].n; showMotif(+d.dataset.i); });
+document.addEventListener("click",e=>{ if(!ac.contains(e.target)&&e.target!==q) ac.style.display="none"; });
+</script>
+</body>
+</html>

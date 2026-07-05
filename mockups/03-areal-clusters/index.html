@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Areal motif clusters — mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+         color: #212529; background: #faf9f5; }
+  header { padding: 12px 20px; border-bottom: 1px solid #dee2e6; background: #fff; }
+  header h1 { font-size: 15px; margin: 0 0 2px; }
+  header .sub { color: #6c757d; font-size: 12px; }
+  .grid { display: grid; grid-template-columns: 340px minmax(0,1fr); gap: 16px; max-width: 1180px;
+          margin: 0 auto; padding: 16px 20px 60px; align-items: start; }
+  .panel { border: 1px solid #dee2e6; border-radius: 10px; background: #fff; }
+  .panel h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #6c757d;
+              margin: 0; padding: 11px 13px; border-bottom: 1px solid #f1f3f5; }
+  .clu { padding: 10px 13px; border-bottom: 1px solid #f1f3f5; cursor: pointer; }
+  .clu:hover { background: #f7f9fb; } .clu.active { background: #eef4fb; }
+  .clu .lab { font-size: 12.5px; font-weight: 600; }
+  .clu .sz { color: #9299a1; font-size: 11px; }
+  .fbar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 6px; background: #eef1f4; }
+  .fbar > i { height: 100%; }
+  #search { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 12px; }
+  #ac { position: absolute; z-index: 20; background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+        max-height: 300px; overflow-y: auto; box-shadow: 0 6px 18px rgba(0,0,0,.09); display: none; }
+  #ac div { padding: 6px 11px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+  #ac div:hover { background: #eef4fb; }
+  .m { padding: 9px 13px; border-bottom: 1px solid #f4f6f8; cursor: pointer; }
+  .m:hover { background: #f7f9fb; }
+  .m .code { font-weight: 700; color: #b5651d; }
+  .m .nm { font-size: 13px; }
+  .m .meta { color: #9299a1; font-size: 11px; }
+  .jac { float: right; font-weight: 700; font-variant-numeric: tabular-nums; color: #2f6a3b; font-size: 12px; }
+  .seedbox { padding: 12px 14px; background: #fbf7f0; border-bottom: 1px solid #efe4d3; }
+  .legend { padding: 10px 13px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .legend .row { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: #495057; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; }
+  .back { color: #3a6ea5; cursor: pointer; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Geographically co-occurring motif clusters — Berezkin areal catalogue</h1>
+  <div class="sub">3,265 motifs clustered by their areal footprint (ethnic traditions → 17 macro-regions) · pick a motif to see what co-distributes with it</div>
+</header>
+<div class="grid">
+  <div>
+    <div style="position:relative"><input id="search" placeholder="Find a motif (id or name)…" autocomplete="off"><div id="ac"></div></div>
+    <div class="panel"><h2>Areal clusters</h2><div id="clusters"></div></div>
+    <div class="panel" style="margin-top:12px"><h2>Macro-regions</h2><div class="legend" id="legend"></div></div>
+  </div>
+  <div class="panel" id="right"><h2 id="rtitle">Select a cluster or a motif</h2><div id="rbody" style="padding:14px;color:#9299a1;font-size:13px">Clusters group motifs that share a geographic/cultural distribution. Click one to list its motifs, or search a motif to see its closest co-distributed neighbours.</div></div>
+</div>
+<script src="data.js"></script>
+<script>
+const D = DATA, L1 = D.regionsL1;
+// palette for macro-regions
+const PAL = ["#3a6ea5","#2a9d8f","#b5651d","#c77dff","#e07a5f","#5b8c5a","#d4a017","#8a94a6",
+             "#3d5a80","#9b2226","#457b9d","#bc6c25","#606c38","#6d597a","#118ab2","#ef476f","#073b4c"];
+const rcol = r => PAL[L1.indexOf(r) % PAL.length];
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function footBar(foot){ // foot: array of shares over L1
+  const top = foot.map((v,i)=>[i,v]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  return `<div class="fbar">`+top.map(([i,v])=>`<i style="width:${v}%;background:${PAL[i%PAL.length]}" title="${esc(L1[i])} ${v}%"></i>`).join("")+`</div>`;
+}
+function clusterLabel(c){ return c.top.slice(0,2).map(t=>t.r).join(" · ") || "mixed"; }
+
+// clusters list
+document.getElementById("clusters").innerHTML = D.clusters.map((c,ci)=>{
+  const foot = L1.map(r=>{ const t=c.top.find(x=>x.r===r); return t?t.share:0; });
+  return `<div class="clu" data-c="${ci}"><span class="sz" style="float:right">${c.size}</span>`+
+    `<div class="lab">${esc(clusterLabel(c))}</div>${footBar(foot)}</div>`;
+}).join("");
+
+// legend
+document.getElementById("legend").innerHTML = L1.map((r,i)=>`<div class="row"><span class="sw" style="background:${PAL[i%PAL.length]}"></span>${esc(r)}</div>`).join("");
+
+const right=document.getElementById("right"), rtitle=document.getElementById("rtitle"), rbody=document.getElementById("rbody");
+
+function showCluster(ci){
+  document.querySelectorAll(".clu").forEach(e=>e.classList.toggle("active", +e.dataset.c===ci));
+  const c=D.clusters[ci];
+  rtitle.textContent = `Cluster · ${clusterLabel(c)} · ${c.size} motifs`;
+  rbody.innerHTML = c.members.map(i=>motifRow(i)).join("");
+  right.querySelector("#rbody").style.padding = "0"; right.querySelector("#rbody").style.color="";
+}
+function motifRow(i, jac){
+  const m=D.motifs[i];
+  return `<div class="m" data-i="${i}">${jac!=null?`<span class="jac">${jac}%</span>`:""}`+
+    `<span class="code">${esc(m.c)}</span> <span class="nm">${esc(m.n)}</span>`+
+    `<div class="meta">${m.nt} traditions</div>${footBar(D.l1foot[i])}</div>`;
+}
+function showMotif(i){
+  const m=D.motifs[i], nb=D.codist[i]||[];
+  rtitle.textContent = `Co-distributed with ${m.c} — ${m.n}`;
+  rbody.style.padding="0"; rbody.style.color="";
+  rbody.innerHTML = `<div class="seedbox"><span class="back" id="back">‹ back</span> &nbsp; `+
+    `<span class="code" style="color:#b5651d;font-weight:700">${esc(m.c)}</span> <b>${esc(m.n)}</b>`+
+    `<div class="meta" style="color:#9299a1;font-size:11px">${m.nt} ethnic traditions</div>${footBar(D.l1foot[i])}</div>`+
+    (nb.length ? nb.map(([j,jac])=>motifRow(j,jac)).join("")
+               : `<div style="padding:14px;color:#9299a1">No strongly co-distributed motifs.</div>`);
+  document.getElementById("back")?.addEventListener("click",()=>{ rbody.scrollTop=0; if(lastCluster!=null) showCluster(lastCluster); });
+}
+let lastCluster=null;
+document.getElementById("clusters").addEventListener("click",e=>{ const c=e.target.closest("[data-c]"); if(!c)return; lastCluster=+c.dataset.c; showCluster(lastCluster); });
+rbody.addEventListener("click",e=>{ const m=e.target.closest("[data-i]"); if(!m)return; showMotif(+m.dataset.i); });
+
+// search
+const search=document.getElementById("search"), ac=document.getElementById("ac");
+search.addEventListener("input",()=>{ const s=search.value.trim().toLowerCase(); if(s.length<2){ac.style.display="none";return;}
+  const hits=[]; for(let i=0;i<D.motifs.length;i++){ const m=D.motifs[i];
+    if(m.c.toLowerCase().startsWith(s)||m.n.toLowerCase().includes(s)){hits.push(i); if(hits.length>=40)break;} }
+  ac.innerHTML=hits.map(i=>`<div data-i="${i}"><b style="color:#b5651d">${esc(D.motifs[i].c)}</b> — ${esc(D.motifs[i].n)}</div>`).join("")||`<div style="color:#9299a1">no match</div>`;
+  const r=search.getBoundingClientRect(); ac.style.left=r.left+"px"; ac.style.top=(r.bottom+4)+"px"; ac.style.width=r.width+"px"; ac.style.display="block"; });
+ac.addEventListener("click",e=>{ const d=e.target.closest("[data-i]"); if(!d)return; ac.style.display="none"; search.value=""; showMotif(+d.dataset.i); });
+document.addEventListener("click",e=>{ if(!ac.contains(e.target)&&e.target!==search) ac.style.display="none"; });
+
+showCluster(0);
+</script>
+</body>
+</html>

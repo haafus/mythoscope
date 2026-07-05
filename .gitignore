@@ -5,6 +5,8 @@ __pycache__/
 
 # generated artifacts — reproduce via pipeline, store outside git
 outputs/
+# mockup data snapshots — regenerate with each prototype's build_data.py
+mockups/*/data.js
 
 # data formats that should not be in git
 *.npy

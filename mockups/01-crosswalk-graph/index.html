@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cross-walk graph — mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+         color: #212529; background: #faf9f5; }
+  header { padding: 12px 18px; border-bottom: 1px solid #dee2e6; background: #fff;
+           display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header h1 { font-size: 15px; margin: 0; font-weight: 700; }
+  header .sub { color: #6c757d; font-size: 12px; }
+  #search { flex: 1 1 260px; max-width: 420px; padding: 7px 10px; font-size: 13px;
+            border: 1px solid #dee2e6; border-radius: 6px; }
+  #results { position: absolute; z-index: 20; background: #fff; border: 1px solid #dee2e6;
+             border-radius: 6px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 14px rgba(0,0,0,.08);
+             display: none; min-width: 320px; }
+  #results div { padding: 6px 10px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+  #results div:hover { background: #eef4fb; }
+  #results .rid { font-weight: 700; }
+  main { position: relative; height: calc(100vh - 52px); }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  canvas.drag { cursor: grabbing; }
+  .legend { position: absolute; bottom: 14px; left: 14px; background: rgba(255,255,255,.94);
+            border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 12px; font-size: 11.5px; }
+  .legend b { display: block; margin: 6px 0 3px; color: #6c757d; font-weight: 600;
+              text-transform: uppercase; font-size: 9.5px; letter-spacing: .04em; }
+  .legend .row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .ln { width: 16px; height: 0; border-top: 3px solid; }
+  .tip { position: absolute; z-index: 30; pointer-events: none; background: #111827; color: #fff;
+         padding: 5px 9px; border-radius: 6px; font-size: 12px; max-width: 280px; display: none; }
+  .ctl { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,.94);
+         border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
+  .ctl label { display: block; margin: 3px 0; cursor: pointer; }
+  .focusinfo { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.94);
+               border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 11px; font-size: 12px; max-width: 300px; }
+  .focusinfo .fi-id { font-weight: 700; }
+  .focusinfo .fi-n { color: #374151; }
+  .focusinfo .fi-d { color: #6c757d; font-size: 11px; margin-top: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cross-walk graph</h1>
+  <span class="sub">click a node to recentre · drag to move · scroll to zoom</span>
+  <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
+</header>
+<main>
+  <canvas id="cv"></canvas>
+  <div id="results"></div>
+  <div class="tip" id="tip"></div>
+  <div class="focusinfo" id="focusinfo"></div>
+  <div class="ctl">
+    <label><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
+    <label><input type="checkbox" id="showInferred" checked> show inferred links</label>
+  </div>
+  <div class="legend" id="legend"></div>
+</main>
+<script src="data.js"></script>
+<script>
+const IDX = { tmi:{c:"#2a9d8f",label:"Thompson (TMI)"}, atu:{c:"#3a6ea5",label:"ATU type"}, brz:{c:"#b5651d",label:"Berezkin"} };
+const METH = {
+  constituent:{c:"#8a94a6",label:"constituent (atu_seq)"},
+  defining:{c:"#2a9d8f",label:"defining motif"},
+  note:{c:"#c77dff",label:"TMI note ⇒ ATU"},
+  summary:{c:"#e07a5f",label:"ATU summary ⇒ TMI"},
+  berezkin:{c:"#3d5a80",label:"Berezkin citation"},
+  inferred:{c:"#c9ced6",label:"inferred (triangle)",dash:true},
+};
+const byId = new Map(DATA.nodes.map(n => [n.id, n]));
+const adj = new Map();                       // id -> [{o, m}]
+for (const n of DATA.nodes) adj.set(n.id, []);
+for (const e of DATA.edges) { adj.get(e.s).push({o:e.t,m:e.m}); adj.get(e.t).push({o:e.s,m:e.m}); }
+const gdeg = new Map(DATA.nodes.map(n => [n.id, adj.get(n.id).length]));
+
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const tip = document.getElementById("tip");
+let DPR = Math.min(2, window.devicePixelRatio || 1);
+function resize(){ cv.width = cv.clientWidth*DPR; cv.height = cv.clientHeight*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0); }
+window.addEventListener("resize", resize); resize();
+
+// ---- view state ----
+let view = { x: cv.clientWidth/2, y: cv.clientHeight/2, k: 1 };
+let sub = { nodes: [], edges: [] };   // current rendered subgraph
+let focusId = null;
+
+function buildSub(centerId){
+  const depth2 = document.getElementById("depth2").checked;
+  const showInf = document.getElementById("showInferred").checked;
+  const keep = new Set([centerId]);
+  const ring1 = [];
+  for (const {o,m} of adj.get(centerId)||[]) { if(!showInf && m==="inferred") continue; keep.add(o); ring1.push(o); }
+  if (depth2) for (const r of ring1) for (const {o,m} of adj.get(r)||[]) { if(!showInf && m==="inferred") continue; keep.add(o); }
+  const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
+  const nodes = [...keep].map((id,i) => {
+    const a = i * 2.399963, rad = 40 + 26*Math.sqrt(i);
+    return Object.assign({}, byId.get(id),
+      { px: id===centerId?cx:cx+Math.cos(a)*rad, py: id===centerId?cy:cy+Math.sin(a)*rad, vx:0, vy:0, fixed:id===centerId });
+  });
+  const nmap = new Map(nodes.map(n=>[n.id,n]));
+  const seen = new Set(), edges = [];
+  for (const e of DATA.edges) {
+    if (!nmap.has(e.s) || !nmap.has(e.t)) continue;
+    if (!showInf && e.m==="inferred") continue;
+    const key = e.s<e.t?e.s+e.t:e.t+e.s; if (seen.has(key)) continue; seen.add(key);
+    edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m });
+  }
+  sub = { nodes, edges };
+  focusId = centerId;
+  view = { x: cv.clientWidth/2, y: cv.clientHeight/2, k: 1 };
+  const f = byId.get(centerId);
+  document.getElementById("focusinfo").innerHTML =
+    `<div class="fi-id" style="color:${IDX[f.x].c}">${f.c}</div>`+
+    `<div class="fi-n">${escapeHtml(f.n)}</div>`+
+    `<div class="fi-d">${IDX[f.x].label} · ${gdeg.get(centerId)} cross-links total · showing ${nodes.length-1}</div>`;
+  alpha = 1;
+}
+
+// ---- force sim ----
+let alpha = 1;
+function tick(){
+  const N = sub.nodes;
+  if (alpha > 0.02) {
+    alpha *= 0.96;
+    for (let i=0;i<N.length;i++){ for (let j=i+1;j<N.length;j++){
+      const a=N[i], b=N[j]; let dx=a.px-b.px, dy=a.py-b.py, d2=dx*dx+dy*dy||0.01;
+      const f = 2600/d2; const d=Math.sqrt(d2); dx/=d; dy/=d;
+      a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f;
+    }}
+    for (const e of sub.edges){ const a=e.a,b=e.b; let dx=b.px-a.px, dy=b.py-a.py;
+      const d=Math.hypot(dx,dy)||0.01; const f=(d-96)*0.02; dx/=d; dy/=d;
+      a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f; }
+    const cx=cv.clientWidth/2, cy=cv.clientHeight/2;
+    for (const n of N){ n.vx+=(cx-n.px)*0.006; n.vy+=(cy-n.py)*0.006;
+      if (n===dragNode || n.fixed && n!==dragNode && false) {}
+      n.vx*=0.85; n.vy*=0.85; if(n!==dragNode){ n.px+=n.vx; n.py+=n.vy; } }
+  }
+  draw();
+  requestAnimationFrame(tick);
+}
+
+function toScreen(n){ return { x:(n.px-cv.clientWidth/2)*view.k+view.x, y:(n.py-cv.clientHeight/2)*view.k+view.y }; }
+
+function draw(){
+  ctx.clearRect(0,0,cv.clientWidth,cv.clientHeight);
+  for (const e of sub.edges){
+    const A=toScreen(e.a), B=toScreen(e.b), m=METH[e.m];
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
+    ctx.strokeStyle=m.c; ctx.lineWidth=e.m==="constituent"?1:1.4;
+    ctx.setLineDash(m.dash?[4,4]:[]); ctx.globalAlpha=.75; ctx.stroke();
+  }
+  ctx.setLineDash([]); ctx.globalAlpha=1;
+  for (const n of sub.nodes){
+    const P=toScreen(n), r=(n.id===focusId?9:4.5+Math.min(5,Math.sqrt(gdeg.get(n.id))))*Math.sqrt(view.k);
+    ctx.beginPath(); ctx.arc(P.x,P.y,r,0,7); ctx.fillStyle=IDX[n.x].c;
+    ctx.strokeStyle=n.id===focusId?"#111":"#fff"; ctx.lineWidth=n.id===focusId?2.5:1.4;
+    ctx.fill(); ctx.stroke();
+    if (n.id===focusId || view.k>1.1 || sub.nodes.length<26){
+      ctx.fillStyle="#111827"; ctx.font=`${n.id===focusId?12:10}px -apple-system,sans-serif`;
+      ctx.textAlign="center"; ctx.fillText(n.c, P.x, P.y-r-3);
+    }
+  }
+}
+
+// ---- interaction ----
+let dragNode=null, panning=false, last=null, moved=false;
+function pick(mx,my){
+  for (let i=sub.nodes.length-1;i>=0;i--){ const P=toScreen(sub.nodes[i]);
+    const r=(sub.nodes[i].id===focusId?9:6)*Math.sqrt(view.k)+3;
+    if ((mx-P.x)**2+(my-P.y)**2 < r*r) return sub.nodes[i]; }
+  return null;
+}
+cv.addEventListener("mousedown", e=>{ const n=pick(e.offsetX,e.offsetY); moved=false;
+  if(n){ dragNode=n; } else { panning=true; cv.classList.add("drag"); } last=[e.offsetX,e.offsetY]; });
+cv.addEventListener("mousemove", e=>{
+  if (dragNode){ const dx=(e.offsetX-last[0])/view.k, dy=(e.offsetY-last[1])/view.k;
+    dragNode.px+=dx; dragNode.py+=dy; dragNode.vx=0; dragNode.vy=0; last=[e.offsetX,e.offsetY]; moved=true; alpha=Math.max(alpha,.3); return; }
+  if (panning){ view.x+=e.offsetX-last[0]; view.y+=e.offsetY-last[1]; last=[e.offsetX,e.offsetY]; moved=true; return; }
+  const n=pick(e.offsetX,e.offsetY);
+  if (n){ tip.style.display="block"; tip.style.left=(e.offsetX+14)+"px"; tip.style.top=(e.offsetY+10)+"px";
+    tip.innerHTML=`<b>${n.c}</b> — ${escapeHtml(n.n)}<br><span style="opacity:.7">${IDX[n.x].label} · ${gdeg.get(n.id)} links</span>`; cv.style.cursor="pointer"; }
+  else { tip.style.display="none"; cv.style.cursor=panning?"grabbing":"grab"; }
+});
+window.addEventListener("mouseup", e=>{
+  if (dragNode && !moved) buildSub(dragNode.id);   // click (no drag) = recentre
+  dragNode=null; panning=false; cv.classList.remove("drag");
+});
+cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
+  const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
+document.getElementById("depth2").addEventListener("change", ()=>focusId&&buildSub(focusId));
+document.getElementById("showInferred").addEventListener("change", ()=>focusId&&buildSub(focusId));
+
+// ---- search ----
+const search=document.getElementById("search"), results=document.getElementById("results");
+search.addEventListener("input", ()=>{
+  const q=search.value.trim().toLowerCase(); if(q.length<2){results.style.display="none";return;}
+  const hits=DATA.nodes.filter(n=>n.c.toLowerCase().startsWith(q)||n.n.toLowerCase().includes(q))
+    .sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0,40);
+  results.innerHTML=hits.map(n=>`<div data-id="${n.id}"><span class="rid" style="color:${IDX[n.x].c}">${n.c}</span> — ${escapeHtml(n.n)} <span style="color:#9299a1">(${gdeg.get(n.id)})</span></div>`).join("")||`<div style="color:#9299a1">no matches</div>`;
+  const r=search.getBoundingClientRect(); results.style.left=r.left+"px"; results.style.top=(r.bottom+4)+"px"; results.style.display="block";
+});
+results.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if(!d)return;
+  buildSub(d.dataset.id); results.style.display="none"; search.value=""; });
+document.addEventListener("click", e=>{ if(!results.contains(e.target)&&e.target!==search) results.style.display="none"; });
+
+function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+// legend
+document.getElementById("legend").innerHTML =
+  `<b>Node</b>`+Object.values(IDX).map(v=>`<div class="row"><span class="dot" style="background:${v.c}"></span>${v.label}</div>`).join("")+
+  `<b>Link method</b>`+Object.values(METH).map(v=>`<div class="row"><span class="ln" style="border-color:${v.c};${v.dash?'border-top-style:dashed;':''}"></span>${v.label}</div>`).join("");
+
+buildSub("atu:875");   // seed on the busiest hub
+tick();
+</script>
+</body>
+</html>
