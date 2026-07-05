@@ -1696,6 +1696,16 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-parallel:hover .motif-parallel-sim { color: #e8e2f2; }
 .motif-parallel-note { margin: 0 0 8px; font-size: 11.5px; color: #8792a0; font-style: italic; }
 
+/* Near-identical band: solid green edge marks the near-certain "same motif". */
+.motif-parallel.motif-parallel-near { background: #e5f0e7; border-style: solid; border-color: #bcd8c3; color: #35533f; }
+.motif-parallel.motif-parallel-near:hover { background: #4f7a5b; border-color: #4f7a5b; color: #fff; }
+.motif-parallel-near .motif-link-id { color: #4a7a58; }
+.motif-parallel-near:hover .motif-link-id,
+.motif-parallel-near:hover .motif-link-name { color: #fff; }
+.motif-parallel-near .motif-link-src { color: #4f7a5b; background: #d3e6d8; }
+.motif-parallel-near .motif-parallel-sim { color: #6f9179; }
+.motif-parallel-near:hover .motif-parallel-sim { color: #dfeee2; }
+
 /* Curated reasoned-parallel groups: a theme heading + a confidence tag over each
    chip row. */
 .motif-parallel-group { margin-bottom: 12px; }

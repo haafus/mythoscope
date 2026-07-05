@@ -981,14 +981,34 @@ function linkSection(title, links) {
 // no recorded cross-walk link. A clearly-labelled suggestion layer (not asserted
 // links) — each chip tags the target index and its title-similarity score.
 const PARALLEL_TAG = { berezkin: "BZ", tmi: "TMI", atu: "ATU" };
-function parallelsSection(parallels, title, note) {
+
+// Content-word overlap between two titles, used to pick the "near-identical" band:
+// TF-IDF cosine can read 1.0 when only generic shared nouns survive vocabulary
+// pruning ("Sun and Moon imprison each other" vs "…are males"), so classify the
+// near-identical band on actual token overlap instead. Mirrors the build-side
+// content_tokens (drop stopwords, strip a trailing plural -s).
+const _PARALLEL_STOP = new Set(("the a an of in on to and or for as by with is are be am was were no not "
+    + "from at into out over under up down off it its his her their they them he she we you i "
+    + "who whom which that this these those each other why man woman animal animals origin").split(" "));
+function _titleTokens(s) {
+    return new Set((String(s || "").toLowerCase().match(/[a-z]+/g) || [])
+        .map((w) => (w.endsWith("s") && w.length > 3 ? w.slice(0, -1) : w))
+        .filter((w) => w.length > 2 && !_PARALLEL_STOP.has(w)));
+}
+function _titleJaccard(a, b) {
+    const A = _titleTokens(a); const B = _titleTokens(b);
+    if (!A.size || !B.size) return 0;
+    let inter = 0; A.forEach((x) => { if (B.has(x)) inter += 1; });
+    return inter / (A.size + B.size - inter);
+}
+function parallelsSection(parallels, title, note, variant = "") {
     if (!parallels || !parallels.length) return "";
     const chips = parallels.map((l) => {
         const pct = Math.round((l.title_sim || 0) * 100);
         const tip = `${l.name || l.id} — title similarity ${l.title_sim}, description ${l.doc_sim}, ${l.shared} shared words`;
         return `
         <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
-           class="motif-link motif-parallel${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
+           class="motif-link motif-parallel${variant}${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
            title="${escapeHtml(tip)}">
             <span class="motif-link-src">${PARALLEL_TAG[l.index] || escapeHtml(l.index)}</span><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}<span class="motif-parallel-sim" title="${escapeHtml(tip)}">~${pct}%</span>
         </a>`;
@@ -1286,11 +1306,19 @@ function renderDetail(d) {
     }
 
     // Cross-index parallels at the foot: first the curated conceptual groups
-    // (reasoning), then the heuristic lexical look-alikes split by confidence
-    // tier — strong (A) matches, then the weaker single-word echoes (B).
+    // (reasoning), then the heuristic lexical look-alikes in three confidence
+    // bands — near-identical titles, then the rest of tier A, then tier B.
     body += reasonedParallelsSection(d.reasoned_parallels);
     const pAll = d.parallels || [];
-    body += parallelsSection(pAll.filter((p) => p.tier !== "B"),
+    const strong = pAll.filter((p) => p.tier !== "B");
+    // "Near-identical" = titles share (almost) all their content words, not merely
+    // a high TF-IDF cosine — so generic sun/moon-style artefacts stay in "Possible".
+    const isNear = (p) => _titleJaccard(d.name, p.name) >= 0.6;
+    body += parallelsSection(strong.filter(isNear),
+        "Near-identical parallels",
+        "Essentially the same motif under a different label — the titles share almost all their words. Near-certain equivalences, strong candidates for an actual cross-walk link.",
+        " motif-parallel-near");
+    body += parallelsSection(strong.filter((p) => !isNear(p)),
         "Possible parallels",
         "Look-alike motifs in other indexes with no recorded cross-walk link — heuristic text matches to review, not confirmed links.");
     body += parallelsSection(pAll.filter((p) => p.tier === "B"),
