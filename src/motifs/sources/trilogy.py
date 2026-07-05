@@ -318,7 +318,7 @@ def _parse_tmi(rows: list[dict]) -> list[dict]:
             "chapter_name": _clean(row.get("chapter_name")),
             "name": _clean(row.get("motif_name")),
             "notes": notes,
-            **parse_notes(notes),  # definition, cultures, references, see_also, atu_inline
+            **parse_notes(notes, code),  # definition, cultures, references, see_also, atu_inline
             "level": level,
             "parent": parent if parent and parent != code else "",
         })

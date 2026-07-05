@@ -757,6 +757,15 @@ class TestTrilogy:
         assert tmi_notes.parse_notes(
             "Braved the wolf, who tore his legs. Dh III 46.")["definition"].startswith("Braved the wolf")
 
+    def test_notes_force_bibliography_override(self):
+        # A curated override treats the whole note as bibliography for a citation the
+        # heuristic can't tell from prose (English-titled: 'The Review of Religion').
+        cite = "Krappe The Review of Religion (1941)"
+        assert tmi_notes.parse_notes(cite, "A112.1")["definition"] == ""      # overridden id
+        assert cite in tmi_notes.parse_notes(cite, "A112.1")["references"]     # kept, not lost
+        assert tmi_notes.parse_notes(cite, "ZZ99")["definition"] == cite       # other id: heuristic keeps it
+        assert tmi_notes.parse_notes(cite)["definition"] == cite               # no id: unchanged
+
     def test_notes_culture_label_with_parenthetical(self):
         # A culture label with a sub-area in parens must still be a citation, not
         # leak into the definition (A1.2 'Grandfather As Creator').

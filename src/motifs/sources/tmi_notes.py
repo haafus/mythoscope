@@ -47,13 +47,36 @@ _GROUP_SPLIT = re.compile(r";|\s--")
 _XREF = re.compile(r"\(?\s*(?:[Cc]f\.\s*)?†\s*[A-Z]\d[\dA-Za-z.]*\.?\s*\)?")
 
 
-def parse_notes(notes: str | None) -> dict:
-    """Decompose a ``notes`` string into definition + structured references."""
+# Hand-curated overrides for notes whose leading citation the heuristic cannot tell
+# from prose: an English-titled citation that opens the bibliography with no culture
+# label ('Krappe The Review of Religion (1941)'), whose title words ('The', 'of')
+# read like a sentence. Each listed motif has its whole note treated as bibliography
+# — the definition is dropped and the citation kept in ``references``. This is an
+# extensible escape hatch: add an id here when a citation still shows as a definition.
+FORCE_BIBLIOGRAPHY: frozenset[str] = frozenset({
+    "A112.1", "A475", "A475.1", "A728", "A751.1.3", "A992.2",
+    "B11.6.1", "B53.2", "B121.1", "B142.3", "B331.2.1", "B469.4", "B563.1",
+    "B713.1", "B732", "B751.2", "B771.3",
+    "C321", "C915.1.1",
+    "D2191",
+    "E0", "E631.3", "E748", "E755.2",
+    "F252.2", "F574.1.2", "F709.1",
+    "G86", "G261.1", "G303.3.3.1.3", "G303.16.3.4",
+})
+
+
+def parse_notes(notes: str | None, motif_id: str | None = None) -> dict:
+    """Decompose a ``notes`` string into definition + structured references. ``motif_id``
+    lets the curated ``FORCE_BIBLIOGRAPHY`` overrides drop a citation the heuristic
+    would otherwise keep as a definition."""
     notes = (notes or "").strip()
     # A leading '--' is just the bibliography-intro dash (no definition); drop it
     # so the first culture label sits at a boundary the parser recognises.
     cleaned = _strip_xrefs(notes).lstrip("-– ").strip()
-    definition, biblio = _split_definition(cleaned)
+    if motif_id in FORCE_BIBLIOGRAPHY:
+        definition, biblio = "", cleaned          # override: the whole note is bibliography
+    else:
+        definition, biblio = _split_definition(cleaned)
     # The definition split can land on a '.' boundary (e.g. after a leading
     # '(Cf. †…)' xref was removed, or a 'definition. Culture:' sentence break),
     # leaving the bibliography with a stray leading '.'. _LABEL treats ';' and
