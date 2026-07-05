@@ -258,7 +258,7 @@ def parse_motif_entry(text: str, page: str) -> dict | None:
 
     # Bare tale-type references the source wrote without the "ATU" prefix
     # ("…, 804A", "–653B") — digits + a letter, so never an areal index.
-    atu_refs = _dedup(atu_refs + _BARE_ATU_RE.findall(before))
+    atu_refs = _clean_atu_refs(atu_refs + _BARE_ATU_RE.findall(before))
 
     # What remains is the name plus see-also codes (cross-references to other
     # Berezkin motifs). Codes are latin; the name is Cyrillic, so pulling the code
@@ -295,6 +295,30 @@ def _dedup(items) -> list[str]:
         if item and item not in seen:
             seen.add(item)
             out.append(item)
+    return out
+
+
+# A clean ATU tale-type id: number + optional subtype letter(s), optional trailing
+# digit, optional star(s). The mapsofmyths ``atu`` field is free text, so cited refs
+# arrive wrapped in parentheses, with trailing "(comment)"/subtype notes, star
+# prefixes, "*"-joined combinations or Cyrillic-homoglyph letters ("(751A)",
+# "934H(4)", "*303*707", "653с"); we normalise each to the canonical form and drop
+# anything that is not id-shaped, so the cross-walk links a real type or nothing.
+_ATU_ID_SHAPE = re.compile(r"^\d{1,4}[A-Z]{0,3}\d{0,2}\*{0,3}$")
+
+
+def _clean_atu_refs(refs) -> list[str]:
+    out: list[str] = []
+    for ref in refs or []:
+        s = str(ref).strip()
+        if s.startswith("(") and s.endswith(")"):
+            s = s[1:-1].strip()                 # "(751A)" -> "751A"
+        s = re.sub(r"\s*\(.*$", "", s).strip()  # drop trailing "(comment)" / "(4)"
+        s = _fix_homoglyphs(s).lstrip("*").strip()
+        for part in re.split(r"\*(?=\d)", s):   # split "*"-joined combos "303*707"
+            part = part.strip().upper()         # ATU subtype letters are upper-case
+            if _ATU_ID_SHAPE.match(part) and part not in out:
+                out.append(part)
     return out
 
 
@@ -424,8 +448,8 @@ def _attach_nodes(motifs: list[dict]) -> None:
         if nd.get("tmi"):
             motif["tmi_refs"] = _split_refs(nd["tmi"])
             n_tmi += 1
-        if nd.get("atu"):  # union with the title-parsed refs, order-preserving
-            motif["atu_refs"] = _dedup(list(motif.get("atu_refs", [])) + _split_refs(nd["atu"]))
+        if nd.get("atu"):  # union with the title-parsed refs, order-preserving + cleaned
+            motif["atu_refs"] = _clean_atu_refs(list(motif.get("atu_refs", [])) + _split_refs(nd["atu"]))
         if nd.get("traditions"):
             motif["traditions"] = nd["traditions"]
             n_trad += 1

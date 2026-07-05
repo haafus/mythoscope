@@ -1040,8 +1040,11 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["areas"] = [{"id": a, "name": legend.get(str(a), "")} for a in rec.get("areas", [])]
         detail["links"]["see_also"] = [_link("berezkin", c) for c in rec.get("see_also", [])]
         # Cross-index links are outgoing references (this motif -> the target),
-        # tagged rel="out" so the frontend shows a ⇒ direction marker.
-        detail["links"]["atu"] = [{**_link("atu", a), "rel": "out"} for a in rec.get("atu_refs", [])]
+        # tagged rel="out" so the frontend shows a ⇒ direction marker. Resolved
+        # ATU ids (old numbers mapped to the current type) come from the cross-walk,
+        # so the chips link the live type rather than a dead cited number.
+        atu_refs = cw.get("berezkin_to_atu", {}).get(rec["id"], rec.get("atu_refs", []))
+        detail["links"]["atu"] = [{**_link("atu", a), "rel": "out"} for a in atu_refs]
         # mapsofmyths enrichment: thematic taxonomy, direct Thompson (TMI) links, and
         # the tradition-level distribution grouped by macro-region.
         detail["motif_type"] = rec.get("motif_type", "")

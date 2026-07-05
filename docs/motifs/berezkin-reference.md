@@ -158,6 +158,15 @@ All in `berezkin.py`.
   (TMI) equivalences (`A736.2`, incl. Cyrillic-homoglyph leads) — carried by the
   mapsofmyths cross-walk (`tmi_refs`), so they are stripped from the name, not read
   as see-also. Leftover Thompson notation (`Th …`) is stripped too.
+- **ATU-ref cleaning (`_clean_atu_refs`).** The `atu_refs` (title-parsed plus the
+  free-text mapsofmyths `atu` field) are normalised to canonical tale-type ids:
+  unwrap parentheses (`(751A)` → `751A`), drop a trailing `(comment)`/subtype note
+  (`934H(4)` → `934H`, `1600A (el-Shamy 2004)` → `1600A`), strip star prefixes and
+  split `*`-joined combinations (`*303*707` → `303`, `707`), fix Cyrillic-homoglyph
+  letters, upper-case subtype letters (`751b*` → `751B*`), and drop anything not
+  id-shaped (`the last episode`). This recovered ~16 live cross-walk edges and
+  removed ~93 dangling ones (106 → 13). The 13 that remain are genuine ATU types
+  absent from our Trilogy source — shown grey, not guessed.
 - **See-also.** Berezkin's own cross-references live in the **definition** as
   `см. (мотив) X`; `_attach_see_also` reads them and keeps the ids that resolve to
   a real motif (~286 motifs). The title never yields a see-also.

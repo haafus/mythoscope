@@ -48,6 +48,21 @@ class TestBerezkinEntry:
         assert e["name"] == "Смертный желает звезду"
         assert e["see_also"] == []
 
+    def test_clean_atu_refs_normalises_and_drops_junk(self):
+        # Free-text ATU refs from mapsofmyths arrive wrapped/annotated; normalise
+        # each to a canonical tale-type id and drop anything not id-shaped.
+        clean = berezkin._clean_atu_refs
+        assert clean(["(751A)"]) == ["751A"]                 # unwrap parens
+        assert clean(["934H(4)"]) == ["934H"]                # drop trailing "(subtype)"
+        assert clean(["1600A (el-Shamy 2004)"]) == ["1600A"]  # drop trailing comment
+        assert clean(["*597"]) == ["597"]                    # strip leading star
+        assert clean(["*303*707"]) == ["303", "707"]         # split "*"-joined combo
+        assert clean(["751b*"]) == ["751B*"]                 # upper-case subtype, keep star
+        assert clean(["328A*"]) == ["328A*"]                 # a clean ref is untouched
+        assert clean(["1525H1"]) == ["1525H1"]               # trailing digit preserved
+        assert clean(["the last episode"]) == []             # pure junk dropped
+        assert clean(["825", "(825)"]) == ["825"]            # dedup after cleaning
+
     def test_see_also_from_definition(self):
         # Berezkin's own cross-refs live in the definition ("см. мотив X"); only ids
         # that resolve to a real motif (and not the motif itself) are kept.

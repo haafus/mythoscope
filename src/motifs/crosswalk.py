@@ -111,23 +111,32 @@ def build(
             atu_to_tmi_summary[atu_id] = codes
     tmi_to_atu_summary = _invert(atu_to_tmi_summary)
 
-    # Berezkin -> ATU from the "ATU NNN" references embedded in titles, plus the
-    # inverse. A ref resolves to a known id, an old number via `aliases`, or its
-    # non-starred form.
+    # Berezkin <-> ATU from the "ATU NNN" references embedded in titles. Each cited
+    # ref is resolved to a current id (a known id, an old number via `aliases`, or
+    # its non-starred form) and BOTH directions are built from that same resolved
+    # edge, so the two maps are exact inverses. The verbatim citation stays on the
+    # motif record (`atu_refs`).
     aliases = aliases or {}
+
+    def _resolve_atu(ref: str) -> str:
+        return (ref if ref in atu_ids
+                else aliases.get(ref) or aliases.get(ref.rstrip("*")) or ref.rstrip("*"))
+
     berezkin_to_atu: dict[str, list[str]] = {}
     atu_to_berezkin: dict[str, list[str]] = {}
     for motif in berezkin_motifs or []:
-        refs = motif.get("atu_refs") or []
-        if not refs:
+        resolved_refs: list[str] = []
+        for ref in motif.get("atu_refs") or []:
+            r = _resolve_atu(ref)
+            if r not in resolved_refs:
+                resolved_refs.append(r)
+        if not resolved_refs:
             continue
-        berezkin_to_atu[motif["id"]] = refs
-        for ref in refs:
-            resolved = (ref if ref in atu_ids
-                        else aliases.get(ref) or aliases.get(ref.rstrip("*")) or ref.rstrip("*"))
-            atu_to_berezkin.setdefault(resolved, [])
-            if motif["id"] not in atu_to_berezkin[resolved]:
-                atu_to_berezkin[resolved].append(motif["id"])
+        berezkin_to_atu[motif["id"]] = resolved_refs
+        for r in resolved_refs:
+            atu_to_berezkin.setdefault(r, [])
+            if motif["id"] not in atu_to_berezkin[r]:
+                atu_to_berezkin[r].append(motif["id"])
 
     # Berezkin -> TMI, direct: the curated Thompson ids on each motif (mapsofmyths
     # `tmi_refs`), plus the inverse — kept only when the id exists in our TMI index.
