@@ -6,10 +6,11 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
+from fetch_cache import cache_path, fetch_to_cache
 from settings import settings
 
 from .clean_gutenberg import clean_gutenberg_in_builder
-from .downloader import download_file, load_download_list
+from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .utils import (
     count_sentences,
@@ -73,12 +74,12 @@ def _extract_text(data: bytes, url: str, title: str, content_type: str = "") -> 
     return _decode_bytes(data)
 
 
-def _download_and_process(item: dict) -> dict | None:
+def _download_and_process(item: dict, force: bool = False) -> dict | None:
     title = item["title"]
     url = item["url"]
 
     try:
-        data = download_file(url)
+        data = fetch_to_cache(url, cache_path(Path(settings.corpus_dir) / "raw", url), force=force)
         content_type = item.get("content_type", "")
         text = _extract_text(data, url, title, content_type)
 
@@ -212,7 +213,7 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         # draining the whole queue (shutdown(wait=True) on a `with` exit would block).
         executor = concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers)
         try:
-            futures = {executor.submit(_download_and_process, item): item for item in to_download}
+            futures = {executor.submit(_download_and_process, item, force): item for item in to_download}
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
                 if result:

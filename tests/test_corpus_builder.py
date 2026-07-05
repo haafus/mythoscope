@@ -83,7 +83,7 @@ class TestBuildCorpusForce:
         # Record which titles get (re)processed; write a file so the path check passes.
         processed = []
 
-        def fake_process(item):
+        def fake_process(item, force=False):
             processed.append(item["title"])
             path = corpus_dir / f"{item['title']}.txt"
             path.write_text("content")
