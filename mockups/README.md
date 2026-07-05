@@ -74,6 +74,15 @@ across indexes: some are ATU tale-type blocks spanning European peoples, some Be
 areal ethnic groups (Amazonia, NW-coast North America, Turkic), some TMI literary
 traditions — the source composition is shown as a colour bar on each.
 
+### 06 · Per-index tradition → motif biclusters
+Same biclustering as #05, but run **separately for each catalogue** — Berezkin only,
+Thompson only, ATU only — with a tab switcher, so you can compare the cultural
+structure each index carries on its own. Berezkin gives crisp areal ethnic groups
+(Siberian, NW-coast, Pueblo, Amazonian, Turkic…); ATU separates European sub-regions
+and a Near-East/N-Africa/S-Asia block; TMI is coarser (its "cultures" are as much
+source-collection as ethnos). Per-index thresholds are in `CFG` at the top of
+`build_data.py`.
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

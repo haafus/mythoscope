@@ -1,0 +1,124 @@
+"""Tradition -> motif biclustering run *separately for each index* — Berezkin only,
+Thompson (TMI) only, ATU only. Same method as mockup 05, but each catalogue's own
+motif x tradition table is co-clustered on its own, so you can compare the areal /
+cultural structure each index carries independently.
+
+Run from repo root:  python mockups/06-per-index-biclusters/build_data.py
+"""
+import json
+import re
+from collections import Counter
+from pathlib import Path
+
+import numpy as np
+from scipy import sparse
+from sklearn.cluster import SpectralCoclustering
+from sklearn.feature_extraction.text import TfidfTransformer
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = Path(__file__).resolve().parent / "data.js"
+
+# per-index tuning: (K clusters, MIN_DF, MAX_DF_FRAC, MIN_CULT-per-motif)
+CFG = {
+    "brz": (14, 6, 0.40, 2),
+    "tmi": (16, 20, 0.33, 2),
+    "atu": (12, 8, 0.60, 3),
+}
+
+
+def load(n):
+    with open(ROOT / "outputs" / "motifs" / n, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def canon(s):
+    return re.sub(r"\s+", " ", (s or "").strip()).rstrip(".,;:")
+
+
+def collect(index):
+    """namespaced motif id -> (code, name, set(tradition labels)) for one index."""
+    out = {}
+    if index == "tmi":
+        for r in load("tmi.json")["motifs"]:
+            cs = {canon(c) for c in (r.get("cultures") or {})}
+            if cs:
+                out[r["id"]] = (r["id"], r.get("name") or r["id"], cs)
+    elif index == "brz":
+        bz = load("berezkin.json")
+        tname = {c: canon(v.get("name") or c) for c, v in bz["traditions"].items()}
+        for r in bz["motifs"]:
+            cs = {tname[c] for c in (r.get("traditions") or []) if c in tname}
+            if cs:
+                out[r["id"]] = (r["id"], r.get("name") or r["id"], cs)
+    else:  # atu
+        for r in load("atu.json")["types"]:
+            ppl = set()
+            for reg in (r.get("attestations_grouped") or {}).get("regions", []):
+                for e in reg.get("entries", []):
+                    if e.get("people"):
+                        ppl.add(canon(e["people"]))
+            if ppl:
+                out[r["id"]] = (r["id"], r.get("name") or r["id"], ppl)
+    return out
+
+
+def bicluster(index):
+    K, MIN_DF, MAX_DF_FRAC, MIN_CULT = CFG[index]
+    motifs = collect(index)
+    ids = list(motifs)
+    df = Counter(c for _, _, cs in motifs.values() for c in cs)
+    keep = {c for c, n in df.items() if n >= MIN_DF and n <= MAX_DF_FRAC * len(ids)}
+    cvocab = sorted(keep)
+    ci = {c: i for i, c in enumerate(cvocab)}
+
+    rows, cols, kept = [], [], []
+    for mid in ids:
+        cc = [ci[c] for c in motifs[mid][2] if c in ci]
+        if len(cc) < MIN_CULT:
+            continue
+        r = len(kept); kept.append(mid)
+        for c in cc:
+            rows.append(r); cols.append(c)
+    M = sparse.csr_matrix((np.ones(len(rows)), (rows, cols)), shape=(len(kept), len(cvocab)))
+    W = TfidfTransformer().fit_transform(M)
+    K = min(K, len(cvocab), len(kept))
+    model = SpectralCoclustering(n_clusters=K, random_state=0, svd_method="arpack").fit(W)
+    rlab, clab = model.row_labels_, model.column_labels_
+
+    clusters = []
+    for k in range(K):
+        cnames = {cvocab[j] for j in np.where(clab == k)[0]}
+        mrows = np.where(rlab == k)[0]
+        if not cnames or not len(mrows):
+            continue
+        mem = [kept[i] for i in mrows]
+
+        def score(mid, cnames=cnames):
+            cs = [c for c in motifs[mid][2] if c in ci]
+            return sum(c in cnames for c in cs) / (len(cs) or 1)
+
+        mem = sorted(mem, key=score, reverse=True)
+        clusters.append({
+            "traditions": sorted(cnames, key=lambda c: -df[c])[:50],
+            "n_trad": len(cnames), "n_motif": len(mrows),
+            "motifs": [{"c": motifs[m][0], "n": motifs[m][1],
+                        "t": sorted([c for c in motifs[m][2] if c in cnames],
+                                    key=lambda c: -df.get(c, 0))[:5]} for m in mem[:80]],
+        })
+    clusters.sort(key=lambda c: -c["n_motif"])
+    return {"n_motifs": len(kept), "n_traditions": len(cvocab), "clusters": clusters}
+
+
+def main():
+    data = {ix: bicluster(ix) for ix in ("brz", "tmi", "atu")}
+    OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")
+    for ix in ("brz", "tmi", "atu"):
+        d = data[ix]
+        print(f"[{ix}] motifs={d['n_motifs']} traditions={d['n_traditions']} clusters={len(d['clusters'])}")
+        for c in d["clusters"][:6]:
+            print(f"    {c['n_motif']:4d} motifs · {', '.join(c['traditions'][:7])}")
+    print(f"data.js ~{OUT.stat().st_size // 1024}KB")
+
+
+if __name__ == "__main__":
+    main()
