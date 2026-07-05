@@ -302,7 +302,6 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         parsed = list(pool.map(parse_one, motifs))
 
     # Resolve + aggregate.
-    by_id = {m["id"]: m for m in motifs}
     per_motif: dict[str, list[dict]] = {}
     src_regions: dict[str, set] = defaultdict(set)
     src_uses: Counter = Counter()
@@ -331,10 +330,9 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
                          "cf": reg["cf"], "citations": citations})
         if tree:
             per_motif[mid] = tree
-        else:  # no citation extracted from this motif's detail page — log it
-            m = by_id.get(mid, {})
-            logger.warning("Berezkin bibliography: no citations extracted — %s/%s",
-                           BASE, m.get("page", ""))
+        # A motif whose detail page carries no citations is common and expected —
+        # the total is reported as `motifs_without_citations` in the summary, so we
+        # don't warn per page.
 
     sources = {k: {"author": biblio.get(k, {}).get("author", ""),
                    "year": biblio.get(k, {}).get("year", ""),
