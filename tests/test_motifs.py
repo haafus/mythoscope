@@ -974,6 +974,33 @@ class TestCrosswalk:
         # old number 403C resolves to the current type 480 via the alias map
         assert cw["atu_to_berezkin"]["480"] == ["M1"]
 
+    def test_inferred_closure_uses_low_fanout_pivots_with_provenance(self):
+        # atu_seq: A1 has its own motif; T1..T3 all use the SAME motif m2 (m2 is
+        # high fan-out → 3 types); T9 uses m3 (low fan-out → 1 type).
+        atu_seq = {"A1": ["mx"], "T1": ["m2"], "T2": ["m2"], "T3": ["m2"], "T9": ["m3"]}
+        tmi_ids = {"m", "m2", "m3", "md", "mx"}
+        atu_ids = {"A1", "T1", "T2", "T3", "T9"}
+        defining = {"A1": ["md"]}                       # A1's ~1:1 defining motif
+        berezkin = [
+            {"id": "BX", "tmi_refs": ["m"], "atu_refs": ["A1"]},  # bridges A1 <-> m (closure A)
+            {"id": "BY", "tmi_refs": ["m3"]},                     # -> T9 via m3 (closure D, ok)
+            {"id": "BZ", "tmi_refs": ["m2"]},                     # m2 in 3 types -> excluded (fan-out)
+        ]
+        cw = crosswalk.build(atu_seq, tmi_ids, berezkin, atu_ids, defining)
+        inf = cw["inferred"]
+        # A: ATU A1 <-> TMI m, bridged by Berezkin BX — stored both ways.
+        assert {"index": "tmi", "id": "m", "via_index": "berezkin", "via_id": "BX"} in inf["atu"]["A1"]
+        assert {"index": "atu", "id": "A1", "via_index": "berezkin", "via_id": "BX"} in inf["tmi"]["m"]
+        # C: Berezkin BX <-> TMI md via A1's defining motif.
+        assert any(e["id"] == "md" and e["via_id"] == "A1" for e in inf["berezkin"]["BX"])
+        # D: Berezkin BY <-> ATU T9 via the low-fan-out motif m3.
+        assert {"index": "atu", "id": "T9", "via_index": "tmi", "via_id": "m3"} in inf["berezkin"]["BY"]
+        # fan-out guard: m2 sits in 3 types (> cap), so BZ gets no inferred link.
+        assert "BZ" not in inf["berezkin"]
+        assert cw["inferred_count"] == len({tuple(sorted(((s, k), (e["index"], e["id"]))))
+                                            for s, byid in inf.items()
+                                            for k, es in byid.items() for e in es})
+
     def test_inline_note_and_summary_maps_are_symmetric(self):
         # Both inline relations are stored in both directions so an edge shows on
         # both indexes' pages.

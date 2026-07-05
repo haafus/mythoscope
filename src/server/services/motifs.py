@@ -1132,8 +1132,25 @@ def get_motif(index: str, motif_id: str) -> dict | None:
     detail["parallels"] = _parallels(index, rec["id"])
     # Curated conceptual parallels found by reasoning (same mytheme, different label).
     detail["reasoned_parallels"] = _reasoned_parallels(index, rec["id"])
+    # Transitively inferred cross-links (triangle closure through a low-fan-out
+    # pivot), each carrying the bridge it was derived through.
+    detail["inferred"] = _inferred(index, rec["id"])
 
     return detail
+
+
+def _inferred(index: str, motif_id: str) -> list[dict]:
+    """Resolve the transitively-inferred cross-links for a motif, each tagged with
+    the bridge motif it was derived through (provenance)."""
+    entries = store.load_crosswalk().get("inferred", {}).get(index, {}).get(motif_id, [])
+    out = []
+    for e in entries:
+        link = _link(e["index"], e["id"])
+        via_rec = _by_id(e["via_index"]).get(e["via_id"])
+        link["via"] = {"index": e["via_index"], "id": e["via_id"],
+                       "name": via_rec.get("name", "") if via_rec else ""}
+        out.append(link)
+    return out
 
 
 def _parallels(index: str, motif_id: str) -> list[dict]:

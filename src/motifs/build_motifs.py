@@ -198,6 +198,8 @@ def build_motifs(*, force: bool = False) -> None:
     logger.info("      + inline relations (each stored both ways): TMI notes → %d ATU types, "
                 "ATU summaries → %d TMI motifs",
                 len(links["atu_to_tmi_note"]), len(links["tmi_to_atu_summary"]))
+    logger.info("      + inferred (transitive closure via low-fan-out pivots): %d edges",
+                links.get("inferred_count", 0))
 
     # --- [5/5] Textual parallels: a heuristic suggestion layer (lexical title +
     #     description matching) surfacing look-alike motifs with *no* recorded

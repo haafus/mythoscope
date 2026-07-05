@@ -19,6 +19,11 @@ Two links are built:
   (``tmi_refs``, from mapsofmyths); the one *direct* Berezkin<->TMI bridge (the
   rest go through ATU). Present only when the mapsofmyths enrichment ran.
 
+Beyond these direct concordances, a small **inferred** layer completes triangles
+transitively — but only through a *low fan-out* pivot (a point-like motif, never a
+tale type, which would fan out to all its constituent motifs). Each inferred edge
+records the bridge it came through and is kept apart from the direct links.
+
 Berezkin's internal see-also links live on the records themselves.
 """
 
@@ -30,6 +35,12 @@ import re
 # ``_SUMMARY_MOTIF`` used to linkify those codes, so the derived inverse map lists
 # exactly the motifs the summary renders as links.
 _SUMMARY_MOTIF = re.compile(r"\b[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*")
+
+# Transitive closure: a triangle is completed only through a *low fan-out* pivot
+# (a vertex whose edge into the target index reaches at most this many nodes). A
+# tale-type node fans out to all its constituent motifs, so closing through it
+# would flood the graph; a point-like motif does not. ``2`` keeps ~1:1 bridges.
+INFER_FANOUT_CAP = 2
 
 
 def _clean_tmi(ref: str) -> str:
@@ -132,6 +143,66 @@ def build(
             if motif["id"] not in tmi_to_berezkin[ref]:
                 tmi_to_berezkin[ref].append(motif["id"])
 
+    # --- Transitive closure (inferred links) -------------------------------
+    # Complete triangles only through a low-fan-out pivot (see INFER_FANOUT_CAP):
+    #   A: ATU<->TMI via a Berezkin motif that concords to both;
+    #   D: Berezkin<->ATU via a TMI motif that defines/constitutes few types;
+    #   C: Berezkin<->TMI via an ATU type's (near-1:1) defining motif.
+    # Each inferred edge keeps its bridge (provenance) and is stored both ways,
+    # kept apart from the direct concordances above.
+    bz_atu_resolved: dict[str, set[str]] = {}
+    for a, bs in atu_to_berezkin.items():
+        for b in bs:
+            bz_atu_resolved.setdefault(b, set()).add(a)
+    direct_atu_tmi = {(a, m) for src in (atu_to_tmi, atu_to_tmi_defining,
+                                         atu_to_tmi_note, atu_to_tmi_summary)
+                      for a, ms in src.items() for m in ms}
+    direct_bz_tmi = {(b, m) for b, ms in berezkin_to_tmi.items() for m in ms}
+    direct_bz_atu = {(b, a) for b, aset in bz_atu_resolved.items() for a in aset}
+
+    inferred: dict[str, dict[str, list]] = {"berezkin": {}, "tmi": {}, "atu": {}}
+    _seen: set[tuple] = set()
+
+    def _infer(ia: str, a: str, ib: str, b: str, via_i: str, via: str) -> None:
+        key = tuple(sorted(((ia, a), (ib, b))))
+        if key in _seen:
+            return
+        _seen.add(key)
+        inferred[ia].setdefault(a, []).append({"index": ib, "id": b, "via_index": via_i, "via_id": via})
+        inferred[ib].setdefault(b, []).append({"index": ia, "id": a, "via_index": via_i, "via_id": via})
+
+    cap = INFER_FANOUT_CAP
+    # A: ATU <-> TMI, bridged by a Berezkin motif narrow on both sides
+    for b, tmis in berezkin_to_tmi.items():
+        atus = bz_atu_resolved.get(b, ())
+        if len(tmis) > cap or len(atus) > cap:
+            continue
+        for m in tmis:
+            for a in atus:
+                if (a, m) not in direct_atu_tmi:
+                    _infer("atu", a, "tmi", m, "berezkin", b)
+    # D: Berezkin <-> ATU, bridged by a TMI motif that belongs to few types
+    for b, tmis in berezkin_to_tmi.items():
+        for m in tmis:
+            types = tmi_to_atu.get(m, ())
+            if not types or len(types) > cap:
+                continue
+            for a in types:
+                if (b, a) not in direct_bz_atu:
+                    _infer("berezkin", b, "atu", a, "tmi", m)
+    # C: Berezkin <-> TMI, bridged by an ATU type's defining motif(s)
+    for b, atus in bz_atu_resolved.items():
+        for a in atus:
+            defs = atu_to_tmi_defining.get(a, ())
+            if not defs or len(defs) > cap:
+                continue
+            for m in defs:
+                if (b, m) not in direct_bz_tmi:
+                    _infer("berezkin", b, "tmi", m, "atu", a)
+    for byid in inferred.values():
+        for lst in byid.values():
+            lst.sort(key=lambda e: (e["index"], e["id"]))
+
     known = sorted(code for code in tmi_to_atu if code in tmi_ids)
 
     return {
@@ -147,5 +218,7 @@ def build(
         "atu_to_berezkin": {k: sorted(v) for k, v in atu_to_berezkin.items()},
         "berezkin_to_tmi": berezkin_to_tmi,
         "tmi_to_berezkin": {k: sorted(v) for k, v in tmi_to_berezkin.items()},
+        "inferred": inferred,
+        "inferred_count": len(_seen),
         "linked_tmi_count": len(known),
     }

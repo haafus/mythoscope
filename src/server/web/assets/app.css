@@ -1714,6 +1714,16 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-parallel-conf.conf-high { color: #3f6b4a; background: #dcecdf; }
 .motif-parallel-conf.conf-medium { color: #7a6a3f; background: #efe7d2; }
 
+/* Transitively inferred cross-links: dotted teal edge + a "via <bridge>" badge. */
+.motif-parallel.motif-inferred { background: #e6f0f2; border-style: dotted; border-color: #bcd6da; color: #35525a; }
+.motif-parallel.motif-inferred:hover { background: #4a7480; border-color: #4a7480; color: #fff; }
+.motif-inferred .motif-link-id { color: #3f6f7a; }
+.motif-inferred:hover .motif-link-id,
+.motif-inferred:hover .motif-link-name { color: #fff; }
+.motif-inferred .motif-link-src { color: #3f6f7a; background: #d3e6ea; }
+.motif-inferred-via { flex: none; font-size: 10px; font-weight: 600; color: #7a95a0; cursor: help; }
+.motif-inferred:hover .motif-inferred-via { color: #dcecef; }
+
 /* Broad TMI category rows in the list, shown bold. */
 .motifs-item.category .motifs-item-name { font-weight: 700; color: #1f3a4d; }
 

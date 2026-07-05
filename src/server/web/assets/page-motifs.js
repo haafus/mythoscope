@@ -1038,6 +1038,27 @@ function reasonedParallelsSection(groups) {
     return section(`Parallels by reasoning (${groups.length})`, note + blocks);
 }
 
+// Transitively inferred cross-links: a triangle completed through a shared
+// point-like motif (the bridge). Derived from real concordances, so stronger than
+// the lexical parallels — but still not a direct link, so shown apart, each chip
+// carrying its bridge.
+function inferredSection(inferred) {
+    if (!inferred || !inferred.length) return "";
+    const chips = inferred.map((l) => {
+        const via = l.via || {};
+        const viaTag = PARALLEL_TAG[via.index] || via.index || "";
+        const tip = `${l.name || l.id} — inferred via ${viaTag} ${via.id}${via.name ? ` (${via.name})` : ""}`;
+        return `
+        <a href="#/motifs?index=${escapeHtml(l.index)}&id=${encodeURIComponent(l.id)}"
+           class="motif-link motif-inferred${l.exists ? "" : " missing"}" data-index="${escapeHtml(l.index)}" data-id="${escapeHtml(l.id)}"
+           title="${escapeHtml(tip)}">
+            <span class="motif-link-src">${PARALLEL_TAG[l.index] || escapeHtml(l.index)}</span><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}<span class="motif-inferred-via" title="${escapeHtml(tip)}">via ${escapeHtml(viaTag)} ${escapeHtml(via.id || "")}</span>
+        </a>`;
+    }).join("");
+    const note = `<div class="motif-parallel-note">Links completed transitively through a shared point-like motif (the bridge is on each chip) — derived from the concordances, not direct links.</div>`;
+    return section(`Inferred cross-links (${inferred.length})`, note + `<div class="motif-links">${chips}</div>`);
+}
+
 // Tradition-level distribution (mapsofmyths): total attesting traditions, broken
 // down by macro-region; each region expands to the named traditions.
 // Title-case an ALL-CAPS label as a proper name (first letter of each word,
@@ -1309,6 +1330,7 @@ function renderDetail(d) {
     // (reasoning), then the heuristic lexical look-alikes in three confidence
     // bands — near-identical titles, then the rest of tier A, then tier B.
     body += reasonedParallelsSection(d.reasoned_parallels);
+    body += inferredSection(d.inferred);
     const pAll = d.parallels || [];
     const strong = pAll.filter((p) => p.tier !== "B");
     // "Near-identical" = titles share (almost) all their content words, not merely
