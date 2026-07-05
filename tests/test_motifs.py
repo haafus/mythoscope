@@ -1039,6 +1039,10 @@ class TestParallels:
         tri = [t for t in par["triangles"]
                if t["berezkin"] == "B1" and t["tmi"] == "K1" and t["atu"] == "1"]
         assert tri and set(tri[0]["missing"]) == {"berezkin-tmi", "berezkin-atu"}
+        # Every adjacency entry is tagged with a confidence tier, and the counts are
+        # reported per tier (both A and B reach the page layer).
+        assert all(e["tier"] in {"A", "B"} for e in adj["berezkin"]["B1"])
+        assert "berezkin_atu_A" in par["counts"] and "berezkin_atu_B" in par["counts"]
 
 
 class TestReasonedParallels:

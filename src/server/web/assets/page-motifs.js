@@ -981,7 +981,7 @@ function linkSection(title, links) {
 // no recorded cross-walk link. A clearly-labelled suggestion layer (not asserted
 // links) — each chip tags the target index and its title-similarity score.
 const PARALLEL_TAG = { berezkin: "BZ", tmi: "TMI", atu: "ATU" };
-function parallelsSection(parallels) {
+function parallelsSection(parallels, title, note) {
     if (!parallels || !parallels.length) return "";
     const chips = parallels.map((l) => {
         const pct = Math.round((l.title_sim || 0) * 100);
@@ -993,8 +993,8 @@ function parallelsSection(parallels) {
             <span class="motif-link-src">${PARALLEL_TAG[l.index] || escapeHtml(l.index)}</span><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}<span class="motif-parallel-sim" title="${escapeHtml(tip)}">~${pct}%</span>
         </a>`;
     }).join("");
-    const note = `<div class="motif-parallel-note">Look-alike motifs in other indexes with no recorded cross-walk link — heuristic text matches to review, not confirmed links.</div>`;
-    return section(`Possible parallels (${parallels.length})`, note + `<div class="motif-links">${chips}</div>`);
+    return section(`${title} (${parallels.length})`,
+        `<div class="motif-parallel-note">${note}</div><div class="motif-links">${chips}</div>`);
 }
 
 // Curated conceptual parallels found by reasoning — the same mytheme under
@@ -1286,9 +1286,16 @@ function renderDetail(d) {
     }
 
     // Cross-index parallels at the foot: first the curated conceptual groups
-    // (reasoning), then the heuristic lexical look-alikes.
+    // (reasoning), then the heuristic lexical look-alikes split by confidence
+    // tier — strong (A) matches, then the weaker single-word echoes (B).
     body += reasonedParallelsSection(d.reasoned_parallels);
-    body += parallelsSection(d.parallels);
+    const pAll = d.parallels || [];
+    body += parallelsSection(pAll.filter((p) => p.tier !== "B"),
+        "Possible parallels",
+        "Look-alike motifs in other indexes with no recorded cross-walk link — heuristic text matches to review, not confirmed links.");
+    body += parallelsSection(pAll.filter((p) => p.tier === "B"),
+        "Weaker parallels",
+        "Lower-confidence matches sharing a single title word — more noise, review needed.");
 
     // An old ATU number the user navigated to is served as the current type.
     const redirect = d.redirected_from

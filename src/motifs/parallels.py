@@ -13,9 +13,10 @@ Method — two TF-IDF signals in one shared space:
 A pair is a candidate when its title similarity clears a high bar, or its doc
 similarity is very high with a softer title floor. Every pair already present in
 the cross-walk (constituent / defining / note / summary for ATU↔TMI, ``atu_refs``
-for Berezkin↔ATU, ``tmi_refs`` for Berezkin↔TMI) is subtracted. Only the
-high-confidence tier (≥2 shared content words in the title, or a very strong doc
-match) reaches the page layer; the fuller list lives in ``docs/motifs/crosswalk/``.
+for Berezkin↔ATU, ``tmi_refs`` for Berezkin↔TMI) is subtracted. Each candidate is
+tagged ``tier``: **A** (≥2 shared content words in the title, or a very strong doc
+match — high confidence) or **B** (a single-word title echo — weaker). Both tiers
+reach the page layer as separate sections; each is capped per motif.
 
 Depends on scikit-learn (a declared project dependency); if it is somehow absent
 the build logs a skip and no ``parallels.json`` is written — the pages then simply
@@ -128,13 +129,14 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
                 ts = float(Xt[a_side][i].multiply(Xt[b_side][j]).sum())
                 if not (ts >= T_TITLE or (ds >= T_DOC_HIGH and ts >= T_TITLE_SOFT)):
                     continue
-                sh = len(content_tokens(A[i]["title"]) & content_tokens(B[j]["title"]))
-                if not (sh >= 2 or ds >= 0.75):  # tier A only
-                    continue
                 if linked(a_side, b_side, A[i]["id"], B[j]["id"]):
                     continue
+                sh = len(content_tokens(A[i]["title"]) & content_tokens(B[j]["title"]))
+                # tier A = ≥2 shared content words (or a very strong doc match);
+                # tier B = single-word title echoes (lower confidence, kept too).
+                tier = "A" if (sh >= 2 or ds >= 0.75) else "B"
                 out[(A[i]["id"], B[j]["id"])] = {
-                    "a": A[i]["id"], "b": B[j]["id"],
+                    "a": A[i]["id"], "b": B[j]["id"], "tier": tier,
                     "title_sim": round(ts, 3), "doc_sim": round(ds, 3), "shared": sh,
                     "score": round(max(ts, ds), 3)}
         return out
@@ -148,26 +150,35 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
 
     def add(side: str, mid: str, other_side: str, oid: str, c: dict) -> None:
         adjacency[side].setdefault(mid, []).append(
-            {"index": other_side, "id": oid, "title_sim": c["title_sim"],
+            {"index": other_side, "id": oid, "tier": c["tier"], "title_sim": c["title_sim"],
              "doc_sim": c["doc_sim"], "shared": c["shared"], "score": c["score"]})
 
     for (a_side, b_side), cs in pairs.items():
         for c in cs.values():
             add(a_side, c["a"], b_side, c["b"], c)
             add(b_side, c["b"], a_side, c["a"], c)
+    # cap each tier separately so a long tier-B tail never crowds out tier A
     for byid in adjacency.values():
-        for lst in byid.values():
+        for mid, lst in list(byid.items()):
             lst.sort(key=lambda e: -e["score"])
-            del lst[MAX_PER_MOTIF:]
+            kept, seen = [], {"A": 0, "B": 0}
+            for e in lst:
+                if seen[e["tier"]] < MAX_PER_MOTIF:
+                    kept.append(e)
+                    seen[e["tier"]] += 1
+            byid[mid] = kept
 
     # triangles: a Berezkin ↔ TMI ↔ ATU triple all pairwise parallel
     idx_of = {s: {d["id"]: n for n, d in enumerate(docs[s])} for s in docs}
     tmi_by_bz: dict[str, list[str]] = {}
     atu_by_bz: dict[str, list[str]] = {}
-    for (b, m) in pairs[("berezkin", "tmi")]:
-        tmi_by_bz.setdefault(b, []).append(m)
-    for (b, a) in pairs[("berezkin", "atu")]:
-        atu_by_bz.setdefault(b, []).append(a)
+    # triangles only from the high-confidence (tier-A) legs
+    for (b, m), c in pairs[("berezkin", "tmi")].items():
+        if c["tier"] == "A":
+            tmi_by_bz.setdefault(b, []).append(m)
+    for (b, a), c in pairs[("berezkin", "atu")].items():
+        if c["tier"] == "A":
+            atu_by_bz.setdefault(b, []).append(a)
     triangles = []
     for b in set(tmi_by_bz) & set(atu_by_bz):
         for m in tmi_by_bz[b]:
@@ -184,9 +195,17 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
                                       "score": round(max(ts, ds), 3)})
     triangles.sort(key=lambda t: -t["score"])
 
+    def tier_count(cs: dict, t: str) -> int:
+        return sum(1 for c in cs.values() if c["tier"] == t)
+
+    counts: dict[str, int] = {"triangles": len(triangles)}
+    for (a, b), cs in pairs.items():
+        counts[f"{a}_{b}_A"] = tier_count(cs, "A")
+        counts[f"{a}_{b}_B"] = tier_count(cs, "B")
+
     return {
         "params": {"title_gate": T_TITLE, "doc_high": T_DOC_HIGH, "cap_per_motif": MAX_PER_MOTIF},
-        "counts": {f"{a}_{b}": len(cs) for (a, b), cs in pairs.items()} | {"triangles": len(triangles)},
+        "counts": counts,
         "adjacency": adjacency,
         "triangles": triangles,
     }

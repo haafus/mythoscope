@@ -210,10 +210,12 @@ def build_motifs(*, force: bool = False) -> None:
     else:
         save_json(store.parallels_path(), par)
         par_counts = par["counts"]
-        logger.info("      candidates (unlinked, high-confidence): ATU~TMI %d, Berezkin~TMI %d, "
-                    "Berezkin~ATU %d; three-way parallels %d",
-                    par_counts.get("atu_tmi", 0), par_counts.get("berezkin_tmi", 0),
-                    par_counts.get("berezkin_atu", 0), par_counts.get("triangles", 0))
+        logger.info("      candidates (unlinked) tier A / tier B: ATU~TMI %d/%d, Berezkin~TMI %d/%d, "
+                    "Berezkin~ATU %d/%d; three-way parallels %d",
+                    par_counts.get("atu_tmi_A", 0), par_counts.get("atu_tmi_B", 0),
+                    par_counts.get("berezkin_tmi_A", 0), par_counts.get("berezkin_tmi_B", 0),
+                    par_counts.get("berezkin_atu_A", 0), par_counts.get("berezkin_atu_B", 0),
+                    par_counts.get("triangles", 0))
 
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),

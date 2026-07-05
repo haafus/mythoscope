@@ -50,8 +50,9 @@ Tier B есть ложные совпадения.
 `find_parallels.py`) — численное совпадение слов; (2) *по рассуждению*
 (`reasoned_parallels*.csv`, `reasoned-parallels.md`) — ручное сопоставление по
 смыслу, ловящее параллели с разной формулировкой, которые численный метод не видит.
-Оба показаны на страницах мотивов отдельными разделами («Possible parallels» и
-«Parallels by reasoning»).
+Оба показаны на страницах мотивов отдельными разделами. Лексический слой разбит по
+тиру на два: «Possible parallels» (тир A) и «Weaker parallels» (тир B); кураторский —
+«Parallels by reasoning».
 
 ## Воспроизвести
 
@@ -64,11 +65,11 @@ PYTHONPATH=src python3 docs/motifs/crosswalk/find_parallels.py
 
 ## Продакшн-версия (на страницах)
 
-Высокоуверенный тир (Tier A) вынесен в **живую подсказку на страницах мотивов**:
-генератор — [`src/motifs/parallels.py`](../../../src/motifs/parallels.py), шаг
-сборки `[5/5]`, пишет `outputs/motifs/parallels.json` (двусторонний список
-смежности + треугольники). Сервис (`server/services/motifs.py`) отдаёт их полем
-`parallels`, фронт (`page-motifs.js`) показывает разделом **«Possible parallels»**
-— пунктирные чипы с бейджем сходства, явно отделённые от подтверждённых связей
-cross-walk. Этот скрипт держит **оба** тира для ревью; на страницы идёт только
-Tier A.
+Оба тира вынесены в **живую подсказку на страницах мотивов**: генератор —
+[`src/motifs/parallels.py`](../../../src/motifs/parallels.py), шаг сборки `[5/5]`,
+пишет `outputs/motifs/parallels.json` (двусторонний список смежности с тиром +
+треугольники). Сервис (`server/services/motifs.py`) отдаёт их полем `parallels`,
+фронт (`page-motifs.js`) показывает двумя разделами — **«Possible parallels»**
+(Tier A) и **«Weaker parallels»** (Tier B) — пунктирные чипы с бейджем сходства,
+явно отделённые от подтверждённых связей cross-walk. Каждый тир капается отдельно,
+чтобы длинный хвост B не вытеснял A.

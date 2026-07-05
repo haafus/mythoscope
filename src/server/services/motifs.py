@@ -1143,6 +1143,7 @@ def _parallels(index: str, motif_id: str) -> list[dict]:
     for e in entries:
         link = _link(e["index"], e["id"])
         link["title_sim"], link["doc_sim"], link["shared"] = e["title_sim"], e["doc_sim"], e["shared"]
+        link["tier"] = e.get("tier", "A")
         out.append(link)
     return out
 
