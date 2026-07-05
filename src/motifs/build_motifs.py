@@ -238,5 +238,49 @@ def build_motifs(*, force: bool = False) -> None:
     save_json(store.meta_path(), meta)
     store.clear_cache()
 
-    logger.info("=== Motif database built: %s ===",
-                ", ".join(f"{k}={v}" for k, v in counts.items()) or "none")
+    _log_summary(counts, links, par_counts)
+
+
+def _edge_set(fwd: dict) -> set:
+    """Undirected edges (frozenset id-pairs) of a ``{a: [b]}`` cross-walk map."""
+    return {frozenset((a, b)) for a, bs in (fwd or {}).items() for b in bs}
+
+
+def _log_summary(counts: dict, links: dict, par_counts: dict) -> None:
+    """Final ``итог``: confirmed cross-index links per pair (union of every
+    relation, deduplicated) and the grand total, plus the suggestion layers."""
+    at = (_edge_set(links.get("atu_to_tmi")) | _edge_set(links.get("atu_to_tmi_defining"))
+          | _edge_set(links.get("atu_to_tmi_note")) | _edge_set(links.get("atu_to_tmi_summary")))
+    ba = _edge_set(links.get("berezkin_to_atu"))
+    bt = _edge_set(links.get("berezkin_to_tmi"))
+    # fold the inferred edges into their pair (dedup the bidirectional entries)
+    inf = {"at": 0, "ba": 0, "bt": 0}
+    seen: set = set()
+    for side, byid in (links.get("inferred") or {}).items():
+        for mid, lst in byid.items():
+            for e in lst:
+                key = frozenset(((side, mid), (e["index"], e["id"])))
+                if key in seen:
+                    continue
+                seen.add(key)
+                pair = frozenset((side, e["index"]))
+                edge = frozenset((mid, e["id"]))
+                if pair == frozenset(("atu", "tmi")):
+                    at.add(edge); inf["at"] += 1
+                elif pair == frozenset(("berezkin", "atu")):
+                    ba.add(edge); inf["ba"] += 1
+                else:
+                    bt.add(edge); inf["bt"] += 1
+    grand = len(at) + len(ba) + len(bt)
+    lex_a = sum(par_counts.get(f"{k}_A", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
+    lex_b = sum(par_counts.get(f"{k}_B", 0) for k in ("atu_tmi", "berezkin_tmi", "berezkin_atu"))
+
+    logger.info("=== ИТОГ: motif database built ===")
+    logger.info("  indexes: %s", ", ".join(f"{k}={v}" for k, v in counts.items()) or "none")
+    logger.info("  confirmed cross-index links (union per pair, incl. inferred):")
+    logger.info("      ATU <-> TMI      %5d  (+%d inferred)", len(at), inf["at"])
+    logger.info("      Berezkin <-> ATU %5d  (+%d inferred)", len(ba), inf["ba"])
+    logger.info("      Berezkin <-> TMI %5d  (+%d inferred)", len(bt), inf["bt"])
+    logger.info("      TOTAL confirmed  %5d", grand)
+    logger.info("  suggestion layers (not confirmed): lexical parallels %d (A) + %d (B); "
+                "reasoned parallels are curated static data", lex_a, lex_b)
