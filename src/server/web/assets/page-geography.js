@@ -150,15 +150,17 @@ function renderMarkers(map, traditions) {
 
 function initializeGeographyMap(traditions) {
     // Real tile-covered world: ±180° longitude and the web-mercator latitude limit.
-    // The previous ±240° bounds reached 60° past the tiles on each side, which
-    // showed up as gray bands beyond the map.
     const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
 
+    // Simple, fixed zoom range: zoom out to the whole world (1), in to street level
+    // (7). No dynamic floor — the start view is a fitBounds of the markers, and the
+    // wheel/buttons can always zoom out from there.
     const map = L.map("geography-map", {
         zoomControl: true,
+        minZoom: 1,
         maxZoom: 7,
         maxBounds: worldBounds,
-        maxBoundsViscosity: 1.0,
+        maxBoundsViscosity: 0.5,
     });
 
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", {
@@ -169,28 +171,17 @@ function initializeGeographyMap(traditions) {
 
     const { bounds: markerBounds, markers } = renderMarkers(map, traditions);
 
-    // Floor the zoom a little below full tile coverage: the fill zoom felt too
-    // tight, so allow half a level of zoom-out (a thin gray frame at most) while
-    // still keeping the map from pulling way out into gray.
-    const ZOOM_OUT_SLACK = 0.5;
-    function recomputeMinZoom() {
-        const floor = map.getBoundsZoom(worldBounds, true) - ZOOM_OUT_SLACK;
-        map.setMinZoom(floor);
-        if (map.getZoom() < floor) map.setZoom(floor);
-    }
     // The map fills its grid cell via CSS; make sure Leaflet reads that height.
     map.invalidateSize();
-    recomputeMinZoom();
 
     if (markerBounds) {
-        // fitBounds is clamped to the min zoom above, so the default view fits the
-        // markers but never zooms out far enough to show gray borders.
-        map.fitBounds(markerBounds, { padding: [34, 34], maxZoom: 4 });
+        // Start with every marker in view.
+        map.fitBounds(markerBounds, { padding: [30, 30] });
     } else {
-        map.setView([20, 15], map.getMinZoom());
+        map.setView([20, 15], 1);
     }
 
-    const onResize = () => { map.invalidateSize(); recomputeMinZoom(); };
+    const onResize = () => map.invalidateSize();
     window.addEventListener("resize", onResize);
     onCleanup(() => {
         window.removeEventListener("resize", onResize);
