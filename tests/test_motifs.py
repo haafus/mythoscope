@@ -820,6 +820,19 @@ class TestTrilogy:
         assert out["definition"] == "She shows remorse when she hears of lover's death."
         assert not out["definition"].endswith("*")
 
+    def test_notes_comma_separated_culture_labels(self):
+        # Culture groups separated by a comma rather than ';' (A240): each labelled
+        # group is split out to its own culture.
+        out = tmi_notes.parse_notes(
+            "Hindu: Keith 90f., Penzer III 161, India: Thompson-Balys, "
+            "Buddhist myth: Malalasekera I 854.")
+        assert out["cultures"]["Hindu"] == ["Keith 90f., Penzer III 161"]
+        assert out["cultures"]["India"] == ["Thompson-Balys"]
+        assert out["cultures"]["Buddhist myth"] == ["Malalasekera I 854"]
+        # but a bare comma-list of cultures that share one citation is left intact
+        out2 = tmi_notes.parse_notes("Mono-Alu, Fauru, Buin: Wheeler 67.")
+        assert list(out2["cultures"]) == ["Mono-Alu, Fauru, Buin"]
+
     def test_notes_no_definition_when_starts_with_citation(self):
         out = tmi_notes.parse_notes("Greek: Fox 4; India: *Thompson-Balys.")
         assert out["definition"] == ""

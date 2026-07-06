@@ -44,6 +44,36 @@ _TYPE = re.compile(r"\bTypes?\s+(\d[\dA-Za-z*]*(?:\s*,\s*\d[\dA-Za-z*]*)*)")
 # (start, ';', ' --') so a colon inside a source title isn't taken for a label.
 _LABEL = re.compile(rf"(?:^|;|\s--)\s*([{_UC}][{_LBL}]*?(?:\s*\([^)]*\))*)\s*:\s*")
 _GROUP_SPLIT = re.compile(r";|\s--")
+# Thompson sometimes separates culture groups with a comma rather than ';'
+# ('Hindu: Keith 90f., … India: Thompson-Balys, Buddhist myth: Malalasekera …').
+# A *plain* culture name is a run of capitalised words joined by a space or single
+# dash, ending in ': ' (the no-period rule keeps a mid-citation comma before an
+# author, '…, Boberg. --Chinese', from looking like a label).
+_PLAIN_LABEL = re.compile(r"[A-ZÀ-Þ][a-zà-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+)*:\s")
+
+
+def _promote_comma_labels(biblio: str) -> str:
+    """Promote a comma that separates two ``Label: citation`` groups into a ';' group
+    boundary, so the second label is recognised. Only fires once a ``Label:`` has
+    opened the current group — so a bare comma-list of cultures that *share* one
+    citation ('Mono-Alu, Fauru, Buin: Wheeler 67') is left intact (the comma there
+    precedes a name, not a second citation)."""
+    out: list[str] = []
+    seen_colon = False                     # a 'Label:' has opened the current group
+    i, n = 0, len(biblio)
+    while i < n:
+        if biblio[i:i + 3] == " --" or biblio[i] == ";":
+            seen_colon = False                  # a group boundary resets the state
+        elif biblio[i] == ":":
+            seen_colon = True
+        elif biblio[i] == "," and seen_colon and _PLAIN_LABEL.match(biblio[i + 1:].lstrip()):
+            out.append(";")                # a second labelled group starts here
+            seen_colon = False
+            i += 1
+            continue
+        out.append(biblio[i])
+        i += 1
+    return "".join(out)
 # A '†' cross-reference, with any leading '(Cf.' and trailing ')'. Stripped from
 # the text before parsing the definition/bibliography (it lives in see_also), so
 # it can't bleed into a neighbouring culture citation.
@@ -97,6 +127,7 @@ def parse_notes(notes: str | None, motif_id: str | None = None) -> dict:
     # ' --' as group boundaries but not '.', so the first culture would be missed
     # — drop the leading dot(s) so it is recognised. (' --' has no leading dot.)
     biblio = biblio.lstrip(".")
+    biblio = _promote_comma_labels(biblio)        # comma-separated culture labels → group boundaries
     return {
         "definition": definition,
         "cultures": _cultures(biblio),
