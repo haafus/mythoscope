@@ -51,7 +51,9 @@ Links:
 - **MOMFER** is the most cited scholarly digital TMI: it added semantic search
   (query "mythical animals", "mortality") over the parsed index. Its parsed
   data (`fbkarsdorp/tmi`, Apache-2.0) is a credible alternative machine-readable
-  source, built from the ruthenia text.
+  source, built from the ruthenia text. **Caveat**: the public search site
+  (`momfer.meertens.knaw.nl`) appears to be offline now — treat the GitHub parse
+  as the durable artifact, the live tool as possibly defunct.
 - **Mellmann** is the best *tabular* form (our analysis in
   `tmi-mellmann-migration.md`): a strict superset of the Trilogy TMI in codes
   and citations, with printed division/section headings and `1st ed.`
@@ -100,7 +102,8 @@ an independent digitization).
 
 Editions: 2004 first ed. → **2011 reprint** → substantially revised & supplemented
 **2024** edition. The 2011 three-volume text circulates as PDFs on academia.edu
-and Scribd (grey-access — *not* confirmed publisher-authorized open access), and
+and Scribd (grey-access — *not* confirmed publisher-authorized open access; the
+"publisher made it freely available" claim traces only to a Reddit thread), and
 those scans are what many user-made ATU spreadsheets are keyed to. See:
 <https://www.folklorefellows.fi/the-types-of-international-folktales-reprinted/>.
 
