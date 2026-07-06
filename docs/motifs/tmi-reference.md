@@ -139,7 +139,27 @@ separates them, keeping the raw `notes` as the source of truth.
 
 - **definition** — the leading prose, taken up to the first bibliography marker
   (` --`, `†`, `Type`, a `*Author`, or a culture label). Heuristic, ~85%
-  reliable; short one-line "definitions" are the noisy edge.
+  reliable; short one-line "definitions" are the noisy edge. Four passes clean
+  up the leaks the marker split leaves behind:
+  - **leading-citation blanking** (`_is_leading_citation`) — when the head
+    before the first marker is itself a citation (carries a bibliographic
+    *locus* — `No. 7`, a roman numeral + page, a year, `ibid.`, `pp.` — and no
+    English prose word), the definition is left blank rather than showing a
+    stray reference. Fires on ~2,600 motifs whose notes open straight into a
+    source (`J21.22` "Nouvelles de Sens No. 7").
+  - **trailing-citation trimming** (`_trim_trailing_citation`) — prose that
+    runs into a citation is cut at the earliest sentence boundary after which
+    every remaining sentence is a citation *and* the kept part still reads as
+    prose. Conservative by construction: it never trims a bare noun list or a
+    prose clause that merely contains a digit (~740 trimmed, no known false
+    cuts). The peeled tail joins **references**.
+  - **quoted-title reunification** (`_reunite_quoted_title`) — a catch-word
+    title split across the definition/notes boundary by an interior quote
+    (`K553` "Wait Till I Get Fat") is stitched back together before parsing.
+  - **`FORCE_BIBLIOGRAPHY` overrides** — a curated id list (~48 entries) for
+    residual citation-only "definitions" the heuristics can't distinguish from
+    prose (English or foreign work titles with no locus). These are blanked
+    outright; see the frozenset in `tmi_notes.py`.
 - **cultures** — citations are tagged by a geographic/linguistic/corpus label
   (`India:`, `Irish myth:`, `Jewish:`). Anchored to a group boundary so a colon
   inside a title is not mistaken for a label. A label may carry parenthetical
