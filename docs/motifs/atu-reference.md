@@ -61,7 +61,11 @@ dropdown (nested by chapter, ascending by number range).
 The **plot summary is linkified** on the type page (`_atu_summary_html`): after
 escaping the prose, `[B261]`-style TMI motif tokens and `Type N` ATU references
 are turned into links — but only for ids that actually exist in the index (a
-missing one stays plain text).
+missing one stays plain text). A motif **range** written with the mojibake
+apostrophe-as-en-dash (`S222'S226`) is restored to read as `S222–S226` (both
+endpoints link); the interior members it spans are credited in the cross-walk
+(`crosswalk._SUMMARY_RANGE`, see [`cross-walk.md`](cross-walk.md) §1.4), not
+spelled out in the prose.
 
 Uther also lists a tale's variant **forms inline as `(1)…(N)`** (175 types, e.g.
 "exists chiefly in four different forms: (1)… (2)…"). `_summary_blocks` parses the

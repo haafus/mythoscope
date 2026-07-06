@@ -157,7 +157,7 @@ degradation); сырой ответ кэшируется в `raw/wikidata/`.
 | ATU ↔ TMI — constituent | `atu_seq` (тип → его мотивы) | `atu_to_tmi` | 1 642 / 3 799 (3 765 существуют) |
 | ATU ↔ TMI — defining | `defining_motifs` у метки типа | `atu_to_tmi_defining` | 62 / 74 |
 | ATU ↔ TMI — note (inline) | цитаты `Type N` в заметках TMI (AaTh→ATU) | `tmi_to_atu_note` | 2 602 / 802 |
-| ATU ↔ TMI — summary (inline) | коды TMI в тексте `summary` типа | `atu_to_tmi_summary` | 1 665 / 3 603 |
+| ATU ↔ TMI — summary (inline) | коды TMI в тексте `summary` типа (диапазоны развёрнуты) | `atu_to_tmi_summary` | 1 665 / 3 810 |
 | Берёзкин ↔ ATU | ссылки на ATU в титулах (`atu_refs`, alias-resolved, +чистка) | `berezkin_to_atu` | 509 / 485 |
 | Берёзкин ↔ TMI (прямо) | кураторские Thompson-id из mapsofmyths (`tmi_refs`, парсим+чистим) | `berezkin_to_tmi` | 193 / 212 |
 

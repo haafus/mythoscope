@@ -29,12 +29,35 @@ Berezkin's internal see-also links live on the records themselves.
 
 from __future__ import annotations
 
+import bisect
 import re
+
+from .sources.trilogy import tmi_sort_key
 
 # A TMI motif token as it appears in an ATU summary — mirrors the read-side
 # ``_SUMMARY_MOTIF`` used to linkify those codes, so the derived inverse map lists
-# exactly the motifs the summary renders as links.
+# the motifs the summary renders as links (plus, for a motif *range*, every index
+# member the range spans — see ``_SUMMARY_RANGE``).
 _SUMMARY_MOTIF = re.compile(r"\b[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*")
+# A motif *range* written in a summary — ``J1759'J1763``, ``X1030'1036``. The
+# separator is a mojibake en-dash rendered as an apostrophe; the upper endpoint may
+# omit the letter (``X1030'1036`` -> X1036). Uther cites a range to mean the whole
+# span, and Trilogy's ``atu_seq`` expands ranges the same way for 14/16 cases, so we
+# expand each range to every TMI id it covers — reuniting the range's constituent
+# members with the type (and filling the odd ``atu_seq`` gap where it does not).
+_SUMMARY_RANGE = re.compile(r"([A-Z]\d[A-Za-z0-9.]*?)'([A-Z]?\d[A-Za-z0-9.]*)")
+
+
+def _expand_range(lo: str, hi: str, ordered: list[str], keys: list) -> list[str]:
+    """Every TMI id in the closed Thompson-order interval ``[lo, hi]``. The upper
+    endpoint inherits the lower's letter if it dropped it (``X1030'1036``).
+    ``ordered``/``keys`` are the index ids and their sort keys, pre-sorted."""
+    if not hi[:1].isalpha():
+        hi = lo[0] + hi
+    klo, khi = tmi_sort_key(lo.rstrip(".")), tmi_sort_key(hi.rstrip("."))
+    if klo > khi:
+        return []
+    return ordered[bisect.bisect_left(keys, klo):bisect.bisect_right(keys, khi)]
 
 # Transitive closure: a triangle is completed only through a *low fan-out* pivot
 # (a vertex whose edge into the target index reaches at most this many nodes). A
@@ -100,15 +123,22 @@ def build(
             tmi_to_atu_note[tmi_id] = landed
     atu_to_tmi_note = _invert(tmi_to_atu_note)
 
+    ordered = sorted(tmi_ids, key=tmi_sort_key)
+    order_keys = [tmi_sort_key(c) for c in ordered]
     atu_to_tmi_summary: dict[str, list[str]] = {}
     for atu_id, summary in (atu_summaries or {}).items():
         codes: list[str] = []
-        for tok in _SUMMARY_MOTIF.findall(summary):
-            code = tok if tok in tmi_ids else tok.rstrip("f")  # "J21ff" -> base "J21"
+        # Ranges first (each expanded to its members), then the bare codes; both are
+        # filtered to the index and de-duplicated, then sorted into Thompson order.
+        toks = [m for lo, hi in _SUMMARY_RANGE.findall(summary)
+                for m in _expand_range(lo, hi, ordered, order_keys)]
+        toks += [tok if tok in tmi_ids else tok.rstrip("f")  # "J21ff" -> base "J21"
+                 for tok in _SUMMARY_MOTIF.findall(summary)]
+        for code in toks:
             if code in tmi_ids and code not in codes:
                 codes.append(code)
         if codes:
-            atu_to_tmi_summary[atu_id] = codes
+            atu_to_tmi_summary[atu_id] = sorted(codes, key=tmi_sort_key)
     tmi_to_atu_summary = _invert(atu_to_tmi_summary)
 
     # Berezkin <-> ATU from the "ATU NNN" references embedded in titles. Each cited

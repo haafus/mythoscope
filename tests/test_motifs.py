@@ -628,6 +628,13 @@ class TestAtuRegions:
         out3 = svc._atu_summary_html("the judgements [B261ff]")
         # the motif-only bracket is unwrapped; base motif links, 'ff' stays as text
         assert 'data-id="B261"' in out3 and "[" not in out3 and out3.endswith("ff</p>")
+        # a motif range ("S222'S226", mojibake apostrophe) reads as "S222–S226": both
+        # endpoints link, the dash is restored, and the motif-only bracket is unwrapped
+        monkeypatch.setattr(svc, "_by_id",
+                            lambda idx: {"S222": {}, "S226": {}} if idx == "tmi" else {})
+        out4 = svc._atu_summary_html("sold to the devil [S222'S226].")
+        assert 'data-id="S222"' in out4 and 'data-id="S226"' in out4
+        assert "–" in out4 and "'" not in out4 and "[" not in out4
 
     def test_summary_blocks_wraps_enumeration_as_ordered_list(self, monkeypatch):
         monkeypatch.setattr(svc, "_by_id", lambda idx: {})
@@ -1140,6 +1147,26 @@ class TestCrosswalk:
         assert cw["atu_to_tmi_summary"]["122"] == ["K550"]      # K550ff → K550; X999 not in TMI
         assert cw["tmi_to_atu_summary"]["J2066"] == ["115"]
         assert cw["tmi_to_atu_summary"]["K550"] == ["122"]
+
+    def test_summary_range_expands_to_index_members(self):
+        # A summary cites a motif *range* with a mojibake en-dash ("J1759'J1763").
+        # The crosswalk expands it to every TMI id the range spans (not just the two
+        # endpoints), so the range's constituent members link back to the type.
+        tmi_ids = {"J1759", "J1760", "J1761", "J1763", "J1799", "K1"}
+        atu_summaries = {"1319": "one thing is mistaken for another [J1759'J1763]."}
+        cw = crosswalk.build({}, tmi_ids, [], {"1319"}, atu_summaries=atu_summaries)
+        # every in-index member of [J1759, J1763] is credited, in Thompson order;
+        # J1799 sits past the upper endpoint and is left out.
+        assert cw["atu_to_tmi_summary"]["1319"] == ["J1759", "J1760", "J1761", "J1763"]
+        assert cw["tmi_to_atu_summary"]["J1761"] == ["1319"]     # interior member links back
+        assert "J1799" not in cw["tmi_to_atu_summary"]
+
+    def test_summary_range_upper_endpoint_may_omit_letter(self):
+        # "X1030'1036" — the upper endpoint drops the letter; it inherits X.
+        tmi_ids = {"X1030", "X1031", "X1036", "X1200"}
+        cw = crosswalk.build({}, tmi_ids, [], {"1960E"},
+                             atu_summaries={"1960E": "a huge farm [X1030'1036]."})
+        assert cw["atu_to_tmi_summary"]["1960E"] == ["X1030", "X1031", "X1036"]
 
     def test_direct_berezkin_tmi(self):
         # tmi_refs (from mapsofmyths) become a direct Berezkin<->TMI bridge; a ref

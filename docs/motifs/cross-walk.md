@@ -25,7 +25,7 @@ Thompson Motif-Index (**TMI**), Aarne–Thompson–Uther (**ATU**) и ареал
 | 1.1 | **ATU ↔ TMI — constituent** | `atu_seq` (тип → упорядоченные мотивы) | `atu_to_tmi` / `tmi_to_atu` | 1 642 типа → мотивы; 3 799 мотивов ← типы (3 765 существуют) | ATU: «Constituent TMI motifs»; TMI: «Related ATU tale types» (⇐) |
 | 1.2 | **ATU ↔ TMI — defining** | `defining_motifs` (мотив у метки типа) | `atu_to_tmi_defining` / `tmi_to_atu_defining` | 62 типа → 74 мотива | ATU: «Defining motif(s)»; TMI: «Defines ATU tale type(s)» |
 | 1.3 | **ATU ↔ TMI — note (inline)** | `atu_inline` — цитаты `Type N` в заметках TMI, разрешённые к ATU | `tmi_to_atu_note` / `atu_to_tmi_note` | 2 602 мотива → 802 типа | TMI: «Related ATU tale types» (⇒); ATU: «Referenced by TMI motifs (via notes)» |
-| 1.4 | **ATU ↔ TMI — summary (inline)** | коды TMI, названные в тексте `summary` типа | `atu_to_tmi_summary` / `tmi_to_atu_summary` | 1 665 типов → 3 603 мотива | ATU: ссылки внутри «Summary»; TMI: «Named in ATU summaries» |
+| 1.4 | **ATU ↔ TMI — summary (inline)** | коды TMI, названные в тексте `summary` типа (диапазоны развёрнуты) | `atu_to_tmi_summary` / `tmi_to_atu_summary` | 1 665 типов → 3 810 мотивов | ATU: ссылки внутри «Summary»; TMI: «Named in ATU summaries» |
 | 2 | **Берёзкин ↔ ATU** | `atu_refs` из титулов Берёзкина (+ alias-rescue, +чистка) | `berezkin_to_atu` / `atu_to_berezkin` | 509 мотивов → 485 типов (472 существуют) | Берёзкин: «Related ATU tale types»; ATU: «Referenced by Berezkin motifs» |
 | 3 | **Берёзкин ↔ TMI (прямой)** | `tmi_refs` (кураторские Thompson-id из mapsofmyths, парсим+чистим) | `berezkin_to_tmi` / `tmi_to_berezkin` | 193 мотива → 212 мотивов | Берёзкин: прямые TMI-ссылки; TMI: «Referenced by Berezkin motifs» |
 
@@ -89,9 +89,21 @@ Uther у метки многих типов называет **определя�
 делает ссылками. Инверсия этого — карта `atu_to_tmi_summary` (что названо в типе) и
 `tmi_to_atu_summary` (в summary каких типов встречается мотив). Извлечение повторяет
 read-side паттерн `_SUMMARY_MOTIF`, включая сокращение `ff` (`K550ff` → база
-`K550`), чтобы список точно совпадал с тем, что реально линкуется в тексте.
+`K550`), чтобы список совпадал с тем, что реально линкуется в тексте.
 
-- Охват: **1 665** типов называют ≥1 живой код TMI; инверсия — **3 603** мотива.
+Отдельно обрабатываются **диапазоны мотивов**: Uther записывает пробег как
+`J1759'J1763` / `X1030'1036` (апостроф здесь — mojibake от en-dash; верхний конец
+может опускать букву). Диапазон называет весь пробег, поэтому `_SUMMARY_RANGE`
+разворачивает его во **все** id индекса, попадающие в интервал `[lo, hi]` в
+Thompson-порядке (`_expand_range`), а не только концы. Это возвращает типу его
+внутренние составные мотивы и заодно закрывает случайные пробелы `atu_seq` (тот
+разворачивает те же диапазоны сам в 14/16 случаев). Read-side восстанавливает
+mojibake `'`→`–`, так что в тексте пробег читается как `J1759–J1763` (оба конца —
+ссылки, внутренние члены не выписываются, но кредитуются в карте).
+
+- Охват: **1 665** типов называют ≥1 живой код TMI; инверсия — **3 810** мотивов
+  (+207 за счёт разворота диапазонов). Расхождение с constituent-списком
+  (`atu_seq`) падает с 289 до 64 рёбер, Jaccard 0.93 → 0.97.
 - Фронт: ATU — ссылки внутри раздела **«Summary»**; TMI — раздел
   **«Named in ATU summaries»**.
 

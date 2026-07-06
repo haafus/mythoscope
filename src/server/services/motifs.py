@@ -1209,7 +1209,11 @@ _SUMMARY_ENUM = re.compile(r"\((\d{1,2})\)")
 # wraps motif codes in square brackets, but since we render them as links the
 # brackets are redundant, so we unwrap groups whose content is only motif codes.
 _BRACKET_GROUP = re.compile(r"\[([^\]]*)\]")
-_MOTIF_ONLY = re.compile(r"[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*f{0,2}")
+_MOTIF_ONLY = re.compile(r"[A-Z]\d[A-Za-z0-9]*(?:\.\d+)*(?:–[A-Z]?\d[A-Za-z0-9.]*)?f{0,2}")
+# A motif *range* — `J1759'J1763`, `X1030'1036`. The separator is a mojibake en-dash
+# printed as an apostrophe; we restore the dash so it reads as a range (the crosswalk
+# credits every member the range spans — see crosswalk._SUMMARY_RANGE).
+_RANGE_SEP = re.compile(r"([A-Z]\d[A-Za-z0-9.]*)'([A-Z]?\d[A-Za-z0-9.]*)")
 
 
 def _is_motif_group(content: str) -> bool:
@@ -1230,6 +1234,10 @@ def _linkify_summary(text: str) -> str:
     alphanumeric, so injecting them raw after escaping the surrounding prose is safe."""
     tmi, atu = _by_id("tmi"), _by_id("atu")
     esc = html.escape(text, quote=False)
+    # Restore the mojibake apostrophe-as-en-dash between range endpoints so they read
+    # as `J1759–J1763` (both endpoints still linkify; interior members are credited in
+    # the crosswalk, not spelled out here).
+    esc = _RANGE_SEP.sub("\\1–\\2", esc)
     # Drop the square brackets around motif-only groups (the chips carry the cue).
     esc = _BRACKET_GROUP.sub(lambda m: m.group(1) if _is_motif_group(m.group(1)) else m.group(0), esc)
 
