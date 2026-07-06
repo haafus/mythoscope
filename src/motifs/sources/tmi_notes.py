@@ -148,11 +148,69 @@ def _is_leading_citation(head: str) -> bool:
     return False
 
 
+def _sentence_ends(s: str):
+    """Yield the index just past each sentence terminator at bracket/paren depth 0 (so
+    ``s[:i]`` keeps the punctuation). Decimal points and terminators nested in
+    ``(…)``/``[…]`` are skipped; a ``.`` counts only when it ends the string or is
+    followed by whitespace then a capital / opening quote or bracket."""
+    depth = 0
+    for i, ch in enumerate(s):
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth = max(0, depth - 1)
+        elif depth == 0 and ch in ".!?":
+            if ch == "." and i and s[i - 1].isdigit() and i + 1 < len(s) and s[i + 1].isdigit():
+                continue
+            j = i + 1
+            while j < len(s) and s[j] == " ":
+                j += 1
+            if j >= len(s) or s[j].isupper() or s[j] in "([\"'":
+                yield i + 1
+
+
+def _is_citation_sentence(seg: str) -> bool:
+    """True if a single sentence is a bibliographic citation (a locus, or an
+    ``Author Work Page`` run whose numbers no lowercase word precedes) rather than
+    prose — so a bare noun list ('Stone, cedar, iron…') is *not* taken for one."""
+    seg = seg.strip()
+    if not seg:
+        return True
+    if _PROSE_WORD.search(seg):     # any English function/verb word => prose, not a pure citation
+        return False
+    if _LOCUS.search(seg):
+        return True
+    d = re.search(r"\d", seg)       # 'Gaster Thespis 211' — proper-noun-led, no word before the number
+    return bool(d and _CAP_INIT.match(seg)
+                and not re.search(r"\b[a-zà-öø-ÿ]{2,}\b", seg[: d.start()]))
+
+
+def _trim_trailing_citation(head: str) -> tuple[str, str]:
+    """Split a citation glued onto the end of a prose definition ('…eating him. Wienert
+    FFC LVI 52…; Halm Aesop No. 231') into ``(definition, trailing)``. Cut at the
+    earliest sentence end after which *every* sentence is itself a citation and the
+    kept part still reads as prose — so real multi-sentence prose (even a bare noun
+    list) is never trimmed."""
+    for cut in _sentence_ends(head):
+        tail = head[cut:].strip()
+        if not (tail and _LOCUS.search(tail) and _PROSE_WORD.search(head[:cut])):
+            continue
+        segs, prev = [], 0
+        for e in [*_sentence_ends(tail), len(tail)]:
+            segs.append(tail[prev:e]); prev = e
+        if all(_is_citation_sentence(s) for s in segs):
+            return head[:cut].strip(), tail
+    return head, ""
+
+
 def _split_definition(notes: str) -> tuple[str, str]:
     m = _BIB_START.search(notes)
     head = (notes[: m.start()] if m else notes).strip(" -")
     biblio = notes[m.start():] if m else ""
     if _is_prose(head) and not _is_leading_citation(head):
+        head, trailing = _trim_trailing_citation(head)
+        if trailing:                          # move the peeled citation into the bibliography
+            biblio = f"{trailing}; {biblio.lstrip(' ;-')}" if biblio.strip(" ;-") else trailing
         return head, biblio
     return "", notes
 

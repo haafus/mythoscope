@@ -763,12 +763,26 @@ class TestTrilogy:
         assert tmi_notes.parse_notes(
             "Malten Jahrb. d. kaiserlichen deutschen archäologischen Inst. XXIX 185.")["definition"] == ""
         assert tmi_notes.parse_notes("Gaster Thespis 211, 389, 397.")["definition"] == ""
-        # A real prose definition with an incidental number, or a trailing citation,
-        # is NOT mistaken for a citation — the prose stays.
+        # A real prose definition with an incidental number is NOT mistaken for a citation.
         assert tmi_notes.parse_notes(
             "At 300 miles all women miscarry.")["definition"] == "At 300 miles all women miscarry."
+
+    def test_notes_trims_trailing_citation(self):
+        # A citation glued onto the end of a prose definition is peeled into references.
+        out = tmi_notes.parse_notes(
+            "Captured person persuades his captor to fatten him. Wienert FFC LVI 52; Halm Aesop No. 231")
+        assert out["definition"] == "Captured person persuades his captor to fatten him."
+        assert "Halm Aesop No. 231" in out["references"]
         assert tmi_notes.parse_notes(
-            "Braved the wolf, who tore his legs. Dh III 46.")["definition"].startswith("Braved the wolf")
+            "Braved the wolf, who tore his legs. Dh III 46.")["definition"] == "Braved the wolf, who tore his legs."
+        # A trailing *prose* sentence — even a bare noun list, or prose that runs into
+        # the citation without a full stop — is left intact.
+        assert tmi_notes.parse_notes(
+            "Seven thrones on top of one another. Stone, cedar, iron, gold. Gaster Thespis 135ff."
+        )["definition"] == "Seven thrones on top of one another. Stone, cedar, iron, gold."
+        assert tmi_notes.parse_notes(
+            "They hear the reapers. Larks move, for they now know it will be done Pauli No. 683."
+        )["definition"].endswith("it will be done Pauli No. 683.")
 
     def test_notes_force_bibliography_override(self):
         # A curated override treats the whole note as bibliography for a citation the
