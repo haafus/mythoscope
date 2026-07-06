@@ -57,7 +57,10 @@ def _expand_range(lo: str, hi: str, ordered: list[str], keys: list) -> list[str]
     klo, khi = tmi_sort_key(lo.rstrip(".")), tmi_sort_key(hi.rstrip("."))
     if klo > khi:
         return []
-    return ordered[bisect.bisect_left(keys, klo):bisect.bisect_right(keys, khi)]
+    span = ordered[bisect.bisect_left(keys, klo):bisect.bisect_right(keys, khi)]
+    # Drop synthetic duplicate ids ('S222~2'): the range names the bare code, whose
+    # canonical member is already in the span; the '~N' sibling only sorts inside it.
+    return [c for c in span if "~" not in c]
 
 # Transitive closure: a triangle is completed only through a *low fan-out* pivot
 # (a vertex whose edge into the target index reaches at most this many nodes). A

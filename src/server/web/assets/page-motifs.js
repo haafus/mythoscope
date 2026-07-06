@@ -354,7 +354,7 @@ function renderList(data) {
     // TMI ids without a dot are the broad top-level categories — show them bold.
     const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
     list.innerHTML = data.items.map((it) => `
-        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}${it.duplicate ? " duplicate" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
+        <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
             <span class="motifs-item-name">${escapeHtml(it.name || "—")}</span>
             <span class="motifs-item-badge${it.substantive ? " is-sub" : ""}">${escapeHtml(it.badge || "")}</span>
@@ -1316,12 +1316,11 @@ function renderDetail(d) {
         body = head;
         if (d.duplicate) {
             const sibs = d.duplicate_siblings || [];
-            const n = sibs.length;
             const links = sibs.map((l) =>
-                `<a href="#/motifs?index=tmi&id=${encodeURIComponent(l.id)}" class="motif-link" data-index="tmi" data-id="${escapeHtml(l.id)}">${escapeHtml(l.id)}${l.name ? ` — ${escapeHtml(l.name)}` : ""}</a>`).join(", ");
-            const which = n === 1 ? "one other motif" : `${n} other motifs`;
-            const tail = links ? `: ${links}` : "";
-            body += `<p class="motif-dup-note">Thompson reuses code <strong>${escapeHtml(d.code || d.id)}</strong> for ${which}${tail}.</p>`;
+                `<a href="#/motifs?index=tmi&id=${encodeURIComponent(l.id)}" class="motif-link" data-index="tmi" data-id="${escapeHtml(l.id)}">${escapeHtml(l.id)}</a>`).join(", ");
+            const which = sibs.length === 1 ? "another Thompson motif" : `${sibs.length} other Thompson motifs`;
+            const tail = links ? ` — see ${links}` : "";
+            body += `<p class="motif-dup-note">Code <strong>${escapeHtml(d.code || d.id)}</strong> is shared with ${which}${tail}.</p>`;
         }
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);

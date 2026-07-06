@@ -117,11 +117,18 @@ All in `trilogy._finalize_tmi` / `_parse_tmi`.
 - **Level.** Ordinary motifs keep the dataset's place-value `level` (it is
   authoritative). Only the broken `.0` interpolations get a depth recomputed
   from their corrected parents.
-- **Duplicate codes.** 8 source codes are reused for distinct motifs
-  (`B172.2, E755.2.8, K1352, K561.1.1, M202.1, N591, S222, Z64`). The first
-  keeps the bare code; the rest get a lowercase suffix (`S222 → S222b`). All
-  occurrences are flagged `duplicate`; `code` preserves the original. (16 records
-  total are flagged.)
+- **Duplicate codes.** 8 codes are given to more than one motif — **by Thompson
+  himself**, where regional supplements (Cross, Neuman, Balys, Thompson-Balys)
+  were slotted under existing numbers (`B172.2, E755.2.8, K1352, K561.1.1, M202.1,
+  N591, S222, Z64`). Two are printing redundancies (`K1352, K561.1.1` — same name
+  twice): these **collapse** to the copy with the most notes. The other 6 are
+  genuinely distinct motifs sharing a code: both are kept, the copy with the most
+  notes keeps the bare code and the rest take a synthetic **`~N`** suffix (`S222`
+  = "Man sells child", `*Types 756B`; `S222~2` = "Prince plans to kill father").
+  `~` is invalid in Thompson notation, so the id is never mistaken for a real code
+  or swept into range/citation matching. Survivors of a shared code are flagged
+  `duplicate` and carry a banner linking the sibling; `code` preserves the bare
+  number.
 - **Notes run-on (defect).** Motif **`A736.1.1`** has an unclosed `notes` cell
   in the source that swallows the serialized text of ~4,200 later rows. We cut
   the note at the first `<code>. †<code>.` row-start marker (which never appears

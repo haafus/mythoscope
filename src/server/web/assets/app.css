@@ -1412,7 +1412,6 @@ body.has-main-navbar {
 .motifs-item:hover .motifs-item-id,
 .motifs-item:hover .motifs-item-name,
 .motifs-item.category:hover .motifs-item-name,
-.motifs-item.duplicate:hover .motifs-item-name,
 .motifs-item:hover .motifs-item-badge { color: #fff; }
 .motifs-item:hover .motifs-item-badge { opacity: 0.85; }
 /* Selection is shown by .active; a click leaves a stray focus ring on the old
@@ -1850,10 +1849,6 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .cslegend b { color: #41506a; font-weight: 700; }
 /* Region colour dot on the per-type attestation accordion. */
 .region-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; margin-right: 8px; flex: 0 0 auto; align-self: center; }
-
-/* Duplicate-code TMI rows (one source code reused for distinct motifs) in red. */
-.motifs-item.duplicate .motifs-item-id,
-.motifs-item.duplicate .motifs-item-name { color: #c0392b; }
 
 .motif-dup-note {
     margin: 16px 0 14px;

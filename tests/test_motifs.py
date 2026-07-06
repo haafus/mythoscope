@@ -258,6 +258,25 @@ class TestAtuStructure:
             {"people": "German", "cite": "Moser-Rath 1964"},
         ]}]
 
+    def test_duplicate_codes_collapse_and_suffix(self):
+        # A code Thompson gives to more than one motif. Same-name copies (a printing
+        # redundancy) collapse to the one with the most notes; genuinely distinct
+        # motifs both survive — the richest keeps the bare code, the rest take a '~N'.
+        motifs = [
+            {"id": "K5", "name": "Cat And Mouse", "notes": "short", "level": 1},
+            {"id": "K5", "name": "Cat And Mouse", "notes": "a much longer note", "level": 1},
+            {"id": "S9", "name": "Prince Kills Father", "notes": "n", "level": 1},
+            {"id": "S9", "name": "Man Sells Child", "notes": "notes *Types 756B here", "level": 1},
+        ]
+        out = {m["id"]: m for m in trilogy._finalize_tmi(motifs)}
+        # same-name pair collapses to the richer copy and is no longer a duplicate
+        assert "K5~2" not in out and out["K5"]["notes"] == "a much longer note"
+        assert not out["K5"].get("duplicate")
+        # distinct pair: richest keeps the bare code, the other gets '~2'; both flagged
+        assert out["S9"]["name"] == "Man Sells Child" and out["S9"]["duplicate"]
+        assert out["S9~2"]["name"] == "Prince Kills Father" and out["S9~2"]["duplicate"]
+        assert out["S9~2"]["code"] == "S9"
+
     def test_mangled_motif_code_override(self):
         # A dropped dot collapses D1610.2.2 -> D16102.2 in the ATU dataset. The
         # override repairs it in both the atu_seq column and the summary text so the
@@ -943,9 +962,10 @@ class TestTrilogy:
             {"id": "A100", "name": "Deity", "level": 0, "parent": ""},
             {"id": "A110", "name": "Origin", "level": 5, "parent": "A100"},    # odd source level
         ])}
-        # duplicate code: first keeps it, second gets a letter sub-index; both flagged
-        assert "A0" in out and "A0b" in out
-        assert out["A0"]["duplicate"] and out["A0b"]["duplicate"] and out["A0b"]["code"] == "A0"
+        # duplicate code, distinct names: richest keeps it, the other gets a '~N'
+        # suffix; both flagged
+        assert "A0" in out and "A0~2" in out
+        assert out["A0"]["duplicate"] and out["A0~2"]["duplicate"] and out["A0~2"]["code"] == "A0"
         # no synthetic grouping nodes
         assert "A52.0" not in out
         assert not any(m.get("synthetic") for m in out.values())
@@ -1504,11 +1524,13 @@ class TestService:
 
     def test_tmi_duplicate_codes_distinguishable(self, tiny_db):
         by = {i["id"]: i for i in svc.list_motifs("tmi")["items"]}
-        assert by["S33"]["duplicate"] and by["S33b"]["duplicate"]
+        assert by["S33"]["duplicate"] and by["S33~2"]["duplicate"]
         # both variants are independently openable with their own content
         assert svc.get_motif("tmi", "S33")["name"] == "Dup one"
-        assert svc.get_motif("tmi", "S33b")["name"] == "Dup two"
-        assert svc.get_motif("tmi", "S33b")["code"] == "S33"
+        assert svc.get_motif("tmi", "S33~2")["name"] == "Dup two"
+        assert svc.get_motif("tmi", "S33~2")["code"] == "S33"
+        # the banner links each to its sibling
+        assert svc.get_motif("tmi", "S33")["duplicate_siblings"][0]["id"] == "S33~2"
 
     def test_missing_motif(self, tiny_db):
         assert svc.get_motif("atu", "nope") is None

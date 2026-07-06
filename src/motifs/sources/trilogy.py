@@ -211,34 +211,47 @@ def _id_trim_parent(code: str, idset: set[str]) -> str:
 def _finalize_tmi(motifs: list[dict]) -> list[dict]:
     """Repair the known Trilogy TMI defects, annotate, and hierarchically sort.
 
-    - Duplicate codes (one code reused for distinct motifs): the first keeps the
-      bare code, the rest get a lowercase letter sub-index (Z64 -> Z64, Z64b) so
-      they are distinguishable; all are flagged ``duplicate``. ``code`` keeps the
-      original. Cross-walk/parent references to the bare code resolve to the first.
+    - Duplicate codes: Thompson's index gives some numbers to more than one motif
+      (regional supplements — Cross, Neuman, Balys, Thompson-Balys — slotted under
+      existing codes). Same-name occurrences (a printing redundancy) collapse to the
+      copy with the most notes; genuinely distinct motifs sharing a code both stay —
+      the richest keeps the bare code, the rest take a synthetic ``~N`` suffix (a
+      marker invalid in Thompson notation, so it is never mistaken for a real code).
+      All survivors of a shared code are flagged ``duplicate``; ``code`` keeps the
+      bare number, to which cross-walk/parent references resolve.
     - ``parent`` is corrected to the effective parent (stored, else id-trimmed).
     - ``level`` keeps the dataset's place-value value for ordinary motifs; only
       the broken '.0' interpolations get a depth computed from corrected parents.
     All defects are logged.
     """
-    counts = collections.Counter(m["id"] for m in motifs)
-    used = set(counts)
-    dup_codes = {code for code, n in counts.items() if n > 1}
-
-    occ: dict[str, int] = {}
     for m in motifs:
         m["code"] = m["id"]
-        if m["id"] in dup_codes:
-            m["duplicate"] = True
-            occ[m["id"]] = occ.get(m["id"], 0) + 1
-            if occ[m["id"]] > 1:  # first keeps the bare code
-                letter = occ[m["id"]] - 1
-                while True:
-                    cand = f"{m['code']}{chr(ord('a') + letter)}"
-                    if cand not in used:
-                        break
-                    letter += 1
-                used.add(cand)
-                m["id"] = cand
+    dup_codes = {code for code, n in collections.Counter(m["id"] for m in motifs).items() if n > 1}
+
+    dropped: set[int] = set()
+    collapsed = 0
+    suffixed: list[str] = []
+    for code in dup_codes:
+        by_name: dict[str, list[dict]] = {}
+        for m in (r for r in motifs if r["id"] == code):
+            by_name.setdefault(" ".join(m.get("name", "").split()).lower(), []).append(m)
+        kept = []
+        for members in by_name.values():   # collapse same-name copies to the richest
+            members.sort(key=lambda r: len(r.get("notes", "")), reverse=True)
+            kept.append(members[0])
+            for r in members[1:]:
+                dropped.add(id(r)); collapsed += 1
+        if len(kept) == 1:                 # was pure redundancy — no longer a duplicate
+            kept[0].pop("duplicate", None)
+            continue
+        kept.sort(key=lambda r: len(r.get("notes", "")), reverse=True)
+        for r in kept:
+            r["duplicate"] = True          # richest keeps the bare code; rest get '~N'
+        for n, r in enumerate(kept[1:], start=2):
+            r["id"] = f"{code}~{n}"
+        suffixed.append(code)
+    if dropped:
+        motifs = [m for m in motifs if id(m) not in dropped]
 
     idset = {m["id"] for m in motifs}
 
@@ -280,8 +293,9 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
         m.pop("source_level", None)
 
     if dup_codes:
-        logger.warning("TMI defect: %d duplicate codes given letter sub-indices: %s",
-                       len(dup_codes), ", ".join(sorted(dup_codes)))
+        logger.warning("TMI defect: %d duplicate codes — %d redundant rows collapsed, "
+                       "%d kept as distinct motifs with '~N' suffixes: %s",
+                       len(dup_codes), collapsed, len(suffixed), ", ".join(sorted(suffixed)))
     if recovered or unresolved:
         logger.warning("TMI defect: %d dotted ids had no source parent — reattached %d via id-trim, %d unresolved",
                        recovered + unresolved, recovered, unresolved)
