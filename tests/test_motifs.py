@@ -984,8 +984,9 @@ class TestTrilogy:
         # 'Japan' folds to the already-regioned 'Japanese'; compounds/families get a region
         assert culture_dict.canonical("Japan") == ("Japanese", "")
         assert culture_dict._REGION["Japanese"] == "East Asia"
-        assert culture_dict._REGION["Finno-Ugric"] == "Europe"
         assert culture_dict._REGION["Finnish-Swedish"] == "Europe"
+        # a cross-region language family is left region-less, not forced into one
+        assert "Finno-Ugric" not in culture_dict._REGION
 
     def test_culture_legend_aggregates_aliases_regions_subs(self):
         motifs = [

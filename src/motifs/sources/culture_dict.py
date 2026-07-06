@@ -109,8 +109,11 @@ _REGION = {
     "Mexican Indian": "Mesoamerica",
     "Guarayú": "South America", "Paressi": "South America", "Ackawoi": "South America",
     "Mono-Alu": "Oceania",  # single Solomon Islands people, despite the hyphen
-    # Language-family / compound labels that read as one culture.
-    "Finno-Ugric": "Europe", "Finnish-Swedish": "Europe", "English-Scottish": "Europe",
+    # Compound labels that read as one culture. ('Finno-Ugric' is left region-less
+    # on purpose: it is a language family straddling Europe and W. Siberia/the Urals
+    # — Thompson's 'Finno-Ugric:' cites Holmberg's *Finno-Ugric, Siberian* mythology
+    # — so no single macro-region fits, as with 'Chinese-Persian'.)
+    "Finnish-Swedish": "Europe", "English-Scottish": "Europe",
     "Missouri-French": "North America", "French-Canadian": "North America",
     "Indo-Chinese": "Southeast Asia",
 }
