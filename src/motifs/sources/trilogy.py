@@ -338,6 +338,19 @@ def _parse_tmi(rows: list[dict]) -> list[dict]:
     return motifs
 
 
+# Mangled TMI motif codes in the Trilogy ATU dataset, corrected to their real id.
+# A dropped dot collapses D1610.2.2 -> D16102.2 (type 780B, "she grows as a bush and
+# sings" = D1610.2.2 "Speaking Bush"). Applied to both the atu_seq column and the
+# summary text so the code links and joins the cross-walk instead of dangling.
+_MOTIF_CODE_FIXES = {"D16102.2": "D1610.2.2"}
+
+
+def _fix_motif_codes(text: str) -> str:
+    for bad, good in _MOTIF_CODE_FIXES.items():
+        text = text.replace(bad, good)
+    return text
+
+
 def _parse_atu_seq(rows: list[dict]) -> dict[str, list[str]]:
     """Group ``atu_seq`` rows into ``{atu_id: [ordered unique TMI motif codes]}``.
 
@@ -348,7 +361,7 @@ def _parse_atu_seq(rows: list[dict]) -> dict[str, list[str]]:
     ordered: dict[str, list[tuple[float, str]]] = {}
     for row in rows:
         atu_id = _clean(row.get("atu_id"))
-        motif = _clean(row.get("motif"))
+        motif = _fix_motif_codes(_clean(row.get("motif")))
         if not atu_id or not motif:
             continue
         try:
@@ -773,6 +786,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]],
             _clean(row.get("tale_name")), _clean(row.get("tale_type")))
         tale_name, tale_summary = _apply_title_override(atu_id, tale_name, tale_summary)
         tale_name, tale_summary = _heal_accents(tale_name), _heal_accents(tale_summary)
+        tale_summary = _fix_motif_codes(tale_summary)   # repair mangled motif codes before they are parsed/linked
         tale_name, tale_summary, defining = _extract_defining_motifs(atu_id, tale_name, tale_summary)
         tale_summary, former_name, former_ids = _extract_apparatus(tale_summary)
         types.append({

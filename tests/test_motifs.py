@@ -258,6 +258,17 @@ class TestAtuStructure:
             {"people": "German", "cite": "Moser-Rath 1964"},
         ]}]
 
+    def test_mangled_motif_code_override(self):
+        # A dropped dot collapses D1610.2.2 -> D16102.2 in the ATU dataset. The
+        # override repairs it in both the atu_seq column and the summary text so the
+        # code is a live TMI id (and links) instead of dangling.
+        assert trilogy._parse_atu_seq([{"atu_id": "780B", "motif": "D16102.2", "motif_order": "1"}]) \
+            == {"780B": ["D1610.2.2"]}
+        rows = [{"atu_id": "780B", "chapter": "Magic", "division": "Magic Objects 560-649",
+                 "tale_name": "The Singing Bone", "tale_type": "she grows as a bush [E631, D16102.2]."}]
+        t = trilogy._parse_atu(rows, {}, {})[0][0]
+        assert "D16102.2" not in t["summary"] and "D1610.2.2" in t["summary"]
+
 
 class TestAshliman:
     def test_type_page_padding_override_and_star(self):

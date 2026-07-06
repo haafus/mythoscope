@@ -208,6 +208,14 @@ introduced several defects. Each is repaired at build time (`trilogy.py`).
   `650A`) alone expand to ~542k of the file's 593k rows. So per-motif variant
   frequency is not a trustworthy salience signal; we collapse across variants and
   keep only the **ordered unique motif set** per type.
+- **Mangled TMI motif codes.** A dropped dot collapses a Thompson id to a
+  non-existent one (`D1610.2.2 → D16102.2` in type 780B, "she grows as a bush and
+  sings" = *Speaking Bush*). A curated `_MOTIF_CODE_FIXES` map repairs these in both
+  the `atu_seq` column and the summary text so the code links and joins the
+  cross-walk instead of dangling. Of the 3,847 TMI codes ATU cites, only ~34 remain
+  absent from our Thompson index — genuine missing leaves of a fuller edition, not
+  defects (34/35 are cited by both `atu_seq` and Uther's prose and sit exactly where
+  a real motif would in Thompson order).
 
 Defects are logged at build time.
 
