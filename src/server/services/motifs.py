@@ -361,7 +361,7 @@ def list_indexes() -> list[dict]:
             summary["substantive_count"] = sum(st[1] for st in chstats.values())
             summary["definition_count"] = sum(st[2] for st in chstats.values())
             summary["atu_count"] = sum(st[3] for st in chstats.values())
-        if index == "atu":  # chapter → division → sub_division hierarchy for the browse dropdown
+        if data.get("divisions"):  # chapter → division → sub_division browse (ATU; TMI via Mellmann)
             summary["divisions"] = data.get("divisions", [])
             summary["subdivisions"] = data.get("subdivisions", [])
         out.append(summary)
@@ -1122,6 +1122,14 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["links"]["atu_summary_refs"] = [_link("atu", a) for a in cw.get("tmi_to_atu_summary", {}).get(rec["id"], [])]
         # Direct Berezkin motifs that map here (mapsofmyths concordance).
         detail["links"]["berezkin"] = [_link("berezkin", b) for b in cw.get("tmi_to_berezkin", {}).get(rec["id"], [])]
+        # Mellmann's printed classification headings (division1-3), for the
+        # Classification line — as in the ATU index.
+        detail["division"] = rec.get("division", "")
+        detail["division_range"] = rec.get("division_range")
+        detail["sub_division"] = rec.get("sub_division", "")
+        detail["sub_division_range"] = rec.get("sub_division_range")
+        detail["division3"] = rec.get("division3", "")
+        detail["division3_range"] = rec.get("division3_range")
 
     elif index == "atu":
         detail["division"] = rec.get("division", "")

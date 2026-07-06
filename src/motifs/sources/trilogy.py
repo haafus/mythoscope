@@ -175,10 +175,10 @@ def _strip_notes_bleed(notes: str) -> str:
     return notes[: m.start()].strip() if m else notes
 
 
-def _read_csv(config: dict, key: str, *, force: bool) -> list[dict]:
+def _read_csv(config: dict, key: str, *, force: bool, subdir: str = "trilogy") -> list[dict]:
     base = config["base_url"].rstrip("/")
     filename = config["files"][key]
-    cache = Path(settings.motifs_dir) / "raw" / "trilogy" / filename
+    cache = Path(settings.motifs_dir) / "raw" / subdir / filename
     raw = fetch_to_cache(f"{base}/{filename}", cache, force=force)
     text = raw.decode("utf-8", errors="replace")
     return list(csv.DictReader(io.StringIO(text)))
@@ -903,15 +903,96 @@ def _atu_subdivisions(types: list[dict]) -> list[dict]:
     return rows
 
 
-def build_tmi(config: dict, *, force: bool = False) -> dict:
+# Katja Mellmann's TMI CSV prints Thompson's classification headings — the code
+# ranges ("A0–A99. Creator.", "A300–A399. Gods of the underworld.") the Trilogy
+# CSV drops. We lift her three nested division levels and hang them on our motifs
+# so the TMI browse and Classification mirror the ATU section. The optional dot
+# after the start number tolerates a source typo ("A800.–A899. The earth.").
+_MEL_DIVISION = re.compile(r"^\s*([A-Z])(\d+)\.?\s*[–—-]\s*[A-Z]?(\d+)\s*\.\s*(.+?)\.?\s*$")
+_MEL_DIVISION_COLS = ("division1", "division2", "division3")
+
+
+def _parse_mel_division(text: str) -> dict | None:
+    """'A300–A399. Gods of the underworld.' -> {chapter, name, start, end}."""
+    m = _MEL_DIVISION.match(text or "")
+    if not m:
+        return None
+    return {"chapter": m.group(1), "name": m.group(4).strip(),
+            "start": int(m.group(2)), "end": int(m.group(3))}
+
+
+def _mellmann_division_levels(config: dict, *, force: bool) -> list[list[dict]]:
+    """Distinct printed range-headings per division level from Mellmann's TMI CSV:
+    ``[[level-1 rows], [level-2], [level-3]]``, each ``{chapter, name, start, end}``."""
+    rows = _read_csv(config, "tmi", force=force, subdir="mellmann")
+    levels: list[dict[tuple, dict]] = [{}, {}, {}]
+    for row in rows:
+        for i, col in enumerate(_MEL_DIVISION_COLS):
+            d = _parse_mel_division(_clean(row.get(col)))
+            if d:
+                levels[i][(d["chapter"], d["start"], d["end"])] = d
+    return [sorted(lv.values(), key=lambda d: (d["chapter"], d["start"])) for lv in levels]
+
+
+def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]]) -> tuple[list[dict], list[dict]]:
+    """Attach Mellmann's division1-3 headings to each motif by its code's chapter +
+    number (range containment, so it also covers our dup ``~N`` and mangled ids),
+    and return the sidebar's ``divisions`` (level 1) and ``subdivisions`` (level 2)
+    lists with per-heading motif counts. Level 3 rides on the motif alone."""
+    def by_chapter(level: list[dict]) -> dict[str, list[tuple]]:
+        out: dict[str, list[tuple]] = {}
+        for d in level:
+            out.setdefault(d["chapter"], []).append((d["start"], d["end"], d))
+        return out
+
+    lv = [by_chapter(lvl) for lvl in levels]
+
+    def lookup(bc: dict[str, list[tuple]], chapter: str, num: int) -> dict | None:
+        for s, e, d in bc.get(chapter, ()):
+            if s <= num <= e:
+                return d
+        return None
+
+    slots = (("division", "division_range"), ("sub_division", "sub_division_range"),
+             ("division3", "division3_range"))
+    div_counts: collections.Counter = collections.Counter()
+    sub_counts: collections.Counter = collections.Counter()
+    for m in motifs:
+        mm = re.match(r"([A-Z])(\d+)", m["id"])
+        if not mm:
+            continue
+        chapter, num = mm.group(1), int(mm.group(2))
+        for i, (name_f, range_f) in enumerate(slots):
+            d = lookup(lv[i], chapter, num)
+            if not d:
+                continue
+            m[name_f] = d["name"]
+            m[range_f] = [d["start"], d["end"]]
+            if i == 0:
+                div_counts[(chapter, d["name"], d["start"], d["end"])] += 1
+            elif i == 1:
+                sub_counts[(chapter, m.get("division", ""), d["name"], d["start"], d["end"])] += 1
+
+    divisions = [{"chapter": ch, "name": nm, "start": s, "end": e, "count": c}
+                 for (ch, nm, s, e), c in div_counts.items()]
+    divisions.sort(key=lambda r: (r["chapter"], r["start"]))
+    subdivisions = [{"chapter": ch, "division": dv, "name": nm, "start": s, "end": e, "count": c}
+                    for (ch, dv, nm, s, e), c in sub_counts.items()]
+    subdivisions.sort(key=lambda r: (r["chapter"], r["start"]))
+    return divisions, subdivisions
+
+
+def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | None = None) -> dict:
     """Download and parse only the Trilogy TMI CSV into the TMI store dict.
 
     Uses just ``tmi.csv`` — disjoint from the ATU files — so it can be a step of
     its own (the caller logs the step header before invoking it, keeping any TMI
-    parse warnings under that header).
+    parse warnings under that header). When ``divisions_config`` is given (Mellmann's
+    TMI CSV), the printed division1-3 range-headings are lifted and joined onto the
+    motifs, adding a ``divisions``/``subdivisions`` browse hierarchy like the ATU index.
     """
     tmi = _finalize_tmi(_parse_tmi(_read_csv(config, "tmi", force=force)))
-    return {
+    store = {
         "label": "Thompson",
         "long_label": "Thompson Motif-Index of Folk-Literature",
         "attribution": config.get("attribution", ""),
@@ -920,6 +1001,12 @@ def build_tmi(config: dict, *, force: bool = False) -> dict:
         "culture_legend": build_legend(tmi),
         "motifs": tmi,
     }
+    if divisions_config:
+        divisions, subdivisions = _assign_tmi_divisions(
+            tmi, _mellmann_division_levels(divisions_config, force=force))
+        store["divisions"] = divisions
+        store["subdivisions"] = subdivisions
+    return store
 
 
 def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:

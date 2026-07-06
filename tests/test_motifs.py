@@ -1416,7 +1416,7 @@ class TestBuildMotifsModes:
         self._setup(tmp_path, monkeypatch)
         fetched = []  # records the `force` (re-fetch) flag passed to the source
 
-        def fake_tmi(cfg, *, force=False):
+        def fake_tmi(cfg, *, force=False, divisions_config=None):
             fetched.append(force)
             return {"motifs": []}
 

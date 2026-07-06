@@ -149,9 +149,9 @@ function renderChapters() {
     const select = document.getElementById("motifsChapter");
     const idx = currentIndex();
     const all = `<option value="">All ${mState.index === "atu" ? "tale types" : "chapters"} (${formatNumber(idx.count)})</option>`;
-    // ATU browses by division (finer than the 7 chapters), grouped under them and
-    // ordered by ascending number range (so the chapters/divisions read 1 → 2399).
-    if (mState.index === "atu" && (idx.divisions || []).length) {
+    // ATU (and TMI, once Mellmann's headings are in) browse by division — finer
+    // than the chapters, grouped under them and ordered by ascending number range.
+    if ((idx.divisions || []).length) {
         // Sub-divisions (optional 3rd level) nest under their division, indented.
         const subsByDiv = new Map();
         for (const s of [...(idx.subdivisions || [])].sort((a, b) => a.start - b.start)) {
@@ -1322,6 +1322,17 @@ function renderDetail(d) {
             const tail = links ? ` — see ${links}` : "";
             body += `<p class="motif-dup-note">Code <strong>${escapeHtml(d.code || d.id)}</strong> is shared with ${which}${tail}.</p>`;
         }
+        // Classification folds the chapter and Mellmann's division1-3 headings (each
+        // with its code range) into one line, as in the ATU index.
+        const cls = [];
+        const withRange = (name, range) => escapeHtml(name)
+            + (range ? ` <span class="motif-range">(${range[0]}–${range[1]})</span>` : "");
+        const chapterLabel = d.chapter_label || d.chapter;
+        if (chapterLabel) cls.push(escapeHtml(chapterLabel));
+        if (d.division) cls.push(withRange(d.division, d.division_range));
+        if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
+        if (d.division3) cls.push(withRange(d.division3, d.division3_range));
+        if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);

@@ -23,5 +23,16 @@
       "atu_seq": "atu_seq.csv",
       "atu_combos": "atu_combos.csv"
     }
+  },
+  "mellmann": {
+    "enabled": true,
+    "label": "Mellmann",
+    "long_label": "Katja Mellmann — Thompson's Motif-Index as CSV (printed division/section headings)",
+    "attribution": "Katja Mellmann, TMI_as_CSV (CC-BY-4.0).",
+    "homepage": "https://github.com/KatjaMellmann/TMI_as_CSV",
+    "base_url": "https://raw.githubusercontent.com/KatjaMellmann/TMI_as_CSV/main",
+    "files": {
+      "tmi": "tmi.csv"
+    }
   }
 }

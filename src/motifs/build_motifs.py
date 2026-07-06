@@ -129,7 +129,16 @@ def build_motifs(*, force: bool = False) -> None:
         # --- [2/5] TMI: header first, so its parse warnings sit under it. ---
         logger.info("[2/5] Thompson Motif-Index (TMI) — source: %s (%s)",
                     tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
-        tmi_index = trilogy.build_tmi(tr_cfg, force=force)
+        mel_cfg = config.get("mellmann", {})
+        mel_on = mel_cfg.get("enabled", False)
+        tmi_index = trilogy.build_tmi(tr_cfg, force=force,
+                                      divisions_config=mel_cfg if mel_on else None)
+        if mel_on:
+            sources["mellmann"] = {"homepage": mel_cfg.get("homepage", ""),
+                                   "attribution": mel_cfg.get("attribution", "")}
+            logger.info("      classification headings — source: Mellmann TMI_as_CSV → "
+                        "%d divisions, %d sub-divisions",
+                        len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])))
         save_json(store.index_path("tmi"), tmi_index)
         tmi_motifs = tmi_index["motifs"]
         counts["tmi"] = len(tmi_motifs)
