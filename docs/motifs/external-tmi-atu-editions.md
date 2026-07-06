@@ -255,3 +255,122 @@ ATU/TMI-linked corpora. No such consolidated overview currently exists.
 | TMI/ATU as RDF/OWL linked data | DFKI ontology (DH2017) |
 | embeddings/LLM over folktale indexes (prior art) | GLOS |
 | large ATU/TMI-tagged text corpus | national archives (Samla, SKS/Finna, …) |
+
+## 5. Validated data inventory (2026-07 audit)
+
+Four parallel agents live-checked every resource on 2026-07-06 (curl + WebFetch
++ WebSearch; headless browsing unavailable in this environment). This section is
+the **authoritative validated layer** over the survey above — where it differs,
+trust this. Verdicts weigh usefulness for mythoscope's specific goals (fuller
+TMI/ATU data, a TMI↔ATU crosswalk, semantic parallels, and a geography-linked
+motif/type atlas).
+
+### 5.1 Master ranking
+
+**Tier 1 — open, reusable, actionable now**
+
+| Source | Payload | Format / access | Volume | License |
+|---|---|---|---|---|
+| **Mellmann `TMI_as_CSV` v1.2** | full TMI + printed div/section headings + `1st ed.` provenance + sort key | CSV (raw GitHub / OSF) | **46,302 rows**, 10 cols; 19,839 with 1st-ed | **CC-BY-4.0** |
+| **Wikidata P2540 (ATU)** | tale-item ⇄ ATU type ⇄ Wikipedia/authority IDs | **SPARQL**, JSON, RDF; dereferenceable URIs | **1,720 items / 1,294 distinct ATU types** | **CC0** |
+| **`fbkarsdorp/tmi` JSON** | TMI motifs with **`locations[]` (geo-parsed)** + **`lemmas[]` (WordNet)** | JSON (raw GitHub) | **46,248 motifs** | **Apache-2.0** |
+| **trilogy AFT / "Bag-of-Tales"** | **ATU-labeled full-text tales** (Ashliman-derived) | CSV / Zenodo `10.5281/zenodo.6575263` | **1,518 tales / 182 ATU types** | CC-BY-SA-4.0 |
+| **Dúchas / NFC (Ireland)** | ATU-typed items, GeoNames coords, dates, **full text** | REST API `duchas.ie/api/v0.6/` (key) + `/en/aath` | ~15k+ typed items (e.g. AT0300 = 338) | CC-BY-**NC**-4.0 |
+
+**Tier 2 — high value, access friction (contact / scrape / watch)**
+
+| Source | Why | Blocker |
+|---|---|---|
+| **Meertens Verhalenbank / ISEBEL** | richest ATU + place + full-text, multilingual (NL/DA/DE/IS), **100k+ tales** | no open API (GraphQL 500/404); scrape server-rendered `search.isebel.eu/dataset/…` pages or negotiate a Meertens data agreement; verhalenbank.nl currently throwing an Omeka error |
+| **GLOS (Karl Grossner)** | near-identical architecture: parsed TMI (46,234) + ATU (2,232 types) + embeddings + QGIS geo | repo `github.com/kgeographer/glos` public but **no LICENSE** (= all rights reserved); email `karl@kgeographer.org` for reuse + collaboration |
+| **Finlayson Arabian Nights corpus** | only motif-level annotated corpus (El-Shamy-keyed): 2,670 expressions / 200 motifs / 58,450 sentences | **embargoed** — code+data promised at `dataverse.fiu.edu` "upon acceptance" (arXiv:2603.19283); watch/email `markaf@fiu.edu` |
+| **DFKI TMI-ATU ontology (Declerck DH2017)** | *exactly* the TMI↔ATU crosswalk: 14,937 classes / 2,802 ATU / `linkToTMI` properties, 15.4 MB OWL | **never released** — placeholder namespace, no SPARQL/GitHub/Zenodo; only path is emailing Thierry Declerck (DFKI) |
+
+**Tier 3 — reference / enrichment (not a bulk corpus)**
+
+| Source | Use | Note |
+|---|---|---|
+| **Finna API (SKS, Finland)** | discovery/enrichment; metadata **CC0**, open JSON API `api.finna.fi/v1` | 19.7M records but ATU-as-subject sparse (~483); not a typed corpus |
+| **Ashliman folktexts** | ATU-organized variant texts, scrapeable | **© no open license** — link/reference, don't redistribute |
+| **BARTOC node 1711** | stable authority URIs for TMI + Wikidata QID `Q19062048` | record JSON/RDF (PDDL-1.0); no motif content |
+| **ruthenia / MOMFER / StoryNotes** | verification full-text / search UI / join-recipe | MOMFER has **no API** (SPA; data = `fbkarsdorp/tmi`); StoryNotes = Mellmann+MOMFER→SQLite FTS blueprint |
+
+**Tier 4 — low / offline / print-only**
+
+- **MFTD** — currently **offline** ("security issues"); static TEI-XML still served but ATU fields mostly empty.
+- **Samla (Norway)** — OAI-PMH (`samla.no/viewer/oai`, mets/marcxml/dc) but AT (Hodne)↔text links are **not** machine-exposed; much closed-access.
+- **Estonia folklore.ee** — static HTML type list with **counts only** (last updated 2004); DBs UI-only, restricted.
+- **InteLex Motif-Index** (Indiana) — paywalled, no export.
+- **Print-only type-indexes** — Hodne, Christiansen ML, El-Shamy (Arab / 1001 Nights), Ting (Chinese), Ikeda (Japanese), Thompson-Balys (Indian), Balys (Lithuanian). Scans on archive.org for some (OCR effort); no structured data.
+
+### 5.2 Corrections & key discoveries vs §1–3b
+
+- **`fbkarsdorp/tmi` carries geo + lemmas** — its JSON has `locations[]`
+  (geo-parsed places) and WordNet `lemmas[]` per motif: a ready **geography +
+  semantic layer** absent from Mellmann and trilogy (Apache-2.0). Dirty
+  diacritics; join on motif code to Mellmann's clean text.
+- **Wikidata P2540 is the best *open* ATU** — 1,294 distinct types vs trilogy's
+  182, CC0, SPARQL, with text/authority links. Corrects §2's "no clean open
+  structured ATU": there is no open *Uther catalogue*, but Wikidata is an open,
+  queryable ATU **crosswalk**.
+- **DFKI ontology was never published** (only the paper). Do not plan around it.
+- **MFTD is offline** and its ATU field was largely empty even when up — demote
+  from §2/quick-ref.
+- **trilogy already ships an ATU-tagged tale corpus** (AFT / Bag-of-Tales, 1,518
+  tales) that we may not be consuming — check `motif-index-data-sources.md`.
+- **GLOS is not just prior art** — its repo may hold reusable parsed tables, but
+  unlicensed; treat as contact-first.
+
+## 6. Enrichment plan
+
+Phased, cheapest-and-openest first. Each step names payload, license, and the
+mythoscope surface it feeds. Respect per-source licenses (esp. Dúchas **NC** and
+Ashliman/ISEBEL ©).
+
+### Phase 0 — open data, no outreach (do first)
+
+1. **TMI backbone → Mellmann** (already scoped in `tmi-mellmann-migration.md`):
+   gains printed div/section headings, `1st ed.` provenance, sort key; CC-BY-4.0.
+2. **Geo + lemma overlay from `fbkarsdorp/tmi`**: join its JSON on motif code to
+   add `locations[]` (feeds the **geography atlas** directly) and `lemmas[]`
+   (feeds **semantic parallels**). Keep Mellmann's clean text; take only the
+   geo/lemma fields. Apache-2.0.
+3. **ATU enrichment from Wikidata P2540** (SPARQL, CC0): pull the 1,294 ATU
+   types with labels + Wikipedia + authority IDs; use to (a) widen ATU type
+   coverage/labels, (b) add external **type→text** links, (c) mint stable URIs.
+4. **Activate trilogy AFT** (1,518 ATU-tagged full-text tales, already in the
+   repo we source): a first **text layer per ATU type** at zero new dependency.
+
+### Phase 1 — a real geography-linked corpus
+
+5. **Dúchas API** (Ireland): ATU-typed, GeoNames-coordinate, dated, full-text
+   Irish corpus — the first genuine **text ⇄ ATU ⇄ place** layer for the atlas.
+   Requires an API key; honor **CC-BY-NC** (non-commercial + attribution).
+6. **ISEBEL / Meertens** (100k+ multilingual ATU+place tales): highest-payoff
+   corpus. No open API → either respectful scraping of server-rendered
+   `search.isebel.eu/dataset/…` pages or a Meertens data-use agreement.
+
+### Phase 2 — outreach & watch (parallel to Phase 1)
+
+7. **Email Thierry Declerck (DFKI)** for the TMI↔ATU `.owl` — if obtained, it is
+   a ready-made crosswalk ontology (`linkToTMI`) validating/seeding ours.
+8. **Email Karl Grossner (GLOS)** re: data/license + possible collaboration — he
+   is building nearly the same system; align rather than duplicate.
+9. **Watch `dataverse.fiu.edu`** for the Finlayson Arabian Nights motif corpus
+   (the only motif-level annotated training set).
+
+### Phase 3 — reference & authority anchoring
+
+10. **Finna CC0 API** as a discovery/enrichment lookup (not a corpus).
+11. **BARTOC + Wikidata URIs** as stable authority anchors for TMI/ATU codes.
+12. **Ashliman / ruthenia / MOMFER** as human-facing verification/reference
+    links (no redistribution of Ashliman's ©).
+
+### Licensing watch
+
+Mixed licenses compose but constrain: CC0 (Wikidata, Finna metadata) and
+CC-BY (Mellmann) are free; Apache-2.0 (fbkarsdorp) is free; **CC-BY-SA-4.0**
+(trilogy) obliges share-alike on its portions; **CC-BY-NC-4.0** (Dúchas) blocks
+commercial use of that corpus; Ashliman and ISEBEL are ©/unclear (reference,
+don't redistribute). Keep attribution per-source; never let one license line
+imply terms over the whole set.
