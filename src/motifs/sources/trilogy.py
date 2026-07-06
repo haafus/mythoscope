@@ -229,7 +229,7 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
     dup_codes = {code for code, n in collections.Counter(m["id"] for m in motifs).items() if n > 1}
 
     dropped: set[int] = set()
-    collapsed = 0
+    collapsed: list[str] = []
     suffixed: list[str] = []
     for code in dup_codes:
         by_name: dict[str, list[dict]] = {}
@@ -240,7 +240,7 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
             members.sort(key=lambda r: len(r.get("notes", "")), reverse=True)
             kept.append(members[0])
             for r in members[1:]:
-                dropped.add(id(r)); collapsed += 1
+                dropped.add(id(r)); collapsed.append(code)
         if len(kept) == 1:                 # was pure redundancy — no longer a duplicate
             kept[0].pop("duplicate", None)
             continue
@@ -295,7 +295,8 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
     if dup_codes:
         logger.warning("TMI defect: %d codes Thompson gives to more than one motif", len(dup_codes))
         if collapsed:
-            logger.warning("      %d same-name redundant row(s) collapsed to the copy with the most notes", collapsed)
+            logger.warning("      %d same-name redundant row(s) collapsed to the copy with the most notes: %s",
+                           len(collapsed), ", ".join(sorted(set(collapsed))))
         if suffixed:
             logger.warning("      %d kept as distinct motifs with a '~N' suffix: %s",
                            len(suffixed), ", ".join(sorted(suffixed)))
