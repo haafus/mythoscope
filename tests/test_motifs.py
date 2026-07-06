@@ -810,6 +810,16 @@ class TestTrilogy:
         assert out["cultures"]["Indian (Hindu)"] == ["Keith 75"]
         assert "*Lang Myth I 200f" in out["references"]
 
+    def test_notes_double_significance_mark_not_left_in_definition(self):
+        # A double significance mark before the first author ('**N. Soumtzov …', K1352)
+        # is consumed whole — the split must not land on the second '*', leaving one on
+        # the end of the definition.
+        out = tmi_notes.parse_notes(
+            "She shows remorse when she hears of lover's death. "
+            "**N. Soumtzov Piesni i skazki (Kievskaia Starina 1894).")
+        assert out["definition"] == "She shows remorse when she hears of lover's death."
+        assert not out["definition"].endswith("*")
+
     def test_notes_no_definition_when_starts_with_citation(self):
         out = tmi_notes.parse_notes("Greek: Fox 4; India: *Thompson-Balys.")
         assert out["definition"] == ""

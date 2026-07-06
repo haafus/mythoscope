@@ -28,8 +28,11 @@ _LC = r"A-Za-zÀ-ÖØ-öø-ÿ"    # any Latin letter, incl. accented
 # stops before reaching across them and the prose before stays the definition.
 _LBL = rf"{_LC},. \-"
 _LABEL_HEAD = rf"[{_UC}][{_LBL}]{{1,26}}?(?:\s*\([^)]*\))*"
+# ``\*+`` (not ``\*``) so a double significance mark before the first author
+# (``**N. Soumtzov …``) is consumed whole — otherwise the split lands on the second
+# ``*`` and the first one leaks onto the end of the definition.
 _BIB_START = re.compile(
-    r"\s--|†|\bTypes?\b|\*[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*" + _LABEL_HEAD + r":"
+    r"\s--|†|\bTypes?\b|\*+[A-Z]|\([Cc]f|(?:^|[;.]|\s--)\s*" + _LABEL_HEAD + r":"
 )
 
 # A '†' motif cross-reference, optionally introduced by 'Cf.' ("compare"); the
@@ -212,7 +215,9 @@ def _trim_trailing_citation(head: str) -> tuple[str, str]:
 
 def _split_definition(notes: str) -> tuple[str, str]:
     m = _BIB_START.search(notes)
-    head = (notes[: m.start()] if m else notes).strip(" -")
+    # strip a trailing significance mark too, for the markers that are not '*Author'
+    # (e.g. 'definition. * -- Author'), where the '*' would otherwise linger.
+    head = (notes[: m.start()] if m else notes).strip(" -*")
     biblio = notes[m.start():] if m else ""
     if _is_prose(head) and not _is_leading_citation(head):
         head, trailing = _trim_trailing_citation(head)
