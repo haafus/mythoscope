@@ -1345,6 +1345,11 @@ function renderDetail(d) {
                     ${sub}
                 </div>
             </div>`;
+        // An old number the user navigated to is served as the current type; note it
+        // just under the header, and say what the old number is (a pre-2004 AaTh code).
+        if (d.redirected_from) {
+            body += `<p class="motif-redirect">You followed <strong>${escapeHtml(d.redirected_from)}</strong> — this type's earlier Aarne–Thompson (AaTh, pre-2004) number, renumbered in ATU 2004.</p>`;
+        }
         // Classification folds chapter, division and sub_division (each with its
         // number range) into one line, as in the Berezkin index.
         const cls = [];
@@ -1388,9 +1393,5 @@ function renderDetail(d) {
         }
     }
 
-    // An old ATU number the user navigated to is served as the current type.
-    const redirect = d.redirected_from
-        ? `<div class="motif-redirect">Redirected from old type <strong>${escapeHtml(d.redirected_from)}</strong></div>`
-        : "";
-    return `<div class="motif-detail-inner">${redirect}${body}</div>`;
+    return `<div class="motif-detail-inner">${body}</div>`;
 }
