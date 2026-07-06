@@ -51,9 +51,10 @@ Links:
 - **MOMFER** is the most cited scholarly digital TMI: it added semantic search
   (query "mythical animals", "mortality") over the parsed index. Its parsed
   data (`fbkarsdorp/tmi`, Apache-2.0) is a credible alternative machine-readable
-  source, built from the ruthenia text. **Caveat**: the public search site
-  (`momfer.meertens.knaw.nl`) appears to be offline now — treat the GitHub parse
-  as the durable artifact, the live tool as possibly defunct.
+  source, built from the ruthenia text. **Live** at
+  <https://momfer.meertens.knaw.nl> (page title "TMI-search"). Note: ruthenia's
+  Thompson index links an older mirror `http://www.momfer.ml/`, which is now
+  dead (a reclaimed Freenom `.ml` domain) — use the Meertens URL.
 - **Mellmann** is the best *tabular* form (our analysis in
   `tmi-mellmann-migration.md`): a strict superset of the Trilogy TMI in codes
   and citations, with printed division/section headings and `1st ed.`
