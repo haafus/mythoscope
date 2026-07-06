@@ -152,9 +152,9 @@ function initializeGeographyMap(traditions) {
     // Real tile-covered world: ±180° longitude and the web-mercator latitude limit.
     const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
 
-    // Simple, fixed zoom range: zoom out to the whole world (1), in to street level
-    // (7). No dynamic floor — the start view is a fitBounds of the markers, and the
-    // wheel/buttons can always zoom out from there.
+    // Start at 1 (whole world) so fitBounds can pick the right opening zoom; the
+    // floor is then pinned to that opening zoom below, so the map never zooms out
+    // past the start view. Zoom in goes to street level (7).
     const map = L.map("geography-map", {
         zoomControl: true,
         minZoom: 1,
@@ -176,10 +176,14 @@ function initializeGeographyMap(traditions) {
 
     if (markerBounds) {
         // Start with every marker in view.
-        map.fitBounds(markerBounds, { padding: [30, 30] });
+        map.fitBounds(markerBounds, { padding: [30, 30], animate: false });
     } else {
         map.setView([20, 15], 1);
     }
+
+    // Pin the minimum zoom to the opening view so the user can zoom in but never
+    // back out past the initial all-markers frame.
+    map.setMinZoom(map.getZoom());
 
     const onResize = () => map.invalidateSize();
     window.addEventListener("resize", onResize);
