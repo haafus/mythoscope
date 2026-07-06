@@ -126,7 +126,10 @@ def _is_prose(head: str) -> bool:
 # "Nouvelles de Sens No. 7").
 _LOCUS = re.compile(
     r"\bNos?\.\s*\*?\d|\bpp?\.\s*\d|\b[IVXLC]{2,}\s+\d|\b\d+\s*ff\b\.?"
-    r"|\(\s*\d{4}\s*\)|\bvol\.?\s*\d|\bibid\b|\bn\.\s*\d", re.I)
+    # a parenthesised publication year, with or without a place before it — a bare
+    # '(1904)' but also an imprint '(Strassburg 1904)' / '(Frankfurt a. M. 1944)',
+    # which opens many foreign-language citations (A240, A121, …).
+    r"|\([^)]*\b(?:1[5-9]|20)\d\d[a-z]?\s*\)|\bvol\.?\s*\d|\bibid\b|\bn\.\s*\d", re.I)
 # English function/verb/pronoun words: present in a real (English) definition,
 # absent from a name-only or foreign-language ("Jahrb. d. kaiserlichen deutschen
 # …") citation. Used only to tell a prose clause apart from a citation, so a

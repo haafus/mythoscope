@@ -837,6 +837,11 @@ class TestTrilogy:
         assert out["cultures"]["Irish myth"] == ["*Cross"]
         assert tmi_notes.parse_notes(
             "Malten Jahrb. d. kaiserlichen deutschen archäologischen Inst. XXIX 185.")["definition"] == ""
+        # a foreign citation opening with a place+year imprint '(Strassburg 1904)'
+        # (not a bare '(1904)') is a locus too, so the note is all bibliography (A240)
+        out2 = tmi_notes.parse_notes(
+            "D. Nielson Die altarabische Mondreligion (Strassburg 1904); **Siecke Hermes 3.")
+        assert out2["definition"] == ""
         assert tmi_notes.parse_notes("Gaster Thespis 211, 389, 397.")["definition"] == ""
         # A real prose definition with an incidental number is NOT mistaken for a citation.
         assert tmi_notes.parse_notes(
