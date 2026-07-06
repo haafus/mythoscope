@@ -366,6 +366,8 @@ def list_indexes() -> list[dict]:
             summary["subdivisions"] = data.get("subdivisions", [])
             if data.get("subdivisions3"):  # TMI carries a third heading level (division3)
                 summary["subdivisions3"] = data.get("subdivisions3", [])
+            if data.get("sections"):       # …and the finest section (tens) level
+                summary["sections"] = data.get("sections", [])
         out.append(summary)
     return out
 
@@ -990,8 +992,8 @@ def _subtree_flags(motif_id: str) -> dict:
 
 
 def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_division: str = "",
-                sub_division3: str = "", q: str = "", level: int | None = None, tier: str = "",
-                limit: int = 200, offset: int = 0) -> dict:
+                sub_division3: str = "", section: str = "", q: str = "", level: int | None = None,
+                tier: str = "", limit: int = 200, offset: int = 0) -> dict:
     """Filtered, paginated motif list for one index."""
     records = _records(index)
     query = q.strip().lower()
@@ -1003,6 +1005,8 @@ def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_divisi
         records = [r for r in records if r.get("sub_division", "") == sub_division]
     if sub_division3:  # TMI's third heading level (division3)
         records = [r for r in records if r.get("division3", "") == sub_division3]
+    if section:  # TMI's finest heading level (the tens section)
+        records = [r for r in records if r.get("section", "") == section]
     if level is not None:
         records = [r for r in records if r.get("level", 0) == level]
     if index == "tmi" and tier in _TIER_PREDICATE:  # substantive / definitions / ATU
@@ -1134,6 +1138,8 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["sub_division_range"] = rec.get("sub_division_range")
         detail["division3"] = rec.get("division3", "")
         detail["division3_range"] = rec.get("division3_range")
+        detail["section"] = rec.get("section", "")
+        detail["section_range"] = rec.get("section_range")
 
     elif index == "atu":
         detail["division"] = rec.get("division", "")

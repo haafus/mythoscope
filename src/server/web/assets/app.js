@@ -3,7 +3,7 @@ import { renderCorpus } from "./page-corpus.js";
 import { renderEmbeddings } from "./page-embeddings.js";
 import { renderGraphPage } from "./page-graphs.js";
 import { renderGeography } from "./page-geography.js?v=60";
-import { renderMotifs } from "./page-motifs.js?v=70";
+import { renderMotifs } from "./page-motifs.js?v=71";
 import { renderAbout } from "./page-about.js";
 
 const DEFAULT_ROUTE = "/corpus";

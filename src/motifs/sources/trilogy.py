@@ -923,25 +923,52 @@ def _parse_mel_division(text: str) -> dict | None:
             "start": int(m.group(2)), "end": int(m.group(3))}
 
 
-def _mellmann_division_levels(config: dict, *, force: bool) -> list[list[dict]]:
-    """Distinct printed range-headings per division level from Mellmann's TMI CSV:
-    ``[[level-1 rows], [level-2], [level-3]]``, each ``{chapter, name, start, end}``."""
+# The `section ("tens")` column is the finest printed heading — a single tens
+# node ("A1810. Creation of felidae.") = the sub-categories Thompson lists in the
+# range-notes (Felidae, Mustelidae, …). One code, no explicit end, so we close each
+# section at the next section's tens (letting a heading span >1 ten, e.g. Rodentia
+# A1840–A1859), and cap the last in a chapter at +9.
+_MEL_SECTION = re.compile(r"^\s*([A-Z])(\d+)\.\s*([^.]+)")
+
+
+def _mellmann_classification(config: dict, *, force: bool) -> tuple[list[list[dict]], list[dict]]:
+    """Parse Mellmann's TMI CSV into ``(division levels 1-3, sections)``. Each row is
+    ``{chapter, name, start, end}``; division ranges are printed, section ranges are
+    derived from consecutive tens within a chapter."""
     rows = _read_csv(config, "tmi", force=force, subdir="mellmann")
     levels: list[dict[tuple, dict]] = [{}, {}, {}]
+    sec_seen: dict[tuple[str, int], str] = {}
     for row in rows:
         for i, col in enumerate(_MEL_DIVISION_COLS):
             d = _parse_mel_division(_clean(row.get(col)))
             if d:
                 levels[i][(d["chapter"], d["start"], d["end"])] = d
-    return [sorted(lv.values(), key=lambda d: (d["chapter"], d["start"])) for lv in levels]
+        m = _MEL_SECTION.match(_clean(row.get('section ("tens")')) or "")
+        if m:
+            sec_seen[(m.group(1), int(m.group(2)))] = m.group(3).strip()
+
+    by_ch: dict[str, list[tuple[int, str]]] = collections.defaultdict(list)
+    for (ch, code), name in sec_seen.items():
+        by_ch[ch].append((code, name))
+    sections: list[dict] = []
+    for ch, items in by_ch.items():
+        items.sort()
+        for j, (code, name) in enumerate(items):
+            end = items[j + 1][0] - 1 if j + 1 < len(items) else code + 9
+            sections.append({"chapter": ch, "name": name, "start": code, "end": end})
+
+    div_levels = [sorted(lv.values(), key=lambda d: (d["chapter"], d["start"])) for lv in levels]
+    sections.sort(key=lambda d: (d["chapter"], d["start"]))
+    return div_levels, sections
 
 
-def _assign_tmi_divisions(motifs: list[dict],
-                          levels: list[list[dict]]) -> tuple[list[dict], list[dict], list[dict]]:
-    """Attach Mellmann's division1-3 headings to each motif by its code's chapter +
-    number (range containment, so it also covers our dup ``~N`` and mangled ids),
-    and return the sidebar's three browse levels — ``divisions`` (1), ``subdivisions``
-    (2), ``subdivisions3`` (3) — each with per-heading motif counts."""
+def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]], sections: list[dict]
+                          ) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+    """Attach Mellmann's division1-3 headings **and** the finer section (tens) to each
+    motif by its code's chapter + number (range containment, so it also covers our dup
+    ``~N`` and mangled ids), and return the four browse levels — ``divisions`` (1),
+    ``subdivisions`` (2), ``subdivisions3`` (3), ``sections`` (4) — with motif counts.
+    Each section nests under its nearest division (its div3, else div2)."""
     def by_chapter(level: list[dict]) -> dict[str, list[tuple]]:
         out: dict[str, list[tuple]] = {}
         for d in level:
@@ -949,6 +976,7 @@ def _assign_tmi_divisions(motifs: list[dict],
         return out
 
     lv = [by_chapter(lvl) for lvl in levels]
+    sec_by_ch = by_chapter(sections)
 
     def lookup(bc: dict[str, list[tuple]], chapter: str, num: int) -> dict | None:
         for s, e, d in bc.get(chapter, ()):
@@ -961,6 +989,7 @@ def _assign_tmi_divisions(motifs: list[dict],
     div_counts: collections.Counter = collections.Counter()
     sub_counts: collections.Counter = collections.Counter()
     sub3_counts: collections.Counter = collections.Counter()
+    sec_counts: collections.Counter = collections.Counter()
     for m in motifs:
         mm = re.match(r"([A-Z])(\d+)", m["id"])
         if not mm:
@@ -979,6 +1008,15 @@ def _assign_tmi_divisions(motifs: list[dict],
             else:
                 sub3_counts[(chapter, m.get("division", ""), m.get("sub_division", ""),
                              d["name"], d["start"], d["end"])] += 1
+        sec = lookup(sec_by_ch, chapter, num)
+        if sec:
+            m["section"] = sec["name"]
+            m["section_range"] = [sec["start"], sec["end"]]
+            # Nest each section under its nearest division (div3 if the motif has one,
+            # else div2); skip the round "general" section that just repeats its parent.
+            parent = m.get("division3") or m.get("sub_division", "")
+            if sec["name"] != parent:
+                sec_counts[(chapter, parent, sec["name"], sec["start"], sec["end"])] += 1
 
     divisions = [{"chapter": ch, "name": nm, "start": s, "end": e, "count": c}
                  for (ch, nm, s, e), c in div_counts.items()]
@@ -990,7 +1028,10 @@ def _assign_tmi_divisions(motifs: list[dict],
                       "name": nm, "start": s, "end": e, "count": c}
                      for (ch, dv, sd, nm, s, e), c in sub3_counts.items()]
     subdivisions3.sort(key=lambda r: (r["chapter"], r["start"]))
-    return divisions, subdivisions, subdivisions3
+    sections_browse = [{"chapter": ch, "parent": pa, "name": nm, "start": s, "end": e, "count": c}
+                       for (ch, pa, nm, s, e), c in sec_counts.items()]
+    sections_browse.sort(key=lambda r: (r["chapter"], r["start"]))
+    return divisions, subdivisions, subdivisions3, sections_browse
 
 
 def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | None = None) -> dict:
@@ -1013,11 +1054,13 @@ def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | Non
         "motifs": tmi,
     }
     if divisions_config:
-        divisions, subdivisions, subdivisions3 = _assign_tmi_divisions(
-            tmi, _mellmann_division_levels(divisions_config, force=force))
+        levels, sections = _mellmann_classification(divisions_config, force=force)
+        divisions, subdivisions, subdivisions3, sections_browse = _assign_tmi_divisions(
+            tmi, levels, sections)
         store["divisions"] = divisions
         store["subdivisions"] = subdivisions
         store["subdivisions3"] = subdivisions3
+        store["sections"] = sections_browse
     return store
 
 

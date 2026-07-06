@@ -8,6 +8,7 @@ const mState = {
     division: "",      // ATU browse level (chapter → division → type)
     subdivision: "",   // ATU finer level (division → sub_division → type)
     subdivision3: "",  // TMI's third heading level (division3)
+    section: "",       // TMI's finest heading level (the tens section)
     query: "",
     selectedId: null,
     motifFilter: "all",  // "all" | "def" | "sub" | "atu"
@@ -30,6 +31,7 @@ function stateParams() {
     if (mState.division) p.set("division", mState.division);
     if (mState.subdivision) p.set("subdivision", mState.subdivision);
     if (mState.subdivision3) p.set("subdivision3", mState.subdivision3);
+    if (mState.section) p.set("section", mState.section);
     if (mState.query.trim()) p.set("q", mState.query.trim());
     if (mState.motifFilter && mState.motifFilter !== "all") p.set("filter", mState.motifFilter);
     if (mState.flatList) p.set("flat", "1");
@@ -92,6 +94,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
     mState.division = params.get("division") || "";
     mState.subdivision = params.get("subdivision") || "";
     mState.subdivision3 = params.get("subdivision3") || "";
+    mState.section = params.get("section") || "";
     mState.query = params.get("q") || "";
     mState.motifFilter = params.get("filter") || "all";
     mState.flatList = params.get("flat") === "1";
@@ -191,8 +194,9 @@ function renderChapters() {
             }
             return map;
         };
-        const subsByDiv = groupBy(idx.subdivisions, "division");     // div2 under div1 (by name)
+        const subsByDiv = groupBy(idx.subdivisions, "division");      // div2 under div1 (by name)
         const subs3BySub = groupBy(idx.subdivisions3, "sub_division"); // div3 under div2 (by name)
+        const secByParent = groupBy(idx.sections, "parent");          // section under div3-else-div2
         const divsByChapter = groupBy(idx.divisions, "chapter");
         for (const arr of divsByChapter.values()) arr.sort((a, b) => a.start - b.start);
         // Indent steps (nbsp) grow per level; bold chapters stand out as headers.
@@ -200,20 +204,27 @@ function renderChapters() {
         const opt = (val, indent, r, sel) =>
             `<option value="${val}"${sel ? " selected" : ""}>${pad(indent)}↳ ${escapeHtml(r.name)} `
             + `${r.start}–${r.end} (${formatNumber(r.count)})</option>`;
+        // A section (level 4) is a leaf under its parent division heading.
+        const secOpts = (parentName, indent) => (secByParent.get(parentName) || [])
+            .map((u) => opt(`s4:${escapeHtml(u.name)}`, indent, u, u.name === mState.section)).join("");
         let html = all;
         for (const c of idx.chapters || []) {
-            const csel = c.id === mState.chapter && !mState.division && !mState.subdivision && !mState.subdivision3;
+            const csel = c.id === mState.chapter && !mState.division && !mState.subdivision
+                && !mState.subdivision3 && !mState.section;
             html += `<option value="${escapeHtml(c.id)}" class="opt-chapter"${csel ? " selected" : ""}>`
                 + `${escapeHtml(c.label)} (${formatNumber(c.count)})</option>`;
             for (const d of divsByChapter.get(c.id) || []) {
                 html += opt(`d:${escapeHtml(d.name)}`, 3, d,
-                    d.name === mState.division && !mState.subdivision && !mState.subdivision3);
+                    d.name === mState.division && !mState.subdivision && !mState.subdivision3 && !mState.section);
                 for (const s of subsByDiv.get(d.name) || []) {
                     html += opt(`sd:${escapeHtml(s.name)}`, 7, s,
-                        s.name === mState.subdivision && !mState.subdivision3);
+                        s.name === mState.subdivision && !mState.subdivision3 && !mState.section);
                     for (const t of subs3BySub.get(s.name) || []) {
-                        html += opt(`s3:${escapeHtml(t.name)}`, 11, t, t.name === mState.subdivision3);
+                        html += opt(`s3:${escapeHtml(t.name)}`, 11, t,
+                            t.name === mState.subdivision3 && !mState.section);
+                        html += secOpts(t.name, 15);          // sections under this div3
                     }
+                    html += secOpts(s.name, 11);              // div2's direct sections (no div3)
                 }
             }
         }
@@ -239,8 +250,9 @@ function wireControls() {
         const v = e.target.value;
         // Prefixes: "s3:" a division3, "sd:" a sub-division, "d:" a division; a bare
         // value is a chapter. The levels are mutually exclusive, so clear the others.
-        mState.chapter = mState.division = mState.subdivision = mState.subdivision3 = "";
-        if (v.startsWith("s3:")) mState.subdivision3 = v.slice(3);
+        mState.chapter = mState.division = mState.subdivision = mState.subdivision3 = mState.section = "";
+        if (v.startsWith("s4:")) mState.section = v.slice(3);
+        else if (v.startsWith("s3:")) mState.subdivision3 = v.slice(3);
         else if (v.startsWith("sd:")) mState.subdivision = v.slice(3);
         else if (v.startsWith("d:")) mState.division = v.slice(2);
         else mState.chapter = v;
@@ -293,6 +305,7 @@ function resetIndexFilters(index) {
     mState.division = "";
     mState.subdivision = "";
     mState.subdivision3 = "";
+    mState.section = "";
     mState.query = "";
     const search = document.getElementById("motifsSearch");
     if (search) search.value = "";
@@ -375,6 +388,7 @@ function listParams() {
     if (mState.division) params.set("division", mState.division);
     if (mState.subdivision) params.set("sub_division", mState.subdivision);
     if (mState.subdivision3) params.set("sub_division3", mState.subdivision3);
+    if (mState.section) params.set("section", mState.section);
     if (mState.query.trim()) params.set("q", mState.query.trim());
     return params;
 }
@@ -1381,6 +1395,7 @@ function renderDetail(d) {
         if (d.division) cls.push(withRange(d.division, d.division_range));
         if (d.sub_division) cls.push(withRange(d.sub_division, d.sub_division_range));
         if (d.division3) cls.push(withRange(d.division3, d.division3_range));
+        if (d.section && d.section !== d.division3) cls.push(withRange(d.section, d.section_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);
