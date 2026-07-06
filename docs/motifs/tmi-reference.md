@@ -145,15 +145,18 @@ A `notes` string packs several layers; `src/motifs/sources/tmi_notes.py`
 separates them, keeping the raw `notes` as the source of truth.
 
 - **definition** — the leading prose, taken up to the first bibliography marker
-  (` --`, `†`, `Type`, a `*Author`, or a culture label). Heuristic, ~85%
+  (` --`, `†`, `Type`, a `*`/`**Author`, or a culture label — a double
+  significance mark before the first author, `**N. Soumtzov …`, is consumed
+  whole so the second `*` never leaks onto the definition). Heuristic, ~85%
   reliable; short one-line "definitions" are the noisy edge. Four passes clean
   up the leaks the marker split leaves behind:
   - **leading-citation blanking** (`_is_leading_citation`) — when the head
     before the first marker is itself a citation (carries a bibliographic
-    *locus* — `No. 7`, a roman numeral + page, a year, `ibid.`, `pp.` — and no
-    English prose word), the definition is left blank rather than showing a
-    stray reference. Fires on ~2,600 motifs whose notes open straight into a
-    source (`J21.22` "Nouvelles de Sens No. 7").
+    *locus* — `No. 7`, a roman numeral + page, a year, a publisher imprint
+    `(Strassburg 1904)`, `ibid.`, `pp.` — and no English prose word), the
+    definition is left blank rather than showing a stray reference. Fires on
+    ~2,600 motifs whose notes open straight into a source (`J21.22` "Nouvelles
+    de Sens No. 7"; `A240` "D. Nielson … (Strassburg 1904)").
   - **trailing-citation trimming** (`_trim_trailing_citation`) — prose that
     runs into a citation is cut at the earliest sentence boundary after which
     every remaining sentence is a citation *and* the kept part still reads as
@@ -163,22 +166,30 @@ separates them, keeping the raw `notes` as the source of truth.
   - **quoted-title reunification** (`_reunite_quoted_title`) — a catch-word
     title split across the definition/notes boundary by an interior quote
     (`K553` "Wait Till I Get Fat") is stitched back together before parsing.
-  - **`FORCE_BIBLIOGRAPHY` overrides** — a curated id list (~48 entries) for
+  - **`FORCE_BIBLIOGRAPHY` overrides** — a curated id list (~55 entries) for
     residual citation-only "definitions" the heuristics can't distinguish from
-    prose (English or foreign work titles with no locus). These are blanked
-    outright; see the frozenset in `tmi_notes.py`.
+    prose — `Author Title (Place YEAR) page` citations whose English-looking
+    title words (`… in Comparative Religion`) trip the prose-word guard, plus
+    foreign/quoted titles with no locus. These are blanked outright; see the
+    frozenset in `tmi_notes.py`.
 - **cultures** — citations are tagged by a geographic/linguistic/corpus label
-  (`India:`, `Irish myth:`, `Jewish:`). Anchored to a group boundary so a colon
-  inside a title is not mistaken for a label. A label may carry parenthetical
-  qualifiers before its colon (`S. Am. Indian (Paressi):`, `Indian (Hindu):`) —
-  these are tolerated so the label is still recognised (and not mistaken for a
-  definition); a leading `--` bibliography dash is stripped. Nested sub-areas
-  (`Africa (Angola): …`) stay inline; the canonical name drops the parens. A
-  label is kept only if at least one of its citations looks source-like (a
-  page/volume/year digit, a capitalised author, `*`, or `ibid.`/`cf.`); this
-  drops prose that a capitalised word before a colon leaked in (`Answer:`,
-  `Decision:`), plus a small stop-list of genre words that head real citations
-  (`Fable`, `Answer`, `Countertask`).
+  (`India:`, `Irish myth:`, `Jewish:`). Anchored to a group boundary (`;`, ` --`,
+  or start) so a colon inside a title is not mistaken for a label. Thompson also
+  sometimes separates two labelled groups with a **comma** rather than `;`
+  (`Hindu: Keith 90f., India: Thompson-Balys, Buddhist myth: Malalasekera …`,
+  `A240`): `_promote_comma_labels` turns such a comma into a group boundary once a
+  `Label:` has already opened the current group — so a bare comma-list of cultures
+  that *share* one citation (`Mono-Alu, Fauru, Buin: Wheeler 67`) is left intact.
+  A label may carry parenthetical qualifiers before its colon
+  (`S. Am. Indian (Paressi):`, `Indian (Hindu):`) — these are tolerated so the
+  label is still recognised (and not mistaken for a definition); a leading `--`
+  bibliography dash is stripped. Nested sub-areas (`Africa (Angola): …`) stay
+  inline; the canonical name drops the parens. A label is kept only if at least
+  one of its citations looks source-like (a page/volume/year digit, a capitalised
+  author, `*`, or `ibid.`/`cf.`); this drops prose that a capitalised word before
+  a colon leaked in (`Answer:`, `Decision:`), plus a small stop-list of genre
+  words that head real citations (`Fable`, `Answer`, `Countertask`). The canonical
+  label maps to a broad **region** via `culture_dict._REGION` (§7).
 - **references** — the bibliography split on `;` / ` --`; the general
   (non-culture-tagged) segments are shown separately on the motif page.
 - **see_also** — `†` cross-references to other motifs, split into `cf`
@@ -216,11 +227,18 @@ stored `culture_legend` (two layers):
   South Asia, Oceania, …). Curated for the common labels (~150 cover ~96% of
   uses); parenthetical sub-areas are collected per culture.
 
+Common hyphenated compounds are region-mapped (`Finnish-Swedish → Europe`,
+`Indo-Chinese → Southeast Asia`), `Japan` folds to `Japanese` (East Asia), and
+the cross-region `Finno-Ugric` family is bucketed with **Siberia** (matching the
+Volga-Finnic `Cheremis` already there and Thompson's cited *Finno-Ugric, Siberian*
+source).
+
 Exposed at `GET /api/motifs/tmi/cultures`. The long tail (~940 labels) keeps
-region `""` but is still counted — mostly rare single cultures plus the
-unsplit compound labels (`England, U.S.`, `Finnish-Swedish`), which are not
-broken on commas (a comma is also a page-list separator). Sub-areas are raw
-parenthetical text and carry some noise (orthographic variants).
+region `""` but is still counted — mostly rare single cultures, the comma-lists of
+cultures that *share* one citation (`England, U.S.`), which are not broken on
+commas here (a comma is also a page-list separator), and a few genuinely
+cross-region compounds (`Chinese-Persian`). Sub-areas are raw parenthetical text
+and carry some noise (orthographic variants).
 
 ---
 

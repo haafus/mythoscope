@@ -319,7 +319,11 @@ link to its in-page anchor. Tale records store only `{title, url}`.
    pages) **and** add the curated `_TYPE_PAGES` set — the numbered pages a one-time
    full probe of every catalogue code found, kept so no per-build brute-force is
    needed (`probe=True` re-runs it to regenerate the set). ATU range only (<3000;
-   higher = Christiansen migratory legends). Pages cached under `raw/ashliman/`.
+   higher = Christiansen migratory legends). Pages cached under `raw/ashliman/`;
+   a page that 404s is remembered in a sibling `.absent` marker so later builds
+   don't re-request it (the site derives many `type{N}.html` names that don't
+   exist, e.g. `type0778J.html`) — a transient error is still retried, and
+   `force` re-checks.
 2. **Map** each site type to a catalogue type: itself when present, else a parent
    or lowest sibling sharing its base number (`attach_target`, hierarchical — so a
    site-only subtype like `333A` folds into `333`); genuine orphans (`676`, `828`,
