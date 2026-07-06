@@ -191,12 +191,14 @@ def build_motifs(*, force: bool = False) -> None:
     links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining,
                             atu_aliases, tmi_notes, aath_to_atu, atu_summaries)
     save_json(store.crosswalk_path(), links)
-    logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI), Berezkin<->ATU %d/%d, "
-                "Berezkin<->TMI (direct) %d/%d (%d TMI motifs reachable from a tale type)",
+    logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI; %d TMI motifs reachable from a tale type)",
                 len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
                 len(links["atu_to_tmi_defining"]), len(links["tmi_to_atu_defining"]),
-                len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]),
-                len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]), links["linked_tmi_count"])
+                links["linked_tmi_count"])
+    logger.info("      Berezkin<->ATU %d/%d",
+                len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]))
+    logger.info("      Berezkin<->TMI (direct) %d/%d",
+                len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]))
     logger.info("      + inline relations (each stored both ways): TMI notes → %d ATU types, "
                 "ATU summaries → %d TMI motifs",
                 len(links["atu_to_tmi_note"]), len(links["tmi_to_atu_summary"]))
