@@ -1330,6 +1330,12 @@ body.has-main-navbar {
     gap: 10px;
 }
 
+/* TMI browse dropdown: the lettered chapters are headers over their nested
+   division1-3 headings, so weight them bold to stand out from the indented rows. */
+#motifsChapter option.opt-chapter {
+    font-weight: 700;
+}
+
 .motifs-tabs {
     display: flex;
     gap: 6px;

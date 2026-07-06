@@ -137,8 +137,9 @@ def build_motifs(*, force: bool = False) -> None:
             sources["mellmann"] = {"homepage": mel_cfg.get("homepage", ""),
                                    "attribution": mel_cfg.get("attribution", "")}
             logger.info("      classification headings — source: Mellmann TMI_as_CSV → "
-                        "%d divisions, %d sub-divisions",
-                        len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])))
+                        "%d divisions, %d sub-divisions, %d sub-sub-divisions",
+                        len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])),
+                        len(tmi_index.get("subdivisions3", [])))
         save_json(store.index_path("tmi"), tmi_index)
         tmi_motifs = tmi_index["motifs"]
         counts["tmi"] = len(tmi_motifs)

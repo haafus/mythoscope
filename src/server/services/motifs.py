@@ -364,6 +364,8 @@ def list_indexes() -> list[dict]:
         if data.get("divisions"):  # chapter → division → sub_division browse (ATU; TMI via Mellmann)
             summary["divisions"] = data.get("divisions", [])
             summary["subdivisions"] = data.get("subdivisions", [])
+            if data.get("subdivisions3"):  # TMI carries a third heading level (division3)
+                summary["subdivisions3"] = data.get("subdivisions3", [])
         out.append(summary)
     return out
 
@@ -988,7 +990,7 @@ def _subtree_flags(motif_id: str) -> dict:
 
 
 def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_division: str = "",
-                q: str = "", level: int | None = None, tier: str = "",
+                sub_division3: str = "", q: str = "", level: int | None = None, tier: str = "",
                 limit: int = 200, offset: int = 0) -> dict:
     """Filtered, paginated motif list for one index."""
     records = _records(index)
@@ -999,6 +1001,8 @@ def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_divisi
         records = [r for r in records if r.get("division", "") == division]
     if sub_division:  # ATU finer level (division → sub_division → type)
         records = [r for r in records if r.get("sub_division", "") == sub_division]
+    if sub_division3:  # TMI's third heading level (division3)
+        records = [r for r in records if r.get("division3", "") == sub_division3]
     if level is not None:
         records = [r for r in records if r.get("level", 0) == level]
     if index == "tmi" and tier in _TIER_PREDICATE:  # substantive / definitions / ATU

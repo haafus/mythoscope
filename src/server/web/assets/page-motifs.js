@@ -7,6 +7,7 @@ const mState = {
     chapter: "",
     division: "",      // ATU browse level (chapter → division → type)
     subdivision: "",   // ATU finer level (division → sub_division → type)
+    subdivision3: "",  // TMI's third heading level (division3)
     query: "",
     selectedId: null,
     motifFilter: "all",  // "all" | "def" | "sub" | "atu"
@@ -28,6 +29,7 @@ function stateParams() {
     if (mState.chapter) p.set("chapter", mState.chapter);
     if (mState.division) p.set("division", mState.division);
     if (mState.subdivision) p.set("subdivision", mState.subdivision);
+    if (mState.subdivision3) p.set("subdivision3", mState.subdivision3);
     if (mState.query.trim()) p.set("q", mState.query.trim());
     if (mState.motifFilter && mState.motifFilter !== "all") p.set("filter", mState.motifFilter);
     if (mState.flatList) p.set("flat", "1");
@@ -89,6 +91,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
     mState.chapter = params.get("chapter") || "";
     mState.division = params.get("division") || "";
     mState.subdivision = params.get("subdivision") || "";
+    mState.subdivision3 = params.get("subdivision3") || "";
     mState.query = params.get("q") || "";
     mState.motifFilter = params.get("filter") || "all";
     mState.flatList = params.get("flat") === "1";
@@ -180,27 +183,37 @@ function renderChapters() {
     // server sends them) with Mellmann's division1/2 headings nested and indented
     // beneath each — so G/Q sit in place, not sorted by number range.
     if (mState.index === "tmi" && (idx.divisions || []).length) {
-        const subsByDiv = new Map();
-        for (const s of idx.subdivisions || []) {
-            if (!subsByDiv.has(s.division)) subsByDiv.set(s.division, []);
-            subsByDiv.get(s.division).push(s);
-        }
-        const divsByChapter = new Map();
-        for (const d of idx.divisions) {
-            if (!divsByChapter.has(d.chapter)) divsByChapter.set(d.chapter, []);
-            divsByChapter.get(d.chapter).push(d);
-        }
+        const groupBy = (rows, key) => {
+            const map = new Map();
+            for (const r of rows || []) {
+                if (!map.has(r[key])) map.set(r[key], []);
+                map.get(r[key]).push(r);
+            }
+            return map;
+        };
+        const subsByDiv = groupBy(idx.subdivisions, "division");     // div2 under div1 (by name)
+        const subs3BySub = groupBy(idx.subdivisions3, "sub_division"); // div3 under div2 (by name)
+        const divsByChapter = groupBy(idx.divisions, "chapter");
         for (const arr of divsByChapter.values()) arr.sort((a, b) => a.start - b.start);
+        // Indent steps (nbsp) grow per level; bold chapters stand out as headers.
+        const pad = (n) => "&nbsp;".repeat(n);
+        const opt = (val, indent, r, sel) =>
+            `<option value="${val}"${sel ? " selected" : ""}>${pad(indent)}↳ ${escapeHtml(r.name)} `
+            + `${r.start}–${r.end} (${formatNumber(r.count)})</option>`;
         let html = all;
         for (const c of idx.chapters || []) {
-            const csel = c.id === mState.chapter && !mState.division && !mState.subdivision ? " selected" : "";
-            html += `<option value="${escapeHtml(c.id)}"${csel}>${escapeHtml(c.label)} (${formatNumber(c.count)})</option>`;
+            const csel = c.id === mState.chapter && !mState.division && !mState.subdivision && !mState.subdivision3;
+            html += `<option value="${escapeHtml(c.id)}" class="opt-chapter"${csel ? " selected" : ""}>`
+                + `${escapeHtml(c.label)} (${formatNumber(c.count)})</option>`;
             for (const d of divsByChapter.get(c.id) || []) {
-                const dsel = d.name === mState.division && !mState.subdivision ? " selected" : "";
-                html += `<option value="d:${escapeHtml(d.name)}"${dsel}>&nbsp;&nbsp;↳ ${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})</option>`;
+                html += opt(`d:${escapeHtml(d.name)}`, 3, d,
+                    d.name === mState.division && !mState.subdivision && !mState.subdivision3);
                 for (const s of subsByDiv.get(d.name) || []) {
-                    const ssel = s.name === mState.subdivision ? " selected" : "";
-                    html += `<option value="sd:${escapeHtml(s.name)}"${ssel}>&nbsp;&nbsp;&nbsp;&nbsp;↳ ${escapeHtml(s.name)} ${s.start}–${s.end} (${formatNumber(s.count)})</option>`;
+                    html += opt(`sd:${escapeHtml(s.name)}`, 7, s,
+                        s.name === mState.subdivision && !mState.subdivision3);
+                    for (const t of subs3BySub.get(s.name) || []) {
+                        html += opt(`s3:${escapeHtml(t.name)}`, 11, t, t.name === mState.subdivision3);
+                    }
                 }
             }
         }
@@ -224,10 +237,13 @@ function wireControls() {
     });
     document.getElementById("motifsChapter").addEventListener("change", (e) => {
         const v = e.target.value;
-        // ATU options: "sd:" a sub-division, "d:" a division; everything else a chapter.
-        if (v.startsWith("sd:")) { mState.subdivision = v.slice(3); mState.division = ""; mState.chapter = ""; }
-        else if (v.startsWith("d:")) { mState.division = v.slice(2); mState.subdivision = ""; mState.chapter = ""; }
-        else { mState.chapter = v; mState.division = ""; mState.subdivision = ""; }
+        // Prefixes: "s3:" a division3, "sd:" a sub-division, "d:" a division; a bare
+        // value is a chapter. The levels are mutually exclusive, so clear the others.
+        mState.chapter = mState.division = mState.subdivision = mState.subdivision3 = "";
+        if (v.startsWith("s3:")) mState.subdivision3 = v.slice(3);
+        else if (v.startsWith("sd:")) mState.subdivision = v.slice(3);
+        else if (v.startsWith("d:")) mState.division = v.slice(2);
+        else mState.chapter = v;
         loadList();
         syncUrl(true);
     });
@@ -276,6 +292,7 @@ function resetIndexFilters(index) {
     mState.chapter = "";
     mState.division = "";
     mState.subdivision = "";
+    mState.subdivision3 = "";
     mState.query = "";
     const search = document.getElementById("motifsSearch");
     if (search) search.value = "";
@@ -357,6 +374,7 @@ function listParams() {
     if (mState.chapter) params.set("chapter", mState.chapter);
     if (mState.division) params.set("division", mState.division);
     if (mState.subdivision) params.set("sub_division", mState.subdivision);
+    if (mState.subdivision3) params.set("sub_division3", mState.subdivision3);
     if (mState.query.trim()) params.set("q", mState.query.trim());
     return params;
 }

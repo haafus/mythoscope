@@ -934,11 +934,12 @@ def _mellmann_division_levels(config: dict, *, force: bool) -> list[list[dict]]:
     return [sorted(lv.values(), key=lambda d: (d["chapter"], d["start"])) for lv in levels]
 
 
-def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]]) -> tuple[list[dict], list[dict]]:
+def _assign_tmi_divisions(motifs: list[dict],
+                          levels: list[list[dict]]) -> tuple[list[dict], list[dict], list[dict]]:
     """Attach Mellmann's division1-3 headings to each motif by its code's chapter +
     number (range containment, so it also covers our dup ``~N`` and mangled ids),
-    and return the sidebar's ``divisions`` (level 1) and ``subdivisions`` (level 2)
-    lists with per-heading motif counts. Level 3 rides on the motif alone."""
+    and return the sidebar's three browse levels — ``divisions`` (1), ``subdivisions``
+    (2), ``subdivisions3`` (3) — each with per-heading motif counts."""
     def by_chapter(level: list[dict]) -> dict[str, list[tuple]]:
         out: dict[str, list[tuple]] = {}
         for d in level:
@@ -957,6 +958,7 @@ def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]]) -> tuple
              ("division3", "division3_range"))
     div_counts: collections.Counter = collections.Counter()
     sub_counts: collections.Counter = collections.Counter()
+    sub3_counts: collections.Counter = collections.Counter()
     for m in motifs:
         mm = re.match(r"([A-Z])(\d+)", m["id"])
         if not mm:
@@ -972,6 +974,9 @@ def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]]) -> tuple
                 div_counts[(chapter, d["name"], d["start"], d["end"])] += 1
             elif i == 1:
                 sub_counts[(chapter, m.get("division", ""), d["name"], d["start"], d["end"])] += 1
+            else:
+                sub3_counts[(chapter, m.get("division", ""), m.get("sub_division", ""),
+                             d["name"], d["start"], d["end"])] += 1
 
     divisions = [{"chapter": ch, "name": nm, "start": s, "end": e, "count": c}
                  for (ch, nm, s, e), c in div_counts.items()]
@@ -979,7 +984,11 @@ def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]]) -> tuple
     subdivisions = [{"chapter": ch, "division": dv, "name": nm, "start": s, "end": e, "count": c}
                     for (ch, dv, nm, s, e), c in sub_counts.items()]
     subdivisions.sort(key=lambda r: (r["chapter"], r["start"]))
-    return divisions, subdivisions
+    subdivisions3 = [{"chapter": ch, "division": dv, "sub_division": sd,
+                      "name": nm, "start": s, "end": e, "count": c}
+                     for (ch, dv, sd, nm, s, e), c in sub3_counts.items()]
+    subdivisions3.sort(key=lambda r: (r["chapter"], r["start"]))
+    return divisions, subdivisions, subdivisions3
 
 
 def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | None = None) -> dict:
@@ -1002,10 +1011,11 @@ def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | Non
         "motifs": tmi,
     }
     if divisions_config:
-        divisions, subdivisions = _assign_tmi_divisions(
+        divisions, subdivisions, subdivisions3 = _assign_tmi_divisions(
             tmi, _mellmann_division_levels(divisions_config, force=force))
         store["divisions"] = divisions
         store["subdivisions"] = subdivisions
+        store["subdivisions3"] = subdivisions3
     return store
 
 
