@@ -907,8 +907,10 @@ def _atu_subdivisions(types: list[dict]) -> list[dict]:
 # ranges ("A0–A99. Creator.", "A300–A399. Gods of the underworld.") the Trilogy
 # CSV drops. We lift her three nested division levels and hang them on our motifs
 # so the TMI browse and Classification mirror the ATU section. The optional dot
-# after the start number tolerates a source typo ("A800.–A899. The earth.").
-_MEL_DIVISION = re.compile(r"^\s*([A-Z])(\d+)\.?\s*[–—-]\s*[A-Z]?(\d+)\s*\.\s*(.+?)\.?\s*$")
+# after the start number tolerates a source typo ("A800.–A899. The earth."); the
+# title is the first period-terminated clause, so a trailing taxonomic "Note: …"
+# (e.g. "A1800–A1899. Creation of mammals. Note: A1810–A1819. Felidae. …") is dropped.
+_MEL_DIVISION = re.compile(r"^\s*([A-Z])(\d+)\.?\s*[–—-]\s*[A-Z]?(\d+)\s*\.\s*([^.]+)")
 _MEL_DIVISION_COLS = ("division1", "division2", "division3")
 
 
