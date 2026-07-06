@@ -98,10 +98,18 @@ encodes — our Trilogy `atu_df` is ATU-numbered but its exact transcription
 provenance is unverified (see `tmi-mellmann-migration.md` §2 on Trilogy being
 an independent digitization).
 
-**Bottom line (ATU):** authority = **Uther 2004/2024** (print, copyrighted);
+Editions: 2004 first ed. → **2011 reprint** → substantially revised & supplemented
+**2024** edition. The 2011 three-volume text circulates as PDFs on academia.edu
+and Scribd (grey-access — *not* confirmed publisher-authorized open access), and
+those scans are what many user-made ATU spreadsheets are keyed to. See:
+<https://www.folklorefellows.fi/the-types-of-international-folktales-reprinted/>.
+
+**Bottom line (ATU):** authority = **Uther 2004/2011/2024** (print, copyrighted);
 best open text corpora = **MFTD** (multilingual) and **Ashliman**; best open
 *type data* = tidy CSVs like **trilogy `atu_df`** — there is no clean,
-complete, freely licensed structured ATU to migrate to.
+complete, freely licensed structured ATU to migrate to. The most complete
+digital ATU in practice is the **2011 PDF** (via grey channels), from which
+projects extract number/title/description spreadsheets.
 
 ---
 
@@ -122,6 +130,100 @@ complete, freely licensed structured ATU to migrate to.
   series) — partially digitized, fragmentary; consult per-need, not as feeds.
 
 ---
+
+## 3b. The wider digital ecosystem (corpora, Linked Data, computational folkloristics)
+
+Sourced from a shared research conversation (retrieved 2026-07 by parsing the
+page HTML) and then **independently re-verified via web search** where marked
+`[verified]`; items marked `[unverified]` come only from that secondary
+conversation and should be checked before being relied on. The central thesis
+is worth recording:
+
+> The active center of modern folkloristics is no longer the TMI/ATU
+> **catalogues** themselves, but the **national archives** where hundreds of
+> thousands of texts are already tagged with ATU/TMI codes. Computational work
+> is built on those tagged corpora, not on the bare indexes.
+
+### National folklore archives (ATU/TMI-tagged text corpora)
+
+The most valuable *data* is the tagged corpus, not the index. Leading archives:
+
+- **Finland — SKS / Finna** `[unverified]` — historic home of the AT system;
+  hundreds of thousands of records, many with AT/ATU numbers, used to prepare
+  new ATU editions; catalogue/bibliography via the Finna portal.
+- **Norway — Samla** `[unverified]` — `samla.no/viewer/typekatalog/eventyr/`;
+  the most open modern system: national tale catalogue, every text typed,
+  AT/ATU-searchable, open web UI, explicitly a development of the AT system.
+- **Estonia — Estonian Folklore Archives** `[unverified]` — one of Europe's
+  largest; digital collections, much of it type-tagged; active AI auto-indexing.
+- **Ireland — National Folklore Collection (UCD)** `[unverified]` — likely the
+  largest English-language folk-tradition archive; search built around ATU +
+  local indexes.
+
+### National / regional type- and motif-indexes (same AT/ATU frame)
+
+Almost every major tradition built its own index, usually keyed
+`local number → ATU → Thompson motifs`. Named in the source `[unverified]`:
+
+- Ørnulf **Hodne**, *The Types of the Norwegian Folktale*
+- Reidar Th. **Christiansen**, *The Migratory Legends* (the "ML" index)
+- Hassan **El-Shamy**, Arab / Middle-Eastern type & motif indexes
+- Japanese, Irish, Spanish, and Baltic national catalogues
+
+(Complements §3's СУС for East Slavic.)
+
+### Semantic / Linked Open Data
+
+- **DFKI — Linked Data for Folktales** `[verified]` — Declerck et al., "Towards a
+  Linked Data Access to Folktales classified by Thompson's Motifs and
+  Aarne-Thompson-Uther's Types", DH2017. Ports TMI (1977) + Uther 2004 into
+  interrelated **OWL/RDF(S)** ontologies: the ID hierarchy becomes an OWL
+  subclass tree, and terminal nodes are both a `Motif` instance and an instance
+  of their pre-terminal class (encoding "motifs are the leaves"). Aimed at LOD
+  access to type/motif-annotated tales.
+  - PDF: <https://www.dfki.de/fileadmin/user_upload/import/9028_Dh2017_LOD_TMI-ATU_final.pdf>
+  - <https://dh-abstracts.library.virginia.edu/works/4064>
+- **BARTOC** `[unverified]` — registers the TMI as a controlled vocabulary with
+  its own identifier, linking it into library/DH knowledge infrastructure.
+
+### Computational folkloristics
+
+- **GLOS — Geographic Lens on Stories** `[verified]` — <https://kgeographer.org/glos_jan2025.html>.
+  Recent project whose **first phase digitized TMI (Thompson 1966) + ATU
+  (Uther 2011)**: OCR → clean → parse into a normalized relational DB, then
+  vector embeddings; current work uses LLMs to induce a schema for comparing
+  creation myths across cultures. Directly parallel to this project's approach
+  (embeddings over motif/type text); worth watching closely.
+  Creation-myth schema: <https://kgeographer.org/glos_creation_schema.html>
+- **Mark Finlayson (FIU) research program** `[unverified]` — no published full
+  TMI database; instead a body of work on automatic motif detection/indexing,
+  annotated motif corpora, and LLM motif search. A 2026 study reportedly uses
+  the El-Shamy *1001 Nights* index (≈2670 annotated occurrences, 200 motifs,
+  58 450 sentences) rather than Thompson — i.e. Finlayson now automates motif
+  tagging rather than re-digitizing Thompson.
+
+### Other access points
+
+- **StoryNotes** `[verified]` — <https://psychemedia.github.io/storynotes/> — a
+  Pandas-friendly interface over the Mellmann CSV (search by code/word, browse
+  levels). Convenient exploration layer, not a separate dataset.
+- **Indiana University / InteLex** `[unverified]` — a commercial digital Motif
+  Index (subscription; mirrors the print edition), behind a paywall.
+- **everything.explained.today / HandWiki** `[unverified]` — encyclopedic
+  mirrors of the Motif-Index overview; low value beyond quick reading.
+
+### Strategic note for this project
+
+The source's most useful observation: **almost no existing project treats motifs
+as a graph** — they use lists, trees, or (DFKI) an RDF ontology, but nobody
+builds the full network `ATU type ⇄ constituent motifs ⇄ attested texts`. That
+`type ↔ motif ↔ text` graph, cross-index and corpus-linked, is precisely
+Mythoscope's niche; GLOS and DFKI are the nearest neighbours to watch.
+
+Suggested by the source as an unfilled gap worth a dedicated survey: a **map of
+all national catalogues** (Russian, Chinese, Japanese, Indian, Arab, Balkan,
+Finno-Ugric …) — which are digitized, have APIs, ship XML/CSV, or expose open
+ATU/TMI-linked corpora. No such consolidated overview currently exists.
 
 ## 4. Relevance to this project
 
@@ -146,3 +248,6 @@ complete, freely licensed structured ATU to migrate to.
 | tale texts for a type, multilingual | MFTD |
 | tale texts for a type, English | Ashliman |
 | East Slavic type equivalents | СУС |
+| TMI/ATU as RDF/OWL linked data | DFKI ontology (DH2017) |
+| embeddings/LLM over folktale indexes (prior art) | GLOS |
+| large ATU/TMI-tagged text corpus | national archives (Samla, SKS/Finna, …) |
