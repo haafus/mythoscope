@@ -1864,14 +1864,18 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
     border: 1px solid #f5c6c0;
     border-radius: 8px;
 }
-/* The sibling link(s) drop onto their own line under the note text. */
-.motif-dup-siblings {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
+/* The sibling link stays inline plain text, not a pill chip. */
+.motif-dup-note .motif-link {
+    display: inline;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    color: #8a3024;
+    font-weight: 600;
+    text-decoration: underline;
 }
+.motif-dup-note .motif-link:hover { color: #6f261d; background: none; }
 
 .motif-source-link { font-size: 12.5px; color: #41506a; word-break: break-all; }
 
