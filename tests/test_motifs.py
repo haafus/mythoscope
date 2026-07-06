@@ -202,6 +202,19 @@ class TestMapsofmythsEnrichment:
         assert m["traditions"] == ["6.2.3.1", "26.1.1.1"]
 
 
+class TestTmiParsing:
+    def test_reunite_quoted_title(self):
+        # Source split a quoted catch-word title wrong: opening quote on the name,
+        # closing quote leaked to the front of the notes (K553).
+        name, notes = trilogy._reunite_quoted_title(
+            '"Wait Till I Get Fat', '" Captured person persuades his captor. Halm Aesop No. 231')
+        assert name == '"Wait Till I Get Fat"'
+        assert notes == "Captured person persuades his captor. Halm Aesop No. 231"
+        # Balanced titles and quote-less names are left alone.
+        assert trilogy._reunite_quoted_title('"Bear-Skin"', "def") == ('"Bear-Skin"', "def")
+        assert trilogy._reunite_quoted_title("Plain Name", '" x') == ("Plain Name", '" x')
+
+
 class TestAtuStructure:
     def test_division_parse(self):
         assert trilogy._split_division("Supernatural Adversaries 300-399") == ("Supernatural Adversaries", 300, 399)

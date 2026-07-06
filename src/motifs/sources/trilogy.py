@@ -300,6 +300,18 @@ def _tmi_chapters(motifs: list[dict]) -> dict[str, str]:
     return chapters
 
 
+def _reunite_quoted_title(name: str, notes: str) -> tuple[str, str]:
+    """Fix a quoted catch-word title the source split wrong: the opening quote stayed
+    on the name (``"Wait Till I Get Fat``) while the closing quote leaked to the front
+    of the notes (``" Captured person…``). Move the closing quote back onto the name so
+    it reads ``"Wait Till I Get Fat"`` and the notes start at the real prose."""
+    if name.startswith('"') and name.count('"') % 2 == 1:
+        rest = notes.lstrip()
+        if rest.startswith('"'):
+            return name + '"', rest[1:].lstrip()
+    return name, notes
+
+
 def _parse_tmi(rows: list[dict]) -> list[dict]:
     motifs = []
     for row in rows:
@@ -312,11 +324,12 @@ def _parse_tmi(rows: list[dict]) -> list[dict]:
             level = 0
         parent = _clean(row.get(f"level_{level - 1}")) if level > 0 else ""
         notes = _strip_notes_bleed(_clean(row.get("notes")))
+        name, notes = _reunite_quoted_title(_clean(row.get("motif_name")), notes)
         motifs.append({
             "id": code,
             "chapter": _clean(row.get("chapter_id")) or code[:1],
             "chapter_name": _clean(row.get("chapter_name")),
-            "name": _clean(row.get("motif_name")),
+            "name": name,
             "notes": notes,
             **parse_notes(notes, code),  # definition, cultures, references, see_also, atu_inline
             "level": level,
