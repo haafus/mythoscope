@@ -985,8 +985,8 @@ class TestTrilogy:
         assert culture_dict.canonical("Japan") == ("Japanese", "")
         assert culture_dict._REGION["Japanese"] == "East Asia"
         assert culture_dict._REGION["Finnish-Swedish"] == "Europe"
-        # a cross-region language family is left region-less, not forced into one
-        assert "Finno-Ugric" not in culture_dict._REGION
+        # the Finno-Ugric family is bucketed with Siberia (matching Cheremis/Holmberg)
+        assert culture_dict._REGION["Finno-Ugric"] == "Siberia"
 
     def test_culture_legend_aggregates_aliases_regions_subs(self):
         motifs = [

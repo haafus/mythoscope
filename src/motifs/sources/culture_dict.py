@@ -105,14 +105,15 @@ _REGION = {
     "Burmese": "Southeast Asia", "Batak": "Southeast Asia",
     "Malay": "Southeast Asia", "Java": "Southeast Asia",
     "Buriat": "Siberia", "Cheremis": "Siberia",
+    # the Finno-Ugric family straddles Europe and W. Siberia/the Urals; bucketed with
+    # Siberia to match the Volga-Finnic 'Cheremis' above and Thompson's cited source
+    # (Holmberg's *Finno-Ugric, Siberian* mythology).
+    "Finno-Ugric": "Siberia",
     "Assyrian": "Near East",
     "Mexican Indian": "Mesoamerica",
     "Guarayú": "South America", "Paressi": "South America", "Ackawoi": "South America",
     "Mono-Alu": "Oceania",  # single Solomon Islands people, despite the hyphen
-    # Compound labels that read as one culture. ('Finno-Ugric' is left region-less
-    # on purpose: it is a language family straddling Europe and W. Siberia/the Urals
-    # — Thompson's 'Finno-Ugric:' cites Holmberg's *Finno-Ugric, Siberian* mythology
-    # — so no single macro-region fits, as with 'Chinese-Persian'.)
+    # Compound labels that read as one culture.
     "Finnish-Swedish": "Europe", "English-Scottish": "Europe",
     "Missouri-French": "North America", "French-Canadian": "North America",
     "Indo-Chinese": "Southeast Asia",
