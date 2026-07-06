@@ -1373,7 +1373,7 @@ function renderDetail(d) {
         if ((links.subtypes || []).length) body += linkSection(`Subtypes (${links.subtypes.length})`, links.subtypes);
         if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
-        if ((links.tmi_via_notes || []).length) body += linkSection(`Referenced by TMI motifs (via notes) (${links.tmi_via_notes.length})`, links.tmi_via_notes);
+        if ((links.tmi_via_notes || []).length) body += linkSection(`Referenced by TMI motifs (${links.tmi_via_notes.length})`, links.tmi_via_notes);
         if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
         body += crossLinkExtras(d);
         body += atuAttestations(d.attestations_grouped, d.attestations);
