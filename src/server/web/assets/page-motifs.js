@@ -149,9 +149,9 @@ function renderChapters() {
     const select = document.getElementById("motifsChapter");
     const idx = currentIndex();
     const all = `<option value="">All ${mState.index === "atu" ? "tale types" : "chapters"} (${formatNumber(idx.count)})</option>`;
-    // ATU (and TMI, once Mellmann's headings are in) browse by division — finer
-    // than the chapters, grouped under them and ordered by ascending number range.
-    if ((idx.divisions || []).length) {
+    // ATU browses by division (finer than the 7 number-range chapters), grouped
+    // under them and ordered by ascending number range (1 → 2399).
+    if (mState.index === "atu" && (idx.divisions || []).length) {
         // Sub-divisions (optional 3rd level) nest under their division, indented.
         const subsByDiv = new Map();
         for (const s of [...(idx.subdivisions || [])].sort((a, b) => a.start - b.start)) {
@@ -174,6 +174,37 @@ function renderChapters() {
         };
         select.innerHTML = all + [...byChapter].map(([ch, divs]) => `
             <optgroup label="${escapeHtml(ch)}">${divs.map(divOption).join("")}</optgroup>`).join("");
+        return;
+    }
+    // TMI: keep the lettered chapters selectable (in alphabetical order, as the
+    // server sends them) with Mellmann's division1/2 headings nested and indented
+    // beneath each — so G/Q sit in place, not sorted by number range.
+    if (mState.index === "tmi" && (idx.divisions || []).length) {
+        const subsByDiv = new Map();
+        for (const s of idx.subdivisions || []) {
+            if (!subsByDiv.has(s.division)) subsByDiv.set(s.division, []);
+            subsByDiv.get(s.division).push(s);
+        }
+        const divsByChapter = new Map();
+        for (const d of idx.divisions) {
+            if (!divsByChapter.has(d.chapter)) divsByChapter.set(d.chapter, []);
+            divsByChapter.get(d.chapter).push(d);
+        }
+        for (const arr of divsByChapter.values()) arr.sort((a, b) => a.start - b.start);
+        let html = all;
+        for (const c of idx.chapters || []) {
+            const csel = c.id === mState.chapter && !mState.division && !mState.subdivision ? " selected" : "";
+            html += `<option value="${escapeHtml(c.id)}"${csel}>${escapeHtml(c.label)} (${formatNumber(c.count)})</option>`;
+            for (const d of divsByChapter.get(c.id) || []) {
+                const dsel = d.name === mState.division && !mState.subdivision ? " selected" : "";
+                html += `<option value="d:${escapeHtml(d.name)}"${dsel}>&nbsp;&nbsp;↳ ${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})</option>`;
+                for (const s of subsByDiv.get(d.name) || []) {
+                    const ssel = s.name === mState.subdivision ? " selected" : "";
+                    html += `<option value="sd:${escapeHtml(s.name)}"${ssel}>&nbsp;&nbsp;&nbsp;&nbsp;↳ ${escapeHtml(s.name)} ${s.start}–${s.end} (${formatNumber(s.count)})</option>`;
+                }
+            }
+        }
+        select.innerHTML = html;
         return;
     }
     const chapters = idx.chapters || [];
