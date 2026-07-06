@@ -744,7 +744,9 @@ function renderTmiTree(d) {
     rows.push(treeRow({ id: d.id, name: d.name, level: d.level, descendant_count: d.descendant_count, descendant_counts: d.descendant_counts, notes_size: d.notes_size, has_definition: d.has_definition, substantive: d.substantive }, depth, { current: true }));
     for (const c of d.children || []) rows.push(treeRow(c, depth + 1, { filterable: true }));
     if (d.children_truncated) rows.push(`<div class="motif-subtree-more" style="--depth:${depth + 1}">… more sub-motifs</div>`);
-    return `${controls(false)}<div class="motif-tree${filterClass()}">${rows.join("")}</div>`;
+    // Wrapped so the filter + hierarchy keeps its own top spacing even when the
+    // motif has no definition/links above it (else it hugs the header — A1).
+    return `<div class="motif-hierarchy">${controls(false)}<div class="motif-tree${filterClass()}">${rows.join("")}</div></div>`;
 }
 
 function bindTreeLinks(detail) {
