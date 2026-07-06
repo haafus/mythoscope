@@ -149,8 +149,9 @@ def build_motifs(*, force: bool = False) -> None:
                     "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
 
         # --- [3/5] ATU: header before the ATU parse, on par with the other steps. ---
-        logger.info("[3/5] Aarne-Thompson-Uther (ATU) tale types — source: %s (%s)",
-                    tr_cfg.get("homepage", "trilogy"),
+        logger.info("[3/5] Aarne-Thompson-Uther (ATU) tale types — source: %s",
+                    tr_cfg.get("homepage", "trilogy"))
+        logger.info("      files: %s",
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
         atu_index, atu_seq = trilogy.build_atu(tr_cfg, force=force)
         # Multilingual names + Wikipedia links from Wikidata (open, best-effort).
@@ -216,12 +217,14 @@ def build_motifs(*, force: bool = False) -> None:
     else:
         save_json(store.parallels_path(), par)
         par_counts = par["counts"]
-        logger.info("      candidates (unlinked) tier A / tier B: ATU~TMI %d/%d, Berezkin~TMI %d/%d, "
-                    "Berezkin~ATU %d/%d; three-way parallels %d",
-                    par_counts.get("atu_tmi_A", 0), par_counts.get("atu_tmi_B", 0),
-                    par_counts.get("berezkin_tmi_A", 0), par_counts.get("berezkin_tmi_B", 0),
-                    par_counts.get("berezkin_atu_A", 0), par_counts.get("berezkin_atu_B", 0),
-                    par_counts.get("triangles", 0))
+        logger.info("      candidates (unlinked look-alikes) — tier A / tier B; near-identical is the "
+                    "strongest subset of tier A:")
+        for key, name in (("atu_tmi", "ATU~TMI     "), ("berezkin_tmi", "Berezkin~TMI"),
+                          ("berezkin_atu", "Berezkin~ATU")):
+            logger.info("        %s  %d / %d  (%d near-identical)", name,
+                        par_counts.get(f"{key}_A", 0), par_counts.get(f"{key}_B", 0),
+                        par_counts.get(f"{key}_near", 0))
+        logger.info("        three-way parallels: %d", par_counts.get("triangles", 0))
 
     # Semantic parallels (BGE-M3) are precomputed offline (scripts/build_semantic_parallels.py)
     # and shipped as a committed file; copy it into outputs so this build serves it.
