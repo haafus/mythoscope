@@ -215,12 +215,28 @@ introduced several defects. Each is repaired at build time (`trilogy.py`).
   cross-walk instead of dangling. Of the 3,847 TMI codes ATU cites, ~33 remain
   absent from our Thompson index. Our index (46,230 motifs) is essentially the
   complete Thompson revision (~46k), so these are **not** a subset gap of some
-  fuller edition; the cause is undetermined. Each is cited by both `atu_seq` and
-  Uther's prose and sorts exactly where a real motif would, so the likeliest
-  explanations are a number Thompson left unassigned (his numbering is deliberately
-  gapped), a code Uther drew from a supplementary index (Baughman, Cross, Tubach…)
-  in Thompson notation, or a stray extraction gap — none of which we can repair
-  without the printed sources, and none a defect on our side.
+  fuller edition. Each was checked against the full Thompson text (Wikisource
+  vol. 1 + the complete ruthenia.ru mirror) and the full text of Baughman's
+  *Type and Motif-Index of the Folktales of England and North America*, with
+  Cross (folded into Thompson) and Tubach (sequential exemplum numbers, not
+  Thompson codes) reasoned out. The verdict:
+  - **1 is a real Thompson motif our extraction dropped** — `X751` "Marriage
+    forbidden outside the parish" (Type 1475); we carry `X750` and `X752` but lost
+    `X751`. A genuine one-row gap (repairable, but left as-is for now).
+  - **1 exists in Thompson with a different meaning** — `B478` is "Helpful
+    octopus"; ATU cites it for a snake sucking out poison, i.e. a mis-numbering on
+    ATU's side (that sense is a B510/B511 healing motif), not a missing entry.
+  - **The other ~31 appear in no consulted index** (not Thompson, not Baughman —
+    verified by full-text grep — not Cross, not Tubach). They fill Thompson's
+    deliberately unassigned numbering gaps and read as ATU-apparatus codes coined
+    in Thompson notation to tag a tale element; several do not even match the
+    meaning of their existing base motif (`K461.2.1`, `K542.1`, `K2135.1`). Only
+    `X1122.3.1` is thematically Baughman-style (the X1122 "remarkable shot" tall-tale
+    cluster Baughman expands), but the literal code is absent from Baughman too.
+
+  So the earlier "probably from a supplementary index" guess did not hold up; these
+  are not defects on our side and are not repairable without the printed sources
+  (bar the single `X751` extraction gap).
 
 Defects are logged at build time.
 
