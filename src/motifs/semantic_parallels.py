@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 MODEL = "BAAI/bge-m3"
 MAX_SEQ = 256
-THRESH = 0.55        # minimum cosine for a suggestion
+THRESH = 0.65        # minimum cosine for a suggestion
 TOPK = 6             # neighbours examined per index side
 CAP = 8              # suggestions kept per motif
 
