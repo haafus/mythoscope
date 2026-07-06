@@ -293,9 +293,12 @@ def _finalize_tmi(motifs: list[dict]) -> list[dict]:
         m.pop("source_level", None)
 
     if dup_codes:
-        logger.warning("TMI defect: %d duplicate codes — %d redundant rows collapsed, "
-                       "%d kept as distinct motifs with '~N' suffixes: %s",
-                       len(dup_codes), collapsed, len(suffixed), ", ".join(sorted(suffixed)))
+        logger.warning("TMI defect: %d codes Thompson gives to more than one motif", len(dup_codes))
+        if collapsed:
+            logger.warning("      %d same-name redundant row(s) collapsed to the copy with the most notes", collapsed)
+        if suffixed:
+            logger.warning("      %d kept as distinct motifs with a '~N' suffix: %s",
+                           len(suffixed), ", ".join(sorted(suffixed)))
     if recovered or unresolved:
         logger.warning("TMI defect: %d dotted ids had no source parent — reattached %d via id-trim, %d unresolved",
                        recovered + unresolved, recovered, unresolved)

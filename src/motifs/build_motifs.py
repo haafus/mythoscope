@@ -221,6 +221,15 @@ def build_motifs(*, force: bool = False) -> None:
                     par_counts.get("berezkin_atu_A", 0), par_counts.get("berezkin_atu_B", 0),
                     par_counts.get("triangles", 0))
 
+    # Semantic parallels (BGE-M3) are precomputed offline (scripts/build_semantic_parallels.py)
+    # and shipped as a committed file; copy it into outputs so this build serves it.
+    sem = store.copy_semantic_parallels()
+    if sem is not None:
+        logger.info("      + semantic parallels (BGE-M3): %d pairs — precomputed, committed file copied into outputs",
+                    sem.get("counts", {}).get("pairs", 0))
+    else:
+        logger.info("      + semantic parallels (BGE-M3): none (run scripts/build_semantic_parallels.py)")
+
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "counts": counts,

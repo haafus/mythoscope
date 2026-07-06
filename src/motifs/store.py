@@ -113,6 +113,19 @@ def load_semantic_parallels() -> dict:
     return _load_cached("semantic_parallels", dst) or {}
 
 
+def copy_semantic_parallels() -> dict | None:
+    """Copy the committed precomputed semantic-parallels file into outputs (always, so
+    a build serves the current version) and return its contents, or ``None`` if the
+    committed file is absent. Unlike ``load_semantic_parallels`` this is unconditional."""
+    src = DATA_DIR / SEMANTIC_PARALLELS_FILE
+    if not src.exists():
+        return None
+    dst = semantic_parallels_path()
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, dst)
+    return load_json_optional(dst) or {}
+
+
 def load_meta() -> dict:
     return _load_cached("meta", meta_path()) or {}
 
