@@ -212,10 +212,15 @@ introduced several defects. Each is repaired at build time (`trilogy.py`).
   non-existent one (`D1610.2.2 → D16102.2` in type 780B, "she grows as a bush and
   sings" = *Speaking Bush*). A curated `_MOTIF_CODE_FIXES` map repairs these in both
   the `atu_seq` column and the summary text so the code links and joins the
-  cross-walk instead of dangling. Of the 3,847 TMI codes ATU cites, only ~34 remain
-  absent from our Thompson index — genuine missing leaves of a fuller edition, not
-  defects (34/35 are cited by both `atu_seq` and Uther's prose and sit exactly where
-  a real motif would in Thompson order).
+  cross-walk instead of dangling. Of the 3,847 TMI codes ATU cites, ~33 remain
+  absent from our Thompson index. Our index (46,230 motifs) is essentially the
+  complete Thompson revision (~46k), so these are **not** a subset gap of some
+  fuller edition; the cause is undetermined. Each is cited by both `atu_seq` and
+  Uther's prose and sorts exactly where a real motif would, so the likeliest
+  explanations are a number Thompson left unassigned (his numbering is deliberately
+  gapped), a code Uther drew from a supplementary index (Baughman, Cross, Tubach…)
+  in Thompson notation, or a stray extraction gap — none of which we can repair
+  without the printed sources, and none a defect on our side.
 
 Defects are logged at build time.
 
