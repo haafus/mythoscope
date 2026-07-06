@@ -44,6 +44,27 @@ Conclusion: dropping Trilogy-as-TMI loses **nothing non-derivable**;
 keeping Trilogy-as-TMI forgoes 79 citations, 14 codes, the heading scaffold,
 provenance, and dangling-reference resolution.
 
+## 2a. Recommended shape: phased, additive-first
+
+Do **not** treat this as one atomic swap. The valuable, non-derivable Mellmann
+data (headings, `1st ed.` provenance) is *low-risk and additive*; the source
+swap itself is the *risky* part (cross-walk join drift, embedding churn).
+Decouple them:
+
+- **Phase 0 — enrichment, no source change.** Harvest two things from Mellmann
+  and join them onto the **existing Trilogy index by code**: (a) the
+  `division1-3` + `section` heading scaffold, (b) the `1st ed.` old→new
+  renumber map. Ship them as generated data files consumed as *optional
+  overlays*. This delivers the Classification section and the dangling-ref
+  resolution **before** touching the source, and is trivially reversible.
+- **Phase 1 — source swap.** Only once Phase 0 has proven the heading/provenance
+  data is sound, replace the TMI parser (sections 4–6). By then the risky part
+  is isolated: coverage/citation/definition changes, nothing else.
+- **Phase 2 — cleanup.** Retire the now-dead Trilogy TMI code paths (`.0`
+  repair, `level_N` reader, definition-unmixing heuristics) and re-embed.
+
+The migration can pause after any phase and still be net-positive.
+
 ## 3. Source facts
 
 | | Trilogy TMI (current) | Mellmann (target) |
@@ -127,6 +148,60 @@ TMI index **by code string**. Swapping the index changes which codes exist.
   join target, exactly as now.
 - `tmi_sort_key` (imported by `crosswalk.py`) is code-based and unaffected.
 
+## 6a. Side-by-side prototyping (no pipeline edits)
+
+Two properties of the current code make a full A/B build possible **without
+editing a single tracked file**:
+
+- `settings` is pydantic with `env_prefix="MYTHO_"`, so `motifs_dir` is
+  overridable via `MYTHO_MOTIFS_DIR`;
+- `_read_csv` reads a **cache** at `{motifs_dir}/raw/trilogy/tmi.csv` and only
+  downloads on a cache miss — so pre-seeding that path swaps the input.
+
+Recommended harness (lives in `scripts/`, imports nothing into the pipeline):
+
+1. `export MYTHO_MOTIFS_DIR=outputs/motifs_mellmann` — isolated output tree.
+2. Copy the existing `atu_*.csv` into the parallel `raw/trilogy/` so ATU is
+   byte-identical and **every diff is attributable to the TMI swap alone**.
+3. A `mellmann_shim.py` writes a Trilogy-schema `tmi.csv` from Mellmann
+   (reconstructing `level_N` via id-trim, `notes = bibliographies`). This runs
+   the **real, unmodified pipeline** — `_finalize_tmi`, `parse_notes`,
+   cross-walk — end to end on Mellmann data.
+4. Run the normal build; it consumes the seeded cache (no download).
+5. `diff` the two `outputs/motifs/*.json` trees.
+
+Two depths, pick by goal:
+- **Shim into Trilogy schema** (above): fastest, zero new modules, exercises
+  the whole downstream incl. cross-walk — best for coverage/citation/dangling
+  diffs. Cost: Mellmann's clean def/citation split and headings are flattened
+  back into the Trilogy shape, so those advantages aren't visible this way.
+- **Parallel builder** `sources/mellmann.py` (new file, unwired → existing
+  behaviour unchanged) + a `scripts/compare_tmi.py` that builds both and diffs
+  the normalized dicts — surfaces the new fields (`division`, `section`,
+  `1st ed.`, clean `definition`). Wire `crosswalk.build(...)` in the harness if
+  downstream comparison is wanted.
+
+Keep the shim/harness even after migration: it becomes the regression oracle
+for Phase 1 (section 9).
+
+## 6b. Reconciliation report as a committed artifact
+
+Have the harness emit a `docs/motifs/tmi-mellmann-diff.md` (or a JSON under
+`outputs/`) enumerating, deterministically: codes added/removed, per-motif
+citation deltas, dangling ATU→TMI before/after, duplicate-set changes, and any
+motif whose `parent`/depth moved. Commit it. This turns "trust me, it's fuller"
+into an auditable diff a reviewer can read, and doubles as the sign-off gate
+for each phase.
+
+## 6c. The renumber map is a reusable asset, not migration scaffolding
+
+The `1st ed.` old→new map (~1175 renumberings + 54 dropped ghosts) has value
+**independent of the source swap**: wired into the cross-walk it resolves ATU
+references that cite pre-revision numbers (`A14→A13.1.1`, `B478→B495.1`, …).
+Extract it as a standalone generated data file in Phase 0 and let the walk
+consult it even while still on the Trilogy index. Ship it once, benefit before,
+during, and after migration.
+
 ## 7. Capabilities unlocked (follow-on, not required for parity)
 
 - A real **Classification / hierarchy** section for TMI in the UI, driven by
@@ -173,6 +248,36 @@ TMI index **by code string**. Swapping the index changes which codes exist.
 - UI: motif page renders definition, citations, cultures, cross-refs, and
   (new) division/section + first-edition.
 
+## 9a. Test oracles worth adding
+
+- **Sort-key oracle**: Mellmann's `[sorting field]` is an independent canonical
+  ordering — assert our `tmi_sort_key` reproduces it (a free correctness check
+  on our sort, regardless of migration outcome).
+- **Golden snapshot**: freeze a fixture of ~50 representative motifs
+  (roots, `.0`, dups, deep dotted, renumbered) pre-migration; assert post-swap
+  parity except intended changes — the mechanical guard behind the section 9
+  checklist.
+- **Renumber round-trip**: for every `old→new` pair, assert `new` exists in the
+  index and `old` does not (catches a stale or self-referential map).
+
+## 9b. Licensing composition
+
+The product would then mix **CC-BY-4.0** (Mellmann TMI) with **CC-BY-SA-4.0**
+(Trilogy ATU) and Berezkin's terms. These don't conflict, but attribution must
+be **per-source**, and the SA obligation attaches only to Trilogy-derived
+portions (the ATU index / `atu_seq`), not to the Mellmann-derived TMI. Update
+the `attribution` blocks in `config/motifs.json` and any export/bundle notice
+accordingly; do not let one blanket licence line imply SA over the whole set.
+
+## 9c. Upstream contribution (open-science hygiene)
+
+Mellmann's repo is public, CC-BY, and actively versioned. The ~14 malformed
+`code`/`MOTIF` rows and typos we found (`T317.0.1`, `X751.`, `Z56.1`→`Z356.1`,
+`detruction`) are worth reporting/patching upstream — it benefits the shared
+dataset and means our ingest cleanup (section 5) can eventually shrink. Track
+which fixes are local workarounds vs upstreamed so the local list can be pruned
+as upstream lands them.
+
 ## 10. Risks & rollback
 
 - **Cross-walk drift**: the join is code-string based; any code-notation
@@ -195,3 +300,8 @@ TMI index **by code string**. Swapping the index changes which codes exist.
 - Where the renumber map lives (a generated data file vs computed at build).
 - Whether to expose `division1-3`/`section` in the API now or defer to the
   Classification-section work.
+- Whether to keep a permanent `MYTHO_MOTIFS_DIR`-based A/B build in CI as a
+  standing regression check, or tear the harness down after migration.
+- Whether Phase 0 overlays (headings + renumber map) ship as committed
+  generated data files or are recomputed at build time from a cached Mellmann
+  copy.
