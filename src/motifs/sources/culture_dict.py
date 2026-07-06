@@ -27,7 +27,7 @@ _ALIAS = {
     "Filipino": "Philippine",
     # Demonyms / spellings that fold into an already-regioned canonical.
     "China": "Chinese", "Hawaiian": "Hawaii", "Arab": "Arabian",
-    "Polynesian": "Polynesia",
+    "Polynesian": "Polynesia", "Japan": "Japanese",
     # Case variants (canonical() is case-sensitive) of existing canonicals.
     "Irish Myth": "Irish myth", "Buddhist Myth": "Buddhist myth",
     "Italian novella": "Italian Novella", "English Romance": "English romance",
@@ -109,6 +109,10 @@ _REGION = {
     "Mexican Indian": "Mesoamerica",
     "Guarayú": "South America", "Paressi": "South America", "Ackawoi": "South America",
     "Mono-Alu": "Oceania",  # single Solomon Islands people, despite the hyphen
+    # Language-family / compound labels that read as one culture.
+    "Finno-Ugric": "Europe", "Finnish-Swedish": "Europe", "English-Scottish": "Europe",
+    "Missouri-French": "North America", "French-Canadian": "North America",
+    "Indo-Chinese": "Southeast Asia",
 }
 
 _SUB_RE = re.compile(r"\s*\(([^)]*)\)")

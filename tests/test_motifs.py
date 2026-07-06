@@ -981,6 +981,11 @@ class TestTrilogy:
         # A leading 'Cf.' compare-prefix is stripped, folding into the real culture.
         assert culture_dict.canonical("Cf. Greek") == ("Greek", "")
         assert culture_dict.canonical("Am. Indian.") == ("American Indian", "")
+        # 'Japan' folds to the already-regioned 'Japanese'; compounds/families get a region
+        assert culture_dict.canonical("Japan") == ("Japanese", "")
+        assert culture_dict._REGION["Japanese"] == "East Asia"
+        assert culture_dict._REGION["Finno-Ugric"] == "Europe"
+        assert culture_dict._REGION["Finnish-Swedish"] == "Europe"
 
     def test_culture_legend_aggregates_aliases_regions_subs(self):
         motifs = [
