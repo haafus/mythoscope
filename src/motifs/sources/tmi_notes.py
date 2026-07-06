@@ -72,6 +72,10 @@ FORCE_BIBLIOGRAPHY: frozenset[str] = frozenset({
     "A515.1.1", "A2232.6", "A2326.2.1", "A2411.2.4.1",
     "E731.4", "G303.3.1.7", "H1556.2",
     "F450", "F1061.1", "F451.5.18", "D1652.1", "H774", "D2143.1.2",
+    # pure 'Author Title (Place YEAR) page' citations whose English-looking title
+    # words ('… in Comparative Religion', '… of Scotland') defeat the prose-word
+    # guard, so the opening citation reads as a definition.
+    "A2000", "E755.1", "G303.2.4", "G303.16.2.3.4", "H885", "K2277", "Q411", "X910",
 })
 
 
