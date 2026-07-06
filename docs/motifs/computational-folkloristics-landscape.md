@@ -40,6 +40,13 @@ Two overlapping fields:
 - **Karl Grossner** (GLOS — Geographic Lens on Stories) — embeddings + LLM over
   digitized TMI/ATU + geography; mythoscope's nearest architectural neighbour.
 - **Thierry Declerck** (DFKI, Saarbrücken) — TMI/ATU as Linked Open Data (OWL/RDF).
+- **Gerhard Lauer** (Johannes Gutenberg Univ. Mainz, Institute of Book Science) —
+  computational folktale studies at scale (large corpora, fairy tales, ML); wrote
+  the 2023 *Fabula* survey that is the field's best short entry point.
+- **Emese Ilyefalvi** (Digital Folklore Lab, Hungary) — digital folklore
+  databases, metadata & standardization, corpus analysis of archives.
+- **Pádraig Mac Carron & Ralph Kenna** (Coventry) — *network mythology*:
+  quantitative comparison of epic character networks (Iliad, Beowulf, Táin).
 - **Berkeley Institute for Data Science (BIDS)** + Slovenian folklore researchers
   — recent AI/LLM-for-folklore collaboration (AI4DH). <https://ai4dh.eu>
 
@@ -78,8 +85,9 @@ Two overlapping fields:
   Berezkin, Le Quellec).
 - **RMN Newsletter** (Retrospective Methods Network, Helsinki) — statistical
   methods for mythology.
-- Cross-over venues for the phylogenetic papers: **Royal Society Open Science**,
-  **PLOS ONE**, **Current Biology**.
+- Cross-over venues for the phylogenetic / network papers: **Royal Society Open
+  Science**, **PLOS ONE**, **Current Biology**, **EPJ Data Science**, **EPL
+  (Europhysics Letters)**.
 
 ---
 
@@ -99,8 +107,14 @@ Two overlapping fields:
   workshop (Tangherlini, Broadwell).
 - **"AI Methods for Research of Folkloristic Narratives"** — recent international
   workshop (Univ. of Ljubljana, 2025; BIDS + Slovenia). <https://ai4dh.eu/2025/06/23/ai-methods-for-research-of-folkloristic-narratives/>
+- **ACM/IEEE Joint Conference on Digital Libraries (JCDL)** and the **Association
+  for Computers and the Humanities (ACH) Conference** — regular homes for
+  archive/tooling and DH-methods work.
 - **CLARIN / DARIAH** annual events — European DH research-infrastructure venues
   where folktale-database/tooling work is presented.
+
+Note: there is **no dedicated Computational Folkloristics conference** — the work
+is spread across the venues above (DH/ADHO and CHR being the primary two).
 
 ---
 
@@ -108,9 +122,23 @@ Two overlapping fields:
 
 **Computational folkloristics — foundational:**
 - Abello, Broadwell & Tangherlini, *Computational Folkloristics*, **Communications
-  of the ACM** 55(7), 2012.
+  of the ACM** 55(7), 2012 — the discipline-defining programmatic paper
+  (folklore-as-data, semantic networks, knowledge graphs, large-scale motif
+  analysis, GIS).
+- Tangherlini, *The Folklore Macroscope* (2013) — the conceptual shift from
+  close reading of single texts to "macroscope" analysis of millions at once.
+- *Computing Folklore Studies: Mapping over a Century of Scholarly Production
+  through Topics*, **Journal of American Folklore** 126(502):455–475, 2013
+  (DOI 10.5406/jamerfolk.126.502.0455) — topic-modeling the field's own history.
 - Tangherlini (guest ed.), *Big Folklore: A Special Issue on Computational
-  Folkloristics*, **Journal of American Folklore**, 2016.
+  Folkloristics*, **Journal of American Folklore** 129(511), 2016
+  (DOI 10.5406/jamerfolk.129.511.0005) — the single best issue to read.
+- **Gerhard Lauer, *Computational Folktale Studies: A Very Brief History*,
+  Fabula 64(1–2):1–6, 2023 (DOI 10.1515/fabula-2023-0001)** — the best modern
+  overview; recommended first read (Aarne → Thompson → ATU → DH → NLP → LLM).
+- Emese Ilyefalvi, *The theoretical, methodological and technical issues of
+  digital folklore databases and computational folkloristics* (2018) — on
+  digital archives, motif databases, and data standardization.
 - Karsdorp, van der Meulen, Meder & van den Bosch, *MOMFER: A Search Engine of
   Thompson's Motif-Index*, **Folklore** 126(1), 2015.
   <https://doi.org/10.1080/0015587X.2015.1006954>
@@ -133,6 +161,13 @@ Two overlapping fields:
   **Trames** 22(4), 2018 (2,264 motifs / 40,000 myths / 934 cultures).
 - Finlayson et al. — motif-detection & the Arabian Nights corpus (arXiv:2603.19283, 2026).
 
+**Network mythology:**
+- Mac Carron & Kenna, *Universal Properties of Mythological Networks*, **EPL
+  (Europhysics Letters)** 99(2), 2012 (arXiv:1205.4324) — character-interaction
+  networks of the Iliad, Beowulf, and the Táin compared to real social networks.
+- Kenna, Mac Carron et al., *Maths Meets Myths: Quantitative Approaches to
+  Ancient Narratives* (2016) — the edited volume of this strand.
+
 ---
 
 ## 5. Methods / approaches in play
@@ -147,6 +182,17 @@ Two overlapping fields:
   clustering (Tangherlini, Berezkin, GLOS).
 - **Linked Open Data / ontologies** — TMI/ATU as RDF/OWL, cross-index links (DFKI).
 - **Network analysis** — storyteller–story networks, motif co-occurrence.
+- **Network mythology** — character-interaction graphs of epics/myths, compared
+  to real vs fictional social networks (Mac Carron & Kenna).
+
+**Active frontiers in computational mythology** (where the field is heading):
+phylogenetic reconstruction of myths; knowledge graphs of gods / characters /
+motifs; automatic motif extraction; semantic embeddings of mythological
+characters; narrative graphs; LLM-based comparison of mythological corpora;
+large motif graphs (GraphRAG-style); and multimodal myth-story databases. The
+common thread — and mythoscope's own bet — is the move **from static motif
+catalogues to dynamic semantic networks** linking motifs, plots, characters, and
+the geography of their spread.
 
 ---
 
@@ -156,6 +202,11 @@ mythoscope overlaps the **Meertens/GLOS** cluster (embeddings + cross-index +
 geography over TMI/ATU/Berezkin) and the **Berezkin/d'Huy** areal-mythology
 cluster. Its differentiator — the survey found no one else builds it — is a
 **cross-index `type ⇄ motif ⇄ text ⇄ place` graph** spanning all three indexes.
+
+The corpora these groups repeatedly test on (detailed in
+`external-tmi-atu-editions.md`): **Nederlandse Volksverhalenbank** / ISEBEL,
+Iceland's **Sagnagrunnur**, Germany's **WossiDiA**, Estonia's **ETKSpace**
+(folklore.ee), and Tangherlini's **Danish Folklore Nexus**.
 
 Practical hooks:
 - **Publish** the dataset/method at **CHR** or in **JOHD** (open-data) / **Journal
