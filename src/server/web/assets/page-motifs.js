@@ -1327,7 +1327,7 @@ function renderDetail(d) {
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
         if ((links.atu_defines || []).length) body += linkSection(`Defines ATU tale type${links.atu_defines.length > 1 ? "s" : ""} (${links.atu_defines.length})`, links.atu_defines);
         if ((links.atu_summary_refs || []).length) body += linkSection(`Named in ATU summaries (${links.atu_summary_refs.length})`, links.atu_summary_refs);
-        if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+        if ((links.berezkin || []).length) body += linkSection(`Referenced by Berezkin motifs (${links.berezkin.length})`, links.berezkin);
         body += crossLinkExtras(d);
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
@@ -1374,7 +1374,7 @@ function renderDetail(d) {
         if ((links.combos || []).length) body += linkSection(`Combined with (${links.combos.length})`, links.combos);
         if ((links.tmi || []).length) body += linkSection(`Constituent TMI motifs (${links.tmi.length})`, links.tmi);
         if ((links.tmi_via_notes || []).length) body += linkSection(`Referenced by TMI motifs (${links.tmi_via_notes.length})`, links.tmi_via_notes);
-        if ((links.berezkin || []).length) body += linkSection("Referenced by Berezkin motifs", links.berezkin);
+        if ((links.berezkin || []).length) body += linkSection(`Referenced by Berezkin motifs (${links.berezkin.length})`, links.berezkin);
         body += crossLinkExtras(d);
         body += atuAttestations(d.attestations_grouped, d.attestations);
         body += atuProse("References", d.references, true);
