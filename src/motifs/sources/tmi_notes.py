@@ -62,6 +62,13 @@ FORCE_BIBLIOGRAPHY: frozenset[str] = frozenset({
     "E0", "E631.3", "E748", "E755.2",
     "F252.2", "F574.1.2", "F709.1",
     "G86", "G261.1", "G303.3.3.1.3", "G303.16.3.4",
+    # citations the trailing-citation trimmer still can't tell from prose — a quoted
+    # or foreign work title ('Krappe "Les funérailles d'Alaric" …'), a 'See;' / bare
+    # 'Author FFC …' opener, or a mangled apparatus fragment.
+    "K2295.2", "N255.1", "W154.21",
+    "A515.1.1", "A2232.6", "A2326.2.1", "A2411.2.4.1",
+    "E731.4", "G303.3.1.7", "H1556.2",
+    "F450", "F1061.1", "F451.5.18", "D1652.1", "H774", "D2143.1.2",
 })
 
 
