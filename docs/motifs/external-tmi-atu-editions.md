@@ -476,3 +476,76 @@ found no existing project builds, and mythoscope's strongest differentiator.
 | Creation-myth schema | GLOS | ages/realms/beings | 2 / M |
 | Gold-standard TMI↔ATU crosswalk | DFKI ontology | cross-walk | 2 / S–M |
 | Linked-data / SPARQL export | DFKI + Wikidata/BARTOC | interop | 2 / M |
+
+## 8. Open-data roadmap (licenses-permitting, Tier 2 excluded)
+
+Scope: only sources whose license and access are **already clear and open** —
+Mellmann (CC-BY-4.0), `fbkarsdorp/tmi` (Apache-2.0), Wikidata P2540 (CC0),
+trilogy AFT (CC-BY-SA-4.0), Finna metadata (CC0). Tier-2 corpora (ISEBEL, GLOS,
+Finlayson, DFKI) are **out of scope until access/license are secured** — they
+re-enter via the §6 outreach track. Dúchas is openly *licensed* but **CC-BY-NC**
+(+ keyed API), so it appears here only as a clearly-flagged conditional item.
+
+Ordering principle: **additive, join-on-code overlays first** (low risk, no
+source swap, each enriches a core surface independently), then the foundational
+Mellmann migration (bigger, riskier, already planned), then polish.
+
+### Priority 1 — quick, additive, low-risk (no migration required)
+
+- **R1 · Motif geography overlay** — join `fbkarsdorp/tmi` `locations[]` on motif
+  code → plot **motifs** on the atlas. *Source:* fbkarsdorp (Apache-2.0). *Effort:*
+  S–M (join is trivial; normalizing its NER'd, diacritic-damaged place strings to
+  our `culture_dict` regions is the real work). *Surface:* geography atlas.
+  *Deps:* none. *Value:* HIGH — unique geo data for motifs, our highest-profile
+  surface. **Start here.**
+- **R2 · Text layer per ATU type (trilogy AFT)** — ingest the AFT / annotated-
+  folktales dataset (1,518 ATU-tagged full-text tales) — it ships in the trilogy
+  repo we already source but is **not** in `config/motifs.json`. *License:*
+  CC-BY-SA-4.0 (already in use). *Effort:* S. *Surface:* catalog (example tales) +
+  parallels (tale-level embeddings) + crosswalk validation. *Deps:* none.
+  *Value:* HIGH — biggest payoff per unit effort; data is already at hand.
+- **R3 · ATU enrichment via Wikidata P2540** — SPARQL-ingest 1,294 ATU types with
+  multilingual labels, example works, and QIDs; join on ATU code. *License:* CC0.
+  *Effort:* S–M. *Surface:* catalog (labels + example tales) + interop (URIs).
+  *Deps:* none. *Value:* MEDIUM-HIGH — widens ATU, adds external text links.
+
+### Priority 2 — foundational (medium effort/risk)
+
+- **R4 · TMI source → Mellmann (+ classification tree + provenance)** — the
+  migration already scoped in `tmi-mellmann-migration.md`: printed `division1–3`/
+  `section` headings become a real classification tree; `1st ed.` becomes an
+  edition-provenance filter; retires the `.0`/`level_N` repair. *License:* CC-BY-4.0.
+  *Effort:* M. *Surface:* catalog. *Deps:* none technically, but R1/R3 join on code
+  so they survive the swap — do them first so the migration diff is isolated.
+  *Risk:* MEDIUM (crosswalk join drift, embedding re-run — see migration doc §6,9).
+  *Value:* HIGH — foundational hierarchy + provenance.
+- **R5 · Concept/lemma facet** — expose `fbkarsdorp` `lemmas[]` (WordNet) as a
+  cross-index concept facet and a lexical-parallel corroboration signal alongside
+  BGE-M3. *License:* Apache-2.0. *Effort:* M. *Surface:* catalog + parallels.
+  *Deps:* reuses R1's ingest of the same JSON. *Value:* MEDIUM.
+
+### Priority 3 — polish / conditional
+
+- **R6 · Authority URIs & linked-data groundwork** — attach Wikidata QIDs (R3) +
+  BARTOC node 1711 URIs to TMI/ATU codes; lays track for a future RDF export.
+  *License:* CC0 / PDDL-1.0. *Effort:* S. *Value:* LOW-MEDIUM (interop, future-proofing).
+- **R7 · Finna discovery enrichment** — optional CC0 API lookups. *Effort:* M for
+  thin payoff (ATU tagging sparse). *Value:* LOW — defer.
+- **R8 · Dúchas coordinate type-atlas (CONDITIONAL)** — ATU-typed, GeoNames-
+  coordinate, dated Irish full-text corpus via keyed API. *License:* **CC-BY-NC**
+  → only if mythoscope stays non-commercial (or per-use agreement) — decide the
+  NC posture before building. *Effort:* M. *Surface:* atlas (first real
+  text⇄ATU⇄place⇄time layer). *Value:* HIGH but **gated on the NC decision**;
+  treat as the bridge into the Tier-2 geography work.
+
+### Sequencing
+
+R1, R2, R3 are independent and parallelizable — ship them as three small,
+additive overlays first (each is a visible win and none touches the TMI source).
+Then R4 (Mellmann migration) with R1/R3 already in place so its diff stays
+isolated; R5 rides on R1's ingest. R6 is a cheap follow-on to R3. R7 defer; R8
+only after an explicit NC/commercial decision.
+
+**Recommended start:** **R2** (zero new dependency, data already in hand) in
+parallel with **R1** (highest-visibility atlas win). Both are pure additive
+overlays that survive the later Mellmann migration untouched.
