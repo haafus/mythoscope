@@ -1271,13 +1271,6 @@ function renderDetail(d) {
                     ${subtitle}
                 </div>
             </div>`;
-        if (d.definition) {
-            let inner = `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`;
-            if (d.definition_rus && d.definition_rus !== d.definition) {
-                inner += `<p class="motif-text motif-def motif-text-rus">${escapeHtml(d.definition_rus)}</p>`;
-            }
-            body += section("Definition", inner);
-        }
         // Classification folds in the chapter (letter + name) alongside the
         // mapsofmyths type/group taxonomy.
         const clsParts = [d.motif_type, d.motif_group].filter(Boolean).map(escapeHtml);
@@ -1291,6 +1284,13 @@ function renderDetail(d) {
         }
         if (clsParts.length) {
             body += section("Classification", `<div class="motif-taxonomy">${clsParts.join(" · ")}</div>`);
+        }
+        if (d.definition) {
+            let inner = `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`;
+            if (d.definition_rus && d.definition_rus !== d.definition) {
+                inner += `<p class="motif-text motif-def motif-text-rus">${escapeHtml(d.definition_rus)}</p>`;
+            }
+            body += section("Definition", inner);
         }
         // Cross-references to other motifs and indexes come before the distribution.
         if ((links.tmi || []).length) body += linkSection(`Related Thompson motifs (${links.tmi.length})`, links.tmi);
