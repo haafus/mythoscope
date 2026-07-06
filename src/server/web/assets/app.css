@@ -1856,13 +1856,21 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motifs-item.duplicate .motifs-item-name { color: #c0392b; }
 
 .motif-dup-note {
-    margin: 0 0 14px;
+    margin: 16px 0 14px;
     padding: 8px 10px;
     font-size: 12.5px;
     color: #8a3024;
     background: #fdecea;
     border: 1px solid #f5c6c0;
     border-radius: 8px;
+}
+/* The sibling link(s) drop onto their own line under the note text. */
+.motif-dup-siblings {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .motif-source-link { font-size: 12.5px; color: #41506a; word-break: break-all; }

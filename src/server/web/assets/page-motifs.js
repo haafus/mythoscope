@@ -1315,7 +1315,10 @@ function renderDetail(d) {
         // filter + hierarchy tree at the very bottom.
         body = head;
         if (d.duplicate) {
-            body += `<p class="motif-dup-note">Source code <strong>${escapeHtml(d.code || d.id)}</strong> is reused for several distinct motifs; shown here under <strong>${escapeHtml(d.id)}</strong>.</p>`;
+            const sibs = (d.duplicate_siblings || []).map((l) =>
+                `<a href="#/motifs?index=tmi&id=${encodeURIComponent(l.id)}" class="motif-link" data-index="tmi" data-id="${escapeHtml(l.id)}" title="${escapeHtml(l.name || l.id)}"><span class="motif-link-id">${escapeHtml(l.id)}</span>${l.name ? `<span class="motif-link-name">${escapeHtml(l.name)}</span>` : ""}</a>`).join(" ");
+            const also = sibs ? `<span class="motif-dup-siblings">Also under this code: ${sibs}</span>` : "";
+            body += `<p class="motif-dup-note">Thompson's index reuses code <strong>${escapeHtml(d.code || d.id)}</strong> for more than one distinct motif; shown here under <strong>${escapeHtml(d.id)}</strong>.${also}</p>`;
         }
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);

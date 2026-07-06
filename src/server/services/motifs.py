@@ -38,6 +38,26 @@ def _by_id(index: str) -> dict[str, dict]:
     return store.cached(f"byid:{index}", lambda: {r["id"]: r for r in _records(index)})
 
 
+def _tmi_dup_code_index() -> dict[str, list[str]]:
+    """Cached ``source code -> [ids]`` for the TMI motifs Thompson's index gives a
+    duplicate number (so a suffixed id can point at its sibling(s))."""
+    def build() -> dict[str, list[str]]:
+        m: dict[str, list[str]] = {}
+        for r in _records("tmi"):
+            if r.get("duplicate"):
+                m.setdefault(r.get("code", r["id"]), []).append(r["id"])
+        return m
+    return store.cached("dupcode:tmi", build)
+
+
+def _tmi_dup_siblings(rec: dict) -> list[dict]:
+    """Links to the other TMI motifs that share this one's duplicated code."""
+    if not rec.get("duplicate"):
+        return []
+    code = rec.get("code", rec["id"])
+    return [_link("tmi", i) for i in _tmi_dup_code_index().get(code, []) if i != rec["id"]]
+
+
 # --- TMI hierarchy (breadcrumbs + subtree) ------------------------------------
 # Parents/levels are corrected at build time (see trilogy._finalize_tmi), so the
 # read side just walks the stored `parent`.
@@ -1078,6 +1098,7 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["level"] = rec.get("level", 0)
         detail["code"] = rec.get("code", rec["id"])
         detail["duplicate"] = bool(rec.get("duplicate"))
+        detail["duplicate_siblings"] = _tmi_dup_siblings(rec)
         detail["breadcrumbs"] = _tmi_ancestors(rec)  # broadest first
         detail["children"], detail["children_truncated"] = _tmi_direct_children(rec["id"])
         detail["descendant_counts"] = _descendant_counts(rec["id"])
