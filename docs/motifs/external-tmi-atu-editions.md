@@ -374,3 +374,105 @@ CC-BY (Mellmann) are free; Apache-2.0 (fbkarsdorp) is free; **CC-BY-SA-4.0**
 commercial use of that corpus; Ashliman and ISEBEL are ©/unclear (reference,
 don't redistribute). Keep attribution per-source; never let one license line
 imply terms over the whole set.
+
+## 7. Extractable layers & features
+
+What each dataset can actually add to mythoscope's surfaces (catalog, cross-walk,
+semantic parallels, geography atlas, ages/realms/beings graphs). Effort tags:
+**S**=small (join/ingest), **M**=medium (parse+model+UI), **L**=large (new subsystem).
+
+### 7.1 From Tier 1 (open — buildable now)
+
+**Mellmann CSV** → `[S–M]`
+- **Classification tree** — the printed `division1–3` + `section` headings become
+  a navigable hierarchy above motifs (fixes the long-missing heading layer; retires
+  our `.0`/`level_N` reconstruction).
+- **Edition-provenance filter** — `1st ed.` splits motifs into 1936-original vs
+  revised-edition additions → a "growth of the index" toggle/timeline.
+- **Cleaner embeddings input** — definition already split from citations → less
+  parser noise into BGE-M3.
+
+**`fbkarsdorp/tmi` JSON** → `[S–M]`
+- **Motif geography** — `locations[]` (geo-parsed attestation places) plots
+  **motifs** on the atlas, not just Berezkin areas → "where is this motif attested."
+- **Concept/lemma layer** — WordNet `lemmas[]` enables concept faceting ("all
+  motifs about *death*/*ring*/*deception*") and a lexical bridge across TMI↔ATU↔
+  Berezkin that corroborates the BGE-M3 semantic parallels (we already found
+  lexical and semantic parallels are complementary; lemmas formalize the lexical side).
+
+**Wikidata P2540** → `[S–M]`
+- **Example tales per ATU type** — links each type to named works (Grimm, etc.)
+  and Wikipedia → an "attested tales / read more" panel on ATU pages.
+- **Multilingual type labels** — ATU type names in many languages for free.
+- **Authority URIs** — QIDs to anchor ATU codes; groundwork for a linked-data export.
+
+**trilogy AFT (Bag-of-Tales)** → `[S]`
+- **Text layer per ATU type** — 1,518 real tale texts attached to types → example
+  texts on ATU pages, plus **tale-level embeddings** (similar tales across
+  cultures) and a way to validate the ATU→TMI crosswalk against real narratives.
+
+**Composite Tier-1 features** (combining the above):
+- **Motif/type geography atlas** = fbkarsdorp `locations[]` + AFT provenance,
+  layered onto the existing Berezkin map → the atlas becomes motif- and type-aware.
+- **Concept explorer** = lemmas as a cross-index facet spanning all three indexes.
+- **"Examples everywhere"** = AFT + Wikidata tales surfaced on every type/motif page.
+- **Provenance/time view** = Mellmann `1st ed.` (index growth) as a first temporal axis.
+
+### 7.2 From Tier 2 (if access / license / data are secured)
+
+**Meertens Verhalenbank / ISEBEL** (100k+ ATU+place+full-text, multilingual) → `[L]`
+- **Dense spatiotemporal atlas** — 100k tales with place + date → real distribution
+  and **diffusion maps** of tale types across NW Europe (heat maps, over time).
+- **The `type ⇄ motif ⇄ text` graph** — co-occurrence of motifs/types in real
+  texts builds the knowledge graph we noted *nobody* has (mythoscope's niche).
+- **Cross-lingual parallels** — same type across NL/DA/DE/IS → translation-invariant
+  motif matching and multilingual embeddings.
+- **Social/temporal dimension** — narrator + date metadata → who told what, when.
+
+**GLOS** (parsed TMI 46,234 + ATU 2,232 + embeddings + CreationSchema) → `[M]`
+- **Fuller ATU** — 2,232 Uther-2011 types vs our 182 (if reuse is licensed).
+- **CreationSchema layer** — controlled-vocab structured fields for creation myths
+  (primordial state, creation sequence, cosmic structure, dualities), LLM-extracted
+  → directly enriches the **ages / realms / beings** graphs and the A-chapter myths.
+- **Cross-validation** — their embeddings + tables as an independent check on ours.
+
+**Finlayson Arabian Nights corpus** (2,670 motif spans / 200 motifs) → `[M–L]`
+- **Automatic motif tagger** — training data to build a model that tags *our* texts
+  (AFT, Dúchas, ISEBEL) with motifs → closes the loop: any tale → its motifs.
+- **Sentence-level motif spans** — fine-grained "motif highlighted in text."
+- **El-Shamy Arab-world index** — a fourth motif dimension beyond TMI/ATU/Berezkin.
+
+**DFKI TMI-ATU ontology** (14,937 classes, `linkToTMI`, 2,802 ATU) → `[S–M]`
+- **Gold-standard crosswalk** — its `linkToTMI`/`linkFromTMIToATU` properties are
+  an independent TMI↔ATU mapping to validate/seed ours (we build ours from
+  `atu_seq`; this is a second opinion).
+- **RDF/OWL export** — publish mythoscope as linked data (SPARQL-queryable),
+  reusing its OWL subclass hierarchy for TMI.
+
+**Dúchas** (Tier-1 license, Tier-2 effort: keyed API) → `[M]`
+- **Coordinate-grade type atlas** — ATU types on a real GeoNames map with dates →
+  the first genuine **text ⇄ ATU ⇄ place ⇄ time** layer (Ireland), a template for ISEBEL.
+
+**Flagship if Tier 2 unlocks:** ISEBEL (scale + geography) + Finlayson (auto-tagging)
++ DFKI (crosswalk) + GLOS (schema) together yield the full
+**type ⇄ motif ⇄ text ⇄ place ⇄ time knowledge graph** — the thing the survey
+found no existing project builds, and mythoscope's strongest differentiator.
+
+### 7.3 Feature → source → surface map
+
+| Feature | Source(s) | mythoscope surface | Tier / effort |
+|---|---|---|---|
+| Classification/heading tree | Mellmann | catalog | 1 / S–M |
+| Edition + time provenance | Mellmann `1st ed.` (+ Dúchas/ISEBEL dates) | catalog, atlas | 1 / S |
+| Motif geography | fbkarsdorp `locations[]` | atlas | 1 / S–M |
+| Concept/lemma facet | fbkarsdorp `lemmas[]` | catalog, parallels | 1 / M |
+| Example tales per type/motif | AFT + Wikidata (+ Dúchas/ISEBEL) | catalog | 1 / S |
+| Multilingual labels + URIs | Wikidata, BARTOC | catalog, LD export | 1 / S |
+| Coordinate type atlas | Dúchas → ISEBEL | atlas | 1–2 / M–L |
+| Diffusion/heat maps over time | ISEBEL | atlas | 2 / L |
+| type⇄motif⇄text graph | ISEBEL + crosswalk + AFT | new graph view | 2 / L |
+| Cross-lingual parallels | ISEBEL | parallels | 2 / M |
+| Auto motif tagger | Finlayson corpus | pipeline | 2 / M–L |
+| Creation-myth schema | GLOS | ages/realms/beings | 2 / M |
+| Gold-standard TMI↔ATU crosswalk | DFKI ontology | cross-walk | 2 / S–M |
+| Linked-data / SPARQL export | DFKI + Wikidata/BARTOC | interop | 2 / M |
