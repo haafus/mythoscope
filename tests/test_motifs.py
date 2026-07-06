@@ -297,6 +297,34 @@ class TestAshliman:
         assert ashliman._type_page("779J*") == "type0779J.html"  # override removed -> derived, star dropped
         assert ashliman._type_page("2034F") == "type2034F.html"  # star dropped, no override
 
+    def test_fetch_page_negative_caches_404(self, tmp_path, monkeypatch):
+        # A page that 404s is remembered so later builds don't re-request it (the site
+        # derives many type{N}.html names that do not exist).
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+        calls = []
+
+        class _Resp:
+            status_code = 404
+
+        def fake_fetch(url, cache, *, force=False, **kw):
+            calls.append(url)
+            exc = Exception("not found")
+            exc.response = _Resp()
+            raise exc
+
+        monkeypatch.setattr(ashliman, "fetch_text", fake_fetch)
+        # first attempt hits the network, 404s, and drops an `.absent` marker
+        assert ashliman._fetch_page("type0778J.html", False) is None
+        assert len(calls) == 1
+        assert (tmp_path / "raw" / "ashliman" / "type0778J.html.absent").exists()
+        # second attempt short-circuits on the marker — no new network call
+        assert ashliman._fetch_page("type0778J.html", False) is None
+        assert len(calls) == 1
+        # `force` re-checks, ignoring the marker
+        ashliman._fetch_page("type0778J.html", True)
+        assert len(calls) == 2
+
     def test_parse_variants_filters_noise_and_dedupes(self):
         html = (
             '<a href="#contents">table of contents</a>'

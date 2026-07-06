@@ -232,15 +232,27 @@ _TYPE_PAGES = frozenset({
 def _fetch_page(page: str, force: bool) -> str | None:
     """Fetch a page, cached under ``raw/ashliman/`` — a cached copy is reused without
     a network call unless ``force`` (as elsewhere in the pipeline). Returns ``None``
-    when the page is absent or unreachable; only a definitive 404 drops the cache, so
-    a transient network error during a ``--force`` rebuild can't wipe a good copy."""
+    when the page is absent or unreachable.
+
+    A page that 404s is remembered in a sibling ``.absent`` marker so it is **not
+    re-requested** on later builds — the site derives many ``type{N}.html`` names that
+    do not exist (e.g. ``type0778J.html``), and without this every build would re-hit
+    all of them. A *transient* error is not remembered (so it retries next time), and
+    ``force`` re-checks everything, clearing the marker once a page is found present."""
     cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
+    absent = cache.with_name(page + ".absent")
+    if not force and absent.exists():
+        return None                              # known-404: skip the network entirely
     try:
-        return fetch_text(f"{BASE}/{page}", cache, force=force)
+        text = fetch_text(f"{BASE}/{page}", cache, force=force)
+        absent.unlink(missing_ok=True)           # present now — clear any stale marker
+        return text
     except Exception as exc:
         status = getattr(getattr(exc, "response", None), "status_code", None)
         if status == 404:
             cache.unlink(missing_ok=True)
+            absent.parent.mkdir(parents=True, exist_ok=True)
+            absent.touch()                       # remember it is definitively absent
         return None
 
 
