@@ -171,8 +171,18 @@ All in `berezkin.py`.
   text, so its Thompson ids arrive with `†`/`*` markers, a trailing dot or `+`
   joins (`*A1115`, `A736.2.`, `†A2219.2.`, `D1565.1+E30.1`). Each is normalised to
   a canonical id (star/dagger/dot stripped, `+`-combos split), non-id junk dropped.
-  This dropped ~93 dangling refs (111 → 18) and cleaned the record; the 18 that
-  remain are genuine Thompson motifs absent from the Trilogy `tmi.csv`.
+  Two further repairs close refs that would otherwise dangle against a live index:
+  a sub-segment mapsofmyths wrote with a Roman/stick `I` for the digit `1`
+  (`A700.I` → `A700.1`, `A724.I.I` → `A724.1.1`; folded build-side in
+  `crosswalk._clean_tmi`, mirroring the read-side `_clean_tmi_ref`), and a small
+  curated `_TMI_REF_FIX` map for four transcription errors / mis-assignments whose
+  intended motif is unambiguous from the Berezkin motif's own meaning —
+  `D2889.6`→`D1889.6` (shed-skin rejuvenation), `F202.4.2`→`F302.4.2` (swan-maiden
+  stolen clothes), `K1539`→`K1538` (death feigned to meet paramour), `D287.5`→`A642`
+  (Purusha: body → world). After all repairs **11** refs still dangle: genuine
+  Thompson motifs absent from our sources, over-specific leaves whose live ancestor
+  is the wrong branch, and one malformed code (`B5482.3`) — shown grey, not guessed.
+  Full case-by-case fit analysis in the cross-walk doc (§3).
 - **See-also.** Berezkin's own cross-references live in the **definition** as
   `см. (мотив) X`; `_attach_see_also` reads them (from the Russian text, before the
   English swap) and keeps only ids that resolve to a real Berezkin motif — so a
