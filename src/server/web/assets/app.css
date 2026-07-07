@@ -1851,9 +1851,12 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
    top. */
 .chart-section { margin-top: 24px; }
 .chart-section:first-of-type { margin-top: 0; }
-.chart-section--geography { --sec-accent: #2a9d8f; }
-.chart-section--content { --sec-accent: #3f6fb0; }
-.chart-section--diagnostics { --sec-accent: #7a5aa8; }
+/* Each section carries its accent (bars, heading, card top) plus a matching link
+   trio — link ink, dotted-underline tint, hover ink — so a chart's clickable
+   labels read in the same hue as the section they sit in. */
+.chart-section--geography { --sec-accent: #2a9d8f; --sec-link: #157f73; --sec-link-soft: #93cabf; --sec-link-strong: #0f6a60; }
+.chart-section--content { --sec-accent: #6b7aa1; --sec-link: #4f5e86; --sec-link-soft: #b3bcd2; --sec-link-strong: #3c4a6e; }
+.chart-section--diagnostics { --sec-accent: #7a5aa8; --sec-link: #63508c; --sec-link-soft: #c3b7dc; --sec-link-strong: #4e3d75; }
 .chart-section-title {
     font-size: 13.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
     margin: 0 0 11px; padding-left: 9px; border-left: 3px solid var(--sec-accent);
@@ -1869,10 +1872,11 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .csbar-row:hover .csbar-val { color: #1f3a4d; font-weight: 700; }
 .csbar-row:hover .csbar-fill { filter: saturate(1.5) brightness(1.12); }
 .csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* Clickable chart labels read as links: teal ink + a dotted underline, solid on hover. */
-a.csbar-lab.chart-link { color: #157f73; text-decoration: underline dotted; text-decoration-color: #93cabf; text-underline-offset: 2px; cursor: pointer; }
-a.csbar-lab.chart-link:hover { color: #0f6a60; text-decoration-style: solid; }
-.csbar-row:hover a.csbar-lab.chart-link { color: #0f6a60; }
+/* Clickable chart labels read as links: the section's link ink + a dotted
+   underline, solid on hover. Colours come from the parent .chart-section-- vars. */
+a.csbar-lab.chart-link { color: var(--sec-link, #157f73); text-decoration: underline dotted; text-decoration-color: var(--sec-link-soft, #93cabf); text-underline-offset: 2px; cursor: pointer; }
+a.csbar-lab.chart-link:hover { color: var(--sec-link-strong, #0f6a60); text-decoration-style: solid; }
+.csbar-row:hover a.csbar-lab.chart-link { color: var(--sec-link-strong, #0f6a60); }
 .csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; }
 .csbar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.35s ease, filter 0.12s ease; }
 .csbar-over { position: absolute; top: 0; left: 0; }   /* substantive subset over the "all" bar */

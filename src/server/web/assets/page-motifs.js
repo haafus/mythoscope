@@ -1031,7 +1031,7 @@ function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLO
 // the textual-parallel motif chips — for dataset diagnostics. The composition bar
 // lives in the diagnostics section, so it uses a violet ramp of that accent.
 const GEO_C = "#2a9d8f";
-const ACC = "#3f6fb0";
+const ACC = "#6b7aa1";
 const DIAG_C = "#7a5aa8", COMPO_DIAG = ["#7a5aa8", "#a693c5", "#d0c6e2"];
 
 // The current overview's index, so chart labels can deep-link to their entity.
@@ -1081,12 +1081,12 @@ function cssBullet(id, rows, labelFn) {
         <div class="csbar-row" title="${escapeHtml(labelFn(r))}: ${formatNumber(r.substantive || 0)} / ${formatNumber(r.count)}">
             ${chartLabel(r, labelFn(r))}
             <span class="csbar-track">
-                <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#c6d6ef"></span>
+                <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#ccd3e4"></span>
                 <span class="csbar-fill csbar-over" style="width:${Math.max(0, Math.round(100 * (r.substantive || 0) / max))}%;background:${ACC}"></span>
             </span>
             <span class="csbar-val">${formatNumber(r.count)}</span>
         </div>`).join("") + `</div>
-        <div class="cslegend"><span><i style="background:${ACC}"></i>substantive</span><span><i style="background:#c6d6ef"></i>all</span></div>`;
+        <div class="cslegend"><span><i style="background:${ACC}"></i>substantive</span><span><i style="background:#ccd3e4"></i>all</span></div>`;
 }
 
 // Single dispatcher for the whole overview (replaces the old Plotly path).
