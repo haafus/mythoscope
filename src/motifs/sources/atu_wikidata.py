@@ -42,7 +42,8 @@ _CATALOG = {
     "Child Ballads": "Child",
     "Fabulae Aesopicae Collectae": "Aesop",
 }
-_CONCORDANCE_ORDER = ["KHM", "AaTh", "Aesop", "Perry", "Child"]
+# AaTh first — the direct pre-2004 ancestor of ATU — then the story collections.
+_CONCORDANCE_ORDER = ["AaTh", "KHM", "Perry", "Aesop", "Child"]
 
 # wd:Q47451145 = "tale type"; only those items name the type itself.
 _QUERY = """SELECT ?atu ?item ?isType (SAMPLE(?perry) AS ?perry)
