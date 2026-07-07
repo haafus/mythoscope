@@ -519,17 +519,30 @@ function bindBibCopy(detail) {
     });
 }
 
-// Replay the reveal each time a collapsible section opens. A CSS animation on
-// [open] only fires the first time (the body stays in the render tree between
-// toggles), so drive it from the `toggle` event via the Web Animations API.
+// Animate a collapsible section both ways. <details> shows/hides its body
+// instantly, so take over the summary click: play a fade/slide, and only flip the
+// `open` attribute at the right moment (before opening, after closing). A guard
+// swallows clicks mid-animation so the reveal can't stutter or re-fire.
 function bindCollapsible(detail) {
     detail.querySelectorAll(".motif-section-collapsible").forEach((d) => {
-        d.addEventListener("toggle", () => {
-            if (!d.open) return;
-            const body = d.querySelector(":scope > *:not(summary)");
-            if (body) body.animate(
-                [{ opacity: 0, transform: "translateY(-4px)" }, { opacity: 1, transform: "translateY(0)" }],
+        const summary = d.querySelector(":scope > summary");
+        const body = d.querySelector(":scope > *:not(summary)");
+        if (!summary || !body) return;
+        let animating = false;
+        summary.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (animating) return;
+            animating = true;
+            const opening = !d.open;
+            if (opening) d.open = true;   // reveal the body so it can fade in
+            const from = { opacity: 0, transform: "translateY(-4px)" };
+            const to = { opacity: 1, transform: "translateY(0)" };
+            const anim = body.animate(opening ? [from, to] : [to, from],
                 { duration: 180, easing: "ease" });
+            anim.onfinish = () => {
+                if (!opening) d.open = false;   // hide the body only after it fades out
+                animating = false;
+            };
         });
     });
 }
