@@ -428,28 +428,23 @@ already symmetric — each is stored with its inverse.
 ## 9a. Overview dashboard (UI)
 
 `GET /api/motifs/atu/stats` aggregates the index in one cached pass
-(`_build_atu_stats`), rendered as a stat-card strip plus a chart grid on the
-**common chart spine** all three index overviews share (order + title scheme in
+(`_build_atu_stats`), rendered as a stat-card strip plus a chart grid split into
+the two colour-coded sections all three overviews share (spine + title scheme in
 [`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
-dashboards*). ATU's carrier is the **people**, so its panels are:
+dashboards*). ATU's carrier is the **people**:
 
-1. **Tale types by chapter**
-2. **Largest divisions** — the 15 largest of the 43 named ranges
-3. **Tale types by region** — types present per region, each counted once (§7,
-   matching the TMI/Berezkin "by region" panel)
-4. **Peoples with the most tale types**
-5. **Regions per tale type** — breadth histogram
-6. **Most widespread tale types (peoples attesting)** — top types by distinct
-   attesting peoples (ATU 563, 301, 613 lead)
-7. **Constituent motifs per tale type** — histogram of `atu_seq` size
-8. **Most motif-rich tale types**
-9. **Largest subtype families** — base types with the most lettered subtypes
-10. **Most-combined tale types** — the `combos` leaderboard
+- **Distribution & content** — *Tale types by chapter*, *Largest divisions* (the
+  15 largest of the 43 named ranges), *Tale types by region* (types present per
+  region, each counted once — §7), *Peoples with the most tale types*, *Regions
+  per tale type* (breadth histogram), *Most widespread tale types (peoples
+  attesting)* (ATU 563, 301, 613 lead), *Most-combined tale types* (the `combos`
+  correlations), *Largest subtype families*.
+- **Dataset diagnostics** — *Constituent motifs per tale type* (histogram of
+  `atu_seq` size) and *Most motif-rich tale types* — its `atu_seq` annotation
+  density. Unlike the two *motif* indexes ATU carries no cross-referenced-motifs
+  leaderboard.
 
-Panels 7–10 are the ATU-specific tail (its *type* structure — motifs, subtype
-families, combinations); unlike the two *motif* indexes it carries no
-cross-referenced-motifs leaderboard. Every count is real, parsed from Uther's
-apparatus (§7).
+Every count is real, parsed from Uther's apparatus (§7).
 
 ---
 

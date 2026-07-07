@@ -270,25 +270,27 @@ see `troubleshooting.md` ("Four competing macro-area schemes").
 ## 7b. Overview dashboard (UI)
 
 `GET /api/motifs/berezkin/stats` aggregates the catalogue in one cached pass
-(`_build_berezkin_stats`), rendered as a stat-card strip plus a chart grid on the
-**common chart spine** all three index overviews share (order + title scheme in
-[`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
-dashboards*). Berezkin's carrier is the **areal code**, so its seven panels are:
+(`_build_berezkin_stats`), rendered as a stat-card strip plus a chart grid split
+into the two colour-coded sections all three overviews share (spine + title scheme
+in [`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
+dashboards*). Berezkin's carrier is the **areal code**:
 
-1. **Motifs by chapter**
-2. **Motifs by thematic group** — the mapsofmyths taxonomy (only when that
-   credentialled enrichment ran, §4a)
-3. **Motifs by region** — macro-region of each areal code, each motif once per
-   region (matching the TMI/ATU "by region" panel)
-4. **Areas with the most motifs** — the areal codes attesting the most motifs
-5. **Areas per motif** — breadth histogram (how many areas a motif spans)
-6. **Most widespread motifs (areas attested)** — the top motifs by areal reach
-7. **Most cross-referenced motifs (see-also)** — `see_also` in-degree (§5); the
-   direct parallel of the TMI "cf./†" leaderboard, since both are motif indexes
-   with an internal see-also relation
+- **Distribution & content** — *Motifs by chapter*; *Motifs by thematic group*
+  (mapsofmyths taxonomy, only when that credentialled enrichment ran, §4a);
+  *Motifs by region* (macro-region of each areal code, each motif once per region);
+  *Areas with the most motifs*; *Areas per motif* (breadth histogram); *Most
+  widespread motifs (areas attested)*; *Traditions per motif* (the finer
+  tradition-level breadth, ~1,046 traditions — enrichment-gated); *Most
+  cross-referenced motifs (see-also)* (`see_also` in-degree, §5 — the parallel of
+  the TMI "cf./†" leaderboard, since both are motif indexes).
+- **Dataset diagnostics** — *Field coverage* (how many motifs carry a definition /
+  English name / areal indices / ATU / TMI link / see-also) and *Motifs by
+  definition length* (documentation-depth histogram, the parallel of TMI's note
+  length).
 
-The cards surface the credentialled enrichment conditionally (English name,
-ATU-/TMI-linked, decoded areas), so the overview stays valid without credentials.
+The cards and the enrichment-gated panels (thematic group, traditions) surface
+only when the credentialled mapsofmyths enrichment ran, so the overview stays
+valid without credentials.
 
 ---
 
