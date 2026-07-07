@@ -931,11 +931,10 @@ def _parse_mel_division(text: str) -> dict | None:
 _MEL_SECTION = re.compile(r"^\s*([A-Z])(\d+)\.\s*([^.]+)")
 
 
-def _mellmann_classification(config: dict, *, force: bool) -> tuple[list[list[dict]], list[dict]]:
-    """Parse Mellmann's TMI CSV into ``(division levels 1-3, sections)``. Each row is
+def _mellmann_classification(rows: list[dict]) -> tuple[list[list[dict]], list[dict]]:
+    """Parse Mellmann's TMI rows into ``(division levels 1-3, sections)``. Each row is
     ``{chapter, name, start, end}``; division ranges are printed, section ranges are
     derived from consecutive tens within a chapter."""
-    rows = _read_csv(config, "tmi", force=force, subdir="mellmann")
     levels: list[dict[tuple, dict]] = [{}, {}, {}]
     sec_seen: dict[tuple[str, int], str] = {}
     for row in rows:
@@ -1034,6 +1033,88 @@ def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]], sections
     return divisions, subdivisions, subdivisions3, sections_browse
 
 
+# Real Thompson motifs Mellmann carries but the Trilogy CSV dropped — imported so
+# the catalogue and cross-walk are complete (X751 closes a dangling ATU reference).
+# Deliberately excluded: the dup-notation copies we already hold as ``~N``
+# (B172.2.2, M202.1[.1], N591[b]); and B31, a first-edition motif dropped from the
+# revised index. A non-None value repairs a typo in Mellmann's own ``MOTIF`` text.
+_MEL_SUPPLEMENT = {
+    "C867.2": None, "D2150": None, "H1333.5.0.3": None, "J2500": None,
+    "P100": None, "Q323": None, "T317.0.1": None, "X751": None, "Z357": None,
+    "Z356.1": "Unique survivor from destruction of animals",  # MOTIF typo: "Z56.1 … detruction"
+}
+# Leading code label in a MOTIF cell (letter + digits + dotted-number segments +
+# an optional bracket suffix), tolerant of a missing dot/space so a malformed
+# "X751.Marriage…" or "Z56.1 Unique…" still splits without eating the title.
+_MEL_MOTIF_CODE = re.compile(r"^[A-Z]\d+(?:\.\d+)*(?:\[[^\]]*\])?\.?\s*")
+
+
+def _split_mel_motif(motif: str, name_override: str | None) -> tuple[str, str]:
+    """Mellmann ``MOTIF`` = 'CODE. Title. Optional definition.' → (name, definition)."""
+    body = _MEL_MOTIF_CODE.sub("", (motif or "").strip(), count=1)
+    head, _, tail = body.partition(". ")
+    name = name_override or head.rstrip(". ").strip()
+    return name, tail.strip()
+
+
+def _placevalue_level(code: str) -> int:
+    """Thompson place-value depth from the code alone: hundreds=0, tens=1, units=2,
+    +1 per dotted segment (``.0`` zero-family levels are recomputed in _finalize)."""
+    m = re.match(r"[A-Z](\d+)", code)
+    if not m:
+        return 0
+    intpart = m.group(1)
+    trailing_zeros = len(intpart) - len(intpart.rstrip("0"))
+    return max(0, 2 - min(trailing_zeros, 2)) + code.count(".")
+
+
+def _supplement_parent(code: str, idset: set[str]) -> str:
+    """Nearest existing ancestor: a dotted ancestor by id-trim, else the nearest
+    place-value rounder (X751 → X750 → X700 → X0) that is present."""
+    trimmed = _id_trim_parent(code, idset)
+    if trimmed:
+        return trimmed
+    m = re.match(r"([A-Z])(\d+)", code)
+    if not m:
+        return ""
+    letter, s = m.group(1), m.group(2)
+    for i in range(len(s) - 1, -1, -1):
+        if s[i] != "0":
+            cand = f"{letter}{s[:i]}{'0' * (len(s) - i)}"
+            if cand != code and cand in idset:
+                return cand
+    root = f"{letter}0"
+    return root if root in idset else ""
+
+
+def _mellmann_supplement(rows: list[dict], existing: set[str], chapter_names: dict[str, str]) -> list[dict]:
+    """Convert the whitelisted missing Mellmann rows into our motif dicts (names/typos
+    cleaned, citations parsed, place-value level + nearest-ancestor parent derived).
+    Only codes absent from ``existing`` are added, so re-runs never duplicate."""
+    out = []
+    for row in rows:
+        code = _clean(row.get("code"))
+        if code not in _MEL_SUPPLEMENT or code in existing:
+            continue
+        name, definition = _split_mel_motif(row.get("MOTIF"), _MEL_SUPPLEMENT[code])
+        notes = _clean(row.get("bibliographies"))
+        parsed = parse_notes(notes, code)
+        if definition:                      # the MOTIF's own definition beats a notes guess
+            parsed["definition"] = definition
+        chapter = code[:1]
+        out.append({
+            "id": code,
+            "chapter": chapter,
+            "chapter_name": chapter_names.get(chapter, ""),
+            "name": name,
+            "notes": notes,
+            **parsed,
+            "level": _placevalue_level(code),
+            "parent": _supplement_parent(code, existing),
+        })
+    return out
+
+
 def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | None = None) -> dict:
     """Download and parse only the Trilogy TMI CSV into the TMI store dict.
 
@@ -1041,9 +1122,24 @@ def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | Non
     its own (the caller logs the step header before invoking it, keeping any TMI
     parse warnings under that header). When ``divisions_config`` is given (Mellmann's
     TMI CSV), the printed division1-3 range-headings are lifted and joined onto the
-    motifs, adding a ``divisions``/``subdivisions`` browse hierarchy like the ATU index.
+    motifs, a handful of real motifs the Trilogy CSV dropped are imported from it,
+    and both add a ``divisions``/``subdivisions`` browse hierarchy like the ATU index.
     """
-    tmi = _finalize_tmi(_parse_tmi(_read_csv(config, "tmi", force=force)))
+    parsed = _parse_tmi(_read_csv(config, "tmi", force=force))
+    supplement: list[dict] = []
+    mel_rows: list[dict] | None = None
+    if divisions_config:
+        mel_rows = _read_csv(divisions_config, "tmi", force=force, subdir="mellmann")
+        chapter_names: dict[str, str] = {}
+        for m in parsed:
+            chapter_names.setdefault(m["chapter"], m["chapter_name"])
+        supplement = _mellmann_supplement(mel_rows, {m["id"] for m in parsed}, chapter_names)
+        if supplement:
+            logger.info("      Mellmann supplement: +%d motifs the Trilogy CSV dropped (%s)",
+                        len(supplement), ", ".join(m["id"] for m in supplement))
+        parsed.extend(supplement)
+
+    tmi = _finalize_tmi(parsed)
     store = {
         "label": "Thompson",
         "long_label": "Thompson Motif-Index of Folk-Literature",
@@ -1053,8 +1149,8 @@ def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | Non
         "culture_legend": build_legend(tmi),
         "motifs": tmi,
     }
-    if divisions_config:
-        levels, sections = _mellmann_classification(divisions_config, force=force)
+    if mel_rows is not None:
+        levels, sections = _mellmann_classification(mel_rows)
         divisions, subdivisions, subdivisions3, sections_browse = _assign_tmi_divisions(
             tmi, levels, sections)
         store["divisions"] = divisions
