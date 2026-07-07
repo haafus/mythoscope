@@ -655,7 +655,7 @@ def _build_berezkin_stats() -> dict:
         {"id": "bzRegions", "title": "Motifs by region", "section": "content"},
         {"id": "bzAreas", "title": "Areas with the most motifs", "section": "content"},
         {"id": "bzBreadth", "title": "Areas per motif", "section": "content"},
-        {"id": "bzWidest", "title": "Most widespread motifs (areas attested)", "section": "content"},
+        {"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"},
     ]
     if n_trad:
         panels.append({"id": "bzTradBreadth", "title": "Traditions per motif", "section": "content"})
@@ -865,7 +865,7 @@ def _build_tmi_stats() -> dict:
             {"id": "ovRegions", "title": "Motifs by region", "section": "content"},
             {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "content"},
             {"id": "ovBreadth", "title": "Cultures per motif", "section": "content"},
-            {"id": "ovWidest", "title": "Most widespread motifs (cultures attested)", "section": "content"},
+            {"id": "ovWidest", "title": "Most widespread motifs (cultures attesting)", "section": "content"},
             {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)", "section": "content"},
             # Dataset diagnostics
             {"id": "ovComposition", "title": "Motifs by kind", "section": "diagnostics"},

@@ -279,7 +279,7 @@ dashboards*). Berezkin's carrier is the **areal code**:
   (mapsofmyths taxonomy, only when that credentialled enrichment ran, §4a);
   *Motifs by region* (macro-region of each areal code, each motif once per region);
   *Areas with the most motifs*; *Areas per motif* (breadth histogram); *Most
-  widespread motifs (areas attested)*; *Traditions per motif* (the finer
+  widespread motifs (areas attesting)*; *Traditions per motif* (the finer
   tradition-level breadth, ~1,046 traditions — enrichment-gated); *Most
   cross-referenced motifs (see-also)* (`see_also` in-degree, §5 — the parallel of
   the TMI "cf./†" leaderboard, since both are motif indexes).

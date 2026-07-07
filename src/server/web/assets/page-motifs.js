@@ -496,7 +496,7 @@ function bindBibCopy(detail) {
 }
 
 // Full labels for the concordance catalogues (Wikidata).
-const CONC_LABELS = { KHM: "Grimm (KHM)", AaTh: "Aarne–Thompson (AaTh)",
+const CONC_LABELS = { KHM: "Grimm (KHM)", AaTh: "Aarne-Thompson (AaTh)",
                       Aesop: "Aesop (Fabulae)", Perry: "Aesop (Perry Index)", Child: "Child ballad" };
 
 // Full bibliographic imprint for each catalogue, shown as a tooltip on the label so
@@ -1498,7 +1498,7 @@ function renderDetail(d) {
         // An old number the user navigated to is served as the current type; note it
         // just under the header, and say what the old number is (a pre-2004 AaTh code).
         if (d.redirected_from) {
-            body += `<p class="motif-redirect"><strong>${escapeHtml(d.redirected_from)}</strong> is this type's old Aarne–Thompson (AaTh) number, renumbered in ATU 2004.</p>`;
+            body += `<p class="motif-redirect"><strong>${escapeHtml(d.redirected_from)}</strong> is this type's old Aarne-Thompson (AaTh) number, renumbered in ATU 2004.</p>`;
         }
         // Classification folds chapter, division and sub_division (each with its
         // number range) into one line, as in the Berezkin index.

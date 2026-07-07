@@ -417,7 +417,7 @@ title scheme in [`motif-index-data-sources.md`](motif-index-data-sources.md) →
 - **Distribution & content** — *Motifs by chapter (all vs. substantive)* (the row
   value is the **all**-count, with a substantive overlay bar), *Motifs by region*,
   *Cultures with the most motifs*, *Cultures per motif* (breadth histogram), *Most
-  widespread motifs (cultures attested)*, *Most cross-referenced motifs (cf./†)*.
+  widespread motifs (cultures attesting)*, *Most cross-referenced motifs (cf./†)*.
 - **Dataset diagnostics** — *Motifs by kind*, *Motifs by hierarchy level*, *Motifs
   by note length*, *Best-documented motifs*, *Most-cited sources* (each work —
   Thompson-Balys, Cross, Neuman, … resolved through the bibliography key, §8).
