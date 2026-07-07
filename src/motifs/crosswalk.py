@@ -74,8 +74,16 @@ def _expand_range(lo: str, hi: str, ordered: list[str], keys: list) -> list[str]
 INFER_FANOUT_CAP = 2
 
 
+# A dotted sub-segment mapsofmyths rendered with a Roman/stick "I" is the digit 1
+# (``A700.I`` -> ``A700.1``, ``A724.I.I`` -> ``A724.1.1``) — a pure run of I's is
+# never a valid Thompson sub-code, so folding it is safe. Mirrors the read-side
+# ``_clean_tmi_ref`` so the build-side link resolves like the displayed chip.
+_TMI_ROMAN_RE = re.compile(r"(?<=\.)(I+)(?=\.|$)")
+
+
 def _clean_tmi(ref: str) -> str:
-    """Normalise a mapsofmyths Thompson id (``*A2211.1``, ``A1313.3.1.``)."""
+    """Normalise a mapsofmyths Thompson id (``*A2211.1``, ``A1313.3.1.``, ``A700.I``)."""
+    ref = _TMI_ROMAN_RE.sub(lambda m: "1" * len(m.group(1)), ref)
     return ref.lstrip("*").rstrip(".").strip()
 
 
