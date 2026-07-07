@@ -1652,6 +1652,9 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motif-oldids { display: flex; flex-wrap: wrap; gap: 6px; }
 .motif-oldid { font-size: 12px; color: var(--muted); background: var(--surface-2, #f1f3f5);
     border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; }
+/* Concordance codes: the same small grey chips as "Earlier ATU numbers", flowing
+   inline after the catalogue label. */
+.motif-conc-codes { display: inline-flex; flex-wrap: wrap; gap: 5px; vertical-align: middle; }
 
 .motif-links {
     display: flex;

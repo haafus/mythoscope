@@ -545,9 +545,11 @@ function atuConcordances(conc) {
     const rows = cats.map((cat) => {
         const cite = CONC_CITATIONS[cat];
         const title = cite ? ` title="${escapeHtml(cite)}"` : "";
+        const chips = [...(conc[cat] || [])].sort(natCompare)
+            .map((code) => `<span class="motif-oldid">${escapeHtml(code)}</span>`).join("");
         return `<div class="motif-altname"><span class="motif-altname-lang" tabindex="0"${title}>`
             + `${escapeHtml(CONC_LABELS[cat] || cat)}</span>`
-            + ` ${[...(conc[cat] || [])].sort(natCompare).map(escapeHtml).join(", ")}</div>`;
+            + ` <span class="motif-conc-codes">${chips}</span></div>`;
     }).join("");
     return section("Also catalogued as", `<div class="motif-altnames">${rows}</div>`);
 }
