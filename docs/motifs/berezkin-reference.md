@@ -271,22 +271,25 @@ see `troubleshooting.md` ("Four competing macro-area schemes").
 
 `GET /api/motifs/berezkin/stats` aggregates the catalogue in one cached pass
 (`_build_berezkin_stats`), rendered as a stat-card strip plus a chart grid split
-into the two colour-coded sections all three overviews share (spine + title scheme
-in [`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
-dashboards*). Berezkin's carrier is the **areal code**:
+into the three colour-coded sections all three overviews share (spine + title
+scheme in [`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
+dashboards*). Berezkin's carrier is the **tradition** (a people, ~1,046 —
+enrichment-gated), falling back to the coarser **areal code** without credentials:
 
-- **Distribution & content** — *Motifs by chapter*; *Motifs by thematic group*
-  (mapsofmyths taxonomy, only when that credentialled enrichment ran, §4a);
-  *Motifs by region* (macro-region of each areal code, each motif once per region);
-  *Areas with the most motifs*; *Areas per motif* (breadth histogram); *Most
-  widespread motifs (areas attesting)*; *Traditions per motif* (the finer
-  tradition-level breadth, ~1,046 traditions — enrichment-gated); *Most
+- **Geography & spread** — *Motifs by region* (macro-region of each areal code,
+  each motif once per region); *Traditions with the most motifs* (the carrier
+  leaderboard, enrichment-gated); *Areas with the most motifs*.
+- **Themes & content** — *Motifs by chapter*; *Motifs by thematic group*
+  (mapsofmyths taxonomy, ordered by group number, only when that credentialled
+  enrichment ran, §4a); *Most widespread motifs (areas attesting)*; *Most
+  widespread motifs (traditions attesting)* (enrichment-gated); *Most
   cross-referenced motifs (see-also)* (`see_also` in-degree, §5 — the parallel of
   the TMI "cf./†" leaderboard, since both are motif indexes).
-- **Dataset diagnostics** — *Field coverage* (how many motifs carry a definition /
-  English name / areal indices / ATU / TMI link / see-also) and *Motifs by
+- **Dataset diagnostics** — *Areas per motif* (log breadth histogram); *Traditions
+  per motif* (the finer tradition-level breadth, enrichment-gated); *Motifs by
   definition length* (documentation-depth histogram, the parallel of TMI's note
-  length).
+  length); *Field coverage* (how many motifs carry a definition / English name /
+  areal indices / ATU / TMI link / see-also); *Most-cited sources*.
 
 The cards and the enrichment-gated panels (thematic group, traditions) surface
 only when the credentialled mapsofmyths enrichment ran, so the overview stays

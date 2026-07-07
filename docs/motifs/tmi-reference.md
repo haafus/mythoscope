@@ -410,17 +410,19 @@ current motif stay. Root and chapter badges show the selected tier's count
 
 **Overview dashboard.** `GET /api/motifs/{index}/stats` aggregates the index in
 one cached pass; the section landing renders it as a stat-card strip plus a chart
-grid split into the two colour-coded sections all three overviews share (spine +
+grid split into the three colour-coded sections all three overviews share (spine +
 title scheme in [`motif-index-data-sources.md`](motif-index-data-sources.md) →
 *Overview dashboards*). TMI's carrier is the **culture**:
 
-- **Distribution & content** — *Motifs by chapter (all vs. substantive)* (the row
-  value is the **all**-count, with a substantive overlay bar), *Motifs by region*,
-  *Cultures with the most motifs*, *Cultures per motif* (breadth histogram), *Most
-  widespread motifs (cultures attesting)*, *Most cross-referenced motifs (cf./†)*.
+- **Geography & spread** — *Motifs by region*, *Cultures with the most motifs*.
+- **Themes & content** — *Motifs by chapter (all vs. substantive)* (the row value
+  is the **all**-count, with a substantive overlay bar), *Most widespread motifs
+  (cultures attesting)*, *Most cross-referenced motifs (cf./†)*, *Best-documented
+  motifs*.
 - **Dataset diagnostics** — *Motifs by kind*, *Motifs by hierarchy level*, *Motifs
-  by note length*, *Best-documented motifs*, *Most-cited sources* (each work —
-  Thompson-Balys, Cross, Neuman, … resolved through the bibliography key, §8).
+  by note length*, *Cultures per motif* (breadth histogram), *Most-cited sources*
+  (each work — Thompson-Balys, Cross, Neuman, … resolved through the bibliography
+  key, §8).
 
 ---
 

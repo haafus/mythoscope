@@ -429,20 +429,21 @@ already symmetric — each is stored with its inverse.
 
 `GET /api/motifs/atu/stats` aggregates the index in one cached pass
 (`_build_atu_stats`), rendered as a stat-card strip plus a chart grid split into
-the two colour-coded sections all three overviews share (spine + title scheme in
+the three colour-coded sections all three overviews share (spine + title scheme in
 [`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
 dashboards*). ATU's carrier is the **people**:
 
-- **Distribution & content** — *Tale types by chapter*, *Largest divisions* (the
-  15 largest of the 43 named ranges), *Tale types by region* (types present per
-  region, each counted once — §7), *Peoples with the most tale types*, *Regions
-  per tale type* (breadth histogram), *Most widespread tale types (peoples
-  attesting)* (ATU 563, 301, 613 lead), *Most-combined tale types* (the `combos`
-  correlations), *Largest subtype families*.
-- **Dataset diagnostics** — *Constituent motifs per tale type* (histogram of
-  `atu_seq` size) and *Most motif-rich tale types* — its `atu_seq` annotation
-  density. Unlike the two *motif* indexes ATU carries no cross-referenced-motifs
-  leaderboard.
+- **Geography & spread** — *Tale types by region* (types present per region, each
+  counted once — §7), *Peoples with the most tale types*.
+- **Themes & content** — *Tale types by chapter*, *Largest divisions* (the 15
+  largest of the 43 named ranges), *Most motif-rich tale types* (its `atu_seq`
+  annotation density), *Most widespread tale types (peoples attesting)* (ATU 563,
+  301, 613 lead), *Most-combined tale types* (the `combos` correlations), *Largest
+  subtype families*. Unlike the two *motif* indexes ATU carries no
+  cross-referenced-motifs leaderboard.
+- **Dataset diagnostics** — *Constituent motifs per tale type* (log histogram of
+  `atu_seq` size), *Regions per tale type* (breadth histogram), *Most-cited
+  sources*.
 
 Every count is real, parsed from Uther's apparatus (§7).
 

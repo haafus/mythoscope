@@ -1845,14 +1845,15 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .chart-title { font-size: 12px; font-weight: 600; color: #41506a; margin-bottom: 6px; }
 .chart { width: 100%; }
 
-/* Overview charts split into colour-coded sections: geography (amber), themes &
-   content (teal), dataset diagnostics (slate). The section accent tints its
-   heading and each card's top. */
+/* Overview charts split into colour-coded sections: geography (sea-wave teal),
+   themes & content (blue), dataset diagnostics (violet, echoing the motif
+   textual-parallel chips). The section accent tints its heading and each card's
+   top. */
 .chart-section { margin-top: 24px; }
 .chart-section:first-of-type { margin-top: 0; }
-.chart-section--geography { --sec-accent: #b5852f; }
-.chart-section--content { --sec-accent: #2a9d8f; }
-.chart-section--diagnostics { --sec-accent: #6b7aa1; }
+.chart-section--geography { --sec-accent: #2a9d8f; }
+.chart-section--content { --sec-accent: #3f6fb0; }
+.chart-section--diagnostics { --sec-accent: #7a5aa8; }
 .chart-section-title {
     font-size: 13.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
     margin: 0 0 11px; padding-left: 9px; border-left: 3px solid var(--sec-accent);
