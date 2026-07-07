@@ -307,17 +307,11 @@ Kazakh… material the other two don't distinguish); ~260 curated labels cover
 Stored per type as `attestations_grouped` (`{total, regions: [{region, count,
 entries}]}`) and aggregated across the index into `culture_legend` (people →
 types-attesting, region). On the type page the section renders as a region
-accordion; the overview gains, on the shared chart spine (order + title scheme in
-[`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
-dashboards*), **Tale types by region** (types present per region, each
-counted once — matching TMI/Berezkin "Motifs by region"), **Peoples with the most
-tale types**, a **Regions per tale type** breadth histogram, and **Most
-widespread tale types (peoples attesting)** — the top types by distinct attesting
-peoples (ATU 563, 301, 613 lead), the ATU counterpart of the TMI/Berezkin
-"most-widespread" panel. This is illustrative-free — every count is real, parsed
-from Uther's own apparatus. The one caveat is the region map itself: a first-pass
-curation (e.g. Maghreb folded into "Near East", Volga-Finnic into "Europe") that
-can be refined.
+accordion; the same data drives the region / peoples / breadth / widest charts of
+the overview dashboard (§9a). Every count is real, parsed from Uther's own
+apparatus; the one caveat is the region map itself — a first-pass curation (e.g.
+Maghreb folded into "Near East", Volga-Finnic into "Europe") that can be
+refined.
 
 ---
 
@@ -428,6 +422,34 @@ pages:
 
 The curated structural links (constituent `atu_seq`, `defining_motifs`) were
 already symmetric — each is stored with its inverse.
+
+---
+
+## 9a. Overview dashboard (UI)
+
+`GET /api/motifs/atu/stats` aggregates the index in one cached pass
+(`_build_atu_stats`), rendered as a stat-card strip plus a chart grid on the
+**common chart spine** all three index overviews share (order + title scheme in
+[`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
+dashboards*). ATU's carrier is the **people**, so its panels are:
+
+1. **Tale types by chapter**
+2. **Largest divisions** — the 15 largest of the 43 named ranges
+3. **Tale types by region** — types present per region, each counted once (§7,
+   matching the TMI/Berezkin "by region" panel)
+4. **Peoples with the most tale types**
+5. **Regions per tale type** — breadth histogram
+6. **Most widespread tale types (peoples attesting)** — top types by distinct
+   attesting peoples (ATU 563, 301, 613 lead)
+7. **Constituent motifs per tale type** — histogram of `atu_seq` size
+8. **Most motif-rich tale types**
+9. **Largest subtype families** — base types with the most lettered subtypes
+10. **Most-combined tale types** — the `combos` leaderboard
+
+Panels 7–10 are the ATU-specific tail (its *type* structure — motifs, subtype
+families, combinations); unlike the two *motif* indexes it carries no
+cross-referenced-motifs leaderboard. Every count is real, parsed from Uther's
+apparatus (§7).
 
 ---
 

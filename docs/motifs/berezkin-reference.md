@@ -72,9 +72,9 @@ Each stored motif (`outputs/motifs/berezkin.json → motifs[]`):
 |---|---|
 | `id` | motif code (`B12`) |
 | `chapter` | leading letter |
-| `name` | motif name — **English** where available (§9), else the cleaned Russian name |
+| `name` | motif name — **English** where available (§4a), else the cleaned Russian name |
 | `name_rus` | the Russian original name (only when English replaced it) |
-| `definition` | short definition — **English** where available (§9), else the Russian one |
+| `definition` | short definition — **English** where available (§4a), else the Russian one |
 | `definition_rus` | the Russian original definition (only when English replaced it) |
 | `areas` | sorted unique region codes (§6) |
 | `see_also` | internal cross-references to other Berezkin motifs, from the definition's `см. мотив X` links (kept only when they resolve to a real motif) |
@@ -86,7 +86,7 @@ Index-level keys: `label, long_label, attribution, homepage, chapters, areas`
 
 ---
 
-## 9. English names & definitions (mapsofmyths.com)
+## 4a. English names & definitions (mapsofmyths.com)
 
 The sister site **[mapsofmyths.com](http://mapsofmyths.com)** (same authors, same
 motif ids, CC BY-NC-SA 4.0) carries an **English name and English definition** for
@@ -238,7 +238,7 @@ displayed. Removing it cut the step from ~180 s to ~60 s.
 Output `berezkin_bibliography.json` (gitignored, best-effort): a per-motif
 `region → citations` tree plus `source → {regions, uses}` aggregates and a reverse
 `area_index`. Current: ~167k citations, ~89% resolved. Distinct from the mapsofmyths
-`tmi_refs` cross-walk (§9) and the TMI folkmasa bibliography — this is the Berezkin
+`tmi_refs` cross-walk (§4a) and the TMI folkmasa bibliography — this is the Berezkin
 catalogue's own source apparatus.
 
 ---
@@ -251,7 +251,7 @@ in [`crosswalk.md`](crosswalk.md); this section covers the Berezkin side.*
 Motif **equivalence** runs two ways:
 
 - **Direct** `berezkin ↔ tmi` — from the curated Thompson ids (`tmi_refs`) that
-  mapsofmyths attaches to each motif (§9), cleaned of `*`/trailing `.` and kept
+  mapsofmyths attaches to each motif (§4a), cleaned of `*`/trailing `.` and kept
   only where the TMI id exists in our index (~190 motifs). This is the exact,
   hand-curated concordance and is shown first on the motif page.
 - **Via ATU** — `berezkin → atu` (from `atu_refs`, ~485 motifs) and `atu → tmi`.
@@ -277,7 +277,7 @@ dashboards*). Berezkin's carrier is the **areal code**, so its seven panels are:
 
 1. **Motifs by chapter**
 2. **Motifs by thematic group** — the mapsofmyths taxonomy (only when that
-   credentialled enrichment ran, §9)
+   credentialled enrichment ran, §4a)
 3. **Motifs by region** — macro-region of each areal code, each motif once per
    region (matching the TMI/ATU "by region" panel)
 4. **Areas with the most motifs** — the areal codes attesting the most motifs

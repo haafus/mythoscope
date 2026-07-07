@@ -229,7 +229,7 @@ ATU достижимо больше пар, но они слабее, поэто
 (see-also). Оба индекса *мотивов* (TMI, Берёзкин) несут лидерборд cross-referenced;
 у ATU (индекс *типов*) его нет. Полные списки панелей каждого индекса — в
 [`tmi-reference.md`](tmi-reference.md) §10, [`atu-reference.md`](atu-reference.md)
-§7 и [`berezkin-reference.md`](berezkin-reference.md) §7b.
+§9a и [`berezkin-reference.md`](berezkin-reference.md) §7b.
 
 ## Просмотрено, но не используется
 
