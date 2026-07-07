@@ -508,9 +508,24 @@ def _breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
 
 
-def _trad_breadth_label(n: int) -> str:
-    return ("0", "1–5", "6–20", "21–50", "51–100", "100+")[
-        0 if n == 0 else 1 if n <= 5 else 2 if n <= 20 else 3 if n <= 50 else 4 if n <= 100 else 5]
+_AREA_SPAN_BUCKETS = ("0", "1", "2", "3", "4", "5", "6–7", "8–10", "11–15", "16–25", "26+")
+
+
+def _area_span_label(n: int) -> str:
+    return _AREA_SPAN_BUCKETS[
+        0 if n == 0 else n if n <= 5 else 6 if n <= 7 else 7 if n <= 10
+        else 8 if n <= 15 else 9 if n <= 25 else 10]
+
+
+_TRAD_SPAN_BUCKETS = ("1–2", "3–5", "6–10", "11–20", "21–35", "36–50",
+                      "51–75", "76–100", "101–150", "151–250", "250+")
+
+
+def _trad_span_label(n: int) -> str:
+    return _TRAD_SPAN_BUCKETS[
+        0 if n <= 2 else 1 if n <= 5 else 2 if n <= 10 else 3 if n <= 20 else 4 if n <= 35
+        else 5 if n <= 50 else 6 if n <= 75 else 7 if n <= 100 else 8 if n <= 150
+        else 9 if n <= 250 else 10]
 
 
 def _deflen_label(n: int) -> str:
@@ -597,6 +612,7 @@ def _build_berezkin_stats() -> dict:
     groups = collections.Counter()
     indeg = collections.Counter()      # how often each motif is a see-also target
     trad_breadth = collections.Counter()
+    trad_counts = collections.Counter()  # motifs attested in each tradition (people)
     deflen = collections.Counter()
     trad_ids: set = set()              # distinct attesting traditions (peoples), like ATU peoples
     n_def = n_atu = n_english = n_tmi = n_areas = n_see = n_trad = 0
@@ -616,10 +632,12 @@ def _build_berezkin_stats() -> dict:
         if trads:
             n_trad += 1
             trad_ids.update(trads)
-            trad_breadth[_trad_breadth_label(len(trads))] += 1
+            trad_breadth[_trad_span_label(len(trads))] += 1
+            for t in trads:
+                trad_counts[t] += 1
         ars = r.get("areas") or []
         n_areas += bool(ars)
-        breadth[_areal_breadth_label(len(ars))] += 1
+        breadth[_area_span_label(len(ars))] += 1
         regs = set()
         for a in ars:
             areas[a] += 1
@@ -631,6 +649,11 @@ def _build_berezkin_stats() -> dict:
     # we label the top codes directly (no de-duplication of names needed).
     top_codes = sorted(areas.items(), key=lambda kv: kv[1], reverse=True)[:20]
     widest = sorted(records, key=lambda r: len(r.get("areas", [])), reverse=True)[:15]
+    # Tradition (people) leaderboards, parallel to the areal ones above.
+    tname = {tid: (t.get("name") or t.get("name_eng") or tid)
+             for tid, t in (data.get("traditions") or {}).items()}
+    top_trads = trad_counts.most_common(20)
+    trad_widest = sorted(records, key=lambda r: len(r.get("traditions") or []), reverse=True)[:15]
     by = _by_id("berezkin")
     hubs = [(mid, c) for mid, c in indeg.most_common(50) if mid in by][:15]
 
@@ -654,18 +677,25 @@ def _build_berezkin_stats() -> dict:
         cards.append({"value": round(100 * n_english / len(records)) if records else 0,
                       "label": "English name", "suffix": "%"})
 
-    # Distribution & content — most significant first.
-    panels = [{"id": "bzChapters", "title": "Motifs by chapter", "section": "content"}]
+    # Distribution & content — region and chapter first, then the areal trio, the
+    # tradition (people) trio, and the see-also hub leaderboard.
+    panels = [
+        {"id": "bzRegions", "title": "Motifs by region", "section": "content"},
+        {"id": "bzChapters", "title": "Motifs by chapter", "section": "content"},
+    ]
     if groups:
         panels.append({"id": "bzGroups", "title": "Motifs by thematic group", "section": "content"})
     panels += [
-        {"id": "bzRegions", "title": "Motifs by region", "section": "content"},
         {"id": "bzAreas", "title": "Areas with the most motifs", "section": "content"},
         {"id": "bzBreadth", "title": "Areas per motif", "section": "content"},
         {"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"},
     ]
     if n_trad:
-        panels.append({"id": "bzTradBreadth", "title": "Traditions per motif", "section": "content"})
+        panels += [
+            {"id": "bzTradTop", "title": "Traditions with the most motifs", "section": "content"},
+            {"id": "bzTradBreadth", "title": "Traditions per motif", "section": "content"},
+            {"id": "bzTradWidest", "title": "Most widespread motifs (traditions attesting)", "section": "content"},
+        ]
     if hubs:
         panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)", "section": "content"})
     # Dataset diagnostics.
@@ -689,19 +719,22 @@ def _build_berezkin_stats() -> dict:
         "cards": cards,
         "sections": _OVERVIEW_SECTIONS,
         "panels": panels,
-        "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
+        "chapters": [{"id": ch, "label": _chapter_label(data, ch), "count": c}
+                     for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
         "top_areas": [{"label": legend.get(str(code), f"#{code}"), "count": c} for code, c in top_codes],
         "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
                    for r in widest],
         "hubs": [{"label": f"{mid} {by[mid].get('name', '')}", "count": c} for mid, c in hubs],
-        "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
+        "breadth": [{"bucket": b, "count": breadth[b]} for b in _AREA_SPAN_BUCKETS],
         "coverage": coverage,
         "deflen": [{"bucket": b, "count": deflen[b]} for b in ("0", "1–60", "61–120", "121–240", "241–480", "480+")],
     }
     if n_trad:
-        stats["trad_breadth"] = [{"bucket": b, "count": trad_breadth[b]}
-                                 for b in ("0", "1–5", "6–20", "21–50", "51–100", "100+")]
+        stats["trad_breadth"] = [{"bucket": b, "count": trad_breadth[b]} for b in _TRAD_SPAN_BUCKETS]
+        stats["top_traditions"] = [{"label": tname.get(tid, tid), "count": c} for tid, c in top_trads]
+        stats["trad_widest"] = [{"label": f"{r['id']} {r.get('name', '')}",
+                                 "count": len(r.get("traditions") or [])} for r in trad_widest]
     if groups:
         # Group labels are long ("03 Cosmogony, the earth and the sky, ..."); keep
         # the leading number + first segment for a readable axis label.
@@ -764,10 +797,10 @@ def _build_atu_stats() -> dict:
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            # Distribution & content — most significant first
+            # Distribution & content — region & chapter first
+            {"id": "atRegions", "title": "Tale types by region", "section": "content"},
             {"id": "atChapters", "title": "Tale types by chapter", "section": "content"},
             {"id": "atDivisions", "title": "Largest divisions", "section": "content"},
-            {"id": "atRegions", "title": "Tale types by region", "section": "content"},
             {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "content"},
             {"id": "atRegBreadth", "title": "Regions per tale type", "section": "content"},
             {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)", "section": "content"},
@@ -868,9 +901,9 @@ def _build_tmi_stats() -> dict:
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            # Distribution & content — most significant first
-            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
+            # Distribution & content — region & chapter first
             {"id": "ovRegions", "title": "Motifs by region", "section": "content"},
+            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
             {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "content"},
             {"id": "ovBreadth", "title": "Cultures per motif", "section": "content"},
             {"id": "ovWidest", "title": "Most widespread motifs (cultures attesting)", "section": "content"},

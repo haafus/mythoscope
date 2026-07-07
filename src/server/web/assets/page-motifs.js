@@ -1064,9 +1064,9 @@ function drawOverviewCharts(s) {
     }
     if (s.index === "tmi") {
         cssStacked("ovComposition", s.composition, COMPO_DIAG);
-        hist("ovLevels", s.levels, (r) => `L${r.level}`);
+        hist("ovLevels", s.levels, (r) => r.level);   // r.level already carries the "L" prefix
         hist("ovNotes", s.notes_histogram, (r) => r.bucket);
-        cssBullet("ovChapters", s.chapters, (r) => r.id);
+        cssBullet("ovChapters", s.chapters, (r) => (r.label && r.label !== r.id ? `${r.id} ${r.label}` : r.id));
         bars("ovCultures", s.top_cultures.slice(0, 15), (r) => r.label);
         hist("ovBreadth", s.breadth_histogram, (r) => r.bucket);
         bars("ovWidest", s.widest, (r) => r.label, (r) => r.count);
@@ -1074,12 +1074,14 @@ function drawOverviewCharts(s) {
         bars("ovHubs", s.see_also_hubs, (r) => `${r.id} ${r.name}`, (r) => r.indeg);
         bars("ovSources", s.top_sources || [], (r) => r.label);
     } else if (s.index === "berezkin") {
-        bars("bzChapters", s.chapters, (r) => r.id);
+        bars("bzChapters", s.chapters, (r) => r.label || r.id);
         if (s.groups) bars("bzGroups", s.groups, (r) => r.label);
         bars("bzAreas", s.top_areas, (r) => r.label);
         hist("bzBreadth", s.breadth, (r) => r.bucket);
         bars("bzWidest", s.widest, (r) => r.label);
+        if (s.top_traditions) bars("bzTradTop", s.top_traditions, (r) => r.label);
         if (s.trad_breadth) hist("bzTradBreadth", s.trad_breadth, (r) => r.bucket);
+        if (s.trad_widest) bars("bzTradWidest", s.trad_widest, (r) => r.label, (r) => r.count);
         if (s.hubs) bars("bzHubs", s.hubs, (r) => r.label, (r) => r.count);
         bars("bzCoverage", s.coverage, (r) => r.label, (r) => r.count);
         hist("bzDefLen", s.deflen, (r) => r.bucket);
