@@ -1609,6 +1609,24 @@ body.has-main-navbar {
     margin-bottom: 7px;
 }
 
+/* Collapsed-by-default section (Source text notes): the summary reads as the
+   section title with a rotating caret; the body is hidden until opened. */
+.motif-section-collapsible > summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.motif-section-collapsible > summary::-webkit-details-marker { display: none; }
+.motif-section-collapsible > summary::before {
+    content: "\25b8"; /* ▸ */
+    font-size: 9px;
+    color: #9bb8b2;
+    transition: transform 0.12s ease;
+}
+.motif-section-collapsible[open] > summary::before { transform: rotate(90deg); }
+
 .motif-text {
     margin: 0;
     line-height: 1.55;

@@ -1136,6 +1136,12 @@ function section(title, bodyHtml) {
     return `<div class="motif-section"><div class="motif-section-title">${escapeHtml(title)}</div>${bodyHtml}</div>`;
 }
 
+// A section collapsed by default, expanded on click (native <details>). The
+// summary reuses the section-title look with a disclosure caret.
+function collapsibleSection(title, bodyHtml) {
+    return `<details class="motif-section motif-section-collapsible"><summary class="motif-section-title">${escapeHtml(title)}</summary>${bodyHtml}</details>`;
+}
+
 function linkSection(title, links) {
     return section(title, `<div class="motif-links">${linkChips(links)}</div>`);
 }
@@ -1500,6 +1506,12 @@ function renderDetail(d) {
         if (d.section && d.section !== d.division3) cls.push(withRange(d.section, d.section_range));
         if (cls.length) body += section("Classification", `<div class="motif-taxonomy">${cls.join(" · ")}</div>`);
         if (d.definition) body += section("Definition", `<p class="motif-text motif-def">${escapeHtml(d.definition)}</p>`);
+        // Direct sub-motifs (the next hierarchy level) as motif chips.
+        if ((d.children || []).length) {
+            const n = d.children_truncated ? `${d.children.length}+` : d.children.length;
+            const kids = d.children.map((c) => ({ index: "tmi", id: c.id, name: c.name, exists: true }));
+            body += linkSection(`Submotifs (${n})`, kids);
+        }
         if ((links.related || []).length) body += linkSection(`Related motifs (${links.related.length})`, links.related);
         if ((links.atu_related || []).length) body += linkSection(`Related ATU tale types (${links.atu_related.length})`, links.atu_related);
         if ((links.atu_defines || []).length) body += linkSection(`Defines ATU tale type${links.atu_defines.length > 1 ? "s" : ""} (${links.atu_defines.length})`, links.atu_defines);
@@ -1516,7 +1528,7 @@ function renderDetail(d) {
                 .map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("");
             body += section(label, `<div class="motif-oldids">${chips}</div>`);
         }
-        if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
+        if (d.notes) body += collapsibleSection("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
     } else if (d.index === "atu") {
         // The pre-2004 Uther name rides under the title as a muted subtitle.
         const sub = d.former_name
