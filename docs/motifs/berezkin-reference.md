@@ -267,6 +267,32 @@ see `troubleshooting.md` ("Four competing macro-area schemes").
 
 ---
 
+## 7b. Overview dashboard (UI)
+
+`GET /api/motifs/berezkin/stats` aggregates the catalogue in one cached pass
+(`_build_berezkin_stats`), rendered as a stat-card strip plus a chart grid on the
+**common chart spine** all three index overviews share (defined in
+`tmi-reference.md §10`): *by chapter → secondary taxonomy → by region →
+carrier-leaderboard → breadth histogram → most-widespread → index-specific tail*.
+Berezkin's carrier is the **areal code**, so its seven panels are:
+
+1. **Motifs by chapter**
+2. **Motifs by thematic group** — the mapsofmyths taxonomy (only when that
+   credentialled enrichment ran, §9)
+3. **Motifs by region** — macro-region of each areal code, each motif once per
+   region (matching the TMI/ATU "by region" panel)
+4. **Areas with the most motifs** — the areal codes attesting the most motifs
+5. **Areas per motif** — breadth histogram (how many areas a motif spans)
+6. **Most widespread motifs (areas attested)** — the top motifs by areal reach
+7. **Most cross-referenced motifs (see-also)** — `see_also` in-degree (§5); the
+   direct parallel of the TMI "cf./†" leaderboard, since both are motif indexes
+   with an internal see-also relation
+
+The cards surface the credentialled enrichment conditionally (English name,
+ATU-/TMI-linked, decoded areas), so the overview stays valid without credentials.
+
+---
+
 ## 8. Known limitations
 
 - **Codes 1–9.** Used by ~15 motifs as the leading index (`K84 .1.11.13…`) but
