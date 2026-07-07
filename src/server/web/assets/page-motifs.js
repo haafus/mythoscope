@@ -1210,7 +1210,7 @@ function reasonedParallelsSection(groups) {
             <div class="motif-links">${chips}</div>
         </div>`;
     }).join("");
-    const note = `<div class="motif-parallel-note">The same mytheme catalogued under different labels across indexes — a curated comparison by reasoning (rationale on each confidence tag; full write-up in the docs).</div>`;
+    const note = `<div class="motif-parallel-note">One mytheme under different labels across indexes — a curated, reasoned comparison (rationale on each confidence tag).</div>`;
     return section(`Parallels by reasoning (${groups.length})`, note + blocks);
 }
 
@@ -1393,7 +1393,7 @@ function semanticParallelsSection(list, shown) {
         </a>`;
     }).join("");
     return section(`Semantic parallels (${fresh.length})`,
-        `<div class="motif-parallel-note">Nearest look-alikes by meaning (BGE-M3 embeddings) in the other indexes with no recorded link — they share sense, not necessarily words. Hints to review, not asserted links.</div><div class="motif-links">${chips}</div>`);
+        `<div class="motif-parallel-note">Nearest by meaning (BGE-M3 embeddings) in other indexes, no recorded link — shared sense, not words; hints to review, not asserted links.</div><div class="motif-links">${chips}</div>`);
 }
 
 function crossLinkExtras(d) {
