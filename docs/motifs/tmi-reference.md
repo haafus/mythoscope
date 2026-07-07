@@ -410,11 +410,22 @@ current motif stay. Root and chapter badges show the selected tier's count
 
 **Overview dashboard.** `GET /api/motifs/{index}/stats` aggregates the index in
 one cached pass; the section landing renders it as a stat-card strip plus a
-responsive grid of charts: composition, nodes per level, notes-size histogram,
-motifs per chapter (all vs substantive), motifs by region, top cultures,
-cultural breadth, most-documented motifs, most-referenced motifs (see_also
-in-degree), and top sources (motifs citing each work — Thompson-Balys, Cross,
-Neuman, … resolved through the bibliography key, §8).
+responsive grid of charts. All three index overviews share a **common chart
+spine** so parallel views sit in the same place: *by chapter → secondary
+taxonomy → by region → carrier-leaderboard → breadth histogram → most-widespread
+→ index-specific tail* (chart titles follow one scheme too — `<records> by
+<category>`, `<carrier> per <record>`, `<carrier>s with the most <records>`,
+`Most widespread <records>`). For TMI the panels are: *Motifs by chapter (all
+vs. substantive)* (the row value is the **all**-count, with a substantive
+overlay bar), *Motifs by kind*, *Motifs by hierarchy level*, *Motifs by region*,
+*Cultures with the most motifs*, *Cultures per motif* (breadth histogram), *Most
+widespread motifs (cultures attested)*, then the TMI-specific tail — *Motifs by
+note length*, *Best-documented motifs*, *Most cross-referenced motifs (cf./†)*,
+and *Most-cited sources* (each work — Thompson-Balys, Cross, Neuman, … resolved
+through the bibliography key, §8). ATU and Berezkin follow the same spine with
+their own carrier (peoples / areas) and tail; both motif indexes (TMI, Berezkin)
+carry the cross-referenced-motifs leaderboard, while ATU's tail is its
+type-specific charts (motif-rich types, subtype families, most-combined).
 
 ---
 
