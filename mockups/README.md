@@ -90,6 +90,12 @@ and a Near-East/N-Africa/S-Asia block; TMI is coarser (its "cultures" are as muc
 source-collection as ethnos). Per-index thresholds are in `CFG` at the top of
 `build_data.py`.
 
+### tmi-detail-tree · extracted TMI detail hierarchy tree
+The **filter + category tree** that used to sit at the bottom of a Thompson motif's
+detail page, removed from the app and preserved here (working). Reproduces
+`renderTmiTree` + its tier filter over a real chapter-A slice; open `index.html`
+directly. See [`tmi-detail-tree/README.md`](tmi-detail-tree/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

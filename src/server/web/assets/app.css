@@ -1767,7 +1767,6 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .motifs-item-badge.is-sub { color: var(--accent); font-weight: 600; }
 
 /* Control bar above a tree: filter dropdown + "Flat list" toggle. */
-.motif-hierarchy { margin-top: 20px; }
 .motif-controls { display: flex; align-items: center; gap: 14px; margin: 2px 0 12px; }
 .motif-controls .motif-filter { margin: 0; }
 .flat-toggle {
