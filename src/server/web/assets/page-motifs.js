@@ -921,6 +921,24 @@ function renderOverviewFrom(s) {
     detail.innerHTML = overviewHtml(s);
     detail.scrollTop = 0;
     drawOverviewCharts(s);   // all overview charts — pure CSS/SVG (Plotly stays for similarity)
+    // Chart labels that name a motif/type or a chapter/division are deep links:
+    // an entity opens its page; a chapter/division sets the browse filter.
+    detail.querySelectorAll(".chart-link").forEach((a) => a.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (a.dataset.nav === "entity") openMotif(OV_INDEX, a.dataset.id);
+        else overviewFilter(a.dataset.nav, a.dataset.value);
+    }));
+}
+
+// Apply a chapter/division filter chosen from an overview chart label: set the
+// browse filter, reflect it in the dropdown, and refresh the sidebar list.
+function overviewFilter(kind, value) {
+    mState.chapter = mState.division = mState.subdivision = mState.subdivision3 = mState.section = "";
+    if (kind === "chapter") mState.chapter = value;
+    else if (kind === "division") mState.division = value;
+    renderChapters();
+    loadList();
+    syncUrl(true);
 }
 
 async function renderOverview() {
@@ -1006,6 +1024,19 @@ const ACC = "#2a9d8f";
 // composition bar lives in that section, so it uses a slate ramp of the accent.
 const DIAG_C = "#6b7aa1", COMPO_DIAG = ["#6b7aa1", "#9aa6c3", "#ccd3e4"];
 
+// The current overview's index, so chart labels can deep-link to their entity.
+let OV_INDEX = "";
+
+// Render a bar's label as a deep link when its row names a navigable entity: a
+// motif/type (`id` → its page), or a chapter/division (→ the browse filter).
+function chartLabel(r, lab) {
+    const t = escapeHtml(lab);
+    if (r && r.id) return `<a class="csbar-lab chart-link" data-nav="entity" data-id="${escapeHtml(r.id)}" href="#/motifs?index=${OV_INDEX}&id=${encodeURIComponent(r.id)}">${t}</a>`;
+    if (r && r.chapter != null) return `<a class="csbar-lab chart-link" data-nav="chapter" data-value="${escapeHtml(r.chapter)}" href="#/motifs?index=${OV_INDEX}&chapter=${encodeURIComponent(r.chapter)}">${t}</a>`;
+    if (r && r.division != null) return `<a class="csbar-lab chart-link" data-nav="division" data-value="${escapeHtml(r.division)}" href="#/motifs?index=${OV_INDEX}&division=${encodeURIComponent(r.division)}">${t}</a>`;
+    return `<span class="csbar-lab">${t}</span>`;
+}
+
 function cssBars(id, rows, labelFn, colorFn, valFn = (r) => r.count) {
     const el = document.getElementById(id);
     if (!el || !rows || !rows.length) return;
@@ -1013,7 +1044,7 @@ function cssBars(id, rows, labelFn, colorFn, valFn = (r) => r.count) {
     el.innerHTML = `<div class="csbars">` + rows.map((r, i) => {
         const lab = labelFn(r), v = valFn(r);
         return `<div class="csbar-row" title="${escapeHtml(lab)}: ${formatNumber(v)}">
-            <span class="csbar-lab">${escapeHtml(lab)}</span>
+            ${chartLabel(r, lab)}
             <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * v / max))}%;background:${colorFn(r, i)}"></span></span>
             <span class="csbar-val">${formatNumber(v)}</span>
         </div>`;
@@ -1038,7 +1069,7 @@ function cssBullet(id, rows, labelFn) {
     const max = Math.max(1, ...rows.map((r) => r.count));
     el.innerHTML = `<div class="csbars">` + rows.map((r) => `
         <div class="csbar-row" title="${escapeHtml(labelFn(r))}: ${formatNumber(r.substantive || 0)} / ${formatNumber(r.count)}">
-            <span class="csbar-lab">${escapeHtml(labelFn(r))}</span>
+            ${chartLabel(r, labelFn(r))}
             <span class="csbar-track">
                 <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#bcdcd6"></span>
                 <span class="csbar-fill csbar-over" style="width:${Math.max(0, Math.round(100 * (r.substantive || 0) / max))}%;background:${ACC}"></span>
@@ -1050,6 +1081,7 @@ function cssBullet(id, rows, labelFn) {
 
 // Single dispatcher for the whole overview (replaces the old Plotly path).
 function drawOverviewCharts(s) {
+    OV_INDEX = s.index;   // chart labels deep-link within this index
     // A chart's default mark colour follows its section: teal for the content
     // panels, slate for the dataset-diagnostics panels (region bars keep the
     // region palette; the composition bar keeps its own ramp).

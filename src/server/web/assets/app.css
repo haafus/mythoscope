@@ -1862,6 +1862,8 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .csbars { display: flex; flex-direction: column; gap: 5px; padding: 6px 2px 2px; }
 .csbar-row { display: grid; grid-template-columns: 148px 1fr 50px; align-items: center; gap: 9px; font-size: 11.5px; line-height: 1.1; }
 .csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.csbar-lab.chart-link { color: inherit; text-decoration: none; cursor: pointer; }
+a.csbar-lab.chart-link:hover { color: #2a9d8f; text-decoration: underline; }
 .csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; }
 .csbar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.35s ease; }
 .csbar-over { position: absolute; top: 0; left: 0; }   /* substantive subset over the "all" bar */

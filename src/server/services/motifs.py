@@ -719,13 +719,13 @@ def _build_berezkin_stats() -> dict:
         "cards": cards,
         "sections": _OVERVIEW_SECTIONS,
         "panels": panels,
-        "chapters": [{"id": ch, "label": _chapter_label(data, ch), "count": c}
+        "chapters": [{"id": ch, "chapter": ch, "label": _chapter_label(data, ch), "count": c}
                      for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
         "top_areas": [{"label": legend.get(str(code), f"#{code}"), "count": c} for code, c in top_codes],
-        "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
+        "widest": [{"id": r["id"], "label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
                    for r in widest],
-        "hubs": [{"label": f"{mid} {by[mid].get('name', '')}", "count": c} for mid, c in hubs],
+        "hubs": [{"id": mid, "label": f"{mid} {by[mid].get('name', '')}", "count": c} for mid, c in hubs],
         "breadth": [{"bucket": b, "count": breadth[b]} for b in _AREA_SPAN_BUCKETS],
         "coverage": coverage,
         "deflen": [{"bucket": b, "count": deflen[b]} for b in ("0", "1–60", "61–120", "121–240", "241–480", "480+")],
@@ -733,7 +733,7 @@ def _build_berezkin_stats() -> dict:
     if n_trad:
         stats["trad_breadth"] = [{"bucket": b, "count": trad_breadth[b]} for b in _TRAD_SPAN_BUCKETS]
         stats["top_traditions"] = [{"label": tname.get(tid, tid), "count": c} for tid, c in top_trads]
-        stats["trad_widest"] = [{"label": f"{r['id']} {r.get('name', '')}",
+        stats["trad_widest"] = [{"id": r["id"], "label": f"{r['id']} {r.get('name', '')}",
                                  "count": len(r.get("traditions") or [])} for r in trad_widest]
     if groups:
         # Group labels are long ("03 Cosmogony, the earth and the sky, ..."); keep
@@ -802,24 +802,24 @@ def _build_atu_stats() -> dict:
             {"id": "atChapters", "title": "Tale types by chapter", "section": "content"},
             {"id": "atDivisions", "title": "Largest divisions", "section": "content"},
             {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "content"},
-            {"id": "atRegBreadth", "title": "Regions per tale type", "section": "content"},
+            {"id": "atRich", "title": "Most motif-rich tale types", "section": "content"},
             {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)", "section": "content"},
             {"id": "atCombos", "title": "Most-combined tale types", "section": "content"},
             {"id": "atFamilies", "title": "Largest subtype families", "section": "content"},
             # Dataset diagnostics
             {"id": "atMotifHist", "title": "Constituent motifs per tale type", "section": "diagnostics"},
-            {"id": "atRich", "title": "Most motif-rich tale types", "section": "diagnostics"},
+            {"id": "atRegBreadth", "title": "Regions per tale type", "section": "diagnostics"},
         ],
-        "chapters": [{"label": ch, "count": c} for ch, c in chapters.most_common() if ch],
-        "divisions": [{"label": dv, "count": c} for dv, c in divisions.most_common(15)],
+        "chapters": [{"chapter": ch, "label": ch, "count": c} for ch, c in chapters.most_common() if ch],
+        "divisions": [{"division": dv, "label": dv, "count": c} for dv, c in divisions.most_common(15)],
         "motif_hist": [{"bucket": b, "count": motif_hist[b]} for b in ("0", "1", "2–3", "4–6", "7–10", "11+")],
-        "top_rich": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
+        "top_rich": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
                      for t in top_rich],
-        "families": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t["subtypes"])}
+        "families": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": len(t["subtypes"])}
                      for t in top_families],
-        "combos": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("combos", []))}
+        "combos": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("combos", []))}
                    for t in top_combos],
-        "widest": [{"label": f"{t['id']} {t.get('name', '')}", "count": _people_count(t)}
+        "widest": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": _people_count(t)}
                    for t in top_widest],
         "regions": [{"region": reg, "count": c} for reg, c in region_types.most_common()],
         "top_peoples": [{"label": canon, "count": e["count"]} for canon, e in top_peoples],
@@ -918,11 +918,11 @@ def _build_tmi_stats() -> dict:
         "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
         "levels": [{"level": f"L{lv}", "count": levels[lv]} for lv in sorted(levels)],
         "notes_histogram": [{"bucket": label, "count": notes_hist[label]} for _, _, label in _NOTES_BUCKETS],
-        "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("cultures") or {})}
+        "widest": [{"id": r["id"], "label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("cultures") or {})}
                    for r in widest],
         "breadth_histogram": [{"bucket": b, "count": breadth[b]}
                               for b in ("0", "1", "2", "3–5", "6–10", "11+")],
-        "chapters": [{"id": ch, "label": chapter_labels.get(ch, ch), "count": c, "substantive": s}
+        "chapters": [{"id": ch, "chapter": ch, "label": chapter_labels.get(ch, ch), "count": c, "substantive": s}
                      for ch, (c, s) in sorted(chapters.items())],
         "regions": [{"region": reg, "count": n} for reg, n in regions.most_common()],
         "top_cultures": [{"label": lbl, "count": n} for lbl, n in cultures.most_common(30)],
