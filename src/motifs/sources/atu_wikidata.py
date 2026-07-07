@@ -5,7 +5,8 @@ Open SPARQL endpoint (`query.wikidata.org`), matched on the ATU-number property
 
   * multilingual **names** — from its *tale-type* items (``P31 = wd:Q47451145``, so
     specific tale instances don't masquerade as names);
-  * **Wikipedia** articles (en/ru/de/fr);
+  * **Wikipedia** articles (en/ru/de/fr) — encyclopedic summaries of the type;
+  * **Wikisource** links (any language) — full primary texts of tales of the type;
   * **concordances** to other catalogues — Grimm/KHM, Aarne-Thompson (AaTh), Perry
     (Aesop), Child ballads — from ``P528`` catalog codes (+ ``P972`` catalog) and the
     Perry-Index property ``P1852``.
@@ -46,6 +47,7 @@ _CONCORDANCE_ORDER = ["KHM", "AaTh", "Aesop", "Perry", "Child"]
 # wd:Q47451145 = "tale type"; only those items name the type itself.
 _QUERY = """SELECT ?atu ?item ?isType (SAMPLE(?perry) AS ?perry)
   (GROUP_CONCAT(DISTINCT CONCAT(STR(?lang),"=",STR(?art)); separator="|") AS ?arts)
+  (GROUP_CONCAT(DISTINCT CONCAT(STR(?slang),"=",STR(?src)); separator="|") AS ?srcs)
   (GROUP_CONCAT(DISTINCT CONCAT(?catL,"=",?code); separator="|") AS ?cats)
   %s WHERE {
   ?item wdt:P2540 ?atu .
@@ -53,6 +55,8 @@ _QUERY = """SELECT ?atu ?item ?isType (SAMPLE(?perry) AS ?perry)
   OPTIONAL { ?item wdt:P1852 ?perry }
   OPTIONAL { ?art schema:about ?item ; schema:inLanguage ?lang ;
              schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] . FILTER(?lang IN (%s)) }
+  OPTIONAL { ?src schema:about ?item ; schema:inLanguage ?slang ;
+             schema:isPartOf [ wikibase:wikiGroup "wikisource" ] }
   OPTIONAL { ?item p:P528 ?st . ?st ps:P528 ?code ; pq:P972 ?ci .
              ?ci rdfs:label ?catL FILTER(lang(?catL)="en") }
 %s
@@ -74,6 +78,11 @@ def _norm_atu(value: str) -> str:
 
 def _wiki_title(url: str) -> str:
     return unquote(url.rsplit("/", 1)[-1]).replace("_", " ")
+
+
+def _lang_key(w: dict) -> tuple:
+    """Sort sitelinks by our language preference, then title."""
+    return (_WIKIS.index(w["lang"]) if w["lang"] in _WIKIS else 9, w["title"])
 
 
 def query_url() -> str:
@@ -104,7 +113,7 @@ def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
         atu = _norm_atu(r.get("atu", {}).get("value", ""))
         if atu not in atu_ids:
             continue
-        e = out.setdefault(atu, {"names": {}, "wikipedia": [], "wikidata": None,
+        e = out.setdefault(atu, {"names": {}, "wikipedia": [], "wikisource": [], "wikidata": None,
                                  "concordances": {}, "_seen": set()})
         is_type = r.get("isType", {}).get("value") == "true"
         if is_type:
@@ -121,6 +130,11 @@ def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
             if url and url not in e["_seen"]:
                 e["_seen"].add(url)
                 e["wikipedia"].append({"lang": lang, "title": _wiki_title(url), "url": url})
+        for piece in filter(None, r.get("srcs", {}).get("value", "").split("|")):
+            lang, _, url = piece.partition("=")
+            if url and url not in e["_seen"]:
+                e["_seen"].add(url)
+                e["wikisource"].append({"lang": lang, "title": _wiki_title(url), "url": url})
         for piece in filter(None, r.get("cats", {}).get("value", "").split("|")):
             label, _, code = piece.partition("=")
             _add_concordance(e, label, code, atu)
@@ -129,8 +143,9 @@ def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
             e["concordances"]["Perry"].append(perry)
     for e in out.values():
         e.pop("_seen", None)
-        # Order Wikipedia links by our language preference, ordered concordances too.
-        e["wikipedia"].sort(key=lambda w: (_WIKIS.index(w["lang"]) if w["lang"] in _WIKIS else 9, w["title"]))
+        # Order Wikipedia/Wikisource links by our language preference, ordered concordances too.
+        e["wikipedia"].sort(key=_lang_key)
+        e["wikisource"].sort(key=_lang_key)
         e["concordances"] = {k: e["concordances"][k] for k in _CONCORDANCE_ORDER if e["concordances"].get(k)}
     return out
 
@@ -169,7 +184,7 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
         cache.unlink(missing_ok=True)
         return {"skipped": "degraded-no-sitelinks"}
 
-    n_names = n_wiki = n_conc = 0
+    n_names = n_wiki = n_src = n_conc = 0
     for t in atu_types:
         m = mapping.get(t["id"])
         if not m:
@@ -183,12 +198,15 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
         if m["wikipedia"]:
             t["wikipedia"] = m["wikipedia"]
             n_wiki += 1
+        if m["wikisource"]:
+            t["wikisource"] = m["wikisource"]
+            n_src += 1
         if m["concordances"]:
             t["concordances"] = m["concordances"]
             n_conc += 1
         if m["wikidata"]:
             t["wikidata"] = m["wikidata"]
-    logger.info("ATU Wikidata: names %d, Wikipedia %d, concordances %d (of %d types)",
-                n_names, n_wiki, n_conc, len(atu_types))
+    logger.info("ATU Wikidata: names %d, Wikipedia %d, Wikisource %d, concordances %d (of %d types)",
+                n_names, n_wiki, n_src, n_conc, len(atu_types))
     return {"types_with_names": n_names, "types_with_wikipedia": n_wiki,
-            "types_with_concordances": n_conc, "rows": len(rows)}
+            "types_with_wikisource": n_src, "types_with_concordances": n_conc, "rows": len(rows)}

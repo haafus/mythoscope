@@ -548,6 +548,19 @@ function atuWikipedia(wiki) {
     return section(`Wikipedia (${list.length})`, `<ul class="motif-wiki-list">${items}</ul>`);
 }
 
+// Wikisource full texts for the type (Wikidata). Kept as their own heading beside
+// Wikipedia: these link to the *primary tale text* to read, not an encyclopedia
+// summary, so they must not blend into the Wikipedia list.
+function atuWikisource(src) {
+    const list = src || [];
+    if (!list.length) return "";
+    const items = list.map((w) => {
+        const lang = w.lang ? ` <span class="motif-wiki-lang">${escapeHtml(w.lang)}</span>` : "";
+        return `<li><a href="${escapeHtml(w.url)}" target="_blank" rel="noopener">${escapeHtml(w.title)} <span class="ext-arrow">↗</span></a>${lang}</li>`;
+    }).join("");
+    return section(`Wikisource — full texts (${list.length})`, `<ul class="motif-wiki-list">${items}</ul>`);
+}
+
 // Example folktales of an ATU type (Ashliman AFT): a plain list of links to each
 // variant's text (deep-linked to its anchor where resolved, else the type page;
 // unresolved tales show as plain titles). Corpus attribution lives on the overview.
@@ -1462,7 +1475,10 @@ function renderDetail(d) {
                 `<div class="motif-oldids">${d.former_ids.map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("")}</div>`)
             : "";
         const namesCol = atuNames(d.names) + earlierAtu + atuConcordances(d.concordances);
-        const endCols = [namesCol, atuWikipedia(d.wikipedia), atuTales(d.tales)].filter(Boolean);
+        // Wikidata column: Wikipedia (summaries) + Wikisource (full texts), each
+        // under its own heading so the reader knows which link leads to a full text.
+        const wikiCol = atuWikipedia(d.wikipedia) + atuWikisource(d.wikisource);
+        const endCols = [namesCol, wikiCol, atuTales(d.tales)].filter(Boolean);
         if (endCols.length) {
             body += `<div class="motif-cols">${endCols.map((c) => `<div class="motif-col">${c}</div>`).join("")}</div>`;
         }
