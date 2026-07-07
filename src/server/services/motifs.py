@@ -537,29 +537,34 @@ def _areal_breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4 if n <= 20 else 5]
 
 
-def _breadth_label(n: int) -> str:
-    return ("0", "1", "2", "3–5", "6–10", "11+")[
-        0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
+# Powers-of-two ("carrier per motif") bins, shared by every right-skewed breadth
+# histogram (areas/traditions/cultures per motif). Each bin is ×2 the previous, so
+# on the chart the bars read at constant multiplicative width: the pile-up and the
+# long thin tail are both legible in one glance, which equal-width bins can't do.
+# 0 and 1 stay their own bins (n.bit_length() already separates them) rather than
+# folding into "2–3", since "no carrier" / "one carrier" are meaningful edges.
+def _pow2_bucket(n: int) -> int:
+    """Bucket index for value n: 0→0, 1→1, 2–3→2, 4–7→3, 8–15→4, … (== n.bit_length())."""
+    return n.bit_length()
 
 
-# Equal-width bins of 5, out past the ~61 max (last is open-ended).
-_AREA_SPAN_BUCKETS = ("0–4", "5–9", "10–14", "15–19", "20–24", "25–29", "30–34",
-                      "35–39", "40–44", "45–49", "50–54", "55–59", "60+")
-
-
-def _area_span_label(n: int) -> str:
-    return _AREA_SPAN_BUCKETS[min(n // 5, len(_AREA_SPAN_BUCKETS) - 1)]
-
-
-_TRAD_SPAN_BUCKETS = ("1–2", "3–5", "6–10", "11–20", "21–35", "36–50",
-                      "51–75", "76–100", "101–150", "151–250", "250+")
-
-
-def _trad_span_label(n: int) -> str:
-    return _TRAD_SPAN_BUCKETS[
-        0 if n <= 2 else 1 if n <= 5 else 2 if n <= 10 else 3 if n <= 20 else 4 if n <= 35
-        else 5 if n <= 50 else 6 if n <= 75 else 7 if n <= 100 else 8 if n <= 150
-        else 9 if n <= 250 else 10]
+def _pow2_histogram(counter) -> list[dict]:
+    """Ordered [{bucket,count}] over powers-of-two bins, from the lowest observed
+    bin up to the widest; the top bin is rendered open-ended ("512+")."""
+    if not counter:
+        return []
+    lo, top = min(counter), max(counter)
+    out = []
+    for i in range(lo, top + 1):
+        if i == 0:
+            label = "0"
+        elif i == 1:
+            label = "1"
+        else:
+            base = 1 << (i - 1)
+            label = f"{base}+" if i == top else f"{base}–{(1 << i) - 1}"
+        out.append({"bucket": label, "count": counter.get(i, 0)})
+    return out
 
 
 def _deflen_label(n: int) -> str:
@@ -666,12 +671,12 @@ def _build_berezkin_stats() -> dict:
         if trads:
             n_trad += 1
             trad_ids.update(trads)
-            trad_breadth[_trad_span_label(len(trads))] += 1
+            trad_breadth[_pow2_bucket(len(trads))] += 1
             for t in trads:
                 trad_counts[t] += 1
         ars = r.get("areas") or []
         n_areas += bool(ars)
-        breadth[_area_span_label(len(ars))] += 1
+        breadth[_pow2_bucket(len(ars))] += 1
         regs = set()
         for a in ars:
             areas[a] += 1
@@ -761,13 +766,13 @@ def _build_berezkin_stats() -> dict:
         "widest": [{"id": r["id"], "label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
                    for r in widest],
         "hubs": [{"id": mid, "label": f"{mid} {by[mid].get('name', '')}", "count": c} for mid, c in hubs],
-        "breadth": [{"bucket": b, "count": breadth[b]} for b in _AREA_SPAN_BUCKETS],
+        "breadth": _pow2_histogram(breadth),
         "coverage": coverage,
         "deflen": [{"bucket": b, "count": deflen[b]} for b in ("0", "1–60", "61–120", "121–240", "241–480", "480+")],
         "top_sources": top_sources,
     }
     if n_trad:
-        stats["trad_breadth"] = [{"bucket": b, "count": trad_breadth[b]} for b in _TRAD_SPAN_BUCKETS]
+        stats["trad_breadth"] = _pow2_histogram(trad_breadth)
         stats["top_traditions"] = [{"label": tname.get(tid, tid), "count": c} for tid, c in top_trads]
         stats["trad_widest"] = [{"id": r["id"], "label": f"{r['id']} {r.get('name', '')}",
                                  "count": len(r.get("traditions") or [])} for r in trad_widest]
@@ -898,7 +903,7 @@ def _build_tmi_stats() -> dict:
                 notes_hist[label] += 1
                 break
         cults = r.get("cultures") or {}
-        breadth[_breadth_label(len(cults))] += 1
+        breadth[_pow2_bucket(len(cults))] += 1
         seen_regions = set()
         for raw in cults:
             canon = canonical(raw)[0]
@@ -958,8 +963,7 @@ def _build_tmi_stats() -> dict:
         "notes_histogram": [{"bucket": label, "count": notes_hist[label]} for _, _, label in _NOTES_BUCKETS],
         "widest": [{"id": r["id"], "label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("cultures") or {})}
                    for r in widest],
-        "breadth_histogram": [{"bucket": b, "count": breadth[b]}
-                              for b in ("0", "1", "2", "3–5", "6–10", "11+")],
+        "breadth_histogram": _pow2_histogram(breadth),
         "chapters": [{"id": ch, "chapter": ch, "label": chapter_labels.get(ch, ch), "count": c, "substantive": s}
                      for ch, (c, s) in sorted(chapters.items())],
         "regions": [{"region": reg, "count": n} for reg, n in regions.most_common()],
