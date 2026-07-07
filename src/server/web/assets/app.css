@@ -1864,7 +1864,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* Hover: brighten just the row's label, value and bar — no background fill. */
 .csbar-row:hover .csbar-lab { color: #16303f; }
 .csbar-row:hover .csbar-val { color: #1f3a4d; font-weight: 700; }
-.csbar-row:hover .csbar-fill { filter: saturate(1.2) brightness(1.04); }
+.csbar-row:hover .csbar-fill { filter: saturate(1.5) brightness(1.12); }
 .csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Clickable chart labels read as links: teal ink + a dotted underline, solid on hover. */
 a.csbar-lab.chart-link { color: #157f73; text-decoration: underline dotted; text-decoration-color: #93cabf; text-underline-offset: 2px; cursor: pointer; }

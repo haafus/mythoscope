@@ -542,14 +542,13 @@ def _breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
 
 
-_AREA_SPAN_BUCKETS = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                      "13–15", "16–20", "21–30", "31–45", "46+")
+# Equal-width bins of 5, out past the ~61 max (last is open-ended).
+_AREA_SPAN_BUCKETS = ("0–4", "5–9", "10–14", "15–19", "20–24", "25–29", "30–34",
+                      "35–39", "40–44", "45–49", "50–54", "55–59", "60+")
 
 
 def _area_span_label(n: int) -> str:
-    if n <= 12:
-        return _AREA_SPAN_BUCKETS[n]
-    return _AREA_SPAN_BUCKETS[13 if n <= 15 else 14 if n <= 20 else 15 if n <= 30 else 16 if n <= 45 else 17]
+    return _AREA_SPAN_BUCKETS[min(n // 5, len(_AREA_SPAN_BUCKETS) - 1)]
 
 
 _TRAD_SPAN_BUCKETS = ("1–2", "3–5", "6–10", "11–20", "21–35", "36–50",
