@@ -450,6 +450,7 @@ _INTRO = {
                     "Bloomington: Indiana University Press, 1955–58.",
         "sources": [
             {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
+            {"label": "Mellmann TMI_as_CSV — classification headings & recovered motifs (CC-BY-4.0)", "url": "https://github.com/KatjaMellmann/TMI_as_CSV"},
             {"label": "folkmasa.org — citation-abbreviation decoding", "url": "https://folkmasa.org/motiv/motif.htm"},
         ],
     },
@@ -463,7 +464,7 @@ _INTRO = {
                     "FF Communications 284–286. Helsinki: Academia Scientiarum Fennica, 2004.",
         "sources": [
             {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
-            {"label": "Wikidata — concordances, multilingual names", "url": "https://www.wikidata.org"},
+            {"label": "Wikidata — concordances, multilingual names, Wikisource full texts", "url": "https://www.wikidata.org"},
             {"label": "Ashliman's Folktexts (AFT) — example tales", "url": "https://sites.pitt.edu/~dash/folktexts.html"},
         ],
     },

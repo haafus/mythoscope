@@ -522,6 +522,22 @@ function atuNames(names) {
     return section("Also known as", `<div class="motif-altnames">${rows}</div>`);
 }
 
+// Natural comparator for catalogue codes ("15" < "59A" < "104" < "1960*"): compare
+// digit runs numerically and letter runs lexically, so codes read in order.
+function natCompare(a, b) {
+    const ax = String(a).match(/\d+|\D+/g) || [];
+    const bx = String(b).match(/\d+|\D+/g) || [];
+    for (let i = 0; i < Math.min(ax.length, bx.length); i++) {
+        if (/^\d/.test(ax[i]) && /^\d/.test(bx[i])) {
+            const d = parseInt(ax[i], 10) - parseInt(bx[i], 10);
+            if (d) return d;
+        } else if (ax[i] !== bx[i]) {
+            return ax[i] < bx[i] ? -1 : 1;
+        }
+    }
+    return ax.length - bx.length;
+}
+
 // Concordances to other catalogues (Grimm/KHM, Aarne-Thompson, Aesop, Child).
 function atuConcordances(conc) {
     const cats = Object.keys(conc || {});
@@ -531,7 +547,7 @@ function atuConcordances(conc) {
         const title = cite ? ` title="${escapeHtml(cite)}"` : "";
         return `<div class="motif-altname"><span class="motif-altname-lang" tabindex="0"${title}>`
             + `${escapeHtml(CONC_LABELS[cat] || cat)}</span>`
-            + ` ${(conc[cat] || []).map(escapeHtml).join(", ")}</div>`;
+            + ` ${[...(conc[cat] || [])].sort(natCompare).map(escapeHtml).join(", ")}</div>`;
     }).join("");
     return section("Also catalogued as", `<div class="motif-altnames">${rows}</div>`);
 }
@@ -1472,7 +1488,7 @@ function renderDetail(d) {
         // types), then catalogue concordances ("Also catalogued as").
         const earlierAtu = (d.former_ids || []).length
             ? section("Earlier ATU numbers",
-                `<div class="motif-oldids">${d.former_ids.map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("")}</div>`)
+                `<div class="motif-oldids">${[...d.former_ids].sort(natCompare).map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("")}</div>`)
             : "";
         const namesCol = atuNames(d.names) + earlierAtu + atuConcordances(d.concordances);
         // Wikidata column: Wikipedia (summaries) + Wikisource (full texts), each
