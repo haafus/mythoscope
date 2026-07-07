@@ -1876,7 +1876,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .chart-section--content { --sec-accent: #467eb6; --sec-link: #2a669f; --sec-link-soft: #a8c1da; --sec-link-strong: #125289; }
 .chart-section--diagnostics { --sec-accent: #856bae; --sec-link: #6f5397; --sec-link-soft: #c2b8d7; --sec-link-strong: #5b3f82; }
 .chart-section-title {
-    font-size: 13.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
     margin: 0 0 11px; padding-left: 9px; border-left: 3px solid var(--sec-accent);
     color: var(--sec-accent);
 }
