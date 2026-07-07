@@ -450,7 +450,7 @@ async function openMotif(index, id, push = true) {
     try {
         const params = new URLSearchParams({ id });
         const data = await api(`/api/motifs/${index}/motif?${params.toString()}`);
-        if (data.redirected_from && data.id !== id) {   // an old ATU number → current type
+        if (data.redirected_from && data.id !== id) {   // an old number → current record
             mState.selectedId = data.id;
             markActive(data.id);
             syncUrl(false);                             // replace the URL with the real id
@@ -1408,6 +1408,11 @@ function renderDetail(d) {
         // The motif's own information first, then the raw source `notes`, and the
         // filter + hierarchy tree at the very bottom.
         body = head;
+        // An old (1st-edition) code the user navigated to is served as the current
+        // motif; note it just under the header, mirroring the ATU redirect.
+        if (d.redirected_from) {
+            body += `<p class="motif-redirect"><strong>${escapeHtml(d.redirected_from)}</strong> is this motif's number in Thompson's first edition (1932–36), renumbered in the 1955–58 revision.</p>`;
+        }
         if (d.duplicate) {
             const sibs = d.duplicate_siblings || [];
             const links = sibs.map((l) =>
@@ -1437,6 +1442,14 @@ function renderDetail(d) {
         body += crossLinkExtras(d);
         if ((d.cultures || []).length) body += tmiAttestations(d.cultures);
         if ((d.references || []).length) body += section(`References (${d.references.length})`, citeList(d.references));
+        // Earlier (1st-edition, 1932–36) Thompson codes this motif was renumbered
+        // from, as grey chips — the mirror of the ATU index's old numbers.
+        if ((d.former_ids || []).length) {
+            const label = `Earlier Thompson code${d.former_ids.length > 1 ? "s" : ""}`;
+            const chips = [...d.former_ids].sort(natCompare)
+                .map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("");
+            body += section(label, `<div class="motif-oldids">${chips}</div>`);
+        }
         if (d.notes) body += section("Source text (notes)", `<p class="motif-text motif-notes-raw">${escapeHtml(d.notes)}</p>`);
         body += renderTmiTree(d);   // filter + hierarchy tree at the bottom
     } else if (d.index === "atu") {

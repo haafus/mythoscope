@@ -5,6 +5,9 @@ Two links are built:
 - **ATU<->TMI** — every ATU tale type carries an ordered list of the TMI motifs
   that compose it (from Trilogy's ``atu_seq``); we store that mapping and its
   inverse so the UI can jump from a Thompson motif to the tale types that use it.
+  A motif code that is a pre-1st-edition (renumbered) number is resolved through
+  the TMI ``aliases`` map to the current motif, mirror-closing the dangling
+  reference (``B478`` -> ``B495.1``) just as ``aliases`` closes old ATU numbers.
   Separately, the **defining** motif(s) Uther names at the label (``defining_motifs``)
   give a distinct "this motif defines type X" link — kept apart from the
   constituent one, since the two relationships barely overlap. Two further
@@ -94,17 +97,35 @@ def build(
     tmi_notes: dict[str, list[str]] | None = None,
     aath_to_atu: dict[str, list[str]] | None = None,
     atu_summaries: dict[str, str] | None = None,
+    tmi_aliases: dict[str, str] | None = None,
 ) -> dict:
     """Return the cross-walk maps from the ATU sequences and Berezkin refs."""
     atu_ids = atu_ids or set()
-    atu_to_tmi = {atu_id: motifs for atu_id, motifs in atu_seq.items() if motifs}
+    tmi_aliases = tmi_aliases or {}
+
+    def _resolve_tmi(code: str) -> str:
+        """A TMI code renumbered since the 1st edition (``B478`` -> ``B495.1``) is
+        remapped to its current id, closing the reference against the live index —
+        mirroring how ``aliases`` closes dangling ATU numbers."""
+        return tmi_aliases.get(code, code)
+
+    def _resolve_seq(motifs: list[str]) -> list[str]:
+        out: list[str] = []
+        for code in motifs:
+            r = _resolve_tmi(code)
+            if r not in out:
+                out.append(r)
+        return out
+
+    atu_to_tmi = {atu_id: _resolve_seq(motifs) for atu_id, motifs in atu_seq.items() if motifs}
     tmi_to_atu = _invert(atu_to_tmi)
 
     # ATU <-> TMI via the *defining* motif(s), kept separate from the constituent
-    # link above; only codes that exist in the TMI index are linked.
+    # link above; only codes that exist in the TMI index are linked (old first-edition
+    # numbers resolved through ``tmi_aliases`` first).
     atu_to_tmi_defining = {
         a: kept for a, codes in (atu_defining or {}).items()
-        if (kept := [c for c in codes if c in tmi_ids])
+        if (kept := [r for c in codes if (r := _resolve_tmi(c)) in tmi_ids])
     }
     tmi_to_atu_defining = _invert(atu_to_tmi_defining)
 
@@ -138,8 +159,9 @@ def build(
         toks += [tok if tok in tmi_ids else tok.rstrip("f")  # "J21ff" -> base "J21"
                  for tok in _SUMMARY_MOTIF.findall(summary)]
         for code in toks:
-            if code in tmi_ids and code not in codes:
-                codes.append(code)
+            r = _resolve_tmi(code)
+            if r in tmi_ids and r not in codes:
+                codes.append(r)
         if codes:
             atu_to_tmi_summary[atu_id] = sorted(codes, key=tmi_sort_key)
     tmi_to_atu_summary = _invert(atu_to_tmi_summary)

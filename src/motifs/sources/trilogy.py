@@ -1115,6 +1115,31 @@ def _mellmann_supplement(rows: list[dict], existing: set[str], chapter_names: di
     return out
 
 
+def _mellmann_first_edition(rows: list[dict], live_ids: set[str]) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """From Mellmann's ``1st ed.`` column build the edition-history redirect system,
+    mirroring ATU's: ``(former_ids per current code, aliases old→current)``. A revised
+    code whose first-edition number(s) differ carries the old code(s) as ``former_ids``;
+    each old code that is not itself a live motif and is claimed by exactly one current
+    code maps in ``aliases`` (ambiguous ones dropped) so a reference to the old number
+    resolves to the motif it was renumbered into."""
+    former: dict[str, list[str]] = {}
+    claims: dict[str, set[str]] = {}
+    for row in rows:
+        code = _clean(row.get("code"))
+        fe = _clean(row.get("1st ed."))
+        if not code or not fe or code not in live_ids:
+            continue
+        olds = [o for o in (p.strip() for p in re.split(r"[;,]", fe)) if o and o != code]
+        if not olds:
+            continue
+        former[code] = olds
+        for old in olds:
+            if old not in live_ids:
+                claims.setdefault(old, set()).add(code)
+    aliases = {old: next(iter(cs)) for old, cs in claims.items() if len(cs) == 1}
+    return former, aliases
+
+
 def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | None = None) -> dict:
     """Download and parse only the Trilogy TMI CSV into the TMI store dict.
 
@@ -1157,6 +1182,14 @@ def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | Non
         store["subdivisions"] = subdivisions
         store["subdivisions3"] = subdivisions3
         store["sections"] = sections_browse
+        former, aliases = _mellmann_first_edition(mel_rows, {m["id"] for m in tmi})
+        by_id = {m["id"]: m for m in tmi}
+        for code, olds in former.items():
+            by_id[code]["former_ids"] = olds
+        store["aliases"] = aliases
+        logger.info("      edition history — source: Mellmann 1st ed. column")
+        logger.info("      %d revised motifs carry earlier codes, %d old codes redirect",
+                    len(former), len(aliases))
     return store
 
 

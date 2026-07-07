@@ -99,10 +99,11 @@ Each stored TMI motif (`outputs/motifs/tmi.json → motifs[]`):
 | `sub_division` / `sub_division_range` | division-2 heading + range (§4a) |
 | `division3` / `division3_range` | division-3 heading + range (§4a) |
 | `section` / `section_range` | the tens section heading + range (§4a) |
+| `former_ids` | earlier (1st-edition) codes this motif was renumbered from (§4b) |
 
 Index-level keys: `label, long_label, attribution, homepage, chapters,
 culture_legend`, plus the browse hierarchy `divisions` / `subdivisions` /
-`subdivisions3` / `sections` (§4a, §7).
+`subdivisions3` / `sections` (§4a, §7) and the `aliases` redirect map (§4b).
 
 ---
 
@@ -135,6 +136,29 @@ The read service (`src/server/services/motifs.py`) adds **derived** fields at
 serve time — never stored: `notes_size`, `has_definition`, `substantive` (§9),
 `descendant_count`, `leaf`, `breadcrumbs`, `children`, and resolved cross-walk
 links.
+
+---
+
+## 4b. Edition history & redirects (from Mellmann)
+
+Thompson renumbered ~1,166 motifs between the **first edition** (1932–36) and the
+**revised edition** (1955–58). Mellmann's `1st ed.` column records the earlier
+code(s) per current motif; we lift it in `trilogy._mellmann_first_edition`,
+mirroring the ATU index's old-number system:
+
+- **`former_ids`** — the earlier code(s) a revised motif carries, shown as grey
+  chips in an **Earlier Thompson codes** section after the references, and
+  matched by search (`A14` finds the current `A13.1.1`). Only emitted when the
+  first-edition code differs from the current one.
+- **`aliases`** (index-level, `{old code: current code}`) — every old code that is
+  **not itself a live motif** and is claimed by exactly one current motif (478
+  codes; ambiguous ones dropped). Navigating to an old code (`#/motifs?index=tmi&
+  id=A14`) serves the current motif flagged with `redirected_from`, exactly like
+  an old ATU number.
+- **Mirror-close.** The cross-walk (`crosswalk.build`, `tmi_aliases`) resolves any
+  ATU→TMI reference to an old code through `aliases` before matching, closing
+  dangling links (`B478` → `B495.1`, `A14` → `A13.1.1`) — the mirror of how the
+  ATU `aliases` close pre-2004 tale-type numbers.
 
 ---
 

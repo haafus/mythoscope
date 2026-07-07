@@ -450,7 +450,7 @@ _INTRO = {
                     "Bloomington: Indiana University Press, 1955–58.",
         "sources": [
             {"label": "Trilogy dataset (j-hagedorn/trilogy, CC-BY-SA)", "url": "https://github.com/j-hagedorn/trilogy"},
-            {"label": "Mellmann TMI_as_CSV — classification headings & recovered motifs (CC-BY-4.0)", "url": "https://github.com/KatjaMellmann/TMI_as_CSV"},
+            {"label": "Mellmann TMI_as_CSV — classification headings, edition history & recovered motifs (CC-BY-4.0)", "url": "https://github.com/KatjaMellmann/TMI_as_CSV"},
             {"label": "folkmasa.org — citation-abbreviation decoding", "url": "https://folkmasa.org/motiv/motif.htm"},
         ],
     },
@@ -1029,12 +1029,13 @@ def list_motifs(index: str, *, chapter: str = "", division: str = "", sub_divisi
 def get_motif(index: str, motif_id: str) -> dict | None:
     """Full detail for one motif with resolved cross-walk links, or None.
 
-    For ATU, an id that is an old (pre-2004) number resolves to the current type it
-    was renumbered to / merged into, flagged with ``redirected_from``."""
+    For ATU an id that is an old (pre-2004) number, and for TMI a pre-1st-edition
+    (renumbered) code, resolves to the current record it was renumbered to / merged
+    into, flagged with ``redirected_from``."""
     rec = _by_id(index).get(motif_id)
     data = store.load_index(index) or {}
     redirected_from = ""
-    if rec is None and index == "atu":
+    if rec is None and index in ("atu", "tmi"):
         target = (data.get("aliases") or {}).get(motif_id)
         if target:
             rec = _by_id(index).get(target)
@@ -1141,6 +1142,9 @@ def get_motif(index: str, motif_id: str) -> dict | None:
         detail["division3_range"] = rec.get("division3_range")
         detail["section"] = rec.get("section", "")
         detail["section_range"] = rec.get("section_range")
+        # Earlier (1st-edition, 1932) Thompson codes this motif was renumbered from
+        # (Mellmann's ``1st ed.`` column) — the mirror of ATU's old numbers.
+        detail["former_ids"] = rec.get("former_ids") or []
 
     elif index == "atu":
         detail["division"] = rec.get("division", "")
