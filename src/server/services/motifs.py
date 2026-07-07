@@ -494,6 +494,11 @@ def _areal_breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4 if n <= 20 else 5]
 
 
+def _breadth_label(n: int) -> str:
+    return ("0", "1", "2", "3–5", "6–10", "11+")[
+        0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
+
+
 # A dotted sub-segment the source rendered as a Roman/stick "I" is the digit 1.
 _TMI_ROMAN_RE = re.compile(r"(?<=\.)(I+)(?=\.|$|\+)")
 
@@ -609,13 +614,13 @@ def _build_berezkin_stats() -> dict:
         cards.append({"value": n_tmi, "label": "TMI-linked"})
     cards.append({"value": len(legend), "label": "decoded areas"})
 
-    panels = [{"id": "bzChapters", "title": "Motifs per chapter"}]
+    panels = [{"id": "bzChapters", "title": "Motifs by chapter"}]
     if groups:
         panels.append({"id": "bzGroups", "title": "Motifs by thematic group"})
     panels += [
-        {"id": "bzBreadth", "title": "Areal breadth (areas per motif)"},
         {"id": "bzRegions", "title": "Motifs by region"},
-        {"id": "bzAreas", "title": "Top areas (most attested)"},
+        {"id": "bzAreas", "title": "Areas with the most motifs"},
+        {"id": "bzBreadth", "title": "Areas per motif"},
         {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
     ]
 
@@ -667,10 +672,16 @@ def _build_atu_stats() -> dict:
             reg_breadth[_areal_breadth_label(len(named))] += 1
             for r in named:
                 region_types[r["region"]] += 1
+    def _people_count(t: dict) -> int:
+        ag = t.get("attestations_grouped") or {}
+        seen = {e["people"] for r in ag.get("regions", []) for e in r.get("entries", []) if e.get("people")}
+        return len(seen)
+
     top_rich = sorted(types, key=lambda t: len(t.get("motifs", [])), reverse=True)[:15]
     top_families = sorted((t for t in types if t.get("subtypes")),
                           key=lambda t: len(t["subtypes"]), reverse=True)[:15]
     top_combos = sorted(types, key=lambda t: len(t.get("combos", [])), reverse=True)[:15]
+    top_widest = sorted(types, key=_people_count, reverse=True)[:15]
     # Peoples: types attesting each canonical people (culture_legend counts).
     top_peoples = sorted(legend.items(), key=lambda kv: kv[1]["count"], reverse=True)[:18]
     return {
@@ -686,15 +697,16 @@ def _build_atu_stats() -> dict:
             {"value": round(100 * n_sum / len(types)) if types else 0, "label": "have summary", "suffix": "%"},
         ],
         "panels": [
-            {"id": "atChapters", "title": "Types per chapter"},
-            {"id": "atRegions", "title": "Types by region"},
-            {"id": "atPeoples", "title": "Top peoples (types attesting)"},
-            {"id": "atRegBreadth", "title": "Regional breadth (regions per type)"},
-            {"id": "atDivisions", "title": "Top divisions"},
-            {"id": "atMotifHist", "title": "TMI motifs per type"},
-            {"id": "atRich", "title": "Most motif-rich types"},
+            {"id": "atChapters", "title": "Tale types by chapter"},
+            {"id": "atRegions", "title": "Tale types by region"},
+            {"id": "atDivisions", "title": "Largest divisions"},
+            {"id": "atPeoples", "title": "Peoples with the most tale types"},
+            {"id": "atRegBreadth", "title": "Regions per tale type"},
+            {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)"},
+            {"id": "atMotifHist", "title": "Constituent motifs per tale type"},
+            {"id": "atRich", "title": "Most motif-rich tale types"},
             {"id": "atFamilies", "title": "Largest subtype families"},
-            {"id": "atCombos", "title": "Most-combined types"},
+            {"id": "atCombos", "title": "Most-combined tale types"},
         ],
         "chapters": [{"label": ch, "count": c} for ch, c in chapters.most_common() if ch],
         "divisions": [{"label": dv, "count": c} for dv, c in divisions.most_common(15)],
@@ -705,6 +717,8 @@ def _build_atu_stats() -> dict:
                      for t in top_families],
         "combos": [{"label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("combos", []))}
                    for t in top_combos],
+        "widest": [{"label": f"{t['id']} {t.get('name', '')}", "count": _people_count(t)}
+                   for t in top_widest],
         "regions": [{"region": reg, "count": c} for reg, c in region_types.most_common()],
         "top_peoples": [{"label": canon, "count": e["count"]} for canon, e in top_peoples],
         "reg_breadth": [{"bucket": b, "count": reg_breadth[b]}
@@ -722,6 +736,7 @@ def _build_tmi_stats() -> dict:
 
     levels = collections.Counter()
     notes_hist = collections.Counter()
+    breadth = collections.Counter()
     chapters: dict[str, list[int]] = {}
     regions = collections.Counter()
     cultures = collections.Counter()
@@ -743,6 +758,7 @@ def _build_tmi_stats() -> dict:
                 notes_hist[label] += 1
                 break
         cults = r.get("cultures") or {}
+        breadth[_breadth_label(len(cults))] += 1
         seen_regions = set()
         for raw in cults:
             canon = canonical(raw)[0]
@@ -782,22 +798,25 @@ def _build_tmi_stats() -> dict:
             {"value": round(100 * n_notes / len(records)) if records else 0, "label": "have notes", "suffix": "%"},
         ],
         "panels": [
-            {"id": "ovComposition", "title": "Composition"},
-            {"id": "ovLevels", "title": "Nodes per hierarchy level"},
-            {"id": "ovNotes", "title": "Notes size (bytes)"},
-            {"id": "ovChapters", "title": "Motifs per chapter (all vs substantive)"},
+            {"id": "ovComposition", "title": "Motifs by kind"},
+            {"id": "ovLevels", "title": "Motifs by hierarchy level"},
+            {"id": "ovNotes", "title": "Motifs by note length"},
+            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)"},
             {"id": "ovRegions", "title": "Motifs by region"},
-            {"id": "ovCultures", "title": "Top cultures"},
-            {"id": "ovTopNotes", "title": "Most-documented motifs"},
-            {"id": "ovHubs", "title": "Most-referenced motifs (cf./†)"},
+            {"id": "ovCultures", "title": "Cultures with the most motifs"},
+            {"id": "ovBreadth", "title": "Cultures per motif"},
             {"id": "ovWidest", "title": "Most widespread motifs (cultures attested)"},
-            {"id": "ovSources", "title": "Top sources (motifs citing)"},
+            {"id": "ovTopNotes", "title": "Best-documented motifs"},
+            {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)"},
+            {"id": "ovSources", "title": "Most-cited sources"},
         ],
         "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
         "levels": [{"level": f"L{lv}", "count": levels[lv]} for lv in sorted(levels)],
         "notes_histogram": [{"bucket": label, "count": notes_hist[label]} for _, _, label in _NOTES_BUCKETS],
         "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("cultures") or {})}
                    for r in widest],
+        "breadth_histogram": [{"bucket": b, "count": breadth[b]}
+                              for b in ("0", "1", "2", "3–5", "6–10", "11+")],
         "chapters": [{"id": ch, "label": chapter_labels.get(ch, ch), "count": c, "substantive": s}
                      for ch, (c, s) in sorted(chapters.items())],
         "regions": [{"region": reg, "count": n} for reg, n in regions.most_common()],

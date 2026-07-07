@@ -1049,6 +1049,7 @@ function drawOverviewCharts(s) {
         hist("ovNotes", s.notes_histogram, (r) => r.bucket);
         cssBullet("ovChapters", s.chapters, (r) => r.id);
         bars("ovCultures", s.top_cultures.slice(0, 15), (r) => r.label);
+        hist("ovBreadth", s.breadth_histogram, (r) => r.bucket);
         bars("ovWidest", s.widest, (r) => r.label, (r) => r.count);
         bars("ovTopNotes", s.top_notes, (r) => `${r.id} ${r.name}`, (r) => r.bytes);
         bars("ovHubs", s.see_also_hubs, (r) => `${r.id} ${r.name}`, (r) => r.indeg);
@@ -1065,6 +1066,7 @@ function drawOverviewCharts(s) {
         if (s.reg_breadth) hist("atRegBreadth", s.reg_breadth, (r) => r.bucket);
         bars("atDivisions", s.divisions, (r) => r.label);
         hist("atMotifHist", s.motif_hist, (r) => r.bucket);
+        if (s.widest) bars("atWidest", s.widest, (r) => r.label, (r) => r.count);
         bars("atRich", s.top_rich, (r) => r.label);
         if (s.families) bars("atFamilies", s.families, (r) => r.label);
         if (s.combos) bars("atCombos", s.combos, (r) => r.label);
