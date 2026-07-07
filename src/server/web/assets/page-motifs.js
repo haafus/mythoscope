@@ -205,6 +205,10 @@ function renderChapters() {
         const subs3BySub = groupBy(idx.subdivisions3, "sub_division"); // div3 under div2 (by name)
         const secByParent = groupBy(idx.sections, "parent");          // section under div3-else-div2
         const divsByChapter = groupBy(idx.divisions, "chapter");
+        // Sections that hang straight under a division (no intervening sub-division —
+        // e.g. chapter A's "Creator" 0–99): they carry an empty parent, so key them
+        // by chapter and match to their division by range below.
+        const looseSecsByCh = groupBy((idx.sections || []).filter((s) => !s.parent), "chapter");
         for (const arr of divsByChapter.values()) arr.sort((a, b) => a.start - b.start);
         // Indent steps (nbsp) grow per level; bold chapters stand out as headers.
         const pad = (n) => "&nbsp;".repeat(n);
@@ -223,6 +227,16 @@ function renderChapters() {
             for (const d of divsByChapter.get(c.id) || []) {
                 html += opt(`d:${escapeHtml(d.name)}`, 3, d,
                     d.name === mState.division && !mState.subdivision && !mState.subdivision3 && !mState.section);
+                // Sections directly under this division (no sub-division level), matched
+                // by range for the current empty-parent data and by name after a rebuild;
+                // skip the round "general" section that just repeats the division heading.
+                const directSecs = [
+                    ...(looseSecsByCh.get(c.id) || []).filter((s) => s.start >= d.start && s.end <= d.end),
+                    ...(secByParent.get(d.name) || []),
+                ].filter((s) => s.name !== d.name).sort((a, b) => a.start - b.start);
+                for (const s of directSecs) {
+                    html += opt(`s4:${escapeHtml(s.name)}`, 7, s, s.name === mState.section);
+                }
                 for (const s of subsByDiv.get(d.name) || []) {
                     html += opt(`sd:${escapeHtml(s.name)}`, 7, s,
                         s.name === mState.subdivision && !mState.subdivision3 && !mState.section);

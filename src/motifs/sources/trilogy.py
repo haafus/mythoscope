@@ -1012,8 +1012,9 @@ def _assign_tmi_divisions(motifs: list[dict], levels: list[list[dict]], sections
             m["section"] = sec["name"]
             m["section_range"] = [sec["start"], sec["end"]]
             # Nest each section under its nearest division (div3 if the motif has one,
-            # else div2); skip the round "general" section that just repeats its parent.
-            parent = m.get("division3") or m.get("sub_division", "")
+            # else div2, else the top division — e.g. chapter A's "Creator" has no
+            # sub-levels); skip the round "general" section that just repeats its parent.
+            parent = m.get("division3") or m.get("sub_division") or m.get("division", "")
             if sec["name"] != parent:
                 sec_counts[(chapter, parent, sec["name"], sec["start"], sec["end"])] += 1
 
