@@ -638,14 +638,14 @@ def _build_berezkin_stats() -> dict:
     cards = [
         {"value": len(records), "label": "motifs"},
         {"value": len([c for c in chapters if c]), "label": "chapters"},
-        {"value": n_def, "label": "with definition"},
+        {"value": len(areas), "label": "areas"},
+        {"value": n_atu, "label": "ATU-linked"},
     ]
-    if n_english:
-        cards.append({"value": n_english, "label": "English name"})
-    cards.append({"value": n_atu, "label": "ATU-linked"})
     if n_tmi:
         cards.append({"value": n_tmi, "label": "TMI-linked"})
-    cards.append({"value": len(legend), "label": "decoded areas"})
+    if n_english:
+        cards.append({"value": round(100 * n_english / len(records)) if records else 0,
+                      "label": "English name", "suffix": "%"})
 
     # Distribution & content — most significant first.
     panels = [{"id": "bzChapters", "title": "Motifs by chapter", "section": "content"}]
@@ -714,7 +714,7 @@ def _build_atu_stats() -> dict:
     motif_hist = collections.Counter()
     reg_breadth = collections.Counter()   # how many macro-regions a type spans
     region_types = collections.Counter()  # types present per region (each type once/region)
-    n_sum = n_mot = n_combo = n_att = 0
+    n_sum = n_mot = n_combo = n_att = n_refs = 0
     for t in types:
         chapters[t.get("chapter", "")] += 1
         if t.get("division"):
@@ -722,6 +722,7 @@ def _build_atu_stats() -> dict:
         n_sum += bool(t.get("summary"))
         n_mot += bool(t.get("motifs"))
         n_combo += bool(t.get("combos"))
+        n_refs += bool(t.get("references"))
         motif_hist[_motif_count_label(len(t.get("motifs", [])))] += 1
         grouped = t.get("attestations_grouped") or {}
         named = [r for r in grouped.get("regions", []) if r["region"] != "—"]
@@ -749,10 +750,10 @@ def _build_atu_stats() -> dict:
         "cards": [
             {"value": len(types), "label": "tale types"},
             {"value": len([c for c in chapters if c]), "label": "chapters"},
-            {"value": n_att, "label": "with attestations"},
             {"value": len(legend), "label": "peoples"},
+            {"value": n_att, "label": "with attestations"},
             {"value": n_mot, "label": "with TMI motifs"},
-            {"value": round(100 * n_sum / len(types)) if types else 0, "label": "have summary", "suffix": "%"},
+            {"value": round(100 * n_refs / len(types)) if types else 0, "label": "with references", "suffix": "%"},
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
@@ -853,8 +854,8 @@ def _build_tmi_stats() -> dict:
         "cards": [
             {"value": len(records), "label": "motifs"},
             {"value": len(chapters), "label": "chapters"},
+            {"value": len(cultures), "label": "cultures"},
             {"value": n_sub, "label": "substantive"},
-            {"value": n_def, "label": "with definition"},
             {"value": n_atu, "label": "ATU-linked"},
             {"value": round(100 * n_notes / len(records)) if records else 0, "label": "have notes", "suffix": "%"},
         ],

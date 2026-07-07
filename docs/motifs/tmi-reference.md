@@ -59,7 +59,7 @@ Thompson-Balys/India, Neuman/Jewish, Boberg/Icelandic, Rotunda/Italian). The
 | Motifs | 46,238 (46,230 Trilogy + 8 net from the Mellmann supplement, §5) |
 | Chapters (letters) | 23 (`A`–`Z`, skipping `I`/`O`/`Y`) |
 | With non-empty notes | 41,959 (90.8%) |
-| With an extracted definition | 8,456 (18%) |
+| With an extracted definition | 5,556 (12%) |
 | With culture-tagged citations | 32,470 |
 | With `†` motif cross-references | 7,017 |
 | With inline ATU `Type` references | 2,912 |
@@ -401,7 +401,7 @@ definition, colour = substantive — two independent signals.)
 
 **Motif filter.** A dropdown above every main-panel tree (catalog root, chapter
 browse, motif detail) offers four tiers with index-wide counts: *Full index*
-(46,230), *With definitions* (8,456), *Substantive only* (5,344), *With ATU
+(46,238), *With definitions* (5,556), *Substantive only* (5,436), *With ATU
 types* (4,752). Selecting a tier lists the chapter's matching motifs at any
 depth (so the list isn't empty when the broad level-0 categories have none),
 and on the root/detail trees hides non-matching rows while ancestors and the
