@@ -1619,13 +1619,23 @@ body.has-main-navbar {
     gap: 6px;
 }
 .motif-section-collapsible > summary::-webkit-details-marker { display: none; }
-.motif-section-collapsible > summary::before {
+/* Caret sits at the end of the title, larger, and rotates when open. */
+.motif-section-collapsible > summary::after {
     content: "\25b8"; /* ▸ */
-    font-size: 9px;
+    font-size: 13px;
+    line-height: 1;
     color: #9bb8b2;
-    transition: transform 0.12s ease;
+    transition: transform 0.18s ease;
 }
-.motif-section-collapsible[open] > summary::before { transform: rotate(90deg); }
+.motif-section-collapsible[open] > summary::after { transform: rotate(90deg); }
+/* Small reveal as the body expands. */
+.motif-section-collapsible[open] > *:not(summary) {
+    animation: motif-notes-reveal 0.18s ease;
+}
+@keyframes motif-notes-reveal {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 .motif-text {
     margin: 0;

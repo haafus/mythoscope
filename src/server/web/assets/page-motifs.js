@@ -229,11 +229,13 @@ function renderChapters() {
                     d.name === mState.division && !mState.subdivision && !mState.subdivision3 && !mState.section);
                 // Sections directly under this division (no sub-division level), matched
                 // by range for the current empty-parent data and by name after a rebuild;
-                // skip the round "general" section that just repeats the division heading.
+                // skip only a section that repeats the whole division (same name *and*
+                // range) — a same-named sub-range like "Creator" 0–9 is kept.
                 const directSecs = [
                     ...(looseSecsByCh.get(c.id) || []).filter((s) => s.start >= d.start && s.end <= d.end),
                     ...(secByParent.get(d.name) || []),
-                ].filter((s) => s.name !== d.name).sort((a, b) => a.start - b.start);
+                ].filter((s) => !(s.name === d.name && s.start === d.start && s.end === d.end))
+                    .sort((a, b) => a.start - b.start);
                 for (const s of directSecs) {
                     html += opt(`s4:${escapeHtml(s.name)}`, 7, s, s.name === mState.section);
                 }
