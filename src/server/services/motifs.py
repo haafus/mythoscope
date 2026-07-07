@@ -726,11 +726,11 @@ def _build_berezkin_stats() -> dict:
     panels.append({"id": "bzChapters", "title": "Motifs by chapter", "section": "content"})
     if groups:
         panels.append({"id": "bzGroups", "title": "Motifs by thematic group", "section": "content"})
-    panels.append({"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"})
+    panels.append({"id": "bzWidest", "title": "Most widespread motifs by area", "section": "content"})
     if n_trad:
-        panels.append({"id": "bzTradWidest", "title": "Most widespread motifs (traditions attesting)", "section": "content"})
+        panels.append({"id": "bzTradWidest", "title": "Most widespread motifs by tradition", "section": "content"})
     if hubs:
-        panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)", "section": "content"})
+        panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs", "section": "content"})
     # Dataset diagnostics.
     top_sources = _berezkin_top_sources()
     panels.append({"id": "bzBreadth", "title": "Areas per motif", "section": "diagnostics"})
@@ -852,7 +852,7 @@ def _build_atu_stats() -> dict:
             {"id": "atChapters", "title": "Tale types by chapter", "section": "content"},
             {"id": "atDivisions", "title": "Largest divisions", "section": "content"},
             {"id": "atRich", "title": "Most motif-rich tale types", "section": "content"},
-            {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)", "section": "content"},
+            {"id": "atWidest", "title": "Most widespread tale types", "section": "content"},
             {"id": "atCombos", "title": "Most-combined tale types", "section": "content"},
             {"id": "atFamilies", "title": "Largest subtype families", "section": "content"},
             # Dataset diagnostics
@@ -957,9 +957,9 @@ def _build_tmi_stats() -> dict:
             {"id": "ovRegions", "title": "Motifs by region", "section": "geography"},
             {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "geography"},
             # Themes & content — chapter, widest, cross-references, documentation
-            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
-            {"id": "ovWidest", "title": "Most widespread motifs (cultures attesting)", "section": "content"},
-            {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)", "section": "content"},
+            {"id": "ovChapters", "title": "Motifs by chapter", "section": "content"},
+            {"id": "ovWidest", "title": "Most widespread motifs", "section": "content"},
+            {"id": "ovHubs", "title": "Most cross-referenced motifs", "section": "content"},
             {"id": "ovTopNotes", "title": "Best-documented motifs", "section": "content"},
             # Dataset diagnostics
             {"id": "ovComposition", "title": "Motifs by kind", "section": "diagnostics"},
