@@ -119,16 +119,19 @@ def server(host: str | None, port: int | None):
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
-@click.option("--sample", "-s", is_flag=True, help="Quick run: first embedding model, limited texts.")
+@click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
+              type=int, metavar="N",
+              help=f"Quick run: first embedding model, limited to N texts "
+                   f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
 def build(model, llm, force, sample):
     """Run the full analysis pipeline end-to-end."""
-    if sample:
+    if sample is not None:
         from model_registry import active_embedding_models
         from settings import settings
         model = model or active_embedding_models()[0]
-        max_texts = SAMPLE_MAX_TEXTS
-        # Keep the motif scrape light on a smoke run: only a handful of detail pages.
-        settings.motifs.max_motifs = SAMPLE_MAX_TEXTS
+        max_texts = sample
+        # Keep the motif scrape light on a smoke run: only the sampled detail pages.
+        settings.motifs.max_motifs = max_texts
         click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
     else:
         max_texts = None
