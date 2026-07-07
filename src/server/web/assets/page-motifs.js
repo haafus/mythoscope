@@ -1001,9 +1001,10 @@ function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLO
 // for the similarity page's interactive scatter/heatmap): these marks render
 // instantly, carry direct labels, and reuse the region palette. Value keys vary
 // (count/bytes/indeg), hence the valFn.
-const ACC = "#2a9d8f", HIST_C = "#6b7aa1", COMPO_C = ["#2a9d8f", "#7cc0b6", "#d4e7e3"];
-// Section accent for the dataset-diagnostics charts (content charts use ACC).
-const DIAG_C = "#6b7aa1";
+const ACC = "#2a9d8f";
+// Section accent for the dataset-diagnostics charts (content charts use ACC); the
+// composition bar lives in that section, so it uses a slate ramp of the accent.
+const DIAG_C = "#6b7aa1", COMPO_DIAG = ["#6b7aa1", "#9aa6c3", "#ccd3e4"];
 
 function cssBars(id, rows, labelFn, colorFn, valFn = (r) => r.count) {
     const el = document.getElementById(id);
@@ -1062,7 +1063,7 @@ function drawOverviewCharts(s) {
         cssBars(rid, s.regions, (r) => r.region, (r, i) => regionColor(r.region, i));
     }
     if (s.index === "tmi") {
-        cssStacked("ovComposition", s.composition, COMPO_C);
+        cssStacked("ovComposition", s.composition, COMPO_DIAG);
         hist("ovLevels", s.levels, (r) => `L${r.level}`);
         hist("ovNotes", s.notes_histogram, (r) => r.bucket);
         cssBullet("ovChapters", s.chapters, (r) => r.id);
