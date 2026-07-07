@@ -169,17 +169,24 @@ function renderChapters() {
             if (!byChapter.has(d.chapter)) byChapter.set(d.chapter, []);
             byChapter.get(d.chapter).push(d);
         }
-        const divOption = (d) => {
-            const sel = d.name === mState.division && !mState.subdivision ? " selected" : "";
-            let html = `<option value="d:${escapeHtml(d.name)}"${sel}>${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})</option>`;
-            for (const s of subsByDiv.get(d.name) || []) {
-                const ssel = s.name === mState.subdivision ? " selected" : "";
-                html += `<option value="sd:${escapeHtml(s.name)}"${ssel}>&nbsp;&nbsp;↳ ${escapeHtml(s.name)} ${s.start}–${s.end} (${formatNumber(s.count)})</option>`;
+        // The 7 chapters are selectable headers (like TMI), with their divisions
+        // and sub-divisions nested and indented beneath — not just optgroup labels.
+        const chCount = new Map((idx.chapters || []).map((c) => [c.id, c.count]));
+        let html = all;
+        for (const [ch, divs] of byChapter) {
+            const csel = ch === mState.chapter && !mState.division && !mState.subdivision ? " selected" : "";
+            const cc = chCount.get(ch);
+            html += `<option value="${escapeHtml(ch)}" class="opt-chapter"${csel}>${escapeHtml(ch)}${cc != null ? ` (${formatNumber(cc)})` : ""}</option>`;
+            for (const d of divs) {
+                const sel = d.name === mState.division && !mState.subdivision ? " selected" : "";
+                html += `<option value="d:${escapeHtml(d.name)}"${sel}>&nbsp;&nbsp;↳ ${escapeHtml(d.name)} ${d.start}–${d.end} (${formatNumber(d.count)})</option>`;
+                for (const s of subsByDiv.get(d.name) || []) {
+                    const ssel = s.name === mState.subdivision ? " selected" : "";
+                    html += `<option value="sd:${escapeHtml(s.name)}"${ssel}>&nbsp;&nbsp;&nbsp;&nbsp;↳ ${escapeHtml(s.name)} ${s.start}–${s.end} (${formatNumber(s.count)})</option>`;
+                }
             }
-            return html;
-        };
-        select.innerHTML = all + [...byChapter].map(([ch, divs]) => `
-            <optgroup label="${escapeHtml(ch)}">${divs.map(divOption).join("")}</optgroup>`).join("");
+        }
+        select.innerHTML = html;
         return;
     }
     // TMI: keep the lettered chapters selectable (in alphabetical order, as the
