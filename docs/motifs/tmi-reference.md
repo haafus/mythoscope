@@ -160,6 +160,16 @@ mirroring the ATU index's old-number system:
   dangling links (`B478` → `B495.1`, `A14` → `A13.1.1`) — the mirror of how the
   ATU `aliases` close pre-2004 tale-type numbers.
 
+**Content-fit validation.** The map restores **124** `Cf.`/`†` cross-references in
+TMI notes that cite a renumbered first-edition code. All **124 (100%)** resolve to
+a motif in the *same Thompson chapter* (no cross-chapter jumps), and in **119
+(95%)** the citing motif shares a content word with the resolved target (e.g.
+`D999`→`D1006` *Magic Buttocks* cited by *Speaking Buttocks*; `D1019`→`D1024`
+*Magic Egg* cited by *Magic Wishing-Eggs*). The 5% without a shared surface word
+are same-chapter and thematically related (stemming misses: *Horses* → *Prophetic
+Horse*). Thompson's renumbering was local and topic-preserving, so old→current
+restoration keeps the meaning.
+
 ---
 
 ## 5. Build-time interpretation decisions
