@@ -947,11 +947,21 @@ function overviewHtml(s) {
     }
     const card = (c) => `<div class="stat-card"><div class="stat-num">${formatNumber(c.value)}${c.suffix || ""}</div><div class="stat-label">${escapeHtml(c.label)}</div></div>`;
     const panel = (p) => `<div class="chart-card"><div class="chart-title">${escapeHtml(p.title)}</div><div class="chart" id="${escapeHtml(p.id)}"></div></div>`;
+    const panels = s.panels || [];
+    // Group the charts into their colour-coded sections (content vs. dataset
+    // diagnostics); fall back to one flat grid if the server sent no sections.
+    const sections = (s.sections || []).filter((sec) => panels.some((p) => p.section === sec.key));
+    const grids = sections.length
+        ? sections.map((sec) => `<section class="chart-section chart-section--${escapeHtml(sec.key)}">
+            <h2 class="chart-section-title">${escapeHtml(sec.title)}</h2>
+            <div class="chart-grid">${panels.filter((p) => p.section === sec.key).map(panel).join("")}</div>
+          </section>`).join("")
+        : `<div class="chart-grid">${panels.map(panel).join("")}</div>`;
     return `<div class="motif-detail-inner motif-overview">
         <h1 class="overview-title">${escapeHtml(s.title || "")}</h1>
         ${introHtml(s.intro)}
         <div class="stat-cards">${(s.cards || []).map(card).join("")}</div>
-        <div class="chart-grid">${(s.panels || []).map(panel).join("")}</div>
+        ${grids}
     </div>`;
 }
 
@@ -992,6 +1002,8 @@ function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLO
 // instantly, carry direct labels, and reuse the region palette. Value keys vary
 // (count/bytes/indeg), hence the valFn.
 const ACC = "#2a9d8f", HIST_C = "#6b7aa1", COMPO_C = ["#2a9d8f", "#7cc0b6", "#d4e7e3"];
+// Section accent for the dataset-diagnostics charts (content charts use ACC).
+const DIAG_C = "#6b7aa1";
 
 function cssBars(id, rows, labelFn, colorFn, valFn = (r) => r.count) {
     const el = document.getElementById(id);
@@ -1037,8 +1049,14 @@ function cssBullet(id, rows, labelFn) {
 
 // Single dispatcher for the whole overview (replaces the old Plotly path).
 function drawOverviewCharts(s) {
-    const bars = (id, rows, labelFn, valFn) => cssBars(id, rows, labelFn, () => ACC, valFn);
-    const hist = (id, rows, labelFn) => cssBars(id, rows, labelFn, () => HIST_C);
+    // A chart's default mark colour follows its section: teal for the content
+    // panels, slate for the dataset-diagnostics panels (region bars keep the
+    // region palette; the composition bar keeps its own ramp).
+    const sectionOf = {};
+    (s.panels || []).forEach((p) => { sectionOf[p.id] = p.section; });
+    const secColor = (id) => (sectionOf[id] === "diagnostics" ? DIAG_C : ACC);
+    const bars = (id, rows, labelFn, valFn) => cssBars(id, rows, labelFn, () => secColor(id), valFn);
+    const hist = (id, rows, labelFn) => cssBars(id, rows, labelFn, () => secColor(id));
     if (s.regions) {
         const rid = s.index === "atu" ? "atRegions" : s.index === "berezkin" ? "bzRegions" : "ovRegions";
         cssBars(rid, s.regions, (r) => r.region, (r, i) => regionColor(r.region, i));
@@ -1060,7 +1078,10 @@ function drawOverviewCharts(s) {
         bars("bzAreas", s.top_areas, (r) => r.label);
         hist("bzBreadth", s.breadth, (r) => r.bucket);
         bars("bzWidest", s.widest, (r) => r.label);
+        if (s.trad_breadth) hist("bzTradBreadth", s.trad_breadth, (r) => r.bucket);
         if (s.hubs) bars("bzHubs", s.hubs, (r) => r.label, (r) => r.count);
+        bars("bzCoverage", s.coverage, (r) => r.label, (r) => r.count);
+        hist("bzDefLen", s.deflen, (r) => r.bucket);
     } else if (s.index === "atu") {
         bars("atChapters", s.chapters, (r) => r.label);
         if (s.top_peoples) bars("atPeoples", s.top_peoples, (r) => r.label);

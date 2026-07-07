@@ -436,6 +436,15 @@ _STATS_BUILDERS = {}  # filled below once the builders are defined
 # description, authorship, the academic citation for the source work, and the
 # concrete data sources used here (with links). Kept server-side so the three
 # overviews stay consistent.
+# Overview charts split into two colour-coded sections: what the index says about
+# the folklore (distributions, cultural/geographic spread, correlations) vs. the
+# shape and completeness of the dataset itself. Panels within each carry an
+# explicit `section`; the frontend groups and tints by it.
+_OVERVIEW_SECTIONS = [
+    {"key": "content", "title": "Distribution & content"},
+    {"key": "diagnostics", "title": "Dataset diagnostics"},
+]
+
 _INTRO = {
     "tmi": {
         "blurb": "The Thompson Motif-Index breaks world folk narrative into ~46,000 numbered "
@@ -497,6 +506,16 @@ def _areal_breadth_label(n: int) -> str:
 def _breadth_label(n: int) -> str:
     return ("0", "1", "2", "3–5", "6–10", "11+")[
         0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
+
+
+def _trad_breadth_label(n: int) -> str:
+    return ("0", "1–5", "6–20", "21–50", "51–100", "100+")[
+        0 if n == 0 else 1 if n <= 5 else 2 if n <= 20 else 3 if n <= 50 else 4 if n <= 100 else 5]
+
+
+def _deflen_label(n: int) -> str:
+    return ("0", "1–60", "61–120", "121–240", "241–480", "480+")[
+        0 if n == 0 else 1 if n <= 60 else 2 if n <= 120 else 3 if n <= 240 else 4 if n <= 480 else 5]
 
 
 # A dotted sub-segment the source rendered as a Roman/stick "I" is the digit 1.
@@ -576,19 +595,28 @@ def _build_berezkin_stats() -> dict:
     breadth = collections.Counter()
     regions = collections.Counter()
     groups = collections.Counter()
-    indeg = collections.Counter()   # how often each motif is a see-also target
-    n_def = n_atu = n_english = n_tmi = 0
+    indeg = collections.Counter()      # how often each motif is a see-also target
+    trad_breadth = collections.Counter()
+    deflen = collections.Counter()
+    n_def = n_atu = n_english = n_tmi = n_areas = n_see = n_trad = 0
     for r in records:
         chapters[r.get("chapter", "")] += 1
         n_def += bool(r.get("definition"))
         n_atu += bool(r.get("atu_refs"))
         n_english += bool(r.get("name_rus"))  # English name preferred (mapsofmyths)
         n_tmi += bool(r.get("tmi_refs"))       # direct Thompson crosswalk (mapsofmyths)
+        n_see += bool(r.get("see_also"))
+        deflen[_deflen_label(len(r.get("definition") or ""))] += 1
         if r.get("motif_group"):
             groups[r["motif_group"]] += 1
         for t in r.get("see_also") or []:
             indeg[t] += 1
+        trads = r.get("traditions") or []
+        if trads:
+            n_trad += 1
+            trad_breadth[_trad_breadth_label(len(trads))] += 1
         ars = r.get("areas") or []
+        n_areas += bool(ars)
         breadth[_areal_breadth_label(len(ars))] += 1
         regs = set()
         for a in ars:
@@ -619,23 +647,40 @@ def _build_berezkin_stats() -> dict:
         cards.append({"value": n_tmi, "label": "TMI-linked"})
     cards.append({"value": len(legend), "label": "decoded areas"})
 
-    panels = [{"id": "bzChapters", "title": "Motifs by chapter"}]
+    # Distribution & content — most significant first.
+    panels = [{"id": "bzChapters", "title": "Motifs by chapter", "section": "content"}]
     if groups:
-        panels.append({"id": "bzGroups", "title": "Motifs by thematic group"})
+        panels.append({"id": "bzGroups", "title": "Motifs by thematic group", "section": "content"})
     panels += [
-        {"id": "bzRegions", "title": "Motifs by region"},
-        {"id": "bzAreas", "title": "Areas with the most motifs"},
-        {"id": "bzBreadth", "title": "Areas per motif"},
-        {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
+        {"id": "bzRegions", "title": "Motifs by region", "section": "content"},
+        {"id": "bzAreas", "title": "Areas with the most motifs", "section": "content"},
+        {"id": "bzBreadth", "title": "Areas per motif", "section": "content"},
+        {"id": "bzWidest", "title": "Most widespread motifs (areas attested)", "section": "content"},
     ]
+    if n_trad:
+        panels.append({"id": "bzTradBreadth", "title": "Traditions per motif", "section": "content"})
     if hubs:
-        panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)"})
+        panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)", "section": "content"})
+    # Dataset diagnostics.
+    panels += [
+        {"id": "bzCoverage", "title": "Field coverage", "section": "diagnostics"},
+        {"id": "bzDefLen", "title": "Motifs by definition length", "section": "diagnostics"},
+    ]
+    coverage = [{"label": "definition", "count": n_def}]
+    if n_english:
+        coverage.append({"label": "English name", "count": n_english})
+    coverage.append({"label": "areal indices", "count": n_areas})
+    coverage.append({"label": "ATU-linked", "count": n_atu})
+    if n_tmi:
+        coverage.append({"label": "TMI-linked", "count": n_tmi})
+    coverage.append({"label": "see-also", "count": n_see})
 
     stats = {
         "index": "berezkin",
         "intro": _INTRO["berezkin"],
         "title": "Berezkin & Duvakin Areal Motif Catalogue",
         "cards": cards,
+        "sections": _OVERVIEW_SECTIONS,
         "panels": panels,
         "chapters": [{"id": ch, "count": c} for ch, c in sorted(chapters.items()) if ch],
         "regions": [{"region": reg, "count": c} for reg, c in regions.most_common()],
@@ -644,7 +689,12 @@ def _build_berezkin_stats() -> dict:
                    for r in widest],
         "hubs": [{"label": f"{mid} {by[mid].get('name', '')}", "count": c} for mid, c in hubs],
         "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
+        "coverage": coverage,
+        "deflen": [{"bucket": b, "count": deflen[b]} for b in ("0", "1–60", "61–120", "121–240", "241–480", "480+")],
     }
+    if n_trad:
+        stats["trad_breadth"] = [{"bucket": b, "count": trad_breadth[b]}
+                                 for b in ("0", "1–5", "6–20", "21–50", "51–100", "100+")]
     if groups:
         # Group labels are long ("03 Cosmogony, the earth and the sky, ..."); keep
         # the leading number + first segment for a readable axis label.
@@ -704,17 +754,20 @@ def _build_atu_stats() -> dict:
             {"value": n_mot, "label": "with TMI motifs"},
             {"value": round(100 * n_sum / len(types)) if types else 0, "label": "have summary", "suffix": "%"},
         ],
+        "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            {"id": "atChapters", "title": "Tale types by chapter"},
-            {"id": "atDivisions", "title": "Largest divisions"},
-            {"id": "atRegions", "title": "Tale types by region"},
-            {"id": "atPeoples", "title": "Peoples with the most tale types"},
-            {"id": "atRegBreadth", "title": "Regions per tale type"},
-            {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)"},
-            {"id": "atMotifHist", "title": "Constituent motifs per tale type"},
-            {"id": "atRich", "title": "Most motif-rich tale types"},
-            {"id": "atFamilies", "title": "Largest subtype families"},
-            {"id": "atCombos", "title": "Most-combined tale types"},
+            # Distribution & content — most significant first
+            {"id": "atChapters", "title": "Tale types by chapter", "section": "content"},
+            {"id": "atDivisions", "title": "Largest divisions", "section": "content"},
+            {"id": "atRegions", "title": "Tale types by region", "section": "content"},
+            {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "content"},
+            {"id": "atRegBreadth", "title": "Regions per tale type", "section": "content"},
+            {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)", "section": "content"},
+            {"id": "atCombos", "title": "Most-combined tale types", "section": "content"},
+            {"id": "atFamilies", "title": "Largest subtype families", "section": "content"},
+            # Dataset diagnostics
+            {"id": "atMotifHist", "title": "Constituent motifs per tale type", "section": "diagnostics"},
+            {"id": "atRich", "title": "Most motif-rich tale types", "section": "diagnostics"},
         ],
         "chapters": [{"label": ch, "count": c} for ch, c in chapters.most_common() if ch],
         "divisions": [{"label": dv, "count": c} for dv, c in divisions.most_common(15)],
@@ -805,18 +858,21 @@ def _build_tmi_stats() -> dict:
             {"value": n_atu, "label": "ATU-linked"},
             {"value": round(100 * n_notes / len(records)) if records else 0, "label": "have notes", "suffix": "%"},
         ],
+        "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)"},
-            {"id": "ovComposition", "title": "Motifs by kind"},
-            {"id": "ovLevels", "title": "Motifs by hierarchy level"},
-            {"id": "ovRegions", "title": "Motifs by region"},
-            {"id": "ovCultures", "title": "Cultures with the most motifs"},
-            {"id": "ovBreadth", "title": "Cultures per motif"},
-            {"id": "ovWidest", "title": "Most widespread motifs (cultures attested)"},
-            {"id": "ovNotes", "title": "Motifs by note length"},
-            {"id": "ovTopNotes", "title": "Best-documented motifs"},
-            {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)"},
-            {"id": "ovSources", "title": "Most-cited sources"},
+            # Distribution & content — most significant first
+            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
+            {"id": "ovRegions", "title": "Motifs by region", "section": "content"},
+            {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "content"},
+            {"id": "ovBreadth", "title": "Cultures per motif", "section": "content"},
+            {"id": "ovWidest", "title": "Most widespread motifs (cultures attested)", "section": "content"},
+            {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)", "section": "content"},
+            # Dataset diagnostics
+            {"id": "ovComposition", "title": "Motifs by kind", "section": "diagnostics"},
+            {"id": "ovLevels", "title": "Motifs by hierarchy level", "section": "diagnostics"},
+            {"id": "ovNotes", "title": "Motifs by note length", "section": "diagnostics"},
+            {"id": "ovTopNotes", "title": "Best-documented motifs", "section": "diagnostics"},
+            {"id": "ovSources", "title": "Most-cited sources", "section": "diagnostics"},
         ],
         "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
         "levels": [{"level": f"L{lv}", "count": levels[lv]} for lv in sorted(levels)],
