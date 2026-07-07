@@ -721,22 +721,23 @@ def _build_berezkin_stats() -> dict:
         panels.append({"id": "bzGroups", "title": "Motifs by thematic group", "section": "content"})
     panels += [
         {"id": "bzAreas", "title": "Areas with the most motifs", "section": "content"},
-        {"id": "bzBreadth", "title": "Areas per motif", "section": "content"},
         {"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"},
     ]
     if n_trad:
         panels += [
             {"id": "bzTradTop", "title": "Traditions with the most motifs", "section": "content"},
-            {"id": "bzTradBreadth", "title": "Traditions per motif", "section": "content"},
             {"id": "bzTradWidest", "title": "Most widespread motifs (traditions attesting)", "section": "content"},
         ]
     if hubs:
         panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)", "section": "content"})
     # Dataset diagnostics.
     top_sources = _berezkin_top_sources()
+    panels.append({"id": "bzBreadth", "title": "Areas per motif", "section": "diagnostics"})
+    if n_trad:
+        panels.append({"id": "bzTradBreadth", "title": "Traditions per motif", "section": "diagnostics"})
     panels += [
-        {"id": "bzCoverage", "title": "Field coverage", "section": "diagnostics"},
         {"id": "bzDefLen", "title": "Motifs by definition length", "section": "diagnostics"},
+        {"id": "bzCoverage", "title": "Field coverage", "section": "diagnostics"},
     ]
     if top_sources:
         panels.append({"id": "bzSources", "title": "Most-cited sources", "section": "diagnostics"})
@@ -945,14 +946,14 @@ def _build_tmi_stats() -> dict:
             {"id": "ovRegions", "title": "Motifs by region", "section": "content"},
             {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
             {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "content"},
-            {"id": "ovBreadth", "title": "Cultures per motif", "section": "content"},
             {"id": "ovWidest", "title": "Most widespread motifs (cultures attesting)", "section": "content"},
             {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)", "section": "content"},
+            {"id": "ovTopNotes", "title": "Best-documented motifs", "section": "content"},
             # Dataset diagnostics
             {"id": "ovComposition", "title": "Motifs by kind", "section": "diagnostics"},
             {"id": "ovLevels", "title": "Motifs by hierarchy level", "section": "diagnostics"},
             {"id": "ovNotes", "title": "Motifs by note length", "section": "diagnostics"},
-            {"id": "ovTopNotes", "title": "Best-documented motifs", "section": "diagnostics"},
+            {"id": "ovBreadth", "title": "Cultures per motif", "section": "diagnostics"},
             {"id": "ovSources", "title": "Most-cited sources", "section": "diagnostics"},
         ],
         "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
