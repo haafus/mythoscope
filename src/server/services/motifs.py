@@ -778,9 +778,12 @@ def _build_berezkin_stats() -> dict:
                                  "count": len(r.get("traditions") or [])} for r in trad_widest]
     if groups:
         # Group labels are long ("03 Cosmogony, the earth and the sky, ..."); keep
-        # the leading number + first segment for a readable axis label.
+        # the leading number + first segment for a readable axis label. Ordered by
+        # the group's own number (the keys are zero-padded "01".."13", so a plain
+        # sort is numeric) rather than by count, so the thematic sequence reads in
+        # catalogue order.
         stats["groups"] = [{"label": g.split(",")[0].strip(), "count": c}
-                           for g, c in groups.most_common()]
+                           for g, c in sorted(groups.items())]
     return stats
 
 
