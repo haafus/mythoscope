@@ -90,6 +90,12 @@ and a Near-East/N-Africa/S-Asia block; TMI is coarser (its "cultures" are as muc
 source-collection as ethnos). Per-index thresholds are in `CFG` at the top of
 `build_data.py`.
 
+### motif-text-embedding-eval · how to embed motifs for text matching
+A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged
+tales: measures recall@k / MRR for motif embeddings composed as name / +summary /
++hierarchy against text as whole-tale / passage-chunks. Answers "what goes in a motif
+embedding" on real data. See [`motif-text-embedding-eval/README.md`](motif-text-embedding-eval/README.md).
+
 ### tmi-detail-tree · extracted TMI detail hierarchy tree
 The **filter + category tree** that used to sit at the bottom of a Thompson motif's
 detail page, removed from the app and preserved here (working). Reproduces
