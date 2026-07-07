@@ -1628,14 +1628,8 @@ body.has-main-navbar {
     transition: transform 0.18s ease;
 }
 .motif-section-collapsible[open] > summary::after { transform: rotate(90deg); }
-/* Small reveal as the body expands. */
-.motif-section-collapsible[open] > *:not(summary) {
-    animation: motif-notes-reveal 0.18s ease;
-}
-@keyframes motif-notes-reveal {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+/* The body's reveal on open is driven from JS (bindCollapsible) so it replays on
+   every toggle, not just the first. */
 
 .motif-text {
     margin: 0;

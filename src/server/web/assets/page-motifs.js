@@ -494,6 +494,7 @@ async function openMotif(index, id, push = true) {
         });
         bindTreeLinks(detail);
         bindBibCopy(detail);
+        bindCollapsible(detail);
     } catch (error) {
         detail.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
@@ -514,6 +515,21 @@ function bindBibCopy(detail) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(flash, () => {});
             }
+        });
+    });
+}
+
+// Replay the reveal each time a collapsible section opens. A CSS animation on
+// [open] only fires the first time (the body stays in the render tree between
+// toggles), so drive it from the `toggle` event via the Web Animations API.
+function bindCollapsible(detail) {
+    detail.querySelectorAll(".motif-section-collapsible").forEach((d) => {
+        d.addEventListener("toggle", () => {
+            if (!d.open) return;
+            const body = d.querySelector(":scope > *:not(summary)");
+            if (body) body.animate(
+                [{ opacity: 0, transform: "translateY(-4px)" }, { opacity: 1, transform: "translateY(0)" }],
+                { duration: 180, easing: "ease" });
         });
     });
 }
