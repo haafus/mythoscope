@@ -1030,7 +1030,7 @@ function cssBullet(id, rows, labelFn) {
                 <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#bcdcd6"></span>
                 <span class="csbar-fill csbar-over" style="width:${Math.max(0, Math.round(100 * (r.substantive || 0) / max))}%;background:${ACC}"></span>
             </span>
-            <span class="csbar-val">${formatNumber(r.substantive || 0)}</span>
+            <span class="csbar-val">${formatNumber(r.count)}</span>
         </div>`).join("") + `</div>
         <div class="cslegend"><span><i style="background:${ACC}"></i>substantive</span><span><i style="background:#bcdcd6"></i>all</span></div>`;
 }
