@@ -1058,8 +1058,9 @@ function drawOverviewCharts(s) {
         bars("bzChapters", s.chapters, (r) => r.id);
         if (s.groups) bars("bzGroups", s.groups, (r) => r.label);
         bars("bzAreas", s.top_areas, (r) => r.label);
-        bars("bzWidest", s.widest, (r) => r.label);
         hist("bzBreadth", s.breadth, (r) => r.bucket);
+        bars("bzWidest", s.widest, (r) => r.label);
+        if (s.hubs) bars("bzHubs", s.hubs, (r) => r.label, (r) => r.count);
     } else if (s.index === "atu") {
         bars("atChapters", s.chapters, (r) => r.label);
         if (s.top_peoples) bars("atPeoples", s.top_peoples, (r) => r.label);

@@ -576,6 +576,7 @@ def _build_berezkin_stats() -> dict:
     breadth = collections.Counter()
     regions = collections.Counter()
     groups = collections.Counter()
+    indeg = collections.Counter()   # how often each motif is a see-also target
     n_def = n_atu = n_english = n_tmi = 0
     for r in records:
         chapters[r.get("chapter", "")] += 1
@@ -585,6 +586,8 @@ def _build_berezkin_stats() -> dict:
         n_tmi += bool(r.get("tmi_refs"))       # direct Thompson crosswalk (mapsofmyths)
         if r.get("motif_group"):
             groups[r["motif_group"]] += 1
+        for t in r.get("see_also") or []:
+            indeg[t] += 1
         ars = r.get("areas") or []
         breadth[_areal_breadth_label(len(ars))] += 1
         regs = set()
@@ -598,6 +601,8 @@ def _build_berezkin_stats() -> dict:
     # we label the top codes directly (no de-duplication of names needed).
     top_codes = sorted(areas.items(), key=lambda kv: kv[1], reverse=True)[:20]
     widest = sorted(records, key=lambda r: len(r.get("areas", [])), reverse=True)[:15]
+    by = _by_id("berezkin")
+    hubs = [(mid, c) for mid, c in indeg.most_common(50) if mid in by][:15]
 
     # The mapsofmyths enrichment (English text, thematic groups, TMI links) is
     # credential-gated, so the cards/panels that surface it appear only when the
@@ -623,6 +628,8 @@ def _build_berezkin_stats() -> dict:
         {"id": "bzBreadth", "title": "Areas per motif"},
         {"id": "bzWidest", "title": "Most widespread motifs (areas attested)"},
     ]
+    if hubs:
+        panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)"})
 
     stats = {
         "index": "berezkin",
@@ -635,6 +642,7 @@ def _build_berezkin_stats() -> dict:
         "top_areas": [{"label": legend.get(str(code), f"#{code}"), "count": c} for code, c in top_codes],
         "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("areas", []))}
                    for r in widest],
+        "hubs": [{"label": f"{mid} {by[mid].get('name', '')}", "count": c} for mid, c in hubs],
         "breadth": [{"bucket": b, "count": breadth[b]} for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
     }
     if groups:
