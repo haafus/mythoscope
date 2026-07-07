@@ -587,7 +587,7 @@ function atuTales(tales) {
     const rows = tales.map((t) => t.url
         ? `<li class="motif-tale"><a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.title)} <span class="ext-arrow">↗</span></a></li>`
         : `<li class="motif-tale">${escapeHtml(t.title)}</li>`).join("");
-    return section(`Ashliman (${tales.length})`, `<ul class="motif-tales">${rows}</ul>`);
+    return section(`Ashliman — full texts (${tales.length})`, `<ul class="motif-tales">${rows}</ul>`);
 }
 
 // Recurring reference-work / journal abbreviations in the Uther apparatus, with
@@ -1492,11 +1492,12 @@ function renderDetail(d) {
             ? section("Earlier ATU numbers",
                 `<div class="motif-oldids">${[...d.former_ids].sort(natCompare).map((x) => `<span class="motif-oldid">${escapeHtml(x)}</span>`).join("")}</div>`)
             : "";
-        const namesCol = atuNames(d.names) + earlierAtu + atuConcordances(d.concordances);
-        // Wikidata column: Wikipedia (summaries) + Wikisource (full texts), each
-        // under its own heading so the reader knows which link leads to a full text.
-        const wikiCol = atuWikipedia(d.wikipedia) + atuWikisource(d.wikisource);
-        const endCols = [namesCol, wikiCol, atuTales(d.tales)].filter(Boolean);
+        // Two columns: names/old-numbers/concordances + Wikipedia (reference) on
+        // the left; the full-text sources — Ashliman, then Wikisource — on the right.
+        const refCol = atuNames(d.names) + earlierAtu + atuConcordances(d.concordances)
+            + atuWikipedia(d.wikipedia);
+        const textCol = atuTales(d.tales) + atuWikisource(d.wikisource);
+        const endCols = [refCol, textCol].filter(Boolean);
         if (endCols.length) {
             body += `<div class="motif-cols">${endCols.map((c) => `<div class="motif-col">${c}</div>`).join("")}</div>`;
         }
