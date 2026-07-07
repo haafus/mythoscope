@@ -537,12 +537,15 @@ def _areal_breadth_label(n: int) -> str:
         0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4 if n <= 20 else 5]
 
 
-# Powers-of-two ("carrier per motif") bins, shared by every right-skewed breadth
-# histogram (areas/traditions/cultures per motif). Each bin is ×2 the previous, so
-# on the chart the bars read at constant multiplicative width: the pile-up and the
-# long thin tail are both legible in one glance, which equal-width bins can't do.
-# 0 and 1 stay their own bins (n.bit_length() already separates them) rather than
-# folding into "2–3", since "no carrier" / "one carrier" are meaningful edges.
+# Powers-of-two bins, shared by every right-skewed count histogram that piles up
+# near 0/1 and trails off over orders of magnitude — carrier-per-motif breadth
+# (areas/traditions/cultures) and constituent-motifs-per-tale-type. Each bin is ×2
+# the previous, so on the chart the bars read at constant multiplicative width: the
+# pile-up and the long thin tail are both legible in one glance, which equal-width
+# bins can't do. 0 and 1 stay their own bins (n.bit_length() already separates
+# them) rather than folding into "2–3", since "none" / "one" are meaningful edges.
+# (Length histograms — notes/definitions — are already on hand-floored doubling
+# bins; small bounded counts like regions-per-type keep equal bins.)
 def _pow2_bucket(n: int) -> int:
     """Bucket index for value n: 0→0, 1→1, 2–3→2, 4–7→3, 8–15→4, … (== n.bit_length())."""
     return n.bit_length()
@@ -631,11 +634,6 @@ def _berezkin_region(code: int) -> str:
     if 55 <= code <= 74:
         return "South America"
     return ""
-
-
-def _motif_count_label(n: int) -> str:
-    return ("0", "1", "2–3", "4–6", "7–10", "11+")[
-        0 if n == 0 else 1 if n == 1 else 2 if n <= 3 else 3 if n <= 6 else 4 if n <= 10 else 5]
 
 
 def _build_berezkin_stats() -> dict:
@@ -807,7 +805,7 @@ def _build_atu_stats() -> dict:
         n_mot += bool(t.get("motifs"))
         n_combo += bool(t.get("combos"))
         n_refs += bool(t.get("references"))
-        motif_hist[_motif_count_label(len(t.get("motifs", [])))] += 1
+        motif_hist[_pow2_bucket(len(t.get("motifs", [])))] += 1
         grouped = t.get("attestations_grouped") or {}
         named = [r for r in grouped.get("regions", []) if r["region"] != "—"]
         if grouped.get("total"):
@@ -857,7 +855,7 @@ def _build_atu_stats() -> dict:
         ],
         "chapters": [{"chapter": ch, "label": ch, "count": c} for ch, c in chapters.most_common() if ch],
         "divisions": [{"division": dv, "label": dv, "count": c} for dv, c in divisions.most_common(15)],
-        "motif_hist": [{"bucket": b, "count": motif_hist[b]} for b in ("0", "1", "2–3", "4–6", "7–10", "11+")],
+        "motif_hist": _pow2_histogram(motif_hist),
         "top_rich": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
                      for t in top_rich],
         "families": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": len(t["subtypes"])}
