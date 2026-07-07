@@ -414,8 +414,14 @@ function renderList(data) {
     const more = data.total > shown
         ? `<div class="motifs-more">Showing ${formatNumber(shown)} of ${formatNumber(data.total)} — refine your search.</div>`
         : "";
-    // TMI ids without a dot are the broad top-level categories — show them bold.
-    const isCategory = (id) => mState.index === "tmi" && !id.includes(".");
+    // TMI place-value headers — the "0" general node, the hundreds and the tens
+    // (a dotless code whose number is a multiple of 10) — are shown bold; the unit
+    // codes (A1, A11, A101) and any decimal are left plain.
+    const isCategory = (id) => {
+        if (mState.index !== "tmi" || id.includes(".")) return false;
+        const m = /^[A-Z]+(\d+)$/.exec(id);
+        return !!m && Number(m[1]) % 10 === 0;
+    };
     list.innerHTML = data.items.map((it) => `
         <button class="motifs-item${it.id === mState.selectedId ? " active" : ""}${isCategory(it.id) ? " category" : ""}" data-id="${escapeHtml(it.id)}" style="--depth:${it.level || 0}">
             <span class="motifs-item-id">${escapeHtml(it.id)}</span>
@@ -1043,7 +1049,7 @@ function drawOverviewCharts(s) {
         hist("ovNotes", s.notes_histogram, (r) => r.bucket);
         cssBullet("ovChapters", s.chapters, (r) => r.id);
         bars("ovCultures", s.top_cultures.slice(0, 15), (r) => r.label);
-        hist("ovBreadth", s.breadth_histogram, (r) => r.bucket);
+        bars("ovWidest", s.widest, (r) => r.label, (r) => r.count);
         bars("ovTopNotes", s.top_notes, (r) => `${r.id} ${r.name}`, (r) => r.bytes);
         bars("ovHubs", s.see_also_hubs, (r) => `${r.id} ${r.name}`, (r) => r.indeg);
         bars("ovSources", s.top_sources || [], (r) => r.label);

@@ -386,9 +386,6 @@ _NOTES_BUCKETS = [
 ]
 
 
-def _breadth_label(n: int) -> str:
-    return ("0", "1", "2", "3–5", "6–10", "11+")[
-        0 if n == 0 else 1 if n == 1 else 2 if n == 2 else 3 if n <= 5 else 4 if n <= 10 else 5]
 
 
 def _citation_key(text: str) -> str:
@@ -725,7 +722,6 @@ def _build_tmi_stats() -> dict:
 
     levels = collections.Counter()
     notes_hist = collections.Counter()
-    breadth = collections.Counter()
     chapters: dict[str, list[int]] = {}
     regions = collections.Counter()
     cultures = collections.Counter()
@@ -747,7 +743,6 @@ def _build_tmi_stats() -> dict:
                 notes_hist[label] += 1
                 break
         cults = r.get("cultures") or {}
-        breadth[_breadth_label(len(cults))] += 1
         seen_regions = set()
         for raw in cults:
             canon = canonical(raw)[0]
@@ -766,6 +761,7 @@ def _build_tmi_stats() -> dict:
 
     by = _by_id("tmi")
     top_notes = sorted(records, key=lambda r: len(r.get("notes", "").encode("utf-8")), reverse=True)[:15]
+    widest = sorted(records, key=lambda r: len(r.get("cultures") or {}), reverse=True)[:15]
     hubs = [(mid, c) for mid, c in indeg.most_common(50) if mid in by][:15]
     chapter_labels = data.get("chapters") or {}
 
@@ -794,14 +790,14 @@ def _build_tmi_stats() -> dict:
             {"id": "ovCultures", "title": "Top cultures"},
             {"id": "ovTopNotes", "title": "Most-documented motifs"},
             {"id": "ovHubs", "title": "Most-referenced motifs (cf./†)"},
-            {"id": "ovBreadth", "title": "Cultural breadth (cultures per motif)"},
+            {"id": "ovWidest", "title": "Most widespread motifs (cultures attested)"},
             {"id": "ovSources", "title": "Top sources (motifs citing)"},
         ],
         "composition": [{"label": k, "count": comp[k]} for k in ("substantive", "scaffold", "variation")],
         "levels": [{"level": f"L{lv}", "count": levels[lv]} for lv in sorted(levels)],
         "notes_histogram": [{"bucket": label, "count": notes_hist[label]} for _, _, label in _NOTES_BUCKETS],
-        "breadth_histogram": [{"bucket": b, "count": breadth[b]}
-                              for b in ("0", "1", "2", "3–5", "6–10", "11+")],
+        "widest": [{"label": f"{r['id']} {r.get('name', '')}", "count": len(r.get("cultures") or {})}
+                   for r in widest],
         "chapters": [{"id": ch, "label": chapter_labels.get(ch, ch), "count": c, "substantive": s}
                      for ch, (c, s) in sorted(chapters.items())],
         "regions": [{"region": reg, "count": n} for reg, n in regions.most_common()],
