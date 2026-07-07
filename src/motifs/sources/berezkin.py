@@ -310,16 +310,39 @@ _ATU_ID_SHAPE = re.compile(r"^\d{1,4}[A-Z]{0,3}\d{0,2}\*{0,3}$")
 _TMI_ID_SHAPE = re.compile(r"^[A-Z]\d[A-Za-z0-9.]*$")
 
 
+# A handful of curated mapsofmyths tmi_refs are transcription errors or mis-
+# assignments: a code absent from every TMI edition whose intended motif is
+# unambiguous from the Berezkin motif's own meaning. Corrected conservatively —
+# only exact-meaning targets (digit typos, an off-by-one, one canonical re-map):
+#   D2889.6  "shed skin → young again"  (H4)  — D2889 is unused; digit typo for
+#            D1889.6 "Rejuvenation by changing skin".
+#   F202.4.2 "stolen clothes of supernatural woman" = swan maiden (K24) — F2→F3
+#            typo for F302.4.2 "Fairy in man's power when he steals her wings
+#            (clothes)".
+#   K1539    "death feigned to meet paramour" (F65A) — off-by-one for K1538,
+#            whose Thompson name is that phrase verbatim.
+#   D287.5   Purusha, primeval body → world (B43) — a mis-assigned transformation
+#            code for A642 "Universe from body of slain giant".
+_TMI_REF_FIX = {
+    "D2889.6": "D1889.6",
+    "F202.4.2": "F302.4.2",
+    "K1539": "K1538",
+    "D287.5": "A642",
+}
+
+
 def _clean_tmi_refs(refs) -> list[str]:
     """Normalise Thompson (TMI) motif ids from the free-text mapsofmyths ``tmi``
     field: strip ``†``/``*`` markers and a trailing dot, split ``+``-joined
-    combinations (``D1565.1+E30.1``), and keep only id-shaped tokens (``*A1115`` ->
-    ``A1115``, ``A736.2.`` -> ``A736.2``). Junk and stray notation are dropped."""
+    combinations (``D1565.1+E30.1``), keep only id-shaped tokens (``*A1115`` ->
+    ``A1115``, ``A736.2.`` -> ``A736.2``), and repair the few known-bad ids
+    (``_TMI_REF_FIX``). Junk and stray notation are dropped."""
     out: list[str] = []
     for ref in refs or []:
         s = str(ref).strip().lstrip("†*").strip()
         for part in re.split(r"\+", s):
             p = part.strip().lstrip("†*").strip().rstrip(".").strip()
+            p = _TMI_REF_FIX.get(p, p)
             if _TMI_ID_SHAPE.match(p) and p not in out:
                 out.append(p)
     return out
