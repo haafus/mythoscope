@@ -1813,7 +1813,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* Scholarly header above the stat cards: description + authorship + sources.
    Plain — no panel; it sits on the page background. */
 .overview-intro {
-    margin: 0 0 32px;
+    margin: 0 0 20px;
     padding: 22px 26px;
     background: #f5f7f9;
     border-left: 3px solid #d7dee5;
@@ -1834,7 +1834,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
     gap: 10px;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
 }
 .stat-card { padding: 10px 12px; text-align: center; background: #f5f7f9; border: 1px solid #e6ecf1; border-radius: 8px; }
 .stat-num { font-size: 20px; font-weight: 700; color: #1f3a4d; }
@@ -1848,7 +1848,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* Overview charts split into colour-coded sections: content (teal) vs. dataset
    diagnostics (slate). The section accent tints its heading and each card's top. */
 .chart-section { margin-top: 20px; }
-.chart-section:first-of-type { margin-top: 8px; }
+.chart-section:first-of-type { margin-top: 0; }
 .chart-section--content { --sec-accent: #2a9d8f; }
 .chart-section--diagnostics { --sec-accent: #6b7aa1; }
 .chart-section-title {
