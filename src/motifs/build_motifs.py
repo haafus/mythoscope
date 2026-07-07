@@ -136,8 +136,8 @@ def build_motifs(*, force: bool = False) -> None:
         if mel_on:
             sources["mellmann"] = {"homepage": mel_cfg.get("homepage", ""),
                                    "attribution": mel_cfg.get("attribution", "")}
-            logger.info("      classification headings — source: Mellmann TMI_as_CSV → "
-                        "%d divisions, %d sub-divisions, %d sub-sub-divisions, %d sections",
+            logger.info("      classification headings — source: Mellmann TMI_as_CSV")
+            logger.info("      %d divisions, %d sub-divisions, %d sub-sub-divisions, %d sections",
                         len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])),
                         len(tmi_index.get("subdivisions3", [])), len(tmi_index.get("sections", [])))
         save_json(store.index_path("tmi"), tmi_index)
