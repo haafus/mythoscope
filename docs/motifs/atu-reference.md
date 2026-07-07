@@ -256,8 +256,10 @@ property **P2540** it attaches, per type:
   beside Wikipedia, so a reader knows which link leads to a full text vs a summary
   (223 types / 808 links);
 - **concordances** to other catalogues — Grimm/**KHM**, Aarne-Thompson (**AaTh**),
-  Aesop (**Perry**), Child ballads — from `P528` (+ `P972`) and `P1852`. Rendered
-  natural-sorted in "Also catalogued as", as are the "Earlier ATU numbers".
+  Aesop (**Perry**), Child ballads — from `P528` (+ `P972`) and `P1852`. In "Also
+  catalogued as" the catalogues are ordered AaTh → KHM → Perry → Aesop → Child
+  (`_CONCORDANCE_ORDER`) and each catalogue's codes are natural-sorted small grey
+  chips (as are the "Earlier ATU numbers").
 
 Current coverage: ~481 names, ~265 Wikipedia, ~223 Wikisource, ~328 concordances.
 Cyrillic homoglyphs in ids are folded (`283В* → 283B*`). The AaTh concordance is
