@@ -475,7 +475,8 @@ _STATS_BUILDERS = {}  # filled below once the builders are defined
 # shape and completeness of the dataset itself. Panels within each carry an
 # explicit `section`; the frontend groups and tints by it.
 _OVERVIEW_SECTIONS = [
-    {"key": "content", "title": "Distribution & content"},
+    {"key": "geography", "title": "Geography & spread"},
+    {"key": "content", "title": "Themes & content"},
     {"key": "diagnostics", "title": "Dataset diagnostics"},
 ]
 
@@ -714,18 +715,18 @@ def _build_berezkin_stats() -> dict:
         cards.append({"value": round(100 * n_english / len(records)) if records else 0,
                       "label": "English name", "suffix": "%"})
 
-    # Distribution & content — region and chapter first, then the areal trio, the
-    # tradition (people) trio, and the see-also hub leaderboard.
-    panels = [{"id": "bzRegions", "title": "Motifs by region", "section": "content"}]
+    # Geography & spread — region, then the carrier (tradition) leaderboard, then
+    # the areal leaderboard.
+    panels = [{"id": "bzRegions", "title": "Motifs by region", "section": "geography"}]
     if n_trad:  # the carrier (tradition) leaderboard sits second, after "by region"
-        panels.append({"id": "bzTradTop", "title": "Traditions with the most motifs", "section": "content"})
+        panels.append({"id": "bzTradTop", "title": "Traditions with the most motifs", "section": "geography"})
+    panels.append({"id": "bzAreas", "title": "Areas with the most motifs", "section": "geography"})
+    # Themes & content — chapter, thematic group, the widest-spread leaderboards,
+    # and the see-also hubs.
     panels.append({"id": "bzChapters", "title": "Motifs by chapter", "section": "content"})
     if groups:
         panels.append({"id": "bzGroups", "title": "Motifs by thematic group", "section": "content"})
-    panels += [
-        {"id": "bzAreas", "title": "Areas with the most motifs", "section": "content"},
-        {"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"},
-    ]
+    panels.append({"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"})
     if n_trad:
         panels.append({"id": "bzTradWidest", "title": "Most widespread motifs (traditions attesting)", "section": "content"})
     if hubs:
@@ -839,9 +840,10 @@ def _build_atu_stats() -> dict:
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            # Distribution & content — region, then the carrier leaderboard, then chapter
-            {"id": "atRegions", "title": "Tale types by region", "section": "content"},
-            {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "content"},
+            # Geography & spread — region, then the carrier (people) leaderboard
+            {"id": "atRegions", "title": "Tale types by region", "section": "geography"},
+            {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "geography"},
+            # Themes & content — chapter, divisions, motif density, spread, families
             {"id": "atChapters", "title": "Tale types by chapter", "section": "content"},
             {"id": "atDivisions", "title": "Largest divisions", "section": "content"},
             {"id": "atRich", "title": "Most motif-rich tale types", "section": "content"},
@@ -945,9 +947,10 @@ def _build_tmi_stats() -> dict:
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            # Distribution & content — region, then the carrier leaderboard, then chapter
-            {"id": "ovRegions", "title": "Motifs by region", "section": "content"},
-            {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "content"},
+            # Geography & spread — region, then the carrier (culture) leaderboard
+            {"id": "ovRegions", "title": "Motifs by region", "section": "geography"},
+            {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "geography"},
+            # Themes & content — chapter, widest, cross-references, documentation
             {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
             {"id": "ovWidest", "title": "Most widespread motifs (cultures attesting)", "section": "content"},
             {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)", "section": "content"},

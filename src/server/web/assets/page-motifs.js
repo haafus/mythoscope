@@ -1027,8 +1027,11 @@ function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLO
 // instantly, carry direct labels, and reuse the region palette. Value keys vary
 // (count/bytes/indeg), hence the valFn.
 const ACC = "#2a9d8f";
-// Section accent for the dataset-diagnostics charts (content charts use ACC); the
-// composition bar lives in that section, so it uses a slate ramp of the accent.
+// Section accents: teal (ACC) for the themes/content charts, warm amber for the
+// geography & spread charts, slate for the dataset-diagnostics charts (kept in
+// sync with the --sec-accent values in app.css). The composition bar lives in the
+// diagnostics section, so it uses a slate ramp of that accent.
+const GEO_C = "#b5852f";
 const DIAG_C = "#6b7aa1", COMPO_DIAG = ["#6b7aa1", "#9aa6c3", "#ccd3e4"];
 
 // The current overview's index, so chart labels can deep-link to their entity.
@@ -1094,7 +1097,8 @@ function drawOverviewCharts(s) {
     // region palette; the composition bar keeps its own ramp).
     const sectionOf = {};
     (s.panels || []).forEach((p) => { sectionOf[p.id] = p.section; });
-    const secColor = (id) => (sectionOf[id] === "diagnostics" ? DIAG_C : ACC);
+    const secColor = (id) => (sectionOf[id] === "diagnostics" ? DIAG_C
+        : sectionOf[id] === "geography" ? GEO_C : ACC);
     const bars = (id, rows, labelFn, valFn) => cssBars(id, rows, labelFn, () => secColor(id), valFn);
     const hist = (id, rows, labelFn) => cssBars(id, rows, labelFn, () => secColor(id));
     if (s.regions) {
