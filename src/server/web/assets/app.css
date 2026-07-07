@@ -1860,17 +1860,21 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 
 /* Pure-CSS "by region" bars (region palette; no Plotly). */
 .csbars { display: flex; flex-direction: column; gap: 5px; padding: 6px 2px 2px; }
-.csbar-row { display: grid; grid-template-columns: 148px 1fr 50px; align-items: center; gap: 9px; font-size: 11.5px; line-height: 1.1; }
-/* Hover: brighten just the row's label, value and bar — no background fill. */
+.csbar-row { display: grid; grid-template-columns: 148px 1fr 50px; align-items: center; gap: 9px; font-size: 11.5px; line-height: 1.1; border-radius: 5px; transition: background 0.12s ease, box-shadow 0.12s ease; }
+/* Hover: highlight the whole row with a soft background (a same-colour box-shadow
+   "pad" so nothing shifts), brighten the label/value/bar, and flip the bar's empty
+   track to white so it contrasts against the highlighted row. */
+.csbar-row:hover { background: #eaf3f2; box-shadow: 0 0 0 4px #eaf3f2; }
 .csbar-row:hover .csbar-lab { color: #16303f; }
 .csbar-row:hover .csbar-val { color: #1f3a4d; font-weight: 700; }
 .csbar-row:hover .csbar-fill { filter: saturate(1.5) brightness(1.12); }
+.csbar-row:hover .csbar-track { background: #fff; }
 .csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Clickable chart labels read as links: teal ink + a dotted underline, solid on hover. */
 a.csbar-lab.chart-link { color: #157f73; text-decoration: underline dotted; text-decoration-color: #93cabf; text-underline-offset: 2px; cursor: pointer; }
 a.csbar-lab.chart-link:hover { color: #0f6a60; text-decoration-style: solid; }
 .csbar-row:hover a.csbar-lab.chart-link { color: #0f6a60; }
-.csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; }
+.csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; transition: background 0.12s ease; }
 .csbar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.35s ease, filter 0.12s ease; }
 .csbar-over { position: absolute; top: 0; left: 0; }   /* substantive subset over the "all" bar */
 .csbar-val { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
