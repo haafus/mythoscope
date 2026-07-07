@@ -1845,18 +1845,19 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .chart-title { font-size: 13px; font-weight: 600; color: #41506a; margin-bottom: 6px; }
 .chart { width: 100%; }
 
-/* Overview charts split into colour-coded sections: geography (sea-wave teal),
-   themes & content (blue), dataset diagnostics (violet, echoing the motif
-   textual-parallel chips). The section accent tints its heading and each card's
-   top. */
+/* Overview charts split into colour-coded sections: geography (teal), themes &
+   content (azure blue), dataset diagnostics (violet). The three accents are
+   balanced in OKLCH — common lightness (L≈0.58) and chroma (C≈0.105), differing
+   only in hue — so no one section reads louder than the others. The section accent
+   tints its heading and each card's top. */
 .chart-section { margin-top: 24px; }
 .chart-section:first-of-type { margin-top: 0; }
 /* Each section carries its accent (bars, heading, card top) plus a matching link
    trio — link ink, dotted-underline tint, hover ink — so a chart's clickable
    labels read in the same hue as the section they sit in. */
-.chart-section--geography { --sec-accent: #2a9d8f; --sec-link: #157f73; --sec-link-soft: #93cabf; --sec-link-strong: #0f6a60; }
-.chart-section--content { --sec-accent: #6b7aa1; --sec-link: #4f5e86; --sec-link-soft: #b3bcd2; --sec-link-strong: #3c4a6e; }
-.chart-section--diagnostics { --sec-accent: #7a5aa8; --sec-link: #63508c; --sec-link-soft: #c3b7dc; --sec-link-strong: #4e3d75; }
+.chart-section--geography { --sec-accent: #008e80; --sec-link: #007769; --sec-link-soft: #9ec8c0; --sec-link-strong: #006255; }
+.chart-section--content { --sec-accent: #467eb6; --sec-link: #2a669f; --sec-link-soft: #a8c1da; --sec-link-strong: #125289; }
+.chart-section--diagnostics { --sec-accent: #856bae; --sec-link: #6f5397; --sec-link-soft: #c2b8d7; --sec-link-strong: #5b3f82; }
 .chart-section-title {
     font-size: 13.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
     margin: 0 0 11px; padding-left: 9px; border-left: 3px solid var(--sec-accent);
@@ -1867,17 +1868,19 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 /* Pure-CSS "by region" bars (region palette; no Plotly). */
 .csbars { display: flex; flex-direction: column; gap: 5px; padding: 6px 2px 2px; }
 .csbar-row { display: grid; grid-template-columns: 148px 1fr 50px; align-items: center; gap: 9px; font-size: 11.5px; line-height: 1.1; }
-/* Hover: brighten just the row's label, value and bar — no background fill. */
+/* Hover: brighten the row's label, value and bar, and deepen the empty track's
+   grey a touch so the whole bar reads as active. */
 .csbar-row:hover .csbar-lab { color: #16303f; }
 .csbar-row:hover .csbar-val { color: #1f3a4d; font-weight: 700; }
 .csbar-row:hover .csbar-fill { filter: saturate(1.5) brightness(1.12); }
+.csbar-row:hover .csbar-track { background: #e2e6ec; }
 .csbar-lab { color: #41506a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Clickable chart labels read as links: the section's link ink + a dotted
    underline, solid on hover. Colours come from the parent .chart-section-- vars. */
 a.csbar-lab.chart-link { color: var(--sec-link, #157f73); text-decoration: underline dotted; text-decoration-color: var(--sec-link-soft, #93cabf); text-underline-offset: 2px; cursor: pointer; }
 a.csbar-lab.chart-link:hover { color: var(--sec-link-strong, #0f6a60); text-decoration-style: solid; }
 .csbar-row:hover a.csbar-lab.chart-link { color: var(--sec-link-strong, #0f6a60); }
-.csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; }
+.csbar-track { position: relative; height: 13px; background: #eef1f4; border-radius: 4px; overflow: hidden; transition: background 0.12s ease; }
 .csbar-fill { display: block; height: 100%; border-radius: 4px; transition: width 0.35s ease, filter 0.12s ease; }
 .csbar-over { position: absolute; top: 0; left: 0; }   /* substantive subset over the "all" bar */
 .csbar-val { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }

@@ -1026,13 +1026,15 @@ function regionColor(name, i = 0) { return REGION_COLORS[name] || _FALLBACK_COLO
 // for the similarity page's interactive scatter/heatmap): these marks render
 // instantly, carry direct labels, and reuse the region palette. Value keys vary
 // (count/bytes/indeg), hence the valFn.
-// Section accents (kept in sync with the --sec-accent values in app.css): sea-wave
-// teal for geography & spread, blue for themes & content (ACC), violet — echoing
-// the textual-parallel motif chips — for dataset diagnostics. The composition bar
-// lives in the diagnostics section, so it uses a violet ramp of that accent.
-const GEO_C = "#2a9d8f";
-const ACC = "#6b7aa1";
-const DIAG_C = "#7a5aa8", COMPO_DIAG = ["#7a5aa8", "#a693c5", "#d0c6e2"];
+// Section accents (kept in sync with the --sec-accent values in app.css): teal for
+// geography & spread, azure blue for themes & content (ACC), violet for dataset
+// diagnostics. The three are balanced in OKLCH — a common lightness (L≈0.58) and
+// chroma (C≈0.105), differing only in hue (blue nudged toward cyan to sit further
+// from violet). The composition bar lives in the diagnostics section, so it uses a
+// violet ramp of that accent.
+const GEO_C = "#008e80";
+const ACC = "#467eb6";
+const DIAG_C = "#856bae", COMPO_DIAG = ["#856bae", "#a694c6", "#c9bedd"];
 
 // The current overview's index, so chart labels can deep-link to their entity.
 let OV_INDEX = "";
@@ -1081,12 +1083,12 @@ function cssBullet(id, rows, labelFn) {
         <div class="csbar-row" title="${escapeHtml(labelFn(r))}: ${formatNumber(r.substantive || 0)} / ${formatNumber(r.count)}">
             ${chartLabel(r, labelFn(r))}
             <span class="csbar-track">
-                <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#ccd3e4"></span>
+                <span class="csbar-fill" style="width:${Math.max(2, Math.round(100 * r.count / max))}%;background:#bfd7f1"></span>
                 <span class="csbar-fill csbar-over" style="width:${Math.max(0, Math.round(100 * (r.substantive || 0) / max))}%;background:${ACC}"></span>
             </span>
             <span class="csbar-val">${formatNumber(r.count)}</span>
         </div>`).join("") + `</div>
-        <div class="cslegend"><span><i style="background:${ACC}"></i>substantive</span><span><i style="background:#ccd3e4"></i>all</span></div>`;
+        <div class="cslegend"><span><i style="background:${ACC}"></i>substantive</span><span><i style="background:#bfd7f1"></i>all</span></div>`;
 }
 
 // Single dispatcher for the whole overview (replaces the old Plotly path).
