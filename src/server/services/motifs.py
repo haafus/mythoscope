@@ -793,13 +793,18 @@ def _build_atu_stats() -> dict:
     data = store.load_index("atu") or {}
     legend = data.get("culture_legend") or {}
     chapters = collections.Counter()
+    chapter_order: dict[str, int] = {}   # chapter -> smallest ATU number in it (catalogue order)
     divisions = collections.Counter()
     motif_hist = collections.Counter()
     reg_breadth = collections.Counter()   # how many macro-regions a type spans
     region_types = collections.Counter()  # types present per region (each type once/region)
     n_sum = n_mot = n_combo = n_att = n_refs = 0
     for t in types:
-        chapters[t.get("chapter", "")] += 1
+        ch = t.get("chapter", "")
+        chapters[ch] += 1
+        if ch:
+            num = t.get("num") if isinstance(t.get("num"), int) else 10 ** 9
+            chapter_order[ch] = min(chapter_order.get(ch, 10 ** 9), num)
         if t.get("division"):
             divisions[t["division"]] += 1
         n_sum += bool(t.get("summary"))
@@ -855,7 +860,8 @@ def _build_atu_stats() -> dict:
             {"id": "atRegBreadth", "title": "Regions per tale type", "section": "diagnostics"},
             {"id": "atSources", "title": "Most-cited sources", "section": "diagnostics"},
         ],
-        "chapters": [{"chapter": ch, "label": ch, "count": c} for ch, c in chapters.most_common() if ch],
+        "chapters": [{"chapter": ch, "label": ch, "count": chapters[ch]}
+                     for ch in sorted((c for c in chapters if c), key=lambda c: chapter_order.get(c, 10 ** 9))],
         "divisions": [{"division": dv, "label": dv, "count": c} for dv, c in divisions.most_common(15)],
         "motif_hist": _pow2_histogram(motif_hist),
         "top_rich": [{"id": t["id"], "label": f"{t['id']} {t.get('name', '')}", "count": len(t.get("motifs", []))}
