@@ -271,10 +271,9 @@ see `troubleshooting.md` ("Four competing macro-area schemes").
 
 `GET /api/motifs/berezkin/stats` aggregates the catalogue in one cached pass
 (`_build_berezkin_stats`), rendered as a stat-card strip plus a chart grid on the
-**common chart spine** all three index overviews share (defined in
-`tmi-reference.md §10`): *by chapter → secondary taxonomy → by region →
-carrier-leaderboard → breadth histogram → most-widespread → index-specific tail*.
-Berezkin's carrier is the **areal code**, so its seven panels are:
+**common chart spine** all three index overviews share (order + title scheme in
+[`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
+dashboards*). Berezkin's carrier is the **areal code**, so its seven panels are:
 
 1. **Motifs by chapter**
 2. **Motifs by thematic group** — the mapsofmyths taxonomy (only when that

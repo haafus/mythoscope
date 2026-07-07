@@ -307,8 +307,9 @@ Kazakh… material the other two don't distinguish); ~260 curated labels cover
 Stored per type as `attestations_grouped` (`{total, regions: [{region, count,
 entries}]}`) and aggregated across the index into `culture_legend` (people →
 types-attesting, region). On the type page the section renders as a region
-accordion; the overview gains, on the shared chart spine (see
-`tmi-reference.md §10`), **Tale types by region** (types present per region, each
+accordion; the overview gains, on the shared chart spine (order + title scheme in
+[`motif-index-data-sources.md`](motif-index-data-sources.md) → *Overview
+dashboards*), **Tale types by region** (types present per region, each
 counted once — matching TMI/Berezkin "Motifs by region"), **Peoples with the most
 tale types**, a **Regions per tale type** breadth histogram, and **Most
 widespread tale types (peoples attesting)** — the top types by distinct attesting
