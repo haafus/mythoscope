@@ -1135,8 +1135,8 @@ def build_tmi(config: dict, *, force: bool = False, divisions_config: dict | Non
             chapter_names.setdefault(m["chapter"], m["chapter_name"])
         supplement = _mellmann_supplement(mel_rows, {m["id"] for m in parsed}, chapter_names)
         if supplement:
-            logger.info("      Mellmann supplement: +%d motifs the Trilogy CSV dropped (%s)",
-                        len(supplement), ", ".join(m["id"] for m in supplement))
+            logger.info("      Mellmann supplement: +%d motifs the Trilogy CSV dropped", len(supplement))
+            logger.info("      %s", ", ".join(m["id"] for m in supplement))
         parsed.extend(supplement)
 
     tmi = _finalize_tmi(parsed)
