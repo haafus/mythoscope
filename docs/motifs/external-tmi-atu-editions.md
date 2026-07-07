@@ -549,3 +549,91 @@ only after an explicit NC/commercial decision.
 **Recommended start:** **R2** (zero new dependency, data already in hand) in
 parallel with **R1** (highest-visibility atlas win). Both are pure additive
 overlays that survive the later Mellmann migration untouched.
+
+## 9. Measured dataset quality & completeness (head-to-head)
+
+All numbers below were **measured** against the live datasets (2026-07): our
+built `tmi.json`/`atu.json`, the Trilogy and Mellmann CSVs, the `fbkarsdorp/tmi`
+JSON, and Wikidata SPARQL. This is the empirical backing for §2–§5.
+
+### 9.1 TMI motif composition — Trilogy vs fbkarsdorp vs Mellmann
+
+| dataset | rows | distinct codes | dup-codes | extra |
+|---|---|---|---|---|
+| **Trilogy** | 46,230 | 46,222 | 8 | — |
+| **fbkarsdorp** | 46,248 | 46,225 | 23 | +6 parse artifacts |
+| **Mellmann** | 46,242 | 46,236 | 6 | +60 first-edition "ghost" rows |
+
+- **Common core: 46,215 codes** shared by all three (the real Thompson motifs —
+  headings, `.0` interpolations, leaves). Every difference is at the margins.
+- **Trilogy-only: 0.** **fbkarsdorp-only: 6**, all artifacts (`+A800`,
+  `W.  W. Traits of character`, …). **Mellmann-only: 10** real (7 leaves + 3
+  headings; e.g. `X751`, `C867.2`, `Z356.1`).
+- **Richest by real motifs = Mellmann** (46,236): it recovers ~7 dropped motifs
+  and splits Thompson's own dup codes into distinct suffixed codes. fbkarsdorp's
+  higher *row* count is **noise** — 23 dup codes (only 4 are Thompson's real
+  dups; ~19 are identical-row artifacts, e.g. `A12` twice) + 6 junk codes.
+- **Duplicate sets differ.** Ours (8) ∩ Mellmann (6) = only 4 (`E755.2.8,
+  K561.1.1, S222, Z64`). We handle `B172.2/M202.1/N591` as dups; Mellmann
+  disambiguates them into suffixed codes. On the 4 shared dups, our `notes` are
+  **equal or fuller** than Mellmann's `bibliographies` (e.g. Z64: 146 vs 22
+  bytes) — collapsing/suffixing lost nothing.
+
+### 9.2 Fidelity & non-derivable data — Trilogy vs fbkarsdorp
+
+Both are independent digitizations of the same printed index; fbkarsdorp is the
+lower-fidelity one:
+
+| axis | Trilogy | fbkarsdorp |
+|---|---|---|
+| diacritics | preserved (Müller, Métraux; **10,680** rows non-ASCII) | **all stripped — 0 non-ASCII**; `Müller → "M ller"` |
+| `†` daggers | **7,024** | **0** |
+| unique fields | recursive `level_N` hierarchy (derivable from codes) | `locations[]` (geo NER, 69%), `lemmas[]` (WordNet, 99%) — both **derivable** from the text |
+
+**Non-derivable loss** (the Mellmann-style test): dropping **fbkarsdorp** loses
+essentially nothing (its `locations`/`lemmas` are recomputable, and cleaner from
+Trilogy's diacritic-preserving text); dropping **Trilogy** loses the diacritics
+(10,680 rows) irrecoverably. So Trilogy is the better **base**; fbkarsdorp's value
+is the *pre-computed* geo/lemma overlays, not unique content. (`fb.description` =
+our `motif_name` on 44,530 rows; `additional_description` = our `definition`.)
+
+### 9.3 Cultures vs fbkarsdorp locations (same source, different extraction)
+
+- Ours: **34,749** motifs (75%) have `cultures`, **1,799** distinct labels.
+- fbkarsdorp: **32,106** (69%) have `locations[]`, **925** tokens.
+- **Exact-token overlap: 153** — surfaces differ (ours keeps citation labels
+  incl. non-geographic `Jewish`/`Buddhist myth`/`Irish myth`; fbkarsdorp
+  NER-normalizes to countries `Ireland`/`Iceland`/`Mexico`).
+- **Complementary:** 889 motifs have an fb-location but no our-culture; 3,544 the
+  reverse. → use fb `locations` as a geocodable overlay, not a replacement.
+
+### 9.4 ATU examples — Ashliman vs Wikidata P2540
+
+**P2540 fields** (per Wikidata item): ATU number, `instance of` (tale type /
+fairy tale / literary work…), title + multilingual label/description, author
+(P50), language, genre, country of origin, catalogue codes (P528) & authority IDs
+(VIAF/GND), image, Wikipedia sitelinks, Wikisource full text. Full tale *text* is
+**not** in Wikidata — only via linked Wikisource/Wikipedia.
+
+| source | what | count | types |
+|---|---|---|---|
+| **Ashliman `tales`** (used) | full readable text (pitt.edu) | 1,457 | 172 |
+| **P2540 → Wikisource** (now used) | full primary text | 385 works / 808 links | 242 (223 mapped) |
+| **P2540 → Wikipedia** (used) | encyclopedic summary | — | 265 |
+| **P2540 works total** | named work entities | 1,794 | 1,294 |
+
+- Wikisource adds full texts on **143 types Ashliman doesn't cover** (212 texts);
+  union of full-text coverage = **315 types**.
+- The ~550 individual P2540 *work* items (Grimm tales etc.) are **not** yet
+  surfaced as example tales — the untapped part of P2540.
+
+### 9.5 Mellmann `1st ed.` provenance (edition history)
+
+`1st ed.` is a **column on every motif row** (not a separate table), filled on
+**19,779 / 46,242 (42%)** — the motifs present in the 1936 first edition (empty =
+added in the 1955–58 revision). It holds **codes only**: 18,603 unchanged, **1,166
+renumbered** (current ≠ 1936 code, e.g. `A13.1.1` was `A14`), **10 with multiple
+codes** (a revised motif that merged 2+ first-edition ones). Plus **60 blank-code
+"ghost" rows** documenting first-edition motifs *dropped* in the revision. The
+renumber map resolves ATU references citing pre-revision numbers (`A14→A13.1.1`,
+`B478→B495.1`) — a follow-on enrichment (not yet applied).

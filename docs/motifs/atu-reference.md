@@ -134,7 +134,7 @@ Each stored type (`outputs/motifs/atu.json → types[]`):
 | `motifs` | constituent TMI motif codes (`atu_seq`) |
 | `combos` | frequently combined type ids |
 | `tales` | example tales `{title, url}`, crawled from Ashliman (§8) |
-| `names` / `wikipedia` / `wikidata` / `concordances` | Wikidata (§6) |
+| `names` / `wikipedia` / `wikisource` / `wikidata` / `concordances` | Wikidata (§6) |
 
 Index-level keys: `label, long_label, attribution, homepage, divisions,
 subdivisions, aliases, types`. `aliases` is `{old ATU number: current type id}` —
@@ -250,12 +250,21 @@ property **P2540** it attaches, per type:
 
 - **multilingual names** of the *tale-type* items (`P31 = Q47451145`, so a
   specific tale isn't mistaken for the type name);
-- **Wikipedia** articles (en/ru/de/fr);
+- **Wikipedia** articles (en/ru/de/fr) — encyclopedic summaries of the type;
+- **Wikisource** links (any language) — the **full primary text** of tales of the
+  type, kept in their own `wikisource` list and rendered under a distinct heading
+  beside Wikipedia, so a reader knows which link leads to a full text vs a summary
+  (223 types / 808 links);
 - **concordances** to other catalogues — Grimm/**KHM**, Aarne-Thompson (**AaTh**),
-  Aesop (**Perry**), Child ballads — from `P528` (+ `P972`) and `P1852`.
+  Aesop (**Perry**), Child ballads — from `P528` (+ `P972`) and `P1852`. Rendered
+  natural-sorted in "Also catalogued as", as are the "Earlier ATU numbers".
 
+Current coverage: ~481 names, ~265 Wikipedia, ~223 Wikisource, ~328 concordances.
 Cyrillic homoglyphs in ids are folded (`283В* → 283B*`). The AaTh concordance is
-also **inverted** to remap old AaTh numbers cited in TMI notes (§9).
+also **inverted** to remap old AaTh numbers cited in TMI notes (§9). P2540 also
+exposes ~550 individual *work* items (Grimm tales etc.) that we do **not** yet
+harvest as example tales — see the dataset comparison in
+[`external-tmi-atu-editions.md`](external-tmi-atu-editions.md).
 
 ---
 

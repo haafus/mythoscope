@@ -56,13 +56,14 @@ Thompson-Balys/India, Neuman/Jewish, Boberg/Icelandic, Rotunda/Italian). The
 
 | | |
 |---|---|
-| Motifs | 46,230 |
+| Motifs | 46,238 (46,230 Trilogy + 8 net from the Mellmann supplement, §5) |
 | Chapters (letters) | 23 (`A`–`Z`, skipping `I`/`O`/`Y`) |
 | With non-empty notes | 41,959 (90.8%) |
 | With an extracted definition | 8,456 (18%) |
 | With culture-tagged citations | 32,470 |
 | With `†` motif cross-references | 7,017 |
 | With inline ATU `Type` references | 2,912 |
+| With a printed classification (division1-3 + section, §4a) | ~46,213 (99.97%) |
 
 Nodes per level:
 
@@ -94,9 +95,41 @@ Each stored TMI motif (`outputs/motifs/tmi.json → motifs[]`):
 | `references` | flat list of citation segments (§6) |
 | `see_also` | `{ref: [ids], cf: [ids]}` from `†` cross-refs (§6) |
 | `atu_inline` | ATU type ids from inline `Type N` (§6) |
+| `division` / `division_range` | printed division-1 heading + code range (§4a) |
+| `sub_division` / `sub_division_range` | division-2 heading + range (§4a) |
+| `division3` / `division3_range` | division-3 heading + range (§4a) |
+| `section` / `section_range` | the tens section heading + range (§4a) |
 
 Index-level keys: `label, long_label, attribution, homepage, chapters,
-culture_legend` (§7).
+culture_legend`, plus the browse hierarchy `divisions` / `subdivisions` /
+`subdivisions3` / `sections` (§4a, §7).
+
+---
+
+## 4a. Printed classification (from Mellmann)
+
+The Trilogy CSV carries the code hierarchy but not Thompson's **printed
+range-headings**. We lift those from Katja Mellmann's `TMI_as_CSV` (CC-BY-4.0,
+source `mellmann` in `config/motifs.json`) and join them onto our motifs by code
+range — four nested levels above the motif:
+
+```
+chapter (A)  →  division1 (A0–A99 Creator)  →  division2 (A300–A399 Gods of the
+underworld)  →  division3 (A650–A699 Nature of the universe)  →  section
+(A1810 Creation of felidae)  →  motif
+```
+
+- Parsed once in `trilogy._mellmann_classification`; division1-3 ranges are
+  printed, **section** ranges are derived from consecutive tens (so a heading may
+  span >1 ten, e.g. Rodentia A1840–A1859), the last in a chapter capped at +9.
+- `trilogy._assign_tmi_divisions` attaches `division/sub_division/division3/
+  section` (+ `_range`) to each motif by chapter+number containment (covers dup
+  `~N` and mangled ids too), and builds the browse lists **141 division / 138
+  sub-division / 49 sub-sub / 1,408 section**. A title's trailing taxonomic
+  `Note:` clause is dropped (captured as the first period-terminated clause).
+- The Titles feed the **Classification** line on the motif page and the
+  chapter→division→…→section **browse dropdown** (mirroring the ATU section).
+  Mellmann also supplies the 8-net **supplement motifs** (§5).
 
 The read service (`src/server/services/motifs.py`) adds **derived** fields at
 serve time — never stored: `notes_size`, `has_definition`, `substantive` (§9),
@@ -136,6 +169,25 @@ All in `trilogy._finalize_tmi` / `_parse_tmi`.
   exist in full as their own records.
 
 These are logged at build time as `TMI defect: …` warnings.
+
+### Mellmann supplement (recovered motifs)
+
+Ten real Thompson motifs that the Trilogy CSV dropped are imported from Mellmann
+(`trilogy._mellmann_supplement`, whitelist `_MEL_SUPPLEMENT`) — injected **before**
+`_finalize_tmi`, so they gain parent/level/classification and join the cross-walk:
+
+- **imported (7 leaves + 3 headings):** `C867.2, D2150, H1333.5.0.3, J2500, P100,
+  Q323, T317.0.1, X751, Z356.1, Z357`. `X751` closes a dangling ATU reference.
+- **cleaned on ingest:** a robust code/title split tolerant of Mellmann's malformed
+  rows (`X751.Marriage…`, `T317.0.1 Life…` — missing dot/space), and a name
+  override repairing the `Z56.1 … detruction` typo → `Z356.1` "…from destruction…".
+- **excluded:** the dup-notation copies we already hold as `~N` (`B172.2.2`,
+  `M202.1[.1]`, `N591[b]`) and `B31` (a first-edition motif dropped in the revised
+  index). Re-runs are idempotent (guarded on the existing id set).
+
+The supplement adds exactly 10 motifs (46,228 after dedup + 10 = **46,238**);
+relative to Trilogy's raw 46,230 rows that reads as +8 net, since `_finalize_tmi`
+first collapses 2 same-name redundant rows.
 
 ---
 
