@@ -430,6 +430,40 @@ def _top_sources(records: list[dict], limit: int = 15) -> list[dict]:
     return out
 
 
+# Leading author/abbreviation of one ';'-separated ATU citation ("Krohn 1889, 46"
+# -> "Krohn"; "BP II, 116" -> "BP II"), before the first comma/digit.
+_ATU_SRC_HEAD = re.compile(r"^(?:cf\.?\s+)?([^,\d]+)", re.I)
+
+
+def _atu_top_sources(types: list[dict], limit: int = 15) -> list[dict]:
+    """Most-cited apparatus works in Uther's key-literature (`references`), by number
+    of tale types citing each. Heuristic: the leading author/abbreviation of every
+    ';'-separated citation, minus a trailing volume numeral or `ff.`"""
+    import collections
+
+    counts: collections.Counter = collections.Counter()
+    for t in types:
+        seen = set()
+        for seg in (t.get("references") or "").split(";"):
+            m = _ATU_SRC_HEAD.match(seg.strip())
+            if not m:
+                continue
+            key = re.sub(r"\s+(?:ff\.?|[IVXLC]+\.?)$", "", m.group(1).strip()).strip()
+            if len(key) >= 2:
+                seen.add(key)
+        for k in seen:
+            counts[k] += 1
+    return [{"label": k, "count": n} for k, n in counts.most_common(limit)]
+
+
+def _berezkin_top_sources(limit: int = 15) -> list[dict]:
+    """Most-cited works in the Berezkin bibliography (areasofmyths), by citation
+    count (`uses`). Empty when the bibliography file is absent."""
+    srcs = (_berezkin_bibliography() or {}).get("sources") or {}
+    top = sorted(srcs.items(), key=lambda kv: kv[1].get("uses", 0), reverse=True)[:limit]
+    return [{"label": key, "count": s.get("uses", 0)} for key, s in top]
+
+
 _STATS_BUILDERS = {}  # filled below once the builders are defined
 
 # Short scholarly header shown at the top of each index overview: one-paragraph
@@ -699,10 +733,13 @@ def _build_berezkin_stats() -> dict:
     if hubs:
         panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)", "section": "content"})
     # Dataset diagnostics.
+    top_sources = _berezkin_top_sources()
     panels += [
         {"id": "bzCoverage", "title": "Field coverage", "section": "diagnostics"},
         {"id": "bzDefLen", "title": "Motifs by definition length", "section": "diagnostics"},
     ]
+    if top_sources:
+        panels.append({"id": "bzSources", "title": "Most-cited sources", "section": "diagnostics"})
     coverage = [{"label": "definition", "count": n_def}]
     if n_english:
         coverage.append({"label": "English name", "count": n_english})
@@ -729,6 +766,7 @@ def _build_berezkin_stats() -> dict:
         "breadth": [{"bucket": b, "count": breadth[b]} for b in _AREA_SPAN_BUCKETS],
         "coverage": coverage,
         "deflen": [{"bucket": b, "count": deflen[b]} for b in ("0", "1–60", "61–120", "121–240", "241–480", "480+")],
+        "top_sources": top_sources,
     }
     if n_trad:
         stats["trad_breadth"] = [{"bucket": b, "count": trad_breadth[b]} for b in _TRAD_SPAN_BUCKETS]
@@ -809,6 +847,7 @@ def _build_atu_stats() -> dict:
             # Dataset diagnostics
             {"id": "atMotifHist", "title": "Constituent motifs per tale type", "section": "diagnostics"},
             {"id": "atRegBreadth", "title": "Regions per tale type", "section": "diagnostics"},
+            {"id": "atSources", "title": "Most-cited sources", "section": "diagnostics"},
         ],
         "chapters": [{"chapter": ch, "label": ch, "count": c} for ch, c in chapters.most_common() if ch],
         "divisions": [{"division": dv, "label": dv, "count": c} for dv, c in divisions.most_common(15)],
@@ -825,6 +864,7 @@ def _build_atu_stats() -> dict:
         "top_peoples": [{"label": canon, "count": e["count"]} for canon, e in top_peoples],
         "reg_breadth": [{"bucket": b, "count": reg_breadth[b]}
                         for b in ("0", "1–2", "3–5", "6–10", "11–20", "21+")],
+        "top_sources": _atu_top_sources(types),
     }
 
 

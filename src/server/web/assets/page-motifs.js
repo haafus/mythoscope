@@ -1124,6 +1124,7 @@ function drawOverviewCharts(s) {
         if (s.hubs) bars("bzHubs", s.hubs, (r) => r.label, (r) => r.count);
         bars("bzCoverage", s.coverage, (r) => r.label, (r) => r.count);
         hist("bzDefLen", s.deflen, (r) => r.bucket);
+        if (s.top_sources) bars("bzSources", s.top_sources, (r) => r.label);
     } else if (s.index === "atu") {
         bars("atChapters", s.chapters, (r) => r.label);
         if (s.top_peoples) bars("atPeoples", s.top_peoples, (r) => r.label);
@@ -1134,6 +1135,7 @@ function drawOverviewCharts(s) {
         bars("atRich", s.top_rich, (r) => r.label);
         if (s.families) bars("atFamilies", s.families, (r) => r.label);
         if (s.combos) bars("atCombos", s.combos, (r) => r.label);
+        if (s.top_sources) bars("atSources", s.top_sources, (r) => r.label);
     }
 }
 
