@@ -1,9 +1,13 @@
 # Motif browser UI — three views in one surface (design)
 
-A design proposal (not yet implemented) for organising the three ways of looking
-at a motif catalogue — **(1) hierarchy/tree exploration, (2) flat filtered &
-sorted lists, (3) full-text search** — plus the two reading intents (**browsing
-lists** vs **reading a card**) inside the existing Motifs page.
+A design proposal — **partially implemented** — for organising the three ways of
+looking at a motif catalogue — **(1) hierarchy/tree exploration, (2) flat
+filtered & sorted lists, (3) full-text search** — plus the two reading intents
+(**browsing lists** vs **reading a card**) inside the existing Motifs page. The
+flat-list/sort lens and search are live (`flatList` / `mState.sort` in
+`page-motifs.js`); the full unified-navigator layout is prototyped in
+`mockups/motifs-navigator/` but not yet the production surface. This doc is the
+target model and the map onto today's identifiers.
 
 Implementation lives in `src/server/web/assets/page-motifs.js` (vanilla ES
 module SPA) and `src/server/services/motifs.py` (read service). This doc maps the

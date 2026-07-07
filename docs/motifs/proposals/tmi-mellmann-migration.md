@@ -1,6 +1,17 @@
 # Migration plan: TMI source Trilogy → Mellmann
 
-Status: **proposed, not implemented.** This document is the plan only.
+Status: **partially implemented — the additive-first phase shipped; the full
+source swap was not done.** This document is kept as the plan and provenance.
+
+What shipped (the recommended §2a "additive-first" path): Mellmann is wired in
+as an *enrichment* source (`mellmann` in `config/motifs.json`, read once in
+`trilogy.build_tmi`) — the printed classification headings (division1–3 +
+section), the 10 recovered supplement motifs, and the `1st ed.` edition-history
+redirects (`former_ids`/`aliases`, mirror-close). See `../tmi-reference.md`
+§4a–4b. Trilogy remains the source of the motif text itself (it preserves the
+`†` daggers and diacritics better), so the proposed *replacement* of the TMI
+backbone (§1) was deliberately not carried out — the two layers below marked as
+future work stay open.
 
 ## 1. Summary
 
@@ -227,8 +238,8 @@ during, and after migration.
 7. Recompute embeddings / semantic parallels **only if** definition/notes
    text materially changed the corpus (it will — the def text is now clean);
    plan a `bge_m3.npy` re-embed and `semantic_parallels.json` refresh.
-8. Update docs: `motif-index-data-sources.md`, `tmi-reference.md` (hierarchy
-   + `.0` sections now obsolete), `cross-walk.md`; add a `1st ed.` note.
+8. Update docs: `../motif-index-data-sources.md`, `../tmi-reference.md` (hierarchy
+   + `.0` sections now obsolete), `../crosswalk.md`; add a `1st ed.` note.
 9. Bump asset versions if the motif API shape changes (new fields) — UI,
    `page-motifs.js`, `app.css` `?v=` query.
 10. Tests: update fixtures/expected counts; add tests for the renumber map,

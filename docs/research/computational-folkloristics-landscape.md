@@ -3,7 +3,7 @@
 The best labs, people, journals, conferences, and landmark publications in the
 computational study of folk narrative and myth — the research community
 mythoscope sits inside. Compiled 2026-07 from web validation; companion to
-`external-tmi-atu-editions.md` (data sources) and its §6 enrichment plan.
+`../motifs/external-tmi-atu-editions.md` (data sources) and its §6 enrichment plan.
 
 Two overlapping fields:
 - **Computational folkloristics** — quantitative/NLP study of folk narrative
@@ -204,7 +204,7 @@ cluster. Its differentiator — the survey found no one else builds it — is a
 **cross-index `type ⇄ motif ⇄ text ⇄ place` graph** spanning all three indexes.
 
 The corpora these groups repeatedly test on (detailed in
-`external-tmi-atu-editions.md`): **Nederlandse Volksverhalenbank** / ISEBEL,
+`../motifs/external-tmi-atu-editions.md`): **Nederlandse Volksverhalenbank** / ISEBEL,
 Iceland's **Sagnagrunnur**, Germany's **WossiDiA**, Estonia's **ETKSpace**
 (folklore.ee), and Tangherlini's **Danish Folklore Nexus**.
 

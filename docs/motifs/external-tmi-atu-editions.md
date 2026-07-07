@@ -6,7 +6,7 @@ index, across languages — with format, edition basis, license, and a note on
 each one's suitability as a source for this project.
 
 Compiled 2026-07. Companion to `motif-index-data-sources.md` (what we actually
-use) and `tmi-mellmann-migration.md` (a proposed TMI source change).
+use) and `proposals/tmi-mellmann-migration.md` (a proposed TMI source change).
 
 ## How to read the "suitability" column
 
@@ -56,7 +56,7 @@ Links:
   Thompson index links an older mirror `http://www.momfer.ml/`, which is now
   dead (a reclaimed Freenom `.ml` domain) — use the Meertens URL.
 - **Mellmann** is the best *tabular* form (our analysis in
-  `tmi-mellmann-migration.md`): a strict superset of the Trilogy TMI in codes
+  `proposals/tmi-mellmann-migration.md`): a strict superset of the Trilogy TMI in codes
   and citations, with printed division/section headings and `1st ed.`
   provenance. Recommended future source.
 
@@ -98,7 +98,7 @@ Aarne (1910, German) → Thompson (1928, 1961 English, "AT") → Uther (2004,
 "ATU", rev. 2024). A code prefixed `AT` is pre-Uther; `ATU` is the 2004
 reorganization. Any open "ATU data" should be checked for which layer it
 encodes — our Trilogy `atu_df` is ATU-numbered but its exact transcription
-provenance is unverified (see `tmi-mellmann-migration.md` §2 on Trilogy being
+provenance is unverified (see `proposals/tmi-mellmann-migration.md` §2 on Trilogy being
 an independent digitization).
 
 Editions: 2004 first ed. → **2011 reprint** → substantially revised & supplemented
@@ -232,7 +232,7 @@ ATU/TMI-linked corpora. No such consolidated overview currently exists.
 ## 4. Relevance to this project
 
 - **TMI**: we use **trilogy**; **Mellmann** is the proposed upgrade
-  (`tmi-mellmann-migration.md`). **ruthenia** and **MOMFER/`fbkarsdorp/tmi`**
+  (`proposals/tmi-mellmann-migration.md`). **ruthenia** and **MOMFER/`fbkarsdorp/tmi`**
   are the authoritative texts to verify against; **archive.org** scans are the
   final ground truth for disputed codes.
 - **ATU**: we use **trilogy `atu_df`** + **Ashliman** for text coverage. No
@@ -329,7 +329,7 @@ Ashliman/ISEBEL ©).
 
 ### Phase 0 — open data, no outreach (do first)
 
-1. **TMI backbone → Mellmann** (already scoped in `tmi-mellmann-migration.md`):
+1. **TMI backbone → Mellmann** (already scoped in `proposals/tmi-mellmann-migration.md`):
    gains printed div/section headings, `1st ed.` provenance, sort key; CC-BY-4.0.
 2. **Geo + lemma overlay from `fbkarsdorp/tmi`**: join its JSON on motif code to
    add `locations[]` (feeds the **geography atlas** directly) and `lemmas[]`
@@ -512,7 +512,7 @@ Mellmann migration (bigger, riskier, already planned), then polish.
 ### Priority 2 — foundational (medium effort/risk)
 
 - **R4 · TMI source → Mellmann (+ classification tree + provenance)** — the
-  migration already scoped in `tmi-mellmann-migration.md`: printed `division1–3`/
+  migration already scoped in `proposals/tmi-mellmann-migration.md`: printed `division1–3`/
   `section` headings become a real classification tree; `1st ed.` becomes an
   edition-provenance filter; retires the `.0`/`level_N` repair. *License:* CC-BY-4.0.
   *Effort:* M. *Surface:* catalog. *Deps:* none technically, but R1/R3 join on code

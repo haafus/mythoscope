@@ -1,7 +1,7 @@
 # Unified motif navigator — interactive mock
 
 An **isolated, click-through mock** of the design in
-[`docs/motifs-browser-ui.md`](../../docs/motifs/motifs-browser-ui.md). It is not wired
+[`docs/motifs-browser-ui.md`](../../docs/motifs/proposals/motifs-browser-ui.md). It is not wired
 into the app and calls no API — open `index.html` directly in a browser
 (`file://…`). The data is a small **real slice of the TMI index** (≈83 motifs from
 chapter A, embedded in the file).

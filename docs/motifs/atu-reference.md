@@ -64,7 +64,7 @@ are turned into links — but only for ids that actually exist in the index (a
 missing one stays plain text). A motif **range** written with the mojibake
 apostrophe-as-en-dash (`S222'S226`) is restored to read as `S222–S226` (both
 endpoints link); the interior members it spans are credited in the cross-walk
-(`crosswalk._SUMMARY_RANGE`, see [`cross-walk.md`](cross-walk.md) §1.4), not
+(`crosswalk._SUMMARY_RANGE`, see [`crosswalk.md`](crosswalk.md) §1.4), not
 spelled out in the prose.
 
 Uther also lists a tale's variant **forms inline as `(1)…(N)`** (175 types, e.g.
@@ -359,7 +359,7 @@ live-site growth and folded-in subtypes).
 ## 9. Cross-walks
 
 *The complete cross-index reference — all six relations, both directions, the
-repair machinery and storage keys — is in [`cross-walk.md`](cross-walk.md); this
+repair machinery and storage keys — is in [`crosswalk.md`](crosswalk.md); this
 section summarises the ATU end.*
 
 - **ATU ↔ TMI** — `atu_seq` gives each type's constituent motif codes (the bridge

@@ -246,7 +246,7 @@ catalogue's own source apparatus.
 ## 7. Cross-walks
 
 *The full picture across all three indexes — every map, direction and repair — is
-in [`cross-walk.md`](cross-walk.md); this section covers the Berezkin side.*
+in [`crosswalk.md`](crosswalk.md); this section covers the Berezkin side.*
 
 Motif **equivalence** runs two ways:
 

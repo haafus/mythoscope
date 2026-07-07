@@ -65,6 +65,5 @@
 1. [How to](docs/how_to.md)
 2. [Preliminary paper draft](docs/draft.md) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91))
 3. [Bibliography](docs/bibliography.md)
-4. [Motif induction methods review](docs/motif-induction-review.md)
-5. [Motif induction survey 2018–2026](docs/motif-induction-survey.md)
-6. [Motif index data sources & integration](docs/motifs/motif-index-data-sources.md)
+4. [Research context](docs/research/) — [motif-induction methods review](docs/research/motif-induction-review.md), [survey 2018–2026](docs/research/motif-induction-survey.md), [computational-folkloristics landscape](docs/research/computational-folkloristics-landscape.md)
+5. [Motif-index documentation](docs/motifs/README.md) — sources, parsing, cross-walk (hub: [data sources & integration](docs/motifs/motif-index-data-sources.md))
