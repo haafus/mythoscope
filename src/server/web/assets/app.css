@@ -1842,7 +1842,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 
 .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .chart-card { padding: 10px 12px; background: #fff; border: 1px solid #e6ecf1; border-radius: 8px; }
-.chart-title { font-size: 12px; font-weight: 600; color: #41506a; margin-bottom: 6px; }
+.chart-title { font-size: 13px; font-weight: 600; color: #41506a; margin-bottom: 6px; }
 .chart { width: 100%; }
 
 /* Overview charts split into colour-coded sections: geography (sea-wave teal),
