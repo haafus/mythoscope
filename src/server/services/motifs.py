@@ -713,10 +713,10 @@ def _build_berezkin_stats() -> dict:
 
     # Distribution & content — region and chapter first, then the areal trio, the
     # tradition (people) trio, and the see-also hub leaderboard.
-    panels = [
-        {"id": "bzRegions", "title": "Motifs by region", "section": "content"},
-        {"id": "bzChapters", "title": "Motifs by chapter", "section": "content"},
-    ]
+    panels = [{"id": "bzRegions", "title": "Motifs by region", "section": "content"}]
+    if n_trad:  # the carrier (tradition) leaderboard sits second, after "by region"
+        panels.append({"id": "bzTradTop", "title": "Traditions with the most motifs", "section": "content"})
+    panels.append({"id": "bzChapters", "title": "Motifs by chapter", "section": "content"})
     if groups:
         panels.append({"id": "bzGroups", "title": "Motifs by thematic group", "section": "content"})
     panels += [
@@ -724,10 +724,7 @@ def _build_berezkin_stats() -> dict:
         {"id": "bzWidest", "title": "Most widespread motifs (areas attesting)", "section": "content"},
     ]
     if n_trad:
-        panels += [
-            {"id": "bzTradTop", "title": "Traditions with the most motifs", "section": "content"},
-            {"id": "bzTradWidest", "title": "Most widespread motifs (traditions attesting)", "section": "content"},
-        ]
+        panels.append({"id": "bzTradWidest", "title": "Most widespread motifs (traditions attesting)", "section": "content"})
     if hubs:
         panels.append({"id": "bzHubs", "title": "Most cross-referenced motifs (see-also)", "section": "content"})
     # Dataset diagnostics.
@@ -836,11 +833,11 @@ def _build_atu_stats() -> dict:
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            # Distribution & content — region & chapter first
+            # Distribution & content — region, then the carrier leaderboard, then chapter
             {"id": "atRegions", "title": "Tale types by region", "section": "content"},
+            {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "content"},
             {"id": "atChapters", "title": "Tale types by chapter", "section": "content"},
             {"id": "atDivisions", "title": "Largest divisions", "section": "content"},
-            {"id": "atPeoples", "title": "Peoples with the most tale types", "section": "content"},
             {"id": "atRich", "title": "Most motif-rich tale types", "section": "content"},
             {"id": "atWidest", "title": "Most widespread tale types (peoples attesting)", "section": "content"},
             {"id": "atCombos", "title": "Most-combined tale types", "section": "content"},
@@ -942,10 +939,10 @@ def _build_tmi_stats() -> dict:
         ],
         "sections": _OVERVIEW_SECTIONS,
         "panels": [
-            # Distribution & content — region & chapter first
+            # Distribution & content — region, then the carrier leaderboard, then chapter
             {"id": "ovRegions", "title": "Motifs by region", "section": "content"},
-            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
             {"id": "ovCultures", "title": "Cultures with the most motifs", "section": "content"},
+            {"id": "ovChapters", "title": "Motifs by chapter (all vs. substantive)", "section": "content"},
             {"id": "ovWidest", "title": "Most widespread motifs (cultures attesting)", "section": "content"},
             {"id": "ovHubs", "title": "Most cross-referenced motifs (cf./†)", "section": "content"},
             {"id": "ovTopNotes", "title": "Best-documented motifs", "section": "content"},
