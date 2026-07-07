@@ -119,6 +119,19 @@ def _norm(m: np.ndarray) -> np.ndarray:
     return m / (np.linalg.norm(m, axis=1, keepdims=True) + 1e-9)
 
 
+def cap_candidates(types, gold, max_candidates):
+    """Keep every gold type, then fill up to max_candidates with deterministic
+    distractors — lets a heavy model finish while staying a real retrieval task."""
+    if not max_candidates or len(types) <= max_candidates:
+        return types
+    gold_ids = {a for a, _ in gold}
+    keep = [t for t in types if t["id"] in gold_ids]
+    others = [t for t in types if t["id"] not in gold_ids]
+    room = max(0, max_candidates - len(keep))
+    step = max(1, len(others) // room) if room else 1
+    return keep + others[::step][:room]
+
+
 def score_grid(model, types, gold, max_tales):
     ids = [t["id"] for t in types]
     id_pos = {tid: i for i, tid in enumerate(ids)}
@@ -166,10 +179,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="BAAI/bge-m3")
     ap.add_argument("--max-tales", type=int, default=400)
+    ap.add_argument("--max-candidates", type=int, default=None,
+                    help="Cap distractor types (keeps all gold) so a heavy model finishes.")
     args = ap.parse_args()
 
-    types = (store.load_index("atu") or {}).get("types", [])
-    gold = load_gold({t["id"] for t in types})
+    types_all = (store.load_index("atu") or {}).get("types", [])
+    gold = load_gold({t["id"] for t in types_all})
+    types = cap_candidates(types_all, gold, args.max_candidates)
+    if len(types) < len(types_all):
+        print(f"[note] candidates capped {len(types_all)} → {len(types)} (all gold kept + distractor sample)")
     print(f"gold: {len(gold)} tales / {len({a for a, _ in gold})} ATU types; candidates: {len(types)} types")
     print(f"loading model {args.model} …")
     from sentence_transformers import SentenceTransformer
