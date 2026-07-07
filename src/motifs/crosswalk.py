@@ -20,7 +20,9 @@ Two links are built:
   ``aliases`` map to the current type.
 - **Berezkin<->TMI** — the curated Thompson id each Berezkin motif carries
   (``tmi_refs``, from mapsofmyths); the one *direct* Berezkin<->TMI bridge (the
-  rest go through ATU). Present only when the mapsofmyths enrichment ran.
+  rest go through ATU). A curated id that is a renumbered first-edition code is
+  resolved through the TMI ``aliases`` first, same as the ATU side. Present only
+  when the mapsofmyths enrichment ran.
 
 Beyond these direct concordances, a small **inferred** layer completes triangles
 transitively — but only through a *low fan-out* pivot (a point-like motif, never a
@@ -194,11 +196,17 @@ def build(
                 atu_to_berezkin[r].append(motif["id"])
 
     # Berezkin -> TMI, direct: the curated Thompson ids on each motif (mapsofmyths
-    # `tmi_refs`), plus the inverse — kept only when the id exists in our TMI index.
+    # `tmi_refs`), plus the inverse — kept only when the id exists in our TMI index,
+    # with old first-edition codes resolved through ``tmi_aliases`` first (same
+    # mirror-close as the ATU side).
     berezkin_to_tmi: dict[str, list[str]] = {}
     tmi_to_berezkin: dict[str, list[str]] = {}
     for motif in berezkin_motifs or []:
-        refs = [r for r in (_clean_tmi(x) for x in (motif.get("tmi_refs") or [])) if r in tmi_ids]
+        refs = []
+        for x in (motif.get("tmi_refs") or []):
+            r = _resolve_tmi(_clean_tmi(x))
+            if r in tmi_ids and r not in refs:
+                refs.append(r)
         if not refs:
             continue
         berezkin_to_tmi[motif["id"]] = refs
