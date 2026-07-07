@@ -598,6 +598,7 @@ def _build_berezkin_stats() -> dict:
     indeg = collections.Counter()      # how often each motif is a see-also target
     trad_breadth = collections.Counter()
     deflen = collections.Counter()
+    trad_ids: set = set()              # distinct attesting traditions (peoples), like ATU peoples
     n_def = n_atu = n_english = n_tmi = n_areas = n_see = n_trad = 0
     for r in records:
         chapters[r.get("chapter", "")] += 1
@@ -614,6 +615,7 @@ def _build_berezkin_stats() -> dict:
         trads = r.get("traditions") or []
         if trads:
             n_trad += 1
+            trad_ids.update(trads)
             trad_breadth[_trad_breadth_label(len(trads))] += 1
         ars = r.get("areas") or []
         n_areas += bool(ars)
@@ -635,10 +637,15 @@ def _build_berezkin_stats() -> dict:
     # The mapsofmyths enrichment (English text, thematic groups, TMI links) is
     # credential-gated, so the cards/panels that surface it appear only when the
     # data is actually present — the overview stays valid without credentials.
+    # Carrier count, parallel to ATU "peoples" / TMI "cultures": Berezkin's fine unit
+    # is the attesting **tradition** (a people, e.g. Ainu/Aymara — enrichment-gated);
+    # without it, fall back to the coarser areal-code count.
+    carrier = ({"value": len(trad_ids), "label": "traditions"} if trad_ids
+               else {"value": len(areas), "label": "areas"})
     cards = [
         {"value": len(records), "label": "motifs"},
         {"value": len([c for c in chapters if c]), "label": "chapters"},
-        {"value": len(areas), "label": "areas"},
+        carrier,
         {"value": n_atu, "label": "ATU-linked"},
     ]
     if n_tmi:
