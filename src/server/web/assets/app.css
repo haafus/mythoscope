@@ -1842,7 +1842,7 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 
 .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .chart-card { padding: 10px 12px; background: #fff; border: 1px solid #e6ecf1; border-radius: 8px; }
-.chart-title { font-size: 12.5px; font-weight: 600; color: #41506a; margin-bottom: 4px; }
+.chart-title { font-size: 12px; font-weight: 600; color: #41506a; margin-bottom: 4px; }
 .chart { width: 100%; }
 
 /* Overview charts split into colour-coded sections: content (teal) vs. dataset
@@ -1852,8 +1852,8 @@ a.motif-abbr:hover { border-bottom-color: #3a5e86; }
 .chart-section--content { --sec-accent: #2a9d8f; }
 .chart-section--diagnostics { --sec-accent: #6b7aa1; }
 .chart-section-title {
-    font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
-    margin: 0 0 10px; padding-left: 9px; border-left: 3px solid var(--sec-accent);
+    font-size: 13.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    margin: 0 0 11px; padding-left: 9px; border-left: 3px solid var(--sec-accent);
     color: var(--sec-accent);
 }
 .chart-section .chart-card { border-top: 2px solid var(--sec-accent); }
