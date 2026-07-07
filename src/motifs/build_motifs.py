@@ -94,8 +94,7 @@ def build_motifs(*, force: bool = False) -> None:
                         _applied(berezkin_motifs, lambda m: m.get("tmi_refs")))
             logger.info("          areal tradition sets                   : %d",
                         _applied(berezkin_motifs, lambda m: m.get("traditions")))
-            logger.info("          + tradition catalogue (shared, %d entries): decodes each areal code "
-                        "above into a people name, macro-region & language",
+            logger.info("          + tradition catalogue: %d areal codes → people name, region & language",
                         len(berezkin_data.get("traditions", {})))
 
         # Bibliography (areasofmyths.com biblio.html) + citation → region/ethnos
