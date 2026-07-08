@@ -58,7 +58,7 @@ function renderBookInfo(doc) {
     }
 
     const originalUrl = doc.url
-        ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Original URL</a>`
+        ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Source</a>`
         : "";
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
