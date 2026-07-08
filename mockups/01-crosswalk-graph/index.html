@@ -84,6 +84,7 @@
   <span class="sub">click a node to recentre · drag to move · scroll to zoom · arrows show link direction</span>
   <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
   <button id="browseBtn" class="btn">☰ Browse hubs</button>
+  <button id="exportBtn" class="btn" title="Download the full graph with the currently enabled layers as two Cosmograph CSVs (links + nodes)">⭳ Cosmograph</button>
 </header>
 <main>
   <canvas id="cv"></canvas>
@@ -471,6 +472,30 @@ function renderBrowse(){
 document.getElementById("browseBtn").addEventListener("click", ()=>{
   const open = browse.style.display!=="flex"; browse.style.display=open?"flex":"none"; if(open) renderBrowse();
 });
+
+// ---- export the full graph (with the currently enabled layers) to Cosmograph ----
+function csvCell(v){ v = String(v ?? ""); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+function downloadCsv(name, text){
+  const url = URL.createObjectURL(new Blob([text], {type:"text/csv"}));
+  const a = document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function exportCosmograph(){
+  const links = DATA.edges.filter(e => edgeOn(e.m));
+  const ids = new Set(), deg = {};
+  for (const e of links){ ids.add(e.s); ids.add(e.t); deg[e.s]=(deg[e.s]||0)+1; deg[e.t]=(deg[e.t]||0)+1; }
+  let lcsv = "source,target,type,confidence\n";
+  for (const e of links) lcsv += `${csvCell(e.s)},${csvCell(e.t)},${e.m},${e.w ?? 1}\n`;
+  let ncsv = "id,label,name,index,cluster,degree\n";
+  for (const n of DATA.nodes){ if(!ids.has(n.id)) continue;
+    ncsv += `${csvCell(n.id)},${csvCell(codeOf(n))},${csvCell(n.n)},${n.x},${nodeCl(n)},${deg[n.id]||0}\n`; }
+  downloadCsv("cosmograph-links.csv", lcsv);
+  setTimeout(()=>downloadCsv("cosmograph-nodes.csv", ncsv), 400);   // stagger the two downloads
+  const btn = document.getElementById("exportBtn");
+  btn.textContent = `✓ ${ids.size.toLocaleString()} nodes · ${links.length.toLocaleString()} links`;
+  setTimeout(()=>{ btn.textContent = "⭳ Cosmograph"; }, 2600);
+}
+document.getElementById("exportBtn").addEventListener("click", exportCosmograph);
 document.querySelectorAll(".bmode button").forEach(b=>b.addEventListener("click", ()=>{
   document.querySelectorAll(".bmode button").forEach(x=>x.classList.remove("active"));
   b.classList.add("active"); browseMode=b.dataset.mode; renderBrowse();
