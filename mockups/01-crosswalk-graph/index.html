@@ -130,7 +130,6 @@
     </div>
   </div>
   <div class="ctl" id="ctl">
-    <label style="display:none"><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
     <div id="nodeleg"></div>
     <div class="ctl-note">Edge colour = source · opacity = confidence</div>
     <div id="layers"></div>
@@ -203,7 +202,7 @@ let posCache = null;                   // id → last {px,py,vx,vy}, carried acr
 // arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
 // so a big hub's neighbourhood lays out cleanly instead of a jittering hairball.
 function buildSub(centerId){
-  const depth2 = document.getElementById("depth2").checked;
+  const depth2 = false;   // 2-hop view retired from the UI — always 1-hop
   const nbr = id => (adj.get(id)||[]).filter(x => edgeOn(x.m)).map(x=>x.o);
   const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
   focusId = centerId; currentCluster = -1;
@@ -462,7 +461,6 @@ window.addEventListener("mouseup", e=>{
 });
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
   const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
-document.getElementById("depth2").addEventListener("change", rebuild);
 // degree filter — thin the current view by hiding low-degree nodes
 const degFilter=document.getElementById("degFilter"), fbval=document.getElementById("fbval");
 degFilter.addEventListener("input", ()=>{
