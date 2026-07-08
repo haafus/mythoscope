@@ -12,9 +12,14 @@ Run from repo root:  python mockups/15-berezkin-clusters-report/build_data.py
 """
 import importlib.util
 import json
+import math
 import re
 from collections import Counter
 from pathlib import Path
+
+import numpy as np
+from scipy.spatial import ConvexHull, QhullError
+from sklearn.cluster import DBSCAN
 
 ROOT = Path(__file__).resolve().parents[2]
 MOCKS = ROOT / "mockups"
@@ -30,6 +35,62 @@ def load_mod(rel, name):
 
 def canon(s):
     return re.sub(r"\s+", " ", (s or "").strip()).rstrip(".,;:")
+
+
+# --------------------------------------------------------------------------- #
+# Approximate filled "footprint" blobs for a cluster's points.
+# DBSCAN groups nearby traditions; singletons (label -1) are dropped as outliers,
+# so a stray point never balloons the shape. Each dense group becomes a buffered,
+# corner-cut (Chaikin) polygon — an organic contour rather than a raw hull.
+# --------------------------------------------------------------------------- #
+def _ring(cx, cy, r, n=18):
+    return [[round(cx + r * math.cos(2 * math.pi * i / n), 2),
+             round(cy + r * math.sin(2 * math.pi * i / n), 2)] for i in range(n)]
+
+
+def _buffer_hull(pts, pad):
+    c = pts.mean(axis=0)
+    try:
+        verts = pts[ConvexHull(pts).vertices]
+    except (QhullError, ValueError):          # collinear / degenerate
+        r = float(np.max(np.linalg.norm(pts - c, axis=1))) + pad
+        return _ring(c[0], c[1], max(r, pad))
+    out = []
+    for v in verts:                            # push each vertex outward from centroid
+        d = v - c
+        n = np.linalg.norm(d) or 1.0
+        p = c + d + (d / n) * pad
+        out.append([round(float(p[0]), 2), round(float(p[1]), 2)])
+    return out
+
+
+def _chaikin(poly, iters=2):
+    for _ in range(iters):
+        out = []
+        for i in range(len(poly)):
+            a, b = poly[i], poly[(i + 1) % len(poly)]
+            out.append([round(a[0] * 0.75 + b[0] * 0.25, 2), round(a[1] * 0.75 + b[1] * 0.25, 2)])
+            out.append([round(a[0] * 0.25 + b[0] * 0.75, 2), round(a[1] * 0.25 + b[1] * 0.75, 2)])
+        poly = out
+    return poly
+
+
+def cluster_blobs(points, eps=12.0, pad=3.5):
+    """points: list of (lon, lat). Returns a list of smoothed polygon rings."""
+    if not points:
+        return []
+    P = np.array([[p["x"], p["y"]] for p in points], dtype=float)
+    if len(P) < 3:
+        return [_chaikin(_ring(P[:, 0].mean(), P[:, 1].mean(), pad + 1))]
+    labels = DBSCAN(eps=eps, min_samples=2).fit(P).labels_
+    blobs = []
+    for lab in sorted(set(labels)):
+        if lab == -1:                          # noise → outliers, ignored
+            continue
+        comp = P[labels == lab]
+        blobs.append(_chaikin(_buffer_hull(comp, pad) if len(comp) >= 3
+                              else _ring(comp[:, 0].mean(), comp[:, 1].mean(), pad + 1)))
+    return blobs
 
 
 # 14 distinct cluster colours (fixed order)
@@ -126,6 +187,9 @@ def main():
     mid2grp = {r["id"]: (r.get("motif_group") or "").split(" ", 1)[-1] or "—" for r in bz["motifs"]}
 
     d = m06.bicluster("brz")
+    pts_by_k = {}
+    for p in d["points"]:
+        pts_by_k.setdefault(p["k"], []).append(p)
     clusters = []
     for k, c in enumerate(d["clusters"]):
         macros = Counter(name2macro.get(t, "?") for t in c["traditions"])
@@ -137,6 +201,7 @@ def main():
         clusters.append({
             "id": k, "color": PALETTE[k % len(PALETTE)],
             "name": pr.get("name", f"Cluster {k}"),
+            "blobs": cluster_blobs(pts_by_k.get(k, [])),
             "n_motif": c["n_motif"], "n_trad": c["n_trad"],
             "macros": [{"name": a, "n": n} for a, n in macros.most_common(6) if a != "?"],
             "themes": [{"name": t, "n": n} for t, n in themes.most_common(4)],

@@ -100,18 +100,26 @@ const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":
 const clip = (s,n)=> s.length>n ? s.slice(0,n-1)+"…" : s;
 
 // ---- map builder (equirectangular: cx=lon+180, cy=90-lat) ----
+function blobPath(ring){
+  return "M" + ring.map(pt=>`${(pt[0]+180).toFixed(2)} ${(90-pt[1]).toFixed(2)}`).join("L") + "Z";
+}
 function mapSVG(activeK){
   const land = `<path class="land" d="${window.LAND||""}"/>`;
+  // filled cluster footprints (under the points). Combined map: all clusters, faint.
+  const cls = activeK==null ? D.clusters : [D.clusters[activeK]];
+  const fillOp = activeK==null ? 0.13 : 0.20, strokeOp = activeK==null ? 0.45 : 0.7;
+  const blobs = cls.flatMap(c => (c.blobs||[]).map(ring=>
+    `<path d="${blobPath(ring)}" fill="${c.color}" fill-opacity="${fillOp}" `+
+    `stroke="${c.color}" stroke-opacity="${strokeOp}" stroke-width="0.4"/>`)).join("");
   const pts = D.points.map(p=>{
     const on = activeK==null || p.k===activeK;
     const cx=p.x+180, cy=90-p.y;
     const col = activeK==null ? D.clusters[p.k].color : (on?D.clusters[p.k].color:"#cfd4cd");
     const r = on ? (activeK==null?1.15:1.5) : 0.7;
-    const op = on ? 0.9 : 0.35;
+    const op = on ? 0.9 : 0.3;
     return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" fill-opacity="${op}"/>`;
   }).join("");
-  // draw active cluster points last (on top)
-  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${pts}</svg>`;
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${blobs}${pts}</svg>`;
 }
 
 document.getElementById("mapAll").innerHTML = mapSVG(null);
