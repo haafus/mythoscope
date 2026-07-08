@@ -4,8 +4,8 @@ Standalone feature prototypes, **separate from the main app**. Each is a single
 self-contained `index.html` (inline CSS/JS, no build step, no framework). Most of the
 numbered ones read a `data.js` snapshot extracted from the built indexes in
 `outputs/motifs/` via a `build_data.py`; the design mocks
-(`geographic-layer`, `motifs-navigator`, `tmi-detail-tree`) embed a small real data
-slice directly and open with no build.
+(`11-tmi-detail-tree`, `12-geographic-layer`, `13-motifs-navigator`) embed a small
+real data slice directly and open with no build.
 
 `data.js` files are git-ignored (they're regenerated artifacts, like `outputs/`).
 Build one, then open the page.
@@ -130,30 +130,30 @@ distances, yet already recovers sensible groups (East-Asian, Oceanic, Germanic,
 Christianity↔Islam, classical epics). The size bar makes the ~3-orders-of-magnitude
 length skew (KJV vs a short folktale) obvious. Analytical-dashboard direction.
 
-### motif-text-embedding-eval · how to embed motifs for text matching
+### 10 · motif-text-embedding-eval · how to embed motifs for text matching
 A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged
 tales: measures recall@k / MRR for motif embeddings composed as name / +summary /
 +hierarchy against text as whole-tale / passage-chunks. Answers "what goes in a motif
-embedding" on real data. See [`motif-text-embedding-eval/README.md`](motif-text-embedding-eval/README.md).
+embedding" on real data. See [`10-motif-text-embedding-eval/README.md`](10-motif-text-embedding-eval/README.md).
 
-### tmi-detail-tree · extracted TMI detail hierarchy tree
+### 11 · tmi-detail-tree · extracted TMI detail hierarchy tree
 The **filter + category tree** that used to sit at the bottom of a Thompson motif's
 detail page, removed from the app and preserved here (working). Reproduces
 `renderTmiTree` + its tier filter over a real chapter-A slice; open `index.html`
-directly. See [`tmi-detail-tree/README.md`](tmi-detail-tree/README.md).
+directly. See [`11-tmi-detail-tree/README.md`](11-tmi-detail-tree/README.md).
 
-### geographic-layer · one shared region taxonomy over all three indexes
+### 12 · geographic-layer · one shared region taxonomy over all three indexes
 A design mock for reading the three indexes **geographically** through one shared
 region taxonomy (ATU attestations · TMI cultures · Berezkin areal traditions): a
 regional "fingerprint" for one entity via the cross-walk, an aggregate by region, and
 linked region/list/detail pages for a Siberia slice. Multiple static HTML pages, no
-build. See [`geographic-layer/README.md`](geographic-layer/README.md).
+build. See [`12-geographic-layer/README.md`](12-geographic-layer/README.md).
 
-### motifs-navigator · unified motif navigator
+### 13 · motifs-navigator · unified motif navigator
 A click-through mock of the [motifs-browser UI proposal](../docs/motifs/proposals/motifs-browser-ui.md)
 — one navigator surface with composable lenses over a real ≈83-motif slice of TMI
 chapter A, embedded in the file. No API, open `index.html` directly. See
-[`motifs-navigator/README.md`](motifs-navigator/README.md).
+[`13-motifs-navigator/README.md`](13-motifs-navigator/README.md).
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded

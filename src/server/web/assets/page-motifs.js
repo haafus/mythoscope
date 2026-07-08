@@ -1041,7 +1041,7 @@ function introHtml(intro) {
     </div>`;
 }
 
-// Shared macro-region palette (echoes the geographic-layer mockup) so a region
+// Shared macro-region palette (echoes the 12-geographic-layer mockup) so a region
 // reads the same colour in the overview bars and the per-type accordion.
 const REGION_COLORS = {
     "Europe": "#4f7096", "Near East": "#c9873f", "Central Asia": "#8a7f4e",
