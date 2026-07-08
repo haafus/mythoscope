@@ -253,7 +253,7 @@ function drawHeat(){
   ord.forEach((ri,r)=>{
     h+=`<text x="${lab-6}" y="${lab+r*cell+cell/2+3}" text-anchor="end" fill="#4a545c">${esc(clip(H.labels[ri]))}</text>`;
     h+=`<rect x="${lab-3}" y="${lab+r*cell+2}" width="2.5" height="${cell-4}" fill="${H.colors[ri]}"/>`;
-    ord.forEach((ci,c)=>{ const v=sim[ri][ci], t=ri===ci?1:(v-lo)/span; const fill=ri===ci?"#e2edf0":ramp(Math.max(0,Math.min(1,t)));
+    ord.forEach((ci,c)=>{ const v=sim[ri][ci], t=ri===ci?1:(v-lo)/span; const fill=ramp(Math.max(0,Math.min(1,t)));  // diagonal = self = max = darkest
       h+=`<rect class="hc" data-r="${ri}" data-c="${ci}" x="${lab+c*cell}" y="${lab+r*cell}" width="${cell-1}" height="${cell-1}" rx="2" fill="${fill}"/>`; });
   });
   h+=`</svg>`;
