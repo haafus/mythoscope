@@ -27,17 +27,23 @@
 
 html {
     background: #faf9f5;
+    /* Chrome only ever rubber-bands the root document, so a pane's over-drag that
+       chains up here flashes the beige page background. Suppress the root bounce;
+       Safari's own white pane bounce (below) is unaffected — it's per-element. */
+    overscroll-behavior: none;
 }
 
 body {
     color: #212529;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.5;
+    overscroll-behavior: none;
 }
 
 /* Keep each pane's overscroll bounce within the pane — so over-dragging reveals
    the pane's own (white) background instead of chaining to the document, which
-   would flash the beige page background past the pane edge. */
+   would flash the beige page background past the pane edge. (Safari renders a
+   local elastic bounce here; Chrome hard-stops, but either way stays white.) */
 .library-tree,
 .rail-body,
 .corpus-page .reader-content,
