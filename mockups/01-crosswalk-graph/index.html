@@ -101,7 +101,8 @@
   <div class="focusinfo" id="focusinfo"></div>
   <div class="ctl">
     <label><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
-    <div class="ctl-h">Suggestion layers</div>
+    <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
+      <input type="checkbox" id="sugAll"> Suggestion layers — all</label>
     <label><input type="checkbox" class="sug" value="near" checked> near-identical</label>
     <label><input type="checkbox" class="sug" value="lexical"> lexical</label>
     <label><input type="checkbox" class="sug" value="reasoned" checked> reasoned</label>
@@ -322,10 +323,14 @@ window.addEventListener("mouseup", e=>{
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
   const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
 document.getElementById("depth2").addEventListener("change", ()=>focusId&&buildSub(focusId));
-document.querySelectorAll(".sug").forEach(cb=>cb.addEventListener("change", ()=>{
-  enabledSug = new Set([...document.querySelectorAll(".sug:checked")].map(c=>c.value));
-  if (focusId) buildSub(focusId);
-}));
+const sugAll = document.getElementById("sugAll");
+function applySug(){ enabledSug = new Set([...document.querySelectorAll(".sug:checked")].map(c=>c.value));
+  const n = document.querySelectorAll(".sug").length, on = enabledSug.size;
+  sugAll.checked = on===n; sugAll.indeterminate = on>0 && on<n;
+  if (focusId) buildSub(focusId); }
+document.querySelectorAll(".sug").forEach(cb=>cb.addEventListener("change", applySug));
+sugAll.addEventListener("change", ()=>{ document.querySelectorAll(".sug").forEach(c=>c.checked=sugAll.checked); applySug(); });
+applySug();   // sync the master's initial (indeterminate) state
 
 // ---- search ----
 const search=document.getElementById("search"), results=document.getElementById("results");
