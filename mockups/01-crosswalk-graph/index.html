@@ -61,7 +61,7 @@
   .filterbox { background: rgba(255,255,255,.94); border: 1px solid #dee2e6; border-radius: 8px;
                padding: 8px 11px; font-size: 12px; }
   .filterbox .fb-h { font-size: 11px; color: #495057; }
-  .filterbox input[type=range] { width: 100%; accent-color: #9aa7b2; margin: 5px 0 2px; }
+  .filterbox input[type=range] { width: 100%; accent-color: #c6ccd2; height: 3px; margin: 7px 0 3px; }
   .filterbox .fb-note { font-size: 10.5px; color: #9299a1; }
   .focusinfo .fi-id { font-weight: 700; }
   .focusinfo .fi-n { color: #374151; }
@@ -254,7 +254,10 @@ function buildSub(centerId){
     const key = e.s<e.t?e.s+e.t:e.t+e.s; if (seen.has(key)) continue; seen.add(key);
     edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d, w:e.w });
   }
-  sub = { nodes, edges };
+  // drop nodes left with no shown edge (the degree filter can strip a node's only
+  // shown neighbours); keep the focus so it never vanishes.
+  const conn = new Set(); for (const e of edges){ conn.add(e.a.id); conn.add(e.b.id); }
+  sub = { nodes: nodes.filter(n => n.id===centerId || conn.has(n.id)), edges };
   layoutMode = useForce ? "force" : "concentric"; alpha = useForce ? 1 : 0;
 
   // Fit the whole neighbourhood into the viewport.
@@ -294,7 +297,8 @@ function buildCluster(cid){
     const key = e.s<e.t?e.s+e.t:e.t+e.s; if (seen.has(key)) continue; seen.add(key);
     edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d, w:e.w });
   }
-  sub = { nodes, edges }; layoutMode = "force"; alpha = 1;
+  const conn = new Set(); for (const e of edges){ conn.add(e.a.id); conn.add(e.b.id); }
+  sub = { nodes: nodes.filter(n => conn.has(n.id)), edges }; layoutMode = "force"; alpha = 1;
   view = { x:cx, y:cy, k:0.9 };
   const col = clColor(cid), by = ci.by_index;
   document.getElementById("focusinfo").innerHTML =
