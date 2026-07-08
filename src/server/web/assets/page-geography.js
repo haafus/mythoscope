@@ -145,7 +145,6 @@ function renderMarkers(map, traditions) {
             const marker = L.marker(position, {
                 icon: createMarkerIcon(item),
                 keyboard: true,
-                title: item.name,
             })
                 .addTo(map)
                 .bindPopup(buildPopupHtml(item), {
