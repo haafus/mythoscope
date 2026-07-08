@@ -1,4 +1,5 @@
 *- Preliminary draft of paper discourse / research plan. To be evolved.*
+*- Live formatted version on [Overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91).*
 *- Though generated and lacks consistency and strong results for now, the overall conceptual framework, structure and references list are intact.*
 *- Could be split and released in several steps.*
 *- Basically, the steps of the research to do/release are:*

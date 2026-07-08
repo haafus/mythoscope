@@ -63,7 +63,7 @@
 ### Documentation
 
 1. [How to](docs/how_to.md) — project map, setup, CLI and the end-to-end pipeline
-2. [Paper](docs/paper/) — [preliminary draft](docs/paper/draft.md) ([overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91)) and [bibliography](docs/paper/bibliography.md)
+2. [Paper](docs/paper/) — [preliminary draft](docs/paper/draft.md) and [bibliography](docs/paper/bibliography.md)
 3. [Research context](docs/research/) — [computational-folkloristics survey](docs/research/computational-folkloristics-survey.md), [landscape](docs/research/computational-folkloristics-landscape.md), [motif-induction methods review](docs/research/motif-induction-review.md), [survey 2018–2026](docs/research/motif-induction-survey.md)
 4. [Motif-index documentation](docs/motifs/README.md) — sources, parsing, cross-walk (hub: [data sources & integration](docs/motifs/motif-index-data-sources.md))
 5. [Reviews](docs/reviews/) — [repository review](docs/reviews/2026-07-repo-review.md), [category-colour system](docs/reviews/color-system-review.md)
