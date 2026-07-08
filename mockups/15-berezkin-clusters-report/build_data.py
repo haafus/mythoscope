@@ -75,22 +75,22 @@ def _chaikin(poly, iters=2):
     return poly
 
 
-def cluster_blobs(points, eps=12.0, pad=3.5):
-    """points: list of (lon, lat). Returns a list of smoothed polygon rings."""
+def cluster_blobs(points, eps=25.0, pad=3.5):
+    """points: list of {x:lon, y:lat}. Returns ONE smoothed ring enclosing the whole
+    cluster. Only truly isolated strays are dropped first (DBSCAN noise at a generous
+    eps), so a lone outlier can't stretch the contour, but genuine sub-groups on
+    different continents are still enclosed by the single hull."""
     if not points:
         return []
     P = np.array([[p["x"], p["y"]] for p in points], dtype=float)
+    if len(P) >= 4:
+        labels = DBSCAN(eps=eps, min_samples=2).fit(P).labels_
+        kept = P[labels != -1]
+        if len(kept) >= 3:
+            P = kept
     if len(P) < 3:
         return [_chaikin(_ring(P[:, 0].mean(), P[:, 1].mean(), pad + 1))]
-    labels = DBSCAN(eps=eps, min_samples=2).fit(P).labels_
-    blobs = []
-    for lab in sorted(set(labels)):
-        if lab == -1:                          # noise → outliers, ignored
-            continue
-        comp = P[labels == lab]
-        blobs.append(_chaikin(_buffer_hull(comp, pad) if len(comp) >= 3
-                              else _ring(comp[:, 0].mean(), comp[:, 1].mean(), pad + 1)))
-    return blobs
+    return [_chaikin(_buffer_hull(P, pad))]
 
 
 # 14 distinct cluster colours (fixed order)

@@ -107,7 +107,7 @@ function mapSVG(activeK){
   const land = `<path class="land" d="${window.LAND||""}"/>`;
   // filled cluster footprints (under the points). Combined map: all clusters, faint.
   const cls = activeK==null ? D.clusters : [D.clusters[activeK]];
-  const fillOp = activeK==null ? 0.13 : 0.20, strokeOp = activeK==null ? 0.45 : 0.7;
+  const fillOp = activeK==null ? 0.09 : 0.20, strokeOp = activeK==null ? 0.4 : 0.7;
   const blobs = cls.flatMap(c => (c.blobs||[]).map(ring=>
     `<path d="${blobPath(ring)}" fill="${c.color}" fill-opacity="${fillOp}" `+
     `stroke="${c.color}" stroke-opacity="${strokeOp}" stroke-width="0.4"/>`)).join("");
