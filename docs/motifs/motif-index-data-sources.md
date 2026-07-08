@@ -34,15 +34,15 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 - **Библиография TMI** (расшифровка сокращённых цитат в `notes`) строится из
   английской библиографии **`folkmasa.org`** плюс кураторская добавка иностранных
   работ → **320 записей, 236 со ссылкой на книгу**.
-- **Cross-walk** между индексами строится на шаге `[4/4]`: ATU↔TMI четырьмя видами
+- **Cross-walk** между индексами строится на шаге `[4/5]`: ATU↔TMI четырьмя видами
   (constituent из `atu_seq`, defining, и два inline — из заметок TMI и из summary
   ATU), Берёзкин↔ATU (ссылки в титулах, с починкой старых номеров), Берёзкин↔TMI
   (напрямую из кураторских Thompson-id `mapsofmyths`). Полный справочник —
   [`crosswalk.md`](crosswalk.md).
 
-## Пайплайн и архитектура (Model B)
+## Пайплайн и архитектура
 
-`mytho motifs` собирает базу в четыре шага (`src/motifs/build_motifs.py`):
+`mytho motifs` собирает базу в пять шагов (`src/motifs/build_motifs.py`):
 
 ```
 [1/5] Berezkin  — scrape areasofmyths + обогащение mapsofmyths
@@ -52,7 +52,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 [5/5] Parallels — эвристические текстовые параллели (подсказки без записанных связей)
 ```
 
-**Model B — только код в репозитории, не данные:**
+**Только код в репозитории, не данные:**
 
 - Сырые загрузки кэшируются в `outputs/motifs/raw/**` (**gitignored**), готовые
   индексы — в `outputs/motifs/*.json` (**gitignored**). Коммитится только код; всё
@@ -176,7 +176,7 @@ degradation); сырой ответ кэшируется в `raw/wikidata/`.
 Ключ — `tmi_bibliography.json`; человекочитаемая версия —
 [`tmi-bibliography-key.md`](tmi-bibliography-key.md).
 
-## Cross-walk (шаг `[4/4]`)
+## Cross-walk (шаг `[4/5]`)
 
 Строится в `src/motifs/crosswalk.py` из уже разобранных индексов. Всего **шесть**
 отношений, каждое хранится в обе стороны; ATU↔TMI распадается на четыре
