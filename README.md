@@ -44,7 +44,7 @@
 4. Cambridge - DH / CST bridge: [CDH](https://www.cdh.cam.ac.uk), [CST](https://www.cst.cam.ac.uk)
 5. [Durham University - Cultural evolution & folklore tradition](https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/) (Jamshid Tehrani)
 6. [Stanford - Literary Lab](https://litlab.stanford.edu) (Franco Moretti)
-7. Ecole Normale Superieure / CNRS - Structural mythology tradition (Julien d'Huy)
+7. [Ecole Normale Superieure / CNRS - Structural mythology tradition](https://college-de-france.academia.edu/JuliendHuy) (Julien d'Huy)
 8. [IACM](https://www.compmyth.org) (Michael Witzel - Harvard, Natalya Yanchevskaya - Princeton, Steve Farmer)
 9. [Лаборатория Ненужных Вещей](https://7seminarov.com) (Брагинская, Александрова, Чегодаев, Березкин и др.)
 

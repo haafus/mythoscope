@@ -1,27 +1,30 @@
 # Mockups
 
 Standalone feature prototypes, **separate from the main app**. Each is a single
-self-contained `index.html` (inline CSS/JS, no build step, no framework) that reads a
-`data.js` snapshot extracted from the built indexes in `outputs/motifs/`.
+self-contained `index.html` (inline CSS/JS, no build step, no framework). Most of the
+numbered ones read a `data.js` snapshot extracted from the built indexes in
+`outputs/motifs/` via a `build_data.py`; the design mocks
+(`geographic-layer`, `motifs-navigator`, `tmi-detail-tree`) embed a small real data
+slice directly and open with no build.
 
 `data.js` files are git-ignored (they're regenerated artifacts, like `outputs/`).
-Build them once, then open the page.
+Build one, then open the page.
 
 ## Run
 
 ```bash
 # from the repo root, with the motif DB already built (`mytho motifs`)
 . .venv/bin/activate
-python mockups/01-crosswalk-graph/build_data.py
-python mockups/02-semantic-parallels/build_data.py
-python mockups/03-areal-clusters/build_data.py
+python mockups/07-tradition-motif-combined/build_data.py   # build any prototype's data.js
 
 # serve the folder (data.js loads via <script>, so file:// works too, but a server is cleaner)
 python -m http.server -d mockups 8890
-# → http://127.0.0.1:8890/01-crosswalk-graph/
+# → http://127.0.0.1:8890/07-tradition-motif-combined/
 ```
 
-## The three prototypes
+The design mocks need no build — open their `index.html` directly.
+
+## The prototypes
 
 ### 01 · Interactive cross-walk graph
 A force-directed explorer over the **confirmed** cross-index links (7,274 edges).
@@ -44,6 +47,13 @@ vectoriser in `build_data.py` (sentence-transformers / an embeddings API) for
 production quality. All 11k vectors + the projection matrix ship quantised (int8) so
 the query is embedded and searched entirely in the browser.
 
+### 03 · Geographically co-occurring motif clusters
+Uses Berezkin's areal data: every motif carries a set of ethnic **traditions**, each
+placed in an areal hierarchy (17 English macro-regions). Motifs are clustered by the
+shape of their areal footprint (subregion, rarity-weighted k-means). Browse clusters
+(dominant regions shown as a colour bar) or pick a motif to see what **co-distributes**
+with it (tradition-set Jaccard) — motifs that "travel together" culturally.
+
 ### 04 · Semantic parallels on BGE-M3 (vs LSA)
 The same corpus as #02, embedded with **real transformer vectors** (`BAAI/bge-m3`,
 1024-d) beside the LSA stand-in, for a direct A/B. Pick a motif → its nearest
@@ -55,13 +65,6 @@ Neighbours are precomputed in `build_data.py` (a browser can't run BGE-M3, and t
 is no live free-text mode here for the same reason). BGE embeddings are cached to
 `bge_emb.npy`; first build downloads the ~2 GB model and encodes ~11k docs (slow on
 CPU, minutes-to-an-hour; instant thereafter).
-
-### 03 · Geographically co-occurring motif clusters
-Uses Berezkin's areal data: every motif carries a set of ethnic **traditions**, each
-placed in an areal hierarchy (17 English macro-regions). Motifs are clustered by the
-shape of their areal footprint (subregion, rarity-weighted k-means). Browse clusters
-(dominant regions shown as a colour bar) or pick a motif to see what **co-distributes**
-with it (tradition-set Jaccard) — motifs that "travel together" culturally.
 
 ### 05 · Tradition → motif mapping (data-driven, no fixed grid)
 Instead of a fixed macro-area grid, this takes the **culture/tradition labels the
@@ -90,6 +93,16 @@ and a Near-East/N-Africa/S-Asia block; TMI is coarser (its "cultures" are as muc
 source-collection as ethnos). Per-index thresholds are in `CFG` at the top of
 `build_data.py`.
 
+### 07 · Tradition → motif biclusters, combined
+Merges #05 and #06 into one page: the cross-index co-clustering (#05) becomes the
+first **All indexes** tab, alongside the per-index tabs (#06), with the cluster column
+to the **left of the shared map**. For the *All* and *TMI* views, TMI's free-text
+culture labels are normalized through the pipeline's curated dictionary
+(`culture_dict.canonical` — merges `Icel.`→`Icelandic`, strips `(sub-area)`, keeps
+genre labels distinct), and the clustering parameters are retuned for the cleaner
+vocabulary. The before/after comparison and the parameter choices are in
+[`07-tradition-motif-combined/NORMALIZATION.md`](07-tradition-motif-combined/NORMALIZATION.md).
+
 ### motif-text-embedding-eval · how to embed motifs for text matching
 A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged
 tales: measures recall@k / MRR for motif embeddings composed as name / +summary /
@@ -101,6 +114,19 @@ The **filter + category tree** that used to sit at the bottom of a Thompson moti
 detail page, removed from the app and preserved here (working). Reproduces
 `renderTmiTree` + its tier filter over a real chapter-A slice; open `index.html`
 directly. See [`tmi-detail-tree/README.md`](tmi-detail-tree/README.md).
+
+### geographic-layer · one shared region taxonomy over all three indexes
+A design mock for reading the three indexes **geographically** through one shared
+region taxonomy (ATU attestations · TMI cultures · Berezkin areal traditions): a
+regional "fingerprint" for one entity via the cross-walk, an aggregate by region, and
+linked region/list/detail pages for a Siberia slice. Multiple static HTML pages, no
+build. See [`geographic-layer/README.md`](geographic-layer/README.md).
+
+### motifs-navigator · unified motif navigator
+A click-through mock of the [motifs-browser UI proposal](../docs/motifs/proposals/motifs-browser-ui.md)
+— one navigator surface with composable lenses over a real ≈83-motif slice of TMI
+chapter A, embedded in the file. No API, open `index.html` directly. See
+[`motifs-navigator/README.md`](motifs-navigator/README.md).
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
