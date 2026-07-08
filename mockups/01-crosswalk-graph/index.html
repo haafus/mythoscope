@@ -68,10 +68,11 @@
   .focusinfo .fi-id { font-weight: 700; }
   .focusinfo .fi-n { color: #374151; }
   .focusinfo .fi-d { color: #6c757d; font-size: 11px; margin-top: 2px; }
-  .btn { padding: 7px 12px; font-size: 12.5px; border: 1px solid #dee2e6; border-radius: 6px;
+  .btn { padding: 9px 12px; font-size: 12.5px; border: 1px solid #dee2e6; border-radius: 6px;
          background: #fff; cursor: pointer; white-space: nowrap; }
   .btn:hover { background: #eef4fb; }
-  #browse { position: absolute; z-index: 25; top: 60px; right: 12px; width: 344px; max-height: 74vh;
+  .btn:active, .btn.on { background: #111827; color: #fff; border-color: #111827; }
+  #browse { position: absolute; z-index: 25; top: 100%; left: 0; margin-top: 8px; width: 300px; max-height: 58vh;
             background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
             box-shadow: 0 6px 20px rgba(0,0,0,.1); display: none; flex-direction: column; }
   #browse .bhead { padding: 8px 10px 6px; font-size: 11px; color: #6c757d; border-bottom: 1px solid #f1f3f5; }
@@ -96,23 +97,6 @@
 <main>
   <canvas id="cv"></canvas>
   <div id="results"></div>
-  <div id="browse">
-    <div class="bmode">
-      <button data-mode="hubs" class="active">Most-linked hubs</button>
-      <button data-mode="clusters">Dense clusters</button>
-    </div>
-    <div class="bhead" id="bhead"></div>
-    <div class="bfilter" id="bfilter">
-      <button data-x="" class="active">All</button>
-      <button data-x="tmi">TMI</button>
-      <button data-x="atu">ATU</button>
-      <button data-x="brz">Berezkin</button>
-    </div>
-    <div id="bvariant" style="display:none;padding:7px 8px;border-bottom:1px solid #f1f3f5">
-      <select id="clsel" style="width:100%;padding:5px 6px;font-size:12px;border:1px solid #dee2e6;border-radius:5px"></select>
-    </div>
-    <div id="blist"></div>
-  </div>
   <div class="tip" id="tip"></div>
   <div id="leftcol">
     <div class="focusinfo" id="focusinfo"></div>
@@ -124,6 +108,23 @@
     <div class="leftbtns">
       <button id="exportBtn" class="btn" title="Download the full graph with the currently enabled layers as two Cosmograph CSVs (links + nodes)">↓ Cosmograph</button>
       <button id="browseBtn" class="btn">☰ Browse</button>
+    </div>
+    <div id="browse">
+      <div class="bmode">
+        <button data-mode="hubs" class="active">Most-linked hubs</button>
+        <button data-mode="clusters">Dense clusters</button>
+      </div>
+      <div class="bhead" id="bhead"></div>
+      <div class="bfilter" id="bfilter">
+        <button data-x="" class="active">All</button>
+        <button data-x="tmi">TMI</button>
+        <button data-x="atu">ATU</button>
+        <button data-x="brz">Berezkin</button>
+      </div>
+      <div id="bvariant" style="display:none;padding:7px 8px;border-bottom:1px solid #f1f3f5">
+        <select id="clsel" style="width:100%;padding:5px 6px;font-size:12px;border:1px solid #dee2e6;border-radius:5px"></select>
+      </div>
+      <div id="blist"></div>
     </div>
   </div>
   <div class="ctl" id="ctl">
@@ -497,8 +498,11 @@ function renderBrowse(){
       `<span class="bn">${escapeHtml(n.n)}</span><span class="bd">${gdeg.get(n.id)}</span></div>`).join("");
   }
 }
-document.getElementById("browseBtn").addEventListener("click", ()=>{
-  const open = browse.style.display!=="flex"; browse.style.display=open?"flex":"none"; if(open) renderBrowse();
+const browseBtn = document.getElementById("browseBtn");
+function hideBrowse(){ browse.style.display="none"; browseBtn.classList.remove("on"); }
+browseBtn.addEventListener("click", ()=>{
+  const open = browse.style.display!=="flex"; browse.style.display=open?"flex":"none";
+  browseBtn.classList.toggle("on", open); if(open) renderBrowse();
 });
 
 // ---- export the full graph (with the currently enabled layers) to Cosmograph ----
@@ -539,9 +543,9 @@ clsel.addEventListener("change", ()=>{ setClustering(+clsel.value); currentClust
 });
 blist.addEventListener("click", e=>{
   const dc=e.target.closest("[data-cl]");
-  if (dc){ buildCluster(+dc.dataset.cl); browse.style.display="none"; return; }
-  const d=e.target.closest("[data-id]"); if(!d)return; buildSub(d.dataset.id); browse.style.display="none"; });
-document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target.id!=="browseBtn") browse.style.display="none"; });
+  if (dc){ buildCluster(+dc.dataset.cl); hideBrowse(); return; }
+  const d=e.target.closest("[data-id]"); if(!d)return; buildSub(d.dataset.id); hideBrowse(); });
+document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target!==browseBtn) hideBrowse(); });
 
 function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
