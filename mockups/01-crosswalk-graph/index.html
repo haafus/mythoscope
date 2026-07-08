@@ -194,6 +194,8 @@ let focusId = null;
 let layoutMode = "force", alpha = 0;   // 1-hop = force sim · 2-hop = concentric rings
 let currentCluster = -1;               // >=0 when showing a whole cluster subgraph
 let minDeg = 1;                        // degree filter — hide nodes with fewer total links
+let posCache = null;                   // id → last {px,py,vx,vy}, carried across a thin-out change
+                                       // so filtering keeps the settled layout instead of restarting it
 
 // Deterministic concentric ego-layout: centre → ring1 (direct links, grouped into
 // arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
@@ -251,8 +253,11 @@ function buildSub(centerId){
   // 1-hop → force sim (seeded at the ring positions); 2-hop → bloom to concentric targets.
   const useForce = !depth2;
   const nodes = [...pos.keys()].map(id => { const p = pos.get(id);
+    const c = posCache && posCache.get(id);   // kept node → resume its current position
     return Object.assign({}, byId.get(id),
-      { tx:p.x, ty:p.y, px: useForce?p.x:cx, py: useForce?p.y:cy, vx:0, vy:0, pinned:false }); });
+      { tx:p.x, ty:p.y,
+        px: c ? c.px : (useForce?p.x:cx), py: c ? c.py : (useForce?p.y:cy),
+        vx: c ? c.vx : 0, vy: c ? c.vy : 0, pinned:false }); });
   const nmap = new Map(nodes.map(n=>[n.id,n]));
   const seen = new Set(), edges = [];
   for (const e of DATA.edges) {
@@ -297,7 +302,10 @@ function buildCluster(cid){
   if (truncated) mem = [...mem].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0, CLUSTER_CAP);
   const R = Math.min(cx,cy)*0.72;
   const nodes = mem.map((n,i)=>{ const th=TAU*i/mem.length;
-    return Object.assign({}, n, { tx:cx, ty:cy, px:cx+Math.cos(th)*R, py:cy+Math.sin(th)*R, vx:0, vy:0, pinned:false }); });
+    const c = posCache && posCache.get(n.id);   // kept node → resume its current position
+    return Object.assign({}, n, { tx:cx, ty:cy,
+      px: c ? c.px : cx+Math.cos(th)*R, py: c ? c.py : cy+Math.sin(th)*R,
+      vx: c ? c.vx : 0, vy: c ? c.vy : 0, pinned:false }); });
   const nmap = new Map(nodes.map(n=>[n.id,n]));
   const seen = new Set(), edges = [];
   for (const e of DATA.edges){
@@ -427,7 +435,17 @@ cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1
 document.getElementById("depth2").addEventListener("change", rebuild);
 // degree filter — thin the current view by hiding low-degree nodes
 const degFilter=document.getElementById("degFilter"), fbval=document.getElementById("fbval");
-degFilter.addEventListener("input", ()=>{ minDeg=+degFilter.value; fbval.textContent=minDeg; rebuild(); });
+degFilter.addEventListener("input", ()=>{
+  minDeg=+degFilter.value; fbval.textContent=minDeg;
+  // Keep the settled layout: carry current node positions into the rebuild and
+  // hold the current zoom/pan, so thinning only drops/adds nodes in place.
+  posCache = new Map(sub.nodes.map(n=>[n.id,{px:n.px,py:n.py,vx:n.vx,vy:n.vy}]));
+  const v = view;
+  rebuild();
+  view = v;
+  posCache = null;
+  if (layoutMode==="force") alpha = 0.3;   // gentle re-settle for new nodes, not a full restart
+});
 // ---- combined panel: node legend + edge legend swatches merged with the toggles ----
 const swLine = m => `<svg class="sw" width="20" height="7"><line x1="0" y1="3.5" x2="20" y2="3.5" `+
   `stroke="#8a94a6" stroke-width="2"${m.dash?` stroke-dasharray="${m.dash.join(' ')}"`:''}/></svg>`;
