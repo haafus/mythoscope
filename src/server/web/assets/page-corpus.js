@@ -2,7 +2,7 @@ import {
     app, api, state,
     buildCorpusApiUrl, escapeHtml, formatNumber,
 } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=1";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=2";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `

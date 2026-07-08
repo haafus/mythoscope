@@ -1,5 +1,5 @@
 import { app, api, escapeHtml, onCleanup } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=1";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=2";
 
 let graphCy = null;
 

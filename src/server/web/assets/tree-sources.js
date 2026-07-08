@@ -35,7 +35,7 @@ function renderTraditionGroups(traditions, major, docIndex) {
                 <button class="tradition-title" type="button" style="--tradition-color:${escapeHtml(color)}">
                     <span class="tradition-dot"></span>
                     <span class="tradition-name">${escapeHtml(tradition)}</span>
-                    <span class="tradition-toggle">${isOpen ? "-" : "+"}</span>
+                    <span class="tradition-toggle">${isOpen ? "▾" : "▸"}</span>
                 </button>
                 <ul class="document-list">
                     ${docs.map((doc) => `
@@ -62,7 +62,7 @@ function bindTreeLeaves(container, documents) {
             if (group.classList.contains("open")) state.corpusOpenTraditions.add(key);
             else state.corpusOpenTraditions.delete(key);
             const toggle = group.querySelector(".tradition-toggle");
-            if (toggle) toggle.textContent = group.classList.contains("open") ? "-" : "+";
+            if (toggle) toggle.textContent = group.classList.contains("open") ? "▾" : "▸";
         });
     });
 
