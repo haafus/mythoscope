@@ -54,8 +54,15 @@
   .comp { display: flex; height: 5px; width: 46px; border-radius: 3px; overflow: hidden; background: #eef1f4; flex: 0 0 auto; }
   .comp > i { height: 100%; }
   #blist .cl-lab { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-  .focusinfo { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.94);
-               border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 11px; font-size: 12px; max-width: 300px; }
+  #leftcol { position: absolute; top: 12px; left: 12px; width: 236px; z-index: 15;
+             display: flex; flex-direction: column; gap: 8px; }
+  .focusinfo { background: rgba(255,255,255,.94); border: 1px solid #dee2e6; border-radius: 8px;
+               padding: 8px 11px; font-size: 12px; }
+  .filterbox { background: rgba(255,255,255,.94); border: 1px solid #dee2e6; border-radius: 8px;
+               padding: 8px 11px; font-size: 12px; }
+  .filterbox .fb-h { font-size: 11px; color: #495057; }
+  .filterbox input[type=range] { width: 100%; accent-color: #9aa7b2; margin: 5px 0 2px; }
+  .filterbox .fb-note { font-size: 10.5px; color: #9299a1; }
   .focusinfo .fi-id { font-weight: 700; }
   .focusinfo .fi-n { color: #374151; }
   .focusinfo .fi-d { color: #6c757d; font-size: 11px; margin-top: 2px; }
@@ -107,7 +114,14 @@
     <div id="blist"></div>
   </div>
   <div class="tip" id="tip"></div>
-  <div class="focusinfo" id="focusinfo"></div>
+  <div id="leftcol">
+    <div class="focusinfo" id="focusinfo"></div>
+    <div class="filterbox">
+      <div class="fb-h">Thin out: min. links per node ≥ <b id="fbval">1</b></div>
+      <input type="range" id="degFilter" min="1" max="20" value="1">
+      <div class="fb-note" id="fbnote"></div>
+    </div>
+  </div>
   <div class="ctl" id="ctl">
     <label><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
     <div id="nodeleg"></div>
@@ -172,6 +186,7 @@ let sub = { nodes: [], edges: [] };   // current rendered subgraph
 let focusId = null;
 let layoutMode = "force", alpha = 0;   // 1-hop = force sim · 2-hop = concentric rings
 let currentCluster = -1;               // >=0 when showing a whole cluster subgraph
+let minDeg = 1;                        // degree filter — hide nodes with fewer total links
 
 // Deterministic concentric ego-layout: centre → ring1 (direct links, grouped into
 // arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
@@ -184,7 +199,7 @@ function buildSub(centerId){
   const f = byId.get(centerId);
   highlightCluster = nodeCl(f);   // focus a node → highlight its cluster
 
-  const ring1 = [...new Set(nbr(centerId))].filter(o => o !== centerId);
+  const ring1 = [...new Set(nbr(centerId))].filter(o => o !== centerId && gdeg.get(o) >= minDeg);
   const ring1set = new Set(ring1);
   const pos = new Map([[centerId, {x:cx, y:cy}]]);
   const angle1 = new Map();
@@ -212,7 +227,7 @@ function buildSub(centerId){
   if (depth2){
     const seen = new Set([centerId, ...ring1]), r2 = new Set();
     for (const r of ring1) for (const o of nbr(r)) if (!seen.has(o)) r2.add(o);
-    ring2 = [...r2];
+    ring2 = [...r2].filter(o => gdeg.get(o) >= minDeg);
     const baseAngle = id => {
       let sx=0, sy=0;
       for (const o of nbr(id)) if (angle1.has(o)) { sx+=Math.cos(angle1.get(o)); sy+=Math.sin(angle1.get(o)); }
@@ -266,7 +281,7 @@ function buildCluster(cid){
   const ci = clMap.get(cid); if (!ci) return;
   const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
   focusId = null; currentCluster = cid; highlightCluster = -1;
-  let mem = DATA.nodes.filter(n => nodeCl(n)===cid);
+  let mem = DATA.nodes.filter(n => nodeCl(n)===cid && gdeg.get(n.id) >= minDeg);
   const truncated = mem.length > CLUSTER_CAP;
   if (truncated) mem = [...mem].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0, CLUSTER_CAP);
   const R = Math.min(cx,cy)*0.72;
@@ -289,7 +304,9 @@ function buildCluster(cid){
     `<div class="fi-d">TMI ${by.tmi} · ATU ${by.atu} · Brz ${by.brz}</div>`;
 }
 // re-run whichever view is active (cluster subgraph or a node's neighbourhood)
-function rebuild(){ if (currentCluster>=0) buildCluster(currentCluster); else if (focusId) buildSub(focusId); }
+function rebuild(){ if (currentCluster>=0) buildCluster(currentCluster); else if (focusId) buildSub(focusId); updateFbNote(); }
+function updateFbNote(){ const el=document.getElementById("fbnote");
+  if (el) el.textContent = `${sub.nodes.length} node${sub.nodes.length!==1?"s":""} shown`; }
 
 // ---- animation ----
 // 1-hop: a light force sim (repulsion + link springs + centre gravity, focus pinned).
@@ -391,6 +408,9 @@ window.addEventListener("mouseup", e=>{
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
   const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
 document.getElementById("depth2").addEventListener("change", rebuild);
+// degree filter — thin the current view by hiding low-degree nodes
+const degFilter=document.getElementById("degFilter"), fbval=document.getElementById("fbval");
+degFilter.addEventListener("input", ()=>{ minDeg=+degFilter.value; fbval.textContent=minDeg; rebuild(); });
 // ---- combined panel: node legend + edge legend swatches merged with the toggles ----
 const swLine = m => `<svg class="sw" width="20" height="7"><line x1="0" y1="3.5" x2="20" y2="3.5" `+
   `stroke="#8a94a6" stroke-width="2"${m.dash?` stroke-dasharray="${m.dash.join(' ')}"`:''}/></svg>`;
@@ -518,6 +538,7 @@ document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target.
 function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 buildSub("atu:875");   // seed on the busiest hub
+updateFbNote();
 tick();
 </script>
 </body>
