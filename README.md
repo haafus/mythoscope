@@ -1,5 +1,28 @@
 # Toward a Computational Framework for Comparative Mythology
 
+**MythoScope** is a computational framework for comparative mythology. It builds a
+corpus of myth and folklore texts, embeds them, and turns the result into an
+explorable **semantic space** — with character / place / time **graphs** extracted
+per text by LLMs, a **geographic** view, and full-text **search by meaning**.
+Alongside this unsupervised layer it assembles a **motif database** that integrates
+the three traditional folklore indexes — Thompson (TMI), Aarne–Thompson–Uther (ATU)
+and Berezkin's areal catalogue — into one cross-linked, browsable whole, with an
+automatic **cross-walk** between them and lexical/semantic **parallel-finding** on
+top. Everything is served through one web UI; the long-term aim is to relate what
+the embeddings surface to the traditional indexes and expose cross-cultural motif
+parallels at scale.
+
+### Documentation
+
+A map of the docs — each entry is a section with its own README for deeper navigation.
+
+- **[How to](docs/how_to.md)** — setup, CLI, and the end-to-end pipeline. Start here.
+- **[Motif indexes](docs/motifs/)** — how TMI, ATU and Berezkin are sourced, parsed and cross-linked.
+- **[Research context](docs/research/)** — surveys of the field this sits in (computational folkloristics, motif induction).
+- **[Paper](docs/paper/)** — the working draft and bibliography.
+- **[Reviews](docs/reviews/)** — point-in-time code audits.
+- **[Mockups](mockups/)** — standalone feature prototypes over the motif data.
+
 ### Basic Pipeline
 
 1. Download and clean text corpora
@@ -59,12 +82,3 @@
 7. Workshop: [ACL Natural Language Processing for Digital Humanities (NLP4DH)](https://www.nlp4dh.com)
 8. Workshop: [ACL SIG on Humanities (SIGHUM)](https://sighum.wordpress.com)
 9. Workshop: [Digital Methods For Mythological Research (dm4myth)](https://dm4myth.github.io)
-
-### Documentation
-
-1. [How to](docs/how_to.md) — project map, setup, CLI and the end-to-end pipeline
-2. [Paper](docs/paper/) — [preliminary draft](docs/paper/draft.md) and [bibliography](docs/paper/bibliography.md)
-3. [Research context](docs/research/) — [computational-folkloristics survey](docs/research/computational-folkloristics-survey.md), [landscape](docs/research/computational-folkloristics-landscape.md), [motif-induction methods review](docs/research/motif-induction-review.md), [survey 2018–2026](docs/research/motif-induction-survey.md)
-4. [Motif-index documentation](docs/motifs/README.md) — sources, parsing, cross-walk (hub: [data sources & integration](docs/motifs/motif-index-data-sources.md))
-5. [Reviews](docs/reviews/) — [repository review](docs/reviews/2026-07-repo-review.md), [category-colour system](docs/reviews/color-system-review.md)
-6. [Mockups](mockups/README.md) — standalone feature prototypes over the motif indexes (self-contained HTML)
