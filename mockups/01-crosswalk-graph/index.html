@@ -425,14 +425,18 @@ function pick(mx,my){
 }
 cv.addEventListener("mousedown", e=>{ const n=pick(e.offsetX,e.offsetY); moved=false;
   if(n){ dragNode=n; } else { panning=true; cv.classList.add("drag"); } last=[e.offsetX,e.offsetY]; });
+function showTip(n, sx, sy){
+  const def = n.d ? `<div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.18);opacity:.9;white-space:normal;line-height:1.4">${escapeHtml(n.d)}</div>` : "";
+  tip.innerHTML=`<b>${codeOf(n)}</b> — ${escapeHtml(n.n)}<br><span style="opacity:.7">${IDX[n.x].label} · ${gdeg.get(n.id)} links</span>${def}`;
+  tip.style.display="block"; tip.style.left=(sx+14)+"px"; tip.style.top=(sy+10)+"px";
+}
 cv.addEventListener("mousemove", e=>{
   if (dragNode){ const dx=(e.offsetX-last[0])/view.k, dy=(e.offsetY-last[1])/view.k;
-    dragNode.px+=dx; dragNode.py+=dy; dragNode.vx=0; dragNode.vy=0; last=[e.offsetX,e.offsetY]; moved=true; alpha=Math.max(alpha,.3); return; }
+    dragNode.px+=dx; dragNode.py+=dy; dragNode.vx=0; dragNode.vy=0; last=[e.offsetX,e.offsetY]; moved=true; alpha=Math.max(alpha,.3);
+    const P=toScreen(dragNode); showTip(dragNode, P.x, P.y); return; }   // tooltip follows the node
   if (panning){ view.x+=e.offsetX-last[0]; view.y+=e.offsetY-last[1]; last=[e.offsetX,e.offsetY]; moved=true; return; }
   const n=pick(e.offsetX,e.offsetY);
-  if (n){ tip.style.display="block"; tip.style.left=(e.offsetX+14)+"px"; tip.style.top=(e.offsetY+10)+"px";
-    const def = n.d ? `<div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.18);opacity:.9;white-space:normal;line-height:1.4">${escapeHtml(n.d)}</div>` : "";
-    tip.innerHTML=`<b>${codeOf(n)}</b> — ${escapeHtml(n.n)}<br><span style="opacity:.7">${IDX[n.x].label} · ${gdeg.get(n.id)} links</span>${def}`; cv.style.cursor="pointer"; }
+  if (n){ showTip(n, e.offsetX, e.offsetY); cv.style.cursor="pointer"; }
   else { tip.style.display="none"; cv.style.cursor=panning?"grabbing":"grab"; }
 });
 window.addEventListener("mouseup", e=>{
