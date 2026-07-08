@@ -120,6 +120,13 @@ def bicluster(index):
     model = SpectralCoclustering(n_clusters=K, random_state=0, svd_method="arpack").fit(W)
     rlab, clab = model.row_labels_, model.column_labels_
 
+    # Membership (0..1): a tradition's share of motifs that sit in its own cluster
+    # (the symmetric motif measure is `score()` below).
+    Mcsc = M.tocsc()
+    trad_mem = {name: round(float(np.mean(rlab[Mcsc.getcol(j).indices] == clab[j]))
+                            if Mcsc.getcol(j).indices.size else 0.0, 3)
+                for j, name in enumerate(cvocab)}
+
     clusters = []
     for k in range(K):
         cnames = {cvocab[j] for j in np.where(clab == k)[0]}
@@ -137,7 +144,7 @@ def bicluster(index):
             "traditions": sorted(cnames, key=lambda c: -df[c])[:50],
             "n_trad": len(cnames), "n_motif": len(mrows),
             "_all": sorted(cnames, key=lambda c: -df[c]),
-            "motifs": [{"c": motifs[m][0], "n": motifs[m][1],
+            "motifs": [{"c": motifs[m][0], "n": motifs[m][1], "s": round(score(m), 3),
                         "t": sorted([c for c in motifs[m][2] if c in cnames],
                                     key=lambda c: -df.get(c, 0))[:5]} for m in mem[:80]],
         })
@@ -150,10 +157,11 @@ def bicluster(index):
         for label in c.pop("_all"):
             xy = resolve(label)
             if xy:
-                points.append({"t": label, "x": xy[0], "y": xy[1], "k": k})
+                points.append({"t": label, "x": xy[0], "y": xy[1], "k": k,
+                               "s": trad_mem.get(label, 0)})
                 placed += 1
     return {"n_motifs": len(kept), "n_traditions": len(cvocab),
-            "clusters": clusters, "points": points, "placed": placed}
+            "clusters": clusters, "points": points, "placed": placed, "trad_mem": trad_mem}
 
 
 def main():

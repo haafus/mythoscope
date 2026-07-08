@@ -95,6 +95,14 @@ def main():
     model.fit(W)
     rlab, clab = model.row_labels_, model.column_labels_
 
+    # Membership = how concentrated an item is in its own co-cluster (0..1):
+    # for a tradition, the fraction of its motifs that sit in its cluster; the
+    # symmetric motif measure is `score()` below (fraction of its traditions in-cluster).
+    Mcsc = M.tocsc()
+    trad_mem = {name: round(float(np.mean(rlab[Mcsc.getcol(j).indices] == clab[j]))
+                            if Mcsc.getcol(j).indices.size else 0.0, 3)
+                for j, name in enumerate(cvocab)}
+
     clusters = []
     for k in range(K):
         cul = [cvocab[j] for j in np.where(clab == k)[0]]
@@ -115,6 +123,7 @@ def main():
             "n_trad": len(cul), "n_motif": len(mem),
             "by_index": dict(by),
             "motifs": [{"x": motifs[m][0], "c": motifs[m][1], "n": motifs[m][2],
+                        "s": round(score(m), 3),
                         "t": sorted([c for c in motifs[m][3] if c in cnames],
                                     key=lambda c: -df.get(c, 0))[:5]}
                        for m in mem_sorted[:80]],
@@ -138,12 +147,14 @@ def main():
         for lab in c.pop("_all"):
             xy = coord(lab)
             if xy:
-                points.append({"t": lab, "x": xy[0], "y": xy[1], "k": k})
+                points.append({"t": lab, "x": xy[0], "y": xy[1], "k": k,
+                               "s": trad_mem.get(lab, 0)})
 
     data = {
         "n_motifs_total": len(kept_ids), "n_traditions": len(cvocab),
         "by_index_total": dict(Counter(motifs[m][0] for m in kept_ids)),
         "clusters": clusters, "points": points, "placed": len(points),
+        "trad_mem": trad_mem,
     }
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")
     print(f"motifs(kept)={len(kept_ids)} traditions(kept)={len(cvocab)} clusters={len(clusters)}")

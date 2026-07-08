@@ -44,6 +44,19 @@
   .m .tt { color: #9299a1; font-size: 11px; margin-top: 1px; }
   .tip { position: fixed; z-index: 40; pointer-events: none; background: #111827; color: #fff;
          padding: 4px 8px; border-radius: 6px; font-size: 11.5px; display: none; }
+  .tip .tk { opacity: .65; }
+  #clearsel { position: absolute; left: 10px; top: 10px; display: none; align-items: center; gap: 6px;
+              padding: 5px 11px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e0;
+              border-radius: 7px; background: rgba(255,255,255,.94); color: #33465c; cursor: pointer; }
+  #clearsel:hover { background: #fff; border-color: #9aacc0; }
+  #clearsel .sw { width: 10px; height: 10px; border-radius: 3px; margin: 0; }
+  svg.map circle { cursor: pointer; }
+  .mem { float: right; display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
+         color: #6c757d; font-variant-numeric: tabular-nums; }
+  .mem .mbar { width: 42px; height: 5px; border-radius: 3px; background: #eef1f4; overflow: hidden; }
+  .mem .mbar > i { display: block; height: 100%; background: #6a97c4; }
+  .chip .cs { color: #9299a1; font-weight: 400; font-size: 10.5px; margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .memhint { font-size: 10.5px; color: #9299a1; font-weight: 400; text-transform: none; letter-spacing: 0; }
 </style>
 </head>
 <body>
@@ -52,7 +65,7 @@
   <div class="sub">Each catalogue's own motif × tradition table, co-clustered on its own · traditions plotted on the map, coloured by cluster.</div>
 </header>
 <div class="tabs" id="tabs"></div>
-<div class="mapwrap"><div class="mapcard"><svg class="map" id="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"></svg><div class="mapnote" id="mapnote"></div></div></div>
+<div class="mapwrap"><div class="mapcard"><svg class="map" id="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"></svg><button id="clearsel"><span class="sw" id="clearsw"></span>Show all clusters</button><div class="mapnote" id="mapnote"></div></div></div>
 <div class="grid">
   <div>
     <div style="position:relative"><input id="search" placeholder="Find a tradition…" autocomplete="off"><div id="ac"></div></div>
@@ -63,6 +76,7 @@
   </div>
 </div>
 <div class="tip" id="tip"></div>
+<script src="land.js"></script>
 <script src="data.js"></script>
 <script>
 const D = DATA;
@@ -78,25 +92,44 @@ document.getElementById("tabs").innerHTML = ORDER.map(ix=>`<div class="tab" data
 function label(c){ return c.traditions.slice(0,3).map(esc).join(" · "); }
 const rtitle=document.getElementById("rtitle"), rbody=document.getElementById("rbody");
 
+const clearsel=document.getElementById("clearsel"), clearsw=document.getElementById("clearsw");
 function drawMap(){
   const d = D[cur];
-  // graticule
   let g = "";
   for (let lon=-180; lon<=180; lon+=30) g += `<line x1="${lon+180}" y1="0" x2="${lon+180}" y2="180" stroke="#cfdce6" stroke-width="0.3"/>`;
   for (let lat=-90; lat<=90; lat+=30) g += `<line x1="0" y1="${90-lat}" x2="360" y2="${90-lat}" stroke="#cfdce6" stroke-width="0.3"/>`;
+  const land = `<path d="${window.LAND||""}" fill="#e7ecdd" stroke="#c3cfbc" stroke-width="0.25"/>`;
   const pts = d.points.map((p,i)=>{
     const on = sel<0 || p.k===sel;
-    return `<circle cx="${p.x+180}" cy="${90-p.y}" r="${on?(p.k===sel?1.7:1.2):0.9}" fill="${PAL[p.k%PAL.length]}" `+
-      `fill-opacity="${on?0.95:0.12}" data-i="${i}"/>`;
+    const col = (sel<0||on) ? PAL[p.k%PAL.length] : "#9aa7b2";
+    const r  = sel<0 ? 1.15 : (on ? 2.2 : 0.8);
+    const op = sel<0 ? 0.92 : (on ? 1 : 0.13);
+    const halo = on&&sel>=0 ? ` stroke="#12233a" stroke-width="0.35"` : "";
+    return `<circle cx="${p.x+180}" cy="${90-p.y}" r="${r}" fill="${col}" fill-opacity="${op}"${halo} data-i="${i}"/>`;
   }).join("");
-  map.innerHTML = g + pts;
+  map.innerHTML = g + land + pts;
   mapnote.textContent = `${d.placed} of ${d.n_traditions} traditions placed (approx. centroids)`;
+  clearsel.style.display = sel>=0 ? "inline-flex" : "none";
+  if(sel>=0) clearsw.style.background = PAL[sel%PAL.length];
 }
-map.addEventListener("mousemove", e=>{ const t=e.target; if(t.tagName!=="circle"||t.dataset.i===undefined){tip.style.display="none";return;}
+let hoverEl=null, hoverR=null;
+function unhover(){ if(hoverEl){ hoverEl.setAttribute("r",hoverR); hoverEl.removeAttribute("stroke"); hoverEl=null; } }
+map.addEventListener("mousemove", e=>{ const t=e.target;
+  if(t.tagName!=="circle"||t.dataset.i===undefined){ unhover(); tip.style.display="none"; return; }
+  if(t!==hoverEl){ unhover(); hoverEl=t; hoverR=t.getAttribute("r");
+    t.setAttribute("r", Math.max(2.6,(+hoverR)+1.4)); t.setAttribute("stroke","#111827"); t.setAttribute("stroke-width","0.5"); t.setAttribute("fill-opacity","1"); }
   const p=D[cur].points[+t.dataset.i]; tip.style.display="block"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY+8)+"px";
-  tip.innerHTML=`${esc(p.t)} <span style="opacity:.6">· cluster ${p.k+1}</span>`; });
-map.addEventListener("mouseleave", ()=>tip.style.display="none");
-map.addEventListener("click", e=>{ const t=e.target; if(t.tagName==="circle"&&t.dataset.i!==undefined) show(D[cur].points[+t.dataset.i].k); });
+  tip.innerHTML=`${esc(p.t)} <span class="tk">${Math.round((p.s||0)*100)}% in-cluster</span>`+
+    `<br><span class="tk">cluster ${p.k+1} · ${esc((D[cur].clusters[p.k].traditions||[]).slice(0,2).join(", "))}</span>`; });
+map.addEventListener("mouseleave", ()=>{ unhover(); tip.style.display="none"; });
+map.addEventListener("click", e=>{ const t=e.target;
+  if(t.tagName==="circle"&&t.dataset.i!==undefined){ show(D[cur].points[+t.dataset.i].k); unhover(); }
+  else reset(); });
+clearsel.addEventListener("click", reset);
+const INTRO = "Pick a co-cluster (or a dot on the map) to see its traditions and characteristic motifs.";
+function reset(){ sel=-1; drawMap();
+  document.querySelectorAll(".clu").forEach(el=>el.classList.remove("active"));
+  rtitle.textContent="Select a co-cluster"; rbody.style.padding="14px"; rbody.style.color="#9299a1"; rbody.innerHTML=INTRO; }
 
 function renderList(){
   const col = IDX[cur].c, d = D[cur]; sel=-1;
@@ -115,14 +148,18 @@ function show(i){
   document.querySelectorAll(".clu").forEach(e=>e.classList.toggle("active",+e.dataset.c===i));
   rtitle.textContent = `Co-cluster ${i+1} — ${c.n_trad} traditions, ${c.n_motif} motifs`;
   rbody.style.padding="0"; rbody.style.color="";
-  const trads = c.traditions.map((t,j)=>`<span class="chip" ${j<6?`style="background:${pc}1e;color:${pc};font-weight:600"`:''}>${esc(t)}</span>`).join("");
-  const mot = c.motifs.map(m=>`<div class="m"><span class="code" style="color:${pc}">${esc(m.c)}</span> <span class="nm">${esc(m.n)}</span>`+
-    (m.t&&m.t.length?`<div class="tt">${m.t.map(esc).join(" · ")}</div>`:"")+`</div>`).join("");
-  rbody.innerHTML = `<div class="sec"><div class="h">Characteristic traditions (${c.n_trad})</div>${trads}</div>`+
-    `<div class="sec" style="border:0;padding-bottom:2px"><div class="h">Characteristic motifs — top ${c.motifs.length} of ${c.n_motif}</div></div>${mot}`;
+  const tm = D[cur].trad_mem || {};
+  const trads = c.traditions.map((t,j)=>{ const cs = Math.round((tm[t]||0)*100);
+    return `<span class="chip" ${j<6?`style="background:${pc}1e;color:${pc};font-weight:600"`:''}>${esc(t)}<span class="cs">${cs}%</span></span>`;}).join("");
+  const mot = c.motifs.map(m=>{ const pct = Math.round((m.s||0)*100);
+    return `<div class="m"><span class="mem"><span class="mbar"><i style="width:${pct}%;background:${pc}"></i></span>${pct}%</span>`+
+    `<span class="code" style="color:${pc}">${esc(m.c)}</span> <span class="nm">${esc(m.n)}</span>`+
+    (m.t&&m.t.length?`<div class="tt">${m.t.map(esc).join(" · ")}</div>`:"")+`</div>`;}).join("");
+  rbody.innerHTML = `<div class="sec"><div class="h">Characteristic traditions (${c.n_trad}) <span class="memhint">· % = share of the tradition's motifs inside this cluster</span></div>${trads}</div>`+
+    `<div class="sec" style="border:0;padding-bottom:2px"><div class="h">Characteristic motifs — top ${c.motifs.length} of ${c.n_motif} <span class="memhint">· % = share of the motif's traditions inside this cluster</span></div></div>${mot}`;
   drawMap();
 }
-document.getElementById("clusters").addEventListener("click",e=>{const c=e.target.closest("[data-c]"); if(c)show(+c.dataset.c);});
+document.getElementById("clusters").addEventListener("click",e=>{const c=e.target.closest("[data-c]"); if(!c)return; const i=+c.dataset.c; if(i===sel)reset(); else show(i);});
 document.getElementById("tabs").addEventListener("click",e=>{const t=e.target.closest("[data-ix]"); if(!t)return; cur=t.dataset.ix; document.getElementById("search").value=""; renderList();});
 
 const search=document.getElementById("search"), ac=document.getElementById("ac");

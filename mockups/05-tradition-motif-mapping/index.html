@@ -34,6 +34,12 @@
   .chip.hi { background: #fff2d6; color: #7a5600; font-weight: 600; }
   .m { padding: 8px 15px; border-bottom: 1px solid #f6f8fa; }
   .m .code { font-weight: 700; } .m .nm { font-size: 13px; }
+  .mem { float: right; display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
+         color: #6c757d; font-variant-numeric: tabular-nums; }
+  .mem .mbar { width: 42px; height: 5px; border-radius: 3px; background: #eef1f4; overflow: hidden; }
+  .mem .mbar > i { display: block; height: 100%; background: #6a97c4; }
+  .chip .cs { color: #9299a1; font-weight: 400; font-size: 10.5px; margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .memhint { font-size: 10.5px; color: #9299a1; font-weight: 400; text-transform: none; letter-spacing: 0; }
   .m .tt { color: #9299a1; font-size: 11px; margin-top: 1px; }
   .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; vertical-align: middle; }
   .idxrow { display: flex; gap: 14px; font-size: 12px; color: #495057; margin-top: 4px; }
@@ -106,7 +112,8 @@ map.addEventListener("mousemove",e=>{const t=e.target;
   if(t!==hoverEl){ unhover(); hoverEl=t; hoverR=t.getAttribute("r");
     t.setAttribute("r", Math.max(2.6, (+hoverR)+1.4)); t.setAttribute("stroke","#111827"); t.setAttribute("stroke-width","0.5"); t.setAttribute("fill-opacity","1"); }
   const p=D.points[+t.dataset.i]; tip.style.display="block"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY+8)+"px";
-  tip.innerHTML=`${esc(p.t)}<br><span class="tk">cluster ${p.k+1} · ${esc((D.clusters[p.k].traditions||[]).slice(0,2).join(", "))}</span>`;});
+  tip.innerHTML=`${esc(p.t)} <span class="tk">${Math.round((p.s||0)*100)}% in-cluster</span>`+
+    `<br><span class="tk">cluster ${p.k+1} · ${esc((D.clusters[p.k].traditions||[]).slice(0,2).join(", "))}</span>`;});
 map.addEventListener("mouseleave",()=>{ unhover(); tip.style.display="none"; });
 map.addEventListener("click",e=>{const t=e.target;
   if(t.tagName==="circle"&&t.dataset.i!==undefined){ show(D.points[+t.dataset.i].k); unhover(); }
@@ -138,16 +145,19 @@ function show(i){
   document.querySelectorAll(".clu").forEach(e=>e.classList.toggle("active",+e.dataset.c===i));
   const c=D.clusters[i], pc=PAL[i%PAL.length]; rtitle.textContent=`Co-cluster ${i+1} — ${c.n_trad} traditions, ${c.n_motif} motifs`;
   rbody.style.padding="0"; rbody.style.color="";
-  const trads = c.traditions.map((t,j)=>`<span class="chip" ${j<6?`style="background:${pc}1e;color:${pc};font-weight:600"`:''}>${esc(t)}</span>`).join("");
+  const memPct = t => D.trad_mem&&D.trad_mem[t]!=null ? `<span class="cs">${Math.round(D.trad_mem[t]*100)}%</span>` : "";
+  const trads = c.traditions.map((t,j)=>`<span class="chip" ${j<6?`style="background:${pc}1e;color:${pc};font-weight:600"`:''} title="${Math.round((D.trad_mem[t]||0)*100)}% of this people's motifs fall in this cluster">${esc(t)}${memPct(t)}</span>`).join("");
   const idxrow = ["tmi","atu","brz"].filter(x=>c.by_index[x]).map(x=>
     `<span><span class="badge" style="background:${IDX[x].c}22;color:${IDX[x].c}">${IDX[x].l}</span> ${c.by_index[x]}</span>`).join("");
-  const mot = c.motifs.map(m=>{const k=IDX[m.x];
-    return `<div class="m"><span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
+  const mot = c.motifs.map(m=>{const k=IDX[m.x], pct=Math.round((m.s||0)*100);
+    return `<div class="m"><span class="mem" title="${pct}% of this motif's traditions are in this cluster">`+
+      `<span class="mbar"><i style="width:${pct}%"></i></span>${pct}%</span>`+
+      `<span class="badge" style="background:${k.c}22;color:${k.c}">${k.l}</span> `+
       `<span class="code" style="color:${k.c}">${esc(m.c)}</span> <span class="nm">${esc(m.n)}</span>`+
       (m.t&&m.t.length?`<div class="tt">${m.t.map(esc).join(" · ")}</div>`:"")+`</div>`;}).join("");
   rbody.innerHTML =
-    `<div class="sec"><div class="h">Characteristic traditions (${c.n_trad})</div>${trads}<div class="idxrow">${idxrow}</div></div>`+
-    `<div class="sec" style="border:0;padding-bottom:2px"><div class="h">Characteristic motifs — top ${c.motifs.length} of ${c.n_motif}</div></div>${mot}`;
+    `<div class="sec"><div class="h">Characteristic traditions (${c.n_trad}) <span class="memhint">— % = share of the people's motifs in this cluster</span></div>${trads}<div class="idxrow">${idxrow}</div></div>`+
+    `<div class="sec" style="border:0;padding-bottom:2px"><div class="h">Characteristic motifs — top ${c.motifs.length} of ${c.n_motif} <span class="memhint">— % = share of the motif's traditions in this cluster</span></div></div>${mot}`;
 }
 document.getElementById("clusters").addEventListener("click",e=>{const c=e.target.closest("[data-c]"); if(!c)return;
   const i=+c.dataset.c; if(i===sel) reset(); else show(i);});   // click the active cluster again to deselect
