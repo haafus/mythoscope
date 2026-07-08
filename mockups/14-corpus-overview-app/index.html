@@ -95,7 +95,7 @@
   .toggle button:hover:not(.on) { background:#4f7096; color:#fff; }
   .hm-wrap { overflow:auto; margin-top:8px; }
   .hm-legend { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted-soft); margin-top:10px; }
-  .hm-legend .ramp { width:120px; height:10px; border-radius:3px; background:linear-gradient(90deg,#eef6f5,#0e5c54); }
+  .hm-legend .ramp { width:140px; height:10px; border-radius:3px; background:linear-gradient(90deg,#c2410c,#f4f2ec,#0e5c54); }
 
   table { width:100%; border-collapse:collapse; font-size:12.5px; }
   th, td { text-align:left; padding:7px 8px; border-bottom:1px solid #f0ede6; }
@@ -205,9 +205,11 @@ function showOverview(){
       <div class="hm-head"><div class="card-h" style="margin:0">Text-similarity heatmap</div>
         <div class="toggle" id="hmToggle"><button data-k="tradition" class="on">Traditions</button><button data-k="text">Texts</button></div></div>
       <div class="hm-wrap"><div id="heat"></div></div>
-      <div class="hm-legend"><span>less similar</span><span class="ramp"></span><span>more similar</span>
-        <span style="margin-left:auto">Rows reordered by hierarchical clustering (seriation)</span></div>
-      <div class="note">TF-IDF cosine over the full texts — a model-free, lexical stand-in for the pipeline's BGE-M3 semantic distances.</div></div>
+      <div class="hm-legend"><span>farther than expected</span><span class="ramp"></span><span>closer than expected</span>
+        <span style="margin-left:auto">Reordered by clustering · normalised for text length</span></div>
+      <div class="note">TF-IDF cosine, <b>double-centred</b> so each tradition's overall verbosity (its row/column
+        average) is removed — colour shows how much <b>closer</b> (teal) or <b>farther</b> (orange) a pair is than
+        their averages predict. A model-free, lexical stand-in for the pipeline's BGE-M3 semantic distances.</div></div>
     <div class="card"><div class="card-h">All texts</div>
       <table id="catalog"><thead><tr><th data-s="title">Title</th><th data-s="tradition">Tradition</th>
         <th data-s="major">Macro-area</th><th class="num" data-s="words">Words</th><th class="num" data-s="sentences">Sentences</th></tr></thead><tbody></tbody></table></div>`;
@@ -241,26 +243,37 @@ function showOverview(){
 }
 
 let hmKind="tradition";
-function ramp(t){ const a=[238,246,245], b=[14,92,84]; const c=a.map((x,i)=>Math.round(x+(b[i]-x)*t)); return `rgb(${c[0]},${c[1]},${c[2]})`; }
+// diverging ramp, t in [-1,1]: orange (farther) ← neutral → teal (closer than expected)
+function divRamp(t){ const neu=[244,242,236], pos=[14,92,84], neg=[194,65,12];
+  const to=t>=0?pos:neg, k=Math.min(1,Math.abs(t));
+  const c=neu.map((x,i)=>Math.round(x+(to[i]-x)*k)); return `rgb(${c[0]},${c[1]},${c[2]})`; }
 function clip(s){ return s.length>18 ? s.slice(0,17)+"…" : s; }
 function drawHeat(){
   const H=D.heat[hmKind], n=H.order.length, sim=H.sim, ord=H.order;
-  let lo=1,hi=0; for(let i=0;i<n;i++)for(let j=0;j<n;j++) if(i!==j){ lo=Math.min(lo,sim[i][j]); hi=Math.max(hi,sim[i][j]); }
-  const span=hi-lo||1, cell=hmKind==="tradition"?20:16, lab=132;
+  // Double-centre: subtract each row's + column's mean (add the global mean back) so a
+  // tradition's overall verbosity drops out, leaving only closer/farther-than-expected.
+  // Symmetric, so it's still a valid heatmap. Diagonal is set to the max pole.
+  const rm=new Array(n).fill(0); let gs=0, gc=0;
+  for(let i=0;i<n;i++){ let s=0; for(let j=0;j<n;j++) if(j!==i){ s+=sim[i][j]; gs+=sim[i][j]; gc++; } rm[i]=s/(n-1); }
+  const gm=gs/gc, resid=(i,j)=> sim[i][j]-rm[i]-rm[j]+gm;
+  let m=0; for(let i=0;i<n;i++)for(let j=0;j<n;j++) if(i!==j) m=Math.max(m,Math.abs(resid(i,j))); m=m||1;
+  const cell=hmKind==="tradition"?20:16, lab=132;
   let h=`<svg width="${lab+n*cell+4}" height="${lab+n*cell+4}" font-size="10" font-family="inherit">`;
   ord.forEach((oi,c)=>{ const x=lab+c*cell+cell/2;
     h+=`<text x="${x}" y="${lab-4}" transform="rotate(-55 ${x} ${lab-4})" text-anchor="start" fill="#6b747c">${esc(clip(H.labels[oi]))}</text>`; });
   ord.forEach((ri,r)=>{
     h+=`<text x="${lab-6}" y="${lab+r*cell+cell/2+3}" text-anchor="end" fill="#4a545c">${esc(clip(H.labels[ri]))}</text>`;
     h+=`<rect x="${lab-3}" y="${lab+r*cell+2}" width="2.5" height="${cell-4}" fill="${H.colors[ri]}"/>`;
-    ord.forEach((ci,c)=>{ const v=sim[ri][ci], t=ri===ci?1:(v-lo)/span; const fill=ramp(Math.max(0,Math.min(1,t)));  // diagonal = self = max = darkest
+    ord.forEach((ci,c)=>{ const t=ri===ci?1:resid(ri,ci)/m; const fill=divRamp(Math.max(-1,Math.min(1,t)));
       h+=`<rect class="hc" data-r="${ri}" data-c="${ci}" x="${lab+c*cell}" y="${lab+r*cell}" width="${cell-1}" height="${cell-1}" rx="2" fill="${fill}"/>`; });
   });
   h+=`</svg>`;
   const el=document.getElementById("heat"); el.innerHTML=h;
   el.querySelectorAll(".hc").forEach(rect=>{
     rect.addEventListener("mousemove",e=>{ const r=+rect.dataset.r, c=+rect.dataset.c;
-      showTip(`<b>${esc(H.labels[r])}</b> ↔ <b>${esc(H.labels[c])}</b><br>cosine ${sim[r][c].toFixed(3)}`,e); });
+      if (r===c){ showTip(`<b>${esc(H.labels[r])}</b><br>self`,e); return; }
+      const rv=resid(r,c);
+      showTip(`<b>${esc(H.labels[r])}</b> ↔ <b>${esc(H.labels[c])}</b><br>cosine ${sim[r][c].toFixed(3)} · ${rv>=0?"+":""}${rv.toFixed(3)} vs expected`,e); });
     rect.addEventListener("mouseleave",hideTip);
   });
 }
