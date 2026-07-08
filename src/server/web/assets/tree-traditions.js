@@ -24,14 +24,48 @@ function renderTraditionPicks(traditions) {
     return html;
 }
 
+let traditionKeyHandler = null;
+
 function bindTraditionPicks(container) {
     container.querySelectorAll(".tradition-pick").forEach((button) => {
-        button.addEventListener("click", () => {
-            const wasActive = button.classList.contains("active");
-            container.querySelectorAll(".tradition-pick.active").forEach((b) => b.classList.remove("active"));
-            const selected = wasActive ? null : button.dataset.tradition;
-            if (selected) button.classList.add("active");
-            container.dispatchEvent(new CustomEvent("tradition-select", { detail: { tradition: selected }, bubbles: true }));
-        });
+        button.addEventListener("click", () => selectPick(container, button));
     });
+
+    // ↑/↓ step through the tradition list (single stable handler; a re-render
+    // detaches the old container, so drop the previous binding first).
+    if (traditionKeyHandler) document.removeEventListener("keydown", traditionKeyHandler);
+    traditionKeyHandler = (e) => onTraditionKeydown(e, container);
+    document.addEventListener("keydown", traditionKeyHandler);
+}
+
+function selectPick(container, button) {
+    const wasActive = button.classList.contains("active");
+    container.querySelectorAll(".tradition-pick.active").forEach((b) => b.classList.remove("active"));
+    const selected = wasActive ? null : button.dataset.tradition;
+    if (selected) button.classList.add("active");
+    container.dispatchEvent(new CustomEvent("tradition-select", { detail: { tradition: selected }, bubbles: true }));
+}
+
+function onTraditionKeydown(e, container) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!container.isConnected) return;
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") return;  // don't hijack typing
+
+    const buttons = Array.from(container.querySelectorAll(".tradition-pick"))
+        .filter((b) => b.offsetParent !== null);  // only traditions inside open macro-areas
+    if (!buttons.length) return;
+    e.preventDefault();
+
+    const cur = buttons.findIndex((b) => b.classList.contains("active"));
+    const delta = e.key === "ArrowDown" ? 1 : -1;
+    const next = cur === -1
+        ? (delta > 0 ? 0 : buttons.length - 1)
+        : Math.min(buttons.length - 1, Math.max(0, cur + delta));
+    if (next === cur) return;
+
+    const btn = buttons[next];
+    btn.scrollIntoView({ block: "nearest" });
+    selectPick(container, btn);  // btn wasn't active → this selects it
 }

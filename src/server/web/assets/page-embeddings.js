@@ -11,7 +11,7 @@ import {
     fetchPointWithNeighbors, renderSearchResultItem,
     runSemanticSearch,
 } from "./search-utils.js";
-import { renderTraditionList } from "./tree-traditions.js";
+import { renderTraditionList } from "./tree-traditions.js?v=1";
 
 function getTraditionColor(name, fallback = "#555") {
     const info = state.traditionInfo || {};

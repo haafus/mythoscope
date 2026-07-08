@@ -52,6 +52,8 @@ function renderTraditionGroups(traditions, major, docIndex) {
     return html;
 }
 
+let bookKeyHandler = null;
+
 function bindTreeLeaves(container, documents) {
     container.querySelectorAll(".tradition-title").forEach((button) => {
         button.addEventListener("click", () => {
@@ -73,6 +75,37 @@ function bindTreeLeaves(container, documents) {
             container.dispatchEvent(new CustomEvent("book-select", { detail: { doc }, bubbles: true }));
         });
     });
+
+    // ↑/↓ step through the visible book list (single stable handler; a re-render
+    // detaches the old container, so drop the previous binding first).
+    if (bookKeyHandler) document.removeEventListener("keydown", bookKeyHandler);
+    bookKeyHandler = (e) => onBookKeydown(e, container, documents);
+    document.addEventListener("keydown", bookKeyHandler);
+}
+
+function onBookKeydown(e, container, documents) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!container.isConnected) return;
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") return;  // don't hijack typing
+
+    const buttons = Array.from(container.querySelectorAll(".document-button"))
+        .filter((b) => b.offsetParent !== null);  // only books inside open traditions
+    if (!buttons.length) return;
+    e.preventDefault();
+
+    const cur = buttons.findIndex((b) => b.classList.contains("active"));
+    const delta = e.key === "ArrowDown" ? 1 : -1;
+    const next = cur === -1
+        ? (delta > 0 ? 0 : buttons.length - 1)
+        : Math.min(buttons.length - 1, Math.max(0, cur + delta));
+    if (next === cur) return;
+
+    const btn = buttons[next];
+    btn.scrollIntoView({ block: "nearest" });
+    const doc = documents[Number(btn.dataset.docIndex)];
+    if (doc) container.dispatchEvent(new CustomEvent("book-select", { detail: { doc }, bubbles: true }));
 }
 
 export function setActiveBook(container, doc) {
