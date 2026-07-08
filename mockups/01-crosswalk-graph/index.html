@@ -170,6 +170,7 @@ let view = { x: cv.clientWidth/2, y: cv.clientHeight/2, k: 1 };
 let sub = { nodes: [], edges: [] };   // current rendered subgraph
 let focusId = null;
 let layoutMode = "force", alpha = 0;   // 1-hop = force sim · 2-hop = concentric rings
+let currentCluster = -1;               // >=0 when showing a whole cluster subgraph
 
 // Deterministic concentric ego-layout: centre → ring1 (direct links, grouped into
 // arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
@@ -178,7 +179,7 @@ function buildSub(centerId){
   const depth2 = document.getElementById("depth2").checked;
   const nbr = id => (adj.get(id)||[]).filter(x => edgeOn(x.m)).map(x=>x.o);
   const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
-  focusId = centerId;
+  focusId = centerId; currentCluster = -1;
   const f = byId.get(centerId);
   highlightCluster = nodeCl(f);   // focus a node → highlight its cluster
 
@@ -256,6 +257,38 @@ function buildSub(centerId){
     `<div class="fi-n">${escapeHtml(f.n)}</div>`+
     `<div class="fi-d">${IDX[f.x].label} · ${detail}</div>${clLine}`;
 }
+
+// Show a whole dense cluster: all its member nodes + the (enabled) links between
+// them, force-laid-out — instead of one node's neighbourhood rays.
+const CLUSTER_CAP = 500;
+function buildCluster(cid){
+  const ci = clMap.get(cid); if (!ci) return;
+  const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
+  focusId = null; currentCluster = cid; highlightCluster = -1;
+  let mem = DATA.nodes.filter(n => nodeCl(n)===cid);
+  const truncated = mem.length > CLUSTER_CAP;
+  if (truncated) mem = [...mem].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0, CLUSTER_CAP);
+  const R = Math.min(cx,cy)*0.72;
+  const nodes = mem.map((n,i)=>{ const th=TAU*i/mem.length;
+    return Object.assign({}, n, { tx:cx, ty:cy, px:cx+Math.cos(th)*R, py:cy+Math.sin(th)*R, vx:0, vy:0, pinned:false }); });
+  const nmap = new Map(nodes.map(n=>[n.id,n]));
+  const seen = new Set(), edges = [];
+  for (const e of DATA.edges){
+    if (!nmap.has(e.s) || !nmap.has(e.t) || !edgeOn(e.m)) continue;
+    const key = e.s<e.t?e.s+e.t:e.t+e.s; if (seen.has(key)) continue; seen.add(key);
+    edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d, w:e.w });
+  }
+  sub = { nodes, edges }; layoutMode = "force"; alpha = 1;
+  view = { x:cx, y:cy, k:0.9 };
+  const col = clColor(cid), by = ci.by_index;
+  document.getElementById("focusinfo").innerHTML =
+    `<div class="fi-id" style="color:${col}">◆ Cluster of ${ci.size}</div>`+
+    `<div class="fi-n">${escapeHtml(ci.top.map(codeOf).join(" · "))}</div>`+
+    `<div class="fi-d">${DATA.clusterings[clPreset].label}${truncated?` · ${CLUSTER_CAP} densest shown`:""} · ${edges.length} internal links</div>`+
+    `<div class="fi-d">TMI ${by.tmi} · ATU ${by.atu} · Brz ${by.brz}</div>`;
+}
+// re-run whichever view is active (cluster subgraph or a node's neighbourhood)
+function rebuild(){ if (currentCluster>=0) buildCluster(currentCluster); else if (focusId) buildSub(focusId); }
 
 // ---- animation ----
 // 1-hop: a light force sim (repulsion + link springs + centre gravity, focus pinned).
@@ -356,7 +389,7 @@ window.addEventListener("mouseup", e=>{
 });
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
   const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
-document.getElementById("depth2").addEventListener("change", ()=>focusId&&buildSub(focusId));
+document.getElementById("depth2").addEventListener("change", rebuild);
 // ---- combined panel: node legend + edge legend swatches merged with the toggles ----
 const swLine = m => `<svg class="sw" width="20" height="7"><line x1="0" y1="3.5" x2="20" y2="3.5" `+
   `stroke="#8a94a6" stroke-width="2"${m.dash?` stroke-dasharray="${m.dash.join(' ')}"`:''}/></svg>`;
@@ -382,7 +415,7 @@ function makeGroup(masterId, cls, setSet){
     const on = [...document.querySelectorAll("."+cls+":checked")];
     setSet(new Set(on.map(c=>c.value)));
     master.checked = on.length===boxes().length; master.indeterminate = on.length>0 && on.length<boxes().length;
-    if (focusId) buildSub(focusId);
+    rebuild();
   }
   boxes().forEach(cb=>cb.addEventListener("change", apply));
   master.addEventListener("change", ()=>{ boxes().forEach(c=>c.checked=master.checked); apply(); });
@@ -448,12 +481,12 @@ bfilter.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
 }));
 const clsel=document.getElementById("clsel");
 clsel.innerHTML = DATA.clusterings.map((c,i)=>`<option value="${i}">${escapeHtml(c.label)}</option>`).join("");
-clsel.addEventListener("change", ()=>{ setClustering(+clsel.value); renderBrowse();
+clsel.addEventListener("change", ()=>{ setClustering(+clsel.value); currentCluster=-1; renderBrowse();
   if (focusId) buildSub(focusId);   // refresh the on-canvas cluster highlight
 });
 blist.addEventListener("click", e=>{
   const dc=e.target.closest("[data-cl]");
-  if (dc){ const c=clMap.get(+dc.dataset.cl); if(c) buildSub(c.top[0].id); browse.style.display="none"; return; }
+  if (dc){ buildCluster(+dc.dataset.cl); browse.style.display="none"; return; }
   const d=e.target.closest("[data-id]"); if(!d)return; buildSub(d.dataset.id); browse.style.display="none"; });
 document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target.id!=="browseBtn") browse.style.display="none"; });
 
