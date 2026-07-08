@@ -317,9 +317,12 @@ body.has-main-navbar {
     text-align: left;
 }
 
-.library-tree .tradition-title:hover,
-.library-tree .tradition-group.open > .tradition-title {
+.library-tree .tradition-title:hover {
     background: #eef3f4;
+    color: #111;
+}
+
+.library-tree .tradition-group.open > .tradition-title {
     color: #111;
 }
 
@@ -355,7 +358,9 @@ body.has-main-navbar {
 .library-tree .document-list {
     display: none;
     list-style: none;
-    padding: 1px 0 4px 28px;
+    /* left pad + the button's own 7px pad aligns book text with the tradition name
+       (title 6px pad + 10px dot + 8px gap = 24px) */
+    padding: 1px 0 4px 17px;
 }
 
 .library-tree .tradition-group.open .document-list {
@@ -374,6 +379,9 @@ body.has-main-navbar {
     line-height: 1.25;
     padding: 5px 7px;
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .library-tree .document-button:hover {

@@ -40,7 +40,7 @@ function renderTraditionGroups(traditions, major, docIndex) {
                 <ul class="document-list">
                     ${docs.map((doc) => `
                         <li>
-                            <button class="document-button" type="button" data-doc-index="${docIndex.get(doc)}">
+                            <button class="document-button" type="button" data-doc-index="${docIndex.get(doc)}" title="${escapeHtml(doc.title)}">
                                 ${escapeHtml(doc.title)}
                             </button>
                         </li>
