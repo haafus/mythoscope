@@ -36,8 +36,11 @@
   .ctl { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,.94);
          border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
   .ctl label { display: block; margin: 3px 0; cursor: pointer; }
+  .ctl label.det { margin-left: 17px; }
+  .ctl input[type=checkbox], .legend input[type=checkbox] { accent-color: #9aa7b2; }
   .ctl-h { margin: 7px 0 2px; font-size: 9.5px; font-weight: 600; text-transform: uppercase;
            letter-spacing: .04em; color: #6c757d; border-top: 1px solid #eef1f4; padding-top: 6px; }
+  .legend .row { padding-left: 12px; }
   .bmode { display: flex; gap: 4px; padding: 7px 8px 0; }
   .bmode button { flex: 1; padding: 5px 4px; font-size: 11.5px; border: 1px solid #dee2e6;
                   border-radius: 5px; background: #fff; cursor: pointer; }
@@ -102,17 +105,24 @@
   <div class="ctl">
     <label><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
     <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
+      <input type="checkbox" id="confAll"> Confirmed cross-walk — all</label>
+    <label class="det"><input type="checkbox" class="conf" value="constituent" checked> constituent</label>
+    <label class="det"><input type="checkbox" class="conf" value="defining" checked> defining</label>
+    <label class="det"><input type="checkbox" class="conf" value="note" checked> TMI note</label>
+    <label class="det"><input type="checkbox" class="conf" value="summary" checked> ATU summary</label>
+    <label class="det"><input type="checkbox" class="conf" value="berezkin" checked> Berezkin citation</label>
+    <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
       <input type="checkbox" id="intraAll"> Intra-index links — all</label>
-    <label><input type="checkbox" class="intra" value="seealso" checked> see-also</label>
-    <label><input type="checkbox" class="intra" value="combo" checked> ATU combos</label>
-    <label><input type="checkbox" class="intra" value="subtype"> ATU subtypes</label>
+    <label class="det"><input type="checkbox" class="intra" value="seealso" checked> see-also</label>
+    <label class="det"><input type="checkbox" class="intra" value="combo" checked> ATU combos</label>
+    <label class="det"><input type="checkbox" class="intra" value="subtype"> ATU subtypes</label>
     <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
       <input type="checkbox" id="sugAll"> Suggestion layers — all</label>
-    <label><input type="checkbox" class="sug" value="near" checked> near-identical</label>
-    <label><input type="checkbox" class="sug" value="lexical"> lexical</label>
-    <label><input type="checkbox" class="sug" value="reasoned" checked> reasoned</label>
-    <label><input type="checkbox" class="sug" value="semantic"> semantic</label>
-    <label><input type="checkbox" class="sug" value="inferred" checked> inferred</label>
+    <label class="det"><input type="checkbox" class="sug" value="near" checked> near-identical</label>
+    <label class="det"><input type="checkbox" class="sug" value="lexical"> lexical</label>
+    <label class="det"><input type="checkbox" class="sug" value="reasoned" checked> reasoned</label>
+    <label class="det"><input type="checkbox" class="sug" value="semantic"> semantic</label>
+    <label class="det"><input type="checkbox" class="sug" value="inferred" checked> inferred</label>
   </div>
   <div class="legend" id="legend"></div>
 </main>
@@ -136,10 +146,10 @@ const METH = {
   semantic:{label:"semantic (BGE-M3)", dash:[1.5,3], sug:true},
   inferred:{label:"inferred (triangle)", dash:[2,4], sug:true},
 };
-const ALWAYS = new Set(["constituent","defining","note","summary","berezkin"]);  // cross-index, always on
+let enabledConf = new Set(["constituent","defining","note","summary","berezkin"]);  // confirmed cross-walk
 let enabledIntra = new Set(["seealso","combo"]);            // intra-index; subtypes off by default
 let enabledSug = new Set(["near","reasoned","inferred"]);   // suggestion layers shown
-const edgeOn = m => ALWAYS.has(m) || enabledIntra.has(m) || enabledSug.has(m);
+const edgeOn = m => enabledConf.has(m) || enabledIntra.has(m) || enabledSug.has(m);
 // cluster colours (dense-community highlight)
 const CPAL = ["#e6194b","#3cb44b","#4363d8","#f58231","#911eb4","#1f9e9e","#f032e6","#9a6324",
               "#008080","#800000","#808000","#000075","#d9a300","#8a5a44","#5a7d5a","#7a4fa3"];
@@ -169,6 +179,7 @@ const TAU = Math.PI*2;
 let view = { x: cv.clientWidth/2, y: cv.clientHeight/2, k: 1 };
 let sub = { nodes: [], edges: [] };   // current rendered subgraph
 let focusId = null;
+let layoutMode = "force", alpha = 0;   // 1-hop = force sim · 2-hop = concentric rings
 
 // Deterministic concentric ego-layout: centre → ring1 (direct links, grouped into
 // arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
@@ -223,9 +234,11 @@ function buildSub(centerId){
     });
   }
 
-  // Nodes bloom out from the centre to their target (px→tx/ty each frame).
-  const nodes = [...pos.keys()].map(id => Object.assign({}, byId.get(id),
-    { tx:pos.get(id).x, ty:pos.get(id).y, px:cx, py:cy, pinned:false }));
+  // 1-hop → force sim (seeded at the ring positions); 2-hop → bloom to concentric targets.
+  const useForce = !depth2;
+  const nodes = [...pos.keys()].map(id => { const p = pos.get(id);
+    return Object.assign({}, byId.get(id),
+      { tx:p.x, ty:p.y, px: useForce?p.x:cx, py: useForce?p.y:cy, vx:0, vy:0, pinned:false }); });
   const nmap = new Map(nodes.map(n=>[n.id,n]));
   const seen = new Set(), edges = [];
   for (const e of DATA.edges) {
@@ -235,6 +248,7 @@ function buildSub(centerId){
     edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d, w:e.w });
   }
   sub = { nodes, edges };
+  layoutMode = useForce ? "force" : "concentric"; alpha = useForce ? 1 : 0;
 
   // Fit the whole neighbourhood into the viewport.
   const maxR = (ring2.length ? R2 : R1) + 44;
@@ -253,12 +267,33 @@ function buildSub(centerId){
     `<div class="fi-d">${IDX[f.x].label} · ${detail}</div>${clLine}`;
 }
 
-// ---- animation: ease each node toward its concentric target ----
-function tick(){
-  for (const n of sub.nodes){
-    if (n === dragNode || n.pinned) continue;
-    n.px += (n.tx - n.px)*0.2; n.py += (n.ty - n.py)*0.2;
+// ---- animation ----
+// 1-hop: a light force sim (repulsion + link springs + centre gravity, focus pinned).
+// 2-hop: deterministic concentric rings (ease each node toward its target).
+function forceStep(){
+  const ns=sub.nodes, cx=cv.clientWidth/2, cy=cv.clientHeight/2;
+  const REP=8000, SPRING=0.035, LINK=64, GRAV=0.02, DAMP=0.86;
+  for (const n of ns){ n.fx=(cx-n.px)*GRAV; n.fy=(cy-n.py)*GRAV; }
+  for (let i=0;i<ns.length;i++){ const a=ns[i];
+    for (let j=i+1;j<ns.length;j++){ const b=ns[j];
+      let dx=a.px-b.px, dy=a.py-b.py, d2=dx*dx+dy*dy; if(d2<1)d2=1;
+      const f=REP/(d2*Math.sqrt(d2)); const fx=dx*f, fy=dy*f;
+      a.fx+=fx; a.fy+=fy; b.fx-=fx; b.fy-=fy; } }
+  for (const e of sub.edges){ const a=e.a,b=e.b; let dx=b.px-a.px,dy=b.py-a.py,d=Math.hypot(dx,dy)||1;
+    const f=(d-LINK)*SPRING, ux=dx/d, uy=dy/d;
+    a.fx+=ux*f; a.fy+=uy*f; b.fx-=ux*f; b.fy-=uy*f; }
+  for (const n of ns){
+    if (n.id===focusId){ n.px=cx; n.py=cy; n.vx=n.vy=0; continue; }
+    if (n===dragNode) continue;
+    n.vx=(n.vx+n.fx)*DAMP; n.vy=(n.vy+n.fy)*DAMP;
+    n.px+=n.vx*alpha; n.py+=n.vy*alpha;
   }
+  if (alpha>0.03) alpha*=0.985;
+}
+function tick(){
+  if (layoutMode==="force") forceStep();
+  else for (const n of sub.nodes){ if (n===dragNode||n.pinned) continue;
+    n.px += (n.tx-n.px)*0.2; n.py += (n.ty-n.py)*0.2; }
   draw();
   requestAnimationFrame(tick);
 }
@@ -272,9 +307,9 @@ function draw(){
     const A=toScreen(e.a), B=toScreen(e.b), m=METH[e.m], col=IDX[e.a.x].c;  // colour = source index
     ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
     // opacity: confirmed links solid-ish; suggestions fade with their confidence.
-    const alpha = m.sug ? 0.12 + 0.68*(e.w ?? 0.5) : 0.78;
+    const op = m.sug ? 0.12 + 0.68*(e.w ?? 0.5) : 0.78;
     ctx.strokeStyle=col; ctx.lineWidth=m.sug?1:1.3;
-    ctx.setLineDash(m.dash||[]); ctx.globalAlpha=alpha; ctx.stroke();
+    ctx.setLineDash(m.dash||[]); ctx.globalAlpha=op; ctx.stroke();
     // Arrowhead at the target end (just outside its node) — confirmed links only.
     if (e.d){
       const ang=Math.atan2(B.y-A.y, B.x-A.x), rB=nodeR(e.b), sz=Math.max(4.5,6*Math.sqrt(view.k));
@@ -346,6 +381,7 @@ function makeGroup(masterId, cls, setSet){
   master.addEventListener("change", ()=>{ boxes().forEach(c=>c.checked=master.checked); apply(); });
   apply();   // sync the master's initial (possibly indeterminate) state
 }
+makeGroup("confAll", "conf", s=>enabledConf=s);
 makeGroup("intraAll", "intra", s=>enabledIntra=s);
 makeGroup("sugAll", "sug", s=>enabledSug=s);
 
