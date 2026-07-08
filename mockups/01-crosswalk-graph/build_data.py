@@ -27,28 +27,34 @@ def main():
             names[f"{idx}:{r['id']}"] = r.get("name") or r.get("id")
 
     # Forward maps only (reverse maps are literal mirrors), tagged by method.
+    # `rev` flips the stored arrow so it points along the *semantic* direction of
+    # the link (who references / contains whom), matching the legend's ⇒ marks:
+    #   constituent/defining/summary : ATU → TMI   (a type points to its motifs)
+    #   note                         : TMI → ATU   (a TMI note cites the type)
+    #   berezkin                     : Berezkin → ATU/TMI (its citation)
     FORWARD = [
-        ("atu", "tmi", "atu_to_tmi", "constituent"),
-        ("atu", "tmi", "atu_to_tmi_defining", "defining"),
-        ("atu", "tmi", "atu_to_tmi_note", "note"),
-        ("atu", "tmi", "atu_to_tmi_summary", "summary"),
-        ("brz", "atu", "berezkin_to_atu", "berezkin"),
-        ("brz", "tmi", "berezkin_to_tmi", "berezkin"),
+        ("atu", "tmi", "atu_to_tmi", "constituent", False),
+        ("atu", "tmi", "atu_to_tmi_defining", "defining", False),
+        ("atu", "tmi", "atu_to_tmi_note", "note", True),
+        ("atu", "tmi", "atu_to_tmi_summary", "summary", False),
+        ("brz", "atu", "berezkin_to_atu", "berezkin", False),
+        ("brz", "tmi", "berezkin_to_tmi", "berezkin", False),
     ]
-    edges = {}  # frozenset(a,b) -> set(methods)
+    edges = {}  # frozenset(a,b) -> {method: (src, tgt)}  (directed per method)
 
-    def add(a, b, method):
-        if a == b:
+    def add(src, tgt, method):
+        if src == tgt:
             return
-        edges.setdefault(frozenset((a, b)), set()).add(method)
+        edges.setdefault(frozenset((src, tgt)), {})[method] = (src, tgt)
 
-    for left, right, mapname, method in FORWARD:
+    for left, right, mapname, method, rev in FORWARD:
         for lid, rids in (cw.get(mapname) or {}).items():
             a = f"{left}:{lid}"
             for rid in rids:
-                add(a, f"{right}:{rid}", method)
+                b = f"{right}:{rid}"
+                add(b, a, method) if rev else add(a, b, method)
 
-    # Transitive-closure ("inferred") edges, with their pivot recorded.
+    # Transitive-closure ("inferred") edges: symmetric triangle closure, undirected.
     IDX = {"tmi": "tmi", "atu": "atu", "berezkin": "brz"}
     for side, byid in (cw.get("inferred") or {}).items():
         for lid, links in byid.items():
@@ -58,13 +64,14 @@ def main():
 
     used = set()
     edge_list = []
-    for pair, methods in edges.items():
-        a, b = tuple(pair)
-        used.add(a); used.add(b)
-        # Pick the single "strongest" method for colouring (confirmed over inferred).
-        order = ["constituent", "defining", "note", "summary", "berezkin", "inferred"]
-        m = min(methods, key=order.index)
-        edge_list.append({"s": a, "t": b, "m": m})
+    # Pick the single "strongest" method for colouring + direction (confirmed over inferred).
+    order = ["constituent", "defining", "note", "summary", "berezkin", "inferred"]
+    for methmap in edges.values():
+        m = min(methmap, key=order.index)
+        src, tgt = methmap[m]
+        used.add(src); used.add(tgt)
+        # `d` = directed: inferred (symmetric) draws no arrow, the rest point src→tgt.
+        edge_list.append({"s": src, "t": tgt, "m": m, "d": m != "inferred"})
 
     # Every node that takes part in at least one cross-walk edge — the complete
     # connected set across all three indexes, not a sample.

@@ -62,7 +62,7 @@
 <body>
 <header>
   <h1>Cross-walk graph</h1>
-  <span class="sub">click a node to recentre · drag to move · scroll to zoom</span>
+  <span class="sub">click a node to recentre · drag to move · scroll to zoom · arrows show link direction</span>
   <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
   <button id="browseBtn" class="btn">☰ Browse hubs</button>
 </header>
@@ -179,7 +179,7 @@ function buildSub(centerId){
     if (!nmap.has(e.s) || !nmap.has(e.t)) continue;
     if (!showInf && e.m==="inferred") continue;
     const key = e.s<e.t?e.s+e.t:e.t+e.s; if (seen.has(key)) continue; seen.add(key);
-    edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m });
+    edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d });
   }
   sub = { nodes, edges };
 
@@ -208,6 +208,7 @@ function tick(){
 }
 
 function toScreen(n){ return { x:(n.px-cv.clientWidth/2)*view.k+view.x, y:(n.py-cv.clientHeight/2)*view.k+view.y }; }
+function nodeR(n){ return (n.id===focusId?9:4.5+Math.min(5,Math.sqrt(gdeg.get(n.id))))*Math.sqrt(view.k); }
 
 function draw(){
   ctx.clearRect(0,0,cv.clientWidth,cv.clientHeight);
@@ -216,10 +217,22 @@ function draw(){
     ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
     ctx.strokeStyle=m.c; ctx.lineWidth=e.m==="constituent"?1:1.4;
     ctx.setLineDash(m.dash?[4,4]:[]); ctx.globalAlpha=.75; ctx.stroke();
+    // Arrowhead at the target end (just outside its node), for directed links.
+    if (e.d){
+      const ang=Math.atan2(B.y-A.y, B.x-A.x), rB=nodeR(e.b), sz=Math.max(4.5,6*Math.sqrt(view.k));
+      const dist=Math.hypot(B.x-A.x, B.y-A.y);
+      if (dist > rB+sz+2){
+        const tx=B.x-Math.cos(ang)*(rB+1.5), ty=B.y-Math.sin(ang)*(rB+1.5);
+        ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(tx,ty);
+        ctx.lineTo(tx-Math.cos(ang-0.45)*sz, ty-Math.sin(ang-0.45)*sz);
+        ctx.lineTo(tx-Math.cos(ang+0.45)*sz, ty-Math.sin(ang+0.45)*sz);
+        ctx.closePath(); ctx.globalAlpha=.9; ctx.fillStyle=m.c; ctx.fill();
+      }
+    }
   }
   ctx.setLineDash([]); ctx.globalAlpha=1;
   for (const n of sub.nodes){
-    const P=toScreen(n), r=(n.id===focusId?9:4.5+Math.min(5,Math.sqrt(gdeg.get(n.id))))*Math.sqrt(view.k);
+    const P=toScreen(n), r=nodeR(n);
     ctx.beginPath(); ctx.arc(P.x,P.y,r,0,7); ctx.fillStyle=IDX[n.x].c;
     ctx.strokeStyle=n.id===focusId?"#111":"#fff"; ctx.lineWidth=n.id===focusId?2.5:1.4;
     ctx.fill(); ctx.stroke();
