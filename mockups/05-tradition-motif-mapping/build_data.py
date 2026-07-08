@@ -41,11 +41,18 @@ def canon(s):
     return s
 
 
-def collect():
-    """namespaced motif id -> (index, code, name, set(culture labels))."""
+def collect(tmi_norm=None):
+    """namespaced motif id -> (index, code, name, set(culture labels)).
+
+    ``tmi_norm``: optional callable applied to each raw TMI culture label
+    (e.g. ``culture_dict.canonical``); when None, labels are only whitespace-
+    canonicalised. Berezkin/ATU labels are never touched by it.
+    """
     out = {}
     for r in load("tmi.json")["motifs"]:
-        cults = {canon(c) for c in (r.get("cultures") or {})}
+        cults = {tmi_norm(c) for c in (r.get("cultures") or {})} if tmi_norm \
+            else {canon(c) for c in (r.get("cultures") or {})}
+        cults = {c for c in cults if c}
         if cults:
             out[f"tmi:{r['id']}"] = ("tmi", r["id"], r.get("name") or r["id"], cults)
     bz = load("berezkin.json")
@@ -66,8 +73,8 @@ def collect():
     return out
 
 
-def build():
-    motifs = collect()
+def build(tmi_norm=None):
+    motifs = collect(tmi_norm)
     ids = list(motifs)
     df = Counter(c for _, _, _, cs in motifs.values() for c in cs)
     nmot = len(ids)

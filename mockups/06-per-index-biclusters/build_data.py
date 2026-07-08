@@ -70,12 +70,18 @@ def canon(s):
     return re.sub(r"\s+", " ", (s or "").strip()).rstrip(".,;:")
 
 
-def collect(index):
-    """namespaced motif id -> (code, name, set(tradition labels)) for one index."""
+def collect(index, tmi_norm=None):
+    """namespaced motif id -> (code, name, set(tradition labels)) for one index.
+
+    ``tmi_norm``: optional callable applied to each raw TMI culture label
+    (e.g. ``culture_dict.canonical``); only used for the ``tmi`` index.
+    """
     out = {}
     if index == "tmi":
         for r in load("tmi.json")["motifs"]:
-            cs = {canon(c) for c in (r.get("cultures") or {})}
+            cs = {tmi_norm(c) for c in (r.get("cultures") or {})} if tmi_norm \
+                else {canon(c) for c in (r.get("cultures") or {})}
+            cs = {c for c in cs if c}
             if cs:
                 out[r["id"]] = (r["id"], r.get("name") or r["id"], cs)
     elif index == "brz":
@@ -97,9 +103,9 @@ def collect(index):
     return out
 
 
-def bicluster(index):
+def bicluster(index, tmi_norm=None):
     K, MIN_DF, MAX_DF_FRAC, MIN_CULT = CFG[index]
-    motifs = collect(index)
+    motifs = collect(index, tmi_norm)
     ids = list(motifs)
     df = Counter(c for _, _, cs in motifs.values() for c in cs)
     keep = {c for c, n in df.items() if n >= MIN_DF and n <= MAX_DF_FRAC * len(ids)}

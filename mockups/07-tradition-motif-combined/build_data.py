@@ -9,11 +9,21 @@ Run from repo root:  python mockups/07-tradition-motif-combined/build_data.py
 """
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MOCKS = ROOT / "mockups"
 OUT = Path(__file__).resolve().parent / "data.js"
+
+sys.path.insert(0, str(ROOT / "src"))
+from motifs.sources.culture_dict import canonical  # noqa: E402
+
+# Normalise TMI's free-text culture labels via the curated pipeline dictionary
+# (merges Icel.->Icelandic, China->Chinese, strips "(sub-area)"/"Cf." etc.) for
+# the "all" and "tmi" views. Berezkin/ATU labels are left untouched.
+def tmi_norm(label):
+    return canonical(label)[0]
 
 
 def load_mod(rel, name):
@@ -27,9 +37,9 @@ def main():
     m05 = load_mod("05-tradition-motif-mapping/build_data.py", "m05_build")
     m06 = load_mod("06-per-index-biclusters/build_data.py", "m06_build")
 
-    data = {"all": m05.build()}
+    data = {"all": m05.build(tmi_norm=tmi_norm)}
     for ix in ("brz", "tmi", "atu"):
-        data[ix] = m06.bicluster(ix)
+        data[ix] = m06.bicluster(ix, tmi_norm=tmi_norm if ix == "tmi" else None)
 
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")
 
