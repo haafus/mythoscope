@@ -27,17 +27,25 @@
 
 html {
     background: #faf9f5;
-    /* The workspace is a fixed-height shell with its own inner scrollers; without
-       this, over-dragging one of those panes chains to the document, which
-       rubber-bands and flashes the beige page background past the pane edge. */
-    overscroll-behavior: none;
 }
 
 body {
     color: #212529;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.5;
-    overscroll-behavior: none;
+}
+
+/* Keep each pane's overscroll bounce within the pane — so over-dragging reveals
+   the pane's own (white) background instead of chaining to the document, which
+   would flash the beige page background past the pane edge. */
+.library-tree,
+.rail-body,
+.corpus-page .reader-content,
+.corpus-page .book-info,
+.motifs-list,
+.motifs-detail,
+.analysis-page .search-results {
+    overscroll-behavior: contain;
 }
 
 body.has-main-navbar {
