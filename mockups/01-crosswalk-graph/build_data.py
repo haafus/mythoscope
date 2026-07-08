@@ -46,7 +46,10 @@ def load(name):
 
 def main():
     cw = load("crosswalk.json")
-    names, idx_rows, valid = {}, {}, {}
+    names, defs, idx_rows, valid = {}, {}, {}, {}
+    # definition text differs by index: TMI/Berezkin call it "definition", ATU
+    # keeps a prose "summary". Capped so the tooltip stays a snippet, not an essay.
+    DEF_KEY = {"tmi": "definition", "atu": "summary", "brz": "definition"}
     for idx, fname, key in (("tmi", "tmi.json", "motifs"),
                             ("atu", "atu.json", "types"),
                             ("brz", "berezkin.json", "motifs")):
@@ -55,6 +58,9 @@ def main():
         valid[idx] = {r["id"] for r in rows}
         for r in rows:
             names[f"{idx}:{r['id']}"] = r.get("name") or r.get("id")
+            d = (r.get(DEF_KEY[idx]) or "").strip()
+            if d:
+                defs[f"{idx}:{r['id']}"] = d[:400] + ("…" if len(d) > 400 else "")
 
     edges = {}  # frozenset(a,b) -> {method: (src, tgt, conf)}  (directed + confidence)
 
@@ -177,10 +183,14 @@ def main():
         node_maps.append(ncl)
         clusterings.append({"label": label, "clusters": cls})
 
-    node_list = [{"id": n, "x": n.split(":", 1)[0], "c": n.split(":", 1)[1],
-                  "n": names.get(n, n.split(":", 1)[1]),
-                  "cl": [nm.get(n, -1) for nm in node_maps]}
-                 for n in sorted(used)]
+    node_list = []
+    for n in sorted(used):
+        row = {"id": n, "x": n.split(":", 1)[0], "c": n.split(":", 1)[1],
+               "n": names.get(n, n.split(":", 1)[1]),
+               "cl": [nm.get(n, -1) for nm in node_maps]}
+        if n in defs:
+            row["d"] = defs[n]        # definition / summary text for the tooltip
+        node_list.append(row)
 
     data = {"nodes": node_list, "edges": edge_list, "clusterings": clusterings}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
