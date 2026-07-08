@@ -29,18 +29,24 @@
   .legend b { display: block; margin: 6px 0 3px; color: #6c757d; font-weight: 600;
               text-transform: uppercase; font-size: 9.5px; letter-spacing: .04em; }
   .legend .row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
   .ln { width: 16px; height: 0; border-top: 3px solid; }
   .tip { position: absolute; z-index: 30; pointer-events: none; background: #111827; color: #fff;
          padding: 5px 9px; border-radius: 6px; font-size: 12px; max-width: 280px; display: none; }
   .ctl { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,.94);
-         border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
+         border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 11px; font-size: 12px;
+         max-height: calc(100vh - 78px); overflow-y: auto; width: 232px; }
   .ctl label { display: block; margin: 3px 0; cursor: pointer; }
-  .ctl label.det { margin-left: 17px; }
-  .ctl input[type=checkbox], .legend input[type=checkbox] { accent-color: #9aa7b2; }
-  .ctl-h { margin: 7px 0 2px; font-size: 9.5px; font-weight: 600; text-transform: uppercase;
+  .ctl label.det { margin-left: 13px; display: flex; align-items: center; gap: 6px; }
+  .ctl label.det .lbl { flex: 1; }
+  .ctl label.det:has(input:not(:checked)) .lbl { text-decoration: line-through; color: #b0b6bd; }
+  .ctl .sw { flex: 0 0 auto; }
+  .ctl input[type=checkbox] { accent-color: #9aa7b2; flex: 0 0 auto; }
+  .ctl-h { margin: 8px 0 2px; font-size: 9.5px; font-weight: 600; text-transform: uppercase;
            letter-spacing: .04em; color: #6c757d; border-top: 1px solid #eef1f4; padding-top: 6px; }
-  .legend .row { padding-left: 12px; }
+  .ctl-h.grp { display: flex; gap: 5px; align-items: center; cursor: pointer; }
+  .ctl-note { font-size: 9.5px; color: #9299a1; margin: 6px 0 1px; }
+  .ctl .row { padding-left: 3px; display: flex; align-items: center; gap: 6px; margin: 2px 0; }
   .bmode { display: flex; gap: 4px; padding: 7px 8px 0; }
   .bmode button { flex: 1; padding: 5px 4px; font-size: 11.5px; border: 1px solid #dee2e6;
                   border-radius: 5px; background: #fff; cursor: pointer; }
@@ -94,37 +100,19 @@
       <button data-x="atu">ATU</button>
       <button data-x="brz">Berezkin</button>
     </div>
-    <div class="bfilter" id="bvariant" style="display:none">
-      <button data-k="cl" class="active">Confirmed links</button>
-      <button data-k="cl2">Incl. suggestions</button>
+    <div id="bvariant" style="display:none;padding:7px 8px;border-bottom:1px solid #f1f3f5">
+      <select id="clsel" style="width:100%;padding:5px 6px;font-size:12px;border:1px solid #dee2e6;border-radius:5px"></select>
     </div>
     <div id="blist"></div>
   </div>
   <div class="tip" id="tip"></div>
   <div class="focusinfo" id="focusinfo"></div>
-  <div class="ctl">
+  <div class="ctl" id="ctl">
     <label><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
-    <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
-      <input type="checkbox" id="confAll"> Confirmed cross-walk — all</label>
-    <label class="det"><input type="checkbox" class="conf" value="constituent" checked> constituent</label>
-    <label class="det"><input type="checkbox" class="conf" value="defining" checked> defining</label>
-    <label class="det"><input type="checkbox" class="conf" value="note" checked> TMI note</label>
-    <label class="det"><input type="checkbox" class="conf" value="summary" checked> ATU summary</label>
-    <label class="det"><input type="checkbox" class="conf" value="berezkin" checked> Berezkin citation</label>
-    <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
-      <input type="checkbox" id="intraAll"> Intra-index links — all</label>
-    <label class="det"><input type="checkbox" class="intra" value="seealso" checked> see-also</label>
-    <label class="det"><input type="checkbox" class="intra" value="combo" checked> ATU combos</label>
-    <label class="det"><input type="checkbox" class="intra" value="subtype"> ATU subtypes</label>
-    <label class="ctl-h" style="display:flex;gap:5px;align-items:center;cursor:pointer">
-      <input type="checkbox" id="sugAll"> Suggestion layers — all</label>
-    <label class="det"><input type="checkbox" class="sug" value="near" checked> near-identical</label>
-    <label class="det"><input type="checkbox" class="sug" value="lexical"> lexical</label>
-    <label class="det"><input type="checkbox" class="sug" value="reasoned" checked> reasoned</label>
-    <label class="det"><input type="checkbox" class="sug" value="semantic"> semantic</label>
-    <label class="det"><input type="checkbox" class="sug" value="inferred" checked> inferred</label>
+    <div id="nodeleg"></div>
+    <div class="ctl-note">Edge colour = source · opacity = confidence</div>
+    <div id="layers"></div>
   </div>
-  <div class="legend" id="legend"></div>
 </main>
 <script src="data.js"></script>
 <script>
@@ -155,12 +143,12 @@ const CPAL = ["#e6194b","#3cb44b","#4363d8","#f58231","#911eb4","#1f9e9e","#f032
               "#008080","#800000","#808000","#000075","#d9a300","#8a5a44","#5a7d5a","#7a4fa3"];
 const clColor = id => id>=0 ? CPAL[id % CPAL.length] : "#c9ced6";
 let highlightCluster = -1;
-// two clusterings: "cl" = confirmed cross-walk only · "cl2" = incl. suggestions
-let clKey = "cl", clMap = new Map();
-const clusterList = () => clKey==="cl" ? (DATA.clusters||[]) : (DATA.clusters2||[]);
-const nodeCl = n => n[clKey] ?? -1;
-function setClustering(k){ clKey=k; clMap = new Map(clusterList().map(c=>[c.id,c])); highlightCluster=-1; }
-setClustering("cl");
+// four clustering presets (cumulative edge sets), precomputed in data.js
+let clPreset = 0, clMap = new Map();
+const clusterList = () => (DATA.clusterings[clPreset]||{clusters:[]}).clusters;
+const nodeCl = n => (n.cl && n.cl[clPreset] != null) ? n.cl[clPreset] : -1;
+function setClustering(i){ clPreset=i; clMap = new Map(clusterList().map(c=>[c.id,c])); highlightCluster=-1; }
+setClustering(0);
 const byId = new Map(DATA.nodes.map(n => [n.id, n]));
 const adj = new Map();                       // id -> [{o, m}]
 for (const n of DATA.nodes) adj.set(n.id, []);
@@ -260,7 +248,7 @@ function buildSub(centerId){
     : `${ring1.length} shown link${ring1.length!==1?"s":""}` + (depth2 ? ` · +${ring2.length} at 2-hop` : "");
   const ci = clMap.get(nodeCl(f));
   const clLine = ci ? `<div class="fi-d" style="color:${clColor(ci.id)}">◆ cluster of ${ci.size} `+
-    `(${clKey==="cl"?"confirmed":"incl. suggestions"})</div>` : "";
+    `(${DATA.clusterings[clPreset].label})</div>` : "";
   document.getElementById("focusinfo").innerHTML =
     `<div class="fi-id" style="color:${IDX[f.x].c}">${f.c}</div>`+
     `<div class="fi-n">${escapeHtml(f.n)}</div>`+
@@ -367,6 +355,23 @@ window.addEventListener("mouseup", e=>{
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
   const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
 document.getElementById("depth2").addEventListener("change", ()=>focusId&&buildSub(focusId));
+// ---- combined panel: node legend + edge legend swatches merged with the toggles ----
+const swLine = m => `<svg class="sw" width="20" height="7"><line x1="0" y1="3.5" x2="20" y2="3.5" `+
+  `stroke="#8a94a6" stroke-width="2"${m.dash?` stroke-dasharray="${m.dash.join(' ')}"`:''}/></svg>`;
+document.getElementById("nodeleg").innerHTML =
+  `<div class="ctl-h" style="border-top:0">Node — index</div>`+
+  Object.values(IDX).map(v=>`<div class="row"><span class="dot" style="background:${v.c}"></span>${v.label}</div>`).join("");
+const LAYERS = [
+  {cls:"conf", master:"confAll", title:"Confirmed cross-walk", items:["constituent","defining","note","summary","berezkin"], on:["constituent","defining","note","summary","berezkin"]},
+  {cls:"intra", master:"intraAll", title:"Intra-index links", items:["seealso","combo","subtype"], on:["seealso","combo"]},
+  {cls:"sug", master:"sugAll", title:"Suggestion layers", items:["near","lexical","reasoned","semantic","inferred"], on:["near","reasoned","inferred"]},
+];
+document.getElementById("layers").innerHTML = LAYERS.map(g=>
+  `<label class="ctl-h grp"><input type="checkbox" id="${g.master}"> ${g.title} — all</label>`+
+  g.items.map(v=>`<label class="det"><input type="checkbox" class="${g.cls}" value="${v}"${g.on.includes(v)?" checked":""}>`+
+    `${swLine(METH[v])}<span class="lbl">${METH[v].label}</span></label>`).join("")
+).join("");
+
 // a checkbox group with a master "— all" toggle (mixed state → indeterminate)
 function makeGroup(masterId, cls, setSet){
   const master = document.getElementById(masterId);
@@ -405,11 +410,11 @@ const bfilter=document.getElementById("bfilter"), bvariant=document.getElementBy
 let browseMode="hubs", browseFilter="";
 function renderBrowse(){
   bfilter.style.display = browseMode==="hubs" ? "flex" : "none";
-  bvariant.style.display = browseMode==="clusters" ? "flex" : "none";
+  bvariant.style.display = browseMode==="clusters" ? "block" : "none";
   if (browseMode==="clusters"){
     const cls = clusterList();
     bhead.textContent = `${cls.length.toLocaleString()} dense cluster${cls.length!==1?"s":""} · `
-      + `${clKey==="cl"?"confirmed links":"incl. suggestions"} · biggest first`;
+      + `${DATA.clusterings[clPreset].label} · biggest first`;
     blist.innerHTML = cls.slice(0,150).map(c=>{
       const lab = c.top.map(t=>escapeHtml(t.c)).join(" · ");
       const tot = c.by_index.tmi+c.by_index.atu+c.by_index.brz || 1;
@@ -439,11 +444,11 @@ bfilter.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
   bfilter.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
   b.classList.add("active"); browseFilter=b.dataset.x; renderBrowse();
 }));
-bvariant.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
-  bvariant.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active"); setClustering(b.dataset.k); renderBrowse();
+const clsel=document.getElementById("clsel");
+clsel.innerHTML = DATA.clusterings.map((c,i)=>`<option value="${i}">${escapeHtml(c.label)}</option>`).join("");
+clsel.addEventListener("change", ()=>{ setClustering(+clsel.value); renderBrowse();
   if (focusId) buildSub(focusId);   // refresh the on-canvas cluster highlight
-}));
+});
 blist.addEventListener("click", e=>{
   const dc=e.target.closest("[data-cl]");
   if (dc){ const c=clMap.get(+dc.dataset.cl); if(c) buildSub(c.top[0].id); browse.style.display="none"; return; }
@@ -451,18 +456,6 @@ blist.addEventListener("click", e=>{
 document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target.id!=="browseBtn") browse.style.display="none"; });
 
 function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-
-// legend — node fill by index; edge colour = source index, opacity = confidence,
-// line style = method (solid+arrow for confirmed links, dashed for suggestions).
-const legLine = m => `<svg width="22" height="7" style="vertical-align:middle;flex:0 0 auto">`+
-  `<line x1="0" y1="3.5" x2="22" y2="3.5" stroke="#8a94a6" stroke-width="2"${m.dash?` stroke-dasharray="${m.dash.join(' ')}"`:''}/></svg>`;
-const legRows = keys => keys.map(k=>`<div class="row">${legLine(METH[k])} ${METH[k].label}</div>`).join("");
-document.getElementById("legend").innerHTML =
-  `<b>Node fill — index</b>`+Object.values(IDX).map(v=>`<div class="row"><span class="dot" style="background:${v.c}"></span>${v.label}</div>`).join("")+
-  `<b>Edge colour = source · opacity = confidence</b>`+
-  `<b>Cross-index link — solid, → direction</b>`+legRows(["constituent","defining","note","summary","berezkin"])+
-  `<b>Intra-index link — solid</b>`+legRows(["seealso","combo","subtype"])+
-  `<b>Suggestion — dashed</b>`+legRows(["near","reasoned","lexical","semantic","inferred"]);
 
 buildSub("atu:875");   // seed on the busiest hub
 tick();

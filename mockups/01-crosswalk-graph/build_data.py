@@ -34,8 +34,6 @@ NEAR_TITLE = 0.9  # title-similarity band that reads as "near-identical"
 # seealso (TMI cf/ref + Berezkin see-also), combo (ATU), subtype (ATU hierarchy).
 CONFIRMED = {"constituent", "defining", "note", "summary", "berezkin",
              "seealso", "combo", "subtype"}
-# the confirmed clustering excludes subtypes (hierarchical, off by default on the front)
-CL_CONFIRMED = CONFIRMED - {"subtype"}
 # strongest → weakest, for picking the one method a shared pair is drawn as
 ORDER = ["constituent", "defining", "note", "summary", "berezkin",
          "seealso", "combo", "subtype",
@@ -143,13 +141,11 @@ def main():
             e["w"] = round(conf, 2)     # confidence → edge opacity on the front
         edge_list.append(e)
 
-    # ---- dense clusters: Louvain, computed two ways ----
-    #   cl  : over the confirmed cross-walk graph only (the asserted structure)
-    #   cl2 : over confirmed + all suggestion/parallel edges (looser, meaning-based)
-    def cluster(edge_filter):
+    # ---- dense clusters: Louvain over four cumulative edge sets (presets) ----
+    def cluster(edgeset):
         G = nx.Graph()
         for e in edge_list:
-            if edge_filter(e["m"]):
+            if e["m"] in edgeset:
                 G.add_edge(e["s"], e["t"])
         comms = sorted((c for c in louvain_communities(G, seed=0) if len(c) >= 2),
                        key=len, reverse=True)
@@ -166,28 +162,38 @@ def main():
                                 for n in top]})
         return node_cl, out
 
-    cl_conf, clusters = cluster(lambda m: m in CL_CONFIRMED)
-    cl_all, clusters2 = cluster(lambda m: True)
+    CROSS = {"constituent", "defining", "note", "summary", "berezkin"}
+    SUG = {"near", "lexical", "reasoned", "semantic", "inferred"}
+    PRESETS = [
+        ("confirmed only", CROSS),
+        ("confirmed + see-also", CROSS | {"seealso"}),
+        ("confirmed + suggestions", CROSS | SUG),
+        ("confirmed + suggestions + see-also", CROSS | SUG | {"seealso"}),
+        ("confirmed + suggestions + see-also + combos", CROSS | SUG | {"seealso", "combo"}),
+    ]
+    node_maps, clusterings = [], []
+    for label, es in PRESETS:
+        ncl, cls = cluster(es)
+        node_maps.append(ncl)
+        clusterings.append({"label": label, "clusters": cls})
 
     node_list = [{"id": n, "x": n.split(":", 1)[0], "c": n.split(":", 1)[1],
                   "n": names.get(n, n.split(":", 1)[1]),
-                  "cl": cl_conf.get(n, -1), "cl2": cl_all.get(n, -1)}
+                  "cl": [nm.get(n, -1) for nm in node_maps]}
                  for n in sorted(used)]
 
-    data = {"nodes": node_list, "edges": edge_list,
-            "clusters": clusters, "clusters2": clusters2}
+    data = {"nodes": node_list, "edges": edge_list, "clusterings": clusterings}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
 
     by_method = {}
     for e in edge_list:
         by_method[e["m"]] = by_method.get(e["m"], 0) + 1
-    print(f"nodes={len(node_list)} edges={len(edge_list)} "
-          f"clusters(confirmed)={len(clusters)} clusters(all)={len(clusters2)} "
-          f"~{OUT.stat().st_size // 1024}KB")
+    print(f"nodes={len(node_list)} edges={len(edge_list)} ~{OUT.stat().st_size // 1024}KB")
     print("edges by method:", by_method)
-    print("biggest confirmed clusters:", [(c["size"], c["by_index"]) for c in clusters[:5]])
-    print("biggest all-links clusters:", [(c["size"], c["by_index"]) for c in clusters2[:5]])
+    for cl in clusterings:
+        print(f"  [{cl['label']:>16}] {len(cl['clusters'])} clusters · "
+              f"biggest {[c['size'] for c in cl['clusters'][:4]]}")
 
 
 if __name__ == "__main__":
