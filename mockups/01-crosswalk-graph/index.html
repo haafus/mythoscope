@@ -117,6 +117,8 @@
 <script src="data.js"></script>
 <script>
 const IDX = { tmi:{c:"#2a9d8f",label:"Thompson (TMI)"}, atu:{c:"#3a6ea5",label:"ATU type"}, brz:{c:"#b5651d",label:"Berezkin"} };
+const IX3 = { tmi:"TMI", atu:"ATU", brz:"BRZ" };          // three-letter index code shown before every motif code
+const codeOf = o => IX3[o.x] + " " + o.c;
 // Edges are coloured by SOURCE index; the method sets the line style instead.
 // Confirmed cross-walk = solid + arrow; each suggestion type = its own dash.
 const METH = {
@@ -250,7 +252,7 @@ function buildSub(centerId){
   const clLine = ci ? `<div class="fi-d" style="color:${clColor(ci.id)}">◆ cluster of ${ci.size} `+
     `(${DATA.clusterings[clPreset].label})</div>` : "";
   document.getElementById("focusinfo").innerHTML =
-    `<div class="fi-id" style="color:${IDX[f.x].c}">${f.c}</div>`+
+    `<div class="fi-id" style="color:${IDX[f.x].c}">${codeOf(f)}</div>`+
     `<div class="fi-n">${escapeHtml(f.n)}</div>`+
     `<div class="fi-d">${IDX[f.x].label} · ${detail}</div>${clLine}`;
 }
@@ -324,7 +326,7 @@ function draw(){
     ctx.fill(); ctx.stroke();
     if (n.id===focusId || view.k>1.1 || sub.nodes.length<26){
       ctx.fillStyle="#111827"; ctx.font=`${n.id===focusId?12:10}px -apple-system,sans-serif`;
-      ctx.textAlign="center"; ctx.fillText(n.c, P.x, P.y-r-3);
+      ctx.textAlign="center"; ctx.fillText(codeOf(n), P.x, P.y-r-3);
     }
   }
 }
@@ -345,7 +347,7 @@ cv.addEventListener("mousemove", e=>{
   if (panning){ view.x+=e.offsetX-last[0]; view.y+=e.offsetY-last[1]; last=[e.offsetX,e.offsetY]; moved=true; return; }
   const n=pick(e.offsetX,e.offsetY);
   if (n){ tip.style.display="block"; tip.style.left=(e.offsetX+14)+"px"; tip.style.top=(e.offsetY+10)+"px";
-    tip.innerHTML=`<b>${n.c}</b> — ${escapeHtml(n.n)}<br><span style="opacity:.7">${IDX[n.x].label} · ${gdeg.get(n.id)} links</span>`; cv.style.cursor="pointer"; }
+    tip.innerHTML=`<b>${codeOf(n)}</b> — ${escapeHtml(n.n)}<br><span style="opacity:.7">${IDX[n.x].label} · ${gdeg.get(n.id)} links</span>`; cv.style.cursor="pointer"; }
   else { tip.style.display="none"; cv.style.cursor=panning?"grabbing":"grab"; }
 });
 window.addEventListener("mouseup", e=>{
@@ -396,7 +398,7 @@ search.addEventListener("input", ()=>{
   const q=search.value.trim().toLowerCase(); if(q.length<2){results.style.display="none";return;}
   const hits=DATA.nodes.filter(n=>n.c.toLowerCase().startsWith(q)||n.n.toLowerCase().includes(q))
     .sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0,40);
-  results.innerHTML=hits.map(n=>`<div data-id="${n.id}"><span class="rid" style="color:${IDX[n.x].c}">${n.c}</span> — ${escapeHtml(n.n)} <span style="color:#9299a1">(${gdeg.get(n.id)})</span></div>`).join("")||`<div style="color:#9299a1">no matches</div>`;
+  results.innerHTML=hits.map(n=>`<div data-id="${n.id}"><span class="rid" style="color:${IDX[n.x].c}">${codeOf(n)}</span> — ${escapeHtml(n.n)} <span style="color:#9299a1">(${gdeg.get(n.id)})</span></div>`).join("")||`<div style="color:#9299a1">no matches</div>`;
   const r=search.getBoundingClientRect(); results.style.left=r.left+"px"; results.style.top=(r.bottom+4)+"px"; results.style.display="block";
 });
 results.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if(!d)return;
@@ -416,7 +418,7 @@ function renderBrowse(){
     bhead.textContent = `${cls.length.toLocaleString()} dense cluster${cls.length!==1?"s":""} · `
       + `${DATA.clusterings[clPreset].label} · biggest first`;
     blist.innerHTML = cls.slice(0,150).map(c=>{
-      const lab = c.top.map(t=>escapeHtml(t.c)).join(" · ");
+      const lab = c.top.map(t=>escapeHtml(codeOf(t))).join(" · ");
       const tot = c.by_index.tmi+c.by_index.atu+c.by_index.brz || 1;
       const bar = ["tmi","atu","brz"].map(x=>c.by_index[x]?`<i style="width:${100*c.by_index[x]/tot}%;background:${IDX[x].c}"></i>`:"").join("");
       return `<div data-cl="${c.id}"><span class="dot" style="background:${clColor(c.id)}"></span>`+
@@ -429,7 +431,7 @@ function renderBrowse(){
       + (all.length>shown.length ? ` (top ${shown.length})` : "");
     blist.innerHTML = shown.map(n=>
       `<div data-id="${n.id}"><span class="dot" style="background:${IDX[n.x].c}"></span>`+
-      `<span class="rid" style="color:${IDX[n.x].c}">${n.c}</span>`+
+      `<span class="rid" style="color:${IDX[n.x].c}">${codeOf(n)}</span>`+
       `<span class="bn">${escapeHtml(n.n)}</span><span class="bd">${gdeg.get(n.id)}</span></div>`).join("");
   }
 }
