@@ -338,6 +338,17 @@ document.getElementById("focusinfo").addEventListener("click", e=>{
 });
 // re-run whichever view is active (cluster subgraph or a node's neighbourhood)
 function rebuild(){ if (currentCluster>=0) buildCluster(currentCluster); else if (focusId) buildSub(focusId); updateFbNote(); }
+// rebuild but keep the settled layout: carry current node positions + hold the
+// zoom/pan, so a filter change only drops/adds nodes in place instead of restarting.
+function rebuildKeepLayout(){
+  if (!sub.nodes.length || (currentCluster<0 && !focusId)){ rebuild(); return; }
+  posCache = new Map(sub.nodes.map(n=>[n.id,{px:n.px,py:n.py,vx:n.vx,vy:n.vy}]));
+  const v = view;
+  rebuild();
+  view = v;
+  posCache = null;
+  if (layoutMode==="force") alpha = 0.3;   // gentle re-settle for new nodes, not a full restart
+}
 function updateFbNote(){ const el=document.getElementById("fbnote");
   if (el) el.textContent = `${sub.nodes.length} node${sub.nodes.length!==1?"s":""} shown`; }
 
@@ -456,14 +467,7 @@ document.getElementById("depth2").addEventListener("change", rebuild);
 const degFilter=document.getElementById("degFilter"), fbval=document.getElementById("fbval");
 degFilter.addEventListener("input", ()=>{
   minDeg=+degFilter.value; fbval.textContent=minDeg;
-  // Keep the settled layout: carry current node positions into the rebuild and
-  // hold the current zoom/pan, so thinning only drops/adds nodes in place.
-  posCache = new Map(sub.nodes.map(n=>[n.id,{px:n.px,py:n.py,vx:n.vx,vy:n.vy}]));
-  const v = view;
-  rebuild();
-  view = v;
-  posCache = null;
-  if (layoutMode==="force") alpha = 0.3;   // gentle re-settle for new nodes, not a full restart
+  rebuildKeepLayout();   // thinning only drops/adds nodes in place
 });
 // ---- combined panel: node legend + edge legend swatches merged with the toggles ----
 const swLine = m => `<svg class="sw" width="20" height="7"><line x1="0" y1="3.5" x2="20" y2="3.5" `+
@@ -490,7 +494,7 @@ function makeGroup(masterId, cls, setSet){
     const on = [...document.querySelectorAll("."+cls+":checked")];
     setSet(new Set(on.map(c=>c.value)));
     master.checked = on.length===boxes().length; master.indeterminate = on.length>0 && on.length<boxes().length;
-    rebuild();
+    rebuildKeepLayout();   // toggling a layer keeps the current layout, only adds/drops its edges
   }
   boxes().forEach(cb=>cb.addEventListener("change", apply));
   master.addEventListener("change", ()=>{ boxes().forEach(c=>c.checked=master.checked); apply(); });
