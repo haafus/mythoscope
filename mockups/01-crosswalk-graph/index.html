@@ -479,7 +479,7 @@ const LAYERS = [
   {cls:"sug", master:"sugAll", title:"Suggestion layers", items:["inferred","reasoned","near","lexical","semantic"], on:["near","reasoned","inferred"]},
 ];
 document.getElementById("layers").innerHTML = LAYERS.map(g=>
-  `<label class="ctl-h grp"><input type="checkbox" id="${g.master}"> ${g.title} — all</label>`+
+  `<label class="ctl-h grp"><input type="checkbox" id="${g.master}"> ${g.title}</label>`+
   g.items.map(v=>`<label class="det"><input type="checkbox" class="${g.cls}" value="${v}"${g.on.includes(v)?" checked":""}>`+
     `${swLine(METH[v])}<span class="lbl">${METH[v].label}</span></label>`).join("")
 ).join("");
