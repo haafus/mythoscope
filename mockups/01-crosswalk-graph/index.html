@@ -196,6 +196,7 @@ let currentCluster = -1;               // >=0 when showing a whole cluster subgr
 let minDeg = 1;                        // degree filter — hide nodes with fewer total links
 let posCache = null;                   // id → last {px,py,vx,vy}, carried across a thin-out change
                                        // so filtering keeps the settled layout instead of restarting it
+let simMaxR = 700;                      // force-sim boundary: no node may drift past this from centre
 
 // Deterministic concentric ego-layout: centre → ring1 (direct links, grouped into
 // arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
@@ -245,7 +246,7 @@ function buildSub(centerId){
       return Math.atan2(sy, sx);
     };
     ring2.sort((p,q)=>baseAngle(p)-baseAngle(q));
-    R2 = R1 + Math.max(120, ring2.length*15/TAU + 50);
+    R2 = Math.min(Math.min(cx,cy)*0.92, R1 + Math.max(120, ring2.length*15/TAU + 50));
     ring2.forEach((id,i)=>{
       const th = -Math.PI/2 + TAU*(i+0.5)/ring2.length;
       pos.set(id, {x:cx+Math.cos(th)*R2, y:cy+Math.sin(th)*R2});
@@ -254,6 +255,7 @@ function buildSub(centerId){
 
   // 1-hop → force sim (seeded at the ring positions); 2-hop → bloom to concentric targets.
   const useForce = !depth2;
+  simMaxR = R1 * 1.5;   // keep the force sim from flinging a weak leaf far past its ring
   const nodes = [...pos.keys()].map(id => { const p = pos.get(id);
     const c = posCache && posCache.get(id);   // kept node → resume its current position
     return Object.assign({}, byId.get(id),
@@ -303,6 +305,7 @@ function buildCluster(cid){
   const truncated = mem.length > CLUSTER_CAP;
   if (truncated) mem = [...mem].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0, CLUSTER_CAP);
   const R = Math.min(cx,cy)*0.55;
+  simMaxR = R * 1.6;   // bound the cluster sim so members can't drift far off the circle
   const nodes = mem.map((n,i)=>{ const th=TAU*i/mem.length;
     const c = posCache && posCache.get(n.id);   // kept node → resume its current position
     return Object.assign({}, n, { tx:cx, ty:cy,
@@ -355,6 +358,9 @@ function forceStep(){
     if (n===dragNode) continue;
     n.vx=(n.vx+n.fx)*DAMP; n.vy=(n.vy+n.fy)*DAMP;
     n.px+=n.vx*alpha; n.py+=n.vy*alpha;
+    // soft boundary: reel a node back if it drifts past the sim radius
+    const dx=n.px-cx, dy=n.py-cy, d=Math.hypot(dx,dy);
+    if (d>simMaxR){ n.px=cx+dx/d*simMaxR; n.py=cy+dy/d*simMaxR; n.vx*=0.4; n.vy*=0.4; }
   }
   if (alpha>0.03) alpha*=0.985;
 }
