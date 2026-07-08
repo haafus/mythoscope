@@ -47,12 +47,12 @@ python -m http.server -d mockups 8890
 
 ## Current coverage (28 books)
 
-`keyword` 14 · `contents` 5 · `allcaps` 5 · `roman` 2 · `none` 2.
+`keyword` 15 · `contents` 5 · `allcaps` 5 · `roman` 2 · `none` 1.
 
-The two misses are honest: the **KJV Bible** (Gutenberg marks verses as `1:1`, not
-`CHAPTER`) and one Australian folktale collection. This is the intended output of a
-probe — it shows where a heuristic detector is strong (epics, Gutenberg books with a
-Contents block) and where a source needs its own rule.
+The one miss is honest: the **KJV Bible** (Gutenberg marks verses as `1:1`, not
+`CHAPTER`). This is the intended output of a probe — it shows where a heuristic
+detector is strong (epics, Gutenberg books with a Contents block) and where a source
+needs its own rule.
 
 ## Notes on offsets
 

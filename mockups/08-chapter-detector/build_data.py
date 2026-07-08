@@ -34,7 +34,8 @@ CORPUS = ROOT / "config" / "corpus.json"
 # Fetch (curl through the environment proxy — works where python TLS is fiddly)
 # --------------------------------------------------------------------------- #
 def gutenberg_id(url: str) -> str:
-    m = re.search(r"/(\d+)/pg\d+\.txt", url) or re.search(r"epub/(\d+)", url)
+    m = (re.search(r"/(\d+)/pg\d+\.txt", url) or re.search(r"epub/(\d+)", url)
+         or re.search(r"/ebooks/(\d+)", url))
     return m.group(1) if m else re.sub(r"\W+", "", url)[-6:]
 
 
@@ -43,8 +44,10 @@ def fetch(url: str) -> str | None:
     dest = CACHE / f"pg{gutenberg_id(url)}.txt"
     if not dest.exists() or dest.stat().st_size < 1000:
         print(f"  download {url}")
+        # -L: some corpus URLs (…/ebooks/<id>.txt.utf-8) 301-redirect to the real
+        # cache file; without it curl would save the "Moved" HTML page instead.
         r = subprocess.run(
-            ["curl", "-sS", "--fail", "--max-time", "90", "-o", str(dest), url],
+            ["curl", "-sS", "-L", "--fail", "--max-time", "90", "-o", str(dest), url],
             capture_output=True, text=True,
         )
         if r.returncode != 0:
