@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Кластеры индекса Берёзкина — отчёт</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { background:#faf9f5; }
+  body { font:14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color:#1e2329; }
+  header { padding:22px 26px 16px; border-bottom:1px solid #e6e3da; background:#fff; }
+  header h1 { font-size:21px; font-weight:750; letter-spacing:-.01em; }
+  header p { color:#6c757d; font-size:13px; margin-top:4px; max-width:820px; }
+  main { max-width:1120px; margin:0 auto; padding:22px 26px 80px; }
+  h2 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#8a929a; margin:0 0 12px; }
+  .card { background:#fff; border:1px solid #e6e3da; border-radius:10px; padding:18px 20px; margin-bottom:20px; }
+  .muted { color:#8a929a; }
+
+  /* legend / nav */
+  .nav { display:flex; flex-wrap:wrap; gap:6px; }
+  .nav a { display:flex; align-items:center; gap:7px; text-decoration:none; color:#2c3440; font-size:12px;
+           border:1px solid #e6e3da; border-radius:20px; padding:4px 11px 4px 7px; background:#fff; }
+  .nav a:hover { background:#f2f0ea; }
+  .nav .dot { width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
+
+  /* maps */
+  svg.map { width:100%; height:auto; display:block; background:#eef2f6; border-radius:8px; }
+  .ocean { fill:#eef2f6; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; }
+  .combined-wrap { display:grid; grid-template-columns:1fr; gap:14px; }
+
+  /* cluster section */
+  .cl { scroll-margin-top:12px; }
+  .cl-head { display:flex; align-items:center; gap:11px; margin-bottom:2px; }
+  .cl-head .dot { width:16px; height:16px; border-radius:50%; flex:0 0 auto; }
+  .cl-head h3 { font-size:18px; font-weight:750; letter-spacing:-.01em; }
+  .cl-head .idx { color:#adb5bd; font-weight:750; font-size:15px; font-variant-numeric:tabular-nums; }
+  .cl-stat { color:#6c757d; font-size:12.5px; margin:2px 0 14px 27px; }
+  .cl-grid { display:grid; grid-template-columns:minmax(0,340px) minmax(0,1fr); gap:20px; align-items:start; }
+  @media (max-width:800px){ .cl-grid { grid-template-columns:1fr; } }
+  .field { margin-bottom:11px; }
+  .field .lab { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#a3457e; margin-bottom:2px; }
+  .field.b .lab { color:#3a6ea5; } .field.e .lab { color:#c2410c; }
+  .field.c-conn .lab { color:#12a150; } .field.c-cont .lab { color:#7c3aed; }
+  .field p { font-size:13.5px; }
+
+  /* bars */
+  .bars { margin:2px 0 14px; }
+  .brow { display:flex; align-items:center; gap:8px; margin:3px 0; font-size:12px; }
+  .brow .bn { flex:0 0 165px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#495057; }
+  .brow .bt { flex:1; height:11px; background:#f1f0ea; border-radius:3px; overflow:hidden; }
+  .brow .bf { display:block; height:100%; border-radius:3px; }
+  .brow .bv { flex:0 0 30px; text-align:right; color:#8a929a; font-variant-numeric:tabular-nums; }
+
+  /* motif table */
+  table { width:100%; border-collapse:collapse; font-size:12px; margin-top:6px; }
+  th,td { text-align:left; padding:5px 7px; border-bottom:1px solid #f0ede6; vertical-align:top; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.code { font-weight:700; color:#4f7096; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  td.sc { text-align:right; font-variant-numeric:tabular-nums; color:#6c757d; white-space:nowrap; }
+  td.grp, td.tr { color:#8a929a; }
+  details.motifs summary { cursor:pointer; font-size:12px; color:#4f7096; margin-top:4px; }
+
+  .closing p { margin-bottom:12px; font-size:13.5px; }
+  .closing h3 { font-size:15px; font-weight:700; margin:16px 0 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Кластеры индекса Берёзкина: ареалы, этиология и содержание</h1>
+  <p>Кокластеризация таблицы «мотив × ареальная традиция» индекса Берёзкина (SpectralCoclustering).
+     Для каждого из 14 кластеров — название, состав и границы, этиология (что объясняет общность),
+     связи с соседями, содержание и таблица мотивов, а также карта. Интерпретация авторская; названия
+     мотивов — краткие каталожные ярлыки.</p>
+</header>
+<main>
+  <div class="card">
+    <h2>Кластеры</h2>
+    <div class="nav" id="nav"></div>
+  </div>
+
+  <div class="card">
+    <h2>Общая карта — все кластеры</h2>
+    <div class="combined-wrap"><div id="mapAll"></div></div>
+    <div class="muted" style="font-size:11.5px;margin-top:8px">Каждая точка — ареальная традиция, поставленная по координате субрегиона и окрашенная по кластеру. Экваториальная проекция.</div>
+  </div>
+
+  <div id="clusters"></div>
+
+  <div class="card closing" id="closing">
+    <h2>Специфика индексов и их пригодность</h2>
+    <div id="closingBody"></div>
+  </div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip = (s,n)=> s.length>n ? s.slice(0,n-1)+"…" : s;
+
+// ---- map builder (equirectangular: cx=lon+180, cy=90-lat) ----
+function mapSVG(activeK){
+  const land = `<path class="land" d="${window.LAND||""}"/>`;
+  const pts = D.points.map(p=>{
+    const on = activeK==null || p.k===activeK;
+    const cx=p.x+180, cy=90-p.y;
+    const col = activeK==null ? D.clusters[p.k].color : (on?D.clusters[p.k].color:"#cfd4cd");
+    const r = on ? (activeK==null?1.15:1.5) : 0.7;
+    const op = on ? 0.9 : 0.35;
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" fill-opacity="${op}"/>`;
+  }).join("");
+  // draw active cluster points last (on top)
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${pts}</svg>`;
+}
+
+document.getElementById("mapAll").innerHTML = mapSVG(null);
+
+// ---- nav / legend ----
+document.getElementById("nav").innerHTML = D.clusters.map(c=>
+  `<a href="#cl${c.id}"><span class="dot" style="background:${c.color}"></span>${c.id}. ${esc(clip(c.name,34))}</a>`).join("");
+
+// ---- clusters ----
+function bars(items, total, color){
+  const max = Math.max(1, ...items.map(i=>i.n));
+  return `<div class="bars">`+items.map(i=>
+    `<div class="brow"><span class="bn">${esc(i.name)}</span>`+
+    `<span class="bt"><span class="bf" style="width:${100*i.n/max}%;background:${color}"></span></span>`+
+    `<span class="bv">${i.n}</span></div>`).join("")+`</div>`;
+}
+function motifTable(ms){
+  const rows = ms.map(m=>
+    `<tr><td class="code">${esc(m.c)}</td><td>${esc(m.n)}</td>`+
+    `<td class="sc">${m.s.toFixed(2)}</td><td class="grp">${esc(clip(m.grp,26))}</td>`+
+    `<td class="tr">${esc(clip((m.t||[]).map(t=>t.split(/[,:(]/)[0].trim()).join(", "),40))}</td></tr>`).join("");
+  return `<table><thead><tr><th>Код</th><th>Мотив</th><th>score</th><th>Тема</th><th>Примеры традиций</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+document.getElementById("clusters").innerHTML = D.clusters.map(c=>`
+  <div class="card cl" id="cl${c.id}">
+    <div class="cl-head"><span class="idx">${c.id}</span><span class="dot" style="background:${c.color}"></span><h3>${esc(c.name)}</h3></div>
+    <div class="cl-stat">${c.n_motif} мотивов · ${c.n_trad} традиций</div>
+    <div class="cl-grid">
+      <div>
+        ${mapSVG(c.id)}
+        <div style="margin-top:12px"><div class="field b"><div class="lab">Макро-ареалы</div></div>${bars(c.macros, c.n_trad, c.color)}</div>
+        <div><div class="field"><div class="lab">Тематические группы</div></div>${bars(c.themes, c.n_motif, "#9aa7b2")}</div>
+      </div>
+      <div>
+        <div class="field b"><div class="lab">Состав и границы</div><p>${esc(c.boundaries)}</p></div>
+        <div class="field e"><div class="lab">Этиология</div><p>${esc(c.etiology)}</p></div>
+        <div class="field c-conn"><div class="lab">Связи</div><p>${esc(c.connections)}</p></div>
+        <div class="field c-cont"><div class="lab">Содержание</div><p>${esc(c.content)}</p></div>
+        <details class="motifs" open><summary>Мотивы (${c.motifs.length})</summary>${motifTable(c.motifs)}</details>
+      </div>
+    </div>
+  </div>`).join("");
+
+// ---- closing prose: index specifics & suitability ----
+document.getElementById("closingBody").innerHTML = `
+  <p>Три индекса дают три разные «оптики». <b>Берёзкин</b> построен как ареальная база: его «традиции» — тонкие этнографические единицы (1019 в выборке), поэтому кокластеризация восстанавливает настоящую географию мифа — вплоть до суб-континентальных регионов (три грани Северной Америки, две — Южной, две — Африки) и даже различает древний трансконтинентальный слой (кластер 6, Солнце/Луна). Это лучший индекс для ареального и историко-диффузионного анализа.</p>
+  <p><b>Thompson (TMI)</b> — тематическая, а не ареальная таксономия (главы A–Z). Его «культуры» — грубая смесь цивилизаций, наций и континентов («Hindu», «Greek», «U.S»), а несколько письменных корпусов прокаталогизированы густо и по всему диапазону. Поэтому его кластеризация даёт гигантский неареальный «мега-кластер высокой мифологии» (почти половина мотивов) — артефакт каталогизации, а не открытая общность. TMI хорош для тематического поиска мотивов и для литературной мифологии, но плох для ареальных выводов: уникальные для него кластеры следует подозревать в артефактности.</p>
+  <p><b>ATU</b> — евроцентричный тип-индекс волшебной сказки (märchen). Его кластеры — почти идеальная диалектология европейского фольклора (балто-финский / славянский / германо-северо-западный / средиземноморский / балкано-кавказский пояса) плюс ближневосточно-индийское продолжение и колониальные хвосты новосветной диффузии. ATU незаменим для истории европейской сказки и её распространения, но слеп к бесписьменным традициям вне контактной зоны.</p>
+  <p><b>Совмещение трёх индексов</b> (кластеризация «All») почти не интегрирует их: кластеры расходятся <i>по индексам</i>, а не по культурам, потому что три словаря культурных ярлыков несовместимы. Это довод не за наивную кокластеризацию сырых меток, а за общий ареальный словарь или мост через crosswalk.</p>
+  <h3>Практический вывод</h3>
+  <p>Доверять стоит структурам, повторяющимся между индексами (европейские суб-пояса, ближневосточно-индийский märchen, Океания) — они устойчивы. Берёзкин-уникальные глубокие кластеры (Солнце/Луна) реальны, но видны лишь благодаря густой выборке бесписьменных традиций. TMI-уникальные — вероятный след инструмента. Для задач: ареальная история мифа → Берёзкин; европейская сказка и её диффузия → ATU; тематический/мотивный поиск и книжная мифология → TMI; интеграция трёх → только через общую географию, не через сырые ярлыки.</p>`;
+</script>
+</body>
+</html>

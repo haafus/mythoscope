@@ -162,6 +162,16 @@ the overview would look as the real **Sources** page reached from the main nav. 
 data and blocks as #13; the change is purely presentational. See
 [`14-corpus-overview-app/README.md`](14-corpus-overview-app/README.md).
 
+### 15 · Berezkin clusters — interactive report
+An analytical report over the 14 Berezkin-index biclusters. Per cluster: a curated
+name / composition & boundaries / etiology / connections / content write-up, macro-area
+and theme bars, a motif table, and a world map highlighting that cluster's traditions;
+plus a combined all-clusters map. A closing section contrasts the three indexes
+(Berezkin / Thompson / ATU) and their fitness for different tasks, and foregrounds the
+thin trans-continental Sun-&-Moon deep-time layer (cluster 6). Interpretive prose is
+original; motif names are short catalogue labels. See
+[`15-berezkin-clusters-report/README.md`](15-berezkin-clusters-report/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
