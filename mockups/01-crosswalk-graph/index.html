@@ -437,6 +437,7 @@ cv.addEventListener("mousemove", e=>{
 });
 window.addEventListener("mouseup", e=>{
   if (dragNode && !moved) buildSub(dragNode.id);   // click (no drag) = recentre
+  if (dragNode) tip.style.display="none";          // released node may fly off — drop its tooltip
   dragNode=null; panning=false; cv.classList.remove("drag");
 });
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
