@@ -1,15 +1,14 @@
-*- Preliminary draft of paper discourse / research plan. To be evolved.*
-*- Live formatted version on [Overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91).*
-*- Though generated and lacks consistency and strong results for now, the overall conceptual framework, structure and references list are intact.*
-*- Could be split and released in several steps.*
-*- Basically, the steps of the research to do/release are:*
+- *Preliminary draft of paper discourse / research plan. To be evolved.*
+- *Live formatted version on [Overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91).*
+- *Though generated and lacks consistency and strong results for now, the overall conceptual framework, structure and references list are intact.*
+- *Could be split and released in several steps.*
+- *Basically, the steps of the research to do/release are:*
   - *infrastructure: build basic corpus, pipeline and tools*
   - *exploratory analysis: try different tools and what do they reveal*
   - *method: define the complete toolset and methodology, prove reproducibility*
   - *discovery: what was established, discovered, what are the universal conclusions and consequences, philosophy*
   - *release source code, datasets and resulting indexes/databases/tools*
-
-*The first two steps are actual for now.*
+- *The first two steps are actual for now.*
 
 # Toward a Computational Framework for Comparative Mythology
 
