@@ -102,14 +102,15 @@ def flatten_traditions(tree: dict) -> dict:
 
 
 def seriate(sim: np.ndarray) -> list[int]:
-    """Leaf order from average-linkage clustering of the distance (1 - sim)."""
+    """Leaf order from average-linkage clustering of the distance (1 - sim), with
+    optimal leaf ordering so adjacent rows are as similar as possible."""
     n = sim.shape[0]
     if n < 3:
         return list(range(n))
     d = 1.0 - sim
     np.fill_diagonal(d, 0.0)
     d = (d + d.T) / 2
-    z = linkage(squareform(d, checks=False), method="average")
+    z = linkage(squareform(d, checks=False), method="average", optimal_ordering=True)
     return [int(i) for i in leaves_list(z)]
 
 
