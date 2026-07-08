@@ -329,7 +329,7 @@ function buildCluster(cid){
     `<div class="fi-id" style="color:${col}">◆ Cluster of ${ci.size}</div>`+
     `<div class="fi-n">${escapeHtml(ci.top.map(codeOf).join(" · "))}</div>`+
     `<div class="fi-d">${DATA.clusterings[clPreset].label}${truncated?` · ${CLUSTER_CAP} densest shown`:""} · ${edges.length} internal links</div>`+
-    `<div class="fi-d">TMI ${by.tmi} · ATU ${by.atu} · Brz ${by.brz}</div>`;
+    `<div class="fi-d">nodes: ${by.tmi} TMI · ${by.atu} ATU · ${by.brz} Brz</div>`;
 }
 // clicking the cluster line in the focus panel jumps to the whole-cluster view
 document.getElementById("focusinfo").addEventListener("click", e=>{
