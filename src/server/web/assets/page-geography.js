@@ -124,6 +124,20 @@ function renderMarkers(map, traditions) {
     const markers = new Map();
     const groups = buildCoordinateGroups(traditions);
 
+    // Grace period before a hover-opened popup closes, so the pointer can travel
+    // from the marker into the popup to click a book link without it vanishing.
+    let closeTimer = null;
+    const cancelClose = () => {
+        if (closeTimer) {
+            clearTimeout(closeTimer);
+            closeTimer = null;
+        }
+    };
+    const scheduleClose = (marker) => {
+        cancelClose();
+        closeTimer = setTimeout(() => marker.closePopup(), 200);
+    };
+
     groups.forEach((group) => {
         group.forEach((item, index) => {
             const position = getOffsetCoordinate(item, index, group.length);
@@ -139,6 +153,21 @@ function renderMarkers(map, traditions) {
                     closeButton: true,
                     maxWidth: 340,
                 });
+
+            marker.on("mouseover", () => {
+                cancelClose();
+                marker.openPopup();
+            });
+            marker.on("mouseout", () => scheduleClose(marker));
+
+            // Keep the popup alive while the pointer is over it (so its book links
+            // stay clickable), and close it once the pointer leaves the popup.
+            marker.on("popupopen", (event) => {
+                const el = event.popup.getElement();
+                if (!el) return;
+                el.addEventListener("mouseenter", cancelClose);
+                el.addEventListener("mouseleave", () => scheduleClose(marker));
+            });
 
             markers.set(item.name, marker);
             bounds.push(position);
