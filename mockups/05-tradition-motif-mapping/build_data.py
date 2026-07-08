@@ -66,7 +66,7 @@ def collect():
     return out
 
 
-def main():
+def build():
     motifs = collect()
     ids = list(motifs)
     df = Counter(c for _, _, _, cs in motifs.values() for c in cs)
@@ -156,9 +156,15 @@ def main():
         "clusters": clusters, "points": points, "placed": len(points),
         "trad_mem": trad_mem,
     }
+    return data
+
+
+def main():
+    data = build()
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")
-    print(f"motifs(kept)={len(kept_ids)} traditions(kept)={len(cvocab)} clusters={len(clusters)}")
-    for c in clusters:
+    print(f"motifs(kept)={data['n_motifs_total']} traditions(kept)={data['n_traditions']} "
+          f"clusters={len(data['clusters'])}")
+    for c in data["clusters"]:
         print(f"  [{c['n_motif']:4d} motifs {c['by_index']}] traditions: "
               + ", ".join(c["traditions"][:8]))
 
