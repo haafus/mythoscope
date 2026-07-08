@@ -4,7 +4,7 @@ Standalone feature prototypes, **separate from the main app**. Each is a single
 self-contained `index.html` (inline CSS/JS, no build step, no framework). Most of the
 numbered ones read a `data.js` snapshot extracted from the built indexes in
 `outputs/motifs/` via a `build_data.py`; the design mocks
-(`11-tmi-detail-tree`, `12-geographic-layer`, `13-motifs-navigator`) embed a small
+(`09-motifs-navigator`, `11-tmi-detail-tree`, `12-geographic-layer`) embed a small
 real data slice directly and open with no build.
 
 `data.js` files are git-ignored (they're regenerated artifacts, like `outputs/`).
@@ -119,16 +119,11 @@ contents, 2 roman, 1 numbered), with offsets pointing at the real body positions
 the KJV book list and the Poetic Edda Contents are relocated to where each section
 actually begins.
 
-### 09 · Corpus overview (dashboard)
-A design prototype for the corpus **overview page** — "what's in this corpus?".
-Isolated: `build_data.py` reads `config/corpus.json` + `config/traditions.json`,
-downloads the 28 raw Gutenberg texts, and computes headline stats, composition by
-macro-area, per-text sizes, and a **text-similarity heatmap** (TF-IDF cosine, both
-text×text and tradition×tradition, reordered by hierarchical clustering / seriation).
-The heatmap is a model-free lexical stand-in for the pipeline's BGE-M3 semantic
-distances, yet already recovers sensible groups (East-Asian, Oceanic, Germanic,
-Christianity↔Islam, classical epics). The size bar makes the ~3-orders-of-magnitude
-length skew (KJV vs a short folktale) obvious. Analytical-dashboard direction.
+### 09 · motifs-navigator · unified motif navigator
+A click-through mock of the [motifs-browser UI proposal](../docs/motifs/proposals/motifs-browser-ui.md)
+— one navigator surface with composable lenses over a real ≈83-motif slice of TMI
+chapter A, embedded in the file. No API, open `index.html` directly. See
+[`09-motifs-navigator/README.md`](09-motifs-navigator/README.md).
 
 ### 10 · motif-text-embedding-eval · how to embed motifs for text matching
 A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged
@@ -149,11 +144,16 @@ regional "fingerprint" for one entity via the cross-walk, an aggregate by region
 linked region/list/detail pages for a Siberia slice. Multiple static HTML pages, no
 build. See [`12-geographic-layer/README.md`](12-geographic-layer/README.md).
 
-### 13 · motifs-navigator · unified motif navigator
-A click-through mock of the [motifs-browser UI proposal](../docs/motifs/proposals/motifs-browser-ui.md)
-— one navigator surface with composable lenses over a real ≈83-motif slice of TMI
-chapter A, embedded in the file. No API, open `index.html` directly. See
-[`13-motifs-navigator/README.md`](13-motifs-navigator/README.md).
+### 13 · Corpus overview (dashboard)
+A design prototype for the corpus **overview page** — "what's in this corpus?".
+Isolated: `build_data.py` reads `config/corpus.json` + `config/traditions.json`,
+downloads the 28 raw Gutenberg texts, and computes headline stats, composition by
+macro-area, per-text sizes, and a **text-similarity heatmap** (TF-IDF cosine, both
+text×text and tradition×tradition, reordered by hierarchical clustering / seriation).
+The heatmap is a model-free lexical stand-in for the pipeline's BGE-M3 semantic
+distances, yet already recovers sensible groups (East-Asian, Oceanic, Germanic,
+Christianity↔Islam, classical epics). The size bar makes the ~3-orders-of-magnitude
+length skew (KJV vs a short folktale) obvious. Analytical-dashboard direction.
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
