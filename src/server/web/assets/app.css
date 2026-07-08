@@ -1428,10 +1428,16 @@ body.has-main-navbar {
 .motifs-item.category:hover .motifs-item-name,
 .motifs-item:hover .motifs-item-badge { color: #fff; }
 .motifs-item:hover .motifs-item-badge { opacity: 0.85; }
-/* Selection is shown by .active; a click leaves a stray focus ring on the old
-   item while ↑/↓ moves .active elsewhere. Drop the ring for mouse focus, keep
-   it for keyboard (Tab) focus. */
-.motifs-item:focus:not(:focus-visible) { outline: none; }
+/* Selection is shown by .active, and a click leaves the item focused so the
+   first ↑/↓ press would otherwise promote it to :focus-visible and paint a
+   stray ring where .active no longer is. These lists are driven by click and
+   arrow keys with selection shown by .active, so drop the focus ring entirely
+   (the nav menu and sidebar lists all share this behaviour). */
+.nav-links > a:focus,
+.library-tree .tradition-title:focus,
+.library-tree .tradition-pick:focus,
+.library-tree .document-button:focus,
+.motifs-item:focus { outline: none; }
 
 .motifs-item-id {
     flex: 0 0 auto;
