@@ -155,6 +155,13 @@ distances, yet already recovers sensible groups (East-Asian, Oceanic, Germanic,
 Christianity↔Islam, classical epics). The size bar makes the ~3-orders-of-magnitude
 length skew (KJV vs a short folktale) obvious. Analytical-dashboard direction.
 
+### 14 · Corpus overview, in the app's design
+Mockup #13 **re-skinned in MythoScope's own design system** — the app navbar (with
+*Sources* active), `.card` / `.stat-card` surfaces, tokens and accents — to show how
+the overview would look as the real **Sources** page reached from the main nav. Same
+data and blocks as #13; the change is purely presentational. See
+[`14-corpus-overview-app/README.md`](14-corpus-overview-app/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
