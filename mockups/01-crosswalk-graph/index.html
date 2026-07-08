@@ -216,7 +216,9 @@ function buildSub(centerId){
 
   // ring1 in per-index arcs (tmi, atu, brz), evenly spaced, starting at the top.
   const groups = ["tmi","atu","brz"].map(x => ring1.filter(id => byId.get(id).x===x));
-  R1 = Math.max(150, ring1.length*20/TAU + 60);
+  // Cap the seed ring so a big hub doesn't start its neighbours far out — that
+  // large a radius yanks the link springs hard on the first frames.
+  R1 = Math.min(Math.min(cx,cy)*0.58, Math.max(140, ring1.length*20/TAU + 60));
   const nGroups = groups.filter(g=>g.length).length;
   const gap = 0.22, usable = TAU - gap*nGroups;
   let a0 = -Math.PI/2;
@@ -300,7 +302,7 @@ function buildCluster(cid){
   let mem = DATA.nodes.filter(n => nodeCl(n)===cid && gdeg.get(n.id) >= minDeg);
   const truncated = mem.length > CLUSTER_CAP;
   if (truncated) mem = [...mem].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0, CLUSTER_CAP);
-  const R = Math.min(cx,cy)*0.72;
+  const R = Math.min(cx,cy)*0.55;
   const nodes = mem.map((n,i)=>{ const th=TAU*i/mem.length;
     const c = posCache && posCache.get(n.id);   // kept node → resume its current position
     return Object.assign({}, n, { tx:cx, ty:cy,
