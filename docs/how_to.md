@@ -8,7 +8,8 @@
 config/          — статические конфиги, шаблоны, models.json, corpus.json
 outputs/         — всё, что генерируется при запуске (corpus, embeddings, projections, …)
 src/             — исходный код (все Python-пакеты, settings.py, main.py, cli.py)
-docs/            — документация
+docs/            — документация (motifs/, research/, reviews/, paper/)
+mockups/         — автономные прототипы фич поверх индексов мотивов (self-contained HTML)
 tests/           — тесты
 pyproject.toml   — конфигурация проекта, зависимости, ruff, mypy
 ```
@@ -552,6 +553,20 @@ Vanilla JS SPA на нативных ES-модулях (без бандлера 
 
 ```bash
 mytho server
+```
+
+## mockups
+
+Автономные прототипы фич **вне основного приложения** — каждый это самодостаточный
+`index.html` (инлайн CSS/JS, без сборки и фреймворков), читающий снапшот `data.js`,
+собранный из индексов в `outputs/motifs/`. Живут в `mockups/`, `data.js` не
+коммитятся (регенерируемые артефакты). Полный список и инструкции запуска —
+[`mockups/README.md`](../mockups/README.md).
+
+```bash
+# с уже собранной базой мотивов (mytho motifs):
+python mockups/07-tradition-motif-combined/build_data.py
+python -m http.server -d mockups 8890   # → http://127.0.0.1:8890/07-tradition-motif-combined/
 ```
 
 ## Директории outputs/
