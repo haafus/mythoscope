@@ -417,6 +417,7 @@ function draw(){
 
 // ---- interaction ----
 let dragNode=null, panning=false, last=null, moved=false;
+let suppressTipFor=null;   // a just-released node: keep its tooltip hidden until the pointer clears it
 function pick(mx,my){
   for (let i=sub.nodes.length-1;i>=0;i--){ const P=toScreen(sub.nodes[i]);
     const r=(sub.nodes[i].id===focusId?9:6)*Math.sqrt(view.k)+3;
@@ -436,12 +437,16 @@ cv.addEventListener("mousemove", e=>{
     const P=toScreen(dragNode); showTip(dragNode, P.x, P.y); return; }   // tooltip follows the node
   if (panning){ view.x+=e.offsetX-last[0]; view.y+=e.offsetY-last[1]; last=[e.offsetX,e.offsetY]; moved=true; return; }
   const n=pick(e.offsetX,e.offsetY);
+  // A node just released under the cursor keeps drifting there; don't flash its
+  // tooltip back until the pointer has moved off it at least once.
+  if (suppressTipFor){ if (n===suppressTipFor){ tip.style.display="none"; cv.style.cursor="pointer"; return; } suppressTipFor=null; }
   if (n){ showTip(n, e.offsetX, e.offsetY); cv.style.cursor="pointer"; }
   else { tip.style.display="none"; cv.style.cursor=panning?"grabbing":"grab"; }
 });
 window.addEventListener("mouseup", e=>{
   if (dragNode && !moved) buildSub(dragNode.id);   // click (no drag) = recentre
-  if (dragNode) tip.style.display="none";          // released node may fly off — drop its tooltip
+  if (dragNode){ tip.style.display="none";         // released node drifts off — drop its tooltip
+    if (moved) suppressTipFor=dragNode; }          // and keep it hidden until the pointer leaves it
   dragNode=null; panning=false; cv.classList.remove("drag");
 });
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
