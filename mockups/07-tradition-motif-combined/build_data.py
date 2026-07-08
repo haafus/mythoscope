@@ -37,9 +37,14 @@ def main():
     m05 = load_mod("05-tradition-motif-mapping/build_data.py", "m05_build")
     m06 = load_mod("06-per-index-biclusters/build_data.py", "m06_build")
 
-    data = {"all": m05.build(tmi_norm=tmi_norm)}
+    # Retuned params for the normalized views (see NORMALIZATION.md): fewer,
+    # better-balanced clusters now that TMI's label vocabulary is consolidated.
+    data = {"all": m05.build(tmi_norm=tmi_norm, K=14)}
     for ix in ("brz", "tmi", "atu"):
-        data[ix] = m06.bicluster(ix, tmi_norm=tmi_norm if ix == "tmi" else None)
+        if ix == "tmi":
+            data[ix] = m06.bicluster(ix, tmi_norm=tmi_norm, cfg=(12, 12, 0.33, 2))
+        else:
+            data[ix] = m06.bicluster(ix)
 
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")
 

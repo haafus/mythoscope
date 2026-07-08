@@ -103,8 +103,10 @@ def collect(index, tmi_norm=None):
     return out
 
 
-def bicluster(index, tmi_norm=None):
-    K, MIN_DF, MAX_DF_FRAC, MIN_CULT = CFG[index]
+def bicluster(index, tmi_norm=None, cfg=None):
+    # cfg overrides CFG[index] as (K, MIN_DF, MAX_DF_FRAC, MIN_CULT); mockup 07
+    # uses it to retune the normalized TMI view.
+    K, MIN_DF, MAX_DF_FRAC, MIN_CULT = cfg or CFG[index]
     motifs = collect(index, tmi_norm)
     ids = list(motifs)
     df = Counter(c for _, _, cs in motifs.values() for c in cs)
@@ -121,6 +123,14 @@ def bicluster(index, tmi_norm=None):
         for c in cc:
             rows.append(r); cols.append(c)
     M = sparse.csr_matrix((np.ones(len(rows)), (rows, cols)), shape=(len(kept), len(cvocab)))
+    # Drop traditions whose every motif was filtered out (all-zero columns): they
+    # pass MIN_DF on the raw df but carry no kept motif, and the spectral
+    # normalisation would divide by their zero column sum. Matters at low MIN_DF.
+    nz = np.asarray(M.sum(axis=0)).ravel() > 0
+    if not nz.all():
+        M = M[:, nz]
+        cvocab = [c for c, k in zip(cvocab, nz) if k]
+        ci = {c: i for i, c in enumerate(cvocab)}
     W = TfidfTransformer().fit_transform(M)
     K = min(K, len(cvocab), len(kept))
     model = SpectralCoclustering(n_clusters=K, random_state=0, svd_method="arpack").fit(W)

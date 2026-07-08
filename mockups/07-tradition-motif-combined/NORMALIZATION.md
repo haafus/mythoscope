@@ -7,20 +7,31 @@ curated pipeline dictionary `src/motifs/sources/culture_dict.py`
 `Esthonian` → `Estonian`), strips `(sub-area)` parentheticals and a leading
 `Cf.`, and **keeps genre labels distinct** (`Italian Novella`, `Spanish
 Exempla`, `Buddhist myth`, `English romance` are not folded into an ethnos).
-Berezkin and ATU labels are left untouched. `K` / `MIN_DF` / `MAX_DF_FRAC` /
-`MIN_CULT` are unchanged, so the diff below isolates the effect of
-normalization alone.
+Berezkin and ATU labels are left untouched.
+
+The clustering parameters were then **retuned** for the two normalized views
+(passed from `07/build_data.py`, so the standalone 05/06 mockups keep their
+original baselines):
+
+| view | param | before | after |
+|------|-------|-------:|------:|
+| all  | `K` (co-clusters)   | 16 | **14** |
+| tmi  | `K`                 | 16 | **12** |
+| tmi  | `MIN_DF`            | 20 | **12** |
+| tmi  | `MAX_DF_FRAC`, `MIN_CULT` | 0.33, 2 | 0.33, 2 (kept) |
 
 ## Headline numbers
 
-| view | metric | before (raw) | after (normalized) |
-|------|--------|-------------:|-------------------:|
+| view | metric | before (raw, K=16) | after (normalized + retuned) |
+|------|--------|-------------------:|-----------------------------:|
 | all  | motifs kept       | 12,163 | 12,400 |
 | all  | traditions (cols) |  1,093 |  1,061 |
-| all  | co-clusters       |     16 |     16 |
-| tmi  | motifs kept       |  6,622 |  6,829 |
-| tmi  | traditions (cols) |    139 |     95 |
-| tmi  | co-clusters       |     11 |     13 |
+| all  | co-clusters       |     16 |     14 |
+| all  | degenerate cl.    |      1 |      0 |
+| tmi  | motifs kept       |  6,622 |  6,893 |
+| tmi  | traditions (cols) |    139 |    117 |
+| tmi  | co-clusters       |     11 |     11 |
+| tmi  | degenerate cl.    |      — |      3 |
 
 Fewer, cleaner columns; slightly more motifs kept (labels that were split
 across variants now clear `MIN_CULT`).
@@ -38,14 +49,34 @@ across variants now clear `MIN_CULT`).
 - **Genre labels preserved** — `Italian Novella`, `Spanish Exempla`,
   `Buddhist myth`, `English romance` stay separate, as intended.
 
-## The cost (why you'd also retune, separately)
+## Choosing the retuned parameters
 
-At the **same** `K`, shrinking the TMI vocabulary (139 → 95) leaves the
-spectral partition with a longer tail of degenerate singleton clusters
-(`Cheremis`, `Tahltan`, `Gold Coast`, `Ila`, `English romance`, each alone).
-The big clusters are cleaner and larger, but a follow-up would lower `MIN_DF`
-(now that labels are consolidated) and/or drop `K` for TMI to absorb that tail.
-That is a separate tuning step and deliberately not done here.
+A grid sweep over TMI (`K` × `MIN_DF` × `MAX_DF_FRAC` × `MIN_CULT`), scored by
+degenerate-cluster count, size balance, biggest-cluster dominance and mean
+tradition purity, settled the choices:
 
-Baseline (`before`) and normalized (`after`) per-cluster summaries were captured
-with `compare.py` over each build's `data.js` while iterating.
+- **Lower `K` (16 → 12) is the main win.** At `K`=16 the partition was *forced*
+  to carve ~6 degenerate clusters; `K`=12 yields 11 clusters with only the
+  3 stubborn ones and lower dominance.
+- **`MIN_DF` 20 → 12** keeps more real traditions and *more* motifs (6,893 vs
+  6,829) without adding degeneracy — enabled by a small robustness fix in
+  `06/build_data.py` that drops all-zero columns (a tradition passing `MIN_DF`
+  but whose every motif was filtered by `MIN_CULT`), which previously crashed
+  the SVD below `MIN_DF`≈18.
+- **`MAX_DF_FRAC` kept at 0.33.** Dropping it to 0.20 balances clusters best but
+  *excludes `India` and `Irish myth`* (the two largest TMI traditions) from the
+  feature set entirely — unacceptable for a tradition map, so we keep them and
+  accept that they anchor one large "world literate mythologies" cluster (C1).
+- **`MIN_CULT` kept at 2.** Raising to 3 halves the motifs kept (≈2,600) and
+  creates *more* singleton clusters.
+
+## Residual: the sparse-Africa tail
+
+Three tiny TMI clusters survive at every setting — `Gold Coast · Hottentot`,
+`Ila · Benga`, `Ibo`. TMI simply cites very few African motifs, so these labels
+are genuinely isolated; the only way to remove them is to drop them below
+`MIN_DF`, which would also discard other legitimate mid-frequency traditions.
+Left as-is, since they honestly reflect the catalogue's coverage.
+
+Baseline (`before`) and final (`after`) per-cluster summaries were captured with
+`compare.py` over each build's `data.js` while iterating.

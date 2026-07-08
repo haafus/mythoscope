@@ -73,7 +73,9 @@ def collect(tmi_norm=None):
     return out
 
 
-def build(tmi_norm=None):
+def build(tmi_norm=None, K=K, MIN_DF=MIN_DF, MIN_CULT=MIN_CULT, MAX_DF_FRAC=MAX_DF_FRAC):
+    # Params default to the module constants (standalone behaviour); callers such
+    # as mockup 07 override them for the normalized combined view.
     motifs = collect(tmi_norm)
     ids = list(motifs)
     df = Counter(c for _, _, _, cs in motifs.values() for c in cs)
