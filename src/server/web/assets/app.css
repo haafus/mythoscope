@@ -393,7 +393,6 @@ body.has-main-navbar {
 .library-tree .document-button.active {
     color: #111;
     background: #e2edf0;
-    font-weight: 600;
 }
 
 .library-sidebar {
