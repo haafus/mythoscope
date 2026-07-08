@@ -84,7 +84,7 @@
   <span class="sub">click a node to recentre · drag to move · scroll to zoom · arrows show link direction</span>
   <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
   <button id="browseBtn" class="btn">☰ Browse hubs</button>
-  <button id="exportBtn" class="btn" title="Download the full graph with the currently enabled layers as two Cosmograph CSVs (links + nodes)">⭳ Cosmograph</button>
+  <button id="exportBtn" class="btn" title="Download the full graph with the currently enabled layers as two Cosmograph CSVs (links + nodes)">↓ Cosmograph</button>
 </header>
 <main>
   <canvas id="cv"></canvas>
@@ -493,7 +493,7 @@ function exportCosmograph(){
   setTimeout(()=>downloadCsv("cosmograph-nodes.csv", ncsv), 400);   // stagger the two downloads
   const btn = document.getElementById("exportBtn");
   btn.textContent = `✓ ${ids.size.toLocaleString()} nodes · ${links.length.toLocaleString()} links`;
-  setTimeout(()=>{ btn.textContent = "⭳ Cosmograph"; }, 2600);
+  setTimeout(()=>{ btn.textContent = "↓ Cosmograph"; }, 2600);
 }
 document.getElementById("exportBtn").addEventListener("click", exportCosmograph);
 document.querySelectorAll(".bmode button").forEach(b=>b.addEventListener("click", ()=>{
