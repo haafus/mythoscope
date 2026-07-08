@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corpus overview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         color: #1e2329; background: #faf9f5; }
+  header { padding: 16px 26px; border-bottom: 1px solid #e6e3da; background: #fff; }
+  header h1 { font-size: 17px; font-weight: 700; }
+  header .sub { color: #78838d; font-size: 12.5px; margin-top: 2px; }
+  main { max-width: 1180px; margin: 0 auto; padding: 20px 26px 60px; }
+  .grid { display: grid; gap: 16px; }
+  .card { background: #fff; border: 1px solid #e6e3da; border-radius: 10px; padding: 16px 18px; }
+  .card h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+             color: #8a929a; margin-bottom: 12px; }
+  .card .note { font-size: 11px; color: #a2a9b0; margin-top: 10px; }
+
+  /* hero stats */
+  .stats { grid-template-columns: repeat(5, 1fr); margin-bottom: 16px; }
+  .stat { background: #fff; border: 1px solid #e6e3da; border-radius: 10px; padding: 14px 16px; }
+  .stat .v { font-size: 26px; font-weight: 750; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .stat .l { font-size: 11px; color: #8a929a; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+
+  .two { grid-template-columns: 1fr 1fr; margin-bottom: 16px; }
+  @media (max-width: 860px){ .two, .stats { grid-template-columns: repeat(2,1fr); } }
+
+  /* horizontal bars */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+  .bar-row .name { flex: 0 0 132px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-row .track { flex: 1; height: 15px; background: #f2f0ea; border-radius: 4px; overflow: hidden; }
+  .bar-row .fill { display: block; height: 100%; border-radius: 4px 0 0 4px; }
+  .bar-row .val { flex: 0 0 92px; text-align: right; color: #6b747c; font-variant-numeric: tabular-nums; font-size: 12px; }
+
+  /* size bars (per text) */
+  .sizes { max-height: 300px; overflow-y: auto; overscroll-behavior: contain; }
+  .sz { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+  .sz .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+  .sz .n { flex: 0 0 168px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+  .sz .t { flex: 1; height: 9px; background: #f2f0ea; border-radius: 3px; overflow: hidden; }
+  .sz .f { display: block; height: 100%; }
+  .sz .w { flex: 0 0 66px; text-align: right; color: #8a929a; font-variant-numeric: tabular-nums; font-size: 11.5px; }
+
+  /* heatmap */
+  .hm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .toggle { display: inline-flex; border: 1px solid #dfe3e8; border-radius: 7px; overflow: hidden; }
+  .toggle button { border: 0; background: #fff; padding: 5px 11px; font: inherit; font-size: 12px; cursor: pointer; color: #5b656e; }
+  .toggle button.on { background: #10504a; color: #fff; }
+  .hm-wrap { overflow: auto; margin-top: 6px; }
+  #heat { position: relative; }
+  .hm-legend { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8a929a; margin-top: 10px; }
+  .hm-legend .ramp { width: 120px; height: 10px; border-radius: 3px;
+                     background: linear-gradient(90deg,#eef6f5,#0e5c54); }
+
+  /* catalogue */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #f0ede6; }
+  th { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #98a0a7; cursor: pointer; user-select: none; }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: #f7f5ef; }
+  td .cdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .muted { color: #98a0a7; }
+
+  .tip { position: fixed; z-index: 40; pointer-events: none; background: #111827; color: #fff;
+         padding: 6px 9px; border-radius: 6px; font-size: 11.5px; max-width: 260px; display: none; line-height: 1.4; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Corpus overview</h1>
+  <div class="sub">28 sacred &amp; mythological texts across world traditions — scale, composition, and how they relate</div>
+</header>
+<main>
+  <div class="grid stats" id="stats"></div>
+
+  <div class="grid two">
+    <div class="card">
+      <h2>Composition by macro-area</h2>
+      <div id="areas"></div>
+      <div class="note">Bar = total words; the corpus leans on a few large scriptural traditions.</div>
+    </div>
+    <div class="card">
+      <h2>Size of each text</h2>
+      <div class="sizes" id="sizes"></div>
+      <div class="note">Linear scale — lengths span ~3 orders of magnitude, so a single text can dwarf the rest.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="hm-head">
+      <h2 style="margin:0">Text-similarity heatmap</h2>
+      <div class="toggle" id="hmToggle">
+        <button data-k="tradition" class="on">Traditions</button>
+        <button data-k="text">Texts</button>
+      </div>
+    </div>
+    <div class="hm-wrap"><div id="heat"></div></div>
+    <div class="hm-legend"><span>less similar</span><span class="ramp"></span><span>more similar</span>
+      <span style="margin-left:auto">Rows reordered by hierarchical clustering (seriation)</span></div>
+    <div class="note">TF-IDF cosine over the full texts — a model-free, lexical stand-in for the pipeline's
+      BGE-M3 semantic distances. Colour is normalised to the observed off-diagonal range for contrast.</div>
+  </div>
+
+  <div class="card">
+    <h2>All texts</h2>
+    <table id="catalog"><thead><tr>
+      <th data-s="title">Title</th><th data-s="tradition">Tradition</th>
+      <th data-s="major">Macro-area</th><th class="num" data-s="words">Words</th>
+      <th class="num" data-s="sentences">Sentences</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+</main>
+<div class="tip" id="tip"></div>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const tip = document.getElementById("tip");
+const fmt = n => n>=1e6 ? (n/1e6).toFixed(1)+"M" : n>=1e3 ? (n/1e3).toFixed(n<1e4?1:0)+"k" : ""+n;
+const full = n => n.toLocaleString();
+function showTip(html,e){ tip.innerHTML=html; tip.style.display="block";
+  tip.style.left=Math.min(e.clientX+14, innerWidth-tip.offsetWidth-8)+"px";
+  tip.style.top=(e.clientY+12)+"px"; }
+function hideTip(){ tip.style.display="none"; }
+
+// ---- hero stats ----
+document.getElementById("stats").innerHTML = [
+  ["Texts", D.stats.texts], ["Traditions", D.stats.traditions], ["Macro-areas", D.stats.areas],
+  ["Words", fmt(D.stats.words)], ["Sentences", fmt(D.stats.sentences)],
+].map(([l,v])=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// ---- composition by macro-area ----
+const amax = Math.max(...D.areas.map(a=>a.words));
+document.getElementById("areas").innerHTML = D.areas.map(a=>
+  `<div class="bar-row"><span class="name">${esc(a.name)}</span>`+
+  `<span class="track"><span class="fill" style="width:${100*a.words/amax}%;background:${a.color}"></span></span>`+
+  `<span class="val">${fmt(a.words)} · ${a.texts}📄</span></div>`).join("");
+
+// ---- size of each text ----
+const byWords = [...D.books].sort((x,y)=>y.words-x.words), wmax = byWords[0].words;
+document.getElementById("sizes").innerHTML = byWords.map(b=>
+  `<div class="sz" data-w="${b.words}"><span class="dot" style="background:${b.color}"></span>`+
+  `<span class="n">${esc(b.title)}</span>`+
+  `<span class="t"><span class="f" style="width:${Math.max(0.6,100*b.words/wmax)}%;background:${b.color}"></span></span>`+
+  `<span class="w">${fmt(b.words)}</span></div>`).join("");
+document.querySelectorAll("#sizes .sz").forEach((el,i)=>{
+  el.addEventListener("mousemove",e=>{const b=byWords[i];
+    showTip(`<b>${esc(b.title)}</b><br>${esc(b.tradition)} · ${full(b.words)} words · ${full(b.sentences)} sentences`,e);});
+  el.addEventListener("mouseleave",hideTip);
+});
+
+// ---- heatmap ----
+let hmKind = "tradition";
+function ramp(t){ // teal sequential, t in [0,1]
+  const a=[238,246,245], b=[14,92,84];
+  const c=a.map((x,i)=>Math.round(x+(b[i]-x)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function drawHeat(){
+  const H = D.heat[hmKind], n = H.order.length, sim = H.sim, ord = H.order;
+  // contrast: normalise to observed off-diagonal min/max
+  let lo=1, hi=0;
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++) if(i!==j){ lo=Math.min(lo,sim[i][j]); hi=Math.max(hi,sim[i][j]); }
+  const span = hi-lo || 1;
+  const cell = hmKind==="tradition" ? 20 : 16, lab = 132;
+  const el = document.getElementById("heat");
+  let h = `<svg width="${lab+n*cell+4}" height="${lab+n*cell+4}" font-size="10" font-family="inherit">`;
+  // column labels (rotated)
+  ord.forEach((oi,c)=>{ const x=lab+c*cell+cell/2;
+    h+=`<text x="${x}" y="${lab-4}" transform="rotate(-55 ${x} ${lab-4})" text-anchor="start" fill="#6b747c">${esc(clip(H.labels[oi]))}</text>`; });
+  ord.forEach((ri,r)=>{
+    h+=`<text x="${lab-6}" y="${lab+r*cell+cell/2+3}" text-anchor="end" fill="#4a545c">${esc(clip(H.labels[ri]))}</text>`;
+    // colour tick for the row's tradition/text
+    h+=`<rect x="${lab-3}" y="${lab+r*cell+2}" width="2.5" height="${cell-4}" fill="${H.colors[ri]}"/>`;
+    ord.forEach((ci,c)=>{ const v=sim[ri][ci], t=ri===ci?1:(v-lo)/span;
+      const fill = ri===ci ? "#dfeae8" : ramp(Math.max(0,Math.min(1,t)));
+      h+=`<rect class="hc" data-r="${ri}" data-c="${ci}" x="${lab+c*cell}" y="${lab+r*cell}" `+
+         `width="${cell-1}" height="${cell-1}" rx="2" fill="${fill}"/>`; });
+  });
+  h+=`</svg>`;
+  el.innerHTML=h;
+  el.querySelectorAll(".hc").forEach(rect=>{
+    rect.addEventListener("mousemove",e=>{ const r=+rect.dataset.r, c=+rect.dataset.c;
+      showTip(`<b>${esc(H.labels[r])}</b> ↔ <b>${esc(H.labels[c])}</b><br>cosine ${sim[r][c].toFixed(3)}`,e); });
+    rect.addEventListener("mouseleave",hideTip);
+  });
+}
+function clip(s){ return s.length>18 ? s.slice(0,17)+"…" : s; }
+document.getElementById("hmToggle").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  hmKind=b.dataset.k; document.querySelectorAll("#hmToggle button").forEach(x=>x.classList.toggle("on",x===b));
+  drawHeat();
+});
+drawHeat();
+
+// ---- catalogue (sortable) ----
+let sortKey="major", sortDir=1;
+function renderTable(){
+  const rows=[...D.books].sort((a,b)=>{
+    const x=a[sortKey], y=b[sortKey];
+    const cmp = typeof x==="number" ? x-y : (""+x).localeCompare(""+y);
+    return sortDir*cmp;
+  });
+  document.querySelector("#catalog tbody").innerHTML = rows.map(b=>
+    `<tr><td><b>${esc(b.title)}</b></td>`+
+    `<td><span class="cdot" style="background:${b.color}"></span>${esc(b.tradition)}</td>`+
+    `<td class="muted">${esc(b.major)}</td>`+
+    `<td class="num">${full(b.words)}</td><td class="num">${full(b.sentences)}</td></tr>`).join("");
+}
+document.querySelectorAll("#catalog th").forEach(th=>th.addEventListener("click",()=>{
+  const k=th.dataset.s; sortDir = k===sortKey ? -sortDir : (k==="words"||k==="sentences"?-1:1); sortKey=k; renderTable();
+}));
+renderTable();
+</script>
+</body>
+</html>

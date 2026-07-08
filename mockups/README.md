@@ -119,6 +119,17 @@ contents, 2 roman, 1 numbered), with offsets pointing at the real body positions
 the KJV book list and the Poetic Edda Contents are relocated to where each section
 actually begins.
 
+### 09 · Corpus overview (dashboard)
+A design prototype for the corpus **overview page** — "what's in this corpus?".
+Isolated: `build_data.py` reads `config/corpus.json` + `config/traditions.json`,
+downloads the 28 raw Gutenberg texts, and computes headline stats, composition by
+macro-area, per-text sizes, and a **text-similarity heatmap** (TF-IDF cosine, both
+text×text and tradition×tradition, reordered by hierarchical clustering / seriation).
+The heatmap is a model-free lexical stand-in for the pipeline's BGE-M3 semantic
+distances, yet already recovers sensible groups (East-Asian, Oceanic, Germanic,
+Christianity↔Islam, classical epics). The size bar makes the ~3-orders-of-magnitude
+length skew (KJV vs a short folktale) obvious. Analytical-dashboard direction.
+
 ### motif-text-embedding-eval · how to embed motifs for text matching
 A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged
 tales: measures recall@k / MRR for motif embeddings composed as name / +summary /
