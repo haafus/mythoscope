@@ -474,7 +474,7 @@ document.getElementById("nodeleg").innerHTML =
   `<div class="ctl-h" style="border-top:0">Node — index</div>`+
   Object.values(IDX).map(v=>`<div class="row"><span class="dot" style="background:${v.c}"></span>${v.label}</div>`).join("");
 const LAYERS = [
-  {cls:"conf", master:"confAll", title:"Confirmed cross-walk", items:["constituent","defining","summary","note","berezkin"], on:["constituent","defining","note","summary","berezkin"]},
+  {cls:"conf", master:"confAll", title:"Confirmed cross-walk", items:["defining","constituent","summary","note","berezkin"], on:["constituent","defining","note","summary","berezkin"]},
   {cls:"intra", master:"intraAll", title:"Intra-index links", items:["seealso","combo","subtype"], on:["seealso","combo"]},
   {cls:"sug", master:"sugAll", title:"Suggestion layers", items:["inferred","reasoned","near","lexical","semantic"], on:["near","reasoned","inferred"]},
 ];
