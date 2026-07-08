@@ -489,7 +489,7 @@ function renderBrowse(){
     bhead.textContent = `${cls.length.toLocaleString()} dense cluster${cls.length!==1?"s":""} · `
       + `${DATA.clusterings[clPreset].label} · biggest first`;
     blist.innerHTML = cls.slice(0,150).map(c=>{
-      const lab = c.top.map(t=>escapeHtml(codeOf(t))).join(" · ");
+      const lab = c.top.map(t=>`<span style="color:${IDX[t.x].c}">${escapeHtml(codeOf(t))}</span>`).join(" · ");
       const tot = c.by_index.tmi+c.by_index.atu+c.by_index.brz || 1;
       const bar = ["tmi","atu","brz"].map(x=>c.by_index[x]?`<i style="width:${100*c.by_index[x]/tot}%;background:${IDX[x].c}"></i>`:"").join("");
       return `<div data-cl="${c.id}"><span class="dot" style="background:${clColor(c.id)}"></span>`+
