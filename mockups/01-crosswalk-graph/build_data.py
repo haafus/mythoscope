@@ -29,9 +29,16 @@ from networkx.algorithms.community import louvain_communities  # noqa: E402
 # adjacency / reasoned use full index names; node ids use short prefixes
 PFX = {"berezkin": "brz", "tmi": "tmi", "atu": "atu"}
 NEAR_TITLE = 0.9  # title-similarity band that reads as "near-identical"
-CONFIRMED = {"constituent", "defining", "note", "summary", "berezkin"}
+# "confirmed" = asserted links (cross-index cross-walk + intra-index references);
+# drawn solid with an arrow, no confidence weight. Intra-index refs split by kind:
+# seealso (TMI cf/ref + Berezkin see-also), combo (ATU), subtype (ATU hierarchy).
+CONFIRMED = {"constituent", "defining", "note", "summary", "berezkin",
+             "seealso", "combo", "subtype"}
+# the confirmed clustering excludes subtypes (hierarchical, off by default on the front)
+CL_CONFIRMED = CONFIRMED - {"subtype"}
 # strongest → weakest, for picking the one method a shared pair is drawn as
 ORDER = ["constituent", "defining", "note", "summary", "berezkin",
+         "seealso", "combo", "subtype",
          "near", "reasoned", "lexical", "semantic", "inferred"]
 
 
@@ -41,11 +48,14 @@ def load(name):
 
 def main():
     cw = load("crosswalk.json")
-    names = {}
+    names, idx_rows, valid = {}, {}, {}
     for idx, fname, key in (("tmi", "tmi.json", "motifs"),
                             ("atu", "atu.json", "types"),
                             ("brz", "berezkin.json", "motifs")):
-        for r in load(fname).get(key, []):
+        rows = load(fname).get(key, [])
+        idx_rows[idx] = rows
+        valid[idx] = {r["id"] for r in rows}
+        for r in rows:
             names[f"{idx}:{r['id']}"] = r.get("name") or r.get("id")
 
     edges = {}  # frozenset(a,b) -> {method: (src, tgt, conf)}  (directed + confidence)
@@ -103,6 +113,26 @@ def main():
             for j in range(i + 1, len(mem)):
                 add(mem[i], mem[j], "reasoned", conf)
 
+    # 6) intra-index references — asserted links *inside* one index (not cross-walk),
+    #    each its own toggleable type: see-also (TMI cf/ref + Berezkin), ATU
+    #    combinations, ATU subtypes (hierarchy).
+    for r in idx_rows["tmi"]:
+        sa = r.get("see_also") or {}
+        for tid in (sa.get("ref") or []) + (sa.get("cf") or []):
+            if tid in valid["tmi"]:
+                add(f"tmi:{r['id']}", f"tmi:{tid}", "seealso")
+    for r in idx_rows["brz"]:
+        for sid in (r.get("see_also") or []):
+            if sid in valid["brz"]:
+                add(f"brz:{r['id']}", f"brz:{sid}", "seealso")
+    for r in idx_rows["atu"]:
+        for cid in (r.get("combos") or []):
+            if cid in valid["atu"]:
+                add(f"atu:{r['id']}", f"atu:{cid}", "combo")
+        for sid in (r.get("subtypes") or []):
+            if sid in valid["atu"]:
+                add(f"atu:{r['id']}", f"atu:{sid}", "subtype")
+
     used, edge_list = set(), []
     for methmap in edges.values():
         m = min(methmap, key=ORDER.index)
@@ -136,7 +166,7 @@ def main():
                                 for n in top]})
         return node_cl, out
 
-    cl_conf, clusters = cluster(lambda m: m in CONFIRMED)
+    cl_conf, clusters = cluster(lambda m: m in CL_CONFIRMED)
     cl_all, clusters2 = cluster(lambda m: True)
 
     node_list = [{"id": n, "x": n.split(":", 1)[0], "c": n.split(":", 1)[1],
