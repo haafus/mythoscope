@@ -52,15 +52,11 @@ function renderBookInfo(doc) {
 
     if (!doc) {
         bookInfo.innerHTML = `
-            <div class="empty-state">Select a book to view words, sentences, description, and download options.</div>
-            <div class="actions">
-                <a class="btn btn-outline" href="/api/corpus/archive">Download Full Archive</a>
-            </div>
+            <div class="empty-state">Select a book to view its words, sentences, and description.</div>
         `;
         return;
     }
 
-    const url = buildCorpusApiUrl(doc);
     const originalUrl = doc.url
         ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Original URL</a>`
         : "";
@@ -86,11 +82,6 @@ function renderBookInfo(doc) {
         <div class="description-text">${escapeHtml(doc.description || "No description available.")}</div>
 
         ${originalUrl}
-
-        <div class="actions">
-            <a class="btn btn-primary" href="${escapeHtml(url)}" download="${escapeHtml(doc.title || "book")}.txt">Download Book</a>
-            <a class="btn btn-outline" href="/api/corpus/archive">Download Full Archive</a>
-        </div>
     `;
 }
 

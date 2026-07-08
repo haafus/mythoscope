@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Query
-from fastapi.responses import PlainTextResponse, StreamingResponse
+from fastapi.responses import PlainTextResponse
 
 from corpus.utils import read_document
 from server.schemas import CatalogResponse, TraditionsResponse
-from server.services.corpus import build_corpus_archive, get_catalog_documents, traditions_with_books
+from server.services.corpus import get_catalog_documents, traditions_with_books
 from settings import settings
 
 router = APIRouter(prefix="/api/corpus", tags=["corpus"])
@@ -28,20 +28,6 @@ def document(
         raise HTTPException(status_code=403, detail="Access denied") from exc
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Document not found") from exc
-
-
-@router.get(
-    "/archive",
-    # Binary zip stream, not JSON: declare the content type for OpenAPI instead
-    # of a response_model.
-    responses={200: {"content": {"application/zip": {}}}},
-)
-def archive() -> StreamingResponse:
-    return StreamingResponse(
-        build_corpus_archive(),
-        media_type="application/zip",
-        headers={"Content-Disposition": 'attachment; filename="mythoscope_corpus.zip"'},
-    )
 
 
 @router.get("/traditions", response_model=TraditionsResponse)

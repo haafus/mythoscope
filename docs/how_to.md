@@ -453,7 +453,7 @@ FastAPI-сервер и SPA-интерфейс.
 - `src/server/api/motifs.py` индексы мотивов, список/детали мотивов, cross-walk.
 - `src/server/api/similarity.py` модели, семантический поиск, точки, проекции.
 - `src/server/schemas.py` Pydantic-схемы запросов и ответов.
-- `src/server/services/` сервисный слой (каталог, ZIP-архив, проекции, поиск).
+- `src/server/services/` сервисный слой (каталог, проекции, поиск).
 
 ### API эндпоинты
 
@@ -461,7 +461,6 @@ FastAPI-сервер и SPA-интерфейс.
 |-------|------|----------|
 | GET | `/api/corpus/catalog` | Каталог текстов корпуса |
 | GET | `/api/corpus/documents` | Текст документа по title |
-| GET | `/api/corpus/archive` | ZIP-архив корпуса |
 | GET | `/api/corpus/traditions` | Традиции с координатами |
 | GET | `/api/graphs/{text_id}/{graph_type}` | JSON-данные графа (nodes + edges) |
 | GET | `/api/motifs/indexes` | Индексы мотивов (berezkin/tmi/atu) + главы и счётчики |
