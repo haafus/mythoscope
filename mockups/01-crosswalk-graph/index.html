@@ -12,11 +12,12 @@
            display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   header h1 { font-size: 15px; margin: 0; font-weight: 700; }
   header .sub { color: #6c757d; font-size: 12px; }
-  #search { flex: 1 1 260px; max-width: 420px; padding: 7px 10px; font-size: 13px;
-            border: 1px solid #dee2e6; border-radius: 6px; }
-  #results { position: absolute; z-index: 20; background: #fff; border: 1px solid #dee2e6;
-             border-radius: 6px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 14px rgba(0,0,0,.08);
-             display: none; min-width: 320px; }
+  #search { width: 100%; box-sizing: border-box; padding: 7px 10px; font-size: 13px;
+            border: 1px solid #dee2e6; border-radius: 6px; background: rgba(255,255,255,.94); }
+  #results { position: absolute; z-index: 26; top: 0; left: 100%; margin-left: 8px; width: 400px;
+             background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+             max-height: calc(100vh - 76px); overflow-y: auto; box-shadow: 0 4px 14px rgba(0,0,0,.08);
+             display: none; }
   #results div { padding: 6px 10px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
   #results div:hover { background: #eef4fb; }
   #results .rid { font-weight: 700; }
@@ -92,13 +93,13 @@
 <header>
   <h1>Cross-walk graph</h1>
   <span class="sub">click a node to recentre · drag to move · scroll to zoom · arrows show link direction</span>
-  <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
 </header>
 <main>
   <canvas id="cv"></canvas>
-  <div id="results"></div>
   <div class="tip" id="tip"></div>
   <div id="leftcol">
+    <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
+    <div id="results"></div>
     <div class="focusinfo" id="focusinfo"></div>
     <div class="filterbox">
       <div class="fb-h">Thin out: min. links per node ≥ <b id="fbval">1</b></div>
@@ -274,7 +275,8 @@ function buildSub(centerId){
   const detail = !linked ? "no links (isolated)"
     : `${ring1.length} shown link${ring1.length!==1?"s":""}` + (depth2 ? ` · +${ring2.length} at 2-hop` : "");
   const ci = clMap.get(nodeCl(f));
-  const clLine = ci ? `<div class="fi-d" style="color:${clColor(ci.id)}">◆ cluster of ${ci.size} `+
+  const clLine = ci ? `<div class="fi-d fi-cl" data-cl="${ci.id}" style="color:${clColor(ci.id)};`+
+    `cursor:pointer;text-decoration:underline;text-underline-offset:2px">◆ cluster of ${ci.size} `+
     `(${DATA.clusterings[clPreset].label})</div>` : "";
   document.getElementById("focusinfo").innerHTML =
     `<div class="fi-id" style="color:${IDX[f.x].c}">${codeOf(f)}</div>`+
@@ -312,6 +314,11 @@ function buildCluster(cid){
     `<div class="fi-d">${DATA.clusterings[clPreset].label}${truncated?` · ${CLUSTER_CAP} densest shown`:""} · ${edges.length} internal links</div>`+
     `<div class="fi-d">TMI ${by.tmi} · ATU ${by.atu} · Brz ${by.brz}</div>`;
 }
+// clicking the cluster line in the focus panel jumps to the whole-cluster view
+document.getElementById("focusinfo").addEventListener("click", e=>{
+  const el = e.target.closest(".fi-cl"); if (!el) return;
+  buildCluster(+el.dataset.cl);
+});
 // re-run whichever view is active (cluster subgraph or a node's neighbourhood)
 function rebuild(){ if (currentCluster>=0) buildCluster(currentCluster); else if (focusId) buildSub(focusId); updateFbNote(); }
 function updateFbNote(){ const el=document.getElementById("fbnote");
@@ -462,7 +469,7 @@ search.addEventListener("input", ()=>{
   const hits=DATA.nodes.filter(n=>n.c.toLowerCase().startsWith(q)||n.n.toLowerCase().includes(q))
     .sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id)).slice(0,40);
   results.innerHTML=hits.map(n=>`<div data-id="${n.id}"><span class="rid" style="color:${IDX[n.x].c}">${codeOf(n)}</span> — ${escapeHtml(n.n)} <span style="color:#9299a1">(${gdeg.get(n.id)})</span></div>`).join("")||`<div style="color:#9299a1">no matches</div>`;
-  const r=search.getBoundingClientRect(); results.style.left=r.left+"px"; results.style.top=(r.bottom+4)+"px"; results.style.display="block";
+  results.style.display="block";
 });
 results.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if(!d)return;
   buildSub(d.dataset.id); results.style.display="none"; search.value=""; });
