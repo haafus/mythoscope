@@ -38,6 +38,24 @@
   .tag.novel { background: #f6ecdc; color: #8a5a12; }
   .bar { height: 3px; border-radius: 2px; background: #eef1f4; margin-top: 8px; overflow: hidden; }
   .bar > i { display: block; height: 100%; background: #3a6ea5; }
+  .browsebtn { margin-left: auto; padding: 7px 14px; font-size: 13px; font-weight: 600;
+               border: 1px solid #dee2e6; border-radius: 7px; background: #fff; cursor: pointer; color: #6c757d; }
+  .browsebtn:hover { background: #eef4fb; }
+  #browse { position: absolute; z-index: 25; width: 360px; max-height: 70vh; background: #fff;
+            border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.1);
+            display: none; flex-direction: column; }
+  #browse .bhead { padding: 8px 10px 6px; font-size: 11px; color: #6c757d; border-bottom: 1px solid #f1f3f5; }
+  .bfilter { display: flex; gap: 4px; padding: 7px 8px; border-bottom: 1px solid #f1f3f5; }
+  .bfilter button { flex: 1; padding: 5px 4px; font-size: 11.5px; border: 1px solid #dee2e6;
+                    border-radius: 5px; background: #fff; cursor: pointer; }
+  .bfilter button.active { background: #111827; color: #fff; border-color: #111827; }
+  #blist { overflow-y: auto; }
+  #blist div { padding: 6px 10px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f6f7f8;
+               display: flex; gap: 7px; align-items: baseline; }
+  #blist div:hover { background: #eef4fb; }
+  #blist .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; align-self: center; }
+  #blist .bn { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #blist .bd { color: #9299a1; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -49,6 +67,17 @@
   <div class="tabs">
     <div class="tab active" data-tab="motif">Parallels for a motif</div>
     <div class="tab" data-tab="text">Free-text search</div>
+    <button id="browseBtn" class="browsebtn">☰ Browse motifs</button>
+  </div>
+  <div id="browse">
+    <div class="bhead" id="bhead"></div>
+    <div class="bfilter">
+      <button data-x="" class="active">All</button>
+      <button data-x="tmi">TMI</button>
+      <button data-x="atu">ATU</button>
+      <button data-x="brz">Berezkin</button>
+    </div>
+    <div id="blist"></div>
   </div>
   <div style="position:relative">
     <input class="q" id="q" placeholder="Search a motif by id or name…" autocomplete="off">
@@ -158,6 +187,37 @@ q.addEventListener("keydown",e=>{ if(e.key==="Enter"&&mode==="text"){ ac.style.d
 ac.addEventListener("click",e=>{ const d=e.target.closest("[data-i]"); if(!d)return;
   ac.style.display="none"; q.value=D.docs[+d.dataset.i].c+" — "+D.docs[+d.dataset.i].n; showMotif(+d.dataset.i); });
 document.addEventListener("click",e=>{ if(!ac.contains(e.target)&&e.target!==q) ac.style.display="none"; });
+
+// ---- browse: discover motifs to start from (most cross-linked first, per index) ----
+const bdeg = new Int32Array(N);
+for (const [a,b] of D.pairs){ bdeg[a]++; bdeg[b]++; }
+const hubsSorted = D.docs.map((_,i)=>i).sort((a,b)=> bdeg[b]-bdeg[a] || (D.docs[a].c<D.docs[b].c?-1:1));
+const browse=document.getElementById("browse"), blist=document.getElementById("blist"), bhead=document.getElementById("bhead"), browseBtn=document.getElementById("browseBtn");
+let browseFilter="";
+function renderBrowse(){
+  const all = browseFilter ? hubsSorted.filter(i=>D.docs[i].x===browseFilter) : hubsSorted;
+  const shown = all.slice(0,150);
+  bhead.textContent = `${all.length.toLocaleString()} motifs · most cross-linked first`
+    + (all.length>shown.length ? ` (top ${shown.length})` : "");
+  blist.innerHTML = shown.map(i=>{ const d=D.docs[i], k=IDX[d.x];
+    return `<div data-i="${i}"><span class="dot" style="background:${k.c}"></span>`+
+      `<b style="color:${k.c}">${esc(d.c)}</b><span class="bn">${esc(d.n)}</span><span class="bd">${bdeg[i]}</span></div>`; }).join("");
+}
+browseBtn.addEventListener("click", ()=>{
+  const open = browse.style.display!=="flex"; browse.style.display=open?"flex":"none";
+  if(open){ const r=browseBtn.getBoundingClientRect();
+    browse.style.left=(r.right-360+window.scrollX)+"px"; browse.style.top=(r.bottom+6+window.scrollY)+"px"; renderBrowse(); }
+});
+document.querySelectorAll(".bfilter button").forEach(b=>b.addEventListener("click", ()=>{
+  document.querySelectorAll(".bfilter button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); browseFilter=b.dataset.x; renderBrowse();
+}));
+blist.addEventListener("click", e=>{ const d=e.target.closest("[data-i]"); if(!d)return; const i=+d.dataset.i;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelector('.tab[data-tab="motif"]').classList.add("active"); mode="motif";
+  q.value=D.docs[i].c+" — "+D.docs[i].n; browse.style.display="none"; showMotif(i);
+});
+document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target!==browseBtn) browse.style.display="none"; });
 </script>
 </body>
 </html>
