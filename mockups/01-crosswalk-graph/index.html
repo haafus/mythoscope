@@ -24,7 +24,8 @@
   canvas { display: block; width: 100%; height: 100%; cursor: grab; }
   canvas.drag { cursor: grabbing; }
   .legend { position: absolute; bottom: 14px; left: 14px; background: rgba(255,255,255,.94);
-            border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 12px; font-size: 11.5px; }
+            border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 12px; font-size: 11.5px;
+            max-height: 52vh; overflow-y: auto; max-width: 260px; }
   .legend b { display: block; margin: 6px 0 3px; color: #6c757d; font-weight: 600;
               text-transform: uppercase; font-size: 9.5px; letter-spacing: .04em; }
   .legend .row { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
@@ -35,6 +36,15 @@
   .ctl { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,.94);
          border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
   .ctl label { display: block; margin: 3px 0; cursor: pointer; }
+  .ctl-h { margin: 7px 0 2px; font-size: 9.5px; font-weight: 600; text-transform: uppercase;
+           letter-spacing: .04em; color: #6c757d; border-top: 1px solid #eef1f4; padding-top: 6px; }
+  .bmode { display: flex; gap: 4px; padding: 7px 8px 0; }
+  .bmode button { flex: 1; padding: 5px 4px; font-size: 11.5px; border: 1px solid #dee2e6;
+                  border-radius: 5px; background: #fff; cursor: pointer; }
+  .bmode button.active { background: #111827; color: #fff; border-color: #111827; }
+  .comp { display: flex; height: 5px; width: 46px; border-radius: 3px; overflow: hidden; background: #eef1f4; flex: 0 0 auto; }
+  .comp > i { height: 100%; }
+  #blist .cl-lab { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
   .focusinfo { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.94);
                border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 11px; font-size: 12px; max-width: 300px; }
   .focusinfo .fi-id { font-weight: 700; }
@@ -70,12 +80,20 @@
   <canvas id="cv"></canvas>
   <div id="results"></div>
   <div id="browse">
+    <div class="bmode">
+      <button data-mode="hubs" class="active">Most-linked hubs</button>
+      <button data-mode="clusters">Dense clusters</button>
+    </div>
     <div class="bhead" id="bhead"></div>
-    <div class="bfilter">
+    <div class="bfilter" id="bfilter">
       <button data-x="" class="active">All</button>
       <button data-x="tmi">TMI</button>
       <button data-x="atu">ATU</button>
       <button data-x="brz">Berezkin</button>
+    </div>
+    <div class="bfilter" id="bvariant" style="display:none">
+      <button data-k="cl" class="active">Confirmed links</button>
+      <button data-k="cl2">Incl. suggestions</button>
     </div>
     <div id="blist"></div>
   </div>
@@ -83,21 +101,46 @@
   <div class="focusinfo" id="focusinfo"></div>
   <div class="ctl">
     <label><input type="checkbox" id="depth2"> 2-hop neighbourhood</label>
-    <label><input type="checkbox" id="showInferred" checked> show inferred links</label>
+    <div class="ctl-h">Suggestion layers</div>
+    <label><input type="checkbox" class="sug" value="near" checked> near-identical</label>
+    <label><input type="checkbox" class="sug" value="lexical"> lexical</label>
+    <label><input type="checkbox" class="sug" value="reasoned" checked> reasoned</label>
+    <label><input type="checkbox" class="sug" value="semantic"> semantic</label>
+    <label><input type="checkbox" class="sug" value="inferred" checked> inferred</label>
   </div>
   <div class="legend" id="legend"></div>
 </main>
 <script src="data.js"></script>
 <script>
 const IDX = { tmi:{c:"#2a9d8f",label:"Thompson (TMI)"}, atu:{c:"#3a6ea5",label:"ATU type"}, brz:{c:"#b5651d",label:"Berezkin"} };
+// Edges are coloured by SOURCE index; the method sets the line style instead.
+// Confirmed cross-walk = solid + arrow; each suggestion type = its own dash.
 const METH = {
-  constituent:{c:"#8a94a6",label:"constituent (atu_seq)"},
-  defining:{c:"#2a9d8f",label:"defining motif"},
-  note:{c:"#c77dff",label:"TMI note ⇒ ATU"},
-  summary:{c:"#e07a5f",label:"ATU summary ⇒ TMI"},
-  berezkin:{c:"#3d5a80",label:"Berezkin citation"},
-  inferred:{c:"#c9ced6",label:"inferred (triangle)",dash:true},
+  constituent:{label:"constituent (atu_seq)"},
+  defining:{label:"defining motif"},
+  note:{label:"TMI note → ATU"},
+  summary:{label:"ATU summary → TMI"},
+  berezkin:{label:"Berezkin citation"},
+  near:{label:"near-identical", dash:[6,3], sug:true},
+  reasoned:{label:"reasoned (curated)", dash:[8,3,1.5,3], sug:true},
+  lexical:{label:"lexical parallel", dash:[3,3], sug:true},
+  semantic:{label:"semantic (BGE-M3)", dash:[1.5,3], sug:true},
+  inferred:{label:"inferred (triangle)", dash:[2,4], sug:true},
 };
+const CONFIRMED = new Set(["constituent","defining","note","summary","berezkin"]);
+let enabledSug = new Set(["near","reasoned","inferred"]);   // suggestion layers shown
+const edgeOn = m => CONFIRMED.has(m) || enabledSug.has(m);
+// cluster colours (dense-community highlight)
+const CPAL = ["#e6194b","#3cb44b","#4363d8","#f58231","#911eb4","#1f9e9e","#f032e6","#9a6324",
+              "#008080","#800000","#808000","#000075","#d9a300","#8a5a44","#5a7d5a","#7a4fa3"];
+const clColor = id => id>=0 ? CPAL[id % CPAL.length] : "#c9ced6";
+let highlightCluster = -1;
+// two clusterings: "cl" = confirmed cross-walk only · "cl2" = incl. suggestions
+let clKey = "cl", clMap = new Map();
+const clusterList = () => clKey==="cl" ? (DATA.clusters||[]) : (DATA.clusters2||[]);
+const nodeCl = n => n[clKey] ?? -1;
+function setClustering(k){ clKey=k; clMap = new Map(clusterList().map(c=>[c.id,c])); highlightCluster=-1; }
+setClustering("cl");
 const byId = new Map(DATA.nodes.map(n => [n.id, n]));
 const adj = new Map();                       // id -> [{o, m}]
 for (const n of DATA.nodes) adj.set(n.id, []);
@@ -122,11 +165,11 @@ let focusId = null;
 // so a big hub's neighbourhood lays out cleanly instead of a jittering hairball.
 function buildSub(centerId){
   const depth2 = document.getElementById("depth2").checked;
-  const showInf = document.getElementById("showInferred").checked;
-  const nbr = id => (adj.get(id)||[]).filter(x => showInf || x.m!=="inferred").map(x=>x.o);
+  const nbr = id => (adj.get(id)||[]).filter(x => edgeOn(x.m)).map(x=>x.o);
   const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
   focusId = centerId;
   const f = byId.get(centerId);
+  highlightCluster = nodeCl(f);   // focus a node → highlight its cluster
 
   const ring1 = [...new Set(nbr(centerId))].filter(o => o !== centerId);
   const ring1set = new Set(ring1);
@@ -177,9 +220,9 @@ function buildSub(centerId){
   const seen = new Set(), edges = [];
   for (const e of DATA.edges) {
     if (!nmap.has(e.s) || !nmap.has(e.t)) continue;
-    if (!showInf && e.m==="inferred") continue;
+    if (!edgeOn(e.m)) continue;
     const key = e.s<e.t?e.s+e.t:e.t+e.s; if (seen.has(key)) continue; seen.add(key);
-    edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d });
+    edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m, d:e.d, w:e.w });
   }
   sub = { nodes, edges };
 
@@ -189,12 +232,15 @@ function buildSub(centerId){
   view = { x: cx, y: cy, k: Math.max(0.25, Math.min(1.4, fit)) };
 
   const linked = gdeg.get(centerId);
-  const detail = !linked ? "no cross-walk links (isolated)"
-    : `${linked} cross-link${linked>1?"s":""}` + (depth2 ? ` · +${ring2.length} at 2-hop` : "");
+  const detail = !linked ? "no links (isolated)"
+    : `${ring1.length} shown link${ring1.length!==1?"s":""}` + (depth2 ? ` · +${ring2.length} at 2-hop` : "");
+  const ci = clMap.get(nodeCl(f));
+  const clLine = ci ? `<div class="fi-d" style="color:${clColor(ci.id)}">◆ cluster of ${ci.size} `+
+    `(${clKey==="cl"?"confirmed":"incl. suggestions"})</div>` : "";
   document.getElementById("focusinfo").innerHTML =
     `<div class="fi-id" style="color:${IDX[f.x].c}">${f.c}</div>`+
     `<div class="fi-n">${escapeHtml(f.n)}</div>`+
-    `<div class="fi-d">${IDX[f.x].label} · ${detail}</div>`;
+    `<div class="fi-d">${IDX[f.x].label} · ${detail}</div>${clLine}`;
 }
 
 // ---- animation: ease each node toward its concentric target ----
@@ -213,26 +259,33 @@ function nodeR(n){ return (n.id===focusId?9:4.5+Math.min(5,Math.sqrt(gdeg.get(n.
 function draw(){
   ctx.clearRect(0,0,cv.clientWidth,cv.clientHeight);
   for (const e of sub.edges){
-    const A=toScreen(e.a), B=toScreen(e.b), m=METH[e.m];
+    const A=toScreen(e.a), B=toScreen(e.b), m=METH[e.m], col=IDX[e.a.x].c;  // colour = source index
     ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
-    ctx.strokeStyle=m.c; ctx.lineWidth=e.m==="constituent"?1:1.4;
-    ctx.setLineDash(m.dash?[4,4]:[]); ctx.globalAlpha=.75; ctx.stroke();
-    // Arrowhead at the target end (just outside its node), for directed links.
+    // opacity: confirmed links solid-ish; suggestions fade with their confidence.
+    const alpha = m.sug ? 0.12 + 0.68*(e.w ?? 0.5) : 0.78;
+    ctx.strokeStyle=col; ctx.lineWidth=m.sug?1:1.3;
+    ctx.setLineDash(m.dash||[]); ctx.globalAlpha=alpha; ctx.stroke();
+    // Arrowhead at the target end (just outside its node) — confirmed links only.
     if (e.d){
       const ang=Math.atan2(B.y-A.y, B.x-A.x), rB=nodeR(e.b), sz=Math.max(4.5,6*Math.sqrt(view.k));
-      const dist=Math.hypot(B.x-A.x, B.y-A.y);
-      if (dist > rB+sz+2){
+      if (Math.hypot(B.x-A.x, B.y-A.y) > rB+sz+2){
         const tx=B.x-Math.cos(ang)*(rB+1.5), ty=B.y-Math.sin(ang)*(rB+1.5);
         ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(tx,ty);
         ctx.lineTo(tx-Math.cos(ang-0.45)*sz, ty-Math.sin(ang-0.45)*sz);
         ctx.lineTo(tx-Math.cos(ang+0.45)*sz, ty-Math.sin(ang+0.45)*sz);
-        ctx.closePath(); ctx.globalAlpha=.9; ctx.fillStyle=m.c; ctx.fill();
+        ctx.closePath(); ctx.globalAlpha=.9; ctx.fillStyle=col; ctx.fill();
       }
     }
   }
   ctx.setLineDash([]); ctx.globalAlpha=1;
+  const hc = highlightCluster;
   for (const n of sub.nodes){
     const P=toScreen(n), r=nodeR(n);
+    // dense-cluster halo for members of the highlighted community
+    if (hc>=0 && nodeCl(n)===hc){
+      ctx.beginPath(); ctx.arc(P.x,P.y,r+3.5,0,7);
+      ctx.strokeStyle=clColor(hc); ctx.lineWidth=2.5; ctx.globalAlpha=.9; ctx.stroke(); ctx.globalAlpha=1;
+    }
     ctx.beginPath(); ctx.arc(P.x,P.y,r,0,7); ctx.fillStyle=IDX[n.x].c;
     ctx.strokeStyle=n.id===focusId?"#111":"#fff"; ctx.lineWidth=n.id===focusId?2.5:1.4;
     ctx.fill(); ctx.stroke();
@@ -269,7 +322,10 @@ window.addEventListener("mouseup", e=>{
 cv.addEventListener("wheel", e=>{ e.preventDefault(); const f=e.deltaY<0?1.1:1/1.1;
   const mx=e.offsetX,my=e.offsetY; view.x=mx-(mx-view.x)*f; view.y=my-(my-view.y)*f; view.k*=f; }, {passive:false});
 document.getElementById("depth2").addEventListener("change", ()=>focusId&&buildSub(focusId));
-document.getElementById("showInferred").addEventListener("change", ()=>focusId&&buildSub(focusId));
+document.querySelectorAll(".sug").forEach(cb=>cb.addEventListener("change", ()=>{
+  enabledSug = new Set([...document.querySelectorAll(".sug:checked")].map(c=>c.value));
+  if (focusId) buildSub(focusId);
+}));
 
 // ---- search ----
 const search=document.getElementById("search"), results=document.getElementById("results");
@@ -284,37 +340,70 @@ results.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if
   buildSub(d.dataset.id); results.style.display="none"; search.value=""; });
 document.addEventListener("click", e=>{ if(!results.contains(e.target)&&e.target!==search) results.style.display="none"; });
 
-// ---- browse: discover entry points (most-connected nodes, per index) ----
+// ---- browse: discover entry points (most-linked hubs) or dense clusters ----
 const hubsSorted = [...DATA.nodes].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id));
 const browse=document.getElementById("browse"), blist=document.getElementById("blist"), bhead=document.getElementById("bhead");
-let browseFilter="";
+const bfilter=document.getElementById("bfilter"), bvariant=document.getElementById("bvariant");
+let browseMode="hubs", browseFilter="";
 function renderBrowse(){
-  const all = browseFilter ? hubsSorted.filter(n=>n.x===browseFilter) : hubsSorted;
-  const shown = all.slice(0, 150);
-  bhead.textContent = `${all.length.toLocaleString()} connected node${all.length!==1?"s":""} · most-linked first`
-    + (all.length>shown.length ? ` (top ${shown.length})` : "");
-  blist.innerHTML = shown.map(n=>
-    `<div data-id="${n.id}"><span class="dot" style="background:${IDX[n.x].c}"></span>`+
-    `<span class="rid" style="color:${IDX[n.x].c}">${n.c}</span>`+
-    `<span class="bn">${escapeHtml(n.n)}</span><span class="bd">${gdeg.get(n.id)}</span></div>`).join("");
+  bfilter.style.display = browseMode==="hubs" ? "flex" : "none";
+  bvariant.style.display = browseMode==="clusters" ? "flex" : "none";
+  if (browseMode==="clusters"){
+    const cls = clusterList();
+    bhead.textContent = `${cls.length.toLocaleString()} dense cluster${cls.length!==1?"s":""} · `
+      + `${clKey==="cl"?"confirmed cross-walk":"incl. suggestions"} · biggest first`;
+    blist.innerHTML = cls.slice(0,150).map(c=>{
+      const lab = c.top.map(t=>escapeHtml(t.c)).join(" · ");
+      const tot = c.by_index.tmi+c.by_index.atu+c.by_index.brz || 1;
+      const bar = ["tmi","atu","brz"].map(x=>c.by_index[x]?`<i style="width:${100*c.by_index[x]/tot}%;background:${IDX[x].c}"></i>`:"").join("");
+      return `<div data-cl="${c.id}"><span class="dot" style="background:${clColor(c.id)}"></span>`+
+        `<span class="cl-lab">${lab}</span><span class="comp">${bar}</span><span class="bd">${c.size}</span></div>`;
+    }).join("");
+  } else {
+    const all = browseFilter ? hubsSorted.filter(n=>n.x===browseFilter) : hubsSorted;
+    const shown = all.slice(0, 150);
+    bhead.textContent = `${all.length.toLocaleString()} connected node${all.length!==1?"s":""} · most-linked first`
+      + (all.length>shown.length ? ` (top ${shown.length})` : "");
+    blist.innerHTML = shown.map(n=>
+      `<div data-id="${n.id}"><span class="dot" style="background:${IDX[n.x].c}"></span>`+
+      `<span class="rid" style="color:${IDX[n.x].c}">${n.c}</span>`+
+      `<span class="bn">${escapeHtml(n.n)}</span><span class="bd">${gdeg.get(n.id)}</span></div>`).join("");
+  }
 }
 document.getElementById("browseBtn").addEventListener("click", ()=>{
   const open = browse.style.display!=="flex"; browse.style.display=open?"flex":"none"; if(open) renderBrowse();
 });
-document.querySelectorAll(".bfilter button").forEach(b=>b.addEventListener("click", ()=>{
-  document.querySelectorAll(".bfilter button").forEach(x=>x.classList.remove("active"));
+document.querySelectorAll(".bmode button").forEach(b=>b.addEventListener("click", ()=>{
+  document.querySelectorAll(".bmode button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); browseMode=b.dataset.mode; renderBrowse();
+}));
+bfilter.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
+  bfilter.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
   b.classList.add("active"); browseFilter=b.dataset.x; renderBrowse();
 }));
-blist.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if(!d)return;
-  buildSub(d.dataset.id); browse.style.display="none"; });
+bvariant.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
+  bvariant.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); setClustering(b.dataset.k); renderBrowse();
+  if (focusId) buildSub(focusId);   // refresh the on-canvas cluster highlight
+}));
+blist.addEventListener("click", e=>{
+  const dc=e.target.closest("[data-cl]");
+  if (dc){ const c=clMap.get(+dc.dataset.cl); if(c) buildSub(c.top[0].id); browse.style.display="none"; return; }
+  const d=e.target.closest("[data-id]"); if(!d)return; buildSub(d.dataset.id); browse.style.display="none"; });
 document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target.id!=="browseBtn") browse.style.display="none"; });
 
 function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
-// legend
+// legend — node fill by index; edge colour = source index, opacity = confidence,
+// line style = method (solid+arrow for confirmed links, dashed for suggestions).
+const legLine = m => `<svg width="22" height="7" style="vertical-align:middle;flex:0 0 auto">`+
+  `<line x1="0" y1="3.5" x2="22" y2="3.5" stroke="#8a94a6" stroke-width="2"${m.dash?` stroke-dasharray="${m.dash.join(' ')}"`:''}/></svg>`;
+const legRows = keys => keys.map(k=>`<div class="row">${legLine(METH[k])} ${METH[k].label}</div>`).join("");
 document.getElementById("legend").innerHTML =
-  `<b>Node</b>`+Object.values(IDX).map(v=>`<div class="row"><span class="dot" style="background:${v.c}"></span>${v.label}</div>`).join("")+
-  `<b>Link method</b>`+Object.values(METH).map(v=>`<div class="row"><span class="ln" style="border-color:${v.c};${v.dash?'border-top-style:dashed;':''}"></span>${v.label}</div>`).join("");
+  `<b>Node fill — index</b>`+Object.values(IDX).map(v=>`<div class="row"><span class="dot" style="background:${v.c}"></span>${v.label}</div>`).join("")+
+  `<b>Edge colour = source · opacity = confidence</b>`+
+  `<b>Confirmed link — solid, → direction</b>`+legRows(["constituent","defining","note","summary","berezkin"])+
+  `<b>Suggestion — dashed</b>`+legRows(["near","reasoned","lexical","semantic","inferred"]);
 
 buildSub("atu:875");   // seed on the busiest hub
 tick();
