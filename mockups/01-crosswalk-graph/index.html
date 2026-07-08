@@ -282,8 +282,12 @@ function buildSub(centerId){
   view = { x: cx, y: cy, k: Math.max(0.25, Math.min(1.4, fit)) };
 
   const linked = gdeg.get(centerId);
+  // Count the edges actually drawn (center↔neighbour *and* neighbour↔neighbour),
+  // so the number matches the lines on screen — not just the direct-neighbour count.
+  const shown = sub.edges.length;
   const detail = !linked ? "no links (isolated)"
-    : `${ring1.length} shown link${ring1.length!==1?"s":""}` + (depth2 ? ` · +${ring2.length} at 2-hop` : "");
+    : `${shown} link${shown!==1?"s":""} on screen · ${ring1.length} direct`
+      + (depth2 ? ` · +${ring2.length} nodes at 2-hop` : "");
   const ci = clMap.get(nodeCl(f));
   const clLine = ci ? `<div class="fi-d fi-cl" data-cl="${ci.id}" style="color:${clColor(ci.id)};`+
     `cursor:pointer;text-decoration:underline;text-underline-offset:2px">◆ cluster of ${ci.size} `+
