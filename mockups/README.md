@@ -114,8 +114,10 @@ tried in priority order: explicit `keyword` headings (Chapter/Book/Sura…), a p
 `allcaps` titles, and bare `numbered` lines. Each detected heading records its char
 offset + a context preview. The viewer lists every book with its winning method and
 chapter count, and shows per-strategy candidate counts so you can eyeball over/under-
-detection. Current coverage: 27/28 books get headings (15 keyword, 5 contents, 5
-allcaps, 2 roman); 1 honest miss (KJV — verse refs, not chapters).
+detection. Current coverage: all 28 books get headings (12 keyword, 8 allcaps, 5
+contents, 2 roman, 1 numbered), with offsets pointing at the real body positions —
+the KJV book list and the Poetic Edda Contents are relocated to where each section
+actually begins.
 
 ### motif-text-embedding-eval · how to embed motifs for text matching
 A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged

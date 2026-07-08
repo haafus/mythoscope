@@ -87,7 +87,9 @@ KEYWORD = re.compile(
 )
 ROMAN = re.compile(r"^\s*([IVXLCDM]{1,7})\.?\s*$")
 NUMBERED = re.compile(r"^\s*(\d{1,3})\.?\s*$")
-CONTENTS = re.compile(r"^\s*(CONTENTS|TABLE OF CONTENTS)\s*$", re.I)
+# header line may carry a trailing footnote marker / page number ("CONTENTS [1]"),
+# but nothing alphabetic — so prose like "contents of the poems…" never matches.
+CONTENTS = re.compile(r"^\s*(CONTENTS|TABLE OF CONTENTS)\b[\s.\[\]\d]*$", re.I)
 
 ROMAN_OK = re.compile(r"^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$", re.I)
 
@@ -176,7 +178,9 @@ def detect(body: str) -> dict:
     counts = {k: len(v) for k, v in strategies.items()}
 
     # Winning strategy: highest-priority one that clears its minimum.
-    priority = [("keyword", 2), ("contents", 3), ("roman", 3), ("allcaps", 3), ("numbered", 4)]
+    # keyword needs >=3 so a couple of stray "BOOK"/"PART" lines don't beat a real
+    # Contents block or a consistent numbered/allcaps scheme.
+    priority = [("keyword", 3), ("contents", 3), ("roman", 3), ("allcaps", 3), ("numbered", 4)]
     method = "none"
     chosen: list[int] = []
     for name, minimum in priority:
@@ -192,43 +196,75 @@ def detect(body: str) -> dict:
 
 
 def detect_contents(lines: list[str]) -> list[int]:
-    """Find a 'Contents' block near the top and locate each entry in the body.
+    """Find a table of contents and locate each entry's heading in the body.
 
-    Returns the line indices in the body where TOC entries first appear."""
+    Two shapes: an explicit 'Contents' header with entries below it, or a
+    *headerless* leading block of title lines — a run of short title-like lines
+    at the very top of the body with no 'Contents' label (e.g. the KJV book
+    list). Returns the body line indices where the entries reappear as headings."""
     head_limit = min(len(lines), max(60, len(lines) // 6))
     ci = next((i for i in range(head_limit) if CONTENTS.match(lines[i])), None)
-    if ci is None:
+
+    if ci is not None:
+        titles, search_from = _collect_toc_entries(lines, ci + 1)   # relocate below the TOC
+    else:
+        block = _leading_title_block(lines)
+        if not block:
+            return []
+        titles, search_from = block        # locate the run's entries *below* it
+    if len(titles) < 3:
         return []
 
-    titles, blanks = [], 0
-    for ln in lines[ci + 1 : ci + 400]:
-        s = ln.strip()
+    found, frm = [], search_from
+    for t in titles:
+        needle = t.lower()[:40]
+        for i in range(frm, len(lines)):
+            if lines[i].strip().lower().startswith(needle):
+                found.append(i)
+                frm = i + 1
+                break
+    # only trust it if we located a good share of the listed entries
+    return found if len(found) >= max(3, len(titles) // 2) else []
+
+
+def _collect_toc_entries(lines: list[str], start: int):
+    """TOC entry titles under an explicit 'Contents' header (strip numbering /
+    page-number dot-leaders). Returns (titles, index just past the block) so the
+    entries are relocated in the body *below* the TOC, not matched to themselves."""
+    titles, blanks, i = [], 0, start
+    limit = min(len(lines), start + 400)
+    while i < limit:
+        s = lines[i].strip()
         if not s:
             blanks += 1
             if blanks >= 3 and titles:
                 break
+            i += 1
             continue
         blanks = 0
-        # drop leading numbering and trailing page-number/dot-leaders
         s = re.sub(r"^\s*(\d+[.)]?|[IVXLCDM]+\.)\s+", "", s)
         s = re.sub(r"[\s.]+\d+\s*$", "", s).strip()
         if 2 <= len(s) <= 70:
             titles.append(s)
-    if len(titles) < 3:
-        return []
+        i += 1
+    return titles, i
 
-    body_after = ci + 1
-    found = []
-    search_from = body_after
-    for t in titles:
-        needle = t.lower()
-        for i in range(search_from, len(lines)):
-            if lines[i].strip().lower().startswith(needle[:40]):
-                found.append(i)
-                search_from = i + 1
-                break
-    # only trust it if we located a good share of the listed entries
-    return found if len(found) >= max(3, len(titles) // 2) else []
+
+def _leading_title_block(lines: list[str]):
+    """A headerless TOC: >=8 consecutive short title-like lines at the very start
+    of the body (ended by the first blank or prose line). Returns (titles, index
+    just past the block) so entries are then relocated *below* it, or None."""
+    i = 0
+    while i < len(lines) and not lines[i].strip():
+        i += 1
+    titles = []
+    while i < len(lines):
+        s = lines[i].strip()
+        if not s or len(s) > 70:           # blank or a prose line ends the run
+            break
+        titles.append(s)
+        i += 1
+    return (titles, i) if len(titles) >= 8 else None
 
 
 # --------------------------------------------------------------------------- #

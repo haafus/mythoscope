@@ -27,7 +27,7 @@ headings with previews.
 | Strategy   | Fires on                                                        |
 |------------|-----------------------------------------------------------------|
 | `keyword`  | isolated line starting `CHAPTER / BOOK / PART / CANTO / SURA / PSALM / HYMN …` |
-| `contents` | a `Contents` block near the top, each entry re-located in the body |
+| `contents` | a `Contents` block near the top (explicit header *or* a headerless leading run of title lines, e.g. the KJV book list), each entry re-located in the body |
 | `roman`    | isolated standalone Roman-numeral lines (`I.`, `IV`, …)          |
 | `allcaps`  | short, isolated, all-uppercase title lines                      |
 | `numbered` | isolated standalone number lines (verse/section numbers)        |
@@ -47,12 +47,18 @@ python -m http.server -d mockups 8890
 
 ## Current coverage (28 books)
 
-`keyword` 15 · `contents` 5 · `allcaps` 5 · `roman` 2 · `none` 1.
+`keyword` 12 · `allcaps` 8 · `contents` 5 · `roman` 2 · `numbered` 1 — **all 28 detected**.
 
-The one miss is honest: the **KJV Bible** (Gutenberg marks verses as `1:1`, not
-`CHAPTER`). This is the intended output of a probe — it shows where a heuristic
-detector is strong (epics, Gutenberg books with a Contents block) and where a source
-needs its own rule.
+Every book gets headings, and the offsets point at the real body positions (not the
+TOC lines): the KJV book list and the Poetic Edda `Contents` are relocated to where
+each book/lay actually begins. A couple of tuning notes baked into the heuristics:
+
+- `keyword` needs ≥3 hits, so a stray `BOOK`/`PART` line can't win over a book's real
+  scheme (Popol Vuh → `allcaps`, Tao Teh King → `numbered`, Poetic Edda → `contents`).
+- the `Contents` header is matched even with a trailing footnote marker (`CONTENTS [1]`).
+
+The viewer still shows every strategy's candidate count, so you can see the runner-up
+signals per book.
 
 ## Notes on offsets
 
