@@ -32,9 +32,9 @@ carry no colour in config, so every text is coloured by its **macro-area**.
 ## Run
 
 ```bash
-python mockups/09-corpus-overview/build_data.py     # downloads (cached) + writes data.js
+python mockups/13-corpus-overview/build_data.py     # downloads (cached) + writes data.js
 python -m http.server -d mockups 8890
-# → http://127.0.0.1:8890/09-corpus-overview/
+# → http://127.0.0.1:8890/13-corpus-overview/
 ```
 
 ## Notes / next steps

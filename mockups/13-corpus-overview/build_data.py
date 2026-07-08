@@ -16,7 +16,7 @@ The heatmap is a *lexical* (TF-IDF) stand-in for the pipeline's BGE-M3 semantic
 distances — deterministic and model-free, so the mock rebuilds anywhere. The
 page labels it as such.
 
-Run from the repo root:  python mockups/09-corpus-overview/build_data.py
+Run from the repo root:  python mockups/13-corpus-overview/build_data.py
 """
 import json
 import re
