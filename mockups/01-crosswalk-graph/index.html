@@ -286,7 +286,7 @@ function buildSub(centerId){
   // so the number matches the lines on screen — not just the direct-neighbour count.
   const shown = sub.edges.length;
   const detail = !linked ? "no links (isolated)"
-    : `${shown} link${shown!==1?"s":""} on screen · ${ring1.length} direct`
+    : `${shown} link${shown!==1?"s":""} · ${ring1.length} direct`
       + (depth2 ? ` · +${ring2.length} nodes at 2-hop` : "");
   const ci = clMap.get(nodeCl(f));
   const clLine = ci ? `<div class="fi-d fi-cl" data-cl="${ci.id}" style="color:${clColor(ci.id)};`+
