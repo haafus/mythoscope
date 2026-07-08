@@ -20,12 +20,11 @@ interpretive prose is original.
 Maps use the shared equirectangular world path (`land.js`, copied from mockup 07);
 projection is `cx = lon+180, cy = 90-lat` over a `0 0 360 180` viewBox.
 
-Each cluster also gets filled **footprint blobs**: its tradition points are grouped
-with DBSCAN (singletons → outliers, dropped so a stray point can't balloon the shape),
-each dense group is convex-hulled, buffered outward and Chaikin-smoothed into an
-organic contour, and drawn semi-transparent under the points. Multi-modal clusters
-(e.g. the Sun-&-Moon layer) therefore show as several disjoint blobs, making the
-discontinuous trans-continental spread visible at a glance.
+Each cluster also gets one filled **convex footprint**: isolated strays are dropped
+first (DBSCAN noise at a generous eps, so a lone outlier can't stretch the hull), then
+all remaining points are enclosed in a single convex hull, buffered outward and
+Chaikin-smoothed, and drawn semi-transparent under the points. Trans-continental
+clusters therefore span the intervening ocean — the price of one contour per cluster.
 
 ## Run
 
