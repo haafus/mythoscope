@@ -30,3 +30,5 @@ dist/
 # data export bundles (mytho export)
 mythoscope-export-*.zip
 mockups/*/cosmograph-*.csv
+# chapter-detector prototype: downloaded Gutenberg text cache
+mockups/*/cache/

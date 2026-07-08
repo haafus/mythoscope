@@ -103,6 +103,20 @@ genre labels distinct), and the clustering parameters are retuned for the cleane
 vocabulary. The before/after comparison and the parameter choices are in
 [`07-tradition-motif-combined/NORMALIZATION.md`](07-tradition-motif-combined/NORMALIZATION.md).
 
+### 08 · Chapter / section detector (corpus coverage probe)
+A **feasibility probe** for auto-extracting a table of contents from the downloaded
+texts. Isolated from the pipeline: its `build_data.py` reads only the source list in
+`config/corpus.json`, downloads the 28 raw Project Gutenberg `.txt` into a gitignored
+`cache/`, and runs a layered heading detector on the **raw** text (blank-line cues
+intact — the main cleaner flattens those away, so it works upstream). Five strategies,
+tried in priority order: explicit `keyword` headings (Chapter/Book/Sura…), a parsed
+`Contents` block located back in the body, standalone `roman` numerals, isolated
+`allcaps` titles, and bare `numbered` lines. Each detected heading records its char
+offset + a context preview. The viewer lists every book with its winning method and
+chapter count, and shows per-strategy candidate counts so you can eyeball over/under-
+detection. Current coverage: 26/28 books get headings (14 keyword, 5 contents, 5
+allcaps, 2 roman); 2 honest misses (KJV — verse refs, not chapters; one folktale set).
+
 ### motif-text-embedding-eval · how to embed motifs for text matching
 A grid experiment (a Python harness, not an HTML page) over Ashliman's ATU-tagged
 tales: measures recall@k / MRR for motif embeddings composed as name / +summary /

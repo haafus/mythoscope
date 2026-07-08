@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapter detector — corpus coverage</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         color: #212529; background: #faf9f5; }
+  header { padding: 12px 18px; border-bottom: 1px solid #dee2e6; background: #fff;
+           display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  header h1 { font-size: 15px; font-weight: 700; }
+  header .sub { color: #6c757d; font-size: 12px; }
+  #summary { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-size: 11px; padding: 3px 8px; border-radius: 20px; border: 1px solid #dee2e6;
+          background: #fff; color: #495057; }
+  .chip b { font-weight: 700; }
+  main { display: grid; grid-template-columns: 340px 1fr; height: calc(100vh - 53px); }
+  #list { overflow-y: auto; border-right: 1px solid #dee2e6; background: #fff;
+          overscroll-behavior: contain; }
+  .book { padding: 9px 14px; border-bottom: 1px solid #f1f3f5; cursor: pointer; display: flex;
+          align-items: center; gap: 8px; }
+  .book:hover { background: #f4f7fb; }
+  .book.active { background: #e9f0f7; }
+  .book .bt { flex: 1; min-width: 0; }
+  .book .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .book .trad { color: #9299a1; font-size: 11px; }
+  .book .cnt { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px; }
+  .mtag { font-size: 10px; padding: 1px 6px; border-radius: 4px; text-transform: uppercase;
+          letter-spacing: .03em; font-weight: 700; color: #fff; }
+  .m-keyword  { background: #2f6fed; }
+  .m-contents { background: #12a150; }
+  .m-roman    { background: #9151d8; }
+  .m-allcaps  { background: #d97706; }
+  .m-numbered { background: #6b7280; }
+  .m-none     { background: #cbd0d6; color: #495057; }
+  #detail { overflow-y: auto; padding: 20px 26px 48px; overscroll-behavior: contain; }
+  #detail h2 { font-size: 17px; }
+  #detail .meta { color: #6c757d; font-size: 12px; margin: 3px 0 14px; }
+  #detail .meta a { color: #2f6fed; }
+  .counts { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 18px; }
+  details.head { margin: 6px 0 18px; border: 1px solid #e9ecef; border-radius: 8px; background: #fbfcfd; }
+  details.head summary { cursor: pointer; padding: 8px 12px; font-size: 12px; color: #6c757d; }
+  details.head pre { padding: 0 12px 12px; font: 11.5px/1.45 ui-monospace, Menlo, monospace;
+                     white-space: pre-wrap; color: #495057; max-height: 300px; overflow: auto; }
+  .ch { padding: 7px 10px; border-bottom: 1px solid #f1f3f5; display: flex; gap: 12px; align-items: baseline; }
+  .ch:hover { background: #f8fafc; }
+  .ch .ln { color: #adb5bd; font-variant-numeric: tabular-nums; font-size: 11px; flex: 0 0 52px; }
+  .ch .ct { flex: 0 0 240px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ch .cp { flex: 1; color: #868e96; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty { color: #9299a1; padding: 40px 0; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Chapter detector</h1>
+  <span class="sub">layered heading heuristics over the raw Gutenberg corpus — coverage probe</span>
+  <div id="summary"></div>
+</header>
+<main>
+  <div id="list"></div>
+  <div id="detail"><div class="empty">Select a book.</div></div>
+</main>
+<script src="data.js"></script>
+<script>
+const D = (window.DATA && DATA.books) || [];
+const esc = s => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const METHODS = ["keyword","contents","roman","allcaps","numbered","none"];
+
+// summary chips: how many books each winning method covered
+const tally = {};
+D.forEach(b => tally[b.method] = (tally[b.method]||0) + 1);
+document.getElementById("summary").innerHTML =
+  `<span class="chip"><b>${D.length}</b> books</span>` +
+  METHODS.filter(m => tally[m]).map(m =>
+    `<span class="chip"><span class="mtag m-${m}">${m}</span> <b>${tally[m]}</b></span>`).join("");
+
+const list = document.getElementById("list");
+list.innerHTML = D.map((b,i) =>
+  `<div class="book" data-i="${i}">
+     <div class="bt"><div class="name">${esc(b.title)}</div><div class="trad">${esc(b.tradition)}</div></div>
+     <span class="mtag m-${b.method}">${b.method}</span>
+     <span class="cnt">${b.chapters.length}</span>
+   </div>`).join("");
+
+function show(i){
+  const b = D[i];
+  document.querySelectorAll(".book").forEach(el => el.classList.toggle("active", +el.dataset.i===i));
+  const counts = METHODS.filter(m => b.counts[m]).map(m =>
+    `<span class="chip"><span class="mtag m-${m}">${m}</span> <b>${b.counts[m]}</b> candidates</span>`).join("");
+  const rows = b.chapters.length
+    ? b.chapters.map(c =>
+        `<div class="ch"><span class="ln">L${c.line}</span>`+
+        `<span class="ct">${esc(c.title)}</span>`+
+        `<span class="cp">${esc(c.preview)}</span></div>`).join("")
+    : `<div class="empty">No headings detected by any strategy.</div>`;
+  document.getElementById("detail").innerHTML =
+    `<h2>${esc(b.title)}</h2>`+
+    `<div class="meta">${esc(b.tradition)} · ${b.lines.toLocaleString()} lines · `+
+      `${(b.bytes/1024|0).toLocaleString()} KB · winning: <span class="mtag m-${b.method}">${b.method}</span> · `+
+      `<a href="${esc(b.url)}" target="_blank" rel="noopener">Gutenberg #${b.id}</a></div>`+
+    `<div class="counts">${counts||'<span class="chip">no candidates</span>'}</div>`+
+    `<details class="head"><summary>First 45 lines (spot the Contents block / heading style)</summary>`+
+      `<pre>${esc(b.headPreview)}</pre></details>`+
+    `<div class="chapters">${rows}</div>`;
+  document.getElementById("detail").scrollTop = 0;
+}
+
+list.addEventListener("click", e => { const el = e.target.closest(".book"); if (el) show(+el.dataset.i); });
+if (D.length) show(0);
+</script>
+</body>
+</html>
