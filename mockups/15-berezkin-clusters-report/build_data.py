@@ -18,7 +18,7 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from scipy.spatial import ConvexHull, QhullError
+from scipy.spatial import ConvexHull, Delaunay, QhullError
 from sklearn.cluster import DBSCAN
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -48,20 +48,71 @@ def _ring(cx, cy, r, n=18):
              round(cy + r * math.sin(2 * math.pi * i / n), 2)] for i in range(n)]
 
 
-def _buffer_hull(pts, pad):
-    c = pts.mean(axis=0)
-    try:
-        verts = pts[ConvexHull(pts).vertices]
-    except (QhullError, ValueError):          # collinear / degenerate
-        r = float(np.max(np.linalg.norm(pts - c, axis=1))) + pad
-        return _ring(c[0], c[1], max(r, pad))
+def _offset(ring, pad):
+    """Push each vertex outward along the mean of its adjacent edge normals so the
+    contour encloses the boundary points with a little padding (concave-safe)."""
+    n = len(ring)
+    area = sum(ring[i][0] * ring[(i + 1) % n][1] - ring[(i + 1) % n][0] * ring[i][1] for i in range(n))
+    if area < 0:                               # force CCW so the right-hand normal is outward
+        ring = ring[::-1]
     out = []
-    for v in verts:                            # push each vertex outward from centroid
-        d = v - c
-        n = np.linalg.norm(d) or 1.0
-        p = c + d + (d / n) * pad
-        out.append([round(float(p[0]), 2), round(float(p[1]), 2)])
+    for i in range(n):
+        a, p, b = ring[i - 1], ring[i], ring[(i + 1) % n]
+        def rnorm(u, v):
+            dx, dy = v[0] - u[0], v[1] - u[1]
+            L = math.hypot(dx, dy) or 1.0
+            return (dy / L, -dx / L)           # right normal (outward for CCW)
+        nx, ny = rnorm(a, p)[0] + rnorm(p, b)[0], rnorm(a, p)[1] + rnorm(p, b)[1]
+        L = math.hypot(nx, ny) or 1.0
+        out.append([round(p[0] + nx / L * pad, 2), round(p[1] + ny / L * pad, 2)])
     return out
+
+
+def _circumradius(a, b, c):
+    d = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+    if abs(d) < 1e-9:
+        return float("inf")
+    a2, b2, c2 = a[0]**2 + a[1]**2, b[0]**2 + b[1]**2, c[0]**2 + c[1]**2
+    ux = (a2 * (b[1] - c[1]) + b2 * (c[1] - a[1]) + c2 * (a[1] - b[1])) / d
+    uy = (a2 * (c[0] - b[0]) + b2 * (a[0] - c[0]) + c2 * (b[0] - a[0])) / d
+    return math.hypot(ux - a[0], uy - a[1])
+
+
+def _alpha_rings(P, alpha):
+    """Boundary loops of the alpha-complex: Delaunay triangles with circumradius <=
+    alpha are 'solid'; edges on exactly one solid triangle are the boundary; stitch
+    them into closed rings. Hugs points; ocean-spanning triangles are dropped."""
+    tri = Delaunay(P)
+    edge_ct = Counter()
+    for s in tri.simplices:
+        if _circumradius(P[s[0]], P[s[1]], P[s[2]]) <= alpha:
+            for e in ((s[0], s[1]), (s[1], s[2]), (s[2], s[0])):
+                edge_ct[frozenset(e)] += 1
+    bedges = [tuple(e) for e, n in edge_ct.items() if n == 1]
+    if not bedges:
+        return []
+    adj = {}
+    for i, j in bedges:
+        adj.setdefault(i, set()).add(j)
+        adj.setdefault(j, set()).add(i)
+    key = lambda a, b: (a, b) if a < b else (b, a)
+    used, rings = set(), []
+    for i0, j0 in bedges:
+        if key(i0, j0) in used:
+            continue
+        ring, used_add = [i0], used.add
+        used_add(key(i0, j0))
+        prev, cur = i0, j0
+        while cur != i0:
+            ring.append(cur)
+            nxt = next((x for x in adj[cur] if x != prev and key(cur, x) not in used), None)
+            if nxt is None:
+                break
+            used_add(key(cur, nxt))
+            prev, cur = cur, nxt
+        if cur == i0 and len(ring) >= 3:
+            rings.append([[round(float(P[k][0]), 2), round(float(P[k][1]), 2)] for k in ring])
+    return rings
 
 
 def _chaikin(poly, iters=2):
@@ -75,22 +126,30 @@ def _chaikin(poly, iters=2):
     return poly
 
 
-def cluster_blobs(points, eps=25.0, pad=3.5):
-    """points: list of {x:lon, y:lat}. Returns ONE smoothed ring enclosing the whole
-    cluster. Only truly isolated strays are dropped first (DBSCAN noise at a generous
-    eps), so a lone outlier can't stretch the contour, but genuine sub-groups on
-    different continents are still enclosed by the single hull."""
+def cluster_blobs(points, eps=25.0, alpha=17.0, pad=2.4):
+    """points: list of {x:lon, y:lat}. Returns concave (alpha-shape) contours that hug
+    the points: a contiguous region becomes one contour, groups genuinely separated by
+    ocean get their own tight contour. Isolated strays are dropped first."""
     if not points:
         return []
     P = np.array([[p["x"], p["y"]] for p in points], dtype=float)
     if len(P) >= 4:
         labels = DBSCAN(eps=eps, min_samples=2).fit(P).labels_
         kept = P[labels != -1]
-        if len(kept) >= 3:
+        if len(kept) >= 4:
             P = kept
-    if len(P) < 3:
-        return [_chaikin(_ring(P[:, 0].mean(), P[:, 1].mean(), pad + 1))]
-    return [_chaikin(_buffer_hull(P, pad))]
+    if len(P) < 4:
+        return [_chaikin(_ring(P[:, 0].mean(), P[:, 1].mean(), pad + 2))]
+    try:
+        rings = _alpha_rings(P, alpha)
+    except (QhullError, ValueError):
+        rings = []
+    if not rings:                              # fallback: convex hull
+        try:
+            rings = [[[round(float(x), 2), round(float(y), 2)] for x, y in P[ConvexHull(P).vertices]]]
+        except (QhullError, ValueError):
+            rings = [_ring(P[:, 0].mean(), P[:, 1].mean(), pad + 2)]
+    return [_chaikin(_offset(r, pad)) for r in rings if len(r) >= 3]
 
 
 # 14 distinct cluster colours (fixed order)
