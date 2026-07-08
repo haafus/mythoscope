@@ -8,6 +8,7 @@
 config/          — статические конфиги, шаблоны, models.json, corpus.json
 outputs/         — всё, что генерируется при запуске (corpus, embeddings, projections, …)
 src/             — исходный код (все Python-пакеты, settings.py, main.py, cli.py)
+scripts/         — офлайн/разовые скрипты вне mytho-пайплайна (см. scripts/README.md)
 docs/            — документация (motifs/, research/, reviews/, paper/)
 mockups/         — автономные прототипы фич поверх индексов мотивов (self-contained HTML)
 tests/           — тесты
