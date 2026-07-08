@@ -150,7 +150,7 @@ function renderMarkers(map, traditions) {
                 .addTo(map)
                 .bindPopup(buildPopupHtml(item), {
                     className: "tradition-popup",
-                    closeButton: true,
+                    closeButton: false,
                     maxWidth: 340,
                 });
 
