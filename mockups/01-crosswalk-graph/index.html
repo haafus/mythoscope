@@ -365,7 +365,7 @@ function tick(){
 }
 
 function toScreen(n){ return { x:(n.px-cv.clientWidth/2)*view.k+view.x, y:(n.py-cv.clientHeight/2)*view.k+view.y }; }
-function nodeR(n){ return (n.id===focusId?9:4.5+Math.min(5,Math.sqrt(gdeg.get(n.id))))*Math.sqrt(view.k); }
+function nodeR(n){ return (n.id===focusId?10:4+Math.min(8,Math.sqrt(gdeg.get(n.id))*1.2))*Math.sqrt(view.k); }
 
 function draw(){
   ctx.clearRect(0,0,cv.clientWidth,cv.clientHeight);
