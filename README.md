@@ -14,12 +14,10 @@ parallels at scale.
 
 ### Documentation
 
-A map of the docs — each entry is a section with its own README for deeper navigation.
-
 - **[How to](docs/how_to.md)** — setup, CLI, and the end-to-end pipeline. Start here.
-- **[Motif indexes](docs/motifs/)** — how TMI, ATU and Berezkin are sourced, parsed and cross-linked.
 - **[Research context](docs/research/)** — surveys of the field this sits in (computational folkloristics, motif induction).
-- **[Paper](docs/paper/)** — the working draft and bibliography.
+- **[Motif indexes](docs/motifs/)** — how TMI, ATU and Berezkin are sourced, parsed and cross-linked.
+- **[Paper](docs/paper/)** — the working paper draft and bibliography.
 - **[Reviews](docs/reviews/)** — point-in-time code audits.
 - **[Mockups](mockups/)** — standalone feature prototypes over the motif data.
 
