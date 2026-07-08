@@ -141,10 +141,13 @@ def main():
             continue
         body = strip_boilerplate(raw)
         ti = tinfo.get(b["tradition"], {"major": "Other", "color": "#6b7280"})
+        # a short opening preview (public-domain text) for the detail page's reader stub
+        excerpt = re.sub(r"\s+", " ", body[:520]).strip()
         books.append({
             "title": b["title"], "tradition": b["tradition"], "major": ti["major"],
             "color": ti["color"], "desc": b.get("description", ""),
             "words": count_words(body), "sentences": count_sentences(body), "chars": len(body),
+            "excerpt": excerpt + "…",
         })
         corpus_texts.append(body)
 

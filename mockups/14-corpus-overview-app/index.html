@@ -5,18 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sources · MythoScope</title>
 <style>
-  /* ---- app design tokens (mirrors src/server/web/assets/app.css) ---- */
   :root { --border:#dee2e6; --accent:#2f6fed; --muted:#6c757d; --muted-soft:#9299a1;
           --content-max:1680px; --page-gutter:20px; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing:border-box; margin:0; padding:0; }
   html { background:#faf9f5; }
-  body { color:#212529; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body { color:#212529; font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-  /* ---- navbar ---- */
+  /* navbar */
   .main-navbar { display:flex; justify-content:space-between; align-items:center; gap:16px 28px;
                  width:100%; max-width:var(--content-max); margin:0 auto; padding:10px var(--page-gutter); }
-  .nav-logo { font-weight:800; font-size:20px; letter-spacing:-.01em; color:#2c3440; }
-  .nav-logo span { color:#4f7096; }
+  .nav-logo a { display:flex; align-items:center; text-decoration:none; }
+  .nav-logo img { display:block; height:46px; width:auto; object-fit:contain; }
   .nav-links { display:flex; align-items:center; justify-content:flex-end; gap:4px 6px; flex-wrap:wrap; }
   .nav-links a { text-decoration:none; color:#7c828b; font-size:12.5px; letter-spacing:.11em;
                  text-transform:uppercase; padding:7px 13px; border-radius:6px; white-space:nowrap; }
@@ -25,48 +24,72 @@
   .nav-links a.nav-info { font-family:Georgia, serif; font-style:italic; font-size:22px; letter-spacing:0;
                           text-transform:none; padding:2px 10px; line-height:1; }
 
-  /* ---- page shell ---- */
-  .container { width:100%; max-width:1180px; margin:0 auto; padding:14px var(--page-gutter) 60px; }
-  .page-head { margin:6px 0 18px; }
-  .page-head h1 { font-size:22px; font-weight:750; letter-spacing:-.01em; }
-  .page-head p { color:var(--muted); font-size:13px; margin-top:3px; }
+  /* workspace: persistent sidebar + main */
+  .container { width:100%; max-width:1400px; margin:0 auto; padding:8px var(--page-gutter) 50px; }
+  .workspace { display:grid; grid-template-columns:264px minmax(0,1fr); gap:20px; align-items:start; }
+  @media (max-width:820px){ .workspace { grid-template-columns:1fr; } }
+  .library-sidebar { position:sticky; top:12px; max-height:calc(100vh - 24px); overflow-y:auto; overscroll-behavior:contain; padding-right:4px; }
 
-  .card { background:#fff; border:1px solid var(--border); border-radius:8px;
-          box-shadow:0 1px 3px rgba(0,0,0,.03); padding:16px 18px; }
-  .card-h { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
-            color:var(--muted-soft); margin-bottom:12px; }
+  /* library tree (mirrors app.css) */
+  .ov-link { width:100%; text-align:left; border:0; background:#eef3f4; color:#2f343b; cursor:pointer;
+             font:inherit; font-weight:700; font-size:13.5px; padding:9px 12px; border-radius:7px; margin-bottom:14px; }
+  .ov-link.active { background:#e2edf0; color:#111; }
+  .major-section { margin-bottom:12px; }
+  .major-title { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px;
+                 border:0; border-bottom:1px solid #eceff1; background:transparent; color:#2f343b; cursor:pointer;
+                 font:inherit; font-size:15px; font-weight:700; padding:7px 4px 6px; text-align:left; }
+  .major-title::after { content:"\25be"; color:#b0b7be; font-size:13px; line-height:1; }
+  .major-section.collapsed .major-title::after { content:"\25b8"; }
+  .major-section.collapsed .major-body { display:none; }
+  .tradition-title { width:100%; display:grid; grid-template-columns:10px minmax(0,1fr) 14px; align-items:center;
+                     gap:8px; border:0; border-radius:4px; background:transparent; color:#3f4650; cursor:pointer;
+                     font:inherit; font-size:13.5px; font-weight:650; padding:5px 6px; text-align:left; }
+  .tradition-title:hover { background:#eef3f4; color:#111; }
+  .tradition-group.open > .tradition-title { color:#111; }
+  .tradition-dot { width:10px; height:10px; border-radius:50%; background:var(--tradition-color,#6b7280); box-shadow:0 0 0 1px rgba(17,24,39,.12); }
+  .tradition-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tradition-toggle { color:#a7afb7; font-size:10px; line-height:1; text-align:right; }
+  .document-list { display:none; list-style:none; padding:1px 0 4px 17px; }
+  .tradition-group.open .document-list { display:block; }
+  .document-button { width:100%; border:0; border-radius:4px; background:transparent; color:var(--muted-soft);
+                     cursor:pointer; font:inherit; font-size:12.5px; line-height:1.25; padding:5px 7px; text-align:left;
+                     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .document-button:hover { color:#111; background:#f4f6f7; }
+  .document-button.active { color:#111; background:#e2edf0; }
+
+  /* shared surfaces */
+  .card { background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.03); padding:16px 18px; }
+  .card-h { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted-soft); margin-bottom:12px; }
   .card .note { font-size:11px; color:#a2a9b0; margin-top:10px; }
   .grid { display:grid; gap:16px; }
   .stats { grid-template-columns:repeat(5,1fr); margin-bottom:16px; }
   .two { grid-template-columns:1fr 1fr; margin-bottom:16px; }
-  @media (max-width:860px){ .two,.stats { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:1000px){ .two,.stats { grid-template-columns:repeat(2,1fr); } }
+  .page-head { margin:2px 0 16px; }
+  .page-head h1 { font-size:22px; font-weight:750; letter-spacing:-.01em; }
+  .page-head p { color:var(--muted); font-size:13px; margin-top:3px; }
 
-  /* ---- stat tiles (app .stat-card) ---- */
   .stat { border:1px solid #e1e6eb; border-radius:8px; background:#fafbfc; padding:13px 14px; }
-  .stat .v { color:#111; font-size:25px; font-weight:750; line-height:1.1; letter-spacing:-.01em;
-             font-variant-numeric:tabular-nums; }
+  .stat .v { color:#111; font-size:24px; font-weight:750; line-height:1.1; letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
   .stat .l { margin-top:4px; color:var(--muted); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
 
-  /* ---- horizontal bars ---- */
   .bar-row { display:flex; align-items:center; gap:10px; margin:5px 0; }
-  .bar-row .name { flex:0 0 132px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+  .bar-row .name { flex:0 0 128px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
   .bar-row .track { flex:1; height:15px; background:#f1f0ea; border-radius:4px; overflow:hidden; }
   .bar-row .fill { display:block; height:100%; border-radius:4px 0 0 4px; }
   .bar-row .val { flex:0 0 92px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; font-size:12px; }
-
   .sizes { max-height:300px; overflow-y:auto; overscroll-behavior:contain; }
-  .sz { display:flex; align-items:center; gap:8px; margin:2px 0; }
+  .sz { display:flex; align-items:center; gap:8px; margin:2px 0; cursor:pointer; border-radius:4px; padding:1px 3px; }
+  .sz:hover { background:#f7f5ef; }
   .sz .dot { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
   .sz .n { flex:0 0 168px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12.5px; }
   .sz .t { flex:1; height:9px; background:#f1f0ea; border-radius:3px; overflow:hidden; }
   .sz .f { display:block; height:100%; }
   .sz .w { flex:0 0 64px; text-align:right; color:var(--muted-soft); font-variant-numeric:tabular-nums; font-size:11.5px; }
 
-  /* ---- heatmap ---- */
   .hm-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .toggle { display:inline-flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
-  .toggle button { border:0; background:#f3f5f8; padding:6px 12px; font:inherit; font-size:12px; font-weight:600;
-                   cursor:pointer; color:var(--muted); }
+  .toggle button { border:0; background:#f3f5f8; padding:6px 12px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; color:var(--muted); }
   .toggle button + button { border-left:1px solid var(--border); }
   .toggle button.on { background:#e2edf0; color:#3a5e86; }
   .toggle button:hover:not(.on) { background:#4f7096; color:#fff; }
@@ -74,22 +97,34 @@
   .hm-legend { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted-soft); margin-top:10px; }
   .hm-legend .ramp { width:120px; height:10px; border-radius:3px; background:linear-gradient(90deg,#eef6f5,#0e5c54); }
 
-  /* ---- catalogue ---- */
   table { width:100%; border-collapse:collapse; font-size:12.5px; }
   th, td { text-align:left; padding:7px 8px; border-bottom:1px solid #f0ede6; }
   th { font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted-soft); cursor:pointer; user-select:none; }
   th.num, td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  #catalog tbody tr { cursor:pointer; }
   tbody tr:hover { background:#f7f5ef; }
   td .cdot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
   .muted { color:var(--muted-soft); }
 
-  .tip { position:fixed; z-index:40; pointer-events:none; background:#111827; color:#fff;
-         padding:6px 9px; border-radius:6px; font-size:11.5px; max-width:260px; display:none; line-height:1.4; }
+  /* detail page */
+  .detail-head { display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
+  .detail-head .dot { width:12px; height:12px; border-radius:50%; flex:0 0 auto; align-self:center; }
+  .detail-head h1 { font-size:22px; font-weight:750; letter-spacing:-.01em; }
+  .detail-sub { color:var(--muted); font-size:13px; margin-bottom:16px; }
+  .detail-grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  .desc-h { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted-soft); margin-bottom:6px; }
+  .desc { color:#374151; font-size:13.5px; }
+  .reader { margin-top:16px; }
+  .reader .excerpt { font-family:Georgia,"Times New Roman",serif; font-size:15px; line-height:1.65; color:#2b2f36; }
+  .reader .stub { margin-top:12px; font-size:12px; color:#a2a9b0; border-top:1px solid #f0ede6; padding-top:10px; }
+  .link { color:#3a5e86; cursor:pointer; }
+
+  .tip { position:fixed; z-index:40; pointer-events:none; background:#111827; color:#fff; padding:6px 9px; border-radius:6px; font-size:11.5px; max-width:260px; display:none; line-height:1.4; }
 </style>
 </head>
 <body>
 <header class="main-navbar">
-  <div class="nav-logo">Mytho<span>Scope</span></div>
+  <div class="nav-logo"><a href="#/about"><img src="logo.png" alt="MythoScope"></a></div>
   <nav class="nav-links">
     <a href="#/corpus" class="active">Sources</a>
     <a href="#/embeddings">Similarity</a>
@@ -103,92 +138,114 @@
 </header>
 
 <div class="container">
-  <div class="page-head">
-    <h1>Sources</h1>
-    <p>28 sacred &amp; mythological texts across world traditions — scale, composition, and how they relate.</p>
-  </div>
-
-  <div class="grid stats" id="stats"></div>
-
-  <div class="grid two">
-    <div class="card">
-      <div class="card-h">Composition by macro-area</div>
-      <div id="areas"></div>
-      <div class="note">Bar = total words; the corpus leans on a few large scriptural traditions.</div>
-    </div>
-    <div class="card">
-      <div class="card-h">Size of each text</div>
-      <div class="sizes" id="sizes"></div>
-      <div class="note">Linear scale — lengths span ~3 orders of magnitude, so a single text can dwarf the rest.</div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <div class="hm-head">
-      <div class="card-h" style="margin:0">Text-similarity heatmap</div>
-      <div class="toggle" id="hmToggle">
-        <button data-k="tradition" class="on">Traditions</button>
-        <button data-k="text">Texts</button>
-      </div>
-    </div>
-    <div class="hm-wrap"><div id="heat"></div></div>
-    <div class="hm-legend"><span>less similar</span><span class="ramp"></span><span>more similar</span>
-      <span style="margin-left:auto">Rows reordered by hierarchical clustering (seriation)</span></div>
-    <div class="note">TF-IDF cosine over the full texts — a model-free, lexical stand-in for the pipeline's
-      BGE-M3 semantic distances. Colour is normalised to the observed off-diagonal range for contrast.</div>
-  </div>
-
-  <div class="card">
-    <div class="card-h">All texts</div>
-    <table id="catalog"><thead><tr>
-      <th data-s="title">Title</th><th data-s="tradition">Tradition</th>
-      <th data-s="major">Macro-area</th><th class="num" data-s="words">Words</th>
-      <th class="num" data-s="sentences">Sentences</th>
-    </tr></thead><tbody></tbody></table>
+  <div class="workspace">
+    <aside class="library-sidebar"><div class="library-tree" id="tree"></div></aside>
+    <main id="main"></main>
   </div>
 </div>
 <div class="tip" id="tip"></div>
+
 <script src="data.js"></script>
 <script>
 const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const tip = document.getElementById("tip");
+const tip = document.getElementById("tip"), main = document.getElementById("main");
 const fmt = n => n>=1e6 ? (n/1e6).toFixed(1)+"M" : n>=1e3 ? (n/1e3).toFixed(n<1e4?1:0)+"k" : ""+n;
 const full = n => n.toLocaleString();
 function showTip(html,e){ tip.innerHTML=html; tip.style.display="block";
   tip.style.left=Math.min(e.clientX+14, innerWidth-tip.offsetWidth-8)+"px"; tip.style.top=(e.clientY+12)+"px"; }
 function hideTip(){ tip.style.display="none"; }
+const bookId = b => b.title;
 
-document.getElementById("stats").innerHTML = [
-  ["Texts", D.stats.texts], ["Traditions", D.stats.traditions], ["Macro-areas", D.stats.areas],
-  ["Words", fmt(D.stats.words)], ["Sentences", fmt(D.stats.sentences)],
-].map(([l,v])=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+// ---- sidebar tree: macro-area -> tradition -> books ----
+function buildTree(){
+  const majors = {};
+  D.areas.forEach(a => majors[a.name] = {});          // macro-areas ordered by size
+  D.books.forEach(b => { (majors[b.major] ??= {}); (majors[b.major][b.tradition] ??= []).push(b); });
+  let html = `<button class="ov-link active" id="ovLink">◧ Corpus overview</button>`;
+  for (const [major, trads] of Object.entries(majors)){
+    html += `<section class="major-section"><button class="major-title">${esc(major)}</button><div class="major-body">`;
+    for (const [trad, books] of Object.entries(trads)){
+      const color = books[0].color;
+      html += `<div class="tradition-group open"><button class="tradition-title" style="--tradition-color:${color}">`+
+        `<span class="tradition-dot"></span><span class="tradition-name">${esc(trad)}</span><span class="tradition-toggle">▾</span></button>`+
+        `<ul class="document-list">`+
+        books.map(b=>`<li><button class="document-button" data-id="${esc(bookId(b))}" title="${esc(b.title)}">${esc(b.title)}</button></li>`).join("")+
+        `</ul></div>`;
+    }
+    html += `</div></section>`;
+  }
+  const tree = document.getElementById("tree");
+  tree.innerHTML = html;
+  tree.querySelector("#ovLink").addEventListener("click", showOverview);
+  tree.querySelectorAll(".major-title").forEach(b=>b.addEventListener("click",()=>b.closest(".major-section").classList.toggle("collapsed")));
+  tree.querySelectorAll(".tradition-title").forEach(b=>b.addEventListener("click",()=>b.closest(".tradition-group").classList.toggle("open")));
+  tree.querySelectorAll(".document-button").forEach(b=>b.addEventListener("click",()=>{
+    showDetail(D.books.find(x=>bookId(x)===b.dataset.id));
+  }));
+}
+function setActive(id){
+  document.getElementById("ovLink").classList.toggle("active", id===null);
+  document.querySelectorAll(".document-button").forEach(b=>b.classList.toggle("active", b.dataset.id===id));
+}
 
-const amax = Math.max(...D.areas.map(a=>a.words));
-document.getElementById("areas").innerHTML = D.areas.map(a=>
-  `<div class="bar-row"><span class="name">${esc(a.name)}</span>`+
-  `<span class="track"><span class="fill" style="width:${100*a.words/amax}%;background:${a.color}"></span></span>`+
-  `<span class="val">${fmt(a.words)} · ${a.texts} txt</span></div>`).join("");
+// ---- overview view ----
+function showOverview(){
+  setActive(null);
+  main.innerHTML = `
+    <div class="page-head"><h1>Sources</h1>
+      <p>28 sacred &amp; mythological texts across world traditions — scale, composition, and how they relate.</p></div>
+    <div class="grid stats" id="stats"></div>
+    <div class="grid two">
+      <div class="card"><div class="card-h">Composition by macro-area</div><div id="areas"></div>
+        <div class="note">Bar = total words; the corpus leans on a few large scriptural traditions.</div></div>
+      <div class="card"><div class="card-h">Size of each text</div><div class="sizes" id="sizes"></div>
+        <div class="note">Linear scale — lengths span ~3 orders of magnitude, so a single text can dwarf the rest.</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="hm-head"><div class="card-h" style="margin:0">Text-similarity heatmap</div>
+        <div class="toggle" id="hmToggle"><button data-k="tradition" class="on">Traditions</button><button data-k="text">Texts</button></div></div>
+      <div class="hm-wrap"><div id="heat"></div></div>
+      <div class="hm-legend"><span>less similar</span><span class="ramp"></span><span>more similar</span>
+        <span style="margin-left:auto">Rows reordered by hierarchical clustering (seriation)</span></div>
+      <div class="note">TF-IDF cosine over the full texts — a model-free, lexical stand-in for the pipeline's BGE-M3 semantic distances.</div></div>
+    <div class="card"><div class="card-h">All texts</div>
+      <table id="catalog"><thead><tr><th data-s="title">Title</th><th data-s="tradition">Tradition</th>
+        <th data-s="major">Macro-area</th><th class="num" data-s="words">Words</th><th class="num" data-s="sentences">Sentences</th></tr></thead><tbody></tbody></table></div>`;
+  window.scrollTo(0,0);
 
-const byWords=[...D.books].sort((x,y)=>y.words-x.words), wmax=byWords[0].words;
-document.getElementById("sizes").innerHTML = byWords.map(b=>
-  `<div class="sz"><span class="dot" style="background:${b.color}"></span>`+
-  `<span class="n">${esc(b.title)}</span>`+
-  `<span class="t"><span class="f" style="width:${Math.max(0.6,100*b.words/wmax)}%;background:${b.color}"></span></span>`+
-  `<span class="w">${fmt(b.words)}</span></div>`).join("");
-document.querySelectorAll("#sizes .sz").forEach((el,i)=>{
-  el.addEventListener("mousemove",e=>{const b=byWords[i];
-    showTip(`<b>${esc(b.title)}</b><br>${esc(b.tradition)} · ${full(b.words)} words · ${full(b.sentences)} sentences`,e);});
-  el.addEventListener("mouseleave",hideTip);
-});
+  document.getElementById("stats").innerHTML = [
+    ["Texts", D.stats.texts], ["Traditions", D.stats.traditions], ["Macro-areas", D.stats.areas],
+    ["Words", fmt(D.stats.words)], ["Sentences", fmt(D.stats.sentences)],
+  ].map(([l,v])=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  const amax=Math.max(...D.areas.map(a=>a.words));
+  document.getElementById("areas").innerHTML = D.areas.map(a=>
+    `<div class="bar-row"><span class="name">${esc(a.name)}</span>`+
+    `<span class="track"><span class="fill" style="width:${100*a.words/amax}%;background:${a.color}"></span></span>`+
+    `<span class="val">${fmt(a.words)} · ${a.texts} txt</span></div>`).join("");
+
+  const byWords=[...D.books].sort((x,y)=>y.words-x.words), wmax=byWords[0].words;
+  document.getElementById("sizes").innerHTML = byWords.map(b=>
+    `<div class="sz" data-id="${esc(bookId(b))}"><span class="dot" style="background:${b.color}"></span>`+
+    `<span class="n">${esc(b.title)}</span>`+
+    `<span class="t"><span class="f" style="width:${Math.max(0.6,100*b.words/wmax)}%;background:${b.color}"></span></span>`+
+    `<span class="w">${fmt(b.words)}</span></div>`).join("");
+  document.querySelectorAll("#sizes .sz").forEach((el,i)=>{
+    el.addEventListener("mousemove",e=>{const b=byWords[i];
+      showTip(`<b>${esc(b.title)}</b><br>${esc(b.tradition)} · ${full(b.words)} words`,e);});
+    el.addEventListener("mouseleave",hideTip);
+    el.addEventListener("click",()=>showDetail(byWords[i]));
+  });
+
+  wireHeat(); renderTable();
+}
 
 let hmKind="tradition";
-function ramp(t){ const a=[238,246,245], b=[14,92,84];
-  const c=a.map((x,i)=>Math.round(x+(b[i]-x)*t)); return `rgb(${c[0]},${c[1]},${c[2]})`; }
+function ramp(t){ const a=[238,246,245], b=[14,92,84]; const c=a.map((x,i)=>Math.round(x+(b[i]-x)*t)); return `rgb(${c[0]},${c[1]},${c[2]})`; }
 function clip(s){ return s.length>18 ? s.slice(0,17)+"…" : s; }
 function drawHeat(){
   const H=D.heat[hmKind], n=H.order.length, sim=H.sim, ord=H.order;
-  let lo=1, hi=0;
-  for(let i=0;i<n;i++)for(let j=0;j<n;j++) if(i!==j){ lo=Math.min(lo,sim[i][j]); hi=Math.max(hi,sim[i][j]); }
+  let lo=1,hi=0; for(let i=0;i<n;i++)for(let j=0;j<n;j++) if(i!==j){ lo=Math.min(lo,sim[i][j]); hi=Math.max(hi,sim[i][j]); }
   const span=hi-lo||1, cell=hmKind==="tradition"?20:16, lab=132;
   let h=`<svg width="${lab+n*cell+4}" height="${lab+n*cell+4}" font-size="10" font-family="inherit">`;
   ord.forEach((oi,c)=>{ const x=lab+c*cell+cell/2;
@@ -196,8 +253,7 @@ function drawHeat(){
   ord.forEach((ri,r)=>{
     h+=`<text x="${lab-6}" y="${lab+r*cell+cell/2+3}" text-anchor="end" fill="#4a545c">${esc(clip(H.labels[ri]))}</text>`;
     h+=`<rect x="${lab-3}" y="${lab+r*cell+2}" width="2.5" height="${cell-4}" fill="${H.colors[ri]}"/>`;
-    ord.forEach((ci,c)=>{ const v=sim[ri][ci], t=ri===ci?1:(v-lo)/span;
-      const fill=ri===ci?"#e2edf0":ramp(Math.max(0,Math.min(1,t)));
+    ord.forEach((ci,c)=>{ const v=sim[ri][ci], t=ri===ci?1:(v-lo)/span; const fill=ri===ci?"#e2edf0":ramp(Math.max(0,Math.min(1,t)));
       h+=`<rect class="hc" data-r="${ri}" data-c="${ci}" x="${lab+c*cell}" y="${lab+r*cell}" width="${cell-1}" height="${cell-1}" rx="2" fill="${fill}"/>`; });
   });
   h+=`</svg>`;
@@ -208,26 +264,53 @@ function drawHeat(){
     rect.addEventListener("mouseleave",hideTip);
   });
 }
-document.getElementById("hmToggle").addEventListener("click",e=>{
-  const b=e.target.closest("button"); if(!b)return;
-  hmKind=b.dataset.k; document.querySelectorAll("#hmToggle button").forEach(x=>x.classList.toggle("on",x===b)); drawHeat();
-});
-drawHeat();
+function wireHeat(){
+  document.getElementById("hmToggle").addEventListener("click",e=>{
+    const b=e.target.closest("button"); if(!b)return;
+    hmKind=b.dataset.k; document.querySelectorAll("#hmToggle button").forEach(x=>x.classList.toggle("on",x===b)); drawHeat();
+  });
+  drawHeat();
+}
 
 let sortKey="major", sortDir=1;
 function renderTable(){
-  const rows=[...D.books].sort((a,b)=>{ const x=a[sortKey],y=b[sortKey];
-    return sortDir*(typeof x==="number"?x-y:(""+x).localeCompare(""+y)); });
+  const rows=[...D.books].sort((a,b)=>{ const x=a[sortKey],y=b[sortKey]; return sortDir*(typeof x==="number"?x-y:(""+x).localeCompare(""+y)); });
   document.querySelector("#catalog tbody").innerHTML = rows.map(b=>
-    `<tr><td><b>${esc(b.title)}</b></td>`+
+    `<tr data-id="${esc(bookId(b))}"><td><b>${esc(b.title)}</b></td>`+
     `<td><span class="cdot" style="background:${b.color}"></span>${esc(b.tradition)}</td>`+
-    `<td class="muted">${esc(b.major)}</td>`+
-    `<td class="num">${full(b.words)}</td><td class="num">${full(b.sentences)}</td></tr>`).join("");
+    `<td class="muted">${esc(b.major)}</td><td class="num">${full(b.words)}</td><td class="num">${full(b.sentences)}</td></tr>`).join("");
+  document.querySelectorAll("#catalog tbody tr").forEach(tr=>tr.addEventListener("click",()=>showDetail(D.books.find(x=>bookId(x)===tr.dataset.id))));
+  document.querySelectorAll("#catalog th").forEach(th=>th.addEventListener("click",()=>{
+    const k=th.dataset.s; sortDir = k===sortKey ? -sortDir : (k==="words"||k==="sentences"?-1:1); sortKey=k; renderTable();
+  }));
 }
-document.querySelectorAll("#catalog th").forEach(th=>th.addEventListener("click",()=>{
-  const k=th.dataset.s; sortDir = k===sortKey ? -sortDir : (k==="words"||k==="sentences"?-1:1); sortKey=k; renderTable();
-}));
-renderTable();
+
+// ---- detail view (per text) ----
+function showDetail(b){
+  if (!b) return;
+  setActive(bookId(b));
+  main.innerHTML = `
+    <div class="page-head" style="margin-bottom:14px">
+      <div class="detail-head"><span class="dot" style="background:${b.color}"></span><h1>${esc(b.title)}</h1></div>
+      <div class="detail-sub">${esc(b.major)} · ${esc(b.tradition)}</div>
+    </div>
+    <div class="detail-grid3">
+      <div class="stat"><div class="v">${full(b.words)}</div><div class="l">Words</div></div>
+      <div class="stat"><div class="v">${full(b.sentences)}</div><div class="l">Sentences</div></div>
+      <div class="stat"><div class="v">${fmt(b.chars)}</div><div class="l">Characters</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px"><div class="desc-h">Description</div>
+      <div class="desc">${esc(b.desc)||'<span class="muted">No description.</span>'}</div></div>
+    <div class="card reader"><div class="card-h">Opening</div>
+      <div class="excerpt">${esc(b.excerpt||"")}</div>
+      <div class="stub">In the app this is where the full reader (text + structure) opens.
+        <span class="link" id="backOv">← Back to corpus overview</span></div></div>`;
+  window.scrollTo(0,0);
+  document.getElementById("backOv").addEventListener("click", showOverview);
+}
+
+buildTree();
+showOverview();
 </script>
 </body>
 </html>

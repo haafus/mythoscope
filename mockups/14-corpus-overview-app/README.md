@@ -4,17 +4,22 @@ The corpus overview from [`13-corpus-overview`](../13-corpus-overview/), **re-sk
 in MythoScope's own design system** to show how it would look as the real **Sources**
 page — the one reached by clicking *Sources* in the main nav.
 
-Same data and blocks as #13 (headline stats, composition by macro-area, per-text size
-bars, TF-IDF text-similarity heatmap with seriation, sortable catalogue); the change
-is purely presentational:
+It follows the app's **index-section pattern** — a persistent left sidebar, an
+overview page, and a per-item detail page — exactly like Motifs (overview + motif
+detail). Here the sidebar is the corpus library tree (macro-area → tradition → texts),
+the overview is the dashboard, and clicking a text opens its **detail page**.
 
-- the app **navbar** (MythoScope wordmark + uppercase nav links, *Sources* active),
-- the app **tokens** — beige `#faf9f5` page, `.card` surfaces, `.stat-card` tiles,
-  muted uppercase section headers, the `#4f7096` hover / `#e2edf0` active accents,
-- the toggle restyled as the app's tab control, the table as the app's table style.
+- **Navbar** — the real MythoScope logo (`logo.png`) + uppercase nav links, *Sources* active.
+- **Sidebar** — the app's `library-tree`: collapsible macro-area sections, tradition
+  groups with colour dots, and the texts under each. A "Corpus overview" item sits on top.
+- **Overview** (default) — the #13 dashboard: headline stats, composition by macro-area,
+  per-text size bars, the TF-IDF similarity heatmap (with seriation), and a catalogue.
+  Rows, size bars, and sidebar texts all drill into detail.
+- **Detail** (per text) — colour dot + title, macro-area · tradition, word/sentence/char
+  tiles, the description, and an "Opening" excerpt (public-domain preview) — the stub
+  where the app's full reader (text + structure) would open.
 
-Design tokens mirror `src/server/web/assets/app.css` inline (the mock stays
-self-contained — the logo is a text wordmark since `/assets` isn't served here).
+App tokens mirror `src/server/web/assets/app.css` inline so the mock stays self-contained.
 
 ## Run
 
