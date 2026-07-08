@@ -66,6 +66,8 @@ def main():
         m = min(methods, key=order.index)
         edge_list.append({"s": a, "t": b, "m": m})
 
+    # Every node that takes part in at least one cross-walk edge — the complete
+    # connected set across all three indexes, not a sample.
     node_list = [{"id": n, "x": n.split(":", 1)[0], "c": n.split(":", 1)[1],
                   "n": names.get(n, n.split(":", 1)[1])}
                  for n in sorted(used)]

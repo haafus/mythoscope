@@ -40,6 +40,23 @@
   .focusinfo .fi-id { font-weight: 700; }
   .focusinfo .fi-n { color: #374151; }
   .focusinfo .fi-d { color: #6c757d; font-size: 11px; margin-top: 2px; }
+  .btn { padding: 7px 12px; font-size: 12.5px; border: 1px solid #dee2e6; border-radius: 6px;
+         background: #fff; cursor: pointer; white-space: nowrap; }
+  .btn:hover { background: #eef4fb; }
+  #browse { position: absolute; z-index: 25; top: 60px; right: 12px; width: 344px; max-height: 74vh;
+            background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.1); display: none; flex-direction: column; }
+  #browse .bhead { padding: 8px 10px 6px; font-size: 11px; color: #6c757d; border-bottom: 1px solid #f1f3f5; }
+  .bfilter { display: flex; gap: 4px; padding: 7px 8px; border-bottom: 1px solid #f1f3f5; }
+  .bfilter button { flex: 1; padding: 5px 4px; font-size: 11.5px; border: 1px solid #dee2e6;
+                    border-radius: 5px; background: #fff; cursor: pointer; }
+  .bfilter button.active { background: #111827; color: #fff; border-color: #111827; }
+  #blist { overflow-y: auto; }
+  #blist div { padding: 6px 10px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid #f6f7f8;
+               display: flex; gap: 7px; align-items: baseline; }
+  #blist div:hover { background: #eef4fb; }
+  #blist .bn { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #blist .bd { color: #9299a1; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -47,10 +64,21 @@
   <h1>Cross-walk graph</h1>
   <span class="sub">click a node to recentre · drag to move · scroll to zoom</span>
   <input id="search" placeholder="Search a motif / type (id or name)…" autocomplete="off">
+  <button id="browseBtn" class="btn">☰ Browse hubs</button>
 </header>
 <main>
   <canvas id="cv"></canvas>
   <div id="results"></div>
+  <div id="browse">
+    <div class="bhead" id="bhead"></div>
+    <div class="bfilter">
+      <button data-x="" class="active">All</button>
+      <button data-x="tmi">TMI</button>
+      <button data-x="atu">ATU</button>
+      <button data-x="brz">Berezkin</button>
+    </div>
+    <div id="blist"></div>
+  </div>
   <div class="tip" id="tip"></div>
   <div class="focusinfo" id="focusinfo"></div>
   <div class="ctl">
@@ -84,23 +112,67 @@ function resize(){ cv.width = cv.clientWidth*DPR; cv.height = cv.clientHeight*DP
 window.addEventListener("resize", resize); resize();
 
 // ---- view state ----
+const TAU = Math.PI*2;
 let view = { x: cv.clientWidth/2, y: cv.clientHeight/2, k: 1 };
 let sub = { nodes: [], edges: [] };   // current rendered subgraph
 let focusId = null;
 
+// Deterministic concentric ego-layout: centre → ring1 (direct links, grouped into
+// arcs per index) → ring2 (2-hop, ordered by their parents' angle). No force sim,
+// so a big hub's neighbourhood lays out cleanly instead of a jittering hairball.
 function buildSub(centerId){
   const depth2 = document.getElementById("depth2").checked;
   const showInf = document.getElementById("showInferred").checked;
-  const keep = new Set([centerId]);
-  const ring1 = [];
-  for (const {o,m} of adj.get(centerId)||[]) { if(!showInf && m==="inferred") continue; keep.add(o); ring1.push(o); }
-  if (depth2) for (const r of ring1) for (const {o,m} of adj.get(r)||[]) { if(!showInf && m==="inferred") continue; keep.add(o); }
+  const nbr = id => (adj.get(id)||[]).filter(x => showInf || x.m!=="inferred").map(x=>x.o);
   const cx = cv.clientWidth/2, cy = cv.clientHeight/2;
-  const nodes = [...keep].map((id,i) => {
-    const a = i * 2.399963, rad = 40 + 26*Math.sqrt(i);
-    return Object.assign({}, byId.get(id),
-      { px: id===centerId?cx:cx+Math.cos(a)*rad, py: id===centerId?cy:cy+Math.sin(a)*rad, vx:0, vy:0, fixed:id===centerId });
-  });
+  focusId = centerId;
+  const f = byId.get(centerId);
+
+  const ring1 = [...new Set(nbr(centerId))].filter(o => o !== centerId);
+  const ring1set = new Set(ring1);
+  const pos = new Map([[centerId, {x:cx, y:cy}]]);
+  const angle1 = new Map();
+  let R1 = 0, R2 = 0;
+
+  // ring1 in per-index arcs (tmi, atu, brz), evenly spaced, starting at the top.
+  const groups = ["tmi","atu","brz"].map(x => ring1.filter(id => byId.get(id).x===x));
+  R1 = Math.max(150, ring1.length*20/TAU + 60);
+  const nGroups = groups.filter(g=>g.length).length;
+  const gap = 0.22, usable = TAU - gap*nGroups;
+  let a0 = -Math.PI/2;
+  for (const g of groups){
+    if (!g.length) continue;
+    const span = usable * (g.length/ring1.length);
+    g.forEach((id,i)=>{
+      const th = a0 + (g.length===1 ? span/2 : span*i/(g.length-1));
+      angle1.set(id, th);
+      pos.set(id, {x:cx+Math.cos(th)*R1, y:cy+Math.sin(th)*R1});
+    });
+    a0 += span + gap;
+  }
+
+  // ring2 on an outer ring, ordered by the circular mean of their ring1 parents.
+  let ring2 = [];
+  if (depth2){
+    const seen = new Set([centerId, ...ring1]), r2 = new Set();
+    for (const r of ring1) for (const o of nbr(r)) if (!seen.has(o)) r2.add(o);
+    ring2 = [...r2];
+    const baseAngle = id => {
+      let sx=0, sy=0;
+      for (const o of nbr(id)) if (angle1.has(o)) { sx+=Math.cos(angle1.get(o)); sy+=Math.sin(angle1.get(o)); }
+      return Math.atan2(sy, sx);
+    };
+    ring2.sort((p,q)=>baseAngle(p)-baseAngle(q));
+    R2 = R1 + Math.max(120, ring2.length*15/TAU + 50);
+    ring2.forEach((id,i)=>{
+      const th = -Math.PI/2 + TAU*(i+0.5)/ring2.length;
+      pos.set(id, {x:cx+Math.cos(th)*R2, y:cy+Math.sin(th)*R2});
+    });
+  }
+
+  // Nodes bloom out from the centre to their target (px→tx/ty each frame).
+  const nodes = [...pos.keys()].map(id => Object.assign({}, byId.get(id),
+    { tx:pos.get(id).x, ty:pos.get(id).y, px:cx, py:cy, pinned:false }));
   const nmap = new Map(nodes.map(n=>[n.id,n]));
   const seen = new Set(), edges = [];
   for (const e of DATA.edges) {
@@ -110,34 +182,26 @@ function buildSub(centerId){
     edges.push({ a:nmap.get(e.s), b:nmap.get(e.t), m:e.m });
   }
   sub = { nodes, edges };
-  focusId = centerId;
-  view = { x: cv.clientWidth/2, y: cv.clientHeight/2, k: 1 };
-  const f = byId.get(centerId);
+
+  // Fit the whole neighbourhood into the viewport.
+  const maxR = (ring2.length ? R2 : R1) + 44;
+  const fit = ring1.length ? Math.min(cv.clientWidth, cv.clientHeight)/2 / maxR : 1;
+  view = { x: cx, y: cy, k: Math.max(0.25, Math.min(1.4, fit)) };
+
+  const linked = gdeg.get(centerId);
+  const detail = !linked ? "no cross-walk links (isolated)"
+    : `${linked} cross-link${linked>1?"s":""}` + (depth2 ? ` · +${ring2.length} at 2-hop` : "");
   document.getElementById("focusinfo").innerHTML =
     `<div class="fi-id" style="color:${IDX[f.x].c}">${f.c}</div>`+
     `<div class="fi-n">${escapeHtml(f.n)}</div>`+
-    `<div class="fi-d">${IDX[f.x].label} · ${gdeg.get(centerId)} cross-links total · showing ${nodes.length-1}</div>`;
-  alpha = 1;
+    `<div class="fi-d">${IDX[f.x].label} · ${detail}</div>`;
 }
 
-// ---- force sim ----
-let alpha = 1;
+// ---- animation: ease each node toward its concentric target ----
 function tick(){
-  const N = sub.nodes;
-  if (alpha > 0.02) {
-    alpha *= 0.96;
-    for (let i=0;i<N.length;i++){ for (let j=i+1;j<N.length;j++){
-      const a=N[i], b=N[j]; let dx=a.px-b.px, dy=a.py-b.py, d2=dx*dx+dy*dy||0.01;
-      const f = 2600/d2; const d=Math.sqrt(d2); dx/=d; dy/=d;
-      a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f;
-    }}
-    for (const e of sub.edges){ const a=e.a,b=e.b; let dx=b.px-a.px, dy=b.py-a.py;
-      const d=Math.hypot(dx,dy)||0.01; const f=(d-96)*0.02; dx/=d; dy/=d;
-      a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f; }
-    const cx=cv.clientWidth/2, cy=cv.clientHeight/2;
-    for (const n of N){ n.vx+=(cx-n.px)*0.006; n.vy+=(cy-n.py)*0.006;
-      if (n===dragNode || n.fixed && n!==dragNode && false) {}
-      n.vx*=0.85; n.vy*=0.85; if(n!==dragNode){ n.px+=n.vx; n.py+=n.vy; } }
+  for (const n of sub.nodes){
+    if (n === dragNode || n.pinned) continue;
+    n.px += (n.tx - n.px)*0.2; n.py += (n.ty - n.py)*0.2;
   }
   draw();
   requestAnimationFrame(tick);
@@ -206,6 +270,31 @@ search.addEventListener("input", ()=>{
 results.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if(!d)return;
   buildSub(d.dataset.id); results.style.display="none"; search.value=""; });
 document.addEventListener("click", e=>{ if(!results.contains(e.target)&&e.target!==search) results.style.display="none"; });
+
+// ---- browse: discover entry points (most-connected nodes, per index) ----
+const hubsSorted = [...DATA.nodes].sort((a,b)=>gdeg.get(b.id)-gdeg.get(a.id));
+const browse=document.getElementById("browse"), blist=document.getElementById("blist"), bhead=document.getElementById("bhead");
+let browseFilter="";
+function renderBrowse(){
+  const all = browseFilter ? hubsSorted.filter(n=>n.x===browseFilter) : hubsSorted;
+  const shown = all.slice(0, 150);
+  bhead.textContent = `${all.length.toLocaleString()} connected node${all.length!==1?"s":""} · most-linked first`
+    + (all.length>shown.length ? ` (top ${shown.length})` : "");
+  blist.innerHTML = shown.map(n=>
+    `<div data-id="${n.id}"><span class="dot" style="background:${IDX[n.x].c}"></span>`+
+    `<span class="rid" style="color:${IDX[n.x].c}">${n.c}</span>`+
+    `<span class="bn">${escapeHtml(n.n)}</span><span class="bd">${gdeg.get(n.id)}</span></div>`).join("");
+}
+document.getElementById("browseBtn").addEventListener("click", ()=>{
+  const open = browse.style.display!=="flex"; browse.style.display=open?"flex":"none"; if(open) renderBrowse();
+});
+document.querySelectorAll(".bfilter button").forEach(b=>b.addEventListener("click", ()=>{
+  document.querySelectorAll(".bfilter button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); browseFilter=b.dataset.x; renderBrowse();
+}));
+blist.addEventListener("click", e=>{ const d=e.target.closest("[data-id]"); if(!d)return;
+  buildSub(d.dataset.id); browse.style.display="none"; });
+document.addEventListener("click", e=>{ if(!browse.contains(e.target)&&e.target.id!=="browseBtn") browse.style.display="none"; });
 
 function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
