@@ -135,7 +135,7 @@ projects extract number/title/description spreadsheets.
 
 ---
 
-## 3b. The wider digital ecosystem (corpora, Linked Data, computational folkloristics)
+## 4. The wider digital ecosystem (corpora, Linked Data, computational folkloristics)
 
 Sourced from a shared research conversation (retrieved 2026-07 by parsing the
 page HTML) and then **independently re-verified via web search** where marked
@@ -229,7 +229,7 @@ all national catalogues** (Russian, Chinese, Japanese, Indian, Arab, Balkan,
 Finno-Ugric …) — which are digitized, have APIs, ship XML/CSV, or expose open
 ATU/TMI-linked corpora. No such consolidated overview currently exists.
 
-## 4. Relevance to this project
+## 5. Relevance to this project
 
 - **TMI**: we use **trilogy**; **Mellmann** is the proposed upgrade
   (`proposals/tmi-mellmann-migration.md`). **ruthenia** and **MOMFER/`fbkarsdorp/tmi`**
@@ -256,7 +256,7 @@ ATU/TMI-linked corpora. No such consolidated overview currently exists.
 | embeddings/LLM over folktale indexes (prior art) | GLOS |
 | large ATU/TMI-tagged text corpus | national archives (Samla, SKS/Finna, …) |
 
-## 5. Validated data inventory (2026-07 audit)
+## 6. Validated data inventory (2026-07 audit)
 
 Four parallel agents live-checked every resource on 2026-07-06 (curl + WebFetch
 + WebSearch; headless browsing unavailable in this environment). This section is
@@ -265,7 +265,7 @@ trust this. Verdicts weigh usefulness for mythoscope's specific goals (fuller
 TMI/ATU data, a TMI↔ATU crosswalk, semantic parallels, and a geography-linked
 motif/type atlas).
 
-### 5.1 Master ranking
+### 6.1 Master ranking
 
 **Tier 1 — open, reusable, actionable now**
 
@@ -303,7 +303,7 @@ motif/type atlas).
 - **InteLex Motif-Index** (Indiana) — paywalled, no export.
 - **Print-only type-indexes** — Hodne, Christiansen ML, El-Shamy (Arab / 1001 Nights), Ting (Chinese), Ikeda (Japanese), Thompson-Balys (Indian), Balys (Lithuanian). Scans on archive.org for some (OCR effort); no structured data.
 
-### 5.2 Corrections & key discoveries vs §1–3b
+### 6.2 Corrections & key discoveries vs §1–4
 
 - **`fbkarsdorp/tmi` carries geo + lemmas** — its JSON has `locations[]`
   (geo-parsed places) and WordNet `lemmas[]` per motif: a ready **geography +
@@ -321,7 +321,7 @@ motif/type atlas).
 - **GLOS is not just prior art** — its repo may hold reusable parsed tables, but
   unlicensed; treat as contact-first.
 
-## 6. Enrichment plan
+## 7. Enrichment plan
 
 Phased, cheapest-and-openest first. Each step names payload, license, and the
 mythoscope surface it feeds. Respect per-source licenses (esp. Dúchas **NC** and
@@ -375,13 +375,13 @@ commercial use of that corpus; Ashliman and ISEBEL are ©/unclear (reference,
 don't redistribute). Keep attribution per-source; never let one license line
 imply terms over the whole set.
 
-## 7. Extractable layers & features
+## 8. Extractable layers & features
 
 What each dataset can actually add to mythoscope's surfaces (catalog, cross-walk,
 semantic parallels, geography atlas, ages/realms/beings graphs). Effort tags:
 **S**=small (join/ingest), **M**=medium (parse+model+UI), **L**=large (new subsystem).
 
-### 7.1 From Tier 1 (open — buildable now)
+### 8.1 From Tier 1 (open — buildable now)
 
 **Mellmann CSV** → `[S–M]`
 - **Classification tree** — the printed `division1–3` + `section` headings become
@@ -418,7 +418,7 @@ semantic parallels, geography atlas, ages/realms/beings graphs). Effort tags:
 - **"Examples everywhere"** = AFT + Wikidata tales surfaced on every type/motif page.
 - **Provenance/time view** = Mellmann `1st ed.` (index growth) as a first temporal axis.
 
-### 7.2 From Tier 2 (if access / license / data are secured)
+### 8.2 From Tier 2 (if access / license / data are secured)
 
 **Meertens Verhalenbank / ISEBEL** (100k+ ATU+place+full-text, multilingual) → `[L]`
 - **Dense spatiotemporal atlas** — 100k tales with place + date → real distribution
@@ -458,7 +458,7 @@ semantic parallels, geography atlas, ages/realms/beings graphs). Effort tags:
 **type ⇄ motif ⇄ text ⇄ place ⇄ time knowledge graph** — the thing the survey
 found no existing project builds, and mythoscope's strongest differentiator.
 
-### 7.3 Feature → source → surface map
+### 8.3 Feature → source → surface map
 
 | Feature | Source(s) | mythoscope surface | Tier / effort |
 |---|---|---|---|
@@ -477,13 +477,13 @@ found no existing project builds, and mythoscope's strongest differentiator.
 | Gold-standard TMI↔ATU crosswalk | DFKI ontology | cross-walk | 2 / S–M |
 | Linked-data / SPARQL export | DFKI + Wikidata/BARTOC | interop | 2 / M |
 
-## 8. Open-data roadmap (licenses-permitting, Tier 2 excluded)
+## 9. Open-data roadmap (licenses-permitting, Tier 2 excluded)
 
 Scope: only sources whose license and access are **already clear and open** —
 Mellmann (CC-BY-4.0), `fbkarsdorp/tmi` (Apache-2.0), Wikidata P2540 (CC0),
 trilogy AFT (CC-BY-SA-4.0), Finna metadata (CC0). Tier-2 corpora (ISEBEL, GLOS,
 Finlayson, DFKI) are **out of scope until access/license are secured** — they
-re-enter via the §6 outreach track. Dúchas is openly *licensed* but **CC-BY-NC**
+re-enter via the §7 outreach track. Dúchas is openly *licensed* but **CC-BY-NC**
 (+ keyed API), so it appears here only as a clearly-flagged conditional item.
 
 Ordering principle: **additive, join-on-code overlays first** (low risk, no
@@ -517,7 +517,7 @@ Mellmann migration (bigger, riskier, already planned), then polish.
   edition-provenance filter; retires the `.0`/`level_N` repair. *License:* CC-BY-4.0.
   *Effort:* M. *Surface:* catalog. *Deps:* none technically, but R1/R3 join on code
   so they survive the swap — do them first so the migration diff is isolated.
-  *Risk:* MEDIUM (crosswalk join drift, embedding re-run — see migration doc §6,9).
+  *Risk:* MEDIUM (crosswalk join drift, embedding re-run — see migration doc §7,13).
   *Value:* HIGH — foundational hierarchy + provenance.
 - **R5 · Concept/lemma facet** — expose `fbkarsdorp` `lemmas[]` (WordNet) as a
   cross-index concept facet and a lexical-parallel corroboration signal alongside
@@ -550,13 +550,13 @@ only after an explicit NC/commercial decision.
 parallel with **R1** (highest-visibility atlas win). Both are pure additive
 overlays that survive the later Mellmann migration untouched.
 
-## 9. Measured dataset quality & completeness (head-to-head)
+## 10. Measured dataset quality & completeness (head-to-head)
 
 All numbers below were **measured** against the live datasets (2026-07): our
 built `tmi.json`/`atu.json`, the Trilogy and Mellmann CSVs, the `fbkarsdorp/tmi`
-JSON, and Wikidata SPARQL. This is the empirical backing for §2–§5.
+JSON, and Wikidata SPARQL. This is the empirical backing for §2–§6.
 
-### 9.1 TMI motif composition — Trilogy vs fbkarsdorp vs Mellmann
+### 10.1 TMI motif composition — Trilogy vs fbkarsdorp vs Mellmann
 
 | dataset | rows | distinct codes | dup-codes | extra |
 |---|---|---|---|---|
@@ -579,7 +579,7 @@ JSON, and Wikidata SPARQL. This is the empirical backing for §2–§5.
   **equal or fuller** than Mellmann's `bibliographies` (e.g. Z64: 146 vs 22
   bytes) — collapsing/suffixing lost nothing.
 
-### 9.2 Fidelity & non-derivable data — Trilogy vs fbkarsdorp
+### 10.2 Fidelity & non-derivable data — Trilogy vs fbkarsdorp
 
 Both are independent digitizations of the same printed index; fbkarsdorp is the
 lower-fidelity one:
@@ -597,7 +597,7 @@ Trilogy's diacritic-preserving text); dropping **Trilogy** loses the diacritics
 is the *pre-computed* geo/lemma overlays, not unique content. (`fb.description` =
 our `motif_name` on 44,530 rows; `additional_description` = our `definition`.)
 
-### 9.3 Cultures vs fbkarsdorp locations (same source, different extraction)
+### 10.3 Cultures vs fbkarsdorp locations (same source, different extraction)
 
 - Ours: **34,749** motifs (75%) have `cultures`, **1,799** distinct labels.
 - fbkarsdorp: **32,106** (69%) have `locations[]`, **925** tokens.
@@ -607,7 +607,7 @@ our `motif_name` on 44,530 rows; `additional_description` = our `definition`.)
 - **Complementary:** 889 motifs have an fb-location but no our-culture; 3,544 the
   reverse. → use fb `locations` as a geocodable overlay, not a replacement.
 
-### 9.4 ATU examples — Ashliman vs Wikidata P2540
+### 10.4 ATU examples — Ashliman vs Wikidata P2540
 
 **P2540 fields** (per Wikidata item): ATU number, `instance of` (tale type /
 fairy tale / literary work…), title + multilingual label/description, author
@@ -627,7 +627,7 @@ fairy tale / literary work…), title + multilingual label/description, author
 - The ~550 individual P2540 *work* items (Grimm tales etc.) are **not** yet
   surfaced as example tales — the untapped part of P2540.
 
-### 9.5 Mellmann `1st ed.` provenance (edition history)
+### 10.5 Mellmann `1st ed.` provenance (edition history)
 
 `1st ed.` is a **column on every motif row** (not a separate table), filled on
 **19,779 / 46,242 (42%)** — the motifs present in the 1936 first edition (empty =

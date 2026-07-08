@@ -308,7 +308,7 @@ Stored per type as `attestations_grouped` (`{total, regions: [{region, count,
 entries}]}`) and aggregated across the index into `culture_legend` (people →
 types-attesting, region). On the type page the section renders as a region
 accordion; the same data drives the region / peoples / breadth / widest charts of
-the overview dashboard (§9a). Every count is real, parsed from Uther's own
+the overview dashboard (§10). Every count is real, parsed from Uther's own
 apparatus; the one caveat is the region map itself — a first-pass curation (e.g.
 Maghreb folded into "Near East", Volga-Finnic into "Europe") that can be
 refined.
@@ -425,7 +425,7 @@ already symmetric — each is stored with its inverse.
 
 ---
 
-## 9a. Overview dashboard (UI)
+## 10. Overview dashboard (UI)
 
 `GET /api/motifs/atu/stats` aggregates the index in one cached pass
 (`_build_atu_stats`), rendered as a stat-card strip plus a chart grid split into
@@ -449,7 +449,7 @@ Every count is real, parsed from Uther's apparatus (§7).
 
 ---
 
-## 10. Known limitations
+## 11. Known limitations
 
 - The scholarly apparatus is only partly decoded: series abbreviations and famous
   works get names/links, but individual author-year citations cannot be expanded

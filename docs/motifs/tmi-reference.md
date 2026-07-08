@@ -21,7 +21,7 @@ Parallel digitizations considered and **not** used as the spine:
   parsed hierarchy columns** (you would have to reconstruct levels yourself).
 - **[folkmasa.org](https://folkmasa.org/motiv/motif.htm)** — a digitization of
   the *English bibliography* with live book links; we use it only to decode
-  citation abbreviations (see §8), not for the motifs themselves.
+  citation abbreviations (see §10), not for the motifs themselves.
 
 Source columns in the Trilogy TMI CSV:
 `id, chapter_name, motif_name, notes, level, chapter_id, level_0 … level_6`.
@@ -56,14 +56,14 @@ Thompson-Balys/India, Neuman/Jewish, Boberg/Icelandic, Rotunda/Italian). The
 
 | | |
 |---|---|
-| Motifs | 46,238 (46,230 Trilogy + 8 net from the Mellmann supplement, §5) |
+| Motifs | 46,238 (46,230 Trilogy + 8 net from the Mellmann supplement, §7) |
 | Chapters (letters) | 23 (`A`–`Z`, skipping `I`/`O`/`Y`) |
 | With non-empty notes | 41,959 (90.8%) |
 | With an extracted definition | 5,556 (12%) |
 | With culture-tagged citations | 32,470 |
 | With `†` motif cross-references | 7,017 |
 | With inline ATU `Type` references | 2,912 |
-| With a printed classification (division1-3 + section, §4a) | ~46,213 (99.97%) |
+| With a printed classification (division1-3 + section, §5) | ~46,213 (99.97%) |
 
 Nodes per level:
 
@@ -83,31 +83,31 @@ Each stored TMI motif (`outputs/motifs/tmi.json → motifs[]`):
 
 | field | meaning |
 |---|---|
-| `id` | motif code, after duplicate disambiguation (§5) |
+| `id` | motif code, after duplicate disambiguation (§7) |
 | `code` | original source code (differs from `id` only for duplicates) |
 | `name` | motif name |
 | `chapter` / `chapter_name` | letter + chapter title |
-| `level` | corrected place-value depth (§5) |
-| `parent` | corrected parent id (§5) |
-| `notes` | raw source notes, after the bleed fix (§5) |
-| `definition` | leading prose split out of `notes` (§6) |
-| `cultures` | `{culture label: [citation strings]}` (§6) |
-| `references` | flat list of citation segments (§6) |
-| `see_also` | `{ref: [ids], cf: [ids]}` from `†` cross-refs (§6) |
-| `atu_inline` | ATU type ids from inline `Type N` (§6) |
-| `division` / `division_range` | printed division-1 heading + code range (§4a) |
-| `sub_division` / `sub_division_range` | division-2 heading + range (§4a) |
-| `division3` / `division3_range` | division-3 heading + range (§4a) |
-| `section` / `section_range` | the tens section heading + range (§4a) |
-| `former_ids` | earlier (1st-edition) codes this motif was renumbered from (§4b) |
+| `level` | corrected place-value depth (§7) |
+| `parent` | corrected parent id (§7) |
+| `notes` | raw source notes, after the bleed fix (§7) |
+| `definition` | leading prose split out of `notes` (§8) |
+| `cultures` | `{culture label: [citation strings]}` (§8) |
+| `references` | flat list of citation segments (§8) |
+| `see_also` | `{ref: [ids], cf: [ids]}` from `†` cross-refs (§8) |
+| `atu_inline` | ATU type ids from inline `Type N` (§8) |
+| `division` / `division_range` | printed division-1 heading + code range (§5) |
+| `sub_division` / `sub_division_range` | division-2 heading + range (§5) |
+| `division3` / `division3_range` | division-3 heading + range (§5) |
+| `section` / `section_range` | the tens section heading + range (§5) |
+| `former_ids` | earlier (1st-edition) codes this motif was renumbered from (§6) |
 
 Index-level keys: `label, long_label, attribution, homepage, chapters,
 culture_legend`, plus the browse hierarchy `divisions` / `subdivisions` /
-`subdivisions3` / `sections` (§4a, §7) and the `aliases` redirect map (§4b).
+`subdivisions3` / `sections` (§5, §9) and the `aliases` redirect map (§6).
 
 ---
 
-## 4a. Printed classification (from Mellmann)
+## 5. Printed classification (from Mellmann)
 
 The Trilogy CSV carries the code hierarchy but not Thompson's **printed
 range-headings**. We lift those from Katja Mellmann's `TMI_as_CSV` (CC-BY-4.0,
@@ -130,16 +130,16 @@ underworld)  →  division3 (A650–A699 Nature of the universe)  →  section
   `Note:` clause is dropped (captured as the first period-terminated clause).
 - The Titles feed the **Classification** line on the motif page and the
   chapter→division→…→section **browse dropdown** (mirroring the ATU section).
-  Mellmann also supplies the 8-net **supplement motifs** (§5).
+  Mellmann also supplies the 8-net **supplement motifs** (§7).
 
 The read service (`src/server/services/motifs.py`) adds **derived** fields at
-serve time — never stored: `notes_size`, `has_definition`, `substantive` (§9),
+serve time — never stored: `notes_size`, `has_definition`, `substantive` (§11),
 `descendant_count`, `leaf`, `breadcrumbs`, `children`, and resolved cross-walk
 links.
 
 ---
 
-## 4b. Edition history & redirects (from Mellmann)
+## 6. Edition history & redirects (from Mellmann)
 
 Thompson renumbered ~1,166 motifs between the **first edition** (1932–36) and the
 **revised edition** (1955–58). Mellmann's `1st ed.` column records the earlier
@@ -172,7 +172,7 @@ restoration keeps the meaning.
 
 ---
 
-## 5. Build-time interpretation decisions
+## 7. Build-time interpretation decisions
 
 All in `trilogy._finalize_tmi` / `_parse_tmi`.
 
@@ -225,7 +225,7 @@ first collapses 2 same-name redundant rows.
 
 ---
 
-## 6. Notes decomposition
+## 8. Notes decomposition
 
 A `notes` string packs several layers; `src/motifs/sources/tmi_notes.py`
 separates them, keeping the raw `notes` as the source of truth.
@@ -275,7 +275,7 @@ separates them, keeping the raw `notes` as the source of truth.
   author, `*`, or `ibid.`/`cf.`); this drops prose that a capitalised word before
   a colon leaked in (`Answer:`, `Decision:`), plus a small stop-list of genre
   words that head real citations (`Fable`, `Answer`, `Countertask`). The canonical
-  label maps to a broad **region** via `culture_dict._REGION` (§7).
+  label maps to a broad **region** via `culture_dict._REGION` (§9).
 - **references** — the bibliography split on `;` / ` --`; the general
   (non-culture-tagged) segments are shown separately on the motif page.
 - **see_also** — `†` cross-references to other motifs, split into `cf`
@@ -288,7 +288,7 @@ separates them, keeping the raw `notes` as the source of truth.
   cross-reference. 94.8% resolve to a real id. `†` tokens are stripped from the
   text *before* definition/culture parsing so they cannot bleed into a
   neighbouring citation. (The serve layer merges `cf` + `ref` into one
-  **Related motifs** list, §11.)
+  **Related motifs** list, §13.)
 - **atu_inline** — inline `Type N` / `Types N, M` references to ATU tale types.
 
 ### What else lives in notes (not extracted as fields)
@@ -299,7 +299,7 @@ bracketed place/year. These remain inside the citation strings.
 
 ---
 
-## 7. Culture dictionary (enrichment)
+## 9. Culture dictionary (enrichment)
 
 `src/motifs/sources/culture_dict.py` aggregates the parsed `cultures` into a
 stored `culture_legend` (two layers):
@@ -328,7 +328,7 @@ and carry some noise (orthographic variants).
 
 ---
 
-## 8. Bibliography key (external enrichment)
+## 10. Bibliography key (external enrichment)
 
 `scripts/build_tmi_bibliography.py` decodes the abbreviated citations into full
 titles and **live book links**:
@@ -356,7 +356,7 @@ XXIX`) link to the journal, not the specific paper; and parse-noise heads
 
 ---
 
-## 9. The "substantive" heuristic
+## 11. The "substantive" heuristic
 
 Goal: separate **substantive motifs** from building scaffolding (empty grouping
 headers) and the mass of thin variations.
@@ -390,7 +390,7 @@ big node). The boundary is intentionally a single tunable constant
 
 ---
 
-## 10. Browsing & overview (UI)
+## 12. Browsing & overview (UI)
 
 The Motifs section reads everything above through `GET /api/motifs/tmi/*`.
 
@@ -422,11 +422,11 @@ title scheme in [`motif-index-data-sources.md`](motif-index-data-sources.md) →
 - **Dataset diagnostics** — *Motifs by kind*, *Motifs by hierarchy level*, *Motifs
   by note length*, *Cultures per motif* (breadth histogram), *Most-cited sources*
   (each work — Thompson-Balys, Cross, Neuman, … resolved through the bibliography
-  key, §8).
+  key, §10).
 
 ---
 
-## 11. Cross-walks
+## 13. Cross-walks
 
 Motif **equivalence** runs through ATU, not geography:
 `tmi → atu` (Trilogy `atu_seq`) and `atu → berezkin`. A motif page merges its ATU
@@ -435,7 +435,7 @@ tale types (constituent from `atu_seq` + inline `Type` from the note) into one
 AaTh and are remapped to ATU 2004 where possible — see
 [`atu-reference.md`](atu-reference.md) §9.
 
-The note's own `†` cross-references (§6) are served as one **Related motifs**
+The note's own `†` cross-references (§8) are served as one **Related motifs**
 list (`links.related`): the `Cf.` compares are the unmarked default and the
 rarer bare-`†` redirects carry a small **see also** tag. The two are thin and
 asymmetric enough that separate sections added noise, not signal, so they are
@@ -443,11 +443,11 @@ merged with the minority marked rather than split.
 
 A **geographic** alignment (TMI cultures ↔ Berezkin areas, via a shared region
 taxonomy) is possible but not built — it would be a coarse region-level overlay,
-not motif-to-motif links (see the culture dictionary, §7).
+not motif-to-motif links (see the culture dictionary, §9).
 
 ---
 
-## 12. Known limitations
+## 14. Known limitations
 
 - The definition / culture split is heuristic (~85–90%); short one-line
   definitions are over-flagged, and colon-less region labels (`--Oceanic Dixon …`)

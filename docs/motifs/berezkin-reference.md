@@ -15,7 +15,7 @@ equivalences, and a trailing list of areal indices). Per-motif detail pages
 (`a1.html`, `k84.html`, …) add a short definition (and the internal see-also
 `см.` links parsed from it). The introduction page
 ([`intro.html`](http://areasofmyths.com/intro.html)) carries the licence and the
-authoritative region-code key (§6).
+authoritative region-code key (§7).
 
 **Licence.** The catalogue's data "can be freely used for non-commercial
 purposes" under **CC BY-NC-SA 4.0**, with mandatory attribution to the source.
@@ -45,7 +45,7 @@ it can be unit-tested on static fixtures.
   | | G Плодородие, земледелие | K Приключения I: деяния героев | |
 
 - **Areal indices** — the dotted numbers after a motif (`… .19.21.`) are
-  **region codes**: the geographic areas where the motif is attested (§6). The
+  **region codes**: the geographic areas where the motif is attested (§7). The
   catalogue's primary axis is geography, not a motif hierarchy.
 
 ---
@@ -72,11 +72,11 @@ Each stored motif (`outputs/motifs/berezkin.json → motifs[]`):
 |---|---|
 | `id` | motif code (`B12`) |
 | `chapter` | leading letter |
-| `name` | motif name — **English** where available (§4a), else the cleaned Russian name |
+| `name` | motif name — **English** where available (§5), else the cleaned Russian name |
 | `name_rus` | the Russian original name (only when English replaced it) |
-| `definition` | short definition — **English** where available (§4a), else the Russian one |
+| `definition` | short definition — **English** where available (§5), else the Russian one |
 | `definition_rus` | the Russian original definition (only when English replaced it) |
-| `areas` | sorted unique region codes (§6) |
+| `areas` | sorted unique region codes (§7) |
 | `see_also` | internal cross-references to other Berezkin motifs, from the definition's `см. мотив X` links (kept only when they resolve to a real motif) |
 | `atu_refs` | ATU tale-type references parsed from the title |
 | `page` | source detail-page filename (for the back-link) |
@@ -86,7 +86,7 @@ Index-level keys: `label, long_label, attribution, homepage, chapters, areas`
 
 ---
 
-## 4a. English names & definitions (mapsofmyths.com)
+## 5. English names & definitions (mapsofmyths.com)
 
 The sister site **[mapsofmyths.com](http://mapsofmyths.com)** (same authors, same
 motif ids, CC BY-NC-SA 4.0) carries an **English name and English definition** for
@@ -136,7 +136,7 @@ distribution maps.
 
 ---
 
-## 5. Parsing decisions
+## 6. Parsing decisions
 
 All in `berezkin.py`.
 
@@ -151,7 +151,7 @@ All in `berezkin.py`.
   come from the published key, not from the page.
 - **Area legend (the decoding).** Taken **verbatim from the published key** in
   `intro.html` ("Цифры соответствуют следующим регионам"), hard-coded as
-  `_CANONICAL_AREAS` / `canonical_area_legend()` (§6). No inference: detail-page
+  `_CANONICAL_AREAS` / `canonical_area_legend()` (§7). No inference: detail-page
   fetching now serves only the definitions.
 - **Title codes.** ATU clauses (`ATU 311, 312`) and bare tale-type refs (`804A`)
   are pulled from the title into `atu_refs`. The other trailing codes are Thompson
@@ -194,7 +194,7 @@ All in `berezkin.py`.
 
 ---
 
-## 6. Areal region codes (the key)
+## 7. Areal region codes (the key)
 
 The dotted numbers are Berezkin's **areal region codes**. The catalogue
 [publishes the key in its introduction](http://areasofmyths.com/intro.html)
@@ -220,7 +220,7 @@ macro-areas, codes 10–74** (code 58, *Дельта Ориноко*, is defunct
 
 ---
 
-## 6b. Bibliography, linked to macro-areas
+## 8. Bibliography, linked to macro-areas
 
 `berezkin_bibliography.py` pulls the catalogue's own bibliography (`biblio.html`,
 grouped by author → year-leading works, ~9,700 works) and links it to the areal
@@ -238,12 +238,12 @@ displayed. Removing it cut the step from ~180 s to ~60 s.
 Output `berezkin_bibliography.json` (gitignored, best-effort): a per-motif
 `region → citations` tree plus `source → {regions, uses}` aggregates and a reverse
 `area_index`. Current: ~167k citations, ~89% resolved. Distinct from the mapsofmyths
-`tmi_refs` cross-walk (§4a) and the TMI folkmasa bibliography — this is the Berezkin
+`tmi_refs` cross-walk (§5) and the TMI folkmasa bibliography — this is the Berezkin
 catalogue's own source apparatus.
 
 ---
 
-## 7. Cross-walks
+## 9. Cross-walks
 
 *The full picture across all three indexes — every map, direction and repair — is
 in [`crosswalk.md`](crosswalk.md); this section covers the Berezkin side.*
@@ -251,7 +251,7 @@ in [`crosswalk.md`](crosswalk.md); this section covers the Berezkin side.*
 Motif **equivalence** runs two ways:
 
 - **Direct** `berezkin ↔ tmi` — from the curated Thompson ids (`tmi_refs`) that
-  mapsofmyths attaches to each motif (§4a), cleaned of `*`/trailing `.` and kept
+  mapsofmyths attaches to each motif (§5), cleaned of `*`/trailing `.` and kept
   only where the TMI id exists in our index (~190 motifs). This is the exact,
   hand-curated concordance and is shown first on the motif page.
 - **Via ATU** — `berezkin → atu` (from `atu_refs`, ~485 motifs) and `atu → tmi`.
@@ -267,7 +267,7 @@ see `troubleshooting.md` ("Four competing macro-area schemes").
 
 ---
 
-## 7b. Overview dashboard (UI)
+## 10. Overview dashboard (UI)
 
 `GET /api/motifs/berezkin/stats` aggregates the catalogue in one cached pass
 (`_build_berezkin_stats`), rendered as a stat-card strip plus a chart grid split
@@ -281,9 +281,9 @@ enrichment-gated), falling back to the coarser **areal code** without credential
   leaderboard, enrichment-gated); *Areas with the most motifs*.
 - **Themes & content** — *Motifs by chapter*; *Motifs by thematic group*
   (mapsofmyths taxonomy, ordered by group number, only when that credentialled
-  enrichment ran, §4a); *Most widespread motifs (areas attesting)*; *Most
+  enrichment ran, §5); *Most widespread motifs (areas attesting)*; *Most
   widespread motifs (traditions attesting)* (enrichment-gated); *Most
-  cross-referenced motifs (see-also)* (`see_also` in-degree, §5 — the parallel of
+  cross-referenced motifs (see-also)* (`see_also` in-degree, §6 — the parallel of
   the TMI "cf./†" leaderboard, since both are motif indexes).
 - **Dataset diagnostics** — *Areas per motif* (log breadth histogram); *Traditions
   per motif* (the finer tradition-level breadth, enrichment-gated); *Motifs by
@@ -297,7 +297,7 @@ valid without credentials.
 
 ---
 
-## 8. Known limitations
+## 11. Known limitations
 
 - **Codes 1–9.** Used by ~15 motifs as the leading index (`K84 .1.11.13…`) but
   below the official start-of-10 in the published key, so they have no name and
