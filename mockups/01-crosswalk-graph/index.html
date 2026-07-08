@@ -152,11 +152,13 @@ const METH = {
   seealso:{label:"TMI, Berezkin see-also"},
   combo:{label:"ATU combined with"},
   subtype:{label:"ATU subtypes"},
-  near:{label:"near-identical", dash:[6,3], sug:true},
-  reasoned:{label:"reasoned / curated", dash:[8,3,1.5,3], sug:true},
+  // dash density follows the checkbox order (inferred → … → semantic):
+  // long dashes at the top grading to a fine dotted line at the bottom.
+  inferred:{label:"inferred triangles", dash:[10,4], sug:true},
+  reasoned:{label:"reasoned / curated", dash:[7,4], sug:true},
+  near:{label:"near-identical", dash:[5,3], sug:true},
   lexical:{label:"lexical parallel", dash:[3,3], sug:true},
   semantic:{label:"semantic parallel", dash:[1.5,3], sug:true},
-  inferred:{label:"inferred triangles", dash:[2,4], sug:true},
 };
 let enabledConf = new Set(["constituent","defining","note","summary","berezkin"]);  // confirmed cross-walk
 let enabledIntra = new Set(["seealso","combo"]);            // intra-index; subtypes off by default
