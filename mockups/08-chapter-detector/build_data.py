@@ -167,6 +167,7 @@ def detect(body: str) -> dict:
             numbered_hits.append(i)
 
     contents = detect_contents(lines)
+    allcaps_hits = _drop_title_block(allcaps_hits)
 
     strategies = {
         "keyword": keyword_hits,
@@ -193,6 +194,19 @@ def detect(body: str) -> dict:
         for i in sorted(chosen)[:400]
     ]
     return {"method": method, "counts": counts, "chapters": chapters}
+
+
+def _drop_title_block(hits: list[int]) -> list[int]:
+    """Skip the title page: a book opens with a tight cluster of all-caps lines
+    (title, byline, publisher) before the body. Drop the leading run of hits
+    packed close together within the first ~80 lines, up to the first real gap —
+    but only if content follows, so a book that is *all* front matter is left be."""
+    if not hits or hits[0] >= 40:
+        return hits
+    k = 0
+    while k + 1 < len(hits) and hits[k + 1] - hits[k] <= 12 and hits[k + 1] < 80:
+        k += 1
+    return hits[k + 1:] if k + 1 < len(hits) else hits
 
 
 def detect_contents(lines: list[str]) -> list[int]:

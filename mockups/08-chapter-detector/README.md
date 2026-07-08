@@ -56,6 +56,9 @@ each book/lay actually begins. A couple of tuning notes baked into the heuristic
 - `keyword` needs ≥3 hits, so a stray `BOOK`/`PART` line can't win over a book's real
   scheme (Popol Vuh → `allcaps`, Tao Teh King → `numbered`, Poetic Edda → `contents`).
 - the `Contents` header is matched even with a trailing footnote marker (`CONTENTS [1]`).
+- the opening **title page** is skipped: a leading tight cluster of all-caps lines
+  (title, byline, publisher) is dropped before the body headings are counted, so
+  Babylonian Legends / Popol Vuh / Hammurabi don't report their cover text as chapters.
 
 The viewer still shows every strategy's candidate count, so you can see the runner-up
 signals per book.
