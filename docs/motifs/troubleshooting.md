@@ -5,6 +5,34 @@ where it bites, and the options for fixing it. Append new entries at the top.
 
 ---
 
+## Raw scrape cache is a snapshot, not a reproducible dataset
+
+**Status:** by design — treat all counts as version-dependent.
+
+Every external download is cached under `outputs/motifs/raw/**` (areasofmyths /
+mapsofmyths HTML, the folkmasa bibliography, Wikidata SPARQL responses). This
+cache is **gitignored and never exported** (`mytho export` skips `raw/**`)
+because it isn't reproducible:
+
+- The upstream sites are live and change over time — pages get edited, motifs
+  added or renumbered, a site can move or go down. A fresh `mytho motifs --force`
+  can therefore return **different counts** than a cache built earlier.
+- The cache is a point-in-time snapshot, not a versioned dataset; two machines
+  scraping on different days may disagree.
+
+Consequences and handling:
+
+- Every motif / type / tradition **count in these docs is an approximate
+  snapshot** of one build — re-verify against a fresh build before quoting it.
+- Only **code** is committed; the built indexes (`outputs/motifs/*.json`) and the
+  raw cache are regenerated, not tracked. To hand a working dataset to someone
+  without credentials or network, ship the built `*.json` via `mytho export`
+  (which excludes `raw/**`), not the cache.
+- Refresh from upstream with `mytho motifs --force` (re-downloads); a plain
+  `mytho motifs` re-parses the existing cache without touching the network.
+
+---
+
 ## Four competing macro-area schemes
 
 **Status:** open — needs a decision before touching `_berezkin_region`.

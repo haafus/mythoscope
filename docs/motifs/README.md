@@ -16,7 +16,7 @@ Then read the rest by topic.
 - [`tmi-bibliography-key.md`](tmi-bibliography-key.md) — decoded TMI citation abbreviations
 
 **How the indexes connect**
-- [`crosswalk.md`](crosswalk.md) — every ATU↔TMI↔Berezkin link, broken-link repair, the parallels layers
+- [`crosswalk.md`](crosswalk.md) — every ATU↔TMI↔Berezkin link, broken-link repair, and the four suggestion layers (lexical & near-identical, reasoned, inferred, semantic BGE-M3)
 - [`crosswalk/`](crosswalk/) — analysis archive: code, data and reports behind those links
 
 **Background & operations**
