@@ -21,7 +21,9 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
+from scipy.cluster.hierarchy import leaves_list, linkage, optimal_leaf_ordering
 from scipy.spatial import ConvexHull, QhullError
+from scipy.spatial.distance import squareform
 from sklearn.cluster import DBSCAN, SpectralCoclustering
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -170,7 +172,20 @@ def main():
     pick = [{"x": pts_all[i]["x"], "y": pts_all[i]["y"],
              "s": [round(float(M[i, g - 1]), 3) for g in GROUPS]} for i in range(len(tids))]
 
-    data = {"heat": heat, "clusters": clusters, "points": points, "pick": pick,
+    # theme co-occurrence: correlation of theme shares across traditions, on the CLR
+    # transform so the constant-sum (compositional) closure doesn't make the dominant
+    # blocks spuriously anti-correlate with everything. Rows/cols are SERIATED (hierarchical
+    # clustering + optimal leaf ordering) so co-occurring blocks sit adjacent.
+    L = np.log(M + 0.005); L = L - L.mean(1, keepdims=True)
+    corr = np.corrcoef(L.T)
+    dist = squareform(np.clip(1 - corr, 0, 2), checks=False)
+    Z = optimal_leaf_ordering(linkage(dist, method="average"), dist)
+    seri = list(leaves_list(Z))                         # order over 0..12
+    cooc = {"order": [GROUPS[i] for i in seri],
+            "groups": [{"g": GROUPS[i], "name": TN[GROUPS[i]]} for i in seri],
+            "m": [[round(float(corr[seri[i], seri[j]]), 2) for j in range(13)] for i in range(13)]}
+
+    data = {"heat": heat, "cooc": cooc, "clusters": clusters, "points": points, "pick": pick,
             "groups": [{"g": g, "name": TN[g]} for g in GROUPS], "n_trad": len(tids),
             "n_area": len(m21.AREAS12)}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";", encoding="utf-8")

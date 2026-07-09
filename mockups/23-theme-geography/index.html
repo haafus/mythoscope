@@ -38,11 +38,11 @@
 <main>
 <header>
   <h1>Тема × география</h1>
-  <p>Где концентрируются тематические блоки. Три вида по каталогу Березкина: <b>(1)</b> тепловая матрица 13 тем-групп ×
-     12 макроареалов по <b>lift</b> (наблюдаемое против ожидаемого при независимости) — сразу видно, что где над- и
-     недопредставлено; <b>(2)</b> карта, где традиции <b>ко-кластеризованы с темами</b> (традиции × темы, аналог
-     мокапа 15, но не по мотивам), кластеры залиты «отпечатками»; <b>(3)</b> переключатель — карта, окрашенная по
-     доле выбранной темы.</p>
+  <p>Где концентрируются тематические блоки и как они сочетаются. Четыре вида по каталогу Березкина: <b>(1)</b>
+     тепловая матрица 13 тем-групп × 12 макроареалов по <b>lift</b> (наблюдаемое против ожидаемого) — что где над- и
+     недопредставлено; <b>(2)</b> матрица <b>совстречаемости тем</b> между собой по традициям; <b>(3)</b> карта, где
+     традиции <b>ко-кластеризованы с темами</b> (традиции × темы, аналог мокапа 15, но не по мотивам), кластеры
+     залиты «отпечатками»; <b>(4)</b> переключатель — карта, окрашенная по доле выбранной темы.</p>
 </header>
 
 <div class="card">
@@ -52,6 +52,16 @@
     <span>недопредставлено</span><span class="ramp"></span><span>перепредставлено</span>
     <span class="muted">· lift 1.0 = нейтрально (как в среднем по каталогу)</span>
   </div>
+</div>
+
+<div class="card">
+  <h2>Совстречаемость тем <span class="s">— корреляция долей по традициям (CLR), сериировано, число = ×100</span></h2>
+  <div class="hm"><div class="grid" id="cooc"></div></div>
+  <div class="scale">
+    <span>анти (одна вытесняет другую)</span><span class="ramp"></span><span>вместе (растут заодно)</span>
+    <span class="muted">· CLR убирает смещение из-за замыкания долей</span>
+  </div>
+  <div class="note" id="coocnote"></div>
 </div>
 
 <div class="card">
@@ -95,6 +105,31 @@ H.groups.forEach((gr,i)=>{
 });
 document.getElementById("heat").style.gridTemplateColumns = `minmax(150px,1.3fr) repeat(${na},1fr)`;
 document.getElementById("heat").innerHTML = g;
+
+// ---- theme co-occurrence matrix (CLR correlation, diverging -1..1, seriated) ----
+const CO = D.cooc;   // groups already in seriated order, each with its original number g
+const TABG = {1:"S&M",2:"Star",3:"Cosm",4:"Deth",5:"Hum",6:"Sub",7:"Pl&A",8:"Mon",9:"Idnt",10:"Advn",11:"Trck",12:"Name",13:"Form"};
+function corrCol(c){
+  if(c>=0){ return `rgb(${mix(NEU,WARM,Math.min(1,c)).join(",")})`; }
+  return `rgb(${mix(NEU,COOL,Math.min(1,-c)).join(",")})`;
+}
+let cg = `<div class="rl"></div>` + CO.groups.map(gr=>`<div class="h" title="${esc(gr.name)}">${TABG[gr.g]}</div>`).join("");
+CO.groups.forEach((gr,i)=>{
+  cg += `<div class="rl" title="${esc(gr.name)}">${gr.g}. ${esc(gr.name)}</div>`;
+  for(let j=0;j<13;j++){
+    const c=CO.m[i][j];
+    if(i===j){ cg += `<div class="cell" style="background:${corrCol(1)};color:rgba(255,255,255,.75);font-weight:600" title="${esc(gr.name)} — сама с собой (максимум)">${TABG[gr.g]}</div>`; continue; }
+    cg += `<div class="cell" style="background:${corrCol(c)}" title="${esc(gr.name)} × ${esc(CO.groups[j].name)}: r=${c}">${Math.round(c*100)}</div>`;
+  }
+});
+document.getElementById("cooc").style.gridTemplateColumns = `minmax(150px,1.3fr) repeat(13,1fr)`;
+document.getElementById("cooc").innerHTML = cg;
+document.getElementById("coocnote").innerHTML =
+  "<b>Категории A/B воспроизводятся из одной совстречаемости.</b> После сериации проступают два смежных блока: "+
+  "сказочный (Adventures · Tricks · Proper names · Formulae · Protagonist identity, к нему примыкают Monstrous beings) "+
+  "и космологический (Sun&Moon · Cosmogony · Origin of humans · subsistence · Stars). Между блоками — сильный минус "+
+  "(Cosmogony × Adventures ≈ −0.6): где корпус космологичен, там мало сказок, и наоборот. Это ровно берёзкинское "+
+  "деление A vs B, полученное из данных без него.";
 
 // ---- map projection (equirectangular: cx=lon+180, cy=90-lat) ----
 const LAND = `<path class="land" d="${window.LAND||""}"/>`;

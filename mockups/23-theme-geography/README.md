@@ -3,7 +3,7 @@
 Visualises the **theme × area signal** that
 [`macro-area-facets.md`](../../docs/motifs/proposals/macro-area-facets.md) only states in
 prose ("Category B is 74–77% of European attestations but 27% in Mesoamerica–Andes";
-"cosmology is pan-global, tales are regional"). Three views over the Berezkin catalogue.
+"cosmology is pan-global, tales are regional"). Four views over the Berezkin catalogue.
 
 ## 1 · Heatmap — 13 theme groups × 12 macro-areas
 
@@ -15,7 +15,19 @@ block everywhere, so only lift shows it is genuinely *concentrated* in the Euras
 ×0.5, Australia ×0.3), while celestial cosmology inverts (Sun & Moon ×3.4 in Australia,
 ×3.1 in Mesoamerica).
 
-## 2 · Co-cluster map — traditions × themes (mockup-15 style)
+## 2 · Co-occurrence matrix — theme × theme
+
+How the 13 blocks co-vary **across traditions**: the correlation of theme shares, on the
+**CLR (centered-log-ratio) transform** so the constant-sum closure of a profile doesn't make
+the dominant blocks spuriously anti-correlate with everything. Rows/cols are **seriated**
+(hierarchical clustering + optimal leaf ordering) so co-occurring blocks sit adjacent. Two
+contiguous blocks fall out — a tales block (Adventures · Tricks · Proper names · Formulae ·
+Protagonist identity, with Monstrous beings adjoining) and a cosmology block (Sun & Moon ·
+Cosmogony · Origin of humans · subsistence · Stars) — with a strong negative rectangle
+between them (Cosmogony × Adventures ≈ −0.6). **That recovers Berezkin's Category A vs B
+split from co-occurrence alone**, without using his labels.
+
+## 3 · Co-cluster map — traditions × themes (mockup-15 style)
 
 The traditions-×-themes analogue of mockup 15's traditions-×-motifs biclusters:
 **SpectralCoclustering** on the tradition × 13-theme proportion matrix groups traditions
@@ -30,7 +42,7 @@ Hover a legend row to isolate one cluster. The seven that fall out are readable 
 - **Plants & animals · Monstrous beings** — etiological (N & W N-America · Siberia · S-America).
 - **Origin of humans · subsistence**, **Stars · Formulae**, **Origin of death · Protagonist**.
 
-## 3 · Theme picker
+## 4 · Theme picker
 
 Pick any of the 13 groups and the map shades each tradition by that theme's share of its
 corpus (sequential), with the top over-represented areas (by lift) listed below. Makes the

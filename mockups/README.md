@@ -256,13 +256,15 @@ pastoralists 36.2%) — cosmology yields to tale as production intensifies, as p
 an honest area confound. See [`22-subsistence-external/README.md`](22-subsistence-external/README.md).
 
 ### 23 · Theme × geography
-Visualises the `theme × area` signal `macro-area-facets.md` only states in prose. Three
-views: a **heatmap** (13 theme groups × 12 macro-areas, coloured by lift — Adventures ×1.2
-in the Eurasian belt, ×0.3 in Australia; Sun & Moon ×3.4 in Australia); a **co-cluster map**
-that biclusters traditions × themes (SpectralCoclustering) and draws each cluster as
-footprint blobs in the style of mockup 15 — the traditions-×-themes analogue of its
-traditions-×-motifs clusters; and a **theme picker** that shades the map by any single
-group's share. See [`23-theme-geography/README.md`](23-theme-geography/README.md).
+Visualises the `theme × area` signal `macro-area-facets.md` only states in prose. Four
+views: a **lift heatmap** (13 theme groups × 12 macro-areas — Adventures ×1.2 in the
+Eurasian belt, ×0.3 in Australia; Sun & Moon ×3.4 in Australia); a **theme × theme
+co-occurrence matrix** (CLR correlation across traditions, seriated) that recovers Berezkin's
+Category A vs B split from co-occurrence alone; a **co-cluster map** that biclusters
+traditions × themes (SpectralCoclustering) and draws each cluster as footprint blobs in the
+style of mockup 15 — the traditions-×-themes analogue of its traditions-×-motifs clusters;
+and a **theme picker** that shades the map by any single group's share. See
+[`23-theme-geography/README.md`](23-theme-geography/README.md).
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
