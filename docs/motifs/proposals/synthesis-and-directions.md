@@ -151,6 +151,9 @@ Ranked by what each *newly enables*, not by ease:
 | **The myth texts themselves** (mapsofmyths / corpora) | scrape-dependent | content embeddings → semantic stratum, a principled banality measure, motif-matching |
 | **Historical contact networks** (routes, missions, trade) | open/curated | the diffusion edges that date the historical strata distribution can't |
 
+> The actionable, significance-ranked sequencing of everything below — as concrete next
+> mockups (M24…) — is in [`roadmap.md`](roadmap.md).
+
 ## 8. New algorithms that could give strong results
 
 Our current estimators are deliberately simple — Fitch **parsimony** (18), **k-means** /
