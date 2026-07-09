@@ -174,6 +174,22 @@ late; a Sanskrit jātaka = axial/literate). So `stratum` must be **derived from
 distribution** (next section), never inferred from `theme` — this case is exactly the
 stress-test a naive "B = late" rule fails and the distributional signal passes.
 
+### theme × area and theme × stratum are a signal
+
+The *mapping* of theme groups onto areas and onto depth is itself informative — theme is
+a statistical **prior** on stratum (not a substitute; the two stay orthogonal per motif).
+Measured over the catalogue:
+
+- **theme × area.** Which themes concentrate where varies strongly: Category B is 74–77%
+  of European attestations but 27% in Mesoamerica–Andes; `theme_profile` clusters
+  regionally (38% of its variance is macro-area). Cosmology is pan-global (mean ~6
+  macro-areas per motif), tales are regional (adventures ~4.8, formulae ~2.9).
+- **theme × stratum.** Category A (cosmology/etiology) is **broader and more areal**
+  (phylo-signal ~0.25 — deep substrate spread by ancient contact); Category B
+  (adventures/tricks) is **narrower and more descent-tracking** (~0.36 — younger tales
+  riding language expansions). So a motif's theme predicts its *tendency* in breadth and
+  depth — a useful covariate for `stratum`, though any one theme still spans strata.
+
 ## Motif · `stratum` — time-depth / transmission (7)
 
 The motif's temporal layer, oldest → latest. The first four are prehistoric
@@ -393,6 +409,31 @@ rows); `theme`, `area`, and the `family` seed are computed.
 - **#4** is `family` — no longer a fourth "region", just the culture axis restricted
   to our corpus.
 - Clusters 2 and 6 were never areas; they are motif `stratum` values (6 and 4).
+
+## Cumulative conclusions
+
+The whole investigation, in one place (prototypes: mockups 15–18; method detail in
+[`stratum-derivation.md`](stratum-derivation.md) §12–13):
+
+1. **"Region" was three axes crammed into one.** Split cleanly into **entities**: a
+   *tradition* carries `area` (12, from `areal_path`), `family` (from `language` +
+   religion), `subsistence` (4) and a derived `theme_profile`; a *motif* carries `theme`
+   (given — Berezkin's category A/B → 13 groups, the primary analytical slicer) and
+   `stratum` (computed). Expressiveness is multiplicative across entities, so `area`
+   shrinks from 18 to 12.
+2. **Berezkin's own rule holds:** don't pool the catalogue — fix a `theme`, then analyse.
+   Theme is first-class and already in our data (`motif_group`).
+3. **Time-depth is a motif property, inferred, not a tradition facet.** Distribution
+   dates a motif, but only under a model and never perfectly (homoplasy, loss, sampling).
+4. **Theme ≠ depth per motif, but predicts it in aggregate.** Category A (cosmology) is
+   broad + areal-deep; Category B (tales) is narrower + more descent-tracking — a prior,
+   not a determiner (endemic-American adventures are deep). `theme × area` and
+   `theme × stratum` are both real signals.
+5. **Geography is primary; language and time are separate computed layers.** Method B
+   shows only ~1% of motifs follow language descent (Eurasian fairy tales); the rest
+   spread areally — so `area` carries most of the structure, while `stratum` is a
+   gated **A × B** estimate (geography dates the areal majority, phylogeny the descent
+   minority), reported as a continuous score with confidence.
 
 ## Implementation sketch (not built)
 

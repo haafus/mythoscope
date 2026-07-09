@@ -233,3 +233,68 @@ Do not hard-wire the mapping; fit the bands, then name them.
 - The named 7 strata are an interpretive overlay; the defensible artefact is the
   **continuous score with confidence**, sliced (per Berezkin) **within a fixed
   `theme`**, since the same theme occupies different depths in different regions.
+
+## 12. Method A × Method B — how they reinforce each other
+
+A (geographic) and B (phylogenetic) are not rivals; each resolves the other's blind
+spot. Worked from the tracked motifs (mockups 17–18):
+
+| Motif | A · mega-sets, fragments | A alone | B · phylo-signal | B alone |
+|---|---|---|---|---|
+| B4 fished-out earth | CONT·IP·NW, 5 | "deep, disjunct" | 0.62 | Austronesian **clade** |
+| A3 sun & moon | CONT·IP·NW, 10 | "deep, disjunct" | 0.17 | "areal" (can't date) |
+| K25 swan-maiden | CONT·IP·NW, 9 | "deep, disjunct" | 0.16 | "areal" |
+| K8aa Jonah | CONT, 4 | "shallow, regional" | 0.15 | "areal" |
+
+1. **B routes, A dates the areal majority.** B only says descent-vs-areal; ~99% are
+   areal and B cannot date them (A3 and K8aa are both ≈0.16). A separates them at once —
+   A3 spans all three mega-sets with barrier crossings (deep pan-global substrate),
+   K8aa is compact in one set (recent borrowing).
+2. **B corrects A's false positives.** A would call B4 "deep disjunct" (it touches the
+   New World); B shows it is a coherent Austronesian clade plus a stray, not an ancient
+   substrate — B filters apparent disjunction that is really "clade + noise".
+3. **B de-noises A's breadth-as-age.** Compute A's depth *within* B's areal slice, after
+   the descent motifs are removed, so widespread-by-descent no longer inflates
+   "widespread = old".
+4. **A upgrades B to phylogeography.** A's coordinates turn B from cladistics into joint
+   ancestral clade **and range** reconstruction, and model the horizontal (contact) edges
+   a pure tree ignores — a reticulate "tree + migration" model then partitions each
+   motif into inherited vs borrowed shares.
+5. **Agreement = confidence, disagreement = diagnosis.** Both deep → high-confidence
+   deep; A-broad but B-areal → confidently *diffused*, not inherited. The disagreement
+   pattern is itself a classifier neither method has alone.
+
+**Gated pipeline:** B-signal → mode tag; descent → clade-depth age (A-breadth calibrates
+spread within the clade); areal → A disjunction/deep-set age; confidence from A–B
+agreement; in the limit, one phylo-geographic-reticulate run with A (space) and B (tree)
+as two observations. **Honest residual:** even together, A and B do not separate A3
+(deep cosmology) from K25 (widely diffused tale) — both are deep-areal by A and areal by
+B; only the **theme** axis (Category A cosmology vs B tale) resolves that. The full model
+is A (space) × B (tree) × theme.
+
+## 13. Cumulative conclusions (empirical)
+
+Backed by mockups 16–18 over the Berezkin catalogue:
+
+- **Method A (mockup 17).** Distribution carries a real depth signal — pan-global
+  celestial cosmogony tops the ranking, the adventure-endemism stress-test passes — but
+  no single linear score works: PC1 conflates old with *widespread*; a
+  disjunction-weighted variant triples the endemism separation yet over-penalises
+  prevalence (swan-maiden 100→16). Distribution alone is a signal, not a dating.
+- **Method B (mockup 18).** A phylogenetic-signal test finds **only ~1% of motifs are
+  broad *and* clade-clustered** (genuine descent) — and those are European fairy-tale
+  types (Cinderella, "seven at a blow"), independently recovering the published
+  phylomemetics result. Cosmology, trickster and the swan-maiden are broad but **areally
+  diffused**. So the language tree is the "wrong tree" for most motifs — which is exactly
+  why **geography is the primary signal** and language/time are separate computed layers.
+- **Theme is a statistical prior on stratum, not a substitute.** Per group, Category A
+  (cosmology/etiology) is geographically **broader** (mean ~6 macro-areas) and **more
+  areal** (phylo-signal ~0.25 — deep substrate), while Category B (adventures/tricks) is
+  **narrower** (~4) and **more descent-tracking** (~0.36 — younger tale diffusion). Theme
+  predicts a motif's *tendency* in area and depth, though any one theme still spans strata
+  (endemic-American adventures are deep). Use theme as a prior/covariate, never as the
+  answer.
+- **The model that follows.** Tradition = area × family × subsistence × theme_profile;
+  motif = theme (given) × stratum (computed, A×B). Analysis fixes a theme (Berezkin's
+  method), then dates within it by the gated A×B pipeline. No single axis suffices; the
+  three together (space, tree, theme) each remove the others' confound.
