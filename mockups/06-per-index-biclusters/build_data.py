@@ -18,7 +18,7 @@ from sklearn.cluster import SpectralCoclustering
 from sklearn.feature_extraction.text import TfidfTransformer
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from _geo import SUBREGION, gaz_coord  # noqa: E402
+from _geo import SUBREGION, berezkin_coords, gaz_coord  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent / "data.js"
@@ -47,18 +47,20 @@ def coord_resolver(index):
     spread out afterwards so they don't pile up).
 
     For the Berezkin index the real location is the tradition's own map
-    coordinate (mapsofmyths ``/gmap-markers-tradition``, stored as ``coordinates``
-    = [lat, lon] in ``berezkin.json``). Only where that is missing do we fall back
-    to the areal-subregion centroid — optionally nudged by a per-people gazetteer
-    hit, but only when it agrees with the tradition's subregion so an accidental
-    name collision can't fling a point across the world.
+    coordinate, read from the committed snapshot ``mockups/tradition-coords.json``
+    (areal_id -> [lat, lon]) so the mockup is independent of the motif pipeline.
+    Only where that is missing do we fall back to the areal-subregion centroid —
+    optionally nudged by a per-people gazetteer hit, but only when it agrees with
+    the tradition's subregion so an accidental name collision can't fling a point
+    across the world.
     """
     if index == "brz":
         bz = load("berezkin.json")
+        coords = berezkin_coords()   # areal_id -> [lat, lon]
         name2coord, name2sub = {}, {}
-        for v in bz["traditions"].values():
+        for aid, v in bz["traditions"].items():
             key = canon(v.get("name") or "")
-            c = v.get("coordinates")
+            c = coords.get(aid) or v.get("coordinates")   # snapshot first, pipeline as fallback
             if isinstance(c, (list, tuple)) and len(c) == 2:
                 name2coord[key] = (float(c[1]), float(c[0]))   # [lat, lon] -> (lon, lat)
             ap = v.get("areal_path") or []

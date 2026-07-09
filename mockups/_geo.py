@@ -132,3 +132,24 @@ def gaz_coord(label):
         if base.endswith(suf) and base[: -len(suf)] in GAZ:
             return GAZ[base[: -len(suf)]]
     return None
+
+
+# Real per-tradition coordinates for the Berezkin catalogue, committed as a snapshot
+# (mockups/tradition-coords.json, areal_id -> [lat, lon]) so the map mockups place
+# each tradition at its actual location without a full motif-pipeline run. Regenerate
+# the snapshot with src/motifs/sources/mapsofmyths.py (refresh).
+_BEREZKIN_COORDS = None
+
+
+def berezkin_coords():
+    """``{areal_id: [lat, lon]}`` from the committed snapshot (cached, read once)."""
+    global _BEREZKIN_COORDS
+    if _BEREZKIN_COORDS is None:
+        import json
+        from pathlib import Path
+        path = Path(__file__).with_name("tradition-coords.json")
+        try:
+            _BEREZKIN_COORDS = json.loads(path.read_text(encoding="utf-8")).get("coordinates", {})
+        except FileNotFoundError:
+            _BEREZKIN_COORDS = {}
+    return _BEREZKIN_COORDS
