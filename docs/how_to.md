@@ -6,6 +6,7 @@
 
 ```
 config/          — статические конфиги, шаблоны, models.json, corpus.json
+sources/         — локальные file:-источники корпуса (git-ignored; см. corpus)
 outputs/         — всё, что генерируется при запуске (corpus, embeddings, projections, …)
 src/             — исходный код (все Python-пакеты, settings.py, main.py, cli.py)
 scripts/         — офлайн/разовые скрипты вне mytho-пайплайна (см. scripts/README.md)
@@ -89,7 +90,7 @@ pip install --upgrade pip
 
 - **`src/settings.py`** — единый источник путей и параметров. Все директории (`outputs/corpus`, `outputs/embeddings`, …), параметры chunking, LLM, сервера и т.д. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` / `config/.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`). Вложенные параметры через `__`: `MYTHO_LLM__MODEL=gpt4o-mini`. Полный список переменных — в `.env.example`.
 - **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах. У LLM-провайдера можно задать необязательные лимиты `rpm`/`tpm`/`rpd` (запросов и токенов в минуту, запросов в сутки) — по ним rate-governor троттлит вызовы при параллельном извлечении графов. Без них параллелизм ограничен только `max_concurrent`. `rpd` — справочный (жёсткой остановки по нему нет; см. раздел graphs).
-- **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL). Книга несёт только `tradition`; её мажор-группа резолвится из `traditions.json`.
+- **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL). Книга несёт только `tradition`; её мажор-группа резолвится из `traditions.json`. Поле `url` может быть веб-адресом (`https://…`) или локальным файлом (`file:…`) — см. раздел corpus.
 - **`config/traditions.json`** — иерархическое дерево `major → {traditions: {tradition → {description, coordinates}}}`. Единый источник группировки: `major_tradition` живёт здесь по одному разу на традицию (а не дублируется в каждой книге). Сборка раскладывает дерево в плоский `outputs/corpus/traditions.json`.
 - **`config/graphs_prompts.json`** — промпты для LLM-извлечения сущностей.
 
@@ -151,7 +152,8 @@ mytho export --help
 Модуль сборки корпуса из `config/corpus.json` (каталог источников). Тексты с Project Gutenberg автоматически очищаются от лицензионных заголовков и хвостов при скачивании.
 
 Основные файлы:
-- `src/corpus/downloader.py` скачивает источники.
+- `src/corpus/downloader.py` скачивает веб-источники.
+- `src/corpus/sources.py` диспетчеризация источника по схеме `url` (веб vs локальный `file:`), резолвинг локальных путей под `sources/` и проверка их неизменности.
 - `src/corpus/extraction.py` извлекает текст из HTML/PDF/TXT.
 - `src/corpus/utils.py` утилиты: пути, нормализация текста, подсчёт слов/предложений, работа с традициями.
 - `src/corpus/iterator.py` итерация по файлам корпуса (`iter_files`, `CorpusFileInfo`).
@@ -175,6 +177,31 @@ mytho corpus
 ```bash
 mytho corpus --force
 ```
+
+### Источники: веб и локальные файлы
+
+Тип источника определяется **схемой поля `url`** — отдельного поля нет:
+
+- `https://…` / `http://…` — скачивается (как раньше), с очисткой Gutenberg-боллерплейта.
+- `file:…` (или голый относительный путь) — читается из локального файла **под каталогом `sources/`** (`settings.sources_dir`).
+
+```jsonc
+// config/corpus.json
+[
+  { "title": "Iliad",       "tradition": "Greek", "url": "https://www.gutenberg.org/files/6130/6130-0.txt" },
+  { "title": "Local Myth",  "tradition": "Greek", "url": "file:local-myth.txt" },      // → sources/local-myth.txt
+  { "title": "Scanned Epic","tradition": "Norse", "url": "file:norse/epic.pdf" }        // → sources/norse/epic.pdf
+]
+```
+
+Как это работает:
+- **Формат** (TXT/HTML/PDF) определяется по содержимому и расширению — так же, как для веб-источников; отдельной настройки не нужно.
+- **Безопасность.** Пути конфайнятся под `sources/`: абсолютные пути, выход за корень (`file:../…`) и удалённые хосты (`file://host/…`) отклоняются. Относительный `file:foo.txt` переносим между машинами.
+- **Детекция изменений.** Веб-источник переиспользуется, пока цел его выходной `.txt`. Локальный файл сверяется по хэшу содержимого с сырым слепком прошлой сборки (в `outputs/corpus/raw/`): правка на диске → переингест, без правок → пропуск. Отдельного хэша в метаданных нет — слепок и есть запись.
+- **Провенанс.** В метаданных остаётся сам `url` (со схемой `file:`); никакого `source_type`. На фронте ссылка «Source» показывается только для веб-источников, у файловых — ничего.
+- **Приватность/лицензии.** Веб-корпус у нас public domain (Gutenberg), а файлы часто нет — поэтому каталог `sources/` **в `.gitignore`** (не коммить чужие тексты). Права отслеживаешь сам.
+
+`sources/` попадает в `mytho export` (см. раздел export), чтобы оригиналы ехали вместе с бандлом.
 
 ## embedding
 
