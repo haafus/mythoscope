@@ -1,0 +1,105 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16 · Tradition thematic profiles</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
+  main { max-width:1180px; margin:0 auto; padding:26px 22px 60px; }
+  header h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:900px; }
+  .card { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:18px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .stat { font-size:12.5px; color:var(--muted); }
+  .stat b { color:var(--ink); font-size:14px; }
+  svg.map { width:100%; height:auto; background:#eef3f4; border-radius:8px; display:block; }
+  .land { fill:#e4e9e3; stroke:#d3d9d0; stroke-width:0.3; }
+  .ocean { fill:#eef3f4; }
+  .nav { display:flex; flex-wrap:wrap; gap:7px; }
+  .nav a { display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:var(--ink);
+           font-size:12px; background:#f4f1ea; border:1px solid #e7e2d7; border-radius:20px; padding:3px 10px; }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .cl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; }
+  .cl { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:15px 16px; }
+  .cl-head { display:flex; align-items:center; gap:8px; }
+  .cl-head h3 { font-size:14px; margin:0; }
+  .cl-head .n { margin-left:auto; font-size:12px; color:var(--muted); }
+  .bars { margin:10px 0 8px; }
+  .brow { display:grid; grid-template-columns:120px 1fr 34px; align-items:center; gap:8px; margin:2px 0; font-size:11px; }
+  .brow .bn { color:#586169; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .brow.top .bn { color:var(--ink); font-weight:600; }
+  .bt { height:9px; background:#f0ece3; border-radius:5px; overflow:hidden; }
+  .bf { height:100%; border-radius:5px; }
+  .brow .bv { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .lab { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#a3457e; margin:8px 0 3px; }
+  .reg { font-size:11.5px; color:#586169; }
+  .ex { font-size:11px; color:#8a929a; margin-top:3px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+</style>
+<main>
+<header>
+  <h1>Тематический профиль традиций Березкина</h1>
+  <p>Каждая традиция — 13-мерный вектор долей её мотивов по тематическим группам Березкина. Кластеризация
+     ведётся <b>только по этому профилю</b> (без географии и языка), затем кластеры нанесены на карту —
+     проверка, несёт ли жанровый баланс корпуса сигнал и группирует ли культуры поверх географии.</p>
+</header>
+
+<div class="card">
+  <div class="stat" id="stat"></div>
+  <div class="nav" id="nav" style="margin-top:10px"></div>
+</div>
+
+<div class="card">
+  <h2>Карта — традиции, окрашенные по тематическому кластеру</h2>
+  <div id="map"></div>
+  <div class="muted" style="margin-top:8px">Точка — традиция; где реальная координата отсутствует, взят центроид ареального субрегиона и точки разведены. Экваториальная проекция.</div>
+</div>
+
+<h2 style="margin:22px 4px 4px">Кластеры</h2>
+<div class="cl-grid" id="clusters"></div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip = (s,n)=> s.length>n ? s.slice(0,n-1)+"…" : s;
+
+document.getElementById("stat").innerHTML =
+  `<b>${D.n_trad}</b> традиций (≥${D.min_motifs} мотивов) · <b>${D.k}</b> кластеров по 13-мерному профилю · `+
+  `дисперсии профиля, объяснённой макроареалом: <b>${D.var_by_macro}%</b> (значит ${100-D.var_by_macro}% — сигнал поверх географии)`;
+
+function mapSVG(){
+  const land = `<path class="land" d="${window.LAND||""}"/>`;
+  const pts = D.points.map(p=>{
+    const cx=p.x+180, cy=90-p.y, col=D.clusters.find(c=>c.id===p.k).color;
+    return `<circle cx="${cx}" cy="${cy}" r="1.15" fill="${col}" fill-opacity="0.85"/>`;
+  }).join("");
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${pts}</svg>`;
+}
+document.getElementById("map").innerHTML = mapSVG();
+
+document.getElementById("nav").innerHTML = D.clusters.map(c=>{
+  const t = c.top.slice(0,2).map(t=>t.name).join(" · ");
+  return `<a href="#cl${c.id}"><span class="dot" style="background:${c.color}"></span>${esc(clip(t,32))} <span class="muted">(${c.n})</span></a>`;
+}).join("");
+
+const maxV = Math.max(...D.clusters.flatMap(c=>c.profile));
+function bars(c){
+  const topset = new Set(c.top.map(t=>t.i));
+  return `<div class="bars">`+c.profile.map((v,i)=>
+    `<div class="brow ${topset.has(i)?"top":""}"><span class="bn">${esc(D.themes[i])}</span>`+
+    `<span class="bt"><span class="bf" style="width:${100*v/maxV}%;background:${c.color}"></span></span>`+
+    `<span class="bv">${(100*v).toFixed(0)}%</span></div>`).join("")+`</div>`;
+}
+document.getElementById("clusters").innerHTML = D.clusters.map(c=>`
+  <div class="cl" id="cl${c.id}">
+    <div class="cl-head"><span class="dot" style="background:${c.color}"></span>
+      <h3>${esc(c.top.slice(0,3).map(t=>t.name).join(" · "))}</h3><span class="n">${c.n} трад.</span></div>
+    ${bars(c)}
+    <div class="lab">Доминирующие макроареалы</div>
+    <div class="reg">${c.regions.map(r=>`${esc(r.name)} <span class="muted">${r.n}</span>`).join(" · ")}</div>
+    <div class="lab">Примеры традиций</div>
+    <div class="ex">${c.examples.map(e=>esc(e)).join(", ")}</div>
+  </div>`).join("");
+</script>

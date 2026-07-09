@@ -177,6 +177,27 @@ deep-time layer (cluster 7). Interpretive prose is original; motif names are sho
 catalogue labels and the Russian column is the index's own `name_rus`. See
 [`15-berezkin-clusters-report/README.md`](15-berezkin-clusters-report/README.md).
 
+### 16 · Tradition thematic profiles
+Tests the `theme_profile` idea from
+[`macro-area-facets.md`](../docs/motifs/proposals/macro-area-facets.md): each Berezkin
+tradition is a 13-dim vector of the proportion of its motifs in each thematic group, and
+the 840 traditions with ≥30 motifs are clustered **by that profile alone** (k-means),
+then mapped. 38% of the profile variance is explained by macro-area — a strong regional
+signal — yet the clusters mix region and worldview (a cosmology-heavy cluster groups
+Mesoamerica–Andes with Tibet/SE-Asia and Ancient Greece). See
+[`16-tradition-theme-profiles/README.md`](16-tradition-theme-profiles/README.md).
+
+### 17 · Motif depth-score
+A first prototype of **Method A** from
+[`stratum-derivation.md`](../docs/motifs/proposals/stratum-derivation.md): estimate a
+motif's time-depth from the shape of its areal distribution alone (prevalence, spread,
+fragmentation, language-family span, mega-set span) via PCA PC1, oriented by
+uncontroversial anchors. Pan-global celestial cosmogony tops the ranking and the
+adventure-endemism stress-test passes; it also honestly exposes the prevalence confound
+(the thin trans-Pacific Sun-&-Moon sinks, the broadly-diffused tar-baby floats up) that
+motivates bias correction and the phylogenetic Method B. See
+[`17-motif-depth-score/README.md`](17-motif-depth-score/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
