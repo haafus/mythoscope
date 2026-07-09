@@ -168,7 +168,7 @@ name / composition & boundaries / etiology / connections / content write-up, mac
 and theme bars, a motif table, and a world map highlighting that cluster's traditions;
 plus a combined all-clusters map. A closing section contrasts the three indexes
 (Berezkin / Thompson / ATU) and their fitness for different tasks, and foregrounds the
-thin trans-continental Sun-&-Moon deep-time layer (cluster 6). Interpretive prose is
+thin trans-continental Sun-&-Moon deep-time layer (cluster 7). Interpretive prose is
 original; motif names are short catalogue labels. See
 [`15-berezkin-clusters-report/README.md`](15-berezkin-clusters-report/README.md).
 
