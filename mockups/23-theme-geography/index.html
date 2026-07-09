@@ -1,0 +1,148 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>23 · Theme × geography</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1080px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:940px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  /* heatmap */
+  .hm { overflow-x:auto; }
+  .grid { display:grid; gap:2px; min-width:640px; font-size:11px; }
+  .grid .h { font-size:9.5px; color:#8b939a; text-align:center; padding:2px 0; letter-spacing:.02em; }
+  .grid .rl { font-size:11px; color:#495057; padding-right:8px; white-space:nowrap; text-align:right; display:flex; align-items:center; justify-content:flex-end; }
+  .cell { height:24px; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#3a2f28; font-variant-numeric:tabular-nums; }
+  .scale { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted); margin-top:10px; }
+  .ramp { height:11px; width:180px; border-radius:6px; background:linear-gradient(90deg,#4f7d99,#e7ded0,#c05540); }
+  /* maps */
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; }
+  .ocean { fill:#dfe6ec; }
+  .clname { font-weight:600; }
+  .legend { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; margin-top:12px; }
+  .li { display:flex; gap:9px; align-items:flex-start; font-size:12px; cursor:pointer; padding:4px 6px; border-radius:7px; }
+  .li:hover, .li.on { background:var(--bg); }
+  .li .dot { width:12px; height:12px; border-radius:4px; margin-top:2px; flex:0 0 auto; }
+  .li .sub { color:var(--muted); font-size:11px; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  select { font:13px inherit; padding:4px 8px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); }
+  .tops { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .chip { font-size:11px; background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:2px 9px; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Тема × география</h1>
+  <p>Где концентрируются тематические блоки. Три вида по каталогу Березкина: <b>(1)</b> тепловая матрица 13 тем-групп ×
+     12 макроареалов по <b>lift</b> (наблюдаемое против ожидаемого при независимости) — сразу видно, что где над- и
+     недопредставлено; <b>(2)</b> карта, где традиции <b>ко-кластеризованы с темами</b> (традиции × темы, аналог
+     мокапа 15, но не по мотивам), кластеры залиты «отпечатками»; <b>(3)</b> переключатель — карта, окрашенная по
+     доле выбранной темы.</p>
+</header>
+
+<div class="card">
+  <h2>Тепловая матрица <span class="s">— тема-группа × макроареал, цвет = lift, число = доля темы внутри ареала (%)</span></h2>
+  <div class="hm"><div class="grid" id="heat"></div></div>
+  <div class="scale">
+    <span>недопредставлено</span><span class="ramp"></span><span>перепредставлено</span>
+    <span class="muted">· lift 1.0 = нейтрально (как в среднем по каталогу)</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Ко-кластеры традиции × темы <span class="s">— footprint-карта в стиле мокапа 15</span></h2>
+  <div id="cmap"></div>
+  <div class="legend" id="clegend"></div>
+  <div class="note">Каждый кластер — группа традиций <i>и</i> определяющих её тем-групп (SpectralCoclustering). Наведи/кликни в легенде, чтобы подсветить один кластер.</div>
+</div>
+
+<div class="card">
+  <h2>Карта по одной теме <span class="s">— доля темы в корпусе традиции</span></h2>
+  <div class="row"><label for="sel">Тема-группа:</label><select id="sel"></select><span class="muted" id="pmax"></span></div>
+  <div id="pmap" style="margin-top:10px"></div>
+  <div class="tops" id="ptops"></div>
+</div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const AB = ["EUR","NEA","ICS","ESE","AUO","SIB","NWA","ENA","MES","SAM","SSA","AUS"];
+
+// ---- diverging lift color: cool(#4f7d99) — neutral(#e7ded0) — warm(#c05540) ----
+const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+const COOL=[79,125,153], NEU=[231,222,208], WARM=[192,85,64];
+function liftCol(l){
+  if(l>=1){ const t=Math.min(1,(l-1)/1.2); return `rgb(${mix(NEU,WARM,t).join(",")})`; }
+  const t=Math.min(1,(1-l)/1.0); return `rgb(${mix(NEU,COOL,t).join(",")})`;
+}
+
+// ---- heatmap ----
+const H=D.heat, na=H.areas.length;
+let g = `<div class="rl"></div>` + H.areas.map((a,j)=>`<div class="h" title="${esc(a)}">${AB[j]||a.slice(0,3)}</div>`).join("");
+H.groups.forEach((gr,i)=>{
+  g += `<div class="rl" title="${esc(gr.name)}">${gr.g}. ${esc(gr.name)}</div>`;
+  for(let j=0;j<na;j++){
+    const l=H.lift[i][j], sh=H.share[i][j];
+    g += `<div class="cell" style="background:${liftCol(l)}" title="${esc(gr.name)} × ${esc(H.areas[j])}\nlift ${l} · доля в ареале ${sh}%">${sh||""}</div>`;
+  }
+});
+document.getElementById("heat").style.gridTemplateColumns = `minmax(150px,1.3fr) repeat(${na},1fr)`;
+document.getElementById("heat").innerHTML = g;
+
+// ---- map projection (equirectangular: cx=lon+180, cy=90-lat) ----
+const LAND = `<path class="land" d="${window.LAND||""}"/>`;
+const blobPath = ring => "M"+ring.map(p=>`${(p[0]+180).toFixed(2)} ${(90-p[1]).toFixed(2)}`).join("L")+"Z";
+
+function clusterMap(activeK){
+  const cls = activeK==null ? D.clusters : D.clusters.filter(c=>c.id===activeK);
+  const fo = activeK==null?0.10:0.22, so = activeK==null?0.45:0.75;
+  const blobs = cls.flatMap(c=>(c.blobs||[]).map(r=>
+    `<path d="${blobPath(r)}" fill="${c.color}" fill-opacity="${fo}" stroke="${c.color}" stroke-opacity="${so}" stroke-width="0.4"/>`)).join("");
+  const pts = D.points.map(p=>{
+    const on = activeK==null||p.k===activeK;
+    const col = on ? D.clusters[p.k].color : "#c8cdc7";
+    return `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="${on?1.2:0.7}" fill="${col}" fill-opacity="${on?0.9:0.3}"/>`;
+  }).join("");
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${blobs}${pts}</svg>`;
+}
+const cmap = document.getElementById("cmap");
+cmap.innerHTML = clusterMap(null);
+document.getElementById("clegend").innerHTML = D.clusters.map(c=>
+  `<div class="li" data-k="${c.id}"><span class="dot" style="background:${c.color}"></span><div>`+
+  `<span class="clname">${esc(c.themes.join(" · "))}</span> <span class="sub">(${c.n})</span><br>`+
+  `<span class="sub">${c.areas.map(a=>esc(a.name)).join(", ")}</span></div></div>`).join("");
+document.querySelectorAll("#clegend .li").forEach(el=>{
+  const k=+el.dataset.k;
+  el.onmouseenter=()=>{ cmap.innerHTML=clusterMap(k); el.classList.add("on"); };
+  el.onmouseleave=()=>{ cmap.innerHTML=clusterMap(null); el.classList.remove("on"); };
+});
+
+// ---- theme picker map ----
+const sel = document.getElementById("sel");
+sel.innerHTML = D.groups.map(gr=>`<option value="${gr.g-1}">${gr.g}. ${esc(gr.name)}</option>`).join("");
+const VIO=[106,90,166];
+function pickMap(gi){
+  const vals = D.pick.map(p=>p.s[gi]);
+  const mx = Math.max(...vals, 0.01);
+  const pts = D.pick.map(p=>{
+    const t = p.s[gi]/mx;
+    const col = `rgb(${mix([224,222,214],VIO,t).join(",")})`;
+    return `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="${0.8+1.7*t}" fill="${col}" fill-opacity="${0.35+0.55*t}"/>`;
+  }).join("");
+  document.getElementById("pmap").innerHTML =
+    `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${pts}</svg>`;
+  document.getElementById("pmax").textContent = `макс. доля ${Math.round(mx*100)}%`;
+  const li = H.lift[gi].map((l,j)=>({a:H.areas[j],l})).sort((x,y)=>y.l-x.l).slice(0,4);
+  document.getElementById("ptops").innerHTML = "перепредставлено в: " + li.map(x=>
+    `<span class="chip">${esc(x.a)} <b>×${x.l.toFixed(1)}</b></span>`).join("");
+}
+sel.onchange = ()=>pickMap(+sel.value);
+pickMap(0);
+</script>

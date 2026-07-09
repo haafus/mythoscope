@@ -181,7 +181,9 @@ stress-test a naive "B = late" rule fails and the distributional signal passes.
 
 The *mapping* of theme groups onto areas and onto depth is itself informative — theme is
 a statistical **prior** on stratum (not a substitute; the two stay orthogonal per motif).
-Measured over the catalogue:
+Measured over the catalogue (the theme × area half is visualised in
+[`mockups/23-theme-geography`](../../../mockups/23-theme-geography/) — a lift heatmap, a
+traditions × themes co-cluster map, and a per-theme picker):
 
 - **theme × area.** Which themes concentrate where varies strongly: Category B is 74–77%
   of European attestations but 27% in Mesoamerica–Andes; `theme_profile` clusters

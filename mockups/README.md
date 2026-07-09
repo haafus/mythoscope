@@ -255,6 +255,15 @@ horticulturalists 57.6%) from **intensive/mobile ones low** (agrarian-states 39.
 pastoralists 36.2%) — cosmology yields to tale as production intensifies, as predicted, with
 an honest area confound. See [`22-subsistence-external/README.md`](22-subsistence-external/README.md).
 
+### 23 · Theme × geography
+Visualises the `theme × area` signal `macro-area-facets.md` only states in prose. Three
+views: a **heatmap** (13 theme groups × 12 macro-areas, coloured by lift — Adventures ×1.2
+in the Eurasian belt, ×0.3 in Australia; Sun & Moon ×3.4 in Australia); a **co-cluster map**
+that biclusters traditions × themes (SpectralCoclustering) and draws each cluster as
+footprint blobs in the style of mockup 15 — the traditions-×-themes analogue of its
+traditions-×-motifs clusters; and a **theme picker** that shades the map by any single
+group's share. See [`23-theme-geography/README.md`](23-theme-geography/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
