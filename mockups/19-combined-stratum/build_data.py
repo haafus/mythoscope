@@ -31,11 +31,11 @@ BROAD = 6             # macro-areas
 TRACK = {"B4": "fished-out earth", "K25": "swan-maiden", "A3": "sun & moon",
          "K8aa": "Jonah (world-religion)", "M182": "tar-baby", "K57": "Cinderella"}
 MODES = {
-    "areal_deep": ("Deep areal substrate", "areal, spans both hemispheres (Indo-Pacific + New World) — Pleistocene-era", "#7c3aed"),
-    "descent": ("Descent (clade)", "clustered on the language tree — dated by clade (Neolithic-era expansions)", "#12a150"),
-    "areal_broad": ("Broad areal", "widespread by contact, one hemisphere — age ambiguous", "#c2410c"),
-    "areal_recent": ("Areal / borrowed", "compact, single set — recent diffusion", "#d97706"),
-    "local": ("Local / insufficient", "too narrow to place", "#98a0a7"),
+    "areal_deep": ("Deep areal substrate", "areal, spans both hemispheres (Indo-Pacific + New World) — Pleistocene-era", "#6a5aa6"),
+    "descent": ("Descent (clade)", "clustered on the language tree — dated by clade (Neolithic-era expansions)", "#3c8a5e"),
+    "areal_broad": ("Broad areal", "widespread by contact, one hemisphere — age ambiguous", "#c05540"),
+    "areal_recent": ("Areal / borrowed", "compact, single set — recent diffusion", "#b28a3e"),
+    "local": ("Local / insufficient", "too narrow to place", "#98a0a5"),
 }
 
 

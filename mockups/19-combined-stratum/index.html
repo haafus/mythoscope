@@ -98,7 +98,7 @@ document.getElementById("xnote").innerHTML =
   `сказочна (Adventures/Tricks). Это независимо воспроизводит сигнал theme × stratum, потому что тема не была входом.`;
 
 document.getElementById("tracked").innerHTML = D.tracked.map(t=>{
-  const cc = t.conf>=0.65?"#12a150":t.conf>=0.45?"#c2410c":"#98a0a7";
+  const cc = t.conf>=0.65?"#3c8a5e":t.conf>=0.45?"#c05540":"#98a0a5";
   return `<tr><td class="code">${esc(t.c)}</td><td>${esc(t.n)} <span class="muted">(${esc(t.label)})</span></td>`+
     `<td><span class="pill" style="background:${col(t.mode)}">${M[t.mode][0]}</span></td>`+
     `<td class="r">${t.dep.toFixed(0)}</td><td class="r">${t.sig.toFixed(2)}</td><td class="r">${t.nm}</td>`+

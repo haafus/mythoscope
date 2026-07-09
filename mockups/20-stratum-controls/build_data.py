@@ -45,11 +45,11 @@ W_CAP = 2.0          # cap on a single tradition's baseline-equivalent evidence 
 TRACK = {"B4": "fished-out earth", "K25": "swan-maiden", "A3": "sun & moon",
          "K8aa": "Jonah (world-religion)", "M182": "tar-baby", "K57": "Cinderella"}
 MODES = {
-    "areal_deep": ("Deep areal substrate", "#7c3aed"),
-    "descent": ("Descent (clade)", "#12a150"),
-    "areal_broad": ("Broad areal", "#c2410c"),
-    "areal_recent": ("Areal / borrowed", "#d97706"),
-    "local": ("Local / insufficient", "#98a0a7"),
+    "areal_deep": ("Deep areal substrate", "#6a5aa6"),
+    "descent": ("Descent (clade)", "#3c8a5e"),
+    "areal_broad": ("Broad areal", "#c05540"),
+    "areal_recent": ("Areal / borrowed", "#b28a3e"),
+    "local": ("Local / insufficient", "#98a0a5"),
 }
 
 
