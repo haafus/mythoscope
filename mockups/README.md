@@ -191,12 +191,25 @@ Mesoamerica–Andes with Tibet/SE-Asia and Ancient Greece). See
 A first prototype of **Method A** from
 [`stratum-derivation.md`](../docs/motifs/proposals/stratum-derivation.md): estimate a
 motif's time-depth from the shape of its areal distribution alone (prevalence, spread,
-fragmentation, language-family span, mega-set span) via PCA PC1, oriented by
-uncontroversial anchors. Pan-global celestial cosmogony tops the ranking and the
-adventure-endemism stress-test passes; it also honestly exposes the prevalence confound
-(the thin trans-Pacific Sun-&-Moon sinks, the broadly-diffused tar-baby floats up) that
-motivates bias correction and the phylogenetic Method B. See
+fragmentation, language-family span, mega-set span). Shows two scores — PC1 and a
+disjunction-weighted variant. Pan-global celestial cosmogony tops the ranking and the
+adventure-endemism stress-test passes (the disjunction weighting triples the
+separation); but neither linear score suffices — PC1 conflates old with *widespread*,
+the disjunction variant over-penalises prevalence (swan-maiden K25 100→16) — which is
+the concrete argument for the phylogenetic Method B. See
 [`17-motif-depth-score/README.md`](17-motif-depth-score/README.md).
+
+### 18 · Motif phylo-strata (Method B)
+A prototype of **Method B**: place each motif on a **language classification tree** (from
+the `language` chains) and run Fitch parsimony ancestral-state reconstruction. The
+**phylogenetic signal** (observed vs random gains) separates descent (clustered on the
+tree) from areal diffusion (scattered). Finding: only ~1% of motifs are broad *and*
+clade-clustered — and those are European fairy-tale types (Cinderella, "seven at a
+blow"), independently recovering the published result that märchen track language
+phylogeny within Eurasia; cosmology, trickster and the swan-maiden are broad but areally
+diffused. So A and B are complementary — B flags the *mode* of spread and dates the
+descent-minority, geography (A) handles the areal majority. See
+[`18-motif-phylostrata/README.md`](18-motif-phylostrata/README.md).
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded

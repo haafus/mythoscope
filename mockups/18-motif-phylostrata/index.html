@@ -1,0 +1,116 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>18 · Motif phylo-strata</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
+  main { max-width:1040px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:900px; }
+  .card { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .stat { font-size:12.5px; color:var(--muted); } .stat b { color:var(--ink); }
+  svg { width:100%; height:auto; display:block; }
+  .qgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .q { border:1px solid #e7e2d7; border-radius:10px; padding:12px 14px; }
+  .q h3 { font-size:13px; margin:0 0 2px; }
+  .q .sub { font-size:11.5px; color:var(--muted); margin-bottom:7px; }
+  .q .cnt { float:right; font-size:12px; color:var(--muted); font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:11.5px; }
+  td { padding:2px 5px; border-bottom:1px solid #f4f1ea; }
+  td.code { font-weight:700; color:#4f7096; white-space:nowrap; }
+  td.sig { text-align:right; font-variant-numeric:tabular-nums; color:#586169; white-space:nowrap; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .trk td { border-bottom:1px solid #f0ede6; padding:4px 7px; font-size:12px; }
+  .pill { display:inline-block; font-size:11px; padding:1px 7px; border-radius:20px; }
+</style>
+<main>
+<header>
+  <h1>Филогенетические страты мотивов — метод B</h1>
+  <p>Каждый мотив нанесён на дерево классификации языков (из цепочек <b>language</b>) и по нему проведена
+     parsimony-реконструкция предковых состояний. Ключевая метрика — <b>филогенетический сигнал</b>:
+     насколько меньше независимых обретений, чем при случайном размещении (D-подобная статистика).
+     Высокий сигнал = мотив собран в кладе (наследование по происхождению); низкий = размазан по дереву
+     (ареальная диффузия / гомоплазия). Это ловит различие, недоступное чисто географическому методу A.</p>
+</header>
+
+<div class="card">
+  <div class="stat" id="stat"></div>
+  <h2 style="margin-top:12px">Широта (макроареалы) × филогенетический сигнал</h2>
+  <div id="scatter"></div>
+  <div class="muted" style="margin-top:6px">Каждая точка — мотив (≥4 традиций). Крупные подписанные — отслеживаемые. Линии — пороги квадрантов.</div>
+</div>
+
+<div class="card">
+  <h2>Четыре режима</h2>
+  <div class="qgrid" id="quads"></div>
+</div>
+
+<div class="card">
+  <h2>Отслеживаемые мотивы</h2>
+  <table class="trk"><thead><tr><th>Код</th><th>Мотив</th><th>Широта (макро)</th><th>Языков.семей</th><th>Обретений</th><th>Сигнал</th></tr></thead>
+  <tbody id="tracked"></tbody></table>
+  <div class="note" id="verdict"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+
+document.getElementById("stat").innerHTML =
+  `<b>${D.n_motifs}</b> мотивов на дереве из <b>${D.n_nodes}</b> узлов. Широких И кладово-собранных (наследование): `+
+  `<b>${D.counts.deep}</b> (${(100*D.counts.deep/D.n_motifs).toFixed(0)}%); широких, но ареально-диффузных: `+
+  `<b>${D.counts.diffuse}</b> (${(100*D.counts.diffuse/D.n_motifs).toFixed(0)}%).`;
+
+// scatter
+(function(){
+  const W=1000,H=460,pad=44, xmax=16;
+  const X=v=>pad+(W-2*pad)*v/xmax, Y=v=>H-pad-(H-2*pad)*v;
+  const jit=()=>(Math.sin((jit.i=(jit.i||0)+1)*12.9898)*43758.5453%1); // deterministic pseudo-jitter
+  const dots=D.cloud.map(p=>{const jx=(((p.x*97+p.y*10000)%13)/13-0.5)*0.7;
+    return `<circle cx="${X(p.x+jx).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="1.5" fill="#8aa0ad" fill-opacity="0.28"/>`;}).join("");
+  const vline=`<line x1="${X(D.br)}" y1="${pad}" x2="${X(D.br)}" y2="${H-pad}" stroke="#d3ccbe" stroke-dasharray="4 3"/>`;
+  const hline=`<line x1="${pad}" y1="${Y(D.co)}" x2="${W-pad}" y2="${Y(D.co)}" stroke="#d3ccbe" stroke-dasharray="4 3"/>`;
+  const qlab=(x,y,t,c)=>`<text x="${x}" y="${y}" font-size="12" fill="${c}" font-weight="600">${t}</text>`;
+  const labels=qlab(W-pad-150,pad+16,"наследование (клада)","#12a150")+qlab(pad+6,pad+16,"клада-ограниченный","#0891b2")
+    +qlab(W-pad-150,H-pad-10,"ареальная диффузия","#c2410c")+qlab(pad+6,H-pad-10,"узкий / шум","#98a0a7");
+  const trk=D.tracked.map(t=>{const jx=(((t.nm*97+t.coh*10000)%13)/13-0.5)*0.7;
+    const cx=X(t.nm+jx),cy=Y(t.coh);
+    return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4" fill="#e11d48"/>`
+      +`<text x="${(cx+6).toFixed(1)}" y="${(cy+3).toFixed(1)}" font-size="11" fill="#1f2a30">${esc(t.c)} · ${esc(t.label)}</text>`;}).join("");
+  const ax=`<line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#c9c2b4"/>`
+    +`<line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}" stroke="#c9c2b4"/>`
+    +`<text x="${W/2}" y="${H-8}" font-size="11" fill="#98a0a7" text-anchor="middle">широта — число макроареалов →</text>`
+    +`<text x="14" y="${H/2}" font-size="11" fill="#98a0a7" text-anchor="middle" transform="rotate(-90 14 ${H/2})">филогенетический сигнал →</text>`;
+  document.getElementById("scatter").innerHTML=`<svg viewBox="0 0 ${W} ${H}">${ax}${dots}${vline}${hline}${labels}${trk}</svg>`;
+})();
+
+const QMETA={deep:["Наследование по происхождению","широкий И кладово-собранный — редко","#12a150"],
+  diffuse:["Ареальная диффузия","широкий, но размазан по дереву — доминирует","#c2410c"],
+  clade:["Клада-ограниченный","узкий, но собран в кладе","#0891b2"],
+  noise:["Узкий / шум","узкий и без сигнала","#98a0a7"]};
+document.getElementById("quads").innerHTML=["deep","diffuse","clade","noise"].map(k=>{
+  const [t,s,c]=QMETA[k];
+  const rows=D.examples[k].slice(0,6).map(e=>`<tr><td class="code">${esc(e.c)}</td><td>${esc(clip(e.n,30))}</td><td class="sig">${e.coh.toFixed(2)}</td></tr>`).join("");
+  return `<div class="q"><span class="cnt">${D.counts[k]}</span><h3 style="color:${c}">${t}</h3><div class="sub">${s}</div><table>${rows}</table></div>`;
+}).join("");
+
+document.getElementById("tracked").innerHTML=D.tracked.map(t=>{
+  const c = t.coh>=0.5 ? "#12a150" : t.coh>=0.3 ? "#c2410c" : "#98a0a7";
+  return `<tr><td class="code">${esc(t.c)}</td><td>${esc(t.n)} <span class="muted">(${esc(t.label)})</span></td>`
+    +`<td class="sig">${t.nm}</td><td class="sig">${t.nl}</td><td class="sig">${t.ch}</td>`
+    +`<td class="sig"><span class="pill" style="background:${c}22;color:${c}">${t.coh.toFixed(2)}</span></td></tr>`;}).join("");
+
+document.getElementById("verdict").innerHTML=
+  "<b>Главный вывод.</b> Только ~1% мотивов и широки, И собраны в кладе (истинное наследование) — и это оказываются "+
+  "европейские сказочные типы (Золушка, «одним махом семерых»), которые, как и в опубликованной филомемтике "+
+  "(Tehrani и др.), <b>следуют языковому родству внутри Евразии</b>. А космология, трикстер и дева-лебедь (K25) — "+
+  "широки, но с низким сигналом: они <b>распространялись ареально, контактом, а не по происхождению</b>. "+
+  "Значит методы дополняют друг друга: <b>B определяет режим</b> (наследование vs ареал) и датирует немногих "+
+  "«наследуемых» по глубине клады, а для ареального большинства возраст оценивает <b>география (метод A)</b> + "+
+  "сигнал глубоких сетов. Язык — «не то дерево» для большинства мотивов, что и подтверждает первичность географии.";
+</script>

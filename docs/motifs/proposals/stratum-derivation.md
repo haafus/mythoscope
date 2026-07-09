@@ -140,6 +140,15 @@ Notes:
 The model-based route folklorists actually use to date tales (phylomemetics; Tehrani,
 d'Huy, Ross). It handles homoplasy natively because it *counts independent gains*.
 
+**Prototyped** in [`mockups/18-motif-phylostrata`](../../../mockups/18-motif-phylostrata/)
+on the interim coarse tree (our `language` chains) with Fitch parsimony + a
+phylogenetic-signal test. Key finding: only ~1% of motifs are broad *and* clade-clustered
+(genuine descent) — and those are Eurasian fairy-tale types, recovering the published
+result — while cosmology/trickster/swan-maiden are broad but areally diffused (low
+signal). So B identifies the *mode* of spread (descent vs areal) and dates the
+descent-minority; geography (Method A) handles the areal majority. The two are
+complementary, not competing.
+
 ```
 # needs: a dated language phylogeny with our traditions at the tips
 1. tree = dated_language_tree(traditions)      # Glottolog topology + node dates
