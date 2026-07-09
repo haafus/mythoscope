@@ -424,6 +424,19 @@ transmission is real and area-independent*; **genetic-only** (e.g. Jonah in Afri
 diffusion. A true third axis needs fine SNP + the M34/M35 corridors; the join is wired for M36.
 See [`33-alt-tree/README.md`](33-alt-tree/README.md).
 
+### 34 · Landscape permeability (roadmap M34)
+Tests whether **resistance (least-cost) distance** over a coarse friction surface (land/sea from
+the coastline + ice + two mountain ranges; three a-priori sea regimes; Dijkstra on a 1° grid)
+beats Method A's isotropic **great-circle** distance at predicting pairwise motif-Jaccard.
+**Q.** Does anisotropic connectivity explain motif-sharing better than raw distance?
+**Finding — the falsifiable gate is NOT passed (honest negative).** Across all three sea regimes
+**great-circle wins** out of sample (held-out R² 0.158 vs 0.086/0.110/0.058), and
+great-circle+resistance = great-circle alone — resistance adds nothing. Either isolation-by-distance
+dominates at this scale or the coarse friction is inadequate (indistinguishable without a fine GIS
+raster). So the connectivity-**geometry** upgrade for M38 is unwarranted (keep great-circle); this
+is what the gate is for — a clean negative saves the line. See
+[`34-landscape-permeability/README.md`](34-landscape-permeability/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

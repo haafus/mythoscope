@@ -38,8 +38,12 @@ These two together retire the two alternative hypotheses that caveat almost ever
    genetic axis; leverage is only in the disagreement — the **language-only** bucket = the
    cross-continental families (IE, Altaic) proves linguistic transmission is real & area-independent.
    Wired the genetic join for M36. A true third axis needs fine SNP + the M34/M35 corridors.
-3. **M34 · Landscape permeability** — resistance-distance geometry, behind one falsifiable test (→ M35).
-4. **M35 · Historical corridors** — dated contact graph; needs M34's physical substrate.
+3. **M34 · Landscape permeability ✓ done — gate NOT passed.** Coarse resistance-distance does
+   **not** beat great-circle out of sample (held-out R² 0.158 vs 0.086; adds nothing to distance)
+   → the connectivity-*geometry* upgrade is unwarranted, M38 keeps great-circle. A fine GIS raster
+   is the only way to reopen it.
+4. **M35 · Historical corridors** — dated contact graph. *Distinct* mechanism from M34 (dated human
+   contact as a covariate, not a distance metric), but M34's negative lowers its priority.
 5. **M36 · Admixture back-migration** — reticulate tree with back-migration edges; needs M33.
 6. **M37 · Cross-index arbitration** — per-motif reliability weights.
 7. **M38 · Joint HPF (capstone)** — assembled once on the settled facets / geometry / graph / tree / weights.
@@ -163,9 +167,15 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   *linguistic transmission is real and not reducible to area*; **genetic-only** = areal diffusion.
   A true third axis needs fine SNP genetics + the M34/M35 corridors. Wires the join for **M36**. · **M**
 
-- **M34 · Landscape permeability / cost-distance geography.** Replace Method A's *isotropic*
-  great-circle distance with **resistance / least-cost distance** over a friction surface — the
-  physical, always-on connectivity substrate. · *data: external* · **Effort: L.**
+- **M34 · Landscape permeability / cost-distance geography. ✓ done — gate NOT passed** (mockup 34).
+  Built a coarse procedural friction surface (land/sea from the committed coastline + ice + two
+  ranges; three a-priori sea regimes) and Dijkstra least-cost distance. **Result:** across all
+  three regimes **great-circle beats resistance-distance out of sample** (held-out R² 0.158 vs
+  realistic 0.086 / maritime 0.110 / terrestrial 0.058; great-circle+resistance = 0.158, i.e.
+  resistance adds nothing). Either isolation-by-distance dominates at this scale or the coarse
+  friction is inadequate — indistinguishable without a fine GIS raster. **The gate does not
+  license replacing great-circle**, so the connectivity-geometry upgrade for M38 is unwarranted
+  (a clean negative, exactly the gate's job). Spec below. · *data: external* · **Effort: L.**
   - **Motivation.** Method A treats 500 km of Eurasian steppe, ocean, Sahara and Himalaya as
     equal. Diffusion friction is strongly anisotropic: low-friction corridors (the Great
     Eurasian Steppe, navigable rivers, coastlines/seaways) carry motifs far, while mountains,
@@ -259,8 +269,9 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
 - **M38 · Joint effort-corrected factorization (Hierarchical Poisson) — the capstone.** The one
   model of synthesis §3: factorize `M` with `a(t)` as an exposure offset; latent factors are the
   emergent themes/strata, de-confounded globally. · *data: have* · **subsumes:** mockups 16–23 as
-  one fit. Built **once**, after its structural inputs land — facets (M32), geometry (M34),
-  contact graph (M35), tree (M33/M36), weights (M37). · **L**
+  one fit. Built **once**, after its structural inputs land — facets (M32), tree (M33/M36),
+  contact graph (M35 if it survives), weights (M37); **geometry stays great-circle** (M34's
+  resistance-distance gate failed). · **L**
 - **M39 · Tradition stratigraphy.** Turn `stratum` around — profile each *tradition* as its
   stack of strata (share of African-substratum … colonial motifs), a geological-column view. ·
   *depends: a trusted stratum from M38 (and M24/M27)* · **checks:** deep-substrate-rich traditions
@@ -274,9 +285,10 @@ trustworthy; the last two make them *datable*. Everything in Tier 2 is a quality
 can slot in whenever, and **M38** is the long-horizon consolidation once M24/M25 have proven the
 signals are worth one joint model.
 
-The **connectivity pair (M34 → M35)** is the highest-ceiling addition after dating: M34
-replaces isotropic geography with a resistance surface (attacking the deep-vs-diffuse residual
-from the *baseline* side, valid at all depths), then M35 layers dated human corridors on top
-(attacking it from the *recent-literate* side) and composes with M36's admixture graph. Build
-**M34 before M35**; gate both behind M34's single falsifiable test (does resistance-distance
-beat great-circle out of sample?) — a clean negative there saves the whole line.
+The **connectivity line** was gated behind M34's single falsifiable test (does resistance-distance
+beat great-circle out of sample?). **M34 returned a clean negative** — coarse resistance does not
+beat distance and adds nothing to it — so the physical-geometry upgrade is **off** (M38 keeps
+great-circle), exactly the outcome the gate was meant to catch cheaply. **M35** (dated human
+corridors) survives as a *distinct* mechanism — corridor co-membership as a covariate, not a
+distance metric — but at lowered priority; the resistance-geometry question reopens only with a
+fine GIS friction raster.
