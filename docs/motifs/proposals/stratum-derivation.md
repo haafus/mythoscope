@@ -480,7 +480,7 @@ answer); **build tasks** are specified and merely unbuilt.
    a motif richly *elaborated* (many sub-variants) in Eurasia but present as a single thin
    form in Africa is a back-migration candidate (Africa as sink); (c) model direction with a
    **reticulate/admixture graph** carrying the published Eurasian-into-Africa gene flow as
-   horizontal edges (the M32 alt-tree, upgraded from a pure tree). Direction, not just span,
+   horizontal edges (the M33 alt-tree, upgraded from a pure tree). Direction, not just span,
    is the open quantity.
 5. **How much does homoplasy inflate the deep tail?** With no banality control we cannot
    yet say how many "broad + disjunct" motifs are ancient vs independently reinvented.

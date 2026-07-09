@@ -114,7 +114,7 @@ Every headline has a deflationary rival; naming them is the honest move.
    the family proxy is too blunt to resolve **direction** — which distribution simply cannot
    fix. This is the same direction-underdeterminacy as the A3-vs-K25 residual, on the Africa
    axis, and it weakens the "African substratum = oldest" stratum specifically. *Fix:* a
-   reticulate/admixture graph (M32) with the published Eurasian-into-Africa gene flow as
+   reticulate/admixture graph (M36) with the published Eurasian-into-Africa gene flow as
    horizontal edges, plus an Islamicate/Horn-Sahel back-migration mask and a sink-vs-source
    elaboration-asymmetry test (`stratum-derivation.md` §14).
 
@@ -160,11 +160,11 @@ Every headline has a deflationary rival; naming them is the honest move.
     isotropic distance mis-files as *deep*; barriers make close-but-separated sharing *more*
     surprising. This is the physical substrate the human corridors ride on, and — being
     time-stable — the one connectivity layer that also speaks to the **deep** residual.
-    Roadmap **M37**.
+    Roadmap **M34**.
   - **Human, dated, shallow — historical corridors.** Explicit edges: empire footprints, the
     Silk Road, maritime trade, missions, the slave trade — this is what actually dates the
     axial/literate and colonial strata that distribution shape *cannot* reach (the §14 open
-    question of whether the historical strata even belong on the same axis). Roadmap **M38**.
+    question of whether the historical strata even belong on the same axis). Roadmap **M35**.
   Both feed a connectivity-aware Method A and a connectivity-aware Galton null; the deepest
   questions want a *time-sliced* friction surface (paleo-coastlines, the green Sahara).
 - **Cross-index arbitration.** Use TMI+ATU as a replication vote: promote motifs consistent
@@ -184,8 +184,8 @@ Ranked by what each *newly enables*, not by ease:
 | **Archaeology / paleoclimate** (peopling dates, LGM refugia) | open | *calibration* for the geographic dating backbone (axiom A8) |
 | **Full TMI + ATU crosswalk** | mixed | replication vote + a handle on the literate/colonial strata (ATU tails) |
 | **The myth texts themselves** (mapsofmyths / corpora) | scrape-dependent | content embeddings → semantic stratum, a principled banality measure, motif-matching |
-| **Terrain / biome / hydrography** (SRTM·GEBCO, WWF ecoregions, HydroRIVERS, GSHHG) | open | a **friction surface** → resistance-distance geography for Method A; corridors & barriers at all depths (M37) |
-| **Historical polities + contact networks** (historical-basemaps, OWTRAD, Seshat, DARMC; Hellenthal admixture for direction) | open/curated | dated diffusion edges that date the historical strata distribution can't; direction for back-migration (M38) |
+| **Terrain / biome / hydrography** (SRTM·GEBCO, WWF ecoregions, HydroRIVERS, GSHHG) | open | a **friction surface** → resistance-distance geography for Method A; corridors & barriers at all depths (M34) |
+| **Historical polities + contact networks** (historical-basemaps, OWTRAD, Seshat, DARMC; Hellenthal admixture for direction) | open/curated | dated diffusion edges that date the historical strata distribution can't; direction for back-migration (M35) |
 
 > The actionable, significance-ranked sequencing of everything below — as concrete next
 > mockups (M24…) — is in [`roadmap.md`](roadmap.md).
