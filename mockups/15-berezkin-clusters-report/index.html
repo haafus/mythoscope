@@ -61,7 +61,8 @@
   th,td { text-align:left; padding:5px 7px; border-bottom:1px solid #f0ede6; vertical-align:top; }
   th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
   td.code { font-weight:700; color:#4f7096; white-space:nowrap; font-variant-numeric:tabular-nums; }
-  td.sc { text-align:right; font-variant-numeric:tabular-nums; color:#6c757d; white-space:nowrap; }
+  td.sc { text-align:right; font-variant-numeric:tabular-nums; color:#6c757d; white-space:nowrap; cursor:help; }
+  th[title] { cursor:help; text-decoration:underline dotted; text-underline-offset:2px; }
   td.ru { color:#4a4f55; }
   details.motifs summary { cursor:pointer; font-size:12px; color:#4f7096; margin-top:4px; }
 
@@ -150,19 +151,23 @@ function bars(items, total, color){
     `<span class="bt"><span class="bf" style="width:${100*i.n/max}%;background:${color}"></span></span>`+
     `<span class="bv">${i.n}</span></div>`).join("")+`</div>`;
 }
+const MOTIF_SCORE_TIP = "score мотива (0–1): доля традиций этого мотива, попавших в данный кластер. "
+  + "1.00 — все традиции мотива внутри кластера; чем выше, тем «характернее» мотив для кластера.";
+const TRAD_SCORE_TIP = "score традиции (0–1): доля мотивов этой традиции, попавших в её кластер. "
+  + "1.00 — все мотивы традиции внутри кластера; чем выше, тем прочнее традиция принадлежит кластеру.";
 function motifTable(ms){
   const rows = ms.map(m=>
     `<tr><td class="code">${esc(m.c)}</td><td>${esc(m.n)}</td>`+
     `<td class="ru">${esc(m.ru||"")}</td>`+
-    `<td class="sc">${m.s.toFixed(2)}</td></tr>`).join("");
-  return `<table><thead><tr><th>Код</th><th>Мотив</th><th>Перевод</th><th>score</th></tr></thead><tbody>${rows}</tbody></table>`;
+    `<td class="sc" title="${MOTIF_SCORE_TIP}">${m.s.toFixed(2)}</td></tr>`).join("");
+  return `<table><thead><tr><th>Код</th><th>Мотив</th><th>Перевод</th><th title="${MOTIF_SCORE_TIP}">score</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 function tradTable(ts){
   const rows = ts.map(t=>
     `<tr><td>${esc(t.name)}</td>`+
     `<td class="ru">${esc(t.ru||"")}</td>`+
-    `<td class="sc">${t.s.toFixed(2)}</td></tr>`).join("");
-  return `<table><thead><tr><th>Традиция</th><th>Перевод</th><th>score</th></tr></thead><tbody>${rows}</tbody></table>`;
+    `<td class="sc" title="${TRAD_SCORE_TIP}">${t.s.toFixed(2)}</td></tr>`).join("");
+  return `<table><thead><tr><th>Традиция</th><th>Перевод</th><th title="${TRAD_SCORE_TIP}">score</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 document.getElementById("clusters").innerHTML = D.clusters.map(c=>`
   <div class="card cl" id="cl${c.id}">
