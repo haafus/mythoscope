@@ -128,6 +128,78 @@ gets a primary stratum, optionally secondaries.
 
 Berezkin's "analyse in parts" = analyse `area` within a fixed `stratum` slice.
 
+## Canonical value catalogue
+
+The complete, closed value sets — human-readable label + `slug` — ready to become
+enums in `region_facets.py`.
+
+### `tradition.area` (12)
+
+| Label | Slug |
+|---|---|
+| Europe | `europe` |
+| Near East & North Africa | `near_east_n_africa` |
+| Iran, Central & South Asia | `iran_c_s_asia` |
+| East & Southeast Asia | `east_se_asia` |
+| Austronesia & Oceania | `austronesia_oceania` |
+| Siberia & Beringia | `siberia_beringia` |
+| Northern & Western North America | `nw_north_america` |
+| Eastern North America | `e_north_america` |
+| Mesoamerica & the Andes | `mesoamerica_andes` |
+| South America | `south_america` |
+| Sub-Saharan Africa | `sub_saharan_africa` |
+| Aboriginal Australia | `australia` |
+
+Optional finer forks (off by default):
+
+| Parent | Label | Slug |
+|---|---|---|
+| europe | Northern & Eastern Europe | `n_e_europe` |
+| europe | Western & Southern Europe | `w_s_europe` |
+| nw_north_america | Northwest Coast & Plateau | `nw_coast_plateau` |
+| nw_north_america | Subarctic & Northeast | `subarctic_ne` |
+| nw_north_america | Southwest & California | `southwest_california` |
+| south_america | Amazonia & Guiana | `amazonia_guiana` |
+| south_america | Central & Eastern Brazil (Gê–Xingu) | `east_brazil_ge` |
+| south_america | Southern Cone & Chaco | `southern_cone` |
+
+### `tradition.family` (11)
+
+| Label | Slug |
+|---|---|
+| Indo-European | `indo_european` |
+| Abrahamic | `abrahamic` |
+| Indic / Dharmic | `indic` |
+| Sinic | `sinic` |
+| Islamicate | `islamicate` |
+| Uralic & Altaic | `uralic_altaic` |
+| Circumpolar & Palaeo-Asiatic | `circumpolar` |
+| Amerindian | `amerindian` |
+| Sub-Saharan | `sub_saharan` |
+| Austronesian & Papuan | `austronesian_papuan` |
+| Australian | `australian` |
+
+### `tradition.subsistence` (4)
+
+| Label | Slug |
+|---|---|
+| Foragers | `forager` |
+| Pastoralists | `pastoralist` |
+| Horticulturalists | `horticulturalist` |
+| Agrarian states | `agrarian_state` |
+
+### `motif.stratum` (7)
+
+| Label | Slug |
+|---|---|
+| African substratum | `african_substratum` |
+| Indo-Pacific | `indo_pacific` |
+| Continental Eurasian | `continental_eurasian` |
+| Circum-Pacific | `circum_pacific` |
+| Post-Neolithic | `post_neolithic` |
+| Axial & literate | `axial_literate` |
+| Colonial & modern | `colonial_modern` |
+
 ## Deterministic population recipe
 
 - **`area`** — pure function of `areal_path` (no network / credentials, like
