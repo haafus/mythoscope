@@ -32,3 +32,5 @@ mythoscope-export-*.zip
 mockups/*/cosmograph-*.csv
 # chapter-detector prototype: downloaded Gutenberg text cache
 mockups/*/cache/
+# local file: corpus sources (may be non-public-domain; keep out of git)
+config/sources/

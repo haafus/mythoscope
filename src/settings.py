@@ -85,6 +85,8 @@ class ServerSettings(BaseModel):
 class Settings(BaseSettings):
     config_dir: Path = Path("config")
     corpus_dir: Path = Path("outputs/corpus")
+    # Root for local `file:` corpus sources; file paths are confined under it.
+    sources_dir: Path = Path("config/sources")
     embeddings_dir: Path = Path("outputs/embeddings")
     projections_dir: Path = Path("outputs/projections")
     graphs_dir: Path = Path("outputs/graphs")

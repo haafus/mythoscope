@@ -126,6 +126,75 @@ class TestBuildCorpusForce:
         build_corpus(force=True)
         assert processed == ["Iliad"]
 
+    def test_web_source_cached_is_skipped(self, tmp_path, monkeypatch):
+        items = [{"title": "Iliad", "tradition": "Greek", "url": "https://example.com/iliad"}]
+        existing = [{"title": "Iliad", "tradition": "Greek", "url": "https://example.com/iliad", "path": "Iliad.txt"}]
+        corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+        (corpus_dir / "Iliad.txt").write_text("old")
+
+        build_corpus(force=False)
+        assert processed == []  # web source with present output is reused
+
+    def test_file_source_is_always_reprocessed(self, tmp_path, monkeypatch):
+        # A local file source is re-read every build (edits are picked up), even when
+        # its output file is already on disk.
+        items = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt"}]
+        existing = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt", "path": "Local.txt"}]
+        corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+        (corpus_dir / "Local.txt").write_text("old")  # present, but file sources reprocess
+
+        build_corpus(force=False)
+        assert processed == ["Local"]
+
+
+class TestFileSourceDispatch:
+    """The real _download_and_process reads a local file: source end to end."""
+
+    def test_reads_local_file_source(self, tmp_path, monkeypatch):
+        from settings import settings
+
+        corpus_dir = tmp_path / "corpus"
+        corpus_dir.mkdir()
+        sources_dir = tmp_path / "sources"
+        sources_dir.mkdir()
+        (sources_dir / "myth.txt").write_text("Once upon a time there was a hero. The end.")
+        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
+        monkeypatch.setattr(settings, "sources_dir", sources_dir)
+
+        item = {
+            "title": "Local Myth",
+            "tradition": "Greek",
+            "major_tradition": "Hellenic",
+            "url": "file:myth.txt",
+            "description": "",
+        }
+        meta = builder._download_and_process(item)
+
+        assert meta is not None
+        assert meta["word_count"] > 0
+        assert (corpus_dir / meta["path"]).exists()
+        # raw snapshot cached under corpus/raw for reproducibility
+        assert list((corpus_dir / "raw").iterdir())
+
+    def test_missing_local_file_returns_none(self, tmp_path, monkeypatch):
+        from settings import settings
+
+        corpus_dir = tmp_path / "corpus"
+        corpus_dir.mkdir()
+        sources_dir = tmp_path / "sources"
+        sources_dir.mkdir()
+        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
+        monkeypatch.setattr(settings, "sources_dir", sources_dir)
+
+        item = {
+            "title": "Missing",
+            "tradition": "Greek",
+            "major_tradition": "Hellenic",
+            "url": "file:nope.txt",
+            "description": "",
+        }
+        assert builder._download_and_process(item) is None
+
 
 class TestUpdateTraditions:
     def _setup(self, tmp_path, monkeypatch, *, books=None, traditions=None):

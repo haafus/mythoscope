@@ -57,7 +57,9 @@ function renderBookInfo(doc) {
         return;
     }
 
-    const originalUrl = doc.url
+    // Only web sources get a clickable link; local file sources show nothing.
+    const isWebSource = /^https?:\/\//i.test(doc.url || "");
+    const originalUrl = isWebSource
         ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Source</a>`
         : "";
     bookInfo.innerHTML = `

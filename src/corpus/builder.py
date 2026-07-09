@@ -12,6 +12,7 @@ from settings import settings
 from .clean_gutenberg import clean_gutenberg_in_builder
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
+from .sources import WEB_SCHEMES, is_file_source, read_local_to_cache, source_scheme
 from .utils import (
     count_sentences,
     count_words,
@@ -79,7 +80,14 @@ def _download_and_process(item: dict, force: bool = False) -> dict | None:
     url = item["url"]
 
     try:
-        data = fetch_to_cache(url, cache_path(Path(settings.corpus_dir) / "raw", url), force=force)
+        raw_cache = cache_path(Path(settings.corpus_dir) / "raw", url)
+        scheme = source_scheme(url)
+        if scheme in WEB_SCHEMES:
+            data = fetch_to_cache(url, raw_cache, force=force)
+        elif is_file_source(url):
+            data = read_local_to_cache(url, raw_cache, settings.sources_dir)
+        else:
+            raise ValueError(f"Unsupported source scheme {scheme!r} in url {url!r}")
         content_type = item.get("content_type", "")
         text = _extract_text(data, url, title, content_type)
 
@@ -198,7 +206,10 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     for item in download_list:
         title = item["title"]
         prev = existing.get(title)
-        if prev and (corpus_root / prev.get("path", "")).exists():
+        # Local file sources are cheap to re-read and may change on disk, so they
+        # are always reprocessed (content edits are picked up without a hash field).
+        # Web sources are reused when their output file is still present.
+        if prev and not is_file_source(item.get("url", "")) and (corpus_root / prev.get("path", "")).exists():
             metadata.append(prev)
             logger.debug(f"{title}: already in corpus, skipping")
         else:
