@@ -1,0 +1,137 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>21 · Deterministic facet population</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; --mag:#5f7d99; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1040px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:930px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:21px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .brow { display:grid; grid-template-columns:150px 1fr 42px; align-items:center; gap:9px; margin:5px 0; font-size:12px; }
+  .brow .lab { text-align:right; color:#495057; }
+  .bt { display:block; height:14px; background:var(--bg); border-radius:5px; overflow:hidden; }
+  .bf { display:block; height:100%; border-radius:5px; background:var(--mag); }
+  .brow .v { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .split { display:flex; height:26px; border-radius:6px; overflow:hidden; margin:6px 0 3px; }
+  .split div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:600; border-right:2px solid var(--surface); }
+  .split div:last-child { border-right:0; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; font-size:11.5px; margin-top:4px; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; }
+  .sw { width:11px; height:11px; border-radius:3px; display:inline-block; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.tag { font-size:10.5px; color:var(--muted); }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Детерминированное заполнение фасетов</h1>
+  <p>Проверка: покрывает ли рецепт из <b>macro-area-facets.md</b> весь корпус? Три детерминированные функции
+     прогнаны по всем 1046 традициям и 3488 мотивам. <b>area</b> и <b>theme</b> — чистые функции данных
+     (<code>areal_path</code>, <code>motif_group_num</code>). <b>family</b> — лингвистический seed из
+     <code>language[0]</code>; религиозная надстройка (Abrahamic / Islamicate / Indic / Sinic) требует
+     кураторства, поэтому каждое присвоение помечено <b>seed</b> или <b>area-fallback</b>.</p>
+</header>
+
+<div class="card">
+  <div class="kpis" id="kpis"></div>
+  <div class="note" id="gaps"></div>
+</div>
+
+<div class="cols">
+  <div class="card">
+    <h2>area <span class="s">— 12 макроареалов</span></h2>
+    <div class="muted" style="margin-bottom:8px">Чистая функция <code>areal_path[0]</code> + переносы по <code>[1]</code>.</div>
+    <div id="area"></div>
+  </div>
+  <div class="card">
+    <h2>family <span class="s">— 11 культурных семей</span></h2>
+    <div class="muted" style="margin-bottom:8px">Лингвистический seed; наддстройка религий — приближённо.</div>
+    <div id="family"></div>
+    <div style="margin-top:12px" class="muted">Метод присвоения:</div>
+    <div class="split" id="method"></div>
+    <div class="legend" id="method-legend"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>theme <span class="s">— категория A / B и 13 групп</span></h2>
+  <div class="split" id="cat"></div>
+  <div class="legend" id="cat-legend"></div>
+  <div style="margin-top:12px" id="theme"></div>
+</div>
+
+<div class="card">
+  <h2>Примеры традиций <span class="s">— area · family · язык · метод</span></h2>
+  <table><thead><tr><th>Традиция</th><th>Area</th><th>Family</th><th>language[0]</th><th>Метод</th></tr></thead>
+  <tbody id="samples"></tbody></table>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const MAG = "#5f7d99";
+const CAT = {A:"#6a5aa6", B:"#c05540"};
+const METHOD = {seed:["из языка","#3c8a5e"], "area-fallback":["по ареалу","#b28a3e"], unresolved:["не решено","#98a0a5"]};
+
+document.getElementById("kpis").innerHTML = [
+  [`${D.n_trad-D.area.uncovered}/${D.n_trad}`, `area · традиций размечено (${D.area.uncovered} без areal_path)`],
+  [`${Math.round(100*(D.family.method.seed||0)/D.n_trad)}%`, `family из языка напрямую (+${Math.round(100*(D.family.method["area-fallback"]||0)/D.n_trad)}% по ареалу)`],
+  [`${D.n_motif-D.theme.uncovered}/${D.n_motif}`, `theme · мотивов с группой (A ${D.theme.cat.A} / B ${D.theme.cat.B})`],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+document.getElementById("gaps").innerHTML =
+  `<b>Остаток — это пробелы в данных, не в рецепте.</b> ${D.area.uncovered} традиции без <code>areal_path</code> `+
+  `(area не ставится), ${D.family.method.unresolved} лингвистических изолятов (айны, баски, шумер, нивхи — своя семья `+
+  `под каждый), ${D.theme.uncovered} мотивов без <code>motif_group_num</code>. Рецепт покрывает всё остальное однозначно.`;
+
+function bars(el, order, counts, color){
+  const max = Math.max(...order.map(k=>counts[k]||0), 1);
+  document.getElementById(el).innerHTML = order.map(k=>{
+    const n = counts[k]||0;
+    return `<div class="brow"><span class="lab">${esc(k)}</span>`+
+      `<span class="bt"><span class="bf" style="width:${100*n/max}%${color?`;background:${color}`:""}"></span></span>`+
+      `<span class="v">${n}</span></div>`;
+  }).join("");
+}
+bars("area", D.area.order, D.area.counts, MAG);
+bars("family", D.family.order, D.family.counts, MAG);
+
+// theme groups sorted by group num, colored by category
+const tg = D.theme.groups;
+const tmax = Math.max(...tg.map(g=>g.n), 1);
+document.getElementById("theme").innerHTML = tg.map(g=>
+  `<div class="brow"><span class="lab">${g.g}. ${esc(g.name)}</span>`+
+  `<span class="bt"><span class="bf" style="width:${100*g.n/tmax}%;background:${CAT[g.cat]}"></span></span>`+
+  `<span class="v">${g.n}</span></div>`).join("");
+
+function stack(el, entries){ // entries: [label, n, color]
+  const tot = entries.reduce((a,e)=>a+e[1],0);
+  document.getElementById(el).innerHTML = entries.filter(e=>e[1]).map(e=>
+    `<div style="flex:${e[1]};background:${e[2]}" title="${e[0]}: ${e[1]}">${100*e[1]/tot>7?e[1]:""}</div>`).join("");
+}
+stack("cat", [["A · Космология/этиология", D.theme.cat.A, CAT.A], ["B · Приключения/трюки", D.theme.cat.B, CAT.B]]);
+document.getElementById("cat-legend").innerHTML =
+  `<span><span class="sw" style="background:${CAT.A}"></span>A · Космология и этиология (${D.theme.cat.A})</span>`+
+  `<span><span class="sw" style="background:${CAT.B}"></span>B · Приключения и трюки (${D.theme.cat.B})</span>`;
+
+stack("method", Object.entries(D.family.method).map(([k,n])=>[METHOD[k][0], n, METHOD[k][1]]));
+document.getElementById("method-legend").innerHTML = Object.entries(D.family.method).map(([k,n])=>
+  `<span><span class="sw" style="background:${METHOD[k][1]}"></span>${METHOD[k][0]} (${n})</span>`).join("");
+
+document.getElementById("samples").innerHTML = D.samples.map(s=>
+  `<tr><td>${esc(s.n)}${s.ru?` <span class="muted">${esc(s.ru)}</span>`:""}</td>`+
+  `<td>${esc(s.area)}</td><td>${esc(s.fam)}</td><td class="tag">${esc(s.lang)}</td>`+
+  `<td class="tag">${esc(METHOD[s.m][0])}</td></tr>`).join("");
+</script>
