@@ -1,0 +1,132 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20 · Stratum controls (sampling + banality)</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1040px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:930px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; margin:4px 0 12px; font-size:11.5px; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; }
+  .sw { width:11px; height:11px; border-radius:3px; display:inline-block; }
+  .prow { display:grid; grid-template-columns:150px 1fr; align-items:center; gap:10px; margin:7px 0; }
+  .prow .lab { font-size:12px; }
+  .stack { display:flex; height:26px; border-radius:6px; overflow:hidden; background:var(--bg); }
+  .stack div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:10.5px; font-weight:600; min-width:0; border-right:2px solid var(--surface); }
+  .stack div:last-child { border-right:0; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td,th { padding:4px 6px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.code { font-weight:700; color:#4f7096; white-space:nowrap; }
+  td.r { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .pill { display:inline-block; font-size:10.5px; padding:1px 7px; border-radius:20px; color:#fff; white-space:nowrap; }
+  .arrow { color:#a3aab1; padding:0 4px; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .flow { display:grid; grid-template-columns:1fr auto 1fr auto; gap:6px 10px; align-items:center; font-size:12px; }
+  .flow .n { font-variant-numeric:tabular-nums; font-weight:600; color:var(--muted); }
+</style>
+<main>
+<header>
+  <h1>Контроли страты — плотность каталога и банальность</h1>
+  <p>Два обязательных контроля из <b>§5</b>, которые ранние мокапы пропускали, наложены на гейт мокапа 19.
+     <b>(1) Плотность каталога.</b> Покрытие традиций a(t) — от 1 до 738 мотивов: в плотно описанной традиции
+     присутствие мотива «дёшево», в тонко описанной — информативно. Каждое присутствие взвешено на
+     baseline-эквивалент покрытия, макроареал засчитывается в «широту» только при ≥1 эквиваленте свидетельства.
+     <b>(2) Банальность.</b> Прокси из общих (коротких) определений и разбросанных синглтонов помечает мотивы,
+     чья «глубина» вероятнее независимое переизобретение, чем наследование.</p>
+</header>
+
+<div class="card">
+  <div class="kpis" id="kpis"></div>
+  <div class="muted" style="margin-top:10px" id="cov"></div>
+</div>
+
+<div class="card">
+  <h2>Как коррекция сдвигает режимы</h2>
+  <div class="legend" id="legend"></div>
+  <div class="prow"><span class="lab">Сырой гейт (мокап 19)</span><div class="stack" id="bar-raw"></div></div>
+  <div class="prow"><span class="lab">С контролем плотности</span><div class="stack" id="bar-cor"></div></div>
+  <div class="note" id="survive"></div>
+</div>
+
+<div class="card">
+  <h2>Куда перетекают мотивы (топ переходов)</h2>
+  <div class="flow" id="flow"></div>
+</div>
+
+<div class="card">
+  <h2>Отслеживаемые мотивы — сырой → скорректированный</h2>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th>Сырой</th><th></th><th>Скоррект.</th><th>Макро</th><th>Эфф.</th><th>Банальн.</th></tr></thead>
+  <tbody id="tracked"></tbody></table>
+</div>
+
+<div class="card">
+  <h2>Флаг банальности: «глубокие/широкие», но вероятно гомоплазия</h2>
+  <p class="muted" style="margin:0 0 8px">Короткое определение + разбросанные синглтоны → возможно переизобретение, а не древность. Не режим, а предупреждение.</p>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th>Режим</th><th>Макро</th><th>Эфф.</th><th>Банальн.</th></tr></thead>
+  <tbody id="banal"></tbody></table>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, M = D.modes, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const ORDER=["areal_deep","descent","areal_broad","areal_recent","local"];
+const col=k=>M[k][1], lab=k=>M[k][0];
+
+document.getElementById("kpis").innerHTML = [
+  [`${D.n}`, "мотивов (≥4 традиций)"],
+  [`${D.n_changed}`, `сменили режим (${Math.round(100*D.n_changed/D.n)}%)`],
+  [`−${Math.round(D.shrink*100)}%`, "усадка «широты» после контроля"],
+  [`${D.deep.keep}/${D.deep.raw}`, "глубоких ареальных устояли"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("cov").innerHTML =
+  `Покрытие традиций a(t): min <b>${D.cov.min}</b> · медиана <b>${D.cov.med}</b> · p90 <b>${D.cov.p90}</b> · max <b>${D.cov.max}</b> мотивов — перекос почти ×${Math.round(D.cov.max/D.cov.med)} между медианой и максимумом.`;
+
+document.getElementById("legend").innerHTML = ORDER.map(k=>
+  `<span><span class="sw" style="background:${col(k)}"></span>${lab(k)}</span>`).join("");
+
+function stack(el, counts){
+  const tot = ORDER.reduce((a,k)=>a+(counts[k]||0),0);
+  document.getElementById(el).innerHTML = ORDER.filter(k=>counts[k]).map(k=>{
+    const n=counts[k], pct=100*n/tot;
+    return `<div style="flex:${n};background:${col(k)}" title="${lab(k)}: ${n}">${pct>6?n:""}</div>`;
+  }).join("");
+}
+stack("bar-raw", D.counts_raw);
+stack("bar-cor", D.counts_cor);
+
+document.getElementById("survive").innerHTML =
+  `<b>Что устояло.</b> Глубокий двуполушарный класс (Indo-Pacific + Новый Свет) в основном переживает контроль — `+
+  `<b>${D.deep.keep} из ${D.deep.raw}</b>; «просто широкий» класс худеет с ${D.broad.raw} до ${D.broad.keep}, `+
+  `потому что часть его широты была плотностью каталога, а не возрастом. Это эмпирически повторяет <b>аксиому 4</b>: `+
+  `дизъюнкция через барьер — сигнал древности сильнее, чем сплошная широта, которую контакт создаёт быстро.`;
+
+document.getElementById("flow").innerHTML = D.flow.map(f=>
+  `<span><span class="pill" style="background:${col(f.from)}">${lab(f.from)}</span></span>`+
+  `<span class="arrow">→</span>`+
+  `<span><span class="pill" style="background:${col(f.to)}">${lab(f.to)}</span></span>`+
+  `<span class="n">${f.n}</span>`).join("");
+
+document.getElementById("tracked").innerHTML = D.tracked.map(t=>
+  `<tr><td class="code">${esc(t.c)}</td><td>${esc(clip(t.n,32))} <span class="muted">(${esc(t.label)})</span></td>`+
+  `<td><span class="pill" style="background:${col(t.raw)}">${lab(t.raw)}</span></td>`+
+  `<td class="arrow">→</td>`+
+  `<td><span class="pill" style="background:${col(t.cor)}">${lab(t.cor)}</span></td>`+
+  `<td class="r">${t.nm}</td><td class="r">${t.nme}</td><td class="r">${t.ban.toFixed(2)}</td></tr>`).join("");
+
+document.getElementById("banal").innerHTML = D.banal.map(b=>
+  `<tr><td class="code">${esc(b.c)}</td><td>${esc(clip(b.n,40))}</td>`+
+  `<td><span class="pill" style="background:${col(b.cor)}">${lab(b.cor)}</span></td>`+
+  `<td class="r">${b.nm}</td><td class="r">${b.nme}</td><td class="r" style="color:#c2410c;font-weight:700">${b.ban.toFixed(2)}</td></tr>`).join("");
+</script>
