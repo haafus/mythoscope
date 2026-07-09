@@ -62,8 +62,8 @@ def main():
     dlat = np.array([d["lat"] for d in dp]); dlon = np.array([d["lon"] for d in dp])
 
     def coord(tid):
-        """(lat, lon): pipeline coordinate if present, else the areal-subregion centroid
-        (coarse — traditions of one subregion share a point; see README)."""
+        """(lat, lon): the committed tradition-coords.json snapshot if present, else the
+        areal-subregion centroid fallback for any tradition the snapshot misses."""
         c = coords.get(tid)
         if isinstance(c, (list, tuple)) and len(c) == 2:
             return float(c[0]), float(c[1])

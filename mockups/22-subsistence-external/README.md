@@ -16,31 +16,34 @@ asserted but never checked.
    pastoralism → **pastoralist**, casual/extensive agriculture → **horticulturalist**,
    intensive → **agrarian-state**. 1203 societies with a bucket + coordinates, cached in
    `dplace_subsistence.json`.
-2. **Join.** Each Berezkin tradition is matched to its nearest D-PLACE society by
-   great-circle distance; 712 land within 250 km (median 154 km).
+2. **Join.** Each Berezkin tradition is placed at its `tradition-coords.json` point and
+   matched to its nearest D-PLACE society by great-circle distance; 820 land within 250 km
+   (median 120 km).
 3. **Test `subsistence × theme`.** For each matched tradition (≥20 motifs) compute the
    Category-A (cosmology/etiology) share of its motifs, averaged per subsistence bucket.
 
 ## What it shows
 
-- **The gradient the proposal predicted is there:** Category-A share is highest for
-  **foragers (56.5%)**, drops through horticulturalists (52.2%) to **agrarian-states
-  (47.1%)** — cosmology gives way to adventure/tale as production intensifies.
-- **Pastoralists are the outlier — strikingly tale-heavy (26.2%):** the epic/heroic
-  narrative traditions of Central-Asian and Near-Eastern herders.
+- **The predicted split holds:** the extractive/low-intensity economies are
+  cosmology-heavy — **foragers 54.7%**, **horticulturalists 57.6%** Category A — while the
+  intensive/mobile ones are tale-heavy — **agrarian-states 39.5%**, **pastoralists 36.2%**.
+  Cosmology gives way to adventure/tale as production intensifies, exactly as the proposal
+  argued (foragers etiology-heavy, farmers märchen-heavy).
+- **Pastoralists are the sharpest tale-heavy case (36.2%):** the epic/heroic narrative
+  traditions of Central-Asian and Near-Eastern herders.
 - The `subsistence × area` cross-tab passes the sanity check: Australia 100% forager,
   Europe all agrarian-state, the Near East mostly pastoralist, Sub-Saharan mostly
   horticulturalist.
 
-## Two honest caveats
+## Honest caveat — the area confound
 
-- **Area confound.** Subsistence correlates with area (pastoralists ≈ Central Asia,
-  foragers ≈ Australia/N-America/Siberia), so part of the `subsistence × theme` gradient is
-  really `area × theme`. The gradient is real but does not prove subsistence is the *cause*.
-- **Coarse join.** The pipeline carries no per-tradition coordinates yet, so traditions are
-  placed at their areal-subregion centroid — the join is at subregion, not village,
-  resolution (a few matches wander, e.g. Aymara → an Amazonian society). Wiring real
-  coordinates (a coordinate-enabled `mytho motifs` refresh) tightens this.
+Subsistence correlates with area (pastoralists ≈ Central Asia, foragers ≈
+Australia/N-America/Siberia), so part of the `subsistence × theme` gradient is really
+`area × theme`. The gradient is real but does not, on its own, prove subsistence is the
+*cause* — separating the two needs a within-area test on more data.
+
+*(Coordinates are per-tradition from the committed `tradition-coords.json` snapshot, so the
+join is at real tradition locations, not subregion centroids.)*
 
 ## Data
 

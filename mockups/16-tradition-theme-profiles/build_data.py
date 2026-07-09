@@ -46,7 +46,7 @@ def _sunflower(j, n):
 
 def main():
     geo = _geo()
-    coords = geo.berezkin_coords()   # areal_id -> [lat, lon] (empty without a coord refresh)
+    coords = geo.berezkin_coords()   # areal_id -> [lat, lon], from tradition-coords.json
     with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]

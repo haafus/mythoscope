@@ -134,28 +134,28 @@ def gaz_coord(label):
     return None
 
 
-# Real per-tradition coordinates for the Berezkin catalogue, read straight from the
-# built motif pipeline (outputs/motifs/mapsofmyths_traditions.json, whose rows carry a
-# `coordinates` [lat, lon] once a coordinate-enabled `mytho motifs` refresh has run).
-# No local copy: the pipeline output is the single source of truth. Where a coordinate
+# Real per-tradition coordinates for the Berezkin catalogue, from the committed snapshot
+# tradition-coords.json (areal_id -> [lat, lon], scraped from mapsofmyths.com). The motif
+# pipeline does not carry coordinates unless a coordinate-enabled `mytho motifs` refresh
+# has run, so this local snapshot is the source the mockups read from. Where a coordinate
 # is missing the map mockups fall back to the areal-subregion centroid.
 _BEREZKIN_COORDS = None
 
 
 def berezkin_coords():
-    """``{areal_id: [lat, lon]}`` from the pipeline's ``mapsofmyths_traditions.json``
-    (cached, read once). Empty if that file is absent or carries no coordinates."""
+    """``{areal_id: [lat, lon]}`` from the committed ``mockups/tradition-coords.json``
+    snapshot (cached, read once). Empty if that file is absent."""
     global _BEREZKIN_COORDS
     if _BEREZKIN_COORDS is None:
         import json
         from pathlib import Path
-        path = Path(__file__).resolve().parents[1] / "outputs" / "motifs" / "mapsofmyths_traditions.json"
+        path = Path(__file__).resolve().parent / "tradition-coords.json"
         try:
-            traditions = json.loads(path.read_text(encoding="utf-8")).get("traditions", {})
+            coords = json.loads(path.read_text(encoding="utf-8")).get("coordinates", {})
         except FileNotFoundError:
-            traditions = {}
+            coords = {}
         _BEREZKIN_COORDS = {
-            aid: v["coordinates"] for aid, v in traditions.items()
-            if isinstance(v.get("coordinates"), (list, tuple)) and len(v["coordinates"]) == 2
+            aid: c for aid, c in coords.items()
+            if isinstance(c, (list, tuple)) and len(c) == 2
         }
     return _BEREZKIN_COORDS

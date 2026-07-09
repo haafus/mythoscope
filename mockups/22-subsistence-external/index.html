@@ -87,8 +87,8 @@ document.getElementById("kpis").innerHTML = [
   [`4`, "типа хозяйства (EA042 + EA028)"],
 ].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
 document.getElementById("cov").innerHTML =
-  `Координаты традиций из ареальных центроидов подобластей (пайплайн без точных координат), поэтому джойн — на уровне `+
-  `подобласти, не отдельной деревни; p90 расстояния ${D.dist.p90} км. ${D.n_coord} традиций с координатами.`;
+  `Координаты традиций — из закоммиченного снапшота <code>tradition-coords.json</code> (mapsofmyths.com), `+
+  `по одной точке на традицию; p90 расстояния джойна ${D.dist.p90} км. ${D.n_coord} традиций с координатами.`;
 
 // headline test — Category-A share by subsistence
 const tt = D.theme_test.filter(t=>t.aShare!=null);

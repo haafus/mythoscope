@@ -47,8 +47,8 @@ def coord_resolver(index):
     spread out afterwards so they don't pile up).
 
     For the Berezkin index the real location is the tradition's own map
-    coordinate, read from the built motif pipeline
-    (``outputs/motifs/mapsofmyths_traditions.json``, areal_id -> [lat, lon]).
+    coordinate, read from the committed ``mockups/tradition-coords.json``
+    snapshot (areal_id -> [lat, lon]).
     Only where that is missing do we fall back to the areal-subregion centroid —
     optionally nudged by a per-people gazetteer hit, but only when it agrees with
     the tradition's subregion so an accidental name collision can't fling a point

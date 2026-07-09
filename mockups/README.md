@@ -244,9 +244,10 @@ small curated overlay. See [`21-facet-population/README.md`](21-facet-population
 Wires the one external dataset the model needs — **D-PLACE** (Ethnographic Atlas, CC-BY) —
 to populate `tradition.subsistence` (the 4th facet, with no in-corpus source), joining each
 tradition to its nearest society. Then tests the correlation the proposal asserted but never
-checked: Category-A (cosmology) share runs **forager 56.5% → horticulturalist 52.2% →
-agrarian-state 47.1%** (pastoralists an epic-tale outlier at 26.2%) — the predicted gradient
-holds, with an honest area confound. See [`22-subsistence-external/README.md`](22-subsistence-external/README.md).
+checked: Category-A (cosmology) share splits **extractive economies high** (foragers 54.7%,
+horticulturalists 57.6%) from **intensive/mobile ones low** (agrarian-states 39.5%,
+pastoralists 36.2%) — cosmology yields to tale as production intensifies, as predicted, with
+an honest area confound. See [`22-subsistence-external/README.md`](22-subsistence-external/README.md).
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
