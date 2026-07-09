@@ -532,6 +532,19 @@ The whole investigation, in one place (prototypes: mockups 15–29; method detai
    (resistance-distance + historical corridors, M34/M35) plus a derived per-tradition
    **stratum-stack** (M39). So the taxonomy keeps all four facets (reweighted, not co-equal) and
    gains a connectivity axis.
+8. **The big axes are confounded, so a mode is separable only where classifications disagree
+   (mockup 33, M33).** Large `area`, large genetic lineages and large language families strongly
+   co-vary (V(area,family)=0.73; a continental genetic tree is essentially `area` re-nested). So
+   swapping the language tree for a continental genetic tree is really the **language-vs-geography**
+   contrast (Method B vs A), *not* an independent axis, and comparing the two only yields signal in
+   the **off-diagonal**: a motif that tracks a family **across** areas (Indo-European, Altaic) is
+   language-descent geography can't make; a motif that tracks an area **across** families is areal.
+   Where family = area (the correlated core) descent and diffusion are **confounded and inseparable
+   from distribution** — this is the same deep-vs-diffuse residual as A3-vs-K25 (mockup 27), and no
+   coarse reclassification dissolves it. **Method consequence:** a genuinely third, de-confounding
+   axis must decouple from *both* area and family — **fine SNP genetics** (ancestry ≠ geography
+   under admixture, M36) and the **connectivity corridors** (routes that are neither flat area nor
+   family, M34/M35). This is *why* those are the next builds.
 
 ## Implementation sketch (not built)
 

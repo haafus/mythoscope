@@ -413,11 +413,15 @@ Tests alt-hypothesis #3 (descent is an artifact of the language tree) by re-runn
 chance-corrected Fitch phylo-signal on a **curated consensus genetic tree** (continental
 resolution, geography-joined) and comparing per-motif signal.
 **Q.** Does the descent signal survive a swap from the language tree to a genetic one?
-**Finding.** Largely yes — corr 0.43, **89% of language-descent motifs stay descent on genes**.
-The 11% **language-only** are exactly the cross-continental families (**Indo-European, Altaic**) =
-genuine *linguistic* transmission across genetic lines; **genetic-only** motifs (e.g. Jonah in
-Africa) are areal-within-continent. Coarse (continental) tree — a fine SNP tree is future work;
-the genetic join is wired for M36. See [`33-alt-tree/README.md`](33-alt-tree/README.md).
+**Finding.** Caveat first — at continental resolution the genetic tree is built from `area`, so
+genetic ≈ geography and both correlate with family (V=0.73): this is really a **language-vs-
+geography** test, not an independent genetic axis, and the modes separate *only where the
+classifications disagree* (the correlated `both` core is confounded, so the 89% "robust" is
+largely tautological). The real result is the off-diagonal: the **language-only** bucket is
+non-empty and is exactly the cross-continental families (**Indo-European, Altaic**) → *linguistic
+transmission is real and area-independent*; **genetic-only** (e.g. Jonah in Africa) = areal
+diffusion. A true third axis needs fine SNP + the M34/M35 corridors; the join is wired for M36.
+See [`33-alt-tree/README.md`](33-alt-tree/README.md).
 
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded

@@ -33,9 +33,11 @@ These two together retire the two alternative hypotheses that caveat almost ever
 1. **M32 · Facet adequacy ✓ done** — non-orthogonal (V≤0.73); family & subsistence nearly
    redundant (Δ R²≈0.01), theme_profile + area carry the signal; set is incomplete (~36% of
    motif-similarity, big cross-continental residual); 12/11 granularity is right.
-2. **M33 · Alternative-tree test ✓ done** — descent survives a genetic tree (89% robust,
-   corr 0.43); the 11% language-only are the cross-continental families (IE, Altaic) = genuine
-   linguistic transmission. Wired the genetic join for M36.
+2. **M33 · Alternative-tree test ✓ done** — at continental resolution the genetic tree ≈ area
+   (geographic join), so this is really a **language-vs-geography** contrast, not an independent
+   genetic axis; leverage is only in the disagreement — the **language-only** bucket = the
+   cross-continental families (IE, Altaic) proves linguistic transmission is real & area-independent.
+   Wired the genetic join for M36. A true third axis needs fine SNP + the M34/M35 corridors.
 3. **M34 · Landscape permeability** — resistance-distance geometry, behind one falsifiable test (→ M35).
 4. **M35 · Historical corridors** — dated contact graph; needs M34's physical substrate.
 5. **M36 · Admixture back-migration** — reticulate tree with back-migration edges; needs M33.
@@ -148,12 +150,15 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   visual capstone. · **L**
 - **M33 · Alternative-tree test (genetics). ✓ done** (mockup 33). Re-ran descent detection
   (chance-corrected Fitch, as mockups 18 / 28) on a **curated consensus genetic tree**
-  (continental resolution, geography-joined) vs the language tree. **Result:** corr 0.43,
-  **89% of language-descent motifs stay descent on genes** → alt-hypothesis #3 largely refuted;
-  the 11% **language-only** are exactly the cross-continental families (**Indo-European 68,
-  Altaic 23**) = genuine *linguistic* transmission, while **genetic-only** motifs are areal-within-
-  continent. Honest limit: continental resolution ≈ areal; a fine SNP tree (HGDP/1000G) is the full
-  version. The tradition→population join is wired for **M36**. · **M**
+  (continental resolution, geography-joined) vs the language tree. **Honest caveat:** at
+  continental resolution the genetic tree is built from `area`, so genetic ≈ geography and both
+  correlate with family (V=0.73) — this is really the **language-vs-geography** contrast (Method
+  B vs A), not an independent genetic axis. The modes separate **only where the classifications
+  disagree**; the correlated core (`both`, 905) is *confounded*, not validated, so the 89% "robust"
+  is largely tautological. **Real result (the off-diagonal):** the **language-only** bucket is
+  non-empty and is exactly the cross-continental families (**Indo-European 68, Altaic 23**) →
+  *linguistic transmission is real and not reducible to area*; **genetic-only** = areal diffusion.
+  A true third axis needs fine SNP genetics + the M34/M35 corridors. Wires the join for **M36**. · **M**
 
 - **M34 · Landscape permeability / cost-distance geography.** Replace Method A's *isotropic*
   great-circle distance with **resistance / least-cost distance** over a friction surface — the
@@ -224,6 +229,14 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   **back-migration** edges (Eurasian gene flow into Africa) as horizontal connections — an
   **admixture graph (a DAG), not a tree**. · *data: external* · **depends on M33** (its
   genetic-tradition join) · **Effort: M–L.**
+  - **Substrate — the fine SNP tree lives here, not as its own mockup.** M33 used a *continental*
+    consensus tree (built from `area`, so genetic ≈ geography). The genuinely de-confounding step
+    is a **fine SNP-based population tree** — a published NJ-on-Fst / TreeMix topology or an Fst
+    matrix over ~50–130 populations (**HGDP**, **SGDP**, or the **AADR**; population-level summary
+    data, not raw genomes, so a small download), joined to traditions by coordinates + name. A bare
+    finer tree still joins geographically, so it does **not** by itself remove the area confound —
+    its payoff is precisely the **admixture edges** below, which is why the SNP tree is folded in
+    here rather than getting a separate number.
   - **Why its own mockup.** M33 is a *swap-and-rerun* on our existing tree machinery (Fitch / Mk
     on a swapped tree); this needs genuine **reticulate-network inference** — ASR on a graph with
     gene-flow edges, a different and heavier method — so bundling the two violated the
