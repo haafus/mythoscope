@@ -106,10 +106,11 @@ Each replaces a descriptive heuristic with a generative model; medium effort, hi
 
 Heavier (download + join), but each opens a class of conclusion we cannot reach now.
 
-- **M30 · Dated-phylogeny wiring (Glottolog CLDF + Bouckaert/EDGE).** Join traditions →
-  Glottocodes, attach node dates. · *data: external* · **unlocks:** `stratum` becomes an
-  **absolute age**, not an ordinal mode; external validation against published phylomemetic
-  dates. Dependency for M31. · **L**
+- **M30 · Dated-phylogeny wiring. ✓ done** (mockup 30). Wired Glottolog (coordinate join,
+  median 53 km → family + glottocode) + a curated family-expansion-date table. **Result:**
+  **439 descent motifs get a calendar age** (Indo-European ~5500 BP märchen belt; B4 →
+  ~5200 BP Austronesian); the areal majority is correctly left undated. Family resolution —
+  node-level Bayesian ages are M31, which needs the glottocodes this mockup attaches. · **L**
 - **M31 · Bayesian phylogeography (relaxed random walk).** On the dated tree, jointly
   reconstruct each deep motif's **ancestral location and age**, and animate its spread over the
   peopling map. · *depends: M30* · **unlocks:** the etiology-stage visual capstone; dates space

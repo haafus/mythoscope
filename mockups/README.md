@@ -374,6 +374,16 @@ homoplasy; corr with the short-def proxy ≈0). See [`29-content-stratum/README.
 **Q.** Does a motif's content (embedding) predict its theme and its depth?
 **Finding.** Content ≈ theme (58% vs 20% chance) but not depth (breadth corr 0.28) → `stratum` is distributional, not semantic; the content-banality idea is a clean negative.
 
+### 30 · Dated phylogeny (roadmap M30)
+Wires **Glottolog** (CC-BY) — each tradition joined to its nearest language (median 53 km) →
+standard family + glottocode — plus a curated table of published **family expansion dates**, to
+turn a descent motif's ordinal clade depth into a **calendar age**.
+**Q.** Can ordinal clade-depth become an absolute (calendar) age?
+**Finding.** Yes for the descent minority: **439 motifs dated**, concentrated at Indo-European
+~5500 BP (the märchen belt) with B4 → ~5200 BP (Austronesian); the areal majority (A3, K25) is
+correctly left undated (geography's job). Family-resolution only — node-level Bayesian ages are
+M31. See [`30-dated-phylogeny/README.md`](30-dated-phylogeny/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
