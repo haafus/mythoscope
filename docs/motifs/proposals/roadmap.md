@@ -26,7 +26,8 @@ These two together retire the two alternative hypotheses that caveat almost ever
 > Numbering: the **M-number is the mockup directory number** (M24 = `mockups/24-…`, and so
 > on). The planned slots **M30–M35 stay put** (dated tree, phylogeography, alt-tree, joint
 > model, stratigraphy, cross-index); **M37–M38** are the two connectivity layers (landscape
-> permeability, historical corridors) added to Tier 3. This audit takes **M36**
+> permeability, historical corridors) and **M39** is the admixture-graph half split off from
+> M32 — all added to Tier 3. This audit takes **M36**
 > (`mockups/36-facet-adequacy/`) — the *number is its topic slot, not its build order*: it is
 > flagged **build-next** by priority, ahead of the lower-numbered but heavier M30–M35.
 
@@ -121,12 +122,12 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   rather than split by the Atlantic seam. A family-resolution point estimate — node-consistent
   RRW with uncertainty (real BEAST on a dated tree) stays future work. The etiology-stage
   visual capstone. · **L**
-- **M32 · Alternative-tree / admixture-graph test (genetics).** Re-run descent detection on a
-  genetic tree instead of the language tree, and — as a **reticulate admixture graph** —
-  carry the published **back-migration** edges (Eurasian gene flow into Africa) as horizontal
-  connections. · *data: external* · **tests:** alt-hypothesis #3 ("wrong tree, not rare
-  descent") *and* alt-hypothesis #6 ("Africa is a sink"): is an Africa↔Eurasia motif deep
-  out-of-Africa or recent back-into-Africa? Direction, not just span. · **M–L**
+- **M32 · Alternative-tree test (genetics).** Re-run descent detection (Fitch / likelihood ASR,
+  mockups 18 / 28) on a **human genetic tree** instead of the language tree — a *swap-and-rerun*
+  on our existing tree machinery. · *data: external* · **tests:** alt-hypothesis #3 ("wrong
+  tree, not rare descent"): do the inherited motifs survive a change of classification (language
+  → genes)? · **M** · *(splits from the old combined M32; the reticulate back-migration half is
+  now **M39**, which builds on this mockup's genetic-tree wiring.)*
 
 - **M37 · Landscape permeability / cost-distance geography.** Replace Method A's *isotropic*
   great-circle distance with **resistance / least-cost distance** over a friction surface — the
@@ -176,8 +177,8 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
     motifs into a **historical-diffusion stratum** with a *recent* age ceiling (the corridor's
     date) — **guarded**: never touches a family-dated-deep or high-signal motif. (2) A **third
     Galton axis** (empire / corridor co-membership) beyond area and family (extends M25). (3)
-    **Directionality** feeds M32 / axiom A8: deep out-of-Africa vs recent back-into-Africa
-    (Arab / Islamic, trans-Saharan).
+    **Directionality** — the historical-corridor counterpart to M39's genetic back-migration test
+    (axiom A8): deep out-of-Africa vs recent back-into-Africa (Arab / Islamic, trans-Saharan).
   - **Data.** `aourednik/historical-basemaps` (dated world political boundaries, GeoJSON,
     CC-BY-SA) · OWTRAD / ORION historical trade routes · DARMC · Seshat Global History Databank ·
     Pleiades / World Historical Gazetteer (place join) · Hellenthal et al. 2014 admixture events
@@ -191,6 +192,21 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
     its coordinate fall inside any historical polity at any snapshot, and how near an OWTRAD
     route? Report the % "reachable" by macro-area. Good coverage → build the corridor facet;
     mostly the Old-World literate belt → scope the claim to that belt.
+
+- **M39 · Admixture-graph back-migration (genetics).** The reticulate half split off from the old
+  combined M32: take M32's genetic-tree wiring and add the published **back-migration** edges
+  (Eurasian gene flow into Africa) as horizontal connections — an **admixture graph (a DAG), not
+  a tree**. · *data: external* · **depends on M32** (its genetic-tradition join) · **Effort:
+  M–L.**
+  - **Why its own mockup.** M32 is a *swap-and-rerun* on our existing tree machinery (Fitch / Mk
+    on a swapped tree); this needs genuine **reticulate-network inference** — ASR on a graph with
+    gene-flow edges, a different and heavier method — so bundling the two violated the
+    one-question-per-mockup discipline that kept M24 / M25 clean.
+  - **Tests alt-hypothesis #6 ("Africa is a sink").** Is an Africa↔Eurasia motif **deep
+    out-of-Africa** or **recent back-into-Africa**? It recovers **direction, not just span** — the
+    concrete challenge to axiom A8. The same directional claim is tested independently by **M38**
+    through *dated human corridors*; M39 is its **genetic** counterpart, so a motif flagged
+    back-migratory by both channels is strongly corroborated.
 
 ## Tier 4 — synthesis & product
 
