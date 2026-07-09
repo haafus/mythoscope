@@ -210,6 +210,16 @@ Berezkin's "analyse in parts" = fix a `theme` (his primary slice), then group th
 attesting traditions by `area` / `family` / `subsistence`, optionally within a
 `stratum`.
 
+**Correction from mockups 18–19 — these 7 are the interpretive band, not the computed
+primitive.** The estimator natively emits a **`mode`** ∈ {`local`, `areal-recent`,
+`areal-broad`, `areal-deep`, `descent`} + a depth score + confidence; the 7 named strata
+are a *(mode × area × family) → band* mapping on top. Two honest limits this exposes:
+only the **prehistoric strata 1–4** are derivable from distribution; the **axial/literate
+(6)** and **colonial/modern (7)** layers are transmission channels read from
+`family`/religion + recency, a separate path, not an A × B output. And the **African
+substratum (1)** has no distinct distributional signature yet (Africa folds into the
+Continental mega-set). See [`stratum-derivation.md` §8, §14](stratum-derivation.md).
+
 ## Deriving `stratum` ourselves (not from Berezkin's labels)
 
 > Full method — theory, features, both algorithms, controls, validation, schema — in

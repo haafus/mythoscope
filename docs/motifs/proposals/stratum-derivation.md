@@ -279,6 +279,21 @@ feature signature:
 
 Do not hard-wire the mapping; fit the bands, then name them.
 
+**Mockup-19 refinement — the estimator's native output is a `mode`, not the 7 labels.**
+The gated A × B pipeline emits a **mode** ∈ {`local`, `areal-recent`, `areal-broad`,
+`areal-deep`, `descent`} plus a depth score and confidence — that is the honest computed
+primitive. The 7 named strata are a *further* interpretation layered on top: a
+(mode × area × family) → band mapping. Two consequences the mockups make explicit:
+
+- **Only the prehistoric strata (1–4) are distribution-derivable.** The **axial/literate**
+  and **colonial/modern** layers are defined by *literate/religious transmission and
+  recency*, not by areal shape — they are read from `family` (Abrahamic / Dharmic / Sinic)
+  plus shallow breadth, a separate derivation path, not an A × B output. Whether they even
+  belong on the same axis as the substrata is open (§14).
+- **The African substratum (1) is not yet separated.** The mockups fold Africa into the
+  Continental mega-set, so stratum 1 currently has no distinct signature; isolating it
+  needs an Africa-and-elsewhere founder set (§4) and the attestation control (§14).
+
 ## 9. Validation
 
 - **Adventure-endemism stress-test (already computed).** 24% of adventure/trick motifs
@@ -390,3 +405,58 @@ Backed by mockups 16–18 over the Berezkin catalogue:
   motif = theme (given) × stratum (computed, A×B). Analysis fixes a theme (Berezkin's
   method), then dates within it by the gated A×B pipeline. No single axis suffices; the
   three together (space, tree, theme) each remove the others' confound.
+
+## 14. Open questions and future work
+
+None of this is in the product; the items below are what stands between the mockups and a
+defensible `stratum` field. **Open questions** are conceptual (some may have no clean
+answer); **build tasks** are specified and merely unbuilt.
+
+### Open questions
+
+1. **Absolute vs relative dating.** Method B runs on our coarse language *classification*,
+   so clade depth is only *ordinal*. A dated tree (Glottolog + Bouckaert/EDGE) is needed
+   to turn "deep node" into a node **age**; until then descent ages are rank-only.
+2. **The A3-vs-K25 residual is irreducible from distribution.** Deep substrate vs wide
+   diffusion within one theme is not separable by A, B, *or* theme (§12). It needs an
+   external prior (dated phylogeny, archaeological/genetic calibration, D-PLACE) — or it
+   stays an honest two-candidate posterior.
+3. **Are the historical strata even the same kind of object?** Axial/literate and
+   colonial/modern are transmission *channels* (religion, print, diaspora), not
+   areal-shape substrata. They derive from `family` + recency, not A × B — open whether
+   they belong on the same `stratum` axis as the prehistoric layers, or a parallel one.
+4. **African substratum has no distinct distributional signature yet** (Africa folds into
+   the Continental mega-set). Can an Africa-and-elsewhere founder set plus the effort
+   control recover Berezkin's oldest layer, or is our sampling there too thin to try?
+5. **How much does homoplasy inflate the deep tail?** With no banality control we cannot
+   yet say how many "broad + disjunct" motifs are ancient vs independently reinvented.
+6. **Representation: modes, named strata, or both?** The estimator natively yields the 5
+   modes; the vocabulary has 7 named strata. Ship the computed mode as the primary facet
+   with the named band as an overlay, or fit the bands directly? (See §8.)
+
+### Build tasks (specified, unbuilt)
+
+1. **Attestation-intensity weighting** (§5, axiom 11) — the single biggest fix; every
+   mockup used raw presence, so the scores partly measure catalogue density, not age.
+2. **Banality / homoplasy discount** (§5) — a `banality` proxy from definition genericness
+   + singleton-scatter, down-weighting reinvention-prone motifs before scoring.
+3. **Dated-phylogeny wiring** — join traditions → Glottocodes, attach Bouckaert/EDGE node
+   dates; upgrades Method B from parsimony-on-classification to model-based ASR with ages.
+4. **`subsistence` via D-PLACE** — the society → Glottocode → Ethnographic Atlas join;
+   currently asserted (foragers etiology-heavy) but untested at scale.
+5. **`theme_profile` bias correction** — mockup 16 used raw proportions; apply the §5
+   weights before using it as an analysis factor.
+6. **Bootstrap confidence** (§6 step 7) — resample traditions for a real interval;
+   mockup 19's confidence is a gate-decisiveness heuristic, not a resampling CI.
+7. **Barrier mask + finer mega-sets** (§4) — replace the 3 coarse sets / DBSCAN fragments
+   with an explicit barrier-crossing count and the Africa founder set.
+8. **Reticulate tree-plus-migration model** (§12.4) — the endgame: one joint run
+   partitioning each motif into inherited vs borrowed shares, A (space) and B (tree) as
+   two observations of the same history.
+9. **Quantitative external benchmark** — compare our descent-minority ages against
+   published phylomemetic dates (Tehrani / d'Huy), beyond the qualitative "märchen track
+   language" recovery of mockup 18.
+10. **Full crosswalk corroboration** — use independent TMI + ATU attestation
+    (`xindex_breadth`), not just ATU presence as in mockup 17.
+11. **Productionise** — `region_facets.py` (`area / family / subsistence / theme /
+    stratum`), the API fields, and the UI theme-slicer + depth-slider; none exist yet.
