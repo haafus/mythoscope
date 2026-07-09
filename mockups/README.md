@@ -395,6 +395,19 @@ fanning across the Pacific. A family-resolution point estimate, not a node-consi
 uncertainty (that needs a real dated tree — BEAST — future work). See
 [`31-phylogeography/README.md`](31-phylogeography/README.md).
 
+### 32 · Facet adequacy (roadmap M32)
+Audits assumption #6 — are `area · family · subsistence · theme_profile` the right,
+non-redundant, complete set of tradition facets? Four sub-tests on the 910 traditions carrying
+all four facets: Cramér's V association, drop-one unique contribution, residual structure, and a
+granularity curve.
+**Q.** Does each facet earn its place, and is the set complete at the right resolution?
+**Finding.** Not orthogonal (V(area,family)=0.73). Each facet is non-zero but **family &
+subsistence are nearly redundant** (unique Δ R² ≈ 0.01) — **theme_profile (0.13) and area (0.08)**
+do the work. The set is **incomplete**: facets recover only ~36% of motif-similarity (block ARI
+and continuous R² agree), leaving a large **cross-continental convergence residual** for the
+connectivity layers (M34/M35). Granularity is right — 12 areas / 11 families beat both coarser
+and finer (which overfit). See [`32-facet-adequacy/README.md`](32-facet-adequacy/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

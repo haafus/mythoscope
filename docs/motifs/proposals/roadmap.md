@@ -30,8 +30,10 @@ These two together retire the two alternative hypotheses that caveat almost ever
 **Build order of the planned queue (M32–M39).** Ordered so the joint capstone (**M38**) is built
 **once**, after every structural input it consumes has landed — no v1/v2/v3 re-fits:
 
-1. **M32 · Facet adequacy** — settles which facets are non-redundant (data: *have*). *build next*
-2. **M33 · Alternative-tree test** — descent robustness under a genetic tree; wires the genetics (→ M36).
+1. **M32 · Facet adequacy ✓ done** — non-orthogonal (V≤0.73); family & subsistence nearly
+   redundant (Δ R²≈0.01), theme_profile + area carry the signal; set is incomplete (~36% of
+   motif-similarity, big cross-continental residual); 12/11 granularity is right.
+2. **M33 · Alternative-tree test** — descent robustness under a genetic tree; wires the genetics (→ M36). *build next*
 3. **M34 · Landscape permeability** — resistance-distance geometry, behind one falsifiable test (→ M35).
 4. **M35 · Historical corridors** — dated contact graph; needs M34's physical substrate.
 5. **M36 · Admixture back-migration** — reticulate tree with back-migration edges; needs M33.
@@ -42,7 +44,15 @@ These two together retire the two alternative hypotheses that caveat almost ever
 Hard edges: **M34 → M35**, **M33 → M36**, everything → **M38 → M39**. Detailed specs follow, in
 build order (the tier headings below are a *significance* overlay, orthogonal to the number).
 
-### M32 · Facet adequacy & orthogonality (audits assumption #6) — *build next*
+### M32 · Facet adequacy & orthogonality (audits assumption #6) — ✓ done (mockup 32)
+
+**Result.** On 910 traditions carrying all four facets: **not orthogonal** (V(area,family)=0.73,
+V(area,sub)=0.59, V(family,sub)=0.52); **unique Δ R²** = theme_profile 0.125, area 0.076,
+subsistence 0.015, family 0.013 (full R²=0.36, Mantel p=0.01) → all non-zero but **family &
+subsistence nearly redundant**, theme_profile + area load-bearing; **adequacy** — facets recover
+only ~36% of motif-similarity (block ARI = continuous R² = 0.36), a large ~64% **cross-continental
+convergence residual** = the set is *incomplete* (the missing axis M34/M35 target); **granularity**
+— 12 areas / 11 families beat coarser and finer (which overfit held-out attestation). Spec below.
 
 **Motivation.** The entity model of [`macro-area-facets.md`](macro-area-facets.md) rests on an
 untested design choice: that `area · family · subsistence · theme_profile` are the *right* and

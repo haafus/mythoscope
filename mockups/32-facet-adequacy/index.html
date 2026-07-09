@@ -1,0 +1,161 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>32 · Facet adequacy</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --area:#6a5aa6; --family:#3c8a5e; --sub:#b28a3e; --theme:#c05540; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:960px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:900px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .grid2 { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; } @media(max-width:720px){.grid2{grid-template-columns:1fr;}}
+  .hm { display:grid; grid-template-columns:auto repeat(3,1fr); gap:3px; margin-top:8px; }
+  .hm .cell { border-radius:5px; padding:9px 4px; text-align:center; font-size:12px; font-variant-numeric:tabular-nums; }
+  .hm .rh, .hm .ch { background:none; color:var(--muted); font-size:10.5px; display:flex; align-items:center; justify-content:center; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin:5px 0; }
+  .bar-row .nm { width:96px; font-size:12px; text-align:right; }
+  .bar-row .tr { flex:1; background:var(--bg); border-radius:5px; height:20px; position:relative; }
+  .bar-row .bf { height:100%; border-radius:5px; }
+  .bar-row .vv { width:52px; font-size:12px; font-variant-numeric:tabular-nums; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  svg { display:block; width:100%; height:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+</style>
+<main>
+<header>
+  <h1>Адекватность фасет — оправдывают ли себя area · family · subsistence · theme_profile</h1>
+  <p>Аудит допущения #6 сущностной модели: что четыре фасеты традиции — <b>правильный</b> и <b>~ортогональный</b>
+     набор. Ортогональность уже опровергнута (оси со-трекают одну историю заселения), поэтому проверяем два claim'а,
+     которые действительно важны: <b>неизбыточность</b> (каждая ли фасета несёт уникальный сигнал) и <b>адекватность</b>
+     (полон ли набор, на правильной ли гранулярности). Всё на данных <i>have</i>: <span id="hdr"></span>.</p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>1 · Ассоциация <span class="s">— Cramér's V между категориальными фасетами</span></h2>
+    <div class="hm" id="hm"></div>
+    <div class="muted" style="margin-top:8px">η²(theme_profile) по каждой фасете — сколько дисперсии 13-мерного профиля объясняет:</div>
+    <div id="eta"></div>
+    <div class="muted" style="margin-top:6px">V→1 = сильная связь. Оси не ортогональны (пик area↔family); theme_profile слабее всего связан с subsistence.</div>
+  </div>
+  <div class="card">
+    <h2>2 · Уникальный вклад <span class="s">— Δ R² в предсказании мотивного сходства</span></h2>
+    <div class="muted" style="margin-bottom:6px">Drop-one: Δ = R²(все) − R²(все − X) = дисперсия попарного Jaccard, которую объясняет <b>только</b> X.</div>
+    <div id="uniq"></div>
+    <div class="note" id="uniqNote"></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>3 · Адекватность / остаток <span class="s">— сколько структуры мотивов ловят фасеты</span></h2>
+    <div id="resid"></div>
+    <div class="note" id="residNote"></div>
+  </div>
+  <div class="card">
+    <h2>4 · Гранулярность <span class="s">— held-out log-lik атрибуции vs разрешение</span></h2>
+    <svg id="gran" viewBox="0 0 340 180"></svg>
+    <div class="muted" id="granNote" style="margin-top:6px"></div>
+  </div>
+</div>
+
+<div class="card note" id="reframe" style="background:#eef1ee;border-color:#cdd8cf;color:#31453a"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA;
+const FC = {area:"var(--area)", family:"var(--family)", subsistence:"var(--sub)", theme_profile:"var(--theme)"};
+const RU = {area:"area", family:"family", subsistence:"subsistence", theme_profile:"theme_profile"};
+document.getElementById("hdr").textContent =
+  `${D.n} традиций (все 4 фасеты + ≥${D.min_motif} мотивов), ${D.n_motif} мотивов; subsistence через D-PLACE ≤${D.match_km} км.`;
+
+// KPIs
+document.getElementById("kpis").innerHTML = [
+  [`V=${D.assoc["area|family"]}`, "area↔family — оси не ортогональны (со-трекают заселение)"],
+  [`${D.unique.delta.theme_profile} / ${D.unique.delta.family}`, "уникальный Δ R²: theme_profile vs family — работают не все"],
+  [`${Math.round(100*D.residual.cont_residual)}%`, `остаток: фасеты ловят лишь ${Math.round(100*(1-D.residual.cont_residual))}% сходства мотивов`],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// 1 · association heatmap (3x3 Cramér's V)
+const F3 = ["area","family","subsistence"];
+const vmax = 1.0, ramp = t => { const a=[233,229,241], b=[74,64,120]; return `rgb(${a.map((c,i)=>Math.round(c+(b[i]-c)*t)).join(",")})`; };
+let hm = `<div class="cell rh"></div>` + F3.map(c=>`<div class="cell ch">${c}</div>`).join("");
+F3.forEach(a=>{ hm += `<div class="cell rh">${a}</div>`;
+  F3.forEach(b=>{ const v = D.assoc[`${a}|${b}`]; const t=v/vmax; const dark=t>0.55;
+    hm += `<div class="cell" style="background:${ramp(t)};color:${dark?'#fff':'#3a3550'}">${a===b?'—':v.toFixed(2)}</div>`; }); });
+document.getElementById("hm").innerHTML = hm;
+document.getElementById("eta").innerHTML = F3.map(f=>{
+  const v=D.eta[f];
+  return `<div class="bar-row"><div class="nm">${f}</div><div class="tr"><div class="bf" style="width:${100*v/0.4}%;background:${FC[f]}"></div></div><div class="vv">${v.toFixed(2)}</div></div>`;
+}).join("");
+
+// 2 · unique contribution (sorted desc)
+const uq = Object.entries(D.unique.delta).sort((a,b)=>b[1]-a[1]);
+const umax = Math.max(...uq.map(x=>x[1]));
+document.getElementById("uniq").innerHTML = uq.map(([f,d])=>
+  `<div class="bar-row"><div class="nm" style="width:104px">${f}</div><div class="tr"><div class="bf" style="width:${100*d/umax}%;background:${FC[f]}"></div></div><div class="vv">${d.toFixed(3)}</div></div>`).join("");
+document.getElementById("uniqNote").innerHTML =
+  `Полная модель R²=<b>${D.unique.full_r2}</b> (Mantel p=${D.unique.mantel_p}). Все Δ>0 — каждая фасета что-то добавляет, `+
+  `но <b>family (${D.unique.delta.family}) и subsistence (${D.unique.delta.subsistence}) почти избыточны</b>: их сигнал ` +
+  `в основном поглощён area+theme. Реальный уникальный вклад несут <b>theme_profile (${D.unique.delta.theme_profile})</b> и `+
+  `<b>area (${D.unique.delta.area})</b>. Переформулировка «неизбыточности»: набор не избыточен формально, но два из четырёх «тонкие».`;
+
+// 3 · adequacy
+const ar = D.residual.ari;
+document.getElementById("resid").innerHTML =
+  `<div style="font-size:30px;font-weight:700">${Math.round(100*D.residual.cont_residual)}% <span style="font-size:14px;color:var(--muted);font-weight:400">остаток</span></div>`+
+  `<div class="muted" style="margin:2px 0 10px">две независимые меры совпадают: непрерывная R²=${D.unique.full_r2} и блочная ARI(family)=${ar.family}</div>`+
+  `<table><thead><tr><th>выравнивание блоков мотивов с…</th><th class="r">ARI</th></tr></thead><tbody>`+
+  ["area","family","subsistence"].map(f=>`<tr><td>${f}</td><td class="r">${ar[f]}</td></tr>`).join("")+
+  `</tbody></table>`;
+document.getElementById("residNote").innerHTML =
+  `Фасеты вместе ловят лишь <b>${Math.round(100*(1-D.residual.cont_residual))}%</b> сходства мотивов → <b>крупный остаток</b> = `+
+  `набор <b>неполон</b> (недостающая ось). Самое необъяснённое ядро (n=${D.residual.worst_cluster_size}) кросс-континентально — `+
+  `${D.residual.worst_desc} — это глубоко/ареальная конвергенция, которую и целят слои связности <b>M34/M35</b>.`;
+
+// 4 · granularity
+(function(){
+  const g=D.gran, W=340,H=180,pl=40,pr=12,pt=14,pb=34;
+  const ks=g.map(x=>x.k), lls=g.map(x=>x.ll);
+  const kx = k => pl + (Math.log(k)-Math.log(10))/(Math.log(100)-Math.log(10))*(W-pl-pr);
+  const lo=Math.min(...lls)*1.02, hi=Math.max(...lls)*0.98;
+  const ly = v => pt + (hi-v)/(hi-lo)*(H-pt-pb);
+  const series = {area:g.filter(x=>x.name.startsWith("area")), family:g.filter(x=>x.name.startsWith("family"))};
+  let s = `<line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#d3ccbe"/>`+
+          `<line x1="${pl}" y1="${pt}" x2="${pl}" y2="${H-pb}" stroke="#d3ccbe"/>`+
+          `<text x="${pl-6}" y="${ly(hi)}" font-size="9" fill="#a3aab1" text-anchor="end">${hi.toFixed(2)}</text>`+
+          `<text x="${pl-6}" y="${ly(lo)}" font-size="9" fill="#a3aab1" text-anchor="end">${lo.toFixed(2)}</text>`+
+          `<text x="${(W)/2}" y="${H-4}" font-size="10" fill="#98a0a7" text-anchor="middle">число групп (log) → мельче</text>`;
+  const col={area:"var(--area)",family:"var(--family)"};
+  for(const [f,pts] of Object.entries(series)){
+    const P=pts.map(p=>[kx(p.k),ly(p.ll)]);
+    s += `<polyline points="${P.map(p=>p.join(",")).join(" ")}" fill="none" stroke="${col[f]}" stroke-width="1.6"/>`;
+    pts.forEach((p,i)=>{ const chosen=(f==="area"&&p.k===12)||(f==="family"&&p.k===11);
+      s += `<circle cx="${kx(p.k)}" cy="${ly(p.ll)}" r="${chosen?4.2:3}" fill="${chosen?col[f]:'#fff'}" stroke="${col[f]}" stroke-width="1.6"/>`;
+      s += `<text x="${kx(p.k)}" y="${ly(p.ll)-7}" font-size="8.5" fill="#7a828a" text-anchor="middle">${p.k}${chosen?'★':''}</text>`; });
+  }
+  document.getElementById("gran").innerHTML = s;
+  document.getElementById("granNote").innerHTML =
+    `★ = текущее разрешение. <span style="color:var(--area)">area·12</span> и <span style="color:var(--family)">family·11</span> `+
+    `бьют и грубее, и мельче: дробление на L1/raw <b>переобучается</b> (ll падает). Гранулярность <b>правильная</b>.`;
+})();
+
+document.getElementById("reframe").innerHTML =
+  `<b>Переформулировка допущения #6.</b> «area·family·subsistence·theme_profile ортогональны и правильны» → `+
+  `<b>(орт.)</b> нет — V до ${D.assoc["area|family"]}; <b>(неизбыт.)</b> каждая фасета несёт ненулевой уникальный сигнал, `+
+  `но family и subsistence тонкие (Δ≈0.01) — работают theme_profile и area; <b>(гранул.)</b> набор адекватен при `+
+  `12 ареалах / 11 семьях (мельче переобучает); <b>(полнота)</b> набор <b>неполон</b> — ловит лишь `+
+  `~${Math.round(100*(1-D.residual.cont_residual))}% сходства мотивов, оставляя крупную кросс-континентальную конвергенцию `+
+  `для слоёв связности M34/M35.`;
+</script>
