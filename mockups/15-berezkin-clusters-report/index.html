@@ -114,27 +114,40 @@
 const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const clip = (s,n)=> s.length>n ? s.slice(0,n-1)+"…" : s;
 
-// ---- map builder (equirectangular: cx=lon+180, cy=90-lat) ----
-function blobPath(ring){
-  return "M" + ring.map(pt=>`${(pt[0]+180).toFixed(2)} ${(90-pt[1]).toFixed(2)}`).join("L") + "Z";
-}
+// ---- map builder (equirectangular, configurable central meridian lon0) ----
+// Combined map: lon0=0 (Atlantic-centred). A single cluster card re-centres on its own
+// region so a Pacific/Beringian cluster (e.g. Океания) is one contiguous footprint
+// instead of being split by the Atlantic seam. Base LAND path is baked at lon0=0.
+const LANDPATH = window.LAND||"";
+const py = lat => 90 - lat;
+const px = (lon, lon0) => (((lon - lon0 + 180) % 360) + 360) % 360;   // independent marks (points)
+const landG = lon0 => `<g>` + [-360,0,360].map(k=>
+  `<path class="land" d="${LANDPATH}" transform="translate(${(-lon0+k).toFixed(1)},0)"/>`).join("") + `</g>`;
+// A blob is a *connected* ring, so it must not be wrapped per-vertex (that re-draws the
+// smear). Map it continuously (no modulo) and draw three ±360-shifted copies; the viewBox
+// clips, so a seam-crossing blob appears as two lobes on both edges (combined) or one
+// centred lobe (re-centred card). Ring longitudes come pre-unwrapped from build_data.
+const ringPath = (ring, lon0) => "M" + ring.map(pt=>`${(pt[0]-lon0+180).toFixed(2)} ${py(pt[1]).toFixed(2)}`).join("L") + "Z";
+const blobG = (ring, lon0, attrs) => `<g>` + [-360,0,360].map(k=>
+  `<path d="${ringPath(ring,lon0)}" transform="translate(${k},0)" ${attrs}/>`).join("") + `</g>`;
+const centreLon = lons => { let x=0,y=0; lons.forEach(l=>{ x+=Math.cos(l*Math.PI/180); y+=Math.sin(l*Math.PI/180); });
+  return Math.atan2(y,x)*180/Math.PI; };
+
 function mapSVG(activeK){
-  const land = `<path class="land" d="${window.LAND||""}"/>`;
-  // filled cluster footprints (under the points). Combined map: all clusters, faint.
-  const cls = activeK==null ? D.clusters : [D.clusters[activeK]];
-  const fillOp = activeK==null ? 0.09 : 0.20, strokeOp = activeK==null ? 0.4 : 0.7;
+  const active = activeK!=null;
+  const lon0 = active ? centreLon(D.points.filter(p=>p.k===activeK).map(p=>p.x)) : 0;
+  const cls = active ? [D.clusters[activeK]] : D.clusters;
+  const fillOp = active ? 0.20 : 0.09, strokeOp = active ? 0.7 : 0.4;
   const blobs = cls.flatMap(c => (c.blobs||[]).map(ring=>
-    `<path d="${blobPath(ring)}" fill="${c.color}" fill-opacity="${fillOp}" `+
-    `stroke="${c.color}" stroke-opacity="${strokeOp}" stroke-width="0.4"/>`)).join("");
+    blobG(ring, lon0, `fill="${c.color}" fill-opacity="${fillOp}" stroke="${c.color}" stroke-opacity="${strokeOp}" stroke-width="0.4"`))).join("");
   const pts = D.points.map(p=>{
-    const on = activeK==null || p.k===activeK;
-    const cx=p.x+180, cy=90-p.y;
-    const col = activeK==null ? D.clusters[p.k].color : (on?D.clusters[p.k].color:"#cfd4cd");
-    const r = on ? (activeK==null?1.15:1.5) : 0.7;
+    const on = !active || p.k===activeK;
+    const col = !active ? D.clusters[p.k].color : (on?D.clusters[p.k].color:"#cfd4cd");
+    const r = on ? (!active?1.15:1.5) : 0.7;
     const op = on ? 0.9 : 0.3;
-    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" fill-opacity="${op}"/>`;
+    return `<circle cx="${px(p.x,lon0).toFixed(2)}" cy="${py(p.y).toFixed(2)}" r="${r}" fill="${col}" fill-opacity="${op}"/>`;
   }).join("");
-  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${blobs}${pts}</svg>`;
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${landG(lon0)}${blobs}${pts}</svg>`;
 }
 
 document.getElementById("mapAll").innerHTML = mapSVG(null);

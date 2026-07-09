@@ -75,6 +75,20 @@ def _chaikin(poly, iters=2):
     return poly
 
 
+def _unwrap_lon(P):
+    """Unwrap longitudes around their circular mean so a cluster straddling the
+    antimeridian (Pacific / Beringian / Oceanic) is contiguous: its points get
+    longitudes like 182 / −182 instead of jumping ±360. Hull, centroid and DBSCAN
+    then work in a flat frame; a seam-crossing hull no longer smears across the
+    Atlantic. Ring vertices may leave [−180, 180]; the renderer wraps them."""
+    lon = P[:, 0]
+    mx = math.degrees(math.atan2(np.mean(np.sin(np.radians(lon))),
+                                 np.mean(np.cos(np.radians(lon)))))
+    P = P.copy()
+    P[:, 0] = mx + ((lon - mx + 180) % 360) - 180
+    return P
+
+
 def cluster_blobs(points, eps=25.0, pad=3.5):
     """points: list of {x:lon, y:lat}. Returns ONE smoothed ring enclosing the whole
     cluster. Only truly isolated strays are dropped first (DBSCAN noise at a generous
@@ -82,7 +96,7 @@ def cluster_blobs(points, eps=25.0, pad=3.5):
     different continents are still enclosed by the single hull."""
     if not points:
         return []
-    P = np.array([[p["x"], p["y"]] for p in points], dtype=float)
+    P = _unwrap_lon(np.array([[p["x"], p["y"]] for p in points], dtype=float))
     if len(P) >= 4:
         labels = DBSCAN(eps=eps, min_samples=2).fit(P).labels_
         kept = P[labels != -1]
