@@ -31,13 +31,21 @@
 </header>
 
 <div class="card">
+  <h2>Недатированное дерево vs датированное (по семьям, M30)</h2>
   <div class="kpis" id="kpis"></div>
   <div class="note" id="limit"></div>
 </div>
 
 <div class="card">
   <h2>Парсимония vs likelihood — отслеживаемые мотивы</h2>
-  <table><thead><tr><th>Код</th><th>Мотив</th><th class="r">парсимония (gains)</th><th class="r">ожидаемые gains</th><th class="r">n</th></tr></thead>
+  <table><thead><tr>
+    <th>Код</th><th>Мотив</th><th class="r">парсим.</th>
+    <th class="r">ожид. gains<br><span class="muted">недатир.</span></th>
+    <th class="r">ожид. gains<br><span class="muted">датир.</span></th>
+    <th class="r">конц.<br><span class="muted">в семье</span></th>
+    <th class="r">deep<br><span class="muted">н→д</span></th>
+    <th class="r">возраст узла<br><span class="muted">/ потолок</span></th>
+  </tr></thead>
   <tbody id="tracked"></tbody></table>
   <div class="note" id="insight"></div>
 </div>
@@ -47,25 +55,36 @@
 <script>
 const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const U=D.undated, C=D.dated;
 document.getElementById("kpis").innerHTML = [
-  [`${D.loss_mult}×`, "потеря быстрее возникновения (Dollo-fit)"],
-  [`${D.corr_pars_eg}`, "corr(парсимония, ожидаемые gains)"],
-  [`${D.n}`, "мотивов (≥8 традиций)"],
+  [`${U.corr} → ${C.corr}`, "corr(парсимония, ожид. gains): недатир. → датир."],
+  [`${U.loss_mult}× → ${C.loss_mult}×`, "потеря/возникновение (Dollo-fit)"],
+  [C.median_conc_origin ? `${C.median_conc_origin} BP` : "—", `медианный узловой возраст концентрированных мотивов (conc≥${D.conc_thr}, n=${C.n_conc_aged}); ${C.n_younger} — младше потолка семьи`],
 ].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
 document.getElementById("limit").innerHTML =
-  `<b>Честный предел.</b> На недатированном классификационном дереве (единичные ветви) likelihood во многом `+
-  `<b>воспроизводит парсимонию</b> — корреляция <b>${D.corr_pars_eg}</b>. Это ровно мотивация для <b>M30</b>: `+
-  `реальный выигрыш (календарные возрасты, острая ASR) даёт датированное дерево. Что уже ново здесь — `+
-  `<b>вероятностный</b> вывод, а не жёсткий счётчик.`;
+  `<b>Что дала датировка (M30).</b> На недатированном дереве (единичные ветви) likelihood во многом `+
+  `<b>воспроизводит парсимонию</b> — corr <b>${U.corr}</b>. Масштабирование ветвей календарными возрастами семей `+
+  `(покрытие ${Math.round(C.cov*100)}% традиций; недатированным семьям — дефолт ${C.default_kyr} тыс. лет) `+
+  `разводит модель с парсимонией (corr <b>${C.corr}</b>) и даёт <b>узловой возраст происхождения</b> — но только `+
+  `для мотивов, <b>концентрированных в своей семье</b> (столбец «конц.»): у таких (B4, K57, tar-baby) возраст узла `+
+  `садится <b>ниже потолка семьи</b> из M30/M31 — то, что M31 предсказывал как «разброс моложе корня». `+
+  `<b>Честный предел.</b> Для ареальных, низко-концентрированных мотивов (K25, A3 — conc≈0.15) «5500 BP» это возраст `+
+  `лишь их наследуемого <b>ИЕ-ядра</b>, а не всего ареала: tree-only модель датирует ядро, но слепа к диффузному `+
+  `хвосту (её и растворяют ареальный канал M19/M31 и связность M34). Масштаб ветвей — прокси по топологии; настоящий `+
+  `RRW с неопределённостью — M31 future work.`;
 
 document.getElementById("tracked").innerHTML = D.tracked.map(t=>{
-  const hl = Math.abs(t.pars - t.eg) > 40;
-  return `<tr class="${hl?'hl':''}"><td class="code">${esc(t.c)}</td><td>${esc(clip(t.n,26))} <span class="muted">(${esc(t.label)})</span></td>`+
-    `<td class="r">${t.pars}</td><td class="r" style="font-weight:700">${t.eg}</td><td class="r">${t.np}</td></tr>`;
+  const hl = t.conc >= D.conc_thr && t.age && t.age < t.ceil;   // concentrated + node age below family ceiling
+  const age = t.age ? `${t.age}<span class="muted"> / ${t.ceil}</span>` : "<span class=muted>—</span>";
+  return `<tr class="${hl?'hl':''}"><td class="code">${esc(t.c)}</td><td>${esc(clip(t.n,22))} <span class="muted">(${esc(t.label)})</span></td>`+
+    `<td class="r">${t.pars}</td><td class="r">${t.eg_u}</td><td class="r" style="font-weight:700">${t.eg_d}</td>`+
+    `<td class="r">${t.conc.toFixed(2)}</td><td class="r">${t.rd_u.toFixed(2)}→${t.rd_d.toFixed(2)}</td><td class="r">${age}</td></tr>`;
 }).join("");
 document.getElementById("insight").innerHTML =
-  "<b>Где likelihood отличается от парсимонии.</b> Для swan-maiden (K25) парсимония требует <b>120</b> независимых "+
-  "возникновений, а модель ожидает лишь <b>~20</b>: с смещением к потере она объясняет разбросанное присутствие "+
-  "<b>потерей из общего предка</b>, а не сотней переизобретений — то, что парсимония в принципе не умеет. Именно "+
-  "эта способность (различать потерю и независимое возникновение) — качественный апгрейд Метода B.";
+  "<b>Как читать таблицу.</b> Недатированная модель уже отличает потерю от переизобретения (K25: парсимония требует "+
+  "~120 независимых возникновений, модель — куда меньше, объясняя разброс <b>потерей из общего предка</b>). "+
+  "Датирование добавляет <b>узловой возраст</b>, но его надо читать <b>вместе с концентрацией</b>: подсвечены строки, "+
+  "где мотив концентрирован в семье (conc≥"+D.conc_thr+") и его узел <b>моложе потолка</b> — там возраст осмыслен как "+
+  "происхождение (B4 внутри австронезийской младше 5200; Cinderella, tar-baby — младше прото-ИЕ). Для ареальных "+
+  "K25/A3 (conc≈0.15) «5500 BP» датирует только ИЕ-ядро, не весь мотив.";
 </script>
