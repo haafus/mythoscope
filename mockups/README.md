@@ -192,11 +192,11 @@ A first prototype of **Method A** from
 [`stratum-derivation.md`](../docs/motifs/proposals/stratum-derivation.md): estimate a
 motif's time-depth from the shape of its areal distribution alone (prevalence, spread,
 fragmentation, language-family span, mega-set span). Shows two scores — PC1 and a
-disjunction-weighted variant. Pan-global celestial cosmogony tops the ranking and the
-adventure-endemism stress-test passes (the disjunction weighting triples the
-separation); but neither linear score suffices — PC1 conflates old with *widespread*,
-the disjunction variant over-penalises prevalence (swan-maiden K25 100→16) — which is
-the concrete argument for the phylogenetic Method B. See
+disjunction-weighted variant. The most prevalent motifs top PC1 (the swan-maiden leads,
+then pan-global celestial cosmogony) and the adventure-endemism stress-test passes (the
+disjunction weighting nearly triples the separation); but neither linear score suffices —
+PC1 conflates old with *widespread*, the disjunction variant over-penalises prevalence
+(swan-maiden K25 100→10) — which is the concrete argument for the phylogenetic Method B. See
 [`17-motif-depth-score/README.md`](17-motif-depth-score/README.md).
 
 ### 18 · Motif phylo-strata (Method B)

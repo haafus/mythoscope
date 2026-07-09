@@ -16,21 +16,23 @@ uncontroversial anchors.
 
 ## What it shows
 
-- The PC1 ranking is sensible: **pan-global celestial cosmogony tops it** (male-sun/
-  female-moon, stars-are-people, theft of fire, primeval waters — spanning all 16
-  macro-areas and 50–69 language families); narrow motifs sink.
+- The PC1 top is the **most prevalent motifs** — the swan-maiden (K25) leads, then
+  pan-global celestial cosmogony (stars-are-people, male-sun/female-moon, primeval waters,
+  theft of fire — spanning all 16 macro-areas and 50–69 language families); narrow motifs
+  sink. That the broadly-diffuse swan-maiden tops PC1 is itself the tell (next section).
 - **Stress-test passed and amplified:** New-World-endemic adventure/trick motifs
   (absent from Europe) score deeper than Europe-only ones under both scores, and the
-  **disjunction weighting triples the gap** (37.8 vs 19.6, up from PC1's 15.5 vs 12.1)
-  — a naive "theme B = late" rule would miss this entirely.
+  **disjunction weighting nearly triples the gap** (40.6 vs 24.0, up from PC1's 17.5 vs
+  11.8) — a naive "theme B = late" rule would miss this entirely.
 
 ## What it honestly shows about the method (the point of a prototype)
 
 Neither linear score is "the answer". **PC1 is dominated by prevalence** (corr with
-`n_macro` = 0.95), so it conflates *old* with *widespread*. The disjunction weighting
-fixes that — but over-corrects: it penalises prevalence so hard that genuinely
-broad-**and**-deep motifs collapse (**K25 swan-maiden 100 → 16**, trickster-coyote
-75 → 4) while sparse scattered motifs float up. A single linear score cannot express
+`n_macro` = 0.93), so it conflates *old* with *widespread* — which is why the broadly-
+diffuse swan-maiden sits at #1. The disjunction weighting fixes that — but over-corrects:
+it penalises prevalence so hard that genuinely broad-**and**-deep motifs collapse
+(**K25 swan-maiden 100 → 10**, trickster-coyote 74 → 3) while sparse scattered motifs
+float up. A single linear score cannot express
 "old = broad **and** cross-clade **and** disjunct" at once — which is exactly the
 argument for the model-based **Method B** (phylogenetic ancestral-state reconstruction,
 weighing independent gains against node depth), plus the mandatory attestation-bias
@@ -49,5 +51,5 @@ python -m http.server -d mockups 8890
 # → http://127.0.0.1:8890/17-motif-depth-score/
 ```
 
-`data.js` is git-ignored. Coordinates come from the pipeline; missing ones fall back to
-the areal-subregion centroid.
+`data.js` is git-ignored. Coordinates come from the committed `tradition-coords.json`
+snapshot; missing ones fall back to the areal-subregion centroid.

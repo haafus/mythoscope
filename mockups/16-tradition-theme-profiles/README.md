@@ -35,6 +35,7 @@ python -m http.server -d mockups 8890
 # → http://127.0.0.1:8890/16-tradition-theme-profiles/
 ```
 
-`data.js` is git-ignored. Coordinates come from the pipeline
-(`mapsofmyths_traditions.json`); where a tradition has none, its areal-subregion
-centroid is used and the points are spread so they don't pile up.
+`data.js` is git-ignored. Coordinates come from the committed `tradition-coords.json`
+snapshot; where a tradition has none, its areal-subregion centroid is used and the points
+are spread so they don't pile up. (Coordinates only place the map dots — the clustering
+and the 38% variance-by-macro are computed on theme profiles, so they are unaffected.)

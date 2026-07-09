@@ -383,7 +383,7 @@ Backed by mockups 16–18 over the Berezkin catalogue:
   celestial cosmogony tops the ranking, the adventure-endemism stress-test passes — but
   no single linear score works: PC1 conflates old with *widespread*; a
   disjunction-weighted variant triples the endemism separation yet over-penalises
-  prevalence (swan-maiden 100→16). Distribution alone is a signal, not a dating.
+  prevalence (swan-maiden 100→10). Distribution alone is a signal, not a dating.
 - **Method B (mockup 18).** A phylogenetic-signal test finds **only ~1% of motifs are
   broad *and* clade-clustered** (genuine descent) — and those are European fairy-tale
   types (Cinderella, "seven at a blow"), independently recovering the published
