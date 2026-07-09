@@ -6,9 +6,10 @@ cultural structure each index carries independently.
 Run from repo root:  python mockups/06-per-index-biclusters/build_data.py
 """
 import json
+import math
 import re
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -23,35 +24,105 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent / "data.js"
 
 
-def jitter(label):
-    h = abs(hash(label))
-    return ((h % 1000) / 1000 - 0.5) * 6, ((h // 1000 % 1000) / 1000 - 0.5) * 4
+def _sunflower_offset(i, n):
+    """Unit-disk position of point ``i`` of ``n`` on a Fermat (sunflower) spiral.
+
+    Deterministic and gives even areal density with no overlaps, so a group of
+    traditions sharing one base coordinate spreads into an even cloud instead of
+    piling up. Returns (dx, dy) with radius in [0, 1]; scale by the desired span.
+    """
+    if n <= 1:
+        return 0.0, 0.0
+    golden = math.pi * (3.0 - math.sqrt(5.0))   # golden angle, ~2.39996 rad
+    r = math.sqrt((i + 0.5) / n)                 # sqrt -> uniform density
+    theta = i * golden
+    return r * math.cos(theta), r * math.sin(theta)
 
 
 def coord_resolver(index):
-    """label -> (lon, lat) or None, per index."""
+    """label -> (lon, lat, precise) or None, per index.
+
+    ``precise`` is True for a real per-tradition location, False for a
+    subregion-centroid fallback (many traditions share one centroid; they are
+    spread out afterwards so they don't pile up).
+
+    For the Berezkin index the real location is the tradition's own map
+    coordinate (mapsofmyths ``/gmap-markers-tradition``, stored as ``coordinates``
+    = [lat, lon] in ``berezkin.json``). Only where that is missing do we fall back
+    to the areal-subregion centroid — optionally nudged by a per-people gazetteer
+    hit, but only when it agrees with the tradition's subregion so an accidental
+    name collision can't fling a point across the world.
+    """
     if index == "brz":
         bz = load("berezkin.json")
-        name2sub = {}
+        name2coord, name2sub = {}, {}
         for v in bz["traditions"].values():
+            key = canon(v.get("name") or "")
+            c = v.get("coordinates")
+            if isinstance(c, (list, tuple)) and len(c) == 2:
+                name2coord[key] = (float(c[1]), float(c[0]))   # [lat, lon] -> (lon, lat)
             ap = v.get("areal_path") or []
             if len(ap) >= 2:
-                name2sub[canon(v.get("name") or "")] = ap[1][1].upper()
+                name2sub[key] = ap[1][1].upper()
         def r(label):
-            sub = name2sub.get(label)
-            c = SUBREGION.get(sub) if sub else None
-            if c:
-                dx, dy = jitter(label)
-                return [round(c[0] + dx, 1), round(c[1] + dy, 1)]
+            real = name2coord.get(label)
+            if real:
+                return (real[0], real[1], True)
+            cen = SUBREGION.get(name2sub.get(label))
+            g = gaz_coord(label)
+            if g and cen:
+                if abs(g[0] - cen[0]) <= 35 and abs(g[1] - cen[1]) <= 25:
+                    return (float(g[0]), float(g[1]), True)
+                return (float(cen[0]), float(cen[1]), False)
+            if g:
+                return (float(g[0]), float(g[1]), True)
+            if cen:
+                return (float(cen[0]), float(cen[1]), False)
             return None
         return r
     def r(label):
         c = gaz_coord(label)
         if c:
-            dx, dy = jitter(label)
-            return [round(c[0] + dx, 1), round(c[1] + dy, 1)]
+            return (float(c[0]), float(c[1]), True)
         return None
     return r
+
+
+def place_points(resolve, labels_by_cluster, trad_mem):
+    """Resolve every tradition to a map point, then spread points that share a
+    base coordinate into an even cloud (sunflower spiral) so nothing piles up.
+
+    ``labels_by_cluster``: list of (cluster_index, [labels]). Returns
+    (points, placed). Placement is fully deterministic (ordered by label).
+    """
+    raw = []   # (label, k, lon, lat, precise)
+    for k, labels in labels_by_cluster:
+        for label in labels:
+            xy = resolve(label)
+            if xy:
+                raw.append((label, k, xy[0], xy[1], xy[2]))
+
+    # group points sharing one base coordinate; a subregion centroid gets a
+    # wider spread than a real per-people coordinate that a few labels collide on.
+    groups = defaultdict(list)
+    for idx, (label, k, lon, lat, precise) in enumerate(raw):
+        groups[(round(lon, 3), round(lat, 3), precise)].append(idx)
+
+    coords = [None] * len(raw)
+    for (lon, lat, precise), members in groups.items():
+        members.sort(key=lambda i: raw[i][0])    # deterministic order by label
+        n = len(members)
+        span = (0.8 if precise else 1.3) * math.sqrt(n)   # degrees
+        for j, idx in enumerate(members):
+            ox, oy = _sunflower_offset(j, n)
+            coords[idx] = (round(lon + ox * span * 1.35, 2),
+                           round(lat + oy * span, 2))
+
+    points = []
+    for idx, (label, k, lon, lat, precise) in enumerate(raw):
+        x, y = coords[idx]
+        points.append({"t": label, "x": x, "y": y, "k": k, "s": trad_mem.get(label, 0)})
+    return points, len(points)
 
 # per-index tuning: (K clusters, MIN_DF, MAX_DF_FRAC, MIN_CULT-per-motif)
 CFG = {
@@ -166,16 +237,11 @@ def bicluster(index, tmi_norm=None, cfg=None):
         })
     clusters.sort(key=lambda c: -c["n_motif"])
 
-    # map points: each cluster's traditions placed by coordinate, coloured by cluster
+    # map points: each cluster's traditions placed by coordinate, coloured by
+    # cluster, then spread within their locale so nothing piles into a blob.
     resolve = coord_resolver(index)
-    points, placed = [], 0
-    for k, c in enumerate(clusters):
-        for label in c.pop("_all"):
-            xy = resolve(label)
-            if xy:
-                points.append({"t": label, "x": xy[0], "y": xy[1], "k": k,
-                               "s": trad_mem.get(label, 0)})
-                placed += 1
+    labels_by_cluster = [(k, c.pop("_all")) for k, c in enumerate(clusters)]
+    points, placed = place_points(resolve, labels_by_cluster, trad_mem)
     return {"n_motifs": len(kept), "n_traditions": len(cvocab),
             "clusters": clusters, "points": points, "placed": placed, "trad_mem": trad_mem}
 
