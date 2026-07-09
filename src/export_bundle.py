@@ -2,8 +2,10 @@
 
 The archive holds the ``outputs/`` products (corpus, embeddings, projections,
 graphs, motifs) so a viewer-profile install elsewhere can serve them offline
-(no GPU / internet / LLM needed). Resumable caches and logs are excluded by
-default — they are rebuild fuel, useless on the target — and added only with
+(no GPU / internet / LLM needed), plus any local ``file:`` corpus sources under
+``config/sources`` (so the originals travel with the bundle and a rebuild on the
+target can re-ingest them). Resumable caches and logs are excluded by default —
+they are rebuild fuel, useless on the target — and added only with
 ``include_caches``. There is no separate import step: restore is just ``unzip``
 from the project root.
 
@@ -41,14 +43,17 @@ _CACHE_FILENAMES = {GRAPHS_CACHE, SUMMARIES_CACHE}
 _RAW_DIR_NAME = "raw"
 
 
-def _components() -> list[tuple[str, Path]]:
-    """(archive name, source dir) for each exportable component, in order."""
+def _components() -> list[tuple[str, Path, str]]:
+    """(archive name, source dir, archive root) for each exportable component, in
+    order. Most live under ``outputs/``; local ``file:`` corpus sources live under
+    ``config/sources`` and restore there, so they carry their own archive root."""
     return [
-        ("corpus", Path(settings.corpus_dir)),
-        ("embeddings", Path(settings.embeddings_dir)),
-        ("projections", Path(settings.projections_dir)),
-        ("graphs", Path(settings.graphs_dir)),
-        ("motifs", Path(settings.motifs_dir)),
+        ("corpus", Path(settings.corpus_dir), "outputs/corpus"),
+        ("embeddings", Path(settings.embeddings_dir), "outputs/embeddings"),
+        ("projections", Path(settings.projections_dir), "outputs/projections"),
+        ("graphs", Path(settings.graphs_dir), "outputs/graphs"),
+        ("motifs", Path(settings.motifs_dir), "outputs/motifs"),
+        ("sources", Path(settings.sources_dir), "config/sources"),
     ]
 
 
@@ -116,7 +121,7 @@ def export_outputs(*, include_caches: bool = False, out_dir: Path | None = None,
 
     # Gather files first so we can skip writing an empty archive.
     plan: list[tuple[Path, str, int]] = []  # (file, arcname, size)
-    for name, src in _components():
+    for name, src, arc_root in _components():
         if not src.exists():
             continue
         comp_bytes = comp_files = 0
@@ -127,7 +132,7 @@ def export_outputs(*, include_caches: bool = False, out_dir: Path | None = None,
             if not include_caches and _is_cache(name, rel):
                 continue
             size = file.stat().st_size
-            plan.append((file, (Path("outputs") / name / rel).as_posix(), size))
+            plan.append((file, (Path(arc_root) / rel).as_posix(), size))
             comp_bytes += size
             comp_files += 1
         if comp_files:

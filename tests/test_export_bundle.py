@@ -22,6 +22,8 @@ def built_outputs(tmp_path, monkeypatch):
     }
     for attr, path in dirs.items():
         monkeypatch.setattr(settings, attr, path)
+    # Isolate local file: sources under an (empty by default) config/sources.
+    monkeypatch.setattr(settings, "sources_dir", tmp_path / "config" / "sources")
 
     def write(path, text="x"):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -76,10 +78,25 @@ class TestExport:
         assert all(n.startswith("outputs/") for n in _names(result))
         assert set(result.components) == {"corpus", "embeddings", "projections", "graphs", "motifs"}
 
+    def test_includes_file_sources(self, built_outputs):
+        from settings import settings
+
+        src = settings.sources_dir
+        src.mkdir(parents=True)
+        (src / "myth.txt").write_text("local source text", encoding="utf-8")
+        (src / "sub" / "epic.pdf").parent.mkdir(parents=True)
+        (src / "sub" / "epic.pdf").write_bytes(b"%PDF-1.4 ...")
+
+        result = eb.export_outputs(out_dir=built_outputs, timestamp="T")
+        names = _names(result)
+        assert "config/sources/myth.txt" in names
+        assert "config/sources/sub/epic.pdf" in names
+        assert "sources" in result.components
+
     def test_nothing_to_export(self, tmp_path, monkeypatch):
         from settings import settings
 
-        for attr in ("corpus_dir", "embeddings_dir", "projections_dir", "graphs_dir", "motifs_dir"):
+        for attr in ("corpus_dir", "embeddings_dir", "projections_dir", "graphs_dir", "motifs_dir", "sources_dir"):
             monkeypatch.setattr(settings, attr, tmp_path / "empty" / attr)
         result = eb.export_outputs(out_dir=tmp_path, timestamp="T")
         assert result.path is None

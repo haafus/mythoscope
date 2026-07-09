@@ -425,13 +425,13 @@ mytho export --caches   # дополнительно включить resumable-
 ```
 
 Что внутри:
-- **по умолчанию** — продукты `outputs/`: corpus, embeddings (каталог ChromaDB), projections, graphs, motifs; **без** кэшей и логов.
+- **по умолчанию** — продукты `outputs/`: corpus, embeddings (каталог ChromaDB), projections, graphs, motifs; плюс локальные `file:`-источники корпуса из `config/sources/` (оригиналы едут вместе с бандлом, чтобы пересборка на целевой машине могла их переингестить); **без** кэшей и логов.
 - **`--caches`** — добавляет resumable-кэши (`extraction_cache.jsonl`, `summaries.jsonl`, `outputs/motifs/raw/`). Логи не включаются никогда.
 
-Члены архива — пути `outputs/...`, поэтому на целевой машине:
+Члены архива — пути `outputs/...` (и `config/sources/...` для файловых источников), поэтому на целевой машине:
 
 ```bash
-unzip mythoscope-export-<timestamp>.zip   # из корня проекта → воссоздаст outputs/
+unzip mythoscope-export-<timestamp>.zip   # из корня проекта → воссоздаст outputs/ (и config/sources/)
 mytho server
 ```
 
