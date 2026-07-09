@@ -268,8 +268,9 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
         "traditions_with_coords": with_coords,
     }
     logger.info("mapsofmyths: refreshed — motifs:%d type/group:%d tmi:%d atu:%d "
-                "traditions-sets:%d; tradition catalogue:%d (coords:%d)",
+                "traditions-sets:%d; tradition catalogue:%d",
                 counts["motifs"], counts["with_type"], counts["with_tmi"],
-                counts["with_atu"], counts["with_traditions"], counts["traditions"],
-                with_coords)
+                counts["with_atu"], counts["with_traditions"], counts["traditions"])
+    logger.info("mapsofmyths: tradition coordinates resolved — coords:%d/%d",
+                with_coords, counts["traditions"])
     return counts
