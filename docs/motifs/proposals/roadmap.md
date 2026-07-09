@@ -36,10 +36,11 @@ Each replaces a descriptive heuristic with a generative model; medium effort, hi
   phylo-signal). **Result:** most motifs areal-dominant (2311/2775), B slightly more
   inheritable than A; the continuum beats the gate, but A3 and K25 get near-identical mixtures
   so the deep-vs-diffuse residual **does not dissolve** — external calibration needed. · **M**
-- **M28 · Likelihood ASR (Mk / Dollo + rate heterogeneity).** Upgrade Method B (18) from Fitch
-  parsimony to a continuous-time gain/loss model with a loss bias and across-motif rate
-  variation. · *data: have* · **refines:** marginal ancestral *probabilities* and a principled
-  homoplasy estimate instead of a hard gain count. · **M**
+- **M28 · Likelihood ASR (Mk / Dollo). ✓ done** (mockup 28). 2-state gain/loss CTMC with
+  marginal ASR (inside/outside) and a Dollo-flavoured loss bias (loss≈8×gain). **Result:** on
+  the *undated* tree it largely reproduces parsimony (`corr=0.90`) — motivating M30 — but adds
+  probabilistic output and a loss-vs-gain split (K25: 120 parsimony gains → ~20 expected). Best
+  re-run once M30 supplies branch dates. · **M**
 - **M29 · Motif content × stratum (BGE-M3).** Cross the semantic embeddings from the
   morphology stage with the computed `stratum`: do *content*-similar motifs share depth? ·
   *data: have* (embeddings already built) · **adds:** an independent (content) signal to the

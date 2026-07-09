@@ -298,6 +298,13 @@ get near-identical mixtures** (descent≈0.16) — the deep-substrate-vs-wide-di
 confirmed irreducible from distribution, needing external calibration. See
 [`27-mixture/README.md`](27-mixture/README.md).
 
+### 28 · Likelihood ASR (roadmap M28)
+Upgrades Method B (18) from Fitch parsimony to a 2-state Mk gain/loss model with marginal ASR
+(inside/outside) and a loss bias (Dollo-fit, loss≈8×gain). On the **undated** tree it largely
+reproduces parsimony (`corr=0.90` — the motivation for M30), but adds probabilistic output and
+a loss-vs-gain decomposition: swan-maiden K25 needs 120 parsimony gains but only ~20 *expected*
+gains, the model preferring loss-from-ancestor. See [`28-likelihood-asr/README.md`](28-likelihood-asr/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

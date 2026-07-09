@@ -1,0 +1,71 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>28 · Likelihood ASR</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:900px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:840px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:20px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  td,th { padding:5px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.code { font-weight:700; color:#4f7096; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.hl { background:#fbf6ec; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Likelihood ASR — Mk gain/loss против парсимонии</h1>
+  <p>Апгрейд Метода B (мокап 18): вместо жёсткого подсчёта возникновений по Фитчу — 2-state непрерывная марковская
+     модель gain/loss с <b>маргинальной</b> реконструкцией предковых состояний (inside/outside sum-product). Даёт
+     <b>вероятностный</b> вывод: ожидаемое (непрерывное) число независимых возникновений и вероятность присутствия в
+     глубоких предках. Скорости подогнаны с <b>смещением к потере</b> (Dollo-подобно).</p>
+</header>
+
+<div class="card">
+  <div class="kpis" id="kpis"></div>
+  <div class="note" id="limit"></div>
+</div>
+
+<div class="card">
+  <h2>Парсимония vs likelihood — отслеживаемые мотивы</h2>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th class="r">парсимония (gains)</th><th class="r">ожидаемые gains</th><th class="r">n</th></tr></thead>
+  <tbody id="tracked"></tbody></table>
+  <div class="note" id="insight"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+document.getElementById("kpis").innerHTML = [
+  [`${D.loss_mult}×`, "потеря быстрее возникновения (Dollo-fit)"],
+  [`${D.corr_pars_eg}`, "corr(парсимония, ожидаемые gains)"],
+  [`${D.n}`, "мотивов (≥8 традиций)"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("limit").innerHTML =
+  `<b>Честный предел.</b> На недатированном классификационном дереве (единичные ветви) likelihood во многом `+
+  `<b>воспроизводит парсимонию</b> — корреляция <b>${D.corr_pars_eg}</b>. Это ровно мотивация для <b>M30</b>: `+
+  `реальный выигрыш (календарные возрасты, острая ASR) даёт датированное дерево. Что уже ново здесь — `+
+  `<b>вероятностный</b> вывод, а не жёсткий счётчик.`;
+
+document.getElementById("tracked").innerHTML = D.tracked.map(t=>{
+  const hl = Math.abs(t.pars - t.eg) > 40;
+  return `<tr class="${hl?'hl':''}"><td class="code">${esc(t.c)}</td><td>${esc(clip(t.n,26))} <span class="muted">(${esc(t.label)})</span></td>`+
+    `<td class="r">${t.pars}</td><td class="r" style="font-weight:700">${t.eg}</td><td class="r">${t.np}</td></tr>`;
+}).join("");
+document.getElementById("insight").innerHTML =
+  "<b>Где likelihood отличается от парсимонии.</b> Для swan-maiden (K25) парсимония требует <b>120</b> независимых "+
+  "возникновений, а модель ожидает лишь <b>~20</b>: с смещением к потере она объясняет разбросанное присутствие "+
+  "<b>потерей из общего предка</b>, а не сотней переизобретений — то, что парсимония в принципе не умеет. Именно "+
+  "эта способность (различать потерю и независимое возникновение) — качественный апгрейд Метода B.";
+</script>
