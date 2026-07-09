@@ -282,6 +282,14 @@ family / Galton (p=0.006) individually, attenuating to marginal (p=0.065) only w
 controlled at once (low power). Subsistence carries its own contribution, partly entangled
 with geography. See [`25-galton-test/README.md`](25-galton-test/README.md).
 
+### 26 · Degree-corrected block model (roadmap M26)
+Replaces the biclustering of 06/07/15/23 with a generative **degree-corrected** co-clustering
+of the motif × tradition matrix (self-contained numpy; K chosen by BIC). The payoff: naive
+clustering of raw counts separates traditions by coverage (`eta²(a(t)|block)=0.80` — a
+sampling artifact); the degree-correction halves it to **0.48** while keeping interpretable,
+region-coherent tradition blocks and Category-A-stratified motif blocks. See
+[`26-blockmodel/README.md`](26-blockmodel/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

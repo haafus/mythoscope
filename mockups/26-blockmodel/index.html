@@ -1,0 +1,102 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>26 · Degree-corrected block model</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:980px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:900px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:21px; font-weight:700; font-variant-numeric:tabular-nums; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .bicrow { display:grid; grid-template-columns:44px 1fr 70px; align-items:center; gap:8px; font-size:12px; margin:3px 0; }
+  .bt { height:14px; background:var(--bg); border-radius:5px; overflow:hidden; display:block; }
+  .bf { height:100%; border-radius:5px; display:block; }
+  .robrow { display:grid; grid-template-columns:130px 1fr 46px; align-items:center; gap:10px; margin:8px 0; font-size:12.5px; }
+  .lab { text-align:right; color:#495057; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Degree-corrected блок-модель</h1>
+  <p>Замена бикластеризации (06/07/15/23) генеративной блок-моделью матрицы мотив×традиция. Каждая традиция
+     кластеризуется по <b>нормированному на степень профилю</b> над блоками мотивов (доли, сумма=1) — нормировка
+     убирает суммарную степень, то есть <b>объём каталога <code>a(t)</code></b>. Число блоков традиций выбрано по
+     <b>BIC</b>. Наивный базлайн кластеризует сырые счётчики — и, как и ожидалось, делит традиции по тому, сколько
+     Березкин записал.</p>
+</header>
+
+<div class="card">
+  <div class="kpis" id="kpis"></div>
+  <div class="muted" id="cov" style="margin-top:10px"></div>
+</div>
+
+<div class="cols">
+  <div class="card">
+    <h2>Выбор числа блоков <span class="s">— BIC(K_t), минимум = выбор</span></h2>
+    <div id="bic"></div>
+  </div>
+  <div class="card">
+    <h2>Degree-robustness <span class="s">— eta²(покрытие | блок), меньше = лучше</span></h2>
+    <div id="rob"></div>
+    <div class="note" id="robnote"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Блоки традиций <span class="s">— degree-corrected</span></h2>
+  <table><thead><tr><th>блок</th><th class="r">n</th><th class="r">медиана a(t)</th><th>топ ареалы</th></tr></thead>
+  <tbody id="tb"></tbody></table>
+</div>
+
+<div class="card">
+  <h2>Блоки мотивов <span class="s">— доля Category A и темы</span></h2>
+  <table><thead><tr><th>блок</th><th class="r">n</th><th class="r">Cat-A</th><th>топ темы</th></tr></thead>
+  <tbody id="mb"></tbody></table>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+document.getElementById("kpis").innerHTML = [
+  [`${D.kt}`, "блоков традиций (выбрано BIC)"],
+  [`${D.km}`, "блоков мотивов"],
+  [`${D.eta_dc} vs ${D.eta_naive}`, "degree-robustness: DC vs наивная"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("cov").innerHTML =
+  `${D.n_trad} традиций (≥${D.min_motif} мотивов) × ${D.n_motif} мотивов · покрытие a(t): ${D.cov.min}…${D.cov.max}, медиана ${D.cov.med}.`;
+
+// BIC bars (more negative = better); highlight min
+const bics = D.bic.map(b=>b.bic), lo=Math.min(...bics), hi=Math.max(...bics), best=D.bic.find(b=>b.bic===lo);
+document.getElementById("bic").innerHTML = D.bic.map(b=>{
+  const w = 100*(hi-b.bic)/(hi-lo+1e-9), on=b.bic===lo;
+  return `<div class="bicrow"><span class="lab">K=${b.kt}</span><span class="bt"><span class="bf" style="width:${Math.max(4,w)}%;background:${on?'#3c8a5e':'#b9bcc0'}"></span></span><span class="r" style="color:${on?'#3c8a5e':'var(--muted)'};font-weight:${on?700:400}">${b.bic}</span></div>`;
+}).join("");
+
+// robustness bars
+function rob(lab, v, col){
+  return `<div class="robrow"><span class="lab">${lab}</span><span class="bt"><span class="bf" style="width:${100*v}%;background:${col}"></span></span><span class="r" style="font-weight:700">${v}</span></div>`;
+}
+document.getElementById("rob").innerHTML =
+  rob("наивная (сырьё)", D.eta_naive, "#c05540") + rob("degree-corrected", D.eta_dc, "#3c8a5e");
+document.getElementById("robnote").innerHTML =
+  `Наивная кластеризация на <b>${Math.round(D.eta_naive*100)}%</b> разделяет традиции по объёму каталога — это артефакт `+
+  `сэмплинга. Degree-correction снижает до <b>${Math.round(D.eta_dc*100)}%</b> (остаток — реальная связь: письменные `+
+  `корпуса и густо описаны, и тематически особы). Блоки становятся про структуру, а не про плотность.`;
+
+document.getElementById("tb").innerHTML = D.tblocks.map(b=>
+  `<tr><td>#${b.g}</td><td class="r">${b.n}</td><td class="r">${b.cov_med}</td><td>${b.areas.map(a=>esc(a.name)).join(" · ")}</td></tr>`).join("");
+document.getElementById("mb").innerHTML = D.mblocks.map(b=>
+  `<tr><td>#${b.h}</td><td class="r">${b.n}</td><td class="r">${b.catA}%</td><td>${b.themes.map(t=>esc(t.name)).join(" · ")}</td></tr>`).join("");
+</script>

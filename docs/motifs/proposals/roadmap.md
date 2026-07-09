@@ -25,11 +25,11 @@ These two together retire the two alternative hypotheses that caveat almost ever
 
 Each replaces a descriptive heuristic with a generative model; medium effort, high payoff.
 
-- **M26 · Degree-corrected bipartite SBM.** Replace k-means / spectral co-clustering (16, 23)
-  and biclustering (06/07/15) with a stochastic block model that picks the block count by
-  evidence and whose **degree-correction absorbs the `a(t)` confounder natively**. · *data:
-  have* · **unlocks:** principled, sampling-robust co-clusters; one model subsumes several. ·
-  **M**
+- **M26 · Degree-corrected bipartite SBM. ✓ done** (mockup 26). Alternating degree-corrected
+  co-clustering (self-contained numpy), K_t chosen by BIC (=9). **Result:** naive raw-count
+  clustering is 80% coverage-driven (`eta²(a(t)|block)=0.80`); the degree-correction halves it
+  to **0.48**, with interpretable region-coherent blocks. Sampling-robust replacement for the
+  biclustering. · **M** · *(a full nested DC-SBM would need graph-tool; deferred.)*
 - **M27 · Descent–areal–reinvention mixture per motif (EM).** Replace mockup 19's binary gate
   with a per-motif **inherited-share ∈ [0,1]** — a mixture of tree-inherited, areal-diffused
   and reinvented components. · *data: have* · **tests:** alternative-hypothesis #2 ("stratum
