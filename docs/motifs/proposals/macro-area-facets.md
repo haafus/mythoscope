@@ -222,6 +222,18 @@ dates it — **but only under a model**, and distribution alone cannot separate 
 inheritance from independent reinvention or diffusion-then-loss (homoplasy, Galton's
 problem). Every stratum is therefore a hypothesis with uncertainty, not a fact.
 
+**Founding assumptions (enumerated in full at
+[`stratum-derivation.md` §0](stratum-derivation.md)).** The computation rests on
+*substantive hypotheses* — distribution dates a motif; spread is descent-or-diffusion;
+breadth + cross-barrier disjunction ⇒ old; the language tree proxies descent lineages;
+geographic span maps to time via the known **peopling sequence** (Africa → Sahul →
+Eurasia → Beringia → Americas); homoplasy mimics depth; theme is orthogonal to depth per
+motif — and *methodological axioms* that keep it honest — effort-correct absence, count
+independent (not raw) spread, define the geography ourselves, use anchors to orient not
+train, **keep theme out of the estimator** (anti-circularity), and emit a confidence, not
+a class. A single linear score and "Category B = late" are both explicitly tested and
+rejected.
+
 **Per-motif features, all computable from our data** (attestation matrix + `areal_path`
 + coordinates + `language` + crosswalk): global prevalence (# traditions / macro-areas
 / **language families**); areal dispersion (mean pairwise distance, # disjoint

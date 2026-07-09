@@ -7,6 +7,90 @@ and its limits, the exact per-motif features, two derivation algorithms (a heuri
 depth index and a phylogenetic model), the mandatory controls, validation, and the
 output schema. Nothing here is built yet.
 
+## 0. Axioms and hypotheses (the foundation)
+
+Everything downstream — the features (§3), both methods (§6–7), the gate (§12), the
+named strata (§8) — rests on the premises below. They are collected here, once and
+explicitly, so any estimate can be read against its assumptions and each premise can be
+attacked on its own. Group **A** are *substantive hypotheses* (empirical claims about how
+folklore behaves, borrowed from areal folkloristics and phylogeography — falsifiable, not
+self-evident); group **B** are *methodological axioms* (rules we impose so the number
+stays honest and non-circular).
+
+### A. Substantive hypotheses
+
+1. **Distribution dates a motif.** The geographic and phylogenetic *shape* of a motif's
+   attestations carries information about the age of its shared distribution. This is the
+   load-bearing premise: if it is false, `stratum` is not computable from our data at all.
+2. **Two transmission processes.** A shared motif spreads by exactly two mechanisms —
+   vertical **descent** (inherited along lineages) or horizontal **contact diffusion** —
+   possibly mixed. The whole A × B gate is the attempt to tell which dominates.
+3. **Breadth + cross-clade spread + cross-barrier disjunction ⇒ antiquity.** Wide
+   prevalence across *unrelated* lineages, disjoint across a major barrier (present in X
+   and Z with a gap in the connecting Y), is the fingerprint of an old motif; compact,
+   single-clade, connected is young or locally endemic. This directional claim is what
+   lets us *orient* every feature toward "old" (§3).
+4. **Disjunction outranks mere breadth.** A trans-barrier gap (vicariance) is a stronger
+   antiquity signal than contiguous widespreadness, which contact can manufacture quickly.
+5. **Phylogenetic clustering ⇒ descent; scatter ⇒ areal.** A motif whose presence
+   clusters on the language tree beyond chance (few independent gains) was transmitted by
+   descent and can be dated by clade age; one needing many independent gains spread
+   areally or was reinvented. This is Method B's routing rule and the gate's switch.
+6. **The language tree proxies the descent lineages.** Cultural inheritance runs closely
+   enough along language classification that the tree is a usable — if imperfect —
+   scaffold for ancestral-state reconstruction. (Languages ≠ genes ≠ tales, and
+   reticulation exists — hence *imperfect*, and hence Method A corrects B, §12.)
+7. **Clade depth dates a descent motif.** Reconstruction to a deep node = old; origin
+   inside a shallow clade = bounded by that clade's dispersal age (an Austronesian-only
+   motif ≈ the Austronesian expansion).
+8. **Geographic span dates an areal motif via the peopling sequence.** The archaeological
+   order of human dispersal — Africa → Sahul / Indo-Pacific → northern Eurasia → Beringia
+   → the Americas — is the time backbone. A motif spanning **both hemispheres**
+   (Indo-Pacific *and* New World) predates the barriers separating them (deep Pleistocene
+   substrate); a compact single mega-set is recent. Geography can stand in for time *only*
+   because this sequence is known independently of our data. (Underlies §4, §8, §12.)
+9. **Homoplasy is real and mimics depth.** Cognitively "easy" motifs are reinvented
+   independently; many scattered singletons are convergence, not descent, and must be
+   discounted rather than counted as breadth.
+10. **Theme is orthogonal to stratum per motif** (a statistical prior only in aggregate).
+    The same theme sits in different strata in different regions (endemic-American
+    adventure = deep; European märchen = late; a jātaka = axial), so depth cannot be read
+    off theme.
+
+### B. Methodological axioms
+
+11. **Absence is detection under effort.** Absence from a well-sampled tradition is
+    informative; absence from a poorly-sampled one is unknown. Without this correction
+    (§5) the score measures catalogue *density*, not age — the single biggest fix.
+12. **Count effective, not raw, spread (Galton).** Neighbouring traditions are not
+    independent samples; breadth is measured as independent gains / barrier crossings, not
+    raw tallies.
+13. **Define the geography ourselves.** Mega-sets and barriers are drawn from our own
+    coordinates (§4), never inherited from Berezkin's partition — otherwise we would be
+    reproducing the expert labels we set out to derive independently.
+14. **Anchors orient, they do not train.** A few uncontroversial motifs fix only the
+    *sign* of the axis (world-religion = late; earth-diver / cosmic-egg / Sun-&-Moon =
+    deep). No ground-truth stratum labels are assumed to exist; the estimator is
+    unsupervised.
+15. **Theme stays out of the estimator (anti-circularity).** Because `theme × stratum` is
+    a result we want to *test*, feeding theme into the gate would manufacture that
+    correlation. Theme is an independent cross-check axis only (mockup 19; §12–13).
+16. **Every stratum is a hypothesis with confidence, never a class.** The deliverable is a
+    continuous depth score + per-motif confidence; A–B agreement raises confidence,
+    disagreement is itself diagnostic. No hard a-priori label is emitted.
+17. **Slice within a fixed theme (Berezkin's "analyse in parts").** Do not pool the whole
+    catalogue; late areal diffusion drowns the thin deep-time signal, so date *within* a
+    theme slice.
+
+### Tested and rejected
+
+- **A single linear depth score.** PC1 and a disjunction-weighted composite both fail —
+  PC1 conflates old with widespread, the weighted variant over-penalises prevalence
+  (mockup 17). No one-dimensional ranking is a dating; hence the gated two-mode design.
+- **"Category B = late European märchen."** Refuted by the 24% of adventure/trick motifs
+  that are New-World-endemic (a deep indigenous layer). This is the stress-test the
+  distributional score must pass (§9), not a rule to encode.
+
 ## 1. What we are estimating, and why it is hard
 
 `stratum` = the **time-depth** of a motif: how old its shared distribution is. We want
