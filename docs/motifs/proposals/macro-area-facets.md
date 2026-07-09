@@ -58,6 +58,21 @@ and `stratum`, and analysis fixes a `theme` (Berezkin's method) before grouping 
 tradition axes. That is why no single axis needs to be fine — the previous draft's 18
 areas can drop to 12.
 
+> **Facet roles & the missing axis (audited, mockup 32 / M32).** The four tradition facets are
+> **not co-equal** and the set is **incomplete** — an adequacy audit gives each a distinct role:
+> - **`area`, `theme_profile`** — *load-bearing*: they carry the real unique signal (drop-one
+>   Δ R² on motif-set similarity = 0.08 and 0.13).
+> - **`family`** — *keep, but not as a motif predictor* (unique Δ R² ≈ 0.01, collinear with area,
+>   V=0.73). Its job is the **descent backbone** — the tree behind Method B, dating and ASR.
+> - **`subsistence`** — *targeted covariate only* for the ecology→theme gradient (survived Galton,
+>   mockup 25); the weakest and only external/noisy facet (D-PLACE join) — the **drop-candidate**
+>   if that hypothesis fails.
+> - **Granularity is right**: 12 areas / 11 families beat both coarser and finer (which overfit).
+> - **Missing axis — connectivity.** The facets recover only ~36 % of motif-similarity; the ~64 %
+>   residual is a **cross-continental convergence** (contact + deep homology) no current facet
+>   captures. The taxonomy therefore *gains* a **connectivity axis** (resistance-distance +
+>   historical corridors, roadmap M34 / M35) and a derived per-tradition **stratum-stack** (M39).
+
 ## Tradition · `area` — 12 macro-areas
 
 Once `family` and `subsistence` carry the cultural load, `area` only answers "where on
@@ -307,6 +322,13 @@ confidence — not as hard classes handed down a priori.
 The complete, closed value sets — human-readable label + `slug` — ready to become
 enums in `region_facets.py`.
 
+> **Post-audit status (mockup 32 / M32).** The four facets below **stay**, but not co-equal:
+> `area` + `theme_profile` are load-bearing, `family` is the descent backbone (not a motif
+> predictor), and `subsistence` is a provisional, external-data covariate (**drop-candidate**).
+> The catalogue is **incomplete** — a **connectivity** axis (resistance-distance + historical
+> corridors, roadmap M34/M35) and a derived per-tradition **stratum-stack** (M39) are the missing
+> value sets, not yet enumerated here because they are not closed until those mockups land.
+
 ### `tradition.area` (12)
 
 | Label | Slug |
@@ -496,6 +518,20 @@ The whole investigation, in one place (prototypes: mockups 15–29; method detai
    substrate (A3) from wide diffusion (K25) from distribution alone (mockup 27) — which,
    with the finding that likelihood ASR ≈ parsimony on an *undated* tree (mockup 28), is
    the standing argument for wiring a **dated phylogeny** (the next capability, M30–M31).
+7. **The facet set is non-redundant but incomplete (mockup 32, M32).** An adequacy audit of the
+   tradition facets on the 910 traditions carrying all four: they are **not orthogonal**
+   (Cramér's V(area,family)=0.73, (area,subsistence)=0.59). Each carries a *non-zero* unique
+   contribution, but only **`theme_profile` (drop-one Δ R²=0.13) and `area` (0.08)** are
+   load-bearing; **`family` (0.01) and `subsistence` (0.01) are nearly redundant** *as motif
+   predictors* — they keep their place for other jobs (`family` = the **descent backbone** of
+   Method B / dating; `subsistence` = a **targeted ecology→theme covariate**, the weakest and only
+   external facet, a drop-candidate). **Granularity is right** — 12 areas / 11 families beat both
+   coarser and finer (which overfit held-out attestation). But the set is **incomplete**: the
+   facets recover only ~36 % of motif-similarity (block ARI and continuous R² agree), leaving a
+   large ~64 % **cross-continental convergence residual** — the **missing axis is connectivity**
+   (resistance-distance + historical corridors, M34/M35) plus a derived per-tradition
+   **stratum-stack** (M39). So the taxonomy keeps all four facets (reweighted, not co-equal) and
+   gains a connectivity axis.
 
 ## Implementation sketch (not built)
 
