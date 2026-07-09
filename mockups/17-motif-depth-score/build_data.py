@@ -166,10 +166,11 @@ def main():
             ms = {macro(t) for t in (r.get("traditions") or [])}
             inA, inE = bool(ms & NEW_WORLD), bool(ms & EURO)
             (e if inA and not inE else eo if inE and not inA else bo if inA and inE else []).append(vals[i])
-        m = lambda x: round(float(np.mean(x)), 1) if x else 0.0
-        return {"endemic_amer": {"n": len(e), "mean": m(e)},
-                "euro_only": {"n": len(eo), "mean": m(eo)},
-                "both": {"n": len(bo), "mean": m(bo)}}
+        def mean(x):
+            return round(float(np.mean(x)), 1) if x else 0.0
+        return {"endemic_amer": {"n": len(e), "mean": mean(e)},
+                "euro_only": {"n": len(eo), "mean": mean(eo)},
+                "both": {"n": len(bo), "mean": mean(bo)}}
     valid = {"pc1": endemism(score), "disj": endemism(disj)}
 
     corr = {f: round(float(np.corrcoef(F[:, j], score)[0, 1]), 2) for j, f in enumerate(FEATURES)}
