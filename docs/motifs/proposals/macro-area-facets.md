@@ -219,7 +219,7 @@ gets a primary stratum, optionally secondaries.
 
 | # | Stratum | What it is | Signature cluster |
 |---|---|---|---|
-| 1 | African substratum | pan-human, shared Sub-Saharan ↔ rest; oldest | — |
+| 1 | African substratum | pan-human, shared Sub-Saharan ↔ rest; oldest — **but** "shared with Africa" ≠ automatically deep: back-migration into Africa can make it recent (see `stratum-derivation.md` A8 caveat, §14) | — |
 | 2 | Indo-Pacific / Austro-Melanesian | Sahul + Melanesia + S-American Pacific rim; early coastal | 8 (partly) |
 | 3 | Continental Eurasian (boreal) | northern Eurasia, into America via Beringia | 3 |
 | 4 | Circum-Pacific / trans-Pacific | celestial etiologies (Sun-&-Moon, monster's eyes) | 6 |

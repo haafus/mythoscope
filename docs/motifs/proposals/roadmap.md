@@ -58,10 +58,12 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   reconstruct each deep motif's **ancestral location and age**, and animate its spread over the
   peopling map. · *depends: M30* · **unlocks:** the etiology-stage visual capstone; dates space
   and tree together with real uncertainty. · **L**
-- **M32 · Alternative-tree test (genetics).** Re-run descent detection on a
-  genetic/admixture tree instead of the language tree. · *data: external* · **tests:**
-  alternative-hypothesis #3 ("wrong tree, not rare descent") — is descent really ~1%, or just
-  ~1% *along language*? · **M–L**
+- **M32 · Alternative-tree / admixture-graph test (genetics).** Re-run descent detection on a
+  genetic tree instead of the language tree, and — as a **reticulate admixture graph** —
+  carry the published **back-migration** edges (Eurasian gene flow into Africa) as horizontal
+  connections. · *data: external* · **tests:** alt-hypothesis #3 ("wrong tree, not rare
+  descent") *and* alt-hypothesis #6 ("Africa is a sink"): is an Africa↔Eurasia motif deep
+  out-of-Africa or recent back-into-Africa? Direction, not just span. · **M–L**
 
 ## Tier 4 — synthesis & product
 

@@ -105,6 +105,18 @@ Every headline has a deflationary rival; naming them is the honest move.
    subsistence carries its own contribution beyond area and shared ancestry individually —
    only jointly controlling both does it attenuate to marginal (low power). Not reducible to
    a pure common cause on the evidence so far.
+6. **Africa is a sink, not only a source.** Axiom A8 treats the peopling sequence as a
+   one-way pump, so "shared Sub-Saharan Africa ↔ rest" reads as deep out-of-Africa. But
+   documented **back-migrations into Africa** (Eurasian back-flow, Afroasiatic /
+   Arab-Islamic / colonial spread) mean such a motif can be *recent into Africa*. *First
+   probe:* Eurasia-shared motifs skew only slightly more toward the Afroasiatic corridor
+   than Africa-endemic ones (6% vs 3% of the African foothold; both ~92% deep-lineage), so
+   the family proxy is too blunt to resolve **direction** — which distribution simply cannot
+   fix. This is the same direction-underdeterminacy as the A3-vs-K25 residual, on the Africa
+   axis, and it weakens the "African substratum = oldest" stratum specifically. *Fix:* a
+   reticulate/admixture graph (M32) with the published Eurasian-into-Africa gene flow as
+   horizontal edges, plus an Islamicate/Horn-Sahel back-migration mask and a sink-vs-source
+   elaboration-asymmetry test (`stratum-derivation.md` §14).
 
 ## 5. Highest-leverage next steps (ranked by effect)
 

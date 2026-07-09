@@ -52,6 +52,16 @@ stays honest and non-circular).
    (Indo-Pacific *and* New World) predates the barriers separating them (deep Pleistocene
    substrate); a compact single mega-set is recent. Geography can stand in for time *only*
    because this sequence is known independently of our data. (Underlies §4, §8, §12.)
+   **Caveat — the pump is not one-directional.** The sequence is a *net first-settlement*
+   order, not a one-way flow: there were substantial **back-migrations into Africa** (the
+   Eurasian back-flow into East/North Africa; Afroasiatic, Semitic, Arab-Islamic, and
+   colonial spreads). So "shared Sub-Saharan Africa ↔ rest" is **not** automatically a deep
+   out-of-Africa retention — it can be a *recent* motif that flowed *back into* Africa. This
+   makes the Africa axis a special case of the general direction-underdeterminacy (§11,
+   §12): spanning a barrier bounds a motif's *possible* antiquity but does not fix the
+   *direction* of spread, which needs external evidence (a reticulate/admixture graph, dated
+   nodes). It particularly weakens the "African substratum = oldest" reading (§8) and the
+   `founder_signal` feature (§3); see the directionality experiments in §14.
 9. **Homoplasy is real and mimics depth.** Cognitively "easy" motifs are reinvented
    independently; many scattered singletons are convergence, not descent, and must be
    discounted rather than counted as breadth.
@@ -149,7 +159,7 @@ notes the direction of the **"old" signal**.
 | `gap_flag` | present in sets X and Z but **absent** in the connecting Y | ↑ (vicariance) |
 | `clade_incoherence` | dispersion over the **language tree**: min #independent family-origins to explain `T(m)` (a parsimony gain count) | ↑ |
 | `xindex_breadth` | #indexes (TMI/ATU/Berezkin) independently attesting `m` via crosswalk | ↑ (corroboration) |
-| `founder_signal` | present in Africa **and** Sahul **and** the Americas at once | ↑ |
+| `founder_signal` | present in Africa **and** Sahul **and** the Americas at once | ↑ (but see axiom A8 caveat: back-migration can put a *recent* motif in Africa) |
 | `banality` | reinvention-proneness proxy (see §5) | ↓ (discount) |
 | `singleton_scatter` | many isolated single-tradition occurrences vs connected chains | ↓ (looks like reinvention, not descent) |
 
@@ -454,6 +464,21 @@ answer); **build tasks** are specified and merely unbuilt.
 4. **African substratum has no distinct distributional signature yet** (Africa folds into
    the Continental mega-set). Can an Africa-and-elsewhere founder set plus the effort
    control recover Berezkin's oldest layer, or is our sampling there too thin to try?
+   **And is "shared with Africa" even deep?** Documented back-migrations into Africa
+   (Eurasian back-flow, Afroasiatic / Arab-Islamic / colonial spread) mean an Africa↔Eurasia
+   motif can be *recent-into-Africa*, not deep-out-of-Africa (axiom A8 caveat). A first
+   coarse probe is only weakly reassuring: motifs shared with Eurasia carry a *slightly*
+   higher Afroasiatic-corridor share of their African foothold than Africa-endemic ones
+   (6% vs 3%), but both are ~92% deep-lineage — because Berezkin's African sampling is 77%
+   Niger-Congo and only 5% Afroasiatic, so the corridor is thin and the family proxy is
+   blunt (deep-family presence does not prove out-of-Africa *direction*). **Experiments:**
+   (a) use the **Islamicate/Abrahamic** overlay + Horn/Sahel geography, not just the
+   Afroasiatic family, as the back-migration mask; (b) a **sink-vs-source asymmetry** test —
+   a motif richly *elaborated* (many sub-variants) in Eurasia but present as a single thin
+   form in Africa is a back-migration candidate (Africa as sink); (c) model direction with a
+   **reticulate/admixture graph** carrying the published Eurasian-into-Africa gene flow as
+   horizontal edges (the M32 alt-tree, upgraded from a pure tree). Direction, not just span,
+   is the open quantity.
 5. **How much does homoplasy inflate the deep tail?** With no banality control we cannot
    yet say how many "broad + disjunct" motifs are ancient vs independently reinvented.
 6. **Representation: modes, named strata, or both?** The estimator natively yields the 5
