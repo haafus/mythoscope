@@ -5,9 +5,10 @@ An analytical HTML report over the **Berezkin-index biclusters** (mockup 06's
 **name · composition & boundaries · etiology (what explains the shared corpus) ·
 connections · content** and a longer **deep content** exposition (its narrative lines,
 recurring motifs and folkloristic context, grounded in the motif definitions) — plus
-its macro-area composition, theme-group mix, a collapsible motif table (code · English
-label · Russian name from the index · score), and a **map** highlighting that cluster's
-traditions. Clusters are numbered **1–14** in the UI. A combined world map shows all
+its macro-area composition, theme-group mix, two collapsible tables — a **motif table**
+(code · English label · Russian name from the index · score) and a **tradition table**
+(English name · Russian name · in-cluster membership score) — and a **map** highlighting
+that cluster's traditions. Clusters are numbered **1–14** in the UI. A combined world map shows all
 clusters at once. A
 **cross-cluster synthesis** block (etiology as universal glue, the locally-dressed
 trickster, where cosmogony concentrates, cluster 7 as the one trans-continental core)

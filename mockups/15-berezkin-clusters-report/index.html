@@ -157,6 +157,13 @@ function motifTable(ms){
     `<td class="sc">${m.s.toFixed(2)}</td></tr>`).join("");
   return `<table><thead><tr><th>Код</th><th>Мотив</th><th>Перевод</th><th>score</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
+function tradTable(ts){
+  const rows = ts.map(t=>
+    `<tr><td>${esc(t.name)}</td>`+
+    `<td class="ru">${esc(t.ru||"")}</td>`+
+    `<td class="sc">${t.s.toFixed(2)}</td></tr>`).join("");
+  return `<table><thead><tr><th>Традиция</th><th>Перевод</th><th>score</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
 document.getElementById("clusters").innerHTML = D.clusters.map(c=>`
   <div class="card cl" id="cl${c.id}">
     <div class="cl-head"><span class="idx">${c.id+1}</span><span class="dot" style="background:${c.color}"></span><h3>${esc(c.name)}</h3></div>
@@ -174,6 +181,7 @@ document.getElementById("clusters").innerHTML = D.clusters.map(c=>`
         <div class="field c-cont"><div class="lab">Содержание</div><p>${esc(c.content)}</p></div>
         ${(c.deep&&c.deep.length)?`<div class="field deep"><div class="lab">Развёрнутое содержание</div>${c.deep.map(p=>`<p>${esc(p)}</p>`).join("")}</div>`:""}
         <details class="motifs"><summary>Мотивы (${c.motifs.length})</summary>${motifTable(c.motifs)}</details>
+        <details class="motifs"><summary>Традиции (${c.trads.length})</summary>${tradTable(c.trads)}</details>
       </div>
     </div>
   </div>`).join("");

@@ -222,15 +222,19 @@ def main():
     with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
         bz = json.load(f)
 
-    name2macro = {}
+    name2macro, name2rus = {}, {}
     for v in bz["traditions"].values():
+        n = canon(v.get("name") or "")
         ap = v.get("areal_path") or []
         if ap:
-            name2macro[canon(v.get("name") or "")] = ap[0][1]
+            name2macro[n] = ap[0][1]
+        if n:
+            name2rus[n] = (v.get("name_rus") or "").strip()
     mid2grp = {r["id"]: (r.get("motif_group") or "").split(" ", 1)[-1] or "—" for r in bz["motifs"]}
     mid2rus = {r["id"]: (r.get("name_rus") or "").strip() for r in bz["motifs"]}
 
     d = m06.bicluster("brz")
+    trad_mem = d["trad_mem"]   # tradition name -> in-cluster membership score (0..1)
     pts_by_k = {}
     for p in d["points"]:
         pts_by_k.setdefault(p["k"], []).append(p)
@@ -249,7 +253,10 @@ def main():
             "n_motif": c["n_motif"], "n_trad": c["n_trad"],
             "macros": [{"name": a, "n": n} for a, n in macros.most_common(6) if a != "?"],
             "themes": [{"name": t, "n": n} for t, n in themes.most_common(4)],
-            "traditions": c["traditions"][:24],
+            "trads": sorted(
+                ({"name": t, "ru": name2rus.get(canon(t), ""),
+                  "s": round(float(trad_mem.get(t, 0.0)), 3)} for t in c["traditions"]),
+                key=lambda x: -x["s"])[:20],
             "motifs": [{"c": mm["c"], "n": mm["n"], "s": mm["s"],
                         "ru": mid2rus.get(mm["c"], "")} for mm in c["motifs"][:20]],
             "boundaries": pr.get("boundaries", ""), "etiology": pr.get("etiology", ""),

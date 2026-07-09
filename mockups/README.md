@@ -167,9 +167,10 @@ An analytical report over the 14 Berezkin-index biclusters (numbered **1–14** 
 UI). Per cluster: a curated name / composition & boundaries / etiology / connections /
 content write-up plus a longer **deep-content** exposition (narrative lines, recurring
 motifs and folkloristic context, grounded in the motif definitions), macro-area and
-theme bars, a collapsible **motif table** (code · English label · Russian name from the
-index · score), and a world map highlighting that cluster's traditions; plus a combined
-all-clusters map. A **cross-cluster synthesis** block precedes the clusters, and a
+theme bars, two collapsible tables — a **motif table** (code · English label · Russian
+name from the index · score) and a **tradition table** (English name · Russian name ·
+membership score) — and a world map highlighting that cluster's traditions; plus a
+combined all-clusters map. A **cross-cluster synthesis** block precedes the clusters, and a
 closing section contrasts the three indexes (Berezkin / Thompson / ATU) and their
 fitness for different tasks, foregrounding the thin trans-continental Sun-&-Moon
 deep-time layer (cluster 7). Interpretive prose is original; motif names are short
