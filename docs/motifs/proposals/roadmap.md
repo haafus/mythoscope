@@ -42,8 +42,11 @@ These two together retire the two alternative hypotheses that caveat almost ever
    **not** beat great-circle out of sample (held-out R² 0.158 vs 0.086; adds nothing to distance)
    → the connectivity-*geometry* upgrade is unwarranted, M38 keeps great-circle. A fine GIS raster
    is the only way to reopen it.
-4. **M35 · Historical corridors** — dated contact graph. *Distinct* mechanism from M34 (dated human
-   contact as a covariate, not a distance metric), but M34's negative lowers its priority.
+4. **M35 · Historical corridors ✓ done — weak but real.** Empire co-membership (historical-basemaps,
+   ≥3-area empires) adds little globally (ΔR² +0.011 over distance+area), but the sharp cross-area
+   test is positive: traditions in *different* areas sharing an empire share ×2.6 more motifs
+   (distance-matched +0.029) — Rome / the Mongol world moved motifs across areas. Scoped to the
+   ~32% empire belt (small-scale societies outside) → a narrow dated covariate, not a general axis.
 5. **M36 · Admixture back-migration** — reticulate tree with back-migration edges; needs M33.
 6. **M37 · Cross-index arbitration** — per-motif reliability weights.
 7. **M38 · Joint HPF (capstone)** — assembled once on the settled facets / geometry / graph / tree / weights.
@@ -204,9 +207,15 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
     downstream uses, its data is cleaner and more complete than the historical layer, and it is
     the physical substrate on which M35's human corridors ride. **Build M34 before M35.**
 
-- **M35 · Historical connectivity layer (empires + trade routes).** The **human, dated** channel
-  layered on M34's physical substrate: contact diffusion that jumps across both tree and space
-  along documented corridors. · *data: external* · **Effort: M–L.**
+- **M35 · Historical connectivity layer (empires + trade routes). ✓ done — weak but real** (mockup
+  35). The **human, dated** channel: co-membership of a multi-area empire (historical-basemaps,
+  4 pre-colonial snapshots). **Result:** only ~32% of traditions were ever in a real empire
+  (Old-World/Mongol-belt biased — small-scale societies outside); empire co-membership adds little
+  globally (ΔR² +0.011 over distance+area), **but** the cross-area test is positive — traditions in
+  *different* macro-areas sharing an empire share **×2.6** more motifs (distance-matched +0.029),
+  so Rome/the Mongol world really carried motifs across area boundaries. A narrow dated covariate
+  for the empire belt, not a general axis. Trade routes (OWTRAD) not yet wired. · *data: external*
+  · **Effort: M–L.**
   - **Motivation.** Our model has only descent (tree) and proximity (space); it has no channel
     for a motif *carried by an empire or trade network* between unrelated, non-adjacent peoples —
     exactly the mechanism behind the unresolved deep-vs-diffuse residual (cluster 7's

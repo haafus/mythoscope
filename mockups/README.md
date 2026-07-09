@@ -437,6 +437,19 @@ raster). So the connectivity-**geometry** upgrade for M38 is unwarranted (keep g
 is what the gate is for — a clean negative saves the line. See
 [`34-landscape-permeability/README.md`](34-landscape-permeability/README.md).
 
+### 35 · Historical corridors (roadmap M35)
+Do historical **empires** move motifs across macro-area boundaries? Links traditions co-resident
+in the same multi-area empire (historical-basemaps, 4 pre-colonial snapshots; ≥3-area empires to
+skip the world-tessellation), and tests the lift beyond distance + area.
+**Q.** Does dated empire co-membership explain motif-sharing beyond geography?
+**Finding — weak but real (vs M34's clean negative).** Only ~32% of traditions were ever in a real
+empire (Old-World/Mongol-belt biased — South America, Australia, Oceania ~0%). Globally empire adds
+little (ΔR² +0.011 over distance+area), **but** the sharp cross-area test is positive: traditions in
+*different* areas sharing an empire share **×2.6** more motifs (distance-matched +0.029) — Rome and
+the Mongol world genuinely carried motifs across boundaries. A narrow dated covariate for the empire
+belt, not a general axis; trade routes (OWTRAD) not yet wired. See
+[`35-historical-corridors/README.md`](35-historical-corridors/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

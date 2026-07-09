@@ -35,3 +35,4 @@ mockups/*/cache/
 # local file: corpus sources (may be non-public-domain; keep out of git)
 /sources/
 mockups/30-dated-phylogeny/glottolog_languages.csv
+mockups/35-historical-corridors/*.geojson
