@@ -87,8 +87,12 @@ Every headline has a deflationary rival; naming them is the honest move.
    **rejected** for the theme findings; breadth-as-age was already handled in mockup 20.
 2. **`stratum` isn't one axis.** The A3-vs-K25 residual hints that "depth" may be
    ill-posed — motifs may be **mixtures** of an areal-substrate component, a descent
-   component, and a reinvention rate, with no single ordinal "age". *Test:* fit a per-motif
-   3-way mixture instead of a single stratum label; see if the residual dissolves.
+   component, and a reinvention rate, with no single ordinal "age". *Tested (mockup 27):*
+   a per-motif descent/areal/reinvention decomposition **partly upholds** this — most motifs
+   are areal-dominant, tales slightly more inheritable, and the continuum beats the binary
+   gate — but the residual **does not dissolve**: A3 and K25 get near-identical mixtures, so
+   deep-substrate-vs-wide-diffusion stays irreducible from distribution and needs external
+   calibration (M30/M31).
 3. **Wrong tree, not rare descent.** Method B found ~1% follow the *language* tree — but a
    **population-genetic** or a **cultural** tree might fit better. "Geography is primary" may
    be "language is the wrong lineage." *Test:* re-run Method B on a genetic/admixture tree.

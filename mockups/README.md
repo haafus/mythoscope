@@ -290,6 +290,14 @@ sampling artifact); the degree-correction halves it to **0.48** while keeping in
 region-coherent tradition blocks and Category-A-stratified motif blocks. See
 [`26-blockmodel/README.md`](26-blockmodel/README.md).
 
+### 27 · Descent / areal / reinvention mixture (roadmap M27)
+Replaces mockup 19's binary gate with a per-motif continuous decomposition into three shares
+(descent = chance-corrected phylo-signal, areal, reinvention). **Most motifs areal-dominant**
+(2311/2775), B slightly more inheritable than A; B4→descent, Cinderella→50/50. But **A3 and K25
+get near-identical mixtures** (descent≈0.16) — the deep-substrate-vs-wide-diffusion residual is
+confirmed irreducible from distribution, needing external calibration. See
+[`27-mixture/README.md`](27-mixture/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

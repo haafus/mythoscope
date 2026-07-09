@@ -1,0 +1,119 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>27 · Descent / areal / reinvention mixture</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --desc:#3c8a5e; --areal:#c05540; --reinv:#98a0a5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:980px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:910px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .legend { display:flex; gap:14px; font-size:11.5px; margin:6px 0 12px; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; } .sw { width:11px; height:11px; border-radius:3px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:20px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .hist { display:flex; align-items:flex-end; gap:4px; height:120px; margin-top:6px; }
+  .hb { flex:1; background:var(--areal); border-radius:4px 4px 0 0; position:relative; }
+  .hx { display:flex; gap:4px; font-size:9.5px; color:var(--muted); margin-top:3px; }
+  .hx span { flex:1; text-align:center; }
+  .stack { display:flex; height:22px; border-radius:6px; overflow:hidden; }
+  .stack div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:10.5px; font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td,th { padding:5px 7px; border-bottom:1px solid var(--bg); text-align:left; vertical-align:middle; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.code { font-weight:700; color:#4f7096; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  .mbar { display:flex; height:15px; width:150px; border-radius:4px; overflow:hidden; }
+  .mbar div { height:100%; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Смесь: наследование / ареал / переизобретение</h1>
+  <p>Континуум вместо бинарного гейта мокапа 19. Для каждого мотива — три доли, сумма=1:
+     <b>наследование</b> (структура следует языковому дереву, chance-corrected phylo-signal),
+     <b>ареал</b> (структура, не следующая дереву — контактная диффузия), <b>переизобретение</b> (изолированные
+     присутствия без родственника и без соседа). Per-tradition EM был отвергнут (неидентифицируем для широких
+     мотивов из-за Гальтона); здесь разложение на уровне мотива, где descent chance-corrected и не насыщается широтой.</p>
+</header>
+
+<div class="card">
+  <div class="kpis" id="kpis"></div>
+  <div class="legend" style="margin-top:12px">
+    <span><span class="sw" style="background:var(--desc)"></span>наследование</span>
+    <span><span class="sw" style="background:var(--areal)"></span>ареал</span>
+    <span><span class="sw" style="background:var(--reinv)"></span>переизобретение</span>
+  </div>
+</div>
+
+<div class="cols" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div class="card">
+    <h2>Распределение доли наследования <span class="s">— континуум</span></h2>
+    <div class="hist" id="hist"></div>
+    <div class="hx" id="histx"></div>
+    <div class="muted" style="margin-top:6px">Большинство мотивов слева (ареально-доминантны) — подтверждает «география первична».</div>
+  </div>
+  <div class="card">
+    <h2>Средние доли: Category A vs B</h2>
+    <div style="margin-top:10px" class="muted">A · Космология/этиология</div>
+    <div class="stack" id="stA" style="margin:3px 0 12px"></div>
+    <div class="muted">B · Приключения/трюки</div>
+    <div class="stack" id="stB" style="margin:3px 0"></div>
+    <div class="muted" style="margin-top:10px" id="abnote"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Отслеживаемые мотивы <span class="s">— разложение</span></h2>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th>Смесь (desc·areal·reinv)</th><th class="r">desc</th><th class="r">areal</th><th class="r">n</th></tr></thead>
+  <tbody id="tracked"></tbody></table>
+  <div class="note" id="resid"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const C = {desc:"#3c8a5e", areal:"#c05540", reinv:"#98a0a5"};
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+
+document.getElementById("kpis").innerHTML = [
+  [`${D.dom.areal||0}`, "мотивов ареально-доминантны"],
+  [`${D.dom.inherited||0}`, "наследование-доминантны"],
+  [`${D.dom.reinvention||0}`, "переизобретение-доминантны"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+const hmax = Math.max(...D.hist,1);
+document.getElementById("hist").innerHTML = D.hist.map((h,i)=>{
+  const t=i/(D.hist.length-1), col=`rgb(${[Math.round(192+ (60-192)*t),Math.round(85+(138-85)*t),Math.round(64+(94-64)*t)].join(",")})`;
+  return `<div class="hb" style="height:${100*h/hmax}%;background:${col}" title="${h}"></div>`;
+}).join("");
+document.getElementById("histx").innerHTML = ["0","","0.4","","0.8","1"].map(x=>`<span>${x}</span>`).join("");
+
+function stack(el, s){
+  const el2 = document.getElementById(el);
+  el2.innerHTML = ["desc","areal","reinv"].filter(k=>s[k]>0.02).map(k=>
+    `<div style="flex:${s[k]};background:${C[k]}">${Math.round(s[k]*100)}%</div>`).join("");
+}
+stack("stA", D.byA); stack("stB", D.byB);
+document.getElementById("abnote").innerHTML =
+  `Category B (сказки) чуть <b>более наследуема</b> (${Math.round(D.byB.desc*100)}%) чем A (космология, ${Math.round(D.byA.desc*100)}%) — `+
+  `сказки чаще едут на языковых экспансиях, как и утверждал пропозал. Обе — преимущественно ареальны.`;
+
+function mbar(r){
+  return `<div class="mbar">`+["desc","areal","reinv"].map(k=>`<div style="width:${r[k]*100}%;background:${C[k]}"></div>`).join("")+`</div>`;
+}
+document.getElementById("tracked").innerHTML = D.tracked.map(r=>
+  `<tr><td class="code">${esc(r.c)}</td><td>${esc(clip(r.n,26))} <span class="muted">(${esc(r.label)})</span></td>`+
+  `<td>${mbar(r)}</td><td class="r" style="color:var(--desc);font-weight:700">${r.desc.toFixed(2)}</td>`+
+  `<td class="r" style="color:var(--areal)">${r.areal.toFixed(2)}</td><td class="r">${r.np}</td></tr>`).join("");
+document.getElementById("resid").innerHTML =
+  "<b>Континуум работает, но остаток не растворяется.</b> B4 (fished-earth) → наследование (0.61, австронезийская клада); "+
+  "Cinderella → пополам (0.50), как и положено европейской сказке. Но <b>A3 (sun & moon) и K25 (swan-maiden) получают "+
+  "почти идентичные смеси</b> (desc≈0.16, areal≈0.84) — разложение их <b>не разделяет</b>. «Глубокий субстрат vs широкая "+
+  "диффузия» внутри ареальной доли — честный остаток, неразрешимый и здесь; нужна внешняя калибровка (датированное дерево).";
+</script>

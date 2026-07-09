@@ -30,11 +30,12 @@ Each replaces a descriptive heuristic with a generative model; medium effort, hi
   clustering is 80% coverage-driven (`eta²(a(t)|block)=0.80`); the degree-correction halves it
   to **0.48**, with interpretable region-coherent blocks. Sampling-robust replacement for the
   biclustering. · **M** · *(a full nested DC-SBM would need graph-tool; deferred.)*
-- **M27 · Descent–areal–reinvention mixture per motif (EM).** Replace mockup 19's binary gate
-  with a per-motif **inherited-share ∈ [0,1]** — a mixture of tree-inherited, areal-diffused
-  and reinvented components. · *data: have* · **tests:** alternative-hypothesis #2 ("stratum
-  isn't one axis"); may dissolve the A3-vs-K25 residual into "60% substrate / 40% diffusion".
-  · **M**
+- **M27 · Descent–areal–reinvention mixture per motif. ✓ done** (mockup 27). Per-motif
+  decomposition into inherited/areal/reinvention shares (a per-tradition EM was tried and
+  rejected as unidentifiable under Galton; the motif-level version uses the chance-corrected
+  phylo-signal). **Result:** most motifs areal-dominant (2311/2775), B slightly more
+  inheritable than A; the continuum beats the gate, but A3 and K25 get near-identical mixtures
+  so the deep-vs-diffuse residual **does not dissolve** — external calibration needed. · **M**
 - **M28 · Likelihood ASR (Mk / Dollo + rate heterogeneity).** Upgrade Method B (18) from Fitch
   parsimony to a continuous-time gain/loss model with a loss bias and across-motif rate
   variation. · *data: have* · **refines:** marginal ancestral *probabilities* and a principled
