@@ -42,6 +42,10 @@
   .field .lab { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#a3457e; margin-bottom:2px; }
   .field.b .lab { color:#3a6ea5; } .field.e .lab { color:#c2410c; }
   .field.c-conn .lab { color:#12a150; } .field.c-cont .lab { color:#7c3aed; }
+  .field.deep .lab { color:#a3457e; }
+  .field.deep { margin-top:6px; padding-top:10px; border-top:1px solid #efe9e0; }
+  .field.deep p { margin-bottom:9px; }
+  .field.deep p:last-child { margin-bottom:0; }
   .field p { font-size:13.5px; }
 
   /* bars */
@@ -83,6 +87,16 @@
     <h2>Общая карта — все кластеры</h2>
     <div class="combined-wrap"><div id="mapAll"></div></div>
     <div class="muted" style="font-size:11.5px;margin-top:8px">Каждая точка — ареальная традиция, поставленная по координате субрегиона и окрашенная по кластеру. Экваториальная проекция.</div>
+  </div>
+
+  <div class="card closing" id="synthesis">
+    <h2>Что показывает картина в целом</h2>
+    <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.55">
+      <li style="margin-bottom:9px"><b>Этиология — универсальный клей</b>, но её предмет меняется по поясам: в Европе (0) объясняют быт и природу через христианских персонажей; в Африке (13) — происхождение смерти; в Океании (8) — извлечение суши из моря; в Сибири (3) — окраску и повадки птиц.</li>
+      <li style="margin-bottom:9px"><b>Трикстер вездесущ, но локально «одет»</b>: Ворон на С-З побережье (5), скатологический герой в субарктике (9), паук в Африке (12), лесные звери в Амазонии (10). Сама фигура плута маркирует регион вернее, чем сюжет.</li>
+      <li style="margin-bottom:9px"><b>Космогония концентрируется по краям Тихого океана</b> (4, 6, 7, 8) и в Южной Америке (10, 11), тогда как Западная Евразия (0, 1, 2) уже перешла в постмифологические жанры — сказку, новеллу, книжную эпику.</li>
+      <li><b>Кластер 6 — единственное подлинно трансконтинентальное ядро</b>: сюжет о Солнце и Луне из глаз чудовища связывает берега обоих полушарий и читается как реликт древнейшей диффузии — самый интересный результат всей биокластеризации.</li>
+    </ul>
   </div>
 
   <div id="clusters"></div>
@@ -158,6 +172,7 @@ document.getElementById("clusters").innerHTML = D.clusters.map(c=>`
         <div class="field e"><div class="lab">Этиология</div><p>${esc(c.etiology)}</p></div>
         <div class="field c-conn"><div class="lab">Связи</div><p>${esc(c.connections)}</p></div>
         <div class="field c-cont"><div class="lab">Содержание</div><p>${esc(c.content)}</p></div>
+        ${(c.deep&&c.deep.length)?`<div class="field deep"><div class="lab">Развёрнутое содержание</div>${c.deep.map(p=>`<p>${esc(p)}</p>`).join("")}</div>`:""}
         <details class="motifs" open><summary>Мотивы (${c.motifs.length})</summary>${motifTable(c.motifs)}</details>
       </div>
     </div>

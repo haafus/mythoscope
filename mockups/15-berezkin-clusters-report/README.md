@@ -3,9 +3,13 @@
 An analytical HTML report over the **Berezkin-index biclusters** (mockup 06's
 `bicluster("brz")`). For each of the 14 clusters it gives a curated write-up —
 **name · composition & boundaries · etiology (what explains the shared corpus) ·
-connections · content** — plus its macro-area composition, theme-group mix, a motif
-table, and a **map** highlighting that cluster's traditions. A combined world map
-shows all clusters at once. A closing section contrasts the three indexes (Berezkin /
+connections · content** and a longer **deep content** exposition (its narrative lines,
+recurring motifs and folkloristic context, grounded in the motif definitions) — plus
+its macro-area composition, theme-group mix, a motif table, and a **map** highlighting
+that cluster's traditions. A combined world map shows all clusters at once. A
+**cross-cluster synthesis** block (etiology as universal glue, the locally-dressed
+trickster, where cosmogony concentrates, cluster 6 as the one trans-continental core)
+precedes the clusters, and a closing section contrasts the three indexes (Berezkin /
 Thompson / ATU) and their fitness for different tasks.
 
 ## Data
@@ -14,8 +18,10 @@ Thompson / ATU) and their fitness for different tasks.
 macro-area distribution (from the tradition `areal_path`), theme groups and top
 motifs + map points (lon/lat per tradition), and merges in the hand-written
 per-cluster analysis (a `PROSE` dict keyed by cluster id, with a `sig` tradition used
-to assert alignment at build time). Motif *names* are short catalogue labels; all
-interpretive prose is original.
+to assert alignment at build time). Each `PROSE` entry carries the four short fields
+plus a `deep` list of paragraphs (the extended exposition). Motif *names* are short
+catalogue labels; all interpretive prose is original — the deep content paraphrases the
+Berezkin motif definitions rather than reproducing them.
 
 Maps use the shared equirectangular world path (`land.js`, copied from mockup 07);
 projection is `cx = lon+180, cy = 90-lat` over a `0 0 360 180` viewBox.
