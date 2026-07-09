@@ -1,170 +1,192 @@
-# Proposal: a three-facet region model (area · family · transmission)
+# Proposal: an entity model for region, culture and time-depth
 
 Extends [`troubleshooting.md`](../troubleshooting.md) §"four macro-region
-vocabularies". That section shows four incompatible "region" schemes fighting over
-one UI slot. The root cause is not that one of them is wrong — it is that **"region"
-is being asked to encode three orthogonal things at once**, and no single
-mutually-exclusive list can. This proposes splitting them into three facets, each
-with its own small vocabulary, plus a deterministic recipe to populate them.
+vocabularies". A first draft of this proposal treated *area · family · transmission*
+as three facets **of a tradition**. That was wrong on one point, and fixing it
+simplifies the rest: the three things do not live on the same entity.
+
+- **Area** and **culture/family** are properties of a **tradition** (where a people
+  lives, what language/religion it has).
+- **Time-depth / transmission** is a property of a **motif** — not a tradition. One
+  tradition carries motifs of many strata at once (any Sub-Saharan tradition holds
+  both a deep African-substratum motif *and* a recent Islamic one). A motif is dated
+  by the **shape of its areal distribution**, not by any single carrier.
+
+This is exactly why the two non-areal biclusters (literary-epic Asia, Sun-&-Moon)
+appeared as *motif-side* structure, not as tradition groups: "literate" and "deep"
+describe bundles of motifs. So the model is three **entities**, each with its own
+small vocabulary, not three columns on one table.
 
 Evidence base: Berezkin's authoritative 16 macro-areas and their `areal_path`
-subregions; the per-tradition `language` families; the 14 empirical biclusters of
-[`15-berezkin-clusters-report`](../../../mockups/15-berezkin-clusters-report/); and
-the four existing schemes (troubleshooting §schemes).
+subregions; the per-tradition `language` families; the 14 biclusters of
+[`15-berezkin-clusters-report`](../../../mockups/15-berezkin-clusters-report/); the
+four existing schemes (troubleshooting §schemes).
 
-## Why one list cannot work
+## Berezkin's own method: analyse the catalogue in parts
 
-The 14 biclusters over motif × tradition co-occurrence are the ground truth of "what
-groups with what". 12 of them are areal — but **two are not**: cluster 2
-(literary-epic Asia) is a *civilisational diffusion channel*, and cluster 6
-(Sun-&-Moon) is a *deep-time stratum*. So even the data refuses to reduce to one
-axis. Three axes are in play:
+Berezkin's published position (comparative-mythology work on the peopling of the New
+World and the African substratum — **paraphrased; this text is not in our scraped
+data**, which holds only the catalogue entries) is that the global motif
+distribution must **not** be counted as one pool. The corpus falls into large sets
+with different histories — a **Continental** (Afro-Eurasian, later mainland America
+via Beringia) set and an **Indo-Pacific / Austro-Melanesian** ("Gondwanan") set — and
+these are analysed **separately**, because late areal diffusion otherwise drowns the
+thin deep-time signal. Our trans-Pacific Sun-&-Moon cluster is precisely that deep
+Circum-Pacific layer, visible only when it is not mixed into the continental mass.
 
-- **A · Areal geography** — where a tradition physically sits. Mutually exclusive.
-- **B · Culture/linguistic family** — Indo-European, Bantu, Austronesian, plus a
-  religion overlay (Abrahamic, Indic/Dharmic, Sinic…). Cuts **across** geography
-  (Islam spans the Near East, Maghreb, Central Asia, parts of South/SE Asia).
-- **C · Transmission / time-depth** — oral-areal vs literate-civilisational vs
-  colonial-diaspora vs deep-time substrate. This is where clusters 2 and 6 live.
+This directly favours the entity model: **slice by motif stratum first, then analyse
+areas within a slice** — instead of one flat region list doing everything.
 
-A tradition is a *point in all three*, e.g. Anatolian Turks = (Balkans–Caucasus–
-Anatolia, Islamicate, oral-areal); a Sanskrit jātaka = (South Asia, Indic,
-literate-civilisational).
+## The entity schema
 
-## Facet A — 18 areal macro-areas
+| Entity | Properties |
+|---|---|
+| **Tradition** | `area` (12, geographic) · `family` (~10, language/religion) · `subsistence` (4, economy) · coordinates · raw `language` list · `areal_id` / `areal_path` · attestation richness |
+| **Motif** | `stratum` (7, time-depth / transmission) · theme group (chapter) · definition · cross-index links |
+| **Attestation** (motif × tradition) | the bare presence — the raw material from which a motif's `stratum` is inferred |
 
-Framework = Berezkin's authoritative 16, with the two most over-lumped cells
-split where a subregion boundary marks a real folklore seam, Madagascar folded into
-Austronesia, and the non-areal cluster 6 kept **off** this axis. Derivation is
-deterministic from `areal_path[0]` (macro) and, for the split cells, `areal_path[1]`
-(subregion).
+Expressiveness is now **multiplicative and cross-entity**: a tradition's profile is
+`area × family × subsistence` (≈ 12 × 10 × 4), and each attested motif adds its
+`stratum`. That is why no single axis needs to be fine — the previous draft's 18
+areas can drop to 12.
 
-| # | Macro-area | Derived from Berezkin macro / subregion | Cluster | Folklore signature |
-|---|---|---|---|---|
-| 1 | Northern & Eastern Europe | NORTHERN AND EASTERN EUROPE | 0 | Christian-etiological + Finno-Ugric north |
-| 2 | Western & Southern Europe | WESTERN EUROPE/NORTH AFRICA → *Southern & Western Europe, Ancient Greece & Rome* | 0 | märchen + Christian legend |
-| 3 | Balkans–Caucasus–Anatolia | WESTERN EUROPE → *Balkan-Carpathians*; SW&C.ASIA → *N./S. Caucasus – Asia Minor* | 1 | tale-type crossroads |
-| 4 | Near East & North Africa | SW&C.ASIA → *Near East*; W.EUROPE → *North Africa, Horn of Africa* | 1 | Semito-Mediterranean belt |
-| 5 | Iran & Central Asia | SW&C.ASIA → *Iran – Central Asia, Turkestan* | 1/2 | Iranian + Turkic Central Asia |
-| 6 | South Asia | SW&C.ASIA → *Aryan & South India*; TIBET-cell → *South Asia* | 2 | Aryan + Dravidian India, Sri Lanka |
-| 7 | East Asia | EAST ASIA | 2 | China, Korea, Japan |
-| 8 | Tibet & Mainland SE Asia | TIBET-cell → *Tibet/NE India, Burma-Indochina* | 7 | Sino-Tibetan / Austroasiatic uplands |
-| 9 | Austronesia & Oceania | OCEANIA; TIBET-cell → *Nusantara*; Madagascar | 8 | island cosmogony, sea-fished land |
-| 10 | Siberia | SIBERIA – MONGOLIA | 3 | taiga hunters, shamanic |
-| 11 | Arctic & Beringia | BERINGIA | 3/9 | Eskimo-Aleut, the deep-time bridge |
-| 12 | Subarctic & NE North America | N.AM NORTH&WEST → *Subarctic, The Northeast* | 9 | boreal Algonquian/Athabaskan trickster |
-| 13 | Northwest Coast & Plateau | N.AM NORTH&WEST → *Northwest Coast, Coast-Plateau* | 5 | Raven cycle |
-| 14 | Western & Southwestern N. America | N.AM NORTH&WEST → *California, Great Basin, Great Southwest* | 4 | Pueblo/California emergence |
-| 15 | Plains, Woodlands & Southeast | PLAINS AND SOUTHEAST; N.AM NORTH&WEST → *Midwest* | 4 | agro-Woodland origins |
-| 16 | Mesoamerica & Central Andes | MEXICO – CENTRAL ANDES | 6-core | high-culture cosmogony |
-| 17 | Amazonia & Guiana | EASTERN S.AM → *Antilles-Guiana, all Amazonia, Llanos, Montaña* | 10 | tropical-forest craft origins |
-| 18 | Central & Eastern Brazil (Gê–Xingu) | EASTERN S.AM → *Eastern & Southeastern Brazil* | 11 | gender/men's-house complex |
-| 19 | Southern South America | SOUTHERN SOUTH AMERICA (+ Chaco) | — | Chaco & Southern Cone |
-| 20 | Sub-Saharan Africa | Sub-Saharan Africa | 12/13 | Bantu + West-African trickster |
-| 21 | Aboriginal Australia | AUSTRALIA | — | Dreaming |
+## Tradition · `area` — 12 macro-areas
 
-**Tuning forks** (move the count between 18 and 21):
-- South America 2 or 3 — merge 18+19 into "East & South Brazil / Southern Cone".
-- Africa 1 or 2 — split 20 into West/Central vs East/Southern (Bantu); cluster 13
-  (origin-of-death) is more *thematic* than areal, so 1 is the safe default.
-- Beringia — fold 11 into 10 (Siberia) as one circumpolar unit, or keep the bridge.
+Once `family` and `subsistence` carry the cultural load, `area` only answers "where on
+the map", so the 18 collapse to a **continental-plus-necessary-seams** grid of 12.
+Kept fine only where language/subsistence can't recover the seam (the Americas).
+Derived deterministically from `areal_path[0]`, with a few `areal_path[1]`
+reassignments.
 
-The compact default is **18** (SA=2, Africa=1, Beringia separate).
-
-## Facet B — culture/linguistic family (~10)
-
-Seedable from the per-tradition `language[0]` field, then a **religion overlay** for
-the literate civilisations (religion trumps linguistics where it reorganises the
-corpus). Not mutually exclusive with A — this is a different partition.
-
-| Family | Seed (`language[0]` / overlay) | Spans areas |
+| # | Area | From Berezkin macro (with `[1]` moves) |
 |---|---|---|
-| Indo-European (pagan/folk) | Indoeuropean | 1,2,3 (+ diaspora) |
-| Abrahamic | overlay (Jewish/Christian/Muslim corpora) | 1,2,4,5,6 |
-| Indic / Dharmic | overlay on Aryan India + Buddhist | 6,7,8 |
-| Sinic | Sino-Tibetan (Han) + literate overlay | 7 |
-| Islamicate | overlay on Turkic/Iranian/Arab | 3,4,5 |
-| Uralic & Altaic | Uralic, Altaic | 1,5,10 |
-| Circumpolar / Palaeo-Asiatic | Escoaleut, Chukotko-Kamchatkan, isolate-N | 10,11 |
-| Amerindian | Na-Dene, Algic, Uto-Aztecan, Tupian, Carib, Macro-Ge, Salishan… | 12–19 |
-| Sub-Saharan (Niger-Congo / Nilo-Saharan) | Niger-Kongo, Nilo-Saharan | 20 |
-| Austronesian & Papuan | Austronesian, Austroasiatic, Papuan | 9 |
-| Australian | Australian | 21 |
+| 1 | Europe | Northern & Eastern Europe; W.Europe/N.Africa → *S.&W. Europe, Balkan-Carpathians, Greece-Rome* |
+| 2 | Near East & North Africa | SW&C.Asia → *Near East, N./S. Caucasus – Asia Minor*; W.Europe → *North Africa, Horn of Africa* |
+| 3 | Iran, Central & South Asia | SW&C.Asia → *Iran–Central Asia, Turkestan, Aryan & South India*; Tibet-cell → *South Asia* |
+| 4 | East & Mainland SE Asia | East Asia; Tibet-cell → *Tibet/NE India, Burma-Indochina* |
+| 5 | Austronesia & Oceania | Oceania; Tibet-cell → *Nusantara*; Madagascar |
+| 6 | Siberia & Arctic–Beringia | Siberia–Mongolia; Beringia |
+| 7 | Northern & Western North America | N.Am North&West → *NW Coast, Coast-Plateau, California, Great Basin, Great Southwest, Subarctic* |
+| 8 | Eastern North America | Plains & Southeast; N.Am North&West → *Midwest, The Northeast* |
+| 9 | Mesoamerica & Central Andes | Mexico – Central Andes |
+| 10 | South America (Amazonia to Southern Cone) | Eastern South America; Southern South America |
+| 11 | Sub-Saharan Africa | Sub-Saharan Africa |
+| 12 | Aboriginal Australia | Australia |
 
-(This is scheme #4 generalised from our 12 corpus families to the whole motif
-catalogue; the corpus keeps its own labels as a subset.)
+**Optional finer forks** (only if a view wants them; `subsistence` + `family` already
+recover most): Europe → North/East vs West/South; North America 7 → NW-Coast /
+Subarctic / Southwest-California (Na-Dene vs Algic vs Uto-Aztecan + fisher/hunter/
+farmer split); South America 10 → Amazonia / Gê-Brazil / Southern Cone.
 
-## Facet C — transmission / time-depth (4)
+## Tradition · `family` — culture / linguistic family (~10)
 
-| Type | Meaning | Signature cluster |
-|---|---|---|
-| oral-areal | attested from oral fieldwork; spreads by contact | most (12 of 14) |
-| literate-civilisational | book/epic diffusion (Sanskrit, Pali, Chinese, Greek, Arabic) | 2 |
-| colonial-diaspora | recent transplant (Afro-Caribbean, Ibero-American) | ATU tails |
-| deep-time substrate | Pleistocene-era shared layer, trans-continental | 6 (Sun-&-Moon) |
+Seeded from `language[0]`, then a **religion overlay** for the literate civilisations
+(religion trumps linguistics where it reorganises the corpus). A different partition
+from `area`.
 
-Most Berezkin traditions are oral-areal; the literate/deep-time tags mark the
-handful the co-clustering flagged as non-areal, giving clusters 2 and 6 a home.
+| Family | Seed / overlay |
+|---|---|
+| Indo-European | Indoeuropean |
+| Abrahamic | overlay: Jewish / Christian / Muslim corpora |
+| Indic / Dharmic | overlay: Aryan India + Buddhist |
+| Sinic | Sino-Tibetan (Han) + literate overlay |
+| Islamicate | overlay: Turkic / Iranian / Arab |
+| Uralic & Altaic | Uralic, Altaic |
+| Circumpolar / Palaeo-Asiatic | Escoaleut, Chukotko-Kamchatkan, N-isolates |
+| Amerindian | Na-Dene, Algic, Uto-Aztecan, Tupian, Carib, Macro-Ge, Salishan, Quechuan… |
+| Sub-Saharan | Niger-Congo, Nilo-Saharan, (Afro-Asiatic south) |
+| Austronesian & Papuan | Austronesian, Austroasiatic, Papuan |
+| Australian | Australian |
+
+(This is scheme #4 generalised from the 12 corpus families to the whole catalogue;
+the corpus keeps its own labels as a subset.)
+
+## Tradition · `subsistence` — economy type (4)
+
+New property, curated. The biclusters split neighbours by mode of life, not geography
+or language (Northwest-Coast fishers ≠ Subarctic hunters ≠ Pueblo farmers, all
+Amerindian). It carries part of the load that let `area` shrink to 12.
+
+`forager` (hunter-gatherer / fisher) · `pastoralist` · `horticulturalist` (swidden) ·
+`agrarian-state` (intensive agriculture + literate state).
+
+## Motif · `stratum` — time-depth / transmission (7)
+
+The motif's temporal layer, oldest → latest. The first four are prehistoric
+substrata (dated by areal shape); the last three are historical channels. A motif
+gets a primary stratum, optionally secondaries.
+
+| # | Stratum | What it is | Signature cluster |
+|---|---|---|---|
+| 1 | African substratum | pan-human, shared Sub-Saharan ↔ rest; oldest | — |
+| 2 | Indo-Pacific / Austro-Melanesian | Sahul + Melanesia + S-American Pacific rim; early coastal | 8 (partly) |
+| 3 | Continental Eurasian (boreal) | northern Eurasia, into America via Beringia | 3 |
+| 4 | Circum-Pacific / trans-Pacific | celestial etiologies (Sun-&-Moon, monster's eyes) | 6 |
+| 5 | post-Neolithic / agrarian-state | fertility & state cosmologies | 4, 11 |
+| 6 | axial / literate-civilisational | Abrahamic, Dharmic, Sinic book traditions & epics | 2 |
+| 7 | colonial / modern diaspora | slave trade, missions, print (Afro-Caribbean, Ibero-American) | ATU tails |
+
+Berezkin's "analyse in parts" = analyse `area` within a fixed `stratum` slice.
 
 ## Deterministic population recipe
 
-- **Facet A** — pure function of `areal_path`: map `areal_path[0]` 1:1 to a macro-area,
-  except the five split cells (SW&C.Asia, W.Europe/N.Africa, Tibet-cell, N.Am
-  North&West, Eastern S.Am) which branch on `areal_path[1]` per the table above. No
-  network, no credentials (works off the committed reference like `_CANONICAL_AREAS`).
-- **Facet B** — seed from `language[0]` via a ~25-row family map, then apply a small
-  curated **religion overlay** list (the literate corpora: Jewish, Christian, Islamic,
-  Hindu, Buddhist, …).
-- **Facet C** — a short curated set: default `oral-areal`; a literate list (the
-  book traditions); a colonial-diaspora list (New-World animal-tale tails); and the
-  deep-time tag applied to cluster-6 membership.
+- **`area`** — pure function of `areal_path` (no network / credentials, like
+  `_CANONICAL_AREAS`): `areal_path[0]` → area, with the `[1]` moves above.
+- **`family`** — seed from `language[0]` via a ~25-row map, then a small curated
+  religion overlay (the literate corpora).
+- **`subsistence`** — curated (~dozens of rows keyed by area/subregion/language).
+- **`stratum`** — inferred from a motif's attestation set (which sets/areas it spans),
+  with curation for the diagnostic layers; not per-tradition.
 
-Only B's overlay and C are hand-curated (dozens of rows, not 1046); A and B's seed
-are computed.
+Only the overlay, `subsistence`, and `stratum` curation are hand-authored (dozens of
+rows); `area` and the `family` seed are computed.
 
-## Sample mapping (`tradition → area · family · transmission`)
+## Samples
 
-| Tradition | Area | Family | Transmission |
+**Traditions** → `area · family · subsistence`
+
+| Tradition | Area | Family | Subsistence |
 |---|---|---|---|
-| Lithuanians | N. & E. Europe | Indo-European | oral-areal |
-| Germans (NW) | W. & S. Europe | Indo-European | oral-areal |
-| Anatolia Turks | Balkans–Caucasus–Anatolia | Islamicate | oral-areal |
-| Egyptian (ancient) | Near East & N. Africa | Abrahamic-adjacent | literate-civilisational |
-| Mongols (Khalkha) | Siberia | Uralic & Altaic | oral-areal |
-| Indian literary | South Asia | Indic / Dharmic | literate-civilisational |
-| Han Chinese | East Asia | Sinic | literate-civilisational |
-| Mizo (Lushei) | Tibet & Mainland SE Asia | Sino-Tibetan | oral-areal |
-| Ifugao | Austronesia & Oceania | Austronesian | oral-areal |
-| Nanai | Siberia | Uralic & Altaic (Tungusic) | oral-areal |
-| Tlingit | Northwest Coast & Plateau | Amerindian (Na-Dene) | oral-areal |
-| Menominee | Subarctic & NE N. America | Amerindian (Algic) | oral-areal |
-| Navajo | W. & SW N. America | Amerindian (Na-Dene) | oral-areal |
-| Kechua (Quechua) | Mesoamerica & Central Andes | Amerindian (Quechuan) | oral-areal |
-| Warao | Amazonia & Guiana | Amerindian (isolate) | oral-areal |
-| Bororo | Central & Eastern Brazil | Amerindian (Macro-Ge) | oral-areal |
-| Hausa | Sub-Saharan Africa | Sub-Saharan (Afro-Asiatic) | oral-areal |
-| Wolof | Sub-Saharan Africa | Sub-Saharan (Niger-Congo) | oral-areal |
-| Aranda | Aboriginal Australia | Australian | oral-areal |
-| Br'er-Rabbit US South | Plains, Woodlands & SE | Sub-Saharan (diaspora) | colonial-diaspora |
-| Toba / Pilaga | Southern South America | Amerindian (Guaicuruan) | deep-time substrate (Sun-Moon) |
+| Lithuanians | Europe | Indo-European | agrarian-state |
+| Anatolia Turks | Near East & N. Africa | Islamicate | agrarian-state |
+| Mongols (Khalkha) | Siberia & Arctic–Beringia | Uralic & Altaic | pastoralist |
+| Han Chinese | East & Mainland SE Asia | Sinic | agrarian-state |
+| Ifugao | Austronesia & Oceania | Austronesian | horticulturalist |
+| Nanai | Siberia & Arctic–Beringia | Uralic & Altaic (Tungusic) | forager |
+| Tlingit | N. & W. North America | Amerindian (Na-Dene) | forager (fisher) |
+| Navajo | N. & W. North America | Amerindian (Na-Dene) | horticulturalist |
+| Menominee | Eastern North America | Amerindian (Algic) | forager |
+| Bororo | South America | Amerindian (Macro-Ge) | horticulturalist |
+| Hausa | Sub-Saharan Africa | Sub-Saharan | agrarian-state |
+| Aranda | Aboriginal Australia | Australian | forager |
+
+**Motifs** → `stratum`
+
+| Motif | Stratum |
+|---|---|
+| A11C Sun, Moon & monster's eyes | Circum-Pacific / trans-Pacific |
+| K25a5 Two brothers & the swan-maidens | Continental Eurasian (boreal) |
+| B4 The fished-out earth | Indo-Pacific / Austro-Melanesian |
+| H36D Death and the hare (origin of death) | African substratum |
+| K27z2 Princess averts incest (jātaka-type) | axial / literate-civilisational |
+| M182 The tar-baby (US South) | colonial / modern diaspora |
 
 ## What it resolves
 
-- **Scheme #1 vs #3** (troubleshooting): both collapse into Facet A — one areal
-  vocabulary derived from `areal_path`, so the overview chart and the Traditions
-  section stop disagreeing on the same page.
-- **Scheme #2** (TMI): TMI's culture labels resolve onto the *same* three facets via
-  the existing gazetteer, so Berezkin and TMI overviews become cross-referenceable
-  per facet instead of per incompatible list.
-- **Scheme #4** (corpus families): recognised as Facet B — no longer a rogue fourth
-  "region"; it is the culture-family axis restricted to our texts.
-- Clusters 2 and 6, homeless in any geographic list, are exactly Facet C's
-  literate-civilisational and deep-time-substrate tags.
+- **#1 vs #3** collapse into `area` — one areal vocabulary from `areal_path`, so the
+  overview chart and the Traditions section stop disagreeing on one page.
+- **#2** (TMI) resolves onto the same three tradition properties via the gazetteer,
+  so Berezkin and TMI overviews cross-reference per property, not per rogue list.
+- **#4** is `family` — no longer a fourth "region", just the culture axis restricted
+  to our corpus.
+- Clusters 2 and 6 were never areas; they are motif `stratum` values (6 and 4).
 
 ## Implementation sketch (not built)
 
-- `region_facets.py`: `area(areal_path)`, `family(language, name)`, `transmission(name)`.
-- `_berezkin_region` → `area()`; `culture_dict._REGION` → the TMI-label bridge onto the
-  same facets; `config/traditions.json` families → Facet B for the corpus.
-- Surfaces as three grouping toggles in the overviews (Area / Family / Transmission)
-  instead of one ambiguous "region" control.
+- `region_facets.py`: `area(areal_path)`, `family(language, name)`,
+  `subsistence(name)` on traditions; `stratum(motif)` on motifs.
+- `_berezkin_region` → `area()`; `culture_dict._REGION` → the TMI-label bridge onto
+  the same properties; `config/traditions.json` families → `family` for the corpus.
+- Overviews expose grouping by **Area / Family / Subsistence** for traditions and a
+  **Stratum** slicer for motifs — replacing the one ambiguous "region" control, and
+  letting a view fix a stratum before grouping by area (Berezkin's method).
