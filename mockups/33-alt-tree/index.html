@@ -1,0 +1,152 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>33 · Alternative-tree test</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --both:#3c8a5e; --lang:#6a5aa6; --gen:#b28a3e; --none:#98a0a5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:960px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:910px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .grid2 { display:grid; grid-template-columns:1.15fr .85fr; gap:16px; } @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  .lg { display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; margin-top:6px; }
+  .lg span { display:inline-flex; align-items:center; gap:5px; }
+  .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  td.code { font-weight:700; color:#4f7096; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin:4px 0; } .bar-row .nm { width:100px; font-size:11.5px; text-align:right; }
+  .bar-row .tr { flex:1; background:var(--bg); border-radius:5px; height:16px; } .bar-row .bf { height:100%; border-radius:5px; }
+  .bar-row .vv { width:30px; font-size:11.5px; font-variant-numeric:tabular-nums; }
+  svg { display:block; width:100%; height:auto; }
+</style>
+<main>
+<header>
+  <h1>Тест на альтернативном дереве — переживает ли «происхождение» смену дерева на генетическое</h1>
+  <p>Проверка alt-гипотезы #3 («сигнал происхождения — артефакт неправильного, языкового дерева»). Пере-считываем
+     phylo-signal (Fitch с поправкой на случайность, как в мокапах 18/28) на <b>генетическом дереве</b> вместо
+     языкового и сравниваем по каждому мотиву. Генетическое дерево — <b>курированная консенсусная топология
+     континентального разрешения</b> (Африка-аутгруппа → out-of-Africa → West/East Eurasian; Америки вложены в
+     Восточную Евразию через Берингию), джойн традиция→популяция по <b>географии</b>, не по языку. <span id="hdr"></span></p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Сигнал: языковое дерево (X) vs генетическое (Y) <span class="s">— каждая точка = мотив</span></h2>
+    <svg id="scatter" viewBox="0 0 320 320"></svg>
+    <div class="lg" id="legend"></div>
+  </div>
+  <div class="card">
+    <h2>Квадранты</h2>
+    <div id="quad"></div>
+    <div class="note" id="quadNote"></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Кто «language-only» <span class="s">— семьи, пересекающие континенты</span></h2>
+    <div class="muted" style="margin-bottom:6px">Мотивы с происхождением по языку, но не по генам — их доминирующие языковые семьи:</div>
+    <div id="fams"></div>
+    <div class="muted" style="margin-top:8px">Это подпись настоящего <b>лингвистического</b> наследования: семья передаёт мотив через генетические границы.</div>
+  </div>
+  <div class="card">
+    <h2>Отслеживаемые мотивы</h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th><th class="r">sig язык</th><th class="r">sig гены</th><th>режим</th></tr></thead>
+    <tbody id="tracked"></tbody></table>
+  </div>
+</div>
+
+<div class="card note" id="verdict" style="background:#eef1ee;border-color:#cdd8cf;color:#31453a"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const QC = {both:"var(--both)", lang:"var(--lang)", gen:"var(--gen)", none:"var(--none)"};
+const c = D.counts;
+document.getElementById("hdr").textContent =
+  `${D.n} мотивов (≥${D.min_trad} традиций) на ${D.n_trad} традициях, общих для обоих деревьев. Порог descent = ${D.descent}.`;
+
+document.getElementById("kpis").innerHTML = [
+  [`${D.corr}`, "corr(сигнал языкового, генетического) — умеренно положительная"],
+  [`${Math.round(100*c.robust)}%`, `робастность: ${c.both} из ${c.lang} language-descent мотивов остаются descent и на генах`],
+  [`${c.lang_only}`, "language-only — следуют языку, но не генам (кросс-континентальные семьи)"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// scatter
+(function(){
+  const W=320,H=320,pl=34,pr=10,pt=10,pb=30, t=D.descent;
+  const X=v=>pl+v*(W-pl-pr), Y=v=>H-pb-v*(H-pt-pb);
+  let s=`<rect x="${pl}" y="${pt}" width="${W-pl-pr}" height="${H-pt-pb}" fill="#fbfaf7"/>`;
+  // threshold lines
+  s+=`<line x1="${X(t)}" y1="${pt}" x2="${X(t)}" y2="${H-pb}" stroke="#d8cfc0" stroke-dasharray="3 3"/>`;
+  s+=`<line x1="${pl}" y1="${Y(t)}" x2="${W-pr}" y2="${Y(t)}" stroke="#d8cfc0" stroke-dasharray="3 3"/>`;
+  // quadrant labels
+  s+=`<text x="${W-pr-3}" y="${pt+12}" font-size="8.5" fill="#7fa88f" text-anchor="end">both (робастно)</text>`;
+  s+=`<text x="${W-pr-3}" y="${H-pb-4}" font-size="8.5" fill="#8f82b8" text-anchor="end">language-only</text>`;
+  s+=`<text x="${pl+3}" y="${pt+12}" font-size="8.5" fill="#bfa05a">genetic-only</text>`;
+  s+=D.scatter.map(p=>`<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="1.5" fill="${QC[p.q]}" fill-opacity="0.5"/>`).join("");
+  // tracked, labelled
+  s+=D.tracked.map(m=>{
+    const q = m.sl>=t&&m.sg>=t?"both":m.sl>=t?"lang":m.sg>=t?"gen":"none";
+    return `<circle cx="${X(m.sl)}" cy="${Y(m.sg)}" r="3.2" fill="${QC[q]}" stroke="#fff" stroke-width="0.8"/>`+
+      `<text x="${X(m.sl)+4.5}" y="${Y(m.sg)+3}" font-size="8.5" fill="#3a4148">${esc(m.c)}</text>`;
+  }).join("");
+  // axes
+  s+=`<text x="${(pl+W-pr)/2}" y="${H-6}" font-size="10" fill="#98a0a7" text-anchor="middle">сигнал на языковом дереве →</text>`;
+  s+=`<text x="12" y="${(pt+H-pb)/2}" font-size="10" fill="#98a0a7" text-anchor="middle" transform="rotate(-90 12 ${(pt+H-pb)/2})">сигнал на генетическом →</text>`;
+  document.getElementById("scatter").innerHTML=s;
+})();
+document.getElementById("legend").innerHTML = [
+  ["both","both — гены+язык согласны (глубокое наследование)"],["lang","language-only — по языку, не по генам"],
+  ["gen","genetic-only — континентально-ареальные"],["none","ни то, ни другое"]
+].map(([q,l])=>`<span><i class="dot" style="background:${QC[q]}"></i>${l}</span>`).join("");
+
+// quadrant counts
+document.getElementById("quad").innerHTML =
+  `<table><tbody>`+
+  [["both",c.both,"гены+язык согласны"],["lang",c.lang_only,"только язык"],
+   ["gen",c.gen_only,"только гены (ареальные)"]].map(([q,n,l])=>
+    `<tr><td><i class="dot" style="background:${QC[q]}"></i> ${l}</td><td class="r" style="font-weight:700">${n}</td></tr>`).join("")+
+  `</tbody></table>`;
+document.getElementById("quadNote").innerHTML =
+  `Языковое дерево ловит ${c.lang} descent-мотивов, генетическое — ${c.gen} (континентальное дерево грубее и заодно `+
+  `работает как ареальный детектор — отсюда ${c.gen_only} «genetic-only»). Пересечение <b>${c.both}</b> = `+
+  `<b>${Math.round(100*c.robust)}%</b> языкового descent устойчивы к смене дерева.`;
+
+// language-only families
+const fmax = Math.max(...D.lang_only_fams.map(x=>x[1]));
+document.getElementById("fams").innerHTML = D.lang_only_fams.map(([f,n])=>
+  `<div class="bar-row"><div class="nm">${esc(f)}</div><div class="tr"><div class="bf" style="width:${100*n/fmax}%;background:var(--lang)"></div></div><div class="vv">${n}</div></div>`).join("");
+
+// tracked table
+const MODE = {both:"оба · робастно", lang:"язык · лингв. передача", gen:"гены · континент. субстрат", none:"ареальный"};
+document.getElementById("tracked").innerHTML = D.tracked.map(m=>{
+  const q = m.sl>=D.descent&&m.sg>=D.descent?"both":m.sl>=D.descent?"lang":m.sg>=D.descent?"gen":"none";
+  return `<tr><td class="code">${esc(m.c)}</td><td>${esc(clip(m.n,20))} <span class="muted">(${esc(m.label)})</span></td>`+
+    `<td class="r">${m.sl.toFixed(2)}</td><td class="r">${m.sg.toFixed(2)}</td>`+
+    `<td><i class="dot" style="background:${QC[q]}"></i> ${MODE[q]}</td></tr>`;
+}).join("");
+
+document.getElementById("verdict").innerHTML =
+  `<b>Вердикт по alt-#3.</b> Сигнал происхождения <b>не</b> артефакт языкового дерева: <b>${Math.round(100*c.robust)}%</b> `+
+  `language-descent мотивов остаются descent и на генетическом. Смена дерева не отменяет происхождение, а <b>уточняет</b> `+
+  `его на три режима: <b>both</b> (гены+язык+ареал согласны — самое глубокое наследование, напр. B4 австронезийский), `+
+  `<b>language-only</b> (ИЕ, алтайские — семьи, пересекающие континенты; настоящая <i>лингвистическая</i> передача, напр. `+
+  `Cinderella), <b>genetic-only</b> (континентальный субстрат, напр. Иона в Африке). <b>Честный предел:</b> дерево `+
+  `континентального разрешения, джойн по географии — поэтому «genetic-only» частично совпадает с ареальным; `+
+  `тонкое SNP-дерево (HGDP/1000G) разрешило бы внутриконтинентальную структуру — это остаётся будущей работой, а сама `+
+  `генетическая привязка традиция→популяция готова для M36 (admixture-граф с рёбрами обратной миграции).`;
+</script>

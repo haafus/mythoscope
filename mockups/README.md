@@ -408,6 +408,17 @@ and continuous R² agree), leaving a large **cross-continental convergence resid
 connectivity layers (M34/M35). Granularity is right — 12 areas / 11 families beat both coarser
 and finer (which overfit). See [`32-facet-adequacy/README.md`](32-facet-adequacy/README.md).
 
+### 33 · Alternative-tree test (roadmap M33)
+Tests alt-hypothesis #3 (descent is an artifact of the language tree) by re-running the
+chance-corrected Fitch phylo-signal on a **curated consensus genetic tree** (continental
+resolution, geography-joined) and comparing per-motif signal.
+**Q.** Does the descent signal survive a swap from the language tree to a genetic one?
+**Finding.** Largely yes — corr 0.43, **89% of language-descent motifs stay descent on genes**.
+The 11% **language-only** are exactly the cross-continental families (**Indo-European, Altaic**) =
+genuine *linguistic* transmission across genetic lines; **genetic-only** motifs (e.g. Jonah in
+Africa) are areal-within-continent. Coarse (continental) tree — a fine SNP tree is future work;
+the genetic join is wired for M36. See [`33-alt-tree/README.md`](33-alt-tree/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

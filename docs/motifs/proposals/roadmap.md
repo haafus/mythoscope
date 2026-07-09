@@ -33,7 +33,9 @@ These two together retire the two alternative hypotheses that caveat almost ever
 1. **M32 · Facet adequacy ✓ done** — non-orthogonal (V≤0.73); family & subsistence nearly
    redundant (Δ R²≈0.01), theme_profile + area carry the signal; set is incomplete (~36% of
    motif-similarity, big cross-continental residual); 12/11 granularity is right.
-2. **M33 · Alternative-tree test** — descent robustness under a genetic tree; wires the genetics (→ M36). *build next*
+2. **M33 · Alternative-tree test ✓ done** — descent survives a genetic tree (89% robust,
+   corr 0.43); the 11% language-only are the cross-continental families (IE, Altaic) = genuine
+   linguistic transmission. Wired the genetic join for M36.
 3. **M34 · Landscape permeability** — resistance-distance geometry, behind one falsifiable test (→ M35).
 4. **M35 · Historical corridors** — dated contact graph; needs M34's physical substrate.
 5. **M36 · Admixture back-migration** — reticulate tree with back-migration edges; needs M33.
@@ -144,12 +146,14 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   rather than split by the Atlantic seam. A family-resolution point estimate — node-consistent
   RRW with uncertainty (real BEAST on a dated tree) stays future work. The etiology-stage
   visual capstone. · **L**
-- **M33 · Alternative-tree test (genetics).** Re-run descent detection (Fitch / likelihood ASR,
-  mockups 18 / 28) on a **human genetic tree** instead of the language tree — a *swap-and-rerun*
-  on our existing tree machinery. · *data: external* · **tests:** alt-hypothesis #3 ("wrong
-  tree, not rare descent"): do the inherited motifs survive a change of classification (language
-  → genes)? · **M** · *(the reticulate back-migration half is **M36**, which builds on this
-  mockup's genetic-tree wiring.)*
+- **M33 · Alternative-tree test (genetics). ✓ done** (mockup 33). Re-ran descent detection
+  (chance-corrected Fitch, as mockups 18 / 28) on a **curated consensus genetic tree**
+  (continental resolution, geography-joined) vs the language tree. **Result:** corr 0.43,
+  **89% of language-descent motifs stay descent on genes** → alt-hypothesis #3 largely refuted;
+  the 11% **language-only** are exactly the cross-continental families (**Indo-European 68,
+  Altaic 23**) = genuine *linguistic* transmission, while **genetic-only** motifs are areal-within-
+  continent. Honest limit: continental resolution ≈ areal; a fine SNP tree (HGDP/1000G) is the full
+  version. The tradition→population join is wired for **M36**. · **M**
 
 - **M34 · Landscape permeability / cost-distance geography.** Replace Method A's *isotropic*
   great-circle distance with **resistance / least-cost distance** over a friction surface — the
