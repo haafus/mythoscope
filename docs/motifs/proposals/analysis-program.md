@@ -160,6 +160,11 @@ dating (needs a dated phylogeny), the deep-substrate/wide-diffusion residual, wh
 historical strata belong on the same axis at all, and the un-run controls. These are open
 questions, held open on purpose.
 
+**The cross-cutting synthesis** — how the stages influence and reinforce each other, the
+alternative hypotheses, the joint model that would replace the pipeline, the strongest next
+steps, and the algorithms/data that would unlock new conclusions — is in
+[`synthesis-and-directions.md`](synthesis-and-directions.md).
+
 ## Cross-cutting principles
 
 - **Given vs inferred, always labelled; confidence on everything inferred.**

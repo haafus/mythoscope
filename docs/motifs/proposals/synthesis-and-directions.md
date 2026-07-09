@@ -1,0 +1,214 @@
+# Synthesis & directions — the system as one object, and where it goes next
+
+A joint reading of everything built so far — the program arc
+([`analysis-program.md`](analysis-program.md)), the two proposals
+([`macro-area-facets.md`](macro-area-facets.md),
+[`stratum-derivation.md`](stratum-derivation.md)), the taxonomies, and mockups 01–23. Not a
+recap of conclusions (those live in each doc's "cumulative conclusions"); this is the
+cross-cutting analysis: **what influences what, what reinforces what, how to combine it, the
+alternative hypotheses we should fear, and the highest-leverage moves next.**
+
+## 1. The whole thing is two threads through one matrix
+
+Everything derives from **one measurement** — the attestation matrix `M` (motif × tradition,
+binary presence) — plus a few deterministic reads (`area←areal_path`, `theme←motif_group`,
+`family←language`) and external joins (`subsistence←D-PLACE`). Drawn as an influence graph,
+two things thread through *all* of it:
+
+- **A shared confounder — sampling effort `a(t)`.** It contaminates every count-based
+  quantity, not just `stratum`: `theme_profile` (a densely-catalogued corpus looks
+  genre-rich), the `theme × area` lift, the `subsistence × theme` gradient, and breadth-as-age
+  alike. Mockup 20 showed it thins the "broad areal" class by a third — but it was only ever
+  applied to `stratum`. **The same correction belongs everywhere counts are used.** Until it
+  is, every positive signal carries the same asterisk.
+- **A shared latent — the peopling of the world.** `area` (where a people is *now*), `family`
+  (its *language lineage*), and `stratum` (when a motif *arrived*) are not three independent
+  axes — they are **three projections of one space-time history**: space, lineage, time.
+  That is *why* "the three axes each remove the others' confound" (the recurring conclusion):
+  they triangulate one underlying process. This reframes the model — instead of three facets
+  to populate separately, there is **one latent phylogeographic history**, and area / family /
+  stratum are its observable coordinates.
+
+Everything else is a cross-link between projections: `area → theme_profile` (38% of variance,
+mockup 16); `subsistence ↔ theme` (gradient, mockup 22, confounded by area); `theme ↔ theme`
+(the A/B co-occurrence blocks, mockup 23); `theme → stratum`-tendency (aggregate prior);
+`area → stratum` (Method A dates the areal majority); `family → stratum` (Method B, the ~1%
+descent minority).
+
+## 2. What reinforces / refines what (the triangulation map)
+
+The mockups are not independent probes — several measure the same latent from different
+angles, and that agreement is the real evidence:
+
+- **The theme axis is triple-confirmed.** Berezkin *declares* A/B; theme co-occurrence
+  *recovers* it from correlation alone (23); `theme_profile` clustering (16) and the
+  `subsistence × theme` gradient (22) show the same cosmology-vs-tales split organising
+  traditions. Four independent routes to one division ⇒ it is real, not editorial.
+- **A refines B and B refines A** (stratum): geography dates the areal majority B can't;
+  phylogeny filters A's false "deep disjuncts" (the B4 case). Mockup 19 gates them; mockup 20
+  shows the gated result survives bias-correction on its deep spine.
+- **theme_profile could refine stratum, untested.** If a tradition's genre balance predicts
+  *which strata it carries*, then `theme_profile` is a tradition-level prior on the motif-level
+  `stratum` — a link we drew but never measured.
+- **The crosswalk (TMI/ATU) is unused replication.** A motif attested in all three indexes
+  with a consistent map is high-confidence; cross-index *disagreement* localises coding
+  artifacts. We have this signal and don't use it (only mockup 17's `xindex` touches it).
+
+## 3. The combination move: one joint model instead of a pipeline
+
+The mockups are a *pipeline of separate estimators* that each re-discover pieces of the same
+structure and each re-fight the same confounder. The strongest consolidation is a **single
+joint latent-variable model over `M`**:
+
+> Cell probability `P(motif m present in tradition t) = f(tradition factors, motif factors)`
+> with a **per-tradition sampling offset** `a(t)` baked in, where tradition factors are
+> `area · family · subsistence · latent-history-position` and motif factors are
+> `theme · latent-stratum`.
+
+Fitting this once would: (a) factor out sampling **globally** rather than per-mockup;
+(b) estimate `stratum` jointly with everything, so `theme`/`area`/`family` act as the
+covariates that de-confound it (exactly the "three axes remove each other's confound" claim,
+made formal); (c) yield honest posteriors and confidences instead of stacked heuristics. Two
+concrete shapes: a **Bayesian hierarchical logistic** (facets as fixed effects, history +
+stratum as latents, `a(t)` as offset), or the **reticulate tree+migration** model already
+sketched in `stratum-derivation.md` §12.4 (one run partitioning each motif into inherited vs
+borrowed shares, A=space and B=tree as two observations). The pipeline mockups become its
+validation harness, not its replacement.
+
+## 4. Alternative hypotheses we should actively try to confirm
+
+Every headline has a deflationary rival; naming them is the honest move.
+
+1. **It's all sampling.** The subsistence×theme gradient, the theme×area lift, breadth-as-age
+   — could be artifacts of collection intensity and Berezkin's own regional focus. *Test:*
+   redo each under the §5 effort-correction; report which survive. (Partial evidence: mockup
+   20 says the deep-disjunct spine does; the rest is untested.)
+2. **`stratum` isn't one axis.** The A3-vs-K25 residual hints that "depth" may be
+   ill-posed — motifs may be **mixtures** of an areal-substrate component, a descent
+   component, and a reinvention rate, with no single ordinal "age". *Test:* fit a per-motif
+   3-way mixture instead of a single stratum label; see if the residual dissolves.
+3. **Wrong tree, not rare descent.** Method B found ~1% follow the *language* tree — but a
+   **population-genetic** or a **cultural** tree might fit better. "Geography is primary" may
+   be "language is the wrong lineage." *Test:* re-run Method B on a genetic/admixture tree.
+4. **The A/B blocks are corpus-type, not worldview.** Oral-vs-literate collection could
+   manufacture the cosmology/tales split (literate corpora over-record adventures). *Test:*
+   control for corpus register / `family` religion overlay before reading the blocks.
+5. **Reverse causation on subsistence×theme.** Maybe neither causes the other — both are
+   downstream of deep history/area. *Test:* partial correlation within area (see §5).
+
+## 5. Highest-leverage next steps (ranked by effect)
+
+1. **Global effort-correction pass (epistemic leverage).** Apply the §5 attestation-intensity
+   weighting to *every* count-based mockup (16, 22, 23), not just 20. This is cheap and it
+   either validates or kills half of our findings — the single highest-value experiment,
+   because it resolves alternative-hypothesis #1 across the board.
+2. **Wire the dated phylogeny (capability leverage).** Glottolog CLDF + the Bouckaert/EDGE
+   dated global tree turns `stratum` from an *ordinal mode* into an *absolute age*, and opens
+   external validation against published phylomemetic dates. This is the one missing external
+   resource that unlocks a genuinely new class of conclusion (§14 build-task #3).
+3. **Within-area partial correlations (decisiveness leverage).** Recompute subsistence×theme
+   and theme×stratum *within* each macro-area (or as partial correlations controlling for
+   area). Cheap, and it decisively separates the signals we keep flagging as area-confounded.
+4. **Motif content × stratum (independent-signal leverage).** We built BGE-M3 embeddings in
+   the morphology stage but never crossed them with `stratum`. Do *semantically* similar
+   motifs share a stratum? A content signal, independent of distribution, either corroborates
+   the distributional estimate or exposes it — and gives a principled **banality** measure
+   (minimally-counter-intuitive / generic definitions) to replace mockup 20's crude proxy.
+
+## 6. New ideas that would push the work forward
+
+- **Tradition stratigraphy.** Turn `stratum` around: profile each *tradition* as a stack of
+  strata (its share of African-substratum / Indo-Pacific / … / colonial motifs) — a
+  geological-column view of a corpus. "Which traditions are deep-substrate-rich vs
+  recent-heavy" is a new, directly-mappable tradition facet, and a strong check (deep-rich
+  traditions should cluster in refugia / early-peopled regions).
+- **Descent–diffusion as a continuum, not a gate.** Replace mockup 19's binary mode switch
+  with a per-motif **inherited-share ∈ [0,1]** from the reticulate model — most motifs are
+  mixtures, and the gate currently forces a false dichotomy.
+- **Phylogeographic reconstruction (the visual capstone).** Animate each deep motif's inferred
+  spread over the peopling map (origin node → range) — the etiology stage made legible, and a
+  powerful validation surface (does the reconstruction respect known migration routes?).
+- **Contact-network layer.** Model areal diffusion with explicit edges (trade routes, the
+  Silk Road, the slave trade, missions) — this is what actually dates the axial/literate and
+  colonial strata that distribution shape *cannot* reach (the §14 open question about whether
+  the historical strata even belong on the same axis).
+- **Cross-index arbitration.** Use TMI+ATU as a replication vote: promote motifs consistent
+  across indexes, flag Berezkin-only ones as coding-dependent — a confidence multiplier we
+  already have the data for.
+
+## 7. Data that would unlock new strong conclusions
+
+Ranked by what each *newly enables*, not by ease:
+
+| Data | License | Unlocks |
+|---|---|---|
+| **Glottolog CLDF** (tree + tip coords) | CC-BY | descent on a real classification; join key for everything below |
+| **Bouckaert/EDGE dated phylogeny** | open | absolute node **ages** → ordinal stratum becomes calendar time |
+| **Human genetic / admixture data** | open (published) | an *alternative descent tree* to test "wrong tree vs rare descent" (alt-hyp #3) |
+| **D-PLACE beyond subsistence** (settlement, political complexity, kinship) | CC-BY | more tradition covariates → de-confound the theme gradients |
+| **Archaeology / paleoclimate** (peopling dates, LGM refugia) | open | *calibration* for the geographic dating backbone (axiom A8) |
+| **Full TMI + ATU crosswalk** | mixed | replication vote + a handle on the literate/colonial strata (ATU tails) |
+| **The myth texts themselves** (mapsofmyths / corpora) | scrape-dependent | content embeddings → semantic stratum, a principled banality measure, motif-matching |
+| **Historical contact networks** (routes, missions, trade) | open/curated | the diffusion edges that date the historical strata distribution can't |
+
+## 8. New algorithms that could give strong results
+
+Our current estimators are deliberately simple — Fitch **parsimony** (18), **k-means** /
+**spectral co-clustering** (16, 23), **Pearson** correlation (23), a **heuristic gate** (19).
+Each has a principled, stronger replacement that also fixes a specific weakness we already
+named. Ordered by expected payoff:
+
+1. **Bayesian phylogeography — relaxed-random-walk diffusion on a dated tree** (the core-question
+   upgrade). The gold standard from linguistics/epidemiology (BEAST-style): jointly reconstruct
+   each motif's **ancestral location and age** as a continuous diffusion over the dated
+   phylogeny. Replaces "Method A dates space, Method B dates tree, gate picks one" with a single
+   model that dates space *and* tree together, with real uncertainty. Directly yields the
+   phylogeographic reconstruction (§6) and absolute ages.
+2. **Degree-corrected bipartite stochastic block model** (the co-clustering + sampling upgrade).
+   Replaces biclustering (06/07/15) and spectral co-clustering (23) with a *generative* block
+   model that (a) selects the number of blocks by evidence instead of a hand-set `k`, (b) gives
+   probabilistic membership, and — crucially — (c) the **degree-correction absorbs the `a(t)`
+   sampling confounder natively**, so blocks reflect structure, not catalogue density. One model
+   that de-confounds and clusters at once.
+3. **Hierarchical Poisson / logistic factorization with an exposure offset** (the joint-model of
+   §3, made concrete). Factorize `M` into tradition-factors × motif-factors with `a(t)` as a
+   per-row **offset**; non-negative latent factors are the emergent themes/strata, effort-corrected
+   *globally*. This is the single fit that subsumes mockups 16–23 and resolves alternative-
+   hypothesis #1 in one pass.
+4. **Phylogenetic mixed models (PGLMM / PGLS)** (the Galton fix). Every correlation we report —
+   subsistence×theme (22), theme×area/theme (23) — is currently uncorrected for shared ancestry
+   (neighbours aren't independent). A phylogenetic mixed model puts the language/dated tree in as
+   the covariance structure and tests these associations **properly**, which is the rigorous
+   version of the within-area partial correlations in §5.3. Cheap, decisive, and it directly
+   answers "is the gradient real or just Galton + area?"
+5. **Likelihood ancestral-state reconstruction (Mk / Dollo + rate heterogeneity)** (the Method-B
+   upgrade). Swap parsimony gain-counting for a continuous-time Markov gain/loss model with a
+   loss bias (Dollo-like: motifs are lost more easily than independently re-invented) and
+   across-motif rate variation. Gives marginal ancestral **probabilities** and a principled
+   homoplasy estimate instead of a hard count.
+6. **Finite mixture (EM) of descent / areal / reinvention components per motif** (the
+   anti-gate). Tests alternative-hypothesis #2: fit each motif as a **mixture** of an
+   inherited-along-the-tree component, an areal-diffusion component, and a reinvention rate,
+   estimating the **inherited share ∈ [0,1]** instead of forcing a binary mode. Most motifs are
+   mixtures; the A3-vs-K25 residual may dissolve into "60% substrate / 40% diffusion."
+7. **Occupancy / detection models** (the sampling control, formalised). Mockup 20's coverage
+   weighting is a heuristic; an occupancy model states it correctly — *observed* presence =
+   *true* presence × detection(effort) — and estimates true range with per-cell uncertainty.
+   The statistically honest form of axiom 11.
+8. **Structural Topic Model on traditions-as-documents** (the theme-profile upgrade). Treat each
+   tradition's motif set as a document; STM estimates theme prevalence **as a function of
+   covariates** (`area`, `subsistence`, `family`) with the confounds partialled out by
+   construction — the model-based version of mockups 16 and 22 together.
+
+Common thread: each swap trades a descriptive heuristic for a **generative model with an
+explicit sampling/ancestry term**, which is exactly where our current results carry their
+asterisks. The two with the highest ceiling are #1 (dating) and #3 (the joint effort-corrected
+factorization); the two cheapest-yet-decisive are #4 (Galton) and #7 (occupancy).
+
+## The one-line throughline
+
+We have been reconstructing **one latent process — the peopling of the world and the flow of
+stories across it — from one biased matrix**. The facets (`area`/`family`/`subsistence`/
+`theme`) are its observable projections; `stratum` is the hidden time coordinate. The next
+phase is to stop estimating the projections separately and **fit the process once** —
+effort-corrected, dated, and content-aware — with the mockups as its validation harness.
