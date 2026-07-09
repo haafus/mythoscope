@@ -3,7 +3,7 @@
 The archive holds the ``outputs/`` products (corpus, embeddings, projections,
 graphs, motifs) so a viewer-profile install elsewhere can serve them offline
 (no GPU / internet / LLM needed), plus any local ``file:`` corpus sources under
-``config/sources`` (so the originals travel with the bundle and a rebuild on the
+``sources/`` (so the originals travel with the bundle and a rebuild on the
 target can re-ingest them). Resumable caches and logs are excluded by default —
 they are rebuild fuel, useless on the target — and added only with
 ``include_caches``. There is no separate import step: restore is just ``unzip``
@@ -46,14 +46,14 @@ _RAW_DIR_NAME = "raw"
 def _components() -> list[tuple[str, Path, str]]:
     """(archive name, source dir, archive root) for each exportable component, in
     order. Most live under ``outputs/``; local ``file:`` corpus sources live under
-    ``config/sources`` and restore there, so they carry their own archive root."""
+    ``sources/`` and restore there, so they carry their own archive root."""
     return [
         ("corpus", Path(settings.corpus_dir), "outputs/corpus"),
         ("embeddings", Path(settings.embeddings_dir), "outputs/embeddings"),
         ("projections", Path(settings.projections_dir), "outputs/projections"),
         ("graphs", Path(settings.graphs_dir), "outputs/graphs"),
         ("motifs", Path(settings.motifs_dir), "outputs/motifs"),
-        ("sources", Path(settings.sources_dir), "config/sources"),
+        ("sources", Path(settings.sources_dir), "sources"),
     ]
 
 

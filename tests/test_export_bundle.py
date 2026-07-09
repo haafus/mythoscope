@@ -22,8 +22,8 @@ def built_outputs(tmp_path, monkeypatch):
     }
     for attr, path in dirs.items():
         monkeypatch.setattr(settings, attr, path)
-    # Isolate local file: sources under an (empty by default) config/sources.
-    monkeypatch.setattr(settings, "sources_dir", tmp_path / "config" / "sources")
+    # Isolate local file: sources under an (empty by default) sources/ dir.
+    monkeypatch.setattr(settings, "sources_dir", tmp_path / "sources")
 
     def write(path, text="x"):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -89,8 +89,8 @@ class TestExport:
 
         result = eb.export_outputs(out_dir=built_outputs, timestamp="T")
         names = _names(result)
-        assert "config/sources/myth.txt" in names
-        assert "config/sources/sub/epic.pdf" in names
+        assert "sources/myth.txt" in names
+        assert "sources/sub/epic.pdf" in names
         assert "sources" in result.components
 
     def test_nothing_to_export(self, tmp_path, monkeypatch):
