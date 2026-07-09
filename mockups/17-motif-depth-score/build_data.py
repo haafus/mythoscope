@@ -31,8 +31,12 @@ NEW_WORLD = {"NORTH AMERICA: NORTH AND WEST", "PLAINS AND SOUTHEAST",
 INDO_PACIFIC = {"OCEANIA", "AUSTRALIA"}
 EURO = {"WESTERN EUROPE, NORTH AFRICA", "NORTHERN AND EASTERN EUROPE"}
 # uncontroversial anchors to orient the axis (direction only, not training)
-DEEP_ANCHORS = {"A11C", "C6i1", "A47", "B4", "A10", "C10"}          # celestial / earth-diver / flood
-SHALLOW_ANCHORS = {"B88", "K8aa", "M182", "K27z2", "H7c1"}          # Job / Jonah / tar-baby / jataka / cunning-into-paradise
+DEEP_ANCHORS = {"C6i1", "A47", "B4", "A10", "C10", "D4A"}           # earth-diver / sun-egg / flood / theft-of-fire
+SHALLOW_ANCHORS = {"B88", "K8aa", "K27z2", "H7c1"}                  # Job / Jonah / jataka / cunning-into-paradise
+# disjunction-weighted variant: reward cross-clade + barrier-spanning + fragmented,
+# penalise raw prevalence (the fix for the prevalence confound of PC1).
+DISJ_W = {"n_trad": -1.0, "n_macro": -0.5, "n_lang": 1.0, "spread": 0.5,
+          "fragments": 0.8, "set_span": 1.0, "xindex": 0.0}
 FEATURES = ["n_trad", "n_macro", "n_lang", "spread", "fragments", "set_span", "xindex"]
 
 
@@ -116,13 +120,25 @@ def main():
     sa = [pc[idx[c]] for c in SHALLOW_ANCHORS if c in idx]
     if da and sa and np.mean(da) < np.mean(sa):
         pc = -pc
-    # scale to 0..100
-    score = 100 * (pc - pc.min()) / (np.ptp(pc) or 1)
+    def scale(a):
+        return 100 * (a - a.min()) / (np.ptp(a) or 1)
+    score = scale(pc)
+
+    # disjunction-weighted variant (explicit weights, prevalence de-emphasised)
+    disj = Z @ np.array([DISJ_W[f] for f in FEATURES])
+    disj = scale(disj)
+
+    def percentile(a):
+        order = a.argsort()
+        rank = np.empty(len(a)); rank[order] = np.arange(len(a))
+        return 100 * rank / (len(a) - 1)
+    pct_s, pct_d = percentile(score), percentile(disj)
 
     def enrich(i):
         r = mids[i]
         return {"c": r["id"], "n": r.get("name", ""),
-                "s": round(float(score[i]), 1), "g": int(r.get("motif_group_num") or 0),
+                "s": round(float(score[i]), 1), "d": round(float(disj[i]), 1),
+                "g": int(r.get("motif_group_num") or 0),
                 "nt": int(F[i, 0]), "nm": int(F[i, 1]), "nl": int(F[i, 2]),
                 "fr": int(F[i, 4]), "ss": int(F[i, 5])}
 
@@ -130,45 +146,49 @@ def main():
     deepest = [enrich(int(i)) for i in order[:25]]
     shallowest = [enrich(int(i)) for i in order[-25:][::-1]]
 
-    # histogram
     hist, edges = np.histogram(score, bins=20, range=(0, 100))
 
-    # anchors
     anchors = {"deep": [enrich(idx[c]) for c in DEEP_ANCHORS if c in idx],
                "shallow": [enrich(idx[c]) for c in SHALLOW_ANCHORS if c in idx]}
 
-    # validation: adventure/trick endemism — New-World-endemic vs Europe-only
-    endemic, euro_only, both = [], [], []
-    for i, r in enumerate(mids):
-        if str(r.get("motif_group_num")) not in ("10", "11"):
-            continue
-        ms = {macro(t) for t in (r.get("traditions") or [])}
-        inA, inE = bool(ms & NEW_WORLD), bool(ms & EURO)
-        if inA and not inE:
-            endemic.append(score[i])
-        elif inE and not inA:
-            euro_only.append(score[i])
-        elif inA and inE:
-            both.append(score[i])
-    valid = {
-        "endemic_amer": {"n": len(endemic), "mean": round(float(np.mean(endemic)), 1)},
-        "euro_only": {"n": len(euro_only), "mean": round(float(np.mean(euro_only)), 1)},
-        "both": {"n": len(both), "mean": round(float(np.mean(both)), 1)},
-    }
+    # PC1 → disjunction movers: biggest percentile gains (rise) and losses (fall)
+    delta = pct_d - pct_s
+    mv = np.argsort(-delta)
+    movers = {"risers": [enrich(int(i)) for i in mv[:12]],
+              "fallers": [enrich(int(i)) for i in mv[-12:][::-1]]}
 
-    # feature ↔ score correlation, to show what drives depth
+    # validation: adventure/trick endemism under BOTH scores
+    def endemism(vals):
+        e, eo, bo = [], [], []
+        for i, r in enumerate(mids):
+            if str(r.get("motif_group_num")) not in ("10", "11"):
+                continue
+            ms = {macro(t) for t in (r.get("traditions") or [])}
+            inA, inE = bool(ms & NEW_WORLD), bool(ms & EURO)
+            (e if inA and not inE else eo if inE and not inA else bo if inA and inE else []).append(vals[i])
+        m = lambda x: round(float(np.mean(x)), 1) if x else 0.0
+        return {"endemic_amer": {"n": len(e), "mean": m(e)},
+                "euro_only": {"n": len(eo), "mean": m(eo)},
+                "both": {"n": len(bo), "mean": m(bo)}}
+    valid = {"pc1": endemism(score), "disj": endemism(disj)}
+
     corr = {f: round(float(np.corrcoef(F[:, j], score)[0, 1]), 2) for j, f in enumerate(FEATURES)}
+    corr_d = {f: round(float(np.corrcoef(F[:, j], disj)[0, 1]), 2) for j, f in enumerate(FEATURES)}
 
     data = {"n_motifs": len(mids), "min_trad": MIN_TRAD, "features": FEATURES,
-            "corr": corr, "hist": [int(h) for h in hist],
-            "edges": [round(float(e), 1) for e in edges],
-            "deepest": deepest, "shallowest": shallowest,
+            "corr": corr, "corr_disj": corr_d, "disj_w": DISJ_W,
+            "hist": [int(h) for h in hist], "edges": [round(float(e), 1) for e in edges],
+            "deepest": deepest, "shallowest": shallowest, "movers": movers,
             "anchors": anchors, "valid": valid}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
-    print(f"{len(mids)} motifs scored · endemic-Amer adv mean {valid['endemic_amer']['mean']} "
-          f"vs Euro-only {valid['euro_only']['mean']} · data.js ~{OUT.stat().st_size // 1024}KB")
-    print("  feature↔score corr:", corr)
+    print(f"{len(mids)} motifs scored · data.js ~{OUT.stat().st_size // 1024}KB")
+    print(f"  endemism (endemic-Amer vs Euro-only):  PC1 {valid['pc1']['endemic_amer']['mean']} vs "
+          f"{valid['pc1']['euro_only']['mean']}   disj {valid['disj']['endemic_amer']['mean']} vs "
+          f"{valid['disj']['euro_only']['mean']}")
+    print("  top risers under disjunction weighting:",
+          [f"{m['c']}({m['s']:.0f}->{m['d']:.0f})" for m in movers["risers"][:6]])
+    print("  top fallers:", [f"{m['c']}({m['s']:.0f}->{m['d']:.0f})" for m in movers["fallers"][:6]])
 
 
 if __name__ == "__main__":

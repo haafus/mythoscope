@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>17 · Motif depth-score</title>
 <style>
-  :root { --ink:#1f2a30; --muted:#6c757d; --deep:#c2410c; --shallow:#3a6ea5; }
+  :root { --ink:#1f2a30; --muted:#6c757d; }
   * { box-sizing:border-box; }
   body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
   main { max-width:1080px; margin:0 auto; padding:26px 22px 60px; }
@@ -16,32 +16,33 @@
   th,td { text-align:left; padding:4px 7px; border-bottom:1px solid #f0ede6; }
   th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
   td.code { font-weight:700; color:#4f7096; white-space:nowrap; }
-  td.sc { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.sc { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:600; }
   td.meta { color:#98a0a7; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .hist { display:flex; align-items:flex-end; gap:2px; height:120px; }
-  .hbar { flex:1; background:#cdd8dd; border-radius:2px 2px 0 0; }
+  .hbar { flex:1; border-radius:2px 2px 0 0; }
   .brow { display:grid; grid-template-columns:120px 1fr 42px; align-items:center; gap:8px; font-size:12px; margin:2px 0; }
   .bt { height:9px; background:#f0ece3; border-radius:5px; overflow:hidden; }
   .bf { height:100%; border-radius:5px; }
   .brow .bv { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
-  .anchor { display:flex; justify-content:space-between; font-size:12px; padding:2px 0; border-bottom:1px solid #f4f1ea; }
-  .anchor .s { font-variant-numeric:tabular-nums; font-weight:600; }
+  .anchor { display:flex; justify-content:space-between; gap:8px; font-size:12px; padding:2px 0; border-bottom:1px solid #f4f1ea; }
+  .anchor .s { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
   .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
   .muted { color:var(--muted); font-size:11.5px; }
   .pill { display:inline-block; font-size:11px; padding:1px 8px; border-radius:20px; background:#eef2f4; color:#4f7096; }
+  .arrow { color:#98a0a7; }
 </style>
 <main>
 <header>
   <h1>Depth-score мотивов — вывод глубины из распределения</h1>
   <p>Прототип метода A (см. <b>stratum-derivation.md</b>): глубина мотива оценивается по форме его ареала —
-     распространённость, разброс, фрагментация, число языковых семей, охват мега-сетов — сведённых в один
-     score (PCA PC1, ориентированный по бесспорным якорям). <b>Первичная эвристика без bias-коррекции</b> —
-     проверка, что дистрибутивный сигнал есть, а не готовая датировка.</p>
+     распространённость, разброс, фрагментация, число языковых семей, охват мега-сетов. Показаны две версии:
+     <b>PC1</b> (первая главная компонента) и <b>disjunction-weighted</b> (давит распространённость, поднимает
+     кросс-кладовость и дизъюнкцию). Это проверка сигнала, не готовая датировка.</p>
 </header>
 
 <div class="card">
   <div class="stat" id="stat"></div>
-  <h2 style="margin-top:14px">Распределение score (0 = узкий/поздний, 100 = широкий/глубокий)</h2>
+  <h2 style="margin-top:14px">Распределение PC1-score (0 = узкий/поздний, 100 = широкий/глубокий)</h2>
   <div class="hist" id="hist"></div>
   <div class="muted" id="axis" style="display:flex;justify-content:space-between;margin-top:4px"></div>
 </div>
@@ -53,25 +54,40 @@
 
 <div class="cols">
   <div class="card">
-    <h2 style="color:var(--deep)">Самые «глубокие» мотивы</h2>
-    <table><thead><tr><th>Код</th><th>Мотив</th><th>гр</th><th>score</th><th>ареалы·языки·фрагм</th></tr></thead>
+    <h2 style="color:#c2410c">Самые «глубокие» (по PC1)</h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th><th>PC1</th><th>disj</th><th>ар·яз·фр</th></tr></thead>
     <tbody id="deep"></tbody></table>
   </div>
   <div class="card">
-    <h2 style="color:var(--shallow)">Самые «поздние/узкие»</h2>
-    <table><thead><tr><th>Код</th><th>Мотив</th><th>гр</th><th>score</th><th>трад.</th></tr></thead>
+    <h2 style="color:#3a6ea5">Самые «поздние/узкие» (по PC1)</h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th><th>PC1</th><th>disj</th><th>трад</th></tr></thead>
     <tbody id="shallow"></tbody></table>
   </div>
 </div>
 
 <div class="card">
-  <h2>Валидация</h2>
-  <div id="valid"></div>
+  <h2>PC1 против disjunction-weighted</h2>
+  <div id="endem"></div>
   <div class="cols" style="margin-top:12px">
-    <div><div class="muted" style="margin-bottom:4px">Глубокие якоря (должны быть высоко)</div><div id="anchDeep"></div></div>
-    <div><div class="muted" style="margin-bottom:4px">Поздние якоря (должны быть низко)</div><div id="anchShallow"></div></div>
+    <div>
+      <div class="muted" style="margin-bottom:4px">Поднялись при взвешивании дизъюнкции (низкая распространённость, но кросс-кладово/разорвано)</div>
+      <table><thead><tr><th>Код</th><th>Мотив</th><th>PC1→disj</th></tr></thead><tbody id="risers"></tbody></table>
+    </div>
+    <div>
+      <div class="muted" style="margin-bottom:4px">Упали (широкие, но связные — PC1 переоценил по объёму)</div>
+      <table><thead><tr><th>Код</th><th>Мотив</th><th>PC1→disj</th></tr></thead><tbody id="fallers"></tbody></table>
+    </div>
   </div>
-  <div class="note" id="confound"></div>
+  <div class="note" id="verdict"></div>
+</div>
+
+<div class="card">
+  <h2>Якоря ориентации</h2>
+  <div class="cols">
+    <div><div class="muted" style="margin-bottom:4px">Глубокие (должны быть высоко)</div><div id="anchDeep"></div></div>
+    <div><div class="muted" style="margin-bottom:4px">Поздние (должны быть низко)</div><div id="anchShallow"></div></div>
+  </div>
+  <div class="note" id="anchnote"></div>
 </div>
 </main>
 
@@ -79,42 +95,53 @@
 <script>
 const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
-const col = s => s>=50 ? "#c2410c" : s>=25 ? "#b5651d" : "#3a6ea5";
+function grad(s){ const a=[58,110,165], b=[194,65,12], t=Math.max(0,Math.min(1,s/100));
+  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(",")})`; }
 
 document.getElementById("stat").innerHTML =
   `<b>${D.n_motifs}</b> мотивов (≥${D.min_trad} традиций) отранжированы по глубине распределения.`;
 
 const hmax = Math.max(...D.hist);
-document.getElementById("hist").innerHTML = D.hist.map(h=>
-  `<div class="hbar" style="height:${100*h/hmax}%" title="${h}"></div>`).join("");
+document.getElementById("hist").innerHTML = D.hist.map((h,i)=>
+  `<div class="hbar" style="height:${100*h/hmax}%;background:${grad((i+0.5)/D.hist.length*100)}" title="${h}"></div>`).join("");
 document.getElementById("axis").innerHTML = `<span>0 · узкий/поздний</span><span>100 · широкий/глубокий</span>`;
 
 const cmax = Math.max(...Object.values(D.corr).map(Math.abs));
 document.getElementById("corr").innerHTML = Object.entries(D.corr).map(([f,v])=>
   `<div class="brow"><span>${f}</span><span class="bt"><span class="bf" style="width:${100*Math.abs(v)/cmax}%;background:${v<0?"#9aa7b2":"#0e9aa7"}"></span></span><span class="bv">${v.toFixed(2)}</span></div>`).join("");
 
-const rowD = a => `<tr><td class="code">${esc(a.c)}</td><td>${esc(clip(a.n,34))}</td><td class="meta">${a.g}</td>`+
-  `<td class="sc" style="color:${col(a.s)};font-weight:600">${a.s.toFixed(1)}</td><td class="meta">${a.nm}·${a.nl}·${a.fr}</td></tr>`;
-const rowS = a => `<tr><td class="code">${esc(a.c)}</td><td>${esc(clip(a.n,36))}</td><td class="meta">${a.g}</td>`+
-  `<td class="sc" style="color:${col(a.s)}">${a.s.toFixed(1)}</td><td class="meta">${a.nt}</td></tr>`;
-document.getElementById("deep").innerHTML = D.deepest.map(rowD).join("");
-document.getElementById("shallow").innerHTML = D.shallowest.map(rowS).join("");
+const sc = (v,which)=>`<span style="color:${grad(v)}">${v.toFixed(1)}</span>`;
+document.getElementById("deep").innerHTML = D.deepest.map(a=>
+  `<tr><td class="code">${esc(a.c)}</td><td>${esc(clip(a.n,30))}</td><td class="sc">${sc(a.s)}</td><td class="sc">${sc(a.d)}</td><td class="meta">${a.nm}·${a.nl}·${a.fr}</td></tr>`).join("");
+document.getElementById("shallow").innerHTML = D.shallowest.map(a=>
+  `<tr><td class="code">${esc(a.c)}</td><td>${esc(clip(a.n,32))}</td><td class="sc">${sc(a.s)}</td><td class="sc">${sc(a.d)}</td><td class="meta">${a.nt}</td></tr>`).join("");
 
 const v = D.valid;
-document.getElementById("valid").innerHTML =
+document.getElementById("endem").innerHTML =
   `<b>Стресс-тест эндемизма приключений</b> (группы 10–11): эндемичные Новому Свету (нет в Европе) должны быть глубже европейских.<br>`+
-  `<span class="pill">эндемик-Америки: ${v.endemic_amer.mean} <span class="muted">(n=${v.endemic_amer.n})</span></span> &gt; `+
-  `<span class="pill">только Европа: ${v.euro_only.mean} <span class="muted">(n=${v.euro_only.n})</span></span> · `+
-  `общие: ${v.both.mean} <span class="muted">(n=${v.both.n})</span> — `+
-  (v.endemic_amer.mean>v.euro_only.mean?"<b style='color:#12a150'>тест пройден</b>":"<b style='color:#c2410c'>не пройден</b>");
+  `<span class="pill">PC1 — эндемик: ${v.pc1.endemic_amer.mean} &gt; Европа: ${v.pc1.euro_only.mean}</span> `+
+  `<span class="pill">disj — эндемик: ${v.disj.endemic_amer.mean} &gt; Европа: ${v.disj.euro_only.mean}</span> `+
+  `<span class="muted">(n=${v.disj.endemic_amer.n}/${v.disj.euro_only.n})</span><br>`+
+  `<span class="muted">Взвешивание дизъюнкции <b>усиливает разделение</b> (разрыв ${(v.disj.endemic_amer.mean-v.disj.euro_only.mean).toFixed(1)} против ${(v.pc1.endemic_amer.mean-v.pc1.euro_only.mean).toFixed(1)} у PC1).</span>`;
 
-const anch = a => `<div class="anchor"><span>${esc(a.c)} ${esc(clip(a.n,32))}</span><span class="s" style="color:${col(a.s)}">${a.s.toFixed(1)}</span></div>`;
+const mrow = a=>`<tr><td class="code">${esc(a.c)}</td><td>${esc(clip(a.n,26))}</td><td class="sc">${sc(a.s)} <span class="arrow">→</span> ${sc(a.d)}</td></tr>`;
+document.getElementById("risers").innerHTML = D.movers.risers.map(mrow).join("");
+document.getElementById("fallers").innerHTML = D.movers.fallers.map(mrow).join("");
+
+document.getElementById("verdict").innerHTML =
+  "<b>Ни одна из двух не «ответ».</b> PC1 путает старое с <i>широким</i> (нагружен распространённостью). "+
+  "Дизъюнкционный вариант чинит это — усиливает эндемизм-сигнал — но перегибает в другую сторону: "+
+  "давит объём так, что реально широко-глубокие мотивы (K25 «дева-лебедь» 100→16, трикстер-койот) проваливаются, "+
+  "а редкие разрозненные всплывают. Один линейный score не выражает «старое = широкое И кросс-кладово И разорвано» "+
+  "одновременно — для этого нужен модельный метод B (реконструкция предковых состояний на языковом дереве, "+
+  "который взвешивает независимые обретения против глубины узла).";
+
+const anch = a=>`<div class="anchor"><span>${esc(a.c)} ${esc(clip(a.n,30))}</span><span class="s">PC1 ${sc(a.s)} · disj ${sc(a.d)}</span></div>`;
 document.getElementById("anchDeep").innerHTML = D.anchors.deep.sort((x,y)=>y.s-x.s).map(anch).join("");
 document.getElementById("anchShallow").innerHTML = D.anchors.shallow.sort((x,y)=>y.s-x.s).map(anch).join("");
-
-document.getElementById("confound").innerHTML =
-  "<b>Честно про пределы.</b> PC1 сильно нагружен распространённостью (corr n_macro 0.95), поэтому эвристика "+
-  "путает «старое» с «широким». Два известных провала видны на якорях: <b>A11C</b> (тонкий транс-тихоокеанский "+
-  "Солнце-Луна) уходит вниз, потому что редок; <b>tar-baby</b> (широко диффундировавший поздний сюжет) лезет вверх. "+
-  "Это ровно те конфаунды, ради которых нужны bias-коррекция, взвешивание дизъюнкции и филогенетический метод B.";
+document.getElementById("anchnote").innerHTML =
+  "Якоря лишь ориентируют ось (направление), не обучают. Часть хрестоматийно-глубоких мотивов "+
+  "(напр. earth-diver, flood) в выборке Березкина атрибутированы неравномерно, поэтому их абсолютный "+
+  "score скромен — напоминание, что <b>глубина отдельного мотива ≠ глубина кластера</b> (транс-тихоокеанский "+
+  "«Солнце-Луна» — свойство кластера 6 из многих мотивов, а не одиночного мотива).";
 </script>
