@@ -1,0 +1,131 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>36 · Admixture back-migration</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --deep:#3c8a5e; --adm:#c05540; --eur:#8b93c9; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:960px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:910px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .grid2 { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; } @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; }
+  .lg { display:flex; gap:12px; flex-wrap:wrap; font-size:11.5px; margin-top:6px; } .lg i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px;}
+  .bar-row { display:flex; align-items:center; gap:8px; margin:6px 0; } .bar-row .nm { width:170px; font-size:12px; text-align:right; }
+  .bar-row .tr { flex:1; background:var(--bg); border-radius:5px; height:22px; } .bar-row .bf { height:100%; border-radius:5px; }
+  .bar-row .vv { width:46px; font-size:12px; font-variant-numeric:tabular-nums; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .verdict { background:#f4eeec; border-color:#e2c9c2; color:#6b3f34; }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  td.code { font-weight:700; color:#4f7096; }
+</style>
+<main>
+<header>
+  <h1>Обратная миграция через admixture-граф — направление, а не только размах</h1>
+  <p>Тест alt-гипотезы #6 («Африка — сток»): мотив, общий у <b>Африки и Западной Евразии</b>, — это глубокий
+     <b>out-of-Africa</b> или недавняя <b>обратная миграция в Африку</b>? Дерево не различает; admixture-граф добавляет
+     задокументированные рёбра <b>Евразия→Африка</b>, и направление даёт <b>внутриафриканское</b> распределение:
+     достигает глубокого неприместного резервуара (Зап./Центр./Юж. Африка, Сан) → <b>глубокий OoA</b>; сидит только в
+     евразийски-примешанном <b>коридоре</b> (Сев. Африка, Рог, Сахель) → <b>back-migration</b>. Рёбра = устоявшаяся
+     геногеография (Hellenthal 2014, Pagani), грубая — сырой SNP не нужен. <span id="hdr"></span></p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Африканские ярусы + Зап. Евразия <span class="s">— зелёное = глубокий резервуар, красное = примешанный коридор</span></h2>
+    <div id="map"></div>
+    <div class="lg" id="lg"></div>
+  </div>
+  <div class="card">
+    <h2>Ключевой контраст <span class="s">— доля африканского присутствия в примешанном коридоре</span></h2>
+    <div id="contrast"></div>
+    <div class="note" id="contrastNote"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Направление 836 мотивов Африка↔Евразия</h2>
+  <div id="dir"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Кандидаты в back-migration <span class="s">— только в коридоре</span></h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th><th class="r">кор.</th><th class="r">глуб.</th><th class="r">евр.</th></tr></thead><tbody id="bm"></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Глубокий out-of-Africa <span class="s">— достигает Сан/Зап. Африки</span></h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th><th class="r">кор.</th><th class="r">глуб.</th><th class="r">евр.</th></tr></thead><tbody id="dp"></tbody></table>
+  </div>
+</div>
+
+<div class="card verdict note" id="verdict"></div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])), clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const RC={deep:"var(--deep)",admixed:"var(--adm)",weur:"var(--eur)"};
+document.getElementById("hdr").textContent =
+  `Ярусы: глубокие ${D.counts.deep}, коридор ${D.counts.admixed}, Зап.Евразия ${D.counts.weur} традиций.`;
+document.getElementById("kpis").innerHTML = [
+  [`${D.n_afr_eur}`, "мотивов Африка↔Зап.Евразия"],
+  [`${D.dir.backmig} (${Math.round(100*D.backmig_share)}%)`, "кандидаты в back-migration — только в примешанном коридоре"],
+  [`${D.mean_admf.afr_eur} vs ${D.mean_admf.afr_only}`, "доля в коридоре: Африка↔Евразия vs Africa-only"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// map
+(function(){
+  const px=lon=>lon+180, py=lat=>90-lat;
+  const order={weur:0,deep:1,admixed:2};
+  const pts=D.pts.slice().sort((a,b)=>order[a.r]-order[b.r]).map(p=>
+    `<circle cx="${px(p.x).toFixed(1)}" cy="${py(p.y).toFixed(1)}" r="${p.r==='weur'?0.9:1.4}" fill="${RC[p.r]}" fill-opacity="${p.r==='weur'?0.5:0.9}"/>`).join("");
+  document.getElementById("map").innerHTML =
+    `<svg class="map" viewBox="0 30 200 120" preserveAspectRatio="xMidYMid meet"><rect x="0" y="30" width="200" height="120" fill="#dfe6ec"/>`+
+    `<path class="land" d="${window.LAND||""}"/>${pts}</svg>`;
+  document.getElementById("lg").innerHTML=[["deep","глубокий резервуар (Сан/Зап./Центр./Юж.)"],["admixed","примешанный коридор (Сев./Рог/Сахель)"],["weur","Зап. Евразия"]]
+    .map(([r,l])=>`<span><i style="background:${RC[r]}"></i>${l}</span>`).join("");
+})();
+
+// contrast bars
+const cb=[["Африка↔Евразия",D.mean_admf.afr_eur,"var(--adm)"],["Africa-only (базлайн)",D.mean_admf.afr_only,"var(--deep)"]];
+document.getElementById("contrast").innerHTML=cb.map(([nm,v,c])=>
+  `<div class="bar-row"><div class="nm">${nm}</div><div class="tr"><div class="bf" style="width:${100*v}%;background:${c}"></div></div><div class="vv">${v.toFixed(2)}</div></div>`).join("");
+document.getElementById("contrastNote").innerHTML =
+  `Мотивы, общие с Евразией, сидят в примешанном коридоре на <b>${D.mean_admf.afr_eur}</b>, а чисто-африканские — лишь `+
+  `<b>${D.mean_admf.afr_only}</b> (×${(D.mean_admf.afr_eur/D.mean_admf.afr_only).toFixed(1)}). Африкано-евразийское сходство `+
+  `<b>концентрируется на северном евразийски-примешанном крае Африки</b> — ровно то, что предсказывает обратная миграция.`;
+
+// direction split
+const dr=[["back-migration (недавняя)",D.dir.backmig,"var(--adm)"],["глубокий out-of-Africa",D.dir.deep_ooa,"var(--deep)"],["неоднозначно",D.dir.ambiguous,"#98a0a5"]];
+const dmax=D.n_afr_eur;
+document.getElementById("dir").innerHTML=dr.map(([nm,v,c])=>
+  `<div class="bar-row"><div class="nm" style="width:190px">${nm}</div><div class="tr"><div class="bf" style="width:${100*v/dmax}%;background:${c}"></div></div><div class="vv">${v} · ${Math.round(100*v/dmax)}%</div></div>`).join("");
+
+// examples
+const exrow=r=>`<tr><td class="code">${esc(r.c)}</td><td>${esc(clip(r.n,26))}</td><td class="r">${r.adm}</td><td class="r">${r.deep}</td><td class="r">${r.eur}</td></tr>`;
+document.getElementById("bm").innerHTML=D.examples.backmig.map(exrow).join("");
+document.getElementById("dp").innerHTML=D.examples.deep.map(exrow).join("");
+
+document.getElementById("verdict").innerHTML =
+  `<b>Вердикт — критика A8 подтверждается.</b> <b>${Math.round(100*D.backmig_share)}%</b> африкано-евразийских мотивов `+
+  `сидят только в северном примешанном коридоре → это <b>недавний поток, а не глубокий out-of-Africa</b>. Значит немалая `+
+  `часть «африканского субстрата» — на деле <b>обратный поток</b>, что <b>ослабляет «африканский субстрат = древнейший»</b> `+
+  `(аксиома A8). <b>Честный конфаунд:</b> примешанный коридор — это ещё и географически <b>ближайшая к Ближнему Востоку</b> `+
+  `часть Африки, поэтому по одному распределению <b>генетическую обратную миграцию не отличить от культурной диффузии</b> `+
+  `вдоль того же коридора — но оба «недавние, не глубокие», а это и есть суть для A8. Тонкий SNP-граф (HGDP) уточнил бы `+
+  `механизм. Для M38: пометить африкано-евразийские мотивы с высокой долей коридора как <b>кандидатов в back-migration</b>, `+
+  `а не в глубокий субстрат.`;
+</script>

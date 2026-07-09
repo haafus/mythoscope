@@ -47,7 +47,11 @@ These two together retire the two alternative hypotheses that caveat almost ever
    test is positive: traditions in *different* areas sharing an empire share ×2.6 more motifs
    (distance-matched +0.029) — Rome / the Mongol world moved motifs across areas. Scoped to the
    ~32% empire belt (small-scale societies outside) → a narrow dated covariate, not a general axis.
-5. **M36 · Admixture back-migration** — reticulate tree with back-migration edges; needs M33.
+5. **M36 · Admixture back-migration ✓ done — A8 critique confirmed.** Of 836 Africa↔W-Eurasia
+   motifs, **43% sit only in the Eurasian-admixed corridor** (N.Africa/Horn/Sahel) → recent
+   back-flow, not deep OoA (corridor-fraction 0.60 vs 0.17 for Africa-only, ×3.5). Weakens
+   "African substratum = oldest." Confound: corridor = also the Near-East-proximal edge, so
+   genetic back-migration ≡ cultural diffusion from distribution alone (both recent, the A8 point).
 6. **M37 · Cross-index arbitration** — per-motif reliability weights.
 7. **M38 · Joint HPF (capstone)** — assembled once on the settled facets / geometry / graph / tree / weights.
 8. **M39 · Tradition stratigraphy** — reads M38's stratum back onto traditions (downstream).
@@ -246,11 +250,16 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
     route? Report the % "reachable" by macro-area. Good coverage → build the corridor facet;
     mostly the Old-World literate belt → scope the claim to that belt.
 
-- **M36 · Admixture-graph back-migration (genetics).** The reticulate half split off from the old
-  combined alt-tree item: take **M33**'s genetic-tree wiring and add the published
-  **back-migration** edges (Eurasian gene flow into Africa) as horizontal connections — an
-  **admixture graph (a DAG), not a tree**. · *data: external* · **depends on M33** (its
-  genetic-tradition join) · **Effort: M–L.**
+- **M36 · Admixture-graph back-migration (genetics). ✓ done — A8 critique confirmed** (mockup 36).
+  Took the documented Eurasian→Africa back-migration edges (coarse settled geno-geography) and
+  read **direction** off each motif's within-Africa footprint (deep un-admixed reservoir vs the
+  Eurasian-admixed N.Africa/Horn/Sahel corridor). **Result:** of 836 Africa↔W-Eurasia motifs,
+  **43% are corridor-only back-migration candidates** (corridor-fraction 0.60 vs 0.17 for
+  Africa-only motifs, ×3.5) → a large slice of the "African substratum" is recent back-flow, not
+  deep OoA, **weakening axiom A8**. Honest confound: the admixed corridor is also the
+  Near-East-proximal edge, so genetic back-migration is indistinguishable from cultural diffusion
+  from distribution alone (both recent). A fine SNP graph (HGDP/SGDP) is the mechanistic upgrade. ·
+  *data: external* · **depends on M33** · **Effort: M–L.**
   - **Substrate — the fine SNP tree lives here, not as its own mockup.** M33 used a *continental*
     consensus tree (built from `area`, so genetic ≈ geography). The genuinely de-confounding step
     is a **fine SNP-based population tree** — a published NJ-on-Fst / TreeMix topology or an Fst

@@ -450,6 +450,20 @@ the Mongol world genuinely carried motifs across boundaries. A narrow dated cova
 belt, not a general axis; trade routes (OWTRAD) not yet wired. See
 [`35-historical-corridors/README.md`](35-historical-corridors/README.md).
 
+### 36 · Admixture back-migration (roadmap M36)
+Tests alt-hypothesis #6 / the A8 back-migration critique: is an Africa↔West-Eurasia motif deep
+out-of-Africa or recent back-into-Africa? Reads **direction** off the within-Africa footprint —
+deep un-admixed reservoir (West/Central/Southern, San) vs the Eurasian-admixed corridor
+(N.Africa/Horn/Sahel), the documented back-migration edge.
+**Q.** For a shared Africa–Eurasia motif, which way did it flow?
+**Finding — the A8 critique is confirmed.** Of 836 Africa↔W-Eurasia motifs, **43% sit
+corridor-only** = back-migration candidates (corridor-fraction 0.60 vs 0.17 for Africa-only, ×3.5)
+→ a large slice of the "African substratum" is recent back-flow, **weakening "African substratum =
+oldest"**. Honest confound: the corridor is also the Near-East-proximal edge, so genetic
+back-migration ≡ cultural diffusion from distribution alone (both recent — the point for A8); a
+fine SNP graph is the mechanistic upgrade. See
+[`36-admixture-backmigration/README.md`](36-admixture-backmigration/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

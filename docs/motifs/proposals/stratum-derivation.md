@@ -482,6 +482,13 @@ answer); **build tasks** are specified and merely unbuilt.
    **reticulate/admixture graph** carrying the published Eurasian-into-Africa gene flow as
    horizontal edges (the M33 alt-tree, upgraded from a pure tree). Direction, not just span,
    is the open quantity.
+   *Now tested (mockup 36, M36).* Reading direction off each motif's within-Africa footprint —
+   deep un-admixed reservoir (West/Central/Southern, San) vs the Eurasian-admixed corridor
+   (N.Africa/Horn/Sahel) — **43% of the 836 Africa↔W-Eurasia motifs sit corridor-only** and are
+   back-migration candidates (corridor-fraction 0.60 vs 0.17 for Africa-only motifs, ×3.5). So a
+   large slice of "shared with Africa" is **recent back-flow, not deep OoA — axiom A8 is weakened.**
+   Residual confound: the corridor is also the Near-East-proximal edge, so genetic back-migration
+   ≡ cultural diffusion from distribution alone (both recent); a fine SNP graph would separate them.
 5. **How much does homoplasy inflate the deep tail?** With no banality control we cannot
    yet say how many "broad + disjunct" motifs are ancient vs independently reinvented.
 6. **Representation: modes, named strata, or both?** The estimator natively yields the 5
