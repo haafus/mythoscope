@@ -167,6 +167,9 @@ attesting traditions by `area` / `family` / `subsistence`, optionally within a
 
 ## Deriving `stratum` ourselves (not from Berezkin's labels)
 
+> Full method — theory, features, both algorithms, controls, validation, schema — in
+> [`stratum-derivation.md`](stratum-derivation.md). Summary below.
+
 `stratum` is the one field that is **inferred, not given** — so if we want it as a key
 divider we must compute it reproducibly and honestly. The premise (areal folkloristics
 + phylogeography): a motif spreads by descent or by contact, so its distribution shape
