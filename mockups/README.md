@@ -266,6 +266,14 @@ style of mockup 15 — the traditions-×-themes analogue of its traditions-×-mo
 and a **theme picker** that shades the map by any single group's share. See
 [`23-theme-geography/README.md`](23-theme-geography/README.md).
 
+### 24 · Effort-correction sweep (roadmap M24)
+Tests whether the theme findings are catalogue-density artifacts (synthesis alt-hypothesis
+#1): re-runs four headline results **raw vs coverage-weighted** (shared weight
+`w(t)=min(2, median/a(t))`, [`_bias.py`](_bias.py)) with a per-finding verdict. **3 of 4
+survive** — subsistence×theme, theme×area lift and the A/B co-occurrence blocks hold; the one
+that **weakens** is theme_profile variance-by-area (34%→26%), so geography's grip on genre
+balance was partly over-stated by sampling. See [`24-bias-sweep/README.md`](24-bias-sweep/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

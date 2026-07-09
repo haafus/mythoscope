@@ -1,0 +1,119 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>24 · Effort-correction sweep</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; --raw:#a9b0b5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:960px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:880px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .v { font-size:11px; padding:2px 10px; border-radius:20px; color:#fff; font-weight:600; float:right; }
+  .brow { display:grid; grid-template-columns:170px 1fr 92px; align-items:center; gap:10px; margin:6px 0; font-size:12.5px; }
+  .lab { text-align:right; color:#495057; }
+  .pair { display:grid; gap:3px; }
+  .bt { height:13px; background:var(--bg); border-radius:5px; overflow:hidden; display:block; }
+  .bf { height:100%; border-radius:5px; display:block; }
+  .val { text-align:right; font-variant-numeric:tabular-nums; }
+  .val .r { color:var(--muted); } .val .w { font-weight:700; }
+  .arrow { color:#a3aab1; padding:0 3px; }
+  .legend { font-size:11px; color:var(--muted); margin-top:4px; }
+  .legend b { color:#495057; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:10px 13px; font-size:12.5px; color:#6b5a2e; margin-top:10px; }
+  .kpi { font-size:13px; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  td,th { padding:4px 6px; border-bottom:1px solid var(--bg); text-align:left; }
+  td.r2 { text-align:right; font-variant-numeric:tabular-nums; }
+</style>
+<main>
+<header>
+  <h1>Проверка на плотность каталога (sweep)</h1>
+  <p>Альт-гипотеза #1: наши тематические сигналы — артефакт плотности каталога. Четыре главные находки пересчитаны
+     <b>сырьём vs со взвешиванием покрытия</b> — единый вес <span id="wf"></span>, который даунвейтит переопрошенные
+     корпуса, так что каждая традиция вносит сопоставимый вклад, а не 738-мотивные гиганты. По каждой находке —
+     вердикт: <b>survives / weakens / flips</b>. Серым — «было», цветом — «стало».</p>
+</header>
+
+<div class="card kpi" id="kpi"></div>
+
+<div class="card">
+  <h2>A · theme_profile: дисперсия, объяснённая макроареалом <span class="v" id="vA"></span></h2>
+  <div class="muted" id="Asub"></div>
+  <div id="A" style="margin-top:8px"></div>
+  <div class="note" id="Anote"></div>
+</div>
+
+<div class="card">
+  <h2>B · subsistence × theme — доля Category A <span class="v" id="vB"></span></h2>
+  <div class="muted">Космология тяжелее у экстрактивных экономик, легче у интенсивных/мобильных.</div>
+  <div id="B" style="margin-top:8px"></div>
+</div>
+
+<div class="card">
+  <h2>C · theme × area — lift <span class="v" id="vC"></span></h2>
+  <div class="muted">Перепредставленность темы в ареале (наблюдаемое/ожидаемое).</div>
+  <table style="margin-top:6px"><thead><tr><th>ячейка</th><th class="r2">было</th><th></th><th class="r2">стало</th></tr></thead>
+  <tbody id="C"></tbody></table>
+</div>
+
+<div class="card">
+  <h2>D · совстречаемость: два блока A/B <span class="v" id="vD"></span></h2>
+  <div class="muted">Средняя корреляция внутри блоков (сказки, космология) и между ними.</div>
+  <table style="margin-top:6px"><thead><tr><th></th><th class="r2">было</th><th></th><th class="r2">стало</th></tr></thead>
+  <tbody id="D"></tbody></table>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, F = D.findings, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const VC = {survives:"#3c8a5e", weakens:"#b28a3e", flips:"#c05540", "n/a":"#98a0a5"};
+const VT = {survives:"survives", weakens:"weakens", flips:"flips", "n/a":"n/a"};
+const setV = (id,v)=>{const e=document.getElementById(id);e.textContent=VT[v];e.style.background=VC[v];};
+document.getElementById("wf").innerHTML = `<code>w(t)=min(${D.cap}, ${Math.round(D.med)}/a(t))</code>`;
+
+const nSurv = Object.values(F).filter(f=>f.verdict==="survives").length;
+document.getElementById("kpi").innerHTML =
+  `<b>${nSurv}/4</b> находки устойчивы к поправке на плотность (${D.n_trad} традиций ≥${D.min_motif} мотивов, `+
+  `медиана покрытия ${Math.round(D.med)}). Главный сдвиг — доля дисперсии theme_profile, объяснённая географией: `+
+  `часть её была доминированием крупных корпусов.`;
+
+// paired raw/weighted bar
+function pair(rawV, wV, max, col){
+  const p = v => `<span class="bt"><span class="bf" style="width:${100*v/max}%;background:${col}"></span></span>`;
+  return `<div class="pair">${p(rawV).replace(col,'var(--raw)')}${p(wV)}</div>`;
+}
+// A
+setV("vA", F.A.verdict);
+document.getElementById("Asub").textContent = `${F.A.raw}${F.A.unit} → ${F.A.w}${F.A.unit} (эта-квадрат по 12 макроареалам)`;
+document.getElementById("A").innerHTML =
+  `<div class="brow"><span class="lab">объяснено ареалом</span>${pair(F.A.raw,F.A.w,Math.max(F.A.raw,F.A.w)*1.15,"#6a5aa6")}`+
+  `<span class="val"><span class="r">${F.A.raw}%</span> <span class="arrow">→</span> <span class="w">${F.A.w}%</span></span></div>`;
+document.getElementById("Anote").innerHTML =
+  `Доля падает с <b>${F.A.raw}%</b> до <b>${F.A.w}%</b>: когда густо описанные корпуса перестают доминировать, `+
+  `география объясняет <b>меньше</b> жанрового баланса. Сигнал реальный, но был <b>переоценён</b> плотностью — `+
+  `это ровно то, что sweep должен вскрывать.`;
+// B
+setV("vB", F.B.verdict);
+const bmax = Math.max(...F.B.rows.flatMap(r=>[r.raw||0,r.w||0]))*1.1;
+document.getElementById("B").innerHTML = F.B.rows.map(r=>
+  `<div class="brow"><span class="lab">${esc(r.label)} <span class="muted">(${r.n})</span></span>`+
+  `${pair(r.raw||0,r.w||0,bmax,"#3c8a5e")}`+
+  `<span class="val"><span class="r">${r.raw}</span> <span class="arrow">→</span> <span class="w">${r.w}%</span></span></div>`).join("");
+// C
+setV("vC", F.C.verdict);
+document.getElementById("C").innerHTML = F.C.cells.map(c=>{
+  const up = c.w>=c.raw;
+  return `<tr><td>${esc(c.label)}</td><td class="r2" style="color:var(--muted)">${c.raw}</td>`+
+    `<td class="arrow">→</td><td class="r2" style="font-weight:700;color:${up?'#3c8a5e':'#b28a3e'}">${c.w}</td></tr>`;
+}).join("");
+// D
+setV("vD", F.D.verdict);
+document.getElementById("D").innerHTML =
+  `<tr><td>внутри блоков (вместе)</td><td class="r2" style="color:var(--muted)">${F.D.within_raw}</td><td class="arrow">→</td><td class="r2" style="font-weight:700;color:#3c8a5e">${F.D.within_w}</td></tr>`+
+  `<tr><td>между блоками (анти)</td><td class="r2" style="color:var(--muted)">${F.D.between_raw}</td><td class="arrow">→</td><td class="r2" style="font-weight:700;color:#c05540">${F.D.between_w}</td></tr>`+
+  `<tr><td>Cosmogony × Adventures</td><td class="r2" style="color:var(--muted)">${F.D.pair_raw}</td><td class="arrow">→</td><td class="r2" style="font-weight:700;color:#c05540">${F.D.pair_w}</td></tr>`;
+</script>

@@ -80,9 +80,11 @@ validation harness, not its replacement.
 Every headline has a deflationary rival; naming them is the honest move.
 
 1. **It's all sampling.** The subsistence×theme gradient, the theme×area lift, breadth-as-age
-   — could be artifacts of collection intensity and Berezkin's own regional focus. *Test:*
-   redo each under the §5 effort-correction; report which survive. (Partial evidence: mockup
-   20 says the deep-disjunct spine does; the rest is untested.)
+   — could be artifacts of collection intensity and Berezkin's own regional focus. *Tested
+   (mockup 24):* **3 of 4 survive** effort-correction — the subsistence gradient, theme×area
+   lift and A/B co-occurrence blocks hold; only theme_profile's variance-by-area weakens
+   (34%→26%), so it was partly over-stated but not manufactured. Alt-hypothesis largely
+   **rejected** for the theme findings; breadth-as-age was already handled in mockup 20.
 2. **`stratum` isn't one axis.** The A3-vs-K25 residual hints that "depth" may be
    ill-posed — motifs may be **mixtures** of an areal-substrate component, a descent
    component, and a reinvention rate, with no single ordinal "age". *Test:* fit a per-motif

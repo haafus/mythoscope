@@ -132,7 +132,9 @@ in each of the 13 theme groups (§`motif.theme`). Distinct from the motif's own 
 **It is a strong, partly cross-geographic signal** (measured over the 840 traditions
 with ≥30 motifs):
 - **38%** of the variance in `theme_profile` is explained by macro-area — a large,
-  real regional structure, yet 62% is orthogonal to geography.
+  real regional structure, yet 62% is orthogonal to geography. (Under effort-correction the
+  figure drops to **~26%**, mockup 24 — geography's grip on genre balance was partly
+  over-stated by catalogue density; still substantial, still mostly orthogonal.)
 - k-means over the profiles yields interpretable groups that mix region and worldview:
   a **trickster-first** African profile (group 11 dominant), a **märchen** Eurasian
   profile (10·11·08), an **adventure + cosmology** North-American/Beringian profile
