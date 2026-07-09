@@ -62,6 +62,31 @@ FAMILY_DATES = {
     "Eskimo-Aleut": (2000, (2000, 4000), "Inuit-Yupik ~2000; family ~4000"),
     "Quechuan": (1500, (1000, 2000), "Andes"),
     "Mongolic-Khitan": (1000, (800, 1500), "—"),
+    # --- expansion (join clean-up era): coarser published / archaeological estimates, wide
+    #     ranges. Glottolog family names; they raise dated-family coverage 68% -> 85% of
+    #     traditions. Deliberately conservative — used only as ceilings, like the rest. ---
+    "Otomanguean": (5500, (4000, 7000), "Mesoamerica; deep"),
+    "Nakh-Daghestanian": (6000, (5000, 8000), "E Caucasus; deep (was lumped as N Caucasian)"),
+    "Abkhaz-Adyge": (5000, (4000, 7000), "NW Caucasus"),
+    "Mande": (5000, (4000, 7000), "W Africa"),
+    "Central Sudanic": (5000, (4000, 7000), "—"),
+    "Chibchan": (4000, (3000, 6000), "Lower Central America"),
+    "Mixe-Zoque": (4000, (3000, 5000), "Mesoamerica"),
+    "Iroquoian": (3500, (2500, 5000), "E North America"),
+    "Nuclear-Macro-Je": (3500, (2500, 5000), "Brazilian highlands"),
+    "Pano-Tacanan": (3500, (2500, 5000), "W Amazonia"),
+    "Salishan": (3000, (2000, 5000), "NW Coast / Plateau"),
+    "Siouan": (3000, (2000, 4000), "Plains / Southeast"),
+    "Nilotic": (3000, (2500, 5000), "E Africa"),
+    "Tucanoan": (3000, (2000, 5000), "NW Amazonia"),
+    "Caddoan": (3000, (2000, 4000), "Plains"),
+    "Wakashan": (3000, (2000, 5000), "NW Coast"),
+    "Kiowa-Tanoan": (3000, (2000, 5000), "SW / Plains"),
+    "Cochimi-Yuman": (2500, (2000, 4000), "SW North America"),
+    "Japonic": (2200, (1500, 3000), "Yayoi dispersal"),
+    "Tungusic": (2000, (1500, 3000), "Manchuria / Siberia"),
+    "Chukotko-Kamchatkan": (2000, (1500, 4000), "NE Siberia"),
+    "Yukaghir": (2000, (1000, 4000), "NE Siberia; small"),
 }
 
 

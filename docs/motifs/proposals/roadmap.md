@@ -136,12 +136,15 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
 
 - **M30 · Dated-phylogeny wiring. ✓ done** (mockup 30). Wired Glottolog (coordinate join,
   median 53 km → family + glottocode) + a curated family-expansion-date table. **Result:**
-  **439 descent motifs get a calendar age** (Indo-European ~5500 BP märchen belt; B4 →
+  **451 descent motifs get a calendar age** (Indo-European ~5500 BP märchen belt; B4 →
   ~5200 BP Austronesian); the areal majority is correctly left undated. Family resolution —
-  node-level Bayesian ages are M31, which needs the glottocodes this mockup attaches. · **L**
+  node-level Bayesian ages are M31, which needs the glottocodes this mockup attaches. The join is
+  built name-first (`build_join.py`, fixing wrong-neighbour matches; name-agreement 14%→29%) and
+  the family-date table expanded to 45 families (dated-family coverage 68%→85% of traditions,
+  +12 dated motifs — a data-hygiene upgrade that left every existing age unchanged). · **L**
 - **M31 · Bayesian phylogeography. ✓ done** (mockup 31). Reconstructs each dated descent
   motif's **origin location + age** (spherical family-foothold centroid + mockup-30 family-date
-  ceiling) and maps its spread. **Result:** 439 origins coloured by age, dense at the
+  ceiling) and maps its spread. **Result:** 451 origins coloured by age, dense at the
   Indo-European märchen belt ~5500 BP; B4 centred in Western Oceania ≤5200 BP with Pacific
   spread lines. The map **re-centres on the selected motif's region** (central meridian =
   circular-mean longitude) so a Pacific-diffusion motif like B4 reads as **circum-Pacific**

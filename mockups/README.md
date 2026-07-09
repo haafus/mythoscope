@@ -375,11 +375,12 @@ homoplasy; corr with the short-def proxy ≈0). See [`29-content-stratum/README.
 **Finding.** Content ≈ theme (58% vs 20% chance) but not depth (breadth corr 0.28) → `stratum` is distributional, not semantic; the content-banality idea is a clean negative.
 
 ### 30 · Dated phylogeny (roadmap M30)
-Wires **Glottolog** (CC-BY) — each tradition joined to its nearest language (median 53 km) →
-standard family + glottocode — plus a curated table of published **family expansion dates**, to
-turn a descent motif's ordinal clade depth into a **calendar age**.
+Wires **Glottolog** (CC-BY) — each tradition joined to its language **name-first** (`build_join.py`;
+fixes wrong-neighbour matches, name-agreement 14%→29%) → standard family + glottocode — plus a
+curated table of published **family expansion dates** (45 families), to turn a descent motif's
+ordinal clade depth into a **calendar age**.
 **Q.** Can ordinal clade-depth become an absolute (calendar) age?
-**Finding.** Yes for the descent minority: **439 motifs dated**, concentrated at Indo-European
+**Finding.** Yes for the descent minority: **451 motifs dated**, concentrated at Indo-European
 ~5500 BP (the märchen belt) with B4 → ~5200 BP (Austronesian); the areal majority (A3, K25) is
 correctly left undated (geography's job). Family-resolution only — node-level Bayesian ages are
 M31. See [`30-dated-phylogeny/README.md`](30-dated-phylogeny/README.md).
@@ -389,7 +390,7 @@ The etiology capstone: reconstructs each dated descent motif's **origin location
 maps its spread. Location = spherical centroid of the motif's traditions within its family;
 age = the mockup-30 family-date ceiling.
 **Q.** Where and when did each descent motif originate, and how did it spread?
-**Finding.** 439 origins on one map, coloured by age — dense at the Indo-European märchen belt
+**Finding.** 451 origins on one map, coloured by age — dense at the Indo-European märchen belt
 (~5500 BP), with **B4 (fished-earth) centred in Western Oceania ≤ 5200 BP** and spread lines
 fanning across the Pacific. A family-resolution point estimate, not a node-consistent RRW with
 uncertainty (that needs a real dated tree — BEAST — future work). See

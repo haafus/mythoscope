@@ -9,12 +9,12 @@ each one's **origin** — a location *and* an age — and show its spread over t
   is the mean of what a full Bayesian relaxed-random-walk over a dated tree would reconstruct
   at the origin node.
 
-Only the inherited, family-concentrated minority (439 motifs) is placed; the areal majority
+Only the inherited, family-concentrated minority (451 motifs) is placed; the areal majority
 has no single origin to reconstruct — its history is diffusion (mockup 19).
 
 ## What it shows
 
-- **439 descent-motif origins on one map**, coloured by age (1500–9000 BP). They cluster
+- **451 descent-motif origins on one map**, coloured by age (1500–9000 BP). They cluster
   densely in **Europe** — the Indo-European märchen belt (~5500 BP), the largest dated set —
   and scatter across N-America, Siberia, Oceania, Sub-Saharan Africa.
 - **B4 (fished-out earth)** centres in **Western Oceania**, age ceiling the **Austronesian

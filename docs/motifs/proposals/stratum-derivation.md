@@ -451,7 +451,7 @@ answer); **build tasks** are specified and merely unbuilt.
 ### Open questions
 
 1. **Absolute vs relative dating.** *Partly addressed (mockup 30).* Wiring Glottolog + a
-   curated family-expansion-date table now gives **439 descent motifs a calendar age** at
+   curated family-expansion-date table now gives **451 descent motifs a calendar age** at
    **family resolution** (B4 → ~5200 BP Austronesian; the Indo-European märchen belt ~5500 BP).
    Still open: **node-level** Bayesian ages (a motif dated to a *subclade*, not the whole
    family) — that needs a dated *tree* with branch lengths and ancestral-state reconstruction

@@ -19,9 +19,9 @@ roughly its age.
 
 ## What it shows
 
-- **439 of 3036 motifs get a calendar age** — the ordinal→absolute payoff. They spread from
+- **451 of 3036 motifs get a calendar age** — the ordinal→absolute payoff. They spread from
   ~9000 BP (Afro-Asiatic) to ~1500 BP (Quechuan), **concentrated at Indo-European ~5500 BP
-  (299 motifs)** — the Eurasian märchen belt, now dated, recovering the phylomemetics picture.
+  (~300 motifs)** — the Eurasian märchen belt, now dated, recovering the phylomemetics picture.
 - **B4 (fished-out earth) → ~5200 BP** (Austronesian expansion): mockup 18's "Austronesian
   clade" is now a date.
 - **The areal majority is correctly excluded** — A3 (sun & moon) and K25 (swan-maiden) have
@@ -35,21 +35,31 @@ roughly its age.
 - **Descent-only.** Only the inherited, family-concentrated minority is datable this way; the
   bulk is areal.
 - **Wide uncertainty.** The dates are literature point-estimates with ranges (Indo-European
-  alone spans the Steppe-vs-Anatolian debate, ~4500–8000 BP); the ~53 km join can jump a
-  family boundary. **Ages are ranges, not claims.**
+  alone spans the Steppe-vs-Anatolian debate, ~4500–8000 BP); the join can still jump a family
+  boundary. **Ages are ranges, not claims.**
+- **`FAMILY_DATES` is 45 families of *coarse* estimates.** The 22 beyond the well-established
+  core (Salishan, Siouan, Tungusic, Japonic, Nakh-Daghestanian…) are deliberately conservative
+  ceilings with wide ranges; they raise coverage but add few *motifs* (small families rarely hold
+  a ≥55%-concentrated motif). Dated-family coverage is ~85% of traditions; the ~5% isolates are
+  an irreducible floor (an isolate has no clade to date).
 
 ## Data
 
-Glottolog (Hammarström et al., CC-BY-4.0), joined by coordinate; `glottolog_join.json` is a
-committed derivative (tradition → glottocode / family / distance). Expansion dates are from
+Glottolog (Hammarström et al., CC-BY-4.0). `build_join.py` builds the committed
+`glottolog_join.json` (tradition → glottocode / family / distance) **name-first** — matching the
+tradition's declared language by name and only falling back to nearest-coordinate — which fixes
+the wrong-neighbour matches a pure coordinate join makes (Biloxi → Siouan, not the nearest French
+creole; name-agreement 14% → 29%). Pseudo-languoids (Sign Language, Bookkeeping, …) are excluded.
+It downloads a git-ignored snapshot of glottolog-cldf `languages.csv`. Expansion dates are from
 the comparative-phylolinguistics literature (cited inline in `FAMILY_DATES`).
 
 ## Run
 
 ```bash
+python mockups/30-dated-phylogeny/build_join.py   # (re)build glottolog_join.json (downloads glottolog-cldf)
 python mockups/30-dated-phylogeny/build_data.py   # writes data.js (~8 s)
 python -m http.server -d mockups 8890
 # → http://127.0.0.1:8890/30-dated-phylogeny/
 ```
 
-`data.js` is git-ignored; `glottolog_join.json` is committed.
+`data.js` and `glottolog_languages.csv` are git-ignored; `glottolog_join.json` is committed.
