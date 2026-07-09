@@ -1,4 +1,4 @@
-import { escapeHtml } from "./core.js";
+import { escapeHtml, CATEGORY_NONE } from "./core.js";
 import { renderMajorTree } from "./tree-scaffold.js";
 
 // Tradition leaves (no books); emits "tradition-select" with the tradition, or
@@ -14,7 +14,7 @@ export async function renderTraditionList(container) {
 function renderTraditionPicks(traditions) {
     let html = "";
     traditions.forEach((docs, tradition) => {
-        const color = docs[0] && docs[0].color ? docs[0].color : "#6b7280";
+        const color = docs[0] && docs[0].color ? docs[0].color : CATEGORY_NONE;
         html += `
             <button class="tradition-title tradition-pick" type="button" data-tradition="${escapeHtml(tradition)}" style="--tradition-color:${escapeHtml(color)}">
                 <span class="tradition-dot"></span>

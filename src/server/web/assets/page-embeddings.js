@@ -4,6 +4,7 @@ import {
     escapeHtml, reflowHtml,
     loadTraditionInfo,
     persistSelectedModel, renderModelOptions,
+    CATEGORY_NONE,
 } from "./core.js";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js";
 import {
@@ -11,9 +12,9 @@ import {
     fetchPointWithNeighbors, renderSearchResultItem,
     runSemanticSearch,
 } from "./search-utils.js";
-import { renderTraditionList } from "./tree-traditions.js?v=1";
+import { renderTraditionList } from "./tree-traditions.js?v=2";
 
-function getTraditionColor(name, fallback = "#555") {
+function getTraditionColor(name, fallback = CATEGORY_NONE) {
     const info = state.traditionInfo || {};
     return (info[name] && info[name].color) || fallback;
 }

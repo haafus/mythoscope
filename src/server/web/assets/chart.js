@@ -1,5 +1,5 @@
 
-import { normalizePreviewText } from "./core.js";
+import { normalizePreviewText, CATEGORY_NONE } from "./core.js";
 import { pointTooltipHtml } from "./search-utils.js";
 import { getTooltip, positionTooltip } from "./chart-tooltip.js";
 import { dimColor } from "./chart-color.js";
@@ -45,7 +45,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
 
     const traditions = [...new Set(points.map((p) => p.tradition || "Unknown"))];
     el._traditions = traditions; // trace order, for highlightTradition
-    el._traditionColors = traditions.map((t) => colorMap[t] || "#888888");
+    el._traditionColors = traditions.map((t) => colorMap[t] || CATEGORY_NONE);
 
     const traces = traditions.map((tradition) => {
         const pts = points.filter((p) => (p.tradition || "Unknown") === tradition);

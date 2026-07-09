@@ -2,6 +2,11 @@
 
 export const app = document.getElementById("app");
 
+// The single fallback colour for any category/tradition that has no colour of
+// its own (missing tradition colour, unknown graph Category, …). Keep in sync
+// with the --category-none token in app.css.
+export const CATEGORY_NONE = "#6b7280";
+
 export const state = {
     models: [],
     selectedModel: localStorage.getItem("selectedModel") || "",

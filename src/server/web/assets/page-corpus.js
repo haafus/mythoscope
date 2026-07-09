@@ -1,8 +1,9 @@
 import {
     app, api, state,
     buildCorpusApiUrl, escapeHtml, formatNumber,
+    CATEGORY_NONE,
 } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=3";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=4";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `
@@ -65,7 +66,7 @@ function renderBookInfo(doc) {
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
-            <span class="info-dot" style="--book-color:${escapeHtml(doc.color || "#6b7280")}"></span>
+            <span class="info-dot" style="--book-color:${escapeHtml(doc.color || CATEGORY_NONE)}"></span>
             <span>${escapeHtml(doc.major_tradition || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
         </div>
 

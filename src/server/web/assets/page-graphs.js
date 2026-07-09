@@ -1,5 +1,5 @@
-import { app, api, escapeHtml, onCleanup } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=3";
+import { app, api, escapeHtml, onCleanup, CATEGORY_NONE } from "./core.js";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=4";
 
 let graphCy = null;
 
@@ -130,7 +130,7 @@ function renderCytoscapeGraph(container, data, graphType) {
             {
                 selector: "node",
                 style: {
-                    "background-color": (ele) => GRAPH_CATEGORY_COLORS[ele.data("Category")] || "#aaaaaa",
+                    "background-color": (ele) => GRAPH_CATEGORY_COLORS[ele.data("Category")] || CATEGORY_NONE,
                     width: (ele) => ele.data("size") || 3,
                     height: (ele) => ele.data("size") || 3,
                     label: (ele) => ele.data("display_name") || ele.data("Name") || ele.data("id"),

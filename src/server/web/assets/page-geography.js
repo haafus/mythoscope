@@ -1,4 +1,4 @@
-import { app, escapeHtml, loadTraditionInfo, onCleanup } from "./core.js";
+import { app, escapeHtml, loadTraditionInfo, onCleanup, CATEGORY_NONE } from "./core.js";
 
 export async function renderGeography() {
     app.innerHTML = `
@@ -51,7 +51,7 @@ function normalizeTraditions(raw) {
                 name,
                 description: info.description || "",
                 coordinates,
-                color: isValidColor(info.color) ? info.color : "#334155",
+                color: isValidColor(info.color) ? info.color : CATEGORY_NONE,
                 books: Array.isArray(info.books) ? info.books.filter(Boolean) : [],
             };
         })
