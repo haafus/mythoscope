@@ -21,6 +21,59 @@ These two together retire the two alternative hypotheses that caveat almost ever
   at once (low power). The gradient is real beyond area and ancestry. · **S–M** · *(a proper
   dated-tree PGLS still wanted once M30 lands.)*
 
+## Next up — assumption audit
+
+> Note: the priority **M-number** and the mockup **directory number** have now diverged
+> (mockups 24–29 = M24–M29 by luck). This item is the **next mockup to build** — directory
+> `mockups/30-facet-adequacy/` — but keeps a high M-number to signal its priority slot.
+
+### M36 · Facet adequacy & orthogonality (audits assumption #6)
+
+**Motivation.** The entity model of [`macro-area-facets.md`](macro-area-facets.md) rests on an
+untested design choice: that `area · family · subsistence · theme_profile` are the *right* and
+*~orthogonal* set of tradition facets (one of the program-level assumptions not yet folded into
+`stratum-derivation.md` §0). A first probe already
+shows they are **not orthogonal** — Cramér's V(area, family) = **0.74**, V(area, subsistence) =
+0.57, V(family, subsistence) = 0.49; `theme_profile` variance explained is only 0.34 / 0.28 /
+0.10 by area / family / subsistence. So the mockup does **not** try to prove orthogonality
+(already falsified — the three tradition axes co-track one latent, the peopling history of §1);
+it audits the two claims that actually matter, and reframes #6 accordingly.
+
+The claim splits into **(A) non-redundancy** — does each facet earn its place by a *unique*
+contribution? — and **(B) adequacy** — is the set *complete* (small residual) at the *right*
+granularity? Four sub-tests, all on data we `have`:
+
+1. **Association matrix (orthogonality, descriptive).** Cramér's V among the categorical facets
+   {area, family, subsistence} + multivariate η² of `theme_profile` by each. *Deliverable:* a
+   4×4 heatmap. *Verdict:* quantifies the entanglement (expected: strong area↔family, weakest
+   for theme_profile) — the honest picture, not a pass/fail.
+2. **Unique contribution (non-redundancy, the real test).** Variation partitioning / drop-one:
+   predict tradition–tradition similarity (motif-set **Jaccard** on the attestation matrix, or a
+   held-out attestation-prediction accuracy) from the facets, then from the facets *minus X*, for
+   each facet X. *Metric:* Δ = R²(all) − R²(all − X) = the variance only X explains. *Verdict:* a
+   facet with Δ ≈ 0 is redundant (drop candidate); Δ > 0 earns its place. Report Δ per facet.
+3. **Residual structure (adequacy / completeness).** Cluster traditions on the **raw** motif
+   vectors (or reuse the degree-corrected blocks of **mockup 26**), then measure the fraction of
+   that structure the four facets jointly explain (R² / adjusted Rand between facet-predicted and
+   observed grouping). *Verdict:* a large **unexplained residual → a missing axis** (the facet set
+   is incomplete); a small residual → adequate. Name what the residual looks like if it is large.
+4. **Granularity (right resolution).** A BIC / held-out curve over coarse↔fine variants — area
+   12 vs the 18-way finer forks, merged vs split families — echoing mockup 26's BIC-for-K.
+   *Verdict:* if 18 areas explain materially more held-out structure, 12 is too coarse; if not,
+   12 is right.
+
+**Deliverable.** One page: the association heatmap, a per-facet unique-contribution bar chart
+(the headline), the residual-structure number with a note on what (if anything) is missing, and
+the granularity curve. **Reframes assumption #6** from "~orthogonal" (false) to "each facet
+carries a non-zero unique signal; the set is adequate at granularity G; residual = R", with the
+numbers to back each clause. **Data:** *have*. **Effort:** **M**.
+
+**Why it's next.** It is the cheapest way to audit the entity model itself — everything in
+stages 3–4 slices by these facets, so knowing which are redundant, whether one is missing, and
+at what granularity, hardens the foundation before the heavier Tier-3 dating work. It also feeds
+directly into the joint model (M33): the unique-contribution result tells that model which
+facets to keep as fixed effects.
+
 ## Tier 2 — strong method upgrades on data we already have
 
 Each replaces a descriptive heuristic with a generative model; medium effort, high payoff.
