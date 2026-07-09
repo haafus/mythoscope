@@ -384,6 +384,17 @@ turn a descent motif's ordinal clade depth into a **calendar age**.
 correctly left undated (geography's job). Family-resolution only — node-level Bayesian ages are
 M31. See [`30-dated-phylogeny/README.md`](30-dated-phylogeny/README.md).
 
+### 31 · Phylogeography (roadmap M31)
+The etiology capstone: reconstructs each dated descent motif's **origin location + age** and
+maps its spread. Location = spherical centroid of the motif's traditions within its family;
+age = the mockup-30 family-date ceiling.
+**Q.** Where and when did each descent motif originate, and how did it spread?
+**Finding.** 439 origins on one map, coloured by age — dense at the Indo-European märchen belt
+(~5500 BP), with **B4 (fished-earth) centred in Western Oceania ≤ 5200 BP** and spread lines
+fanning across the Pacific. A family-resolution point estimate, not a node-consistent RRW with
+uncertainty (that needs a real dated tree — BEAST — future work). See
+[`31-phylogeography/README.md`](31-phylogeography/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

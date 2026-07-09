@@ -111,9 +111,12 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   **439 descent motifs get a calendar age** (Indo-European ~5500 BP märchen belt; B4 →
   ~5200 BP Austronesian); the areal majority is correctly left undated. Family resolution —
   node-level Bayesian ages are M31, which needs the glottocodes this mockup attaches. · **L**
-- **M31 · Bayesian phylogeography (relaxed random walk).** On the dated tree, jointly
-  reconstruct each deep motif's **ancestral location and age**, and animate its spread over the
-  peopling map. · *depends: M30* · **unlocks:** the etiology-stage visual capstone; dates space
+- **M31 · Bayesian phylogeography. ✓ done** (mockup 31). Reconstructs each dated descent
+  motif's **origin location + age** (spherical family-foothold centroid + mockup-30 family-date
+  ceiling) and maps its spread. **Result:** 439 origins coloured by age, dense at the
+  Indo-European märchen belt ~5500 BP; B4 centred in Western Oceania ≤5200 BP with Pacific
+  spread lines. A family-resolution point estimate — node-consistent RRW with uncertainty (real
+  BEAST on a dated tree) stays future work. The etiology-stage visual capstone. · **L** · *(orig:)* dates space
   and tree together with real uncertainty. · **L**
 - **M32 · Alternative-tree / admixture-graph test (genetics).** Re-run descent detection on a
   genetic tree instead of the language tree, and — as a **reticulate admixture graph** —

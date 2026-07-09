@@ -1,0 +1,114 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>31 · Phylogeography</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1020px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:920px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .scale { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted); margin-top:10px; }
+  .ramp { height:11px; width:220px; border-radius:6px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+  .chip { font-size:11px; background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:2px 9px; }
+  .tsel { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 10px; }
+  .tsel button { font:12px inherit; border:1px solid var(--line); background:var(--surface); border-radius:20px; padding:3px 11px; cursor:pointer; }
+  .tsel button.on { background:#6a5aa6; color:#fff; border-color:#6a5aa6; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+</style>
+<main>
+<header>
+  <h1>Филогеография — где и когда возник мотив</h1>
+  <p>Capstone этиологии: для descent-мотивов, которые смог датировать мокап 30, показываем <b>реконструкцию</b> —
+     <b>место</b> и <b>возраст</b> происхождения, и распространение по карте. <b>Место</b> = центр ареала мотива внутри
+     его семьи (точечная оценка того, что дал бы полный relaxed-random-walk по датированному дереву). <b>Возраст</b> =
+     потолок по дате экспансии семьи (мокап 30). Датируется только наследуемое меньшинство — у ареального большинства
+     нет единого «происхождения».</p>
+</header>
+
+<div class="card">
+  <h2>Карта происхождений <span class="s">— точка = центр ареала descent-мотива, цвет = возраст (потолок по семье)</span></h2>
+  <div class="muted" style="margin-bottom:6px">Подсветить распространение отслеживаемого мотива (линии из центра к его традициям):</div>
+  <div class="tsel" id="tsel"></div>
+  <div id="map"></div>
+  <div class="scale">
+    <span id="slab0"></span><span class="ramp" id="ramp"></span><span id="slab1"></span>
+    <span class="muted">· BP (лет назад)</span>
+  </div>
+  <div class="note" id="honest"></div>
+</div>
+
+<div class="card">
+  <h2>Отслеживаемые реконструкции</h2>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th>Центр (шир., долг.)</th><th>Семья</th><th class="r">возраст-потолок</th><th class="r">традиций</th></tr></thead>
+  <tbody id="tracked"></tbody></table>
+</div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const LAND = `<path class="land" d="${window.LAND||""}"/>`;
+const px = lon => (lon+180), py = lat => (90-lat);
+// age -> colour (sequential violet: old dark -> young light)
+const lo=D.age_lo, hi=D.age_hi;
+const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+const OLD=[74,64,120], YOUNG=[209,203,228];
+const ageCol=a=>`rgb(${mix(YOUNG,OLD,(a-lo)/(hi-lo)).join(",")})`;
+
+function mapSVG(activeC){
+  const pts = D.origins.map(o=>{
+    const r = 1.1 + 1.6*Math.sqrt(o.n/40);
+    return `<circle cx="${px(o.lon).toFixed(2)}" cy="${py(o.lat).toFixed(2)}" r="${r}" fill="${ageCol(o.age)}" fill-opacity="0.82" stroke="#fff" stroke-width="0.2"/>`;
+  }).join("");
+  let lines="", star="";
+  if(activeC){
+    const t=D.tracked.find(x=>x.c===activeC);
+    if(t){
+      lines = t.tips.map(p=>{
+        let tl=p.lon;                        // draw the short way across the dateline
+        while(tl - t.lon > 180) tl-=360;
+        while(tl - t.lon < -180) tl+=360;
+        return `<line x1="${px(t.lon).toFixed(2)}" y1="${py(t.lat).toFixed(2)}" x2="${px(tl).toFixed(2)}" y2="${py(p.lat).toFixed(2)}" stroke="#c05540" stroke-width="0.35" stroke-opacity="0.5"/>`;
+      }).join("");
+      star = `<circle cx="${px(t.lon).toFixed(2)}" cy="${py(t.lat).toFixed(2)}" r="2.6" fill="#c05540" stroke="#fff" stroke-width="0.5"/>`;
+    }
+  }
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${lines}${pts}${star}</svg>`;
+}
+const mapEl=document.getElementById("map");
+function draw(active){ mapEl.innerHTML=mapSVG(active); }
+draw(null);
+
+document.getElementById("tsel").innerHTML = `<button class="on" data-c="">все происхождения</button>` +
+  D.tracked.map(t=>`<button data-c="${t.c}">${esc(t.c)} · ${esc(t.label)}</button>`).join("");
+document.querySelectorAll("#tsel button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#tsel button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  draw(b.dataset.c||null);
+});
+
+document.getElementById("ramp").style.background = `linear-gradient(90deg, rgb(${YOUNG.join(",")}), rgb(${OLD.join(",")}))`;
+document.getElementById("slab0").textContent = `${lo}`;
+document.getElementById("slab1").textContent = `${hi}`;
+
+document.getElementById("honest").innerHTML =
+  `<b>Что это и чего это не.</b> ${D.n} descent-мотивов размещены. B4 (fished-earth) центрируется в <b>Западной Океании</b>, `+
+  `потолок возраста — австронезийская экспансия ≤5200 BP (сам океанийский разброс моложе). Это <b>прокси уровня семьи</b>: `+
+  `место = центр ареала, возраст = потолок по семье — <b>не согласованный предковый узел</b>. Согласованные узловые `+
+  `место+возраст с облаком неопределённости даёт настоящий relaxed-random-walk (BEAST) на реально датированном дереве — `+
+  `это остаётся будущей работой; здесь показана точечная оценка, к которой такой RRW сходится в среднем.`;
+
+document.getElementById("tracked").innerHTML = D.tracked.map(t=>
+  `<tr><td style="font-weight:700;color:#4f7096">${esc(t.c)}</td><td>${esc(clip(t.n,26))} <span class="muted">(${esc(t.label)})</span></td>`+
+  `<td>${t.lat}, ${t.lon}</td><td>${esc(t.fam)}</td><td class="r">≤ ${t.age} BP</td><td class="r">${t.tips.length}</td></tr>`).join("");
+</script>
