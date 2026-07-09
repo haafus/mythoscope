@@ -211,6 +211,17 @@ diffused. So A and B are complementary — B flags the *mode* of spread and date
 descent-minority, geography (A) handles the areal majority. See
 [`18-motif-phylostrata/README.md`](18-motif-phylostrata/README.md).
 
+### 19 · Combined stratum (gated A × B)
+Realises [`stratum-derivation.md`](../docs/motifs/proposals/stratum-derivation.md) §12 —
+A and B in **one gated pipeline**, not two scores. **B** (phylo-signal) picks the *mode*
+(descent vs areal); the mode picks the dating instrument (clade depth for descent,
+geographic disjunction / deep mega-set span for areal); confidence comes from A–B
+agreement. The payoff: the "broad" motifs neither method could resolve alone split three
+ways — `areal-deep` / `descent` / `areal-broad`. **Theme is deliberately not an input**
+(that would be circular); it stays an independent cross-check and corroborates anyway —
+the Category-A cosmology share falls from 64% in the deep-areal mode to 24% in descent.
+See [`19-combined-stratum/README.md`](19-combined-stratum/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

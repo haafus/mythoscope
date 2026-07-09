@@ -268,9 +268,13 @@ spot. Worked from the tracked motifs (mockups 17–18):
 spread within the clade); areal → A disjunction/deep-set age; confidence from A–B
 agreement; in the limit, one phylo-geographic-reticulate run with A (space) and B (tree)
 as two observations. **Honest residual:** even together, A and B do not separate A3
-(deep cosmology) from K25 (widely diffused tale) — both are deep-areal by A and areal by
-B; only the **theme** axis (Category A cosmology vs B tale) resolves that. The full model
-is A (space) × B (tree) × theme.
+(deep cosmology) from K25 (widely diffused wife-quest) — both are deep-areal by A and
+areal by B, and **theme does not rescue them either**: A3 (group 01) and K25 (group 05)
+are *both* Category A, so the theme axis draws no line between them. This residual —
+deep substrate vs wide diffusion, within one theme — is not resolvable from the
+distribution and must not be closed by feeding theme into the estimator (that would be
+circular; see §13). It needs external calibration (dated language phylogenies, D-PLACE).
+Theme remains an **independent cross-check** axis, never an estimator input.
 
 ## 13. Cumulative conclusions (empirical)
 
@@ -292,8 +296,12 @@ Backed by mockups 16–18 over the Berezkin catalogue:
   areal** (phylo-signal ~0.25 — deep substrate), while Category B (adventures/tricks) is
   **narrower** (~4) and **more descent-tracking** (~0.36 — younger tale diffusion). Theme
   predicts a motif's *tendency* in area and depth, though any one theme still spans strata
-  (endemic-American adventures are deep). Use theme as a prior/covariate, never as the
-  answer.
+  (endemic-American adventures are deep). Because we want to *test* theme × stratum as a
+  finding, theme must stay **out of the estimator** — an independent cross-check axis, not
+  an input. Feeding it into the gate would manufacture the very correlation we set out to
+  measure (circular). Mockup 19 keeps the gate purely distributional (A × B) and confirms
+  the gradient holds anyway: Category-A share falls from 64% in the deep-areal mode to 24%
+  in the descent mode — genuine corroboration precisely because theme was never used.
 - **The model that follows.** Tradition = area × family × subsistence × theme_profile;
   motif = theme (given) × stratum (computed, A×B). Analysis fixes a theme (Berezkin's
   method), then dates within it by the gated A×B pipeline. No single axis suffices; the

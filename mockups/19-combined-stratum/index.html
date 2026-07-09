@@ -1,0 +1,113 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19 · Combined stratum (gated A × B)</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
+  main { max-width:1040px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:920px; }
+  .card { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .stat { font-size:12.5px; color:var(--muted); } .stat b { color:var(--ink); }
+  .split { display:flex; gap:4px; height:30px; border-radius:6px; overflow:hidden; margin:8px 0; }
+  .split div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:600; }
+  .modes { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .m { border:1px solid #e7e2d7; border-radius:10px; padding:12px 14px; }
+  .m .cnt { float:right; font-size:12px; color:var(--muted); font-weight:600; }
+  .m h3 { font-size:13px; margin:0 0 2px; } .m .sub { font-size:11.5px; color:var(--muted); margin-bottom:7px; }
+  table { width:100%; border-collapse:collapse; font-size:11.5px; }
+  td,th { padding:3px 6px; border-bottom:1px solid #f4f1ea; text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.code { font-weight:700; color:#4f7096; white-space:nowrap; }
+  td.r { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .pill { display:inline-block; font-size:11px; padding:1px 8px; border-radius:20px; color:#fff; }
+  .conf { font-variant-numeric:tabular-nums; }
+  .brow { display:grid; grid-template-columns:120px 1fr 40px; align-items:center; gap:8px; font-size:12px; margin:3px 0; }
+  .bt { display:block; height:12px; background:#f0ece3; border-radius:6px; overflow:hidden; }
+  .bf { display:block; height:100%; border-radius:6px; }
+  .brow .bv { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+</style>
+<main>
+<header>
+  <h1>Комбинированная страта — гейтированный A × B</h1>
+  <p>Один конвейер вместо двух счётчиков. Для каждого мотива: <b>B</b> (филогенетический сигнал на языковом
+     дереве) решает режим — наследование (клада) vs ареал; режим выбирает инструмент датировки — глубина клады
+     для наследуемых, географическая дизъюнкция / охват глубоких мега-сетов для ареальных. Выдаёт метку страты,
+     глубину и <b>confidence по согласию A и B</b>. <b>Тема сюда намеренно не входит</b> — это было бы круговой
+     логикой; она остаётся отдельной осью для независимой перекрёстной проверки.</p>
+</header>
+
+<div class="card">
+  <div class="stat" id="stat"></div>
+  <h2 style="margin-top:12px">Ключевое: «широкие» мотивы связка разводит на три режима</h2>
+  <div class="split" id="split"></div>
+  <div class="muted">Метод A в одиночку назвал бы все «широкие» глубокими; метод B — все «ареальными». Связка их различает.</div>
+</div>
+
+<div class="card">
+  <h2>Пять режимов</h2>
+  <div class="modes" id="modes"></div>
+</div>
+
+<div class="card">
+  <h2>Независимая проверка: тема × режим</h2>
+  <p class="muted" style="margin:0 0 8px">Тема <b>не участвовала</b> в назначении режима, поэтому градиент космологии — настоящее подтверждение, а не круг.</p>
+  <div id="xtab"></div>
+  <div class="note" id="xnote"></div>
+</div>
+
+<div class="card">
+  <h2>Отслеживаемые мотивы — итоговый вердикт</h2>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th>Режим</th><th>Глубина</th><th>B-сигнал</th><th>Макро</th><th>Confidence</th></tr></thead>
+  <tbody id="tracked"></tbody></table>
+  <div class="note" id="verdict"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const M = D.modes, col = m => M[m][2];
+
+document.getElementById("stat").innerHTML =
+  `<b>${D.n}</b> мотивов (≥${D.min_trad} традиций) классифицированы по режиму распространения.`;
+
+const bs = D.broad_split, bst = Object.values(bs).reduce((a,b)=>a+b,0);
+document.getElementById("split").innerHTML = ["areal_deep","descent","areal_broad"].filter(k=>bs[k]).map(k=>
+  `<div style="flex:${bs[k]};background:${col(k)}">${M[k][0]} · ${bs[k]}</div>`).join("");
+
+document.getElementById("modes").innerHTML = ["areal_deep","descent","areal_broad","areal_recent","local"].map(k=>{
+  const rows=D.examples[k].slice(0,6).map(e=>`<tr><td class="code">${esc(e.c)}</td><td>${esc(clip(e.n,30))}</td><td class="r">${e.dep.toFixed(0)}</td></tr>`).join("");
+  return `<div class="m"><span class="cnt">${D.counts[k]||0}</span><h3 style="color:${col(k)}">${M[k][0]}</h3>`+
+    `<div class="sub">${M[k][1]}</div><table>${rows}</table></div>`;
+}).join("");
+
+const order=["areal_deep","descent","areal_broad","areal_recent","local"];
+document.getElementById("xtab").innerHTML = order.map(k=>{
+  const x=D.xtab[k];
+  return `<div class="brow"><span>${M[k][0]}</span><span class="bt"><span class="bf" style="width:${x.catA_pct}%;background:${col(k)}"></span></span><span class="bv">${x.catA_pct}%</span></div>`;
+}).join("");
+document.getElementById("xnote").innerHTML =
+  `Доля Category A (космология/этиология) падает с <b>${D.xtab.areal_deep.catA_pct}%</b> в «глубоком ареальном» до `+
+  `<b>${D.xtab.descent.catA_pct}%</b> в «наследовании» — то есть глубокий субстрат космологичен, а наследуемая клада `+
+  `сказочна (Adventures/Tricks). Это независимо воспроизводит сигнал theme × stratum, потому что тема не была входом.`;
+
+document.getElementById("tracked").innerHTML = D.tracked.map(t=>{
+  const cc = t.conf>=0.65?"#12a150":t.conf>=0.45?"#c2410c":"#98a0a7";
+  return `<tr><td class="code">${esc(t.c)}</td><td>${esc(t.n)} <span class="muted">(${esc(t.label)})</span></td>`+
+    `<td><span class="pill" style="background:${col(t.mode)}">${M[t.mode][0]}</span></td>`+
+    `<td class="r">${t.dep.toFixed(0)}</td><td class="r">${t.sig.toFixed(2)}</td><td class="r">${t.nm}</td>`+
+    `<td class="r conf" style="color:${cc}">${t.conf.toFixed(2)}</td></tr>`;}).join("");
+
+document.getElementById("verdict").innerHTML =
+  "<b>Что даёт связка.</b> B4 (fished-earth) → <i>наследование</i> (австронезийская клада), а не «глубокий дизъюнкт», "+
+  "как ошибочно сказал бы A. A3 и K25 → <i>глубокий ареальный</i>, но с <b>умеренной confidence (~0.72)</b>: различить "+
+  "древний субстрат и широкую диффузию по распределению нельзя — это честный остаток, и он <b>не «решается» темой</b>. "+
+  "Пограничные (Золушка, tar-baby) получают низкую confidence — как и должно. Итог: режим и датировка чисто "+
+  "распределительные (A×B), а тема служит независимой проверкой, не входом.";
+</script>
