@@ -96,7 +96,11 @@ Every headline has a deflationary rival; naming them is the honest move.
    manufacture the cosmology/tales split (literate corpora over-record adventures). *Test:*
    control for corpus register / `family` religion overlay before reading the blocks.
 5. **Reverse causation on subsistence×theme.** Maybe neither causes the other — both are
-   downstream of deep history/area. *Test:* partial correlation within area (see §5).
+   downstream of deep history/area. *Tested (mockup 25):* the association **survives**
+   restricted permutation within area (p=0.003) and within language family (p=0.006), so
+   subsistence carries its own contribution beyond area and shared ancestry individually —
+   only jointly controlling both does it attenuate to marginal (low power). Not reducible to
+   a pure common cause on the evidence so far.
 
 ## 5. Highest-leverage next steps (ranked by effect)
 

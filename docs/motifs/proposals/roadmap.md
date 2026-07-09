@@ -12,18 +12,14 @@ Legend: **effort** S/M/L · **data**: *have* (in `outputs/motifs/` + committed s
 
 These two together retire the two alternative hypotheses that caveat almost everything.
 
-- **M24 · Effort-correction sweep.** Re-run the count-based mockups (16 theme_profile, 22
-  subsistence×theme, 23 lift + co-occurrence) with the §5 attestation-intensity weighting
-  already prototyped in mockup 20, and report each finding **before vs after**. · *method:*
-  coverage-weighted counts / occupancy weights · *data: have* · **proves:** resolves
-  alternative-hypothesis #1 ("it's all sampling") across the board — the single highest
-  value-per-effort experiment. · **S**
-- **M25 · Galton-corrected association tests (PGLS / PGLMM).** Re-test subsistence×theme,
-  theme×area and theme×stratum with the language tree as the covariance structure, so
-  neighbours stop counting as independent samples. · *method:* phylogenetic mixed model ·
-  *data: have* (tree from mockup 18) · **proves:** the gradients are real, not
-  autocorrelation + area — the rigorous form of the "within-area partial correlation" we keep
-  promising. · **S–M**
+- **M24 · Effort-correction sweep. ✓ done** (mockup 24). Re-ran the count-based findings raw
+  vs coverage-weighted. **Result: 3 of 4 survive**; theme_profile variance-by-area weakens
+  (34%→26%). Alternative-hypothesis #1 largely rejected for the theme findings. · **S**
+- **M25 · Galton-corrected association test. ✓ done** (mockup 25). Restricted-permutation test
+  of subsistence×theme within area and within language family. **Result: survives control for
+  area (p=0.003) and for family/Galton (p=0.006)** individually; marginal (p=0.065) under both
+  at once (low power). The gradient is real beyond area and ancestry. · **S–M** · *(a proper
+  dated-tree PGLS still wanted once M30 lands.)*
 
 ## Tier 2 — strong method upgrades on data we already have
 

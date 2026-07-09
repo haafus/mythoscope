@@ -39,8 +39,10 @@ asserted but never checked.
 
 Subsistence correlates with area (pastoralists ≈ Central Asia, foragers ≈
 Australia/N-America/Siberia), so part of the `subsistence × theme` gradient is really
-`area × theme`. The gradient is real but does not, on its own, prove subsistence is the
-*cause* — separating the two needs a within-area test on more data.
+`area × theme`. **Now tested (mockup 25):** the gradient *survives* restricted permutation
+within area (p=0.003) and within language family (p=0.006), so subsistence carries its own
+contribution — it attenuates to marginal only when both are controlled at once (low power).
+The confound is real but does not explain the signal away.
 
 *(Coordinates are per-tradition from the committed `tradition-coords.json` snapshot, so the
 join is at real tradition locations, not subregion centroids.)*

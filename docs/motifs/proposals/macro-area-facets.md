@@ -475,8 +475,10 @@ The whole investigation, in one place (prototypes: mockups 15–23; method detai
    broad + areal-deep; Category B (tales) is narrower + more descent-tracking — a prior,
    not a determiner (endemic-American adventures are deep). `theme × area`, `theme × theme`
    (the A/B blocks) and `theme × stratum` are all real signals; so is `subsistence × theme`
-   — extractive economies skew cosmological, intensive/mobile ones tale-heavy (mockup 22,
-   with an area confound).
+   — extractive economies skew cosmological, intensive/mobile ones tale-heavy (mockup 22).
+   The area confound on that last one was **tested** (mockup 25): it survives controlling for
+   area (p=0.003) and for language family / Galton (p=0.006), so subsistence carries its own
+   contribution, only partly entangled with geography.
 5. **Geography is primary; language and time are separate computed layers.** Method B
    shows only ~1% of motifs follow language descent (Eurasian fairy tales); the rest
    spread areally — so `area` carries most of the structure, while `stratum` is a

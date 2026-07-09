@@ -1,0 +1,83 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>25 · Galton-corrected test</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:900px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:840px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .stat { display:flex; gap:26px; flex-wrap:wrap; margin-bottom:6px; }
+  .stat .b { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; } .stat .l { font-size:11px; color:var(--muted); }
+  .means { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .chip { font-size:11.5px; background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:2px 10px; }
+  .prow { display:grid; grid-template-columns:270px 1fr 74px; align-items:center; gap:12px; margin:9px 0; font-size:12.5px; }
+  .plab b { color:#495057; } .plab span { color:var(--muted); font-size:11px; }
+  .track { position:relative; height:16px; background:var(--bg); border-radius:5px; }
+  .fill { position:absolute; left:0; top:0; height:100%; border-radius:5px; }
+  .thr { position:absolute; top:-3px; bottom:-3px; width:2px; background:#c05540; }
+  .thrlab { position:absolute; top:-16px; font-size:9.5px; color:#c05540; transform:translateX(-50%); white-space:nowrap; }
+  .pv { text-align:right; font-variant-numeric:tabular-nums; font-weight:700; }
+  .sig { color:#3c8a5e; } .ns { color:#98a0a5; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Тест на Гальтона — subsistence × theme</h1>
+  <p>Градиент «фуражиры космологичны, аграрии сказочны» (мокап 22) мог быть автокорреляцией соседей (проблема Гальтона)
+     или просто ареалом. Проверка <b>restricted permutation</b>: статистику (эта² доли Category A по 4-м типам хозяйства)
+     сравниваем с нуль-моделями, которые тасуют метку хозяйства только <b>внутри страт</b> — держа структуру страты
+     фиксированной. Выживает при рестрикции ⇒ не объясняется этой стратой.</p>
+</header>
+
+<div class="card">
+  <div class="stat">
+    <div><div class="b" id="eta"></div><div class="l">эта² (объяснено хозяйством)</div></div>
+    <div><div class="b" id="gap"></div><div class="l">разрыв экстрактивные − интенсивные</div></div>
+    <div><div class="b" id="n"></div><div class="l">традиций (сматчено, ≥30 мотивов)</div></div>
+  </div>
+  <div class="means" id="means"></div>
+</div>
+
+<div class="card">
+  <h2>p-value наблюдаемого эффекта под каждой нуль-моделью</h2>
+  <div id="tests"></div>
+  <div class="note" id="verdict"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const SUBLAB = {forager:"Foragers", pastoralist:"Pastoralists", horticulturalist:"Horticulturalists", agrarian_state:"Agrarian states"};
+document.getElementById("eta").textContent = D.obs_eta.toFixed(3);
+document.getElementById("gap").textContent = "+" + D.obs_gap + "pp";
+document.getElementById("n").textContent = D.n;
+document.getElementById("means").innerHTML = ["forager","horticulturalist","pastoralist","agrarian_state"]
+  .filter(s=>D.means[s]!=null).map(s=>`<span class="chip">${esc(SUBLAB[s])}: <b>${D.means[s]}%</b> A</span>`).join("");
+
+// -log10(p) bars, threshold at 0.05
+const order = ["free","area","family","both"];
+const nl = p => -Math.log10(Math.max(p, 1e-4));
+const maxnl = Math.max(...order.map(k=>nl(D.tests[k].p)), nl(0.05)) * 1.08;
+const thrPct = 100 * nl(0.05) / maxnl;
+document.getElementById("tests").innerHTML = order.map(k=>{
+  const t = D.tests[k], w = 100*nl(t.p)/maxnl, col = t.sig ? "#3c8a5e" : "#b9a37a";
+  return `<div class="prow"><span class="plab"><b>${esc(D.labels[k])}</b><br><span>${t.blocks} страт${k==='free'?'':' · '+t.permutable+' переставимо'}</span></span>`+
+    `<span class="track"><span class="fill" style="width:${w}%;background:${col}"></span>`+
+    `<span class="thr" style="left:${thrPct}%"></span><span class="thrlab" style="left:${thrPct}%">p=.05</span></span>`+
+    `<span class="pv ${t.sig?'sig':'ns'}">p=${t.p.toFixed(3)}<br><span style="font-weight:400;font-size:10px">${t.sig?'значимо':'ns'}</span></span></div>`;
+}).join("");
+
+document.getElementById("verdict").innerHTML =
+  `<b>Сигнал реален сверх ареала и сверх родства — по отдельности.</b> Связь subsistence × theme выживает контроль `+
+  `<b>ареала</b> (p=${D.tests.area.p.toFixed(3)}) и контроль <b>языковой семьи / Гальтона</b> (p=${D.tests.family.p.toFixed(3)}) — `+
+  `значит это не просто theme × area и не только автокорреляция соседей. При одновременном контроле обоих эффект `+
+  `слабеет до маргинального (p=${D.tests.both.p.toFixed(3)}), но там резко падает мощность (${D.tests.both.blocks} страт, тонкие ячейки), `+
+  `так что это «ослаблен», а не «убит». Вывод: хозяйство несёт <b>собственный</b> вклад в тематический баланс, `+
+  `частично переплетённый с географией.`;
+</script>

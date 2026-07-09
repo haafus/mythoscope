@@ -274,6 +274,14 @@ survive** — subsistence×theme, theme×area lift and the A/B co-occurrence blo
 that **weakens** is theme_profile variance-by-area (34%→26%), so geography's grip on genre
 balance was partly over-stated by sampling. See [`24-bias-sweep/README.md`](24-bias-sweep/README.md).
 
+### 25 · Galton-corrected test (roadmap M25)
+Tests whether the `subsistence × theme` gradient (mockup 22) is neighbour autocorrelation
+(Galton's problem) or just `area × theme`, by **restricted permutation** — shuffling the
+subsistence label within strata. It **survives** control for area (p=0.003) and for language
+family / Galton (p=0.006) individually, attenuating to marginal (p=0.065) only when both are
+controlled at once (low power). Subsistence carries its own contribution, partly entangled
+with geography. See [`25-galton-test/README.md`](25-galton-test/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
