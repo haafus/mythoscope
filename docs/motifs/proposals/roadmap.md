@@ -52,7 +52,12 @@ These two together retire the two alternative hypotheses that caveat almost ever
    back-flow, not deep OoA (corridor-fraction 0.60 vs 0.17 for Africa-only, ×3.5). Weakens
    "African substratum = oldest." Confound: corridor = also the Near-East-proximal edge, so
    genetic back-migration ≡ cultural diffusion from distribution alone (both recent, the A8 point).
-6. **M37 · Cross-index arbitration** — per-motif reliability weights.
+6. **M37 · Cross-index arbitration ✓ done — findings not a coding artifact.** 48% of motifs are
+   corroborated by an independent index (TMI/ATU); crucially corroboration is **theme-blind**
+   (cosmology 49% = tales 49%) and **higher for broad motifs** (54% vs 20% narrow) — the findings
+   lean on the replicated core. Emits a per-motif confidence weight for M38 (triple 1.0 …
+   berezkin-only 0.5). Caveat: the crosswalk is automated, so berezkin-only over-counts (K25
+   swan-maiden = missed ATU 400) — an *upper* bound on coding-dependence.
 7. **M38 · Joint HPF (capstone)** — assembled once on the settled facets / geometry / graph / tree / weights.
 8. **M39 · Tradition stratigraphy** — reads M38's stratum back onto traditions (downstream).
 
@@ -280,10 +285,14 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
 
 ## Tier 4 — synthesis & product
 
-- **M37 · Cross-index arbitration (TMI / ATU vote).** Use the crosswalk as replication:
-  promote motifs consistent across indexes, flag Berezkin-only ones as coding-dependent. ·
-  *data: partly have* · **adds:** a confidence multiplier on every motif — a per-motif weight the
-  joint model (M38) can use. · **M**
+- **M37 · Cross-index arbitration (TMI / ATU vote). ✓ done** (mockup 37). Used the BZ↔TMI↔ATU
+  crosswalk as replication → a per-motif confidence weight (triple / strong / moderate /
+  berezkin-only). **Result:** 48% corroborated by an independent index; **corroboration is
+  theme-blind** (cosmology 49% = tales 49%) and **higher for broad motifs** (54% vs 20% narrow) →
+  the findings are **not artifacts of Berezkin's coding**, they lean on the replicated core.
+  Emits the observation multiplier M38 can use. Caveat: the crosswalk is automated (title/doc
+  similarity), so berezkin-only over-counts (K25 swan-maiden's ATU 400 was missed) — an upper
+  bound on coding-dependence. · *data: partly have* · **M**
 - **M38 · Joint effort-corrected factorization (Hierarchical Poisson) — the capstone.** The one
   model of synthesis §3: factorize `M` with `a(t)` as an exposure offset; latent factors are the
   emergent themes/strata, de-confounded globally. · *data: have* · **subsumes:** mockups 16–23 as

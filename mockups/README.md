@@ -464,6 +464,17 @@ back-migration ≡ cultural diffusion from distribution alone (both recent — t
 fine SNP graph is the mechanistic upgrade. See
 [`36-admixture-backmigration/README.md`](36-admixture-backmigration/README.md).
 
+### 37 · Cross-index arbitration (roadmap M37)
+Uses the BZ↔TMI↔ATU crosswalk as replication → a per-motif confidence weight (triple / strong /
+moderate / berezkin-only), and checks whether our findings are Berezkin coding artifacts.
+**Q.** Are the findings corroborated by independent motif indexes, and is confidence theme-skewed?
+**Finding — not a coding artifact.** 48% of motifs are cross-index corroborated; corroboration is
+**theme-blind** (cosmology 49% = tales 49%) and **higher for broad motifs** (54% vs 20% narrow) —
+the analysis leans on the replicated core. Emits the observation weight for M38. Caveat: the
+crosswalk is automated, so berezkin-only over-counts (K25 swan-maiden's ATU 400 was missed) — an
+upper bound on coding-dependence. See
+[`37-cross-index-arbitration/README.md`](37-cross-index-arbitration/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

@@ -1,0 +1,130 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>37 · Cross-index arbitration</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --triple:#3c8a5e; --strong:#6a9e5e; --moderate:#b28a3e; --only:#c05540; --a:#6a5aa6; --b:#3c8a5e; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:960px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:910px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; } @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  .stack { display:flex; height:26px; border-radius:6px; overflow:hidden; margin:8px 0; }
+  .stack div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; }
+  .lg { display:flex; gap:12px; flex-wrap:wrap; font-size:11.5px; margin-top:4px; } .lg i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;}
+  .bar-row { display:flex; align-items:center; gap:8px; margin:4px 0; } .bar-row .nm { width:150px; font-size:11.5px; text-align:right; }
+  .bar-row .tr { flex:1; background:var(--bg); border-radius:5px; height:17px; } .bar-row .bf { height:100%; border-radius:5px; }
+  .bar-row .vv { width:34px; font-size:11.5px; font-variant-numeric:tabular-nums; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .verdict { background:#eef1ee; border-color:#cdd8cf; color:#31453a; }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } td.r { text-align:right; font-variant-numeric:tabular-nums; } td.code{font-weight:700;color:#4f7096;}
+</style>
+<main>
+<header>
+  <h1>Кросс-индексный арбитраж — надёжность мотива через репликацию</h1>
+  <p>Кросуок BZ↔TMI↔ATU как <b>репликация</b>: мотив Березкина, подтверждённый <b>независимым</b> каталогизатором
+     (Thompson TMI, Uther ATU), — надёжен; Berezkin-only — зависит от кодировки. Даёт <b>вес доверия на мотив</b> (для
+     капстоуна M38) и проверяет честный вопрос: <b>скошено ли доверие по теме</b> — не артефакт ли наши космологические
+     выводы кодировки Березкина? <span id="hdr"></span></p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="card">
+  <h2>Уровни доверия <span class="s">— triple (в TMI и ATU) → strong → moderate → berezkin-only</span></h2>
+  <div class="stack" id="stack"></div>
+  <div class="lg" id="lglevels"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Проверка 1: скос по теме? <span class="s">— доля корроборированных по группе</span></h2>
+    <div id="theme"></div>
+    <div class="note" id="themeNote"></div>
+  </div>
+  <div class="card">
+    <h2>Проверка 2: по широте <span class="s">— корроборированы ли широкие (наши находки)?</span></h2>
+    <div id="breadth"></div>
+    <div class="note" id="breadthNote"></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Золотой стандарт <span class="s">— во всех трёх индексах (triangles)</span></h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th></tr></thead><tbody id="tri"></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Широкие Berezkin-only <span class="s">— находки на одной кодировке Березкина</span></h2>
+    <table><thead><tr><th>Код</th><th>Мотив</th><th class="r">трад.</th></tr></thead><tbody id="bo"></tbody></table>
+  </div>
+</div>
+
+<div class="card verdict note" id="verdict"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])), clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+const LC={triple:"var(--triple)",strong:"var(--strong)",moderate:"var(--moderate)",berezkin_only:"var(--only)"};
+document.getElementById("hdr").textContent =
+  `${D.n} мотивов · TMI-подтверждено ${D.n_tmi} · ATU ${D.n_atu} · во всех трёх ${D.n_triangle}.`;
+document.getElementById("kpis").innerHTML = [
+  [`${Math.round(100*D.overall_corr)}%`, "мотивов кросс-индексно корроборированы (независимая репликация)"],
+  [`${D.by_cat.A.corr==D.by_cat.B.corr?'=':'≠'}`, `космология ${Math.round(100*D.by_cat.A.corr)}% vs сказки ${Math.round(100*D.by_cat.B.corr)}% — доверие НЕ скошено по теме`],
+  [`${D.mean_w}`, "средний вес доверия на мотив (для M38)"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// levels stacked bar
+const order=["triple","strong","moderate","berezkin_only"], LN={triple:"triple",strong:"strong",moderate:"moderate",berezkin_only:"berezkin-only"};
+document.getElementById("stack").innerHTML=order.map(k=>{
+  const v=D.levels[k], p=100*v/D.n;
+  return `<div style="width:${p}%;background:${LC[k]}">${p>7?v:''}</div>`;
+}).join("");
+document.getElementById("lglevels").innerHTML=order.map(k=>
+  `<span><i style="background:${LC[k]}"></i>${LN[k]} — ${D.levels[k]} (×${D.levelw[k]})</span>`).join("");
+
+// theme bars (sorted)
+const th=D.by_theme.slice().sort((a,b)=>a.corr-b.corr);
+document.getElementById("theme").innerHTML=th.map(t=>
+  `<div class="bar-row"><div class="nm">${esc(t.name)} <span class="muted">[${t.cat}]</span></div>`+
+  `<div class="tr"><div class="bf" style="width:${100*t.corr}%;background:${t.cat=='A'?'var(--a)':'var(--b)'}"></div></div><div class="vv">${Math.round(100*t.corr)}%</div></div>`).join("");
+document.getElementById("themeNote").innerHTML =
+  `Диапазон узкий (~40–57%), и <b>космология (A, ${Math.round(100*D.by_cat.A.corr)}%) = сказки (B, ${Math.round(100*D.by_cat.B.corr)}%)</b> `+
+  `— доверие <b>не скошено по теме</b>. Значит космологические находки <b>не артефакт</b> идиосинкразий Березкина: их `+
+  `подтверждают независимые индексы наравне со сказочными.`;
+
+// breadth bars
+const bmax=Math.max(...D.by_breadth.map(b=>b.corr));
+document.getElementById("breadth").innerHTML=D.by_breadth.map(b=>
+  `<div class="bar-row"><div class="nm">${esc(b.bin)} <span class="muted">(${b.n})</span></div>`+
+  `<div class="tr"><div class="bf" style="width:${100*b.corr/bmax}%;background:var(--triple)"></div></div><div class="vv">${Math.round(100*b.corr)}%</div></div>`).join("");
+document.getElementById("breadthNote").innerHTML =
+  `Широкие мотивы корроборированы <b>сильнее</b> (${Math.round(100*D.by_breadth[2].corr)}% против ${Math.round(100*D.by_breadth[0].corr)}% у узких). `+
+  `Наши выводы по <b>широте/глубине опираются на корроборированное подмножество</b>, а не на кодировко-зависимый узкий хвост — это укрепляет весь проект.`;
+
+document.getElementById("tri").innerHTML=D.triples.map(r=>
+  `<tr><td class="code">${esc(r.id)}</td><td>${esc(clip(r.n,34))}</td></tr>`).join("");
+document.getElementById("bo").innerHTML=D.broad_only.map(r=>
+  `<tr><td class="code">${esc(r.id)}</td><td>${esc(clip(r.n,26))} <span class="muted">${esc(r.grp)}</span></td><td class="r">${r.np}</td></tr>`).join("");
+
+document.getElementById("verdict").innerHTML =
+  `<b>Вердикт — находки не артефакт кодировки.</b> <b>${Math.round(100*D.overall_corr)}%</b> мотивов подтверждены `+
+  `независимым индексом; и, что важно, <b>доверие не скошено по теме</b> (космология = сказки) и <b>широкие мотивы `+
+  `корроборированы сильнее узких</b> — то есть наши распределительные выводы держатся на реплицированном ядре, а не на `+
+  `Berezkin-only хвосте. Оставшиеся Berezkin-only — в основном мелкие суб-варианты. <b>Для M38:</b> использовать вес `+
+  `доверия (triple 1.0 … berezkin-only 0.5) как множитель наблюдения; помечать широкие Berezkin-only как требующие `+
+  `осторожности. <b>Честный предел:</b> кросуок <b>автоматический</b> (по сходству названий/описаний), поэтому `+
+  `«Berezkin-only» содержит <b>ложные негативы</b> — напр. <b>K25 swan-maiden</b> (513 традиций) помечен BZ-only, хотя `+
+  `у него есть известный тип <b>ATU 400</b>, просто авто-матч его не поймал. Значит истинная корроборация <b>выше 48%</b>, `+
+  `а «Berezkin-only» — верхняя граница кодировко-зависимости (что ещё сильнее подпирает вывод «не артефакт»). BZ↔ATU-плечо `+
+  `тонкое (ATU — только европейские типы), так что ATU слабее TMI.`;
+</script>
