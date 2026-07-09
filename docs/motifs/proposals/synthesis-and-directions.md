@@ -150,10 +150,23 @@ Every headline has a deflationary rival; naming them is the honest move.
 - **Phylogeographic reconstruction (the visual capstone).** Animate each deep motif's inferred
   spread over the peopling map (origin node → range) — the etiology stage made legible, and a
   powerful validation surface (does the reconstruction respect known migration routes?).
-- **Contact-network layer.** Model areal diffusion with explicit edges (trade routes, the
-  Silk Road, the slave trade, missions) — this is what actually dates the axial/literate and
-  colonial strata that distribution shape *cannot* reach (the §14 open question about whether
-  the historical strata even belong on the same axis).
+- **Connectivity-aware geography (two layers).** Method A currently measures geography as
+  *isotropic* great-circle distance — 500 km of steppe, ocean and Himalaya count the same.
+  Replace it with **connectivity**, in two composable layers:
+  - **Physical, always-on, valid at all depths — landscape permeability.** A friction surface
+    from terrain + biome + hydrography → **resistance / least-cost distance** between
+    traditions ("isolation by resistance", not by distance). Low-friction corridors (the
+    Eurasian steppe, navigable rivers, coastlines) explain far-but-connected sharing that
+    isotropic distance mis-files as *deep*; barriers make close-but-separated sharing *more*
+    surprising. This is the physical substrate the human corridors ride on, and — being
+    time-stable — the one connectivity layer that also speaks to the **deep** residual.
+    Roadmap **M37**.
+  - **Human, dated, shallow — historical corridors.** Explicit edges: empire footprints, the
+    Silk Road, maritime trade, missions, the slave trade — this is what actually dates the
+    axial/literate and colonial strata that distribution shape *cannot* reach (the §14 open
+    question of whether the historical strata even belong on the same axis). Roadmap **M38**.
+  Both feed a connectivity-aware Method A and a connectivity-aware Galton null; the deepest
+  questions want a *time-sliced* friction surface (paleo-coastlines, the green Sahara).
 - **Cross-index arbitration.** Use TMI+ATU as a replication vote: promote motifs consistent
   across indexes, flag Berezkin-only ones as coding-dependent — a confidence multiplier we
   already have the data for.
@@ -171,7 +184,8 @@ Ranked by what each *newly enables*, not by ease:
 | **Archaeology / paleoclimate** (peopling dates, LGM refugia) | open | *calibration* for the geographic dating backbone (axiom A8) |
 | **Full TMI + ATU crosswalk** | mixed | replication vote + a handle on the literate/colonial strata (ATU tails) |
 | **The myth texts themselves** (mapsofmyths / corpora) | scrape-dependent | content embeddings → semantic stratum, a principled banality measure, motif-matching |
-| **Historical contact networks** (routes, missions, trade) | open/curated | the diffusion edges that date the historical strata distribution can't |
+| **Terrain / biome / hydrography** (SRTM·GEBCO, WWF ecoregions, HydroRIVERS, GSHHG) | open | a **friction surface** → resistance-distance geography for Method A; corridors & barriers at all depths (M37) |
+| **Historical polities + contact networks** (historical-basemaps, OWTRAD, Seshat, DARMC; Hellenthal admixture for direction) | open/curated | dated diffusion edges that date the historical strata distribution can't; direction for back-migration (M38) |
 
 > The actionable, significance-ranked sequencing of everything below — as concrete next
 > mockups (M24…) — is in [`roadmap.md`](roadmap.md).

@@ -25,7 +25,8 @@ These two together retire the two alternative hypotheses that caveat almost ever
 
 > Numbering: the **M-number is the mockup directory number** (M24 = `mockups/24-…`, and so
 > on). The planned slots **M30–M35 stay put** (dated tree, phylogeography, alt-tree, joint
-> model, stratigraphy, cross-index). This new audit takes the next free number, **M36**
+> model, stratigraphy, cross-index); **M37–M38** are the two connectivity layers (landscape
+> permeability, historical corridors) added to Tier 3. This audit takes **M36**
 > (`mockups/36-facet-adequacy/`) — the *number is its topic slot, not its build order*: it is
 > flagged **build-next** by priority, ahead of the lower-numbered but heavier M30–M35.
 
@@ -127,6 +128,70 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   descent") *and* alt-hypothesis #6 ("Africa is a sink"): is an Africa↔Eurasia motif deep
   out-of-Africa or recent back-into-Africa? Direction, not just span. · **M–L**
 
+- **M37 · Landscape permeability / cost-distance geography.** Replace Method A's *isotropic*
+  great-circle distance with **resistance / least-cost distance** over a friction surface — the
+  physical, always-on connectivity substrate. · *data: external* · **Effort: L.**
+  - **Motivation.** Method A treats 500 km of Eurasian steppe, ocean, Sahara and Himalaya as
+    equal. Diffusion friction is strongly anisotropic: low-friction corridors (the Great
+    Eurasian Steppe, navigable rivers, coastlines/seaways) carry motifs far, while mountains,
+    rainforest and open ocean block them. "Isolation by resistance," not "by distance."
+  - **Build.** A pre-modern *walking* friction raster from open terrain (SRTM · GEBCO · ETOPO →
+    slope / ruggedness), biomes (WWF ecoregions), rivers (HydroRIVERS) and coasts (GSHHG); then
+    least-cost / circuit resistance distance (`Circuitscape.jl`, GRASS `r.walk`, Tobler's hiking
+    function) between the Berezkin tradition centroids. **Two variants** — terrestrial-only vs
+    maritime-enabled — keyed to the `subsistence` facet, since the sea is a barrier for land
+    peoples but a *highway* for maritime ones (Austronesian, circum-Pacific, Mediterranean).
+  - **Tests.** (1) **Headline, falsifiable:** does resistance-distance explain tradition–tradition
+    motif-Jaccard *better* than great-circle, out of sample? (MRM / Mantel, ΔAIC / held-out ΔR²).
+    If it does not beat isotropic distance, drop it. (2) Re-run the stratum gate with resistance
+    geography: how many of the deep-vs-diffuse residual motifs (mockup 27's A3 / K25 look-alikes)
+    move to *areal* once a corridor explains their spread? (3) Sanity: the circum-Pacific /
+    Beringian (Siberia ↔ NW America) and Austronesian-maritime links — the very "wrong-hemisphere"
+    cases mockups 15 & 31 had to re-project — should be *predicted* by coastal / maritime
+    permeability, not treated as anomalous long jumps.
+  - **Caveats.** Milder anachronism than M38 (physical geography is Holocene-stable, so this is
+    valid *deep*) — but sea level (Beringia, Sunda / Sahul shelves) and vegetation (green Sahara
+    ~6000 BP) shifted, so the deepest questions want a **time-sliced** surface (paleo-coastlines,
+    ICE-6G); a single Holocene surface is the first cut. Friction weights are free parameters —
+    **calibrate on known cases** (steppe transmissions, Austronesian sea routes) or fit them to
+    the language-family structure, never tune to the target result.
+  - **Why it sits first among the two.** It upgrades the *baseline* Method A that everything
+    downstream uses, its data is cleaner and more complete than the historical layer, and it is
+    the physical substrate on which M38's human corridors ride. **Build M37 before M38.**
+
+- **M38 · Historical connectivity layer (empires + trade routes).** The **human, dated** channel
+  layered on M37's physical substrate: contact diffusion that jumps across both tree and space
+  along documented corridors. · *data: external* · **Effort: M–L.**
+  - **Motivation.** Our model has only descent (tree) and proximity (space); it has no channel
+    for a motif *carried by an empire or trade network* between unrelated, non-adjacent peoples —
+    exactly the mechanism behind the unresolved deep-vs-diffuse residual (cluster 7's
+    trans-continental Sun & Moon; the jātaka / Buddhist literary transmission K27z2; the
+    Inner-Asian civilisational belt of mockup 15's cluster 3). `FAMILY_DATES` already captures
+    the *genealogical* migrations (Bantu, Austronesian, IE, Turkic); this adds the
+    *non-genealogical* contact layer.
+  - **Build.** A **dated contact graph**: a pair of traditions is linked if they were
+    co-members of the same polity at date *t* (dated polity footprints) or short-path-connected
+    on the trade network at date *t*; edges carry timestamps and direction.
+  - **Uses.** (1) **Reclassify** low-phylo-signal, corridor-coherent, geographically-scattered
+    motifs into a **historical-diffusion stratum** with a *recent* age ceiling (the corridor's
+    date) — **guarded**: never touches a family-dated-deep or high-signal motif. (2) A **third
+    Galton axis** (empire / corridor co-membership) beyond area and family (extends M25). (3)
+    **Directionality** feeds M32 / axiom A8: deep out-of-Africa vs recent back-into-Africa
+    (Arab / Islamic, trans-Saharan).
+  - **Data.** `aourednik/historical-basemaps` (dated world political boundaries, GeoJSON,
+    CC-BY-SA) · OWTRAD / ORION historical trade routes · DARMC · Seshat Global History Databank ·
+    Pleiades / World Historical Gazetteer (place join) · Hellenthal et al. 2014 admixture events
+    (direction).
+  - **Caveats.** **Anachronism:** empires are shallow (mostly < 2500 yr) — informative only for
+    the *top* of the stratigraphic column; forbid it from touching deep strata. **Coverage
+    bias:** Berezkin's ethnographic units often lie *outside* the great empires, so measure
+    overlap first. **Circularity:** pre-register which corridor predicts which motif class, then
+    test — not a fishing expedition.
+  - **First probe (cheap, before the full build).** An **overlap audit**: for each tradition, does
+    its coordinate fall inside any historical polity at any snapshot, and how near an OWTRAD
+    route? Report the % "reachable" by macro-area. Good coverage → build the corridor facet;
+    mostly the Old-World literate belt → scope the claim to that belt.
+
 ## Tier 4 — synthesis & product
 
 - **M33 · Joint effort-corrected factorization (Hierarchical Poisson).** The one model of
@@ -148,3 +213,10 @@ If only three get built: **M24** (kill the sampling doubt) → **M25** (kill the
 trustworthy; the last two make them *datable*. Everything in Tier 2 is a quality upgrade that
 can slot in whenever, and M33 is the long-horizon consolidation once M24/M25 have proven the
 signals are worth one joint model.
+
+The **connectivity pair (M37 → M38)** is the highest-ceiling addition after dating: M37
+replaces isotropic geography with a resistance surface (attacking the deep-vs-diffuse residual
+from the *baseline* side, valid at all depths), then M38 layers dated human corridors on top
+(attacking it from the *recent-literate* side) and composes with M32's admixture graph. Build
+**M37 before M38**; gate both behind M37's single falsifiable test (does resistance-distance
+beat great-circle out of sample?) — a clean negative there saves the whole line.
