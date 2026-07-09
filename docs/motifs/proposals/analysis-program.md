@@ -151,14 +151,21 @@ honestly — the questions still open.
   systematics view that stage 3 mapped, one block at a time.
 - **Subsistence tracks theme**: extractive economies (foragers, horticulturalists) are
   cosmology-heavy, intensive/mobile ones (agrarian states, pastoralists) tale-heavy — the
-  predicted gradient, with an honest area confound.
+  predicted gradient, which survives Galton and area controls individually (mockup 25), so
+  it is not reducible to geography alone.
 - **The three axes each remove the others' confound**: analysis fixes a theme (Berezkin's
   method), groups by the tradition axes, and dates within by gated A×B.
+- **The results survived a skeptical battery.** Not sampling artifacts (effort-correction
+  leaves 3/4 findings standing, mockup 24; degree-correction halves the density artifact,
+  mockup 26); not mere autocorrelation (mockup 25); distributional, not semantic (content
+  predicts theme, not depth, mockup 29). The estimate is robust where the data support it.
 
 **What resists** (see [`stratum-derivation.md` §14](stratum-derivation.md)): absolute
-dating (needs a dated phylogeny), the deep-substrate/wide-diffusion residual, whether the
-historical strata belong on the same axis at all, and the un-run controls. These are open
-questions, held open on purpose.
+dating (needs a dated phylogeny), and the deep-substrate/wide-diffusion residual — now
+*confirmed* irreducible, since a descent/areal/reinvention continuum still can't separate
+A3 from K25 (mockup 27) and likelihood ASR ≈ parsimony on the undated tree (mockup 28).
+Also open: whether the historical strata belong on the same axis at all. These are held
+open on purpose — the residual is the earned case for the dated phylogeny (M30–M31).
 
 **The cross-cutting synthesis** — how the stages influence and reinforce each other, the
 alternative hypotheses, the joint model that would replace the pipeline, the strongest next

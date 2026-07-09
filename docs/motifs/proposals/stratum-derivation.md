@@ -380,7 +380,7 @@ Theme remains an **independent cross-check** axis, never an estimator input.
 
 ## 13. Cumulative conclusions (empirical)
 
-Backed by mockups 16–23 over the Berezkin catalogue:
+Backed by mockups 16–29 over the Berezkin catalogue:
 
 - **Method A (mockup 17).** Distribution carries a real depth signal — pan-global
   celestial cosmogony tops the ranking, the adventure-endemism stress-test passes — but
@@ -418,6 +418,19 @@ Backed by mockups 16–23 over the Berezkin catalogue:
   economies to tale-heavy for intensive/mobile ones (mockup 22, area confound noted), and
   the theme axis itself is data-confirmed — Category A vs B re-emerges from theme
   co-occurrence across traditions (mockup 23), not just from Berezkin's labels.
+- **The estimate survived a skeptical battery (mockups 24–29), and located its own limit.**
+  It is not a sampling artifact — 3 of 4 theme findings survive effort-correction (mockup
+  24) and a degree-corrected block model halves the catalogue-density artifact of naive
+  clustering (mockup 26). It is not mere neighbour autocorrelation — the `subsistence ×
+  theme` gradient survives Galton and area controls individually (mockup 25). It is
+  distributional, not semantic — content embeddings predict `theme` (58% vs 20% chance) but
+  barely predict depth (mockup 29). Replacing the hard gate with a descent/areal/reinvention
+  **continuum** is the right move but does *not* dissolve the residual: A3 (deep substrate)
+  and K25 (wide diffusion) get near-identical mixtures (mockup 27). And a likelihood ASR
+  ≈ parsimony on the *undated* tree (mockup 28). Two of these point the same way: the
+  deep-substrate-vs-wide-diffusion ambiguity is **irreducible from distribution + an undated
+  tree** — the concrete, earned case for wiring a **dated phylogeny** (M30) and reading ages
+  off it (M31), the next real capability.
 
 ## 14. Open questions and future work
 

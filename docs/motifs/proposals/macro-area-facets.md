@@ -455,9 +455,10 @@ rows); `theme`, `area`, and the `family` seed are computed.
 
 ## Cumulative conclusions
 
-The whole investigation, in one place (prototypes: mockups 15–23; method detail in
+The whole investigation, in one place (prototypes: mockups 15–29; method detail in
 [`stratum-derivation.md`](stratum-derivation.md) §12–14; the overall arc in
-[`analysis-program.md`](analysis-program.md)):
+[`analysis-program.md`](analysis-program.md); forward directions in
+[`synthesis-and-directions.md`](synthesis-and-directions.md)):
 
 1. **"Region" was three axes crammed into one.** Split cleanly into **entities**: a
    *tradition* carries `area` (12, from `areal_path`), `family` (from `language` +
@@ -484,6 +485,17 @@ The whole investigation, in one place (prototypes: mockups 15–23; method detai
    spread areally — so `area` carries most of the structure, while `stratum` is a
    gated **A × B** estimate (geography dates the areal majority, phylogeny the descent
    minority), reported as a continuous score with confidence.
+6. **The findings held under a skeptical battery.** They are not sampling artifacts:
+   effort-correction leaves 3 of 4 theme findings standing (only `theme_profile` variance-
+   by-area softens, 38%→~26%, mockup 24), and a degree-corrected block model halves the
+   catalogue-density artifact that naive clustering carries (mockup 26). They are not mere
+   autocorrelation: `subsistence × theme` survives Galton and area controls individually
+   (mockup 25). Content corroborates the split — embeddings predict `theme` (58% vs 20%
+   chance) but not depth (mockup 29). And the honest residual is confirmed irreducible: a
+   descent/areal/reinvention mixture models the continuum but still cannot separate deep
+   substrate (A3) from wide diffusion (K25) from distribution alone (mockup 27) — which,
+   with the finding that likelihood ASR ≈ parsimony on an *undated* tree (mockup 28), is
+   the standing argument for wiring a **dated phylogeny** (the next capability, M30–M31).
 
 ## Implementation sketch (not built)
 
