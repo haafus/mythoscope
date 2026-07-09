@@ -22,6 +22,17 @@ has no single origin to reconstruct — its history is diffusion (mockup 19).
   to its stray Eurasian/African/American occurrences — a maritime diffusion picture. (The
   famous Māui "fishing up the land" motif, placed and dated.)
 
+## Re-centring — Pacific motifs are not split by the Atlantic seam
+
+An Atlantic-centred equirectangular map puts its seam through the Pacific, so a
+Pacific-diffusion motif like B4 gets torn across both edges and its spread into the Americas
+*looks* like it goes the wrong way (through Eurasia). Fix: when a motif is selected the map
+**re-centres on that motif's own region** — the central meridian `lon0` is the **circular mean
+longitude** of its origin + attesting traditions — and the coastline is drawn as three shifted
+copies so the world stays continuous under the shift. B4 then sits whole in the middle and its
+spread to America reads correctly as **circum-Pacific** (eastward around the ocean), not
+overland through Eurasia. The default "all origins" view keeps `lon0 = 0` (Atlantic-centred).
+
 ## Honest limits — what it is *not*
 
 This is a **family-resolution proxy**: the location is the range centre and the age is the
@@ -29,7 +40,7 @@ family-root ceiling — they are **not the same, node-consistent ancestral node*
 range is younger than the 5200 BP Austronesian root). Node-consistent location + age with an
 **uncertainty cloud** is what a real **relaxed-random-walk (BEAST)** on a genuinely dated tree
 gives; that stays future work. Here we show the point estimate such an RRW converges to on
-average. Trans-dateline spread lines are drawn the short way (equirectangular, no clipping).
+average. Spread lines are drawn the short way in the (re-centred) frame — no clipping.
 
 ## Run
 

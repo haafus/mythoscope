@@ -58,8 +58,18 @@
 <script>
 const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
-const LAND = `<path class="land" d="${window.LAND||""}"/>`;
-const px = lon => (lon+180), py = lat => (90-lat);
+const LANDPATH = window.LAND||"";
+const py = lat => (90-lat);
+// projection with a configurable central meridian lon0 (so a Pacific-diffusion motif is not
+// split by the Atlantic-centred seam). Base LAND path is baked at lon0=0 (x = lon+180).
+const px = (lon, lon0) => (((lon - lon0 + 180) % 360) + 360) % 360;
+const landG = lon0 => `<g>` + [-360,0,360].map(k=>
+  `<path class="land" d="${LANDPATH}" transform="translate(${(-lon0+k).toFixed(1)},0)"/>`).join("") + `</g>`;
+// circular mean longitude of a set of points -> the best centre for that motif
+function centreLon(pts){
+  let x=0,y=0; pts.forEach(p=>{ x+=Math.cos(p.lon*Math.PI/180); y+=Math.sin(p.lon*Math.PI/180); });
+  return Math.atan2(y,x)*180/Math.PI;
+}
 // age -> colour (sequential violet: old dark -> young light)
 const lo=D.age_lo, hi=D.age_hi;
 const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
@@ -67,24 +77,25 @@ const OLD=[74,64,120], YOUNG=[209,203,228];
 const ageCol=a=>`rgb(${mix(YOUNG,OLD,(a-lo)/(hi-lo)).join(",")})`;
 
 function mapSVG(activeC){
+  const t = activeC ? D.tracked.find(x=>x.c===activeC) : null;
+  // re-centre the map on the tracked motif's own region: a Pacific-diffusion motif
+  // (e.g. B4) then sits whole in the middle instead of being split by the Atlantic seam.
+  const lon0 = t ? centreLon([{lon:t.lon}, ...t.tips]) : 0;
   const pts = D.origins.map(o=>{
     const r = 1.1 + 1.6*Math.sqrt(o.n/40);
-    return `<circle cx="${px(o.lon).toFixed(2)}" cy="${py(o.lat).toFixed(2)}" r="${r}" fill="${ageCol(o.age)}" fill-opacity="0.82" stroke="#fff" stroke-width="0.2"/>`;
+    return `<circle cx="${px(o.lon,lon0).toFixed(2)}" cy="${py(o.lat).toFixed(2)}" r="${r}" fill="${ageCol(o.age)}" fill-opacity="0.82" stroke="#fff" stroke-width="0.2"/>`;
   }).join("");
   let lines="", star="";
-  if(activeC){
-    const t=D.tracked.find(x=>x.c===activeC);
-    if(t){
-      lines = t.tips.map(p=>{
-        let tl=p.lon;                        // draw the short way across the dateline
-        while(tl - t.lon > 180) tl-=360;
-        while(tl - t.lon < -180) tl+=360;
-        return `<line x1="${px(t.lon).toFixed(2)}" y1="${py(t.lat).toFixed(2)}" x2="${px(tl).toFixed(2)}" y2="${py(p.lat).toFixed(2)}" stroke="#c05540" stroke-width="0.35" stroke-opacity="0.5"/>`;
-      }).join("");
-      star = `<circle cx="${px(t.lon).toFixed(2)}" cy="${py(t.lat).toFixed(2)}" r="2.6" fill="#c05540" stroke="#fff" stroke-width="0.5"/>`;
-    }
+  if(t){
+    const sx = px(t.lon,lon0);
+    lines = t.tips.map(p=>{
+      let tx = px(p.lon,lon0);              // draw the short way in the re-centred frame
+      if(tx - sx > 180) tx-=360; else if(tx - sx < -180) tx+=360;
+      return `<line x1="${sx.toFixed(2)}" y1="${py(t.lat).toFixed(2)}" x2="${tx.toFixed(2)}" y2="${py(p.lat).toFixed(2)}" stroke="#c05540" stroke-width="0.35" stroke-opacity="0.5"/>`;
+    }).join("");
+    star = `<circle cx="${px(t.lon,lon0).toFixed(2)}" cy="${py(t.lat).toFixed(2)}" r="2.6" fill="#c05540" stroke="#fff" stroke-width="0.5"/>`;
   }
-  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${lines}${pts}${star}</svg>`;
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${landG(lon0)}${lines}${pts}${star}</svg>`;
 }
 const mapEl=document.getElementById("map");
 function draw(active){ mapEl.innerHTML=mapSVG(active); }
@@ -106,7 +117,10 @@ document.getElementById("honest").innerHTML =
   `потолок возраста — австронезийская экспансия ≤5200 BP (сам океанийский разброс моложе). Это <b>прокси уровня семьи</b>: `+
   `место = центр ареала, возраст = потолок по семье — <b>не согласованный предковый узел</b>. Согласованные узловые `+
   `место+возраст с облаком неопределённости даёт настоящий relaxed-random-walk (BEAST) на реально датированном дереве — `+
-  `это остаётся будущей работой; здесь показана точечная оценка, к которой такой RRW сходится в среднем.`;
+  `это остаётся будущей работой; здесь показана точечная оценка, к которой такой RRW сходится в среднем. `+
+  `<b>Проекция.</b> При выборе мотива карта <b>перецентрируется</b> на его собственный регион (центральный меридиан = `+
+  `круговое среднее долгот его традиций), чтобы тихоокеанское расселение вроде B4 не разрывалось атлантическим швом: `+
+  `распространение в Америку тогда читается <b>вокруг океана</b>, а не через Евразию.`;
 
 document.getElementById("tracked").innerHTML = D.tracked.map(t=>
   `<tr><td style="font-weight:700;color:#4f7096">${esc(t.c)}</td><td>${esc(clip(t.n,26))} <span class="muted">(${esc(t.label)})</span></td>`+

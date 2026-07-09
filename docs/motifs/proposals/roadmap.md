@@ -115,8 +115,11 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   motif's **origin location + age** (spherical family-foothold centroid + mockup-30 family-date
   ceiling) and maps its spread. **Result:** 439 origins coloured by age, dense at the
   Indo-European märchen belt ~5500 BP; B4 centred in Western Oceania ≤5200 BP with Pacific
-  spread lines. A family-resolution point estimate — node-consistent RRW with uncertainty (real
-  BEAST on a dated tree) stays future work. The etiology-stage visual capstone. · **L**
+  spread lines. The map **re-centres on the selected motif's region** (central meridian =
+  circular-mean longitude) so a Pacific-diffusion motif like B4 reads as **circum-Pacific**
+  rather than split by the Atlantic seam. A family-resolution point estimate — node-consistent
+  RRW with uncertainty (real BEAST on a dated tree) stays future work. The etiology-stage
+  visual capstone. · **L**
 - **M32 · Alternative-tree / admixture-graph test (genetics).** Re-run descent detection on a
   genetic tree instead of the language tree, and — as a **reticulate admixture graph** —
   carry the published **back-migration** edges (Eurasian gene flow into Africa) as horizontal
