@@ -20,8 +20,6 @@ function getTraditionColor(name) {
 }
 
 function getColorMap(traditions) {
-    // Same source of truth as the rest of the app: the tradition's own colour,
-    // else the single CATEGORY_NONE grey (no separate embeddings palette).
     const map = {};
     traditions.forEach((tradition) => {
         map[tradition] = getTraditionColor(tradition);
