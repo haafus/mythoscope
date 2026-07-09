@@ -134,22 +134,28 @@ def gaz_coord(label):
     return None
 
 
-# Real per-tradition coordinates for the Berezkin catalogue, committed as a snapshot
-# (mockups/tradition-coords.json, areal_id -> [lat, lon]) so the map mockups place
-# each tradition at its actual location without a full motif-pipeline run. Regenerate
-# the snapshot with src/motifs/sources/mapsofmyths.py (refresh).
+# Real per-tradition coordinates for the Berezkin catalogue, read straight from the
+# built motif pipeline (outputs/motifs/mapsofmyths_traditions.json, whose rows carry a
+# `coordinates` [lat, lon] once a coordinate-enabled `mytho motifs` refresh has run).
+# No local copy: the pipeline output is the single source of truth. Where a coordinate
+# is missing the map mockups fall back to the areal-subregion centroid.
 _BEREZKIN_COORDS = None
 
 
 def berezkin_coords():
-    """``{areal_id: [lat, lon]}`` from the committed snapshot (cached, read once)."""
+    """``{areal_id: [lat, lon]}`` from the pipeline's ``mapsofmyths_traditions.json``
+    (cached, read once). Empty if that file is absent or carries no coordinates."""
     global _BEREZKIN_COORDS
     if _BEREZKIN_COORDS is None:
         import json
         from pathlib import Path
-        path = Path(__file__).with_name("tradition-coords.json")
+        path = Path(__file__).resolve().parents[1] / "outputs" / "motifs" / "mapsofmyths_traditions.json"
         try:
-            _BEREZKIN_COORDS = json.loads(path.read_text(encoding="utf-8")).get("coordinates", {})
+            traditions = json.loads(path.read_text(encoding="utf-8")).get("traditions", {})
         except FileNotFoundError:
-            _BEREZKIN_COORDS = {}
+            traditions = {}
+        _BEREZKIN_COORDS = {
+            aid: v["coordinates"] for aid, v in traditions.items()
+            if isinstance(v.get("coordinates"), (list, tuple)) and len(v["coordinates"]) == 2
+        }
     return _BEREZKIN_COORDS

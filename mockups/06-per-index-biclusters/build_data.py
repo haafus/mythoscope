@@ -47,8 +47,8 @@ def coord_resolver(index):
     spread out afterwards so they don't pile up).
 
     For the Berezkin index the real location is the tradition's own map
-    coordinate, read from the committed snapshot ``mockups/tradition-coords.json``
-    (areal_id -> [lat, lon]) so the mockup is independent of the motif pipeline.
+    coordinate, read from the built motif pipeline
+    (``outputs/motifs/mapsofmyths_traditions.json``, areal_id -> [lat, lon]).
     Only where that is missing do we fall back to the areal-subregion centroid —
     optionally nudged by a per-people gazetteer hit, but only when it agrees with
     the tradition's subregion so an accidental name collision can't fling a point
@@ -60,7 +60,7 @@ def coord_resolver(index):
         name2coord, name2sub = {}, {}
         for aid, v in bz["traditions"].items():
             key = canon(v.get("name") or "")
-            c = coords.get(aid) or v.get("coordinates")   # snapshot first, pipeline as fallback
+            c = coords.get(aid) or v.get("coordinates")   # pipeline coords, index row as fallback
             if isinstance(c, (list, tuple)) and len(c) == 2:
                 name2coord[key] = (float(c[1]), float(c[0]))   # [lat, lon] -> (lon, lat)
             ap = v.get("areal_path") or []
