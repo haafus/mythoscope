@@ -62,10 +62,15 @@ These two together retire the two alternative hypotheses that caveat almost ever
    (+ M37 weights) **de-confounds** (η²(a|component) 0.34 vs naive 0.67, mockup-26 ~0.80) **and
    recovers the 12 macro-areas** (ARI 0.37 vs 0.08) in a single fit — subsuming mockups 16–23.
    Great-circle geometry (M34 gate failed).
-8. **M39 · Tradition stratigraphy** — reads M38's stratum back onto traditions (downstream).
+8. **M39 · Tradition stratigraphy ✓ done — falsification test passes.** Profiling each tradition by
+   its deep/areal/local motif stack, **depth rises with region peopling age** (partial corr +0.48
+   controlling coverage; Africa 63% → Americas 48%). The coverage confound *masked* the signal
+   (−0.30), so controlling *strengthens* it — not an artifact. Deep-substrate-rich traditions are in
+   the early-peopled regions, as the stratum logic predicts.
 
-Hard edges: **M34 → M35**, **M33 → M36**, everything → **M38 → M39**. Detailed specs follow, in
-build order (the tier headings below are a *significance* overlay, orthogonal to the number).
+**The planned queue M32–M39 is complete.** Hard edges held: **M34 → M35**, **M33 → M36**,
+everything → **M38 → M39**. Detailed specs follow (the tier headings are a *significance* overlay,
+orthogonal to the number).
 
 ### M32 · Facet adequacy & orthogonality (audits assumption #6) — ✓ done (mockup 32)
 

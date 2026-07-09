@@ -487,6 +487,18 @@ settled inputs (facets M32, tree/direction M33/M36, empire covariate M35, weight
 geometry since M34's gate failed). Honest limit: the MAP/NMF core, not full Bayesian HPF with
 uncertainty. See [`38-joint-hpf/README.md`](38-joint-hpf/README.md).
 
+### 39 · Tradition stratigraphy (roadmap M39)
+Turns `stratum` around: profiles each tradition as its stack of strata (share of deep/broad vs
+areal vs local motifs, depth ≈ breadth), a geological-column view, and runs the falsification test —
+do deep-substrate-rich traditions sit in early-peopled regions / refugia?
+**Q.** Does tradition depth track how early its region was peopled?
+**Finding — the test passes.** corr(deep-share, region peopling age) = +0.43 raw, **+0.48
+controlling for coverage**; the gradient runs **Sub-Saharan Africa 63% (~65 ky) → early Old World
+56–59% → the Americas 48–49% (~14 ky)**. The coverage confound *masked* the signal (−0.30, thickly
+catalogued corpora look shallow), so controlling *strengthens* it — not an artifact. Deep-substrate
+traditions really are in the early-peopled regions. Limit: depth is a breadth proxy (conflates deep
+descent with wide diffusion). See [`39-tradition-stratigraphy/README.md`](39-tradition-stratigraphy/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

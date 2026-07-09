@@ -1,0 +1,100 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>39 · Tradition stratigraphy</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --deep:#3c8a5e; --areal:#b28a3e; --local:#aab0b6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:940px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:900px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .col-row { display:flex; align-items:center; gap:10px; margin:5px 0; }
+  .col-lab { width:210px; font-size:12px; text-align:right; } .col-lab .ky{color:var(--muted);font-size:11px;}
+  .stack { flex:1; display:flex; height:22px; border-radius:5px; overflow:hidden; }
+  .stack div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:10.5px; }
+  .col-v { width:44px; font-size:12px; font-variant-numeric:tabular-nums; }
+  .lg { display:flex; gap:14px; font-size:11.5px; margin-top:8px; } .lg i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;}
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; } @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  .bar-row { display:flex; align-items:center; gap:8px; margin:6px 0; } .bar-row .nm { width:180px; font-size:12px; text-align:right; }
+  .bar-row .tr { flex:1; background:var(--bg); border-radius:5px; height:18px; position:relative; } .bar-row .bf { height:100%; border-radius:5px; }
+  .bar-row .vv { width:52px; font-size:12px; font-variant-numeric:tabular-nums; }
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#31453a; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Стратиграфия традиции — геологическая колонка корпуса</h1>
+  <p>Разворот `stratum`: профилируем каждую <b>традицию</b> как стек её страт — доля мотивов
+     <b>глубоко-широких</b> / ареальных / локальных (глубина мотива ≈ широта, как в мокапе 17). Сильный
+     <b>фальсификационный тест</b>: глубоко-субстратные традиции должны сидеть в <b>рано-заселённых</b> регионах
+     (Африка, Австралия), а не в поздних (Америки). Разъедающий конфаунд — покрытие a(t): тонко-каталогизированный
+     корпус пишет только заметные широкие мотивы → завышает deep-share, поэтому тест дан <b>и сырым, и с контролем
+     покрытия</b>. <span id="hdr"></span></p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="card">
+  <h2>Геологические колонки по регионам <span class="s">— сверху рано-заселённые, снизу поздние</span></h2>
+  <div id="cols"></div>
+  <div class="lg"><span><i style="background:var(--deep)"></i>глубоко-широкие (≥85 пцт)</span><span><i style="background:var(--areal)"></i>ареальные</span><span><i style="background:var(--local)"></i>локальные/эндемичные</span></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Глубоко-субстратные традиции</h2>
+    <table><thead><tr><th>Традиция</th><th>Ареал</th><th class="r">deep</th></tr></thead><tbody id="dr"></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Мелко-слоистые традиции</h2>
+    <table><thead><tr><th>Традиция</th><th>Ареал</th><th class="r">deep</th></tr></thead><tbody id="sh"></tbody></table>
+  </div>
+</div>
+
+<div class="card note" id="verdict"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])), clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+document.getElementById("hdr").textContent =
+  `${D.n} традиций (≥${D.min_trad_motif} мотивов), ${D.n_motif} мотивов; глубокий ярус = широта ≥ ${D.p85} традиций, локальный < ${D.p50}.`;
+document.getElementById("kpis").innerHTML = [
+  [`${D.corr.partial>0?'+':''}${D.corr.partial}`, "частная corr(deep-share, возраст заселения | покрытие) → тест ПРОХОДИТ"],
+  [`${D.corr.raw>0?'+':''}${D.corr.raw}`, "сырая corr(deep-share, возраст заселения)"],
+  [`${D.corr.coverage}`, "конфаунд: corr(deep-share, log покрытия) — маскировал сигнал, не создавал"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// geological columns
+const CC={deep:"var(--deep)",areal:"var(--areal)",local:"var(--local)"};
+document.getElementById("cols").innerHTML = D.by_area.map(a=>{
+  const seg=k=>`<div style="width:${100*a[k]}%;background:${CC[k]}">${a[k]>0.12?Math.round(100*a[k]):''}</div>`;
+  return `<div class="col-row"><div class="col-lab">${esc(a.area)} <span class="ky">${a.peo}ky · ${a.n}</span></div>`+
+    `<div class="stack">${seg('deep')}${seg('areal')}${seg('local')}</div><div class="col-v">${Math.round(100*a.deep)}%</div></div>`;
+}).join("");
+
+const exrow=r=>`<tr><td>${esc(clip(r.name,22))}</td><td class="muted">${esc(clip(r.area,16))}</td><td class="r">${r.deep.toFixed(2)}</td></tr>`;
+document.getElementById("dr").innerHTML=D.deep_rich.map(exrow).join("");
+document.getElementById("sh").innerHTML=D.shallow.map(exrow).join("");
+
+const oldest=D.by_area[0], youngest=D.by_area[D.by_area.length-1];
+document.getElementById("verdict").innerHTML =
+  `<b>Фальсификационный тест ПРОХОДИТ — стратиграфия реальна.</b> Глубина традиции (доля глубоко-широких мотивов) `+
+  `<b>растёт с возрастом заселения региона</b>: частная corr <b>+${D.corr.partial}</b> при контроле покрытия. `+
+  `Градиент чист: <b>${esc(oldest.area)} ${Math.round(100*oldest.deep)}%</b> (${oldest.peo} тыс. лет) → ранний Старый Свет `+
+  `→ <b>${esc(youngest.area)} ${Math.round(100*youngest.deep)}%</b> (${youngest.peo} тыс. лет). Глубоко-субстратные традиции `+
+  `<b>действительно</b> в рано-заселённых регионах/рефугиях — сильное подтверждение всей стратумной логики. `+
+  `<b>И честнее:</b> покрытие a(t) коррелирует с deep-share <b>отрицательно</b> (${D.corr.coverage}) — густо-`+
+  `каталогизированная Европа искусственно занижена, — поэтому контроль покрытия сигнал <b>усиливает</b> `+
+  `(${D.corr.raw}→+${D.corr.partial}): конфаунд его маскировал, а не создавал. <b>Предел:</b> «глубина» здесь — прокси `+
+  `по широте (широкое ≈ старое), а широта смешивает глубокий descent и широкую диффузию; на калиброванных `+
+  `узловых возрастах (M30/M31) для датируемого меньшинства тест можно ужесточить.`;
+</script>
