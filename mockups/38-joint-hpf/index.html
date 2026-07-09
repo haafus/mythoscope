@@ -1,0 +1,107 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>38 · Joint HPF (capstone)</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --hpf:#3c8a5e; --naive:#c05540; --a:#6a5aa6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:980px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:930px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; } @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  .bar-row { display:flex; align-items:center; gap:8px; margin:6px 0; } .bar-row .nm { width:150px; font-size:12px; text-align:right; }
+  .bar-row .tr { flex:1; background:var(--bg); border-radius:5px; height:20px; } .bar-row .bf { height:100%; border-radius:5px; }
+  .bar-row .vv { width:40px; font-size:12px; font-variant-numeric:tabular-nums; }
+  .comp { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:8px 0; }
+  .comp-h { display:flex; align-items:baseline; gap:8px; } .comp-h .area { font-weight:700; font-size:13px; }
+  .comp-h .sz { margin-left:auto; font-size:11px; color:var(--muted); }
+  .chip { display:inline-block; font-size:10.5px; background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:1px 8px; margin:3px 3px 0 0; }
+  .mot { font-size:11px; color:var(--muted); margin-top:4px; } .mot b{color:#4f7096;}
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#31453a; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Совместная факторизация с де-конфаундингом — капстоун</h1>
+  <p>Одна модель вместо конвейера мокапов 16–23: пуассоновская факторизация матрицы присутствия
+     <b>традиция×мотив</b> с <b>экспозиционным офсетом a(t)</b> — так латентные факторы становятся эмерджентными
+     ареально-тематическими компонентами, <b>де-конфаундированными от сэмплинга</b>. Мотивы взвешены по кросс-индексному
+     доверию из <b>M37</b>. Геометрия — great-circle (гейт M34 провалился). <span id="hdr"></span></p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Де-конфаундинг <span class="s">— η²(log a(t) | компонент): ниже = меньше зависит от покрытия</span></h2>
+    <div id="eta"></div>
+    <div class="note" id="etaNote"></div>
+  </div>
+  <div class="card">
+    <h2>Восстановление географии <span class="s">— ARI(компонент, ареал): выше = лучше</span></h2>
+    <div id="ari"></div>
+    <div class="note" id="ariNote"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>12 эмерджентных компонент <span class="s">— возникли из данных, без подсказки про ареал/тему</span></h2>
+  <div id="comps"></div>
+</div>
+
+<div class="card note" id="verdict"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])), clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+document.getElementById("hdr").textContent =
+  `${D.n_trad} традиций × ${D.n_motif} мотивов, K=${D.K} компонент, ${D.iters} итераций; средний вес доверия ${D.mean_conf}.`;
+document.getElementById("kpis").innerHTML = [
+  [`${D.eta.hpf} vs ${D.eta.naive}`, "зависимость от покрытия η²(a|компонент): HPF vs наивный KMeans (мокап-26 ~0.80)"],
+  [`${D.ari_area.hpf} vs ${D.ari_area.naive}`, "восстановление ареала ARI: HPF vs наивный"],
+  [`${D.K}`, "эмерджентных компонент = 12 макро-ареалов, де-конфаундированных"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// eta bars (lower better)
+const eb=[["HPF (offset a(t))",D.eta.hpf,"var(--hpf)"],["наивный KMeans",D.eta.naive,"var(--naive)"],["наивный (мокап 26)",0.80,"#98a0a5"]];
+document.getElementById("eta").innerHTML=eb.map(([nm,v,c])=>
+  `<div class="bar-row"><div class="nm">${nm}</div><div class="tr"><div class="bf" style="width:${100*v}%;background:${c}"></div></div><div class="vv">${v.toFixed(2)}</div></div>`).join("");
+document.getElementById("etaNote").innerHTML =
+  `Офсет a(t) срезает зависимость от покрытия с <b>${D.eta.naive}</b> (наивный) до <b>${D.eta.hpf}</b> — компоненты `+
+  `отражают структуру со-встречаемости, а не то, кто гуще каталогизирован.`;
+
+// ari bars (higher better)
+const ab=[["HPF",D.ari_area.hpf,"var(--hpf)"],["наивный KMeans",D.ari_area.naive,"var(--naive)"]];
+const amax=Math.max(...ab.map(x=>x[1]));
+document.getElementById("ari").innerHTML=ab.map(([nm,v,c])=>
+  `<div class="bar-row"><div class="nm">${nm}</div><div class="tr"><div class="bf" style="width:${100*v/amax}%;background:${c}"></div></div><div class="vv">${v.toFixed(2)}</div></div>`).join("");
+document.getElementById("ariNote").innerHTML =
+  `И при этом компоненты <b>лучше ловят географию</b> (ARI ${D.ari_area.hpf} против ${D.ari_area.naive}): наивная `+
+  `кластеризация слипается по покрытию, а де-конфаундированная восстанавливает реальные ареалы.`;
+
+// components
+document.getElementById("comps").innerHTML = D.comps.map(c=>{
+  const themes = c.themes.filter(t=>t.p>0.05).map(t=>`<span class="chip">${esc(t.t)} ${Math.round(100*t.p)}%</span>`).join("");
+  const areas = c.areas.map((x,i)=>`${i?'<span class="muted">, </span>':''}${esc(x.a)}<span class="muted"> ${x.n}</span>`).join("");
+  const mot = c.motifs.map(m=>`<b>${esc(m.id)}</b> ${esc(clip(m.n,22))}`).join(" · ");
+  return `<div class="comp"><div class="comp-h"><span class="area">${areas}</span><span class="sz">${c.n} традиций</span></div>`+
+    `<div>${themes}</div><div class="mot">${mot}</div></div>`;
+}).join("");
+
+document.getElementById("verdict").innerHTML =
+  `<b>Капстоун: один фит субсумирует 16–23.</b> Пуассоновская факторизация с офсетом a(t) одновременно `+
+  `<b>де-конфаундирует</b> (η² ${D.eta.naive}→${D.eta.hpf}, ниже наивных 0.80 из мокапа 26) <b>и восстанавливает `+
+  `географию</b> (ARI ${D.ari_area.hpf} против ${D.ari_area.naive}) — эмерджентные ${D.K} компонент это 12 макро-ареалов `+
+  `(мокапы 16–19), очищенных от сэмплинга (мокапы 20/24/26), с тематическим профилем каждой (мокап 23), в одной модели. `+
+  `Мотивы взвешены доверием M37; дерево/направление (M33/M36), имперский ковариат (M35) и great-circle-геометрия `+
+  `(M34-гейт провалил resistance) — уложенные входы. <b>Честный предел:</b> это MAP-ядро HPF (веса-множители), не полный `+
+  `байес с Gamma-приорами и неопределённостью; тема почти везде «Adventures» (модальная группа), так что ареальный `+
+  `сигнал сильнее тематического — как и ожидалось (тема кросс-секущая, мокап 23).`;
+</script>

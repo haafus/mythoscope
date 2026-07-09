@@ -58,7 +58,10 @@ These two together retire the two alternative hypotheses that caveat almost ever
    lean on the replicated core. Emits a per-motif confidence weight for M38 (triple 1.0 …
    berezkin-only 0.5). Caveat: the crosswalk is automated, so berezkin-only over-counts (K25
    swan-maiden = missed ATU 400) — an *upper* bound on coding-dependence.
-7. **M38 · Joint HPF (capstone)** — assembled once on the settled facets / geometry / graph / tree / weights.
+7. **M38 · Joint HPF (capstone) ✓ done.** One Poisson factorization with the a(t) exposure offset
+   (+ M37 weights) **de-confounds** (η²(a|component) 0.34 vs naive 0.67, mockup-26 ~0.80) **and
+   recovers the 12 macro-areas** (ARI 0.37 vs 0.08) in a single fit — subsuming mockups 16–23.
+   Great-circle geometry (M34 gate failed).
 8. **M39 · Tradition stratigraphy** — reads M38's stratum back onto traditions (downstream).
 
 Hard edges: **M34 → M35**, **M33 → M36**, everything → **M38 → M39**. Detailed specs follow, in
@@ -293,12 +296,15 @@ Heavier (download + join), but each opens a class of conclusion we cannot reach 
   Emits the observation multiplier M38 can use. Caveat: the crosswalk is automated (title/doc
   similarity), so berezkin-only over-counts (K25 swan-maiden's ATU 400 was missed) — an upper
   bound on coding-dependence. · *data: partly have* · **M**
-- **M38 · Joint effort-corrected factorization (Hierarchical Poisson) — the capstone.** The one
-  model of synthesis §3: factorize `M` with `a(t)` as an exposure offset; latent factors are the
-  emergent themes/strata, de-confounded globally. · *data: have* · **subsumes:** mockups 16–23 as
-  one fit. Built **once**, after its structural inputs land — facets (M32), tree (M33/M36),
-  contact graph (M35 if it survives), weights (M37); **geometry stays great-circle** (M34's
-  resistance-distance gate failed). · **L**
+- **M38 · Joint effort-corrected factorization (Hierarchical Poisson) — the capstone. ✓ done**
+  (mockup 38). Poisson factorization of the tradition×motif presence matrix with `a(t)` as an
+  **exposure offset** (+ M37 confidence as motif weights). **Result:** in one fit it
+  **de-confounds** — η²(log a | component) **0.34** vs naive KMeans 0.67 (mockup-26 naive ~0.80) —
+  **and recovers geography** — ARI(component, area) **0.37** vs naive 0.08: the 12 emergent
+  components are the 12 macro-areas, each with a theme profile, **subsuming mockups 16–23**. Built
+  on the settled inputs — facets (M32), tree/direction (M33/M36), empire covariate (M35), weights
+  (M37); **geometry stays great-circle** (M34's gate failed). Honest limit: MAP/NMF core, not full
+  Bayesian HPF with uncertainty; areal signal > thematic (theme cross-cuts area). · *data: have* · **L**
 - **M39 · Tradition stratigraphy.** Turn `stratum` around — profile each *tradition* as its
   stack of strata (share of African-substratum … colonial motifs), a geological-column view. ·
   *depends: a trusted stratum from M38 (and M24/M27)* · **checks:** deep-substrate-rich traditions

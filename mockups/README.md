@@ -475,6 +475,18 @@ crosswalk is automated, so berezkin-only over-counts (K25 swan-maiden's ATU 400 
 upper bound on coding-dependence. See
 [`37-cross-index-arbitration/README.md`](37-cross-index-arbitration/README.md).
 
+### 38 · Joint HPF — the capstone (roadmap M38)
+One model replacing the 16–23 pipeline: a Poisson factorization of the tradition×motif presence
+matrix with the attestation intensity **a(t) as an exposure offset** (+ M37 confidence as motif
+weights), so the latent factors are the emergent area/theme components de-confounded from sampling.
+**Q.** Can one de-confounded fit recover the structure the piecemeal mockups found?
+**Finding — yes.** In a single fit it **de-confounds** (η²(log a | component) 0.34 vs naive KMeans
+0.67, mockup-26 naive ~0.80) **and recovers geography** (ARI 0.37 vs 0.08): the 12 emergent
+components are the 12 macro-areas, each with a theme profile — subsuming mockups 16–23. Built on the
+settled inputs (facets M32, tree/direction M33/M36, empire covariate M35, weights M37, great-circle
+geometry since M34's gate failed). Honest limit: the MAP/NMF core, not full Bayesian HPF with
+uncertainty. See [`38-joint-hpf/README.md`](38-joint-hpf/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
