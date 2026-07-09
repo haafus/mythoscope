@@ -219,7 +219,8 @@ PROSE = {
 
 def main():
     m06 = load_mod("06-per-index-biclusters/build_data.py", "m06")
-    bz = json.load(open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8"))
+    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+        bz = json.load(f)
 
     name2macro = {}
     for v in bz["traditions"].values():

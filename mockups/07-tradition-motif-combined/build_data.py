@@ -19,6 +19,7 @@ OUT = Path(__file__).resolve().parent / "data.js"
 sys.path.insert(0, str(ROOT / "src"))
 from motifs.sources.culture_dict import canonical  # noqa: E402
 
+
 # Normalise TMI's free-text culture labels via the curated pipeline dictionary
 # (merges Icel.->Icelandic, China->Chinese, strips "(sub-area)"/"Cf." etc.) for
 # the "all" and "tmi" views. Berezkin/ATU labels are left untouched.

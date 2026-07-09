@@ -107,7 +107,7 @@ def place_points(resolve, labels_by_cluster, trad_mem):
     # group points sharing one base coordinate; a subregion centroid gets a
     # wider spread than a real per-people coordinate that a few labels collide on.
     groups = defaultdict(list)
-    for idx, (label, k, lon, lat, precise) in enumerate(raw):
+    for idx, (_label, _k, lon, lat, precise) in enumerate(raw):
         groups[(round(lon, 3), round(lat, 3), precise)].append(idx)
 
     coords = [None] * len(raw)
@@ -121,7 +121,7 @@ def place_points(resolve, labels_by_cluster, trad_mem):
                            round(lat + oy * span, 2))
 
     points = []
-    for idx, (label, k, lon, lat, precise) in enumerate(raw):
+    for idx, (label, k, _lon, _lat, _precise) in enumerate(raw):
         x, y = coords[idx]
         points.append({"t": label, "x": x, "y": y, "k": k, "s": trad_mem.get(label, 0)})
     return points, len(points)
@@ -202,7 +202,7 @@ def bicluster(index, tmi_norm=None, cfg=None):
     nz = np.asarray(M.sum(axis=0)).ravel() > 0
     if not nz.all():
         M = M[:, nz]
-        cvocab = [c for c, k in zip(cvocab, nz) if k]
+        cvocab = [c for c, k in zip(cvocab, nz, strict=True) if k]
         ci = {c: i for i, c in enumerate(cvocab)}
     W = TfidfTransformer().fit_transform(M)
     K = min(K, len(cvocab), len(kept))
