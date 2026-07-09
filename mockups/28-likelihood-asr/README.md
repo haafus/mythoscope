@@ -19,8 +19,8 @@ dated tree** wired from mockup 30 (the M30→M28 payoff).
 
 - **Dating (M30) turns family ceilings into node ages — for concentrated motifs.** Each
   top-level family is given a calendar root age from mockup 30's `FAMILY_DATES` (matched via the
-  modal Glottolog family of its traditions; 88% tradition coverage, undated families take a
-  4.5 kyr default), internal branches are scaled by node height, and `P(t) = expm(Q·t)` runs per
+  modal Glottolog family of its traditions; 95% tradition coverage, undated families take a
+  3.5 kyr default), internal branches are scaled by node height, and `P(t) = expm(Q·t)` runs per
   branch. Result: **778 motifs concentrated in their dominant family (conc ≥ 0.5) get a
   node-level origin age, median ≈ 1833 BP, and every one sits BELOW its family-root ceiling** —
   exactly what mockup 31 predicted an RRW would find (the within-family spread is younger than
