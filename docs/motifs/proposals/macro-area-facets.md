@@ -45,7 +45,7 @@ serve only very limited tasks, and it is far more effective to process motifs
 
 | Entity | Properties |
 |---|---|
-| **Tradition** | `area` (12, geographic) · `family` (~10, language/religion) · `subsistence` (4, economy) · coordinates · raw `language` list · `areal_id` / `areal_path` · attestation richness |
+| **Tradition** | `area` (12, geographic) · `family` (~10, language/religion) · `subsistence` (4, economy) · `theme_profile` (13-dim thematic composition) · coordinates · raw `language` list · `areal_id` / `areal_path` · attestation richness |
 | **Motif** | `theme` (Berezkin's category A/B → 13 groups — **the primary analytical axis**) · `stratum` (7, time-depth) · definition · cross-index links |
 | **Attestation** (motif × tradition) | the bare presence — the raw material from which a motif's `stratum` is inferred |
 
@@ -114,6 +114,35 @@ Amerindian). It carries part of the load that let `area` shrink to 12.
 
 `forager` (hunter-gatherer / fisher) · `pastoralist` · `horticulturalist` (swidden) ·
 `agrarian-state` (intensive agriculture + literate state).
+
+Not hand-curatable at 1046 rows blindly — but **derivable from an open source**:
+[D-PLACE](https://d-place.org/)'s Ethnographic Atlas codes subsistence economy per
+society, mapped to Glottocodes, so a tradition → society → subsistence join populates
+this (and cross-checks `family`).
+
+## Tradition · `theme_profile` — thematic composition (13-dim)
+
+A derived per-tradition feature: the proportion of a tradition's attested motifs falling
+in each of the 13 theme groups (§`motif.theme`). Distinct from the motif's own `theme`
+— this is the *genre balance* of a tradition's corpus, its mythological fingerprint.
+
+**It is a strong, partly cross-geographic signal** (measured over the 840 traditions
+with ≥30 motifs):
+- **38%** of the variance in `theme_profile` is explained by macro-area — a large,
+  real regional structure, yet 62% is orthogonal to geography.
+- k-means over the profiles yields interpretable groups that mix region and worldview:
+  a **trickster-first** African profile (group 11 dominant), a **märchen** Eurasian
+  profile (10·11·08), an **adventure + cosmology** North-American/Beringian profile
+  (with Siberia), and a **cosmology-heavy** cluster that puts Mesoamerica–Andes *with*
+  Tibet/SE-Asia — a genuine cross-continental worldview affinity that pure geography or
+  language would miss.
+
+Uses: (a) a **clustering / similarity factor** on its own or alongside
+`area × family × subsistence`; (b) a **proxy for worldview / mode of life** that
+correlates with `subsistence` (foragers etiology-heavy, agrarian-literate societies
+adventure/märchen-heavy). Caveat: confounded by attestation intensity (a densely
+catalogued corpus reflects what was recorded), so use the bias-corrected weights of
+`stratum-derivation.md` §5 when computing it for analysis.
 
 ## Motif · `theme` — Berezkin's category & group (2 levels)
 

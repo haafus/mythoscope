@@ -37,8 +37,12 @@ not a hard class.
 - **`language`** — the language-family chain per tradition (e.g. `[Indoeuropean, …]`).
 - **Crosswalk** — motif-level links to TMI and ATU (independent attestation).
 
-Everything below is computable from these; only a dated language phylogeny (Method B)
-is an external resource we do not yet have.
+Everything below is computable from these; Method B additionally needs a language
+phylogeny — **available as open data** (§7): [Glottolog](https://glottolog.org/)
+(CLDF, CC-BY) for the classification tree and coordinates, a dated global Bayesian
+phylogeny (Bouckaert/EDGE, as used by [Grambank](https://grambank.clld.org/) 2023) for
+branch dates, and [D-PLACE](https://d-place.org/) (CC-BY) linking societies to
+Glottocodes (also seeds `subsistence`).
 
 ## 3. Per-motif distributional features
 
@@ -156,9 +160,13 @@ d'Huy, Ross). It handles homoplasy natively because it *counts independent gains
 - **Homoplasy.** If explaining the tips needs many independent gains, there is no single
   deep origin — flag as convergent/banal rather than ancient. This is the piece Method A
   can only approximate with `clade_incoherence`.
-- **Interim without a dated tree.** Use the `language` chain as a coarse 2–3 level tree
-  (family → subfamily) and do parsimony gain-counting; it yields `clade_incoherence`
-  (used in Method A) even before a real dated phylogeny exists.
+- **Data (open, licensed).** Glottolog CLDF (CC-BY) — classification topology + tip
+  coordinates, join our traditions to Glottocodes via `language`/name; a dated global
+  Bayesian phylogeny (Bouckaert/EDGE, as in the Grambank 2023 analysis) for branch
+  dates; D-PLACE (CC-BY) bridges societies↔Glottocodes (and seeds `subsistence`).
+- **Interim without the dated tree.** Use the Glottolog classification (or just the
+  `language` chain) as a coarse family → subfamily tree and do parsimony gain-counting;
+  it yields `clade_incoherence` (Method A) before the dated phylogeny is wired in.
 
 ## 8. From score to the named strata
 
