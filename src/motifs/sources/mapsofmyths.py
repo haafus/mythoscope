@@ -89,8 +89,15 @@ def parse_motif_node(html: str) -> dict:
     }
 
 
+_NODE_RE = re.compile(r"/node/(\d+)")
+
+
 def parse_traditions_full(html: str) -> dict[str, dict]:
-    """areal_id -> {name, name_rus, areal_path:[[id,name]], language:[...]}."""
+    """areal_id -> {name, name_rus, areal_path:[[id,name]], language:[...], node}.
+
+    ``node`` is the Drupal node id, used to fetch the tradition's map coordinates
+    from the ``/gmap-markers-tradition`` endpoint (see ``refresh``).
+    """
     from bs4 import BeautifulSoup
 
     out: dict[str, dict] = {}
@@ -109,9 +116,38 @@ def parse_traditions_full(html: str) -> dict[str, dict]:
         lang = r.find("div", class_="field-name-field-language-hierarchy")
         language = [" ".join(a.get_text(" ", strip=True).split())
                     for a in lang.find_all("a")] if lang else []
+        node_link = r.find("a", href=_NODE_RE)
+        node = _NODE_RE.search(node_link["href"]).group(1) if node_link else ""
         out[aid] = {"name": name, "name_rus": _field(r, "body"),
-                    "areal_path": path, "language": language}
+                    "areal_path": path, "language": language, "node": node}
     return out
+
+
+def parse_tradition_markers(payload: str) -> list | None:
+    """``[lat, lon]`` for a tradition from a ``/gmap-markers-tradition`` JSON reply.
+
+    The endpoint returns a list of ``{lat, lng, ...}`` markers (a tradition may span
+    several points); we take their centroid. Returns ``None`` if the reply is empty
+    or unparseable, so a missing/odd tradition can't poison the catalogue.
+    """
+    try:
+        markers = json.loads(payload)
+    except (ValueError, TypeError):
+        return None
+    lats, lons = [], []
+    for m in markers or []:
+        try:
+            # some rows use a comma as the decimal separator (e.g. "61,5")
+            lat = float(str(m["lat"]).replace(",", "."))
+            lon = float(str(m["lng"]).replace(",", "."))
+        except (KeyError, ValueError, TypeError):
+            continue
+        if -90 <= lat <= 90 and -180 <= lon <= 180:
+            lats.append(lat)
+            lons.append(lon)
+    if not lats:
+        return None
+    return [round(sum(lats) / len(lats), 4), round(sum(lons) / len(lons), 4)]
 
 
 # --- pipeline step ---------------------------------------------------------
@@ -131,6 +167,22 @@ def data_dir() -> Path:
 
 def _write(name: str, payload: dict) -> None:
     (data_dir() / name).write_text(json.dumps(payload, ensure_ascii=False, indent=0), encoding="utf-8")
+
+
+def _post_markers(node: str, cache_dir: Path, auth: tuple[str, str], *, force: bool = False) -> str:
+    """POST the ``/gmap-markers-tradition`` endpoint for one node, cached like a
+    fetch (a non-empty cached reply short-circuits unless ``force``)."""
+    cache_file = cache_dir / f"markers_{node}.json"
+    if not force and cache_file.exists() and cache_file.stat().st_size > 0:
+        return cache_file.read_text(encoding="utf-8")
+    import requests  # lazy: the HTTP dep lives in the corpus extra
+
+    resp = requests.post(f"{BASE}/gmap-markers-tradition", data={"tradition": node},
+                         auth=auth, timeout=60)
+    resp.raise_for_status()
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    cache_file.write_text(resp.text, encoding="utf-8")
+    return resp.text
 
 
 def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict:
@@ -178,6 +230,30 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
         "source": "mapsofmyths.com", "license": _LICENSE, "attribution": _ATTRIB, "motifs": nodes})
 
     traditions = parse_traditions_full(get("/traditions_full", "traditions_full.html"))
+
+    # Real per-tradition coordinates: each catalogue row carries a Drupal node id
+    # whose map markers give the tradition's actual location(s). Fetch them (cached,
+    # concurrent) and attach the marker centroid as ``coordinates`` = [lat, lon].
+    marker_cache = cache / "markers"
+
+    def coord(item):
+        aid, rec = item
+        node = rec.get("node")
+        if not node:
+            return aid, None
+        try:
+            return aid, parse_tradition_markers(_post_markers(node, marker_cache, auth, force=force))
+        except Exception as exc:  # a missing/odd marker reply must not abort the build
+            logger.debug("mapsofmyths: marker fetch failed for node %s: %s", node, exc)
+            return aid, None
+
+    with_coords = 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for aid, coords in pool.map(coord, traditions.items()):
+            if coords:
+                traditions[aid]["coordinates"] = coords
+                with_coords += 1
+
     _write(TRADITIONS_FILE, {
         "source": "mapsofmyths.com", "license": _LICENSE, "attribution": _ATTRIB,
         "traditions": traditions})
@@ -189,9 +265,11 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
         "with_atu": sum(1 for r in nodes.values() if r.get("atu")),
         "with_traditions": sum(1 for r in nodes.values() if r.get("traditions")),
         "traditions": len(traditions),
+        "traditions_with_coords": with_coords,
     }
     logger.info("mapsofmyths: refreshed — motifs:%d type/group:%d tmi:%d atu:%d "
-                "traditions-sets:%d; tradition catalogue:%d",
+                "traditions-sets:%d; tradition catalogue:%d (coords:%d)",
                 counts["motifs"], counts["with_type"], counts["with_tmi"],
-                counts["with_atu"], counts["with_traditions"], counts["traditions"])
+                counts["with_atu"], counts["with_traditions"], counts["traditions"],
+                with_coords)
     return counts
