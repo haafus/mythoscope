@@ -380,7 +380,7 @@ Theme remains an **independent cross-check** axis, never an estimator input.
 
 ## 13. Cumulative conclusions (empirical)
 
-Backed by mockups 16–18 over the Berezkin catalogue:
+Backed by mockups 16–23 over the Berezkin catalogue:
 
 - **Method A (mockup 17).** Distribution carries a real depth signal — pan-global
   celestial cosmogony tops the ranking, the adventure-endemism stress-test passes — but
@@ -393,6 +393,12 @@ Backed by mockups 16–18 over the Berezkin catalogue:
   phylomemetics result. Cosmology, trickster and the swan-maiden are broad but **areally
   diffused**. So the language tree is the "wrong tree" for most motifs — which is exactly
   why **geography is the primary signal** and language/time are separate computed layers.
+- **The mandatory controls change the numbers but not the spine (mockup 20).** Weighting
+  presence by attestation intensity thins the "broad areal" class by more than half (its
+  breadth was partly catalogue density), yet the deep both-hemisphere class survives
+  (320/480) — an empirical restatement of the disjunction-outranks-breadth axiom. A
+  banality proxy flags the celestial "X is Y" etiologies as homoplasy candidates. These
+  are non-negotiable before `stratum` ships, and they leave the deep-disjunct spine intact.
 - **Theme is a statistical prior on stratum, not a substitute.** Per group, Category A
   (cosmology/etiology) is geographically **broader** (mean ~6 macro-areas) and **more
   areal** (phylo-signal ~0.25 — deep substrate), while Category B (adventures/tricks) is
@@ -407,7 +413,11 @@ Backed by mockups 16–18 over the Berezkin catalogue:
 - **The model that follows.** Tradition = area × family × subsistence × theme_profile;
   motif = theme (given) × stratum (computed, A×B). Analysis fixes a theme (Berezkin's
   method), then dates within it by the gated A×B pipeline. No single axis suffices; the
-  three together (space, tree, theme) each remove the others' confound.
+  three together (space, tree, theme) each remove the others' confound. The tradition axes
+  corroborate the theme prior: `subsistence × theme` runs cosmology-heavy for extractive
+  economies to tale-heavy for intensive/mobile ones (mockup 22, area confound noted), and
+  the theme axis itself is data-confirmed — Category A vs B re-emerges from theme
+  co-occurrence across traditions (mockup 23), not just from Berezkin's labels.
 
 ## 14. Open questions and future work
 

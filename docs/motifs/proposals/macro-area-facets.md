@@ -152,7 +152,10 @@ catalogued corpus reflects what was recorded), so use the bias-corrected weights
 The primary analytical axis, per Berezkin's own note. **Already in our data** as
 `motif_group` / `motif_group_num` (13 leaf groups); this proposal only adds his
 two-level roll-up — **Category A · Cosmology & etiology** (groups 01–09) vs
-**Category B · Adventures & tricks** (10–13) — and a residual "mixed" tag.
+**Category B · Adventures & tricks** (10–13) — and a residual "mixed" tag. The A/B split
+is not just editorial: it **re-emerges from theme co-occurrence across traditions**
+(seriated CLR correlation, mockup 23) without using Berezkin's labels — see the
+theme × theme signal below.
 
 | Category | Group |
 |---|---|
@@ -179,16 +182,27 @@ stress-test a naive "B = late" rule fails and the distributional signal passes.
 
 ### theme × area and theme × stratum are a signal
 
-The *mapping* of theme groups onto areas and onto depth is itself informative — theme is
-a statistical **prior** on stratum (not a substitute; the two stay orthogonal per motif).
-Measured over the catalogue (the theme × area half is visualised in
+The *mapping* of theme groups onto areas, onto each other, and onto depth is itself
+informative — theme is a statistical **prior** on stratum (not a substitute; the two stay
+orthogonal per motif). Visualised in
 [`mockups/23-theme-geography`](../../../mockups/23-theme-geography/) — a lift heatmap, a
-traditions × themes co-cluster map, and a per-theme picker):
+seriated theme × theme co-occurrence matrix, a traditions × themes co-cluster map, and a
+per-theme picker. Measured over the catalogue:
 
 - **theme × area.** Which themes concentrate where varies strongly: Category B is 74–77%
-  of European attestations but 27% in Mesoamerica–Andes; `theme_profile` clusters
-  regionally (38% of its variance is macro-area). Cosmology is pan-global (mean ~6
-  macro-areas per motif), tales are regional (adventures ~4.8, formulae ~2.9).
+  of European attestations but 27% in Mesoamerica–Andes; by lift, adventures are
+  over-represented in the Eurasian belt (×1.2) and depleted in Australia (×0.3) while
+  Sun & Moon inverts (×3.4 in Australia). `theme_profile` clusters regionally (38% of its
+  variance is macro-area); cosmology is pan-global (mean ~6 macro-areas per motif), tales
+  are regional (adventures ~4.8, formulae ~2.9).
+- **theme × theme.** The A/B split is not merely editorial — it **re-emerges from theme
+  co-occurrence across traditions**. Correlating theme shares (on the CLR transform, to
+  strip the compositional closure) and seriating yields two contiguous blocks: a tales
+  block (adventures · tricks · proper names · formulae · protagonist identity, monstrous
+  beings adjoining) and a cosmology block (Sun & Moon · cosmogony · origin of humans ·
+  subsistence · stars), with a strong negative rectangle between them (cosmogony ×
+  adventures ≈ −0.6). Berezkin's Category A vs B falls out of the data without his labels —
+  a data-driven confirmation that the theme axis is a natural division.
 - **theme × stratum.** Category A (cosmology/etiology) is **broader and more areal**
   (phylo-signal ~0.25 — deep substrate spread by ancient contact); Category B
   (adventures/tricks) is **narrower and more descent-tracking** (~0.36 — younger tales
@@ -439,8 +453,9 @@ rows); `theme`, `area`, and the `family` seed are computed.
 
 ## Cumulative conclusions
 
-The whole investigation, in one place (prototypes: mockups 15–18; method detail in
-[`stratum-derivation.md`](stratum-derivation.md) §12–13):
+The whole investigation, in one place (prototypes: mockups 15–23; method detail in
+[`stratum-derivation.md`](stratum-derivation.md) §12–14; the overall arc in
+[`analysis-program.md`](analysis-program.md)):
 
 1. **"Region" was three axes crammed into one.** Split cleanly into **entities**: a
    *tradition* carries `area` (12, from `areal_path`), `family` (from `language` +
@@ -449,13 +464,17 @@ The whole investigation, in one place (prototypes: mockups 15–18; method detai
    `stratum` (computed). Expressiveness is multiplicative across entities, so `area`
    shrinks from 18 to 12.
 2. **Berezkin's own rule holds:** don't pool the catalogue — fix a `theme`, then analyse.
-   Theme is first-class and already in our data (`motif_group`).
+   Theme is first-class and already in our data (`motif_group`); and the A/B split is
+   **independently recovered** — it re-emerges from theme co-occurrence across traditions
+   (seriated CLR correlation, mockup 23) without his labels.
 3. **Time-depth is a motif property, inferred, not a tradition facet.** Distribution
    dates a motif, but only under a model and never perfectly (homoplasy, loss, sampling).
 4. **Theme ≠ depth per motif, but predicts it in aggregate.** Category A (cosmology) is
    broad + areal-deep; Category B (tales) is narrower + more descent-tracking — a prior,
-   not a determiner (endemic-American adventures are deep). `theme × area` and
-   `theme × stratum` are both real signals.
+   not a determiner (endemic-American adventures are deep). `theme × area`, `theme × theme`
+   (the A/B blocks) and `theme × stratum` are all real signals; so is `subsistence × theme`
+   — extractive economies skew cosmological, intensive/mobile ones tale-heavy (mockup 22,
+   with an area confound).
 5. **Geography is primary; language and time are separate computed layers.** Method B
    shows only ~1% of motifs follow language descent (Eurasian fairy tales); the rest
    spread areally — so `area` carries most of the structure, while `stratum` is a

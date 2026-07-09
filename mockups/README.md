@@ -13,8 +13,8 @@ Build one, then open the page.
 > These are the lab bench for the analysis arc in
 > [`docs/motifs/proposals/analysis-program.md`](../docs/motifs/proposals/analysis-program.md)
 > (collect → describe → classify → explain). Roughly: 01–14 are stages 1–2
-> (collection & morphology), 15–16 & 21 are stage 3 (systematics), 17–20 & 22 are stage 4
-> (phylogeny & etiology).
+> (collection & morphology), 15–16, 21 & 23 are stage 3 (systematics), 17–20 & 22 are
+> stage 4 (phylogeny & etiology).
 
 ## Run
 

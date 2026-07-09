@@ -92,10 +92,16 @@ taxonomy a user can slice by without gaps or overlaps.
   data gaps, not a silent one.
 - **Berezkin's rule adopted:** don't pool the catalogue — the primary slicer is `theme`; the
   tradition axes are cross-cuts within a theme slice.
+- **The chosen characters are natural, not imposed.** The taxonomy's own axes re-emerge from
+  the data: `theme_profile` clusters recover regional worldviews, and the theme **Category
+  A vs B** split falls out of theme co-occurrence across traditions alone (seriated CLR
+  correlation) — a systematic division confirmed, not just declared.
 
 **Artifacts.** the entity model + canonical values (`macro-area-facets.md`); the shared
 geographic layer (12); co-occurrence biclusters (03, 05–07); the Berezkin cluster report
-(15); theme-profile clustering (16); deterministic facet population + coverage (21).
+(15); theme-profile clustering (16); theme × geography — lift heatmap, seriated theme
+co-occurrence, traditions × themes co-clusters (23); deterministic facet population +
+coverage (21).
 
 ## 4. Phylogeny & etiology — *how the distributions arose, dated and explained*
 
@@ -132,10 +138,17 @@ and the theme test (22).
 honestly — the questions still open.
 
 **What we can say.**
+- **The theme axis is a real division, not an editorial one**: Berezkin's Category A vs B
+  re-emerges from theme co-occurrence across traditions alone (seriated CLR correlation,
+  mockup 23) — two contiguous blocks (cosmology vs tales) with a strong negative rectangle
+  between them.
 - **Theme is orthogonal to stratum per motif, but a statistical prior in aggregate**:
   Category A (cosmology) is broader + more areal-deep, Category B (tales) narrower + more
   descent-tracking. It must stay an *independent cross-check*, never an estimator input
   (that would be circular).
+- **Theme maps onto geography**: adventures over-represented in the Eurasian belt,
+  cosmology in the Americas–Pacific and the boreal north (lift heatmap, mockup 23) — the
+  systematics view that stage 3 mapped, one block at a time.
 - **Subsistence tracks theme**: extractive economies (foragers, horticulturalists) are
   cosmology-heavy, intensive/mobile ones (agrarian states, pastoralists) tale-heavy — the
   predicted gradient, with an honest area confound.
