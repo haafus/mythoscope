@@ -9,6 +9,7 @@ in the metadata records it.
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
@@ -66,3 +67,18 @@ def read_local_to_cache(url: str, cache_file: str | Path, root: str | Path) -> b
     cache_file.parent.mkdir(parents=True, exist_ok=True)
     cache_file.write_bytes(data)
     return data
+
+
+def file_source_unchanged(url: str, cache_file: str | Path, root: str | Path) -> bool:
+    """True if the local ``file:`` source still matches the raw-cache snapshot from
+    the previous build (content hash unchanged). Used to skip re-extraction of
+    unmodified files without storing a separate hash in the metadata. Any error
+    (missing snapshot, missing/unreadable source) is treated as "changed"."""
+    cache_file = Path(cache_file)
+    if not cache_file.exists():
+        return False
+    try:
+        current = read_local(url, root)
+    except (OSError, ValueError):
+        return False
+    return hashlib.md5(current).digest() == hashlib.md5(cache_file.read_bytes()).digest()

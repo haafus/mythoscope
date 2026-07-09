@@ -12,7 +12,13 @@ from settings import settings
 from .clean_gutenberg import clean_gutenberg_in_builder
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
-from .sources import WEB_SCHEMES, is_file_source, read_local_to_cache, source_scheme
+from .sources import (
+    WEB_SCHEMES,
+    file_source_unchanged,
+    is_file_source,
+    read_local_to_cache,
+    source_scheme,
+)
 from .utils import (
     count_sentences,
     count_words,
@@ -205,11 +211,20 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
 
     for item in download_list:
         title = item["title"]
+        url = item.get("url", "")
         prev = existing.get(title)
-        # Local file sources are cheap to re-read and may change on disk, so they
-        # are always reprocessed (content edits are picked up without a hash field).
-        # Web sources are reused when their output file is still present.
-        if prev and not is_file_source(item.get("url", "")) and (corpus_root / prev.get("path", "")).exists():
+        output_present = bool(prev) and (corpus_root / prev.get("path", "")).exists()
+        # A local file source is reused only if its content hash still matches the
+        # raw snapshot from the previous build (on-disk edits are re-ingested); the
+        # snapshot lives in corpus/raw, so no hash is stored in the metadata. Web
+        # sources are reused whenever their output file is still present.
+        if output_present and is_file_source(url):
+            raw_cache = cache_path(Path(settings.corpus_dir) / "raw", url)
+            reuse = file_source_unchanged(url, raw_cache, settings.sources_dir)
+        else:
+            reuse = output_present
+
+        if reuse:
             metadata.append(prev)
             logger.debug(f"{title}: already in corpus, skipping")
         else:

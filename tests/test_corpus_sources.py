@@ -1,8 +1,10 @@
 import pytest
 
 from corpus.sources import (
+    file_source_unchanged,
     is_file_source,
     read_local,
+    read_local_to_cache,
     resolve_local_path,
     source_scheme,
 )
@@ -75,3 +77,36 @@ class TestReadLocal:
     def test_missing_file_raises(self, tmp_path):
         with pytest.raises(FileNotFoundError):
             read_local("file:missing.txt", tmp_path)
+
+
+class TestFileSourceUnchanged:
+    def test_matching_snapshot_is_unchanged(self, tmp_path):
+        root = tmp_path / "sources"
+        root.mkdir()
+        (root / "foo.txt").write_bytes(b"hello")
+        cache = tmp_path / "raw" / "snap"
+        read_local_to_cache("file:foo.txt", cache, root)
+        assert file_source_unchanged("file:foo.txt", cache, root) is True
+
+    def test_edited_source_is_changed(self, tmp_path):
+        root = tmp_path / "sources"
+        root.mkdir()
+        (root / "foo.txt").write_bytes(b"hello")
+        cache = tmp_path / "raw" / "snap"
+        read_local_to_cache("file:foo.txt", cache, root)
+        (root / "foo.txt").write_bytes(b"hello world")  # edit on disk
+        assert file_source_unchanged("file:foo.txt", cache, root) is False
+
+    def test_missing_snapshot_is_changed(self, tmp_path):
+        root = tmp_path / "sources"
+        root.mkdir()
+        (root / "foo.txt").write_bytes(b"hello")
+        assert file_source_unchanged("file:foo.txt", tmp_path / "raw" / "absent", root) is False
+
+    def test_missing_source_is_changed(self, tmp_path):
+        root = tmp_path / "sources"
+        root.mkdir()
+        cache = tmp_path / "raw" / "snap"
+        cache.parent.mkdir(parents=True)
+        cache.write_bytes(b"hello")
+        assert file_source_unchanged("file:gone.txt", cache, root) is False

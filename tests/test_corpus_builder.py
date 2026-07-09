@@ -72,9 +72,12 @@ class TestBuildCorpusForce:
         config_dir.mkdir()
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()
+        sources_dir = tmp_path / "sources"
+        sources_dir.mkdir()
         (config_dir / "traditions.json").write_text("{}")
         monkeypatch.setattr(settings, "config_dir", config_dir)
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
+        monkeypatch.setattr(settings, "sources_dir", sources_dir)
 
         monkeypatch.setattr(builder, "load_download_list", lambda: [dict(i) for i in items])
         if existing is not None:
@@ -135,13 +138,45 @@ class TestBuildCorpusForce:
         build_corpus(force=False)
         assert processed == []  # web source with present output is reused
 
-    def test_file_source_is_always_reprocessed(self, tmp_path, monkeypatch):
-        # A local file source is re-read every build (edits are picked up), even when
-        # its output file is already on disk.
+    def test_file_source_unchanged_is_skipped(self, tmp_path, monkeypatch):
+        # File source whose content matches the previous raw snapshot is reused.
+        from fetch_cache import cache_path
+
         items = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt"}]
         existing = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt", "path": "Local.txt"}]
         corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
-        (corpus_dir / "Local.txt").write_text("old")  # present, but file sources reprocess
+        (corpus_dir / "Local.txt").write_text("out")  # output present
+        (tmp_path / "sources" / "local.txt").write_bytes(b"same content")
+        raw = cache_path(corpus_dir / "raw", "file:local.txt")
+        raw.parent.mkdir(parents=True, exist_ok=True)
+        raw.write_bytes(b"same content")  # snapshot matches the source
+
+        build_corpus(force=False)
+        assert processed == []  # unchanged -> reused
+
+    def test_file_source_changed_is_reprocessed(self, tmp_path, monkeypatch):
+        # File source whose content differs from the raw snapshot is re-ingested.
+        from fetch_cache import cache_path
+
+        items = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt"}]
+        existing = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt", "path": "Local.txt"}]
+        corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+        (corpus_dir / "Local.txt").write_text("out")
+        (tmp_path / "sources" / "local.txt").write_bytes(b"new content")
+        raw = cache_path(corpus_dir / "raw", "file:local.txt")
+        raw.parent.mkdir(parents=True, exist_ok=True)
+        raw.write_bytes(b"old content")  # snapshot differs from the edited source
+
+        build_corpus(force=False)
+        assert processed == ["Local"]
+
+    def test_file_source_without_snapshot_is_reprocessed(self, tmp_path, monkeypatch):
+        # No previous raw snapshot (e.g. first file build) -> treat as changed.
+        items = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt"}]
+        existing = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt", "path": "Local.txt"}]
+        corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
+        (corpus_dir / "Local.txt").write_text("out")
+        (tmp_path / "sources" / "local.txt").write_bytes(b"content")
 
         build_corpus(force=False)
         assert processed == ["Local"]
