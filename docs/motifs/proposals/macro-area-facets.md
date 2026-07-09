@@ -1,5 +1,8 @@
 # Proposal: an entity model for region, culture and time-depth
 
+> Stage 3 (**systematics**) of the overall arc in
+> [`analysis-program.md`](analysis-program.md): collect → describe → **classify** → explain.
+
 Extends [`troubleshooting.md`](../troubleshooting.md) §"four macro-region
 vocabularies". A first draft of this proposal treated *area · family · transmission*
 as three facets **of a tradition**. That was wrong on one point, and fixing it
