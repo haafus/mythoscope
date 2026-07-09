@@ -137,7 +137,9 @@ def parse_tradition_markers(payload: str) -> list | None:
     lats, lons = [], []
     for m in markers or []:
         try:
-            lat, lon = float(m["lat"]), float(m["lng"])
+            # some rows use a comma as the decimal separator (e.g. "61,5")
+            lat = float(str(m["lat"]).replace(",", "."))
+            lon = float(str(m["lng"]).replace(",", "."))
         except (KeyError, ValueError, TypeError):
             continue
         if -90 <= lat <= 90 and -180 <= lon <= 180:
