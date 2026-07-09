@@ -133,11 +133,17 @@ protagonist split (09a/09b), realistic tales out of 10 (`realistic_tales`),
 marriage/obscene tricks (50), animal-vs-human actors in 11 (111/112), a `mixed` group
 (14). His placement note: 08–09 lean A, 12–13 lean B.
 
-**A/B is close to the mythology-vs-tale axis and to time-depth.** Category A carries
-the deep worldview-bearing strata; Category B is the later novelistic/märchen layer
-that diffuses recently (our clusters 0/1 — the märchen belts — are B-heavy; the
-cosmogonic clusters are A). So `stratum` below is largely a refinement of
-`theme` (A vs B) × areal shape, not an independent hand-authored axis.
+**Theme and stratum are orthogonal — do not read depth off theme.** It is tempting to
+equate Category A with the deep mythological layer and Category B with the late
+European märchen. The data refutes it: Category B is *not* a European specialty — it
+is 51% of North-American attestations and 58% of Sub-Saharan-African ones, and **24%
+of all adventure/trick motifs are endemic to the New World** (present in the Americas,
+absent from Europe) — a deep indigenous trickster / hero-adventure layer (Raven,
+Coyote, Anansi), not the late märchen. The same theme thus sits in *different* strata
+in different regions (endemic American adventure = deep; the same genre in Europe =
+late; a Sanskrit jātaka = axial/literate). So `stratum` must be **derived from
+distribution** (next section), never inferred from `theme` — this case is exactly the
+stress-test a naive "B = late" rule fails and the distributional signal passes.
 
 ## Motif · `stratum` — time-depth / transmission (7)
 
@@ -158,6 +164,52 @@ gets a primary stratum, optionally secondaries.
 Berezkin's "analyse in parts" = fix a `theme` (his primary slice), then group the
 attesting traditions by `area` / `family` / `subsistence`, optionally within a
 `stratum`.
+
+## Deriving `stratum` ourselves (not from Berezkin's labels)
+
+`stratum` is the one field that is **inferred, not given** — so if we want it as a key
+divider we must compute it reproducibly and honestly. The premise (areal folkloristics
++ phylogeography): a motif spreads by descent or by contact, so its distribution shape
+dates it — **but only under a model**, and distribution alone cannot separate deep
+inheritance from independent reinvention or diffusion-then-loss (homoplasy, Galton's
+problem). Every stratum is therefore a hypothesis with uncertainty, not a fact.
+
+**Per-motif features, all computable from our data** (attestation matrix + `areal_path`
++ coordinates + `language` + crosswalk): global prevalence (# traditions / macro-areas
+/ **language families**); areal dispersion (mean pairwise distance, # disjoint
+components); **cross-barrier disjunction** (present in X and Z with a gap in the
+connecting Y — the strongest "old" signal); membership in self-defined geographic sets
+(Continental / Indo-Pacific / New-World-only); **language-clade coherence** (confined
+to one clade = young; spread across unrelated clades with disjunction = old);
+cross-index breadth (independently attested in TMI/ATU/Berezkin).
+
+**Two methods.**
+- *Heuristic depth index (now):* combine the features into one depth score (or its
+  first principal component), rank all motifs, and let strata **emerge** (cluster in
+  feature space / cut the axis), interpreting post-hoc.
+- *Model-based (the rigorous goal):* map motif presence/absence onto a **dated language
+  phylogeny** and run ancestral-state reconstruction with a gain/loss model
+  (phylomemetics, à la Tehrani/d'Huy). Reconstruction to deep nodes = old; the model
+  also **counts independent gains**, so it handles homoplasy. Needs one external
+  resource — a dated language tree — that we do not yet have.
+
+**Validation stress-test (already available):** the endemic-vs-shared split of the
+adventure/trick corpus. A naive "B = late" rule mislabels the 451 New-World-endemic
+adventure motifs; the distributional signal (endemism + disjunction) correctly ranks
+them as a deep regional layer distinct from the European märchen. Our biclustering
+already surfaced the deepest layer (trans-Pacific Sun-&-Moon) from co-occurrence alone,
+without any Berezkin label — proof the signal is in the data.
+
+**Required controls** (non-negotiable if `stratum` becomes a key divider): model
+**attestation intensity** per tradition (uneven coverage → absence ≠ real absence);
+down-weight **banal / cognitively trivial** motifs (easy to reinvent); define the
+geographic sets ourselves, not from his labels; calibrate direction against a few
+uncontroversial anchors (world-religion = late, earth-diver / cosmic-egg = deep);
+attach a **confidence** to every motif.
+
+**Consequence for the schema:** store `stratum` as a **continuous depth score plus an
+optional binning**, produced by a **separate offline pipeline**, with per-motif
+confidence — not as hard classes handed down a priori.
 
 ## Canonical value catalogue
 
@@ -263,9 +315,9 @@ Optional finer forks (off by default):
 - **`family`** — seed from `language[0]` via a ~25-row map, then a small curated
   religion overlay (the literate corpora).
 - **`subsistence`** — curated (~dozens of rows keyed by area/subregion/language).
-- **`stratum`** — inferred from a motif's `theme` (A/B) and its attestation set
-  (which sets/areas it spans), with curation for the diagnostic layers; not
-  per-tradition.
+- **`stratum`** — derived from the motif's **distribution** (see "Deriving `stratum`
+  ourselves"): a depth score over the attestation features, not read off `theme`; a
+  separate offline pipeline, with per-motif confidence. Not per-tradition.
 
 Only the overlay, `subsistence`, and `stratum` curation are hand-authored (dozens of
 rows); `theme`, `area`, and the `family` seed are computed.
