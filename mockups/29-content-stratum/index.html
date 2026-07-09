@@ -1,0 +1,90 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>29 · Content vs theme / depth</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:920px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:860px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .brow { display:grid; grid-template-columns:210px 1fr 66px; align-items:center; gap:10px; margin:9px 0; font-size:12.5px; }
+  .lab { text-align:right; color:#495057; }
+  .bt { height:16px; background:var(--bg); border-radius:5px; overflow:hidden; display:block; position:relative; }
+  .bf { height:100%; border-radius:5px; display:block; }
+  .thr { position:absolute; top:-3px; bottom:-3px; width:2px; background:#98a0a5; }
+  .val { text-align:right; font-variant-numeric:tabular-nums; font-weight:700; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .ex { font-size:12px; margin:8px 0; } .ex b { color:#4f7096; } .ex .nn { color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.code { font-weight:700; color:#4f7096; } td.r { text-align:right; font-variant-numeric:tabular-nums; }
+</style>
+<main>
+<header>
+  <h1>Содержание × тема / глубина</h1>
+  <p>Скрещиваем семантические эмбеддинги мотивов (BGE-M3, этап морфологии) с двумя осями: предсказывает ли
+     <b>содержание</b> мотива его <b>тему</b> (о чём он) и его <b>глубину</b> (насколько старо распределение)?
+     Ожидание программы: содержание сильно предсказывает тему (тема — содержательная ось), но почти не предсказывает
+     глубину (stratum — распределительный, не смысловой). Прямая проверка «stratum — из распределения, не из смысла».</p>
+</header>
+
+<div class="card">
+  <h2>Насколько содержание предсказывает каждую ось</h2>
+  <div id="bars"></div>
+  <div class="note" id="verdict"></div>
+</div>
+
+<div class="card">
+  <h2>Ближайшие по смыслу <span class="s">— эмбеддинги выровнены и осмысленны</span></h2>
+  <div id="ex"></div>
+</div>
+
+<div class="card">
+  <h2>Content-редундантность ≠ банальность <span class="s">— честная оговорка</span></h2>
+  <p class="muted" style="margin:0 0 8px">Средний косинус к соседям (наиболее «типовые по смыслу»). Корреляция с прокси коротких определений (мокап 20): <b id="cbd"></b>.</p>
+  <table><thead><tr><th>Код</th><th>Мотив</th><th>Тема</th><th class="r">ср. косинус</th></tr></thead><tbody id="banal"></tbody></table>
+  <div class="note" id="bnote"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+
+// bars: theme concordance (obs vs chance), content->breadth, content->prevalence
+const rows = [
+  ["тема: соседи делят группу", D.theme_obs, D.theme_base, "#3c8a5e", true],
+  ["глубина: content→широта (corr)", D.corr_breadth, null, "#c05540", false],
+  ["распространённость: content→prevalence (corr)", D.corr_prev, null, "#c05540", false],
+];
+document.getElementById("bars").innerHTML = rows.map(([lab,v,base,col,pct])=>{
+  const w = pct ? v*100 : Math.abs(v)*100;
+  const thr = base!=null ? `<span class="thr" style="left:${base*100}%" title="случайно ${Math.round(base*100)}%"></span>` : "";
+  return `<div class="brow"><span class="lab">${lab}</span><span class="bt"><span class="bf" style="width:${w}%;background:${col}"></span>${thr}</span>`+
+    `<span class="val">${pct?Math.round(v*100)+'%':v.toFixed(2)}</span></div>`;
+}).join("");
+document.getElementById("verdict").innerHTML =
+  `<b>Содержание = тема, но не глубина.</b> Ближайшие по смыслу мотивы делят тематическую группу в <b>${Math.round(D.theme_obs*100)}%</b> `+
+  `случаев против <b>${Math.round(D.theme_base*100)}%</b> случайно (×${(D.theme_obs/D.theme_base).toFixed(1)}) — эмбеддинги валидированы, `+
+  `содержание почти и есть тема. Но с глубиной/широтой связь слабая (corr ${D.corr_breadth}, prevalence ${D.corr_prev}). `+
+  `Смысл говорит <b>о чём</b> мотив, а не <b>как он стар</b> — это прямое подтверждение, что <b>stratum должен считаться из распределения</b>, а не из содержания.`;
+
+document.getElementById("ex").innerHTML = D.examples.map(e=>
+  `<div class="ex"><b>${esc(e.c)}</b> ${esc(e.n)} → <span class="nn">`+
+  e.nn.map(x=>`${esc(x.c)} ${esc(clip(x.n,26))} (${x.sim})`).join(" · ")+`</span></div>`).join("");
+
+document.getElementById("cbd").textContent = D.corr_banal_deflen;
+document.getElementById("banal").innerHTML = D.top_banal.map(b=>
+  `<tr><td class="code">${esc(b.c)}</td><td>${esc(clip(b.n,34))}</td><td class="muted">${esc(b.g)}</td><td class="r">${b.sim.toFixed(2)}</td></tr>`).join("");
+document.getElementById("bnote").innerHTML =
+  `Топ по среднему косинусу — <b>семейства почти-дубликатов</b> (варианты трикстера M29*), а не гомоплазия. `+
+  `Корреляция с прокси коротких определений практически нулевая (<b>${D.corr_banal_deflen}</b>), так что content-редундантность `+
+  `меряет гранулярность каталога, а не «лёгкость переизобретения» — она <b>не заменяет</b> прокси банальности мокапа 20. `+
+  `Настоящая content-банальность потребует иной конструкции (близость к «общему» центроиду), а не плотности соседей.`;
+</script>

@@ -119,11 +119,11 @@ Every headline has a deflationary rival; naming them is the honest move.
 3. **Within-area partial correlations (decisiveness leverage).** Recompute subsistence×theme
    and theme×stratum *within* each macro-area (or as partial correlations controlling for
    area). Cheap, and it decisively separates the signals we keep flagging as area-confounded.
-4. **Motif content × stratum (independent-signal leverage).** We built BGE-M3 embeddings in
-   the morphology stage but never crossed them with `stratum`. Do *semantically* similar
-   motifs share a stratum? A content signal, independent of distribution, either corroborates
-   the distributional estimate or exposes it — and gives a principled **banality** measure
-   (minimally-counter-intuitive / generic definitions) to replace mockup 20's crude proxy.
+4. **Motif content × stratum (independent-signal leverage).** *Done (mockup 29):* content
+   (BGE-M3) predicts **theme** strongly (nearest-by-meaning share theme 58% vs 20% chance) but
+   **depth** only weakly (breadth corr 0.28) — an independent confirmation that stratum is
+   distributional, not semantic. The content-banality idea was an honest negative (embedding
+   density flags near-duplicates, not homoplasy).
 
 ## 6. New ideas that would push the work forward
 

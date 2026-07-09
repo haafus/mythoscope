@@ -41,11 +41,10 @@ Each replaces a descriptive heuristic with a generative model; medium effort, hi
   the *undated* tree it largely reproduces parsimony (`corr=0.90`) — motivating M30 — but adds
   probabilistic output and a loss-vs-gain split (K25: 120 parsimony gains → ~20 expected). Best
   re-run once M30 supplies branch dates. · **M**
-- **M29 · Motif content × stratum (BGE-M3).** Cross the semantic embeddings from the
-  morphology stage with the computed `stratum`: do *content*-similar motifs share depth? ·
-  *data: have* (embeddings already built) · **adds:** an independent (content) signal to the
-  distributional one, plus a principled **banality** measure (minimally-counter-intuitive /
-  generic definitions) to replace mockup 20's crude proxy. · **M**
+- **M29 · Motif content × stratum (BGE-M3). ✓ done** (mockup 29). **Result:** content predicts
+  theme strongly (nearest-by-meaning share theme group 58% vs 20% chance) but depth only weakly
+  (breadth corr 0.28) — confirms stratum is distributional, not semantic. The content-banality
+  idea is an honest negative (flags near-duplicates, not homoplasy). · **M**
 
 ## Tier 3 — new capability via external data (highest ceiling)
 

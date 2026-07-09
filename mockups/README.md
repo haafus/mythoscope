@@ -305,6 +305,14 @@ reproduces parsimony (`corr=0.90` — the motivation for M30), but adds probabil
 a loss-vs-gain decomposition: swan-maiden K25 needs 120 parsimony gains but only ~20 *expected*
 gains, the model preferring loss-from-ancestor. See [`28-likelihood-asr/README.md`](28-likelihood-asr/README.md).
 
+### 29 · Content vs theme / depth (roadmap M29)
+Crosses the BGE-M3 motif embeddings with the theme and depth axes. **Content is theme, not
+depth:** nearest-by-meaning motifs share the theme group 58% of the time (vs 20% chance) but
+content barely predicts breadth (corr 0.28) or prevalence (0.18) — meaning says *what* a motif
+is, not *how old*, confirming `stratum` must come from distribution. A content-redundancy
+"banality" attempt is an honest negative (it flags near-duplicate M29* trickster variants, not
+homoplasy; corr with the short-def proxy ≈0). See [`29-content-stratum/README.md`](29-content-stratum/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
