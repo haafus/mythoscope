@@ -23,11 +23,13 @@ These two together retire the two alternative hypotheses that caveat almost ever
 
 ## Next up — assumption audit
 
-> Note: the priority **M-number** and the mockup **directory number** have now diverged
-> (mockups 24–29 = M24–M29 by luck). This item is the **next mockup to build** — directory
-> `mockups/30-facet-adequacy/` — but keeps a high M-number to signal its priority slot.
+> Numbering: the **M-number is the mockup directory number** (M24 = `mockups/24-…`, and so
+> on). The planned slots **M30–M35 stay put** (dated tree, phylogeography, alt-tree, joint
+> model, stratigraphy, cross-index). This new audit takes the next free number, **M36**
+> (`mockups/36-facet-adequacy/`) — the *number is its topic slot, not its build order*: it is
+> flagged **build-next** by priority, ahead of the lower-numbered but heavier M30–M35.
 
-### M36 · Facet adequacy & orthogonality (audits assumption #6)
+### M36 · Facet adequacy & orthogonality (audits assumption #6) — *build next*
 
 **Motivation.** The entity model of [`macro-area-facets.md`](macro-area-facets.md) rests on an
 untested design choice: that `area · family · subsistence · theme_profile` are the *right* and
@@ -68,11 +70,12 @@ the granularity curve. **Reframes assumption #6** from "~orthogonal" (false) to 
 carries a non-zero unique signal; the set is adequate at granularity G; residual = R", with the
 numbers to back each clause. **Data:** *have*. **Effort:** **M**.
 
-**Why it's next.** It is the cheapest way to audit the entity model itself — everything in
-stages 3–4 slices by these facets, so knowing which are redundant, whether one is missing, and
-at what granularity, hardens the foundation before the heavier Tier-3 dating work. It also feeds
-directly into the joint model (M33): the unique-contribution result tells that model which
-facets to keep as fixed effects.
+**Why build it next (ahead of M30–M35).** It is the cheapest way to audit the entity model
+itself — everything in stages 3–4 slices by these facets, so knowing which are redundant,
+whether one is missing, and at what granularity, hardens the foundation before the heavier
+Tier-3 dating work (M30–M35, which keep their slots). It also feeds directly into the joint
+model (M33): the unique-contribution result tells that model which facets to keep as fixed
+effects.
 
 ## Tier 2 — strong method upgrades on data we already have
 
