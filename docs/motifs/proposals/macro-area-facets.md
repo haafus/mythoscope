@@ -34,20 +34,25 @@ these are analysed **separately**, because late areal diffusion otherwise drowns
 thin deep-time signal. Our trans-Pacific Sun-&-Moon cluster is precisely that deep
 Circum-Pacific layer, visible only when it is not mixed into the continental mass.
 
-This directly favours the entity model: **slice by motif stratum first, then analyse
-areas within a slice** — instead of one flat region list doing everything.
+His own words name the primary slicing dimension: statistics over the whole catalogue
+serve only very limited tasks, and it is far more effective to process motifs
+**separately by category and thematic group (or any combination of them)**. The
+"parts" are first of all **thematic** — and that taxonomy is already in our data as
+`motif.motif_group` / `motif_group_num`. So the primary slicer is the motif's
+**theme**, and area/family/subsistence/stratum are cross-cuts *within* a theme slice.
 
 ## The entity schema
 
 | Entity | Properties |
 |---|---|
 | **Tradition** | `area` (12, geographic) · `family` (~10, language/religion) · `subsistence` (4, economy) · coordinates · raw `language` list · `areal_id` / `areal_path` · attestation richness |
-| **Motif** | `stratum` (7, time-depth / transmission) · theme group (chapter) · definition · cross-index links |
+| **Motif** | `theme` (Berezkin's category A/B → 13 groups — **the primary analytical axis**) · `stratum` (7, time-depth) · definition · cross-index links |
 | **Attestation** (motif × tradition) | the bare presence — the raw material from which a motif's `stratum` is inferred |
 
-Expressiveness is now **multiplicative and cross-entity**: a tradition's profile is
-`area × family × subsistence` (≈ 12 × 10 × 4), and each attested motif adds its
-`stratum`. That is why no single axis needs to be fine — the previous draft's 18
+Expressiveness is **multiplicative and cross-entity**: a tradition's profile is
+`area × family × subsistence` (≈ 12 × 10 × 4), each attested motif carries its `theme`
+and `stratum`, and analysis fixes a `theme` (Berezkin's method) before grouping by the
+tradition axes. That is why no single axis needs to be fine — the previous draft's 18
 areas can drop to 12.
 
 ## Tradition · `area` — 12 macro-areas
@@ -110,6 +115,30 @@ Amerindian). It carries part of the load that let `area` shrink to 12.
 `forager` (hunter-gatherer / fisher) · `pastoralist` · `horticulturalist` (swidden) ·
 `agrarian-state` (intensive agriculture + literate state).
 
+## Motif · `theme` — Berezkin's category & group (2 levels)
+
+The primary analytical axis, per Berezkin's own note. **Already in our data** as
+`motif_group` / `motif_group_num` (13 leaf groups); this proposal only adds his
+two-level roll-up — **Category A · Cosmology & etiology** (groups 01–09) vs
+**Category B · Adventures & tricks** (10–13) — and a residual "mixed" tag.
+
+| Category | Group |
+|---|---|
+| A · Cosmology & etiology | 01 Sun & Moon · 02 stars & constellations · 03 cosmogony & elements · 04 origin of death & hardship · 05 origin of humans & anatomy · 06 origin of subsistence culture · 07 etiology of plants & animals · 08 monstrous beings & folk beliefs · 09 protagonist identity |
+| B · Adventures & tricks | 10 adventures · 11 tricks & competitions · 12 proper names · 13 formulae |
+
+Berezkin's finer splits (not in our snapshot; optional forks): fire out of 03
+(`origin_of_fire`), non-subsistence culture out of 06, plants/animals split (07a/07b),
+protagonist split (09a/09b), realistic tales out of 10 (`realistic_tales`),
+marriage/obscene tricks (50), animal-vs-human actors in 11 (111/112), a `mixed` group
+(14). His placement note: 08–09 lean A, 12–13 lean B.
+
+**A/B is close to the mythology-vs-tale axis and to time-depth.** Category A carries
+the deep worldview-bearing strata; Category B is the later novelistic/märchen layer
+that diffuses recently (our clusters 0/1 — the märchen belts — are B-heavy; the
+cosmogonic clusters are A). So `stratum` below is largely a refinement of
+`theme` (A vs B) × areal shape, not an independent hand-authored axis.
+
 ## Motif · `stratum` — time-depth / transmission (7)
 
 The motif's temporal layer, oldest → latest. The first four are prehistoric
@@ -126,7 +155,9 @@ gets a primary stratum, optionally secondaries.
 | 6 | axial / literate-civilisational | Abrahamic, Dharmic, Sinic book traditions & epics | 2 |
 | 7 | colonial / modern diaspora | slave trade, missions, print (Afro-Caribbean, Ibero-American) | ATU tails |
 
-Berezkin's "analyse in parts" = analyse `area` within a fixed `stratum` slice.
+Berezkin's "analyse in parts" = fix a `theme` (his primary slice), then group the
+attesting traditions by `area` / `family` / `subsistence`, optionally within a
+`stratum`.
 
 ## Canonical value catalogue
 
@@ -188,6 +219,29 @@ Optional finer forks (off by default):
 | Horticulturalists | `horticulturalist` |
 | Agrarian states | `agrarian_state` |
 
+### `motif.theme` — category (2) + group (13)
+
+| Category | Slug |
+|---|---|
+| Cosmology & etiology | `cosmology_etiology` |
+| Adventures & tricks | `adventures_tricks` |
+
+| Group (num) | Slug | Category |
+|---|---|---|
+| Sun & Moon (01) | `sun_moon` | A |
+| Stars & constellations (02) | `stars_constellations` | A |
+| Cosmogony & elements (03) | `cosmogony_elements` | A |
+| Origin of death & hardship (04) | `origin_of_death` | A |
+| Origin of humans & anatomy (05) | `origin_of_humans` | A |
+| Origin of subsistence culture (06) | `origin_subsistence` | A |
+| Etiology of plants & animals (07) | `plants_animals` | A |
+| Monstrous beings & folk beliefs (08) | `monstrous_beings` | A |
+| Protagonist identity (09) | `protagonist_identity` | A |
+| Adventures (10) | `adventures` | B |
+| Tricks & competitions (11) | `tricks_competitions` | B |
+| Proper names (12) | `proper_names` | B |
+| Formulae (13) | `formulae` | B |
+
 ### `motif.stratum` (7)
 
 | Label | Slug |
@@ -202,16 +256,19 @@ Optional finer forks (off by default):
 
 ## Deterministic population recipe
 
+- **`theme`** — already in the data: `motif_group_num` → group slug, plus a fixed
+  01–09 → A / 10–13 → B roll-up. Zero curation.
 - **`area`** — pure function of `areal_path` (no network / credentials, like
   `_CANONICAL_AREAS`): `areal_path[0]` → area, with the `[1]` moves above.
 - **`family`** — seed from `language[0]` via a ~25-row map, then a small curated
   religion overlay (the literate corpora).
 - **`subsistence`** — curated (~dozens of rows keyed by area/subregion/language).
-- **`stratum`** — inferred from a motif's attestation set (which sets/areas it spans),
-  with curation for the diagnostic layers; not per-tradition.
+- **`stratum`** — inferred from a motif's `theme` (A/B) and its attestation set
+  (which sets/areas it spans), with curation for the diagnostic layers; not
+  per-tradition.
 
 Only the overlay, `subsistence`, and `stratum` curation are hand-authored (dozens of
-rows); `area` and the `family` seed are computed.
+rows); `theme`, `area`, and the `family` seed are computed.
 
 ## Samples
 
@@ -232,16 +289,16 @@ rows); `area` and the `family` seed are computed.
 | Hausa | Sub-Saharan Africa | Sub-Saharan | agrarian-state |
 | Aranda | Aboriginal Australia | Australian | forager |
 
-**Motifs** → `stratum`
+**Motifs** → `theme` · `stratum`
 
-| Motif | Stratum |
-|---|---|
-| A11C Sun, Moon & monster's eyes | Circum-Pacific / trans-Pacific |
-| K25a5 Two brothers & the swan-maidens | Continental Eurasian (boreal) |
-| B4 The fished-out earth | Indo-Pacific / Austro-Melanesian |
-| H36D Death and the hare (origin of death) | African substratum |
-| K27z2 Princess averts incest (jātaka-type) | axial / literate-civilisational |
-| M182 The tar-baby (US South) | colonial / modern diaspora |
+| Motif | Theme (category / group) | Stratum |
+|---|---|---|
+| A11C Sun, Moon & monster's eyes | A / Sun & Moon | Circum-Pacific / trans-Pacific |
+| K25a5 Two brothers & the swan-maidens | A / origin of humans | Continental Eurasian (boreal) |
+| B4 The fished-out earth | A / cosmogony & elements | Indo-Pacific / Austro-Melanesian |
+| H36D Death and the hare (origin of death) | A / origin of death | African substratum |
+| K27z2 Princess averts incest (jātaka-type) | B / adventures | axial / literate-civilisational |
+| M182 The tar-baby (US South) | B / tricks & competitions | colonial / modern diaspora |
 
 ## What it resolves
 
@@ -256,9 +313,10 @@ rows); `area` and the `family` seed are computed.
 ## Implementation sketch (not built)
 
 - `region_facets.py`: `area(areal_path)`, `family(language, name)`,
-  `subsistence(name)` on traditions; `stratum(motif)` on motifs.
+  `subsistence(name)` on traditions; `theme(motif_group_num)`, `stratum(motif)` on
+  motifs.
 - `_berezkin_region` → `area()`; `culture_dict._REGION` → the TMI-label bridge onto
   the same properties; `config/traditions.json` families → `family` for the corpus.
-- Overviews expose grouping by **Area / Family / Subsistence** for traditions and a
-  **Stratum** slicer for motifs — replacing the one ambiguous "region" control, and
-  letting a view fix a stratum before grouping by area (Berezkin's method).
+- Overviews lead with a **Theme** slicer (category A/B → group — Berezkin's primary
+  cut), then group the attesting traditions by **Area / Family / Subsistence**, with
+  an optional **Stratum** filter — replacing the one ambiguous "region" control.
