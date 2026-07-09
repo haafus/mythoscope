@@ -222,7 +222,34 @@ ways — `areal-deep` / `descent` / `areal-broad`. **Theme is deliberately not a
 the Category-A cosmology share falls from 64% in the deep-areal mode to 24% in descent.
 See [`19-combined-stratum/README.md`](19-combined-stratum/README.md).
 
+### 20 · Stratum controls (sampling + banality)
+Applies the two mandatory §5 controls mockups 17–19 skipped, on top of the mockup-19
+gate, and measures the effect. **Attestation-intensity:** tradition coverage a(t) spans
+1…738, so raw breadth partly measures catalogue density; weight each present tradition by
+baseline-equivalent coverage and count a macro toward breadth only with real evidence.
+**Banality:** a generic-definition + singleton-scatter proxy flags likely homoplasy.
+Finding: breadth shrinks 31%, 504 motifs (15%) change mode (mostly areal-broad →
+areal-recent), but the deep both-hemisphere class survives 320/480 — an empirical
+restatement of axiom 4. See [`20-stratum-controls/README.md`](20-stratum-controls/README.md).
+
+### 21 · Deterministic facet population
+Checks whether the deterministic recipe in `macro-area-facets.md` covers the whole corpus
+before it becomes `region_facets.py`. `area(areal_path)` → 12 macro-areas covers 1042/1046
+(4 empty paths); `theme(motif_group_num)` covers 3347/3488; `family(language[0])` resolves
+99% (seed + area-fallback), leaving 10 linguistic isolates for curation. Marks each family
+assignment seed vs area-fallback and is explicit that the religion-overlay families need a
+small curated overlay. See [`21-facet-population/README.md`](21-facet-population/README.md).
+
+### 22 · Subsistence from D-PLACE + theme test
+Wires the one external dataset the model needs — **D-PLACE** (Ethnographic Atlas, CC-BY) —
+to populate `tradition.subsistence` (the 4th facet, with no in-corpus source), joining each
+tradition to its nearest society. Then tests the correlation the proposal asserted but never
+checked: Category-A (cosmology) share runs **forager 56.5% → horticulturalist 52.2% →
+agrarian-state 47.1%** (pastoralists an epic-tale outlier at 26.2%) — the predicted gradient
+holds, with an honest area confound. See [`22-subsistence-external/README.md`](22-subsistence-external/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
-- They read only from `outputs/motifs/` and never touch the app.
+- They read only from `outputs/motifs/` and never touch the app (mockup 22 also reads a
+  committed CC-BY D-PLACE derivative, `22-subsistence-external/dplace_subsistence.json`).

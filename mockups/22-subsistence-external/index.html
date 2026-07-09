@@ -1,0 +1,125 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>22 · Subsistence from D-PLACE + theme test</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1040px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:930px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .kpi .v { font-size:21px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .kpi .l { font-size:11px; color:var(--muted); margin-top:2px; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; font-size:11.5px; margin-top:6px; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; }
+  .sw { width:11px; height:11px; border-radius:3px; display:inline-block; }
+  .brow { display:grid; grid-template-columns:150px 1fr 52px; align-items:center; gap:10px; margin:7px 0; font-size:12.5px; }
+  .brow .lab { text-align:right; }
+  .bt { display:block; height:20px; background:var(--bg); border-radius:5px; overflow:hidden; }
+  .bf { display:block; height:100%; border-radius:5px; }
+  .brow .v { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+  .split { display:flex; height:24px; border-radius:6px; overflow:hidden; margin:5px 0; }
+  .split div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:10.5px; font-weight:600; border-right:2px solid var(--surface); min-width:0; }
+  .split div:last-child { border-right:0; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  td,th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; }
+  td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  .pill { display:inline-block; font-size:10.5px; padding:1px 8px; border-radius:20px; color:#fff; white-space:nowrap; }
+  .note { background:#fbf6ec; border:1px solid #ecdcae; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+  .xt { display:grid; grid-template-columns:150px 1fr; gap:6px 10px; align-items:center; font-size:11.5px; margin:3px 0; }
+</style>
+<main>
+<header>
+  <h1>Subsistence из D-PLACE + тест темы</h1>
+  <p>Четвёртый фасет традиции, у которого нет источника внутри корпуса, — <b>subsistence</b> — берётся из
+     <b>D-PLACE</b> (Ethnographic Atlas). Каждое общество D-PLACE несёт тип хозяйства (из EA042 «доминирующая
+     активность» + EA028 «интенсивность земледелия») и координаты; традиции Березкина джойнятся к ближайшему
+     обществу по большому кругу. Затем проверяется корреляция, которую пропозал <b>утверждал, но не проверял</b>:
+     фуражиры космологичны, земледельцы сказочны (Category A против B).</p>
+</header>
+
+<div class="card">
+  <div class="kpis" id="kpis"></div>
+  <div class="muted" style="margin-top:10px" id="cov"></div>
+</div>
+
+<div class="card">
+  <h2>Тест: доля Category A (космология/этиология) по типу хозяйства <span class="s">— среднее по традиции, ≥20 мотивов</span></h2>
+  <div id="test"></div>
+  <div class="note" id="verdict"></div>
+</div>
+
+<div class="card">
+  <h2>Распределение subsistence <span class="s">— сматченные традиции</span></h2>
+  <div class="split" id="dist"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="card">
+  <h2>subsistence × area <span class="s">— проверка на здравый смысл</span></h2>
+  <div id="xtab"></div>
+</div>
+
+<div class="card">
+  <h2>Примеры джойна <span class="s">— традиция → ближайшее общество D-PLACE</span></h2>
+  <table><thead><tr><th>Традиция</th><th>Area</th><th>Subsistence</th><th>Ближайшее D-PLACE</th><th class="r">км</th><th class="r">A%</th></tr></thead>
+  <tbody id="samples"></tbody></table>
+</div>
+
+<p class="muted">Данные: D-PLACE (Kirby et al. 2016), Ethnographic Atlas (Murdock), CC-BY-4.0.</p>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, S = D.subs, esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const col=k=>S[k][1], lab=k=>S[k][0];
+
+document.getElementById("kpis").innerHTML = [
+  [`${D.n_matched}`, `традиций сматчено (≤${D.match_km} км)`],
+  [`${D.dist.med} км`, "медианное расстояние джойна"],
+  [`${D.n_dplace}`, "обществ D-PLACE с хозяйством"],
+  [`4`, "типа хозяйства (EA042 + EA028)"],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+document.getElementById("cov").innerHTML =
+  `Координаты традиций из ареальных центроидов подобластей (пайплайн без точных координат), поэтому джойн — на уровне `+
+  `подобласти, не отдельной деревни; p90 расстояния ${D.dist.p90} км. ${D.n_coord} традиций с координатами.`;
+
+// headline test — Category-A share by subsistence
+const tt = D.theme_test.filter(t=>t.aShare!=null);
+document.getElementById("test").innerHTML = tt.map(t=>
+  `<div class="brow"><span class="lab">${lab(t.sub)} <span class="muted">(n=${t.n})</span></span>`+
+  `<span class="bt"><span class="bf" style="width:${t.aShare}%;background:${col(t.sub)}"></span></span>`+
+  `<span class="v">${t.aShare}%</span></div>`).join("");
+
+const fg = tt.find(t=>t.sub==="forager"), ag = tt.find(t=>t.sub==="agrarian_state"), pa = tt.find(t=>t.sub==="pastoralist");
+document.getElementById("verdict").innerHTML =
+  `<b>Гипотеза подтверждается — с оговоркой.</b> Космология тяжелее у фуражиров (<b>${fg.aShare}%</b> Category A) `+
+  `и легче у аграрных государств (<b>${ag.aShare}%</b>) — сказки/приключения смещаются к земледелию, как и предсказывал пропозал. `+
+  `Пасторалисты резко сказочны (<b>${pa.aShare}%</b>) — эпические традиции скотоводов. <b>Оговорка (конфаунд ареала):</b> `+
+  `тип хозяйства коррелирует с ареалом (пасторалисты — Ц. Азия/Ближний Восток, фуражиры — Австралия/С. Америка/Сибирь), `+
+  `так что часть сигнала — это theme × area. Градиент реальный, но не доказывает причинность хозяйства.`;
+
+const tot = D.order.reduce((a,k)=>a+(D.counts[k]||0),0);
+document.getElementById("dist").innerHTML = D.order.filter(k=>D.counts[k]).map(k=>
+  `<div style="flex:${D.counts[k]};background:${col(k)}" title="${lab(k)}: ${D.counts[k]}">${100*D.counts[k]/tot>7?D.counts[k]:""}</div>`).join("");
+document.getElementById("legend").innerHTML = D.order.map(k=>
+  `<span><span class="sw" style="background:${col(k)}"></span>${lab(k)} (${D.counts[k]||0})</span>`).join("");
+
+document.getElementById("xtab").innerHTML = D.area_order.map(a=>{
+  const row = D.area_sub[a], t = D.order.reduce((s,k)=>s+(row[k]||0),0);
+  const seg = D.order.filter(k=>row[k]).map(k=>
+    `<div style="flex:${row[k]};background:${col(k)}" title="${lab(k)}: ${row[k]}"></div>`).join("");
+  return `<div class="xt"><span class="lab" style="text-align:right">${esc(a)} <span class="muted">(${t})</span></span><span class="split" style="margin:0">${seg}</span></div>`;
+}).join("");
+
+document.getElementById("samples").innerHTML = D.samples.map(s=>
+  `<tr><td>${esc(s.n)}</td><td>${esc(s.area)}</td>`+
+  `<td><span class="pill" style="background:${col(s.sub)}">${lab(s.sub)}</span></td>`+
+  `<td class="muted">${esc(s.match)}</td><td class="r">${s.km}</td><td class="r">${s.aA==null?"—":s.aA+"%"}</td></tr>`).join("");
+</script>
