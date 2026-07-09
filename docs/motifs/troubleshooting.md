@@ -97,6 +97,11 @@ another way in its Traditions section.
   with TMI") pull in **opposite directions** — pick one before editing
   `_berezkin_region`.
 - **#4 stays separate** by design (different axis, different dataset).
+- **Or split the axes instead of picking one list** — see
+  [`proposals/macro-area-facets.md`](proposals/macro-area-facets.md): a three-facet
+  model (areal geography · culture/linguistic family · transmission/time-depth) that
+  folds #1/#3 into one derived areal vocabulary, recognises #4 as the family facet,
+  and gives the non-areal clusters (literary-epic Asia, Sun-&-Moon) a home.
 
 ### Note
 
