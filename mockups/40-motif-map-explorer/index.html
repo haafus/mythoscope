@@ -1,0 +1,192 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>40 · Motif map explorer</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --deep:#3c8a5e; --areal:#b28a3e; --local:#98a0a5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1200px; margin:0 auto; padding:22px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1000px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 6px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:flex; gap:20px; flex-wrap:wrap; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); }
+  .layout { display:grid; grid-template-columns:430px 1fr; gap:16px; align-items:start; }
+  @media(max-width:900px){ .layout{ grid-template-columns:1fr; } }
+  .controls { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+  #q { flex:1; min-width:120px; font:13px inherit; padding:6px 9px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+  select { font:12px inherit; padding:5px 7px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+  .chip { font:11.5px inherit; border:1px solid var(--line); background:var(--surface); border-radius:20px; padding:3px 10px; cursor:pointer; }
+  .chip.on { color:#fff; border-color:transparent; }
+  .chip.deep.on{background:var(--deep);} .chip.areal.on{background:var(--areal);} .chip.local.on{background:var(--local);}
+  .list { max-height:620px; overflow:auto; margin:-4px -4px 0; padding:0 4px; }
+  .mrow { display:flex; align-items:center; gap:8px; padding:6px 7px; border-radius:8px; cursor:pointer; border:1px solid transparent; }
+  .mrow:hover { background:var(--bg); }
+  .mrow.sel { background:#eef3ef; border-color:#cbe0d1; }
+  .mrow .code { font-weight:700; font-size:11.5px; color:#4f7096; width:52px; flex:none; font-variant-numeric:tabular-nums; }
+  .mrow .nm { flex:1; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mrow .b { font-size:11px; color:var(--muted); width:26px; text-align:right; font-variant-numeric:tabular-nums; flex:none; }
+  .dot { width:7px; height:7px; border-radius:50%; flex:none; }
+  .dot.deep{background:var(--deep);} .dot.areal{background:var(--areal);} .dot.local{background:var(--local);}
+  .fp { display:flex; gap:1px; flex:none; }
+  .fp i { width:6px; height:13px; border-radius:1px; background:#edeae2; display:block; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .mtitle { font-size:15px; font-weight:700; margin:0 0 1px; } .mtitle .cc{color:#4f7096;}
+  .meta { font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .lg { display:flex; gap:12px; flex-wrap:wrap; font-size:11px; color:var(--muted); margin-top:8px; }
+  .lg i{ width:10px; height:10px; border-radius:2px; display:inline-block; margin-right:4px; vertical-align:-1px; }
+  .areas { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+  .atag { font-size:11px; background:var(--bg); border:1px solid var(--line); border-radius:16px; padding:2px 8px; }
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:10px 12px; font-size:12.5px; color:#31453a; margin-top:14px; }
+  .ph { color:var(--muted); font-size:13px; text-align:center; padding:60px 0; }
+</style>
+<main>
+<header>
+  <h1>Карта мотива — традиции и обводка кластеров</h1>
+  <p>Выбери мотив в списке слева (ранжирован по <b>глубине</b> = широте распространения, как в мокапе 17) — справа его
+     <b>традиции</b> лягут точками, а каждый географический <b>кластер</b> обведётся контуром (DBSCAN; одиночные точки
+     остаются без обводки). Работает на <b>всём</b> корпусе, а не только на датируемом descent-меньшинстве (мокап 31).
+     Карта <b>перецентрируется</b> на регион мотива, чтобы тихоокеанское расселение не рвалось атлантическим швом.</p>
+</header>
+
+<div class="card"><div class="kpis" id="kpis"></div></div>
+
+<div class="layout">
+  <div class="card">
+    <div class="controls">
+      <input id="q" placeholder="поиск: код или название…">
+      <select id="theme"></select>
+    </div>
+    <div class="controls" id="tiers">
+      <span class="chip deep on" data-t="deep">глубокие</span>
+      <span class="chip areal on" data-t="areal">ареальные</span>
+      <span class="chip local on" data-t="local">локальные</span>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="muted" id="listnote" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <div id="head"><div class="ph">← выбери мотив, чтобы отрисовать его традиции и кластеры</div></div>
+    <div id="map"></div>
+    <div class="lg" id="legend" style="display:none">
+      <span><i style="background:var(--deep)"></i>точка = традиция (цвет = кластер)</span>
+      <span><i style="background:#98a0a5"></i>одиночная (вне кластера)</span>
+      <span>контур = географический кластер</span>
+    </div>
+    <div class="areas" id="areas"></div>
+  </div>
+</div>
+
+<div class="card note" id="about"></div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, M = D.motifs;
+const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip = (s,n)=> s.length>n ? s.slice(0,n-1)+"…" : s;
+const CAP = 300;                                   // rows rendered at once (keeps the list snappy)
+// cluster palette (muted categorical, fixed order); noise = grey
+const CP = ["#3c8a5e","#6a5aa6","#b28a3e","#c05540","#3a6ea5","#0e9aa7","#a3457e","#7d8b3a"];
+const clusCol = k => k<0 ? "#98a0a5" : CP[k % CP.length];
+
+// ---- map projection (mockup 31): configurable central meridian lon0 ----
+const LANDPATH = window.LAND||"", py = lat => (90-lat);
+const px = (lon, lon0) => (((lon - lon0 + 180) % 360) + 360) % 360;
+const landG = lon0 => `<g>`+[-360,0,360].map(k=>
+  `<path class="land" d="${LANDPATH}" transform="translate(${(-lon0+k).toFixed(1)},0)"/>`).join("")+`</g>`;
+const centreLon = pts => { let x=0,y=0; pts.forEach(p=>{x+=Math.cos(p[0]*Math.PI/180);y+=Math.sin(p[0]*Math.PI/180);});
+  return Math.atan2(y,x)*180/Math.PI; };
+
+function mapSVG(m){
+  const lon0 = centreLon(m.pts);
+  // hull contours — anchor each ring near its first vertex so a seam-crossing polygon stays whole
+  const hulls = m.hulls.map(h=>{
+    const ref = px(h.ring[0][0], lon0);
+    const pts = h.ring.map(([lo,la])=>{ let tx=px(lo,lon0);
+      if(tx-ref>180) tx-=360; else if(tx-ref<-180) tx+=360;
+      return `${tx.toFixed(1)},${py(la).toFixed(1)}`; }).join(" ");
+    const c = clusCol(h.k);
+    return `<polygon points="${pts}" fill="${c}" fill-opacity="0.12" stroke="${c}" stroke-width="0.5" stroke-opacity="0.7" stroke-linejoin="round"/>`;
+  }).join("");
+  const dots = m.pts.map(([lo,la,k])=>
+    `<circle cx="${px(lo,lon0).toFixed(2)}" cy="${py(la).toFixed(2)}" r="1.5" fill="${clusCol(k)}" fill-opacity="0.9" stroke="#fff" stroke-width="0.25"/>`).join("");
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${landG(lon0)}${hulls}${dots}</svg>`;
+}
+
+function select(m){
+  document.querySelectorAll(".mrow").forEach(r=>r.classList.toggle("sel", r.dataset.c===m.c));
+  const areas = D.areas.map((a,i)=>[a,m.fp[i]]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+  document.getElementById("head").innerHTML =
+    `<div class="mtitle"><span class="cc">${esc(m.c)}</span> · ${esc(m.name)}</div>`+
+    `<div class="meta">${esc(m.ru||"")}${m.ru?" · ":""}широта <b>${m.b}</b> традиций · `+
+    `${m.tier==="deep"?"глубокий":m.tier==="areal"?"ареальный":"локальный"} ярус · `+
+    `<b>${m.nc}</b> ${m.nc===1?"кластер":m.nc<5?"кластера":"кластеров"} · ${m.np} размещённых точек</div>`;
+  document.getElementById("map").innerHTML = mapSVG(m);
+  document.getElementById("legend").style.display = "flex";
+  document.getElementById("areas").innerHTML =
+    areas.map(([a,n])=>`<span class="atag">${esc(a)} <b>${n}</b></span>`).join("");
+}
+
+// ---- list rendering with filters ----
+const fpMax = 8;   // footprint cell intensity saturates here
+function fpHTML(fp){
+  return `<span class="fp" title="footprint по 12 макро-ареалам">`+fp.map((n,i)=>{
+    const bg = n? `rgba(60,138,94,${(0.25+0.75*Math.min(1,n/fpMax)).toFixed(2)})` : "#edeae2";
+    return `<i style="background:${bg}" title="${esc(D.areas[i])}: ${n}"></i>`;
+  }).join("")+`</span>`;
+}
+const tierOn = {deep:true, areal:true, local:true};
+let query="", theme=0;
+
+function render(){
+  const q = query.toLowerCase();
+  const rows = M.filter(m=> tierOn[m.tier] && (theme===0||m.g===theme) &&
+      (!q || m.c.toLowerCase().includes(q) || m.name.toLowerCase().includes(q) || (m.ru||"").toLowerCase().includes(q)));
+  const show = rows.slice(0, CAP);
+  document.getElementById("list").innerHTML = show.map(m=>
+    `<div class="mrow" data-c="${esc(m.c)}"><span class="code">${esc(m.c)}</span>`+
+    `<span class="dot ${m.tier}" title="${m.tier}"></span>`+
+    `<span class="nm" title="${esc(m.name)}">${esc(clip(m.name,34))}</span>`+
+    fpHTML(m.fp)+`<span class="b">${m.b}</span></div>`).join("") ||
+    `<div class="ph">ничего не найдено</div>`;
+  document.getElementById("listnote").textContent =
+    rows.length>CAP ? `показаны ${CAP} из ${rows.length} — уточни поиск/фильтр` : `${rows.length} мотивов`;
+  const byC = Object.fromEntries(show.map(m=>[m.c,m]));
+  document.querySelectorAll(".mrow").forEach(r=> r.onclick=()=>select(byC[r.dataset.c]));
+}
+
+// ---- boot ----
+document.getElementById("kpis").innerHTML = [
+  [`${D.n}`, `картируемых мотивов (≥ ${D.min_placed} традиций) из ${D.n_motif_total}`],
+  [`${D.tier_n.deep}`, `глубоких (широта ≥ ${D.p85})`],
+  [`${D.tier_n.areal}`, "ареальных"],
+  [`${D.tier_n.local}`, `локальных (< ${D.p50})`],
+].map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+document.getElementById("theme").innerHTML =
+  `<option value="0">все темы</option>`+
+  Object.entries(D.groups).map(([k,v])=>`<option value="${k}">${k}. ${esc(v)}</option>`).join("");
+document.getElementById("theme").onchange = e=>{ theme=+e.target.value; render(); };
+document.getElementById("q").oninput = e=>{ query=e.target.value; render(); };
+document.querySelectorAll("#tiers .chip").forEach(ch=> ch.onclick=()=>{
+  tierOn[ch.dataset.t] = !tierOn[ch.dataset.t]; ch.classList.toggle("on", tierOn[ch.dataset.t]); render(); });
+
+document.getElementById("about").innerHTML =
+  `<b>Что это.</b> Пересечение мокапов 17 (ранжирование по глубине) и 31 (география мотива), но на <b>всём</b> корпусе: `+
+  `${D.n} мотивов с ≥ ${D.min_placed} размещаемыми традициями. <b>Глубина</b> — прокси по широте распространения `+
+  `(широкое ≈ старое): глубокий ярус ≥ ${D.p85} традиций, локальный < ${D.p50}. <b>Кластеры</b> — DBSCAN по точкам `+
+  `традиций (радиус ≈ ${22}°), каждый обведён сглаженным контуром (буфер + Chaikin, как в мокапе 15); одиночные `+
+  `точки-«стрелы» намеренно без обводки, чтобы не раздувать форму. <b>Footprint</b> в строке — раскладка по 12 `+
+  `макро-ареалам (интенсивность = число традиций). <b>Предел:</b> координаты традиций — грубые центроиды ареальных `+
+  `подрегионов (не точные точки), а «глубина» смешивает древний descent и широкую диффузию — контур показывает `+
+  `<b>где</b> мотив встречается, а не откуда он пришёл.`;
+
+render();
+</script>

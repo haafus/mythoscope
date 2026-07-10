@@ -499,6 +499,20 @@ catalogued corpora look shallow), so controlling *strengthens* it — not an art
 traditions really are in the early-peopled regions. Limit: depth is a breadth proxy (conflates deep
 descent with wide diffusion). See [`39-tradition-stratigraphy/README.md`](39-tradition-stratigraphy/README.md).
 
+### 40 · Motif map explorer
+Pick a motif from a depth-ranked list (breadth tiers of mockup 17, each row with a 12-area
+footprint sparkline) → its attesting traditions plot on the map and each geographic **cluster**
+is outlined with a smoothed contour (DBSCAN + mockup 15's buffered-Chaikin hull); the map
+re-centres on the motif's region (mockup 31). Works over the whole corpus (3265 motifs with ≥4
+locatable traditions), not just the datable descent minority.
+**Q.** Where is a given motif attested, and does it form one continuous range or discrete pockets?
+**Finding — the shape *is* the signal.** A pan-continental motif (swan-maiden K25, breadth 513)
+draws just two mega-contours — the whole Old World and the whole New World, broken only by ocean;
+a recurrent-but-scattered one (Pleiades-as-person I108, breadth 76) fragments into **eleven** tight
+regional contours across five continents. Contours show *where* a motif is attested, not where it
+originated (coarse subregion centroids; breadth conflates descent with diffusion). See
+[`40-motif-map-explorer/README.md`](40-motif-map-explorer/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
