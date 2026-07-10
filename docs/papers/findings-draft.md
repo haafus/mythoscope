@@ -305,7 +305,7 @@ re-derived theme taxonomy connects the etiological logic of Thompson (1955–58)
 of Uther (2004) and the morphological tradition of Propp (1928) and Lévi-Strauss (1955); the recovered
 trickster-casting and death-messenger complexes echo Boas (1916), Radin (1956) and Abrahamsson (1951).
 This paper is the *findings* companion to the infrastructure/framework draft
-(`docs/papers/draft.md`); the full theme re-derivation and the field survey live separately in
+(`docs/papers/machine-draft.md`); the full theme re-derivation and the field survey live separately in
 `docs/motifs/proposals/theme-taxonomy-comparison.md` and `docs/research/`.
 
 ## 7. Reproducibility

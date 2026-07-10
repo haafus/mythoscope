@@ -9,8 +9,8 @@
 >
 > **The four-paper set** (`docs/papers/`): **this** = *framework* (how the corpus, crosswalk,
 > embeddings and tools are built); [`program-draft.md`](program-draft.md) = *position/methods/roadmap*;
-> [`motif-distribution-draft.md`](motif-distribution-draft.md) = *findings* (the substantive results);
-> [`survey-draft.md`](survey-draft.md) = *field survey*. Substantive claims belong to the findings
+> [`findings-draft.md`](findings-draft.md) = *findings* (the substantive results);
+> [`field-draft.md`](field-draft.md) = *field survey*. Substantive claims belong to the findings
 > draft; this paper stays on infrastructure and cross-references the rest.
 >
 > **Two tracks, honestly staged.** The project has two genuine ambitions; the original draft's error
@@ -277,7 +277,7 @@ everything in the findings draft.
 
 The descent/diffusion/convergence decomposition, time-depth from distribution, the datable descent
 minority, facet adequacy, the connectivity gates, and the data-driven theme re-derivation are reported
-in `motif-distribution-draft.md`; the method and assumptions in `program-draft.md`.
+in `findings-draft.md`; the method and assumptions in `program-draft.md`.
 
 ### 5.5 Motif induction from text: built, output-validation pending
 
