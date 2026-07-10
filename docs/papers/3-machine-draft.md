@@ -8,9 +8,9 @@
 > [Overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91).
 >
 > **The four-paper set** (`docs/papers/`): **this** = *framework* (how the corpus, crosswalk,
-> embeddings and tools are built); [`program-draft.md`](program-draft.md) = *position/methods/roadmap*;
-> [`findings-draft.md`](findings-draft.md) = *findings* (the substantive results);
-> [`field-draft.md`](field-draft.md) = *field survey*. Substantive claims belong to the findings
+> embeddings and tools are built); [`2-program-draft.md`](2-program-draft.md) = *position/methods/roadmap*;
+> [`4-findings-draft.md`](4-findings-draft.md) = *findings* (the substantive results);
+> [`1-field-draft.md`](1-field-draft.md) = *field survey*. Substantive claims belong to the findings
 > draft; this paper stays on infrastructure and cross-references the rest.
 >
 > **Two tracks, honestly staged.** The project has two genuine ambitions; the original draft's error
@@ -277,7 +277,7 @@ everything in the findings draft.
 
 The descent/diffusion/convergence decomposition, time-depth from distribution, the datable descent
 minority, facet adequacy, the connectivity gates, and the data-driven theme re-derivation are reported
-in `findings-draft.md`; the method and assumptions in `program-draft.md`.
+in `4-findings-draft.md`; the method and assumptions in `2-program-draft.md`.
 
 ### 5.5 Motif induction from text: built, output-validation pending
 

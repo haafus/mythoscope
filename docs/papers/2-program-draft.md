@@ -6,8 +6,8 @@
 
 *Working position/methods draft. It states the *stance*, the *method*, and the *roadmap* of the
 MythoScope programme; the empirical results that test its assumptions are reported in the findings
-draft (`findings-draft.md`), the tooling in the framework draft (`machine-draft.md`), and the field
-context in the survey (`field-draft.md`). The design notes it formalises are
+draft (`4-findings-draft.md`), the tooling in the framework draft (`3-machine-draft.md`), and the field
+context in the survey (`1-field-draft.md`). The design notes it formalises are
 `docs/motifs/proposals/{analysis-program, macro-area-facets, stratum-derivation, roadmap}.md`.*
 
 ---
@@ -203,5 +203,5 @@ research programme.
 - Pagel, M. (1994). Detecting correlated evolution on phylogenies. *Proc. R. Soc. B* 255, 37–45.
 - **MythoScope design notes** — `docs/motifs/proposals/analysis-program.md` (the arc),
   `macro-area-facets.md` (the entity model & assumptions), `stratum-derivation.md` (axioms & method),
-  `roadmap.md`; companion papers `machine-draft.md` (framework), `findings-draft.md` (findings),
-  `field-draft.md` (survey).
+  `roadmap.md`; companion papers `3-machine-draft.md` (framework), `4-findings-draft.md` (findings),
+  `1-field-draft.md` (survey).

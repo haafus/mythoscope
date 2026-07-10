@@ -19,7 +19,7 @@ Part I  — The Field        (= Paper I, Survey)
 Part II — The Program      (= Paper II, Position/Method/Roadmap)
 Part III— The Machine      (= Paper III, Infrastructure & induction pipeline)
 Part IV — The Findings     (= Paper IV, Results)
-Part V  — Open Problems & Outlook   (= outlook-draft.md — drafted; see below)
+Part V  — Open Problems & Outlook   (= 5-outlook-draft.md — drafted; see below)
 Back matter
   Unified bibliography, data & code availability, appendices, index
 ```
@@ -38,7 +38,7 @@ Back matter
 - **Part IV · The Findings** — the results paper, verbatim: systematics, stratum, dating, facet
   adequacy, connectivity gates, tradition stratigraphy, and the theme re-derivation.
 
-### Part V · Open Problems & Outlook (drafted → [`outlook-draft.md`](outlook-draft.md))
+### Part V · Open Problems & Outlook (drafted → [`5-outlook-draft.md`](5-outlook-draft.md))
 
 Ends the book on the frontier rather than a restated conclusion, on four threads:
 1. **Finishing motif induction from text** — the principal open milestone (Paper III §5.5): induced
