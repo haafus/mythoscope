@@ -5,7 +5,7 @@ words). This is the *first book step*: a single-argument, self-contained volume 
 existing drafts and the ~40 interactive prototypes, and itself the skeleton of a later full monograph
 (70–120k words). Distinct from [`../monograph-outline.md`](../monograph-outline.md), which plans the
 larger book; this file plans the Element. The drafted chapters live alongside it in this folder
-(`1-introduction.md`, …).
+(`01-introduction.md`, `02-field.md`, … `10-discussion.md`; case studies at `09-case-studies.md`).
 
 Written to be read by someone who does not know the project.
 
