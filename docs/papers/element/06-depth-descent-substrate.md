@@ -109,8 +109,12 @@ peopling of the continents. The corpus supports a version of this claim, but a c
 after the two mandatory controls of Chapter 3 are applied.
 
 The first control is coverage weighting, which shrinks apparent breadth by about 31% once the
-densely-catalogued traditions stop inflating every motif's range. The second is a banality proxy that
-flags motifs simple enough to have been reinvented independently rather than transmitted. Under both
+densely-catalogued traditions stop inflating every motif's range. The choice of *this* correction is
+itself a reported negative: a stricter configuration-style null was tried first and **rejected**, because
+conditioning on a motif's own frequency is circular — the whole point is to keep real breadth — and it
+over-corrected savagely, collapsing even the sun-and-moon pair to a recent areal motif with an 84%
+breadth shrink. The milder, non-circular coverage weight is used instead. The second is a banality proxy
+that flags motifs simple enough to have been reinvented independently rather than transmitted. Under both
 together, 504 motifs — about 15% — change mode, mostly sliding from areal-broad to areal-recent as
 their inflated ranges deflate (Figure 6.5). This is the sound of a great deal of apparent antiquity
 evaporating. And yet the deep spine does not vanish: of the 480 motifs that touch both hemispheres, 320
@@ -119,12 +123,18 @@ a skeleton — and its reality is established precisely by the fact that it is w
 controls have taken their share.
 
 That the survivors are not a coding artefact of one catalogue is confirmed by cross-catalogue
-replication. Just under half of all motifs — 48% — are corroborated by an independent index through the
-crosswalk, and the corroboration is **theme-blind**: cosmological motifs are corroborated at 49%,
-tale-types at 49%, so the replication is not quietly favouring one kind of material over another. It is
-also higher for exactly the motifs the deep-substrate claim rests on — 54% for broad motifs against 20%
-for narrow ones — so the analysis leans on a replicated core rather than on Berezkin's coding alone.
-The deep substrate is small, real, and independently attested.
+replication, which grades each motif by how independently it is corroborated — present in both other
+indices, in one, or in Berezkin alone — into a per-motif confidence weight. Just under half of all
+motifs — 48% — are corroborated by an independent index through the crosswalk, and the corroboration is
+**theme-blind**: cosmological motifs are corroborated at 49%, tale-types at 49%, so the replication is not
+quietly favouring one kind of material over another, and the cosmology findings are therefore not an
+artefact of Berezkin's idiosyncratic coding. It is also higher for exactly the motifs the deep-substrate
+claim rests on — 54% for broad motifs against 20% for the narrow tail of fine sub-variants — so the
+analysis leans on a replicated core. And the 48% is a *lower* bound, because the crosswalk is an
+automated similarity match with false negatives: the swan-maiden, the single broadest motif in the
+catalogue, is flagged Berezkin-only even though it plainly has a well-known tale-type parallel the match
+missed. The true corroborated share is higher, "Berezkin-only" is an upper bound on coding-dependence,
+and both facts only strengthen the conclusion that the deep substrate is real rather than invented.
 
 ## 6.5 The irreducible limit, and why content cannot break it
 
@@ -143,9 +153,15 @@ This is not a failure of a particular method; it is a property of the evidence. 
 substrate and a widely diffused innovation produce the same kind of footprint — broad, disjunct,
 areally scattered — and no score computed from that footprint can separate them. Nor can *content*
 supply the missing signal, which one might hope it could. Nearest-by-meaning motifs do share a theme
-group 58% of the time, against a 20% chance baseline, so meaning is far from random — but meaning
+group 58% of the time, against a 20% chance baseline — a factor of 2.9, confirming both that the
+embeddings are valid and that content is very nearly the theme axis itself — but meaning
 barely predicts *age*: content correlates only about r ≈ 0.28 with breadth and 0.18 with prevalence
-(Figure 6.6). **What a motif is about is not how old it is.** No embedding, no linear score, and no
+(Figure 6.6). **What a motif is about is not how old it is.** The point is reinforced by a further
+reported failure: an attempt to read a cheap "banality" score off content — the hope that
+reinvention-prone motifs would sit recognisably in dense regions of meaning-space — did not pan out,
+because embedding density turns out to measure catalogue granularity (near-duplicate variants of one
+trickster) rather than proneness to reinvention, correlating near zero with the definition-based proxy.
+The negative is recorded rather than buried. No embedding, no linear score, and no
 single facet dates a motif, and the diagnostic contrast between A3 and K25 is irreducible from
 distribution alone. Separating them requires stepping outside the distribution entirely — to genetics,
 to historical corridors, to node-level dated phylogenies — which is the boundary Chapter 7 begins to
