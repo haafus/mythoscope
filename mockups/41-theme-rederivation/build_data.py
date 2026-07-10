@@ -135,7 +135,10 @@ def main():
                    random_state=42).fit_transform(X)
     u10 = umap.UMAP(n_components=10, n_neighbors=15, min_dist=0.0, metric="cosine",
                     random_state=42).fit_transform(X)
-    lab = KMeans(n_clusters=K1, n_init=8, random_state=0).fit(u10).labels_
+    km = KMeans(n_clusters=K1, n_init=8, random_state=0).fit(u10)
+    lab = km.labels_
+    d1 = np.linalg.norm(u10 - km.cluster_centers_[lab], axis=1)   # dist to level-1 centroid
+    d2 = d1.copy()                                                # dist to level-2 sub-centroid
 
     purity = sum(Counter(grp[lab == c]).most_common(1)[0][1] for c in range(K1)) / len(M)
     ari = adjusted_rand_score(grp, lab)
@@ -157,7 +160,9 @@ def main():
         k2 = int(np.clip(round(len(idx) / 55), 2, 5))
         subs = []
         if len(idx) >= 8:
-            sl = KMeans(n_clusters=k2, n_init=5, random_state=0).fit(u10[idx]).labels_
+            skm = KMeans(n_clusters=k2, n_init=5, random_state=0).fit(u10[idx])
+            sl = skm.labels_
+            d2[idx] = np.linalg.norm(u10[idx] - skm.cluster_centers_[sl], axis=1)
             tmp = []
             for s in range(k2):
                 si = idx[sl == s]
@@ -205,22 +210,49 @@ def main():
     cont = [[int(((lab == inv_disp(cl_of, disp)) & (grp == g)).sum()) for g in cols]
             for disp in range(K1)]
 
+    # fit = looseness of a motif inside its cluster, on a common scale so the L1↔L2 toggle is
+    # comparable (flip to L2 → tight peripheral sub-themes go green). "Outlier" = beyond the 98th
+    # pct at that level; the genuine residue is a motif loose at BOTH levels.
+    scale = float(np.percentile(d1, 99)) or 1.0
+    f1 = np.clip(d1 / scale, 0, 1)
+    f2 = np.clip(d2 / scale, 0, 1)
+    p98d1, p98d2 = float(np.percentile(d1, 98)), float(np.percentile(d2, 98))
+    out_l1 = int((d1 > p98d1).sum())
+    out_both = int(((d1 > p98d1) & (d2 > p98d2)).sum())
+    subname_of = [c["subs"] for c in clusters]           # per display-cluster sub list
+    cl_name = {c["id"]: c["name"] for c in clusters}
+
+    def sub_label(i):
+        subs = subname_of[cl_of[lab[i]]]
+        return subs[subid[i]]["label"] if subid[i] < len(subs) else ""
+
+    # residue list: the loosest-at-L2 motifs (top 16), tagging those that are ALSO L1-outliers
+    resid_ix = sorted(range(len(M)), key=lambda i: -d2[i])[:16]
+    residue = [{"c": M[i]["id"], "nm": M[i].get("name", ""),
+                "cl": cl_name[cl_of[lab[i]]], "sub": sub_label(i),
+                "d1": round(float(d1[i]), 2), "d2": round(float(d2[i]), 2),
+                "both": bool(d1[i] > p98d1 and d2[i] > p98d2)} for i in resid_ix]
+
     xs, ys = u2[:, 0].astype(float), u2[:, 1].astype(float)
     xmin, xr = xs.min(), (xs.max() - xs.min()) or 1.0
     ymin, yr = ys.min(), (ys.max() - ys.min()) or 1.0
     pts = [{"x": round((xs[i] - xmin) / xr, 4),
             "y": round((ys[i] - ymin) / yr, 4),
             "t": int(grp[i]), "k": int(cl_of[lab[i]]), "s": int(subid[i]), "c": M[i]["id"],
-            "nm": M[i].get("name", ""), "b": int(br[i])} for i in range(len(M))]
+            "nm": M[i].get("name", ""), "b": int(br[i]),
+            "f1": round(float(f1[i]), 3), "f2": round(float(f2[i]), 3)} for i in range(len(M))]
 
     data = {"n": len(M), "K1": K1, "purity": round(purity, 3), "ari": round(ari, 3),
             "quality": QUALITY, "gnames_ru": GN, "gnames_en": GEN,
             "clusters": clusters, "themes": themes, "cont": cont, "cont_cols": cols,
-            "pts": pts}
+            "fit": {"out_l1": out_l1, "out_both": out_both,
+                    "p98d1": round(p98d1, 2), "p98d2": round(p98d2, 2), "scale": round(scale, 2)},
+            "residue": residue, "pts": pts}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False,
                                                  separators=(",", ":")) + ";", encoding="utf-8")
     print(f"UMAP-10 · K={K1} · purity {purity:.3f} · ARI-vs-13themes {ari:.3f} · data.js "
           f"~{OUT.stat().st_size // 1024}KB")
+    print(f"  fit: outliers >p98 — {out_l1} from L1 centre → {out_both} still from L2 sub-centre")
     for cl in clusters:
         d = cl["dom"][0]
         print(f"  [{cl['id']:2}] n={cl['n']:4} pur={cl['purity']:.2f} "

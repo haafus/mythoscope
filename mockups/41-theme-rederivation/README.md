@@ -21,10 +21,15 @@ hand taxonomy.
 5. **Comparison** to the 13 hand themes — contingency, purity, adjusted Rand, and a per-theme
    verdict (how concentrated each theme is in one data cluster).
 
-**Coverage.** KMeans is a hard partition, so all 3488 motifs are assigned — nothing is left
-uncovered. The scheme in fact *increases* coverage over the hand taxonomy: the **141** motifs
-Berezkin left un-grouped ("?") each receive a data-theme. Only ~**2 %** sit far from any centroid
-(weakly-fitting outliers).
+**Coverage & fitness.** KMeans is a hard partition, so all 3488 motifs are assigned — nothing is
+left uncovered. The scheme in fact *increases* coverage over the hand taxonomy: the **141** motifs
+Berezkin left un-grouped ("?") each receive a data-theme. A third scatter mode, **"по пригодности"**,
+colours each motif by how loosely it sits in its cluster, with a **L1-centre ↔ L2-sub-centre**
+toggle: flip it and the peripheral knots (rainbow, girl-from-fruit) go from red (far from the big
+L1 centroid) to green (dead-centre of their own sub-theme). The KPI states it — **outliers > p98:
+70 from L1 → 1 from L2**: the "2 % outliers" are not noise but *under-resolved* micro-themes that
+level 2 already names. The **"хуже всего вписаны"** panel lists the loosest-at-L2 motifs; only the
+single row flagged **"оба уровня"** (loose at both levels) is the genuine residue.
 
 ## What it shows
 

@@ -72,7 +72,11 @@
     <div class="seg" id="colorby">
       <button data-m="t" class="on">по темам Берёзкина</button>
       <button data-m="k">по кластерам данных</button>
+      <button data-m="f">по пригодности</button>
     </div>
+    <span id="fitlevel" style="display:none"><span class="muted">мерить от:</span>
+      <span class="seg"><button data-l="1">L1-центра</button><button data-l="2" class="on">L2-под-центра</button></span>
+      <span class="muted" id="fitkpi"></span></span>
   </div>
   <div class="scatterwrap">
     <canvas id="cv" width="2200" height="1180"></canvas>
@@ -82,6 +86,13 @@
 </div>
 
 <div class="card" id="detail" style="display:none"></div>
+
+<div class="card" id="residcard">
+  <h2>Хуже всего вписаны — по L2 <span class="s">— рыхлые точки; «оба уровня» = настоящий остаток (далёк и от L1, и от L2)</span></h2>
+  <table class="cmp"><thead><tr><th>Мотив</th><th>Кластер › под-кластер</th><th class="r">d(L1)</th><th class="r">d(L2)</th><th></th></tr></thead>
+  <tbody id="resid"></tbody></table>
+  <div class="note" id="residnote"></div>
+</div>
 
 <div class="card">
   <h2>Сравнение с 13 рукотворными темами <span class="s">— насколько тема концентрируется в одном кластере данных</span></h2>
@@ -124,13 +135,39 @@ document.getElementById("qtab").innerHTML =
 const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
 const W = cv.width, H = cv.height, PAD = 26;
 const sx = x => PAD + x*(W-2*PAD), sy = y => H-PAD - y*(H-2*PAD);
-let mode = "t";                 // 't' theme | 'k' cluster
+let mode = "t";                 // 't' theme | 'k' cluster | 'f' fitness
+let fitLevel = "2";             // '1' dist to L1 centre | '2' dist to L2 sub-centre
 let hi = null;                  // highlighted category (theme id or cluster id), null = all
 let selK = null;                // selected level-1 cluster -> level-2 view (null = off)
+let hiPt = null;                // highlighted single motif code (from residue list)
 const off = new Set();          // toggled-off legend categories
+// fitness ramp: tight (green) -> loose (amber -> red)
+const FSTOP = [[0,[60,138,94]],[0.55,[214,161,58]],[1,[192,85,64]]];
+function fitCol(f){ let a=FSTOP[0],b=FSTOP[FSTOP.length-1];
+  for(let i=0;i<FSTOP.length-1;i++){ if(f>=FSTOP[i][0]&&f<=FSTOP[i+1][0]){a=FSTOP[i];b=FSTOP[i+1];break;} }
+  const t=(f-a[0])/((b[0]-a[0])||1), c=a[1].map((v,j)=>Math.round(v+(b[1][j]-v)*t));
+  return `rgb(${c.join(",")})`; }
 
+function ringOverlay(){
+  if(hiPt===null) return;
+  const p = P.find(q=>q.c===hiPt); if(!p) return;
+  ctx.globalAlpha=1; ctx.strokeStyle="#c05540"; ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), 9, 0, 7); ctx.stroke();
+}
 function draw(){
   ctx.clearRect(0,0,W,H);
+  if(mode==="f"){                        // FITNESS mode: colour by looseness at L1 or L2
+    for(const pass of [0,1]){            // tight first, loose on top (so outliers stand out)
+      for(const p of P){
+        const f = fitLevel==="2" ? p.f2 : p.f1, loose = f>0.5;
+        if((pass===0) === loose) continue;
+        ctx.globalAlpha = loose ? 0.95 : 0.8;
+        ctx.fillStyle = fitCol(f);
+        ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), loose?4.6:3.2, 0, 7); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1; ringOverlay(); return;
+  }
   if(selK!==null){                       // LEVEL-2 mode: selected cluster coloured by sub-cluster
     for(const pass of [0,1]){
       for(const p of P){
@@ -141,7 +178,7 @@ function draw(){
         ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), inSel?4.8:2.5, 0, 7); ctx.fill();
       }
     }
-    ctx.globalAlpha = 1; return;
+    ctx.globalAlpha = 1; ringOverlay(); return;
   }
   // two passes: dim first, highlighted on top
   for(const pass of [0,1]){
@@ -155,7 +192,7 @@ function draw(){
       ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), active?4.2:3, 0, 7); ctx.fill();
     }
   }
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = 1; ringOverlay();
 }
 draw();
 
@@ -179,6 +216,13 @@ cv.addEventListener("mouseleave", ()=>tip.style.opacity=0);
 // ---- legend (depends on mode) ----
 function renderLegend(){
   const el = document.getElementById("legend");
+  if(mode==="f"){
+    const ramp = `linear-gradient(90deg,${fitCol(0)},${fitCol(0.55)},${fitCol(1)})`;
+    el.innerHTML = `<span class="muted">пригодность:</span>`+
+      `<span style="display:inline-block;width:200px;height:11px;border-radius:6px;background:${ramp}"></span>`+
+      `<span class="muted">плотно (в центре под-темы) → рыхло (далеко)</span>`;
+    return;
+  }
   if(mode==="t"){
     const gs = [1,2,3,4,5,6,7,8,9,10,11,12,13];
     el.innerHTML = gs.map(g=>`<span class="lgi ${off.has(g)?'off':''}" data-c="${g}"><i style="background:${themeCol(g)}"></i>${esc(D.gnames_ru[g])}</span>`).join("");
@@ -195,9 +239,35 @@ function renderLegend(){
 renderLegend();
 document.getElementById("colorby").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   document.getElementById("colorby").querySelectorAll("button").forEach(x=>x.classList.remove("on"));
-  b.classList.add("on"); mode=b.dataset.m; hi=null; off.clear();
-  selK=null; renderDetail(); renderCards(); renderLegend(); draw();
+  b.classList.add("on"); mode=b.dataset.m; hi=null; off.clear(); selK=null;
+  document.getElementById("fitlevel").style.display = mode==="f" ? "inline" : "none";
+  if(mode!=="f") hiPt=null;
+  renderDetail(); renderCards(); renderLegend(); draw();
 });
+document.getElementById("fitkpi").innerHTML =
+  `выбросов (>p98): <b>${D.fit.out_l1}</b> от L1 → <b>${D.fit.out_both}</b> от L2`;
+document.querySelectorAll("#fitlevel .seg button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#fitlevel .seg button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); fitLevel=b.dataset.l; draw();
+});
+
+// ---- residue list (loosest-at-L2 motifs) ----
+document.getElementById("resid").innerHTML = D.residue.map(r=>
+  `<tr data-c="${esc(r.c)}" style="cursor:pointer"><td><b>${esc(r.c)}</b> ${esc(r.nm)}</td>`+
+  `<td class="muted">${esc(r.cl)} › ${esc(r.sub)}</td>`+
+  `<td class="r">${r.d1.toFixed(2)}</td><td class="r">${r.d2.toFixed(2)}</td>`+
+  `<td>${r.both?'<span class="tag dissolved">оба уровня</span>':''}</td></tr>`).join("");
+document.querySelectorAll("#resid tr").forEach(tr=>tr.onclick=()=>{
+  hiPt = tr.dataset.c;
+  if(mode!=="f"){ mode="f"; document.getElementById("colorby").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.m==="f"));
+    document.getElementById("fitlevel").style.display="inline"; selK=null; renderDetail(); renderCards(); renderLegend(); }
+  draw(); document.getElementById("cv").scrollIntoView({behavior:"smooth",block:"center"});
+});
+document.getElementById("residnote").innerHTML =
+  `Список ранжирован по расстоянию до <b>L2</b>-под-центра (самые рыхлые сверху). Почти все они — далеко от `+
+  `<b>L1</b>-центроида (столбец d(L1) большой), но <b>близко</b> к своему под-кластеру (d(L2) мал): это тесные `+
+  `периферийные под-темы (радуга, дева-из-плода), а не шум. Настоящий остаток — строки «оба уровня»: их всего `+
+  `<b>${D.fit.out_both}</b>. Клик по строке — найти мотив на карте.`;
 
 // ---- level-2 detail panel (appears when a cluster is selected) ----
 function renderDetail(){
