@@ -251,8 +251,37 @@ def main():
             "residue": residue, "pts": pts}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False,
                                                  separators=(",", ":")) + ";", encoding="utf-8")
+
+    # committed, reusable facet: the taxonomy definition + per-motif L1/L2 assignment.
+    # (outputs/ is git-ignored, so this lives beside the mockup and is version-controlled.)
+    tax_clusters = [{"l1": c["id"], "name": c["name"],
+                     "old_theme_mix": [{"g": d["g"], "name": d["en"], "n": d["n"]} for d in c["dom"]],
+                     "size": c["n"], "purity": c["purity"],
+                     "subs": [{"l2": j, "name": s["label"], "size": s["n"]}
+                              for j, s in enumerate(c["subs"])]}
+                    for c in clusters]
+    name_of = {c["id"]: c["name"] for c in clusters}
+    sub_of = {c["id"]: c["subs"] for c in clusters}
+    tax_motifs = {}
+    for i in range(len(M)):
+        l1 = cl_of[lab[i]]; l2 = int(subid[i])
+        subs = sub_of[l1]
+        tax_motifs[M[i]["id"]] = {"l1": l1, "l1_name": name_of[l1],
+                                  "l2": l2, "l2_name": subs[l2]["label"] if l2 < len(subs) else ""}
+    tax = {"meta": {"method": "BGE-M3(name+definition) -> UMAP-10 -> KMeans K=16 + level-2 KMeans",
+                    "embedding_text": "name + definition (~96% English, ~4% Russian; BAAI/bge-m3)",
+                    "n_motifs": len(M), "n_clusters": K1, "n_subclusters": sum(len(c["subs"]) for c in clusters),
+                    "umap": {"n_neighbors": 15, "min_dist_2d": 0.1, "min_dist_10d": 0.0, "random_state": 42},
+                    "kmeans_random_state": 0, "source": "mockups/41-theme-rederivation/build_data.py",
+                    "note": "data-driven 'narrative form' facet, orthogonal to Berezkin's 13 etiological themes; not a replacement"},
+           "clusters": tax_clusters,
+           "motifs": {k: tax_motifs[k] for k in sorted(tax_motifs)}}
+    (HERE / "narrative_taxonomy.json").write_text(
+        json.dumps(tax, ensure_ascii=False, indent=1), encoding="utf-8")
+
     print(f"UMAP-10 · K={K1} · purity {purity:.3f} · ARI-vs-13themes {ari:.3f} · data.js "
-          f"~{OUT.stat().st_size // 1024}KB")
+          f"~{OUT.stat().st_size // 1024}KB · narrative_taxonomy.json "
+          f"~{(HERE / 'narrative_taxonomy.json').stat().st_size // 1024}KB")
     print(f"  fit: outliers >p98 — {out_l1} from L1 centre → {out_both} still from L2 sub-centre")
     for cl in clusters:
         d = cl["dom"][0]
