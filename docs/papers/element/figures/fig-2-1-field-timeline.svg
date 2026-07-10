@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 280" font-family="Georgia, serif" fill="#1a1a1a">
+  <style>
+    .title { font-size:19px; font-weight:bold; }
+    .era { font-size:15px; font-weight:bold; }
+    .m { font-size:12px; fill:#3a3a3a; }
+    .yr { font-size:12px; fill:#8a7f6a; }
+    .axis { stroke:#8a7f6a; stroke-width:2; }
+    .band1 { fill:#eae4d6; }
+    .band2 { fill:#e2ded0; }
+    .lead { font-size:12px; fill:#5b5346; font-style:italic; }
+  </style>
+  <text x="430" y="30" text-anchor="middle" class="title">Two eras of computational folkloristics</text>
+
+  <rect class="band1" x="40" y="55" width="380" height="150" rx="4"/>
+  <rect class="band2" x="420" y="55" width="400" height="150" rx="4"/>
+  <text x="230" y="78" text-anchor="middle" class="era">Classical era · 2008–2018</text>
+  <text x="620" y="78" text-anchor="middle" class="era">Modern era · 2018–2026</text>
+
+  <text x="55" y="104" class="m">• index digitisation (TMI, ATU)</text>
+  <text x="55" y="126" class="m">• topic-model motif induction</text>
+  <text x="55" y="148" class="m">• tale phylogenetics</text>
+  <text x="55" y="170" class="m">• character / motif networks</text>
+
+  <text x="435" y="104" class="m">• transformer embeddings</text>
+  <text x="435" y="126" class="m">• clustering: UMAP → density → keywords</text>
+  <text x="435" y="148" class="m">• large-language-model annotation</text>
+  <text x="435" y="170" class="m">• use-type-annotated benchmarks</text>
+
+  <line class="axis" x1="40" y1="228" x2="820" y2="228"/>
+  <g text-anchor="middle">
+    <text x="40" y="248" class="yr">2008</text>
+    <text x="420" y="248" class="yr">2018</text>
+    <text x="820" y="248" class="yr">2026</text>
+  </g>
+  <line class="axis" x1="420" y1="222" x2="420" y2="234"/>
+  <text x="430" y="272" text-anchor="middle" class="lead">verdict, carried into this book: use embeddings as a retrieval / candidate-generation layer over a curated index — not as an end-to-end classifier</text>
+</svg>

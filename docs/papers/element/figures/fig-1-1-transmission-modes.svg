@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 300" font-family="Georgia, serif" fill="#1a1a1a">
+  <style>
+    .panel { fill:#f4f1ea; stroke:#8a7f6a; stroke-width:1.5; }
+    .head { font-size:16px; font-weight:bold; }
+    .sub { font-size:12px; fill:#5b5346; font-style:italic; }
+    .title { font-size:19px; font-weight:bold; }
+    .tree { fill:none; stroke:#3a3a3a; stroke-width:2; }
+    .node { fill:#b3572e; }
+    .arr { fill:none; stroke:#b3572e; stroke-width:2; marker-end:url(#m); }
+    .spark { fill:#5b8a72; }
+  </style>
+  <defs><marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#b3572e"/></marker></defs>
+  <text x="430" y="30" text-anchor="middle" class="title">Why a motif recurs — three modes</text>
+
+  <!-- descent -->
+  <rect class="panel" x="20" y="55" width="255" height="205" rx="6"/>
+  <text x="147" y="82" text-anchor="middle" class="head">Descent</text>
+  <path class="tree" d="M147 100 L147 120 M147 120 L97 150 M147 120 L197 150 M97 150 L72 190 M97 150 L122 190 M197 150 L172 190 M197 150 L222 190"/>
+  <circle class="node" cx="72" cy="196" r="6"/><circle class="node" cx="122" cy="196" r="6"/>
+  <circle class="node" cx="172" cy="196" r="6"/><circle class="node" cx="222" cy="196" r="6"/>
+  <text x="147" y="232" text-anchor="middle" class="sub">inherited down a lineage;</text>
+  <text x="147" y="248" text-anchor="middle" class="sub">tracks the language tree</text>
+
+  <!-- areal -->
+  <rect class="panel" x="302" y="55" width="255" height="205" rx="6"/>
+  <text x="430" y="82" text-anchor="middle" class="head">Areal diffusion</text>
+  <circle class="node" cx="345" cy="150" r="6"/><circle class="node" cx="405" cy="135" r="6"/>
+  <circle class="node" cx="470" cy="155" r="6"/><circle class="node" cx="515" cy="140" r="6"/>
+  <path class="arr" d="M352 149 L398 137"/><path class="arr" d="M412 136 L463 153"/><path class="arr" d="M477 154 L508 142"/>
+  <text x="430" y="232" text-anchor="middle" class="sub">borrowed between neighbours;</text>
+  <text x="430" y="248" text-anchor="middle" class="sub">tracks geography, not descent</text>
+
+  <!-- reinvention -->
+  <rect class="panel" x="584" y="55" width="255" height="205" rx="6"/>
+  <text x="711" y="82" text-anchor="middle" class="head">Reinvention</text>
+  <g class="spark">
+    <path d="M640 150 l6 -18 l6 18 l18 6 l-18 6 l-6 18 l-6 -18 l-18 -6 z"/>
+    <path d="M770 165 l5 -15 l5 15 l15 5 l-15 5 l-5 15 l-5 -15 l-15 -5 z"/>
+  </g>
+  <text x="711" y="232" text-anchor="middle" class="sub">arises independently more</text>
+  <text x="711" y="248" text-anchor="middle" class="sub">than once; a cognitive attractor</text>
+
+  <text x="430" y="286" text-anchor="middle" class="sub" font-size="13">Galton's problem: on a map the three can look alike — a deep inheritance and a wide diffusion cast the same shadow</text>
+</svg>

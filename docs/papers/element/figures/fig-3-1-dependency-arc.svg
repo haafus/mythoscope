@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 220" font-family="Georgia, serif" fill="#1a1a1a">
+  <style>
+    .stage { fill:#f4f1ea; stroke:#8a7f6a; stroke-width:1.5; }
+    .title { font-size:19px; font-weight:bold; }
+    .sub { font-size:12px; fill:#5b5346; font-style:italic; }
+    .num { font-size:13px; fill:#8a7f6a; }
+    .arrow { fill:none; stroke:#8a7f6a; stroke-width:2; marker-end:url(#a); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8a7f6a"/>
+    </marker>
+  </defs>
+  <text x="430" y="34" text-anchor="middle" class="title">The natural-history arc — a dependency order</text>
+  <g>
+    <rect class="stage" x="20"  y="70" width="180" height="86" rx="6"/>
+    <rect class="stage" x="240" y="70" width="180" height="86" rx="6"/>
+    <rect class="stage" x="460" y="70" width="180" height="86" rx="6"/>
+    <rect class="stage" x="680" y="70" width="160" height="86" rx="6"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="110" y="100" class="num">1</text>
+    <text x="110" y="122" class="title" font-size="17">Collect</text>
+    <text x="110" y="142" class="sub">carry the bias forward</text>
+    <text x="330" y="100" class="num">2</text>
+    <text x="330" y="122" class="title" font-size="17">Describe</text>
+    <text x="330" y="142" class="sub">what is one motif?</text>
+    <text x="550" y="100" class="num">3</text>
+    <text x="550" y="122" class="title" font-size="17">Classify</text>
+    <text x="550" y="142" class="sub">the facet space</text>
+    <text x="760" y="100" class="num">4</text>
+    <text x="760" y="122" class="title" font-size="17">Explain</text>
+    <text x="760" y="142" class="sub">stratum + residual</text>
+  </g>
+  <path class="arrow" d="M200 113 L238 113"/>
+  <path class="arrow" d="M420 113 L458 113"/>
+  <path class="arrow" d="M640 113 L678 113"/>
+  <text x="430" y="196" text-anchor="middle" class="sub" font-size="13">each stage presupposes the one before — you cannot classify what you have not described, or explain a distribution you have not mapped</text>
+</svg>

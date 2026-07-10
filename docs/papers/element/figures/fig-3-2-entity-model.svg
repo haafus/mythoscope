@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 300" font-family="Georgia, serif" fill="#1a1a1a">
+  <style>
+    .box { fill:#f4f1ea; stroke:#8a7f6a; stroke-width:1.5; }
+    .head { font-size:16px; font-weight:bold; }
+    .f { font-size:12px; fill:#3a3a3a; }
+    .given { fill:#5b8a72; }
+    .inf { fill:#b3572e; font-weight:bold; }
+    .tag { font-size:11px; font-style:italic; }
+    .link { fill:none; stroke:#8a7f6a; stroke-width:1.5; stroke-dasharray:4 3; }
+    .title { font-size:19px; font-weight:bold; }
+  </style>
+  <text x="430" y="30" text-anchor="middle" class="title">The three-entity model — one inferred field</text>
+
+  <rect class="box" x="20" y="60" width="240" height="200" rx="6"/>
+  <text x="140" y="86" text-anchor="middle" class="head">Tradition</text>
+  <text x="36" y="112" class="f"><tspan class="given">●</tspan> macro-area (12)</text>
+  <text x="36" y="134" class="f"><tspan class="given">●</tspan> language / religion family</text>
+  <text x="36" y="156" class="f"><tspan class="given">●</tspan> subsistence (4)</text>
+  <text x="36" y="178" class="f"><tspan class="given">●</tspan> theme profile</text>
+  <text x="36" y="200" class="f"><tspan class="given">●</tspan> coordinates</text>
+  <text x="36" y="222" class="f"><tspan class="given">●</tspan> attestation richness a(t)</text>
+  <text x="140" y="248" text-anchor="middle" class="tag given">given / deterministic</text>
+
+  <rect class="box" x="310" y="60" width="240" height="200" rx="6"/>
+  <text x="430" y="86" text-anchor="middle" class="head">Motif</text>
+  <text x="326" y="112" class="f"><tspan class="given">●</tspan> definition</text>
+  <text x="326" y="134" class="f"><tspan class="given">●</tspan> cross-catalogue links</text>
+  <text x="326" y="156" class="f"><tspan class="given">●</tspan> theme</text>
+  <text x="326" y="188" class="f" font-size="13"><tspan class="inf">◆ stratum</tspan> — time-depth + mode</text>
+  <text x="326" y="208" class="tag inf">the ONLY inferred field</text>
+  <text x="326" y="224" class="tag inf">always a hypothesis + confidence</text>
+
+  <rect class="box" x="600" y="60" width="240" height="200" rx="6"/>
+  <text x="720" y="86" text-anchor="middle" class="head">Attestation</text>
+  <text x="616" y="118" class="f">the presence of a motif</text>
+  <text x="616" y="138" class="f">in a tradition</text>
+  <text x="616" y="172" class="f" font-style="italic">observed raw material</text>
+  <text x="616" y="192" class="f" font-style="italic">from which stratum is</text>
+  <text x="616" y="212" class="f" font-style="italic">computed — never itself</text>
+  <text x="616" y="232" class="f" font-style="italic">inferred</text>
+
+  <path class="link" d="M260 160 L310 160"/>
+  <path class="link" d="M550 160 L600 160"/>
+  <text x="285" y="152" text-anchor="middle" class="tag" fill="#8a7f6a">carries</text>
+  <text x="575" y="152" text-anchor="middle" class="tag" fill="#8a7f6a">links</text>
+  <text x="430" y="288" text-anchor="middle" class="tag" fill="#5b5346">separate the given (green) from the inferred (orange); attach a confidence to the inferred</text>
+</svg>
