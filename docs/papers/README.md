@@ -33,6 +33,8 @@ Shared apparatus:
   matters"); *not* the works-cited — precise citations live in each paper's reference list and in
   `../research/`, to be merged into a generated `references.md` at monograph-assembly time.
 - [`monograph-outline.md`](monograph-outline.md) — how the four papers + Part V compose into one book.
+- [`release-plan.md`](release-plan.md) — preprints (how many / where), target venues, Quarto book +
+  GitHub Pages tooling, DOIs, and the rights/licensing checklist.
 
 Related, kept separate on purpose:
 
