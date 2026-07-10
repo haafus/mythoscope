@@ -164,6 +164,19 @@ shrinking effects but for finding their true size. A programme that reported onl
 have understated this result; one that reported only its successes would never have set the test at
 all.
 
+> **Figure 6.1.** The distribution-shape depth score and its histogram, with disjunction weighted above
+> breadth. **Figure 6.2.** The phylogenetic signal: observed clustering on the language tree against a
+> label-permuted null, separating descent from diffusion. **Figure 6.3.** The three-way descent / areal
+> / reinvention mixture over the corpus (most motifs areal-dominant, 2,311 of 2,775). **Figure 6.4.**
+> The diagnostic pair: sun-and-moon (A3) and the swan-maiden (K25) receive near-identical mixtures
+> (descent ≈ 0.16) despite utterly different histories — the irreducibility, in one panel.
+> **Figure 6.5.** The deep substrate under the two mandatory controls: breadth shrinks 31%, 504 motifs
+> change mode, and the both-hemisphere spine survives 320 of 480. **Figure 6.6.** Content barely
+> predicts age: nearest-by-meaning motifs share a theme 58% of the time (vs 20% chance) yet content
+> correlates only r ≈ 0.28 with breadth. **Figure 6.7.** Calendar ages for the 451 descent motifs,
+> concentrated at the Indo-European märchen belt (~5,500 BP). **Figure 6.8.** Tradition stratigraphy:
+> deep-share against first-peopling age, partial r = +0.48 once coverage is controlled.
+
 ---
 
 The phylogeny stage thus resolves what it can and marks what it cannot. Areal diffusion is the dominant

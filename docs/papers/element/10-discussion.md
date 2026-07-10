@@ -43,7 +43,11 @@ The single largest fact the corpus yields is not any of the positive findings bu
 leave unexplained. A tradition's describable facets recover only about a third of motif similarity; the
 connectivity channels of Chapter 7 closed only a sliver of the remaining two-thirds; and the deep-versus-
 diffuse ambiguity cannot be resolved from distribution at all. This **convergence residual** is not a
-failure of the programme — it is the programme's agenda, drawn as a map (Figure 10.1). Its shape names
+failure of the programme — it is the programme's agenda, drawn as a map (Figure 10.1).
+
+> **Figure 10.1.** The convergence residual as a research map: the ~36% of motif similarity the facets
+> recover and the thin sliver empires add, against the ~64% that remains — annotated with the external
+> joins (fine genetics, trade routes, node-level dating, finished text induction) that would light it up. Its shape names
 precisely what is missing: not more distributional cleverness, which has been pushed about as far as the
 data allows, but *external* evidence of the channels along which motifs actually moved and the lineages
 along which they were actually inherited. Each region of the residual points to a specific join that

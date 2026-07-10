@@ -40,6 +40,10 @@ countless local borrowings that never had a common source at all. The two look a
 of the analytical work in this book is, at bottom, a sustained effort to hold Galton's problem in
 view and to report honestly when the data cannot tell the two apart (Figure 1.1).
 
+> **Figure 1.1.** The three modes by which a motif comes to recur — inheritance down a lineage (descent),
+> borrowing between neighbours (areal diffusion), and independent reinvention — and Galton's problem: on
+> a map, a deep inheritance and a wide diffusion cast the same shadow.
+
 The stakes are not merely methodological. Behind the three modes stand three quite different pictures
 of the human past. If descent dominates, then myth is a slow-changing heritable system, and its
 distribution is a kind of fossil record from which the deep history of peoples might be read. If

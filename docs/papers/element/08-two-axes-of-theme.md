@@ -99,6 +99,16 @@ re-deriving the axis from meaning brought it back to the surface. This is the cl
 the book of why the theme axis had to be checked rather than assumed: a scholar's ordering, however
 reasonable, can hide exactly the stratum a depth analysis is looking for.
 
+> **Figure 8.1.** The UMAP re-derivation: motifs embedded, reduced, and clustered into 16 clusters ×
+> 61 sub-themes, coloured by the hand themes for comparison — coherence rises from silhouette −0.03 to
+> +0.28, ARI with the hand scheme only 0.12. **Figure 8.2.** The facet showdown: the narrative axis's
+> unique ΔR² (0.191 at 16 clusters, 0.321 at 61 sub-themes) against the hand theme's 0.125, and the
+> collapse of the hand theme's unique contribution to 0.003 when both are in the model. **Figure 8.3.**
+> The cross-continental worldview clusters the narrative profile recovers — a celestial profile linking
+> the Cherokee, ancient Italy, southeastern Australia, and the Netsilik. **Figure 8.4.** Depth on the
+> narrative taxonomy: cross-continental span from 1.00 (Formulae) to 2.10 (death-messenger), with the
+> deep swallowing-monster complex (span 1.80) shown to be 53% built from old Adventures/Tricks motifs.
+
 ---
 
 The theme chapter thus resolves the question Chapter 5 deferred, and it does so in the book's

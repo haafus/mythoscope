@@ -42,7 +42,16 @@ Assembling these into one object means building a single **attestation matrix**:
 of which traditions carry which motifs, with every cell traceable back to its source. The corpus
 overview — how many texts, traditions, areas, and words the assembled corpus contains, broken down by
 region and tradition — is itself a first analytical surface, and one worth inspecting before any
-modelling, because it exposes the shape of what is there to be explained (Figure 4.3, Table 4.1). Two
+modelling, because it exposes the shape of what is there to be explained (Figure 4.3, Table 4.1).
+
+> **Figure 4.3.** The corpus-overview dashboard: the assembled multilingual corpus by region and
+> tradition — texts, traditions, macro-areas, and word counts — the "what is in this corpus?" surface
+> that every later analysis is a refinement of.
+>
+> **Figure 4.4.** The distribution of attestation-intensity a(t), the number of motifs recorded per
+> tradition: it ranges from a single entry to over seven hundred, with a median near seventy-five. This
+> long right tail is the sampling confound that Chapter 3 insisted be carried forward, and it is the
+> single most important fact about the raw matrix. Two
 principles govern the assembly. The first is *provenance*: nothing enters the matrix without a record
 of where it came from, so that a later result can always be traced to the coding that produced it. The
 second is *restraint about categories*: the assembly deliberately does not impose a motif taxonomy or a
@@ -96,6 +105,12 @@ comparison* by a clear margin (Figure 4.2). This is the honest version of the te
 from a suggestive picture. Where the embedding is used later — to re-derive the theme axis in
 Chapter 8, for instance — it is used as this validated retrieval layer, never as an independent
 oracle about a motif's age or origin, a circularity the programme's axioms explicitly forbid.
+
+> **Figure 4.1.** The cross-catalogue link graph: 7,274 confirmed edges connecting Thompson's
+> *Motif-Index*, the tale-type index, and Berezkin's catalogue, filterable by the kind of evidence that
+> drew each edge. **Figure 4.2.** The retrieval evaluation: recall@k of the transformer embeddings
+> against a lexical baseline on the confirmed crosswalk — the transformer wins, which is why it is
+> adopted downstream.
 
 ## 4.4 Space, coverage, the bench — and induction, staged
 

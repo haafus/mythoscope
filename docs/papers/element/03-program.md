@@ -21,6 +21,9 @@ to reconstruction. A catalogue of some three and a half thousand motifs distribu
 traditions is the same kind of object, and it rewards the same arc — **collect, describe, classify,
 explain** (Figure 3.1).
 
+> **Figure 3.1.** The natural-history arc as a dependency order: each stage presupposes the one before —
+> you cannot classify what you have not described, or explain a distribution you have not mapped.
+
 The crucial point about the arc is that it is a **dependency order, not a schedule.** The stages are
 not four phases of a project to be worked through and ticked off; they are a logical ordering in which
 each stage presupposes the one before. You cannot classify what you have not described, and you cannot
@@ -60,6 +63,10 @@ motifs of many different ages at once — a Sub-Saharan corpus may hold both a d
 motif and a recently arrived Islamic one — so it is a category error to speak of a tradition as
 "old." What is old, or young, or deep, or shallow, is a *motif's distribution*. Recognising this
 yields three entities, each with a deliberately small vocabulary (Figure 3.2).
+
+> **Figure 3.2.** The three-entity data model — tradition, motif, attestation — with the given /
+> deterministic facets marked apart from the single inferred field (`stratum`), the one quantity that is
+> always a hypothesis carrying a confidence rather than an observed fact.
 
 A **tradition** is described by a handful of *given or deterministic* facets: its macro-area (one of
 twelve), its language or religious family, its subsistence economy (one of four), the thematic

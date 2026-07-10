@@ -96,6 +96,15 @@ Chapter 6 established — the both-hemisphere spine survived every control — b
 inference from "touches Africa" to "oldest," and it names a mechanism, admixture direction, that a
 finer genetic analysis could turn into a real third axis.
 
+> **Figure 7.1.** The joint Poisson factorization: in one fit it de-confounds sampling (η² of catalogue
+> richness 0.34, against 0.67 for k-means and ~0.80 for co-clustering) and recovers geography (block
+> ARI 0.37 vs 0.08), its twelve components being the twelve macro-areas. **Figure 7.2.** The landscape
+> gate: held-out R² for great-circle distance (0.158) against resistance distance (≤0.110) across the
+> three sea regimes — the upgrade fails out of sample. **Figure 7.3.** Historical empires: traditions in
+> different macro-areas that shared an empire share ×2.6 more motifs (distance-matched +0.029), against
+> a negligible global effect (ΔR² +0.011). **Figure 7.4.** The back-migration check: 43% of 836
+> Africa–Eurasia motifs sit only in the admixed corridor (corridor-fraction 0.60 vs 0.17, ×3.5).
+
 ---
 
 The connectivity chapter thus closes very little of the residual, and its value lies in that honesty.

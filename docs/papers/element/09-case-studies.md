@@ -75,6 +75,13 @@ with proper uncertainty, and a dated tree with full Bayesian phylogeography woul
 at family resolution, B4 is a motif the machine genuinely cracks, and it stands for the one percent of
 the corpus that behaves like the fossil the whole enterprise was built to read.
 
+> **Figure 9.1.** The swan-maiden (K25) plotted across its traditions with its cluster hull — broad,
+> disjunct, areally scattered — the map of a motif the machine reads as diffused, not inherited.
+> **Figure 9.2.** Sun-and-moon-as-kin (A3): the pan-global, cross-hemispheric distribution of the deep
+> celestial substrate, areally diffused despite its antiquity. **Figure 9.3.** The fished-up-earth (B4)
+> reconstruction: origin in Western Oceania (ceiling ~5,200 BP at the Austronesian expansion) with spread
+> lines fanning across the Pacific — the one case the machine dates in space and time.
+
 ---
 
 Three motifs, three verdicts. The swan-maiden: broad, areal, undatable from its distribution. Sun and

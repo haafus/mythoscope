@@ -32,7 +32,21 @@ generation of quantitative methods on them. Almost everything is scaffolded on t
 *Motif-Index*, which codes some 46,000 narrative elements alphanumerically, and the
 Aarne–Thompson–Uther type index, which enumerates around 2,500 international tale types; Berezkin's
 areal catalogue is a third, mythology-oriented scheme that uniquely records systematic geographic
-distributions (Table 2.1). Digital re-use of these began with search: MOMFER put a semantic
+distributions (Table 2.1).
+
+**Table 2.1 · The reference works and open datasets of the field.**
+
+| Resource | What it is | Scale | Role here |
+|---|---|---|---|
+| Thompson *Motif-Index* (TMI) | subject taxonomy of narrative elements | ~46,000 motifs | curated vocabulary; crosswalk node |
+| Aarne–Thompson–Uther (ATU) | international tale-type index | ~2,500 types | curated vocabulary; crosswalk node |
+| Berezkin areal catalogue | motifs + their tradition distributions | ~3,500 motifs · ~1,050 traditions | primary substrate (encodes distribution) |
+| GOLEM | motif *use* annotated in text | thousands of instances | detection benchmark (field context) |
+| D-PLACE / Ethnographic Atlas | cultural + environmental traits by society | global | subsistence join (Chapter 5) |
+| Glottolog | language classification + family dates | global | descent tree + calibration (Chapter 6) |
+| pre-colonial political boundaries | historical polity extents | global | empire covariate (Chapter 7) |
+
+Digital re-use of these began with search: MOMFER put a semantic
 query-expansion engine over the Motif-Index, the most direct precedent for meaning-based rather than
 string-based search over a motif catalogue, and parallel efforts converted the indices into
 machine-readable ontologies.
@@ -67,6 +81,11 @@ best published narrative-motif detectors reach high accuracy when told what to l
 not validated for open-vocabulary motif *discovery*, and they remain prone to hallucinated exemplars,
 inventing plausible motifs that are not there. Few-shot use-type classification on the sharpest modern
 benchmark peaked around 41%. Detection from scratch remains hard.
+
+> **Figure 2.1.** The two eras of computational folkloristics — the classical era (index digitisation,
+> topic-model induction, tale phylogenetics, narrative networks) and the modern era (transformer
+> embeddings, clustering pipelines, large-language-model annotation) — and the verdict this book adopts:
+> embeddings as a retrieval layer over a curated index, not an end-to-end classifier.
 
 ## 2.3 The hard lessons
 

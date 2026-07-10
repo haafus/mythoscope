@@ -130,6 +130,20 @@ confounding stated to the decimal. That is what a de-confounded gradient looks l
 model the rest of the book follows: report the effect, report the control that nearly erases it, and
 let the reader see the difference.
 
+> **Figure 5.1.** Co-clustering the motif × tradition matrix: region-coherent tradition blocks
+> (Amazonian, Northwest-Coast, Siberian, Turkic, European) paired with their characteristic motifs.
+> **Figure 5.2.** Model selection and de-confounding: the block model settles on nine blocks (by BIC),
+> and the degree-correction cuts the coverage confound from η² = 0.795 to 0.481 while keeping the
+> regional blocks.
+> **Figure 5.3.** The facet audit: drop-one unique ΔR² for each descriptor — theme profile (~0.13) and
+> macro-area (~0.08) carry the signal; language family and subsistence add ~0.01 each once the others
+> are known.
+> **Figure 5.4.** The subsistence gradient in Category-A share (foragers 54.7%, horticulturalists 57.6%,
+> agrarian states 39.5%, pastoralists 36.2%), with the restricted-permutation p-values that control area
+> (0.003), family (0.006), and both at once (0.065).
+> **Figure 5.5.** Theme × macro-area lift: the heatmap of over- and under-representation (Sun & Moon in
+> Australia ×3.4; Adventures ×1.2 in the Eurasian belt, ×0.3 in Australia).
+
 ---
 
 The systematics stage thus leaves the programme with a firm foundation and a precisely measured hole.
