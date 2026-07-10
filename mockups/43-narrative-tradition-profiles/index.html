@@ -1,0 +1,87 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>43 · Narrative tradition profiles</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1040px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:960px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:15px 18px; margin:14px 0; }
+  h2 { font-size:15px; margin:0 0 4px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:flex; gap:24px; flex-wrap:wrap; } .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); max-width:210px; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .cgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; } @media(max-width:780px){.cgrid{grid-template-columns:1fr;}}
+  .ccard { border:1px solid var(--line); border-radius:10px; padding:11px 13px; }
+  .ccard h3 { font-size:13px; margin:0 0 5px; display:flex; align-items:center; gap:6px; } .ccard h3 i{width:11px;height:11px;border-radius:3px;flex:none;}
+  .prow { display:flex; align-items:center; gap:7px; margin:3px 0; font-size:11.5px; }
+  .prow .pn { width:172px; text-align:right; flex:none; color:#41505a; } .prow .pt { flex:1; background:var(--bg); border-radius:4px; height:12px; } .prow .pf{height:100%;border-radius:4px;} .prow .pv{width:30px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:7px; } .chip{font-size:10.5px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:1px 7px;}
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#31453a; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Нарративные профили традиций — мокап 16 на новом фасете</h1>
+  <p>То же, что мокап 16 (кластеризуем традиции по жанровому балансу их корпуса и рисуем на карте),
+     но профиль — <b>16-мерное распределение по нарративным кластерам</b> (таксономия мокапа 41), а не
+     13 рукотворных тем. Обосновано мокапом 42: нарративный профиль — строго лучший дескриптор традиции
+     (субсумирует тематический). Вопрос: даёт ли лучший дескриптор более резкую / кросс-континентальную
+     группировку культур?</p>
+</header>
+
+<div class="card"><div class="kpis">
+  <div class="kpi"><div class="v" id="k_n"></div><div class="l">традиций (≥30 мотивов), k=8 кластеров</div></div>
+  <div class="kpi"><div class="v" id="k_vn"></div><div class="l">дисперсии профиля объясняет макро-ареал (нарративный)</div></div>
+  <div class="kpi"><div class="v" id="k_vt"></div><div class="l">то же для 13 тем — нарративный <b>ортогональнее</b> географии</div></div>
+</div></div>
+
+<div class="card">
+  <h2>Кластеры традиций на карте <span class="s">— цвет = кластер по нарративному профилю (без географии и языка на входе)</span></h2>
+  <div id="map"></div>
+</div>
+
+<div class="card">
+  <h2>8 профильных кластеров <span class="s">— топ нарративных измерений, охват макро-ареалов, примеры</span></h2>
+  <div class="cgrid" id="cgrid"></div>
+  <div class="note" id="note"></div>
+</div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+k_n.textContent = D.n_trad; k_vn.textContent = D.var_by_macro+"%"; k_vt.textContent = D.var_by_macro_theme+"%";
+const CMAP = Object.fromEntries(D.clusters.map(c=>[c.id, c.color]));
+
+// map
+const LAND=window.LAND||"", px=lon=>lon+180, py=lat=>90-lat;
+document.getElementById("map").innerHTML =
+  `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>`+
+  `<path class="land" d="${LAND}"/>`+
+  D.points.map(p=>`<circle cx="${px(p.x).toFixed(1)}" cy="${py(p.y).toFixed(1)}" r="1.5" fill="${CMAP[p.k]}" fill-opacity="0.82" stroke="#fff" stroke-width="0.2"/>`).join("")+
+  `</svg>`;
+
+// cluster cards
+document.getElementById("cgrid").innerHTML = D.clusters.map(c=>{
+  const prof = c.top.map(t=>{
+    const w = Math.round(100*t.v/(c.top[0].v||1));
+    return `<div class="prow"><div class="pn">${esc(clip(t.name,26))}</div><div class="pt"><div class="pf" style="width:${w}%;background:${c.color}"></div></div><div class="pv">${(t.v*100).toFixed(0)}%</div></div>`;
+  }).join("");
+  const reg = c.regions.map(r=>`<span class="chip">${esc(clip(r.name,20))} ${r.n}</span>`).join("");
+  return `<div class="ccard"><h3><i style="background:${c.color}"></i>Кластер ${c.id} <span class="muted" style="font-weight:400">n=${c.n} · ${c.n_macro} макро-ареалов</span></h3>`+
+    prof + `<div class="chips">${reg}</div>`+
+    `<div class="muted" style="margin-top:6px">напр.: ${esc(c.examples.slice(0,5).map(e=>clip(e,16)).join(" · "))}</div></div>`;
+}).join("");
+
+document.getElementById("note").innerHTML =
+  `<b>Профиль остаётся своей осью — и сильнее прежнего.</b> Макро-ареал объясняет лишь <b>${D.var_by_macro}%</b> `+
+  `дисперсии нарративного профиля (против ${D.var_by_macro_theme}% у 13 тем) — то есть новый профиль <b>ещё ортогональнее</b> `+
+  `географии, а по мокапу 42 он к тому же лучше предсказывает сходство традиций. Кластеры кросс-континентальны `+
+  `(охват 9–13 макро-ареалов): это группировки по <b>мировоззрению</b> (напр. небесно-космогонический профиль, `+
+  `сводящий разнесённые традиции), а не по соседству. Оговорка та же, что в 16: сырые доли смещены интенсивностью каталогизации.`;
+</script>

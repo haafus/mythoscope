@@ -541,6 +541,30 @@ areal signal (Cramér's V theme×area) is **diluted** by the coarse 16 clusters 
 recovers at the 61-sub level (0.142). Recommendation: **add** the narrative facet, **keep** the
 etiological themes for geography. See [`42-facet-showdown/README.md`](42-facet-showdown/README.md).
 
+### 43 · Narrative tradition profiles
+Mockup 16 re-run on the data-driven facet: each tradition → a 16-dim narrative-cluster profile
+(mockup 41) instead of the 13 hand themes, clustered (k-means, k=8) and mapped. Justified by mockup
+42 (the narrative profile subsumes the theme profile as a tradition descriptor).
+**Q.** Does the better descriptor give a sharper / more cross-continental grouping of cultures?
+**Finding — yes, even more geography-orthogonal.** Macro-area explains only **31%** of the narrative
+profile variance (vs 38% for 13 themes) — it carries more non-geographic "worldview" signal. The
+clusters are cross-continental (9–13 macro-areas): a celestial/cosmology profile groups Cherokee +
+Ancient Italy + SE-Australia + Netsilik; a cosmology cluster ties Mesoamerica–Andes to Tibet/E-Asia.
+Caveat: raw proportions confounded by attestation intensity. See
+[`43-narrative-tradition-profiles/README.md`](43-narrative-tradition-profiles/README.md).
+
+### 44 · Narrative stratum
+Theme × depth on the narrative taxonomy (mockup 41) instead of the 13 hand themes — the original
+reason for re-deriving themes: the catch-alls "Adventures" (1243) and "Tricks" (620) average over
+motifs of different antiquity. Depth proxy = cross-continental mega-set span (0–3).
+**Q.** Does the narrative split reveal a depth gradient the flat catch-alls hid?
+**Finding — yes.** Clusters run span **1.00** (Formulae, recent Eurasian rhetoric) → **2.10**
+(death-messenger); deep clusters are etiological (0–32% from catch-alls), shallow ones are märchen
+(82–90%). The find: the swallowing-monster/body cluster is **deep** (span 1.80) yet 53% built from
+catch-all motifs — a deep complex the flat "Adventures" averaged away. Old "Adventures" (flat 1.59)
+now fans across 1.43–1.96. Limit: breadth/span proxy conflates descent with diffusion (mockups 17,
+39). See [`44-narrative-stratum/README.md`](44-narrative-stratum/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

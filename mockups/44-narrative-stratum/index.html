@@ -1,0 +1,113 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>44 · Narrative stratum</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --deep:#3c8a5e; --march:#b28a3e; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1000px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:940px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:15px 18px; margin:14px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:flex; gap:24px; flex-wrap:wrap; } .kpi .v{font-size:19px;font-weight:700;} .kpi .l{font-size:11px;color:var(--muted);max-width:220px;}
+  .col-row { display:flex; align-items:center; gap:9px; margin:3px 0; }
+  .col-lab { width:270px; font-size:12px; text-align:right; flex:none; }
+  .track { flex:1; background:var(--bg); border-radius:5px; height:18px; position:relative; }
+  .fill { height:100%; border-radius:5px; display:flex; align-items:center; justify-content:flex-end; color:#fff; font-size:10.5px; padding-right:6px; font-variant-numeric:tabular-nums; }
+  .badge { width:74px; flex:none; font-size:10px; text-align:center; border-radius:10px; padding:1px 0; }
+  .b-eti { background:#e2efe6; color:#2c6b45; } .b-mar { background:#f5ecd8; color:#8a6d1e; }
+  .bcol { width:44px; flex:none; font-size:11px; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; } @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  .part { display:flex; align-items:center; gap:8px; margin:2px 0; font-size:11.5px; } .part .pn{flex:1;text-align:right;color:#41505a;} .part .pt{width:120px;background:var(--bg);border-radius:4px;height:11px;} .part .pf{height:100%;border-radius:4px;background:var(--deep);} .part .pv{width:30px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  table { width:100%; border-collapse:collapse; font-size:12px; } td,th{padding:3px 7px;border-bottom:1px solid var(--bg);text-align:left;} th{font-size:10px;text-transform:uppercase;letter-spacing:.03em;color:#a3aab1;} td.r{text-align:right;font-variant-numeric:tabular-nums;}
+  .lg { display:flex; gap:16px; font-size:11.5px; color:var(--muted); margin:6px 0 2px; } .lg i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px;}
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#31453a; margin-top:12px; }
+  .call { background:#fbf6ec; border:1px solid #ecdcae; border-radius:9px; padding:11px 13px; font-size:12.5px; color:#6b5a2e; margin-top:12px; }
+</style>
+<main>
+<header>
+  <h1>Нарративный стратум — глубина, которую свалки прятали</h1>
+  <p>Тема × глубина, но на <b>нарративной таксономии</b> (мокап 41), а не на 13 рукотворных темах. Исходная
+     мотивация всей ветки: гигантские свалки «Приключения» (1243) и «Трюки» (620) усредняют мотивы разной
+     древности. Глубина-прокси = <b>кросс-континентальный охват</b> (мега-сет 0–3: задевает ли мотив
+     Новый Свет / Старый Свет / Сахул — «широко через океаны ≈ старо»), рядом — средняя широта.</p>
+</header>
+
+<div class="card"><div class="kpis">
+  <div class="kpi"><div class="v" id="k_n"></div><div class="l">нарративных кластеров</div></div>
+  <div class="kpi"><div class="v" id="k_r"></div><div class="l">диапазон глубины (мега-сет), было плоско</div></div>
+  <div class="kpi"><div class="v" id="k_m"></div><div class="l">мотивов размечено</div></div>
+</div></div>
+
+<div class="card">
+  <h2>Геологическая колонка нарративных тем <span class="s">— сверху глубокие, снизу мелкие; бейдж = откуда собран кластер</span></h2>
+  <div class="lg"><span><i style="background:var(--deep)"></i>глубина = ⌀ мега-сет (0–3)</span><span><span class="badge b-eti" style="display:inline-block">этиология</span> из этиологических тем</span><span><span class="badge b-mar" style="display:inline-block">märchen</span> из свалок (Прикл./Трюки/Флора)</span></div>
+  <div id="cols"></div>
+  <div class="call" id="exception"></div>
+</div>
+
+<div class="card">
+  <h2>Как разложились старые свалки <span class="s">— плоская тема → нарративные кластеры разной глубины</span></h2>
+  <div class="grid2" id="decomp"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Глубочайшие под-темы</h2>
+    <table><thead><tr><th>Под-тема</th><th class="r">мега</th><th class="r">n</th></tr></thead><tbody id="deep"></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Мельчайшие под-темы</h2>
+    <table><thead><tr><th>Под-тема</th><th class="r">мега</th><th class="r">n</th></tr></thead><tbody id="shallow"></tbody></table>
+  </div>
+</div>
+
+<div class="card note" id="verdict"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc=s=>(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const clip=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+k_n.textContent = D.clusters.length; k_r.textContent = D.span_lo.toFixed(2)+"–"+D.span_hi.toFixed(2); k_m.textContent = D.n_motif;
+const S0=0.9, S1=2.2, w=v=>Math.max(4,100*(v-S0)/(S1-S0));
+
+document.getElementById("cols").innerHTML = D.clusters.map(c=>{
+  const eti = c.catchall < 0.5;
+  return `<div class="col-row"><div class="col-lab">${esc(clip(c.name,40))}</div>`+
+    `<div class="track"><div class="fill" style="width:${w(c.span)}%;background:var(--deep)">${c.span.toFixed(2)}</div></div>`+
+    `<div class="badge ${eti?'b-eti':'b-mar'}">${eti?'этиология':'märchen'} ${Math.round(c.catchall*100)}%</div>`+
+    `<div class="bcol">b=${c.b.toFixed(0)}</div></div>`;
+}).join("");
+
+// exception callout: deepest cluster that is mostly catch-all origin
+const exc = D.clusters.filter(c=>c.catchall>=0.5).sort((a,b)=>b.span-a.span)[0];
+document.getElementById("exception").innerHTML =
+  `<b>Находка, которую свалки прятали:</b> «${esc(exc.name)}» глубок (мега-сет <b>${exc.span.toFixed(2)}</b>), `+
+  `но на <b>${Math.round(exc.catchall*100)}%</b> собран из мотивов, которые Берёзкин отнёс к «Приключениям/Трюкам/Флоре». `+
+  `Плоская свалка усредняла этот глубокий проглатывательно-телесный комплекс с мелкой сказкой — новый фасет его вытащил.`;
+
+document.getElementById("decomp").innerHTML = D.catch_decomp.map(cd=>{
+  const maxp = cd.parts[0].span;
+  const parts = cd.parts.map(p=>`<div class="part"><div class="pn">${esc(clip(p.name,26))}</div>`+
+    `<div class="pt"><div class="pf" style="width:${100*(p.span-S0)/(S1-S0)}%"></div></div><div class="pv">${p.span.toFixed(2)}</div></div>`).join("");
+  return `<div><div style="font-size:12.5px;font-weight:600;margin-bottom:4px">«${esc(cd.label)}» <span class="muted">n=${cd.n}, плоский мега-сет ${cd.span.toFixed(2)} → теперь ${cd.parts[cd.parts.length-1].span.toFixed(2)}–${maxp.toFixed(2)}</span></div>${parts}</div>`;
+}).join("");
+
+const row=s=>`<tr><td>${esc(clip(s.name,30))} <span class="muted">${esc(clip(s.l1_name,14))}</span></td><td class="r">${s.span.toFixed(2)}</td><td class="r">${s.n}</td></tr>`;
+document.getElementById("deep").innerHTML = D.deep_subs.map(row).join("");
+document.getElementById("shallow").innerHTML = D.shallow_subs.map(row).join("");
+
+document.getElementById("verdict").innerHTML =
+  `<b>Стратум по нарративным темам работает там, где плоские свалки были слепы.</b> Глубина растёт `+
+  `<b>${D.span_lo.toFixed(2)} → ${D.span_hi.toFixed(2)}</b> с чёткой закономерностью: глубокие кластеры `+
+  `<b>этиологичны</b> (космогония, светила, антропогония — 0–32% из свалок), мелкие — <b>märchen</b> `+
+  `(одурачивание людоеда, мстители, магическая жена — 82–90% из свалок). Формулы — на самом дне (мега-сет 1.00, `+
+  `чисто евразийская риторика). Ключевое: старые «Приключения» (плоский мега-сет 1.59) теперь расходятся на `+
+  `кластеры 1.43–1.96 — глубокий проглатывательно-телесный хвост, спрятанный в свалке, стал виден. `+
+  `<b>Предел:</b> глубина здесь — прокси по кросс-континентальному охвату (широкое ≈ старое), смешивающий `+
+  `древний descent и широкую диффузию (как в мокапах 17, 39); на калиброванных возрастах (M30/M31) тест можно ужесточить.`;
+</script>
