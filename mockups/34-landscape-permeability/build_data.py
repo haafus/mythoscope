@@ -25,9 +25,17 @@ import json
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
-from scipy.sparse import csr_matrix
-from scipy.sparse.csgraph import dijkstra
+
+try:
+    from PIL import Image, ImageDraw
+    from scipy.sparse import csr_matrix
+    from scipy.sparse.csgraph import dijkstra
+except ModuleNotFoundError as e:
+    raise SystemExit(
+        f"\n✗ missing dependency: {e.name}\n"
+        "  → this mockup needs Pillow + scipy (not core project deps):\n"
+        "    pip install Pillow scipy\n"
+    ) from e
 
 ROOT = Path(__file__).resolve().parents[2]
 MOCKS = Path(__file__).resolve().parents[1]
