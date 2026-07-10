@@ -52,13 +52,23 @@ def haversine(lat1, lon1, lat2, lon2):
     return 6371.0 * 2 * np.arcsin(np.sqrt(a))
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def main():
     geo = _geo()
     coords = geo.berezkin_coords()   # {areal_id: [lat, lon]}
-    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+    with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
+                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
-    dp = json.loads((HERE / "dplace_subsistence.json").read_text(encoding="utf-8"))
+    dp = json.loads(_need(HERE / "dplace_subsistence.json",
+                          "committed D-PLACE snapshot missing from mockups/22-subsistence-external/"
+                          ).read_text(encoding="utf-8"))
     dlat = np.array([d["lat"] for d in dp]); dlon = np.array([d["lon"] for d in dp])
 
     def coord(tid):

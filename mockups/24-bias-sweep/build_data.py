@@ -41,6 +41,13 @@ def _load(rel, name):
     return m
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def w_eta2(X, groups, w):
     """Weighted multivariate eta^2 = between-group SS / total SS (fraction of theme-profile
     variance explained by the grouping)."""
@@ -71,7 +78,8 @@ def main():
     m21 = _load("21-facet-population/build_data.py", "m21")
     geo = _load("_geo.py", "_geo")
     coords = geo.berezkin_coords()
-    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+    with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
+                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]; motifs = bz["motifs"]
     w_t, med = bias.coverage_weights(motifs, T)
@@ -111,7 +119,9 @@ def main():
     A_w = w_eta2(Xa, ga, wa)
 
     # ---- B · subsistence x theme (nearest D-PLACE, as mockup 22) ----
-    dp = json.loads((MOCKS / "22-subsistence-external" / "dplace_subsistence.json").read_text(encoding="utf-8"))
+    dp = json.loads(_need(MOCKS / "22-subsistence-external" / "dplace_subsistence.json",
+                          "run `python mockups/22-subsistence-external/build_data.py` first"
+                          ).read_text(encoding="utf-8"))
     dlat = np.array([d["lat"] for d in dp]); dlon = np.array([d["lon"] for d in dp])
 
     def coord(tid):

@@ -40,15 +40,25 @@ def _load(rel, name):
     return m
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def main():
     geo = _load("_geo.py", "geo")
     m30 = _load("30-dated-phylogeny/build_data.py", "m30")
     FAMILY_DATES = m30.FAMILY_DATES
     coords = geo.berezkin_coords()
-    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+    with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
+                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
-    join = json.loads((MOCKS / "30-dated-phylogeny" / "glottolog_join.json").read_text(encoding="utf-8"))
+    join = json.loads(_need(MOCKS / "30-dated-phylogeny" / "glottolog_join.json",
+                            "run `python mockups/30-dated-phylogeny/build_join.py` first"
+                            ).read_text(encoding="utf-8"))
     gfam = {t: j["gfam"] for t, j in join.items()}
 
     def coord(t):

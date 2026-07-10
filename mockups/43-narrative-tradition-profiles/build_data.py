@@ -45,12 +45,22 @@ def var_by_macro(X, macros):
     return round(100 * between / tot)
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def main():
     geo = _load("_geo.py", "geo")
     coords = geo.berezkin_coords()
-    bz = json.loads((ROOT / "outputs/motifs/berezkin.json").read_text("utf-8"))
+    bz = json.loads(_need(ROOT / "outputs/motifs/berezkin.json",
+                          "build the motif DB first: `mytho motifs`").read_text("utf-8"))
     T = bz["traditions"]
-    tax = json.loads((MOCKS / "41-theme-rederivation/narrative_taxonomy.json").read_text("utf-8"))
+    tax = json.loads(_need(MOCKS / "41-theme-rederivation/narrative_taxonomy.json",
+                           "run `python mockups/41-theme-rederivation/build_data.py` first"
+                           ).read_text("utf-8"))
     NT = tax["motifs"]
     NAMES = [c["name"] for c in sorted(tax["clusters"], key=lambda c: c["l1"])]
     K1 = len(NAMES)

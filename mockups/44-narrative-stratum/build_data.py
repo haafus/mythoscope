@@ -40,11 +40,21 @@ def _load(rel, name):
     m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); return m
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def main():
     m21 = _load("21-facet-population/build_data.py", "m21")
-    bz = json.loads((ROOT / "outputs/motifs/berezkin.json").read_text("utf-8"))
+    bz = json.loads(_need(ROOT / "outputs/motifs/berezkin.json",
+                          "build the motif DB first: `mytho motifs`").read_text("utf-8"))
     T, motifs = bz["traditions"], bz["motifs"]
-    tax = json.loads((MOCKS / "41-theme-rederivation/narrative_taxonomy.json").read_text("utf-8"))
+    tax = json.loads(_need(MOCKS / "41-theme-rederivation/narrative_taxonomy.json",
+                           "run `python mockups/41-theme-rederivation/build_data.py` first"
+                           ).read_text("utf-8"))
     NT = tax["motifs"]
     subbase, acc = {}, 0
     for c in sorted(tax["clusters"], key=lambda c: c["l1"]):

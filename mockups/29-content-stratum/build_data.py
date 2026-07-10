@@ -24,16 +24,26 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent / "data.js"
 K = 5
+
+
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
 TN = {1: "Sun&Moon", 2: "Stars", 3: "Cosmogony", 4: "Death", 5: "Humans", 6: "Subsistence",
       7: "Plants&animals", 8: "Monsters", 9: "Identity", 10: "Adventures", 11: "Tricks",
       12: "Names", 13: "Formulae"}
 
 
 def main():
-    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+    with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
+                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     M = bz["motifs"]; T = bz["traditions"]
-    E = np.load(ROOT / "outputs" / "motifs" / "raw" / "bge_m3.npy")
+    E = np.load(_need(ROOT / "outputs" / "motifs" / "raw" / "bge_m3.npy",
+                      "generate embeddings first: `python scripts/build_semantic_parallels.py` "
+                      "(downloads BGE-M3 ~2GB, slow first run)"))
     off = E.shape[0] - len(M)
     B = E[off:off + len(M)].astype(np.float32)
     B /= np.linalg.norm(B, axis=1, keepdims=True) + 1e-9

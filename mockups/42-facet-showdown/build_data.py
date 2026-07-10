@@ -59,20 +59,32 @@ def mean_max_share(lab, area):
     return tot / len(labs)
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def main():
     geo = _load("_geo.py", "geo")
     m21 = _load("21-facet-population/build_data.py", "m21")
     coords = geo.berezkin_coords()
-    bz = json.loads((ROOT / "outputs/motifs/berezkin.json").read_text("utf-8"))
+    bz = json.loads(_need(ROOT / "outputs/motifs/berezkin.json",
+                          "build the motif DB first: `mytho motifs`").read_text("utf-8"))
     T, motifs = bz["traditions"], bz["motifs"]
-    tax = json.loads((MOCKS / "41-theme-rederivation/narrative_taxonomy.json").read_text("utf-8"))
+    tax = json.loads(_need(MOCKS / "41-theme-rederivation/narrative_taxonomy.json",
+                           "run `python mockups/41-theme-rederivation/build_data.py` first"
+                           ).read_text("utf-8"))
     NT = tax["motifs"]
     subbase, acc = {}, 0
     for c in tax["clusters"]:
         subbase[c["l1"]] = acc; acc += len(c["subs"])
     K1, KSUB = len(tax["clusters"]), acc
 
-    dp = json.loads((MOCKS / "22-subsistence-external/dplace_subsistence.json").read_text("utf-8"))
+    dp = json.loads(_need(MOCKS / "22-subsistence-external/dplace_subsistence.json",
+                          "run `python mockups/22-subsistence-external/build_data.py` first"
+                          ).read_text("utf-8"))
     dlat, dlon = np.array([d["lat"] for d in dp]), np.array([d["lon"] for d in dp])
 
     def coord(tid):

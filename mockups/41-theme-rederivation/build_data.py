@@ -121,12 +121,25 @@ SUBNAMES = {
 }
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def main():
-    import umap
-    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+    try:
+        import umap
+    except ImportError as e:
+        raise SystemExit("\n✗ this mockup needs umap-learn: `pip install umap-learn`\n") from e
+    with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
+                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     M = bz["motifs"]
-    E = np.load(ROOT / "outputs" / "motifs" / "raw" / "bge_m3.npy")
+    E = np.load(_need(ROOT / "outputs" / "motifs" / "raw" / "bge_m3.npy",
+                      "generate embeddings first: `python scripts/build_semantic_parallels.py` "
+                      "(downloads BGE-M3 ~2GB, slow first run)"))
     X = E[-len(M):].astype(np.float32)
     X = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-9)
     grp = np.array([int(r.get("motif_group_num") or 0) for r in M])

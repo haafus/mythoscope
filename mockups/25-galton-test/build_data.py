@@ -41,6 +41,13 @@ def _load(rel, name):
     return m
 
 
+def _need(p, hint=""):
+    """Fail with a clear message (not a raw traceback) when a required input is absent."""
+    if not p.exists():
+        raise SystemExit(f"\n✗ missing input: {p}" + (f"\n  → {hint}\n" if hint else "\n"))
+    return p
+
+
 def eta2(y, labels):
     """Fraction of variance in y explained by categorical labels."""
     y = np.asarray(y, float); mean = y.mean()
@@ -63,7 +70,8 @@ def main():
     m21 = _load("21-facet-population/build_data.py", "m21")
     geo = _load("_geo.py", "_geo")
     coords = geo.berezkin_coords()
-    with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
+    with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
+                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]; motifs = bz["motifs"]
 
@@ -78,7 +86,9 @@ def main():
                     if g <= 9:
                         aA[t] += 1
 
-    dp = json.loads((MOCKS / "22-subsistence-external" / "dplace_subsistence.json").read_text(encoding="utf-8"))
+    dp = json.loads(_need(MOCKS / "22-subsistence-external" / "dplace_subsistence.json",
+                          "run `python mockups/22-subsistence-external/build_data.py` first"
+                          ).read_text(encoding="utf-8"))
     dlat = np.array([d["lat"] for d in dp]); dlon = np.array([d["lon"] for d in dp])
 
     def coord(tid):
