@@ -276,16 +276,35 @@ form for describing a tradition and for resolving the depth hidden inside genre 
 function for reading geography. The practical implication is a **two-facet** representation rather than
 a replacement.
 
-## 6. Comparison with prior work
+## 6. Related work and contribution
 
-The descent/diffusion decomposition operationalises Naroll's Galton's problem and extends the
-folktale-phylogenetics of Tehrani (2013) and da Silva & Tehrani (2016) from curated tale-type sets to
-a whole areal catalogue, adding an explicit *areal* mode and de-confounding. The deep-substrate results
-engage Berezkin (2015) and d'Huy (2013) but insist on sampling and banality controls and on the
-irreducibility of the deep-vs-diffuse contrast without calibration. The re-derived theme taxonomy
-connects the etiological logic of Thompson (1955–58) with the tale-type logic of Uther (2004) and the
-morphological tradition of Propp (1928) and Lévi-Strauss (1955), and the recovered trickster-casting
-and death-messenger complexes echo Boas, Radin (1956) and Abrahamsson (1951).
+Computational folkloristics falls into two eras (the full landscape is surveyed in
+`docs/research/`). The **classical era** (c. 2008–2018) digitised and formalised the ATU and Thompson
+indices, induced motifs with topic models (Karsdorp & van den Bosch 2013), added WordNet-based
+semantic search over the Motif-Index (MOMFER: Karsdorp et al. 2015) and interoperable OWL/RDF
+ontologies (Declerck & Lendvai 2011), ran phylogenetics of tales and myths (da Silva & Tehrani 2016;
+d'Huy 2013; Thuillard, d'Huy, Le Quellec & Berezkin 2018), and analysed character and motif networks
+(Mac Carron & Kenna 2012; Abello, Broadwell & Tangherlini 2012). The **modern era** (2018–2026) is
+dominated by transformer embeddings and BERTopic-style clustering (Tangherlini & Chen 2024) and by
+LLM motif/type annotation (Arčon et al. 2025) — which is repeatedly matched by simple TF-IDF/SVM
+baselines (Eklund et al. 2023; Meaney et al. 2024), so motif *detection* from raw text remains
+unsolved and is best treated as candidate generation over a curated index.
+
+Our contribution is orthogonal to that detection problem: we take the **curated index as given** and
+analyse the *shape of its distributions*. Relative to the phylomemetic programme — which codes
+presence/absence over a **curated tale-type set within a single family** and runs Bayesian
+phylogenetics (da Silva & Tehrani 2016; Sakamoto Martini, Kendal & Tehrani 2023) — we (i) work over a
+**whole areal catalogue** rather than a hand-picked subset, (ii) add an explicit **areal-diffusion
+mode** and a gated descent/areal/reinvention decomposition rather than assuming a tree, (iii) carry
+**sampling and banality de-confounding** throughout (Galton's problem: Naroll 1961), and (iv) insist on
+the **irreducibility** of the deep-substrate-vs-wide-diffusion contrast without external calibration.
+The deep-substrate results engage Berezkin (2015) and d'Huy (2013) under these controls. The
+re-derived theme taxonomy connects the etiological logic of Thompson (1955–58) with the tale-type logic
+of Uther (2004) and the morphological tradition of Propp (1928) and Lévi-Strauss (1955); the recovered
+trickster-casting and death-messenger complexes echo Boas (1916), Radin (1956) and Abrahamsson (1951).
+This paper is the *findings* companion to the infrastructure/framework draft
+(`docs/papers/draft.md`); the full theme re-derivation and the field survey live separately in
+`docs/motifs/proposals/theme-taxonomy-comparison.md` and `docs/research/`.
 
 ## 7. Reproducibility
 
@@ -324,7 +343,11 @@ the map of what a finer linguistic, genetic, and historical-corridor calibration
 
 ## References
 
+- Abello, J., Broadwell, P., & Tangherlini, T. R. (2012). Computational folkloristics.
+  *Communications of the ACM* 55(7), 60–70.
 - Abrahamsson, H. (1951). *The Origin of Death: Studies in African Mythology*. Uppsala.
+- Arčon, I., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
+  automation based on motifs: a Cinderella case study. *arXiv:2510.18561* (*Fabula*).
 - Berezkin, Yu. E. (2015). Folklore and mythology catalogue: its lay-out and potential for research.
   *Retrospective Methods Network Newsletter* 10, 56–70.
 - Berezkin, Yu. E., & Duvakin, E. N. *The Electronic Analytic Catalogue of Folklore Motifs* (Tales of
@@ -336,24 +359,41 @@ the map of what a finer linguistic, genetic, and historical-corridor calibration
   *Rock Art Research* 30(1), 115–118.
 - da Silva, S. G., & Tehrani, J. J. (2016). Comparative phylogenetic analyses uncover the ancient roots
   of Indo-European folktales. *Royal Society Open Science* 3, 150645.
+- Declerck, T., & Lendvai, P. (2011). Towards a standardized linguistic annotation of the textual
+  content of labels in knowledge representation systems. *LREC*.
+- Eklund, J., Hagedorn, J., & Darányi, S. (2023). Teaching tale types to a computer. *Fabula* 64(1–2),
+  92–106.
 - Fitch, W. M. (1971). Toward defining the course of evolution: minimum change for a specific tree
   topology. *Systematic Zoology* 20(4), 406–416.
 - Gopalan, P., Hofman, J. M., & Blei, D. M. (2015). Scalable recommendation with hierarchical Poisson
   factorization. *UAI*.
 - Hammarström, H., Forkel, R., Haspelmath, M., & Bank, S. (2023). *Glottolog 4.8*. MPI-EVA.
+- Karsdorp, F., & van den Bosch, A. (2013). Identifying motifs in folktales using topic models.
+  *BENELEARN*.
+- Karsdorp, F., van der Meulen, M., Meder, T., & van den Bosch, A. (2015). MOMFER: a search engine of
+  Thompson's Motif-Index of Folk Literature. *Folklore* 126(1), 37–52.
 - Kirby, K. R., et al. (2016). D-PLACE: A global database of cultural, linguistic and environmental
   diversity. *PLoS ONE* 11(7), e0158391.
 - Lévi-Strauss, C. (1955). The structural study of myth. *Journal of American Folklore* 68, 428–444.
+- Mac Carron, P., & Kenna, R. (2012). Universal properties of mythological networks. *EPL* 99, 28002.
 - Mantel, N. (1967). The detection of disease clustering and a generalized regression approach.
   *Cancer Research* 27, 209–220.
 - McInnes, L., Healy, J., & Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection.
   *arXiv:1802.03426*.
+- Meaney, C., Alex, B., & Lamb, W. (2024). Classification of tale types and narrator gender in Gaelic
+  folktales. *NLP4DH*.
 - Murdock, G. P. (1967). *Ethnographic Atlas*. University of Pittsburgh Press.
 - Naroll, R. (1961). Two solutions to Galton's problem. *Philosophy of Science* 28(1), 15–39.
 - Pagel, M. (1994). Detecting correlated evolution on phylogenies: a general method for the comparative
   analysis of discrete characters. *Proc. R. Soc. B* 255, 37–45.
 - Propp, V. (1928). *Morphology of the Folktale* (Eng. trans. 1968). University of Texas Press.
 - Radin, P. (1956). *The Trickster: A Study in American Indian Mythology*. Philosophical Library.
+- Sakamoto Martini, S., Kendal, J., & Tehrani, J. J. (2023). A phylomemetic analysis of Cinderella
+  (ATU 510/511). (Bayesian inference + NeighborNet, 266 versions).
+- Tangherlini, T. R., & Chen, J. (2024). Travels with BERT: mapping intertextuality in Andersen.
+  *Orbis Litterarum* 79, 519–562.
 - Tehrani, J. J. (2013). The phylogeny of Little Red Riding Hood. *PLoS ONE* 8(11), e78871.
 - Thompson, S. (1955–58). *Motif-Index of Folk-Literature* (6 vols). Indiana University Press.
+- Thuillard, M., d'Huy, J., Le Quellec, J.-L., & Berezkin, Yu. E. (2018). A large-scale study of world
+  myths. *Trames* 22(4), 407–424.
 - Uther, H.-J. (2004). *The Types of International Folktales* (ATU). FF Communications 284–286.
