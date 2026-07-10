@@ -1,4 +1,4 @@
-# 09 · Corpus overview (dashboard)
+# 13 · Corpus overview (dashboard)
 
 A design prototype for a **corpus overview page** — the "what's in this corpus?"
 dashboard. Isolated from the pipeline.
