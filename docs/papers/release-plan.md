@@ -40,6 +40,31 @@ redistribute raw**); label "working draft, not peer-reviewed"; posts are version
 deleted (withdrawal leaves a tombstone). **arXiv specifically** needs an **endorsement** for a first
 submission to a category and moderates topic fit; LaTeX preferred (it compiles), PDF accepted.
 
+### 1.1 Why not a personal site only
+
+A personal-site URL is fine for "let people read it," but it does not close two functions a deposit
+with a DOI does — so **do both** (site as the shopfront, a DOI deposit as the vault), not site-only:
+
+| Function | Personal site | Deposit + DOI |
+|---|---|---|
+| People read it | ✅ | ✅ |
+| Citability (stable reference) | ⚠️ weak | ✅ |
+| **Priority** (proof of "I was first") | ⚠️ weak | ✅ strong |
+| Permanence (outlives the hosting) | ❌ | ✅ |
+| Discoverability (Scholar, indexing) | ⚠️ | ✅ |
+
+- **Timestamp you control is weak evidence.** A date on your own site is set by *you*, so it counts for
+  little in a priority dispute (**scooping** — someone publishing your openly-posted idea first). An
+  independent timestamp — a preprint/repository DOI, or at least public git history — is stamped by a
+  third party and is what actually protects priority. Posting openly *helps* priority; posting only
+  where you control the clock does not.
+- **Link rot.** Personal sites are the shortest-lived category of scholarly link; most are dead within
+  5–10 years. A repository (Zenodo, CERN-backed) survives a domain/host change; a DOI resolves even
+  after the file moves.
+
+**Verdict:** site-only is reasonable for early sharing, not safe for priority or longevity. Landing on
+GitHub Pages **plus** a Zenodo DOI per notable version (GitHub↔Zenodo, see §4) gets both at ~no cost.
+
 ## 2. Target venues by discipline
 
 - **Computational / Digital Humanities:** *Journal of Cultural Analytics*; *Digital Scholarship in the
