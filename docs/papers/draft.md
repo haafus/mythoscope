@@ -1,14 +1,24 @@
-- *Preliminary draft of paper discourse / research plan. To be evolved.*
-- *Live formatted version on [Overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91).*
-- *Though generated and lacks consistency and strong results for now, the overall conceptual framework, structure and references list are intact.*
-- *Could be split and released in several steps.*
-- *Basically, the steps of the research to do/release are:*
-  - *infrastructure: build basic corpus, pipeline and tools*
-  - *exploratory analysis: try different tools and what do they reveal*
-  - *method: define the complete toolset and methodology, prove reproducibility*
-  - *discovery: what was established, discovered, what are the universal conclusions and consequences, philosophy*
-  - *release source code, datasets and resulting indexes/databases/tools*
-- *The first two steps are actual for now.*
+> **Status & scope (2026-07).** This is the **framework / infrastructure** draft — one of four
+> companion papers, now realigned with what was actually built (see banner below). Its *conceptual
+> frame, structure and reference list* are kept; its earlier fabricated Results/Evaluation placeholders
+> have been replaced with honest pointers, and its scope has been corrected from an aspirational
+> raw-text motif-induction + RAG/KG system to what the project really is: **the assembly and
+> cross-linking of three curated motif indices with a semantic-retrieval layer and an analysis lab
+> bench.** Live formatted version on
+> [Overleaf](https://www.overleaf.com/3284195327nzmxtpqmsvwm#2b1a91).
+>
+> **The four-paper set** (`docs/papers/`): **this** = *framework* (how the corpus, crosswalk,
+> embeddings and tools are built); [`program-draft.md`](program-draft.md) = *position/methods/roadmap*;
+> [`motif-distribution-draft.md`](motif-distribution-draft.md) = *findings* (the substantive results);
+> [`survey-draft.md`](survey-draft.md) = *field survey*. Substantive claims belong to the findings
+> draft; this paper stays on infrastructure and cross-references the rest.
+>
+> **Honest correction to the original framing.** The project's own survey finds that motif *detection
+> from raw text is unsolved* and that embeddings are best used as *retrieval / candidate generation
+> over a curated index*, not as end-to-end induction. Accordingly, the analytical substrate here is the
+> three **curated indices** (Thompson, ATU, Berezkin), embedded at motif granularity (name+definition);
+> the raw-text corpus below serves corpus-overview and embedding-evaluation, not headline motif
+> discovery. Knowledge-graph and RAG components are *tooling directions*, not the central result.
 
 # Toward a Computational Framework for Comparative Mythology
 
@@ -16,11 +26,25 @@
 
 ## Abstract
 
-This paper introduces a scalable computational framework for the comparative study of mythological corpora, integrating motif-level semantic embeddings, knowledge graph construction, and retrieval-augmented generation (RAG). While traditional approaches to mythology rely on manual motif indexing, structural analysis, or small-scale quantitative comparisons, such methods remain limited in their ability to capture semantic variation, cross-cultural similarity, and large-scale structure.
+This paper presents the **computational infrastructure** for a large-scale, reproducible comparative
+study of world mythology: a pipeline that assembles three standard, expert-curated motif catalogues —
+Thompson's *Motif-Index* (TMI), the Aarne–Thompson–Uther tale-type index (ATU), and Berezkin's areal
+catalogue — into one cross-linked corpus, embeds every motif at the level of its name and definition
+with a multilingual transformer, and exposes the result through a semantic-retrieval layer and a
+series of self-contained analysis prototypes. Rather than attempting end-to-end motif induction from
+raw text — which the field regards as unsolved — we treat embeddings as a **retrieval and
+candidate-generation** layer over the curated indices, validated by recall on a confirmed cross-index
+crosswalk, and use the assembled matrix as the substrate for distributional analysis of motif
+geography and time-depth.
 
-We present a multilingual corpus of mythological and religious texts spanning major and minor world traditions, and propose a pipeline that automatically segments texts into semantically coherent units, computes embeddings at sentence and chunk levels, and constructs motif-centric knowledge graphs. Dimensionality reduction and clustering reveal cross-cultural motif affinities that align with established typologies while also uncovering previously unobserved patterns.
-
-By operationalizing theoretical insights from structural anthropology, folklore studies, and the cognitive science of religion within modern NLP architectures, this work demonstrates how computational methods can complement and extend classical approaches to mythology. The framework enables large-scale, cross-cultural, reproducible analysis, combining unsupervised and supervised methods to provide a foundation for future work in computational mythology and digital humanities.
+Concretely, the framework contributes: a reproducible ingestion-and-crosswalk pipeline off committed
+sources; a 7,274-edge confirmed cross-index link set; motif-level multilingual embeddings with a
+lexical baseline and a recall@k evaluation; a coordinate and coverage layer for spatial and
+sampling-aware analysis; and a lab bench of ~40 standalone prototypes that carry the actual analyses.
+The substantive findings those prototypes produced — the balance of descent, diffusion and
+convergence; time-depth from distribution; facet adequacy; and a data-driven theme taxonomy — are
+reported in the companion **findings** draft; the method and assumptions in the **program** draft; the
+field context in the **survey**.
 
 **Keywords:** Computational mythology; digital humanities; semantic embeddings; folklore; narrative analysis; knowledge graphs
 
@@ -36,12 +60,18 @@ This paper addresses this gap by introducing an integrated computational pipelin
 
 Importantly, this approach is not intended to replace established theoretical frameworks. Instead, it provides computational tools that allow classical theories — such as structural anthropology and cognitive models of religious concepts — to be explored and tested at scale. By grounding computational analysis in well-established theoretical traditions, the framework seeks to bridge digital humanities, folklore studies, and cognitive science.
 
-The contributions of this paper are threefold:
-(i) a large, multilingual corpus of mythological texts spanning diverse cultural traditions;
-(ii) a scalable, reproducible computational pipeline for motif-level analysis;
-(iii) empirical demonstrations of cross-cultural motif structure that both align with and extend existing typologies.
+The contributions of this **framework** paper are:
+(i) a reproducible pipeline that ingests and **cross-links three curated motif indices** (TMI, ATU,
+Berezkin) into one provenanced attestation matrix, with a multilingual corpus for corpus-overview and
+embedding evaluation;
+(ii) motif-level multilingual embeddings used as a **retrieval layer**, validated by recall@k against
+the confirmed crosswalk (with a lexical baseline), plus the coordinate/coverage layer that makes
+spatial, sampling-aware analysis possible;
+(iii) a self-contained **analysis lab bench** over that matrix.
 
-Taken together, this work argues for computational mythology as a distinct and methodologically coherent research direction within the digital humanities.
+The *substantive* cross-cultural results these enable are reported in the findings companion; this
+paper argues that such infrastructure, honestly scoped, is the precondition for a methodologically
+coherent computational mythology.
 
 ## 2. Related Work
 
@@ -70,6 +100,16 @@ The cognitive science of religion offers explanatory frameworks for the persiste
 The present study bridges these traditions by introducing a scalable pipeline that integrates motif-level semantic embeddings, knowledge graph construction, and retrieval-augmented generation. This approach enables automated motif discovery, cross-cultural comparison, and theory-driven analysis of mythological corpora, addressing limitations of prior work in scale, automation, and semantic representation.
 
 ## 3. Corpus Design and Coverage
+
+> **Two layers.** The project holds two distinct bodies of data, and conflating them was the original
+> draft's central overstatement. **(a) A raw-text corpus** (below): ~28 committed public-domain source
+> texts, used for corpus-overview dashboards and for *evaluating* how best to embed motifs against text
+> — not for headline motif induction. **(b) The analytical substrate**: the three **curated motif
+> indices** (TMI ~46k motifs; ATU ~2,500 tale types; Berezkin ~3,500 motifs over ~1,050 traditions),
+> which carry expert definitions, areal distributions and cross-references. All the distributional
+> analysis in the companion drafts runs on layer (b); layer (a) is supporting infrastructure. The
+> ambition of a much larger multilingual full-text corpus (this section) remains a design target, not
+> a completed asset.
 
 ### 3.1 Design Principles
 
@@ -184,23 +224,39 @@ Motifs, entities, and conceptual relations were represented as a knowledge graph
 
 A retrieval-based component enables querying the corpus at the motif level, supporting exploratory analysis and hypothesis generation.
 
-## 5. Results
+## 5. Results (infrastructure)
 
-### 5.1 Embedding Space Structure
+This paper reports only the results that validate the *infrastructure*; the substantive
+cross-cultural findings are in the findings companion and are cross-referenced, not restated.
 
-Embedding spaces exhibit clear local coherence, with texts from related traditions clustering together while maintaining cross-cultural connections.
+### 5.1 Retrieval quality of the embeddings
 
-### 5.2 Cross-Cultural Motif Clusters
+The motif-level embeddings are validated as a retrieval layer, not asserted. On the confirmed
+cross-index crosswalk, real transformer vectors (BGE-M3, name+definition) are measured by **recall@k**
+against a lexical (LSA) baseline; the transformer wins by a reported margin, which is why it was
+adopted downstream. This is the honest analogue of the original draft's "clusters emerge without
+supervision" claim — a number on a held-out link set rather than an impression.
 
-Clusters corresponding to well-known motif families, such as flood myths and divine descent narratives, emerge without supervision.
+### 5.2 The crosswalk as a navigable object
 
-### 5.3 Visualization of Mythological Affinities
+The confirmed links form a 7,274-edge cross-index graph (constituent / defining / note / summary /
+citation evidence), explorable as one filterable object and reusable later as **independent
+corroboration** (a motif corroborated across indexes is weighted up in the analyses).
 
-Low-dimensional visualizations reveal both expected groupings and novel affinities across distant traditions.
+### 5.3 Systematics recovered from the assembled matrix
 
-### 5.4 Case Studies
+Co-clustering the motif × tradition incidence recovers region-coherent tradition blocks paired with
+their characteristic motifs (Amazonian, Northwest-Coast, Siberian, Turkic, a European tale-type
+block), consistently across indices. Crucially, this structure survives de-confounding from catalogue
+sampling (a degree-corrected model roughly halves the coverage artifact), establishing that the
+assembled matrix carries real cultural signal and not just collecting bias — the precondition for
+everything in the findings draft.
 
-Detailed case studies illustrate how the framework captures semantic variation within shared mythological themes.
+### 5.4 Substantive results (pointer)
+
+The descent/diffusion/convergence decomposition, time-depth from distribution, the datable descent
+minority, facet adequacy, the connectivity gates, and the data-driven theme re-derivation are reported
+in `motif-distribution-draft.md`; the method and assumptions in `program-draft.md`.
 
 ## 6. Evaluation
 
@@ -218,9 +274,15 @@ A subset of the corpus was aligned with entries from Thompson's *Motif-Index of 
 
 We evaluate the retrieval-augmented generation component by posing motif-level queries (e.g., "world creation from a primordial body") and measuring whether retrieved passages span multiple unrelated traditions. Qualitative inspection by domain experts indicates that retrieved sets capture structurally analogous myths while preserving cultural specificity.
 
-### 6.4 Theory-Informed Validation
+### 6.4 Theory-Informed Validation (proposed, not yet run)
 
-To assess theoretical relevance, we examine whether embedding neighborhoods reflect predictions from cognitive theories of religion. Concepts corresponding to minimally counterintuitive agents cluster more tightly than mundane narrative elements, consistent with Boyer's account of cognitive optimality. Similarly, ritualized narratives associated with high-arousal contexts exhibit distinct clustering patterns, aligning with Whitehouse's modes of religiosity.
+A natural extrinsic test is whether embedding neighbourhoods reflect predictions from cognitive
+theories of religion — e.g. whether minimally counterintuitive agents (Boyer) cluster more tightly
+than mundane elements, or whether high-arousal ritual narratives form distinct profiles (Whitehouse's
+modes of religiosity). **This has not been carried out** and is listed here as a designed evaluation,
+not a result; the original draft stated it as a finding, which it is not. The validation actually
+performed to date is distributional and areal (findings draft): the theme axis, kept out of the
+time-depth estimation, independently corroborates the recovered strata.
 
 ### 6.5 Limitations
 
@@ -292,7 +354,13 @@ Taken together, this work argues for computational mythology as a coherent and p
 
 ## 9. Data and Code Availability
 
-All corpus data, preprocessing scripts, and trained models will be made publicly available upon publication to support reproducibility and further research.
+The ingestion-and-crosswalk pipeline runs off committed public-domain sources with no credentials and
+is exportable as a bundle; the analysis prototypes are self-contained (`build_data.py` → static
+viewer) with fixed seeds; regenerated artifacts (embeddings, per-mockup `data.js`) are treated like
+build output. Curated indices are redistributed under their sources' terms (Berezkin via its query
+engine; see the survey's licensing notes). A tagged release of source, indices and tools is planned;
+the licences and access constraints of each external asset are documented in `docs/research/` and
+`docs/motifs/`.
 
 ## References
 
@@ -363,6 +431,10 @@ Jockers, M. (2013). *Macroanalysis: Digital Methods and Literary History*. Unive
 Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence embeddings using Siamese BERT-networks. *Proceedings of EMNLP*.
 
 Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers. *Proceedings of NAACL-HLT*.
+
+Chen, J., Xiao, S., Zhang, P., Luo, K., Lian, D., & Liu, Z. (2024). BGE M3-Embedding: Multi-lingual, multi-functionality, multi-granularity text embeddings. *arXiv:2402.03216*.
+
+McInnes, L., Healy, J., & Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection. *arXiv:1802.03426*.
 
 ### Knowledge Representation and Cultural Ontologies
 
