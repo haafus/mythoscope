@@ -1,0 +1,227 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>41 · Theme re-derivation (UMAP)</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:22px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1000px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 8px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); max-width:150px; }
+  .qtab { font-size:12px; border-collapse:collapse; }
+  .qtab td,.qtab th { padding:2px 9px; text-align:right; } .qtab th { color:var(--muted); font-weight:600; font-size:10.5px; text-transform:uppercase; }
+  .qtab td:first-child,.qtab th:first-child { text-align:left; }
+  .qbar { display:inline-block; height:8px; border-radius:4px; background:#3c8a5e; vertical-align:middle; margin-left:6px; }
+  .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .seg button { font:12px inherit; border:0; background:var(--surface); padding:5px 12px; cursor:pointer; color:var(--muted); }
+  .seg button.on { background:#3c8a5e; color:#fff; }
+  .scatterwrap { position:relative; }
+  canvas { width:100%; display:block; border-radius:8px; background:#faf8f3; border:1px solid var(--line); cursor:crosshair; }
+  #tip { position:absolute; pointer-events:none; background:#1f2a30; color:#fff; font-size:11.5px; padding:5px 8px; border-radius:6px; opacity:0; transition:opacity .08s; max-width:240px; z-index:5; }
+  .legend { display:flex; gap:4px 12px; flex-wrap:wrap; margin-top:9px; font-size:11.5px; }
+  .lgi { cursor:pointer; display:flex; align-items:center; gap:5px; padding:1px 4px; border-radius:5px; }
+  .lgi.off { opacity:.32; } .lgi i { width:10px; height:10px; border-radius:2px; flex:none; }
+  table.cmp { width:100%; border-collapse:collapse; font-size:12px; } .cmp td,.cmp th { padding:4px 7px; border-bottom:1px solid var(--bg); text-align:left; }
+  .cmp th { font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#a3aab1; } .cmp td.r { text-align:right; font-variant-numeric:tabular-nums; }
+  .vb { display:inline-block; height:9px; border-radius:4px; vertical-align:middle; }
+  .tag { display:inline-block; font-size:10.5px; padding:1px 7px; border-radius:12px; font-weight:600; }
+  .tag.recovered { background:#e2efe6; color:#2c6b45; } .tag.split { background:#f5ecd8; color:#8a6d1e; } .tag.dissolved { background:#f3e0dc; color:#a53f2c; }
+  .cgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; } @media(max-width:820px){ .cgrid{grid-template-columns:1fr;} }
+  .ccard { border:1px solid var(--line); border-radius:10px; padding:11px 13px; cursor:pointer; transition:border-color .1s; }
+  .ccard:hover, .ccard.sel { border-color:#3c8a5e; box-shadow:0 0 0 1px #3c8a5e33; }
+  .ccard h3 { font-size:13px; margin:0 0 2px; display:flex; align-items:center; gap:6px; } .ccard h3 i { width:11px;height:11px;border-radius:3px;flex:none; }
+  .ccard .d { font-size:11.5px; color:var(--muted); margin:2px 0 6px; }
+  .chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
+  .chip { font-size:10.5px; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:1px 7px; }
+  .chip.dom { background:#eef3ef; border-color:#cbe0d1; }
+  .pur { height:5px; border-radius:3px; background:#e7e2d7; margin-top:6px; overflow:hidden; } .pur i { display:block; height:100%; background:#3c8a5e; }
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#31453a; margin-top:14px; }
+</style>
+<main>
+<header>
+  <h1>Ре-деривация тем — что каталог предлагает сам</h1>
+  <p>Вместо 13 рукотворных тем Берёзкина кластеризуем мотивы <b>по смыслу</b> (эмбеддинги BGE-M3) и смотрим, какую
+     тематику предлагает само содержание. Снижение размерности <b>UMAP</b> (в 2D — то, что вы видите; в 10D — для
+     кластеризации), затем два уровня KMeans и сравнение с рукотворной разметкой. UMAP-10 чистит кластеры лучше
+     PCA и сырого пространства.</p>
+</header>
+
+<div class="card">
+  <div class="kpis">
+    <div class="kpi"><div class="v" id="k_n"></div><div class="l">мотивов кластеризовано</div></div>
+    <div class="kpi"><div class="v" id="k_k"></div><div class="l">естественных кластеров (L1)</div></div>
+    <div class="kpi"><div class="v" id="k_pur"></div><div class="l">purity против 13 тем</div></div>
+    <div class="kpi"><div class="v" id="k_ari"></div><div class="l">adjusted Rand vs 13 тем — структура иная</div></div>
+    <div style="flex:1; min-width:260px">
+      <div class="muted" style="margin-bottom:3px">качество кластеризации по пространству (K=16)</div>
+      <table class="qtab" id="qtab"></table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>UMAP-проекция мотивов <span class="s">— наведи на точку; переключи раскраску; кликни кластер/тему в легенде</span></h2>
+  <div class="controls">
+    <span class="muted">раскраска:</span>
+    <div class="seg" id="colorby">
+      <button data-m="t" class="on">по темам Берёзкина</button>
+      <button data-m="k">по кластерам данных</button>
+    </div>
+  </div>
+  <div class="scatterwrap">
+    <canvas id="cv" width="2200" height="1180"></canvas>
+    <div id="tip"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="card">
+  <h2>Сравнение с 13 рукотворными темами <span class="s">— насколько тема концентрируется в одном кластере данных</span></h2>
+  <table class="cmp"><thead><tr><th>Тема Берёзкина</th><th class="r">мотивов</th><th class="r">конц.</th><th>в скольких кластерах</th><th>вердикт</th></tr></thead>
+  <tbody id="cmp"></tbody></table>
+  <div class="note" id="cmpnote"></div>
+</div>
+
+<div class="card">
+  <h2>16 естественных кластеров <span class="s">— название, доля чистоты, доминирующие темы, топ-мотивы, подкатегории (L2)</span></h2>
+  <div class="cgrid" id="cgrid"></div>
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, P = D.pts;
+const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+// theme palette (13 + none) and cluster palette (16)
+const TC = {1:"#d65d4f",2:"#e0963c",3:"#3c8a5e",4:"#7a3b3b",5:"#6a5aa6",6:"#8a6d28",7:"#7d8b3a",
+            8:"#3a6ea5",9:"#a3457e",10:"#4f7096",11:"#c8781f",12:"#8a8f95",13:"#0e9aa7",0:"#d5d2ca"};
+const KC = ["#3c8a5e","#4f7096","#c8781f","#a3457e","#6a5aa6","#0e9aa7","#8a6d28","#c05540",
+            "#2f8f8f","#7d8b3a","#b0894a","#5b6e8c","#9b5a9b","#d6a13a","#7a3b3b","#3a6ea5"];
+const themeCol = t => TC[t] || "#ccc", clusCol = k => KC[k % KC.length];
+
+// ---- KPIs + quality table ----
+k_n.textContent = D.n; k_k.textContent = D.K1;
+k_pur.textContent = D.purity.toFixed(2); k_ari.textContent = D.ari.toFixed(2);
+const qmaxP = Math.max(...D.quality.map(q=>q.purity));
+document.getElementById("qtab").innerHTML =
+  `<tr><th>пространство</th><th>purity</th><th>ARI</th></tr>` + D.quality.map(q=>{
+    const best = q.space.startsWith("UMAP-10");
+    return `<tr><td${best?' style="font-weight:700;color:#2c6b45"':''}>${q.space}</td>`+
+      `<td>${q.purity.toFixed(3)}<span class="qbar" style="width:${(q.purity/qmaxP*46).toFixed(0)}px"></span></td>`+
+      `<td>${q.ari.toFixed(3)}</td></tr>`;
+  }).join("");
+
+// ---- scatter (canvas) ----
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const W = cv.width, H = cv.height, PAD = 26;
+const sx = x => PAD + x*(W-2*PAD), sy = y => H-PAD - y*(H-2*PAD);
+let mode = "t";                 // 't' theme | 'k' cluster
+let hi = null;                  // highlighted category (theme id or cluster id), null = all
+const off = new Set();          // toggled-off legend categories
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // two passes: dim first, highlighted on top
+  for(const pass of [0,1]){
+    for(const p of P){
+      const cat = mode==="t" ? p.t : p.k;
+      if(off.has(cat)) continue;
+      const active = hi===null || hi===cat;
+      if((pass===0) === active) continue;
+      ctx.globalAlpha = active ? 0.9 : 0.07;
+      ctx.fillStyle = mode==="t" ? themeCol(p.t) : clusCol(p.k);
+      ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), active?4.2:3, 0, 7); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+draw();
+
+// hover tooltip — nearest point within radius
+const tip = document.getElementById("tip");
+cv.addEventListener("mousemove", e=>{
+  const r = cv.getBoundingClientRect();
+  const mx = (e.clientX-r.left)/r.width*W, my = (e.clientY-r.top)/r.height*H;
+  let best=null, bd=1e9;
+  for(const p of P){ if(off.has(mode==="t"?p.t:p.k)) continue;
+    const dx=sx(p.x)-mx, dy=sy(p.y)-my, d=dx*dx+dy*dy; if(d<bd){bd=d; best=p;} }
+  if(best && bd < 220){
+    const cl = D.clusters.find(c=>c.id===best.k);
+    tip.innerHTML = `<b>${esc(best.c)}</b> · ${esc(best.nm)}<br><span style="opacity:.75">тема: ${esc(D.gnames_ru[best.t]||"—")} · кластер: ${esc(cl?cl.name:best.k)} · широта ${best.b}</span>`;
+    tip.style.left = (e.clientX-r.left+12)+"px"; tip.style.top = (e.clientY-r.top+12)+"px"; tip.style.opacity=1;
+  } else tip.style.opacity=0;
+});
+cv.addEventListener("mouseleave", ()=>tip.style.opacity=0);
+
+// ---- legend (depends on mode) ----
+function renderLegend(){
+  const el = document.getElementById("legend");
+  if(mode==="t"){
+    const gs = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+    el.innerHTML = gs.map(g=>`<span class="lgi ${off.has(g)?'off':''}" data-c="${g}"><i style="background:${themeCol(g)}"></i>${esc(D.gnames_ru[g])}</span>`).join("");
+  } else {
+    el.innerHTML = D.clusters.map(c=>`<span class="lgi ${off.has(c.id)?'off':''}" data-c="${c.id}"><i style="background:${clusCol(c.id)}"></i>${esc(c.name)}</span>`).join("");
+  }
+  el.querySelectorAll(".lgi").forEach(g=>{
+    const cat = +g.dataset.c;
+    g.onmouseenter = ()=>{ hi=cat; draw(); };
+    g.onmouseleave = ()=>{ hi=null; draw(); };
+    g.onclick = ()=>{ off.has(cat)?off.delete(cat):off.add(cat); renderLegend(); draw(); };
+  });
+}
+renderLegend();
+document.getElementById("colorby").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  document.getElementById("colorby").querySelectorAll("button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); mode=b.dataset.m; hi=null; off.clear(); renderLegend(); draw();
+});
+
+// ---- comparison table ----
+document.getElementById("cmp").innerHTML = D.themes.map(t=>{
+  const w = Math.round(t.conc*90);
+  return `<tr><td>${esc(t.ru)} <span class="muted">${esc(t.en)}</span></td><td class="r">${t.n}</td>`+
+    `<td class="r">${t.conc.toFixed(2)}<span class="vb" style="width:${w}px;background:${t.verdict==='recovered'?'#3c8a5e':t.verdict==='dissolved'?'#c05540':'#b28a3e'};margin-left:6px"></span></td>`+
+    `<td>${t.spans} (80% в ${t.n_clusters_80})</td>`+
+    `<td><span class="tag ${t.verdict}">${t.verdict==='recovered'?'воспроизведена':t.verdict==='dissolved'?'растворена':'расщеплена'}</span></td></tr>`;
+}).join("");
+document.getElementById("cmpnote").innerHTML =
+  `<b>Небесно-космогонический и формульный блок — реальны:</b> Солнце/Луна (88% в одном кластере), Звёзды (67%), `+
+  `Космогония, Имена, а также микро-темы «Смерть-вестник» и кастинг трикстера изолируются как чистые плотные острова. `+
+  `<b>Свалки растворяются:</b> Приключения (конц. 0.20) и Флора/фауна не имеют своего кластера — данные пересобирают их `+
+  `в нарративные комплексы (магическая жена, бегство от людоеда, животная басня, одурачивание людоеда, месть), `+
+  `<b>пересекающие</b> линию Приключения/Трюки. Низкий ARI (${D.ari.toFixed(2)}) — прямое подтверждение: контент-разбиение `+
+  `совпадает с рукотворным лишь частично.`;
+
+// ---- cluster cards ----
+let selK = null;
+function renderCards(){
+  document.getElementById("cgrid").innerHTML = D.clusters.map(c=>{
+    const dom = c.dom.slice(0,3).map((d,i)=>`<span class="chip ${i===0?'dom':''}">${esc(d.ru)} ${d.n}</span>`).join("");
+    const subs = c.subs.map(s=>`<span class="chip" title="${esc(s.ex.join(' · '))}">${esc(s.label.slice(0,26))} · ${s.n}</span>`).join("");
+    const top = c.top.slice(0,4).map(m=>esc(m.name)).join(" · ");
+    return `<div class="ccard ${selK===c.id?'sel':''}" data-k="${c.id}">`+
+      `<h3><i style="background:${clusCol(c.id)}"></i>${esc(c.name)} <span class="muted" style="font-weight:400">n=${c.n}</span></h3>`+
+      `<div class="d">${esc(c.desc)}</div>`+
+      `<div class="chips">${dom}</div>`+
+      `<div class="muted" style="margin-top:6px">топ: ${top}</div>`+
+      (subs?`<div class="chips" style="margin-top:6px">${subs}</div>`:"")+
+      `<div class="pur" title="чистота: доля доминирующей темы"><i style="width:${Math.round(c.purity*100)}%"></i></div>`+
+      `<div class="muted" style="margin-top:2px">чистота ${c.purity.toFixed(2)} · ${c.subs.length} подкатегории</div></div>`;
+  }).join("");
+  document.getElementById("cgrid").querySelectorAll(".ccard").forEach(el=>{
+    el.onclick = ()=>{
+      const k = +el.dataset.k;
+      selK = selK===k ? null : k;
+      if(selK!==null && mode!=="k"){ mode="k"; document.getElementById("colorby").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.m==="k")); off.clear(); renderLegend(); }
+      hi = selK; draw(); renderCards();
+      if(selK!==null) document.getElementById("cv").scrollIntoView({behavior:"smooth",block:"center"});
+    };
+  });
+}
+renderCards();
+</script>

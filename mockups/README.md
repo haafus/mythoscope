@@ -513,6 +513,21 @@ regional contours across five continents. Contours show *where* a motif is attes
 originated (coarse subregion centroids; breadth conflates descent with diffusion). See
 [`40-motif-map-explorer/README.md`](40-motif-map-explorer/README.md).
 
+### 41 · Theme re-derivation (UMAP)
+Asks what themes the catalogue proposes by itself: cluster motifs by meaning (BGE-M3 embeddings of
+name+definition), reduce with **UMAP** (2-D scatter you look at; 10-D for clustering — it beats
+PCA-64 and raw on purity and theme-agreement), two-level KMeans (16 natural clusters × sub-clusters,
+hand-named), then compare against Berezkin's 13 hand themes. Scatter toggles theme/cluster colouring.
+**Q.** Do the 13 hand themes match the structure the content itself carries?
+**Finding — only partly, and predictably.** The **celestial/cosmogonic/formulaic** block is real:
+Sun-Moon (88% concentrated), Stars, Cosmogony, Names are recovered, and the data carves out pure
+islands the hand scheme buries — **Formulae 100% pure**, the death-messenger complex 100%, trickster
+**casting** split from trickster plots. But the catch-alls **dissolve**: Adventures (conc 0.20) and
+Flora/fauna have no natural cluster — the data reorganises them into narrative complexes (magic-wife,
+ogre-escape, animal-fable, revenge) that cut **across** the Adventures/Tricks line. ARI vs the hand
+taxonomy is only **0.12**. Limit: content-derived (catalogue phrasing), blind to distribution/depth.
+See [`41-theme-rederivation/README.md`](41-theme-rederivation/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
