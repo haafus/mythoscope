@@ -23,13 +23,27 @@ catchy and recently borrowed everywhere — but the *shape* of the spread, and a
 neighbouring peoples, is the signature of contact, which manufactures broad contiguous ranges quickly.
 A motif attested on both sides of an ocean, in continental sets that have been separated since the
 peopling of the world, is much harder to explain by recent borrowing. The depth score therefore
-combines prevalence, geographic spread, spatial fragmentation, language-family span, and — weighted
-most heavily — the number of separate continental "mega-sets" a motif touches, orienting every feature
-toward antiquity by the disjunction-outranks-breadth rule (Figure 6.1). The score is a hypothesis with
-a confidence, never a recorded fact, exactly as the given/inferred discipline of Chapter 3 requires;
-and it carries a limitation that must be stated with it, because a breadth-and-disjunction proxy
-inevitably conflates ancient descent with wide diffusion — the very ambiguity §6.5 will show to be
-irreducible.
+combines, for each motif, a battery of distributional features — the number of traditions, macro-areas,
+and language families it touches, its mean geographic spread, its spatial fragmentation into separate
+components, the count of continental mega-sets it straddles, and its cross-catalogue corroboration —
+and it weights them by the disjunction-outranks-breadth rule (Figure 6.1).
+
+The prototype is candid about how easily this can go wrong, and the lesson is worth carrying. A naïve
+first principal component of the features turns out to be dominated by sheer prevalence — it correlates
+0.93 with the number of macro-areas a motif touches — so it conflates *old* with *widespread*, and its
+top-ranked motif is the **swan-maiden**, a motif that later analysis shows is broadly *diffused* rather
+than ancient. That the most widely-diffused motif tops a "depth" score is the tell that raw prevalence
+is the wrong signal. Re-weighting to punish prevalence and reward cross-continental disjunction fixes
+the ranking in the right direction — New-World-endemic adventure motifs, absent from Europe, correctly
+score deeper than Europe-only ones, and the disjunction weighting nearly triples that gap — but it
+*over*-corrects, collapsing genuinely broad-and-deep motifs by penalising their breadth too hard. This
+is why no single linear score is treated as the answer: the score is a hypothesis with a confidence,
+never a recorded fact, and it carries an irreducible limitation, because a breadth-and-disjunction proxy
+conflates ancient descent with wide diffusion — the very ambiguity §6.5 will show cannot be escaped. Its
+value is comparative and diagnostic — the pan-global celestial motifs it surfaces (the stars imagined as
+people, the sun and moon as a male–female pair, the primeval waters, the theft of fire, each spanning
+all sixteen macro-areas and fifty to seventy language families) are exactly the deep-substrate
+candidates the rest of the chapter tests — not a datestamp read off a single number.
 
 ## 6.2 Depth from the language tree
 
@@ -62,10 +76,24 @@ finding that märchen follow language phylogeny within the Indo-European world. 
 without being tuned to.
 
 Everything else broad is broad by *diffusion*. Cosmology, the trickster, and the swan-maiden are all
-widespread, but their distributions are areally scattered, not clade-clustered. The gated combination
-of the two methods lets Method B pick the mode and the mode pick the dating instrument, and it splits
-the otherwise-unresolvable "broad" motifs three ways: **areal-deep**, **descent**, and **areal-broad**
-(Figure 6.3). Here the theme cross-check pays off exactly as Chapter 3 promised it might. Theme was
+widespread, but their distributions are areally scattered, not clade-clustered. Turning the binary
+descent-versus-diffusion gate into a continuous decomposition — a per-motif split into descent, areal,
+and reinvention shares that sum to one — puts numbers on this, and the way it is built matters, because
+the obvious approach fails. A per-*tradition* mixture was tried first and **rejected**: for a broad
+motif, "has a same-family relative that also carries it" is trivially satisfied — Galton's problem
+again — so descent and diffusion become unidentifiable and the model over-attributes to descent. The
+decomposition is therefore anchored at the *motif* level in the chance-corrected phylogenetic signal,
+which does not saturate with breadth: a motif's reinvention share is the fraction of its carriers that
+sit isolated, with no same-family relative and no neighbour within 1,500 km; the rest is split between
+descent and areal in proportion to the phylogenetic signal. Run this way, **most motifs are
+areal-dominant — 2,311 of 2,775** — with 460 descent-dominant and a mere 4 reinvention-dominant, and
+the tales of Category B come out slightly more inheritable (mean descent 35%) than the cosmology of
+Category A (28%), because tales ride language expansions more readily. The individually tracked motifs
+come out where they should: Cinderella splits roughly 50/50, a genuine descent-tracking European tale;
+the fished-up earth reads 0.61 descent on its Austronesian clade; and the trickster and the broad
+cosmological motifs read areal-dominant. The gated combination then lets Method B pick the mode and the
+mode pick the dating instrument, splitting the otherwise-unresolvable "broad" motifs three ways:
+**areal-deep**, **descent**, and **areal-broad** (Figure 6.3). Here the theme cross-check pays off exactly as Chapter 3 promised it might. Theme was
 never fed to either estimator, yet the Category-A cosmological share of a motif's content falls from
 64% in the deep-areal mode to 24% in the descent mode — the descent minority is disproportionately
 *narrative* (fairy tales), the deep-areal material disproportionately *cosmological*, and the model
@@ -126,12 +154,20 @@ probe and Chapter 10 hands to future work. The residual is not tuned away; it is
 ## 6.6 Dating the descent minority
 
 Where the mode *can* be resolved — the descent minority Method B isolates — the corpus can be pushed
-one step further, from ordinal depth to calendar age. Joining the traditions to the Glottolog language
-catalogue and calibrating clade depth against published family-expansion dates yields calendar ages for
-the **451** descent motifs, concentrated, as expected, at the Indo-European märchen belt around 5,500
-years ago (Figure 6.7). The areal majority — A3, K25 and their kind — is correctly left *undated*,
-because dating an areally diffused motif by clade depth would be meaningless, and the gated method knows
-not to try.
+one step further, from ordinal depth to calendar age. Each tradition is joined to its nearest language
+in the Glottolog catalogue (at a median of 53 km), giving it a standard family, and a curated table of
+published family-expansion estimates for twenty-three families — drawn from the Bayesian-phylogenetic
+dating literature — supplies the calibration. The dating rule is deliberately conservative: a motif is
+dated to a family's expansion only if it is both phylogenetically *clustered* (a phylogenetic signal at
+or above 0.4, so inherited rather than areal) *and* concentrated in that one family (at least 55% of its
+carriers), on the reasoning that if it rode the family's spread, that spread is roughly its age. Under
+this rule, **451 of some 3,000 datable motifs receive a calendar age**, ranging from about 9,000 years
+before present for Afro-Asiatic material down to about 1,500 for Quechuan, and piling up — some three
+hundred of them — at the Indo-European märchen belt around 5,500 years ago (Figure 6.7). The areal
+majority is correctly left *undated*: the sun-and-moon pair and the swan-maiden both have low
+phylogenetic signal (0.15–0.17) and spread across families rather than within one, so the method
+assigns them no family date, because dating an areally diffused motif by clade depth would be
+meaningless and the gated method knows not to try.
 
 The same machinery can place a descent motif in space as well as time. Reconstructing the origin of the
 fished-up-earth motif (B4) — the earth-diver's cousin, in which land is hauled up from the sea — puts
@@ -151,18 +187,23 @@ peopled earliest — deep myth should pool where humans have been longest. This 
 is falsifiable: run it, and the deep-share of a tradition either does or does not track its region's
 first-peopling age.
 
-It does. The partial correlation between a tradition's deep-substrate share and the antiquity of its
-region's settlement, controlling for coverage, is **+0.48** (Figure 6.8). The gradient runs in the
-right order and at plausible magnitudes: Sub-Saharan Africa highest at 63% deep-share against a
-settlement age near 65,000 years, the early Old World in the middle at 56–59%, and the Americas lowest
-at 48–49% against a settlement age near 14,000 years. What makes this more than a restatement of the
-depth score is what coverage does to it: a tradition's deep-share is *negatively* correlated (−0.30)
-with how thoroughly it was catalogued, so the sampling confound was **masking** the signal, not faking
-it. Controlling for coverage *strengthens* the correlation rather than weakening it — the opposite of
-the theme-by-area finding in Chapter 5, and a reminder that de-confounding is not a machine for
-shrinking effects but for finding their true size. A programme that reported only raw numbers would
-have understated this result; one that reported only its successes would never have set the test at
-all.
+It does. Profiling each tradition as a stack of strata — the share of its motifs that are broad and deep
+(above the 85th percentile of breadth), areal, or local and endemic — and correlating that deep-share
+with its region's settlement age gives a partial correlation, controlling for coverage, of **+0.48**
+(raw +0.43; Figure 6.8). The gradient runs in the right order and at plausible magnitudes: Sub-Saharan
+Africa highest at 63% deep-share against a settlement age near 65,000 years, the early Old World in the
+middle at 56–59%, and the Americas lowest at 48–49% against a settlement age near 14,000 years. The
+individual traditions at the extremes are readable: the deepest are African and South-Asian tribal
+corpora — the Herero, the Iraku, the Bobo, the Kannikaran — and the shallowest are Amazonian — the
+Pirahã, the Urarina, the Cariri — precisely the late-peopled endpoint the test predicts. What makes this
+more than a restatement of the depth score is what coverage does to it: a tradition's deep-share is
+*negatively* correlated (−0.30) with how thoroughly it was catalogued, because a thickly-catalogued
+corpus like Europe (attestation intensity near 330) records many rare motifs and so looks artificially
+*shallow*. The sampling confound was therefore **masking** this signal, not faking it, and controlling
+for coverage *strengthens* the correlation rather than weakening it — the opposite of the theme-by-area
+finding in Chapter 5, and a reminder that de-confounding is not a machine for shrinking effects but for
+finding their true size. A programme that reported only raw numbers would have understated this result;
+one that reported only its successes would never have set the test at all.
 
 > **Figure 6.1.** The distribution-shape depth score and its histogram, with disjunction weighted above
 > breadth. **Figure 6.2.** The phylogenetic signal: observed clustering on the language tree against a
