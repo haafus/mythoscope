@@ -195,3 +195,93 @@ stapled papers.
 The existing drafts total ~15k words; the Element targets ~30k. So this is roughly a **2× expansion**,
 concentrated in chapters 6 and 8 (the result chapters), the new introduction, and the case studies —
 achievable from current material, unlike the 5–8× a full monograph would need.
+
+---
+
+## Detailed budgets: subsections, mockups, and figures
+
+Each chapter broken into subsections with word budgets, the exact source prototypes, and a numbered
+figure list. "new" = a diagram to be drawn, not from a prototype. Every other figure is a static
+render of an existing interactive prototype. Target ~28 figures; trim to ~25 in production.
+
+### Chapter 1 — Introduction: the shape of a distribution · 3,000 words · 1 figure
+- 1.1 Why a motif recurs; the three modes and Galton's problem — 900 — *Findings §1*
+- 1.2 The three obstacles (catalogues, coverage, the theme axis) — 700 — *Findings §1*
+- 1.3 The thesis, in one paragraph — 400 — *new*
+- 1.4 What the Element does; chapter roadmap — 1,000 — *new*
+- **Figures:** Fig 1.1 — the three transmission modes (descent / areal / reinvention) as a schematic over a world map (*new*).
+
+### Chapter 2 — The field and its unsolved task · 3,000 words · 1 figure + 1 table
+- 2.1 The classical era — 900 — *Survey*
+- 2.2 The modern era — 900 — *Survey*
+- 2.3 The hard lessons — 700 — *Survey*
+- 2.4 The verdict: embeddings as a retrieval layer — 500 — *Survey*
+- **Figures:** Fig 2.1 — two-era timeline of the field by method family (*new*). Table 2.1 — open datasets and their licences (*Survey*).
+
+### Chapter 3 — A natural-history program · 3,000 words · 2 figures
+- 3.1 The collect → describe → classify → explain arc — 800 — *Program §1*
+- 3.2 The three-entity model; the single inferred field — 800 — *Program §2*
+- 3.3 Explicit assumptions — 700 — *Program §3*
+- 3.4 De-confounding and falsifiable gates — 700 — *Program §4–5*
+- **Figures:** Fig 3.1 — the dependency arc (*new*). Fig 3.2 — the tradition / motif / attestation data model (*new*).
+
+### Chapter 4 — The corpus and the bench · 3,500 words · 4 figures + 1 table
+- 4.1 The three catalogues into one attestation matrix — 900 — *Machine; mockups 13, 14*
+- 4.2 The cross-catalogue link set — 800 — *Machine; mockup 01*
+- 4.3 The retrieval layer and its evaluation — 800 — *Machine; mockups 02, 04, 10*
+- 4.4 The spatial and coverage layers; the bench; induction staged — 1,000 — *Machine; mockups 12, 09, 11*
+- **Figures:** Fig 4.1 — the three-catalogue crosswalk graph (*mockup 01*). Fig 4.2 — recall@k, embeddings vs lexical baseline (*mockup 10*). Fig 4.3 — corpus-overview dashboard (*mockups 13/14*). Fig 4.4 — attestation-intensity distribution a(t) (*mockup 13*). Table 4.1 — corpus composition by catalogue (*Machine*).
+
+### Chapter 5 — Systematics and the tradition · 3,500 words · 5 figures
+- 5.1 De-confoundable structure (co-clustering + block model) — 900 — *Findings §4.1; mockups 06, 07, 15, 26*
+- 5.2 The four facets and their audit — 900 — *Findings §4.5; mockups 21, 32*
+- 5.3 The theme axis, data-confirmed — 700 — *Findings §4.2; mockups 16, 23*
+- 5.4 The subsistence gradient and its controls — 1,000 — *Findings §4.2; mockups 22, 24, 25*
+- **Figures:** Fig 5.1 — co-clustered motif × tradition blocks (*mockup 26*). Fig 5.2 — degree-correction halving the coverage confound (*mockup 26*). Fig 5.3 — facet drop-one ΔR² and redundancy (*mockup 32*). Fig 5.4 — subsistence × Category-A gradient with restricted-permutation controls (*mockups 22, 25*). Fig 5.5 — theme × area lift heatmap (*mockup 23*).
+
+### Chapter 6 — Depth, descent, and the deep substrate · 4,500 words · 8 figures
+- 6.1 Depth from a distribution's shape (Method A) — 700 — *Findings §4.3; mockup 17*
+- 6.2 Depth from the language tree (Method B) — 700 — *Findings §4.3; mockups 18, 19*
+- 6.3 Areal diffusion dominates; the ~1% descent minority — 800 — *Findings §4.3; mockup 27*
+- 6.4 The deep substrate: real but small; the controls — 700 — *Findings §4.3; mockups 20, 37*
+- 6.5 Irreducibility (A3 vs K25); content does not predict age — 700 — *Findings §4.3; mockups 27, 29*
+- 6.6 Dating the descent minority — 500 — *Findings §4.4; mockups 30, 31*
+- 6.7 Tradition stratigraphy — 400 — *Findings §4.6; mockup 39*
+- **Figures:** Fig 6.1 — depth score + histogram (*mockup 17*). Fig 6.2 — phylogenetic signal, descent vs diffusion (*mockup 18*). Fig 6.3 — three-way descent/areal/reinvention mixture (*mockup 27*). Fig 6.4 — A3 vs K25 near-identical mixtures (*mockup 27*). Fig 6.5 — deep substrate surviving controls, 320/480 (*mockup 20*). Fig 6.6 — content barely predicts breadth (*mockup 29*). Fig 6.7 — dated descent minority, calendar ages (*mockup 30*). Fig 6.8 — tradition stratigraphy, deep-share vs peopling age +0.48 (*mockup 39*). (Robustness — alt-tree, mockup 33 — folded into text.)
+
+### Chapter 7 — Connectivity: what the facets miss · 2,500 words · 3 figures
+- 7.1 The convergence residual — 600 — *Findings §4.5; mockup 38*
+- 7.2 Landscape permeability fails its gate — 700 — *Findings §4.5; mockup 34*
+- 7.3 Historical empires weakly pass — 700 — *Findings §4.5; mockup 35*
+- 7.4 The back-migration critique — 500 — *Findings §4.5; mockup 36*
+- **Figures:** Fig 7.1 — held-out R², resistance vs great-circle distance (*mockup 34*). Fig 7.2 — cross-area motif sharing by shared empire (*mockup 35*). Fig 7.3 — the Africa↔Eurasia corridor fraction (*mockup 36*).
+
+### Chapter 8 — Two axes of theme · 3,000 words · 4 figures
+- 8.1 Re-deriving theme from meaning — 700 — *Findings §4.7; mockup 41*
+- 8.2 Orthogonality: etiology vs narrative form — 700 — *Findings §4.7; mockup 41*
+- 8.3 Head-to-head as a tradition descriptor — 800 — *Findings §4.7; mockups 42, 43*
+- 8.4 Catch-all dissolution and the hidden depth gradient — 800 — *Findings §4.7; mockup 44*
+- **Figures:** Fig 8.1 — UMAP re-derivation, 16 clusters × 61 sub-themes (*mockup 41*). Fig 8.2 — facet showdown, ΔR² narrative vs etiological (*mockup 42*). Fig 8.3 — narrative worldview clusters across traditions (*mockup 43*). Fig 8.4 — catch-alls dissolving; the deep swallowing-monster complex (*mockup 44*).
+
+### Chapter 9 — Three motifs traced through the machine · 2,500 words · 3 figures
+- 9.1 The swan-maiden — the irreducibility case — 850 — *new synthesis; mockups 40, 27*
+- 9.2 Sun and moon as kin — the deep celestial substrate — 850 — *new synthesis; mockups 40, 17*
+- 9.3 The fished-up earth — dated descent in Oceania — 800 — *new synthesis; mockups 31, 40*
+- **Figures:** Fig 9.1 — swan-maiden map + mixture (*mockup 40*). Fig 9.2 — sun-and-moon distribution (*mockup 40*). Fig 9.3 — fished-up-earth origin and Pacific spread (*mockup 31*).
+
+### Chapter 10 — Discussion and outlook · 2,500 words · 1 figure
+- 10.1 The three cross-cutting conclusions — 900 — *Findings §5*
+- 10.2 The residual as the map of future work — 700 — *Findings §5; Outlook*
+- 10.3 Open milestones and release — 900 — *Outlook*
+- **Figures:** Fig 10.1 — the convergence residual as a research map (*new*).
+
+### Appendices · 1,500 words · 0–2 figures
+- A. Data model — 300 — *proposals (entity model)*
+- B. Cross-catalogue link methodology — 400 — *Machine; mockup 01*
+- C. Methods reference (depth score, de-confounding, ancestral-state reconstruction) — 500 — *mockups 17, 24, 25, 28*
+- D. Reproducibility: figure → prototype map; data & code DOIs — 300 — *all mockups*
+
+### Totals
+- **Prose:** ~30,000 words across ten chapters + ~1,500 appendix.
+- **Figures:** ~28 (of which 6 new diagrams: Figs 1.1, 2.1, 3.1, 3.2, 10.1 + Table 2.1); the rest are static renders of existing prototypes.
+- **Prototypes used:** 01, 02, 04, 06, 07, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 — nearly the whole bench. (Not drawn on: 03, 05, 08, 28 feed the text/appendix but not a numbered figure.)
