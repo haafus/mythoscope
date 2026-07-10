@@ -81,6 +81,8 @@
   <div class="legend" id="legend"></div>
 </div>
 
+<div class="card" id="detail" style="display:none"></div>
+
 <div class="card">
   <h2>Сравнение с 13 рукотворными темами <span class="s">— насколько тема концентрируется в одном кластере данных</span></h2>
   <table class="cmp"><thead><tr><th>Тема Берёзкина</th><th class="r">мотивов</th><th class="r">конц.</th><th>в скольких кластерах</th><th>вердикт</th></tr></thead>
@@ -103,7 +105,8 @@ const TC = {1:"#d65d4f",2:"#e0963c",3:"#3c8a5e",4:"#7a3b3b",5:"#6a5aa6",6:"#8a6d
             8:"#3a6ea5",9:"#a3457e",10:"#4f7096",11:"#c8781f",12:"#8a8f95",13:"#0e9aa7",0:"#d5d2ca"};
 const KC = ["#3c8a5e","#4f7096","#c8781f","#a3457e","#6a5aa6","#0e9aa7","#8a6d28","#c05540",
             "#2f8f8f","#7d8b3a","#b0894a","#5b6e8c","#9b5a9b","#d6a13a","#7a3b3b","#3a6ea5"];
-const themeCol = t => TC[t] || "#ccc", clusCol = k => KC[k % KC.length];
+const SUBPAL = ["#3c8a5e","#c8781f","#6a5aa6","#0e9aa7","#c05540"];   // level-2 within a cluster
+const themeCol = t => TC[t] || "#ccc", clusCol = k => KC[k % KC.length], subCol = s => SUBPAL[s % SUBPAL.length];
 
 // ---- KPIs + quality table ----
 k_n.textContent = D.n; k_k.textContent = D.K1;
@@ -123,10 +126,23 @@ const W = cv.width, H = cv.height, PAD = 26;
 const sx = x => PAD + x*(W-2*PAD), sy = y => H-PAD - y*(H-2*PAD);
 let mode = "t";                 // 't' theme | 'k' cluster
 let hi = null;                  // highlighted category (theme id or cluster id), null = all
+let selK = null;                // selected level-1 cluster -> level-2 view (null = off)
 const off = new Set();          // toggled-off legend categories
 
 function draw(){
   ctx.clearRect(0,0,W,H);
+  if(selK!==null){                       // LEVEL-2 mode: selected cluster coloured by sub-cluster
+    for(const pass of [0,1]){
+      for(const p of P){
+        const inSel = p.k===selK;
+        if((pass===0) === inSel) continue;       // pass 0 = the rest (dim grey), pass 1 = selection on top
+        ctx.globalAlpha = inSel ? 0.92 : 0.05;
+        ctx.fillStyle = inSel ? subCol(p.s) : "#b8b4ab";
+        ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), inSel?4.8:2.5, 0, 7); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1; return;
+  }
   // two passes: dim first, highlighted on top
   for(const pass of [0,1]){
     for(const p of P){
@@ -153,7 +169,8 @@ cv.addEventListener("mousemove", e=>{
     const dx=sx(p.x)-mx, dy=sy(p.y)-my, d=dx*dx+dy*dy; if(d<bd){bd=d; best=p;} }
   if(best && bd < 220){
     const cl = D.clusters.find(c=>c.id===best.k);
-    tip.innerHTML = `<b>${esc(best.c)}</b> · ${esc(best.nm)}<br><span style="opacity:.75">тема: ${esc(D.gnames_ru[best.t]||"—")} · кластер: ${esc(cl?cl.name:best.k)} · широта ${best.b}</span>`;
+    const sub = cl && cl.subs[best.s] ? ` › ${esc(cl.subs[best.s].label)}` : "";
+    tip.innerHTML = `<b>${esc(best.c)}</b> · ${esc(best.nm)}<br><span style="opacity:.75">тема: ${esc(D.gnames_ru[best.t]||"—")} · кластер: ${esc(cl?cl.name:best.k)}${sub} · широта ${best.b}</span>`;
     tip.style.left = (e.clientX-r.left+12)+"px"; tip.style.top = (e.clientY-r.top+12)+"px"; tip.style.opacity=1;
   } else tip.style.opacity=0;
 });
@@ -178,8 +195,26 @@ function renderLegend(){
 renderLegend();
 document.getElementById("colorby").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   document.getElementById("colorby").querySelectorAll("button").forEach(x=>x.classList.remove("on"));
-  b.classList.add("on"); mode=b.dataset.m; hi=null; off.clear(); renderLegend(); draw();
+  b.classList.add("on"); mode=b.dataset.m; hi=null; off.clear();
+  selK=null; renderDetail(); renderCards(); renderLegend(); draw();
 });
+
+// ---- level-2 detail panel (appears when a cluster is selected) ----
+function renderDetail(){
+  const el = document.getElementById("detail");
+  if(selK===null){ el.style.display="none"; return; }
+  const c = D.clusters.find(x=>x.id===selK);
+  el.style.display="block";
+  el.innerHTML =
+    `<h2><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:${clusCol(c.id)};margin-right:5px"></i>`+
+    `Уровень 2 — подкатегории кластера «${esc(c.name)}» <span class="s">n=${c.n} · ${c.subs.length} под-кластеров · точки на карте выше раскрашены по ним</span> `+
+    `<a href="#" id="clr" style="font-size:12px;font-weight:400;margin-left:8px">сбросить</a></h2>`+
+    `<div class="cgrid">`+ c.subs.map((s,i)=>
+      `<div class="ccard" style="cursor:default">`+
+        `<h3><i style="background:${subCol(i)}"></i>${esc(s.label)} <span class="muted" style="font-weight:400">n=${s.n}</span></h3>`+
+        `<div class="muted">${esc(s.ex.join(" · "))}</div></div>`).join("") +`</div>`;
+  document.getElementById("clr").onclick = e=>{ e.preventDefault(); selK=null; renderDetail(); renderCards(); draw(); };
+}
 
 // ---- comparison table ----
 document.getElementById("cmp").innerHTML = D.themes.map(t=>{
@@ -198,7 +233,6 @@ document.getElementById("cmpnote").innerHTML =
   `совпадает с рукотворным лишь частично.`;
 
 // ---- cluster cards ----
-let selK = null;
 function renderCards(){
   document.getElementById("cgrid").innerHTML = D.clusters.map(c=>{
     const dom = c.dom.slice(0,3).map((d,i)=>`<span class="chip ${i===0?'dom':''}">${esc(d.ru)} ${d.n}</span>`).join("");
@@ -216,9 +250,8 @@ function renderCards(){
   document.getElementById("cgrid").querySelectorAll(".ccard").forEach(el=>{
     el.onclick = ()=>{
       const k = +el.dataset.k;
-      selK = selK===k ? null : k;
-      if(selK!==null && mode!=="k"){ mode="k"; document.getElementById("colorby").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.m==="k")); off.clear(); renderLegend(); }
-      hi = selK; draw(); renderCards();
+      selK = selK===k ? null : k;        // toggle level-2 view for this cluster
+      hi = null; renderDetail(); draw(); renderCards();
       if(selK!==null) document.getElementById("cv").scrollIntoView({behavior:"smooth",block:"center"});
     };
   });

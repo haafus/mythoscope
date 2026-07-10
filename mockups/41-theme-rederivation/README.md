@@ -15,9 +15,16 @@ hand taxonomy.
    the hand themes (ARI 0.12 vs 0.08 vs 0.07) — reducing first genuinely helps.
 3. **Level-1** KMeans → **16** natural clusters, each hand-named (keyed to a signature motif so
    the label follows content, not the KMeans index).
-4. **Level-2** KMeans inside each cluster → sub-categories, labelled by their most widespread motif.
+4. **Level-2** KMeans inside each cluster → ~55 sub-categories, each **hand-named** (keyed to its
+   signature motif). Click a cluster card to enter the level-2 view: the scatter recolours that
+   cluster's points by sub-cluster and a panel lists the named sub-categories.
 5. **Comparison** to the 13 hand themes — contingency, purity, adjusted Rand, and a per-theme
    verdict (how concentrated each theme is in one data cluster).
+
+**Coverage.** KMeans is a hard partition, so all 3488 motifs are assigned — nothing is left
+uncovered. The scheme in fact *increases* coverage over the hand taxonomy: the **141** motifs
+Berezkin left un-grouped ("?") each receive a data-theme. Only ~**2 %** sit far from any centroid
+(weakly-fitting outliers).
 
 ## What it shows
 
