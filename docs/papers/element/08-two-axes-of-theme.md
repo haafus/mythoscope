@@ -38,9 +38,17 @@ ordering was not built to see.
 ## 8.2 Orthogonality: what a myth explains versus how a tale is built
 
 The most consequential divergence is what happens to the two giant genre catch-alls. Berezkin's
-Adventures (1,243 motifs) and Tricks (620 motifs) **dissolve** under the data-driven clustering into
-narrative complexes — the magic wife, the ogre outwitted and escaped, the animal fable, the
-revenge plot — and those complexes cut straight across the Adventures/Tricks line. A motif's membership
+Adventures and Tricks together account for **53% of the whole catalogue**, and under the data-driven
+clustering they **dissolve** into a set of coherent, named narrative complexes that cut straight across
+the Adventures/Tricks line. The largest data cluster, "magic flight and the obtaining of goods" (433
+motifs), is drawn 240 from Tricks and 135 from Adventures; a "magic wife and difficult tasks" cluster
+(358 motifs, 70% pure) gathers the pursued heroine of the Cinderella type, the animal-bride of the
+swan-maiden, and the quest for a stolen wife; an "escape from the ogre and heroic adventures" cluster
+(342 motifs) collects the dragon-slayer and the flight from the devourer; an "avengers, abductions, and
+demons" cluster (262 motifs, 74% pure) holds the Bluebeard revenge plot; and an "animal fable of helpers
+and grateful beasts" cluster (255 motifs) pulls together the beast-helper stories. None of these
+respects the Adventures/Tricks boundary — a motif's membership in the data scheme has little to do with
+its membership in the hand scheme. A motif's membership
 in the data scheme has little to do with its membership in the hand scheme, because the two are indexing
 **orthogonal** things. The classical axis sorts motifs by *etiological function* — what the myth
 explains, the inheritance of the Aarne–Thompson chapter logic. The data axis sorts them by *narrative
@@ -99,9 +107,12 @@ The deep clusters are overwhelmingly etiological, drawing only 0–32% of their 
 Adventures/Tricks catch-alls; the shallow clusters are märchen, drawing 82–90% from them. Depth and
 narrative kind line up, once the catch-alls are broken open.
 
-The payoff case is the swallowing-monster and vulnerable-body complex — the motif family in which a
-being is swallowed and the world or the body is made from what is inside. It sits *deep*, at a span of
-1.80, and yet 53% of it is built from motifs Berezkin had filed under Adventures, Tricks, and Flora. The
+The payoff case is the swallower-and-vulnerable-body complex — a 412-motif cluster, only 26% pure
+against the hand scheme, in which a being is swallowed and released, an external soul or vulnerable spot
+decides a life, and the world or the body is made from what is inside. Its composition is the tell: it
+is assembled from 108 motifs Berezkin filed under Adventures, 99 under Monsters, and 55 under Flora and
+fauna. It sits *deep*, at a span of 1.80, and yet the majority of it is drawn from the novelistic and
+etiological catch-alls rather than from any cosmological label. The
 flat genre category had averaged this genuinely deep cosmological stratum together with shallow tales,
 and only re-deriving the axis from meaning pulls it back out. The decomposition makes the point in
 aggregate as well as in this one case: the old flat Adventures category, with a single mega-set span of

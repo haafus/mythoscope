@@ -158,6 +158,18 @@ always be some transformation of the data under which a compelling pattern appea
 set a gate in advance and to walk away when the data does not clear it is the main thing standing
 between this programme and an elegant over-fit.
 
+There is a further discipline that pairs with the gates, and it is adversarial. Beyond stating its own
+assumptions, the programme enumerates the **rival explanations it most fears** — the ways a finding could
+be an artefact rather than a fact — and sets out to confirm or dispatch each one by name. Could the
+structure be catalogue density rather than culture? Could the subsistence gradient be an area effect
+wearing a subsistence mask? Could an apparent inheritance be the wrong descent tree, or an apparent
+African substratum be back-migration into Africa rather than out of it? Each of these is a named
+alternative hypothesis, and the result chapters that follow are, in part, the record of confronting them:
+the degree-corrected block model dispatches the density worry (Chapter 5), restricted permutation the
+area-masquerade (Chapter 5), the admixture-direction test the back-migration worry (Chapter 7). A
+programme that only defends its assumptions is weaker than one that also hunts down the explanations that
+would overturn its results.
+
 These commitments have a limit, and the programme states it up front rather than discovering it with
 embarrassment later. **From distribution alone, a deep shared inheritance and a widely diffused
 innovation can be genuinely indistinguishable.** The two diagnostic motifs the book returns to — the
