@@ -3,8 +3,9 @@
 Structure and table of contents for a **Cambridge Element** (short-form scholarly book, ~30,000
 words). This is the *first book step*: a single-argument, self-contained volume assembled from the
 existing drafts and the ~40 interactive prototypes, and itself the skeleton of a later full monograph
-(70–120k words). Distinct from [`monograph-outline.md`](monograph-outline.md), which plans the larger
-book; this file plans the Element.
+(70–120k words). Distinct from [`../monograph-outline.md`](../monograph-outline.md), which plans the
+larger book; this file plans the Element. The drafted chapters live alongside it in this folder
+(`1-introduction.md`, …).
 
 Written to be read by someone who does not know the project.
 
