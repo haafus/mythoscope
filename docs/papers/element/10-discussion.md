@@ -65,11 +65,18 @@ baselines actually beaten, and culture-bearers consulted where the meaning of a 
 off the text. This is the milestone that would let the programme grow its own corpus rather than inherit
 one.
 
-The second is **closing the convergence residual** with the external joins the residual names: fine-grained
-genetic data for a true third axis independent of both language and geography, wired trade-route networks
-to test contact channels the coarse landscape model missed, and node-level Bayesian dating on a proper
-dated tree to replace the current family-resolution ages. These are the expensive joins, and they are
-expensive precisely because they are the ones that would move the needle.
+The second is **closing the convergence residual** with the external joins the residual names. It helps to
+see which joins are already made and which remain, because the pattern is deliberate. The *cheap and
+load-bearing* axes are wired: subsistence from the ethnographic atlas (gradient confirmed,
+Galton-robust), language family and expansion dates from the language catalogue (451 descent motifs
+calendar-dated), historical empire boundaries (a weak but real cross-area effect), and a coarse
+admixture-direction proxy (back-migration confirmed). The axes that would actually *close* the residual
+are the expensive ones still pending: fine-grained genetic data for a true third axis independent of both
+language and geography, wired trade-route networks to test the contact channels the coarse landscape
+model missed, and node-level Bayesian dating on a properly dated tree to replace today's family-resolution
+ages. That the cheap joins are done and the residual-closing joins are not is not an accident of effort;
+it is the shape of the frontier — geography and language are inexpensive and only get you a third of the
+way, and the last two-thirds costs genetics, trade routes, and dated trees.
 
 The third is **productionising the two-facet theme taxonomy** — the etiological and the narrative axes
 together — into the pipeline as standing infrastructure rather than a prototype result, so that every
