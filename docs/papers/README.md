@@ -11,11 +11,16 @@ These are **evolving drafts**, not submissions; numbers come from the prototype 
   ("Geography, Descent, and Genre in the Global Distribution of Folklore Motifs"): the
   *what we found* synthesis of the analysis arc — descent vs areal diffusion, depth from
   distribution, facet adequacy and connectivity, and the data-driven theme re-derivation.
+- [`survey-draft.md`](survey-draft.md) — **the survey paper** ("Computational Folkloristics and
+  the Induction of Motifs"): a review of the field — indices/ontologies, supervised classification,
+  topic models, embeddings & motif detection, sequence/network mining, phylogenetic mythology, and
+  Propp extraction — with a datasets/licences table and the open problems. Assembled from the
+  [`../research/`](../research/) notes.
 - [`bibliography.md`](bibliography.md) — the annotated, thematically-grouped reading list.
 
 Related, kept separate on purpose:
 
-- Field survey of computational folkloristics → [`../research/`](../research/).
+- Raw field-survey notes and the labs/venues landscape → [`../research/`](../research/).
 - The full data-driven theme re-derivation and its comparison to Berezkin's themes →
   [`../motifs/proposals/theme-taxonomy-comparison.md`](../motifs/proposals/theme-taxonomy-comparison.md).
 - Per-result method and figures → the individual `mockups/*/README.md`.
