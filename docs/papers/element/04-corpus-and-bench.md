@@ -51,7 +51,16 @@ modelling, because it exposes the shape of what is there to be explained (Figure
 > **Figure 4.4.** The distribution of attestation-intensity a(t), the number of motifs recorded per
 > tradition: it ranges from a single entry to over seven hundred, with a median near seventy-five. This
 > long right tail is the sampling confound that Chapter 3 insisted be carried forward, and it is the
-> single most important fact about the raw matrix. Two
+> single most important fact about the raw matrix.
+
+The same skew shows in the raw-text corpus that feeds the induction pipeline. Its texts span some three
+orders of magnitude in length — the King James Bible runs to roughly 790,000 words against a
+38,000-word *Beowulf* — and its bulk is dominated by the Abrahamic and Indian scriptural traditions,
+which is itself a bias to be carried forward rather than hidden. Even a crude lexical similarity over
+these texts, seriated so that related traditions sit adjacent, already recovers sensible groups — an
+East-Asian cluster of Confucian, Taoist, and Buddhist texts; a Germanic branch of Anglo-Saxon, Norse,
+and Germanic material; the Christianity–Islam pairing; the classical epics — a reassurance that the
+corpus carries real structure before any modelling begins. Two
 principles govern the assembly. The first is *provenance*: nothing enters the matrix without a record
 of where it came from, so that a later result can always be traced to the coding that produced it. The
 second is *restraint about categories*: the assembly deliberately does not impose a motif taxonomy or a
@@ -102,7 +111,14 @@ the k nearest neighbours by vector similarity? The transformer is measured again
 baseline built from word co-occurrence, and it is adopted downstream only because it *wins that
 comparison* by a clear margin (Figure 4.2). This is the honest version of the tempting claim that
 "meaningful clusters emerge on their own": a number on a held-out link set rather than an impression
-from a suggestive picture. Where the embedding is used later — to re-derive the theme axis in
+from a suggestive picture. A companion retrieval experiment settles a design question the same way —
+embedding a motif by its *name alone* against embedding it by *name plus summary*, scored by ranking the
+true type among all ~2,240 tale types for some 1,500 real tales with the labels stripped out.
+Name-plus-summary roughly *doubles* the mean reciprocal rank over name-only (from about 0.12 to 0.23) and
+cuts the median rank of the correct type from around 300 to below 140; representing the text as passages
+rather than one vector helps the rank further. That is why every motif is embedded by name *and*
+definition, not name alone — the choice is made by a measured retrieval gain, not by taste. Where the
+embedding is used later — to re-derive the theme axis in
 Chapter 8, for instance — it is used as this validated retrieval layer, never as an independent
 oracle about a motif's age or origin, a circularity the programme's axioms explicitly forbid.
 

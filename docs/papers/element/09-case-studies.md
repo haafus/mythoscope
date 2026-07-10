@@ -16,9 +16,11 @@ exactly where it stops.
 
 A man comes upon women bathing, their feather or seal-skin garments laid aside. He hides one. The
 woman who cannot reclaim her skin cannot fly or swim away, and so becomes his wife — until, years later,
-she finds the hidden garment and is gone. The swan-maiden, catalogued as K25, is one of the most widely
-attested story-shapes on earth, found from Ireland to Japan to the Americas, and it is exactly the kind
-of near-universal motif that has tempted scholars to see a single deep origin behind it.
+she finds the hidden garment and is gone. This is the swan-maiden, the type case of Berezkin's **magic
+wife (K25)** — defined broadly as *a man consciously marrying a woman related to the non-human world* —
+and with **513 attesting traditions** it is one of the most widely recorded story-shapes in the entire
+catalogue, found from Ireland to Japan to the Americas. It is exactly the kind of near-universal motif
+that has tempted scholars to see a single deep origin behind it.
 
 Run through the machine, its distribution is broad and its footprint disjunct — it touches multiple
 continental sets, and on the depth score of Chapter 6 it reads as old. But Method B, reading the
@@ -35,12 +37,12 @@ from its distribution, say how old it is.
 
 ## 9.2 Sun and moon as kin: the deep substrate, and the wall
 
-The sun and the moon are imagined, across an astonishing range of unrelated traditions, as kin — as
-brother and sister, as a married pair who quarrelled, as pursuer and pursued. The motif, catalogued as
-A3, is cosmological to its core, and it is a leading candidate for the deep celestial substrate that
-Chapter 6 confirmed is real: the night sky is available to everyone, the pairing is elementary, and its
-pan-global, cross-hemispheric distribution survives the coverage and banality controls that strip the
-inflated antiquity off lesser motifs. On the depth score it reads as deep; in the gated combination it
+Across an astonishing range of unrelated traditions the sun is imagined as male and the moon as female:
+Berezkin's **male sun and female moon (A3)** — *the moon is female or bisexual, the sun is male* — a
+gendered celestial pairing attested in **362 traditions**. It is cosmological to its core, and it is a
+leading candidate for the deep celestial substrate that Chapter 6 confirmed is real: the night sky is
+available to everyone, the pairing is elementary, and its pan-global, cross-hemispheric distribution
+survives the coverage and banality controls that strip the inflated antiquity off lesser motifs. On the depth score it reads as deep; in the gated combination it
 files as **areal-deep**; and its content sits squarely in Category A, the cosmological pole that the
 theme cross-check associated with the deepest layer (Figure 9.2).
 
@@ -58,9 +60,10 @@ must come from outside.
 ## 9.3 The fished-up earth: a descent motif the machine cracks
 
 The third motif is the counter-case, and it is why the programme is not merely a catalogue of things it
-cannot do. In the fished-up-earth motif, catalogued as B4 — a cousin of the earth-diver — the land is
-hauled up out of the primordial sea, drawn up on a line or a hook. Unlike the swan-maiden, its carriers
-are *not* scattered across the language tree. They cluster, within the Austronesian world, in a way
+cannot do. Berezkin's **fished-out earth (B4)** — *islands or a continent are fished out of the ocean, or
+pulled to their present place by a rope* — is a cousin of the earth-diver, and with just **36 attesting
+traditions** it is far narrower than the other two. Unlike the magic wife, its carriers are *not*
+scattered across the language tree. They cluster, within the Austronesian world, in a way
 Method B reads as descent rather than diffusion, and that single fact unlocks everything the machine can
 otherwise only wish for.
 
