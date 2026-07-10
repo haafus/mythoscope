@@ -1,0 +1,114 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>42 · Facet showdown</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --old:#b28a3e; --new16:#3c8a5e; --new61:#2f6f57; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:960px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:920px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 3px; } h2 .s { font-weight:400; color:var(--muted); font-size:12px; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .kpis { display:flex; gap:22px; flex-wrap:wrap; }
+  .kpi .v { font-size:19px; font-weight:700; } .kpi .l { font-size:11px; color:var(--muted); max-width:190px; }
+  .metric { margin:14px 0 4px; font-size:12.5px; font-weight:600; } .metric span { font-weight:400; color:var(--muted); }
+  .bar-row { display:flex; align-items:center; gap:10px; margin:5px 0; }
+  .bar-row .nm { width:186px; font-size:12px; text-align:right; flex:none; }
+  .bar-row .nm i { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:0; }
+  .tr { flex:1; background:var(--bg); border-radius:5px; height:20px; position:relative; }
+  .bf { height:100%; border-radius:5px; display:flex; align-items:center; justify-content:flex-end; color:#fff; font-size:11px; padding-right:6px; font-variant-numeric:tabular-nums; }
+  .lg { display:flex; gap:16px; font-size:11.5px; margin:2px 0 2px; color:var(--muted); } .lg i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px;}
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; } @media(max-width:720px){.grid2{grid-template-columns:1fr;}}
+  .call { background:#eef3ef; border:1px solid #cbe0d1; border-radius:9px; padding:11px 13px; font-size:12.5px; color:#26543b; margin-top:12px; }
+  .call b.big { font-size:15px; }
+  .note { background:#eef1ee; border:1px solid #cdd8cf; border-radius:8px; padding:11px 13px; font-size:12.5px; color:#31453a; margin-top:12px; }
+  .warn { background:#fbf6ec; border-color:#ecdcae; color:#6b5a2e; }
+</style>
+<main>
+<header>
+  <h1>Дуэль фасетов — 13 тем Берёзкина vs нарративный фасет</h1>
+  <p>Эмпирическая проверка: лучше ли data-driven нарративная классификация (16 кластеров / 61 под-тема,
+     из мокапа 41) как <b>фасет традиции</b>, чем рукотворные 13 тем? Две установленные метрики на одном
+     рабочем наборе — уникальный вклад ΔR² (метод мокапа 32) и ареальный сигнал тема×ареал (метод мокапа 23).
+     Репликация точна: ΔR² старых тем = <b>0.125</b>, как в мокапе 32.</p>
+</header>
+
+<div class="card"><div class="kpis">
+  <div class="kpi"><div class="v" id="k_n"></div><div class="l">традиций в наборе (≥15 мотивов)</div></div>
+  <div class="kpi"><div class="v" id="k_p"></div><div class="l">пар традиций</div></div>
+  <div class="kpi"><div class="v" id="k_b"></div><div class="l">базовый R² (ареал+семья+хозяйство)</div></div>
+</div></div>
+
+<div class="card">
+  <h2>Тест A — достаточность фасета <span class="s">— предсказание попарного мотивного Jaccard традиций (мокап 32)</span></h2>
+  <div class="lg"><span><i style="background:var(--old)"></i>13 тем (старое)</span><span><i style="background:var(--new16)"></i>16 кластеров (новое)</span><span><i style="background:var(--new61)"></i>61 под-тема (новое, тонко)</span></div>
+
+  <div class="metric">Уникальный вклад ΔR² <span>— дисперсия, которую объясняет ТОЛЬКО этот фасет поверх {ареал+семья+хозяйство}. Больше = лучше.</span></div>
+  <div id="delta"></div>
+
+  <div class="metric">Остаток (1 − полный R²) <span>— доля структуры традиций, которую фасет НЕ ловит. Меньше = лучше.</span></div>
+  <div id="resid"></div>
+
+  <div class="call" id="subs"></div>
+</div>
+
+<div class="card">
+  <h2>Тест B — ареальный сигнал <span class="s">— насколько тема концентрируется по 12 макро-ареалам (мокап 23)</span></h2>
+  <div class="grid2">
+    <div>
+      <div class="metric">Cramér's V (тема × ареал) <span>— больше = резче</span></div>
+      <div id="cv"></div>
+    </div>
+    <div>
+      <div class="metric">Средняя доля топ-ареала <span>— пик каждой темы</span></div>
+      <div id="share"></div>
+    </div>
+  </div>
+  <div class="note warn" id="bnote"></div>
+</div>
+
+<div class="card note" id="verdict"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA;
+const COL = {theme:"var(--old)", narr:"var(--new16)", sub:"var(--new61)"};
+const CB = ["var(--old)","var(--new16)","var(--new61)"];
+k_n.textContent = D.n_trad; k_p.textContent = D.n_pairs.toLocaleString("ru"); k_b.textContent = D.base_r2.toFixed(3);
+
+function bars(el, items, max, fmt){
+  document.getElementById(el).innerHTML = items.map(it=>
+    `<div class="bar-row"><div class="nm"><i style="background:${it.color}"></i>${it.label}</div>`+
+    `<div class="tr"><div class="bf" style="width:${Math.max(6,100*it.v/max)}%;background:${it.color}">${fmt(it.v)}</div></div></div>`).join("");
+}
+const f3 = v=>v.toFixed(3);
+bars("delta", D.facets.map((f,i)=>({label:f.label, v:f.delta, color:CB[i]})), 0.34, f3);
+bars("resid", D.facets.map((f,i)=>({label:f.label, v:f.residual, color:CB[i]})), 0.70, f3);
+bars("cv", D.testB.map((b,i)=>({label:b.label, v:b.cv, color:CB[i]})), 0.16, f3);
+bars("share", D.testB.map((b,i)=>({label:b.label, v:b.share, color:CB[i]})), 0.36, f3);
+
+document.getElementById("subs").innerHTML =
+  `<b class="big">Субсумция:</b> когда в модели <b>оба</b> фасета, уникальный вклад старых 13 тем падает до `+
+  `<b>${D.subsumption.theme_given_narr.toFixed(3)}</b> (тема почти избыточна), а нарративный сохраняет `+
+  `<b>${D.subsumption.narr_given_theme.toFixed(3)}</b> поверх темы. → Нарративный фасет <b>почти полностью поглощает</b> `+
+  `тематический как дескриптор традиции, но не наоборот.`;
+
+document.getElementById("bnote").innerHTML =
+  `<b>Смешанный результат.</b> По Cramér's V <b>16 кластеров разбавляют</b> ареальный сигнал (${D.testB[1].cv.toFixed(3)} < ${D.testB[0].cv.toFixed(3)}): `+
+  `в рукотворной схеме его несут этиологические темы (космогония), а крупные märchen-кластеры пан-евразийские и `+
+  `географически размыты. Сигнал восстанавливается и превышает старый <b>только на уровне 61 под-темы</b> `+
+  `(${D.testB[2].cv.toFixed(3)}). По концентрации в топ-ареале оба новых уровня острее старого.`;
+
+document.getElementById("verdict").innerHTML =
+  `<b>Вывод.</b> Как <b>дескриптор традиции</b> (тест A) нарративный фасет уверенно выигрывает: ΔR² `+
+  `<b>${D.facets[0].delta.toFixed(3)} → ${D.facets[1].delta.toFixed(3)} → ${D.facets[2].delta.toFixed(3)}</b>, `+
+  `остаток мокапа 32 падает <b>${D.facets[0].residual.toFixed(2)} → ${D.facets[1].residual.toFixed(2)} → ${D.facets[2].residual.toFixed(2)}</b>, `+
+  `и он почти вытесняет тему (субсумция). Как <b>ареальный маркер</b> (тест B) выгода есть только на тонком уровне `+
+  `под-тем — 16 кластеров даже чуть хуже старого. <b>Рекомендация:</b> добавить нарративный фасет (окупается в 32), `+
+  `но <b>не выбрасывать</b> 13 этиологических тем — они несут ареальный сигнал, который крупные нарративные кластеры разбавляют. `+
+  `Схемы ортогональны: «как устроен рассказ» (новое) vs «что объясняет миф» (старое).`;
+</script>

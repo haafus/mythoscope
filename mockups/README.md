@@ -528,6 +528,19 @@ ogre-escape, animal-fable, revenge) that cut **across** the Adventures/Tricks li
 taxonomy is only **0.12**. Limit: content-derived (catalogue phrasing), blind to distribution/depth.
 See [`41-theme-rederivation/README.md`](41-theme-rederivation/README.md).
 
+### 42 · Facet showdown (13 hand themes vs narrative facet)
+Empirical head-to-head: is mockup 41's data-driven narrative classification (16 clusters / 61
+sub-themes) a better **tradition facet** than Berezkin's 13 hand themes? Two established metrics on
+one working set — unique ΔR² (mockup 32) and theme×area signal (mockup 23). Faithful: the hand-theme
+ΔR² reproduces mockup 32's 0.125 exactly.
+**Q.** Does the narrative facet reduce mockup 32's 64% residual and/or sharpen the areal signal?
+**Finding — yes as a descriptor, mixed as an areal marker.** ΔR² 0.125 → **0.191** (16) → **0.321** (61);
+mockup 32's residual falls **0.64 → 0.57 → 0.44**; and the narrative facet nearly **subsumes** the
+theme (its unique Δ with both in the model collapses to **0.003** vs the narrative's 0.069). But the
+areal signal (Cramér's V theme×area) is **diluted** by the coarse 16 clusters (0.102 < 0.125) and only
+recovers at the 61-sub level (0.142). Recommendation: **add** the narrative facet, **keep** the
+etiological themes for geography. See [`42-facet-showdown/README.md`](42-facet-showdown/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
