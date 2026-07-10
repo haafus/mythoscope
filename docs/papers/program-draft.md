@@ -1,5 +1,7 @@
 # A Natural-History Program for Computational Comparative Mythology
 
+*Computational Comparative Mythology — Paper **II of IV · The Program**. Companions: I The Field · III The Machine · IV The Findings — see [README](README.md).*
+
 ### Position, methodology, and roadmap
 
 *Working position/methods draft. It states the *stance*, the *method*, and the *roadmap* of the

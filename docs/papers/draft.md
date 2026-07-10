@@ -13,29 +13,41 @@
 > [`survey-draft.md`](survey-draft.md) = *field survey*. Substantive claims belong to the findings
 > draft; this paper stays on infrastructure and cross-references the rest.
 >
-> **Honest correction to the original framing.** The project's own survey finds that motif *detection
-> from raw text is unsolved* and that embeddings are best used as *retrieval / candidate generation
-> over a curated index*, not as end-to-end induction. Accordingly, the analytical substrate here is the
-> three **curated indices** (Thompson, ATU, Berezkin), embedded at motif granularity (name+definition);
-> the raw-text corpus below serves corpus-overview and embedding-evaluation, not headline motif
-> discovery. Knowledge-graph and RAG components are *tooling directions*, not the central result.
+> **Two tracks, honestly staged.** The project has two genuine ambitions; the original draft's error
+> was to present the second as already *delivering validated results*, not to describe its
+> architecture. **Track 2 — inducing motifs directly from raw multilingual text** is in fact the
+> purpose of the **main codebase**: the whole pipeline `corpus → embeddings → projections → graphs →
+> motifs` (collection & cleaning of source texts, semantic chunking and embedding, dimensionality
+> reduction, knowledge-graph extraction, and alignment to the motif indices), served through the app,
+> is a machine for turning raw corpora into candidate motifs anchored to the curated vocabulary. That
+> machine is **built**; what is *not yet complete* is its validated output — induced motifs at scale —
+> because text motif-detection is hard-to-unsolved field-wide (survey), so we stage it. **Track 1 —
+> distributional analysis over the already-rich curated indices** (Thompson, ATU, Berezkin), embedded
+> at motif granularity: this is the exploratory arc that has *run ahead* and carries every substantive
+> result in the findings draft, using Berezkin's coded areal distributions as the currently-richest
+> substrate. In short: the induction pipeline is the main built infrastructure and the standing goal;
+> the curated-index analysis is where results exist today. Knowledge-graph and RAG components serve
+> both tracks.
 
-# Toward a Computational Framework for Comparative Mythology
+# Inducing and Cross-Indexing Motifs: A Corpus Pipeline and Analysis Bench
 
-**(Motif-Level Embeddings for Comparative Mythology)**
+*Computational Comparative Mythology — Paper **III of IV · The Machine**. Companions: I The Field · II The Program · IV The Findings — see [README](README.md).*
+
+*(formerly "Toward a Computational Framework for Comparative Mythology")*
 
 ## Abstract
 
 This paper presents the **computational infrastructure** for a large-scale, reproducible comparative
-study of world mythology: a pipeline that assembles three standard, expert-curated motif catalogues —
-Thompson's *Motif-Index* (TMI), the Aarne–Thompson–Uther tale-type index (ATU), and Berezkin's areal
-catalogue — into one cross-linked corpus, embeds every motif at the level of its name and definition
-with a multilingual transformer, and exposes the result through a semantic-retrieval layer and a
-series of self-contained analysis prototypes. Rather than attempting end-to-end motif induction from
-raw text — which the field regards as unsolved — we treat embeddings as a **retrieval and
-candidate-generation** layer over the curated indices, validated by recall on a confirmed cross-index
-crosswalk, and use the assembled matrix as the substrate for distributional analysis of motif
-geography and time-depth.
+study of world mythology. The main pipeline — `corpus → embeddings → projections → graphs → motifs`,
+served through an application — collects and cleans multilingual source texts, embeds them at chunk
+granularity, reduces and graphs them, and is built to **induce motifs from raw text** and anchor them
+to three standard, expert-curated catalogues: Thompson's *Motif-Index* (TMI), the
+Aarne–Thompson–Uther tale-type index (ATU), and Berezkin's areal catalogue, unified by a confirmed
+cross-index crosswalk. Because text motif-detection is hard field-wide, we **stage** that induction:
+what is validated so far is the embedding **retrieval** layer (recall against the crosswalk), while
+substantive analysis runs on the already-coded indices — chiefly Berezkin's areal distributions —
+which serve as the currently-richest substrate for the distributional study of motif geography and
+time-depth. Induced-motif output at scale is the standing goal the built pipeline is oriented toward.
 
 Concretely, the framework contributes: a reproducible ingestion-and-crosswalk pipeline off committed
 sources; a 7,274-edge confirmed cross-index link set; motif-level multilingual embeddings with a
@@ -101,15 +113,16 @@ The present study bridges these traditions by introducing a scalable pipeline th
 
 ## 3. Corpus Design and Coverage
 
-> **Two layers.** The project holds two distinct bodies of data, and conflating them was the original
-> draft's central overstatement. **(a) A raw-text corpus** (below): ~28 committed public-domain source
-> texts, used for corpus-overview dashboards and for *evaluating* how best to embed motifs against text
-> — not for headline motif induction. **(b) The analytical substrate**: the three **curated motif
-> indices** (TMI ~46k motifs; ATU ~2,500 tale types; Berezkin ~3,500 motifs over ~1,050 traditions),
-> which carry expert definitions, areal distributions and cross-references. All the distributional
-> analysis in the companion drafts runs on layer (b); layer (a) is supporting infrastructure. The
-> ambition of a much larger multilingual full-text corpus (this section) remains a design target, not
-> a completed asset.
+> **Two data layers, one machine.** The project holds two bodies of data. **(a) A raw-text corpus**
+> (this section): committed public-domain source texts — presently a modest set, scaling toward the
+> broad multilingual corpus described here — fed to the main `corpus → embeddings → projections →
+> graphs → motifs` pipeline whose purpose is to **induce candidate motifs from text** and align them to
+> the indices. **(b) The three curated motif indices** (TMI ~46k motifs; ATU ~2,500 tale types;
+> Berezkin ~3,500 motifs over ~1,050 traditions), which supply the expert vocabulary, areal
+> distributions and cross-references — both as the *anchor* the induction targets and as the *substrate*
+> the distributional analysis runs on today. The companion findings run on (b) because it is already
+> richly coded; the induction over (a) is built infrastructure whose validated output at scale is the
+> pending milestone, not a dropped ambition.
 
 ### 3.1 Design Principles
 
@@ -200,6 +213,14 @@ In sum, the corpus provides a scalable, diverse, and theoretically informed foun
 
 ## 4. Methodology
 
+The steps below are the stages of the main pipeline (`corpus → embeddings → projections → graphs →
+motifs`, exposed via the app's server): collection and cleaning of source texts (§4.1), semantic
+chunking and multilingual embedding (§4.2), dimensionality reduction and projection (§4.3),
+clustering (§4.4), knowledge-graph extraction (§4.5), and retrieval (§4.6). The pipeline's terminal
+stage **aligns induced candidate units to the curated TMI/ATU/Berezkin vocabulary** via the crosswalk,
+so that induction is anchored, not open-vocabulary. This is the induction machine; §5 reports what is
+validated of it so far.
+
 ### 4.1 Text Segmentation and Chunking
 
 Texts were segmented into sentences and overlapping chunks designed to capture coherent narrative units.
@@ -257,6 +278,16 @@ everything in the findings draft.
 The descent/diffusion/convergence decomposition, time-depth from distribution, the datable descent
 minority, facet adequacy, the connectivity gates, and the data-driven theme re-derivation are reported
 in `motif-distribution-draft.md`; the method and assumptions in `program-draft.md`.
+
+### 5.5 Motif induction from text: built, output-validation pending
+
+The induction pipeline (§4) runs end-to-end — texts are collected, chunked, embedded, projected,
+graphed, and aligned to the indices — and its component steps are individually validated (chapter/
+section detection across the source texts; a recall@k / MRR grid settling how to compose a motif
+embedding, mockups 08 and 10; the retrieval layer, §5.1). What remains is the hardest and
+field-unsolved part: validating *induced* motifs at scale against the curated gold, for which strong
+classical baselines must be beaten and human culture-bearers consulted (survey). This is the project's
+principal open milestone, not a discarded aim.
 
 ## 6. Evaluation
 

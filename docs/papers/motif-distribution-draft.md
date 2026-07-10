@@ -1,5 +1,7 @@
 # Geography, Descent, and Genre in the Global Distribution of Folklore Motifs
 
+*Computational Comparative Mythology — Paper **IV of IV · The Findings**. Companions: I The Field · II The Program · III The Machine — see [README](README.md).*
+
 ### A computational re-analysis of a cross-indexed mythological motif corpus
 
 *Working draft — synthesises the MythoScope analysis arc (prototype series `mockups/15–44` and

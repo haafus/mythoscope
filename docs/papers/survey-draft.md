@@ -1,5 +1,7 @@
 # Computational Folkloristics and the Induction of Motifs: A Survey
 
+*Computational Comparative Mythology — Paper **I of IV · The Field**. Companions: II The Program · III The Machine · IV The Findings — see [README](README.md).*
+
 *Working survey draft, assembled from the MythoScope research notes
 (`docs/research/computational-folkloristics-survey.md`, `…-landscape.md`,
 `motif-induction-review.md`, `motif-induction-survey.md`). It reviews others' work; claims that
