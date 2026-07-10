@@ -55,14 +55,22 @@ Orthogonality alone would be a curiosity. What makes it matter is that the two a
 differently when put to work, and the difference is legible when each is used as a facet to describe a
 tradition and predict which motifs it shares with another.
 
-As a descriptor, the data-driven axis wins decisively. Reproducing first the published figure — the
-hand theme's unique contribution to explaining motif similarity, ΔR² = 0.125 — the analysis then
-improves on it: the narrative facet's unique contribution is 0.191 at the 16-cluster resolution and
-0.321 at the 61-sub-theme resolution, shrinking the unexplained share of motif similarity from 64% to
-57% and then to 44% (Figure 8.2). More striking, the narrative axis nearly **subsumes** the etiological
-one: put both facets in the same model, and the hand theme's unique contribution collapses to 0.003
-while the narrative facet retains 0.069. Almost everything the classical themes explain about a
-tradition, the narrative axis already explains, and then some. As a tradition profile it is also more
+The head-to-head runs on the same 910-tradition working set as the facet audit of Chapter 5, and it
+begins by reproducing the hand theme's published unique contribution exactly — ΔR² = 0.125 — so that the
+comparison is on equal footing. On that footing the data-driven axis wins decisively:
+
+| tradition facet | unique ΔR² | residual (1 − full R²) |
+|---|---|---|
+| 13 hand themes | 0.125 | 0.636 |
+| 16 narrative clusters | 0.191 | 0.570 |
+| 61 narrative sub-themes | 0.321 | 0.440 |
+
+The narrative facet shrinks the 64% residual of Chapter 5 to 57% at the coarse resolution and 44% at the
+fine one (Figure 8.2). More striking still is what happens when both facets are placed in the same
+model: the hand theme's unique contribution collapses to **0.003** — nearly redundant — while the
+narrative facet keeps **0.069** on top of the hand theme. The subsumption runs one way only. Almost
+everything the classical themes explain about a tradition, the narrative axis already explains, and then
+some; almost nothing the narrative axis explains is left for the classical themes to add. As a tradition profile it is also more
 geography-orthogonal — macro-area explains 31% of its variance against 38% for the hand profile — and
 it recovers the same cross-continental worldview clusters a comparativist would want to see, a shared
 celestial profile linking the Cherokee, ancient Italy, southeastern Australia, and the Netsilik across
@@ -91,13 +99,16 @@ The deep clusters are overwhelmingly etiological, drawing only 0–32% of their 
 Adventures/Tricks catch-alls; the shallow clusters are märchen, drawing 82–90% from them. Depth and
 narrative kind line up, once the catch-alls are broken open.
 
-The payoff case is the swallowing-monster and body-cosmology complex — the motif family in which a
+The payoff case is the swallowing-monster and vulnerable-body complex — the motif family in which a
 being is swallowed and the world or the body is made from what is inside. It sits *deep*, at a span of
-1.80, and yet 53% of it is built from motifs Berezkin had filed under Adventures and Tricks. The flat
-genre category had buried a genuinely deep cosmological stratum inside a novelistic label, and only
-re-deriving the axis from meaning brought it back to the surface. This is the clearest demonstration in
-the book of why the theme axis had to be checked rather than assumed: a scholar's ordering, however
-reasonable, can hide exactly the stratum a depth analysis is looking for.
+1.80, and yet 53% of it is built from motifs Berezkin had filed under Adventures, Tricks, and Flora. The
+flat genre category had averaged this genuinely deep cosmological stratum together with shallow tales,
+and only re-deriving the axis from meaning pulls it back out. The decomposition makes the point in
+aggregate as well as in this one case: the old flat Adventures category, with a single mega-set span of
+1.59, now fans across narrative clusters spanning 1.43 to 1.96, and the old Tricks, flat at 1.40, fans
+across 1.26 to 1.67 — a spread of antiquity the single number had collapsed. This is the clearest
+demonstration in the book of why the theme axis had to be checked rather than assumed: a scholar's
+ordering, however reasonable, can hide exactly the stratum a depth analysis is looking for.
 
 > **Figure 8.1.** The UMAP re-derivation: motifs embedded, reduced, and clustered into 16 clusters ×
 > 61 sub-themes, coloured by the hand themes for comparison — coherence rises from silhouette −0.03 to
