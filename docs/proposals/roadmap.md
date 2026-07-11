@@ -72,6 +72,16 @@ These two together retire the two alternative hypotheses that caveat almost ever
 everything → **M38 → M39**. Detailed specs follow (the tier headings are a *significance* overlay,
 orthogonal to the number).
 
+**M40 · Recursive layer-peeling (data-driven stratigraphy) — proposed, first probe run.** A core
+method: let the statistics (not a priori Laurasia/Gondwana labels) define the top-level split, extract
+and **date** each block's core as a layer, subtract it, and **recurse** on the residual — a bottom-up
+dated stratigraphy that generalises the per-motif depth score (M17) to whole layers. First-bifurcation
+probe already run: the data-driven top seam is **not** Gondwana/Laurasia but a Western/Central-Eurasian
+block vs the rest — coverage-suspicious, so the gating step is coverage correction (M24 weights) before
+trusting layer 1. Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
+recursion stability) and evidence: [`stratigraphic-peeling.md`](stratigraphic-peeling.md). *data: have ·
+Effort: M · uses M06/M15 biclustering + M17 dating gate + M24 coverage weights.*
+
 ### M32 · Facet adequacy & orthogonality (audits assumption #6) — ✓ done (mockup 32)
 
 **Result.** On 910 traditions carrying all four facets: **not orthogonal** (V(area,family)=0.73,

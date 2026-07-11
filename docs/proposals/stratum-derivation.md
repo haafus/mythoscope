@@ -10,6 +10,12 @@ and its limits, the exact per-motif features, two derivation algorithms (a heuri
 depth index and a phylogenetic model), the mandatory controls, validation, and the
 output schema. Nothing here is built yet.
 
+> Its recursive, corpus-level generalisation is
+> [`stratigraphic-peeling.md`](stratigraphic-peeling.md) — a **data-driven stratigraphy**
+> that lets the statistics define the top-level split, extracts and dates each block's
+> core as a layer, subtracts it, and recurses on the residual. Per-motif depth (this doc)
+> is the dating gate inside that loop.
+
 ## 0. Axioms and hypotheses (the foundation)
 
 Everything downstream — the features (§3), both methods (§6–7), the gate (§12), the
