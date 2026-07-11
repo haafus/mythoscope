@@ -114,6 +114,46 @@ top seam** — from an artefactual Western Europe to a defensible New-World/Old-
 needs the real bias weights (mockup 24) and several rarefaction depths; the qualitative result (effort
 artefact gone, Americas the distinct pole) is already stable across both corrections.
 
+### Recursion to depth 3 — the emergent stratigraphy
+
+Running the peel recursively (coverage-corrected L1+idf, Ward k=2 per node, depth 3) yields a
+geographically and thematically coherent tree, bottom-up, with no imposed labels — and each block's **core**
+(top motifs by lift) reads as its known folklore:
+
+```
+948  ROOT
+├─432  NEW WORLD (Ame323 Eur100)          core: paramour-animal, monster-fight, theft-of-fire
+│   ├─192  deep pan-American cosmology (Ame182)   core: incestuous Moon, rainbow serpent, deluge
+│   │   ├─51   Meso/N-American (buzzard-husband ×15, Moon-rabbit, first sunrise)
+│   │   └─141  S-American/Amazonian (jaguar, sky-of-birds)
+│   └─240  BERINGIAN / circum-Pacific bridge (Ame141 + Eur99)   core: two-sisters, thunderbirds, false-burial
+└─516  OLD WORLD (Eur299 Afr169 Oce46)    core: dragon-slayer, ungrateful-one, strange-son
+    ├─92   Sub-Saharan Africa (Afr91)      core: hyena-fails, death-and-chameleon, demonic-wife
+    └─424  Eurasian-Oceanian märchen (Eur298 Afr78 Oce46)   core: Cinderella, helpful-cow, quest
+        ├─163  Indo-Pacific cosmology (Eur114 + Oce46)   core: brother-sister cosmogony, shed-skin
+        └─261  W-Eurasian + N-African tale belt (Eur184 Afr77)   core: Bremen-animals, averted-incest
+```
+
+**What emerges** — a recognisable genetic-geographic stratigraphy: L1 New/Old World; L2 a **Beringian /
+circum-Pacific bridge** (Americas + N-Eurasia together — Berezkin's deep trans-Beringian signal) and a
+**clean Sub-Saharan Africa** peel; L3 a North/South-America split and the Eurasian märchen dividing into an
+**Indo-Pacific cosmology** cluster (Oceania joins here) and the **Western-Eurasian + North-African ATU tale
+belt** (Bremen musicians, Cinderella).
+
+**Honest gates on this tree:**
+- **Silhouettes are weak** (L1 +0.03, L2 +0.04 / +0.11) → the structure is **clinal** (isolation-by-distance),
+  not crisp modules; peeling imposes hard cuts on a soft gradient. This is consistent with the programme's
+  own "geography is primary, areal" finding — the tree is a useful discretisation, not a claim of sharp
+  blocks.
+- **Singleton / tiny outlier peels** (e.g. an n=1 leaf with lift ×158) are **outliers, not layers**; the
+  subtraction operator needs a minimum block size that routes them aside (guards #4/#5).
+- **The null model (guard #1) is not yet run** — the blocks are geographically coherent (a strong sign they
+  are real, not peel-induced), but not yet permutation-tested.
+- Still L1+idf, not the full mockup-24 bias weights.
+
+Even so, the recursion demonstrates the method's payoff: coverage-corrected peeling reconstructs a plausible,
+interpretable stratigraphy of world mythology from the bare attestation matrix.
+
 ## Roadmap
 
 1. **Run step 0 first — coverage-correct** the matrix (mockup 24 weights) *and* a rarefaction /
