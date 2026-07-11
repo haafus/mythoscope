@@ -15,10 +15,44 @@ def _load_registry() -> dict[str, Any]:
     return _registry
 
 
+def _entry_model(entry: Any) -> str:
+    """The HF id of an embedding entry, which may be a bare string or an object."""
+    return entry["model"] if isinstance(entry, dict) else entry
+
+
+def _find_embedding_entry(name_or_id: str) -> tuple[str, Any]:
+    """(alias, entry) for a name that may be an alias or a HF id, looked up in the
+    visible ``models`` section only (``inactive`` is invisible to code)."""
+    models = _load_registry().get("embedding", {}).get("models", {})
+    if name_or_id in models:
+        return name_or_id, models[name_or_id]
+    for alias, entry in models.items():
+        if _entry_model(entry) == name_or_id:
+            return alias, entry
+    return name_or_id, None
+
+
 def resolve_embedding_model(name: str) -> str:
-    registry = _load_registry()
-    models = registry.get("embedding", {}).get("models", {})
-    return models.get(name, name)
+    _, entry = _find_embedding_entry(name)
+    return _entry_model(entry) if entry is not None else name
+
+
+def embedding_config(name_or_id: str) -> dict[str, Any]:
+    """Normalized per-model embedding config (the argument may be an alias or a HF id
+    passed straight in). Only ``model`` is guaranteed; the rest are optional defaults."""
+    alias, entry = _find_embedding_entry(name_or_id)
+    if entry is None:
+        entry = {"model": name_or_id}
+    elif not isinstance(entry, dict):
+        entry = {"model": entry}
+    return {
+        "alias": alias,
+        "model": entry["model"],
+        "dtype": entry.get("dtype", "auto"),
+        "query_prompt": entry.get("query_prompt", ""),
+        "document_prompt": entry.get("document_prompt", ""),
+        "batch_size": entry.get("batch_size"),
+    }
 
 
 def resolve_llm_provider(name: str) -> dict[str, Any]:
@@ -48,11 +82,13 @@ def list_llm_providers() -> list[str]:
 
 
 def active_embedding_models() -> list[str]:
-    return list(_load_registry().get("embedding", {}).get("models", {}).values())
+    models = _load_registry().get("embedding", {}).get("models", {})
+    return [_entry_model(v) for v in models.values()]
 
 
 def list_embedding_aliases() -> dict[str, str]:
-    return dict(_load_registry().get("embedding", {}).get("models", {}))
+    models = _load_registry().get("embedding", {}).get("models", {})
+    return {k: _entry_model(v) for k, v in models.items()}
 
 
 def model_to_key(model_name: str) -> str:
@@ -62,7 +98,8 @@ def model_to_key(model_name: str) -> str:
 def model_name_for_key(key: str) -> str:
     emb = _load_registry().get("embedding", {})
     for section in ("models", "inactive"):
-        for name in emb.get(section, {}).values():
-            if model_to_key(name) == key:
-                return name
+        for entry in emb.get(section, {}).values():
+            model = _entry_model(entry)
+            if model_to_key(model) == key:
+                return model
     return key

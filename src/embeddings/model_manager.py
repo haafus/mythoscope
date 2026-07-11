@@ -1,15 +1,66 @@
 import gc
 import logging
 import os
+import shutil
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer
 
-from model_registry import resolve_embedding_model
+from model_registry import embedding_config
+from settings import settings
 
 logger = logging.getLogger(__name__)
+
+ST_OVERRIDES = settings.config_dir / "st_overrides"
+
+_DTYPES = {
+    "float32": torch.float32, "fp32": torch.float32,
+    "float16": torch.float16, "fp16": torch.float16,
+    "bfloat16": torch.bfloat16, "bf16": torch.bfloat16,
+}
+
+
+def _resolve_dtype(dtype_cfg: str | None) -> torch.dtype | None:
+    """Torch dtype to load in. ``None`` means leave the default (fp32). ``auto`` picks
+    bf16/fp16 on GPU (never on CPU, where low precision is not faster)."""
+    if dtype_cfg and dtype_cfg != "auto":
+        return _DTYPES.get(dtype_cfg.lower())
+    if torch.cuda.is_available():
+        return torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+    return None
+
+
+def _prepare_snapshot(alias: str, hf_id: str) -> str:
+    """Ensure the model is on disk and, if it ships no sentence-transformers config of
+    its own, inject the vendored ST scaffolding from ``config/st_overrides/<alias>/``
+    (last-token pooling + normalize) so it is not loaded with the wrong default pooling."""
+    from huggingface_hub import snapshot_download
+
+    try:  # cache first — no network when the model is already downloaded
+        local = Path(snapshot_download(hf_id, local_files_only=True))
+    except Exception:
+        logger.info(f"Model '{hf_id}' not fully cached; fetching from the hub")
+        local = Path(snapshot_download(hf_id))
+    if (local / "modules.json").exists():
+        return str(local)
+
+    override = ST_OVERRIDES / alias
+    if override.exists():
+        for f in override.rglob("*"):
+            if f.is_file() and f.name != "README.md":
+                dst = local / f.relative_to(override)
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(f, dst)
+        logger.info(f"Injected ST config overrides for '{alias}' from {override}")
+    else:
+        logger.warning(
+            f"ST overrides expected for '{alias}' (no native ST config) but not found "
+            f"at {override}; loading as-is (pooling may be wrong)"
+        )
+    return str(local)
 
 
 def _memory_info(device: str) -> str:
@@ -30,30 +81,29 @@ def _memory_info(device: str) -> str:
 class EmbeddingEncoder:
     def __init__(self) -> None:
         self.model_name: str | None = None
+        self.config: dict[str, Any] | None = None
         self._model: Any = None
 
     def load(self, model_name: str) -> None:
-        model_name = resolve_embedding_model(model_name)
+        cfg = embedding_config(model_name)
+        hf_id = cfg["model"]
 
-        if self._model is not None and self.model_name == model_name:
+        if self._model is not None and self.model_name == hf_id:
             return
 
         self.unload()
-        logger.info(f"Loading model '{model_name}' into device...")
-        self._model = self._load_model(model_name)
-        self.model_name = model_name
+        dtype = _resolve_dtype(cfg["dtype"])
+        local = _prepare_snapshot(cfg["alias"], hf_id)
+        logger.info(f"Loading model '{hf_id}' (dtype={dtype or 'float32'}) into device...")
+        kwargs: dict[str, Any] = {"trust_remote_code": True}
+        if dtype is not None:
+            kwargs["model_kwargs"] = {"torch_dtype": dtype}
+        self._model = SentenceTransformer(local, **kwargs)
+        self.model_name = hf_id
+        self.config = cfg
         device = str(self._model.device)
         mem = _memory_info(device)
-        logger.info(f"Model '{model_name}' loaded on {device}{f' ({mem})' if mem else ''}.")
-
-    @staticmethod
-    def _load_model(model_name: str) -> Any:
-        # Use the cache first to avoid a network hang offline; download only if missing.
-        try:
-            return SentenceTransformer(model_name, trust_remote_code=True, local_files_only=True)
-        except OSError:
-            logger.info(f"Model '{model_name}' not in local cache; fetching from the hub")
-            return SentenceTransformer(model_name, trust_remote_code=True)
+        logger.info(f"Model '{hf_id}' loaded on {device}{f' ({mem})' if mem else ''}.")
 
     def encode(self, texts: list[str], **kwargs) -> np.ndarray:
         if self._model is None:
@@ -77,6 +127,7 @@ class EmbeddingEncoder:
         logger.info(f"Unloading model from {device}...")
         self._model = None
         self.model_name = None
+        self.config = None
         gc.collect()
         if device.startswith("cuda"):
             torch.cuda.empty_cache()
