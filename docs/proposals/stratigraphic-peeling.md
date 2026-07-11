@@ -328,6 +328,45 @@ contrast between the two spaces is itself a small but real finding.
 > "geography is primary, areal" thesis, and it is *why* clustering here imposes cuts rather than finding
 > them.
 
+### Two worldview derivations compared — confirmatory (13) vs exploratory (16)
+
+The worldview peel is run in **two independent genre-profile spaces** (mockup 45, tabs *Theme (13)* and
+*Narrative (16)*): Berezkin's **13 hand-labelled etiological themes**, and mockup 41's **16 data-driven
+narrative-form clusters** (BGE-M3 embeddings of motif name+definition → KMeans; *zero* cosmology labels).
+Measured head-to-head over the 8-leaf partitions:
+
+| Criterion | Theme (13) | Narrative (16) | Better |
+|---|--:|--:|:--:|
+| Global 8-leaf silhouette (own CLR space) | +0.059 | +0.065 | ≈ tie |
+| Split silhouette — top / mean | 0.139 / 0.166 | 0.145 / **0.196** | Narrative (steadier; no 0.09 dip) |
+| Top-split cosmology-share gap | **0.30** | 0.19 | Theme |
+| Top-split M17 gap | **47.2** | 27.7 | Theme |
+| Depth ladder — leaf M17 range / std | **82.4 / 28.6** | 74.1 / 25.9 | Theme |
+| young→deep coherence — r(leaf a-share, leaf M17) | **+0.878** | +0.767 | Theme |
+| Leaf-size balance (max/min) | 15.5× | **11.6×** | Narrative |
+| Mutual agreement of the two trees | ARI **0.06** · AMI 0.16 · V 0.17 | — | (low → complementary) |
+| Orthogonality to geography | ARI 0.13 · V 0.24 | ARI 0.16 · V 0.15 | both orthogonal |
+
+**Reading.** *Theme (13)* is the better **confirmatory** stratigraphy: sharpest top cut (cosmology-share gap
+0.30 vs 0.19, depth gap 47 vs 28), widest monotone depth ladder (down to M17 = 87 — the *primeval-tree /
+mankind-from-tree* anthropogonic leaf), tightest cosmology↔depth coupling (r = 0.88). But this is *partly
+circular*: Berezkin's axes were designed around exactly the cosmology-vs-tale distinction, and M17 depth
+correlates with cosmology, so the theme axis wins on a signal it was built for.
+
+*Narrative (16)* is the better **exploratory** stratigraphy: modularity is higher and *steadier* at depth
+(mean split silhouette 0.196 vs 0.166, no degenerate split), leaves are more balanced, and it surfaces
+structure the theme axis **cannot represent** (its dimensions *are* the cosmology themes): off-diagonal
+leaves such as *Sun & Moon myths* (a-share 0.33 but M17 = 57 — an African/American swallower-trickster layer
+deep by disjunction, not by cosmology-share), and a **form-based trickster/dupe stratum** that stitches the
+North-American trickster cycle to the Old-World animal fable across the New/Old-World line.
+
+**The strongest single result is not either tree winning — it is their agreement on the coarse polarity
+despite ARI = 0.06 at the leaf level.** A bottom-up narrative axis built with *no* cosmology labels
+independently reproduces the same young-tale → deep-cosmogony top split as Berezkin's hand-labelled themes.
+That makes the polarity a **property of the data, not an artefact of Berezkin's design** — which was the
+entire point of adding the second axis. The two are complementary, not redundant: theme for a clean dated
+ladder, narrative for discovering strata (form-based, off-diagonal) that the labelled axis fragments.
+
 *Status: proposal + probes + recommendation + mockup 45 (two dated soft-factor models). Value delivered:
 a visualisation and a clean negative result (clinal → no discrete strata). No new scientific finding;
 production wiring (real M38 output, calibrated M17/clade ages, external validation) remains — and would be

@@ -97,6 +97,31 @@ discrete layers** — so a worldview space is the one where a recursive *dated* 
 strata (young märchen → deep cosmology) rather than discretising a gradient. That both the hand-labelled
 (13-dim) and the bottom-up embedding (16-dim) derivations recover it is the robustness check.
 
+### Which worldview tab worked better — confirmatory (13) vs exploratory (16)
+
+Measured head-to-head over the two 8-leaf partitions:
+
+| | Theme (13) | Narrative (16) |
+|---|--:|--:|
+| Global 8-leaf silhouette | +0.059 | +0.065 |
+| Split silhouette, top / mean | 0.139 / 0.166 | 0.145 / **0.196** |
+| Top-split cosmology-share gap | **0.30** | 0.19 |
+| Top-split M17 gap | **47** | 28 |
+| Leaf M17 range (depth ladder) | **82** (to M17 87) | 74 |
+| r(leaf a-share, leaf M17) | **+0.88** | +0.77 |
+| Agreement of the two trees | ARI **0.06** · V 0.17 | — |
+
+- **Theme (13) — better *confirmatory* ladder:** sharpest young/deep cut, widest monotone depth range
+  (down to the anthropogonic *primeval-tree* leaf at M17 = 87), tightest cosmology↔depth coupling. But it
+  *wins on the axis it was designed for* (Berezkin's themes = the cosmology-vs-tale distinction), so it's
+  partly circular.
+- **Narrative (16) — better *exploratory* stratigraphy:** steadier modularity at depth, more balanced
+  leaves, and it surfaces structure the theme axis can't represent — off-diagonal leaves (*Sun & Moon myths*:
+  a-share 0.33 yet M17 = 57) and a **form-based trickster/dupe stratum** crossing the New/Old-World line.
+- **The real result is their agreement on the coarse polarity at ARI = 0.06** — a bottom-up axis with *no*
+  cosmology labels reproduces the same young→deep top split as the hand-labelled one, so the polarity is a
+  property of the data, not of Berezkin's design. Complementary, not redundant.
+
 ## Agreement with Berezkin's own partition
 
 The hard-layer map is the only prototype that shows a single coverage-corrected **nested** areal partition
