@@ -95,6 +95,49 @@ prefaces).
 | 5 LLM / classifier | high | high | medium | ✗ | ✓ | yes |
 | 6 Embedding outliers | medium | medium | low | ✗ | ✓ | yes |
 
+## Empirical validation on the corpus
+
+The two deterministic methods (3 auto markers and 4 stylometric cues) were run over the actual 28-text
+corpus (`config/corpus.json` texts, cleaned with `clean_gutenberg_in_builder`). Method A = the editorial
+heading denylist (`INTRODUCTION|PREFACE|CONTENTS|NOTES|APPENDIX|INDEX|GLOSSARY|…`); Method B = editorial
+cue density (`[12]` footnote refs, `cf./ibid./op. cit.`, modern years `1600–1999`, meta-language "this
+translation"/"the reader") measured per decile, expecting a **U-shape** (outer deciles ≫ middle) when
+editorial matter sits at the front/back.
+
+| Measure | Result |
+|---|---|
+| Front-matter heading detected | **25 / 28** |
+| Back-matter heading detected | **15 / 28** |
+| Body fully clean (zero cues in middle deciles) | **10 / 28** |
+| U-shaped cue profile (outer/middle > 1) | **14 / 18** measurable |
+| Outer/middle cue-density ratio | median **4.20**, mean **13.62** |
+
+**Where it works.** Clean translations with separated apparatus are handled almost perfectly: 10 texts
+have a completely cue-free body, with editorial matter strictly at the edges — *Odyssey* ×39, *Ramayan*
+×80, *Kalevala* ×44, *West African Folk-Tales* ×27, *Te Tohunga* ×18. The heading anchor and the cue
+profile agree: cut the edges, keep the body. Plain scripture with no apparatus (King James, Dhammapada,
+Tao Teh King, Bhagavad Gita, Upanishads, Analects) is equally safe — nothing to strip, and the methods
+strip nothing.
+
+**Where it fails.**
+
+- **Annotated critical editions** are the main failure mode: scholarly notes are interleaved line-by-line,
+  so the U-shape collapses. *Poetic Edda* — 89 headings, ratio **0.78** (the denylist over-fires because
+  "NOTES" is a per-poem heading, so heading position cannot define a single front/back boundary);
+  *Beowulf* — ratio **0.86**, cues in every decile (`[6,12,11,10,13,10,14,12,9,13]`); *Nibelungenlied*
+  **0.62**; *Koran* **1.40** (barely U-shaped). These are exactly the texts a boundary cut cannot handle.
+- **Mid-document editorial headings**: *Mahabharata* (9 headings) and *Ramayan* carry structural book/parva
+  titles resembling editorial sections, which naive "cut before first / after last heading" logic would
+  mistake for boundaries.
+
+**What this validates.** The layered conclusion below is confirmed by the numbers, and confirmed in the
+specific way it claims: Method A is a reliable **front-matter anchor** (25/28) but weaker on back matter
+(15/28) and must be guarded by an "is the heading near an edge?" check (or it over-fires on the Edda).
+Method B is not itself a cutter but an excellent **validator/flagger**: it confirms a clean body (10/28
+perfect) and, more usefully, flags the ~4 annotated editions where positional cutting is unsafe and
+per-text or LLM handling is required. Neither method alone covers the corpus; ~2/3 clean automatically,
+and the annotated remainder needs the curated/LLM layer — as the hybrid prescribes.
+
 ## Conclusion — a layered hybrid
 
 For this project (small curated corpus, reproducibility matters, an existing per-text clean hook, but a
