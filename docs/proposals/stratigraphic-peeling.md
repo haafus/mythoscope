@@ -367,6 +367,36 @@ That makes the polarity a **property of the data, not an artefact of Berezkin's 
 entire point of adding the second axis. The two are complementary, not redundant: theme for a clean dated
 ladder, narrative for discovering strata (form-based, off-diagonal) that the labelled axis fragments.
 
+### Borrowing from population genetics, fluid dynamics, climate science (mockup 46)
+
+The soft-factor picture is structurally an **admixture** model, so the material invites the population-genetics
+toolkit — and it is not a metaphor: on the raw matrix, **isolation-by-distance is real** (Mantel r = +0.42,
+p = 0.003) and **areal differentiation is moderate** (AMOVA F<sub>st</sub> ≈ 0.059, p = 0.003 — about human
+sub-continental scale). Honest triage of the three analogies the material suggests:
+
+- **Population genetics — the real match.** ADMIXTURE/STRUCTURE (Bernoulli likelihood + CV-selected K) is a
+  principled upgrade of NMF/M38 with uncertainty; **f3/f4** give formal admixture tests; **TreeMix /
+  admixture graphs** fit tree + reticulation (the residual measures non-treeness — our clinal case);
+  **EEMS** turns isolation-by-distance into a barrier/corridor migration surface; **AMOVA/F<sub>st</sub>**
+  replace eyeballed silhouettes with permutation p-values. *Limit:* the drift null is analogical (horizontal,
+  biased transmission; no recombination), and there is **no admixture-LD clock** — dating stays the M17
+  disjunction proxy. Because our geography is reticulate/clinal, the reticulation-aware half of the toolkit
+  (EEMS, f-stats, admixture graphs) fits better than the tree-based folklore-phylogenetics (d'Huy, Tehrani,
+  Berezkin) already in the literature.
+- **Fluid dynamics — mostly metaphor.** Full Navier–Stokes has no cultural analog; only the scalar
+  diffusion/advection subset maps — a **diffusion equation as a spatial null** for single-motif spread
+  (deviations = long-range jumps vs local spread), which the genetics migration-surface realises more
+  rigorously. No time axis kills DMD.
+- **Climate/ocean — the statistics transfer, the physics does not.** GCMs are inapplicable, but
+  **teleconnection networks** (long-range motif correlation after distance-detrending) operationalise the
+  deep disjunct substrate; **EOF/rotated-EOF** and **kriging/GP** give cleaner spatial modes and smooth motif
+  surfaces; **sea-route (least-cost) distances** could improve the isolation-by-distance fit for the Pacific.
+
+**mockup 46 (migration-surface)** implements the cheapest high-value slice: the Mantel test, AMOVA/F<sub>st</sub>
+with pairwise-area matrix, and an EEMS-lite effective-migration surface + bridge network. It confirms the
+clinal + moderate-areal picture with significance and renders it as a barrier/corridor map — added **rigour +
+visualisation**, not a new discovery.
+
 *Status: proposal + probes + recommendation + mockup 45 (two dated soft-factor models). Value delivered:
 a visualisation and a clean negative result (clinal → no discrete strata). No new scientific finding;
 production wiring (real M38 output, calibrated M17/clade ages, external validation) remains — and would be

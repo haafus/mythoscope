@@ -1,0 +1,190 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>46 · Migration surface</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --barrier:#c0603f; --corridor:#2f7fb0; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1000px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 10px; letter-spacing:.01em; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
+  .grid3 { display:grid; grid-template-columns:1.15fr 1fr; gap:14px; align-items:start; }
+  @media (max-width:820px){ .grid2,.grid3 { grid-template-columns:1fr; } }
+  .stat { display:flex; align-items:baseline; gap:10px; margin:2px 0 6px; }
+  .stat .big { font-size:30px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .u { color:var(--muted); font-size:12px; }
+  .pill { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; background:#eef3ee; color:#3a6b4a; border:1px solid #d8e6d8; }
+  .toolbar { display:flex; gap:14px; align-items:center; margin:0 0 10px; flex-wrap:wrap; }
+  label.ck { font-size:12.5px; color:#495057; display:inline-flex; gap:6px; align-items:center; cursor:pointer; }
+  .legend { display:flex; gap:14px; align-items:center; font-size:11.5px; color:var(--muted); margin-top:8px; flex-wrap:wrap; }
+  .sw { display:inline-block; width:26px; height:11px; border-radius:3px; vertical-align:middle; margin-right:5px; }
+  table.pw { border-collapse:collapse; font-size:11px; }
+  table.pw td { width:15px; height:15px; padding:0; }
+  table.pw td.lab { width:auto; height:auto; padding:2px 6px; color:#495057; white-space:nowrap; text-align:right; font-size:10.5px; }
+  table.pw td.top { text-align:center; vertical-align:bottom; }
+  table.pw td.top div { writing-mode:vertical-rl; transform:rotate(180deg); font-size:10px; color:#495057; height:74px; }
+  .kv { font-size:12px; } .kv b { font-variant-numeric:tabular-nums; }
+  h3 { font-size:12px; margin:14px 0 5px; color:#3a444b; text-transform:uppercase; letter-spacing:.04em; }
+  .list { font-size:12px; } .list div { padding:2px 0; border-bottom:1px solid var(--line); display:flex; gap:8px; }
+  .list .v { font-variant-numeric:tabular-nums; width:52px; color:#495057; }
+  .bar { display:flex; align-items:center; gap:8px; margin:3px 0; font-size:12px; }
+  .bar .lab { width:78px; color:#495057; } .bar .track { flex:1; background:var(--bg); border-radius:5px; height:13px; overflow:hidden; }
+  .bar .fill { display:block; height:100%; border-radius:5px; min-width:2px; } .bar .vv { width:44px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+</style>
+
+<main>
+<header>
+  <h1>46 · Migration surface</h1>
+  <p>The tradition × motif matrix read as a <b>landscape-genetics</b> dataset. <b>Isolation-by-distance</b>
+  (Mantel) and an <b>AMOVA / Fst</b> variance-partition quantify how areal the material is; an <b>EEMS-lite
+  effective-migration surface</b> maps where motif similarity decays faster than distance predicts
+  (<span style="color:var(--barrier)"><b>barriers</b></span>) or slower (<span style="color:var(--corridor)"><b>corridors</b></span>),
+  with the strongest long-range <b>bridges</b> drawn as edges. A descriptive re-encoding — cultural transmission
+  is horizontal and biased, so the drift null is analogical, not demographic.</p>
+</header>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Isolation by distance <span class="muted">— Mantel test</span></h2>
+    <div class="stat"><span class="big" id="mr"></span><span class="u">Pearson r · motif-dissimilarity vs geographic distance</span></div>
+    <div id="mp"></div>
+    <h3>Distance-decay curve</h3>
+    <div id="decay"></div>
+    <p class="muted">A smooth rise to a plateau (no step) is the signature of a <b>clinal</b> continuum — the same isolation-by-distance seen in landscape genetics.</p>
+  </div>
+  <div class="card">
+    <h2>Areal differentiation <span class="muted">— AMOVA / F<sub>st</sub></span></h2>
+    <div class="stat"><span class="big" id="fst"></span><span class="u">F<sub>st</sub>-analog across <span id="nareas"></span> macro-areas</span></div>
+    <div id="fstp"></div>
+    <h3>Mean Jaccard dissimilarity</h3>
+    <div class="bar"><span class="lab">within-area</span><span class="track"><span class="fill" id="bw" style="background:#6f9a5a"></span></span><span class="vv" id="vw"></span></div>
+    <div class="bar"><span class="lab">between-area</span><span class="track"><span class="fill" id="bb" style="background:#b45c4b"></span></span><span class="vv" id="vb"></span></div>
+    <p class="muted">F<sub>st</sub> ≈ 0.06 = moderate structure: most motif variance sits <b>within</b> areas. For scale, human continental F<sub>st</sub> ≈ 0.10–0.15, sub-continental ≈ 0.01–0.03.</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Effective-migration surface <span class="muted">— EEMS-lite (IBD residual mapped in space)</span></h2>
+  <div class="toolbar">
+    <label class="ck"><input type="checkbox" id="ckBridges" checked> long-range bridges</label>
+    <label class="ck"><input type="checkbox" id="ckPoints"> tradition points</label>
+    <span class="muted" id="mapstat"></span>
+  </div>
+  <div id="map"></div>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--barrier)"></span>barrier — more dissimilar than distance predicts (low effective migration)</span>
+    <span><span class="sw" style="background:var(--corridor)"></span>corridor — more similar than distance predicts (high effective migration)</span>
+    <span><span class="sw" style="background:#2f8f83;height:3px"></span>bridge — strongest long-range similarity</span>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <h2>Pairwise area F<sub>st</sub></h2>
+    <div id="heat"></div>
+    <p class="muted" style="margin-top:8px">Darker = more differentiated. The pale Eurasian block (SW/C-Asia–India · W-Europe · Tibet/SE-Asia) is the low-F<sub>st</sub> märchen corridor; the New-World and N&amp;E-Europe rows are the most isolated.</p>
+  </div>
+  <div class="card">
+    <h2>Strongest bridges <span class="muted">— long-range corridors</span></h2>
+    <div class="list" id="bridges"></div>
+    <p class="muted" style="margin-top:8px">Surprising similarity at distance — the recognisable diffusion corridors: the Indo-European / Eurasian tale belt, the trans-Saharan link, and the Austronesian reach within Oceania.</p>
+  </div>
+</div>
+
+<p class="muted" id="foot"></p>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D=window.DATA, esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LAND=`<path class="land" d="${window.LAND||""}"/>`;
+const SHORT={"NORTHERN AND EASTERN EUROPE":"N&E Europe","WESTERN EUROPE, NORTH AFRICA":"W-Europe/N-Afr",
+ "SOUTHWEST AND CENTRAL ASIA, ARYAN INDIA":"SW/C-Asia·India","TIBET, NON-ARYAN SOUTH ASIA, SOUTHEAST ASIA":"Tibet/SE-Asia",
+ "EAST ASIA":"East Asia","SIBERIA – MONGOLIA":"Siberia–Mongolia","BERINGIA":"Beringia","OCEANIA":"Oceania",
+ "Sub-Saharan Africa":"Sub-Sah. Africa","NORTH AMERICA: NORTH AND WEST":"N America","PLAINS AND SOUTHEAST":"Plains/SE",
+ "MEXICO – CENTRAL ANDES":"Meso/Andes","EASTERN SOUTH AMERICA":"E-S America","SOUTHERN SOUTH AMERICA":"S Cone"};
+const sh=a=>SHORT[a]||a;
+document.getElementById("foot").textContent=D.note;
+
+// ---- stat cards ----
+document.getElementById("mr").textContent="+"+D.mantel.r.toFixed(3);
+document.getElementById("mp").innerHTML=`<span class="pill">p = ${D.mantel.p} · ${D.mantel.perm} permutations</span> <span class="muted">${D.n_pairs.toLocaleString()} pairs</span>`;
+document.getElementById("fst").textContent=D.fst.value.toFixed(3);
+document.getElementById("nareas").textContent=D.fst.n_areas;
+document.getElementById("fstp").innerHTML=`<span class="pill">p = ${D.fst.p} · ${D.mantel.perm} permutations</span>`;
+document.getElementById("vw").textContent=D.fst.within; document.getElementById("vb").textContent=D.fst.between;
+document.getElementById("bw").style.width=(100*D.fst.within/D.fst.between).toFixed(1)+"%";
+document.getElementById("bb").style.width="100%";
+
+// ---- decay curve ----
+(function(){
+  const W=300,H=120,pl=34,pb=20,pt=8,pr=6;
+  const xs=D.decay.map(d=>d.km), ys=D.decay.map(d=>d.dissim);
+  const xmax=Math.max(...xs), ymin=Math.min(...ys), ymax=Math.max(...ys);
+  const X=v=>pl+(W-pl-pr)*v/xmax, Y=v=>pt+(H-pt-pb)*(1-(v-ymin)/(ymax-ymin+1e-9));
+  const path=D.decay.map((d,i)=>(i?"L":"M")+X(d.km).toFixed(1)+" "+Y(d.dissim).toFixed(1)).join("");
+  const yt=[ymin,(ymin+ymax)/2,ymax].map(v=>`<text x="2" y="${(Y(v)+3).toFixed(1)}" font-size="9" fill="#9aa">${v.toFixed(2)}</text>`).join("");
+  const xt=[0,5000,10000,15000,20000].filter(v=>v<=xmax).map(v=>`<text x="${X(v).toFixed(1)}" y="${H-6}" font-size="9" fill="#9aa" text-anchor="middle">${v/1000}k</text>`).join("");
+  document.getElementById("decay").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    <line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#e0dccf"/><line x1="${pl}" y1="${pt}" x2="${pl}" y2="${H-pb}" stroke="#e0dccf"/>
+    ${yt}${xt}<path d="${path}" fill="none" stroke="#4f7096" stroke-width="2"/>
+    <text x="${(W)/2}" y="${H-1}" font-size="9" fill="#9aa" text-anchor="middle">geographic distance (km)</text></svg>`;
+})();
+
+// ---- map ----
+const dcolor=t=>{ const c=t>=0?[192,96,63]:[47,127,176]; const a=(0.12+0.6*Math.abs(t)).toFixed(2);
+  return `rgba(${c[0]},${c[1]},${c[2]},${a})`; };
+function drawMap(){
+  const cells=D.cells.map(c=>`<rect x="${(c.lon+180-1.5).toFixed(1)}" y="${(90-c.lat-1.5).toFixed(1)}" width="3" height="3" fill="${dcolor(c.t)}"><title>${c.t>0?"barrier":"corridor"} ${c.t.toFixed(2)} (n=${c.n})</title></rect>`).join("");
+  let br="";
+  if(document.getElementById("ckBridges").checked){
+    br=D.edges.filter(e=>Math.abs(e.lon1-e.lon2)<180).slice(0,16).map(e=>{
+      const w=(0.3+2.0*Math.min(1,Math.abs(e.resid)/0.28)).toFixed(2);
+      return `<line x1="${(e.lon1+180).toFixed(1)}" y1="${(90-e.lat1).toFixed(1)}" x2="${(e.lon2+180).toFixed(1)}" y2="${(90-e.lat2).toFixed(1)}" stroke="#2f8f83" stroke-width="${w}" stroke-opacity="0.6" stroke-linecap="round"><title>${esc(sh(e.a))} ↔ ${esc(sh(e.b))} · ${e.km}km · resid ${e.resid}</title></line>`;}).join("");
+  }
+  let pts="";
+  if(document.getElementById("ckPoints").checked){
+    pts=D.points.map(p=>`<circle cx="${(p.lon+180).toFixed(1)}" cy="${(90-p.lat).toFixed(1)}" r="0.8" fill="${dcolor(p.t)}" fill-opacity="0.9"><title>${esc(p.name)} — ${esc(sh(p.macro))}</title></circle>`).join("");
+  }
+  document.getElementById("map").innerHTML=`<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${cells}${br}${pts}</svg>`;
+  const nb=D.cells.filter(c=>c.t>0.4).length, nc=D.cells.filter(c=>c.t<-0.4).length;
+  document.getElementById("mapstat").textContent=`${D.cells.length} cells · ${nb} strong barriers · ${nc} strong corridors · ${D.edges.length} bridges`;
+}
+document.getElementById("ckBridges").onchange=drawMap;
+document.getElementById("ckPoints").onchange=drawMap;
+drawMap();
+
+// ---- pairwise Fst heatmap ----
+(function(){
+  const pw=D.pairwise_fst, areas=[...new Set(pw.flatMap(x=>[x.a,x.b]))];
+  const mean={}; areas.forEach(a=>mean[a]=0); let cnt={}; areas.forEach(a=>cnt[a]=0);
+  pw.forEach(x=>{mean[x.a]+=x.fst;mean[x.b]+=x.fst;cnt[x.a]++;cnt[x.b]++;});
+  const ord=areas.slice().sort((a,b)=>(mean[b]/cnt[b])-(mean[a]/cnt[a]));
+  const M={}; pw.forEach(x=>{M[x.a+"|"+x.b]=x.fst;M[x.b+"|"+x.a]=x.fst;});
+  const fmax=Math.max(...pw.map(x=>x.fst)), fmin=Math.min(...pw.map(x=>x.fst));
+  const col=v=>{const t=(v-fmin)/(fmax-fmin+1e-9);   // pale=low Fst (corridor) .. dark=high Fst (isolated)
+    return `rgb(${Math.round(245-165*t)},${Math.round(238-150*t)},${Math.round(225-120*t)})`;};
+  let html='<table class="pw"><tr><td class="lab"></td>'+ord.map(a=>`<td class="top"><div>${esc(sh(a))}</div></td>`).join("")+'</tr>';
+  ord.forEach(a=>{
+    html+=`<tr><td class="lab">${esc(sh(a))}</td>`+ord.map(b=>{
+      if(a===b) return `<td style="background:#efe9dc"></td>`;
+      const v=M[a+"|"+b]; return `<td style="background:${col(v)}" title="${esc(sh(a))} × ${esc(sh(b))}: Fst ${v.toFixed(3)}"></td>`;
+    }).join("")+"</tr>";
+  });
+  html+="</table>";
+  document.getElementById("heat").innerHTML=html;
+})();
+
+// ---- bridges list ----
+document.getElementById("bridges").innerHTML=D.edges.slice(0,12).map(e=>
+  `<div><span class="v">${e.resid.toFixed(3)}</span><span>${esc(sh(e.a))} ↔ ${esc(sh(e.b))} <span class="muted">· ${e.km}km</span></span></div>`).join("");
+</script>

@@ -577,6 +577,17 @@ permutation null floors everywhere: the structure is **clinal, not modular** —
 so soft factors are shown as the honest layer model. See
 [`45-stratigraphic-peeling/README.md`](45-stratigraphic-peeling/README.md).
 
+### 46 · Migration surface
+The tradition × motif matrix read as a **landscape-genetics** dataset (the population-genetics angle from
+the peeling discussion). **Isolation-by-distance** (Mantel r = +0.42, p = 0.003) and **AMOVA / F<sub>st</sub>**
+(0.059, p = 0.003, ~human sub-continental) quantify the clinal areal structure; an **EEMS-lite
+effective-migration surface** maps barriers (American/African/Australian peripheries) vs corridors (the
+Eurasian belt), with the strongest long-range **bridges** — the Indo-European tale belt, trans-Saharan link,
+Austronesian reach. **Q.** Do genetics tools (admixture-adjacent) add rigour/structure over mockup 45?
+**Finding.** They confirm the clinal + moderate-areal picture with permutation p-values and turn it into a
+barrier/corridor map + bridge network — descriptive, not demographic (no admixture-LD clock; dating stays
+M17). See [`46-migration-surface/README.md`](46-migration-surface/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
