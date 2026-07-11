@@ -4,9 +4,17 @@ Static renders of the analysis prototypes, screenshotted from the committed `moc
 (with their committed `data.js`) via headless Chromium. Every figure shows real data matching the
 numbers in the chapters.
 
-**Status: draft renders.** Two production steps remain: (1) the prototype UI is in **Russian** — for the
-English book each figure should be re-rendered from an English build or captioned in English; (2) these
-are full-window captures (1400×1750) and several need **cropping** to the relevant panel.
+**Status.** The interactive prototypes are authored in Russian; these renders translate them to English.
+- **Fully English (UI + data): 19 figures** — fig-4-3, 5-3, 5-4a, 5-5, 6-1, 6-2, 6-3-6-4, 6-5, 6-6, 6-7,
+  6-8, 7-1, 7-2, 7-3, 7-4, 9-3, plus the manual 5-1-5-2 — and the 5 conceptual diagrams. These carry
+  English motif names (from `berezkin.json`) and are book-ready (modulo cropping).
+- **English UI, residual Russian in the DATA LAYER: 8 figures** — fig-4-1 (01), fig-4-2 (04),
+  fig-9-1 (40): individual Berezkin motif *names*; fig-8-1 (41), fig-8-3 (43), fig-8-4 (44): theme /
+  narrative-cluster names; fig-5-4b (25), fig-8-2 (42): a few legend labels. These come from each
+  mockup's `data.js` (not the UI), so the final fix is to remap the Berezkin names to their English
+  `berezkin.json` equivalents (by motif id) and translate the fixed theme/cluster label set, then
+  re-render. Tracked as a remaining production step.
+- All are full-window captures and several need **cropping** to the relevant panel for final layout.
 
 | File | Prototype | Figure(s) | Chapter |
 |---|---|---|---|
