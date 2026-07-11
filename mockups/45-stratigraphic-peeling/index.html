@@ -53,15 +53,17 @@
   <p>A coverage-corrected recursive peel of the Berezkin attestation matrix into nested <b>layers</b>,
   with each layer's geography, motif core, a breadth-based <b>dating proxy</b> and <b>bootstrap stability</b>.
   The structure is <b>clinal</b> (isolation-by-distance), so the tree is a <i>discretisation of a continuum</i>,
-  not discrete strata — hence the parallel <b>soft factors</b> (an M38-style effort-corrected Poisson
-  factorisation), each <b>dated by the M17 depth score</b> of its motifs. That gives a <b>dated stratigraphy</b>
-  of overlapping layers — deep = cosmogonic/celestial, shallow = märchen/trickster. Explore both.</p>
+  not discrete strata — hence the parallel <b>soft factors</b>, offered in <b>two models</b> (plain
+  <b>NMF</b> and the effort-corrected <b>M38 Poisson</b>), each <b>dated by the M17 depth score</b> of its
+  motifs. That gives a <b>dated stratigraphy</b> of overlapping layers — deep = cosmogonic/celestial,
+  shallow = märchen/trickster. Switch models to see how coverage correction reshapes the layers.</p>
 </header>
 
 <div class="toolbar">
   <div class="seg" id="mode">
     <button data-m="layers" class="on">Hard layers (peel)</button>
-    <button data-m="factors">Soft factors (M38-style)</button>
+    <button data-m="nmf">Soft · NMF</button>
+    <button data-m="poisson">Soft · M38 Poisson</button>
   </div>
   <span class="muted" id="stat"></span>
 </div>
@@ -87,7 +89,7 @@ const leaves = D.nodes.filter(n=>n.leaf);
 const LAND = `<path class="land" d="${window.LAND||""}"/>`;
 let mode="layers", sel=null, selFactor=null;
 
-document.getElementById("stat").textContent = `${D.n_trad} traditions · ${D.n_motif} motifs · ${leaves.length} leaf layers · ${D.factors.length} soft factors`;
+document.getElementById("stat").textContent = `${D.n_trad} traditions · ${D.n_motif} motifs · ${leaves.length} leaf layers · ${D.factors.poisson.length} soft factors × 2 models`;
 document.getElementById("foot").textContent = D.note;
 
 // ---------- map ----------
@@ -99,8 +101,9 @@ function drawMap(){
     colorOf = p => byId[p.leaf] ? byId[p.leaf].color : "#999";
     hi = p => !set || set.has(p.leaf);
   } else {
-    const leafFac = {}; leaves.forEach(l=>leafFac[l.id]=l.factor);
-    colorOf = p => (D.factors[leafFac[p.leaf]]||{}).color || "#999";
+    const fl=D.factors[mode], key="factor_"+mode;
+    const leafFac = {}; leaves.forEach(l=>leafFac[l.id]=l[key]);
+    colorOf = p => (fl[leafFac[p.leaf]]||{}).color || "#999";
     hi = p => selFactor==null || leafFac[p.leaf]===selFactor;
   }
   const pts = D.points.map(p=>{
@@ -113,11 +116,13 @@ function drawMap(){
 
 // ---------- tree ----------
 function renderTree(){
-  document.getElementById("navTitle").textContent = mode==="layers" ? "Layers (click to inspect)" : "Soft factors";
+  document.getElementById("navTitle").textContent = mode==="layers" ? "Layers (click to inspect)" : `${D.factor_info[mode].label} — dated soft layers`;
   const el = document.getElementById("tree");
-  if(mode==="factors"){
-    el.innerHTML = `<div class="muted" style="margin-bottom:6px">ordered deep → shallow (M17 depth score)</div>` + D.factors.map(f=>{
-      const cont = Object.entries(f.cont).slice(0,2).map(([k,v])=>`${k} ${v}`).join(" · ");
+  if(mode!=="layers"){
+    const fl=D.factors[mode];
+    el.innerHTML = `<div class="muted" style="margin-bottom:8px">${esc(D.factor_info[mode].desc)}</div>`
+      + `<div class="muted" style="margin-bottom:6px">ordered deep → shallow (M17 depth score)</div>` + fl.map(f=>{
+      const cont = Object.entries(f.cont).slice(0,3).map(([k,v])=>`${k} ${v}`).join(" · ");
       return `<div class="node ${selFactor===f.id?"on":""}" data-f="${f.id}"><span class="dot" style="background:${f.color}"></span><span class="nm">Factor ${f.id+1}</span><span class="sub" style="margin-left:6px">${esc(cont)}</span><span class="ct" title="M17 disjunction depth (0–100)">▲ ${f.depth}</span></div>`;
     }).join("");
     el.querySelectorAll("[data-f]").forEach(n=>n.onclick=()=>{selFactor=+n.dataset.f; drawMap(); renderTree(); renderDetail();});
@@ -145,11 +150,12 @@ function bar(items, key, val, colorFn, max){
 }
 function renderDetail(){
   const d = document.getElementById("detail");
-  if(mode==="factors"){
-    if(selFactor==null){ d.innerHTML = `<h2>Soft factors (NMF, k=${D.factors.length})</h2><p class="muted">Overlapping latent layers — a tradition loads on several at once, the honest model for clinal data. Click a factor.</p>`; return; }
-    const f=D.factors[selFactor];
-    d.innerHTML = `<h2><span style="color:${f.color}">■</span> Factor ${f.id+1}</h2>
-      <div class="badges"><span class="badge" title="M17 disjunction-weighted depth of the factor's motifs (0–100, high=deep)">depth <b>${f.depth}</b> · ${esc(f.depth_label)}</span><span class="badge">${Object.entries(f.cont).slice(0,3).map(([k,v])=>k+" "+v).join(" · ")}</span></div>
+  if(mode!=="layers"){
+    const fl=D.factors[mode];
+    if(selFactor==null){ d.innerHTML = `<h2>${esc(D.factor_info[mode].label)} — dated soft layers (k=${fl.length})</h2><p class="muted">${esc(D.factor_info[mode].desc)} Overlapping latent layers — a tradition loads on several at once. Click a factor.</p>`; return; }
+    const f=fl[selFactor];
+    d.innerHTML = `<h2><span style="color:${f.color}">■</span> ${esc(D.factor_info[mode].label)} · Factor ${f.id+1}</h2>
+      <div class="badges"><span class="badge" title="M17 disjunction-weighted depth of the factor's motifs (0–100, high=deep)">depth <b>${f.depth}</b> · ${esc(f.depth_label)}</span><span class="badge" title="traditions dominantly loading on this factor">${f.n} traditions · ${Object.entries(f.cont).slice(0,3).map(([k,v])=>k+" "+v).join(" · ")}</span></div>
       <p class="muted">A soft (overlapping) layer — a tradition loads on several. Dated by the M17 depth of its motifs; deep factors are cosmogonic/celestial, shallow ones are märchen/trickster.</p>
       <h3>Top motifs <span class="sub">(▲ = per-motif M17 depth)</span></h3><table class="core">${f.motifs.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td><td class="lift">${m.depth==null?"—":"▲"+m.depth}</td></tr>`).join("")}</table>
       <h3>Top traditions</h3><div class="sub">${f.trads.map(esc).join(" · ")}</div>`;
@@ -161,7 +167,7 @@ function renderDetail(){
     + `<span class="badge" title="mean cross-continental breadth of core motifs — a proxy for age">dating: <b>${esc(n.depth_label)}</b> (${n.depth_index})</span>`;
   if(n.leaf){
     badges += `<span class="badge" title="fraction of bootstrap resamples that reproduce this block (Jaccard)">stability <b>${n.stability==null?"—":n.stability}</b></span>`;
-    if(n.factor!=null) badges += `<span class="badge">≈ <a class="fx" data-f="${n.factor}">Factor ${n.factor+1}</a></span>`;
+    if(n.factor_poisson!=null) badges += `<span class="badge">≈ <a class="fx" data-f="${n.factor_poisson}">M38 Factor ${n.factor_poisson+1}</a></span>`;
   } else badges += `<span class="badge" title="silhouette of this split — weak everywhere: the data are clinal">split sil ${n.sil}</span>`;
   d.innerHTML = `<h2>${n.leaf?`<span style="color:${n.color}">■</span> `:""}${esc(n.name)}</h2>
     <div class="badges">${badges}</div>
@@ -170,7 +176,7 @@ function renderDetail(){
     <h3>Theme-group profile of core</h3>${bar(n.themes,x=>`${x.grp} · ${GNAME[x.grp]||""}`,x=>x.n,()=>"#9c8a5a")}
     <h3>Core motifs <span class="sub">(top by lift; ×lift, breadth = continents spanned)</span></h3>
     <table class="core">${n.core.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td><td class="lift">×${m.lift}</td><td class="id" title="continents spanned">${m.breadth}c</td></tr>`).join("")}</table>`;
-  d.querySelectorAll(".fx").forEach(a=>a.onclick=()=>{mode="factors";selFactor=+a.dataset.f;setMode();});
+  d.querySelectorAll(".fx").forEach(a=>a.onclick=()=>{mode="poisson";selFactor=+a.dataset.f;setMode();});
 }
 
 // ---------- mode ----------
@@ -181,6 +187,7 @@ function setMode(){
 document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{mode=b.dataset.m; setMode();});
 
 sel = D.nodes[0].id;
-if(location.hash==="#factors"){ mode="factors"; selFactor=0; }
+if(location.hash==="#nmf"){ mode="nmf"; selFactor=0; }
+else if(location.hash==="#poisson"||location.hash==="#factors"){ mode="poisson"; selFactor=0; }
 setMode();
 </script>

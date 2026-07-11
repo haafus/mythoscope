@@ -30,10 +30,16 @@ loads on several at once).
   breadth-based **dating proxy** (broad + disjunct = deep — the root's core is the pan-global celestial
   substrate; peeled leaves are regional/shallow), and **bootstrap stability** (how reproducibly the block
   recovers under resampling — 0.54–0.83 here; the Beringian bridge is the least stable, as expected).
-- **Soft factors (M38-style + M17 dating)** — the honest layer model: an effort-corrected Poisson
-  factorisation (`P[t,m] ~ Poisson(a(t)·(WH)[t,m])`, the M38 form) into six **overlapping** latent layers,
-  each **dated** by the M17 disjunction depth score of its motifs. This yields a **dated stratigraphy**,
-  ordered deep→shallow — the payoff the hard tree could not give:
+- **Soft factors — two models, toggled** (the honest layer model for clinal data). Both factor the
+  coverage-corrected matrix into six **overlapping** latent layers, each **dated** by the M17 disjunction
+  depth score of its motifs (a **dated stratigraphy**, deep→shallow). The two differ in one instructive way:
+  - **NMF** (Euclidean) — isolates a **clean Austronesian/Oceanic layer** (F3: Eurasia 77 · Oceania 36),
+    but is not corrected for cataloguing effort by construction.
+  - **M38 Poisson** — `P[t,m] ~ Poisson(a(t)·(WH)[t,m])` with the attestation-intensity offset `a(t)`,
+    **coverage-corrected by construction**; it **distributes** Oceania across factors (F1 + F3) rather than
+    isolating it. Switching models shows exactly how effort-correction reshapes the layers.
+
+  The M38 Poisson stratigraphy — the payoff the hard tree could not give:
 
   | Layer | depth | geography | core motifs |
   |---|--:|---|---|

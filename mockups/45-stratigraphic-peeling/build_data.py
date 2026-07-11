@@ -192,37 +192,50 @@ disj=Z@DISJ_W
 depth=np.full(M,np.nan); rank=(disj.argsort().argsort()/(len(disj)-1))*100
 for k,j in enumerate(fidx): depth[j]=rank[k]     # 0..100 percentile, high=deep
 
-# ---- M38-style soft factors: Poisson P[t,m]~Poisson(a(t)(WH)[t,m]) via KL updates ----
-K=6; rng0=np.random.default_rng(0)
-P=Xb; a=P.sum(1,keepdims=True); a[a==0]=1
-W=rng0.random((N,K))+0.1; H=rng0.random((K,M))+0.1; ones=np.ones_like(P)
-for _ in range(220):
-    Mh=a*(W@H)+1e-9; Q=P/Mh
-    H*= ((a*W).T@Q)/(((a*W).T@ones)+1e-9)
-    Mh=a*(W@H)+1e-9; Q=P/Mh
-    W*= (Q@H.T)/((a*(ones@H.T))+1e-9)
+# ---- soft factors: TWO models, both dated by the M17 depth score ----
+from sklearn.decomposition import NMF
 def fdepth(hk):
     w=hk.copy(); mask=~np.isnan(depth); w=w*mask
     return float(np.nansum(w*np.nan_to_num(depth))/(w.sum()+1e-9))
-dom=W.argmax(1)
-factors=[]
-for f in range(K):
-    topm=np.argsort(-H[f])[:8]; topt=np.argsort(-W[:,f])[:12]
-    members=[i for i in range(N) if dom[i]==f]        # FULL dominant membership, not just top-12
-    d=fdepth(H[f])
-    factors.append({"id":f,"color":PAL[(f+7)%len(PAL)],"depth":round(d,1),"n":len(members),
-        "depth_label":"deep / near-global" if d>=62 else "intermediate" if d>=45 else "shallow / regional",
-        "cont":dict(Counter(cont(macro_of[keep[i]]) for i in members).most_common()),
-        "motifs":[{"id":MOT[j]["id"],"name":MOT[j]["name"],"grp":MOT[j]["motif_group_num"],
-                   "depth":(None if np.isnan(depth[j]) else round(float(depth[j]),0))} for j in topm],
-        "trads":[TR[keep[i]]["name"] for i in topt]})
-factors.sort(key=lambda x:-x["depth"])          # dated stratigraphy: deep first
-old2new={f["id"]:i for i,f in enumerate(factors)}
-for i,f in enumerate(factors): f["id"]=i
+def build_factors(W,H):
+    dom=W.argmax(1); K=W.shape[1]; fl=[]
+    for f in range(K):
+        topm=np.argsort(-H[f])[:8]; topt=np.argsort(-W[:,f])[:12]
+        members=[i for i in range(N) if dom[i]==f]     # FULL dominant membership, not just top-12
+        d=fdepth(H[f])
+        fl.append({"id":f,"color":PAL[(f+7)%len(PAL)],"depth":round(d,1),"n":len(members),
+            "depth_label":"deep / near-global" if d>=62 else "intermediate" if d>=45 else "shallow / regional",
+            "cont":dict(Counter(cont(macro_of[keep[i]]) for i in members).most_common()),
+            "motifs":[{"id":MOT[j]["id"],"name":MOT[j]["name"],"grp":MOT[j]["motif_group_num"],
+                       "depth":(None if np.isnan(depth[j]) else round(float(depth[j]),0))} for j in topm],
+            "trads":[TR[keep[i]]["name"] for i in topt]})
+    fl.sort(key=lambda x:-x["depth"])                  # dated stratigraphy: deep first
+    old2new={f["id"]:i for i,f in enumerate(fl)}
+    for i,f in enumerate(fl): f["id"]=i
+    leafmap={}
+    for nd in nodes:
+        if nd["leaf"]:
+            mem=[i for i in leaf_of if leaf_of[i]==nd["id"]]
+            leafmap[nd["id"]]=int(old2new[Counter(dom[i] for i in mem).most_common(1)[0][0]]) if mem else None
+    return fl, leafmap
+K=6
+# model 1 — NMF (Euclidean) on the coverage-corrected matrix
+nmf=NMF(n_components=K,init="nndsvda",max_iter=400,random_state=0); Wn=nmf.fit_transform(Xc); Hn=nmf.components_
+fl_nmf, leaf_nmf = build_factors(Wn, Hn)
+# model 2 — M38-style effort-corrected Poisson: P~Poisson(a(t)·(WH)), KL updates
+rng0=np.random.default_rng(0); a=Xb.sum(1,keepdims=True); a[a==0]=1
+Wp=rng0.random((N,K))+0.1; Hp=rng0.random((K,M))+0.1; ones=np.ones_like(Xb)
+for _ in range(220):
+    Mh=a*(Wp@Hp)+1e-9; Q=Xb/Mh; Hp*=((a*Wp).T@Q)/(((a*Wp).T@ones)+1e-9)
+    Mh=a*(Wp@Hp)+1e-9; Q=Xb/Mh; Wp*=(Q@Hp.T)/((a*(ones@Hp.T))+1e-9)
+fl_pois, leaf_pois = build_factors(Wp, Hp)
 for nd in nodes:
     if nd["leaf"]:
-        members=[i for i in leaf_of if leaf_of[i]==nd["id"]]
-        nd["factor"]=int(old2new[Counter(dom[i] for i in members).most_common(1)[0][0]]) if members else None
+        nd["factor_nmf"]=leaf_nmf.get(nd["id"]); nd["factor_poisson"]=leaf_pois.get(nd["id"])
+factors={"nmf":fl_nmf,"poisson":fl_pois}
+factor_info={
+  "nmf":{"label":"NMF","desc":"Non-negative matrix factorisation (Euclidean) on the coverage-corrected (L1+idf) matrix. Isolates a clean Austronesian/Oceanic layer, but is not corrected for cataloguing effort by construction."},
+  "poisson":{"label":"M38 Poisson","desc":"Effort-corrected Poisson factorisation with an exposure offset a(t) — the M38 form, coverage-corrected by construction. Distributes Oceania across factors rather than isolating it."}}
 
 # ---- points for the map (colored by leaf) ----
 leaves=[nd for nd in nodes if nd["leaf"]]
@@ -236,8 +249,9 @@ for i,tid in enumerate(keep):
         points.append({"lon":round(c[1],2),"lat":round(c[0],2),"leaf":lid,
                        "name":TR[tid]["name"],"macro":macro_of[tid]})
 
-data={"n_trad":N,"n_motif":M,"depth":DEPTH,"nodes":nodes,"points":points,"factors":factors,
-      "note":"Coverage-corrected recursive peel (L1+idf). Structure is clinal; tree is a discretisation."}
+data={"n_trad":N,"n_motif":M,"depth":DEPTH,"nodes":nodes,"points":points,
+      "factors":factors,"factor_info":factor_info,
+      "note":"Coverage-corrected recursive peel (L1+idf) + two soft-factor models (NMF, M38 Poisson), both dated by the M17 depth score. Structure is clinal; the hard tree is a discretisation."}
 out=Path(__file__).parent/"data.js"
 out.write_text("window.DATA = "+json.dumps(data,ensure_ascii=False)+";",encoding="utf-8")
 print(f"{len(nodes)} nodes ({len(leaves)} leaves) · {len(points)} placed · {K} factors · data.js ~{out.stat().st_size//1024}KB")
