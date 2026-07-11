@@ -18,9 +18,18 @@ removing the leading principal component to expose sub-structure, and the same d
 
 ## The method
 
-1. **Matrix + seriation (coverage-corrected).** Motif × tradition attestation matrix, coverage-weighted;
-   seriate/cluster and read the **first bifurcation** — how many large blocks there are is an *empirical*
-   question, not an assumption.
+0. **Coverage normalisation — a precondition, not a later guard.** The correction for cataloguing effort
+   must happen **before the first bifurcation is even read**, because the leading split is precisely where
+   coverage bites hardest (the most-catalogued zone peels first — see the probe below). Reading a
+   bifurcation off an uncorrected matrix is invalid: the split you read *is* the artefact. So coverage
+   correction (bias weights, mockup 24) is **step 0** — an admissibility gate on the matrix — not one guard
+   among five. **Caveat:** weighting cannot fully separate a genuinely distinct region from a merely
+   over-catalogued one (they are confounded — Western Europe is both a real märchen zone *and* the most
+   intensely recorded). Step 0 is necessary but not sufficient; a surviving seam must be re-checked against
+   a coverage-*independent* signal (rarefaction to equal motif counts; the crosswalk-replicated core, M37),
+   not weights alone.
+1. **Seriation on the corrected matrix.** Seriate/cluster and read the **first bifurcation** — how many
+   large blocks there are is an *empirical* question, not an assumption.
 2. **Core / substrate of each block** = its **consensus signature**: motifs broadly shared *within* the
    block and characteristic of it (lift, not raw share).
 3. **Draw each core as a named nucleus** — map + motif list + theme profile.
@@ -40,9 +49,11 @@ layer. It generalises the depth score from *per motif* to *per layer*, and does 
    subtracted from and re-clustered — so part of the residual structure is an artefact of the subtraction
    operator. Require a **null model** (permutation) or out-of-sample validation to show residual clusters are
    real, not induced by peeling.
-2. **Coverage confound.** The leading split can be driven by **cataloguing intensity**, not deep history.
-   **Coverage-correct before reading the split** (bias weights, mockup 24) — otherwise you peel a sampling
-   artefact.
+2. **Coverage confound — promoted to step 0 (precondition), not a guard applied after.** The leading split
+   can be driven by **cataloguing intensity**, not deep history, and it corrupts the *very first* thing the
+   method reads — so correction precedes step 1 (see step 0). Listed here only for completeness; and even
+   step 0 cannot fully disentangle a real region from an over-catalogued one, so the surviving seam needs a
+   coverage-independent cross-check.
 3. **Core ≠ substrate.** A block's most-shared motifs are its consensus, but "shared" can be recent
    diffusion. Calling a core a *substrate* requires it to independently pass the depth test (disjunctness +
    banality control) — hence dating as a gate (step 4).
@@ -73,16 +84,20 @@ form a top-level Gondwanan block**; Africa sits with the Americas/rest.
 | KMeans k=2 | 226: W.Eurasia + Near East + Siberia | 722: Americas 325 · Eurasia-rest 239 · Africa 105 · Oceania 46 · Australia 7 |
 
 Two readings, **not yet separable**: the young European fairy-tale / descent layer standing out (real), and
-/ or a cataloguing-effort artefact (Western Europe is the most intensely catalogued zone) — exactly guard
-#2. Takeaways: **(a)** the data-driven instinct is vindicated — an imposed Laurasia/Gondwana `a/b` would have
-been the *wrong* top seam here; **(b)** the method already yields a concrete first layer to peel and a clean
-residual to recurse on; **(c)** guard #2 is live, so **proper coverage correction is the gating next step**
-before trusting layer 1.
+/ or a cataloguing-effort artefact (Western Europe is the most intensely catalogued zone). This probe
+**skipped step 0** (only idf down-weighting, not the real bias weights), so its seam is **provisional and
+probably partly artefactual** — which is the whole point: the very first read is coverage-corrupted, so
+step 0 must run *before* any bifurcation is trusted. Takeaways: **(a)** the data-driven instinct is
+vindicated — an imposed Laurasia/Gondwana `a/b` would have been the *wrong* top seam here; **(b)** the method
+already yields a concrete first layer to peel and a clean residual to recurse on; **(c)** coverage
+correction is not a later fix but the **precondition (step 0)** on which layer 1's validity depends.
 
 ## Roadmap
 
-1. **Coverage-correct** the matrix (mockup 24 weights), re-read the first bifurcation, confirm the block
-   count and whether the W-Eurasian seam survives correction or a different (older) seam emerges.
+1. **Run step 0 first — coverage-correct** the matrix (mockup 24 weights) *and* a rarefaction /
+   crosswalk-replicated cross-check, then read the first bifurcation on the corrected matrix: does the
+   W-Eurasian seam survive, or does a different (older) seam emerge once cataloguing effort is removed?
+   Everything downstream is conditional on this.
 2. **Full recursion** with all five guards — cores → maps → dated ages (gated) → declared subtraction →
    residual re-clustering → null-model check.
 3. Ship as a new mockup (e.g. `45-stratigraphic-peeling`) and a section in
