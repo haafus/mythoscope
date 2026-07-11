@@ -53,10 +53,12 @@
   <p>Recursive coverage-corrected peeling of the Berezkin matrix, in <b>two spaces</b>. <b>Geography</b>
   (motif-attestation): a hard peel + two soft-factor models (NMF, effort-corrected M38 Poisson) — but the
   structure is <b>clinal</b> (isolation-by-distance, weak silhouettes), so its "layers" are a discretisation
-  of a gradient. <b>Worldview</b> (theme-profile, the mockup 16/23 axis): the same peel is far more
-  <b>modular</b> (higher silhouettes) — real strata running young <b>märchen/trickster</b> → deep
-  <b>cosmology</b>, and crossing continents. Everything is <b>dated by the M17 depth score</b>. The finding:
-  the two axes differ in <i>topology</i> — geography is a continuum, worldview has discrete layers.</p>
+  of a gradient. <b>Worldview</b> — the same peel in a genre-profile space, shown in <b>two independent
+  axes</b>: Berezkin's <b>13 etiological themes</b> and mockup&nbsp;41's <b>16 data-driven narrative-form</b>
+  clusters (BGE-M3 embeddings). Both are far more <b>modular</b> (higher silhouettes) — real strata running
+  young <b>märchen/trickster</b> → deep <b>cosmology</b>, and crossing continents. Everything is <b>dated by
+  the M17 depth score</b>. The finding: the two axes differ in <i>topology</i> — geography is a continuum,
+  worldview has discrete layers, and both worldview derivations (hand-labelled and bottom-up) recover it.</p>
 </header>
 
 <div class="toolbar">
@@ -66,9 +68,10 @@
     <button data-m="nmf">Soft · NMF</button>
     <button data-m="poisson">Soft · M38 Poisson</button>
   </div>
-  <span class="muted" style="margin-left:6px"><b>Worldview</b> <span style="opacity:.7">(theme space, modular)</span></span>
+  <span class="muted" style="margin-left:6px"><b>Worldview</b> <span style="opacity:.7">(genre space, modular)</span></span>
   <div class="seg modeseg">
-    <button data-m="worldview">Theme layers</button>
+    <button data-m="worldview">Theme (13)</button>
+    <button data-m="narrative">Narrative (16)</button>
   </div>
 </div>
 <div class="toolbar"><span class="muted" id="stat"></span></div>
@@ -92,15 +95,17 @@ const CONTCOL = {Americas:"#c47a5a",Eurasia:"#4f7096",Africa:"#9c6a94",Oceania:"
 const LAND = `<path class="land" d="${window.LAND||""}"/>`;
 let mode="layers", sel=null, selFactor=null;
 const isFactor = m => m==="nmf"||m==="poisson";
-const isTree = m => !isFactor(m);                       // "layers" (geography) or "worldview" (theme)
+const isTree = m => !isFactor(m);                       // geography "layers" or worldview "worldview"/"narrative"
+const WVSPACE = {worldview:{nodes:"theme_nodes",key:"leaf_theme"}, narrative:{nodes:"narr_nodes",key:"leaf_narr"}};
 function ctx(){
-  const nodes = mode==="worldview" ? D.theme_nodes : D.nodes;
-  const key = mode==="worldview" ? "leaf_theme" : "leaf";
+  const sp = WVSPACE[mode];
+  const nodes = sp ? D[sp.nodes] : D.nodes;
+  const key = sp ? sp.key : "leaf";
   const bid={}; nodes.forEach(n=>bid[n.id]=n);
   return {nodes, key, bid, leaves: nodes.filter(n=>n.leaf)};
 }
 
-document.getElementById("stat").textContent = `${D.n_trad} traditions · ${D.n_motif} motifs · geography: ${D.nodes.filter(n=>n.leaf).length} leaves + ${D.factors.poisson.length}×2 factors · worldview: ${D.theme_nodes.filter(n=>n.leaf).length} leaves`;
+document.getElementById("stat").textContent = `${D.n_trad} traditions · ${D.n_motif} motifs · geography: ${D.nodes.filter(n=>n.leaf).length} leaves + ${D.factors.poisson.length}×2 factors · worldview: ${D.theme_nodes.filter(n=>n.leaf).length} theme + ${D.narr_nodes.filter(n=>n.leaf).length} narrative leaves`;
 document.getElementById("foot").textContent = D.note;
 
 // ---------- map ----------
@@ -127,7 +132,8 @@ function drawMap(){
 
 // ---------- tree ----------
 const TREEDESC = {layers:"Peel in motif-attestation space — recovers geography. The structure is clinal (weak silhouettes), so this tree is a discretisation of a gradient.",
-  worldview:"Peel in theme-profile space (mockup 16/23 axis) — recovers worldview/genre. Far more modular (higher silhouettes): real strata, young märchen → deep cosmology, crossing continents."};
+  worldview:"Peel in Berezkin's 13 etiological theme-groups (the mockup 16/23 axis) — recovers worldview/genre. Far more modular (higher silhouettes): real strata, young märchen → deep cosmology, crossing continents.",
+  narrative:"Peel in the data-driven 16-dim narrative-form space (mockup 41: BGE-M3 embeddings → KMeans on motif name+definition) — an independent, bottom-up worldview axis. Same young-tale → deep-cosmogony gradient, derived without Berezkin's theme labels."};
 function renderTree(){
   const el = document.getElementById("tree");
   if(isFactor(mode)){
@@ -142,7 +148,7 @@ function renderTree(){
     return;
   }
   const {nodes}=ctx();
-  document.getElementById("navTitle").textContent = mode==="worldview" ? "Worldview — theme layers" : "Geography — layers";
+  document.getElementById("navTitle").textContent = mode==="worldview" ? "Worldview — theme layers (13-dim)" : mode==="narrative" ? "Worldview — narrative layers (16-dim)" : "Geography — layers";
   const kids = {}; nodes.forEach(n=>{ if(n.parent){(kids[n.parent]=kids[n.parent]||[]).push(n);} });
   function row(n){
     const c = n.leaf ? n.color : "#c7ccd1";
@@ -182,7 +188,8 @@ function renderDetail(){
   const conts = Object.entries(n.cont).map(([k,v])=>({k,v}));
   let badges = `<span class="badge">n = <b>${n.n}</b></span><span class="badge">level ${n.level}</span>`;
   if(isTheme){
-    badges += `<span class="badge" title="cosmology/etiology (Berezkin A) share of the block's motifs">A-share <b>${Math.round(n.a_share*100)}%</b></span>`
+    const ashLab = mode==="narrative" ? "cosmogonic-cluster share (narrative clusters 2/8/10/11/14)" : "cosmology/etiology (Berezkin A) share of the block's motifs";
+    badges += `<span class="badge" title="${ashLab}">${mode==="narrative"?"cosmo-share":"A-share"} <b>${Math.round(n.a_share*100)}%</b></span>`
       + `<span class="badge" title="mean M17 disjunction depth of the block's core motifs (0–100)">M17 depth <b>${n.depth_index==null?"—":n.depth_index}</b> · ${esc(n.depth_label)}</span>`;
   } else {
     badges += `<span class="badge" title="mean cross-continental breadth of core motifs — a proxy for age">dating: <b>${esc(n.depth_label)}</b> (${n.depth_index})</span>`;
@@ -197,7 +204,7 @@ function renderDetail(){
     <div class="badges">${badges}</div>
     <h3>Continents</h3>${bar(conts,x=>x.k,x=>x.v,x=>CONTCOL[x.k]||"#889")}
     <h3>Macro-areas</h3>${bar(n.macros,x=>x.name,x=>x.n,()=>"#6f8ba3")}
-    <h3>${isTheme?"Theme-group profile (genre balance, %)":"Theme-group profile of core"}</h3>${bar(n.themes,x=>`${x.grp} · ${GNAME[x.grp]||""}`,x=>x.n,()=>"#9c8a5a")}
+    <h3>${isTheme?(mode==="narrative"?"Narrative-form profile (16-dim, %)":"Theme-group profile (genre balance, %)"):"Theme-group profile of core"}</h3>${bar(n.themes,x=>GNAME[x.grp]?`${x.grp} · ${GNAME[x.grp]}`:x.grp,x=>x.n,()=>"#9c8a5a")}
     <h3>Core motifs <span class="sub">(top by lift; ×lift, breadth = continents spanned)</span></h3>
     <table class="core">${n.core.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td><td class="lift">×${m.lift}</td><td class="id" title="continents spanned">${m.breadth}c</td></tr>`).join("")}</table>`;
   d.querySelectorAll(".fx").forEach(a=>a.onclick=()=>{mode="poisson";selFactor=+a.dataset.f;setMode();});
@@ -215,5 +222,6 @@ sel = D.nodes[0].id;
 if(location.hash==="#nmf"){ mode="nmf"; selFactor=0; }
 else if(location.hash==="#poisson"||location.hash==="#factors"){ mode="poisson"; selFactor=0; }
 else if(location.hash==="#worldview"){ mode="worldview"; }
+else if(location.hash==="#narrative"){ mode="narrative"; }
 setMode();
 </script>

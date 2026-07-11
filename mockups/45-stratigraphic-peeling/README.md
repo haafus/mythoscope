@@ -71,23 +71,31 @@ python -m http.server -d mockups 8890
 # → http://127.0.0.1:8890/45-stratigraphic-peeling/
 ```
 
-## Two spaces — Worldview mode (theme-profile)
+## Two spaces — Geography and Worldview (three toggled tabs)
 
-The same recursive peel runs in **two spaces**, toggled and grouped in the toolbar:
+The same recursive peel runs in **two kinds of space**, toggled and grouped in the toolbar:
 
 - **Geography** (motif-attestation, the modes above) — recovers areal structure, but is **clinal**
   (isolation-by-distance; top-split silhouette ≈ 0.03), so its layers discretise a gradient.
-- **Worldview** (theme-profile, the mockup 16 / 23 axis) — clusters traditions by their **13-dim genre
-  balance** (CLR), recovering *what kind of stories* a tradition tells. This peel is far more **modular**
-  (top-split silhouette ≈ 0.16, up to 0.45 deeper): the top split is a young **märchen/trickster** block
-  (cosmology-share A ≈ 28 %, M17 depth ≈ 6) vs a deep **cosmology-rich** block (A ≈ 58 %, depth ≈ 53–87),
-  and it **crosses continents** — on the map the worldview colours are intermixed across regions, where the
-  geography colours cluster by region. Each theme layer carries its A-share, M17 depth, genre profile and
-  core motifs.
+- **Worldview** — clusters traditions by *what kind of stories* they tell (CLR genre profile). Shown in
+  **two independent derivations** as separate tabs, to check the finding isn't an artefact of one labelling:
+  - **Theme (13)** — Berezkin's **13 etiological theme-groups** (the mockup 16 / 23 axis). Top split is a
+    young **märchen/trickster** block (cosmology-share A ≈ 28 %, M17 depth ≈ 6) vs a deep **cosmology-rich**
+    block (A ≈ 58 %, depth ≈ 53–87).
+  - **Narrative (16)** — the **data-driven 16-dim narrative-form** clusters from mockup 41 (BGE-M3
+    embeddings of motif name+definition → KMeans; *no* Berezkin theme labels). A fully bottom-up axis; its
+    columns are narrative forms (Magic wife, Magic flight, Cosmogony, Sun & Moon, …). It recovers the **same
+    young-tale → deep-cosmogony gradient** the theme axis does.
 
-**The finding:** the two axes differ in *topology* — **geography is a continuum, worldview has discrete
-layers** — so the theme-profile space is the one where a recursive *dated* stratigraphy actually finds
-strata (young märchen → deep cosmology) rather than discretising a gradient.
+  Both worldview peels are far more **modular** than geography (top-split silhouette ≈ 0.16, up to 0.45
+  deeper) and both **cross continents** — on the map the worldview colours are intermixed across regions,
+  where the geography colours cluster by region. Each worldview layer carries its cosmology-share, M17 depth,
+  genre profile and core motifs.
+
+**The finding:** the two kinds of axis differ in *topology* — **geography is a continuum, worldview has
+discrete layers** — so a worldview space is the one where a recursive *dated* stratigraphy actually finds
+strata (young märchen → deep cosmology) rather than discretising a gradient. That both the hand-labelled
+(13-dim) and the bottom-up embedding (16-dim) derivations recover it is the robustness check.
 
 ## Agreement with Berezkin's own partition
 
