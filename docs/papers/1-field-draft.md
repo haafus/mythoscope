@@ -238,6 +238,9 @@ candidate-generators not classifiers, always with a baseline — is the field's 
   American Folklore* 129(511), 55–77.
 - Grootendorst, M. (2022). BERTopic: neural topic modeling with a class-based TF-IDF procedure.
   *arXiv:2203.05794*.
+- Hatzel, H. O., Artemova, E., Stiemer, H., Gius, E., & Biemann, C. (2026). SemEval-2026 Task 4:
+  Narrative Story Similarity and Narrative Representation Learning. *SemEval-2026*, 3460–3478.
+  https://narrative-similarity-task.github.io
 - Karsdorp, F., & van den Bosch, A. (2013). Identifying motifs in folktales using topic models.
   *BENELEARN*.
 - Karsdorp, F., & Fonteyn, L. (2019). Cultural entrenchment of folktales is encoded in language.

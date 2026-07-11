@@ -44,7 +44,8 @@ parallels at scale.
 10. Try AE / VAE / SAE?
 11. Try hierarchical chunking / embeddings?
 12. Research narrative and network extraction methods?
-13. ...
+13. Benchmark narrative-similarity embedders on our tasks — take the top systems from **SemEval-2026 Task 4 (Narrative Story Similarity)**, **Qwen3-Embedding** with story-similarity instruction variants, and **`uhhlt/story-emb`**; build embeddings and measure whether they work better for our motif/tradition tasks than the current general embedders
+14. ...
 
 ### Potential Data Sources
 

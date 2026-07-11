@@ -44,6 +44,10 @@ and in the data-availability note (Appendix D).
 - Grootendorst, M. (2022). BERTopic: neural topic modeling with a class-based TF-IDF procedure.
   *arXiv:2203.05794*.
 - Hammarström, H., Forkel, R., Haspelmath, M., & Bank, S. (2023). *Glottolog 4.8*. MPI-EVA.
+- Hatzel, H. O., Artemova, E., Stiemer, H., Gius, E., & Biemann, C. (2026). SemEval-2026 Task 4:
+  Narrative Story Similarity and Narrative Representation Learning. *Proceedings of the 20th
+  International Workshop on Semantic Evaluation (SemEval-2026)*, 3460–3478. Task page:
+  https://narrative-similarity-task.github.io
 - Jason, H. (2006). *Motif, Type and Genre*. FF Communications.
 - Karsdorp, F., & Fonteyn, L. (2019). Cultural entrenchment of folktales is encoded in language.
 - Karsdorp, F., & van den Bosch, A. (2013). Identifying motifs in folktales using topic models.

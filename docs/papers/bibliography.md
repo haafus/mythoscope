@@ -76,6 +76,11 @@ clustering template. **GOLEM** (Yarlott et al., LREC-COLING 2024) and Yarlott & 
 motif-detection frontier and how hard it is (the honest baseline for Track 2, induction from text).
 **Declerck & Lendvai** (2011→) — TMI/ATU as Linked Open Data. Karsdorp & van den Bosch (2013) — motifs
 as topics, the induction origin point.
+**Hatzel, Artemova, Stiemer, Gius & Biemann** — *SemEval-2026 Task 4: Narrative Story Similarity and
+Narrative Representation Learning* (SemEval-2026, pp. 3460–3478;
+[task page](https://narrative-similarity-task.github.io)) — a shared task operationalising narrative
+similarity (theme / course-of-action / outcome) as anchor-based comparison; the source of `uhhlt/story-emb`
+and a ready benchmark + candidate embedders for our own motif/tradition retrieval.
 
 ## V. Narrative networks and graph-based mythology
 
