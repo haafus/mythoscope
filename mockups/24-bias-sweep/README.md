@@ -1,7 +1,7 @@
 # 24 · Effort-correction sweep (roadmap M24)
 
 Tests **alternative-hypothesis #1** from
-[`synthesis-and-directions.md`](../../docs/motifs/proposals/synthesis-and-directions.md) §4:
+[`synthesis-and-directions.md`](../../docs/proposals/synthesis-and-directions.md) §4:
 are our theme findings artifacts of catalogue density? Re-runs four headline results **raw
 vs coverage-weighted** and gives each a verdict — *survives / weakens / flips*.
 

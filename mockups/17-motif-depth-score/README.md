@@ -1,7 +1,7 @@
 # 17 · Motif depth-score
 
 A first prototype of **Method A** from
-[`stratum-derivation.md`](../../docs/motifs/proposals/stratum-derivation.md): estimate a
+[`stratum-derivation.md`](../../docs/proposals/stratum-derivation.md): estimate a
 motif's time-depth from the **shape of its areal distribution alone**, with no Berezkin
 stratum labels.
 

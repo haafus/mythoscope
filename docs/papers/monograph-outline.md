@@ -65,7 +65,7 @@ The drafts were written to stand alone, so three overlaps must be trimmed when m
 1. **Related work.** Part I (survey) is the full treatment; Part II §6 and Part IV §6 should shrink to
    a paragraph that points back to Part I.
 2. **The theme re-derivation** appears in Part IV §4.7 (summary) and in
-   `../motifs/proposals/theme-taxonomy-comparison.md` (full). Keep the summary in IV; the full
+   `../proposals/theme-taxonomy-comparison.md` (full). Keep the summary in IV; the full
    comparison becomes an appendix.
 3. **Assumptions & method** are stated in Part II and *used* in Part IV; Part IV should cite, not
    restate, them.

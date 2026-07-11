@@ -1,7 +1,7 @@
 # 16 · Tradition thematic profiles
 
 Tests the idea (from
-[`macro-area-facets.md`](../../docs/motifs/proposals/macro-area-facets.md) —
+[`macro-area-facets.md`](../../docs/proposals/macro-area-facets.md) —
 `tradition.theme_profile`) that a tradition's **genre balance** is a signal.
 
 Each Berezkin tradition becomes a **13-dim vector** — the proportion of its attested
@@ -24,7 +24,7 @@ then plotted on the world map coloured by cluster.
 
 Raw proportions are confounded by **attestation intensity** (a densely catalogued
 corpus reflects what was recorded). For analysis use the bias-corrected weights of
-[`stratum-derivation.md`](../../docs/motifs/proposals/stratum-derivation.md) §5; here
+[`stratum-derivation.md`](../../docs/proposals/stratum-derivation.md) §5; here
 the raw profile is enough to show the signal exists.
 
 ## Run

@@ -1,7 +1,7 @@
 # 20 · Stratum controls (sampling + banality)
 
 Applies the two mandatory §5 controls from
-[`stratum-derivation.md`](../../docs/motifs/proposals/stratum-derivation.md) that mockups
+[`stratum-derivation.md`](../../docs/proposals/stratum-derivation.md) that mockups
 17–19 skipped, and measures **how much the estimate moves** once they are on. It re-runs
 the mockup-19 gated A × B estimator, then corrects.
 

@@ -1,7 +1,7 @@
 # 18 · Motif phylo-strata (Method B)
 
 A prototype of **Method B** from
-[`stratum-derivation.md`](../../docs/motifs/proposals/stratum-derivation.md): estimate a
+[`stratum-derivation.md`](../../docs/proposals/stratum-derivation.md): estimate a
 motif's history from a **language phylogeny**, not from geography. Method A (mockup 17)
 scored motifs by areal spread and could not tell deep inheritance from areal diffusion
 or reinvention. Method B can.

@@ -8,7 +8,7 @@
 MythoScope programme; the empirical results that test its assumptions are reported in the findings
 draft (`4-findings-draft.md`), the tooling in the framework draft (`3-machine-draft.md`), and the field
 context in the survey (`1-field-draft.md`). The design notes it formalises are
-`docs/motifs/proposals/{analysis-program, macro-area-facets, stratum-derivation, roadmap}.md`.*
+`docs/proposals/{analysis-program, macro-area-facets, stratum-derivation, roadmap}.md`.*
 
 ---
 
@@ -201,7 +201,7 @@ research programme.
   diversity. *PLoS ONE* 11(7), e0158391.
 - Naroll, R. (1961). Two solutions to Galton's problem. *Philosophy of Science* 28(1), 15–39.
 - Pagel, M. (1994). Detecting correlated evolution on phylogenies. *Proc. R. Soc. B* 255, 37–45.
-- **MythoScope design notes** — `docs/motifs/proposals/analysis-program.md` (the arc),
+- **MythoScope design notes** — `docs/proposals/analysis-program.md` (the arc),
   `macro-area-facets.md` (the entity model & assumptions), `stratum-derivation.md` (axioms & method),
   `roadmap.md`; companion papers `3-machine-draft.md` (framework), `4-findings-draft.md` (findings),
   `1-field-draft.md` (survey).

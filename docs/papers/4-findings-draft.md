@@ -5,7 +5,7 @@
 ### A computational re-analysis of a cross-indexed mythological motif corpus
 
 *Working draft — synthesises the MythoScope analysis arc (prototype series `mockups/15–44` and
-the `docs/motifs/proposals/` design notes). Numbers are from self-contained research prototypes
+the `docs/proposals/` design notes). Numbers are from self-contained research prototypes
 built on the assembled corpus; each carries the documented limits restated in §8.*
 
 ---
@@ -306,7 +306,7 @@ of Uther (2004) and the morphological tradition of Propp (1928) and Lévi-Straus
 trickster-casting and death-messenger complexes echo Boas (1916), Radin (1956) and Abrahamsson (1951).
 This paper is the *findings* companion to the infrastructure/framework draft
 (`docs/papers/3-machine-draft.md`); the full theme re-derivation and the field survey live separately in
-`docs/motifs/proposals/theme-taxonomy-comparison.md` and `docs/research/`.
+`docs/proposals/theme-taxonomy-comparison.md` and `docs/research/`.
 
 ## 7. Reproducibility
 

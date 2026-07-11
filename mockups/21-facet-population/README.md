@@ -1,7 +1,7 @@
 # 21 · Deterministic facet population
 
 Answers a build question, not a research one: **does the deterministic population recipe
-in [`macro-area-facets.md`](../../docs/motifs/proposals/macro-area-facets.md) actually
+in [`macro-area-facets.md`](../../docs/proposals/macro-area-facets.md) actually
 cover the whole corpus** before it becomes `region_facets.py`? Runs the three deterministic
 facet functions over all 1046 traditions and 3488 motifs and reports coverage + shape.
 

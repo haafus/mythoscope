@@ -1,6 +1,6 @@
 # 19 · Combined stratum (gated A × B)
 
-Realises [`stratum-derivation.md`](../../docs/motifs/proposals/stratum-derivation.md) §12
+Realises [`stratum-derivation.md`](../../docs/proposals/stratum-derivation.md) §12
 — the integration of Method A (geography, mockup 17) and Method B (phylogeny, mockup
 18) into **one gated pipeline**, not two separate scores.
 

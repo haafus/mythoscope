@@ -4,7 +4,7 @@ Working drafts for the MythoScope research programme, written as one coherent se
 umbrella title **Computational Comparative Mythology**. Each paper stands alone but the four are
 designed to read in order and to compose into a monograph (see
 [`monograph-outline.md`](monograph-outline.md)). These are **evolving drafts**, not submissions;
-numbers come from the prototype series (`mockups/`) and the design notes (`docs/motifs/proposals/`),
+numbers come from the prototype series (`mockups/`) and the design notes (`docs/proposals/`),
 with the limits each carries.
 
 | # | Face | Title | What it is |
@@ -40,5 +40,5 @@ Related, kept separate on purpose:
 
 - Raw field-survey notes and the labs/venues landscape → [`../research/`](../research/).
 - The full data-driven theme re-derivation vs Berezkin's themes →
-  [`../motifs/proposals/theme-taxonomy-comparison.md`](../motifs/proposals/theme-taxonomy-comparison.md).
+  [`../proposals/theme-taxonomy-comparison.md`](../proposals/theme-taxonomy-comparison.md).
 - Per-result method and figures → the individual `mockups/*/README.md`.

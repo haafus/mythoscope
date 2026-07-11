@@ -3,7 +3,7 @@
 > Stage 3 (**systematics**) of the overall arc in
 > [`analysis-program.md`](analysis-program.md): collect → describe → **classify** → explain.
 
-Extends [`troubleshooting.md`](../troubleshooting.md) §"four macro-region
+Extends [`troubleshooting.md`](../motifs/troubleshooting.md) §"four macro-region
 vocabularies". A first draft of this proposal treated *area · family · transmission*
 as three facets **of a tradition**. That was wrong on one point, and fixing it
 simplifies the rest: the three things do not live on the same entity.
@@ -22,7 +22,7 @@ small vocabulary, not three columns on one table.
 
 Evidence base: Berezkin's authoritative 16 macro-areas and their `areal_path`
 subregions; the per-tradition `language` families; the 14 biclusters of
-[`15-berezkin-clusters-report`](../../../mockups/15-berezkin-clusters-report/); the
+[`15-berezkin-clusters-report`](../../mockups/15-berezkin-clusters-report/); the
 four existing schemes (troubleshooting §schemes).
 
 ## Berezkin's own method: analyse the catalogue in parts
@@ -202,7 +202,7 @@ stress-test a naive "B = late" rule fails and the distributional signal passes.
 The *mapping* of theme groups onto areas, onto each other, and onto depth is itself
 informative — theme is a statistical **prior** on stratum (not a substitute; the two stay
 orthogonal per motif). Visualised in
-[`mockups/23-theme-geography`](../../../mockups/23-theme-geography/) — a lift heatmap, a
+[`mockups/23-theme-geography`](../../mockups/23-theme-geography/) — a lift heatmap, a
 seriated theme × theme co-occurrence matrix, a traditions × themes co-cluster map, and a
 per-theme picker. Measured over the catalogue:
 

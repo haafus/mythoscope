@@ -11,7 +11,7 @@ real data slice directly and open with no build.
 Build one, then open the page.
 
 > These are the lab bench for the analysis arc in
-> [`docs/motifs/proposals/analysis-program.md`](../docs/motifs/proposals/analysis-program.md)
+> [`docs/proposals/analysis-program.md`](../docs/proposals/analysis-program.md)
 > (collect → describe → classify → explain). Roughly: 01–14 are stages 1–2
 > (collection & morphology), 15–16, 21 & 23 are stage 3 (systematics), 17–20 & 22 are
 > stage 4 (phylogeny & etiology).
@@ -145,7 +145,7 @@ actually begins.
 **Finding.** Feasible — a 5-strategy priority detector gets headings for all 28 books at real body offsets.
 
 ### 09 · motifs-navigator · unified motif navigator
-A click-through mock of the [motifs-browser UI proposal](../docs/motifs/proposals/motifs-browser-ui.md)
+A click-through mock of the [motifs-browser UI proposal](../docs/proposals/motifs-browser-ui.md)
 — one navigator surface with composable lenses over a real ≈83-motif slice of TMI
 chapter A, embedded in the file. No API, open `index.html` directly. See
 [`09-motifs-navigator/README.md`](09-motifs-navigator/README.md).
@@ -218,7 +218,7 @@ catalogue labels and the Russian column is the index's own `name_rus`. See
 
 ### 16 · Tradition thematic profiles
 Tests the `theme_profile` idea from
-[`macro-area-facets.md`](../docs/motifs/proposals/macro-area-facets.md): each Berezkin
+[`macro-area-facets.md`](../docs/proposals/macro-area-facets.md): each Berezkin
 tradition is a 13-dim vector of the proportion of its motifs in each thematic group, and
 the 840 traditions with ≥30 motifs are clustered **by that profile alone** (k-means),
 then mapped. 38% of the profile variance is explained by macro-area — a strong regional
@@ -230,7 +230,7 @@ Mesoamerica–Andes with Tibet/SE-Asia and Ancient Greece). See
 
 ### 17 · Motif depth-score
 A first prototype of **Method A** from
-[`stratum-derivation.md`](../docs/motifs/proposals/stratum-derivation.md): estimate a
+[`stratum-derivation.md`](../docs/proposals/stratum-derivation.md): estimate a
 motif's time-depth from the shape of its areal distribution alone (prevalence, spread,
 fragmentation, language-family span, mega-set span). Shows two scores — PC1 and a
 disjunction-weighted variant. The most prevalent motifs top PC1 (the swan-maiden leads,
@@ -257,7 +257,7 @@ descent-minority, geography (A) handles the areal majority. See
 **Finding.** Only ~1% are broad *and* clade-clustered (Eurasian märchen — recovering the published result); the rest spread areally → **geography is primary**.
 
 ### 19 · Combined stratum (gated A × B)
-Realises [`stratum-derivation.md`](../docs/motifs/proposals/stratum-derivation.md) §12 —
+Realises [`stratum-derivation.md`](../docs/proposals/stratum-derivation.md) §12 —
 A and B in **one gated pipeline**, not two scores. **B** (phylo-signal) picks the *mode*
 (descent vs areal); the mode picks the dating instrument (clade depth for descent,
 geographic disjunction / deep mega-set span for areal); confidence comes from A–B
