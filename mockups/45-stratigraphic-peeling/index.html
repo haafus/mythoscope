@@ -1,0 +1,182 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>45 · Stratigraphic peeling</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1000px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 8px; letter-spacing:.01em; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .toolbar { display:flex; gap:10px; align-items:center; margin:8px 0 0; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:9px; overflow:hidden; }
+  .seg button { border:0; background:var(--surface); padding:7px 14px; font-size:12.5px; cursor:pointer; color:var(--muted); }
+  .seg button.on { background:var(--ink); color:#fff; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .grid2 { display:grid; grid-template-columns:340px 1fr; gap:14px; align-items:start; }
+  @media (max-width:820px){ .grid2 { grid-template-columns:1fr; } }
+  /* tree */
+  .tree { font-size:13px; }
+  .node { padding:5px 8px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:8px; }
+  .node:hover { background:var(--bg); } .node.on { background:#eef2f5; outline:1px solid #d5dee5; }
+  .node .dot { width:11px; height:11px; border-radius:3px; flex:0 0 auto; }
+  .node .nm { font-weight:600; } .node .ct { color:var(--muted); font-size:11px; margin-left:auto; font-variant-numeric:tabular-nums; }
+  .kids { margin-left:14px; border-left:1px dashed #dcd6c8; padding-left:6px; }
+  .leaf-mark { color:#9aa; font-size:10px; }
+  /* detail */
+  .badges { display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 12px; }
+  .badge { font-size:11.5px; padding:4px 9px; border-radius:20px; background:var(--bg); border:1px solid var(--line); }
+  .badge b { font-weight:600; }
+  .bar { display:flex; align-items:center; gap:8px; margin:3px 0; font-size:12px; }
+  .bar .lab { width:150px; color:#495057; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar .track { flex:1; background:var(--bg); border-radius:5px; height:13px; overflow:hidden; }
+  .bar .fill { display:block; height:100%; border-radius:5px; min-width:2px; }
+  .bar .v { width:34px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  table.core { border-collapse:collapse; width:100%; font-size:12px; margin-top:4px; }
+  table.core td { padding:3px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.core .id { color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.core .lift { text-align:right; color:#b45c4b; font-variant-numeric:tabular-nums; }
+  .g { display:inline-block; min-width:20px; text-align:center; font-size:10px; color:#fff; background:#8a939a; border-radius:4px; padding:0 4px; }
+  .sub { color:var(--muted); font-size:11px; }
+  h3 { font-size:12px; margin:16px 0 5px; color:#3a444b; text-transform:uppercase; letter-spacing:.04em; }
+  a.fx { color:#6f5aa8; cursor:pointer; text-decoration:underline; }
+</style>
+
+<main>
+<header>
+  <h1>45 · Stratigraphic peeling</h1>
+  <p>A coverage-corrected recursive peel of the Berezkin attestation matrix into nested <b>layers</b>,
+  with each layer's geography, motif core, a breadth-based <b>dating proxy</b> and <b>bootstrap stability</b>.
+  The structure is <b>clinal</b> (isolation-by-distance), so the tree is a <i>discretisation of a continuum</i>,
+  not discrete strata — hence the parallel <b>soft factors</b> (NMF), the honest layer model. Explore both.</p>
+</header>
+
+<div class="toolbar">
+  <div class="seg" id="mode">
+    <button data-m="layers" class="on">Hard layers (peel)</button>
+    <button data-m="factors">Soft factors (NMF)</button>
+  </div>
+  <span class="muted" id="stat"></span>
+</div>
+
+<div class="card"><div id="map"></div></div>
+
+<div class="grid2">
+  <div class="card"><h2 id="navTitle">Layers</h2><div class="tree" id="tree"></div></div>
+  <div class="card" id="detail"></div>
+</div>
+
+<p class="muted" id="foot"></p>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, esc = s => (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GNAME = {"01":"Sun & Moon","02":"Stars","03":"Cosmogony & elements","04":"Origin of death","05":"Origin of humans","06":"Subsistence culture","07":"Plants & animals","08":"Monstrous beings","09":"Protagonist identity","10":"Adventures","11":"Tricks & competitions","12":"Proper names","13":"Formulae"};
+const CONTCOL = {Americas:"#c47a5a",Eurasia:"#4f7096",Africa:"#9c6a94",Oceania:"#3f9e93",Australia:"#bd9a43"};
+const byId = {}; D.nodes.forEach(n=>byId[n.id]=n);
+const leaves = D.nodes.filter(n=>n.leaf);
+const LAND = `<path class="land" d="${window.LAND||""}"/>`;
+let mode="layers", sel=null, selFactor=null;
+
+document.getElementById("stat").textContent = `${D.n_trad} traditions · ${D.n_motif} motifs · ${leaves.length} leaf layers · ${D.factors.length} soft factors`;
+document.getElementById("foot").textContent = D.note;
+
+// ---------- map ----------
+function leavesUnder(id){ return leaves.filter(l=>l.id===id||l.id.startsWith(id+".")).map(l=>l.id); }
+function drawMap(){
+  let colorOf, hi;
+  if(mode==="layers"){
+    const set = sel ? new Set(leavesUnder(sel)) : null;
+    colorOf = p => byId[p.leaf] ? byId[p.leaf].color : "#999";
+    hi = p => !set || set.has(p.leaf);
+  } else {
+    const leafFac = {}; leaves.forEach(l=>leafFac[l.id]=l.factor);
+    colorOf = p => (D.factors[leafFac[p.leaf]]||{}).color || "#999";
+    hi = p => selFactor==null || leafFac[p.leaf]===selFactor;
+  }
+  const pts = D.points.map(p=>{
+    const on=hi(p);
+    return `<circle cx="${(p.lon+180).toFixed(2)}" cy="${(90-p.lat).toFixed(2)}" r="${on?1.25:0.7}" fill="${on?colorOf(p):"#b9b9b9"}" fill-opacity="${on?0.92:0.22}"><title>${esc(p.name)} — ${esc(p.macro)}</title></circle>`;
+  }).join("");
+  document.getElementById("map").innerHTML =
+    `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${pts}</svg>`;
+}
+
+// ---------- tree ----------
+function renderTree(){
+  document.getElementById("navTitle").textContent = mode==="layers" ? "Layers (click to inspect)" : "Soft factors";
+  const el = document.getElementById("tree");
+  if(mode==="factors"){
+    el.innerHTML = D.factors.map(f=>{
+      const cont = Object.entries(f.cont).slice(0,3).map(([k,v])=>`${k} ${v}`).join(" · ");
+      return `<div class="node ${selFactor===f.id?"on":""}" data-f="${f.id}"><span class="dot" style="background:${f.color}"></span><span class="nm">Factor ${f.id+1}</span><span class="ct">${esc(cont)}</span></div>`;
+    }).join("");
+    el.querySelectorAll("[data-f]").forEach(n=>n.onclick=()=>{selFactor=+n.dataset.f; drawMap(); renderTree(); renderDetail();});
+    return;
+  }
+  const kids = {}; D.nodes.forEach(n=>{ if(n.parent){(kids[n.parent]=kids[n.parent]||[]).push(n);} });
+  function row(n){
+    const c = n.leaf ? n.color : "#c7ccd1";
+    const mark = n.leaf ? `<span class="leaf-mark">◆</span>` : "";
+    let h = `<div class="node ${sel===n.id?"on":""}" data-id="${n.id}"><span class="dot" style="background:${c}"></span><span class="nm">${esc(n.name)}</span> ${mark}<span class="ct">${n.n}</span></div>`;
+    if(kids[n.id]) h += `<div class="kids">${kids[n.id].sort((a,b)=>b.n-a.n).map(row).join("")}</div>`;
+    return h;
+  }
+  el.innerHTML = row(D.nodes[0]);
+  el.querySelectorAll("[data-id]").forEach(n=>n.onclick=e=>{e.stopPropagation(); sel=n.dataset.id; drawMap(); renderTree(); renderDetail();});
+}
+
+// ---------- detail ----------
+function bar(items, key, val, colorFn, max){
+  const mx = max || Math.max(...items.map(val), 1);
+  return items.map(it=>{
+    const v=val(it), w=(100*v/mx).toFixed(1);
+    return `<div class="bar"><span class="lab" title="${esc(key(it))}">${esc(key(it))}</span><span class="track"><span class="fill" style="width:${w}%;background:${colorFn(it)}"></span></span><span class="v">${v}</span></div>`;
+  }).join("");
+}
+function renderDetail(){
+  const d = document.getElementById("detail");
+  if(mode==="factors"){
+    if(selFactor==null){ d.innerHTML = `<h2>Soft factors (NMF, k=${D.factors.length})</h2><p class="muted">Overlapping latent layers — a tradition loads on several at once, the honest model for clinal data. Click a factor.</p>`; return; }
+    const f=D.factors[selFactor];
+    d.innerHTML = `<h2><span style="color:${f.color}">■</span> Factor ${f.id+1}</h2>
+      <div class="badges"><span class="badge">${Object.entries(f.cont).slice(0,3).map(([k,v])=>k+" "+v).join(" · ")}</span></div>
+      <h3>Top motifs</h3><table class="core">${f.motifs.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td></tr>`).join("")}</table>
+      <h3>Top traditions</h3><div class="sub">${f.trads.map(esc).join(" · ")}</div>`;
+    return;
+  }
+  const n = byId[sel] || D.nodes[0];
+  const conts = Object.entries(n.cont).map(([k,v])=>({k,v}));
+  let badges = `<span class="badge">n = <b>${n.n}</b></span><span class="badge">level ${n.level}</span>`
+    + `<span class="badge" title="mean cross-continental breadth of core motifs — a proxy for age">dating: <b>${esc(n.depth_label)}</b> (${n.depth_index})</span>`;
+  if(n.leaf){
+    badges += `<span class="badge" title="fraction of bootstrap resamples that reproduce this block (Jaccard)">stability <b>${n.stability==null?"—":n.stability}</b></span>`;
+    if(n.factor!=null) badges += `<span class="badge">≈ <a class="fx" data-f="${n.factor}">Factor ${n.factor+1}</a></span>`;
+  } else badges += `<span class="badge" title="silhouette of this split — weak everywhere: the data are clinal">split sil ${n.sil}</span>`;
+  d.innerHTML = `<h2>${n.leaf?`<span style="color:${n.color}">■</span> `:""}${esc(n.name)}</h2>
+    <div class="badges">${badges}</div>
+    <h3>Continents</h3>${bar(conts,x=>x.k,x=>x.v,x=>CONTCOL[x.k]||"#889")}
+    <h3>Macro-areas</h3>${bar(n.macros,x=>x.name,x=>x.n,()=>"#6f8ba3")}
+    <h3>Theme-group profile of core</h3>${bar(n.themes,x=>`${x.grp} · ${GNAME[x.grp]||""}`,x=>x.n,()=>"#9c8a5a")}
+    <h3>Core motifs <span class="sub">(top by lift; ×lift, breadth = continents spanned)</span></h3>
+    <table class="core">${n.core.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td><td class="lift">×${m.lift}</td><td class="id" title="continents spanned">${m.breadth}c</td></tr>`).join("")}</table>`;
+  d.querySelectorAll(".fx").forEach(a=>a.onclick=()=>{mode="factors";selFactor=+a.dataset.f;setMode();});
+}
+
+// ---------- mode ----------
+function setMode(){
+  document.querySelectorAll("#mode button").forEach(b=>b.classList.toggle("on",b.dataset.m===mode));
+  drawMap(); renderTree(); renderDetail();
+}
+document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{mode=b.dataset.m; setMode();});
+
+sel = D.nodes[0].id;
+setMode();
+</script>

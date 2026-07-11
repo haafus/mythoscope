@@ -565,6 +565,18 @@ catch-all motifs — a deep complex the flat "Adventures" averaged away. Old "Ad
 now fans across 1.43–1.96. Limit: breadth/span proxy conflates descent with diffusion (mockups 17,
 39). See [`44-narrative-stratum/README.md`](44-narrative-stratum/README.md).
 
+### 45 · Stratigraphic peeling
+Interactive realisation of [`stratigraphic-peeling.md`](../docs/proposals/stratigraphic-peeling.md):
+coverage-corrected recursive peel of the attestation matrix into nested **layers**, by geography and
+motif core, with a dating proxy, bootstrap stability, and a parallel **soft-factor (NMF)** view.
+**Q.** Do data-driven layers (not a priori Laurasia/Gondwana) reveal a datable stratigraphy?
+**Finding.** Coverage correction is step 0 — else the top seam is just the most-catalogued zone (W-Europe).
+Corrected, the top split is **New World ↔ Old World**, recursing to a coherent tree (Beringian bridge,
+clean Africa, Indo-Pacific, W-Eurasian tale belt). But silhouettes are weak at *every* level and a
+permutation null floors everywhere: the structure is **clinal, not modular** — the tree is a discretisation,
+so soft factors are shown as the honest layer model. See
+[`45-stratigraphic-peeling/README.md`](45-stratigraphic-peeling/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

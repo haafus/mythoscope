@@ -195,5 +195,32 @@ anchoring, not a crisp modular hierarchy read off internal separation.
    [`stratum-derivation.md`](stratum-derivation.md); feed the dated layers back into the tradition
    `stratum-stack` of [`macro-area-facets.md`](macro-area-facets.md).
 
-*Status: proposal + one exploratory probe. The method is specified and its first step is run; the full
-recursion and its guards are not yet built.*
+## Recommendation — what to do with this
+
+The experiments settle the method's role. **Do not force hard recursive peeling deeper on clinal data** —
+there is no discrete bottom to find, and perfecting the stopping rule is a dead end (internal criteria
+provably fail). Instead:
+
+1. **Fix the discretisation at 2–3 layers** and stop; the top layers are meaningful and match known
+   geography.
+2. **Shift the payoff from "the tree" to "dated cores."** The value is the ~5–6 coherent blocks (the
+   pan-global celestial substrate, the Beringian bridge, Sub-Saharan Africa, Indo-Pacific cosmology, the
+   Western-Eurasian tale belt, the New World) — **date each core** via the depth score (mockup 17) and clade
+   anchoring, turning the tree into a *dated stratigraphy* (the Element ch. 6 goal).
+3. **Use a soft decomposition as the real layer model.** Clinal, overlapping layers are exactly what the
+   existing **joint Poisson factorisation (M38)** represents — latent components a tradition loads on
+   *several* at once (as reality demands: one tradition carries many strata). Make the *scientific* layers
+   the soft factors; keep peeling as the intuitive **discovery / naming / cross-check** tool over them.
+4. **Validate blocks externally, cheaply:** bootstrap stability (does a split reproduce under resampling)
+   and clade correspondence (does a block map to a dated linguistic/genetic group) — the only criteria that
+   still bite on clinal data.
+
+In one line: **peeling is right for *seeing and naming* layers; dating and counting them belongs to the
+soft factorisation that already exists — not to a deeper hard tree.**
+
+This recommendation is realised as an interactive mockup —
+[`45-stratigraphic-peeling`](../../mockups/45-stratigraphic-peeling/) — visualising the layers, their
+geography, motif composition, proxy dating, bootstrap stability, and the soft-factor cross-check.
+
+*Status: proposal + probes + recommendation, realised in mockup 45. Full M17 dating and M38 integration
+remain to be wired into the production pipeline.*
