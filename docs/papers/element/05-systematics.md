@@ -140,6 +140,18 @@ overstated by the fact that some regions were catalogued far more thoroughly tha
 drop — 38% down to 26% — rather than the flattering raw figure is exactly the discipline Chapter 3
 committed to, and it matters here because the theme axis returns as a central character in Chapter 8.
 
+That the weakening is a genuine finding rather than an isolated embarrassment is clear from applying the
+same coverage weight — one tradition, one vote — as a *sweep* across four headline theme results at once,
+each given a verdict of survives, weakens, or flips. Three of the four **survive**: the subsistence
+gradient holds (and even sharpens, the forager-to-agrarian spread widening once dense corpora stop
+dominating), the theme-by-area lift holds (Adventures over Europe firming from ×1.19 to ×1.38 as
+Sun-and-Moon over Australia settles from ×3.4 to ×2.6), and the A/B co-occurrence block structure holds
+(the within-block correlation easing only from +0.29 to +0.24). The single casualty is the
+variance-explained-by-area figure, which weakens exactly as reported. A de-confounding pass that failed
+*everything* would suggest the corpus is all artefact; one that failed *nothing* would suggest the
+correction has no teeth. Three-of-four is the signature of a real signal with one over-stated component
+honestly flagged.
+
 ## 5.4 The subsistence gradient, and what Galton's problem does to it
 
 The fourth facet, subsistence, is the only one with no in-corpus source: it has to be joined from

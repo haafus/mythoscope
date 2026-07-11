@@ -63,6 +63,18 @@ a circular input. Method A reads the map; Method B reads the tree; and the two a
 than redundant, because the tree separates the *mode* — descent or diffusion — that the map alone
 cannot.
 
+The parsimony count can be upgraded to a proper probabilistic model — a continuous-time gain/loss
+process with a loss bias, reconstructing expected rather than minimum numbers of independent origins —
+and doing so both validates the simpler method and adds something it cannot express. On undated branches
+the likelihood model largely *reproduces* parsimony (the two gain-counts correlate 0.91), which is
+reassuring. But the loss-biased version can represent a possibility parsimony cannot: that a motif's
+scattered presence reflects **loss from a common ancestor** rather than many independent births. The
+swan-maiden is the vivid case — parsimony, forced to explain its scattered distribution by fresh origins,
+needs some 120 of them, an absurdity, whereas the loss-biased model reads much of that scatter as a once-
+wider inheritance since lost in many branches. Which of these is right for any given motif is exactly the
+descent-versus-diffusion question, and having a model that can even *pose* the loss hypothesis is part of
+taking the tree seriously.
+
 ## 6.3 Areal diffusion dominates, and the descent minority is small
 
 Putting the two estimators together produces the chapter's first headline, and it is a deflationary
@@ -190,7 +202,20 @@ fished-up-earth motif (B4) — the earth-diver's cousin, in which land is hauled
 its centroid in Western Oceania with a ceiling at the Austronesian expansion of about 5,200 years ago,
 and maps its spread as lines fanning out across the Pacific. These are family-resolution point
 estimates, not node-consistent reconstructions with proper uncertainty; a dated tree and full Bayesian
-phylogeography would sharpen them, and that is left as future work. But even at family resolution, the
+phylogeography would sharpen them, and that is left as future work. A first step toward it has in fact
+been taken: feeding the family dates into the probabilistic model as calendar root ages and scaling the
+branches yields *node-level* origin ages for the 778 motifs concentrated enough in one family to carry
+them, at a median around 1,800 years before present — and, as a consistency check, every one falls below
+its family-root ceiling, exactly as a within-family spread younger than the family's origin should. The
+fished-up earth gets a node age near 1,700 years against its 5,200-year Austronesian ceiling; Cinderella
+around 3,700 against the proto-Indo-European 5,500. And one further robustness question targets the
+descent signal itself: is Method B's clustering an artefact of using the *language* tree? Re-running the
+detector on a continental genetic topology — Africa outgroup, an out-of-Africa split into West and East
+Eurasian branches with Native Americans nested inside the East — turns this into a real test, but the
+honest verdict is a limit as much as a result: at continental resolution that genetic tree is itself
+built from geography, so it re-poses the language-versus-geography contrast rather than supplying an
+independent genetic axis. That axis needs fine population-genetic data, and it is the pending join
+Chapter 10 names. But even at family resolution, the
 descent minority is the one part of the corpus where the programme can say not just *that* a motif was
 inherited but roughly *when* and *from where* — the fossil-record dream, realised for the one percent of
 the corpus that actually behaves like a fossil.
