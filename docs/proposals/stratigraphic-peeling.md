@@ -270,6 +270,27 @@ Assessed plainly, without inflation:
   over-claim layers), not a finding. A minor side-note: coverage correction *dissolves* the clean
   Austronesian factor (NMF isolates it, the effort-corrected Poisson distributes it).
 
+### The hard-layer map — a distinctive visualisation, and its fit to Berezkin
+
+To be fair in the other direction: the **hard-layer tab is a genuine contribution** — not as a finding, but
+as a **visualisation/synthesis** absent from the other ~44 prototypes. It is the only one that shows a
+single **coverage-corrected, nested (continent → subregion) areal partition of all ~950 traditions on one
+map**: mockup 15 gives flat biclusters, 16 / 43 give k-means theme-profile clusters, none give the
+hierarchy — and it surfaces recognisable, interpretable blocks (the Beringian bridge, a clean Africa peel,
+the Indo-Pacific merge, a North/South-America split) legibly in one view. That "vivid" quality is compatible
+with the clinal caveat: a strong geographic gradient (sharpened at ocean/Bering barriers), coverage-cleaned
+and one-leaf-assigned, *looks* partitioned even though its boundaries are soft.
+
+**How much does the partition agree with Berezkin's own?** Measured on the 947 placed traditions, our 7
+leaves vs Berezkin's 16 macro-areas: **V = 0.68, completeness = 0.81, ARI = 0.47** — i.e. a **consistent
+coarsening** of his scheme (his areas are rarely split across our leaves), and our top New/Old-World split
+matches his 3-way megaset at **ARI = 0.73**. Purest matches: **Sub-Saharan Africa 98%**, **Mesoamerica/Andes
+98%**, N-America 73%, Amazonia 76%. The two principled *departures*: our "Eurasian märchen" leaf **merges**
+several of his Eurasian areas (Europe + Near East + Central Asia) into one belt, and our "Siberia" leaf is a
+**Beringian bridge** that deliberately crosses his Old/New-World line (Siberia + N-America + Beringia
+together). So: recognisably Berezkin's geography at coarser resolution, plus a couple of meaningful
+cross-area merges — the map is a faithful, legible synthesis, which is where its value lies.
+
 > **"Clinal"** = a continuous gradient, not discrete groups. Motif similarity falls off *smoothly* with
 > geographic distance (neighbours always similar, no sharp seam where one "group" ends) — like a colour
 > gradient or a dialect continuum, versus distinct blocks. It is the same thing as the programme's

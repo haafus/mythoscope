@@ -71,6 +71,17 @@ python -m http.server -d mockups 8890
 # → http://127.0.0.1:8890/45-stratigraphic-peeling/
 ```
 
+## Agreement with Berezkin's own partition
+
+The hard-layer map is the only prototype that shows a single coverage-corrected **nested** areal partition
+of all ~950 traditions on one map (mockup 15 = flat biclusters; 16 / 43 = k-means theme clusters). Measured
+against Berezkin's 16 macro-areas it is a **consistent coarsening**: V = 0.68, completeness = 0.81; the top
+New/Old-World split matches his 3-way megaset at ARI = 0.73. Purest leaves — Sub-Saharan Africa 98%,
+Mesoamerica/Andes 98%, N-America 73%, Amazonia 76%. Two principled departures: the "Eurasian märchen" leaf
+merges his Europe + Near East + Central Asia into one belt, and the "Siberia" leaf is a **Beringian bridge**
+crossing his Old/New-World line. A distinctive, faithful *visualisation* of the known areal structure — not
+a new scientific finding (see the proposal's Conclusions).
+
 ## Notes / honest limits
 
 - Coverage is controlled by L1+idf here, **not** the full bias weights (mockup 24) — the qualitative result
