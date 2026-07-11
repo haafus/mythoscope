@@ -204,20 +204,21 @@ for _ in range(220):
 def fdepth(hk):
     w=hk.copy(); mask=~np.isnan(depth); w=w*mask
     return float(np.nansum(w*np.nan_to_num(depth))/(w.sum()+1e-9))
+dom=W.argmax(1)
 factors=[]
 for f in range(K):
     topm=np.argsort(-H[f])[:8]; topt=np.argsort(-W[:,f])[:12]
+    members=[i for i in range(N) if dom[i]==f]        # FULL dominant membership, not just top-12
     d=fdepth(H[f])
-    factors.append({"id":f,"color":PAL[(f+7)%len(PAL)],"depth":round(d,1),
+    factors.append({"id":f,"color":PAL[(f+7)%len(PAL)],"depth":round(d,1),"n":len(members),
         "depth_label":"deep / near-global" if d>=62 else "intermediate" if d>=45 else "shallow / regional",
-        "cont":dict(Counter(cont(macro_of[keep[i]]) for i in topt).most_common()),
+        "cont":dict(Counter(cont(macro_of[keep[i]]) for i in members).most_common()),
         "motifs":[{"id":MOT[j]["id"],"name":MOT[j]["name"],"grp":MOT[j]["motif_group_num"],
                    "depth":(None if np.isnan(depth[j]) else round(float(depth[j]),0))} for j in topm],
         "trads":[TR[keep[i]]["name"] for i in topt]})
 factors.sort(key=lambda x:-x["depth"])          # dated stratigraphy: deep first
 old2new={f["id"]:i for i,f in enumerate(factors)}
 for i,f in enumerate(factors): f["id"]=i
-dom=W.argmax(1)
 for nd in nodes:
     if nd["leaf"]:
         members=[i for i in leaf_of if leaf_of[i]==nd["id"]]
