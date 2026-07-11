@@ -177,6 +177,52 @@ marker**, not treated as a load-bearing drop cue. On clean texts the filter is s
 designed — as a conservative (≥2-category) secondary strainer for interleaved notes and, above a per-text
 drop-rate threshold (>5%), as a **flag for review** rather than a silent drop.
 
+### How much a start/stop cut removes, and where it suffices
+
+To size approach 2, the front/back boundaries were **estimated** from headings (curated `content_start`/
+`content_end` markers do not exist yet): front cut = the first body heading (`BOOK`/`CHAPTER`/`CANTO`/…)
+after the front apparatus; back cut = the first back-matter heading (`NOTES`/`APPENDIX`/`INDEX`/`GLOSSARY`)
+in the tail (last 20%, to avoid mid-document per-section notes). Kept/cut measured by characters; the cue
+filter then run over the *kept body* to see whether start/stop alone leaves it clean.
+
+**Corpus total: a start/stop cut removes ≈ 14% of the volume and keeps ≈ 86%** (21.3M characters) — the
+front/back apparatus (title pages, prefaces, contents, notes, indexes, glossaries) is about one seventh of
+the raw corpus.
+
+| Text | cut % | keep % | body residual | Text | cut % | keep % | body residual |
+|---|--:|--:|--:|---|--:|--:|--:|
+| King James | 0.0 | 100.0 | 0.0 | Australian Legendary | 9.4 | 90.6 | 0.0 |
+| Iliad | 0.0 | 100.0 | 0.0 | Popol Vuh | 12.4 | 87.6 | **2.4** ✗ |
+| Aeneid | 0.1 | 99.9 | 0.0 | Buddhist Psalms | 14.7 | 85.3 | 0.0 |
+| Mabinogion | 0.2 | 99.8 | 0.0 | Nibelungenlied | 14.9 | 85.1 | 0.0 |
+| Tao Teh King | 0.2 | 99.8 | 0.0 | Ramayan | 16.3 | 83.7 | 0.0 |
+| Dhammapada | 0.5 | 99.5 | 0.0 | Myths of Australian | 17.4 | 82.6 | 0.0 |
+| Analects | 0.6 | 99.4 | 0.0 | Mahabharata | 20.7 | 79.3 | 0.0 |
+| Odyssey | 2.6 | 97.4 | 0.0 | Myths of China | 21.1 | 78.9 | 0.4 |
+| Upanishads | 2.5 | 97.5 | 0.0 | Koran | 28.8 | 71.2 | 0.2 |
+| Book of the Dead | 3.0 | 97.0 | **1.2** ✗ | Beowulf | 2.8 | 97.2 | **5.9** ✗ |
+| Bhagavad Gita | 4.4 | 95.6 | 0.0 | Poetic Edda | 62.6 | 37.4 | **15.6** ✗ |
+| Ma-ui | 4.6 | 95.4 | 0.0 | Babylonian Legends | 6.2 | 93.8 | **31.3** ✗ |
+| Hammurabi | 8.5 | 91.5 | 0.0 | West African | 6.5 | 93.5 | 0.0 |
+| Kalevala | 8.3 | 91.7 | 0.1 | Te Tohunga | 7.0 | 93.0 | 0.0 |
+
+**Start/stop alone suffices for 23 of 28 texts** — after trimming the edges the body has <1% residual
+editorial by chunk (20 of them exactly 0%). The **5 exceptions** carry line-interleaved notes that two
+boundary markers cannot reach and need the cue-strip/LLM layer on top: *Babylonian Legends* (31.3% body
+residual), *Poetic Edda* (15.6%), *Beowulf* (5.9%), *Popol Vuh* (2.4%), *Book of the Dead* (1.2%) —
+together ~6.8% of corpus volume. (Per-text cut % still carries estimator uncertainty — e.g. the Edda's
+62.6% reflects a notes-heavy edition, not a clean split — but the ~14% aggregate and the 23/28 sufficiency
+are robust.)
+
+**Marker-placement confidence.** Not every boundary is equally safe to author. About **12 texts have a
+crisp, doubt-free structural marker** — a canonical "the text begins here" heading and a clean or clearly
+labelled end (the scriptures and classical epics: King James, Odyssey, Iliad, Aeneid, Tao Teh King,
+Dhammapada, Bhagavad Gita, Analects, Hammurabi, Kalevala, Ramayan, Ma-ui). About **11 need a judgment
+call**, almost always on the front — where an analytical introduction or a translator's framing stops
+being editorial and the tradition begins (Myths of China cutting at Chapter IV, Mabinogion, Upanishads,
+Te Tohunga, West African, Buddhist Psalms, the two Australian volumes, Nibelungenlied, Koran, Mahabharata).
+The remaining **5 are the interleaved editions** above, where start/stop is the wrong tool regardless.
+
 ## Conclusion — a layered hybrid
 
 For this project (small curated corpus, reproducibility matters, an existing per-text clean hook, but a
