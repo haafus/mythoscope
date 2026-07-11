@@ -92,6 +92,28 @@ vindicated — an imposed Laurasia/Gondwana `a/b` would have been the *wrong* to
 already yields a concrete first layer to peel and a clean residual to recurse on; **(c)** coverage
 correction is not a later fix but the **precondition (step 0)** on which layer 1's validity depends.
 
+### Step 0 applied — the seam changes (this is the point)
+
+Running step 0 confirms the uncorrected seam was largely an artefact and **changes the answer**:
+
+- **Direct confound (smoking gun).** The peeled 94-tradition W-Eurasian block has mean coverage **391.7
+  motifs/tradition** (median 380) vs **91.3** (median 74) for the residual and **121** overall — it is
+  simply the **richly-catalogued tail**, so the uncorrected seam tracks cataloguing effort.
+- **Coverage-equalised (rarefaction to 20 motifs/tradition, and L1-normalised profiles).** The W-Eurasian
+  seam **disappears**. The corrected top split becomes **New World ↔ Old World** — the **Americas** are the
+  distinct pole (≈290 American traditions separating), with the Old-World residual being Eurasia + Africa +
+  Oceania together. (Some seed instability: the bipartition flips between "Americas out" and "Old World out",
+  but the Americas are the distinctive block either way.)
+- **Still not Gondwana/Laurasia:** Africa groups with **Eurasia** (the Old World), not with Australia — so
+  neither the imposed `a/b` nor the uncorrected W-Eurasian seam is the real layer 1; the data-driven,
+  coverage-corrected answer is **Americas vs the Old World**, consistent with Berezkin's New-World peopling
+  work.
+
+The lesson is exactly the step-0 argument made concrete: **correcting before the first read changed the
+top seam** — from an artefactual Western Europe to a defensible New-World/Old-World contrast. Firming it up
+needs the real bias weights (mockup 24) and several rarefaction depths; the qualitative result (effort
+artefact gone, Americas the distinct pole) is already stable across both corrections.
+
 ## Roadmap
 
 1. **Run step 0 first — coverage-correct** the matrix (mockup 24 weights) *and* a rarefaction /

@@ -77,9 +77,11 @@ method: let the statistics (not a priori Laurasia/Gondwana labels) define the to
 and **date** each block's core as a layer, subtract it, and **recurse** on the residual — a bottom-up
 dated stratigraphy that generalises the per-motif depth score (M17) to whole layers. First-bifurcation
 probe already run: the data-driven top seam is **not** Gondwana/Laurasia but a Western/Central-Eurasian
-block vs the rest — coverage-suspicious. Key refinement: coverage correction is a **step-0 precondition**
-(run *before* the first bifurcation is read, since that first read is where cataloguing effort bites
-hardest), not a later guard. Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
+block vs the rest — but **step 0 (coverage correction) changes the answer**: that W-Eurasian block is just
+the richly-catalogued tail (mean 392 vs 91 motifs/tradition), and once coverage is equalised (rarefaction /
+L1-norm) the top seam becomes **New World ↔ Old World** (the Americas are the distinct pole; Africa groups
+with Eurasia — still not Gondwana/Laurasia). Coverage correction is therefore a **step-0 precondition**, not
+a later guard. Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
 recursion stability) and evidence: [`stratigraphic-peeling.md`](stratigraphic-peeling.md). *data: have ·
 Effort: M · uses M06/M15 biclustering + M17 dating gate + M24 coverage weights.*
 
