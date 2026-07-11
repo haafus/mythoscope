@@ -33,24 +33,28 @@ Consequences and handling:
 
 ---
 
-## Four competing macro-area schemes
+## Competing macro-area schemes (six vocabularies)
 
 **Status:** open — needs a decision before touching `_berezkin_region`.
 
-There are **four independent "macro-region" vocabularies** in play at once, none
-of which agree with the others. Three of them are geographic and overlap in the
-same UI; the fourth is a different axis entirely. This makes "region" ambiguous:
-the same Berezkin motif page labels regions one way in the overview chart and
-another way in its Traditions section.
+There are **six independent "macro-region" vocabularies** in play at once, none of
+which fully agree. #1–#3 are geographic partitions of the **motif catalogue** and
+overlap in the same UI; #4 is a different axis *and* a different dataset (our corpus
+of texts); #5 is a frontend **colour layer** whose own key names form yet another
+list; #6 is the **proposed unifying target** that would subsume the rest. This makes
+"region" ambiguous: the same Berezkin motif page labels regions one way in the
+overview chart and another way in its Traditions section.
 
-### The four schemes
+### The schemes
 
 | # | Scheme | Buckets | Where it lives | Authored by | Used for |
 |---|---|---|---|---|---|
 | 1 | Berezkin broad regions | **11** | `_berezkin_region()` in `src/server/services/motifs.py` | us (ad-hoc) | Berezkin overview "Motifs by region" chart |
 | 2 | TMI culture regions | **12** | `_REGION` in `src/motifs/sources/culture_dict.py` | us (ad-hoc) | TMI overview "Motifs by region" + per-motif "Attestations by culture" grouping |
 | 3 | Berezkin areal hierarchy (major traditions) | **16** | `areal_path[0]` in `outputs/motifs/mapsofmyths_traditions.json` | Berezkin (authoritative) | Berezkin per-motif "Traditions" distribution grouping |
-| 4 | Corpus tradition families | **12** | `config/traditions.json` | us (hand-authored) | Geography map + corpus grouping — **different dataset (our texts), not motifs** |
+| 4 | Corpus tradition families (`major_tradition`) | **12** | `config/traditions.json` | us (hand-authored) | Geography map + corpus grouping — **different dataset (our texts), not motifs** |
+| 5 | `REGION_COLORS` motif-region palette | **~16** | `REGION_COLORS` / `regionColor()` in `src/server/web/assets/page-motifs.js` | us (ad-hoc) | **Colour layer**, not a partition: maps region *names* → hex for the #1/#3 bars and attestation accordions. Its keys (`Central Asia`, `Southeast Asia`, `Caribbean`, `Asia`, `—`…) union #1+#2 names, so its vocabulary matches neither cleanly. See [`../reviews/color-system-review.md`](../reviews/color-system-review.md) §7 |
+| 6 | Proposed `area` facet (**target**) | **12** | `docs/proposals/macro-area-facets.md` → mockup 21; not yet in code (`region_facets.py` unwritten) | us (derived from #3's `areal_path`) | The converged geographic axis of a tradition in the entity model — the intended replacement that folds #1/#3/#5 into one deterministic 12-area vocabulary |
 
 ### Why they conflict
 
@@ -73,6 +77,14 @@ another way in its Traditions section.
   Indo-European, …), not geography, and it classifies our **corpus of texts**,
   not the motif catalogue's world coverage. It only shares a few incidental names
   ("Polynesian", "African").
+- **#5** is not a competing *partition* but a colour map, so it can't be "wrong" the
+  way #1–#3 can — yet its key list is a **fifth region naming** (it lists both #1 and
+  #2 names so it can colour either), so it quietly hardcodes region names a third way
+  and drifts from whatever #1/#2/#3 actually emit; an unlisted name silently falls to
+  the fallback palette.
+- **#6** doesn't conflict — it's the **target**: a deterministic 12-area collapse of
+  #3's `areal_path`. It's listed so the enumeration is complete, but it lives only in
+  the proposal + mockup 21, not yet in the running code.
 
 ### Impact
 
@@ -99,10 +111,11 @@ another way in its Traditions section.
 - **#4 stays separate** by design (different axis, different dataset).
 - **Or model the entities instead of picking one list** — see
   [`proposals/macro-area-facets.md`](proposals/macro-area-facets.md): an entity model
-  where a **tradition** carries `area` (12, derived from `areal_path`), `family` and
-  `subsistence`, while time-depth (`stratum`) is a **motif** property, not a
-  tradition one. Folds #1/#3 into `area`, recognises #4 as `family`, and gives the
-  non-areal clusters (literary-epic Asia, Sun-&-Moon) a home as motif strata.
+  where a **tradition** carries `area` (12, derived from `areal_path` — this is scheme
+  #6), `family` and `subsistence`, while time-depth (`stratum`) is a **motif** property,
+  not a tradition one. Folds #1/#3 into `area` (#6), lets #5's palette re-key to those
+  12 areas, recognises #4 as `family`, and gives the non-areal clusters (literary-epic
+  Asia, Sun-&-Moon) a home as motif strata.
 
 ### Note
 
