@@ -87,9 +87,13 @@ negative result**: internal criteria fail — a permutation null floors at p≈0
 silhouette 0), and silhouettes are ~0.03–0.11 at every level including the root, because the structure is
 **clinal (isolation-by-distance), not modular**. There is no discrete bottom; depth is a discretisation
 choice, and layers must be validated **externally** (bootstrap stability, the M17 dating gate, clade
-correspondence), not by cluster-separation metrics. Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
-recursion stability) and evidence: [`stratigraphic-peeling.md`](stratigraphic-peeling.md). *data: have ·
-Effort: M · uses M06/M15 biclustering + M17 dating gate + M24 coverage weights.*
+correspondence), not by cluster-separation metrics. **Honest verdict:** no new scientific result — the dated
+layers re-present M17 depth + existing factor components + the established deep-cosmology/shallow-märchen
+pattern; PCA would land close; the value is a visualisation and the clean *negative* result (clinal → no
+discrete strata). Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
+recursion stability), the two dated soft-factor models (mockup 45) and conclusions:
+[`stratigraphic-peeling.md`](stratigraphic-peeling.md). *data: have · Effort: M · uses M06/M15 biclustering +
+M17 dating gate + M24 coverage weights.*
 
 ### M32 · Facet adequacy & orthogonality (audits assumption #6) — ✓ done (mockup 32)
 

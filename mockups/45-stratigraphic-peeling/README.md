@@ -39,7 +39,8 @@ loads on several at once).
     **coverage-corrected by construction**; it **distributes** Oceania across factors (F1 + F3) rather than
     isolating it. Switching models shows exactly how effort-correction reshapes the layers.
 
-  The M38 Poisson stratigraphy — the payoff the hard tree could not give:
+  The M38 Poisson stratigraphy (soft layers where the hard tree could not build them — but a *re-presentation*
+  of M17 depth + existing factor components, not a new result; see the proposal's Conclusions):
 
   | Layer | depth | geography | core motifs |
   |---|--:|---|---|

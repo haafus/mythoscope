@@ -238,11 +238,45 @@ not give:
 | F5 | 33 | Eurasia + Africa | trickster-fox · external soul · nestlings |
 | F6 | 30 | Eurasia + Africa | dragon-slayer · kind-and-unkind · personified Death |
 
-**The result is content-ful:** the deep layers (F1–F4) are cosmogonic/celestial and New-World-endemic; the
-shallow layers (F5–F6) are the young Eurasian/African **märchen** (ATU dragon-slayer, kind-and-unkind). This
-both *quantifies* and *vindicates* the recommendation — soft, overlapping, datable layers succeed exactly
-where the hard discrete tree failed. It is a proof-of-concept on the M17 disjunction proxy; a production run
-should swap in the real M38 factors + calibrated M17/clade ages.
+The deep layers (F1–F4) are cosmogonic/celestial and New-World-endemic; the shallow layers (F5–F6) are the
+young Eurasian/African **märchen** (ATU dragon-slayer, kind-and-unkind). This is a proof-of-concept that
+soft, overlapping, datable layers can be built where the hard discrete tree could not — but see the honest
+conclusions below on how *new* this actually is.
 
-*Status: proposal + probes + recommendation, realised in mockup 45 including dated soft layers. Production
-wiring (real M38 output, calibrated dating, clade validation) remains.*
+## Conclusions — what this arc did and did not produce
+
+Assessed plainly, without inflation:
+
+- **No genuinely new scientific result.** The dated soft layers are a **synthesis of things that already
+  existed**, not a discovery: (a) the depth axis is **literally M17** — each layer's age is the M17
+  per-motif disjunction score averaged over its motifs, so nothing is added to the dating; (b) the layers
+  themselves are the **same coarse components** the existing factor / theme work already recovers (mockups
+  16 / 23 / 38); (c) the pattern *deep = cosmology/celestial + New-World-endemic, shallow = Eurasian
+  märchen* is the **already-established** finding (Element ch. 6 / 8: the celestial substrate is deep,
+  European tales are young, theme and stratum are orthogonal). So the earlier "content-ful new finding"
+  claim was an **overstatement**; this is a re-presentation, not a new result.
+- **It is the same as the previous per-motif-prevalence approach.** M17 dated motifs from the shape of their
+  distribution; this dates *groups* of motifs by the same M17 scores. The stratigraphy's depth axis *is*
+  M17 — grouping-then-averaging adds presentation, not depth information.
+- **PCA would get close.** M17's own score is a PCA (PC1) of distributional features; a PCA of the
+  tradition × motif matrix would recover the same coarse components (prevalence, New/Old World, …) and the
+  same clinal signature (a scree plot with no elbow). The factorisation's only advantages over PCA are
+  **interpretability** (non-negative, parts-based "layers" a motif positively belongs to) and the **coverage
+  offset** `a(t)` in the Poisson variant — not a different result.
+- **The one real, if modest, takeaway is methodological and negative:** the corpus is **clinal**
+  (isolation-by-distance), so it has **no discrete strata** — hard recursive peeling is a dead end, and any
+  "layers" are a *discretisation of a continuum*, to be trusted per-block by external anchoring
+  (bootstrap stability, dated clades), not read off internal cluster metrics. That adds **rigour** (don't
+  over-claim layers), not a finding. A minor side-note: coverage correction *dissolves* the clean
+  Austronesian factor (NMF isolates it, the effort-corrected Poisson distributes it).
+
+> **"Clinal"** = a continuous gradient, not discrete groups. Motif similarity falls off *smoothly* with
+> geographic distance (neighbours always similar, no sharp seam where one "group" ends) — like a colour
+> gradient or a dialect continuum, versus distinct blocks. It is the same thing as the programme's
+> "geography is primary, areal" thesis, and it is *why* clustering here imposes cuts rather than finding
+> them.
+
+*Status: proposal + probes + recommendation + mockup 45 (two dated soft-factor models). Value delivered:
+a visualisation and a clean negative result (clinal → no discrete strata). No new scientific finding;
+production wiring (real M38 output, calibrated M17/clade ages, external validation) remains — and would be
+the only path here to an actual new result (dated layers with real ages).*
