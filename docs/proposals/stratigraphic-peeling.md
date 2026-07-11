@@ -154,6 +154,35 @@ belt** (Bremen musicians, Cinderella).
 Even so, the recursion demonstrates the method's payoff: coverage-corrected peeling reconstructs a plausible,
 interpretable stratigraphy of world mythology from the bare attestation matrix.
 
+### Stopping rule — why internal criteria fail (the structure is clinal)
+
+Attempting a principled bottom (the natural next step) produced a **more important negative result than a
+tree**:
+
+- **Significance does not stop.** A permutation test (Ward + a column-shuffle null that breaks co-occurrence
+  while keeping motif prevalence, 150 perms) returns **p ≈ 0.007 at *every* split — the floor** — including a
+  split whose silhouette is **−0.000** (fully overlapping clusters). The null is too weak: any structure
+  beyond marginal prevalence, even a clinal gradient, beats it. **Significance ≠ meaningfulness**; the tree
+  only ever stopped on the size floor.
+- **Effect size has no natural gap.** Silhouettes are **~0.03–0.11 at *every* level, including the top**
+  (the New/Old-World root itself is only ≈ 0.03–0.09). Any silhouette floor therefore either kills the whole
+  tree (a 0.05 floor stops at the root) or nothing.
+- **Why:** mythological similarity is a **smooth geographic gradient** (isolation-by-distance), not a
+  hierarchy of crisp modules — the programme's own "geography is primary, areal" thesis. Peeling
+  **discretises a continuum**; it does not recover true discrete strata. So *"have we exhausted the levels?"*
+  is the wrong question — there is **no discrete bottom**, only a gradient, and depth is a **discretisation
+  choice** (how finely to cut), not a discoverable truth. (Fittingly, the root treated as one block has a
+  **pan-global celestial-substrate** core — male-sun/female-moon, eclipses, man-in-the-moon — the universal
+  layer shared by all.)
+
+**Consequence for guards #1/#5.** Internal cluster criteria (p-value, silhouette) validate neither the
+stopping point nor "how many layers are real." Depth must be validated **externally**: (a) **stability** —
+does a split reproduce under bootstrap resampling; (b) the **dating gate** — a layer is real only if its core
+**dates coherently** (mockup 17); (c) **clade correspondence** — does a block map to a dated linguistic /
+genetic group. The tree stays **interpretable and useful** (its blocks are geographically coherent and match
+known mythology geography) — but it is a *discretisation of a continuum*, to be trusted per-block by external
+anchoring, not a crisp modular hierarchy read off internal separation.
+
 ## Roadmap
 
 1. **Run step 0 first — coverage-correct** the matrix (mockup 24 weights) *and* a rarefaction /

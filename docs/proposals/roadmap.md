@@ -81,7 +81,13 @@ block vs the rest — but **step 0 (coverage correction) changes the answer**: t
 the richly-catalogued tail (mean 392 vs 91 motifs/tradition), and once coverage is equalised (rarefaction /
 L1-norm) the top seam becomes **New World ↔ Old World** (the Americas are the distinct pole; Africa groups
 with Eurasia — still not Gondwana/Laurasia). Coverage correction is therefore a **step-0 precondition**, not
-a later guard. Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
+a later guard. Depth-3 recursion reconstructs a coherent stratigraphy (New/Old World → Beringian bridge +
+clean Africa → N/S America, Indo-Pacific vs W-Eurasian tale belt), but the **stopping rule is an open
+negative result**: internal criteria fail — a permutation null floors at p≈0.007 everywhere (even at
+silhouette 0), and silhouettes are ~0.03–0.11 at every level including the root, because the structure is
+**clinal (isolation-by-distance), not modular**. There is no discrete bottom; depth is a discretisation
+choice, and layers must be validated **externally** (bootstrap stability, the M17 dating gate, clade
+correspondence), not by cluster-separation metrics. Full spec, guards (null model, coverage, dating-as-gate, declared subtraction,
 recursion stability) and evidence: [`stratigraphic-peeling.md`](stratigraphic-peeling.md). *data: have ·
 Effort: M · uses M06/M15 biclustering + M17 dating gate + M24 coverage weights.*
 
