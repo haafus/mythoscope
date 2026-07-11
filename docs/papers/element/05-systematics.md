@@ -112,10 +112,13 @@ lean on most heavily and the one Chapter 3 flagged as never having been checked:
 grouping of motifs by subject. Does it correspond to anything in the material, or is it a scholar's
 imposition?
 
-It corresponds to something. Berezkin's high-level division between cosmological/etiological material
-(his Category A — cosmogony, the origin of death, the origin of humans) and novelistic/trickster
-material (Category B — adventures, tricks, tale-types) **re-emerges from the data without using his
-labels.** The test correlates theme shares across traditions on a centred-log-ratio transform — so
+It corresponds to something. Berezkin's high-level division rolls the thirteen theme groups into two
+categories — **Category A**, cosmology and etiology (groups one through nine: the luminaries, cosmogony,
+the origin of death, of humans, of subsistence), and **Category B**, adventures and tricks (groups ten
+through thirteen) — and that division **re-emerges from the data without using his labels.** One tempting
+reading of the split is refuted along the way: the naive equation of Category A with a deep ancient layer
+and Category B with late European fairy-tales does *not* hold, because Category B is not a European
+specialty — the novelistic material is distributed worldwide, not confined to the märchen belt. The test correlates theme shares across traditions on a centred-log-ratio transform — so
 that the constant-sum closure of a profile does not make the dominant blocks spuriously
 anti-correlate — and seriates the result so that co-occurring themes sit adjacent. Two contiguous
 blocks fall out on their own: a **tales block** (Adventures, Tricks, Proper names, Formulae, and

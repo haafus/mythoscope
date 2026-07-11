@@ -23,7 +23,12 @@ catalogue, found from Ireland to Japan to the Americas. It is exactly the kind o
 that has tempted scholars to see a single deep origin behind it.
 
 Run through the machine, its distribution is broad and its footprint disjunct — it touches multiple
-continental sets, and on the depth score of Chapter 6 it reads as old. But Method B, reading the
+continental sets, and on the depth score of Chapter 6 it reads as old. Plotted on the map, its 513
+traditions do not form one blanket but several separated regional clusters — a European mass, an East and
+Southeast Asian mass, scattered American and Oceanic outliers — each drawn as its own smoothed contour,
+with lone strays left bare so that a single outlier cannot balloon a shape. That visible disjunction,
+gaps between filled regions rather than a continuous spread, is exactly the footprint the depth score is
+built to reward. But Method B, reading the
 language tree, finds its carriers *scattered* rather than clustered: it does not track descent within
 any one family. The gated combination therefore files it as **areal-broad**, and the continuous mixture
 model puts its descent component at about 0.16 (Figure 9.1). It is, on the numbers, a widely diffused
@@ -70,7 +75,11 @@ otherwise only wish for.
 Because B4 behaves like an inheritance, the gated method knows it may be dated by clade depth rather
 than left undated as the areal motifs are. Reconstructing its origin places its centroid in **Western
 Oceania**, with a ceiling at the Austronesian expansion of about 5,200 years ago, and mapping its spread
-draws lines fanning out across the Pacific along the paths of that expansion (Figure 9.3). Here the
+draws lines fanning out across the Pacific along the paths of that expansion (Figure 9.3). Drawing this
+correctly takes one small cartographic care the machine applies automatically: the map is re-centred on
+the motif's own region, its central meridian set to the circular mean of its traditions, so that a
+Pacific-spread distribution reads as a coherent fan *around* the ocean rather than being torn in two by
+the arbitrary Atlantic seam of a standard projection. Here the
 fossil-record dream of comparative mythology is, for once, realised: not just *that* a motif was
 inherited but roughly *when* and *from where*, and along which routes it travelled. The estimate is
 honest about its resolution — it is a family-level point estimate, not a node-consistent reconstruction

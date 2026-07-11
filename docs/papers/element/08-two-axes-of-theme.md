@@ -29,11 +29,16 @@ complete: the 141 motifs the hand scheme leaves un-grouped all receive a theme.
 
 Its agreement with the hand scheme is only moderate — an adjusted Rand index of 0.12 — and the
 disagreement is informative rather than noisy. Where the two agree, they agree on the celestial,
-cosmogonic, and formulaic block, which the data recovers cleanly. Where they diverge, the data isolates
-tight micro-complexes the hand scheme buries: the Formulae group comes out 100% pure, the African
-death-messenger complex emerges as its own thing, and the trickster's zoological *casting* — which
-animals play which roles — separates from trickster *plots*. The data sees structure the etiological
-ordering was not built to see.
+cosmogonic, and formulaic block, which the data recovers cleanly. Where they diverge, the data does two
+things the etiological ordering cannot. It breaks the giant catch-alls open (§8.2), and it **splits the
+thin hand-themes by morphology**, isolating micro-complexes the subject-ordering buries. Berezkin's
+"Identifications" theme, for instance — motifs about who a character *is* — the data pulls apart into two
+very pure clusters: a *casting of the trickster* (which animal plays the fool-maker — coyote, raven, fox,
+hare, spider) and a *casting of the victim* (which animal is fooled), the latter coming out 100% pure at
+just ten motifs. The "Origin of death" theme splits into a swallower-and-body complex and a small,
+clean death-messenger complex; even "Formulae" separates a pure rhetorical core from cosmogonic
+descriptive clichés. The etiological scheme sorts these by what they explain; the data sorts them by how
+the tale casts and builds them, and sees structure the older ordering was never designed to see.
 
 ## 8.2 Orthogonality: what a myth explains versus how a tale is built
 
