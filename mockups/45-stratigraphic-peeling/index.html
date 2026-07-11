@@ -117,7 +117,8 @@ function renderTree(){
   const el = document.getElementById("tree");
   if(mode==="factors"){
     el.innerHTML = `<div class="muted" style="margin-bottom:6px">ordered deep → shallow (M17 depth score)</div>` + D.factors.map(f=>{
-      return `<div class="node ${selFactor===f.id?"on":""}" data-f="${f.id}"><span class="dot" style="background:${f.color}"></span><span class="nm">Factor ${f.id+1}</span><span class="ct" title="M17 disjunction depth (0–100)">▲ ${f.depth}</span></div>`;
+      const cont = Object.entries(f.cont).slice(0,2).map(([k,v])=>`${k} ${v}`).join(" · ");
+      return `<div class="node ${selFactor===f.id?"on":""}" data-f="${f.id}"><span class="dot" style="background:${f.color}"></span><span class="nm">Factor ${f.id+1}</span><span class="sub" style="margin-left:6px">${esc(cont)}</span><span class="ct" title="M17 disjunction depth (0–100)">▲ ${f.depth}</span></div>`;
     }).join("");
     el.querySelectorAll("[data-f]").forEach(n=>n.onclick=()=>{selFactor=+n.dataset.f; drawMap(); renderTree(); renderDetail();});
     return;
