@@ -16,8 +16,8 @@ cat ~/.ssh/id_ed25519.pub
 ```
 
 ## Rent the GPU (website)
-- **RunPod:** Billing → add $10 · Settings → SSH Public Keys → paste · Pods → Deploy (24 GB GPU, PyTorch
-  template, 30 GB disk) → Connect.
+- **RunPod (recommended):** Billing → add $10 · Settings → SSH Public Keys → paste · Pods → Deploy →
+  **Community Cloud** tab → **RTX 4090** (or L40S) · PyTorch template · 30 GB disk → Connect.
 - **Vast.ai:** Billing → add $10 · Account → SSH Keys → paste · Search (RTX 4090, ≥24 GB, reliability ≥0.99,
   PyTorch image) → Rent · Instances → Connect.
 

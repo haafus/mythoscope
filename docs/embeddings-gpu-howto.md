@@ -6,6 +6,27 @@ either service** and no prior experience with them.
 
 ---
 
+## Final recommendation (the configuration to use)
+
+For MythoScope, use this configuration:
+
+- **Service:** **RunPod, Community Cloud** (its cheaper marketplace tier — first-party reliability, but
+  community-hosted prices).
+- **GPU:** **RTX 4090** — the best price/speed for this job (24 GB is enough for both models). If an
+  **L40S** (48 GB) is available at a good price, take it for extra headroom.
+- **Environment:** **Ubuntu + CUDA + Python 3.11**, running the models through **sentence-transformers**
+  (the project's default path) — or **vLLM** if the model is supported and you want a faster serving path.
+
+> On the two engine choices: the project's `mytho embeddings` command runs **sentence-transformers** out
+> of the box (nothing extra to set up — this is what the steps below use). **vLLM** is an optional,
+> faster alternative for serving, but it is not wired into the pipeline; use it only if you're comfortable
+> exporting vectors yourself, and note vLLM's embedding support is model-dependent.
+
+The rest of this document is the full walk-through for exactly that setup. Where it says "RunPod" in
+Part 1, choose the **Community Cloud** tab and an **RTX 4090** offer.
+
+---
+
 ## The mental model (read this first)
 
 You do **not** move your whole project to the cloud. You do this:
