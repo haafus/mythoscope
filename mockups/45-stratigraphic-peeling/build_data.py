@@ -237,6 +237,56 @@ factor_info={
   "nmf":{"label":"NMF","desc":"Non-negative matrix factorisation (Euclidean) on the coverage-corrected (L1+idf) matrix. Isolates a clean Austronesian/Oceanic layer, but is not corrected for cataloguing effort by construction."},
   "poisson":{"label":"M38 Poisson","desc":"Effort-corrected Poisson factorisation with an exposure offset a(t) — the M38 form, coverage-corrected by construction. Distributes Oceania across factors rather than isolating it."}}
 
+# ==== Worldview peel — same method in THEME-PROFILE space (the orthogonal axis) ====
+GRP=sorted({MOT[j].get("motif_group_num") for j in range(M) if MOT[j].get("motif_group_num")})
+GIDX={g:i for i,g in enumerate(GRP)}; GA={"01","02","03","04","05","06","07","08","09"}
+Xt=np.zeros((N,len(GRP)),np.float32)
+for i,tid in enumerate(keep):
+    for j in tset[tid]:
+        g=MOT[j].get("motif_group_num")
+        if g in GIDX: Xt[i,GIDX[g]]+=1
+tprof=Xt/(Xt.sum(1,keepdims=True)+1e-9); TOVER=tprof.mean(0)
+tclr=np.log(tprof+1e-3); tclr=tclr-tclr.mean(1,keepdims=True)   # CLR theme profile
+def a_share(idx):
+    p=tprof[idx].mean(0); return float(sum(p[GIDX[g]] for g in GRP if g in GA))
+def m17_depth(idx):
+    prevb=Xb[idx].mean(0); lift=prevb/(OVER+1e-9)
+    cand=[j for j in np.argsort(-lift) if prevb[j]>=0.30 and not np.isnan(depth[j])][:15]
+    ds=[depth[j] for j in cand]; return round(float(np.mean(ds)),1) if ds else None
+GNAME={"01":"Sun&Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence",
+       "07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks",
+       "12":"Names","13":"Formulae"}
+def theme_name(idx,level,is_leaf):
+    if level==0: return "All traditions"
+    a=a_share(idx); mp=tprof[idx].mean(0)
+    base="Cosmology-rich" if a>=0.55 else ("Märchen / trickster" if a<=0.35 else "Mixed genre")
+    if not is_leaf: return base
+    top=max(GRP,key=lambda g:mp[GIDX[g]]/(TOVER[GIDX[g]]+1e-9))   # most over-represented theme (lift)
+    return f"{base} · {GNAME.get(top,top)}"
+tnodes=[]; tleaf={}
+def tpeel(idx,nid,parent,level):
+    n=len(idx); V=tclr[idx]; lab,_=ward_route(V); m=lab>=0
+    sil=float(silhouette_score(V[m],lab[m])) if len(set(lab[m]))>1 else 0.0
+    is_leaf=(n<MIN_NODE) or (level>=DEPTH) or (len(set(lab[m]))<2)
+    mp=tprof[idx].mean(0); md=m17_depth(idx)
+    tnodes.append({"id":nid,"parent":parent,"level":level,"name":theme_name(idx,level,is_leaf),"n":n,
+        "sil":round(sil,3),"leaf":is_leaf,"a_share":round(a_share(idx),2),
+        "cont":dict(Counter(cont(macro_of[keep[i]]) for i in idx).most_common()),
+        "macros":[{"name":a,"n":v} for a,v in Counter(macro_of[keep[i]] for i in idx).most_common(6)],
+        "themes":[{"grp":g,"n":round(100*float(mp[GIDX[g]]))} for g in sorted(GRP,key=lambda g:-mp[GIDX[g]])[:6]],
+        "core":core_motifs(idx,8),
+        "depth_index":md,"depth_label":("deep / near-global" if md and md>=62 else "intermediate" if md and md>=45 else "shallow / regional")})
+    if is_leaf:
+        for i in idx: tleaf[i]=nid
+        return
+    gs=sorted([[idx[i] for i in range(n) if lab[i]==c] for c in sorted(set(lab[m]))],key=len)
+    for gj,g in enumerate(gs): tpeel(g,f"{nid}.{gj}",nid,level+1)
+tpeel(list(range(N)),"0",None,0)
+tleaves=[nd for nd in tnodes if nd["leaf"]]
+tlc={nd["id"]:PAL[i%len(PAL)] for i,nd in enumerate(tleaves)}
+for nd in tnodes:
+    if nd["leaf"]: nd["color"]=tlc[nd["id"]]
+
 # ---- points for the map (colored by leaf) ----
 leaves=[nd for nd in nodes if nd["leaf"]]
 lcolor={nd["id"]:PAL[i%len(PAL)] for i,nd in enumerate(leaves)}
@@ -247,11 +297,12 @@ for i,tid in enumerate(keep):
     c=coord(tid); lid=leaf_of.get(i)
     if c and lid:
         points.append({"lon":round(c[1],2),"lat":round(c[0],2),"leaf":lid,
+                       "leaf_theme":tleaf.get(i),
                        "name":TR[tid]["name"],"macro":macro_of[tid]})
 
-data={"n_trad":N,"n_motif":M,"depth":DEPTH,"nodes":nodes,"points":points,
+data={"n_trad":N,"n_motif":M,"depth":DEPTH,"nodes":nodes,"theme_nodes":tnodes,"points":points,
       "factors":factors,"factor_info":factor_info,
-      "note":"Coverage-corrected recursive peel (L1+idf) + two soft-factor models (NMF, M38 Poisson), both dated by the M17 depth score. Structure is clinal; the hard tree is a discretisation."}
+      "note":"Two spaces: geography (motif-attestation, clinal) via hard peel + NMF/M38 soft factors, and worldview (theme-profile, modular) via the theme peel. All dated by the M17 depth score."}
 out=Path(__file__).parent/"data.js"
 out.write_text("window.DATA = "+json.dumps(data,ensure_ascii=False)+";",encoding="utf-8")
-print(f"{len(nodes)} nodes ({len(leaves)} leaves) · {len(points)} placed · {K} factors · data.js ~{out.stat().st_size//1024}KB")
+print(f"{len(nodes)} geo nodes ({len(leaves)} leaves) · {len(tnodes)} theme nodes ({len(tleaves)} leaves) · {len(points)} placed · data.js ~{out.stat().st_size//1024}KB")

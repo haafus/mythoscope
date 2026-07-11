@@ -71,6 +71,24 @@ python -m http.server -d mockups 8890
 # → http://127.0.0.1:8890/45-stratigraphic-peeling/
 ```
 
+## Two spaces — Worldview mode (theme-profile)
+
+The same recursive peel runs in **two spaces**, toggled and grouped in the toolbar:
+
+- **Geography** (motif-attestation, the modes above) — recovers areal structure, but is **clinal**
+  (isolation-by-distance; top-split silhouette ≈ 0.03), so its layers discretise a gradient.
+- **Worldview** (theme-profile, the mockup 16 / 23 axis) — clusters traditions by their **13-dim genre
+  balance** (CLR), recovering *what kind of stories* a tradition tells. This peel is far more **modular**
+  (top-split silhouette ≈ 0.16, up to 0.45 deeper): the top split is a young **märchen/trickster** block
+  (cosmology-share A ≈ 28 %, M17 depth ≈ 6) vs a deep **cosmology-rich** block (A ≈ 58 %, depth ≈ 53–87),
+  and it **crosses continents** — on the map the worldview colours are intermixed across regions, where the
+  geography colours cluster by region. Each theme layer carries its A-share, M17 depth, genre profile and
+  core motifs.
+
+**The finding:** the two axes differ in *topology* — **geography is a continuum, worldview has discrete
+layers** — so the theme-profile space is the one where a recursive *dated* stratigraphy actually finds
+strata (young märchen → deep cosmology) rather than discretising a gradient.
+
 ## Agreement with Berezkin's own partition
 
 The hard-layer map is the only prototype that shows a single coverage-corrected **nested** areal partition
