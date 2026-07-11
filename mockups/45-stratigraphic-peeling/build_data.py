@@ -243,39 +243,69 @@ def m17_depth(idx):
     cand=[j for j in np.argsort(-lift) if prevb[j]>=0.30 and not np.isnan(depth[j])][:15]
     ds=[depth[j] for j in cand]; return round(float(np.mean(ds)),1) if ds else None
 
-def worldview_peel(prof, over, gname, glabel, cosmo_cols, thi, tlo):
+def worldview_peel(prof, over, glabel, gname, sig_labels, cosmo_cols, thi, tlo):
     """Generic recursive peel in a genre-profile space (CLR). Returns (nodes, leaf_of).
-    gname = short cluster names (for node naming); glabel = value stored per profile column."""
+    Names combine a depth register (Deep / Young) with a *signature* form — the cluster most
+    over-represented vs the parent block, so siblings diverge by construction. A dedup pass then
+    disambiguates any remaining collisions on the first dimension that actually differs across the
+    tied group (continent → macro-area → secondary signature form). glabel = value stored per
+    profile column; gname = short cluster name; sig_labels = evocative noun phrase for the name."""
     clr=np.log(prof+1e-3); clr=clr-clr.mean(1,keepdims=True)
     K=prof.shape[1]
     def a_share(idx):
         p=prof[idx].mean(0); return float(sum(p[k] for k in cosmo_cols))
-    def wv_name(idx,level,is_leaf):
+    def sig_order(mp, pp):
+        cand=[k for k in range(K) if mp[k]>=0.03] or list(range(K))
+        return sorted(cand, key=lambda k: mp[k]/(pp[k]+1e-6), reverse=True)   # most over-rep vs parent first
+    def pick_sig(order, psig):
+        if psig is None: return order[0]
+        for k in order:                         # skip the form inherited from the parent block
+            if k!=psig: return k
+        return order[0]
+    def wv_name(level, a, k):
         if level==0: return "All traditions"
-        a=a_share(idx); mp=prof[idx].mean(0)
-        base="Cosmology-rich" if a>=thi else ("Märchen / trickster" if a<=tlo else "Mixed genre")
-        if not is_leaf: return base
-        top=max(range(K),key=lambda k:mp[k]/(over[k]+1e-9))   # most over-represented cluster (lift)
-        return f"{base} · {gname[top]}"
+        reg="Deep " if a>=thi else ("Young " if a<=tlo else "")
+        return reg + sig_labels[k]
     nodes=[]; leaf={}
-    def rec(idx,nid,parent,level):
+    def rec(idx,nid,parent,level,pp,psig):
         n=len(idx); V=clr[idx]; lab,_=ward_route(V); m=lab>=0
         sil=float(silhouette_score(V[m],lab[m])) if len(set(lab[m]))>1 else 0.0
         is_leaf=(n<MIN_NODE) or (level>=DEPTH) or (len(set(lab[m]))<2)
-        mp=prof[idx].mean(0); md=m17_depth(idx)
-        nodes.append({"id":nid,"parent":parent,"level":level,"name":wv_name(idx,level,is_leaf),"n":n,
-            "sil":round(sil,3),"leaf":is_leaf,"a_share":round(a_share(idx),2),
+        mp=prof[idx].mean(0); md=m17_depth(idx); a=a_share(idx); order=sig_order(mp,pp)
+        mysig=pick_sig(order,psig)
+        macs=[a2 for a2,_ in Counter(macro_of[keep[i]] for i in idx).most_common(6)]
+        nodes.append({"id":nid,"parent":parent,"level":level,"name":wv_name(level,a,mysig),"n":n,
+            "sil":round(sil,3),"leaf":is_leaf,"a_share":round(a,2),
             "cont":dict(Counter(cont(macro_of[keep[i]]) for i in idx).most_common()),
-            "macros":[{"name":a,"n":v} for a,v in Counter(macro_of[keep[i]] for i in idx).most_common(6)],
+            "macros":[{"name":a2,"n":v} for a2,v in Counter(macro_of[keep[i]] for i in idx).most_common(6)],
             "themes":[{"grp":glabel[k],"n":round(100*float(mp[k]))} for k in sorted(range(K),key=lambda k:-mp[k])[:6]],
             "core":core_motifs(idx,8),
-            "depth_index":md,"depth_label":("deep / near-global" if md and md>=62 else "intermediate" if md and md>=45 else "shallow / regional")})
+            "depth_index":md,"depth_label":("deep / near-global" if md and md>=62 else "intermediate" if md and md>=45 else "shallow / regional"),
+            "_disc":[next(iter(Counter(cont(macro_of[keep[i]]) for i in idx)),None),
+                     SHORT.get(macs[0],macs[0]) if macs else None]+[gname[k] for k in order if k!=mysig][:3]})
         if is_leaf:
             for i in idx: leaf[i]=nid
             return
         gs=sorted([[idx[i] for i in range(n) if lab[i]==c] for c in sorted(set(lab[m]))],key=len)
-        for gj,g in enumerate(gs): rec(g,f"{nid}.{gj}",nid,level+1)
-    rec(list(range(N)),"0",None,0)
+        for gj,g in enumerate(gs): rec(g,f"{nid}.{gj}",nid,level+1,mp,mysig)
+    rec(list(range(N)),"0",None,0,over,None)
+    # dedup: for each tied name, append the first _disc dimension whose values differ across the group
+    for _ in range(4):
+        groups={}
+        for nd in nodes:
+            if nd["level"]>0: groups.setdefault(nd["name"],[]).append(nd)
+        if all(len(g)<2 for g in groups.values()): break
+        for name,g in groups.items():
+            if len(g)<2: continue
+            for dim in range(max(len(nd["_disc"]) for nd in g)):
+                vals=[(nd["_disc"][dim] if dim<len(nd["_disc"]) else None) for nd in g]
+                if len({v for v in vals if v})>1:      # this dimension discriminates
+                    for nd,v in zip(g,vals):
+                        if v: nd["name"]+=f" · {v}"
+                    break
+            else:
+                for i,nd in enumerate(g): nd["name"]+=f" · {i+1}"
+    for nd in nodes: nd.pop("_disc",None)
     lv=[nd for nd in nodes if nd["leaf"]]
     lc={nd["id"]:PAL[i%len(PAL)] for i,nd in enumerate(lv)}
     for nd in nodes:
@@ -288,14 +318,18 @@ GIDX={g:i for i,g in enumerate(GRP)}; GA={"01","02","03","04","05","06","07","08
 GNAME={"01":"Sun&Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence",
        "07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks",
        "12":"Names","13":"Formulae"}
+TSIG={"01":"Sun & Moon","02":"Star lore","03":"Cosmogony & elements","04":"Origin-of-death",
+      "05":"Origin-of-humans","06":"Subsistence culture","07":"Plant & animal origins",
+      "08":"Monstrous beings","09":"Protagonist cycle","10":"Adventure tales","11":"Trick & contest",
+      "12":"Naming lore","13":"Tale formulae"}
 Xt=np.zeros((N,len(GRP)),np.float32)
 for i,tid in enumerate(keep):
     for j in tset[tid]:
         g=MOT[j].get("motif_group_num")
         if g in GIDX: Xt[i,GIDX[g]]+=1
 tprof=Xt/(Xt.sum(1,keepdims=True)+1e-9)
-tnodes,tleaf=worldview_peel(tprof, tprof.mean(0), [GNAME.get(g,g) for g in GRP], list(GRP),
-                            {GIDX[g] for g in GRP if g in GA}, 0.55, 0.35)
+tnodes,tleaf=worldview_peel(tprof, tprof.mean(0), list(GRP), [GNAME.get(g,g) for g in GRP],
+                            [TSIG.get(g,g) for g in GRP], {GIDX[g] for g in GRP if g in GA}, 0.55, 0.35)
 
 # space 2 — data-driven 16-dim narrative form (mockup 41 BGE-M3 clusters)
 tax=json.load(open(ROOT/"mockups"/"41-theme-rederivation"/"narrative_taxonomy.json"))
@@ -305,13 +339,17 @@ NNAME=["Magic flight","Monsters / swallower","Cosmogony","Magic wife","Ogre-flig
        "Stars / rainbow-snake","Origin of humans","Trickster casting","Tale formulae",
        "Origin of death","Dupe casting"]
 NCOSMO={2,8,10,11,14}   # cosmogonic / celestial / origin narrative clusters
+NSIG=["Magic-flight escape","Swallowing monsters","Primeval-waters cosmogony","Magic wife & hard tasks",
+      "Ogre-flight heroics","Avengers & abductions","Grateful-animal fable","Fooling the ogre",
+      "Sun & Moon myths","Animal-bride birth","Star & rainbow-snake lore","Origin of people",
+      "Who-is-the-trickster","Tale formulae","Origin-of-death myth","Who-is-the-dupe"]
 Xn=np.zeros((N,NK),np.float32)
 for i,tid in enumerate(keep):
     for j in tset[tid]:
         nt=NT.get(MOT[j]["id"])
         if nt is not None: Xn[i,nt["l1"]]+=1
 nprof=Xn/(Xn.sum(1,keepdims=True)+1e-9)
-nnodes,nleaf=worldview_peel(nprof, nprof.mean(0), NNAME, NNAME, NCOSMO, 0.42, 0.20)
+nnodes,nleaf=worldview_peel(nprof, nprof.mean(0), NNAME, NNAME, NSIG, NCOSMO, 0.42, 0.20)
 
 # ---- points for the map (colored by leaf) ----
 leaves=[nd for nd in nodes if nd["leaf"]]
