@@ -291,6 +291,13 @@ several of his Eurasian areas (Europe + Near East + Central Asia) into one belt,
 together). So: recognisably Berezkin's geography at coarser resolution, plus a couple of meaningful
 cross-area merges — the map is a faithful, legible synthesis, which is where its value lies.
 
+**Matched to his granularity, the fit is closer.** Our tree is root → New/Old World (2) → 4 → **7 leaves**
+(Africa a leaf at level 2, the rest at level 3). Split each leaf one level deeper (**13 sub-areas**,
+≈ his 16) and agreement with his macro-areas *rises*: **V 0.68 → 0.74, ARI 0.47 → 0.57, homogeneity
+0.59 → 0.71** (completeness dips 0.81 → 0.76 as finer cuts begin to split some of his areas). So the
+partition is a **faithful nested refinement** of Berezkin's scheme — the closer we match his resolution,
+the more it coincides.
+
 > **"Clinal"** = a continuous gradient, not discrete groups. Motif similarity falls off *smoothly* with
 > geographic distance (neighbours always similar, no sharp seam where one "group" ends) — like a colour
 > gradient or a dialect continuum, versus distinct blocks. It is the same thing as the programme's
