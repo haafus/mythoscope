@@ -30,8 +30,23 @@ loads on several at once).
   breadth-based **dating proxy** (broad + disjunct = deep — the root's core is the pan-global celestial
   substrate; peeled leaves are regional/shallow), and **bootstrap stability** (how reproducibly the block
   recovers under resampling — 0.54–0.83 here; the Beringian bridge is the least stable, as expected).
-- **Soft factors (NMF)** — six overlapping latent components with their top motifs and traditions; each hard
-  leaf is matched to its dominant factor, so the two representations can be cross-read.
+- **Soft factors (M38-style + M17 dating)** — the honest layer model: an effort-corrected Poisson
+  factorisation (`P[t,m] ~ Poisson(a(t)·(WH)[t,m])`, the M38 form) into six **overlapping** latent layers,
+  each **dated** by the M17 disjunction depth score of its motifs. This yields a **dated stratigraphy**,
+  ordered deep→shallow — the payoff the hard tree could not give:
+
+  | Layer | depth | geography | core motifs |
+  |---|--:|---|---|
+  | F1 | 81 | Americas | Sun & Moon, Theft of fire, Magic wife, Stars-are-people |
+  | F2 | 72 | Americas + Eurasia | Earth-grows-big, Primeval waters, thunderbirds |
+  | F3 | 63 | Eurasia + Africa | Magic wife, primeval sky, trickster-hare |
+  | F4 | 62 | Eurasia | Man-in-the-Moon, Cosmic hunt, lunar-disc figure |
+  | F5 | 33 | Eurasia + Africa | trickster-fox, external soul, nestlings |
+  | F6 | 30 | Eurasia + Africa | dragon-slayer, kind-and-unkind, personified Death |
+
+  Deep layers are cosmogonic/celestial (+ New-World-endemic); shallow layers are the young Eurasian/African
+  **märchen** (ATU dragon-slayer, kind-and-unkind). Each hard leaf is matched to its dominant factor so the
+  two views cross-read.
 
 ## Data
 

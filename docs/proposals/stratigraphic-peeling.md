@@ -222,5 +222,27 @@ This recommendation is realised as an interactive mockup —
 [`45-stratigraphic-peeling`](../../mockups/45-stratigraphic-peeling/) — visualising the layers, their
 geography, motif composition, proxy dating, bootstrap stability, and the soft-factor cross-check.
 
-*Status: proposal + probes + recommendation, realised in mockup 45. Full M17 dating and M38 integration
-remain to be wired into the production pipeline.*
+### The payoff realised — dated soft layers
+
+Recommendation 2+3 is now done in mockup 45: an **M38-style effort-corrected Poisson factorisation**
+(`P[t,m] ~ Poisson(a(t)·(WH)[t,m])`) into six **overlapping** soft layers, each **dated by the M17
+disjunction depth score** of its motifs — a **dated stratigraphy**, the result the hard clinal tree could
+not give:
+
+| Layer | depth (M17) | geography | core motifs |
+|---|--:|---|---|
+| F1 | 81 | Americas | Sun & Moon · Theft of fire · Magic wife · Stars-are-people |
+| F2 | 72 | Americas + Eurasia | Earth-grows-big · Primeval waters · thunderbirds |
+| F3 | 63 | Eurasia + Africa | Magic wife · primeval sky · trickster-hare |
+| F4 | 62 | Eurasia | Man-in-the-Moon · Cosmic hunt · lunar-disc figure |
+| F5 | 33 | Eurasia + Africa | trickster-fox · external soul · nestlings |
+| F6 | 30 | Eurasia + Africa | dragon-slayer · kind-and-unkind · personified Death |
+
+**The result is content-ful:** the deep layers (F1–F4) are cosmogonic/celestial and New-World-endemic; the
+shallow layers (F5–F6) are the young Eurasian/African **märchen** (ATU dragon-slayer, kind-and-unkind). This
+both *quantifies* and *vindicates* the recommendation — soft, overlapping, datable layers succeed exactly
+where the hard discrete tree failed. It is a proof-of-concept on the M17 disjunction proxy; a production run
+should swap in the real M38 factors + calibrated M17/clade ages.
+
+*Status: proposal + probes + recommendation, realised in mockup 45 including dated soft layers. Production
+wiring (real M38 output, calibrated dating, clade validation) remains.*

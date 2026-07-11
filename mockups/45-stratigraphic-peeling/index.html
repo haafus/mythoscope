@@ -53,13 +53,15 @@
   <p>A coverage-corrected recursive peel of the Berezkin attestation matrix into nested <b>layers</b>,
   with each layer's geography, motif core, a breadth-based <b>dating proxy</b> and <b>bootstrap stability</b>.
   The structure is <b>clinal</b> (isolation-by-distance), so the tree is a <i>discretisation of a continuum</i>,
-  not discrete strata — hence the parallel <b>soft factors</b> (NMF), the honest layer model. Explore both.</p>
+  not discrete strata — hence the parallel <b>soft factors</b> (an M38-style effort-corrected Poisson
+  factorisation), each <b>dated by the M17 depth score</b> of its motifs. That gives a <b>dated stratigraphy</b>
+  of overlapping layers — deep = cosmogonic/celestial, shallow = märchen/trickster. Explore both.</p>
 </header>
 
 <div class="toolbar">
   <div class="seg" id="mode">
     <button data-m="layers" class="on">Hard layers (peel)</button>
-    <button data-m="factors">Soft factors (NMF)</button>
+    <button data-m="factors">Soft factors (M38-style)</button>
   </div>
   <span class="muted" id="stat"></span>
 </div>
@@ -114,9 +116,8 @@ function renderTree(){
   document.getElementById("navTitle").textContent = mode==="layers" ? "Layers (click to inspect)" : "Soft factors";
   const el = document.getElementById("tree");
   if(mode==="factors"){
-    el.innerHTML = D.factors.map(f=>{
-      const cont = Object.entries(f.cont).slice(0,3).map(([k,v])=>`${k} ${v}`).join(" · ");
-      return `<div class="node ${selFactor===f.id?"on":""}" data-f="${f.id}"><span class="dot" style="background:${f.color}"></span><span class="nm">Factor ${f.id+1}</span><span class="ct">${esc(cont)}</span></div>`;
+    el.innerHTML = `<div class="muted" style="margin-bottom:6px">ordered deep → shallow (M17 depth score)</div>` + D.factors.map(f=>{
+      return `<div class="node ${selFactor===f.id?"on":""}" data-f="${f.id}"><span class="dot" style="background:${f.color}"></span><span class="nm">Factor ${f.id+1}</span><span class="ct" title="M17 disjunction depth (0–100)">▲ ${f.depth}</span></div>`;
     }).join("");
     el.querySelectorAll("[data-f]").forEach(n=>n.onclick=()=>{selFactor=+n.dataset.f; drawMap(); renderTree(); renderDetail();});
     return;
@@ -147,8 +148,9 @@ function renderDetail(){
     if(selFactor==null){ d.innerHTML = `<h2>Soft factors (NMF, k=${D.factors.length})</h2><p class="muted">Overlapping latent layers — a tradition loads on several at once, the honest model for clinal data. Click a factor.</p>`; return; }
     const f=D.factors[selFactor];
     d.innerHTML = `<h2><span style="color:${f.color}">■</span> Factor ${f.id+1}</h2>
-      <div class="badges"><span class="badge">${Object.entries(f.cont).slice(0,3).map(([k,v])=>k+" "+v).join(" · ")}</span></div>
-      <h3>Top motifs</h3><table class="core">${f.motifs.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td></tr>`).join("")}</table>
+      <div class="badges"><span class="badge" title="M17 disjunction-weighted depth of the factor's motifs (0–100, high=deep)">depth <b>${f.depth}</b> · ${esc(f.depth_label)}</span><span class="badge">${Object.entries(f.cont).slice(0,3).map(([k,v])=>k+" "+v).join(" · ")}</span></div>
+      <p class="muted">A soft (overlapping) layer — a tradition loads on several. Dated by the M17 depth of its motifs; deep factors are cosmogonic/celestial, shallow ones are märchen/trickster.</p>
+      <h3>Top motifs <span class="sub">(▲ = per-motif M17 depth)</span></h3><table class="core">${f.motifs.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||""}">${m.grp}</span></td><td class="lift">${m.depth==null?"—":"▲"+m.depth}</td></tr>`).join("")}</table>
       <h3>Top traditions</h3><div class="sub">${f.trads.map(esc).join(" · ")}</div>`;
     return;
   }
@@ -178,5 +180,6 @@ function setMode(){
 document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{mode=b.dataset.m; setMode();});
 
 sel = D.nodes[0].id;
+if(location.hash==="#factors"){ mode="factors"; selFactor=0; }
 setMode();
 </script>

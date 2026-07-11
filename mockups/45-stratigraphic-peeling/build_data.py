@@ -9,9 +9,9 @@ import json, sys, math
 from collections import Counter
 from pathlib import Path
 import numpy as np
-from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import AgglomerativeClustering, DBSCAN
 from sklearn.metrics import silhouette_score
-from sklearn.decomposition import NMF
+from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "mockups"))
@@ -159,25 +159,69 @@ for nd in nodes:
     if nd["leaf"]:
         s=stab.get(nd["id"],[]); nd["stability"]=round(float(np.mean(s)),2) if s else None
 
-# ---- NMF soft factors (the "clinal" representation) ----
-K=6
-W=NMF(n_components=K,init="nndsvda",max_iter=400,random_state=0).fit_transform(Xc)
-Hn=NMF(n_components=K,init="nndsvda",max_iter=400,random_state=0).fit(Xc).components_
+# ---- per-motif depth score (M17 Method A, disjunction-weighted) ----
+NW={"NORTH AMERICA: NORTH AND WEST","PLAINS AND SOUTHEAST","MEXICO – CENTRAL ANDES",
+    "EASTERN SOUTH AMERICA","SOUTHERN SOUTH AMERICA","BERINGIA"}
+IP={"OCEANIA","AUSTRALIA"}
+DISJ_W=np.array([-1.0,-0.5,1.0,0.5,0.8,1.0,0.0])   # n_trad n_macro n_lang spread fragments set_span xindex
+def macro_u(t):
+    ap=TR[t].get("areal_path") or []; return ap[0][1].upper() if ap else None
+def lang0(t):
+    lg=TR[t].get("language") or []; return lg[0] if lg else None
+def megaset(mu): return "NW" if mu in NW else ("IP" if mu in IP else "CONT")
+def hav(a,b):
+    la1,lo1,la2,lo2=map(math.radians,[a[0],a[1],b[0],b[1]])
+    h=math.sin((la2-la1)/2)**2+math.cos(la1)*math.cos(la2)*math.sin((lo2-lo1)/2)**2
+    return 2*6371*math.asin(min(1,math.sqrt(h)))
+feat,fidx=[],[]
+for j,m in enumerate(MOT):
+    tids=m.get("traditions") or []
+    if len(tids)<3: continue
+    mus=[macro_u(t) for t in tids if macro_u(t)]
+    langs={lang0(t) for t in tids if lang0(t)}
+    pts=[COORD[t] for t in tids if t in COORD]
+    if len(pts)>=2:
+        cen=(np.mean([p[0] for p in pts]),np.mean([p[1] for p in pts]))
+        spread=np.mean([hav(p,cen) for p in pts])
+        frags=len(set(DBSCAN(eps=0.35,min_samples=1,metric="haversine").fit(np.radians([[p[0],p[1]] for p in pts])).labels_))
+    else: spread,frags=0.0,1
+    feat.append([len(tids),len(set(mus)),len(langs),spread,frags,len({megaset(x) for x in mus}),1+(1 if m.get("atu_refs") else 0)])
+    fidx.append(j)
+Z=StandardScaler().fit_transform(np.array(feat,dtype=float))
+disj=Z@DISJ_W
+depth=np.full(M,np.nan); rank=(disj.argsort().argsort()/(len(disj)-1))*100
+for k,j in enumerate(fidx): depth[j]=rank[k]     # 0..100 percentile, high=deep
+
+# ---- M38-style soft factors: Poisson P[t,m]~Poisson(a(t)(WH)[t,m]) via KL updates ----
+K=6; rng0=np.random.default_rng(0)
+P=Xb; a=P.sum(1,keepdims=True); a[a==0]=1
+W=rng0.random((N,K))+0.1; H=rng0.random((K,M))+0.1; ones=np.ones_like(P)
+for _ in range(220):
+    Mh=a*(W@H)+1e-9; Q=P/Mh
+    H*= ((a*W).T@Q)/(((a*W).T@ones)+1e-9)
+    Mh=a*(W@H)+1e-9; Q=P/Mh
+    W*= (Q@H.T)/((a*(ones@H.T))+1e-9)
+def fdepth(hk):
+    w=hk.copy(); mask=~np.isnan(depth); w=w*mask
+    return float(np.nansum(w*np.nan_to_num(depth))/(w.sum()+1e-9))
 factors=[]
 for f in range(K):
-    topm=np.argsort(-Hn[f])[:8]
-    topt=np.argsort(-W[:,f])[:12]
-    macs=Counter(cont(macro_of[keep[i]]) for i in topt)
-    factors.append({"id":f,"color":PAL[(f+7)%len(PAL)],
-        "cont":dict(macs.most_common()),
-        "motifs":[{"id":MOT[j]["id"],"name":MOT[j]["name"],"grp":MOT[j]["motif_group_num"]} for j in topm],
+    topm=np.argsort(-H[f])[:8]; topt=np.argsort(-W[:,f])[:12]
+    d=fdepth(H[f])
+    factors.append({"id":f,"color":PAL[(f+7)%len(PAL)],"depth":round(d,1),
+        "depth_label":"deep / near-global" if d>=62 else "intermediate" if d>=45 else "shallow / regional",
+        "cont":dict(Counter(cont(macro_of[keep[i]]) for i in topt).most_common()),
+        "motifs":[{"id":MOT[j]["id"],"name":MOT[j]["name"],"grp":MOT[j]["motif_group_num"],
+                   "depth":(None if np.isnan(depth[j]) else round(float(depth[j]),0))} for j in topm],
         "trads":[TR[keep[i]]["name"] for i in topt]})
-# match each leaf to dominant factor
+factors.sort(key=lambda x:-x["depth"])          # dated stratigraphy: deep first
+old2new={f["id"]:i for i,f in enumerate(factors)}
+for i,f in enumerate(factors): f["id"]=i
 dom=W.argmax(1)
 for nd in nodes:
     if nd["leaf"]:
         members=[i for i in leaf_of if leaf_of[i]==nd["id"]]
-        nd["factor"]=int(Counter(dom[i] for i in members).most_common(1)[0][0]) if members else None
+        nd["factor"]=int(old2new[Counter(dom[i] for i in members).most_common(1)[0][0]]) if members else None
 
 # ---- points for the map (colored by leaf) ----
 leaves=[nd for nd in nodes if nd["leaf"]]
