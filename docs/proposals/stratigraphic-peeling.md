@@ -392,10 +392,25 @@ sub-continental scale). Honest triage of the three analogies the material sugges
   deep disjunct substrate; **EOF/rotated-EOF** and **kriging/GP** give cleaner spatial modes and smooth motif
   surfaces; **sea-route (least-cost) distances** could improve the isolation-by-distance fit for the Pacific.
 
-**mockup 46 (migration-surface)** implements the cheapest high-value slice: the Mantel test, AMOVA/F<sub>st</sub>
-with pairwise-area matrix, and an EEMS-lite effective-migration surface + bridge network. It confirms the
-clinal + moderate-areal picture with significance and renders it as a barrier/corridor map — added **rigour +
-visualisation**, not a new discovery.
+Three mockups now realise this recommendation:
+
+- **mockup 46 (migration-surface)** — the Mantel test (r = +0.42), AMOVA/F<sub>st</sub> (0.059) with the
+  pairwise-area matrix, and an EEMS-lite effective-migration surface + bridge network. Confirms the clinal +
+  moderate-areal picture with permutation significance and renders it as a barrier/corridor map.
+- **mockup 47 (admixture)** — the actual STRUCTURE/ADMIXTURE model (X ~ Bernoulli(Q·P), EM) with K chosen by
+  cross-validation. The **CV curve plateaus with no sharp minimum** → admixture finds **no discrete K**, an
+  independent confirmation of the clinal continuum; the K = 5 pools order deep→shallow by M17. A principled,
+  uncertainty-aware replacement for the ad-hoc k = 6 NMF.
+- **mockup 48 (teleconnections)** — the climate-science slice: distance-detrended long-range motif sharing as
+  a macro-area network with communities (Pacific-rim · W-Eurasian belt · E-Asia/Africa · isolated Meso/Andes)
+  and the **teleconnector motifs** (deep M17 74–100 celestial substrate) that drive it — the pan-global
+  disjunct layer as an explicit network rather than a tree.
+
+Together they add **rigour** (permutation p-values, CV, a proper Bernoulli likelihood) and **strong
+visualisations that test existing findings** (barrier/corridor surface, admixture structure, teleconnection
+network). None is a new *discovery* — every one re-confirms the clinal + moderate-areal + deep-disjunct-substrate
+picture, which is itself the honest payoff: four independent methods (peeling, migration surface, admixture CV,
+teleconnections) agree on it.
 
 *Status: proposal + probes + recommendation + mockup 45 (two dated soft-factor models). Value delivered:
 a visualisation and a clean negative result (clinal → no discrete strata). No new scientific finding;

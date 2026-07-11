@@ -1,0 +1,145 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>47 · Admixture</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1000px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 10px; letter-spacing:.01em; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .grid2 { display:grid; grid-template-columns:360px 1fr; gap:14px; align-items:start; }
+  @media (max-width:820px){ .grid2 { grid-template-columns:1fr; } }
+  .pill { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; background:#eef3ee; color:#3a6b4a; border:1px solid #d8e6d8; }
+  .pool { border:1px solid var(--line); border-radius:10px; padding:9px 11px; margin:8px 0; cursor:pointer; }
+  .pool:hover { background:var(--bg); } .pool.on { outline:2px solid #cdd8df; }
+  .pool .hd { display:flex; align-items:center; gap:8px; }
+  .pool .sw { width:13px; height:13px; border-radius:3px; flex:0 0 auto; }
+  .pool .nm { font-weight:700; } .pool .dp { margin-left:auto; font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  table.mot { border-collapse:collapse; width:100%; font-size:11.5px; margin-top:6px; }
+  table.mot td { padding:2px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.mot .id { color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.mot .p { text-align:right; color:#3a6b4a; font-variant-numeric:tabular-nums; }
+  table.mot .d { text-align:right; color:#b45c4b; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .g { display:inline-block; min-width:18px; text-align:center; font-size:9px; color:#fff; background:#8a939a; border-radius:4px; padding:0 3px; }
+  h3 { font-size:12px; margin:14px 0 5px; color:#3a444b; text-transform:uppercase; letter-spacing:.04em; }
+</style>
+
+<main>
+<header>
+  <h1>47 · Admixture</h1>
+  <p>The proper population-genetics <b>admixture</b> model fit to the motif matrix:
+  X[t,m] ~ Bernoulli(<b>Q</b>·<b>P</b>), where each tradition's row of <b>Q</b> is its ancestry proportions over
+  <b>K latent motif-pools</b> and <b>P</b> is each pool's motif frequencies (exact EM). <b>K is chosen by
+  cross-validation</b>, exactly as ADMIXTURE does — and the CV curve <b>plateaus with no sharp minimum</b>,
+  the diagnostic that the material is <b>clinal</b> (a continuum of mixtures, not K discrete populations). A
+  principled, dated replacement for mockup 45's ad-hoc k=6 NMF.</p>
+</header>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Choosing K <span class="muted">— cross-validation</span></h2>
+    <div id="cv"></div>
+    <p class="muted" id="cvnote"></p>
+  </div>
+  <div class="card">
+    <h2>Admixture structure <span class="muted">— each tradition's pool proportions (Q), grouped by macro-area</span></h2>
+    <div id="struct"></div>
+    <p class="muted">Vertical bars = the ~950 traditions; each bar's colours are its mix of the K dated pools (deep→shallow). Few bars are a single colour — <b>most traditions are admixed</b>, the hallmark of a clinal continuum.</p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Dominant pool by tradition <span class="muted">— argmax Q, opacity = assignment confidence</span></h2>
+  <div id="map"></div>
+</div>
+
+<div class="card">
+  <h2>The K dated pools <span class="muted">— deep→shallow by M17; click to highlight on the map</span></h2>
+  <div id="pools"></div>
+</div>
+
+<p class="muted" id="foot"></p>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D=window.DATA, esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LAND=`<path class="land" d="${window.LAND||""}"/>`;
+const GNAME={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+const SHORT={"NORTHERN AND EASTERN EUROPE":"N&E Europe","WESTERN EUROPE, NORTH AFRICA":"W-Eur/N-Afr","SOUTHWEST AND CENTRAL ASIA, ARYAN INDIA":"SW/C-Asia","TIBET, NON-ARYAN SOUTH ASIA, SOUTHEAST ASIA":"Tibet/SE-Asia","EAST ASIA":"E Asia","SIBERIA – MONGOLIA":"Siberia","BERINGIA":"Beringia","OCEANIA":"Oceania","AUSTRALIA":"Australia","Sub-Saharan Africa":"Africa","NORTH AMERICA: NORTH AND WEST":"N America","PLAINS AND SOUTHEAST":"Plains/SE","MEXICO – CENTRAL ANDES":"Meso/Andes","EASTERN SOUTH AMERICA":"E-S America","SOUTHERN SOUTH AMERICA":"S Cone"};
+const POOL=D.pools.map(p=>p.color);
+let sel=null;
+document.getElementById("foot").textContent=D.note;
+
+// ---- CV curve ----
+(function(){
+  const W=330,H=170,pl=42,pb=28,pt=10,pr=10;
+  const xs=D.Ks, ys=D.cv, sd=D.cvsd||xs.map(_=>0);
+  const xmin=xs[0],xmax=xs[xs.length-1], ymin=Math.min(...ys)-Math.max(...sd)-0.001, ymax=Math.max(...ys)+0.001;
+  const X=v=>pl+(W-pl-pr)*(v-xmin)/(xmax-xmin), Y=v=>pt+(H-pt-pb)*(1-(v-ymin)/(ymax-ymin));
+  const path=xs.map((k,i)=>(i?"L":"M")+X(k).toFixed(1)+" "+Y(ys[i]).toFixed(1)).join("");
+  const err=xs.map((k,i)=>`<line x1="${X(k).toFixed(1)}" y1="${Y(ys[i]-sd[i]).toFixed(1)}" x2="${X(k).toFixed(1)}" y2="${Y(ys[i]+sd[i]).toFixed(1)}" stroke="#b9c2c8" stroke-width="1"/>`).join("");
+  const dots=xs.map((k,i)=>`<circle cx="${X(k).toFixed(1)}" cy="${Y(ys[i]).toFixed(1)}" r="${k===D.K?4:2.4}" fill="${k===D.K?'#b45c4b':'#4f7096'}"/>`).join("");
+  const kstar=`<line x1="${X(D.K).toFixed(1)}" y1="${pt}" x2="${X(D.K).toFixed(1)}" y2="${H-pb}" stroke="#b45c4b" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>`;
+  const yt=[ymin,(ymin+ymax)/2,ymax].map(v=>`<text x="6" y="${(Y(v)+3).toFixed(1)}" font-size="9" fill="#9aa">${v.toFixed(3)}</text>`).join("");
+  const xt=xs.map(k=>`<text x="${X(k).toFixed(1)}" y="${H-14}" font-size="9" fill="#9aa" text-anchor="middle">${k}</text>`).join("");
+  document.getElementById("cv").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    <line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#e0dccf"/><line x1="${pl}" y1="${pt}" x2="${pl}" y2="${H-pb}" stroke="#e0dccf"/>
+    ${kstar}${yt}${xt}${err}<path d="${path}" fill="none" stroke="#4f7096" stroke-width="1.8"/>${dots}
+    <text x="${(pl+W)/2}" y="${H-2}" font-size="9" fill="#9aa" text-anchor="middle">K (number of pools)</text>
+    <text x="10" y="${pt}" font-size="9" fill="#9aa">held-out deviance</text></svg>`;
+  document.getElementById("cvnote").innerHTML=`Knee at <b>K = ${D.K}</b>. The curve flattens after — gains past the knee sit within CV noise (±${Math.max(...sd).toFixed(3)}), so there is <b>no discrete K</b>: the admixture model itself confirms the structure is <b>clinal</b>.`;
+})();
+
+// ---- structure plot ----
+(function(){
+  const bars=D.bars, K=D.K, n=bars.length, H=104, GAP=6;
+  const w=n+ (D.spans.length-1)*GAP;
+  let x=0, rects="", labels="", lastEnd=0, gi=0;
+  D.spans.forEach((sp,si)=>{
+    for(let i=sp.start;i<sp.end;i++){
+      const b=bars[i]; let y=0;
+      for(let k=0;k<K;k++){ const h=b.q[k]*H; if(h>0.15) rects+=`<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="1.05" height="${h.toFixed(2)}" fill="${POOL[k]}"/>`; y+=h; }
+      x+=1;
+    }
+    const mid=x-(sp.end-sp.start)/2;
+    labels+=`<line x1="${x.toFixed(1)}" y1="0" x2="${x.toFixed(1)}" y2="${H+4}" stroke="#fff" stroke-width="1.4"/>`;
+    labels+=`<text x="${mid.toFixed(1)}" y="${H+13}" font-size="7.5" fill="#6c757d" text-anchor="end" transform="rotate(-40 ${mid.toFixed(1)} ${H+13})">${esc(SHORT[sp.macro]||sp.macro)}</text>`;
+    x+=GAP;
+  });
+  document.getElementById("struct").innerHTML=`<svg viewBox="0 0 ${w} ${H+42}" style="width:100%;height:auto" preserveAspectRatio="none">${rects}${labels}</svg>`;
+})();
+
+// ---- map ----
+function drawMap(){
+  const pts=D.points.map(p=>{
+    const on=sel==null||p.dom===sel;
+    return `<circle cx="${(p.lon+180).toFixed(1)}" cy="${(90-p.lat).toFixed(1)}" r="${on?1.3:0.7}" fill="${on?POOL[p.dom]:'#c3c3c3'}" fill-opacity="${on?(0.35+0.6*p.conf).toFixed(2):0.25}"><title>${esc(p.name)} — ${esc(SHORT[p.macro]||p.macro)} · pool ${p.dom+1} (${Math.round(p.conf*100)}%)</title></circle>`;
+  }).join("");
+  document.getElementById("map").innerHTML=`<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${pts}</svg>`;
+}
+drawMap();
+
+// ---- pool cards ----
+function renderPools(){
+  document.getElementById("pools").innerHTML=D.pools.map(p=>{
+    const cont=Object.entries(p.cont).slice(0,3).map(([k,v])=>`${k} ${v}`).join(" · ");
+    const mot=p.motifs.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||''}">${m.grp||'–'}</span></td><td class="p" title="pool frequency">${m.p}</td><td class="d" title="M17 depth">${m.depth==null?'—':'▲'+m.depth}</td></tr>`).join("");
+    return `<div class="pool ${sel===p.id?'on':''}" data-k="${p.id}">
+      <div class="hd"><span class="sw" style="background:${p.color}"></span><span class="nm">Pool ${p.id+1}</span>
+        <span class="muted">${esc(cont)}</span>
+        <span class="dp" title="M17 disjunction depth (0–100)">▲ ${p.depth} · ${p.n} trad</span></div>
+      <table class="mot">${mot}</table></div>`;
+  }).join("");
+  document.querySelectorAll("[data-k]").forEach(el=>el.onclick=()=>{const k=+el.dataset.k; sel=sel===k?null:k; drawMap(); renderPools();});
+}
+renderPools();
+</script>

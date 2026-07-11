@@ -588,6 +588,23 @@ Austronesian reach. **Q.** Do genetics tools (admixture-adjacent) add rigour/str
 barrier/corridor map + bridge network — descriptive, not demographic (no admixture-LD clock; dating stays
 M17). See [`46-migration-surface/README.md`](46-migration-surface/README.md).
 
+### 47 · Admixture
+The proper **STRUCTURE/ADMIXTURE** model fit to the matrix: X ~ Bernoulli(**Q·P**), K by cross-validation
+(exact EM). **Q.** Does a principled admixture model find a natural K to replace mockup 45's ad-hoc k=6?
+**Finding.** The CV curve drops to K≈5 then **plateaus with no sharp minimum** — admixture finds **no
+discrete K**, the diagnostic of a clinal continuum of mixtures; most traditions are visibly admixed. The
+K=5 pools order deep→shallow by M17 (New-World cosmogony → Eurasian/African trickster → European märchen).
+Descriptive, not demographic (no admixture-LD clock). See [`47-admixture/README.md`](47-admixture/README.md).
+
+### 48 · Teleconnections
+Climate-science **teleconnections**: distance-detrended long-range (>3000 km) motif sharing aggregated to a
+macro-area network with communities + the motifs responsible. **Q.** What long-range reticulation does
+isolation-by-distance leave unexplained? **Finding.** A tight western-Eurasian belt + trans-Pacific/Atlantic
+links; communities = Pacific-rim (New World + Oceania) · W-Eurasian belt · E-Asia/Africa · isolated
+Meso/Andes. The **teleconnector motifs** are the deep (M17 74–100) disjunct celestial substrate
+(Pleiades-as-people, Sun & Moon, rainbow serpent) — the pan-global layer as a network, not a tree. See
+[`48-teleconnections/README.md`](48-teleconnections/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
