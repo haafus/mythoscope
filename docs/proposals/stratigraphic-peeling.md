@@ -298,6 +298,30 @@ cross-area merges — the map is a faithful, legible synthesis, which is where i
 partition is a **faithful nested refinement** of Berezkin's scheme — the closer we match his resolution,
 the more it coincides.
 
+### Two spaces — geography is clinal, worldview is modular (the better place to peel)
+
+The peel above runs in **motif-attestation space** (tradition × 3488 motifs → *who shares which specific
+stories* → **geography**). Running the same recursive peel in **theme-profile space** (tradition × 13 theme
+groups → *what kind of stories a tradition tells* → **worldview/genre**, the mockup 16 / 23 axis) gives a
+sharply different — and more useful — result:
+
+- **The top split is worldview, not geography, and it is dated.** In CLR theme-profile space the root split
+  is a **märchen/trickster** block (Adventures/Tricks-heavy, cosmology-share A = 28 %, M17 depth ≈ 3 — young)
+  vs a **cosmology-rich** block (A = 58 %, depth ≈ 30). It **crosses continents** — the cosmology block pools
+  Americas + Eurasia + Oceania — exactly the etiological↔narrative second axis (Element ch. 8), now as a
+  *dated hierarchy*.
+- **Theme space is genuinely modular; motif space is clinal.** Top-split silhouette is **+0.16** (and
+  **0.11–0.44** at deeper levels) in theme-profile space versus **+0.028** in motif space — a ~7× difference.
+  So the two axes differ not only in *content* but in **topology**: **geography is a continuum**
+  (isolation-by-distance, where peeling only discretises), while **worldview has real discrete-ish layers**
+  (where recursive peeling actually finds structure).
+
+**Consequence:** theme-profile space is the *right* place for a recursive dated stratigraphy — it yields
+genuine worldview strata (young märchen → deep cosmology) orthogonal to the geographic areas, where the
+geographic peel could only discretise a gradient. This is a recursive/dated generalisation of the flat
+theme-profile clustering (mockup 16) and the theme co-occurrence A/B (mockup 23); the modular-vs-clinal
+contrast between the two spaces is itself a small but real finding.
+
 > **"Clinal"** = a continuous gradient, not discrete groups. Motif similarity falls off *smoothly* with
 > geographic distance (neighbours always similar, no sharp seam where one "group" ends) — like a colour
 > gradient or a dialect continuum, versus distinct blocks. It is the same thing as the programme's
