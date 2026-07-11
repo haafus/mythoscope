@@ -454,8 +454,8 @@ not motif-to-motif links (see the culture dictionary, §9).
   merge into the previous culture.
 - Culture sub-areas carry parse noise; the region-less tail is mostly rare
   cultures plus unsplit compound labels (`England, U.S.`) — see
-  `troubleshooting.md`. The broad **region** tags themselves are one of four
-  non-aligned macro-region schemes (also in `troubleshooting.md`).
+  `../troubleshooting.md`. The broad **region** tags themselves are one of six
+  non-aligned macro-region schemes (also in `../troubleshooting.md`).
 - Bibliography links cover ~71% of citation uses; foreign long-tail and
   author-in-journal citations are not linked to the exact edition.
 - `substantive`, `definition`, region tags and citation links are interpretive

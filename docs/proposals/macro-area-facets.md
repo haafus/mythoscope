@@ -3,8 +3,8 @@
 > Stage 3 (**systematics**) of the overall arc in
 > [`analysis-program.md`](analysis-program.md): collect → describe → **classify** → explain.
 
-Extends [`troubleshooting.md`](../motifs/troubleshooting.md) §"four macro-region
-vocabularies". A first draft of this proposal treated *area · family · transmission*
+Extends [`troubleshooting.md`](../troubleshooting.md) §"competing macro-area
+schemes". A first draft of this proposal treated *area · family · transmission*
 as three facets **of a tradition**. That was wrong on one point, and fixing it
 simplifies the rest: the three things do not live on the same entity.
 
@@ -23,7 +23,7 @@ small vocabulary, not three columns on one table.
 Evidence base: Berezkin's authoritative 16 macro-areas and their `areal_path`
 subregions; the per-tradition `language` families; the 14 biclusters of
 [`15-berezkin-clusters-report`](../../mockups/15-berezkin-clusters-report/); the
-four existing schemes (troubleshooting §schemes).
+five existing schemes (troubleshooting §schemes; this proposal's `area` is the sixth, the target).
 
 ## Berezkin's own method: analyse the catalogue in parts
 
