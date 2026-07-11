@@ -4,7 +4,47 @@ from corpus.clean_gutenberg import (
     _remove_header_metadata,
     clean_gutenberg_text,
     is_gutenberg_text,
+    trim_to_content,
 )
+
+
+class TestTrimToContent:
+    def test_start_marker_trims_front(self):
+        text = "Translator's preface, all editorial.\n\nBOOK I\nSing, O Muse, the tale."
+        out = trim_to_content(text, content_start="Sing, O Muse")
+        assert out == "Sing, O Muse, the tale."
+
+    def test_end_marker_trims_back(self):
+        text = "The story ends here.\n\nGLOSSARY\nword: meaning"
+        out = trim_to_content(text, content_end="GLOSSARY")
+        assert out == "The story ends here."
+
+    def test_start_and_end_together(self):
+        text = "preface\n\nOm! the body begins\nmiddle\n\nAPPENDIX\nback matter"
+        out = trim_to_content(text, content_start="Om! the body begins", content_end="APPENDIX")
+        assert out == "Om! the body begins\nmiddle"
+
+    def test_whitespace_tolerant_match(self):
+        # marker words separated differently (newline vs space) still match
+        text = "front\n\nTell me,\nO   Muse, of the hero"
+        out = trim_to_content(text, content_start="Tell me, O Muse")
+        assert out.startswith("Tell me,")
+
+    def test_end_uses_last_occurrence(self):
+        # a marker word also in a front table of contents must not cut early
+        text = "CONTENTS NOTES\n\nreal body text\n\nNOTES\n1. a note"
+        out = trim_to_content(text, content_end="NOTES")
+        assert "real body text" in out
+        assert "1. a note" not in out
+
+    def test_missing_marker_keeps_text(self):
+        text = "some body without the marker"
+        out = trim_to_content(text, content_start="NONEXISTENT", content_end="ALSO MISSING")
+        assert out == text
+
+    def test_no_markers_is_noop(self):
+        text = "unchanged body"
+        assert trim_to_content(text) == text
 
 
 class TestIsGutenbergText:

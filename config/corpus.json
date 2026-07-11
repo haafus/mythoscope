@@ -9,7 +9,8 @@
     "title": "The Koran",
     "tradition": "Islam",
     "url": "https://www.gutenberg.org/cache/epub/7440/pg7440.txt",
-    "description": "An English translation of the Qur'an, the central sacred text of Islam, presenting revelations associated with the Prophet Muhammad."
+    "description": "An English translation of the Qur'an, the central sacred text of Islam, presenting revelations associated with the Prophet Muhammad.",
+    "content_start": "PRAISE be to GOD, the LORD of all creatures"
   },
   {
     "title": "The Analects of Confucius",
@@ -27,7 +28,9 @@
     "title": "The Ramayan of Valmiki",
     "tradition": "Hinduism",
     "url": "https://www.gutenberg.org/cache/epub/24869/pg24869.txt",
-    "description": "An English verse translation of the Ramayana, one of India's great mythological epics, narrating the deeds of Rama, Sita, Hanuman, and Ravana."
+    "description": "An English verse translation of the Ramayana, one of India's great mythological epics, narrating the deeds of Rama, Sita, Hanuman, and Ravana.",
+    "content_start": "bird of charming song",
+    "content_end": "APPENDIX"
   },
   {
     "title": "The Dhammapada",
@@ -45,13 +48,15 @@
     "title": "Myths and Legends of China",
     "tradition": "Chinese",
     "url": "https://www.gutenberg.org/cache/epub/15250/pg15250.txt",
-    "description": "A broad collection of Chinese myths, legends, deities, culture heroes, creation stories, and folk religious traditions."
+    "description": "A broad collection of Chinese myths, legends, deities, culture heroes, creation stories, and folk religious traditions.",
+    "content_start": "The most conspicuous figure in Chinese cosmogony"
   },
   {
     "title": "Buddhist Psalms",
     "tradition": "Japanese Buddhism",
     "url": "https://www.gutenberg.org/cache/epub/7015/pg7015.txt",
-    "description": "English translations of devotional Japanese Buddhist poems associated with Shinran Shonin and Pure Land religious thought."
+    "description": "English translations of devotional Japanese Buddhist poems associated with Shinran Shonin and Pure Land religious thought.",
+    "content_start": "Since He who is Infinite attained unto the Wisdom Supreme"
   },
   {
     "title": "The Book of the Dead",
@@ -81,43 +86,54 @@
     "title": "Kalevala The Epic Poem of Finland",
     "tradition": "Finnish",
     "url": "https://www.gutenberg.org/cache/epub/5186/pg5186.txt",
-    "description": "The Finnish national epic, compiled from oral poetry, featuring creation myths, magic songs, heroes, shamans, and mythic quests."
+    "description": "The Finnish national epic, compiled from oral poetry, featuring creation myths, magic songs, heroes, shamans, and mythic quests.",
+    "content_end": "GLOSSARY"
   },
   {
     "title": "The Mabinogion",
     "tradition": "Celtic",
     "url": "https://www.gutenberg.org/cache/epub/5160/pg5160.txt",
-    "description": "A collection of medieval Welsh tales containing Celtic mythological motifs, heroic legends, magical transformations, and Arthurian material."
+    "description": "A collection of medieval Welsh tales containing Celtic mythological motifs, heroic legends, magical transformations, and Arthurian material.",
+    "content_start": "King Arthur was at Caerlleon upon Usk",
+    "content_end": "FOOTNOTES"
   },
   {
     "title": "The Nibelungenlied",
     "tradition": "Germanic",
     "url": "https://www.gutenberg.org/cache/epub/7321/pg7321.txt",
-    "description": "A medieval German heroic epic involving Siegfried, Kriemhild, dragons, treasure, betrayal, and mythic heroic tradition."
+    "description": "A medieval German heroic epic involving Siegfried, Kriemhild, dragons, treasure, betrayal, and mythic heroic tradition.",
+    "content_start": "To us in olden story"
   },
   {
     "title": "West African Folk-Tales",
     "tradition": "West African",
     "url": "https://www.gutenberg.org/cache/epub/66923/pg66923.txt",
-    "description": "A collection of West African folktales, including trickster and animal stories often associated with Anansi and oral storytelling traditions."
+    "description": "A collection of West African folktales, including trickster and animal stories often associated with Anansi and oral storytelling traditions.",
+    "content_start": "In the olden days all the stories which men told were stories of Nyankupon",
+    "content_end": "NOTES"
   },
   {
     "title": "Australian Legendary Tales",
     "tradition": "Australian Aboriginal",
     "url": "https://www.gutenberg.org/cache/epub/3833/pg3833.txt",
-    "description": "A collection of Aboriginal Australian legends and Dreaming-related stories recorded from oral traditions."
+    "description": "A collection of Aboriginal Australian legends and Dreaming-related stories recorded from oral traditions.",
+    "content_start": "Dinewan the emu, being the largest",
+    "content_end": "APPENDIX"
   },
   {
     "title": "Te Tohunga",
     "tradition": "Maori",
     "url": "https://www.gutenberg.org/cache/epub/54610/pg54610.txt",
-    "description": "A collection of ancient legends and traditions of the Maori, including mythic figures, ancestral stories, ritual specialists, and sacred knowledge."
+    "description": "A collection of ancient legends and traditions of the Maori, including mythic figures, ancestral stories, ritual specialists, and sacred knowledge.",
+    "content_start": "thou sun, advancing high, Beaming red"
   },
   {
     "title": "Legends of Ma-ui a Demi God of Polynesia",
     "tradition": "Polynesian",
     "url": "https://www.gutenberg.org/cache/epub/32601/pg32601.txt",
-    "description": "A collection of Polynesian legends about Maui, the trickster and culture hero known for feats such as fishing up islands and slowing the sun."
+    "description": "A collection of Polynesian legends about Maui, the trickster and culture hero known for feats such as fishing up islands and slowing the sun.",
+    "content_start": "Maui is a demi god whose name should probably be pronounced",
+    "content_end": "INDEX"
   },
   {
     "title": "The Popol Vuh",
@@ -129,19 +145,22 @@
     "title": "Myths of the Australian Aborigines",
     "tradition": "Australian",
     "url": "https://www.gutenberg.org/cache/epub/71940/pg71940.txt",
-    "description": "A collection of myths about the Dreamtime and traditional beliefs of the indigenous peoples of Australia."
+    "description": "A collection of myths about the Dreamtime and traditional beliefs of the indigenous peoples of Australia.",
+    "exclude": true
   },
   {
     "title": "The Odyssey",
     "tradition": "Greek",
     "url": "https://www.gutenberg.org/cache/epub/1727/pg1727.txt",
-    "description": "An ancient Greek epic poem attributed to Homer, recounting the long, mythic journey of the hero Odysseus returning to Ithaca after the fall of Troy."
+    "description": "An ancient Greek epic poem attributed to Homer, recounting the long, mythic journey of the hero Odysseus returning to Ithaca after the fall of Troy.",
+    "content_start": "Tell me, O Muse, of that ingenious hero"
   },
   {
     "title": "The Bhagavad Gita",
     "tradition": "Hinduism",
     "url": "https://www.gutenberg.org/cache/epub/2388/pg2388.txt",
-    "description": "A central sacred scripture of Hinduism, presenting a philosophical dialogue between Prince Arjuna and the god Krishna on duty, honor, and the nature of reality."
+    "description": "A central sacred scripture of Hinduism, presenting a philosophical dialogue between Prince Arjuna and the god Krishna on duty, honor, and the nature of reality.",
+    "content_start": "Ranged thus for battle on the sacred plain"
   },
   {
     "title": "Beowulf",
@@ -159,12 +178,14 @@
     "title": "The Code of Hammurabi",
     "tradition": "Babylonian",
     "url": "https://www.gutenberg.org/cache/epub/17150/pg17150.txt",
-    "description": "One of the oldest deciphered writings of significant length in the world, providing a comprehensive Babylonian law code from ancient Mesopotamia."
+    "description": "One of the oldest deciphered writings of significant length in the world, providing a comprehensive Babylonian law code from ancient Mesopotamia.",
+    "content_start": "If a man weave a spell and put a ban upon a man"
   },
   {
     "title": "The Mahabharata",
     "tradition": "Hinduism",
     "url": "https://www.gutenberg.org/cache/epub/15474/pg15474.txt",
-    "description": "A massive ancient Indian epic that narrates the Kurukshetra War between the Pandava and Kaurava princes, alongside vast philosophical and religious treatises."
+    "description": "A massive ancient Indian epic that narrates the Kurukshetra War between the Pandava and Kaurava princes, alongside vast philosophical and religious treatises.",
+    "content_start": "Om! Having bowed down to Narayana and Nara"
   }
 ]

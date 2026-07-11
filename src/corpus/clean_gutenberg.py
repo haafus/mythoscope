@@ -135,6 +135,41 @@ def is_gutenberg_text(text: str) -> bool:
     return any(re.search(pattern, text, re.IGNORECASE) for pattern in patterns)
 
 
+def _content_marker_regex(marker: str) -> re.Pattern:
+    # Match the marker as a run of tokens tolerant of intervening whitespace, so a
+    # phrase copied from wrapped/re-flowed text still matches after normalization.
+    return re.compile(r"\s+".join(re.escape(tok) for tok in marker.split()))
+
+
+def trim_to_content(
+    text: str,
+    content_start: str | None = None,
+    content_end: str | None = None,
+    title: str = "",
+) -> str:
+    """Trim curated editorial front/back matter by marker.
+
+    `content_start` — keep from the first occurrence of the marker (a distinctive
+    opening phrase of the tradition body). `content_end` — keep up to the last
+    occurrence of the marker (a back-matter heading such as APPENDIX / GLOSSARY /
+    INDEX). Meant to run after Gutenberg-boilerplate stripping. A marker that is not
+    found is logged and left as-is — it never silently drops the whole text.
+    """
+    if content_start:
+        m = _content_marker_regex(content_start).search(text)
+        if m:
+            text = text[m.start():]
+        else:
+            logger.warning("%s: content_start marker not found, keeping full front: %r", title, content_start)
+    if content_end:
+        matches = list(_content_marker_regex(content_end).finditer(text))
+        if matches:
+            text = text[: matches[-1].start()]
+        else:
+            logger.warning("%s: content_end marker not found, keeping full back: %r", title, content_end)
+    return text.strip()
+
+
 def clean_gutenberg_in_builder(original_text: str, url: str = "", title: str = "") -> str:
     if url and ("gutenberg.org" in url or "gutenberg" in url.lower()):
         logger.debug(f"{title}: Project Gutenberg URL detected, applying cleanup")

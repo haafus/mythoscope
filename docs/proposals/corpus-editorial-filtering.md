@@ -251,3 +251,19 @@ Extend the `config/corpus.json` entry schema with optional `content_start` / `co
 strings or regexes) and extend `clean_gutenberg_in_builder` (or a new clean step) to trim to those
 markers when present; add a small, per-language cue denylist applied at the chunk stage. Both are
 deterministic and committed as data.
+
+### Status — Layer 1 implemented
+
+The curated-boundary layer is now in the pipeline: `trim_to_content` (`src/corpus/clean_gutenberg.py`)
+runs after Gutenberg-boilerplate stripping in `_finalize_text`, keeping text from the first `content_start`
+match to the last `content_end` match (whitespace-tolerant; a missing marker is logged, never drops the
+whole text), and `load_download_list` skips entries flagged `"exclude": true`. Markers are set as
+distinctive body-opening phrases (not headings, which repeat in tables of contents) and were verified
+against the real corpus. In `config/corpus.json`: **`content_start`/`content_end` on 15 texts**
+(front/back apparatus trimmed — e.g. Koran −24%, Kalevala glossary, Mabinogion Lady Guest's introduction)
+and **one exclusion** — *Myths of the Australian Aborigines* (Ramsay Smith), which sampling showed to be
+an anthropological monograph (0/14 content samples narrative), not tradition text. *Myths and Legends of
+China* (Werner) is kept but trimmed to `CHAPTER III` (−16%), dropping the two analytical opening chapters
+and keeping the ~69% that is myth retelling. The five interleaved-note editions (Babylonian, Poetic Edda,
+Beowulf, Popol Vuh, Book of the Dead) are intentionally left without markers — start/stop cannot reach
+line-interleaved notes, so they await the cue-strip layer.

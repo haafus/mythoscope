@@ -294,3 +294,21 @@ class TestUpdateTraditions:
 
         data = json.loads((corpus_dir / "traditions.json").read_text())
         assert data == {}
+
+
+class TestLoadDownloadListExclude:
+    def test_excluded_items_are_filtered(self, tmp_path, monkeypatch):
+        from settings import settings
+        from corpus.downloader import load_download_list
+
+        config_dir = tmp_path / "config"
+        config_dir.mkdir()
+        items = [
+            {"title": "Keep", "url": "http://x/1"},
+            {"title": "Drop", "url": "http://x/2", "exclude": True},
+        ]
+        (config_dir / "corpus.json").write_text(json.dumps(items))
+        monkeypatch.setattr(settings, "config_dir", config_dir)
+
+        titles = [i["title"] for i in load_download_list()]
+        assert titles == ["Keep"]

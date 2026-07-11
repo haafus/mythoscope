@@ -57,6 +57,9 @@ def load_download_list() -> list[dict]:
     filtered = []
 
     for item in items:
+        if item.get("exclude"):
+            logger.info("Excluded from corpus (marked exclude): %s", item.get("title", item.get("url")))
+            continue
         url = item["url"]
         if url in seen_urls:
             logger.warning(f"Duplicate URL: {url}, skipping")

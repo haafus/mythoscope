@@ -9,7 +9,7 @@ from pathlib import Path
 from fetch_cache import cache_path, fetch_to_cache
 from settings import settings
 
-from .clean_gutenberg import clean_gutenberg_in_builder
+from .clean_gutenberg import clean_gutenberg_in_builder, trim_to_content
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .sources import (
@@ -35,9 +35,16 @@ data_lock = threading.Lock()
 
 
 
-def _finalize_text(text: str, url: str, title: str) -> tuple[bytes, dict]:
+def _finalize_text(
+    text: str,
+    url: str,
+    title: str,
+    content_start: str | None = None,
+    content_end: str | None = None,
+) -> tuple[bytes, dict]:
     text = normalize_text(text)
     text = clean_gutenberg_in_builder(text, url, title)
+    text = trim_to_content(text, content_start, content_end, title)
     data_utf8 = text.encode("utf-8")
     stats = {
         "md5": md5(data_utf8),
@@ -100,7 +107,9 @@ def _download_and_process(item: dict, force: bool = False) -> dict | None:
         if not text or not text.strip():
             raise ValueError("Empty content after conversion")
 
-        data_utf8, stats = _finalize_text(text, url, title)
+        data_utf8, stats = _finalize_text(
+            text, url, title, item.get("content_start"), item.get("content_end")
+        )
 
         filename = text_path(settings.corpus_dir, item["major_tradition"], item["tradition"], title)
 
