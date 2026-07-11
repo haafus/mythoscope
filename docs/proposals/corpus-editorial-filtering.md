@@ -138,6 +138,45 @@ perfect) and, more usefully, flags the ~4 annotated editions where positional cu
 per-text or LLM handling is required. Neither method alone covers the corpus; ~2/3 clean automatically,
 and the annotated remainder needs the curated/LLM layer — as the hybrid prescribes.
 
+### The cue filter at real chunk granularity
+
+The decile test above measures the *positional distribution* of cues, not the drop filter of approach 4 as
+it would actually run. To test that, the cue filter was run over the **real pipeline chunks** — the same
+recursive splitter the embedding stage uses (`chunk_size=1024`, `chunk_overlap=128`), **25,594 chunks**
+across the 28 texts — with a per-chunk drop rule and the dropped chunks inspected by eye. Two thresholds
+were compared: drop a chunk if it carries ≥2 distinct cue categories, or ≥1.
+
+| Drop rule | Chunks dropped | Share |
+|---|---|---|
+| ≥2 distinct cue categories | **299** | **1.2%** |
+| ≥1 cue category | **1,968** | **7.7%** |
+
+- **Clean texts → 0%.** Iliad (1,161 chunks), Dhammapada, Tao Teh King, Analects, Mabinogion, Buddhist
+  Psalms drop nothing at either threshold — the filter is a no-op where there is no apparatus.
+- **Annotated editions → the extreme.** At ≥2: *Babylonian Legends* 32.3%, *Poetic Edda* 15.9%, *Beowulf*
+  7.0%. At ≥1 it becomes destructive: *Beowulf* 66.7%, *Babylonian* 47.6%, *Edda* 41.5%, *Popol Vuh*
+  27.8%, *Koran* 23.5%.
+
+**The ≥1 threshold is unusable** — false-positive-dominated (a lone `[12]` or a stray year inside genuine
+narrative). **The ≥2 threshold is much safer** (1.2% overall) and on inspection ~7 of 8 sampled drops are
+truly editorial (title pages, tables of contents, citation lists, prefaces). But two **systematic
+false-positive patterns** surfaced, and both matter:
+
+1. **An inline footnote marker `[N]` stapled onto tradition text.** *Myths and Legends of China* drops the
+   Zhuangzi butterfly-dream parable — real Taoist text — only because the editor set a footnote reference
+   `[10]` into it. A footnote marker signals *a note exists here*, not *this passage is editorial*.
+2. **The myth itself, in scholarly dress, read as apparatus.** *Babylonian Legends* drops lines of the
+   Enūma Eliš itself — "15. They formed a band and went forth to battle to help Tiamat…" — because
+   numbered lines, bracketed `[…]` restorations of a damaged tablet, and the nearby words
+   "tablet"/"manuscript" match editorial cues. Most of that 32% is a false positive on live text.
+
+**Design consequence.** The cue filter must **not** be a blind auto-cutter on annotated editions — that is
+exactly where it drops the most *and* mis-drops the most, so those texts (Babylonian, Edda, Beowulf) belong
+to the curated-boundary (approach 2) or LLM layer, not to cues. A lone `[N]` should be **stripped as a
+marker**, not treated as a load-bearing drop cue. On clean texts the filter is safe (0%) and works as
+designed — as a conservative (≥2-category) secondary strainer for interleaved notes and, above a per-text
+drop-rate threshold (>5%), as a **flag for review** rather than a silent drop.
+
 ## Conclusion — a layered hybrid
 
 For this project (small curated corpus, reproducibility matters, an existing per-text clean hook, but a
