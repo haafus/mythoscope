@@ -703,6 +703,15 @@ substrate (Americas/Oceania), whereas ATU's and TMI's top structure is dominated
 core** (wonder tales / literary humor). The continent bar on every node keeps that effort-confound visible. See
 [`60-worldview-peel-catalogues/README.md`](60-worldview-peel-catalogues/README.md).
 
+### 61 · Hard layers across catalogues
+The geography half of mockup 45 (its hard layers), ported to all three indexes: units peeled by their full attestation
+footprint (coverage-corrected Ward; ATU/TMI SVD-reduced), blocks named by continent. Companion to mockup 60 (the
+worldview half). **Q.** Do the units of each catalogue stratify into geographic layers at all? **Finding.** Only
+**Berezkin stratifies** (7 clean geographic leaves, New/Old World → regional). **ATU and TMI do not** — one
+pan-regional blob holds 90–92% of units and the big blocks have *no* characteristic motif. Clean geographic layering is
+a property of Berezkin's areal sampling design, not of folklore indexes in general. See
+[`61-hard-layers-catalogues/README.md`](61-hard-layers-catalogues/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

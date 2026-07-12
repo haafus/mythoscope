@@ -1,0 +1,89 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>61 · Hard layers across catalogues</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;--acc:#4f7096;
+        --Americas:#b45c4b;--Eurasia:#4f7096;--Africa:#bd9a43;--Oceania:#3f9e93;--q:#c9c2b4;
+        --yes:#3f8a6a;--weak:#bd9a43;--no:#b45c4b;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1120px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:1000px;}
+  .tabs{display:flex;gap:8px;margin:16px 0 6px;flex-wrap:wrap;}
+  .tab{padding:8px 15px;font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:#6c757d;}
+  .tab.active{color:#fff;background:var(--acc);border-color:var(--acc);}
+  .verdict{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0 12px;background:var(--surface);display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  .vbadge{font-size:12px;font-weight:800;color:#fff;border-radius:6px;padding:4px 11px;text-transform:uppercase;letter-spacing:.03em;}
+  .vtext{font-size:12.5px;color:#495057;}
+  .legend{font-size:10.5px;color:var(--muted);margin:0 0 4px;}
+  .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:middle;}
+  .node{background:var(--surface);border:1px solid var(--line);border-left-width:4px;border-radius:9px;padding:9px 12px;margin:5px 0;}
+  .nrow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .nname{font-weight:700;font-size:13.5px;} .nmeta{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;}
+  .bars{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;align-items:flex-start;}
+  .barblock{min-width:200px;} .blab{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+  .stack{display:flex;height:12px;width:220px;border-radius:3px;overflow:hidden;background:var(--bg);}
+  .seg{height:100%;}
+  .core{flex:1;min-width:280px;font-size:11px;color:#495057;}
+  .core .m{display:inline-block;margin:1px 0;}
+  .gtag{display:inline-block;min-width:15px;text-align:center;font-size:8.5px;color:#fff;background:#8a939a;border-radius:3px;padding:0 3px;margin-right:2px;}
+  .lift{color:var(--muted);font-size:9.5px;}
+  .reps{font-size:10.5px;color:#5b6770;margin-top:5px;}
+  .empty{font-style:italic;color:var(--muted);font-size:11px;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:14px;}
+</style>
+<main>
+<header><h1>61 · Hard layers across catalogues <span class="nmeta">— mockup 45's geographic peel, for all three indexes</span></h1>
+<p>The <b>hard-layers (geography) half of mockup 45</b>, ported to every catalogue. Each catalogue's <b>units</b>
+(Berezkin traditions · ATU peoples · TMI cultures) are recursively split by their <b>full attestation footprint</b>
+(coverage-corrected L1×idf, Ward — the same hard peel as 45; ATU/TMI footprints are SVD-reduced first as they are far
+sparser). Blocks are named <b>geographically</b> from their continent mix. The question each tab answers: <b>do the
+units stratify into geographic layers at all?</b></p></header>
+
+<div class="tabs" id="tabs"></div>
+<div class="verdict" id="verdict"></div>
+<div class="legend">Continent bar: <span class="sw" style="background:var(--Eurasia)"></span>Eurasia <span class="sw" style="background:var(--Americas)"></span>Americas <span class="sw" style="background:var(--Africa)"></span>Africa <span class="sw" style="background:var(--Oceania)"></span>Oceania <span class="sw" style="background:var(--q)"></span>? · depth = mean cross-continent breadth of the block's core features (broad = near-global).</div>
+<div id="tree"></div>
+<div class="note" id="note"></div>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("note").textContent=D.note;
+const CATS=[["brz","Berezkin"],["atu","ATU"],["tmi","TMI"]];
+const CONTC={Americas:"var(--Americas)",Eurasia:"var(--Eurasia)",Africa:"var(--Africa)",Oceania:"var(--Oceania)","?":"var(--q)"};
+const VCOL={"stratifies":"var(--yes)","weakly stratifies":"var(--weak)","does not stratify":"var(--no)"};
+let cur="brz";
+
+function stack(items,total,colf){
+  return `<div class="stack">`+items.map(([k,v])=>`<span class="seg" title="${esc(k)}: ${v}" style="width:${(100*v/total).toFixed(1)}%;background:${colf(k)}"></span>`).join("")+`</div>`;
+}
+function coreHTML(nd){
+  if(!nd.core||!nd.core.length) return `<div class="core"><div class="blab">Core features</div><span class="empty">no characteristic feature reaches the block (undifferentiated)</span></div>`;
+  const rows=nd.core.slice(0,6).map(m=>`<span class="m">${m.grp?`<span class="gtag">${esc(m.grp)}</span>`:""}${esc(m.name)} <span class="lift">×${m.lift}</span></span>`).join(" · ");
+  return `<div class="core"><div class="blab">Core features <span class="lift">(over-represented, lift ×)</span></div>${rows}</div>`;
+}
+function nodeHTML(nd){
+  const dc=VCOL[D.catalogues[cur].verdict]; // border tint by catalogue verdict is too much; use depth instead
+  const contItems=Object.entries(nd.cont); const contTot=contItems.reduce((s,[,v])=>s+v,0)||1;
+  const border=nd.color||"#cfc9bd";
+  const reps=nd.leaf&&nd.reps&&nd.reps.length?`<div class="reps"><b>Units:</b> ${nd.reps.slice(0,7).map(esc).join(" · ")}</div>`:"";
+  return `<div class="node" style="margin-left:${nd.level*22}px;border-left-color:${nd.leaf?border:'#cfc9bd'}">
+    <div class="nrow"><span class="nname">${esc(nd.name)}</span>
+      <span class="nmeta">n=${nd.n} · depth ${nd.depth_index} (${esc(nd.depth_label)}) · sil ${nd.sil}${nd.leaf?" · leaf":""}</span></div>
+    <div class="bars">
+      <div class="barblock"><div class="blab">Continents</div>${stack(contItems,contTot,(k)=>CONTC[k]||"var(--q)")}</div>
+      ${coreHTML(nd)}
+    </div>${reps}</div>`;
+}
+function render(){
+  const c=D.catalogues[cur];
+  const vb=`<span class="vbadge" style="background:${VCOL[c.verdict]}">${c.verdict}</span>`;
+  document.getElementById("verdict").innerHTML=`${vb}<span class="vtext"><b>${c.n_unit} ${esc(c.unit)}</b> × ${c.n_feat.toLocaleString()} ${esc(c.features)} features → <b>${c.n_leaves} leaf blocks</b>, largest holds <b>${c.largest_leaf_pct}%</b> of units · top-split silhouette ${c.top_sil}${c.real_coords?"":" · <i>continents from gazetteer / attestation regions (Euro-biased)</i>"}</span>`;
+  const nodes=c.nodes.slice().sort((a,b)=>{const A=a.id.split("."),B=b.id.split(".");for(let i=0;i<Math.max(A.length,B.length);i++){const x=+A[i]||-1,y=+B[i]||-1;if(x!==y)return x-y;}return 0;});
+  document.getElementById("tree").innerHTML=nodes.map(nodeHTML).join("");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.k===cur));
+}
+document.getElementById("tabs").innerHTML=CATS.map(([k,l])=>`<div class="tab" data-k="${k}">${l} <span style="opacity:.7">· ${D.catalogues[k].n_unit} ${esc(D.catalogues[k].unit)}</span></div>`).join("");
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{cur=t.dataset.k;render();}));
+render();
+</script>
