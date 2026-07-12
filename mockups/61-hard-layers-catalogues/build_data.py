@@ -29,7 +29,7 @@ from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "mockups"))
-from _geo import gaz_coord  # noqa: E402
+from _geo import gaz_coord, berezkin_coords  # noqa: E402
 
 PAL = ["#4f7096","#c9873f","#6f9a5a","#b45c4b","#9c6a94","#bd9a43","#3f9e93","#8a6bbf",
        "#c0728f","#5b9bd5","#d08b4f","#7fa86b"]
@@ -159,7 +159,7 @@ def peel_geo(Xb, cont_of, macro_of, short, uname, uweight, feat_name, feat_grp,
     for nd in nodes: nd.pop("_disc", None)
     lv = [nd for nd in nodes if nd["leaf"]]
     for i, nd in enumerate(lv): nd["color"] = PAL[i % len(PAL)]
-    return nodes
+    return nodes, leaf
 
 
 def verdict(nodes, N):
@@ -193,6 +193,14 @@ def build_berezkin():
         if "australia" in a or "oceania" in a: return "Oceania"
         if any(w in a for w in ("america", "andes", "mexico", "amazon")): return "Americas"
         return "Eurasia"
+    COORD = berezkin_coords()
+    def coord(tid):
+        if tid in COORD: return COORD[tid]
+        p = tid.split(".")
+        for i in range(len(p) - 1, 0, -1):
+            k = ".".join(p[:i])
+            if k in COORD: return COORD[k]
+        return None
     tset = defaultdict(set)
     for j, m in enumerate(MOT):
         for tid in m.get("traditions", []): tset[tid].add(j)
@@ -206,9 +214,16 @@ def build_berezkin():
         uname.append(TR[tid]["name"]); w[i] = len(tset[tid])
     feat_name = [(m["id"], m.get("name", m["id"])) for m in MOT]
     feat_grp = [m.get("motif_group_num") for m in MOT]
-    nodes = peel_geo(Xb, cont_of, macro_of, SHORT, uname, w, feat_name, feat_grp, 40, 8, 3)
+    nodes, leaf = peel_geo(Xb, cont_of, macro_of, SHORT, uname, w, feat_name, feat_grp, 40, 8, 3)
+    lc = {nd["id"]: nd["color"] for nd in nodes if nd["leaf"]}
+    pts = []
+    for i, tid in enumerate(keep):
+        c = coord(tid)
+        if c and i in leaf:
+            pts.append({"lon": round(c[1], 2), "lat": round(c[0], 2), "c": lc[leaf[i]],
+                        "name": uname[i], "macro": macro_of[i]})
     return {"nodes": nodes, "n_unit": N, "unit": "traditions", "n_feat": len(MOT),
-            "features": "motif attestation", "real_coords": True, **verdict(nodes, N)}
+            "features": "motif attestation", "real_coords": True, "points": pts, **verdict(nodes, N)}
 
 
 # ============================ ATU ============================
@@ -235,9 +250,16 @@ def build_atu():
     cont_of = [cont_region_atu(m) for m in macro_of]
     w = np.array([p_w[p] for p in peoples])
     feat_name = [(t["id"], t.get("name", t["id"])) for t in types]
-    nodes = peel_geo(Xb, cont_of, macro_of, {}, peoples, w, feat_name, None, 12, 2, 2, svd_dims=40)
+    nodes, leaf = peel_geo(Xb, cont_of, macro_of, {}, peoples, w, feat_name, None, 12, 2, 2, svd_dims=40)
+    lc = {nd["id"]: nd["color"] for nd in nodes if nd["leaf"]}
+    pts = []
+    for i, p in enumerate(peoples):
+        g = gaz_coord(p)
+        if g and i in leaf:
+            pts.append({"lon": round(g[0], 2), "lat": round(g[1], 2), "c": lc[leaf[i]],
+                        "name": p, "macro": macro_of[i]})
     return {"nodes": nodes, "n_unit": N, "unit": "peoples", "n_feat": len(types),
-            "features": "tale-type attestation", "real_coords": False, **verdict(nodes, N)}
+            "features": "tale-type attestation", "real_coords": False, "points": pts, **verdict(nodes, N)}
 
 
 # ============================ TMI ============================
@@ -264,9 +286,16 @@ def build_tmi():
     w = np.array([c_w[c] for c in cults])
     feat_name = [(m["id"], m.get("name", m["id"])) for m in MOT]
     feat_grp = [m.get("chapter") for m in MOT]
-    nodes = peel_geo(Xb, cont_of, macro_of, {}, cults, w, feat_name, feat_grp, 12, 2, 2, svd_dims=40)
+    nodes, leaf = peel_geo(Xb, cont_of, macro_of, {}, cults, w, feat_name, feat_grp, 12, 2, 2, svd_dims=40)
+    lc = {nd["id"]: nd["color"] for nd in nodes if nd["leaf"]}
+    pts = []
+    for i, c in enumerate(cults):
+        g = gaz_coord(c)
+        if g and i in leaf:
+            pts.append({"lon": round(g[0], 2), "lat": round(g[1], 2), "c": lc[leaf[i]],
+                        "name": c, "macro": macro_of[i]})
     return {"nodes": nodes, "n_unit": N, "unit": "cultures", "n_feat": len(MOT),
-            "features": "motif attestation", "real_coords": False, **verdict(nodes, N)}
+            "features": "motif attestation", "real_coords": False, "points": pts, **verdict(nodes, N)}
 
 
 data = {"catalogues": {"brz": build_berezkin(), "atu": build_atu(), "tmi": build_tmi()},
