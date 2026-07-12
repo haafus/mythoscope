@@ -1,0 +1,47 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>53 · Implicational structure</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1100px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:970px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  h2{font-size:14px;margin:0 0 10px;} .muted{color:var(--muted);font-size:11.5px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;} @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+  .hub{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:8px 0;}
+  .hub .hd{font-weight:700;display:flex;align-items:center;gap:8px;} .hub .hd .ct{margin-left:auto;color:var(--muted);font-size:11px;}
+  .sub{font-size:12px;padding:2px 0 2px 14px;color:#3a444b;display:flex;gap:8px;align-items:baseline;}
+  .sub .p{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;} .arrow{color:#9aa;}
+  .g{display:inline-block;min-width:18px;text-align:center;font-size:9px;color:#fff;background:#8a939a;border-radius:4px;padding:0 3px;}
+  .x{color:#b45c4b;} table{border-collapse:collapse;width:100%;font-size:12px;} td{padding:3px 6px;border-bottom:1px solid var(--line);}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+</style>
+<main>
+<header><h1>53 · Implicational structure</h1>
+<p>Asymmetric co-occurrence: if a tradition has motif <b>X</b> it almost always has motif <b>Y</b>, but not the
+reverse → <b>X implies Y</b> — X is a <b>specialization</b> of Y. Aggregated, these recover a data-driven
+<b>subtype → type</b> hierarchy the flat motif-group can't express.</p></header>
+
+<div class="card note" id="lead"></div>
+
+<div class="card"><h2>Type hubs <span class="muted">— the motif "types" and the subtypes that imply them</span></h2>
+<div id="hubs"></div></div>
+
+<div class="card"><h2>Cross-theme implications <span class="muted">— the non-obvious ones (X and Y in different theme groups)</span></h2>
+<table id="cross"></table></div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GN={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+document.getElementById("lead").innerHTML=`Over <b>${D.n_freq}</b> frequent motifs, <b>${D.n_edges.toLocaleString()}</b> strong implications (P(Y|X) ≥ 0.80, much &gt; P(X|Y), X rarer). They read as <b>"is a kind of"</b>: a specific variant entails its parent complex. Most are subtype→type; the cross-theme ones below are where a narrative element in one theme reliably drags in a motif from another.`;
+document.getElementById("hubs").innerHTML=D.hubs.map(h=>`<div class="hub">
+  <div class="hd"><span class="g" title="${GN[h.grp]||''}">${h.grp||'–'}</span> ${esc(h.name)} <span class="ct">${h.nsub} subtypes imply it · in ${h.n} traditions</span></div>
+  ${h.subs.map(s=>`<div class="sub"><span class="g" title="${GN[s.grp]||''}" style="${s.cross?'background:#b45c4b':''}">${s.grp||'–'}</span><span>${esc(s.name)}</span><span class="arrow">⇒</span><span class="p">P(Y|X)=${s.pyx} · P(X|Y)=${s.pxy} · n=${s.n}</span></div>`).join("")}
+</div>`).join("");
+document.getElementById("cross").innerHTML=`<tr><td class="muted">specialization (X)</td><td></td><td class="muted">implies type (Y)</td><td class="muted">P(Y|X)</td></tr>`+
+ D.cross.map(c=>`<tr><td><span class="g">${c.xgrp}</span> ${esc(c.xname)}</td><td class="arrow">⇒</td><td><span class="g">${c.ygrp}</span> ${esc(c.yname)}</td><td class="muted">${c.pyx} <span style="opacity:.6">/ ${c.pxy}</span></td></tr>`).join("");
+</script>

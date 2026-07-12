@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>55 · Ancestral repertoires</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1140px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:980px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0;}
+  h2{font-size:14px;margin:0;} .muted{color:var(--muted);font-size:11.5px;}
+  .fam .hd{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;}
+  .fam .age{color:#7a5a3a;font-weight:700;font-variant-numeric:tabular-nums;} .fam .meta{color:var(--muted);font-size:11px;margin-left:auto;}
+  .mot{display:flex;flex-wrap:wrap;gap:5px;}
+  .m{font-size:11.5px;padding:2px 7px;border:1px solid var(--line);border-radius:14px;background:#faf8f3;}
+  .m b{color:#3a6b4a;font-variant-numeric:tabular-nums;} .g{display:inline-block;min-width:16px;text-align:center;font-size:9px;color:#fff;background:#8a939a;border-radius:4px;padding:0 3px;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+</style>
+<main>
+<header><h1>55 · Ancestral repertoires</h1>
+<p>Set-level ancestral-state reconstruction: a motif is placed at a language family's <b>proto-node</b> if it is
+attested in <b>≥ 2 of the family's primary sub-branches</b> (parsimony — present in two sister clades ⇒ present in
+their ancestor). Aggregated per family, this is a <b>reconstructed proto-mythology</b>, dated by the family's
+expansion age (M30). Coarse (family-resolution, presence-only), oldest family first.</p></header>
+
+<div class="card note">Chips show each motif and <b>how many sub-branches</b> attest it (of the family's total) — more branches = more securely ancestral. This dates the *inherited* repertoire only; the deep pan-global substrate (sun &amp; moon, primeval waters) shows up in <i>every</i> family independently, which is why it can't be pinned to any one proto-node.</div>
+
+<div id="fams"></div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GN={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+document.getElementById("fams").innerHTML=D.families.map(f=>`<div class="card fam">
+  <div class="hd"><h2>proto-${esc(f.family)}</h2><span class="age">${f.label}</span>
+    <span class="meta">${f.n_branch} sub-branches · ${f.n_trad} traditions · ${f.n_recon} motifs reconstructed</span></div>
+  <div class="mot">${f.motifs.map(m=>`<span class="m"><span class="g" title="${GN[m.grp]||''}">${m.grp||'–'}</span> ${esc(m.name)} <b>${m.branches}/${m.of}</b></span>`).join("")}</div>
+</div>`).join("");
+</script>

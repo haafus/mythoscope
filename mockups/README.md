@@ -638,6 +638,31 @@ core) — ancient + simple + observational, so their spread **can't** separate d
 invention. Much of the "deep substrate" is mode-undecidable. See
 [`51-descent-diffusion-invention/README.md`](51-descent-diffusion-invention/README.md).
 
+### 52 · Diversity turnover
+Ecology's α/γ/β diversity applied to motifs by macro-area. **Q.** Is there a biogeography of motif diversity?
+**Finding.** Alpha (richness) is just cataloguing effort (Europe highest); **beta = turnover** is the real signal:
+Europe **lowest** (4.9 — a homogenised diffusion belt), Sub-Saharan Africa & Tibet/SE-Asia **highest** (17.1 —
+internally divergent). Clinal-vs-homogenised from the diversity side. See [`52-diversity-turnover/README.md`](52-diversity-turnover/README.md).
+
+### 53 · Implicational structure
+Asymmetric co-occurrence (X⇒Y when P(Y|X)≫P(X|Y), X rarer) as a data-driven motif taxonomy. **Q.** Do motifs form
+a subtype→type hierarchy the flat groups miss? **Finding.** Yes — ~10k implications reading "is a kind of";
+type-hubs (Trickster-fox, Magic wife, dragon-slayer…) with their implied subtypes (Duck-wife ⇒ Magic wife). A
+first data-derived motif ontology. See [`53-implicational/README.md`](53-implicational/README.md).
+
+### 54 · Dated catalogue
+One per-motif age table combining every signal (M17 depth · phylo-signal · barrier floor · textual floor · family
+age) → consensus best year-floor + independent-corroboration count. **Q.** How much of the corpus can we floor in
+years, and how corroborated? **Finding.** any-signal **3338/3488**, absolute year-floor **1992**, corroborated by
+**≥2 methods 447**; searchable/sortable. Floors are lower bounds. See [`54-dated-catalogue/README.md`](54-dated-catalogue/README.md).
+
+### 55 · Ancestral repertoires
+Set-level ASR: motif at a family proto-node if in ≥2 primary sub-branches → reconstructed proto-mythologies, dated
+by expansion age. **Q.** Can we reconstruct proto-Indo-European / proto-Austronesian mythology as a set?
+**Finding.** Yes and legible — proto-Austronesian celestial/cosmogonic core, proto-IE märchen core; but the deep
+pan-global substrate reconstructs in *every* family (can't be pinned — mockup 51's undecidability). See
+[`55-ancestral-repertoires/README.md`](55-ancestral-repertoires/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

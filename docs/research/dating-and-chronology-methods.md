@@ -121,6 +121,18 @@ data we have) ÷ effort.
     *Critique:* rate-constancy is the most discredited assumption in the space (failed for language).
     A sanity check at best. Lowest.
 
+> **Two more effort/mode confounds, tested and recorded (mockups 52/54 arc).**
+> - **Serial-founder / out-of-Africa** (would date an *origin* by diversity decline): naively **fails** — per-tradition
+>   richness *is* cataloguing effort, so the best-declining "origin" is the **Levant** (r = −0.44), i.e. the
+>   over-studied Old-World literate zone, not Africa (E-Africa only −0.27). Needs an effort-rarefied diversity to
+>   test properly; the effort-robust **beta-turnover** (mockup 52) instead shows Europe homogenised, Africa/Tibet
+>   divergent — a real signal but about homogenisation, not origin.
+> - **Rate-by-stratum / "old = conserved"** (§Q9): a naive homoplasy conservation index gives the *opposite* —
+>   deep (M17) motifs look **more** homoplastic (0.65 vs 0.49, corr +0.39) — but only because "deep" here means
+>   *areal / cross-family*, which is high-homoplasy on a language tree by construction. The measure conflates
+>   areality with volatility, so it cannot test mutation rate; **Q9 stays unresolved** by the same descent-vs-areal
+>   confound that limits everything else.
+
 **Meta-conclusion (absolute).** Years only via external calibration, and the datable fraction is
 limited on clinal data. The recommended chain — **2** (how much is datable) → **1** (year-floors on the
 substrate) → **3/4** (calibrate the vertical fraction) → optionally **10/6** (coherent dated posterior) —

@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>54 · Dated catalogue</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1140px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:980px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  h2{font-size:14px;margin:0 0 10px;} .muted{color:var(--muted);font-size:11.5px;}
+  .cov{display:flex;gap:20px;flex-wrap:wrap;} .cov .box{text-align:center;} .cov .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;} .cov .lab{font-size:11px;color:var(--muted);}
+  .bar{display:flex;align-items:center;gap:8px;margin:2px 0;font-size:12px;} .bar .lab{width:70px;color:#495057;} .bar .track{flex:1;background:var(--bg);border-radius:5px;height:13px;overflow:hidden;} .bar .fill{display:block;height:100%;border-radius:5px;background:#7a5a3a;min-width:2px;} .bar .v{width:44px;text-align:right;color:var(--muted);}
+  input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;width:220px;}
+  table{border-collapse:collapse;width:100%;font-size:11.5px;} td,th{padding:3px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+  th{color:var(--muted);font-size:10px;text-transform:uppercase;cursor:pointer;white-space:nowrap;} td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .yr{color:#7a5a3a;font-weight:600;white-space:nowrap;} .g{display:inline-block;min-width:18px;text-align:center;font-size:9px;color:#fff;background:#8a939a;border-radius:4px;padding:0 3px;}
+  .chip{display:inline-block;font-size:9.5px;padding:1px 5px;border-radius:9px;margin-right:3px;} .c-bar{background:#efe0d3;color:#7a5a3a;} .c-tex{background:#f2ecdd;color:#8a6a3a;} .c-fam{background:#e6efe4;color:#3a6b4a;}
+  .dep{color:#b45c4b;font-variant-numeric:tabular-nums;}
+</style>
+<main>
+<header><h1>54 · Dated catalogue</h1>
+<p>One <b>per-motif age table</b> combining every signal the project produces — <b>M17 depth</b>, <b>phylo-signal</b>,
+<b>barrier floor</b> (mockup 49), <b>textual floor</b> (mockup 50), <b>language-family age</b> (M30) — into a
+<b>consensus best year-floor</b> and a count of <b>independent</b> corroborating methods. A synthesis, not a new
+method; floors are lower bounds, not ages.</p></header>
+
+<div class="grid"></div>
+<div class="card"><h2>Coverage</h2><div class="cov" id="cov"></div>
+<h2 style="margin-top:14px">Consensus best year-floor</h2><div id="hist"></div></div>
+
+<div class="card"><h2>The catalogue <span class="muted">— corroborated & oldest first (top 400); click a header to sort, type to filter</span></h2>
+<div style="margin-bottom:8px"><input id="q" placeholder="filter by motif name / id…"></div>
+<div style="overflow-x:auto"><table id="tbl"></table></div></div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GN={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+const c=D.coverage;
+document.getElementById("cov").innerHTML=[
+ {n:c.any,l:"any signal",col:"#4f7096"},{n:c.any_abs,l:"absolute year-floor",col:"#7a5a3a"},
+ {n:c.corrob2,l:"≥2 independent methods",col:"#6f9a5a"},
+ {n:c.barrier,l:"barrier",col:"#a06a3f"},{n:c.textual,l:"textual",col:"#c0873f"},{n:c.family,l:"family age",col:"#3a6b4a"}
+].map(x=>`<div class="box"><div class="big" style="color:${x.col}">${x.n}</div><div class="lab">${x.l}</div></div>`).join("");
+const hmax=Math.max(...D.hist.map(h=>h.n));
+document.getElementById("hist").innerHTML=D.hist.map(h=>`<div class="bar"><span class="lab">${h.lab}</span><span class="track"><span class="fill" style="width:${(100*h.n/hmax).toFixed(1)}%"></span></span><span class="v">${h.n}</span></div>`).join("");
+
+let rows=D.table.slice(), sortKey="nabs", sortDir=-1;
+function sig(r){let s="";if(r.barrier)s+=`<span class="chip c-bar" title="barrier: ${r.btier}">▲${r.barrier/1000}k</span>`;if(r.textual)s+=`<span class="chip c-tex" title="textual: ${r.tcorp}">${r.tcorp}</span>`;if(r.family)s+=`<span class="chip c-fam" title="family: ${r.fname}">${esc(r.fname)}</span>`;return s;}
+function render(){
+ const q=document.getElementById("q").value.toLowerCase();
+ let rs=rows.filter(r=>!q||r.name.toLowerCase().includes(q)||r.id.toLowerCase().includes(q));
+ rs.sort((a,b)=>{const x=a[sortKey],y=b[sortKey];return sortDir*((x==null?-1:x)>(y==null?-1:y)?1:-1);});
+ document.getElementById("tbl").innerHTML=`<tr>
+   <th data-k="id">id</th><th data-k="name">motif</th><th>grp</th>
+   <th data-k="best">best floor</th><th data-k="nabs">✓ methods</th>
+   <th data-k="depth">M17</th><th data-k="psig">φ-sig</th><th>signals</th></tr>`+
+  rs.slice(0,220).map(r=>`<tr>
+   <td class="n">${r.id}</td><td>${esc(r.name)}</td><td><span class="g" title="${GN[r.grp]||''}">${r.grp||'–'}</span></td>
+   <td class="yr">${r.blabel}</td><td class="n">${'★'.repeat(r.nabs)}</td>
+   <td class="n dep">${r.depth==null?'':'▲'+r.depth}</td><td class="n">${r.psig==null?'':r.psig}</td>
+   <td>${sig(r)}</td></tr>`).join("");
+ document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='name'||k==='id')?1:-1;}render();});
+}
+document.getElementById("q").oninput=render; render();
+</script>

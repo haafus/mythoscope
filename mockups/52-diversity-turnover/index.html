@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>52 · Diversity turnover</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1100px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:960px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  h2{font-size:14px;margin:0 0 10px;} .muted{color:var(--muted);font-size:11.5px;}
+  svg.map{width:100%;height:auto;display:block;background:#dfe6ec;border-radius:8px;}
+  .land{fill:#e7ecdd;stroke:#c3cfbc;stroke-width:.25;} .ocean{fill:#dfe6ec;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;} @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+  table{border-collapse:collapse;width:100%;font-size:12px;} td,th{padding:4px 7px;border-bottom:1px solid var(--line);text-align:right;}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;} td.l,th.l{text-align:left;}
+  .bar{display:inline-block;height:12px;border-radius:3px;vertical-align:middle;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+</style>
+<main>
+<header><h1>52 · Diversity turnover</h1>
+<p>Ecology's diversity split applied to motifs by macro-area. <b>Alpha</b> (per-tradition richness) just tracks
+<b>cataloguing effort</b> — over-studied Europe on top — so it is <i>not</i> a diversity signal. <b>Beta</b>
+(turnover = γ/α) is far less effort-driven and <i>is</i>: <b>low beta = a homogeneous shared stock</b> (a
+diffusion belt), <b>high beta = internally divergent traditions</b>.</p></header>
+
+<div class="card"><h2>Macro-areas by turnover <span class="muted">— β = distinct motifs per tradition-worth</span></h2>
+<table id="tbl"></table>
+<div class="note" style="margin-top:10px" id="note2"></div></div>
+
+<div class="card"><h2>Turnover on the map <span class="muted">— traditions coloured by their region's β (blue = homogeneous belt, red = divergent)</span></h2>
+<div id="map"></div></div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="land.js"></script><script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LAND=`<path class="land" d="${window.LAND||""}"/>`;
+document.getElementById("foot").textContent=D.note;
+const bcol=b=>{const t=(b-D.bmin)/(D.bmax-D.bmin+1e-9);return `rgb(${Math.round(80+150*t)},${Math.round(130-40*t)},${Math.round(190-120*t)})`;};
+const amax=Math.max(...D.rows.map(r=>r.alpha)),bmax=D.bmax;
+document.getElementById("tbl").innerHTML=`<tr><th class="l">macro-area</th><th>n</th><th>α richness</th><th>γ total</th><th>β turnover</th></tr>`+
+ D.rows.map(r=>`<tr><td class="l">${esc(r.short)}</td><td>${r.n}</td>
+   <td><span class="bar" style="width:${(50*r.alpha/amax).toFixed(0)}px;background:#c7b98a"></span> ${r.alpha}</td>
+   <td>${r.gamma}</td>
+   <td><span class="bar" style="width:${(70*r.beta/bmax).toFixed(0)}px;background:${bcol(r.beta)}"></span> <b>${r.beta}</b></td></tr>`).join("");
+document.getElementById("note2").innerHTML=`<b>Read:</b> α (yellow) is highest in <b>N&amp;E Europe (365)</b> and W-Europe — the most-catalogued zones — an effort artefact. β (blue→red) tells the real story: <b>Europe is lowest (4.9–6.9)</b> — a homogenised <b>diffusion belt</b> sharing one ATU märchen stock; <b>Sub-Saharan Africa, Tibet/SE-Asia (17.1)</b> and the Americas are highest — internally <b>divergent</b>, each tradition its own. Same clinal-vs-homogenised story from the diversity side.`;
+document.getElementById("map").innerHTML=`<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}`+
+ D.points.map(p=>`<circle cx="${(p.lon+180).toFixed(1)}" cy="${(90-p.lat).toFixed(1)}" r="1.1" fill="${bcol(p.beta)}" fill-opacity="0.75"><title>${esc(p.name)} — ${esc(p.area)} β=${p.beta}</title></circle>`).join("")+`</svg>`;
+</script>
