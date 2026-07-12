@@ -251,3 +251,82 @@ stories across it — from one biased matrix**. The facets (`area`/`family`/`sub
 `theme`) are its observable projections; `stratum` is the hidden time coordinate. The next
 phase is to stop estimating the projections separately and **fit the process once** —
 effort-corrected, dated, and content-aware — with the mockups as its validation harness.
+
+---
+
+## Update (2026-07, after mockups 24–55) — the stable trilogy and the text-free frontier
+
+### The three results that no longer move
+
+After the full arc (pop-genetics 46–48, admixture 47, chronology 49–50, descent/diffusion 51,
+diversity/catalogue/repertoires 52–55), **three conclusions have become load-bearing and stable —
+independent methods keep re-deriving them, and no further *matrix* method is expected to overturn
+them.** They are the ceiling of what the presence/absence matrix can say.
+
+1. **Geography is clinal, not modular.** Mythological similarity is a smooth isolation-by-distance
+   gradient, not discrete blocks: Mantel r ≈ +0.42, AMOVA F<sub>st</sub> ≈ 0.06 (human sub-continental
+   scale), silhouettes weak at *every* peel level, and an admixture CV curve that **plateaus with no
+   clean K** (mockups 45/46/47). "Culture areas" are a discretisation of a continuum.
+2. **Cataloguing effort is the dominant confound and must be corrected first.** Naïve clusters,
+   per-tradition richness, and the serial-founder "origin" all recover the *most-catalogued zone*
+   (Europe / the Levant), not a cultural signal — until `a(t)` is removed (mockups 24/26/38/52).
+   Every uncorrected count-based signal carries the same asterisk.
+3. **Descent vs diffusion vs invention is irreducible from distribution alone.** The matrix cannot
+   separate deep inheritance from late diffusion from independent invention; only *barrier-crossing*
+   hard-resolves a fraction, and the deepest, simplest, most-widespread motifs (the celestial
+   substrate) are **mode-undecidable** — old *and* reinventable (mockups 27/28/51). Phylo-signal is a
+   smooth continuum, not two classes; ~1% is unambiguously clade-faithful.
+
+**Consequence.** Matrix-only work from here **refines or confirms**, it does not break through. The
+genuine new territory needs either *new data* (the tale texts — syntagmatic motif combination, which
+this plan deliberately excludes) or *new questions* (structural content, mechanism).
+
+### The text-free plan — experiments & mockups worth doing without the tale corpora
+
+Ranked by whether they can add *new structure* vs merely *refine the trilogy above*. (Tier C uses the
+motif **definitions/metadata** we already hold — not the full tale corpora — so it is still text-free.)
+
+**Tier A — can add genuinely new structure (matrix only):**
+- **Pairwise MaxEnt / inverse-Ising model.** The minimal model reproducing pairwise co-occurrence →
+  **direct vs indirect motif couplings**, separating real interactions from transitive correlation.
+  The rigorous upgrade of the implication hubs (mockup 53). Precedented in cultural data.
+- **Higher-order co-occurrence → simplicial complex + persistent homology.** Which motif *triples/sets*
+  co-occur across traditions beyond the pairwise prediction (synergy/redundancy), and the **topology**
+  of trait-space (loops = cyclic areal structure, voids = forbidden combinations). Text-free because it
+  uses co-occurrence *across repertoires*, not *within tales*. The one place topology is more than
+  confirmatory. Honest caveat: on the (already-known clinal) geography it will mostly confirm one
+  connected blob — the value is in the higher-order motif combinatorics.
+- **Bayesian-nonparametric latent-feature model (Indian Buffet Process / HDP).** The principled
+  *infinite-K* admixture — formalises mockup 47's "no clean K" instead of picking one.
+- **Epidemiology as a generative model-comparison.** Simulate **simple vs complex contagion** on the
+  geographic tradition-graph; ask which transmission rule reproduces the observed statistics
+  (clustering, breadth spectrum, fragmentation). A *mechanistic* handle on the diffusion question —
+  limited (no time axis) to model-comparison, not history reconstruction, but it speaks directly to
+  the irreducibility of result 3.
+
+**Tier B — refine / externally validate (mostly confirm):**
+- **Co-occurrence null models** (C-score / checkerboard): do motifs exclude or attract beyond chance?
+- **Cantometrics / Global-Jukebox cross-validation:** do our motif areas match Lomax-style *song-style*
+  areas? External-data check that the areas are real culture areas, not myth-specific (needs the open
+  song dataset, not our texts).
+- **Species-distribution / niche models:** predict a motif's range from covariates (climate,
+  subsistence, neighbours); residuals flag loss vs absence.
+- **Optimal transport / Gromov-Wasserstein:** rigorously align motif-space with geography-space — a
+  single "how much is structure just geography" number.
+- **Cheap:** spatial statistics (Moran's I, Getis-Ord, GWR); **Mapper/TDA** as an honest picture of the
+  clinal continuum's shape; Ollivier-Ricci curvature for bridges/bottlenecks; random-matrix-theory
+  noise floor on the co-occurrence matrix.
+
+**Tier C — structural content from motif metadata (text-light, high-novelty):**
+- **Lévi-Strauss binary oppositions.** Code oppositions (sky/earth, raw/cooked, life/death, …) from the
+  motif **definitions** we already have; build the opposition structure and search for
+  *transformation pairs* (variants related by an operation). The humanities' own theory of myth, made
+  computable — a different axis (logical content) from everything distributional we have done. Recent
+  precedent exists (Doja et al. 2021; categorical rewrite calculi).
+- **Semantic maps** of motifs from co-occurrence — a typology-style connectivity graph of "which
+  meanings travel together".
+
+**The honest framing:** Tier A can add real new structure without disturbing the trilogy; Tier B mostly
+confirms it more rigorously; Tier C opens the one *text-free* content axis (structural meaning). The
+actual breakthrough — motif **sequence and combination inside tales** — is excluded here by
+construction, and remains the highest-value future move once the tale texts are wired in.
