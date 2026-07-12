@@ -50,6 +50,16 @@ younger Sumerian one does. So this is a layer of **hard calendar anchors** (real
 calibrating/validating other methods), **not** a universal clock — and it is exactly the literacy bias the
 research note warned about, made visible.
 
+## Relation to M30 (already-built calendar dating)
+
+This is **not** the project's first calendar dating — **[mockup 30 · dated-phylogeny](../30-dated-phylogeny/README.md)**
+already dates 451 motifs via Glottolog + language-family expansion ages, covering the *non-literate* world too.
+The two are a **different, complementary route** and were cross-validated: only **40 motifs overlap**, they do
+not rank-correlate (Spearman −0.03 — a literate-recording clock vs a lineage-expansion clock), but they are
+**fully consistent** (the textual floor is ≤ the family age in 100% of overlapping cases) and together floor
+**~1118 motifs** (vs 451 from M30 alone). Use M30 for the phylogenetic minority, this for the literate
+Old-World + Mesoamerica fraction.
+
 ## Data
 
 `build_data.py`: maps each motif to the dated corpora attesting it → an oldest-attestation floor; recomputes

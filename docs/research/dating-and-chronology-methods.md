@@ -32,7 +32,17 @@ defensible **relative ordering** (§B), which delivers most of the value without
 Effectiveness ≈ (defensibility of the date) × (fraction of corpus it can date) × (feasibility on
 data we have) ÷ effort.
 
-1. **Biogeographic lower bounds (recast M17 into years).** ⭐ best cheap win.
+> **Much of this is already built** — the roadmap M-series (mockups 17–39) is a prior dating/stratigraphy
+> programme; the mockup 45–50 arc re-treads a lot of it. The genuinely *realised* calendar dating lives in
+> **M30 · dated-phylogeny** (language-family expansion dates, 451 motifs), **M28 · likelihood-ASR** (dated
+> gain/loss reconstruction) and **M31 · Bayesian phylogeography**; admixture in **M36/M38**, dated contact in
+> **M35**, cost-distance geography in **M34**. The ✅ tags below point at the existing mockup, not at future
+> work. **Two calendar methods now exist and were cross-validated** (M30 family-ages × mockup-50 textual
+> floors): only **40 motifs overlap**, they don't rank-correlate (Spearman −0.03, different clocks) but are
+> **fully consistent** (textual floor ≤ family age in 100% of cases) and **complementary** — union **1118**
+> motifs get some calendar estimate, vs 451 from M30 alone.
+
+1. **Biogeographic lower bounds (recast M17 into years).** ⭐ best cheap win. ✅ realised — mockup 49 (②).
    A motif whose distribution spans a known barrier under signs of shared inheritance is *no younger*
    than the crossing: trans-Beringia ~15–17 ka, Sunda–Sahul, Wallace line, the Austronesian island
    sequence. This is Berezkin/d'Huy/Thuillard's own logic (Old- vs New-World set comparison anchored
@@ -40,22 +50,28 @@ data we have) ÷ effort.
    substrate (the mockup-48 teleconnector motifs). Needs only our data + hard-coded barrier dates.
    *Critique:* lower bounds only; barrier-spanning motifs only; one ancient long-range jump is
    indistinguishable from deep inheritance.
-2. **Datability partition (phylogenetic-signal gate).**
+2. **Datability partition (phylogenetic-signal gate).** ✅ realised — mockups 18/28 (phylo-signal) + 49 (①).
    Not a date but the prerequisite: D-statistic (Fritz–Purvis), δ-score, TIGER, Q-residuals,
    retention/consistency index on a reference tree tell *which* motifs are tree-like enough to date.
-   On clinal data, estimating that fraction is itself a first-order result.
+   On clinal data, estimating that fraction is itself a first-order result. M18/M28 compute the Fitch/Mk
+   phylo-signal that M30 already uses as its descent gate; mockup 49 (①) adds the areal-tree NRI route split.
    *Critique:* needs a reference tree (areal or language); on reticulate data the tree is shaky —
    but that is exactly why this gate must come first.
-3. **Language-phylogeny calibration.**
-   Map motif presence onto dated Bayesian language trees (Indo-European ~6–8.5 ka, Austronesian
-   ~5.2 ka, Bantu, Uralic); a motif congruent with a clade inherits its MRCA age. The da Silva–Tehrani
-   method that dated "tales of magic" to the Bronze Age. Uses our `language` field.
-   *Critique:* covers only language-tracking motifs; most of ours are areal/clinal → low coverage;
-   needs our language labels aligned to Glottolog + published trees.
-4. **Genetic co-phylogeny calibration.**
+3. **Language-phylogeny calibration.** ✅ realised — mockup 30.
+   Map motif presence onto dated language trees; a motif congruent with a clade inherits its expansion age.
+   The da Silva–Tehrani method that dated "tales of magic" to the Bronze Age. **Built** in
+   [`mockups/30-dated-phylogeny`](../../mockups/30-dated-phylogeny/README.md): Berezkin traditions joined to
+   Glottolog (median 53 km) + a curated 45-family expansion-date table (Bouckaert, Gray, Grollemund, Heggarty,
+   Bowern…). A motif that is phylo-clustered (signal ≥ 0.4) *and* ≥ 55% in one family is dated to that family's
+   spread → **451 motifs dated**, ~9000 BP (Afro-Asiatic) → ~1500 BP (Quechuan), peak at Indo-European ~5500 BP.
+   *Critique confirmed:* covers only the language-tracking minority; the areal majority (sun & moon, swan-maiden)
+   is correctly left undated — its age is a geographic question, not a phylogenetic one.
+4. **Genetic co-phylogeny calibration.** ◑ partially realised — mockups 31/36.
    Correlate motif distances with **dated human population splits** (absolute dates from genomics:
    out-of-Africa ~60 ka, LGM, Beringia). Berezkin and the 2025 bioRxiv preprint do this — mythemes
-   correlate with pre-LGM movements ≥38 ka.
+   correlate with pre-LGM movements ≥38 ka. M31 (Bayesian phylogeography) reconstructs dated descent origins;
+   M36 (admixture-graph back-migration) uses settled human back-migration geography to direction Africa↔Eurasia
+   sharing. A direct motif-distance × dated-genetic-split regression is still open.
    *Critique:* correlation ≠ per-motif date; Galton's problem and ecological confounds; yields broad
    epochs, not motif ages.
 5. **Textual terminus ante quem (+ LLM harvesting).** ✅ realised — mockup 50.
@@ -70,9 +86,12 @@ data we have) ÷ effort.
    is **flat against M17 depth (r = 0.02)**, so it is a hard-anchor layer, not a universal clock; lumped
    corpora (Vedic + Purana) over-state the old end (flagged); mixed corpora (Korea) excluded to avoid
    false-ageing.
-6. **Ancestral-state stochastic mapping (SIMMAP).**
-   Given a *dated* backbone (from 1/3/4), stochastic character mapping yields a per-motif
-   origin-age **posterior with uncertainty** — the principled replacement for the breadth proxy.
+6. **Ancestral-state stochastic mapping (SIMMAP / Mk).** ✅ realised — mockup 28.
+   Given a *dated* backbone (from 1/3/4), a continuous-time Markov (Mk) gain/loss model with marginal
+   ancestral-state reconstruction yields a per-motif origin estimate — the principled replacement for the
+   breadth proxy. **Built** in [`mockups/28-likelihood-asr`](../../mockups/28-likelihood-asr/README.md):
+   loss-biased (Dollo-flavoured) Mk, run on both the undated tree (reproduces parsimony, corr 0.91) and the
+   **M30-dated family-scaled tree**. Full stochastic tip-dated *posterior* (real BEAST) stays future.
    *Critique:* a multiplier on backbone quality, not standalone; assumes tree-like descent we largely
    lack.
 7. **Neutral cultural-drift / frequency spectrum (Neiman, cultural-F<sub>st</sub>).**
@@ -103,10 +122,15 @@ data we have) ÷ effort.
     A sanity check at best. Lowest.
 
 **Meta-conclusion (absolute).** Years only via external calibration, and the datable fraction is
-limited on clinal data. Recommended order: **2** (how much is datable) → **1** (year-floors on the
-substrate) → **3/4** (calibrate the vertical fraction) → optionally **10/6** (coherent dated
-posterior). Mockups 46–48 already realise the population-genetics slice; a barrier-bound recast of
-M17 (method 1) is the cheapest first artefact with real years.
+limited on clinal data. The recommended chain — **2** (how much is datable) → **1** (year-floors on the
+substrate) → **3/4** (calibrate the vertical fraction) → optionally **10/6** (coherent dated posterior) —
+is **already largely built**: methods 1, 2, 3, 6 are realised (mockups 49, 18/28, 30, 28) and 4 partially
+(31/36). The **union of the two calendar routes** — M30 language-family ages (451) + mockup-50 textual floors
+(707), overlap only 40 — gives **~1118 motifs** a calendar estimate, all mutually consistent. The remaining
+open work is the top of the ladder: **method 10** (a single FBD/tip-dating model folding barrier bounds +
+textual termini + family ages + iconographic fossils into one dated posterior with uncertainty) and a real
+BEAST phylogeography (M31's stated future). Everything below method 6 in the ranking (drift, seriation,
+fossils, glottochronology) remains a sanity-check tier, not a build target.
 
 ---
 
