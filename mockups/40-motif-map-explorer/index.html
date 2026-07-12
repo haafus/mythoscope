@@ -106,15 +106,16 @@ const centreLon = pts => { let x=0,y=0; pts.forEach(p=>{x+=Math.cos(p[0]*Math.PI
 
 function mapSVG(m){
   const lon0 = centreLon(m.pts);
-  // hull contours — anchor each ring near its first vertex so a seam-crossing polygon stays whole
-  const hulls = m.hulls.map(h=>{
-    const ref = px(h.ring[0][0], lon0);
-    const pts = h.ring.map(([lo,la])=>{ let tx=px(lo,lon0);
-      if(tx-ref>180) tx-=360; else if(tx-ref<-180) tx+=360;
-      return `${tx.toFixed(1)},${py(la).toFixed(1)}`; }).join(" ");
+  // hull contours — the ring is already an unwrapped, continuous polygon (build frame), so anchor its
+  // first vertex with px() then add each vertex's offset RELATIVE to that vertex (no per-vertex re-wrap,
+  // which tore rings spanning >180° of longitude). Tile at ±360 so a wide/seam-crossing ring shows whole.
+  const hullPolys = m.hulls.map(h=>{
+    const l0 = h.ring[0][0], base = px(l0, lon0);
+    const pts = h.ring.map(([lo,la])=>`${(base+(lo-l0)).toFixed(1)},${py(la).toFixed(1)}`).join(" ");
     const c = clusCol(h.k);
     return `<polygon points="${pts}" fill="${c}" fill-opacity="0.12" stroke="${c}" stroke-width="0.5" stroke-opacity="0.7" stroke-linejoin="round"/>`;
   }).join("");
+  const hulls = [-360,0,360].map(k=>`<g transform="translate(${k},0)">${hullPolys}</g>`).join("");
   const dots = m.pts.map(([lo,la,k])=>
     `<circle cx="${px(lo,lon0).toFixed(2)}" cy="${py(la).toFixed(2)}" r="1.5" fill="${clusCol(k)}" fill-opacity="0.9" stroke="#fff" stroke-width="0.25"/>`).join("");
   return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${landG(lon0)}${hulls}${dots}</svg>`;
