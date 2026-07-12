@@ -100,7 +100,7 @@ function drawMap(){
     const op = sel<0 ? 0.92 : (on ? 1 : 0.13);
     const halo = on&&sel>=0 ? ` stroke="#12233a" stroke-width="0.35"` : "";
     return `<circle cx="${p.x+180}" cy="${90-p.y}" r="${r}" fill="${col}" fill-opacity="${op}"${halo} data-i="${i}"/>`;}).join("");
-  map.innerHTML=g+land+pts; mapnote.textContent=`${D.placed} of ${D.n_traditions} traditions placed (approx. centroids)`;
+  map.innerHTML=g+land+pts; mapnote.textContent=`${D.placed} of ${D.n_traditions} traditions placed · ${D.placed_precise} real coordinates, ${D.placed-D.placed_precise} region/country centroids`;
   clearsel.style.display = sel>=0 ? "inline-flex" : "none";
   if(sel>=0) clearsw.style.background = PAL[sel%PAL.length];
 }

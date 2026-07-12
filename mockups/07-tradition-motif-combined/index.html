@@ -120,7 +120,9 @@ function drawMap(){
     const halo = on&&sel>=0 ? ` stroke="#12233a" stroke-width="0.35"` : "";
     return `<circle cx="${p.x+180}" cy="${90-p.y}" r="${r}" fill="${col}" fill-opacity="${op}"${halo} data-i="${i}"/>`;}).join("");
   map.innerHTML=g+land+pts;
-  mapnote.textContent=`${d.placed} of ${d.n_traditions} traditions placed (approx. centroids)`;
+  mapnote.textContent = d.placed_precise!=null
+    ? `${d.placed} of ${d.n_traditions} traditions placed · ${d.placed_precise} real coordinates, ${d.placed-d.placed_precise} region/country centroids`
+    : `${d.placed} of ${d.n_traditions} traditions placed`;
   clearsel.style.display = sel>=0 ? "inline-flex" : "none";
   if(sel>=0) clearsw.style.background = PAL[sel%PAL.length];
 }

@@ -19,7 +19,7 @@ from sklearn.cluster import SpectralCoclustering
 from sklearn.feature_extraction.text import TfidfTransformer
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from _geo import SUBREGION, gaz_coord  # noqa: E402
+from _geo import SUBREGION, berezkin_coords, gaz_coord  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).resolve().parent / "data.js"
@@ -139,23 +139,39 @@ def build(tmi_norm=None, K=K, MIN_DF=MIN_DF, MIN_CULT=MIN_CULT, MAX_DF_FRAC=MAX_
         })
     clusters.sort(key=lambda c: -c["n_motif"])
 
-    # map points: place each cluster's traditions (Berezkin subregion, else gazetteer)
+    # map points: a Berezkin tradition goes to its own real coordinate
+    # (tradition-coords.json, [lat, lon] -> (lon, lat)); only where that is
+    # missing, or for TMI/ATU labels with no per-tradition location, do we fall
+    # back to the areal-subregion centroid / a country-people gazetteer, which
+    # many labels share and so get jittered apart.
     bz = load("berezkin.json")
-    name2sub = {canon(v.get("name") or ""): (v["areal_path"][1][1].upper())
-                for v in bz["traditions"].values() if len(v.get("areal_path") or []) >= 2}
+    bz_coords = berezkin_coords()   # areal_id -> [lat, lon]
+    name2coord, name2sub = {}, {}
+    for aid, v in bz["traditions"].items():
+        key = canon(v.get("name") or "")
+        c = bz_coords.get(aid) or v.get("coordinates")
+        if isinstance(c, (list, tuple)) and len(c) == 2:
+            name2coord[key] = (float(c[1]), float(c[0]))
+        ap = v.get("areal_path") or []
+        if len(ap) >= 2:
+            name2sub[key] = ap[1][1].upper()
 
     def coord(label):
+        real = name2coord.get(label)
+        if real:                       # real per-tradition location: no jitter
+            return [round(real[0], 2), round(real[1], 2), True]
         c = SUBREGION.get(name2sub.get(label)) or gaz_coord(label)
-        if c:
+        if c:                          # shared centroid/gazetteer: spread apart
             dx, dy = jitter(label)
-            return [round(c[0] + dx, 1), round(c[1] + dy, 1)]
+            return [round(c[0] + dx, 1), round(c[1] + dy, 1), False]
         return None
 
-    points = []
+    points, n_precise = [], 0
     for k, c in enumerate(clusters):
         for lab in c.pop("_all"):
             xy = coord(lab)
             if xy:
+                n_precise += xy[2]
                 points.append({"t": lab, "x": xy[0], "y": xy[1], "k": k,
                                "s": trad_mem.get(lab, 0)})
 
@@ -163,6 +179,7 @@ def build(tmi_norm=None, K=K, MIN_DF=MIN_DF, MIN_CULT=MIN_CULT, MAX_DF_FRAC=MAX_
         "n_motifs_total": len(kept_ids), "n_traditions": len(cvocab),
         "by_index_total": dict(Counter(motifs[m][0] for m in kept_ids)),
         "clusters": clusters, "points": points, "placed": len(points),
+        "placed_precise": n_precise,
         "trad_mem": trad_mem,
     }
     return data
