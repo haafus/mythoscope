@@ -1,0 +1,106 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>51 · Descent / Diffusion / Invention</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1010px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 10px; } h3 { font-size:12px; margin:0 0 6px; text-transform:uppercase; letter-spacing:.04em; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .counts { display:flex; gap:18px; flex-wrap:wrap; }
+  .counts .box { text-align:center; } .counts .big { font-size:28px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .counts .lab { font-size:11px; color:var(--muted); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
+  @media (max-width:820px){ .grid2 { grid-template-columns:1fr; } }
+  table.mot { border-collapse:collapse; width:100%; font-size:11.5px; }
+  table.mot td { padding:2px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.mot .id { color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.mot .m { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .g { display:inline-block; min-width:18px; text-align:center; font-size:9px; color:#fff; background:#8a939a; border-radius:4px; padding:0 3px; }
+  .note { font-size:12px; background:#faf7f0; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .callout { font-size:13px; background:#f3eff6; border:1px solid #e0d6ea; border-radius:8px; padding:11px 13px; }
+</style>
+
+<main>
+<header>
+  <h1>51 · Descent / Diffusion / Invention</h1>
+  <p>A dispersed motif (low NRI) is <b>not</b> automatically deep inheritance. It can be deep <b>descent</b>
+  (inherited, differentially lost → relict), late <b>diffusion</b> (borrowed along a contact corridor →
+  contiguous), or independent <b>invention</b> (a cognitively obvious motif reinvented → simple, observational).
+  You can't read the mode off dispersal — so this stacks the project's discriminators plus one new one,
+  <b>motif complexity</b> from the definition text (a complex, arbitrary motif is not reinvented twice).
+  A transparent heuristic, not ground truth.</p>
+</header>
+
+<div class="card">
+  <h2>Modes among the ${dispersed} dispersed motifs <span class="muted">(span ≥ 5 macro-areas)</span></h2>
+  <div class="counts" id="counts"></div>
+  <div class="callout" id="callout" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+  <h2>The decision space</h2>
+  <div class="muted" style="margin-bottom:6px">x = <b>complexity</b> (definition content-words): simple/invention-prone → complex/transmitted &nbsp;·&nbsp; y = <b>descent evidence</b>: barrier-crossing + geographic disjunction + independent dated-corpus attestation</div>
+  <div id="scatter"></div>
+</div>
+
+<div class="grid2">
+  <div class="card"><h3 style="color:#4f7096">Descent <span class="muted">— complex + anti-diffusion evidence</span></h3><table class="mot" id="ex_descent"></table></div>
+  <div class="card"><h3 style="color:#c0873f">Diffusion <span class="muted">— complex + corridor-confined, contiguous, no barrier</span></h3><table class="mot" id="ex_diffusion"></table></div>
+  <div class="card"><h3 style="color:#9c6a94">Invention-prone <span class="muted">— simple + observational (spread ≠ transmission)</span></h3><table class="mot" id="ex_invention"></table></div>
+  <div class="card"><h3 style="color:#7c828a">Ambiguous <span class="muted">— no signal dominates</span></h3><table class="mot" id="ex_ambiguous"></table></div>
+</div>
+
+<div class="card note" id="limits"></div>
+<p class="muted" id="foot"></p>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D=window.DATA, esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GNAME={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+const C=D.colors;
+document.getElementById("foot").textContent=D.note;
+document.querySelector("h2").innerHTML=document.querySelector("h2").innerHTML.replace("${dispersed}",D.n_dispersed);
+
+// counts
+const order=["descent","diffusion","invention","ambiguous"];
+const labels={descent:"Descent",diffusion:"Diffusion",invention:"Invention-prone",ambiguous:"Ambiguous"};
+document.getElementById("counts").innerHTML=order.map(k=>`<div class="box"><div class="big" style="color:${C[k]}">${D.counts[k]}</div><div class="lab">${labels[k]}</div></div>`).join("");
+document.getElementById("callout").innerHTML=`<b>The irreducible ambiguity.</b> <b>${D.inv_old} of ${D.n_inv}</b> invention-prone motifs are <i>also</i> old (they cross a closed barrier or are documented across ≥2 disconnected corpora) — the celestial/cosmogonic core: <i>Male sun and female moon, Primeval waters, Figure on lunar disc</i>. They are ancient <b>and</b> simple <b>and</b> observational, so their pan-global spread <b>cannot</b> distinguish deep common descent from ancient independent invention (psychic unity). Much of the "deep substrate" is mode-undecidable.`;
+
+// scatter
+(function(){
+  const W=1000,H=440,pl=44,pr=14,pt=14,pb=34;
+  const X=v=>pl+(W-pl-pr)*v, Y=v=>pt+(H-pt-pb)*(1-v);
+  const zones=[
+    {x0:0,x1:0.35,y0:0,y1:1,c:"#9c6a94",lab:"INVENTION-PRONE"},
+    {x0:0.35,x1:1,y0:0.45,y1:1,c:"#4f7096",lab:"DESCENT"},
+    {x0:0.35,x1:1,y0:0,y1:0.30,c:"#c0873f",lab:"DIFFUSION"},
+    {x0:0.35,x1:1,y0:0.30,y1:0.45,c:"#9aa0a6",lab:"ambiguous"}];
+  let bg=zones.map(z=>`<rect x="${X(z.x0).toFixed(1)}" y="${Y(z.y1).toFixed(1)}" width="${(X(z.x1)-X(z.x0)).toFixed(1)}" height="${(Y(z.y0)-Y(z.y1)).toFixed(1)}" fill="${z.c}" fill-opacity="0.07"/>`
+    +`<text x="${(X((z.x0+z.x1)/2)).toFixed(1)}" y="${(Y(z.y1)+13).toFixed(1)}" font-size="10" fill="${z.c}" text-anchor="middle" font-weight="600" opacity="0.85">${z.lab}</text>`).join("");
+  let rng=12345; const rnd=()=>{rng=(rng*1103515245+12345)&0x7fffffff; return rng/0x7fffffff-0.5;};
+  const pts=D.points.map(p=>{
+    const jx=rnd()*0.012, jy=rnd()*0.03, r=1.1+Math.min(2.2,(p.nmac-5)*0.28);
+    return `<circle cx="${X(p.x+jx).toFixed(1)}" cy="${Y(p.y+jy).toFixed(1)}" r="${r.toFixed(1)}" fill="${C[p.mode]}" fill-opacity="0.62"><title>${esc(p.name)} — ${p.nmac} areas · ${p.mode}</title></circle>`;
+  }).join("");
+  const ax=`<line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#d8d0bf"/><line x1="${pl}" y1="${pt}" x2="${pl}" y2="${H-pb}" stroke="#d8d0bf"/>
+    <text x="${(pl+W)/2}" y="${H-6}" font-size="10" fill="#9aa" text-anchor="middle">complexity → (simple · reinventable  ←→  complex · transmitted)</text>
+    <text x="12" y="${pt+6}" font-size="10" fill="#9aa">descent evidence ↑</text>`;
+  document.getElementById("scatter").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${bg}${ax}${pts}</svg>`;
+})();
+
+// example tables
+function fill(id,rows){
+  document.getElementById(id).innerHTML=rows.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||''}">${m.grp||'–'}</span></td><td class="m" title="areas · complexity · barrier · corpora · fragments">${m.nmac}ma · cx${m.cx}${m.barrier?' · '+m.barrier.split('-')[0]:''}${m.ncorp?' · '+m.ncorp+'corp':''}</td></tr>`).join("");
+}
+order.forEach(k=>fill("ex_"+k,D.examples[k]));
+
+document.getElementById("limits").innerHTML=`<b>Honest limits.</b> The complexity axis is a <b>text proxy</b> (distinct content-words in the definition, median ${D.median_cx}) — it undersells a narratively complex motif that happens to have a terse definition and no ATU tag (e.g. <i>Magic wife</i> / swan-maiden, a known <i>transmitted</i> tale, can slip into "invention-prone"). ATU tale-types are excluded from invention, but Berezkin's ATU coverage is partial. The descent axis leans on barrier-crossing (the one hard test — diffusion can't cross a closed barrier) and can't exclude <b>independent invention on both sides</b>. So read the four modes as <b>weight of evidence</b>, not verdicts — the honest payoff is the callout above: the deepest, simplest, most-widespread motifs are exactly where mode is <b>undecidable</b>.`;
+</script>

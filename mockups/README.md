@@ -626,6 +626,18 @@ documented (Egypt 2350 BCE) are the celestial substrate, many recorded independe
 corpora. But documented age is **flat** against M17 depth (r=0.02) — a hard-anchor layer, not a universal
 clock, biased to who wrote things down. See [`50-dated-attestations/README.md`](50-dated-attestations/README.md).
 
+### 51 · Descent / Diffusion / Invention
+How do we tell a dispersed motif (low NRI) from **late wide diffusion** — or from independent **invention**?
+A per-motif scorecard stacking the project's discriminators (barrier-crossing, M17 disjunction, mockup-50
+independent corpora) plus one new signal: **motif complexity** from the definition text (a complex, arbitrary
+motif isn't reinvented twice). **Q.** Can we assign a dispersed motif to descent / diffusion / invention?
+**Finding.** Of 1477 dispersed motifs: descent 622 · diffusion 378 · invention-prone 357 · ambiguous 120 —
+diffusion = the complex Old-World-corridor märchen, descent = complex barrier-crossing cosmology. But the real
+answer is the **irreducible ambiguity**: **307 of 357** invention-prone motifs are *also* old (the celestial
+core) — ancient + simple + observational, so their spread **can't** separate deep descent from independent
+invention. Much of the "deep substrate" is mode-undecidable. See
+[`51-descent-diffusion-invention/README.md`](51-descent-diffusion-invention/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
