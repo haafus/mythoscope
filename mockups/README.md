@@ -663,6 +663,14 @@ by expansion age. **Q.** Can we reconstruct proto-Indo-European / proto-Austrone
 pan-global substrate reconstructs in *every* family (can't be pinned — mockup 51's undecidability). See
 [`55-ancestral-repertoires/README.md`](55-ancestral-repertoires/README.md).
 
+### 56 · Motif coupling (inverse-Ising)
+Pairwise maximum-entropy model of the top-500 motifs, effort-corrected — the couplings Jᵢⱼ are the **direct**
+links (transitive paths removed). **Q.** Which motif associations are real vs correlated only through a hub?
+**Finding.** Only **9%** of strongly-correlated pairs survive as direct couplings — **91% are indirect**
+(shared over-catalogued traditions). Direct attraction recovers real complexes; **direct repulsion recovers
+competing variant-slots** invisible to co-occurrence (*Pleiades boys ↔ girls*, *Man-in-Moon ↔ Moon-rabbit*).
+See [`56-motif-coupling/README.md`](56-motif-coupling/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
