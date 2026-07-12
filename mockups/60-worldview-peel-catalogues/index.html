@@ -1,0 +1,91 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>60 · Worldview peel across catalogues</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;
+        --deep:#4f7096;--mid:#6f9a5a;--shallow:#c9873f;
+        --Americas:#b45c4b;--Eurasia:#4f7096;--Africa:#bd9a43;--Oceania:#3f9e93;--q:#c9c2b4;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1120px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:1000px;}
+  .tabs{display:flex;gap:8px;margin:16px 0 6px;flex-wrap:wrap;}
+  .tab{padding:8px 15px;font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:#6c757d;}
+  .tab.active{color:#fff;background:var(--deep);border-color:var(--deep);}
+  .caption{color:var(--muted);font-size:12px;margin:2px 0 12px;}
+  .node{background:var(--surface);border:1px solid var(--line);border-left-width:4px;border-radius:9px;padding:9px 12px;margin:5px 0;}
+  .nrow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .nname{font-weight:700;font-size:13.5px;} .nmeta{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;}
+  .badge{font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;}
+  .bars{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;align-items:center;}
+  .barblock{flex:1;min-width:230px;}
+  .blab{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+  .stack{display:flex;height:12px;border-radius:3px;overflow:hidden;background:var(--bg);}
+  .seg{height:100%;}
+  .themeleg{font-size:10.5px;color:#556;margin-top:3px;line-height:1.5;}
+  .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle;}
+  .reps{font-size:10.5px;color:#5b6770;margin-top:5px;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:14px;}
+  .legend{font-size:10.5px;color:var(--muted);margin:0 0 4px;}
+</style>
+<main>
+<header><h1>60 · Worldview peel across catalogues <span class="nmeta">— the same stratigraphic peel in each catalogue's own taxonomy</span></h1>
+<p>The worldview half of <b>mockup 45</b>, ported to all three indexes so they are directly comparable. Each catalogue's
+<b>units</b> (Berezkin traditions · ATU peoples · TMI cultures) are recursively peeled by their profile over that
+catalogue's <b>native categories</b> (CLR, coverage-aware). A node's name = a depth <b>register</b> (Deep / Young, from
+the share of the catalogue's archaic/mythic categories) + its <b>signature</b> category; the depth index is the mean
+cross-continent breadth of the categories it emphasises (broad = old). The continent bar is on every node on purpose —
+ATU and TMI are Euro-/literary-biased, so their "deep" layer is partly the over-catalogued European core, not antiquity.</p></header>
+
+<div class="tabs" id="tabs"></div>
+<div class="caption" id="caption"></div>
+<div class="legend">Register: <span class="badge" style="background:var(--deep)">Deep</span> archaic/mythic-heavy · <span class="badge" style="background:var(--shallow)">Young</span> tale/joke-heavy · depth index = cross-continent breadth (0–100). Continent bar: <span class="sw" style="background:var(--Eurasia)"></span>Eurasia <span class="sw" style="background:var(--Americas)"></span>Americas <span class="sw" style="background:var(--Africa)"></span>Africa <span class="sw" style="background:var(--Oceania)"></span>Oceania <span class="sw" style="background:var(--q)"></span>?</div>
+<div id="tree"></div>
+<div class="note" id="note"></div>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("note").textContent=D.note;
+const CATS=[["brz","Berezkin"],["atu","ATU"],["tmi","TMI"]];
+const CONTC={Americas:"var(--Americas)",Eurasia:"var(--Eurasia)",Africa:"var(--Africa)",Oceania:"var(--Oceania)","?":"var(--q)"};
+const THEMEPAL=["#4f7096","#c9873f","#6f9a5a","#b45c4b","#9c6a94","#bd9a43","#3f9e93","#8a6bbf"];
+let cur="brz";
+
+function depthColor(lab){return lab.startsWith("deep")?"var(--deep)":lab.startsWith("inter")?"var(--mid)":"var(--shallow)";}
+function regBadge(name,a){
+  if(name.startsWith("Deep ")) return `<span class="badge" style="background:var(--deep)">Deep</span>`;
+  if(name.startsWith("Young ")) return `<span class="badge" style="background:var(--shallow)">Young</span>`;
+  return "";
+}
+function stack(items,total,colf){
+  return `<div class="stack">`+items.map(([k,v])=>`<span class="seg" title="${esc(k)}: ${v}" style="width:${(100*v/total).toFixed(1)}%;background:${colf(k)}"></span>`).join("")+`</div>`;
+}
+function nodeHTML(nd,children){
+  const dc=depthColor(nd.depth_label);
+  const contItems=Object.entries(nd.cont); const contTot=contItems.reduce((s,[,v])=>s+v,0)||1;
+  const thTot=nd.themes.reduce((s,t)=>s+t.n,0)||1;
+  const thItems=nd.themes.map((t,i)=>[t.k,t.n]);
+  const thleg=nd.themes.slice(0,4).map((t,i)=>`<span class="sw" style="background:${THEMEPAL[i%THEMEPAL.length]}"></span>${esc(t.k)} ${t.n}%`).join(" · ");
+  const reps=nd.leaf&&nd.reps&&nd.reps.length?`<div class="reps"><b>Units:</b> ${nd.reps.slice(0,7).map(esc).join(" · ")}</div>`:"";
+  return `<div class="node" style="margin-left:${nd.level*22}px;border-left-color:${dc}">
+    <div class="nrow">${regBadge(nd.name,nd.a_share)}<span class="nname">${esc(nd.name)}</span>
+      <span class="nmeta">n=${nd.n} · depth ${nd.depth_index} (${esc(nd.depth_label)}) · archaic-share ${nd.a_share} · sil ${nd.sil}</span></div>
+    <div class="bars">
+      <div class="barblock"><div class="blab">Category profile</div>${stack(thItems,thTot,(k)=>THEMEPAL[thItems.findIndex(x=>x[0]===k)%THEMEPAL.length])}<div class="themeleg">${thleg}</div></div>
+      <div class="barblock" style="max-width:230px"><div class="blab">Continents</div>${stack(contItems,contTot,(k)=>CONTC[k]||"var(--q)")}</div>
+    </div>${reps}</div>`;
+}
+function render(){
+  const c=D.catalogues[cur];
+  document.getElementById("caption").innerHTML=`<b>${esc(c.taxonomy)}</b> · ${c.n_unit} ${esc(c.unit)} · ${c.n_dim}-dim profile · ${c.nodes.filter(n=>n.leaf).length} leaf blocks`;
+  // order nodes as a pre-order tree by id string
+  const nodes=c.nodes.slice().sort((a,b)=>a.id.split(".").map(Number).join(",").localeCompare(b.id.split(".").map(Number).join(","),undefined,{numeric:true}));
+  // simpler: stable id sort
+  nodes.sort((a,b)=>{const A=a.id.split("."),B=b.id.split(".");for(let i=0;i<Math.max(A.length,B.length);i++){const x=+A[i]||-1,y=+B[i]||-1;if(x!==y)return x-y;}return 0;});
+  document.getElementById("tree").innerHTML=nodes.map(nd=>nodeHTML(nd)).join("");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.k===cur));
+}
+document.getElementById("tabs").innerHTML=CATS.map(([k,l])=>`<div class="tab" data-k="${k}">${l} <span style="opacity:.7">· ${D.catalogues[k].n_unit} ${esc(D.catalogues[k].unit)}</span></div>`).join("");
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{cur=t.dataset.k;render();}));
+render();
+</script>

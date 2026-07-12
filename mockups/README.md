@@ -693,6 +693,16 @@ plateauing admixture CV. **Q.** How many latent components does the data actuall
 familiar areal/thematic blocks (Old-World tales / cosmology / New-World cosmogony), not a hidden partition. See
 [`59-infinite-k/README.md`](59-infinite-k/README.md).
 
+### 60 · Worldview peel across catalogues
+The worldview half of mockup 45, ported to all three indexes in each one's own authored taxonomy so they are
+comparable: Berezkin 13 etiological groups (traditions) · ATU 7 tale-type chapters (peoples) · TMI 23 letter-chapters
+(cultures). Same coverage-aware CLR peel; nodes named by depth register (Deep/Young) + signature category, dated by
+cross-continent breadth. **Q.** Does mockup 45's stratigraphic peel work for ATU and TMI, and what does it show?
+**Finding.** Yes — but the comparison is the point: Berezkin's deep layer is a real **non-European** cosmological
+substrate (Americas/Oceania), whereas ATU's and TMI's top structure is dominated by the **over-catalogued European
+core** (wonder tales / literary humor). The continent bar on every node keeps that effort-confound visible. See
+[`60-worldview-peel-catalogues/README.md`](60-worldview-peel-catalogues/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
