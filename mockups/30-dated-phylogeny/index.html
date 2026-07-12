@@ -22,6 +22,7 @@
   .fam { position:absolute; transform:translateX(-50%); }
   .fam .rng { position:absolute; top:-1px; height:2px; background:#c9c2b4; transform:translateY(-50%); }
   .fam .dot { position:absolute; border-radius:50%; background:var(--acc); transform:translate(-50%,-50%); border:1.5px solid #fff; }
+  .fam .lead { position:absolute; left:0; width:1px; background:#e0dac9; transform:translateX(-50%); }
   .fam .lab { position:absolute; transform:translateX(-50%); font-size:10.5px; color:#495057; white-space:nowrap; }
   .fam .n { position:absolute; transform:translate(-50%,-50%); color:#fff; font-size:9px; font-weight:700; }
   table { width:100%; border-collapse:collapse; font-size:12px; }
@@ -83,21 +84,40 @@ document.getElementById("join").innerHTML =
 const MAXBP = 10000, W = 100;   // percent width
 const x = bp => (1 - bp/MAXBP) * W;   // BP -> % (older left)
 const tl = document.getElementById("tl");
-let html = `<div class="axis">`;
+const fams = D.fam_rows.slice().sort((a,b)=>b.age-a.age);
+const rmax = Math.max(...fams.map(f=>f.n));
+// greedy lane assignment so labels stack above the axis without overlapping.
+// process left→right (older = left); a label goes in the lowest lane whose last
+// occupant ends before this one starts.
+const Wpx = tl.clientWidth || 900;           // axis is 100% of .tl
+const LINE = 16, GAP = 8, CHARW = 6.2, BASE = 24;   // px
+const items = fams.map(f=>{
+  const cx = x(f.age)/100*Wpx;
+  const w  = f.fam.length*CHARW + 8;
+  return {f, cx, w, left:cx-w/2, right:cx+w/2};
+}).sort((a,b)=>a.left-b.left);
+const laneEnd = [];
+items.forEach(it=>{
+  let l = 0;
+  while (l<laneEnd.length && laneEnd[l] > it.left - GAP) l++;
+  it.lane = l; laneEnd[l] = it.right;
+});
+const nLane = laneEnd.length;
+const topPad = BASE + nLane*LINE + 8;        // room for the tallest label stack
+
+let html = `<div class="axis" style="margin-top:${topPad}px">`;
 for (let bp=10000; bp>=0; bp-=2000){
   html += `<div class="tick" style="left:${x(bp)}%"><span>${bp? (bp/1000)+'k' : '0'} BP</span></div>`;
 }
-// stagger families vertically to avoid label overlap
-const fams = D.fam_rows.slice().sort((a,b)=>b.age-a.age);
-const rmax = Math.max(...fams.map(f=>f.n));
-fams.forEach((f,i)=>{
-  const r = 6 + 16*Math.sqrt(f.n/rmax);
-  const up = i%2===0;
-  const yLab = up ? -30 : 16, yDot = 0;
+items.forEach(it=>{
+  const f = it.f, r = 6 + 16*Math.sqrt(f.n/rmax);
+  const yLab = -(BASE + it.lane*LINE);         // above the axis, stacked by lane
+  const leadTop = yLab + 11;                    // from just under the label down to the axis
   html += `<div class="fam" style="left:${x(f.age)}%;top:0">`+
+    `<div class="lead" style="top:${leadTop}px;height:${-leadTop}px"></div>`+
     `<div class="rng" style="left:${(x(f.lo)-x(f.age))}%;width:${(x(f.hi)-x(f.lo))*-1}%"></div>`+
-    `<div class="dot" style="width:${r*2}px;height:${r*2}px;top:${yDot}px"></div>`+
-    `<div class="n" style="top:${yDot}px">${f.n}</div>`+
+    `<div class="dot" style="width:${r*2}px;height:${r*2}px;top:0"></div>`+
+    `<div class="n" style="top:0">${f.n}</div>`+
     `<div class="lab" style="top:${yLab}px">${esc(f.fam)}</div></div>`;
 });
 html += `</div>`;
