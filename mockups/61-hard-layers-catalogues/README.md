@@ -41,6 +41,34 @@ almost no extractable geographic layering: their footprints are dominated by a s
 [direction 6, the effort/universality confound](../../docs/proposals/synthesis-and-directions.md), seen from the
 geography side, and the mirror image of [mockup 60](../60-worldview-peel-catalogues/)'s worldview result.
 
+## Unit thresholds and robustness
+
+The three catalogues use **different** minimum-repertoire thresholds, in different currencies, and they are pragmatic,
+not a single principled cut:
+
+| Catalogue | Threshold | Units kept | of total labels | currency |
+|-----------|-----------|-----------|-----------------|----------|
+| Berezkin | ≥ 15 motifs | 948 | 1046 | of 3,488 motifs |
+| ATU | ≥ 12 tale-types | 165 | 215 | of 2,242 types |
+| TMI | ≥ 40 motifs | 94 | 1,799 | of 46,238 motifs |
+
+Berezkin's ≥ 15 is inherited verbatim from mockup 45. TMI's ≥ 40 is a *higher number* but a *lower relative bar* — TMI
+is ~13× denser than Berezkin and its dense cultures cite thousands of motifs, so ≥ 40 admits only thin footprints and
+was the setting **most favourable** to finding structure (fewest, densest cultures).
+
+**The "does not stratify" verdict is not an artifact of the threshold** — lowering TMI's cut makes the blob *more*
+monolithic, not less (top-level 2-way Ward split, largest block):
+
+| TMI threshold | cultures | top split | largest block |
+|---------------|----------|-----------|---------------|
+| ≥ 10 | 215 | 214 / 1 | 100% |
+| ≥ 15 | 156 | 155 / 1 | 99% |
+| ≥ 25 | 125 | 124 / 1 | 99% |
+| ≥ 40 (used) | 94 | 92 / 2 | 98% |
+
+Thinner cultures either join the blob or peel off as single outliers; none reveal a hidden geographic layer. Matching
+Berezkin's ≥ 15 would make TMI look *worse*, not better. So the high threshold did not manufacture the negative result.
+
 ## Honest limits
 
 Only Berezkin has real coordinates; ATU/TMI continents come from attestation regions / a gazetteer and are
