@@ -1,0 +1,176 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>49 · Chronology</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7;
+          --old:#7a5a3a; --young:#4f7096; --agree:#6f9a5a; --disagree:#b45c4b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1010px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 10px; letter-spacing:.01em; }
+  h3 { font-size:12px; margin:15px 0 6px; color:#3a444b; text-transform:uppercase; letter-spacing:.04em; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .toolbar { display:flex; gap:10px; align-items:center; margin:8px 0; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:9px; overflow:hidden; }
+  .seg button { border:0; background:var(--surface); padding:7px 15px; font-size:12.5px; cursor:pointer; color:var(--muted); }
+  .seg button.on { background:var(--ink); color:#fff; }
+  svg.map { width:100%; height:auto; display:block; background:#dfe6ec; border-radius:8px; }
+  .land { fill:#e7ecdd; stroke:#c3cfbc; stroke-width:.25; } .ocean { fill:#dfe6ec; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
+  .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:start; }
+  @media (max-width:820px){ .grid2,.grid3 { grid-template-columns:1fr; } }
+  .pill { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; background:#eef3ee; color:#3a6b4a; border:1px solid #d8e6d8; margin:2px 4px 2px 0; }
+  .pill.bad { background:#f6ecea; color:#9c4a3a; border-color:#e6d3cf; }
+  .stat { display:flex; align-items:baseline; gap:10px; margin:2px 0 4px; }
+  .stat .big { font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .u { color:var(--muted); font-size:12px; }
+  .bar { display:flex; align-items:center; gap:8px; margin:3px 0; font-size:12px; }
+  .bar .lab { width:120px; color:#495057; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar .track { flex:1; background:var(--bg); border-radius:5px; height:14px; overflow:hidden; }
+  .bar .fill { display:block; height:100%; border-radius:5px; min-width:2px; }
+  .bar .v { width:60px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  table.mot { border-collapse:collapse; width:100%; font-size:11.5px; }
+  table.mot td { padding:2px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.mot .id { color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.mot .n { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .g { display:inline-block; min-width:18px; text-align:center; font-size:9px; color:#fff; background:#8a939a; border-radius:4px; padding:0 3px; }
+  table.pw { border-collapse:collapse; font-size:11px; } table.pw td { padding:3px 6px; text-align:center; font-variant-numeric:tabular-nums; }
+  table.pw td.lab { text-align:right; color:#495057; }
+  .note { font-size:12px; background:#faf7f0; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+</style>
+
+<main>
+<header>
+  <h1>49 · Chronology</h1>
+  <p>Can we put a <b>time axis</b> on the motifs? Three linked views (one build), per
+  <a href="../../docs/research/dating-and-chronology-methods.md" style="color:#6f5aa8">dating-and-chronology-methods</a>:
+  <b>①&nbsp;Datability</b> — which dating <i>route</i> each motif admits; <b>②&nbsp;Barrier floors</b> — absolute
+  year lower-bounds from biogeographic barriers; <b>③&nbsp;Pseudo-chronology</b> — a consensus <i>relative</i>
+  order, rooted by the barriers, with an honest map of where it is unreliable. Descriptive: ordering needs a
+  polarity assumption, and diffusion confounds breadth.</p>
+</header>
+
+<div class="toolbar">
+  <div class="seg" id="tabs">
+    <button data-t="date" class="on">① Datability</button>
+    <button data-t="floor">② Barrier floors</button>
+    <button data-t="chrono">③ Pseudo-chronology</button>
+  </div>
+  <span class="muted" id="sub"></span>
+</div>
+
+<div id="view"></div>
+<p class="muted" id="foot"></p>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D=window.DATA, esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LAND=`<path class="land" d="${window.LAND||""}"/>`;
+const GNAME={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+let tab="date";
+
+function motTable(rows){ return `<table class="mot">${rows.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||''}">${m.grp||'–'}</span></td><td class="n" title="NRI · macro-areas · attestations">${m.nri==null?'':'NRI '+m.nri}${m.nmac!=null?' · '+m.nmac+'ma':''} · ${m.n}</td></tr>`).join("")}</table>`; }
+
+function bars(items,val,lab,color,mx){ const m=mx||Math.max(...items.map(val),1);
+  return items.map(it=>`<div class="bar"><span class="lab" title="${esc(lab(it))}">${esc(lab(it))}</span><span class="track"><span class="fill" style="width:${(100*val(it)/m).toFixed(1)}%;background:${color(it)}"></span></span><span class="v">${val(it)}</span></div>`).join(""); }
+
+// ---------- ① datability ----------
+function viewDate(){
+  const d=D.datability, r=d.routes, tot=r.barrier+r.tree+r.weak;
+  const hmax=Math.max(...d.hist);
+  const hist=d.hist.map((h,i)=>`<rect x="${(i*18+2)}" y="${(90-80*h/hmax).toFixed(1)}" width="15" height="${(80*h/hmax).toFixed(1)}" fill="#8a6bbf" opacity="0.85"/>`).join("");
+  const xt=d.bins.filter((_,i)=>i%2==0).map((b,i)=>`<text x="${(d.bins.indexOf(b)*18+9)}" y="98" font-size="8" fill="#9aa" text-anchor="middle">${b}</text>`).join("");
+  return `<div class="grid2">
+    <div class="card"><h2>Which dating route each motif admits</h2>
+      <p class="muted">Not "datable vs not": on Berezkin's areal tree <b>${Math.round(d.frac_clustered*100)}% of motifs are areal-clustered</b> (median NRI ${d.median_nri}) — coarse structure is tree-like even though fine geography is clinal. What differs is <b>which route</b> gives a date.</p>
+      ${bars([{k:"Barrier — crosses a biogeographic barrier → absolute floor (②)",v:r.barrier,c:"#7a5a3a"},
+              {k:"Tree — clade-concentrated (NRI≥3, ≤2 areas) → language/phylogeny",v:r.tree,c:"#6f9a5a"},
+              {k:"Weak — spread, no clean barrier → weakly datable",v:r.weak,c:"#b9a06a"}],
+             x=>x.v,x=>x.k,x=>x.c,tot)}
+      <div class="note" style="margin-top:12px">NRI (clade-concentration) is really a <b>recency</b> axis — it anti-correlates with the consensus age order (Spearman <b>${d.r_nri_age}</b>): tightly clade-local motifs are young, spread ones old.</div>
+    </div>
+    <div class="card"><h2>NRI spectrum <span class="muted">— clade-concentration (net relatedness on the areal tree)</span></h2>
+      <svg viewBox="0 0 254 104" style="width:100%;height:auto">${hist}${xt}
+        <text x="127" y="104" font-size="8" fill="#9aa" text-anchor="middle">NRI (clipped) — high = tight clade-local (recent), ~0 = spread (substrate)</text></svg>
+      <p class="muted">${d.n_scored} motifs scored (≥3 attestations). The mass sits at high NRI — almost everything tracks <i>some</i> region.</p>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="card"><h3 style="color:#6f9a5a">Tree-route <span class="muted">(clade-local, young)</span></h3>${motTable(d.tree)}</div>
+    <div class="card"><h3 style="color:#7a5a3a">Barrier-route <span class="muted">(spread, deep)</span></h3>${motTable(d.barrier)}</div>
+    <div class="card"><h3 style="color:#a2894f">Weak-route <span class="muted">(spread, no barrier)</span></h3>${motTable(d.weak)}</div>
+  </div>`;
+}
+
+// ---------- ② barrier floors ----------
+function viewFloor(){
+  const b=D.barriers, cols={50000:"#5b3a2a",15000:"#a06a3f",13000:"#c79a63",0:"#d9d2c4"};
+  const pts=b.points.map(p=>`<circle cx="${(p.lon+180).toFixed(1)}" cy="${(90-p.lat).toFixed(1)}" r="${p.floor>0?1.4:0.7}" fill="${cols[p.floor]||'#d9d2c4'}" fill-opacity="${p.floor>0?0.9:0.3}"><title>${esc(p.name)} — floor ${p.floor?('≥'+(p.floor/1000)+'ka'):'none'}</title></circle>`).join("");
+  const tierBar=b.tiers.map(t=>`<div class="bar"><span class="lab">${esc(t.name)} ${t.conf=='contested'?'⚠':''}</span><span class="track"><span class="fill" style="width:${(100*t.n/Math.max(...b.tiers.map(x=>x.n))).toFixed(1)}%;background:${cols[t.yr]}"></span></span><span class="v">${t.n} · ≥${t.yr/1000}ka</span></div>`).join("");
+  const exCards=b.tiers.map(t=>`<div class="card"><h3 style="color:${cols[t.yr]}">${esc(t.name)} — ≥${t.yr/1000} ka ${t.conf=='contested'?'<span class="pill bad">contested</span>':'<span class="pill">solid</span>'}</h3>${motTable(b.examples[t.name]||[])}</div>`).join("");
+  return `<div class="card"><h2>Deepest barrier crossed → year lower-bound <span class="muted">— per tradition, the oldest floor among its motifs</span></h2>
+    <div id="fmap">${`<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${LAND}${pts}</svg>`}</div>
+    <div style="margin-top:10px">${tierBar}</div>
+    <p class="muted"><b>${b.n_floored}</b> motifs carry a floor. A motif with ≥2 attestations on each side of a barrier is <i>no younger</i> than the crossing — but one ancient long-range jump is indistinguishable from deep inheritance, so these are <b>lower bounds</b>, not ages.</p></div>
+  <div class="grid3">${exCards}</div>`;
+}
+
+// ---------- ③ pseudo-chronology ----------
+function viewChrono(){
+  const c=D.chronology, rb=c.ribbon.slice().reverse(), n=rb.length;   // reversed → OLD on the left
+  // consensus ribbon coloured by agreement
+  const W=1000, agcol=a=>{const t=Math.max(0,Math.min(1,a)); return `rgb(${Math.round(180-100*t)},${Math.round(92+70*t)},${Math.round(75+10*t)})`;};
+  const step=W/n;
+  const ribbon=rb.map((r,i)=>`<rect x="${(i*step).toFixed(2)}" y="0" width="${(step+0.4).toFixed(2)}" height="26" fill="${agcol(r.a)}"/>`).join("");
+  // density of anchors (old) and ATU (young) along the axis — the validation (old on left)
+  const B=40, anc=Array(B).fill(0), atu=Array(B).fill(0);
+  rb.forEach((r,i)=>{const b=Math.min(B-1,Math.floor(i/n*B)); if(r.anc)anc[b]++; if(r.atu)atu[b]++;});
+  const dmax=Math.max(...anc,...atu);
+  const dens=(arr,col)=>arr.map((v,i)=>`<rect x="${(i*W/B).toFixed(1)}" y="${(40-38*v/dmax).toFixed(1)}" width="${(W/B-1).toFixed(1)}" height="${(38*v/dmax).toFixed(1)}" fill="${col}" opacity="0.8"/>`).join("");
+  // method corr heatmap
+  const mk=c.methods, cm=c.corr;
+  const ccol=v=>{const t=(v+1)/2; return `rgb(${Math.round(200-90*t)},${Math.round(120+70*t)},${Math.round(110+30*t)})`;};
+  let heat='<table class="pw"><tr><td></td>'+mk.map(m=>`<td class="lab" style="font-size:9px">${m.split(' ')[0]}</td>`).join("")+"</tr>";
+  mk.forEach((m,i)=>{heat+=`<tr><td class="lab" style="font-size:10px">${esc(m)}</td>`+cm[i].map((v,j)=>`<td style="background:${i==j?'#efe9dc':ccol(v)}">${v.toFixed(2)}</td>`).join("")+"</tr>";});
+  heat+="</table>";
+  const geo=c.geo_corr;
+  const geobars=bars(mk.map(m=>({m,v:geo[m]})),x=>x.v,x=>x.m,x=>Math.abs(x.v)>0.5?"#b45c4b":"#8a939a",1);
+  const lab=c.labels;   // = order[:14] (youngest) ++ order[-14:] (oldest)
+  const old=lab.slice(-10).reverse(), young=lab.slice(0,10);
+  return `<div class="card"><h2>Consensus relative order <span class="muted">— ${n} motifs, CA + diffusion + M17 + prevalence, rooted by barrier anchors</span></h2>
+    <div class="muted" style="margin-bottom:4px">← older &nbsp;·&nbsp; colour = method agreement (<span style="color:#6f9a5a">green = agree</span> → <span style="color:#b45c4b">red = disagree</span>) &nbsp;·&nbsp; younger →</div>
+    <svg viewBox="0 0 1000 28" style="width:100%;height:auto" preserveAspectRatio="none">${ribbon}</svg>
+    <h3>Validation — do anchors land old &amp; ATU tales land young?</h3>
+    <svg viewBox="0 0 1000 42" style="width:100%;height:auto" preserveAspectRatio="none">${dens(anc,"#7a5a3a")}${dens(atu,"#4f7096")}</svg>
+    <div class="muted"><span style="color:#7a5a3a">■ barrier-anchor motifs</span> (mean rank <b>${c.val.barrier_old_rank}</b>, should be old/left) · <span style="color:#4f7096">■ ATU tale motifs</span> (mean rank <b>${c.val.atu_young_rank}</b>, should be young/right). Both check out — the <b>coarse polarity is validated</b>.</div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h2>Method agreement</h2>${heat}
+      <div class="note" style="margin-top:10px"><b>The honest catch.</b> CA seriation and diffusion pseudotime agree (0.94) — but that is because the <b>dominant ordination axis is geography, not time</b>: their correlation with New-World share is <b>0.87 / 0.84</b>. Only barrier-anchoring + M17 inject a temporal signal; prevalence (drift) disagrees entirely.</div>
+      <h3>How much is each ordering just geography?</h3>${geobars}
+      <div class="muted">corr with New-World share — high = the "order" is really space, not time.</div>
+    </div>
+    <div class="card"><h2>Ends of the consensus axis</h2>
+      <p class="muted">Mean agreement across the whole ribbon is only <b>${c.mean_agree}</b> — so the <b>fine order is unreliable</b>; treat the ends as tendencies, not truth.</p>
+      <h3 style="color:#7a5a3a">Old end</h3>${motTable(old.map(x=>({...x,nri:null,nmac:null,n:''})))}
+      <h3 style="color:#4f7096">Young end</h3>${motTable(young.map(x=>({...x,nri:null,nmac:null,n:''})))}
+    </div>
+  </div>
+  <div class="card note"><b>Verdict.</b> A defensible <b>coarse</b> chronology exists — barriers old, ATU tales young, validated — but there is <b>no robust fine-grained age order</b>: the strongest ordination signal is geography, the age-oriented heuristics (M17, prevalence) agree only weakly, and mean agreement is ${c.mean_agree}. This is the honest ceiling the research note predicted: ordering recovers <i>space</i> readily and <i>time</i> only coarsely.</div>`;
+}
+
+function render(){
+  document.getElementById("view").innerHTML = tab=="date"?viewDate():tab=="floor"?viewFloor():viewChrono();
+  document.getElementById("sub").textContent = `${D.n_trad} traditions · ${D.n_motif} motifs · ${D.n_ordered} ordered (≥5 attestations)`;
+}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b)); render();});
+render();
+</script>

@@ -605,6 +605,18 @@ Meso/Andes. The **teleconnector motifs** are the deep (M17 74–100) disjunct ce
 (Pleiades-as-people, Sun & Moon, rainbow serpent) — the pan-global layer as a network, not a tree. See
 [`48-teleconnections/README.md`](48-teleconnections/README.md).
 
+### 49 · Chronology
+Can we put a **time axis** on the motifs? One page, three linked views (per
+[`../docs/research/dating-and-chronology-methods.md`](../docs/research/dating-and-chronology-methods.md)):
+**① datability** (NRI route partition: barrier / tree-language / weak — 99% of motifs are areal-clustered),
+**② barrier floors** (trans-Beringian ≥15ka, pan-American ≥13ka, Sahul ≥50ka contested — real year-floors on
+the deep substrate), **③ pseudo-chronology** (CA + diffusion pseudotime + M17 + prevalence, rooted by barrier
+anchors). **Q.** Can several independent orderings + rooting give a defensible relative chronology?
+**Finding.** The **coarse** polarity is validated (barriers old rank 0.69, ATU tales young 0.33) but there is
+**no robust fine order** — the dominant ordination axis is geography, not time (corr with New-World share
+0.87/0.84), age heuristics agree only weakly (mean 0.63). Ordering recovers *space* readily, *time* only
+coarsely — the mockup shows it. See [`49-chronology/README.md`](49-chronology/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

@@ -163,14 +163,21 @@ diffusion still masquerades (a widely-borrowed young motif reads old on breadth)
 several polarities* beats any one, and the disagreement between them is a map of where the
 pseudotime is unreliable.
 
-### Proposed artefact — mockup 49 "Pseudo-chronology"
+### Realised — mockup 49 "Chronology"
 
-Compute CA axis 1, DPT pseudotime and a NeighborNet order; root them by outgroup (Africa) + barrier
-anchors; show the **consensus motif rank with agreement bands** (narrow where methods concur, wide
-where they argue); validate against the barrier bounds and ATU/language-clade depth. Output: an
-ordered ribbon "ancient substrate → young märchen" with an honest reliability marking per segment —
-the first artefact where the order comes from *several independent methods with an explicit rooting*,
-not one breadth heuristic.
+Built as [`mockups/49-chronology`](../../mockups/49-chronology/README.md), one page with three linked
+views: **① datability** (the NRI route partition — barrier/tree/weak), **② barrier floors** (trans-Beringian
+≥ 15 ka, pan-American ≥ 13 ka, Sahul ≥ 50 ka contested), and **③ pseudo-chronology** (CA seriation +
+diffusion pseudotime + M17 + prevalence, rooted by barrier anchors, with agreement bands).
+
+The result confirmed the honest ceiling this note predicted. The **coarse** polarity is validated —
+barrier-anchor motifs land old (mean consensus rank 0.69), ATU tales land young (0.33). But there is **no
+robust fine-grained order**: CA seriation and diffusion pseudotime agree (0.94) only because the **dominant
+ordination axis is geography, not time** (their correlation with New-World share is 0.87 / 0.84); the
+age-oriented heuristics (M17, prevalence) agree only weakly; mean agreement is 0.63. Naive ordination
+recovers *space* readily and *time* only coarsely — exactly the polarity/interpretation trap flagged in §B2.
+The mockup surfaces this rather than hiding it. (NeighborNet was substituted by the diffusion-map pseudotime;
+outgroup rooting by the barrier anchors — both are the tractable equivalents on our data.)
 
 ---
 
