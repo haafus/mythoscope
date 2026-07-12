@@ -58,12 +58,18 @@ data we have) ÷ effort.
    correlate with pre-LGM movements ≥38 ka.
    *Critique:* correlation ≠ per-motif date; Galton's problem and ecological confounds; yields broad
    epochs, not motif ages.
-5. **Textual terminus ante quem (+ LLM harvesting).**
+5. **Textual terminus ante quem (+ LLM harvesting).** ✅ realised — mockup 50.
    A motif in a dated ancient text (Gilgamesh, Rigveda, Homer, Popol Vuh) is *no younger* than the
    source; `atu_refs` is a weak proxy. An LLM can scale the harvest of earliest attestations against a
-   curated dated-source set, with verification.
-   *Critique:* strong literacy/geographic bias (nothing for preliterate Americas/Oceania/Africa),
-   lower bounds only, hallucination risk → verification mandatory.
+   curated dated-source set, with verification. **Built** in
+   [`mockups/50-dated-attestations`](../../mockups/50-dated-attestations/README.md) using Berezkin's *own*
+   dated literate traditions as the corpora (15: Sumer, Egypt, Hittite, Ugarit, Vedic, Early Chinese, … →
+   Aztec): **707 motifs floored** in calendar years, **329 of them not reachable by any barrier** (total
+   absolute-floored 1284 → 1613); the oldest documented (Egypt ~2350 BCE) are the celestial substrate,
+   recorded independently across up to 9 corpora. *Critique confirmed:* strong literacy bias — documented age
+   is **flat against M17 depth (r = 0.02)**, so it is a hard-anchor layer, not a universal clock; lumped
+   corpora (Vedic + Purana) over-state the old end (flagged); mixed corpora (Korea) excluded to avoid
+   false-ageing.
 6. **Ancestral-state stochastic mapping (SIMMAP).**
    Given a *dated* backbone (from 1/3/4), stochastic character mapping yields a per-motif
    origin-age **posterior with uncertainty** — the principled replacement for the breadth proxy.

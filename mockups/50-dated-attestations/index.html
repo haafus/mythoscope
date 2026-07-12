@@ -1,0 +1,130 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>50 · Dated attestations</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --surface:#fff; --bg:#f4f1ea; --line:#e7e2d7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:1180px; margin:0 auto; padding:24px 20px 60px; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:1010px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  h2 { font-size:14px; margin:0 0 10px; } h3 { font-size:12px; margin:14px 0 6px; color:#3a444b; text-transform:uppercase; letter-spacing:.04em; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
+  @media (max-width:820px){ .grid2 { grid-template-columns:1fr; } }
+  .cov { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end; }
+  .cov .box { text-align:center; } .cov .big { font-size:30px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .cov .lab { font-size:11px; color:var(--muted); }
+  .bar { display:flex; align-items:center; gap:8px; margin:3px 0; font-size:12px; }
+  .bar .lab { width:88px; color:#495057; } .bar .track { flex:1; background:var(--bg); border-radius:5px; height:14px; overflow:hidden; }
+  .bar .fill { display:block; height:100%; border-radius:5px; min-width:2px; } .bar .v { width:44px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  table.mot { border-collapse:collapse; width:100%; font-size:11.5px; }
+  table.mot td { padding:2px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.mot .id { color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.mot .yr { color:#7a5a3a; font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right; }
+  table.mot .d { color:#b45c4b; font-variant-numeric:tabular-nums; text-align:right; }
+  .g { display:inline-block; min-width:18px; text-align:center; font-size:9px; color:#fff; background:#8a939a; border-radius:4px; padding:0 3px; }
+  .note { font-size:12px; background:#faf7f0; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .pill { display:inline-block; font-size:10px; padding:1px 6px; border-radius:10px; margin-left:4px; }
+  .pill.high{background:#e6efe4;color:#3a6b4a;} .pill.medium{background:#f2ecdd;color:#8a6a3a;} .pill.low{background:#f4e7e4;color:#9c5140;}
+</style>
+
+<main>
+<header>
+  <h1>50 · Dated attestations</h1>
+  <p>Real <b>calendar years</b> with no external file: several of Berezkin's own traditions <i>are</i> dated
+  literate corpora — <b>Sumer, Ancient Egypt, Hittite, Ugarit, Vedic, Early Chinese, …</b>. A motif recorded
+  in one is <b>documented by</b> that corpus's date — an absolute <b>terminus-ante-quem</b> floor — merged with
+  the biogeographic barrier floors (mockup 49). Lower bounds, not ages; and biased to who kept writing.</p>
+</header>
+
+<div class="card">
+  <h2>Coverage <span class="muted">— motifs that gain an absolute floor</span></h2>
+  <div class="cov" id="cov"></div>
+  <p class="muted" id="covnote" style="margin-top:10px"></p>
+</div>
+
+<div class="card">
+  <h2>The dated corpora <span class="muted">— when each motif-complex first enters the written record</span></h2>
+  <div id="timeline"></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>Earliest documented attestation</h2>
+    <div id="hist"></div>
+    <h3>Validation — does documented age track M17 depth?</h3>
+    <div id="val"></div>
+  </div>
+  <div class="card">
+    <h2>Oldest documented motifs <span class="muted">— the first written myths</span></h2>
+    <table class="mot" id="oldest"></table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Independently documented across many corpora <span class="muted">— ≥4 dated literate traditions</span></h2>
+  <p class="muted">Motifs recorded separately in Egypt <i>and</i> Sumer <i>and</i> China <i>and</i> Mesoamerica… — hard, redundant evidence of antiquity (or of being a near-universal). These are the deep celestial/cosmogonic substrate seen from the written side.</p>
+  <table class="mot" id="multi"></table>
+</div>
+
+<p class="muted" id="foot"></p>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D=window.DATA, esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GNAME={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+const cc={high:"#6f9a5a",medium:"#c0873f",low:"#b45c4b"};
+
+// coverage
+const cv=D.coverage;
+document.getElementById("cov").innerHTML=[
+  {n:cv.any,l:"any absolute floor",c:"#4f7096"},
+  {n:cv.barrier,l:"biogeographic barrier",c:"#7a5a3a"},
+  {n:cv.textual,l:"textual (dated corpus)",c:"#c0873f"},
+  {n:cv.tex_only,l:"NEW — textual, no barrier",c:"#6f9a5a"}
+].map(x=>`<div class="box"><div class="big" style="color:${x.c}">${x.n}</div><div class="lab">${x.l}</div></div>`).join("");
+document.getElementById("covnote").innerHTML=`Textual attestation across <b>${cv.n_corpora}</b> dated corpora floors <b>${cv.textual}</b> motifs — <b>${cv.tex_only}</b> of them not reachable by any barrier, lifting the total with an absolute floor from ${cv.barrier} to <b>${cv.any}</b>.`;
+
+// timeline
+(function(){
+  const co=D.corpora, W=1000,H=210,pl=8,pr=8,pt=16,pb=26;
+  const ys=co.map(c=>c.yr), ymin=Math.min(...ys)-100, ymax=Math.max(...ys)+200;
+  const X=v=>pl+(W-pl-pr)*(ymax-v)/(ymax-ymin);   // old (large ya) on the LEFT
+  const nmax=Math.max(...co.map(c=>c.n_first));
+  // axis ticks (years-ago → BCE/CE)
+  const ticks=[4000,3000,2000,1000,0];
+  const axis=ticks.map(t=>{const ce=2000-t; const lab=ce<0?(-ce)+' BCE':(ce||'now')+(ce?' CE':''); return `<line x1="${X(t).toFixed(1)}" y1="${pt}" x2="${X(t).toFixed(1)}" y2="${H-pb}" stroke="#eee6d6"/><text x="${X(t).toFixed(1)}" y="${H-pb+13}" font-size="9" fill="#9aa" text-anchor="middle">${lab}</text>`;}).join("");
+  // lay out labels on alternating rows to reduce overlap
+  let pts=""; co.forEach((c,i)=>{
+    const x=X(c.yr), row=i%4, y=pt+18+row*38, r=3+Math.sqrt(c.n_first)*1.1;
+    const right=x>W*0.62;   // flip label to the left for points near the right edge
+    pts+=`<line x1="${x.toFixed(1)}" y1="${(H-pb).toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#e0dccf" stroke-width="0.8"/>`;
+    pts+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${cc[c.conf]}" fill-opacity="0.85"><title>${esc(c.name)} — ${c.label} · ${c.n_first} motifs first documented here (${c.n} total) · ${esc(c.note)}</title></circle>`;
+    pts+=`<text x="${((right?x-r-3:x+r+3)).toFixed(1)}" y="${(y+3).toFixed(1)}" font-size="9.5" fill="#3a444b" text-anchor="${right?'end':'start'}">${esc(c.name)} <tspan fill="#9aa">${c.label} · ${c.n_first}</tspan></text>`;
+  });
+  document.getElementById("timeline").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${axis}<line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#d8d0bf"/>${pts}</svg>
+   <div class="muted">← older · point size = motifs first documented in that corpus · colour = <span style="color:#6f9a5a">high</span> / <span style="color:#c0873f">medium</span> / <span style="color:#b45c4b">low</span> confidence · younger →</div>`;
+})();
+
+// earliest-attestation histogram
+(function(){
+  const h=D.hist, mx=Math.max(...h.map(x=>x.n));
+  document.getElementById("hist").innerHTML=h.map(x=>`<div class="bar"><span class="lab">${x.lab} ya</span><span class="track"><span class="fill" style="width:${(100*x.n/mx).toFixed(1)}%;background:#c0873f"></span></span><span class="v">${x.n}</span></div>`).join("");
+})();
+
+// validation
+(function(){
+  const v=D.validation, mx=Math.max(...v.depth_by_age.map(x=>x.d||0));
+  document.getElementById("val").innerHTML=v.depth_by_age.map(x=>`<div class="bar"><span class="lab">${x.lab}</span><span class="track"><span class="fill" style="width:${(100*(x.d||0)/mx).toFixed(1)}%;background:#8a6bbf"></span></span><span class="v">${x.d==null?'—':'▲'+x.d}</span></div>`).join("")
+    +`<div class="note" style="margin-top:8px"><b>No.</b> Mean M17 depth is flat across documented-age buckets and the overall rank correlation is only <b>${v.r_tex_depth}</b>. Documented age and distributional depth are <b>independent, confounded signals</b>: textual floors favour cultures that <i>wrote</i> — a genuinely ancient Americas-only motif gets no floor, a younger Sumerian one does. Use them as <b>hard anchors</b>, not a universal clock.</div>`;
+})();
+
+function motRows(rows, extra){ return rows.map(m=>`<tr><td class="id">${m.id}</td><td>${esc(m.name)}</td><td><span class="g" title="${GNAME[m.grp]||''}">${m.grp||'–'}</span></td>${extra(m)}</tr>`).join(""); }
+document.getElementById("oldest").innerHTML=motRows(D.oldest,m=>`<td class="yr" title="${esc(m.corpus)} · ${m.ncorp} corpora">${m.label}${m.ncorp>1?' ·'+m.ncorp+'×':''}</td><td class="d" title="M17 depth">${m.depth==null?'':'▲'+m.depth}</td>`);
+document.getElementById("multi").innerHTML=motRows(D.multi,m=>`<td class="yr">${m.label}</td><td class="d" title="dated corpora">${m.ncorp}×</td><td class="muted" style="font-size:10px">${m.corps.slice(0,6).join(', ')}${m.corps.length>6?'…':''}</td>`);
+</script>

@@ -617,6 +617,15 @@ anchors). **Q.** Can several independent orderings + rooting give a defensible r
 0.87/0.84), age heuristics agree only weakly (mean 0.63). Ordering recovers *space* readily, *time* only
 coarsely — the mockup shows it. See [`49-chronology/README.md`](49-chronology/README.md).
 
+### 50 · Dated attestations
+Real **calendar-year** floors from Berezkin's own dated literate corpora (Sumer, Egypt, Hittite, Vedic, Early
+Chinese, … 15 in all) — the textual *terminus ante quem* route, no external file. **Q.** How many motifs can
+we floor in actual years, and does documented age track distributional depth? **Finding.** **707** motifs get
+a textual floor (**329** not reachable by any barrier → total absolute-floored 1284→**1613**); the oldest
+documented (Egypt 2350 BCE) are the celestial substrate, many recorded independently across up to **9**
+corpora. But documented age is **flat** against M17 depth (r=0.02) — a hard-anchor layer, not a universal
+clock, biased to who wrote things down. See [`50-dated-attestations/README.md`](50-dated-attestations/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.
