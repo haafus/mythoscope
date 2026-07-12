@@ -330,3 +330,18 @@ motif **definitions/metadata** we already hold — not the full tale corpora —
 confirms it more rigorously; Tier C opens the one *text-free* content axis (structural meaning). The
 actual breakthrough — motif **sequence and combination inside tales** — is excluded here by
 construction, and remains the highest-value future move once the tale texts are wired in.
+
+**Tier A — realised (2026-07).** All four are built:
+- **inverse-Ising → mockup 56.** New structure confirmed: only 9% of strong correlations are direct;
+  direct **repulsion** recovers competing variant-slots invisible to co-occurrence.
+- **contagion model-comparison → mockup 57.** Three spreading regimes; complexity orders
+  complex > simple > long-range — an independent mechanistic vote for mockup 51's axis.
+- **higher-order + persistent homology → mockup 58.** Two honest negatives — *no* synergy (every triple
+  explained by its pairs) and *one* connected blob with zero persistent loops. The clinal result,
+  reconfirmed topologically. As predicted, geography stayed a single blob; the higher-order motif
+  combinatorics carried no synergy either.
+- **infinite-K / HDP → mockup 59.** Effective K ≈ 3 + an elbow-free tail: mockup 47's "no clean K"
+  formalised, components = the familiar areal/thematic blocks.
+
+Net: Tier A added one genuinely new result (56's variant-slot repulsion) and three sharp confirmations
+(57 mechanistic, 58 topological, 59 nonparametric). The trilogy stands; the text corpus remains the move.

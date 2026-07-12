@@ -1,0 +1,73 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>59 · Infinite-K</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;--bar:#4f7096;--tail:#c0873f;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1120px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:990px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  h2{font-size:14px;margin:0 0 10px;} h3{font-size:12px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;}
+  .muted{color:var(--muted);font-size:11.5px;}
+  .counts{display:flex;gap:26px;flex-wrap:wrap;} .counts .box{text-align:center;} .counts .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--bar);} .counts .lab{font-size:11px;color:var(--muted);}
+  .comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;}
+  .comp{border:1px solid var(--line);border-radius:10px;padding:12px 14px;}
+  .comp .w{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--bar);}
+  .comp .meta{font-size:11px;color:var(--muted);margin:2px 0 8px;}
+  .comp table{border-collapse:collapse;width:100%;font-size:11px;} .comp td{padding:2px 4px;border-bottom:1px solid var(--line);}
+  .g{display:inline-block;min-width:16px;text-align:center;font-size:9px;color:#fff;background:#8a939a;border-radius:4px;padding:0 3px;}
+  .areas{font-size:10.5px;color:#5b6770;margin-top:6px;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+</style>
+<main>
+<header><h1>59 · Infinite-K <span class="muted">— a Bayesian-nonparametric latent model</span></h1>
+<p>Mockup 47 found the admixture cross-validation curve just plateaus — no clean number of populations K. The principled
+answer is a model that never fixes K: a <b>Hierarchical Dirichlet Process</b> (traditions = documents, motifs = words),
+which infers an unbounded number of latent components and lets the data decide how many carry weight. We read off the
+<b>effective K</b> and — the real object of interest — the <b>shape of the component-weight decay</b>.</p></header>
+
+<div class="card"><h2>How many components does the data actually use?</h2>
+<div class="counts" id="counts"></div>
+<h3 style="margin-top:16px">Component-weight decay <span class="muted">— corpus-level stick weights, sorted</span></h3>
+<div id="curve"></div></div>
+
+<div class="card"><h2>The components it settles on</h2>
+<div class="comps" id="comps"></div></div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GN={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+document.getElementById("counts").innerHTML=[
+  [D.effK90,"components hold 90% of the mass"],
+  [D.effK1,"components with ≥ 1% each"],
+  [D.T,"components the model was free to use"],
+  [D.n_trad,"traditions · "+D.n_motif+" motifs"]
+].map(([n,l])=>`<div class="box"><div class="big">${n}</div><div class="lab">${l}</div></div>`).join("");
+
+// weight curve
+(function(){
+  const w=D.weight_curve,W=1000,H=190,pl=34,pr=12,pt=12,pb=26;
+  const n=w.length,mx=Math.max(...w);
+  const bw=(W-pl-pr)/n;
+  const bars=w.map((v,i)=>{const h=(H-pt-pb)*v/mx;const big=v>=0.03;
+    return `<rect x="${(pl+i*bw+0.6).toFixed(1)}" y="${(H-pb-h).toFixed(1)}" width="${(bw-1.2).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="${big?'var(--bar)':'var(--tail)'}" fill-opacity="${big?0.9:0.7}"/>`;}).join("");
+  const yt=[0,mx/2,mx].map(v=>`<text x="${pl-6}" y="${(H-pb-(H-pt-pb)*v/mx+3).toFixed(1)}" font-size="9" fill="#9aa" text-anchor="end">${(v*100).toFixed(0)}%</text>`).join("");
+  document.getElementById("curve").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${bars}${yt}
+    <text x="${pl}" y="${H-8}" font-size="9" fill="#9aa">1</text>
+    <text x="${W-pr}" y="${H-8}" font-size="9" fill="#9aa" text-anchor="end">${n}</text>
+    <text x="${(pl+W)/2}" y="${H-8}" font-size="9" fill="#9aa" text-anchor="middle">component rank →</text></svg>
+    <div class="muted" style="margin-top:2px">Three components (blue) carry the mass; then a smooth tail (amber) with no elbow — the model keeps spreading probability rather than snapping to a clean count. That flat tail <i>is</i> "no natural K".</div>`;
+})();
+
+document.getElementById("comps").innerHTML=D.components.filter(c=>c.weight>=0.01).map((c,i)=>{
+  const mo=c.motifs.slice(0,7).map(m=>`<tr><td><span class="g" title="${GN[m.grp]||''}">${m.grp||'–'}</span> ${esc(m.name)}</td></tr>`).join("");
+  const ar=c.areas.map(a=>`${esc(a.a)} (${a.n})`).join(" · ");
+  return `<div class="comp"><div class="w">${(c.weight*100).toFixed(0)}%</div>
+    <div class="meta">component ${i+1} · ${c.n} traditions dominant</div>
+    <table>${mo}</table>
+    <div class="areas"><b>Where:</b> ${ar}</div></div>`;
+}).join("");
+</script>

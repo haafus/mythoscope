@@ -671,6 +671,28 @@ links (transitive paths removed). **Q.** Which motif associations are real vs co
 competing variant-slots** invisible to co-occurrence (*Pleiades boys ↔ girls*, *Man-in-Moon ↔ Moon-rabbit*).
 See [`56-motif-coupling/README.md`](56-motif-coupling/README.md).
 
+### 57 · Contagion (simple vs complex spreading)
+Simulate a motif spreading on a small-world tradition network (k-NN geography + weak long-range ties) under two
+rules, score real footprints by geographic fragmentation. **Q.** Which spreading mechanism fits each motif, and
+does it line up with complexity? **Finding.** Three regimes — most fit **simple** contagion, a minority **complex**,
+a tail too disjunct for any local rule (**long-range / descent**). Mean complexity orders **complex > simple >
+long-range**, an independent mechanistic vote for mockup 51's complexity axis. Model-comparison on the snapshot,
+no time axis. See [`57-contagion/README.md`](57-contagion/README.md).
+
+### 58 · Higher-order structure (synergy + topology)
+Interaction information over motif triples + persistent homology (`ripser`, Jaccard) of the motif cloud. **Q.** Are
+there irreducible three-way packages, or lumps/loops in trait-space the pairwise view misses? **Finding.** Two honest
+negatives — **no synergy** (best triple II ≈ −0.02; every triple explained by its pairs) and **one connected blob,
+zero persistent H1 loops**. The clinal-geography result (result 1), reconfirmed from information-theoretic and
+topological angles that could have shown structure and didn't. See [`58-higher-order/README.md`](58-higher-order/README.md).
+
+### 59 · Infinite-K (Hierarchical Dirichlet Process)
+A latent model that never fixes K (traditions = documents, motifs = words), the principled answer to mockup 47's
+plateauing admixture CV. **Q.** How many latent components does the data actually use? **Finding.** Effective
+**K ≈ 3** (~90% mass) + a smooth **elbow-free tail** — the formalisation of "no natural K." The components are the
+familiar areal/thematic blocks (Old-World tales / cosmology / New-World cosmogony), not a hidden partition. See
+[`59-infinite-k/README.md`](59-infinite-k/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

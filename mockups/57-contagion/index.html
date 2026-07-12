@@ -1,0 +1,86 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>57 · Contagion</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;
+        --complex:#4f7096;--simple:#c0873f;--long:#9c6a94;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1120px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:990px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  h2{font-size:14px;margin:0 0 10px;} h3{font-size:12px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;}
+  .muted{color:var(--muted);font-size:11.5px;}
+  .counts{display:flex;gap:20px;flex-wrap:wrap;} .counts .box{text-align:center;} .counts .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;} .counts .lab{font-size:11px;color:var(--muted);}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start;} @media(max-width:900px){.grid3{grid-template-columns:1fr;}}
+  .bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px;} .bar .lab{width:150px;color:#495057;} .bar .track{flex:1;background:var(--bg);border-radius:5px;height:14px;overflow:hidden;} .bar .fill{display:block;height:100%;border-radius:5px;min-width:2px;} .bar .v{width:36px;text-align:right;color:var(--muted);}
+  table{border-collapse:collapse;width:100%;font-size:11.5px;} td{padding:2px 5px;border-bottom:1px solid var(--line);}
+  td.n{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .g{display:inline-block;min-width:16px;text-align:center;font-size:9px;color:#fff;background:#8a939a;border-radius:4px;padding:0 3px;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+</style>
+<main>
+<header><h1>57 · Contagion <span class="muted">— simple vs complex spreading as a generative model</span></h1>
+<p>Epidemiology of representations, as a model-comparison. On a small-world tradition network (k-NN geography +
+weak long-range ties), a motif spreads under two rules: <b>simple contagion</b> (one exposure — crosses weak
+ties, can jump) vs <b>complex contagion</b> (needs a fraction of neighbours — stalls at weak ties, stays
+compact). We compare each real motif's <b>geographic fragmentation</b> at its size to both simulated ensembles
+and assign the better-fitting mechanism. <b>No time axis</b> → this is model-comparison on the snapshot, not
+history; the network is a geographic proxy.</p></header>
+
+<div class="card"><h2>Which mechanism fits each motif</h2>
+<div class="counts" id="counts"></div>
+<h3 style="margin-top:14px">Validation — do complex-contagion motifs carry more narrative complexity?</h3>
+<div id="cxval"></div>
+<div class="note" style="margin-top:8px" id="cxnote"></div></div>
+
+<div class="card"><h2>Fragmentation vs footprint size <span class="muted">— simulated bands + real motifs (coloured by assigned mechanism)</span></h2>
+<div id="chart"></div>
+<div class="muted" style="margin-top:6px"><span style="color:var(--complex)">■ complex</span> (low fragmentation, contiguous) · <span style="color:var(--simple)">■ simple</span> (crosses weak ties) · <span style="color:var(--long)">■ long-range/descent</span> (too disjunct for any local rule)</div></div>
+
+<div class="grid3">
+  <div class="card"><h3 style="color:var(--complex)">Complex <span class="muted">— compact, reinforced</span></h3><table id="ex_complex"></table></div>
+  <div class="card"><h3 style="color:var(--simple)">Simple <span class="muted">— viral, crosses ties</span></h3><table id="ex_simple"></table></div>
+  <div class="card"><h3 style="color:var(--long)">Long-range / descent <span class="muted">— unreachable locally</span></h3><table id="ex_long"></table></div>
+</div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GN={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+const COL={complex:"#4f7096",simple:"#c0873f","long-range/descent":"#9c6a94",long:"#9c6a94"};
+document.getElementById("foot").textContent=D.note;
+const c=D.counts;
+document.getElementById("counts").innerHTML=[["complex",c.complex],["simple",c.simple],["long-range/descent",c["long-range/descent"]]]
+ .map(([k,n])=>`<div class="box"><div class="big" style="color:${COL[k]}">${n}</div><div class="lab">${k}</div></div>`).join("");
+const cb=D.cx_by_mode,mx=Math.max(cb.complex,cb.simple,cb.long);
+document.getElementById("cxval").innerHTML=[["complex (needs reinforcement)",cb.complex,COL.complex],["simple (one exposure)",cb.simple,COL.simple],["long-range / descent",cb.long,COL.long]]
+ .map(([l,v,col])=>`<div class="bar"><span class="lab">${l}</span><span class="track"><span class="fill" style="width:${(100*v/mx).toFixed(0)}%;background:${col}"></span></span><span class="v">${v}</span></div>`).join("");
+document.getElementById("cxnote").innerHTML=`Mean definition content-words (mockup 51's complexity proxy) by assigned mechanism: <b>complex ${cb.complex}</b> &gt; simple ${cb.simple} &gt; long-range/descent ${cb.long}. The predicted ordering holds — <b>complex, arbitrary motifs spread by reinforced (complex) contagion; the simplest, most-disjunct ones are unreachable locally and go by descent / long jumps</b>. A modest but directional mechanistic confirmation of the complexity axis.`;
+
+// chart
+(function(){
+  const W=1000,H=340,pl=42,pr=12,pt=12,pb=30;
+  const xs=D.bands.map(b=>b.m); const xmin=Math.min(...xs),xmax=Math.max(...xs);
+  const ymax=Math.max(...D.points.map(p=>p.frag),...D.bands.map(b=>b.s_mean+b.s_sd))*1.02;
+  const X=v=>pl+(W-pl-pr)*(v-xmin)/(xmax-xmin), Y=v=>pt+(H-pt-pb)*(1-v/ymax);
+  function band(key,mk,sk,col){
+    const top=D.bands.map(b=>`${X(b.m).toFixed(1)},${Y(b[mk]+b[sk]).toFixed(1)}`);
+    const bot=D.bands.slice().reverse().map(b=>`${X(b.m).toFixed(1)},${Y(Math.max(0,b[mk]-b[sk])).toFixed(1)}`);
+    const line=D.bands.map((b,i)=>(i?"L":"M")+X(b.m).toFixed(1)+" "+Y(b[mk]).toFixed(1)).join("");
+    return `<polygon points="${top.concat(bot).join(" ")}" fill="${col}" fill-opacity="0.12"/><path d="${line}" fill="none" stroke="${col}" stroke-width="1.6"/>`;
+  }
+  const dots=D.points.map(p=>`<circle cx="${X(p.n).toFixed(1)}" cy="${Y(p.frag).toFixed(1)}" r="1.5" fill="${COL[p.mode]||'#999'}" fill-opacity="0.5"/>`).join("");
+  const yt=[0,ymax/2,ymax].map(v=>`<text x="6" y="${(Y(v)+3).toFixed(1)}" font-size="9" fill="#9aa">${v.toFixed(0)}</text>`).join("");
+  const xt=[8,60,120,180].map(v=>`<text x="${X(v).toFixed(1)}" y="${H-12}" font-size="9" fill="#9aa" text-anchor="middle">${v}</text>`).join("");
+  document.getElementById("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    ${dots}${band('complex','c_mean','c_sd',COL.complex)}${band('simple','s_mean','s_sd',COL.simple)}
+    ${yt}${xt}<text x="16" y="${pt+4}" font-size="9" fill="#9aa">geo fragments ↑</text>
+    <text x="${(pl+W)/2}" y="${H-1}" font-size="9" fill="#9aa" text-anchor="middle">footprint size (traditions)</text></svg>`;
+})();
+
+function fill(id,rows){
+  document.getElementById(id).innerHTML=rows.map(m=>`<tr><td><span class="g" title="${GN[m.grp]||''}">${m.grp||'–'}</span> ${esc(m.name)}</td><td class="n">${m.n}t · ${m.frag}fr · cx${m.cx}</td></tr>`).join("");
+}
+fill("ex_complex",D.examples.complex); fill("ex_simple",D.examples.simple); fill("ex_long",D.examples.long);
+</script>

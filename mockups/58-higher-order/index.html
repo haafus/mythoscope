@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>58 · Higher-order structure</title>
+<style>
+  :root{--ink:#1f2a30;--muted:#6c757d;--surface:#fff;--bg:#f4f1ea;--line:#e7e2d7;
+        --syn:#4f7096;--red:#b0693f;--h0:#5a7d63;--h1:#9c6a94;}
+  *{box-sizing:border-box;} body{margin:0;font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);}
+  main{max-width:1120px;margin:0 auto;padding:24px 20px 60px;} h1{font-size:21px;margin:0 0 4px;}
+  header p{color:var(--muted);font-size:13px;margin:0;max-width:990px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  h2{font-size:14px;margin:0 0 10px;} h3{font-size:12px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.04em;}
+  .muted{color:var(--muted);font-size:11.5px;}
+  .counts{display:flex;gap:22px;flex-wrap:wrap;} .counts .box{text-align:center;} .counts .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;} .counts .lab{font-size:11px;color:var(--muted);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;} @media(max-width:900px){.grid2{grid-template-columns:1fr;}}
+  table{border-collapse:collapse;width:100%;font-size:11.5px;} td{padding:3px 5px;border-bottom:1px solid var(--line);vertical-align:top;}
+  td.n{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .g{display:inline-block;min-width:16px;text-align:center;font-size:9px;color:#fff;background:#8a939a;border-radius:4px;padding:0 3px;}
+  .tri{line-height:1.35;} .plus{color:var(--muted);padding:0 3px;}
+  .note{font-size:12px;background:#faf7f0;border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+  .verdict{font-size:12.5px;border-left:3px solid var(--h0);padding:2px 0 2px 12px;margin:4px 0;}
+</style>
+<main>
+<header><h1>58 · Higher-order structure <span class="muted">— synergy triples & the topology of trait-space</span></h1>
+<p>Two things the pairwise view (mockups 53 / 56) cannot see. <b>Synergy</b>: motif triples that form a package only
+together — measured by interaction information <i>II(X;Y;Z)</i> = Σ<i>H</i>(pairs) − Σ<i>H</i>(singles) − <i>H</i>(triple),
+where &gt;0 means the triple carries dependency beyond every one of its pairs. <b>Topology</b>: the shape of the motif
+cloud (each of the top-300 motifs a point in 948-dim tradition-incidence space, Jaccard distance) via persistent
+homology — H0 counts connected components, H1 counts loops, across every scale. The two together ask: is trait-space
+lumpy and cyclic, or one connected blob?</p></header>
+
+<div class="card"><h2>The topological verdict</h2>
+<div class="counts" id="counts"></div>
+<div id="verdicts" style="margin-top:12px"></div></div>
+
+<div class="grid2">
+  <div class="card"><h3 style="color:var(--syn)">Most synergistic triples <span class="muted">— highest II</span></h3>
+    <p class="muted" style="margin:0 0 8px">The best candidates in the whole catalogue still have <b>II&nbsp;&lt;&nbsp;0</b> — even the least-redundant triple is redundant. No motif package exceeds the sum of its pairs.</p>
+    <table id="syn"></table></div>
+  <div class="card"><h3 style="color:var(--red)">Most redundant triples <span class="muted">— lowest II</span></h3>
+    <p class="muted" style="margin:0 0 8px">The floor is variant-families: a motif, its subtype, and a sub-subtype share almost all their information — a single fact recorded thrice.</p>
+    <table id="red"></table></div>
+</div>
+
+<div class="card"><h2>Persistence diagram <span class="muted">— birth vs death of topological features (Jaccard scale)</span></h2>
+<div id="pd"></div>
+<div class="muted" style="margin-top:6px"><span style="color:var(--h0)">■ H0</span> connected components — all born at 0, nearly all die early (they merge into one blob) · <span style="color:var(--h1)">■ H1</span> loops — all sit on the diagonal (born≈die = noise), none persist past the 0.08 floor.</div></div>
+<p class="muted" id="foot"></p>
+</main>
+<script src="data.js"></script>
+<script>
+const D=window.DATA,esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GN={"01":"Sun & Moon","02":"Stars","03":"Cosmogony","04":"Death","05":"Humans","06":"Subsistence","07":"Plants/animals","08":"Monsters","09":"Protagonist","10":"Adventures","11":"Tricks","12":"Names","13":"Formulae"};
+document.getElementById("foot").textContent=D.note;
+const nH0=D.h0.filter(([b,d])=>d-b>0.05).length;
+document.getElementById("counts").innerHTML=[
+  ["1","dominant H0 component<br>(everything merges into one)","var(--h0)"],
+  [D.n_h1_loops,"persistent H1 loops<br>(> 0.08 noise floor)","var(--h1)"],
+  ["< 0","best triple's II<br>(no synergy anywhere)","var(--syn)"]
+].map(([n,l,col])=>`<div class="box"><div class="big" style="color:${col}">${n}</div><div class="lab">${l}</div></div>`).join("");
+document.getElementById("verdicts").innerHTML=[
+ "<b>No synergy.</b> Across the 4000 best-supported triples the maximum interaction information is "+D.synergy[0].ii+" — negative. Every motif triple is explained by its pairs; there is no irreducible three-way package. The pairwise couplings of mockup 56 already capture the dependency structure.",
+ "<b>One blob, no loops.</b> H0 collapses to a single connected component and H1 shows "+D.n_h1_loops+" features above the noise floor (top persistence "+D.top_h1_persistence[0]+"). Trait-space is a single connected cline, not a set of lumps or a ring of mutually-avoiding regimes — the geography result of the whole project, now confirmed from a purely topological angle."
+].map(t=>`<div class="verdict">${t}</div>`).join("");
+
+function tri(id,rows){
+  document.getElementById(id).innerHTML=rows.map(r=>{
+    const m=r.m.map(x=>`<span class="g" title="${GN[x.grp]||''}">${x.grp||'–'}</span> ${esc(x.name)}`).join('<span class="plus">＋</span>');
+    return `<tr><td class="tri">${m}</td><td class="n">II ${r.ii}</td></tr>`;
+  }).join("");
+}
+tri("syn",D.synergy.slice(0,8)); tri("red",D.redundancy.slice(0,8));
+
+// persistence diagram
+(function(){
+  const S=360,pad=34,mx=1.0;
+  const X=v=>pad+(S-2*pad)*v/mx, Y=v=>S-pad-(S-2*pad)*v/mx;
+  const diag=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(mx)}" y2="${Y(mx)}" stroke="#ccc" stroke-dasharray="3 3"/>`;
+  const floor=`<line x1="${X(0)}" y1="${Y(0.08)}" x2="${X(mx-0.08)}" y2="${Y(mx)}" stroke="#e0d5c8"/>`;
+  const h0=D.h0.map(([b,d])=>`<circle cx="${X(b).toFixed(1)}" cy="${Y(Math.min(d,mx)).toFixed(1)}" r="2.2" fill="#5a7d63" fill-opacity="0.5"/>`).join("");
+  const h1=D.h1.map(([b,d])=>`<circle cx="${X(b).toFixed(1)}" cy="${Y(Math.min(d,mx)).toFixed(1)}" r="2.6" fill="#9c6a94" fill-opacity="0.75"/>`).join("");
+  const ticks=[0,0.5,1].map(v=>`<text x="${X(v)}" y="${S-pad+14}" font-size="9" fill="#9aa" text-anchor="middle">${v}</text><text x="${pad-8}" y="${Y(v)+3}" font-size="9" fill="#9aa" text-anchor="end">${v}</text>`).join("");
+  document.getElementById("pd").innerHTML=`<svg viewBox="0 0 ${S} ${S}" style="width:${S}px;max-width:100%;height:auto">
+    ${diag}${floor}${h0}${h1}${ticks}
+    <text x="${X(0.5)}" y="${S-6}" font-size="9" fill="#9aa" text-anchor="middle">birth (Jaccard)</text>
+    <text x="12" y="${Y(0.5)}" font-size="9" fill="#9aa" text-anchor="middle" transform="rotate(-90 12 ${Y(0.5)})">death</text></svg>
+    <div class="muted" style="margin-top:4px">Points near the dashed diagonal die as soon as they are born — noise. The dotted line is the 0.08 persistence floor; no H1 point clears it.</div>`;
+})();
+</script>
