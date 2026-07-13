@@ -81,6 +81,7 @@ class Settings(BaseSettings):
     web_root: Path = Path("src/server/web")
 
     log_level: str = "INFO"
+    logs_max_files: int = 20  # per-run log files kept in logs_dir (<=0 = keep all)
 
     corpus: CorpusSettings = CorpusSettings()
     embedding: EmbeddingSettings = EmbeddingSettings()
