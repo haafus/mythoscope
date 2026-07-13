@@ -28,6 +28,11 @@
         "base_url": "https://api.deepseek.com",
         "model": "deepseek-chat",
         "env_key": "DEEPSEEK_API_KEY"
+      },
+      "or-gpt4o-mini": {
+        "base_url": "https://openrouter.ai/api/v1",
+        "model": "openai/gpt-4o-mini",
+        "env_key": "OPENROUTER_API_KEY"
       }
     },
     "inactive": {
