@@ -82,12 +82,11 @@ def embeddings(model: str | None, force: bool):
 
 
 @mytho.command()
-@click.option("--model", "-m", default=None, help="Embedding model name (all models if omitted).")
-@click.option("--summaries", is_flag=True, help="Generate summaries UMAP from LLM plot summaries.")
+@click.option("--model", "-m", default=None, help="Embedding variant key (all variants if omitted).")
 @click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
-def projections(model: str | None, summaries: bool, force: bool):
+def projections(model: str | None, force: bool):
     """Generate UMAP projections and embedding visualizations."""
-    _run("Projections", _build_projections, model=model, summaries=summaries, force=force)
+    _run("Projections", _build_projections, model=model, force=force)
 
 
 @mytho.command()
@@ -126,9 +125,9 @@ def server(host: str | None, port: int | None):
 def build(model, llm, force, sample):
     """Run the full analysis pipeline end-to-end."""
     if sample is not None:
-        from model_registry import active_embedding_models
+        from model_registry import embedding_variants
         from settings import settings
-        model = model or active_embedding_models()[0]
+        model = model or embedding_variants()[0]
         max_texts = sample
         # Keep the motif scrape light on a smoke run: only the sampled detail pages.
         settings.motifs.max_motifs = max_texts
@@ -166,11 +165,11 @@ def _build_embeddings(model: str | None, force: bool = False):
     build_embeddings(model_name=model, force=force)
 
 
-def _build_projections(model: str | None, force: bool = False, summaries: bool = False):
+def _build_projections(model: str | None, force: bool = False):
     logger.info("Loading ML libraries (torch, umap, chromadb)...")
     from projections.build_projections import build_projections
 
-    build_projections(model_name=model, summaries=summaries, force=force)
+    build_projections(model_name=model, force=force)
 
 
 def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
@@ -294,7 +293,7 @@ def _header(name: str, size: int):
 
 @mytho.command()
 @click.option("--apply", is_flag=True, help="Actually delete files (default is dry run).")
-@click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/summaries); needs --apply to delete.")
+@click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/preprocessing); needs --apply to delete.")
 def clean(apply: bool, caches: bool):
     """Find and remove orphan files (and, with --caches, resumable caches)."""
     try:
@@ -349,9 +348,9 @@ def _clean(apply: bool, caches: bool):
         if apply:
             from embeddings import chroma_manager
             for col in orphan_cols:
-                chroma_manager.delete_collection(col["model"])
+                chroma_manager.delete_collection(col["name"])
             for info in orphan_chunks:
-                collection = chroma_manager.get_collection(info["model"])
+                collection = chroma_manager.get_collection(info["collection"])
                 collection.delete(ids=info["orphan_ids"])
         click.echo()
 
@@ -428,7 +427,7 @@ def _clean(apply: bool, caches: bool):
 
 
 @mytho.command()
-@click.option("--caches", is_flag=True, help="Also include resumable caches (extraction/summaries/motif raw scrape).")
+@click.option("--caches", is_flag=True, help="Also include resumable caches (extraction/preprocessing/motif raw scrape).")
 def export(caches: bool):
     """Bundle built outputs into a portable zip for another machine."""
     from export_bundle import export_outputs, orphan_summary

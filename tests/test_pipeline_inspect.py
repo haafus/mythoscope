@@ -9,6 +9,7 @@ from pipeline_inspect import GRAPHS_CACHE, SUMMARIES_CACHE, cache_files, graphs_
 def _settings(tmp_path):
     return types.SimpleNamespace(
         graphs_dir=tmp_path / "graphs",
+        preprocessed_dir=tmp_path / "preprocessed",
         projections_dir=tmp_path / "projections",
         corpus_dir=tmp_path / "corpus",
         embeddings_dir=tmp_path / "embeddings",
@@ -45,10 +46,13 @@ class TestCacheFiles:
         partial.mkdir(parents=True)
         (partial / GRAPHS_CACHE).write_text("y")  # no graphs -> partial book
         (s.projections_dir / "m").mkdir(parents=True)
-        (s.projections_dir / "m" / SUMMARIES_CACHE).write_text("z")
+        (s.projections_dir / "m" / SUMMARIES_CACHE).write_text("z")  # stale pre-redesign cache
+        s.preprocessed_dir.mkdir(parents=True)
+        (s.preprocessed_dir / "summary.abc123.jsonl").write_text("p")
 
         owners = sorted(p.parent.name for p, _ in cache_files(s))
-        assert owners == ["A", "B", "m"]  # complete + partial graph caches + summaries
+        # complete + partial graph caches, preprocessing cache, stale summaries cache
+        assert owners == ["A", "B", "m", "preprocessed"]
 
 
 class TestGraphsStatus:

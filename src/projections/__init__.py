@@ -2,7 +2,6 @@ PROJECTION_METHODS = [
     {"key": "umap",                      "label": "UMAP 2D",                   "chart_type": "scatter"},
     {"key": "residual_umap",             "label": "Residual UMAP",             "chart_type": "scatter"},
     {"key": "rlace_umap",                "label": "RLACE UMAP",                "chart_type": "scatter"},
-    {"key": "summaries_umap",                "label": "Summary UMAP",                "chart_type": "scatter"},
     {"key": "distance_heatmap",          "label": "Distance Heatmap",          "chart_type": "heatmap"},
     {"key": "tradition_distribution",    "label": "Tradition Distribution",    "chart_type": "distribution"},
 ]

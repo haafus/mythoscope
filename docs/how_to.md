@@ -25,7 +25,7 @@ CLI (cli.py) ──► settings.py (+ config/*.json, model_registry.py)
    │
    ├─ corpus/      ──► outputs/corpus/      (тексты + corpus.json)
    ├─ embeddings/  ──► outputs/embeddings/  (ChromaDB)
-   ├─ projections/ ──► outputs/projections/ (UMAP/heatmap JSON, summaries-UMAP)
+   ├─ projections/ ──► outputs/projections/ (UMAP/heatmap JSON)
    ├─ graphs/      ──► outputs/graphs/       (beings/realms/ages JSON)
    ├─ motifs/      ──► outputs/motifs/       (berezkin/tmi/atu JSON + crosswalk)
    └─ server/      ◄── читает outputs/ и отдаёт SPA + REST API
@@ -37,14 +37,14 @@ motifs (независим от корпуса) → server
 Доменные пакеты (`corpus`, `embeddings`, `projections`, `graphs`, `motifs`, `server`) — по шагу пайплайна. Общая инфраструктура, не привязанная к шагу:
 
 - **`llm/`** — работа с LLM: `client.py` (`LLMProcessor` — OpenAI-compatible вызовы, классификация ошибок, ретраи), `rate_limiter.py` (`RateGovernor` — лимиты RPM/TPM + circuit breaker), `concurrency.py` (`map_concurrent` — параллельный фан-аут с быстрой отменой).
-- **`chunk_cache.py`** — append-only content-hash JSONL-кэш (graphs, summaries): возобновление по содержимому.
+- **`chunk_cache.py`** — append-only content-hash JSONL-кэш (graphs, chunk-preprocessing): возобновление по содержимому.
 - **`json_utils.py`** — атомарная запись JSON (`save_json`).
 - **`model_registry.py`** — резолв алиасов моделей и LLM-провайдеров из `config/models.json`.
 - **`settings.py`** — pydantic-settings, единый источник путей/параметров (env `MYTHO_*`).
 
 Как устроен троттлинг и параллелизм LLM-шагов:
 
-1. Потребитель (graphs/summaries) гонит элементы через `map_concurrent` с `max_concurrent` воркерами.
+1. Потребитель (graphs / chunk-preprocessing) гонит элементы через `map_concurrent` с `max_concurrent` воркерами.
 2. Каждый вызов идёт через `LLMProcessor` → `RateGovernor` (общий синглтон на модель): два token-bucket'а (RPM/TPM), пред-оплата по оценке токенов и сверка по факту из `usage` ответа.
 3. На устойчивом rate-limit взводится circuit breaker (`DailyLimitReached`) → штатная остановка; фатальные ошибки (`FatalLLMError`) → немедленная.
 4. Результат пишется в content-hash кэш → повторный запуск продолжает с места.
@@ -92,7 +92,7 @@ pip install --upgrade pip
 - **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах. У LLM-провайдера можно задать необязательные лимиты `rpm`/`tpm`/`rpd` (запросов и токенов в минуту, запросов в сутки) — по ним rate-governor троттлит вызовы при параллельном извлечении графов. Без них параллелизм ограничен только `max_concurrent`. `rpd` — справочный (жёсткой остановки по нему нет; см. раздел graphs).
 - **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL). Книга несёт только `tradition`; её мажор-группа резолвится из `traditions.json`. Поле `url` может быть веб-адресом (`https://…`) или локальным файлом (`file:…`) — см. раздел corpus.
 - **`config/traditions.json`** — иерархическое дерево `major → {traditions: {tradition → {description, coordinates}}}`. Единый источник группировки: `major_tradition` живёт здесь по одному разу на традицию (а не дублируется в каждой книге). Сборка раскладывает дерево в плоский `outputs/corpus/traditions.json`.
-- **`config/prompts.json`** — промпты для LLM: извлечение сущностей для графов (`locations`, `time`, `beings`, `relations`) и `summary` для Summary-UMAP проекции.
+- **`config/prompts.json`** — промпты для LLM: извлечение сущностей для графов (`locations`, `time`, `beings`, `relations`) и `summary` для препроцессинга чанков (см. embedding-варианты ниже).
 
 ## LLM-провайдеры
 
@@ -208,11 +208,27 @@ mytho corpus --force
 Модуль генерации эмбеддингов и записи в Chroma DB.
 
 Основные файлы:
-- `src/embeddings/build_embeddings.py` оркестрирует генерацию для нескольких моделей (skip/resume по метаданным коллекции); читает корпус, режет тексты на чанки, считает эмбеддинги и пишет в Chroma.
+- `src/embeddings/build_embeddings.py` оркестрирует генерацию по вариантам (skip/resume по метаданным коллекции); читает корпус, режет тексты на чанки, при необходимости препроцессит их, считает эмбеддинги и пишет в Chroma.
 - `src/embeddings/chunking.py` разбивает тексты на чанки с перекрытием (используется и для embeddings, и для graphs).
-- `src/embeddings/chroma_manager.py` хранилище ChromaDB: module-level функции (создание/удаление коллекций, список моделей) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
+- `src/embeddings/preprocess.py` LLM-препроцессинг чанков (напр. пересказ) с общим content-hash кэшем в `outputs/preprocessed/`.
+- `src/embeddings/chroma_manager.py` хранилище ChromaDB: module-level функции (создание/удаление коллекций, список коллекций) и `ChromaCollection` (upsert, загрузка данных, existing_ids).
 - `src/embeddings/model_manager.py` загрузка/выгрузка SentenceTransformer моделей (`EmbeddingEncoder`).
-- `src/model_registry.py` резолвит алиасы моделей из `config/models.json`.
+- `src/model_registry.py` резолвит embedding-варианты из `config/models.json`.
+
+### Embedding-варианты (`config/models.json` → `embedding`)
+
+Каждая запись в `embedding.models` (активные) или `embedding.inactive` (примеры, по умолчанию не собираются) — это **вариант**. Ключ записи (алиас) — канонический идентификатор: имя коллекции Chroma, папки, сегмент API, `value` в дропдауне. Ограничения ключа: `[a-z0-9._-]`, 3–63 символа, начинается/кончается буквой-цифрой. Запись может быть строкой (голый HF-id) или объектом с полями:
+
+| Поле | Обяз. | Дефолт | Значение |
+|------|-------|--------|----------|
+| `model` | да | — | HF-id базовой модели. |
+| `label` | нет | генерится из ключа | Отображаемое имя (UI, логи). |
+| `preprocess_prompt` | нет | нет (сырой текст) | Имя промпта в `config/prompts.json`; включает препроцессинг чанков перед эмбеддингом. |
+| `query_prefix` / `document_prefix` | нет | `""` | Инлайн-префикс входа модели (специфичен для модели: E5 `passage:`, Qwen/BGE — только query). |
+| `dtype` | нет | `auto` | dtype энкодера. |
+| `batch_size` | нет | из настроек | Размер батча. |
+
+Конвенция имён: **`*_prompt` — ссылка в `config/prompts.json`; `*_prefix` — инлайн-литерал** при модели. Правка `preprocess_prompt`-промпта регенерит кэш препроцессинга сама (ключ по хэшу текста), но коллекцию нужно пересобрать вручную: `mytho embeddings --model <key> --force`.
 
 Возможности:
 - Построить эмбеддинги для нескольких моделей.

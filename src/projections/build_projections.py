@@ -1,6 +1,6 @@
 import logging
 
-from model_registry import resolve_embedding_model
+from model_registry import embedding_config
 
 from . import PROJECTION_METHODS
 from .analyzer import ModelData, load_model_data
@@ -12,53 +12,43 @@ logger = logging.getLogger(__name__)
 def build_projections(
     model_name: str | None = None,
     generate_all_plots: bool = True,
-    summaries: bool = False,
     force: bool = False,
 ) -> ModelData | None:
     from embeddings import chroma_manager
 
-    available_models = chroma_manager.get_available_models()
+    available = chroma_manager.get_available_models()
 
-    if not available_models:
-        logger.error("ERROR: No available models in the Chroma database!")
+    if not available:
+        logger.error("ERROR: No available collections in the Chroma database!")
         return None
 
-    models_to_analyze = [resolve_embedding_model(model_name)] if model_name else available_models
-    logger.info(f"Models queued for analysis: {models_to_analyze}")
+    keys = [embedding_config(model_name)["key"]] if model_name else available
+    logger.info(f"Variants queued for analysis: {keys}")
 
     result: ModelData | None = None
-    for current_model in models_to_analyze:
-        logger.info(f"Starting model analysis: {current_model}")
+    for key in keys:
+        logger.info(f"Starting analysis: {key}")
 
-        model_data = load_model_data(current_model)
+        model_data = load_model_data(key)
 
         if model_data is None:
-            logger.warning(f"No data found for model {current_model}, skipping...")
+            logger.warning(f"No data found for variant {key}, skipping...")
             continue
 
         result = model_data
         if generate_all_plots:
-            _generate_plots(model_data, force=force, include_summaries=summaries)
+            _generate_plots(model_data, force=force)
 
     logger.info("Projection analysis complete.")
     return result
 
 
-def _generate_plots(model_data: ModelData, force: bool = False, include_summaries: bool = False) -> None:
+def _generate_plots(model_data: ModelData, force: bool = False) -> None:
     for method in PROJECTION_METHODS:
         key = method["key"]
         chart_type = method["chart_type"]
         label = method["label"]
         output_path = model_data.output_dir / f"{key}.json"
-
-        if key == "summaries_umap":
-            if not include_summaries:
-                continue
-            if not force and output_path.exists():
-                logger.info("Skipping %s (already exists)", label)
-                continue
-            _generate_summary_plot(model_data, force)
-            continue
 
         if not force and output_path.exists():
             logger.info("Skipping %s (already exists)", label)
@@ -75,22 +65,3 @@ def _generate_plots(model_data: ModelData, force: bool = False, include_summarie
             logger.exception("Error creating %s", label)
 
     logger.info("Visualizations for %s: %s", model_data.model_name, model_data.output_dir)
-
-
-def _generate_summary_plot(model_data: ModelData, force: bool) -> None:
-    from llm import FatalLLMError
-
-    from .summaries import run_summaries
-
-    logger.info("Generating Summary UMAP projection (LLM summaries)...")
-    try:
-        run_summaries(
-            model_data.data,
-            output_dir=model_data.output_dir,
-            embedding_model=model_data.model_name,
-            force=force,
-        )
-    except FatalLLMError:
-        raise
-    except Exception:
-        logger.exception("Error creating Summary UMAP plot")

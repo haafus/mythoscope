@@ -8,12 +8,13 @@ from tqdm import tqdm
 
 from corpus.iterator import CorpusFileInfo, iter_files
 from corpus.utils import chunk_id
-from model_registry import active_embedding_models, resolve_embedding_model
+from model_registry import embedding_config, embedding_variants
 from settings import settings
 
 from . import chroma_manager
 from .chunking import chunk_text
 from .model_manager import EmbeddingEncoder
+from .preprocess import preprocess_texts
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +25,9 @@ def build_embeddings(
     force: bool = False,
 ) -> None:
     if model_name:
-        models_to_run = [resolve_embedding_model(model_name)]
+        keys = [embedding_config(model_name)["key"]]
     else:
-        models_to_run = models or active_embedding_models()
+        keys = models or embedding_variants()
 
     encoder = EmbeddingEncoder()
 
@@ -35,11 +36,11 @@ def build_embeddings(
     logger.info(f"   Embeddings: {settings.embeddings_dir}")
 
     try:
-        for model in models_to_run:
+        for key in keys:
             if force:
-                chroma_manager.delete_collection(model)
-            encoder.load(model)
-            logger.info(f"   Model: {model}")
+                chroma_manager.delete_collection(key)
+            encoder.load(key)
+            logger.info(f"   Variant: {key} (model {encoder.model_name})")
             _save_corpus_to_chroma(encoder)
     finally:
         encoder.unload()
@@ -48,7 +49,9 @@ def build_embeddings(
 
 
 def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
-    model_name = encoder.model_name
+    cfg = encoder.config
+    key = cfg["key"]
+    preprocess_prompt = cfg["preprocess_prompt"]
     emb = settings.embedding
     corpus_dir = settings.corpus_dir
     batch_size = emb.batch_size
@@ -60,8 +63,8 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
         return
 
     collection = chroma_manager.get_or_create_collection(
-        model_name,
-        metadata={"model": model_name, "hnsw:space": "cosine"},
+        key,
+        metadata={"key": key, "model": encoder.model_name, "hnsw:space": "cosine"},
     )
 
     existing_ids = collection.existing_ids()
@@ -98,26 +101,32 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
                     (i, chunk) for i, (cid, chunk) in enumerate(zip(ids, chunks, strict=True))
                     if cid not in existing_ids
                 ]
-
-                n_skipped = n_chunks - len(missing)
-                if n_skipped:
-                    skipped_total += n_skipped
-
+                skipped_total += n_chunks - len(missing)
                 if not missing:
                     continue
 
-                missing_indices = [i for i, _ in missing]
-                missing_chunks = [chunk for _, chunk in missing]
-                missing_ids = [ids[i] for i in missing_indices]
-                missing_metas = [metadatas[i] for i in missing_indices]
+                # For a preprocessing variant, embed the transformed text (and store it as the
+                # document); a chunk whose preprocessing failed is skipped and retried next run.
+                if preprocess_prompt:
+                    transformed = preprocess_texts([c for _, c in missing], preprocess_prompt)
+                    kept = [(i, out) for (i, _), out in zip(missing, transformed, strict=True) if out.strip()]
+                else:
+                    kept = missing
+                if not kept:
+                    continue
 
-                for b_start in range(0, len(missing_chunks), batch_size):
-                    b_end = min(b_start + batch_size, len(missing_chunks))
-                    b_chunks = missing_chunks[b_start:b_end]
+                kept_idx = [i for i, _ in kept]
+                kept_texts = [t for _, t in kept]
+                kept_ids = [ids[i] for i in kept_idx]
+                kept_metas = [metadatas[i] for i in kept_idx]
+
+                for b_start in range(0, len(kept_texts), batch_size):
+                    b_end = min(b_start + batch_size, len(kept_texts))
+                    b_texts = kept_texts[b_start:b_end]
 
                     t_enc = time.monotonic()
                     b_embs = encoder.encode(
-                        b_chunks,
+                        b_texts,
                         batch_size=batch_size,
                         show_progress_bar=False,
                         normalize_embeddings=True,
@@ -126,15 +135,15 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
                     b_embs = np.asarray(b_embs, dtype=np.float32)
 
                     collection.upsert(
-                        ids=missing_ids[b_start:b_end],
+                        ids=kept_ids[b_start:b_end],
                         embeddings=b_embs,
-                        metadatas=missing_metas[b_start:b_end],
-                        documents=b_chunks,
+                        metadatas=kept_metas[b_start:b_end],
+                        documents=b_texts,
                     )
 
-                    pbar.update(len(b_chunks))
+                    pbar.update(len(b_texts))
 
-                added_total += len(missing_chunks)
+                added_total += len(kept_texts)
 
             except Exception:
                 logger.exception("Error processing %s", file_info.filename)
@@ -142,7 +151,8 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
             encoder.release_cache()
 
     collection.modify(metadata={
-        "model": model_name,
+        "key": key,
+        "model": encoder.model_name,
         "chunk_size": emb.chunk_size,
         "total_chunks": total_chunks,
     })

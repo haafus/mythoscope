@@ -83,12 +83,17 @@ class EmbeddingEncoder:
         self.model_name: str | None = None
         self.config: dict[str, Any] | None = None
         self._model: Any = None
+        self._loaded_hf: str | None = None
 
-    def load(self, model_name: str) -> None:
-        cfg = embedding_config(model_name)
+    def load(self, key: str) -> None:
+        cfg = embedding_config(key)
         hf_id = cfg["model"]
 
-        if self._model is not None and self.model_name == hf_id:
+        # Config always refreshes — two variants can share one HF model (raw vs preprocessed),
+        # and reusing the loaded weights must not carry the previous variant's config.
+        self.config = cfg
+        self.model_name = hf_id
+        if self._model is not None and self._loaded_hf == hf_id:
             return
 
         self.unload()
@@ -99,6 +104,7 @@ class EmbeddingEncoder:
         if dtype is not None:
             kwargs["model_kwargs"] = {"torch_dtype": dtype}
         self._model = SentenceTransformer(local, **kwargs)
+        self._loaded_hf = hf_id
         self.model_name = hf_id
         self.config = cfg
         device = str(self._model.device)
@@ -128,6 +134,7 @@ class EmbeddingEncoder:
         self._model = None
         self.model_name = None
         self.config = None
+        self._loaded_hf = None
         gc.collect()
         if device.startswith("cuda"):
             torch.cuda.empty_cache()

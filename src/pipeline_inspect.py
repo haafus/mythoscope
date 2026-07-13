@@ -128,13 +128,13 @@ def embeddings_status(settings) -> dict[str, Any]:
 
 
 def embeddings_orphan_collections(settings) -> list[dict[str, Any]]:
-    from model_registry import list_embedding_aliases, model_to_key
+    from model_registry import embedding_variants
 
     info = embeddings_status(settings)
     if not info["exists"]:
         return []
 
-    known_keys = {model_to_key(name) for name in list_embedding_aliases().values()}
+    known_keys = set(embedding_variants(include_inactive=True))
 
     return [c for c in info["collections"] if c["name"] not in known_keys]
 
@@ -306,16 +306,18 @@ def motifs_raw_cache(settings) -> tuple[Path, int] | None:
 
 
 # ---------------------------------------------------------------------------
-# Resumable caches (graphs extraction + summaries)
+# Resumable caches (graphs extraction + chunk preprocessing)
 # ---------------------------------------------------------------------------
 
 def cache_files(settings) -> list[tuple[Path, int]]:
-    """All resumable cache files (graphs + summaries), with sizes."""
+    """All resumable cache files (graphs extraction + chunk preprocessing), with sizes.
+    Also sweeps the pre-redesign ``summaries.jsonl`` files if any remain."""
     result: list[tuple[Path, int]] = []
-    for base, name in (
+    for base, pattern in (
         (Path(settings.graphs_dir), GRAPHS_CACHE),
+        (Path(settings.preprocessed_dir), "*.jsonl"),
         (Path(settings.projections_dir), SUMMARIES_CACHE),
     ):
         if base.exists():
-            result.extend((p, file_size(p)) for p in base.rglob(name))
+            result.extend((p, file_size(p)) for p in base.rglob(pattern))
     return result

@@ -4,7 +4,6 @@ from typing import Any
 import chromadb
 import numpy as np
 
-from model_registry import model_to_key
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -77,15 +76,15 @@ class ChromaCollection:
         return records, embeddings
 
 
-def get_or_create_collection(model_name: str, **kwargs) -> ChromaCollection:
+def get_or_create_collection(key: str, **kwargs) -> ChromaCollection:
     return ChromaCollection(
-        _get_client().get_or_create_collection(name=model_to_key(model_name), **kwargs)
+        _get_client().get_or_create_collection(name=key, **kwargs)
     )
 
 
-def get_collection(model_name: str) -> ChromaCollection:
+def get_collection(key: str) -> ChromaCollection:
     return ChromaCollection(
-        _get_client().get_collection(name=model_to_key(model_name))
+        _get_client().get_collection(name=key)
     )
 
 
@@ -97,12 +96,12 @@ def get_available_models() -> list[str]:
     return sorted(col.name for col in _get_client().list_collections())
 
 
-def delete_collection(model_name: str) -> bool:
+def delete_collection(key: str) -> bool:
     try:
-        _get_client().delete_collection(name=model_to_key(model_name))
+        _get_client().delete_collection(name=key)
         return True
     except Exception as e:
         code = getattr(e, "status_code", None) or getattr(e, "code", None)
         message = getattr(e, "message", None) or str(e)
-        logger.error(f"Failed to delete collection {model_name!r} (code={code}): {message}")
+        logger.error(f"Failed to delete collection {key!r} (code={code}): {message}")
         return False

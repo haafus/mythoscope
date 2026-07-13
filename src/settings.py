@@ -88,6 +88,7 @@ class Settings(BaseSettings):
     # Root for local `file:` corpus sources; file paths are confined under it.
     sources_dir: Path = Path("sources")
     embeddings_dir: Path = Path("outputs/embeddings")
+    preprocessed_dir: Path = Path("outputs/preprocessed")
     projections_dir: Path = Path("outputs/projections")
     graphs_dir: Path = Path("outputs/graphs")
     motifs_dir: Path = Path("outputs/motifs")

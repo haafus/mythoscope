@@ -4,7 +4,6 @@ import threading
 import numpy as np
 
 from corpus.utils import chunk_id
-from model_registry import model_name_for_key
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +35,8 @@ class SimilarityService:
         return [head, *self._query(collection, embedding, top_k, where=where)]
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
-        model_name = model_name_for_key(model_key)
         collection = self._get_collection(model_key)
-        embedding = self._encode_query(model_name, query)
+        embedding = self._encode_query(model_key, query)
         return self._query(collection, embedding.tolist(), top_k)
 
     def warmup(self, model_key: str) -> None:
@@ -49,14 +47,13 @@ class SimilarityService:
         Raises ImportError in the viewer build (no embedding deps); callers map
         that to 503 just like search().
         """
-        model_name = model_name_for_key(model_key)
         collection = self._get_collection(model_key)
-        embedding = self._encode_query(model_name, "warmup")
+        embedding = self._encode_query(model_key, "warmup")
         self._query(collection, embedding.tolist(), 1)
 
     def _get_collection(self, model_key: str):
         from embeddings import chroma_manager
-        return chroma_manager.get_collection(model_name_for_key(model_key))
+        return chroma_manager.get_collection(model_key)
 
     def _query(self, collection, embedding, top_k: int, where=None) -> list[dict]:
         raw = collection.query(
@@ -73,14 +70,14 @@ class SimilarityService:
             )
         ]
 
-    def _encode_query(self, model_name: str, query: str) -> np.ndarray:
+    def _encode_query(self, model_key: str, query: str) -> np.ndarray:
         # Lazy import keeps the viewer build torch-free; raises ImportError
         # there, which the API maps to 503.
         from embeddings.model_manager import EmbeddingEncoder
         with self._encode_lock:
             if self._encoder is None:
                 self._encoder = EmbeddingEncoder()
-            self._encoder.load(model_name)
+            self._encoder.load(model_key)
             raw = self._encoder.encode(
                 [query],
                 normalize_embeddings=True,

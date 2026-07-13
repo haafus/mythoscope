@@ -43,7 +43,9 @@ def _require_collection(model: str) -> None:
 
 @router.get("/models", response_model=ModelListResponse)
 def list_models() -> dict:
-    models = [{"name": key, "key": key} for key in _available_models()]
+    from model_registry import embedding_config
+
+    models = [{"name": embedding_config(key)["label"], "key": key} for key in _available_models()]
     return {"models": models, "text_search": _text_search_available()}
 
 

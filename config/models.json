@@ -64,14 +64,19 @@
       "qwen-4b": {
         "model": "Qwen/Qwen3-Embedding-4B",
         "dtype": "auto",
-        "query_prompt": "Instruct: Retrieve stories with a similar narrative to the given story\nQuery:",
-        "document_prompt": ""
+        "query_prefix": "Instruct: Retrieve stories with a similar narrative to the given story\nQuery:",
+        "document_prefix": ""
       },
       "story-emb": {
         "model": "uhhlt/story-emb",
         "dtype": "auto",
-        "query_prompt": "Instruct: Retrieve stories with a similar narrative to the given story\nQuery: ",
-        "document_prompt": ""
+        "query_prefix": "Instruct: Retrieve stories with a similar narrative to the given story\nQuery: ",
+        "document_prefix": ""
+      },
+      "bge-m3-summary": {
+        "model": "BAAI/bge-m3",
+        "preprocess_prompt": "summary",
+        "label": "BGE-M3 · summary"
       }
     }
   }

@@ -298,8 +298,8 @@ class TestUpdateTraditions:
 
 class TestLoadDownloadListExclude:
     def test_excluded_items_are_filtered(self, tmp_path, monkeypatch):
-        from settings import settings
         from corpus.downloader import load_download_list
+        from settings import settings
 
         config_dir = tmp_path / "config"
         config_dir.mkdir()
