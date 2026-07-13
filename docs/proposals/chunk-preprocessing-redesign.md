@@ -1,8 +1,21 @@
 # Chunk preprocessing — redesign plan
 
 Redesign of the `summaries` feature into a general **chunk-preprocessing** stage that produces
-**first-class embedding variants**. Design is settled; this is the build plan. Nothing here is
-implemented yet.
+**first-class embedding variants**.
+
+## Status — implemented (2026-07)
+
+Built in commit `47de423` (plan: `a21531f`). All 12 decisions and the full implementation/removal
+work below landed; 451 unit tests green, lint clean.
+
+- **Verified:** unit tests (registry identity, config, chroma naming, cli, pipeline caches), and a
+  logic smoke of `preprocess.py` (prompt load, hash + whitespace normalisation, cache resume without
+  an LLM call) and variant resolution.
+- **Not yet exercised:** a real end-to-end run (`mytho embeddings --model bge-m3-summary` → Chroma →
+  search) — needs models + an LLM key; run once in a real environment.
+- **Deferred from decision C:** `clean --caches` sweeps `outputs/preprocessed/` **wholesale** (like
+  every other resumable cache), not the reachability-based orphan-only GC — consistent with the
+  existing `--caches` semantics; the finer GC can be added later if needed.
 
 ## Goal
 
