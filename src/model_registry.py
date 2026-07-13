@@ -95,16 +95,6 @@ def resolve_embedding_model(name: str) -> str:
     return _entry_model(entry) if entry is not None else name
 
 
-def model_name_for_key(key: str) -> str:
-    """Variant key -> HF model id (to load the encoder). Falls through unchanged."""
-    emb = _embedding_section()
-    for section in ("models", "inactive"):
-        entry = emb.get(section, {}).get(key)
-        if entry is not None:
-            return _entry_model(entry)
-    return key
-
-
 def resolve_llm_provider(name: str) -> dict[str, Any]:
     registry = _load_registry()
     models = registry.get("llm", {}).get("models", {})
