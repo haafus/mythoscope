@@ -45,7 +45,8 @@ parallels at scale.
 11. Try hierarchical chunking / embeddings?
 12. Research narrative and network extraction methods?
 13. Benchmark narrative-similarity embedders on our tasks — take the top systems from **SemEval-2026 Task 4 (Narrative Story Similarity)**, **Qwen3-Embedding** with story-similarity instruction variants, and **`uhhlt/story-emb`**; build embeddings and measure whether they work better for our motif/tradition tasks than the current general embedders
-14. ...
+14. Try hierarchical aggregation of chunks — summaries and graphs of characters, epochs and locations — so large texts that don't fit in context still yield an overview-level result (~50–100 key entities, not every entity): extract per chunk (map), then consolidate globally with either an LLM dedup/reduce pass over the candidate list (merge aliases, pick the central ones) or ranking by graph degree centrality
+15. ...
 
 ### Potential Data Sources
 
