@@ -76,6 +76,19 @@
         "query_prefix": "Instruct: Retrieve stories with a similar narrative to the given story\nQuery:",
         "document_prefix": ""
       },
+      "qwen-4b-coa-prefix": {
+        "model": "Qwen/Qwen3-Embedding-4B",
+        "dtype": "auto",
+        "query_prefix": "Instruct: Represent the sequence of events and plot of this story for narrative-similarity retrieval, disregarding theme and setting\nQuery: ",
+        "document_prefix": "Instruct: Represent the sequence of events and plot of this story for narrative-similarity retrieval, disregarding theme and setting\nQuery: ",
+        "label": "Qwen3-4B · CoA prefix"
+      },
+      "qwen-4b-coa-extract": {
+        "model": "Qwen/Qwen3-Embedding-4B",
+        "dtype": "auto",
+        "preprocess_prompt": "course_of_action",
+        "label": "Qwen3-4B · CoA extract"
+      },
       "story-emb": {
         "model": "uhhlt/story-emb",
         "dtype": "auto",
