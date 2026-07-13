@@ -25,6 +25,11 @@ class TestEmbeddingConfig:
     def test_inline_prefix_present(self):
         assert embedding_config("story-emb")["query_prefix"].startswith("Instruct:")
 
+    def test_symmetric_prefix_both_sides(self):
+        cfg = embedding_config("e5-large")
+        assert cfg["query_prefix"] == "query: "
+        assert cfg["document_prefix"] == "query: "
+
     def test_label_generated_when_absent(self):
         assert embedding_config("bge-m3")["label"] == "Bge · M3"
 

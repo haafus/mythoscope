@@ -78,8 +78,9 @@ class SimilarityService:
             if self._encoder is None:
                 self._encoder = EmbeddingEncoder()
             self._encoder.load(model_key)
+            prefix = self._encoder.config["query_prefix"]
             raw = self._encoder.encode(
-                [query],
+                [prefix + query],
                 normalize_embeddings=True,
                 convert_to_numpy=True,
                 show_progress_bar=False,

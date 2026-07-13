@@ -52,6 +52,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     cfg = encoder.config
     key = cfg["key"]
     preprocess_prompt = cfg["preprocess_prompt"]
+    document_prefix = cfg["document_prefix"]
     emb = settings.embedding
     corpus_dir = settings.corpus_dir
     batch_size = emb.batch_size
@@ -123,10 +124,13 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
                 for b_start in range(0, len(kept_texts), batch_size):
                     b_end = min(b_start + batch_size, len(kept_texts))
                     b_texts = kept_texts[b_start:b_end]
+                    # The prefix is the model's input formatting, not content: encode
+                    # prefix+text, store the clean text as the document.
+                    enc_input = [document_prefix + t for t in b_texts] if document_prefix else b_texts
 
                     t_enc = time.monotonic()
                     b_embs = encoder.encode(
-                        b_texts,
+                        enc_input,
                         batch_size=batch_size,
                         show_progress_bar=False,
                         normalize_embeddings=True,
