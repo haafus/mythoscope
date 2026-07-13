@@ -1,7 +1,6 @@
 import json
 import logging
 from itertools import islice
-from pathlib import Path
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from corpus.iterator import iter_files
@@ -63,7 +62,7 @@ def build_graphs(
     rebuilding from a complete cache needs no API key). ``force`` clears each
     book's cache first, forcing a full re-extraction.
     """
-    prompts_path = Path("config/graphs_prompts.json")
+    prompts_path = settings.config_dir / "prompts.json"
     try:
         prompts = json.loads(prompts_path.read_text(encoding="utf-8"))
     except Exception as e:

@@ -1,3 +1,4 @@
+import json
 import logging
 from pathlib import Path
 
@@ -9,13 +10,14 @@ from settings import settings
 
 logger = logging.getLogger(__name__)
 
-SUMMARY_PROMPT = (
-    "You are a comparative mythology analyst. "
-    "Summarize the plot of this text fragment in 2-3 neutral sentences. "
-    "Do NOT mention character names, place names, or culture-specific terms. "
-    "Replace proper nouns with generic roles (e.g. 'the hero', 'the god', 'the trickster'). "
-    "Focus only on the narrative structure: what happens, what transforms, what conflict arises."
-)
+
+def load_summary_prompt() -> str:
+    """The plot-summary prompt, shared with the graph prompts in ``config/prompts.json``."""
+    prompts_path = settings.config_dir / "prompts.json"
+    try:
+        return json.loads(prompts_path.read_text(encoding="utf-8"))["summary"]
+    except Exception as e:
+        raise RuntimeError(f"Failed to load 'summary' prompt from {prompts_path}: {e}") from e
 
 
 def generate_summaries(
@@ -26,6 +28,7 @@ def generate_summaries(
     from llm import LLMProcessor
 
     llm = LLMProcessor(use_json_mode=False)
+    summary_prompt = load_summary_prompt()
 
     cache_path = output_dir / "summaries.jsonl"
     if force:
@@ -46,7 +49,7 @@ def generate_summaries(
 
         completed = map_concurrent(
             uncached,
-            lambda item: llm.ask_text(SUMMARY_PROMPT, item.get("text", "")[:4000]),
+            lambda item: llm.ask_text(summary_prompt, item.get("text", "")[:4000]),
             settings.projections.max_concurrent,
             on_result=_store,
         )

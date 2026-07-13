@@ -92,7 +92,7 @@ pip install --upgrade pip
 - **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах. У LLM-провайдера можно задать необязательные лимиты `rpm`/`tpm`/`rpd` (запросов и токенов в минуту, запросов в сутки) — по ним rate-governor троттлит вызовы при параллельном извлечении графов. Без них параллелизм ограничен только `max_concurrent`. `rpd` — справочный (жёсткой остановки по нему нет; см. раздел graphs).
 - **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL). Книга несёт только `tradition`; её мажор-группа резолвится из `traditions.json`. Поле `url` может быть веб-адресом (`https://…`) или локальным файлом (`file:…`) — см. раздел corpus.
 - **`config/traditions.json`** — иерархическое дерево `major → {traditions: {tradition → {description, coordinates}}}`. Единый источник группировки: `major_tradition` живёт здесь по одному разу на традицию (а не дублируется в каждой книге). Сборка раскладывает дерево в плоский `outputs/corpus/traditions.json`.
-- **`config/graphs_prompts.json`** — промпты для LLM-извлечения сущностей.
+- **`config/prompts.json`** — промпты для LLM: извлечение сущностей для графов (`locations`, `time`, `beings`, `relations`) и `summary` для Summary-UMAP проекции.
 
 ## LLM-провайдеры
 
@@ -280,7 +280,7 @@ mytho projections --summaries
 Модуль извлечения персонажей, отношений, мест и времени через LLM и генерации графов.
 
 Основные файлы:
-- `config/graphs_prompts.json` содержит промпты для извлечения сущностей.
+- `config/prompts.json` содержит промпты для извлечения сущностей (и `summary` для Summary-UMAP).
 - `src/graphs/build_graphs.py` оркестрирует генерацию: итерация по текстам, чанкинг, параллельное извлечение, агрегация.
 - `src/graphs/extraction.py` извлекает сущности из чанка через LLM (4 последовательных вызова на чанк) и дедуплицирует их.
 - `src/embeddings/chunking.py` разбивает тексты на чанки (общий модуль).
