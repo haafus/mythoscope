@@ -47,7 +47,8 @@ parallels at scale.
 13. Benchmark narrative-similarity embedders on our tasks — take the top systems from **SemEval-2026 Task 4 (Narrative Story Similarity)**, **Qwen3-Embedding** with story-similarity instruction variants, and **`uhhlt/story-emb`**; build embeddings and measure whether they work better for our motif/tradition tasks than the current general embedders
 14. Try hierarchical aggregation of chunks — summaries and graphs of characters, epochs and locations — so large texts that don't fit in context still yield an overview-level result (~50–100 key entities, not every entity): extract per chunk (map), then consolidate globally with either an LLM dedup/reduce pass over the candidate list (merge aliases, pick the central ones) or ranking by graph degree centrality
 15. Try graph extraction over large context-filling chunks (instead of the current small ~4k-char chunks) — fewer, longer chunks give the model more global salience per call and cut the alias/duplication inflation from over-segmentation; compare quality and cost against the per-chunk approach
-16. ...
+16. Try ABTT (All-But-The-Top) embedding post-processing — subtract the common mean and top principal component(s), then renormalize. Our embeddings are strongly anisotropic (measured common-component ‖μ‖ ≈ 0.62–0.89; random-pair cosine 0.39–0.79, e5-large near-degenerate), so a large constant offset inflates every similarity. Expect it to de-hub neighbor lists and, most concretely, make absolute cosine thresholds (e.g. the motif semantic-parallels gate) meaningful; fit μ/PCs once per collection and apply the same transform to stored vectors and queries. Build it as a sibling collection so the raw variant stays for A/B
+17. ...
 
 ### Potential Data Sources
 
