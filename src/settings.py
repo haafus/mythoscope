@@ -9,9 +9,7 @@ from pydantic_settings import BaseSettings
 for _env_file in (".env", "config/.env"):
     load_dotenv(_env_file)
 
-# ---------------------------------------------------------------------------
-# Sub-models (BaseModel — not BaseSettings, nested inside Settings)
-# ---------------------------------------------------------------------------
+# Sub-models are plain BaseModel; only the root reads the environment.
 
 
 class CorpusSettings(BaseModel):
@@ -44,42 +42,30 @@ class GraphsSettings(BaseModel):
     use_json_mode: bool = True
     chunk_size: int = 4000
     chunk_overlap: int = 1000
-    # Chunks processed in parallel; the rate limiter is the real throttle, this just
-    # bounds in-flight work. Each chunk now makes its 4 LLM calls sequentially, so
-    # concurrency lives entirely here (overshoot is harmless — the buckets throttle).
-    # 18 keeps a typical gpt-4o-mini run near its TPM ceiling rather than latency-bound.
+    # Only bounds in-flight chunks; the rate limiter is the real throttle. 18 keeps
+    # a typical gpt-4o-mini run near its TPM ceiling.
     max_concurrent: int = 18
-    # Keep only the N most-mentioned entities in each graph (None = keep all).
-    max_entities: int | None = 50
+    max_entities: int | None = 50  # most-mentioned kept per graph; None = keep all
 
 
 class MotifsSettings(BaseModel):
-    # Concurrent HTTP fetches when scraping Berezkin detail pages.
-    max_workers: int = 10
-    # Fetch + parse Berezkin per-motif detail pages (definitions). The motif
-    # backbone (codes, names, areas) is always built from the single index page;
-    # details add the short definition at the cost of one request per motif.
+    max_workers: int = 10  # concurrent Berezkin detail-page fetches
+    # Detail pages add per-motif definitions; the backbone (codes, names, areas)
+    # comes from the index page regardless.
     berezkin_details: bool = True
-    # Cap motifs whose detail pages are fetched (None = all). Used by `build --sample`.
-    max_motifs: int | None = None
+    max_motifs: int | None = None  # cap detailed motifs (None = all); used by `build --sample`
 
 
 class ProjectionsSettings(BaseModel):
     umap_n_neighbors: int = 15
     umap_min_dist: float = 0.1
-    # Summaries processed in parallel (one LLM call each).
-    max_concurrent: int = 5
+    max_concurrent: int = 5  # LLM calls in flight during chunk preprocessing
 
 
 class ServerSettings(BaseModel):
     host: str = "127.0.0.1"
     port: int = 8000
     gzip_minimum_size: int = 1024
-
-
-# ---------------------------------------------------------------------------
-# Root settings
-# ---------------------------------------------------------------------------
 
 
 class Settings(BaseSettings):
@@ -97,7 +83,6 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
-    # sub-settings
     corpus: CorpusSettings = CorpusSettings()
     embedding: EmbeddingSettings = EmbeddingSettings()
     llm: LLMSettings = LLMSettings()
