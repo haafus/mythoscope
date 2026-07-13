@@ -51,7 +51,11 @@ def preprocess_texts(texts: list[str], prompt_name: str) -> list[str]:
 
     uncached = list(dict.fromkeys(t for t in texts if t.strip() and chunk_hash(t) not in cache))
     if uncached:
-        llm = LLMProcessor(use_json_mode=False)
+        llm = LLMProcessor(
+            model_alias=settings.embedding.llm,
+            temperature=settings.embedding.temperature,
+            use_json_mode=False,
+        )
         logger.info(
             f"Preprocessing {len(uncached)} chunks with '{prompt_name}' "
             f"(concurrency={settings.projections.max_concurrent})..."

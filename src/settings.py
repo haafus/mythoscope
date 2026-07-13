@@ -30,15 +30,14 @@ class EmbeddingSettings(BaseModel):
     chunk_overlap: int = 128
     batch_size: int = 32
     max_workers: int = 16
-
-
-class LLMSettings(BaseModel):
-    model: str = "gpt4o-mini"
+    # LLM for chunk preprocessing (summary variants); alias from config/models.json.
+    llm: str = "gpt4o-mini"
     temperature: float = 0.1
-    max_retries: int = 5
 
 
 class GraphsSettings(BaseModel):
+    llm: str = "gpt4o-mini"  # alias from config/models.json
+    temperature: float = 0.1
     use_json_mode: bool = True
     chunk_size: int = 4000
     chunk_overlap: int = 1000
@@ -85,7 +84,6 @@ class Settings(BaseSettings):
 
     corpus: CorpusSettings = CorpusSettings()
     embedding: EmbeddingSettings = EmbeddingSettings()
-    llm: LLMSettings = LLMSettings()
     graphs: GraphsSettings = GraphsSettings()
     motifs: MotifsSettings = MotifsSettings()
     projections: ProjectionsSettings = ProjectionsSettings()

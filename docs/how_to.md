@@ -88,7 +88,7 @@ pip install --upgrade pip
 
 ## Конфигурация
 
-- **`src/settings.py`** — единый источник путей и параметров. Все директории (`outputs/corpus`, `outputs/embeddings`, …), параметры chunking, LLM, сервера и т.д. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` / `config/.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`). Вложенные параметры через `__`: `MYTHO_LLM__MODEL=gpt4o-mini`. Полный список переменных — в `.env.example`.
+- **`src/settings.py`** — единый источник путей и параметров. Все директории (`outputs/corpus`, `outputs/embeddings`, …), параметры chunking, LLM, сервера и т.д. Переопределяется через переменные окружения с префиксом `MYTHO_` или файл `.env` / `config/.env` (например, `MYTHO_CORPUS_DIR=/data/corpus`). Вложенные параметры через `__`: `MYTHO_GRAPHS__LLM=gpt4o-mini`. Полный список переменных — в `.env.example`.
 - **`config/models.json`** — реестр LLM-провайдеров (base_url, model, env_key) и алиасов embedding-моделей. Алиасы позволяют писать `bge-m3` вместо `BAAI/bge-m3` в CLI и конфигах. У LLM-провайдера можно задать необязательные лимиты `rpm`/`tpm`/`rpd` (запросов и токенов в минуту, запросов в сутки) — по ним rate-governor троттлит вызовы при параллельном извлечении графов. Без них параллелизм ограничен только `max_concurrent`. `rpd` — справочный (жёсткой остановки по нему нет; см. раздел graphs).
 - **`config/corpus.json`** — каталог текстов корпуса (источники, традиции, URL). Книга несёт только `tradition`; её мажор-группа резолвится из `traditions.json`. Поле `url` может быть веб-адресом (`https://…`) или локальным файлом (`file:…`) — см. раздел corpus.
 - **`config/traditions.json`** — иерархическое дерево `major → {traditions: {tradition → {description, coordinates}}}`. Единый источник группировки: `major_tradition` живёт здесь по одному разу на традицию (а не дублируется в каждой книге). Сборка раскладывает дерево в плоский `outputs/corpus/traditions.json`.
@@ -126,7 +126,7 @@ GEMINI_API_KEY=AIza...
 DEEPSEEK_API_KEY=sk-...
 ```
 
-**Добавить провайдера** — новая запись в `llm.models` с его OpenAI-compatible `base_url`, именем модели и `env_key`. Выбрать модель: `mytho graphs --model <алиас>` или дефолт `MYTHO_LLM__MODEL`.
+**Добавить провайдера** — новая запись в `llm.models` с его OpenAI-compatible `base_url`, именем модели и `env_key`. Выбрать модель: `mytho graphs --model <алиас>` или дефолт `MYTHO_GRAPHS__LLM`.
 
 **Локальная модель (Ollama)** — перенеси нужный алиас из `inactive` в `models` (или добавь свой) с `base_url: http://localhost:11434/v1`, **без** `env_key` и без лимитов. Приватность: при облачном провайдере текст корпуса уходит в его API — если это нежелательно, используй локальную модель.
 
@@ -316,7 +316,7 @@ mytho projections --summaries
 
 `settings.py` → `graphs.max_entities` (env `MYTHO_GRAPHS__MAX_ENTITIES`, по умолчанию 50; `None` = оставить всё) ограничивает каждый граф **N самыми часто упоминаемыми** сущностями (по числу упоминаний до дедупа); рёбра остаются только между оставленными. В логе пишется, сколько найдено всего и сколько оставлено по каждому типу.
 
-Запуск с моделью по умолчанию (из `settings.py` → `llm.model`):
+Запуск с моделью по умолчанию (из `settings.py` → `graphs.llm`):
 
 ```bash
 mytho graphs

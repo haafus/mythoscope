@@ -107,7 +107,11 @@ def build_graphs(
         uncached = [c for c in chunks if chunk_hash(c) not in cache]
         if uncached:
             if processor is None:  # first chunk that actually needs the LLM
-                processor = LLMProcessor(model_alias=llm, use_json_mode=graphs_cfg.use_json_mode)
+                processor = LLMProcessor(
+                    model_alias=llm or graphs_cfg.llm,
+                    temperature=graphs_cfg.temperature,
+                    use_json_mode=graphs_cfg.use_json_mode,
+                )
                 logger.info(f"Extracting with model={processor.model_name}...")
             cached = len(chunks) - len(uncached)
             logger.info(

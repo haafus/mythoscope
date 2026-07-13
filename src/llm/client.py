@@ -109,25 +109,29 @@ def _retry_delay(e: Exception, attempt: int) -> float:
     return min(2.0 ** attempt, 30.0)
 
 
+# Our own error-aware retry loop (`_complete`) drives this; the SDK's retries are off.
+MAX_RETRIES = 5
+
+
 class LLMProcessor:
     def __init__(
         self,
-        model_alias: str | None = None,
+        model_alias: str,
+        *,
+        temperature: float,
         use_json_mode: bool = True,
         request_timeout: float = 120.0,
     ):
         from model_registry import resolve_llm_provider
-        from settings import settings
 
         from .rate_limiter import get_governor
 
-        cfg = settings.llm
-        provider = resolve_llm_provider(model_alias or cfg.model)
+        provider = resolve_llm_provider(model_alias)
 
         self.model_name = provider["model"]
         self.use_json_mode = use_json_mode
-        self.temperature = cfg.temperature
-        self.max_retries = cfg.max_retries
+        self.temperature = temperature
+        self.max_retries = MAX_RETRIES
 
         # One shared budget per underlying model across all callers (graphs, summaries, …).
         self.governor = get_governor(
