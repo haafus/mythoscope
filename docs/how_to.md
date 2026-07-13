@@ -97,7 +97,7 @@ pip install --upgrade pip
 ## LLM-провайдеры
 
 Реестр LLM — `config/models.json`, секция `llm`:
-- `models` — активные алиасы (видны в `mytho graphs --model ...`);
+- `models` — активные алиасы (доступны для `MYTHO_GRAPHS__LLM` / `MYTHO_EMBEDDING__LLM`);
 - `inactive` — заготовки (например, локальные модели), не предлагаются, пока не перенесены в `models`.
 
 Запись провайдера:
@@ -126,7 +126,7 @@ GEMINI_API_KEY=AIza...
 DEEPSEEK_API_KEY=sk-...
 ```
 
-**Добавить провайдера** — новая запись в `llm.models` с его OpenAI-compatible `base_url`, именем модели и `env_key`. Выбрать модель: `mytho graphs --model <алиас>` или дефолт `MYTHO_GRAPHS__LLM`.
+**Добавить провайдера** — новая запись в `llm.models` с его OpenAI-compatible `base_url`, именем модели и `env_key`. Выбрать модель для шага можно через `MYTHO_GRAPHS__LLM=<алиас>` (графы) или `MYTHO_EMBEDDING__LLM=<алиас>` (препроцессинг чанков).
 
 **Локальная модель (Ollama)** — перенеси нужный алиас из `inactive` в `models` (или добавь свой) с `base_url: http://localhost:11434/v1`, **без** `env_key` и без лимитов. Приватность: при облачном провайдере текст корпуса уходит в его API — если это нежелательно, используй локальную модель.
 
@@ -316,16 +316,10 @@ mytho projections --summaries
 
 `settings.py` → `graphs.max_entities` (env `MYTHO_GRAPHS__MAX_ENTITIES`, по умолчанию 50; `None` = оставить всё) ограничивает каждый граф **N самыми часто упоминаемыми** сущностями (по числу упоминаний до дедупа); рёбра остаются только между оставленными. В логе пишется, сколько найдено всего и сколько оставлено по каждому типу.
 
-Запуск с моделью по умолчанию (из `settings.py` → `graphs.llm`):
+Модель берётся из `settings.py` → `graphs.llm` (алиас из `config/models.json`; переопределяется через `MYTHO_GRAPHS__LLM`, например `MYTHO_GRAPHS__LLM=gemini25-flash`):
 
 ```bash
 mytho graphs
-```
-
-Запуск с конкретной LLM из реестра `config/models.json`:
-
-```bash
-mytho graphs --model gemini25-flash
 ```
 
 По умолчанию `mytho graphs` **каждый раз пересобирает все графы из уже извлечённого кэша** (`extraction_cache.jsonl`); LLM вызывается только для ещё не извлечённых чанков и создаётся лениво — если кэш полон, ключ не нужен (удобно после изменения логики построения графов). `--force` чистит кэш и извлекает заново через LLM:
@@ -631,11 +625,8 @@ python -m http.server -d mockups 8890   # → http://127.0.0.1:8890/07-tradition
 mytho build --model bge-m3
 ```
 
-Указать отдельную LLM-модель для шага graphs (embedding-модель задаётся через `--model`):
-
-```bash
-mytho build --model bge-m3 --llm gemini25-flash
-```
+`--model` задаёт embedding-модель; LLM-модели для графов и препроцессинга берутся
+из настроек (`MYTHO_GRAPHS__LLM`, `MYTHO_EMBEDDING__LLM`).
 
 Быстрый прогон для проверки пайплайна — первая активная embedding-модель и ограниченное
 число текстов (по умолчанию 2). Можно передать своё число `N`, чтобы прогнать больше:

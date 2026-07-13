@@ -90,11 +90,10 @@ def projections(model: str | None, force: bool):
 
 
 @mytho.command()
-@click.option("--model", "-m", default=None, help="LLM model name from config/models.json registry.")
 @click.option("--force", "-f", is_flag=True, help="Re-extract from scratch (clear caches); default rebuilds from cache.")
-def graphs(model: str | None, force: bool):
+def graphs(force: bool):
     """Extract knowledge graphs from corpus texts using an LLM."""
-    _run("Graphs", _build_graphs, llm=model, force=force)
+    _run("Graphs", _build_graphs, force=force)
 
 
 @mytho.command()
@@ -116,13 +115,12 @@ def server(host: str | None, port: int | None):
 
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
-@click.option("--llm", default=None, help="LLM model for graphs (from config/models.json).")
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
               type=int, metavar="N",
               help=f"Quick run: first embedding model, limited to N texts "
                    f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
-def build(model, llm, force, sample):
+def build(model, force, sample):
     """Run the full analysis pipeline end-to-end."""
     if sample is not None:
         from model_registry import embedding_variants
@@ -139,7 +137,7 @@ def build(model, llm, force, sample):
         ("Corpus", _build_corpus, {"force": force, "max_texts": max_texts}),
         ("Embeddings", _build_embeddings, {"model": model, "force": force}),
         ("Projections", _build_projections, {"model": model, "force": force}),
-        ("Graphs", _build_graphs, {"llm": llm, "force": force, "max_texts": max_texts}),
+        ("Graphs", _build_graphs, {"force": force, "max_texts": max_texts}),
         ("Motifs", _build_motifs, {"force": force}),
     ]
 
@@ -172,11 +170,11 @@ def _build_projections(model: str | None, force: bool = False):
     build_projections(model_name=model, force=force)
 
 
-def _build_graphs(llm: str | None = None, force: bool = False, max_texts: int | None = None):
+def _build_graphs(force: bool = False, max_texts: int | None = None):
     logger.info("Loading graph libraries...")
     from graphs.build_graphs import build_graphs
 
-    build_graphs(llm=llm, force=force, max_texts=max_texts)
+    build_graphs(force=force, max_texts=max_texts)
 
 
 def _build_motifs(force: bool = False):

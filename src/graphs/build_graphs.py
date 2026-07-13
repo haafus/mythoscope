@@ -51,7 +51,6 @@ def _extract_chunks(
 
 
 def build_graphs(
-    llm: str | None = None,
     force: bool = False,
     max_texts: int | None = None,
 ) -> None:
@@ -108,7 +107,7 @@ def build_graphs(
         if uncached:
             if processor is None:  # first chunk that actually needs the LLM
                 processor = LLMProcessor(
-                    model_alias=llm or graphs_cfg.llm,
+                    model_alias=graphs_cfg.llm,
                     temperature=graphs_cfg.temperature,
                     use_json_mode=graphs_cfg.use_json_mode,
                 )
