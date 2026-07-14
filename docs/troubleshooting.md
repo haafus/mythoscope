@@ -18,10 +18,9 @@ collection**, and every collection stores a full copy of what it embeds:
   is attached to every point.
 
 So the **same chunks are copied into every collection**, once per variant — including
-**raw variants**, not only preprocessing ones. With M active models the corpus text
-exists as M separate copies (one `document` set per model). (Correction to an earlier
-version of this note: raw variants are *not* duplication-free — their `document` already
-*is* a per-model copy of the source.)
+**raw variants**, not only preprocessing ones: a raw variant's `document` is itself a
+per-model copy of the source. With M active models the corpus text exists as M separate
+copies (one `document` set per model).
 
 Preprocessing variants (the "Option A" plan) add a **further** copy: their `document`
 holds the *processed* text, so to also reveal the original in the UI we would store the
