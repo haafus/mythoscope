@@ -30,8 +30,9 @@
   <h1>Фасеты традиций на карте</h1>
   <p>Один и тот же набор традиций Березкина, раскрашенный по выбранному фасету. Переключай ось —
      карта перекрашивается. <b>area</b> выводится из <code>areal_path</code>, <b>family</b> — из языковой
-     цепочки, <b>тема</b> — доминирующая тематическая группа традиции, <b>subsistence</b> — из D-PLACE
-     (ближайшее общество ≤ 250 км).</p>
+     цепочки, <b>narrative</b> — доминирующий нарративный кластер традиции (16 data-driven кластеров
+     мокапа 41, а не «Adventures»-доминанта Березкина), <b>subsistence</b> — из D-PLACE (ближайшее
+     общество ≤ 250 км).</p>
 </header>
 
 <div class="card">
@@ -53,7 +54,7 @@
 <script>
 const D = window.DATA, GREY = "#c4c8cd";
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const KEY = { area:"a", family:"f", theme:"t", subsistence:"s" };
+const KEY = { area:"a", family:"f", narrative:"n", subsistence:"s" };
 let active = "area";
 
 function drawMap(fid){

@@ -21,12 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 MOCKS = Path(__file__).resolve().parents[1]
 OUT = Path(__file__).resolve().parent / "data.js"
 
-MIN_MOTIFS = 30  # below this a theme profile is too noisy to call a dominant group
-
-THEMES = ["Sun & Moon", "Stars & constellations", "Cosmogony & elements",
-          "Origin of death", "Origin of humans", "Origin of subsistence",
-          "Plants & animals", "Monstrous beings", "Protagonist identity",
-          "Adventures", "Tricks & competitions", "Proper names", "Formulae"]
+MIN_MOTIFS = 30  # below this a narrative profile is too noisy to call a dominant cluster
 
 # Subsistence comes from D-PLACE (nearest society), reusing mockup 22's snapshot.
 SUB_ORDER = ["forager", "pastoralist", "horticulturalist", "agrarian_state"]
@@ -70,16 +65,21 @@ def main():
         bz = json.load(f)
     T = bz["traditions"]
 
-    # per-tradition 13-dim theme counts → dominant group
-    prof = defaultdict(lambda: np.zeros(13))
+    # Data-driven narrative clusters (mockup 41): each motif → one of 16 named clusters.
+    # The dominant theme (Berezkin's 13) is uninformative — "Adventures" swamps everything —
+    # so the theme facet uses the balanced narrative clusters instead.
+    with open(MOCKS / "41-theme-rederivation" / "narrative_taxonomy.json", encoding="utf-8") as f:
+        tax = json.load(f)
+    NT = tax["motifs"]
+    NARR = [c["name"] for c in sorted(tax["clusters"], key=lambda c: c["l1"])]
+
+    # per-tradition narrative-cluster counts → dominant cluster
+    prof = defaultdict(lambda: np.zeros(len(NARR)))
     for r in bz["motifs"]:
-        g = r.get("motif_group_num")
-        if not g:
-            continue
-        gi = int(g) - 1
-        if 0 <= gi < 13:
+        nt = NT.get(r["id"])
+        if nt:
             for tid in (r.get("traditions") or []):
-                prof[tid][gi] += 1
+                prof[tid][nt["l1"]] += 1
 
     def coord(t):
         c = coords.get(t)
@@ -103,7 +103,7 @@ def main():
     fam_ix = {a: i for i, a in enumerate(f21.FAMILIES11)}
     sub_ix = {s: i for i, s in enumerate(SUB_ORDER)}
 
-    recs = []  # (tid, lon, lat, area_idx, fam_idx, theme_idx, sub_idx)  (-1 = no value)
+    recs = []  # (tid, lon, lat, area_idx, fam_idx, narr_idx, sub_idx)  (-1 = no value)
     for t, v in T.items():
         xy = coord(t)
         if not xy:
@@ -114,11 +114,11 @@ def main():
         lang0 = (v.get("language") or [None])[0]
         family, _ = f21.family_of(lang0, area)
         p = prof.get(t)
-        theme = int(np.argmax(p)) if (p is not None and p.sum() >= MIN_MOTIFS) else -1
+        narr = int(np.argmax(p)) if (p is not None and p.sum() >= MIN_MOTIFS) else -1
         d = _haversine(lat, lon, dp_lat, dp_lon)
         j = int(np.argmin(d))
         sub = sub_ix[dp_sub[j]] if d[j] <= MATCH_KM else -1
-        recs.append((t, lon, lat, area_ix.get(area, -1), fam_ix.get(family, -1), theme, sub))
+        recs.append((t, lon, lat, area_ix.get(area, -1), fam_ix.get(family, -1), narr, sub))
 
     # spread points sharing a base coordinate so nothing piles up (mockup 16 recipe)
     groups = defaultdict(list)
@@ -134,7 +134,7 @@ def main():
             xy_by_i[i] = (round(lon + ox * span * 1.35, 2), round(lat + oy * span, 2))
 
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
-               "a": r[3], "f": r[4], "t": r[5], "s": r[6]}
+               "a": r[3], "f": r[4], "n": r[5], "s": r[6]}
               for i, r in enumerate(recs)]
 
     def facet(label, cats, key, colors=None):
@@ -146,25 +146,25 @@ def main():
                      for i, c in enumerate(cats)],
         }
 
-    # forager · pastoralist · horticulturalist · agrarian_state — blue/amber/green/red
-    # for maximum separation between the four buckets.
-    sub_colors = ["#2f6fed", "#e08215", "#16a34a", "#dc2626"]
+    # forager · pastoralist · horticulturalist · agrarian_state — a jewel/earth set:
+    # slate-blue / terracotta / teal-green / plum. Contrasting but not flat primaries.
+    sub_colors = ["#3f6f9e", "#cc7a33", "#2f8f6b", "#9c4576"]
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
-        "theme": facet(f"Dominant theme · {len(THEMES)}", THEMES, "t"),
+        "narrative": facet(f"Narrative cluster · {len(NARR)}", NARR, "n"),
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
     }
     facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
 
-    data = {"facets": facets, "order": ["area", "family", "theme", "subsistence"],
+    data = {"facets": facets, "order": ["area", "family", "narrative", "subsistence"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
-    n_theme = sum(1 for p in points if p["t"] >= 0)
+    n_narr = sum(1 for p in points if p["n"] >= 0)
     n_sub = sum(1 for p in points if p["s"] >= 0)
-    print(f"{len(points)} traditions placed · {n_theme} with a dominant theme "
+    print(f"{len(points)} traditions placed · {n_narr} with a dominant narrative cluster "
           f"(>={MIN_MOTIFS} motifs) · {n_sub} with subsistence (<= {MATCH_KM:.0f}km)")
 
 
