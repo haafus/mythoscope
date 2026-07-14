@@ -16,10 +16,13 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
+from sklearn.cluster import KMeans
 
 ROOT = Path(__file__).resolve().parents[2]
 MOCKS = Path(__file__).resolve().parents[1]
 OUT = Path(__file__).resolve().parent / "data.js"
+
+K_CLUSTERS = 8  # tradition profile clusters (KMeans over the 16-dim narrative profile)
 
 MIN_MOTIFS = 30  # below this a narrative profile is too noisy to call a dominant cluster
 
@@ -103,7 +106,8 @@ def main():
     fam_ix = {a: i for i, a in enumerate(f21.FAMILIES11)}
     sub_ix = {s: i for i, s in enumerate(SUB_ORDER)}
 
-    recs = []  # (tid, lon, lat, area_idx, fam_idx, narr_idx, sub_idx)  (-1 = no value)
+    recs = []  # [tid, lon, lat, area_idx, fam_idx, narr_cluster, sub_idx]  (-1 = no value)
+    prof_rows, prof_tids = [], []   # narrative profiles of placed, well-attested traditions
     for t, v in T.items():
         xy = coord(t)
         if not xy:
@@ -113,12 +117,30 @@ def main():
         area = f21.area_of(ap)
         lang0 = (v.get("language") or [None])[0]
         family, _ = f21.family_of(lang0, area)
-        p = prof.get(t)
-        narr = int(np.argmax(p)) if (p is not None and p.sum() >= MIN_MOTIFS) else -1
         d = _haversine(lat, lon, dp_lat, dp_lon)
         j = int(np.argmin(d))
         sub = sub_ix[dp_sub[j]] if d[j] <= MATCH_KM else -1
-        recs.append((t, lon, lat, area_ix.get(area, -1), fam_ix.get(family, -1), narr, sub))
+        recs.append([t, lon, lat, area_ix.get(area, -1), fam_ix.get(family, -1), -1, sub])
+        p = prof.get(t)
+        if p is not None and p.sum() >= MIN_MOTIFS:
+            prof_rows.append(p / p.sum())
+            prof_tids.append(t)
+
+    # Cluster the traditions by their narrative profile (mockup 43's move), then colour
+    # each tradition by its profile cluster — not by a single dominant motif group.
+    X = np.array(prof_rows)
+    labels = KMeans(n_clusters=K_CLUSTERS, random_state=0, n_init=10).fit(X).labels_
+    sizes = [int((labels == c).sum()) for c in range(K_CLUSTERS)]
+    order = sorted(range(K_CLUSTERS), key=lambda c: -sizes[c])   # biggest cluster first
+    remap = {c: i for i, c in enumerate(order)}
+    # Name a cluster by what it over-represents vs the global mean (its *distinctive*
+    # complexes), not its biggest dims — those are shared across clusters and don't separate them.
+    gm = X.mean(0)
+    cluster_names = [" · ".join(NARR[k] for k in (X[labels == c].mean(0) - gm).argsort()[::-1][:2])
+                     for c in order]
+    tid_cluster = {t: remap[int(labels[i])] for i, t in enumerate(prof_tids)}
+    for r in recs:
+        r[5] = tid_cluster.get(r[0], -1)
 
     # spread points sharing a base coordinate so nothing piles up (mockup 16 recipe)
     groups = defaultdict(list)
@@ -152,7 +174,7 @@ def main():
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
-        "narrative": facet(f"Narrative cluster · {len(NARR)}", NARR, "n"),
+        "narrative": facet(f"Narrative profile cluster · {K_CLUSTERS}", cluster_names, "n"),
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
     }
@@ -164,8 +186,8 @@ def main():
                    encoding="utf-8")
     n_narr = sum(1 for p in points if p["n"] >= 0)
     n_sub = sum(1 for p in points if p["s"] >= 0)
-    print(f"{len(points)} traditions placed · {n_narr} with a dominant narrative cluster "
-          f"(>={MIN_MOTIFS} motifs) · {n_sub} with subsistence (<= {MATCH_KM:.0f}km)")
+    print(f"{len(points)} traditions placed · {n_narr} clustered by narrative profile "
+          f"(k={K_CLUSTERS}, >={MIN_MOTIFS} motifs) · {n_sub} with subsistence (<= {MATCH_KM:.0f}km)")
 
 
 if __name__ == "__main__":

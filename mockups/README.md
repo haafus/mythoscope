@@ -714,9 +714,10 @@ a property of Berezkin's areal sampling design, not of folklore indexes in gener
 
 ### 62 · Facet map
 One world map with a facet switcher: colour the same Berezkin traditions by `area` (12, from
-`areal_path`), `family` (11, from language), dominant `narrative` cluster (16, mockup 41), or
-`subsistence` (4, D-PLACE nearest society). Shows how each axis cross-cuts the geography — the
-visual answer to the F7 gap (`family`/areal facet absent from the UI). See
+`areal_path`), `family` (11, from language), `narrative` profile cluster (8, traditions clustered
+by their narrative-genre balance à la mockup 43), or `subsistence` (4, D-PLACE nearest society).
+Shows how each axis cross-cuts the geography — the visual answer to the F7 gap (`family`/areal
+facet absent from the UI). See
 [`62-facet-map/README.md`](62-facet-map/README.md).
 
 ## Notes

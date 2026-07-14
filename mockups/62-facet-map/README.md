@@ -14,10 +14,12 @@ data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a
   (4 traditions have an empty `areal_path`).
 - **Family · 11** — from the language chain (reuses mockup 21's `family_of`): language seed + area
   fallback for ambiguous cases.
-- **Narrative cluster · 16** — the dominant of mockup 41's 16 data-driven narrative clusters in a
-  tradition's motif set (argmax of its narrative profile); only for traditions with ≥ 30 motifs.
-  Berezkin's 13 hand themes were tried first but are useless as a facet — the *Adventures* catch-all
-  is the argmax almost everywhere; the narrative clusters are balanced and vary across the map.
+- **Narrative profile cluster · 8** — traditions *clustered by their thematic composition* (KMeans
+  k=8 over the 16-dim narrative profile of mockup 41, the mockup-43 move), not coloured by a single
+  dominant group. Each cluster is named by the two narrative complexes it most over-represents vs the
+  global average. Only traditions with ≥ 30 motifs are clustered. (A dominant-group facet was tried
+  first but is useless — Berezkin's *Adventures* catch-all wins almost everywhere, and even the
+  narrative argmax is lopsided.)
 - **Subsistence · 4** — from D-PLACE, the nearest Ethnographic-Atlas society within 250 km (reuses
   mockup 22's `dplace_subsistence.json`).
 
@@ -28,9 +30,10 @@ Grey points have no value on the active facet.
 - **`area` and `family` correlate but cross-cut.** One family spans several areas (Austronesian across
   Nusantara, Oceania, Madagascar; Amerindian across all four American areas), and one area holds several
   families — the visual case for keeping both as distinct axes.
-- **`narrative` splits Old World vs New World.** The magic-wife / magic-flight complexes dominate Eurasia
-  and Africa, while the monster-swallower complex dominates the Americas, Pacific rim and Australia — a
-  divide the uniform Berezkin *Adventures* argmax hid completely.
+- **`narrative` clusters cross-cut geography.** The 8 profile clusters group cultures by the genre balance
+  of their corpus, and some span continents (a magic-wife/ogre cluster across Eurasia–Africa, a
+  monster-swallower/miraculous-birth cluster across the Americas and Pacific) — the point of clustering by
+  composition rather than by location.
 - **`subsistence` tracks ecology**, not descent — horticulturalists across the tropics, agrarian states
   across Eurasia, foragers in Australia / boreal North America / Siberia, pastoralists in the steppe belt.
 
