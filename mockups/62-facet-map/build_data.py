@@ -191,9 +191,18 @@ def main():
         if len(ms) >= 8:
             tid_depth[r[0]] = float(np.mean([rank[k] for k in ms]))
 
-    # Histogram-equalize the depth for the map: colour by a tradition's depth *rank* among all
-    # traditions (0–1), so the concentrated middle of the distribution spreads across the full
-    # ramp instead of collapsing to one shade. Raw values are kept for the legend range.
+    # Coverage correction: depth is negatively confounded by coverage a(t) = richness — a thickly
+    # catalogued corpus records more rare local motifs and looks artificially shallow (mockup 39).
+    # Partial it out: replace depth with the residual of depth on log-coverage, i.e. how deep a
+    # tradition is *relative to what its cataloguing level predicts*. >0 = deeper than expected.
+    dep_tids = list(tid_depth)
+    logcov = np.log([len(tmot[t]) for t in dep_tids])
+    dy = np.array([tid_depth[t] for t in dep_tids])
+    slope, intercept = np.polyfit(logcov, dy, 1)
+    tid_depth = {t: float(dy[i] - (slope * logcov[i] + intercept)) for i, t in enumerate(dep_tids)}
+
+    # Histogram-equalize the corrected depth for the map: colour by a tradition's rank among all
+    # traditions (0–1), so the concentrated middle spreads across the full ramp instead of one shade.
     srt = sorted(tid_depth, key=lambda t: tid_depth[t])
     depth_eq = {t: i / (len(srt) - 1) for i, t in enumerate(srt)} if len(srt) > 1 else {}
 
@@ -233,14 +242,15 @@ def main():
                     "(diffusion belt), high = internally divergent. α richness is effort-confounded; β is not.",
         },
         "depth": {
-            "label": "Tradition depth · mean rank",
+            "label": "Tradition depth · coverage-corrected",
             "kind": "continuous", "key": "p", "unit": "перцентиль среди традиций",
             "min": 0, "max": 1,
             # high-contrast light→dark (YlOrRd): shallow = pale, deep = dark red.
             "ramp": ["#ffffcc", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
-            "note": f"mean depth-rank of a tradition's motifs (each motif's breadth, mockup 17, as a "
-                    f"0–1 percentile, averaged), then histogram-equalized for contrast — colour = rank "
-                    f"among traditions (raw mean-rank {min(depths):.2f}–{max(depths):.2f}). Deep = older/broader stock.",
+            "note": f"mean depth-rank of a tradition's motifs (breadth percentile, mockup 17), with "
+                    f"coverage partialled out — residual on log-richness (mockup 39's confound), so "
+                    f">0 = deeper than its cataloguing predicts. Histogram-equalized; residual "
+                    f"{min(depths):+.2f}…{max(depths):+.2f}.",
         },
     }
     facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
@@ -252,7 +262,7 @@ def main():
                    encoding="utf-8")
     n_narr = sum(1 for p in points if p["n"] >= 0)
     print(f"{len(points)} placed · {n_narr} narrative-clustered · {len(tid_beta)} β-diversity "
-          f"· {len(tid_depth)} depth (mean-rank {min(depths):.2f}–{max(depths):.2f})")
+          f"· {len(tid_depth)} depth (coverage-corrected residual {min(depths):+.2f}…{max(depths):+.2f})")
 
 
 if __name__ == "__main__":

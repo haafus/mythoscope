@@ -25,12 +25,13 @@ data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a
 - **Motif diversity · β** — *continuous*: β-turnover (γ/α) per macro-area from mockup 52, broadcast to
   its traditions on a blue→red scale. α (per-tradition richness) is a cataloguing-effort artefact, so β
   is used — low = a homogeneous shared stock (diffusion belt), high = internally divergent traditions.
-- **Tradition depth · mean rank** — *continuous*: the mean **depth-rank** of a tradition's motifs. A
-  motif's depth = its breadth (# attesting traditions, mockup 17); breadth is heavy-tailed, so each
-  motif's breadth is first turned into a 0–1 percentile and then averaged over the tradition — a robust
-  "average depth" that a raw mean of breadth (swamped by a few pan-global motifs, and unbounded) is not.
-  Deeper = older / broader motif stock. (Deep-*share* — fraction in the top-15% tier, mockup 39 — is the
-  compositional alternative; mean-rank keeps the full gradient.)
+- **Tradition depth · coverage-corrected** — *continuous*: the mean **depth-rank** of a tradition's
+  motifs (each motif's breadth, mockup 17, as a 0–1 percentile, averaged — a robust "average depth"
+  that a raw, unbounded mean of the heavy-tailed breadth is not), then **corrected for coverage**:
+  the residual on log-richness, since a thickly-catalogued corpus records more rare local motifs and
+  looks artificially shallow (mockup 39's confound, corr −0.30). So the colour is depth *relative to
+  what a tradition's cataloguing level predicts* (>0 = deeper than expected), histogram-equalized for
+  contrast. Deep-*share* (fraction in the top tier, mockup 39) is the compositional alternative.
 
 Grey points have no value on the active facet.
 
