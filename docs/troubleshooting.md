@@ -1,7 +1,47 @@
-# Motif indexes — troubleshooting & known issues
+# Troubleshooting & known issues
 
-Running log of cross-cutting problems in the motif subsystem: what's wrong, why,
-where it bites, and the options for fixing it. Append new entries at the top.
+Running log of cross-cutting problems across the project (motifs, embeddings, …):
+what's wrong, why, where it bites, and the options for fixing it. Append new
+entries at the top.
+
+---
+
+## Source chunk is copied into every preprocessing / model variant
+
+**Status:** by design (the "Option A" tradeoff) — accepted; revisit if collections bloat.
+
+Preprocessing variants — a `config/models.json` entry with `preprocess_prompt`
+(e.g. summary, course-of-action) — embed an LLM-transformed chunk, and the UI
+reveals the **original** text on hover over the sidebar fragment. To serve that
+without depending on the corpus being present, the original source chunk is stored
+in the variant's Chroma metadata at build time (`source_text`).
+
+Because each embedding variant is its own Chroma collection keyed by the same
+chunk ids, the **same source chunk is duplicated into every collection that embeds
+it** — one copy per (model × preprocessing mode). Raw-text variants don't carry it
+(their stored document already *is* the source).
+
+Where it bites:
+
+- **Storage scales with variant count.** N preprocess collections over the corpus =
+  N copies of the source. For summary/CoA variants the source is *longer* than the
+  processed document that is actually embedded, so the duplicated source can dominate
+  a collection's size.
+- **Snapshot drift.** The stored copy is frozen at build time. If the corpus is
+  re-cleaned or the chunk parameters change, `source_text` goes stale relative to the
+  live corpus until that variant is rebuilt.
+
+Options:
+
+- **Accept (current).** Simplest, self-contained, works offline in `mytho export`
+  bundles; storage cost is modest at corpus scale.
+- **Recompute on demand ("Option B").** Drop `source_text`; the server rebuilds the
+  original chunk from the corpus by `text_id` + `chunk_index` (chunk size read from
+  collection metadata). Zero duplication and always current, but needs the corpus on
+  the serving machine and chunk params matching the build.
+- **Single-copy reference.** Store the source only in the raw/base collection and have
+  preprocess variants look it up by shared id. One copy, but couples variants and
+  assumes the base collection exists.
 
 ---
 
