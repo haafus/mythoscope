@@ -260,7 +260,7 @@ def main():
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
         "diversity": {
-            "label": "Motif diversity · β-turnover",
+            "label": "Motif diversity · β",
             "kind": "continuous", "key": "d", "unit": "β = γ/α",
             "min": round(min(betas), 2), "max": round(max(betas), 2),
             # mockup 52's blue→red β scale, blue end softened (lighter, less saturated).
@@ -269,7 +269,7 @@ def main():
                     "(diffusion belt), high = internally divergent. α richness is effort-confounded; β is not.",
         },
         "depth": {
-            "label": "Tradition depth · coverage-corrected",
+            "label": "Tradition depth",
             "kind": "continuous", "key": "p", "unit": "перцентиль среди традиций",
             "min": 0, "max": 1,
             # high-contrast light→dark (YlOrRd): shallow = pale, deep = dark red.
