@@ -146,7 +146,9 @@ def main():
                      for i, c in enumerate(cats)],
         }
 
-    sub_colors = ["#5f7d99", "#b28a3e", "#3c8a5e", "#6a5aa6"]
+    # forager · pastoralist · horticulturalist · agrarian_state — blue/amber/green/red
+    # for maximum separation between the four buckets.
+    sub_colors = ["#2f6fed", "#e08215", "#16a34a", "#dc2626"]
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
