@@ -206,7 +206,8 @@ def main():
             "label": "Motif diversity · β-turnover",
             "kind": "continuous", "key": "d",
             "min": round(min(betas), 2), "max": round(max(betas), 2),
-            "ramp": ["#eef2f6", "#8fb0d6", "#3f74b8", "#123f83"],
+            # mockup 52's exact blue→red β scale: rgb(80,130,190) → rgb(230,90,70).
+            "ramp": ["#5082be", "#e65a46"],
             "note": "β-turnover (γ/α) per macro-area (mockup 52): low = homogeneous shared stock "
                     "(diffusion belt), high = internally divergent. α richness is effort-confounded; β is not.",
         },
