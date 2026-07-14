@@ -155,8 +155,32 @@ def main():
             ox, oy = _sunflower(j, n)
             xy_by_i[i] = (round(lon + ox * span * 1.35, 2), round(lat + oy * span, 2))
 
+    # Motif diversity (mockup 52): β-turnover (γ/α) per macro-area, broadcast to its traditions.
+    # Continuous, not categorical: α (per-tradition richness) tracks cataloguing effort; β does not.
+    tmot = defaultdict(set)
+    for k, m in enumerate(bz["motifs"]):
+        for t in (m.get("traditions") or []):
+            tmot[t].add(k)
+
+    def _macro(t):
+        ap = T[t].get("areal_path") or []
+        return ap[0][1] if ap and ap[0] else None
+
+    by_macro = defaultdict(list)
+    for r in recs:
+        if len(tmot[r[0]]) >= 15:
+            by_macro[_macro(r[0])].append(r[0])
+    area_beta = {}
+    for a, ts in by_macro.items():
+        if a is None or len(ts) < 8:
+            continue
+        alpha = float(np.mean([len(tmot[t]) for t in ts]))
+        area_beta[a] = len(set().union(*[tmot[t] for t in ts])) / alpha
+    tid_beta = {r[0]: area_beta[_macro(r[0])] for r in recs if _macro(r[0]) in area_beta}
+
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
-               "a": r[3], "f": r[4], "n": r[5], "s": r[6]}
+               "a": r[3], "f": r[4], "n": r[5], "s": r[6],
+               "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None}
               for i, r in enumerate(recs)]
 
     def facet(label, cats, key, colors=None):
@@ -171,23 +195,33 @@ def main():
     # forager · pastoralist · horticulturalist · agrarian_state — a jewel/earth set:
     # slate-blue / terracotta / teal-green / plum. Contrasting but not flat primaries.
     sub_colors = ["#3f6f9e", "#cc7a33", "#2f8f6b", "#9c4576"]
+    betas = list(tid_beta.values())
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
         "narrative": facet(f"Narrative profile cluster · {K_CLUSTERS}", cluster_names, "n"),
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
+        "diversity": {
+            "label": "Motif diversity · β-turnover",
+            "kind": "continuous", "key": "d",
+            "min": round(min(betas), 2), "max": round(max(betas), 2),
+            "ramp": ["#eef2f6", "#8fb0d6", "#3f74b8", "#123f83"],
+            "note": "β-turnover (γ/α) per macro-area (mockup 52): low = homogeneous shared stock "
+                    "(diffusion belt), high = internally divergent. α richness is effort-confounded; β is not.",
+        },
     }
     facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
 
-    data = {"facets": facets, "order": ["area", "family", "narrative", "subsistence"],
+    data = {"facets": facets, "order": ["area", "family", "narrative", "subsistence", "diversity"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
     n_narr = sum(1 for p in points if p["n"] >= 0)
     n_sub = sum(1 for p in points if p["s"] >= 0)
     print(f"{len(points)} traditions placed · {n_narr} clustered by narrative profile "
-          f"(k={K_CLUSTERS}, >={MIN_MOTIFS} motifs) · {n_sub} with subsistence (<= {MATCH_KM:.0f}km)")
+          f"(k={K_CLUSTERS}) · {n_sub} with subsistence · {len(tid_beta)} with β-diversity "
+          f"({len(area_beta)} macro-areas)")
 
 
 if __name__ == "__main__":

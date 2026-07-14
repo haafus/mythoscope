@@ -8,7 +8,7 @@ the geography, so you can *see* how each cross-cuts the map.
 Answers the open UI gap from `docs/reviews/2026-07-repo-review.md` **F7** (`family`/areal facet in the
 data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a single shared view.
 
-## The four facets
+## The five facets
 
 - **Area · 12** — deterministic from `areal_path` (reuses mockup 21's `area_of`). Near-total coverage
   (4 traditions have an empty `areal_path`).
@@ -22,6 +22,10 @@ data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a
   narrative argmax is lopsided.)
 - **Subsistence · 4** — from D-PLACE, the nearest Ethnographic-Atlas society within 250 km (reuses
   mockup 22's `dplace_subsistence.json`).
+- **Motif diversity · β** — the one *continuous* facet: β-turnover (γ/α) per macro-area from mockup 52,
+  broadcast to its traditions, drawn on a sequential scale. α (per-tradition richness) is a cataloguing-
+  effort artefact, so β is used instead — low = a homogeneous shared stock (diffusion belt), high =
+  internally divergent traditions.
 
 Grey points have no value on the active facet.
 
