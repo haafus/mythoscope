@@ -256,7 +256,7 @@ def main():
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
-        "narrative": facet(f"Narrative profile cluster · {K_CLUSTERS}", cluster_names, "n"),
+        "narrative": facet(f"Narrative · {K_CLUSTERS}", cluster_names, "n"),
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
         "diversity": {
@@ -278,7 +278,7 @@ def main():
                     ">0 = глубже, чем предсказывает каталогизация (мокапы 17/39)",
         },
         "cosmology": {
-            "label": "Cosmology share · A/(A+B)",
+            "label": "Cosmology",
             "kind": "continuous", "key": "c", "unit": "доля Категории A",
             "min": round(min(cosmos), 2), "max": round(max(cosmos), 2),
             # sequential purple: low (adventure-heavy) → high (cosmology-heavy).
@@ -287,7 +287,7 @@ def main():
                     "(мокапы 22/24)",
         },
         "peopling": {
-            "label": "Peopling age · ky",
+            "label": "Peopling",
             "kind": "continuous", "key": "e", "unit": "ky BP",
             "min": min(peos), "max": max(peos),
             # sequential green: recently peopled (pale) → anciently peopled (dark).
