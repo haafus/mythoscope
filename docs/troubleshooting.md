@@ -6,42 +6,46 @@ entries at the top.
 
 ---
 
-## Source chunk is copied into every preprocessing / model variant
+## Chunk text and metadata are duplicated across every collection
 
-**Status:** by design (the "Option A" tradeoff) — accepted; revisit if collections bloat.
+**Status:** by design — inherent to the per-variant collection layout; Option A adds one more copy.
 
-Preprocessing variants — a `config/models.json` entry with `preprocess_prompt`
-(e.g. summary, course-of-action) — embed an LLM-transformed chunk, and the UI
-reveals the **original** text on hover over the sidebar fragment. To serve that
-without depending on the corpus being present, the original source chunk is stored
-in the variant's Chroma metadata at build time (`source_text`).
+Each embedding variant (a model, or a model × preprocessing mode) is its **own Chroma
+collection**, and every collection stores a full copy of what it embeds:
 
-Because each embedding variant is its own Chroma collection keyed by the same
-chunk ids, the **same source chunk is duplicated into every collection that embeds
-it** — one copy per (model × preprocessing mode). Raw-text variants don't carry it
-(their stored document already *is* the source).
+- the chunk text goes into Chroma's `document` field, and
+- per-chunk metadata (`text_id`, `chunk_index`, `tradition`, `major_tradition`, `url`)
+  is attached to every point.
+
+So the **same chunks are copied into every collection**, once per variant — including
+**raw variants**, not only preprocessing ones. With M active models the corpus text
+exists as M separate copies (one `document` set per model). (Correction to an earlier
+version of this note: raw variants are *not* duplication-free — their `document` already
+*is* a per-model copy of the source.)
+
+Preprocessing variants (the "Option A" plan) add a **further** copy: their `document`
+holds the *processed* text, so to also reveal the original in the UI we would store the
+source chunk in metadata (`source_text`) — an extra copy on top of the per-model baseline.
 
 Where it bites:
 
-- **Storage scales with variant count.** N preprocess collections over the corpus =
-  N copies of the source. For summary/CoA variants the source is *longer* than the
-  processed document that is actually embedded, so the duplicated source can dominate
-  a collection's size.
-- **Snapshot drift.** The stored copy is frozen at build time. If the corpus is
-  re-cleaned or the chunk parameters change, `source_text` goes stale relative to the
-  live corpus until that variant is rebuilt.
+- **Storage scales with variant count × corpus size.** Adding a model or a preprocess
+  mode re-copies the whole corpus's chunks; a preprocess variant stores the chunk twice
+  (processed `document` + `source_text` metadata).
+- **Snapshot drift.** Every copy is frozen at build time; re-cleaning the corpus or
+  changing chunk params leaves stale copies until each collection is rebuilt.
 
 Options:
 
-- **Accept (current).** Simplest, self-contained, works offline in `mytho export`
-  bundles; storage cost is modest at corpus scale.
-- **Recompute on demand ("Option B").** Drop `source_text`; the server rebuilds the
-  original chunk from the corpus by `text_id` + `chunk_index` (chunk size read from
-  collection metadata). Zero duplication and always current, but needs the corpus on
-  the serving machine and chunk params matching the build.
-- **Single-copy reference.** Store the source only in the raw/base collection and have
-  preprocess variants look it up by shared id. One copy, but couples variants and
-  assumes the base collection exists.
+- **Accept (current).** One collection per variant is Chroma's model; self-contained and
+  offline-friendly for `mytho export` bundles.
+- **Drop only the extra Option-A copy.** For preprocess variants, recompute the source
+  from the corpus by `text_id` + `chunk_index` (chunk size from collection metadata) or
+  reference the base collection — removes the *source_text* copy, not the inherent
+  per-model `document` duplication.
+- **Remove the inherent per-model duplication.** Would need a different storage model —
+  e.g. a shared chunk store keyed by chunk id, with collections holding only vectors.
+  Larger change; noted for completeness, out of scope for now.
 
 ---
 
