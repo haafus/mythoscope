@@ -191,10 +191,16 @@ def main():
         if len(ms) >= 8:
             tid_depth[r[0]] = float(np.mean([rank[k] for k in ms]))
 
+    # Histogram-equalize the depth for the map: colour by a tradition's depth *rank* among all
+    # traditions (0–1), so the concentrated middle of the distribution spreads across the full
+    # ramp instead of collapsing to one shade. Raw values are kept for the legend range.
+    srt = sorted(tid_depth, key=lambda t: tid_depth[t])
+    depth_eq = {t: i / (len(srt) - 1) for i, t in enumerate(srt)} if len(srt) > 1 else {}
+
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
                "a": r[3], "f": r[4], "n": r[5], "s": r[6],
                "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None,
-               "p": round(tid_depth[r[0]], 3) if r[0] in tid_depth else None}
+               "p": round(depth_eq[r[0]], 3) if r[0] in depth_eq else None}
               for i, r in enumerate(recs)]
 
     def facet(label, cats, key, colors=None):
@@ -228,13 +234,13 @@ def main():
         },
         "depth": {
             "label": "Tradition depth · mean rank",
-            "kind": "continuous", "key": "p", "unit": "mean depth-rank",
-            "min": round(min(depths), 2), "max": round(max(depths), 2),
-            # sediment/geological ramp (fits a stratigraphic column): pale → ochre → deep brown.
-            "ramp": ["#f0e6c8", "#d69f45", "#9a5a24", "#4a2c12"],
-            "note": "mean depth-rank of a tradition's motifs — each motif's breadth (mockup 17) as a "
-                    "0–1 percentile, averaged. Rank-transform tames the heavy-tailed breadth so a few "
-                    "pan-global motifs don't swamp a raw mean. Deeper = older/broader motif stock.",
+            "kind": "continuous", "key": "p", "unit": "перцентиль среди традиций",
+            "min": 0, "max": 1,
+            # high-contrast light→dark (YlOrRd): shallow = pale, deep = dark red.
+            "ramp": ["#ffffcc", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
+            "note": f"mean depth-rank of a tradition's motifs (each motif's breadth, mockup 17, as a "
+                    f"0–1 percentile, averaged), then histogram-equalized for contrast — colour = rank "
+                    f"among traditions (raw mean-rank {min(depths):.2f}–{max(depths):.2f}). Deep = older/broader stock.",
         },
     }
     facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
