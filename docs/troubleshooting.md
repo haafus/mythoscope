@@ -36,15 +36,14 @@ Where it bites:
 
 Options:
 
-- **Accept (current).** One collection per variant is Chroma's model; self-contained and
-  offline-friendly for `mytho export` bundles.
-- **Drop only the extra Option-A copy.** For preprocess variants, recompute the source
-  from the corpus by `text_id` + `chunk_index` (chunk size from collection metadata) or
-  reference the base collection — removes the *source_text* copy, not the inherent
-  per-model `document` duplication.
-- **Remove the inherent per-model duplication.** Would need a different storage model —
-  e.g. a shared chunk store keyed by chunk id, with collections holding only vectors.
-  Larger change; noted for completeness, out of scope for now.
+- **Accept (current).** One collection per variant is Chroma's native model, and each
+  collection carries everything it shows — no lookup against another store at view time.
+- **Intermediate chunk-text store (SQLite), the intended direction.** Keep the chunk
+  texts — the source and each variant (summary, course of action, …) — in a store keyed
+  by chunk id, with Chroma collections holding only vectors. The server resolves any view
+  by id, so each text is stored once: the duplication disappears (both the `source_text`
+  copy and the per-model `document` copies), and it generalizes to any number of views.
+  Not planned yet.
 
 ---
 
