@@ -157,12 +157,16 @@ def build_graphs(
         keep_ages = top_mentioned_names(all_times, results["times"], max_entities)
         top_times = filter_by_names(all_times, keep_ages)
 
-        def _kept(total, keep):
-            return total if keep is None else len(keep)
+        def _summary(total, keep, limit=max_entities):
+            kept = total if keep is None else len(keep)
+            dropped = total - kept
+            if dropped > 0:
+                return f"{total} found, kept {kept}, {dropped} dropped by limit ({limit})"
+            return f"{total} found, kept {kept}"
 
-        logger.info(f"Beings:    {len(all_beings)} found, kept {_kept(len(all_beings), keep_beings)}")
-        logger.info(f"Realms:    {len(all_locations)} found, kept {_kept(len(all_locations), keep_realms)}")
-        logger.info(f"Ages:      {len(all_times)} found, kept {_kept(len(all_times), keep_ages)}")
+        logger.info(f"Beings:    {_summary(len(all_beings), keep_beings)}")
+        logger.info(f"Realms:    {_summary(len(all_locations), keep_realms)}")
+        logger.info(f"Ages:      {_summary(len(all_times), keep_ages)}")
         logger.info(f"Relations: {len(all_relations)} found")
 
         try:
