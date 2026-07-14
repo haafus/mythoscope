@@ -265,8 +265,8 @@ def main():
             "min": round(min(betas), 2), "max": round(max(betas), 2),
             # mockup 52's blue→red β scale, blue end softened (lighter, less saturated).
             "ramp": ["#83a4c6", "#e65a46"],
-            "note": "β-turnover (γ/α) per macro-area (mockup 52): low = homogeneous shared stock "
-                    "(diffusion belt), high = internally divergent. α richness is effort-confounded; β is not.",
+            "note": "β-turnover (γ/α) по макроареалу: низкий — общий фонд мотивов, высокий — "
+                    "внутренне разнородный (мокап 52)",
         },
         "depth": {
             "label": "Tradition depth",
@@ -274,10 +274,8 @@ def main():
             "min": 0, "max": 1,
             # high-contrast light→dark (YlOrRd): shallow = pale, deep = dark red.
             "ramp": ["#ffffcc", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
-            "note": f"mean depth-rank of a tradition's motifs (breadth percentile, mockup 17), with "
-                    f"coverage partialled out — residual on log-richness (mockup 39's confound), so "
-                    f">0 = deeper than its cataloguing predicts. Histogram-equalized; residual "
-                    f"{min(depths):+.2f}…{max(depths):+.2f}.",
+            "note": "средний ранг глубины мотивов традиции с поправкой на покрытие — "
+                    ">0 = глубже, чем предсказывает каталогизация (мокапы 17/39)",
         },
         "cosmology": {
             "label": "Cosmology share · A/(A+B)",
@@ -285,8 +283,8 @@ def main():
             "min": round(min(cosmos), 2), "max": round(max(cosmos), 2),
             # sequential purple: low (adventure-heavy) → high (cosmology-heavy).
             "ramp": ["#f3eef8", "#c8a8dd", "#9151d8", "#4a1e77"],
-            "note": "share of a tradition's motifs in Berezkin Category A (cosmology/etiology, groups "
-                    "01–09) vs B (adventures/tricks, 10–13). High = cosmology-heavy (mockups 22/24/25).",
+            "note": "доля мотивов Категории A — космогония/этиология против приключений "
+                    "(мокапы 22/24)",
         },
         "peopling": {
             "label": "Peopling age · ky",
@@ -294,11 +292,14 @@ def main():
             "min": min(peos), "max": max(peos),
             # sequential green: recently peopled (pale) → anciently peopled (dark).
             "ramp": ["#ffffcc", "#addd8e", "#41ab5d", "#005a32"],
-            "note": "first-peopling age of a tradition's macro-area (ky BP, mockup 39) — the "
-                    "validation axis for depth: older regions carry deeper substrate.",
+            "note": "возраст первого заселения макроареала, тыс. лет назад (мокап 39)",
         },
     }
-    facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
+    facets["area"]["note"] = "12 макроареалов, детерминированно из areal_path (мокап 21)"
+    facets["family"]["note"] = "~11 языковых/религиозных семей из языковой цепочки (мокап 21)"
+    facets["narrative"]["note"] = ("кластер традиции по нарративному профилю — KMeans k=8 "
+                                   "над 16-мерным профилем (мокапы 41/43)")
+    facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
     data = {"facets": facets,
             "order": ["area", "family", "narrative", "subsistence", "diversity", "depth",
