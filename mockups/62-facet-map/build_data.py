@@ -260,7 +260,7 @@ def main():
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
         "diversity": {
-            "label": "Motif diversity · β",
+            "label": "Motif diversity",
             "kind": "continuous", "key": "d", "unit": "β = γ/α",
             "min": round(min(betas), 2), "max": round(max(betas), 2),
             # mockup 52's blue→red β scale, blue end softened (lighter, less saturated).
