@@ -16,6 +16,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
+from scipy.stats import rankdata
 from sklearn.cluster import KMeans
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -178,9 +179,22 @@ def main():
         area_beta[a] = len(set().union(*[tmot[t] for t in ts])) / alpha
     tid_beta = {r[0]: area_beta[_macro(r[0])] for r in recs if _macro(r[0]) in area_beta}
 
+    # Tradition depth = mean depth-rank of its motifs. Motif depth = breadth (# attesting
+    # traditions, mockup 17); breadth is heavy-tailed, so a raw mean is distorted by the few
+    # pan-global motifs. Rank-transform each motif's breadth to a 0–1 percentile first, then
+    # average over the tradition: bounded, robust, and uses every motif (not just a top tier).
+    breadth = np.array([len(m.get("traditions") or []) for m in bz["motifs"]])
+    rank = (rankdata(breadth, method="average") - 1) / (len(breadth) - 1)   # 0..1 depth percentile
+    tid_depth = {}
+    for r in recs:
+        ms = list(tmot[r[0]])
+        if len(ms) >= 8:
+            tid_depth[r[0]] = float(np.mean([rank[k] for k in ms]))
+
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
                "a": r[3], "f": r[4], "n": r[5], "s": r[6],
-               "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None}
+               "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None,
+               "p": round(tid_depth[r[0]], 3) if r[0] in tid_depth else None}
               for i, r in enumerate(recs)]
 
     def facet(label, cats, key, colors=None):
@@ -196,6 +210,7 @@ def main():
     # slate-blue / terracotta / teal-green / plum. Contrasting but not flat primaries.
     sub_colors = ["#3f6f9e", "#cc7a33", "#2f8f6b", "#9c4576"]
     betas = list(tid_beta.values())
+    depths = list(tid_depth.values())
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
@@ -204,25 +219,34 @@ def main():
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
         "diversity": {
             "label": "Motif diversity · β-turnover",
-            "kind": "continuous", "key": "d",
+            "kind": "continuous", "key": "d", "unit": "β = γ/α",
             "min": round(min(betas), 2), "max": round(max(betas), 2),
-            # mockup 52's exact blue→red β scale: rgb(80,130,190) → rgb(230,90,70).
-            "ramp": ["#5082be", "#e65a46"],
+            # mockup 52's blue→red β scale, blue end softened (lighter, less saturated).
+            "ramp": ["#83a4c6", "#e65a46"],
             "note": "β-turnover (γ/α) per macro-area (mockup 52): low = homogeneous shared stock "
                     "(diffusion belt), high = internally divergent. α richness is effort-confounded; β is not.",
+        },
+        "depth": {
+            "label": "Tradition depth · mean rank",
+            "kind": "continuous", "key": "p", "unit": "mean depth-rank",
+            "min": round(min(depths), 2), "max": round(max(depths), 2),
+            # sediment/geological ramp (fits a stratigraphic column): pale → ochre → deep brown.
+            "ramp": ["#f0e6c8", "#d69f45", "#9a5a24", "#4a2c12"],
+            "note": "mean depth-rank of a tradition's motifs — each motif's breadth (mockup 17) as a "
+                    "0–1 percentile, averaged. Rank-transform tames the heavy-tailed breadth so a few "
+                    "pan-global motifs don't swamp a raw mean. Deeper = older/broader motif stock.",
         },
     }
     facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
 
-    data = {"facets": facets, "order": ["area", "family", "narrative", "subsistence", "diversity"],
+    data = {"facets": facets,
+            "order": ["area", "family", "narrative", "subsistence", "diversity", "depth"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
     n_narr = sum(1 for p in points if p["n"] >= 0)
-    n_sub = sum(1 for p in points if p["s"] >= 0)
-    print(f"{len(points)} traditions placed · {n_narr} clustered by narrative profile "
-          f"(k={K_CLUSTERS}) · {n_sub} with subsistence · {len(tid_beta)} with β-diversity "
-          f"({len(area_beta)} macro-areas)")
+    print(f"{len(points)} placed · {n_narr} narrative-clustered · {len(tid_beta)} β-diversity "
+          f"· {len(tid_depth)} depth (mean-rank {min(depths):.2f}–{max(depths):.2f})")
 
 
 if __name__ == "__main__":

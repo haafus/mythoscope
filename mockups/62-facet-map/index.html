@@ -32,7 +32,8 @@
      карта перекрашивается. <b>area</b> выводится из <code>areal_path</code>, <b>family</b> — из языковой
      цепочки, <b>narrative</b> — кластер традиции по её нарративному профилю (KMeans k=8 над 16-мерным
      профилем мокапа 41 — как в мокапе 43), <b>subsistence</b> — из D-PLACE (ближайшее общество ≤ 250 км),
-     <b>diversity</b> — β-turnover разнообразия мотивов по макроареалу (мокап 52, непрерывная шкала).</p>
+     <b>diversity</b> — β-turnover разнообразия мотивов по макроареалу (мокап 52), <b>depth</b> — средний
+     ранг глубины мотивов традиции (глубина мотива = breadth, мокап 17). Обе — непрерывные шкалы.</p>
 </header>
 
 <div class="card">
@@ -54,7 +55,7 @@
 <script>
 const D = window.DATA, GREY = "#c4c8cd";
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const KEY = { area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d" };
+const KEY = { area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p" };
 let active = "area";
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
@@ -90,7 +91,7 @@ function drawLegend(fid){
     const grad = `linear-gradient(to right, ${facet.ramp.join(",")})`;
     return `<span class="lg"><span class="n">${facet.min}</span>`+
       `<span style="display:inline-block;width:200px;height:11px;border-radius:6px;margin:0 4px;background:${grad}"></span>`+
-      `<span class="n">${facet.max}</span> <span class="n">(β = γ/α)</span></span>`+
+      `<span class="n">${facet.max}</span>${facet.unit?` <span class="n">(${esc(facet.unit)})</span>`:""}</span>`+
       (uncol?`<span class="lg"><span class="dot" style="background:${GREY}"></span>без значения <span class="n">${uncol}</span></span>`:"");
   }
   const cats = (facet.cats || []).map((c,i)=>({...c,i})).filter(c=>c.n>0).sort((a,b)=>b.n-a.n);

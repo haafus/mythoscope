@@ -8,7 +8,7 @@ the geography, so you can *see* how each cross-cuts the map.
 Answers the open UI gap from `docs/reviews/2026-07-repo-review.md` **F7** (`family`/areal facet in the
 data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a single shared view.
 
-## The five facets
+## The six facets
 
 - **Area · 12** — deterministic from `areal_path` (reuses mockup 21's `area_of`). Near-total coverage
   (4 traditions have an empty `areal_path`).
@@ -22,10 +22,15 @@ data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a
   narrative argmax is lopsided.)
 - **Subsistence · 4** — from D-PLACE, the nearest Ethnographic-Atlas society within 250 km (reuses
   mockup 22's `dplace_subsistence.json`).
-- **Motif diversity · β** — the one *continuous* facet: β-turnover (γ/α) per macro-area from mockup 52,
-  broadcast to its traditions, drawn on a sequential scale. α (per-tradition richness) is a cataloguing-
-  effort artefact, so β is used instead — low = a homogeneous shared stock (diffusion belt), high =
-  internally divergent traditions.
+- **Motif diversity · β** — *continuous*: β-turnover (γ/α) per macro-area from mockup 52, broadcast to
+  its traditions on a blue→red scale. α (per-tradition richness) is a cataloguing-effort artefact, so β
+  is used — low = a homogeneous shared stock (diffusion belt), high = internally divergent traditions.
+- **Tradition depth · mean rank** — *continuous*: the mean **depth-rank** of a tradition's motifs. A
+  motif's depth = its breadth (# attesting traditions, mockup 17); breadth is heavy-tailed, so each
+  motif's breadth is first turned into a 0–1 percentile and then averaged over the tradition — a robust
+  "average depth" that a raw mean of breadth (swamped by a few pan-global motifs, and unbounded) is not.
+  Deeper = older / broader motif stock. (Deep-*share* — fraction in the top-15% tier, mockup 39 — is the
+  compositional alternative; mean-rank keeps the full gradient.)
 
 Grey points have no value on the active facet.
 
