@@ -722,6 +722,18 @@ a tradition's motifs, mockups 17/39), `cosmology` (Category-A share, mockups 22/
 visual answer to the F7 gap (`family`/areal facet absent from the UI). See
 [`62-facet-map/README.md`](62-facet-map/README.md).
 
+### 63 · Age vs connectivity gap
+One world map coloured by the gap between two axes the `depth × peopling` story conflates: **age**
+(macro-area first-peopling, ky BP) and **connectivity** (a reproducible, myth-free geographic proxy —
+between-region centrality of each area's spherical centroid). They are essentially independent
+(r ≈ +0.14 across 12 areas), so `gap = z(connectivity) − z(age)` on an RdBu diverging ramp isolates the
+natural experiments: **old-but-isolated** (Sub-Saharan Africa, Australia, Oceania — old yet shallow on
+the `depth` map) vs **connected-but-young** (the Old-World hub — Near East, Europe, Iran). Both groups
+point the same way — depth follows diffusion-network embeddedness, not age alone — matching the
+breadth → cross-macro collapse and the failed within-family Galton test. (Geometry mis-files both
+Americas as "connected" because straight-line distance can't see the Beringian barrier; flagged in the
+table.) See [`63-age-connectivity-gap/README.md`](63-age-connectivity-gap/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

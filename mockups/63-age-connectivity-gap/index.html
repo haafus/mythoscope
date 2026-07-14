@@ -1,0 +1,119 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>63 · Возраст vs связность</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --cool:#2166ac; --warm:#b2182b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
+  main { max-width:1180px; margin:0 auto; padding:26px 22px 60px; }
+  header h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:920px; }
+  .card { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:18px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  svg.map { width:100%; height:auto; background:#eef3f4; border-radius:8px; display:block; }
+  .land { fill:#e4e9e3; stroke:#d3d9d0; stroke-width:0.3; }
+  .ocean { fill:#eef3f4; }
+  .lbl { font:600 3px -apple-system,Segoe UI,sans-serif; fill:#1f2a30;
+         paint-order:stroke; stroke:#fff; stroke-width:0.9px; stroke-linejoin:round; }
+  .legend { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:12.5px; }
+  .legend .n { color:var(--muted); font-variant-numeric:tabular-nums; }
+  .muted { color:var(--muted); font-size:11.5px; }
+  table { border-collapse:collapse; width:100%; font-size:13px; margin-top:4px; }
+  th, td { padding:6px 10px; text-align:right; border-bottom:1px solid #eee9de; }
+  th:first-child, td:first-child { text-align:left; }
+  th { color:var(--muted); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; }
+  td.name { display:flex; align-items:center; gap:8px; }
+  .sw { width:12px; height:12px; border-radius:3px; flex:none; }
+  .tag { font-size:11px; padding:1px 7px; border-radius:20px; white-space:nowrap; }
+  .tag.cool { background:#e2edf6; color:var(--cool); }
+  .tag.warm { background:#f7e2e2; color:var(--warm); }
+  .tag.mid  { background:#efece4; color:var(--muted); }
+  tabular { font-variant-numeric:tabular-nums; }
+</style>
+<main>
+<header>
+  <h1>Возраст заселения против связности сети</h1>
+  <p>История «в древних регионах мифология глубже» смешивает две оси: <b>возраст</b> — когда
+     современный человек впервые заселил макроареал (тыс. лет назад), и <b>связность</b> — насколько
+     регион встроен в старосветскую сеть диффузии. Здесь связность — воспроизводимый географический
+     прокси без мифоданных: между-региональная центральность (близость центроида зоны к центроидам
+     остальных зон, затухание 4000&nbsp;км). Оси коррелируют слабо, поэтому большинство регионов лежит
+     вне диагонали. Карта раскрашена по <b>gap&nbsp;=&nbsp;z(связность)&nbsp;−&nbsp;z(возраст)</b>: синие —
+     старые, но изолированные; красные — связные, но молодые; нейтральные (оси совпадают) сливаются с
+     фоном. Именно окрашенные регионы — естественные эксперименты.</p>
+</header>
+
+<div class="card">
+  <h2>Карта расхождения осей</h2>
+  <div id="map"></div>
+  <div class="legend">
+    <span class="n" style="color:var(--cool)">◀ старые, изолированные</span>
+    <span id="grad" style="flex:1;max-width:320px;height:12px;border-radius:6px"></span>
+    <span class="n" style="color:var(--warm)">связные, молодые ▶</span>
+  </div>
+  <div class="muted" style="margin-top:10px">Точка — традиция, раскрашена по gap своего макроареала (все точки региона
+    одного цвета — это картограмма по точкам). Подписаны регионы с |gap|&nbsp;≥&nbsp;0.6. Экваториальная проекция.</div>
+</div>
+
+<div class="card">
+  <h2>Регионы по расхождению осей</h2>
+  <table id="tbl">
+    <thead><tr><th>Макроареал</th><th>Возраст, тыс.&nbsp;лет</th><th>Связность</th><th>gap (σ)</th><th>Тип</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="muted" style="margin-top:12px">⚠ Обе Америки геометрия записывает в «связные»: по прямой они не так далеки
+    от Евразии. Исторически они за бериджийским ледово-водным барьером, которого чистое расстояние не видит, — тот же
+    слепой угол, что и с Австралией, только для Австралии разрыв так велик, что расстояние всё равно её ловит. Поэтому
+    надёжная группа «связные, но молодые» — это старосветский хаб (Ближний Восток, Иран, Европа), а не Новый Свет.</div>
+</div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, B = D.bound;
+const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+function ramp(x){                       // x in [0,1] → interpolated colour on the diverging ramp
+  x = Math.max(0, Math.min(1, x));
+  const r = D.ramp, n = r.length-1, i = Math.min(n-1, Math.floor(x*n)), t = x*n - i;
+  const a = hex2rgb(r[i]), b = hex2rgb(r[i+1]);
+  return `rgb(${a.map((v,k)=>Math.round(v+(b[k]-v)*t)).join(",")})`;
+}
+const gapColor = g => ramp((g + B) / (2*B));
+
+// area metadata by point's area index (points carry area index `a`)
+const byIdx = {};
+D.aorder.forEach((name,i)=>{ byIdx[i] = D.areas.find(a=>a.name===name); });
+
+function drawMap(){
+  const land = `<path class="land" d="${window.LAND||""}"/>`;
+  const pts = D.points.map(p=>{
+    const g = byIdx[p.a].gap;
+    return `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${gapColor(g)}" fill-opacity="0.9"/>`;
+  }).join("");
+  const labels = D.areas.filter(a=>Math.abs(a.gap)>=0.6).map(a=>
+    `<text class="lbl" x="${(a.cx+180).toFixed(2)}" y="${(90-a.cy).toFixed(2)}" text-anchor="middle">${esc(a.name)}</text>`
+  ).join("");
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
+    `<rect class="ocean" width="360" height="180"/>${land}${pts}${labels}</svg>`;
+}
+
+function typeTag(g){
+  if (g <= -0.6) return `<span class="tag cool">старый · изолированный</span>`;
+  if (g >=  0.6) return `<span class="tag warm">связный · молодой</span>`;
+  return `<span class="tag mid">оси согласованы</span>`;
+}
+
+function drawTable(){
+  return D.areas.map(a=>
+    `<tr><td class="name"><span class="sw" style="background:${gapColor(a.gap)}"></span>${esc(a.name)}</td>`+
+    `<td class="tabular">${a.age}</td><td class="tabular">${a.conn.toFixed(2)}</td>`+
+    `<td class="tabular">${a.gap>=0?"+":""}${a.gap.toFixed(2)}</td><td style="text-align:right">${typeTag(a.gap)}</td></tr>`
+  ).join("");
+}
+
+document.getElementById("map").innerHTML = drawMap();
+document.getElementById("grad").style.background = `linear-gradient(to right, ${D.ramp.join(",")})`;
+document.querySelector("#tbl tbody").innerHTML = drawTable();
+</script>
