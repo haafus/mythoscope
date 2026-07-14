@@ -39,7 +39,7 @@ class GraphsSettings(BaseModel):
     llm: str = "gpt4o-mini"  # alias from config/models.json
     temperature: float = 0.1
     use_json_mode: bool = True
-    chunk_size: int = 4000
+    chunk_size: int = 50000
     chunk_overlap: int = 1000
     # Only bounds in-flight chunks; the rate limiter is the real throttle. 18 keeps
     # a typical gpt-4o-mini run near its TPM ceiling.
