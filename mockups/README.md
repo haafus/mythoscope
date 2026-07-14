@@ -712,6 +712,13 @@ pan-regional blob holds 90–92% of units and the big blocks have *no* character
 a property of Berezkin's areal sampling design, not of folklore indexes in general. See
 [`61-hard-layers-catalogues/README.md`](61-hard-layers-catalogues/README.md).
 
+### 62 · Facet map
+One world map with a facet switcher: colour the same Berezkin traditions by `area` (12, from
+`areal_path`), `family` (11, from language), dominant `theme` (13), or `subsistence` (4, D-PLACE
+nearest society). Shows how each axis cross-cuts the geography — the visual answer to the F7 gap
+(`family`/areal facet absent from the UI). See
+[`62-facet-map/README.md`](62-facet-map/README.md).
+
 ## Notes
 - Prototypes, not production: no error handling to speak of, one file each, hard-coded
   parameters (dim, k, top-N) near the top of each `build_data.py`.

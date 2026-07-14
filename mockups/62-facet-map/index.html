@@ -1,0 +1,104 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>62 · Facet map</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
+  main { max-width:1180px; margin:0 auto; padding:26px 22px 60px; }
+  header h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:900px; }
+  .card { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:18px 20px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  svg.map { width:100%; height:auto; background:#eef3f4; border-radius:8px; display:block; }
+  .land { fill:#e4e9e3; stroke:#d3d9d0; stroke-width:0.3; }
+  .ocean { fill:#eef3f4; }
+  .seg { display:inline-flex; flex-wrap:wrap; gap:6px; }
+  .seg button { font:inherit; font-size:13px; padding:6px 14px; border:1px solid #e7e2d7; background:#fff;
+                color:var(--ink); border-radius:20px; cursor:pointer; }
+  .seg button.on { background:#2f6fed; border-color:#2f6fed; color:#fff; }
+  .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
+  .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px; min-height:1em; }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:12px; }
+  .lg { display:inline-flex; align-items:center; gap:7px; font-size:12.5px; }
+  .dot { width:11px; height:11px; border-radius:50%; display:inline-block; flex:none; }
+  .lg .n { color:var(--muted); font-variant-numeric:tabular-nums; }
+  .muted { color:var(--muted); font-size:11.5px; }
+</style>
+<main>
+<header>
+  <h1>Фасеты традиций на карте</h1>
+  <p>Один и тот же набор традиций Березкина, раскрашенный по выбранному фасету. Переключай ось —
+     карта перекрашивается. <b>area</b> выводится из <code>areal_path</code>, <b>family</b> — из языковой
+     цепочки, <b>тема</b> — доминирующая тематическая группа традиции, <b>subsistence</b> — из D-PLACE
+     (ближайшее общество ≤ 250 км).</p>
+</header>
+
+<div class="card">
+  <div class="seg" id="facets"></div>
+  <div class="facet-note" id="note"></div>
+</div>
+
+<div class="card">
+  <h2 id="maptitle"></h2>
+  <div id="map"></div>
+  <div class="legend" id="legend"></div>
+  <div class="muted" style="margin-top:10px">Точка — традиция; где реальной координаты нет, взят центроид ареального
+    субрегиона и точки разведены. Серые — без значения по этому фасету. Экваториальная проекция.</div>
+</div>
+</main>
+
+<script src="land.js"></script>
+<script src="data.js"></script>
+<script>
+const D = window.DATA, GREY = "#c4c8cd";
+const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const KEY = { area:"a", family:"f", theme:"t", subsistence:"s" };
+let active = "area";
+
+function drawMap(fid){
+  const facet = D.facets[fid] || {}, key = KEY[fid];
+  const colors = (facet.cats || []).map(c => c.color);
+  const land = `<path class="land" d="${window.LAND||""}"/>`;
+  // uncoloured points first (behind), coloured on top
+  const order = [...D.points].map((p,i)=>({p,i}))
+    .sort((x,y)=> ( (x.p[key]>=0) - (y.p[key]>=0) ));
+  const pts = order.map(({p})=>{
+    const idx = p[key];
+    const col = (idx!=null && idx>=0 && colors[idx]) ? colors[idx] : GREY;
+    const op = (col===GREY) ? 0.5 : 0.9;
+    return `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.2" fill="${col}" fill-opacity="${op}"/>`;
+  }).join("");
+  return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${pts}</svg>`;
+}
+
+function drawLegend(fid){
+  const facet = D.facets[fid], key = KEY[fid];
+  const cats = (facet.cats || []).map((c,i)=>({...c,i})).filter(c=>c.n>0).sort((a,b)=>b.n-a.n);
+  const uncol = D.points.filter(p=>!(p[key]>=0)).length;
+  const rows = cats.map(c=>
+    `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)} <span class="n">${c.n}</span></span>`
+  );
+  if (uncol) rows.push(`<span class="lg"><span class="dot" style="background:${GREY}"></span>без значения <span class="n">${uncol}</span></span>`);
+  return rows.join("");
+}
+
+function render(){
+  const facet = D.facets[active];
+  document.getElementById("maptitle").textContent = "Карта — раскраска: " + facet.label;
+  document.getElementById("map").innerHTML = facet.disabled ? drawMap("__none__") : drawMap(active);
+  document.getElementById("legend").innerHTML = facet.disabled ? "" : drawLegend(active);
+  document.getElementById("note").textContent = facet.disabled ? ("⚠ " + (facet.note||"нет данных")) : "";
+  document.querySelectorAll("#facets button").forEach(b=>b.classList.toggle("on", b.dataset.f===active));
+}
+
+document.getElementById("facets").innerHTML = D.order.map(fid=>{
+  const f = D.facets[fid];
+  const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
+  return `<button data-f="${fid}"${f.disabled?" disabled":""}${title}${fid===active?' class="on"':""}>${esc(f.label)}</button>`;
+}).join("");
+document.querySelectorAll("#facets button").forEach(b=>{
+  if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
+});
+render();
+</script>
