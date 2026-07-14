@@ -8,7 +8,7 @@ the geography, so you can *see* how each cross-cuts the map.
 Answers the open UI gap from `docs/reviews/2026-07-repo-review.md` **F7** (`family`/areal facet in the
 data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a single shared view.
 
-## The six facets
+## The eight facets
 
 - **Area · 12** — deterministic from `areal_path` (reuses mockup 21's `area_of`). Near-total coverage
   (4 traditions have an empty `areal_path`).
@@ -32,6 +32,12 @@ data but not on any map) and gives `area`, `family`, `theme` and `subsistence` a
   looks artificially shallow (mockup 39's confound, corr −0.30). So the colour is depth *relative to
   what a tradition's cataloguing level predicts* (>0 = deeper than expected), histogram-equalized for
   contrast. Deep-*share* (fraction in the top tier, mockup 39) is the compositional alternative.
+- **Cosmology share · A/(A+B)** — *continuous*: the share of a tradition's motifs in Berezkin
+  **Category A** (cosmology / etiology, groups 01–09) vs **B** (adventures / tricks, 10–13). High =
+  cosmology-heavy corpus (mockups 22 / 24 / 25). New-World traditions run cosmology-heavy.
+- **Peopling age · ky** — *continuous*: the first-peopling age of a tradition's macro-area (ky BP,
+  mockup 39), per-area. The validation axis for `depth` — older regions carry the deeper substrate,
+  so the two maps should agree (Africa deep + old, the Americas shallow + recent).
 
 Grey points have no value on the active facet.
 

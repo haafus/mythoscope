@@ -206,10 +206,35 @@ def main():
     srt = sorted(tid_depth, key=lambda t: tid_depth[t])
     depth_eq = {t: i / (len(srt) - 1) for i, t in enumerate(srt)} if len(srt) > 1 else {}
 
+    # Category-A (cosmology) share: Berezkin groups 01–09 (A: cosmology/etiology) vs 10–13
+    # (B: adventures/tricks) per tradition. High = cosmology-heavy corpus.
+    grpA, grpAB = defaultdict(int), defaultdict(int)
+    for m in bz["motifs"]:
+        g = m.get("motif_group_num")
+        if g and 1 <= int(g) <= 13:
+            for t in (m.get("traditions") or []):
+                grpAB[t] += 1
+                if int(g) <= 9:
+                    grpA[t] += 1
+    tid_cosmo = {t: grpA[t] / grpAB[t] for t in grpAB if grpAB[t] >= 15}
+
+    # Peopling age (ky BP) of a tradition's macro-area — the validation axis for depth (mockup 39).
+    PEOPLING = {
+        "Sub-Saharan Africa": 65, "Aboriginal Australia": 50, "East & SE Asia": 50,
+        "Iran, C. & S. Asia": 45, "Near East & N. Africa": 45, "Europe": 42,
+        "Austronesia & Oceania": 33, "Siberia & Beringia": 32,
+        "Northern & Western N. America": 15, "Eastern North America": 15,
+        "Mesoamerica & Andes": 14, "South America": 14,
+    }
+    tid_peo = {r[0]: PEOPLING[f21.AREAS12[r[3]]] for r in recs
+               if r[3] >= 0 and f21.AREAS12[r[3]] in PEOPLING}
+
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
                "a": r[3], "f": r[4], "n": r[5], "s": r[6],
                "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None,
-               "p": round(depth_eq[r[0]], 3) if r[0] in depth_eq else None}
+               "p": round(depth_eq[r[0]], 3) if r[0] in depth_eq else None,
+               "c": round(tid_cosmo[r[0]], 3) if r[0] in tid_cosmo else None,
+               "e": tid_peo.get(r[0])}
               for i, r in enumerate(recs)]
 
     def facet(label, cats, key, colors=None):
@@ -226,6 +251,8 @@ def main():
     sub_colors = ["#3f6f9e", "#cc7a33", "#2f8f6b", "#9c4576"]
     betas = list(tid_beta.values())
     depths = list(tid_depth.values())
+    cosmos = list(tid_cosmo.values())
+    peos = list(tid_peo.values())
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
@@ -252,17 +279,36 @@ def main():
                     f">0 = deeper than its cataloguing predicts. Histogram-equalized; residual "
                     f"{min(depths):+.2f}…{max(depths):+.2f}.",
         },
+        "cosmology": {
+            "label": "Cosmology share · A/(A+B)",
+            "kind": "continuous", "key": "c", "unit": "доля Категории A",
+            "min": round(min(cosmos), 2), "max": round(max(cosmos), 2),
+            # sequential purple: low (adventure-heavy) → high (cosmology-heavy).
+            "ramp": ["#f3eef8", "#c8a8dd", "#9151d8", "#4a1e77"],
+            "note": "share of a tradition's motifs in Berezkin Category A (cosmology/etiology, groups "
+                    "01–09) vs B (adventures/tricks, 10–13). High = cosmology-heavy (mockups 22/24/25).",
+        },
+        "peopling": {
+            "label": "Peopling age · ky",
+            "kind": "continuous", "key": "e", "unit": "ky BP",
+            "min": min(peos), "max": max(peos),
+            # sequential green: recently peopled (pale) → anciently peopled (dark).
+            "ramp": ["#ffffcc", "#addd8e", "#41ab5d", "#005a32"],
+            "note": "first-peopling age of a tradition's macro-area (ky BP, mockup 39) — the "
+                    "validation axis for depth: older regions carry deeper substrate.",
+        },
     }
     facets["subsistence"]["note"] = f"nearest D-PLACE society ≤ {MATCH_KM:.0f} km (mockup 22)"
 
     data = {"facets": facets,
-            "order": ["area", "family", "narrative", "subsistence", "diversity", "depth"],
+            "order": ["area", "family", "narrative", "subsistence", "diversity", "depth",
+                      "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
     n_narr = sum(1 for p in points if p["n"] >= 0)
     print(f"{len(points)} placed · {n_narr} narrative-clustered · {len(tid_beta)} β-diversity "
-          f"· {len(tid_depth)} depth (coverage-corrected residual {min(depths):+.2f}…{max(depths):+.2f})")
+          f"· {len(tid_depth)} depth · {len(tid_cosmo)} cosmology-share · {len(tid_peo)} peopling")
 
 
 if __name__ == "__main__":

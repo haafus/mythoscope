@@ -33,8 +33,9 @@
      цепочки, <b>narrative</b> — кластер традиции по её нарративному профилю (KMeans k=8 над 16-мерным
      профилем мокапа 41 — как в мокапе 43), <b>subsistence</b> — из D-PLACE (ближайшее общество ≤ 250 км),
      <b>diversity</b> — β-turnover разнообразия мотивов по макроареалу (мокап 52), <b>depth</b> — средний
-     ранг глубины мотивов традиции (глубина мотива = breadth, мокап 17) с поправкой на покрытие. Обе —
-     непрерывные шкалы.</p>
+     ранг глубины мотивов традиции (глубина мотива = breadth, мокап 17) с поправкой на покрытие,
+     <b>cosmology</b> — доля мотивов Категории A (космогония vs приключения), <b>peopling</b> — возраст
+     заселения макроареала (ky). Четыре последних — непрерывные шкалы.</p>
 </header>
 
 <div class="card">
@@ -56,7 +57,7 @@
 <script>
 const D = window.DATA, GREY = "#c4c8cd";
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const KEY = { area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p" };
+const KEY = { area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p", cosmology:"c", peopling:"e" };
 let active = "area";
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
