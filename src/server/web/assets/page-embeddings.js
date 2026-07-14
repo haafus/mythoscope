@@ -11,6 +11,7 @@ import {
     attributionLine,
     fetchPointWithNeighbors, renderSearchResultItem,
     runSemanticSearch,
+    sourceAttr, wireSourceIcons, hideSourceTip, destroySourceTip,
 } from "./search-utils.js";
 import { renderTraditionList } from "./tree-traditions.js?v=2";
 
@@ -107,6 +108,7 @@ export async function renderEmbeddings() {
     onCleanup(() => {
         window.removeEventListener("resize", onResize);
         destroyChart(document.getElementById("scatter-plot"));
+        destroySourceTip();
     });
 
     try {
@@ -254,7 +256,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
             : "";
         let html = `
             <div class="fragment-detail">
-                <div class="fragment-text">${reflowHtml(point.text)}</div>
+                <div class="fragment-text"${sourceAttr(point)}>${reflowHtml(point.text)}</div>
                 ${attributionLine(point)}
                 ${editButton}
             </div>
@@ -267,7 +269,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
         if (neighbors.length > 0) {
             html += neighbors.map((neighbor) => `
                 <div class="neighbor-item" data-neighbor-id="${escapeHtml(neighbor.id)}" data-neighbor-chunk="${escapeHtml(neighbor.chunk_index)}">
-                    <div class="fragment-text">${reflowHtml(neighbor.text || "")}</div>
+                    <div class="fragment-text"${sourceAttr(neighbor)}>${reflowHtml(neighbor.text || "")}</div>
                     ${attributionLine(neighbor, { withScore: true })}
                 </div>
             `).join("");
@@ -275,7 +277,9 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
             html += '<div class="search-empty">No similar fragments found.</div>';
         }
 
+        hideSourceTip();
         infoContent.innerHTML = html;
+        wireSourceIcons(infoContent);
         document.getElementById("fragmentEditBtn")?.addEventListener("click", showSearchPanel);
         document.getElementById("crossTraditionToggle")?.addEventListener("change", (e) => {
             crossTradition = e.target.checked;
@@ -375,4 +379,5 @@ function displayAnalysisSearchResults(data) {
             ${results.map((result) => renderSearchResultItem(result, data)).join("")}
         </div>
     `);
+    wireSourceIcons(document.getElementById("searchResults"));
 }

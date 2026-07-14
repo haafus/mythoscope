@@ -80,9 +80,74 @@ export function renderSearchResultItem(result, data) {
                 <span class="result-score ${cls}">${percent}% similarity</span>
             </span>
             <span class="search-result-meta">${escapeHtml(searchResultMetaLine(result))}</span>
-            <span class="result-text chunk-text">${chunkTextHtml(result, data.query)}</span>
+            <span class="result-text chunk-text"${sourceAttr(result)}>${chunkTextHtml(result, data.query)}</span>
         </div>
     `;
+}
+
+// --- Source reveal: preprocessing variants embed a transformed chunk and carry
+// the original in `source_text`. Stamp `sourceAttr` on the text element, then
+// `wireSourceIcons` appends a hover icon that shows the original in a tooltip. ---
+
+const SOURCE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h9v13H6a2 2 0 0 0-2 2V5Z"/><path d="M15 3h3a2 2 0 0 1 2 2v12a3 3 0 0 1-3 3H7"/><path d="M8 7h4M8 10h4"/></svg>';
+
+// Empty for raw variants (no source_text) → no icon, no extra flag needed.
+export function sourceAttr(item) {
+    return item && item.source_text ? ` data-source-text="${escapeHtml(item.source_text)}"` : "";
+}
+
+let sourceTip = null;
+function sourceTipEl() {
+    if (!sourceTip) {
+        sourceTip = document.createElement("div");
+        sourceTip.className = "source-tip";
+        document.body.appendChild(sourceTip);
+    }
+    return sourceTip;
+}
+
+export function hideSourceTip() {
+    if (sourceTip) sourceTip.style.display = "none";
+}
+
+// Remove the shared tooltip node (call on page teardown).
+export function destroySourceTip() {
+    if (sourceTip) { sourceTip.remove(); sourceTip = null; }
+}
+
+function showSourceTip(anchor, text) {
+    const tip = sourceTipEl();
+    tip.textContent = text;
+    tip.style.display = "block";
+    const r = anchor.getBoundingClientRect();
+    const tr = tip.getBoundingClientRect();
+    // Prefer opening to the left (the rail is on the right); flip if there's no room.
+    let left = r.left - tr.width - 10;
+    if (left < 8) left = Math.min(r.right + 10, window.innerWidth - tr.width - 8);
+    const top = Math.min(r.top - 6, window.innerHeight - tr.height - 8);
+    tip.style.left = `${Math.max(8, left)}px`;
+    tip.style.top = `${Math.max(8, top)}px`;
+}
+
+// Append a source icon to each [data-source-text] element in `root` and wire hover/focus.
+export function wireSourceIcons(root) {
+    root.querySelectorAll("[data-source-text]").forEach((el) => {
+        // reflowHtml wraps text in <p class="reflow-p">; land the icon at the end
+        // of the last paragraph so it trails the text inline.
+        const target = el.querySelector(".reflow-p:last-child") || el;
+        const icon = document.createElement("button");
+        icon.type = "button";
+        icon.className = "src-icon";
+        icon.setAttribute("aria-label", "Show source text");
+        icon.title = "Source fragment";
+        icon.innerHTML = SOURCE_ICON_SVG;
+        const src = el.dataset.sourceText;
+        icon.addEventListener("mouseenter", () => showSourceTip(icon, src));
+        icon.addEventListener("mouseleave", hideSourceTip);
+        icon.addEventListener("focus", () => showSourceTip(icon, src));
+        icon.addEventListener("blur", hideSourceTip);
+        target.appendChild(icon);
+    });
 }
 
 // Returns { point, neighbors }: the API gives the queried point first, then its

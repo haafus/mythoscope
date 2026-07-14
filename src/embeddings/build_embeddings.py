@@ -121,6 +121,12 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
                 kept_ids = [ids[i] for i in kept_idx]
                 kept_metas = [metadatas[i] for i in kept_idx]
 
+                # For a preprocessing variant the embedded document is the transformed
+                # text, so keep the original chunk in metadata for the UI to reveal.
+                if preprocess_prompt:
+                    for i, meta in zip(kept_idx, kept_metas, strict=True):
+                        meta["source_text"] = chunks[i]
+
                 for b_start in range(0, len(kept_texts), batch_size):
                     b_end = min(b_start + batch_size, len(kept_texts))
                     b_texts = kept_texts[b_start:b_end]

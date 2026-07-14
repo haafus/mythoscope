@@ -33,6 +33,9 @@ class SearchResult(BaseModel):
     text: str = ""
     filename: str = ""
     url: str = ""
+    # Original chunk for preprocessing variants (the embedded `text` is the
+    # transformed version); empty for raw variants, where `text` is the source.
+    source_text: str = ""
 
 
 class CorpusDocument(BaseModel):

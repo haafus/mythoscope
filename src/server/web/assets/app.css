@@ -993,6 +993,53 @@ body.has-main-navbar {
     line-height: 1.55;
 }
 
+/* Source-reveal icon at the end of a preprocessing variant's fragment text. */
+.analysis-page .src-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -3px;
+    margin-left: 3px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted-soft);
+    cursor: pointer;
+    transition: color 0.12s ease, background 0.12s ease;
+}
+
+.analysis-page .src-icon svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.analysis-page .src-icon:hover,
+.analysis-page .src-icon:focus-visible {
+    color: var(--accent);
+    background: #eaf1fe;
+    outline: none;
+}
+
+/* Floating source tooltip (appended to body so the rail's scroll never clips it). */
+.source-tip {
+    position: fixed;
+    z-index: 60;
+    display: none;
+    width: 320px;
+    max-width: 44vw;
+    padding: 20px 22px;
+    border-radius: 9px;
+    background: #141414;
+    color: #fff;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.42);
+    font-size: 13.5px;
+    line-height: 1.6;
+    pointer-events: none;
+    overflow-wrap: anywhere;
+}
+
 /* Reflowed source paragraphs (see reflowHtml): keep paragraph spacing, let text
    wrap to the column instead of the source's hard line breaks. */
 .analysis-page .fragment-text .reflow-p {
