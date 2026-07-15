@@ -35,7 +35,8 @@ SPLIT = {"Russia", "China", "United States of America", "Canada",
 # canon overrides where a unit's centroid snaps to the wrong region (e.g. the Arab
 # SE-Arabian shore is closer to an Iranian anchor across the narrow Gulf than to ours)
 OVERRIDE = {"Libya": "Near East & North Africa", "Turkey": "Caucasus & Iran",
-            "Oman": "Near East & North Africa", "United Arab Emirates": "Near East & North Africa"}
+            "Oman": "Near East & North Africa", "United Arab Emirates": "Near East & North Africa",
+            "Ecuador": "Mesoamerica & the Andes"}  # Andean highland heartland, not its Amazon Oriente
 
 
 def fetch(name):
