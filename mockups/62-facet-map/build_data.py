@@ -16,6 +16,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
+from contourpy import FillType, contour_generator
+from scipy.spatial import cKDTree
 from scipy.stats import rankdata
 from sklearn.cluster import KMeans
 
@@ -195,6 +197,84 @@ def _haversine(lat, lon, lats, lons):
     dlat, dlon = lats - lat, lons - lon
     h = np.sin(dlat / 2) ** 2 + math.cos(lat) * np.cos(lats) * np.sin(dlon / 2) ** 2
     return 6371.0 * 2 * np.arcsin(np.sqrt(h))
+
+
+def _dp_open(poly, eps):  # Douglas–Peucker on an open polyline
+    keep = np.zeros(len(poly), bool)
+    keep[0] = keep[-1] = True
+    stack = [(0, len(poly) - 1)]
+    while stack:
+        i, j = stack.pop()
+        if j <= i + 1:
+            continue
+        a, ab = poly[i], poly[j] - poly[i]
+        L = np.hypot(*ab) or 1.0
+        seg = poly[i + 1:j] - a
+        d = np.abs(ab[0] * seg[:, 1] - ab[1] * seg[:, 0]) / L
+        k = int(d.argmax())
+        if d[k] > eps:
+            keep[i + 1 + k] = True
+            stack += [(i, i + 1 + k), (i + 1 + k, j)]
+    return poly[keep]
+
+
+def _dp_ring(ring, eps):  # DP on a closed ring — split at the point farthest from ring[0]
+    if len(ring) > 1 and np.allclose(ring[0], ring[-1]):
+        ring = ring[:-1]
+    if len(ring) < 4:
+        return ring
+    m = int(np.hypot(*(ring - ring[0]).T).argmax())
+    a = _dp_open(ring[:m + 1], eps)
+    b = _dp_open(np.vstack([ring[m:], ring[0]]), eps)
+    return np.vstack([a[:-1], b[:-1]])
+
+
+def _chaikin(poly, it=1):  # corner-cutting to round the simplified rings
+    for _ in range(it):
+        out = [poly[0]]
+        for a, b in zip(poly[:-1], poly[1:], strict=False):
+            out += [0.75 * a + 0.25 * b, 0.25 * a + 0.75 * b]
+        out.append(poly[-1])
+        poly = np.array(out)
+    return poly
+
+
+def region_borders(regions, step=0.5):
+    """Geographic borders of the regions as filled polygons: partition the map by
+    nearest tradition point (a Voronoi tessellation dissolved per region), then trace
+    each region's area. Clipped to land in the browser; Antarctica left uncoloured."""
+    pts, reg = [], []
+    for ri, (_, _, trads) in enumerate(regions):
+        for _, lat, lon in trads:
+            pts.append((lon, lat)); reg.append(ri)
+    pts, reg = np.array(pts, float), np.array(reg)
+    wrapped = np.vstack([pts, pts + [360, 0], pts - [360, 0]])  # dateline wrap
+    tree = cKDTree(wrapped)
+    R = np.concatenate([reg, reg, reg])
+
+    lon = np.arange(-180, 180 + step, step)
+    lat = np.arange(-90, 90 + step, step)
+    lo, la = np.meshgrid(lon, lat)
+    _, idx = tree.query(np.column_stack([lo.ravel(), la.ravel()]), k=1)
+    z = R[idx].reshape(la.shape)
+    z[la < -60] = -1  # no traditions in Antarctica — leave it blank
+    mx, my = lon + 180, 90 - lat  # map coords: x = lon+180, y = 90-lat
+
+    out = []
+    for ri, (name, color, _) in enumerate(regions):
+        cg = contour_generator(x=mx, y=my, z=(z == ri).astype(float), fill_type=FillType.OuterCode)
+        points, codes = cg.filled(0.5, 1.5)
+        d = []
+        for ppts, cds in zip(points, codes, strict=False):
+            starts = np.where(cds == 1)[0]
+            for seg in np.split(np.arange(len(cds)), starts[1:]):
+                ring = ppts[seg]
+                if len(ring) < 4:
+                    continue
+                ring = _chaikin(np.vstack([r := _dp_ring(ring, 0.35), r[0]]))
+                d.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in ring) + "Z")
+        out.append({"name": name, "color": color, "d": "".join(d)})
+    return out
 
 
 def main():
@@ -507,9 +587,18 @@ def main():
         "note": "полный список традиций; заливка — ареал региона, точки нейтральны",
     }
 
+    # Borders layer — region areas as filled polygons (nearest-region partition), no points
+    facets["borders"] = {
+        "label": "Regions · areas",
+        "kind": "borders",
+        "cats": region_borders(REGIONS),
+        "note": "географические границы регионов — заливка ареалов (раздел по ближайшей традиции); "
+                "Антарктида не раскрашена",
+    }
+
     data = {"facets": facets,
-            "order": ["regions", "territory", "hardlayers", "volume", "area", "family", "narrative",
-                      "subsistence", "diversity", "depth", "cosmology", "peopling"],
+            "order": ["regions", "borders", "territory", "hardlayers", "volume", "area", "family",
+                      "narrative", "subsistence", "diversity", "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")

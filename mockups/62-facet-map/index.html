@@ -32,6 +32,7 @@
   <p><b>regions</b> — курированные традиции 14 регионов канона (<code>research/regions.md</code>) с ручными
      координатами и палитрой CARTO Prism; это <b>не</b> индекс Березкина, а собственный список каталога.
      <b>regions · fill</b> — те же регионы и полный список традиций, но заливкой ареала, точки нейтральным цветом.
+     <b>regions · areas</b> — географические границы регионов как залитые полигоны (раздел карты по ближайшей традиции), без точек.
      Остальные фасеты раскрашивают один и тот же набор традиций Березкина. Переключай ось —
      карта перекрашивается. <b>hard layers</b> — жёсткие страты-листья рекурсивного geo-peel с поправкой
      на покрытие (мокап 45), <b>volume</b> — 14 разделов, сбалансированных по объёму фиксации Березкина
@@ -95,6 +96,17 @@ function drawMap(fid){
     ).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${wash}${dots}</svg>`;
   }
+  if (facet.kind === "borders"){
+    const L = window.LAND||"";
+    const polys = facet.cats.map(c=>          // region areas, fills only, clipped to land
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="0.5"><title>${esc(c.name)}</title></path>`
+    ).join("");
+    return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
+      `<defs><clipPath id="landclip"><path d="${L}"/></clipPath></defs>`+
+      `<rect class="ocean" width="360" height="180"/>`+
+      `<g clip-path="url(#landclip)">${polys}</g>`+
+      `<path d="${L}" fill="none" stroke="#d3d9d0" stroke-width="0.3"/></svg>`;
+  }
   const key = KEY[fid], cont = facet.kind === "continuous";
   const colors = (facet.cats || []).map(c => c.color);
   const has = p => cont ? p[key] != null : p[key] >= 0;
@@ -117,6 +129,11 @@ function drawLegend(fid){
   if (facet.kind === "regions" || facet.kind === "territory"){
     return facet.cats.map(c=>
       `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)} <span class="n">${c.n}</span></span>`
+    ).join("");
+  }
+  if (facet.kind === "borders"){
+    return facet.cats.map(c=>
+      `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</span>`
     ).join("");
   }
   if (facet.kind === "continuous"){
