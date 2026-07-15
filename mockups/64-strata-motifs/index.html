@@ -1,0 +1,148 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>64 · Страты × мотивы</title>
+<style>
+  :root { --ink:#1f2a30; --muted:#6c757d; --line:#e7e2d7; --accent:#2f6fed; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:#f4f1ea; }
+  main { max-width:1180px; margin:0 auto; padding:26px 22px 60px; }
+  header h1 { font-size:21px; margin:0 0 4px; }
+  header p { color:var(--muted); font-size:13px; margin:0; max-width:940px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:16px 0; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  .seg { display:flex; flex-wrap:wrap; gap:6px; }
+  .seg button { font:inherit; font-size:13px; padding:6px 14px; border:1px solid var(--line); background:#fff;
+                color:var(--ink); border-radius:20px; cursor:pointer; }
+  .seg button.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .ctrl { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:14px; }
+  .ctrl label { font-size:12px; color:var(--muted); white-space:nowrap; }
+  input[type=range] { width:260px; accent-color:var(--accent); }
+  .rule { font-size:12px; color:var(--ink); background:#f7f5ef; border:1px solid var(--line);
+          border-radius:8px; padding:6px 10px; }
+  .rule b { font-variant-numeric:tabular-nums; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:14px; }
+  .grp { border:1px solid var(--line); border-radius:12px; background:#fff; padding:14px 15px; display:flex; flex-direction:column; }
+  .grp h3 { font-size:14px; margin:0 0 2px; line-height:1.35; }
+  .grp .dating { font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .grp .blurb { font-size:12px; color:var(--muted); margin:7px 0 0; }
+  .grp .carriers { font-size:11px; color:var(--muted); margin:6px 0 0; }
+  .grp .carriers b { color:var(--ink); font-weight:600; }
+  .cnt { font-size:12px; color:var(--muted); margin:10px 0 6px; padding-top:9px; border-top:1px solid #f0ece2; }
+  .cnt b { color:var(--accent); font-variant-numeric:tabular-nums; }
+  ul.mot { list-style:none; margin:0; padding:0; max-height:430px; overflow-y:auto; }
+  ul.mot li { display:flex; align-items:baseline; gap:8px; padding:3px 0; font-size:12.5px; border-top:1px solid #f5f2ea; }
+  ul.mot li:first-child { border-top:0; }
+  .bdg { flex:none; font-size:10.5px; font-variant-numeric:tabular-nums; color:#4a5560; background:#eef2f6;
+         border-radius:5px; padding:1px 6px; min-width:58px; text-align:center; }
+  .bdg.pure { background:#e3f0e4; color:#2f6a3a; }
+  .mid { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; color:var(--muted); flex:none; }
+  .nm { color:var(--ink); }
+  .more { font-size:11.5px; color:var(--muted); padding:7px 0 0; }
+  .empty { font-size:12px; color:var(--muted); font-style:italic; padding:8px 0; }
+</style>
+<main>
+<header>
+  <h1>Страты × мотивы — вертикальный срез каталога</h1>
+  <p>Карта регионов (мокап 62) — <b>горизонтальный</b> срез вертикально-слоистой реальности
+     (<code>research/regions.md</code> §3: субстрат → экспансия → письменная надстройка). Здесь —
+     <b>вертикальный</b> срез: традиции группируются по общему историческому слою, затем группа
+     пересекается с индексом мотивов Березкина, чтобы вывести <b>характерный набор мотивов</b> слоя —
+     <b>пересечениями множеств</b>, а не статистикой. Привязка ареалов Березкина перепривязана к нашим
+     14 регионам канона. Ползунок строгости идёт от <b>строгого исключения</b> (мотив есть во всех
+     ареалах группы и ни в одном снаружи — работает для широких трансконтинентальных пластов) до
+     <b>мягкой концентрации</b> (есть в большинстве ареалов группы и <i>редко</i> снаружи — нужно для
+     одиночных миграций, где мотивы «протекают» к соседям).</p>
+</header>
+
+<div class="card">
+  <div class="seg" id="axes"></div>
+  <div class="ctrl">
+    <label>Строгость:</label>
+    <span style="font-size:11.5px;color:var(--muted)">мягко</span>
+    <input type="range" id="strict" min="0" max="100" value="45">
+    <span style="font-size:11.5px;color:var(--muted)">строго</span>
+    <span class="rule" id="rule"></span>
+  </div>
+</div>
+
+<div class="grid" id="groups"></div>
+
+<script src="data.js"></script>
+<script>
+const D = window.DATA, AX = D.axes;
+const axKeys = Object.keys(AX);
+let curAx = "strata";
+const SHOWN = 45;   // motifs listed per group before "+N ещё"
+
+// strictness st∈[0,1] (1 = strictest) → required inside count + max allowed outside
+function params(st, insize){
+  const reqInside = Math.max(2, Math.ceil((0.5 + 0.5*st) * insize));
+  const maxOut = Math.round((1 - st) * 3);
+  return { reqInside, maxOut };
+}
+
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+const esc = s => (s||"").replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function render(){
+  const st = +document.getElementById("strict").value / 100;
+  const groups = AX[curAx].groups;
+  const u = groups[0].unit === "регион" ? "регионах" : "ареалах";
+  const ruleEl = document.getElementById("rule");
+  const maxOut = Math.round((1 - st) * 3);
+  const pct = Math.round((0.5 + 0.5*st) * 100);
+  ruleEl.innerHTML = st >= 0.999
+    ? `мотив во <b>всех</b> ${u} группы и в <b>0</b> снаружи (∩ и эксклюзив)`
+    : `мотив в <b>≥${pct}%</b> ${u} группы и не более чем в <b>${maxOut}</b> снаружи`;
+
+  const host = document.getElementById("groups");
+  host.innerHTML = "";
+  for(const g of groups){
+    const { reqInside, maxOut } = params(st, g.insize);
+    const hits = g.rows.filter(r => r[1] >= reqInside && r[2] <= maxOut);
+    const card = el("div", "grp");
+    card.appendChild(el("h3", null, esc(g.title)));
+    if(g.dating) card.appendChild(el("div", "dating", esc(g.dating)));
+    card.appendChild(el("div", "blurb", esc(g.blurb)));
+    card.appendChild(el("div", "carriers",
+      "<b>Несущие:</b> " + g.carriers.map(esc).join(" · ")));
+    const unit = g.unit || "ареал";
+    const unitPl = unit === "регион" ? "регионов" : "ареалов";
+    card.appendChild(el("div", "cnt",
+      `<b>${hits.length}</b> характерных мотивов · ${g.insize} ${unitPl} группы`));
+    if(hits.length === 0){
+      card.appendChild(el("div", "empty",
+        "при этой строгости — ни одного (ослабь ползунок)"));
+    } else {
+      const ul = el("ul", "mot");
+      for(const [mi, ins, out] of hits.slice(0, SHOWN)){
+        const m = D.motifs[mi] || {ru:mi, en:"", grp:""};
+        const li = el("li");
+        const pure = out === 0;
+        li.appendChild(el("span", "bdg" + (pure?" pure":""),
+          `${ins}/${g.insize}·+${out}`));
+        li.appendChild(el("span", "mid", esc(mi)));
+        const en = m.en && m.en.toLowerCase() !== (m.ru||"").toLowerCase()
+          ? ` <span style="color:#9aa0a6">· ${esc(m.en)}</span>` : "";
+        li.appendChild(el("span", "nm", esc(m.ru) + en));
+        ul.appendChild(li);
+      }
+      card.appendChild(ul);
+      if(hits.length > SHOWN)
+        card.appendChild(el("div", "more", `+ ещё ${hits.length - SHOWN}`));
+    }
+    host.appendChild(card);
+  }
+}
+
+// axis tabs
+const axHost = document.getElementById("axes");
+for(const k of axKeys){
+  const b = el("button", k===curAx ? "on" : null, esc(AX[k].label));
+  b.onclick = () => { curAx = k; [...axHost.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); render(); };
+  axHost.appendChild(b);
+}
+document.getElementById("strict").addEventListener("input", render);
+render();
+</script>
+</main>
