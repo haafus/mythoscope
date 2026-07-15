@@ -56,11 +56,15 @@ FAMILY = {
         "Malawi", "Mozambique", "Kenya", "Uganda", "Rwanda", "Burundi", "United Republic of Tanzania",
         "South Africa", "Namibia", "Botswana", "Lesotho", "eSwatini", "Burkina Faso", "Mali",
         "Equatorial Guinea"],
-    "Indigenous Americas": [
-        "Canada", "United States of America", "Greenland", "Mexico", "Guatemala", "Belize",
-        "Honduras", "El Salvador", "Nicaragua", "Costa Rica", "Panama", "Colombia", "Venezuela",
-        "Guyana", "Suriname", "Ecuador", "Peru", "Bolivia", "Paraguay", "Chile", "Argentina",
-        "Uruguay", "Brazil", "Cuba", "Haiti", "Dominican Republic"],
+    # the Americas are dozens of families — bundled areally by culture-area macro-region
+    "North America (many families)": ["Canada", "United States of America", "Greenland"],
+    "Mesoamerica (Uto-Aztecan, Maya…)": [
+        "Mexico", "Guatemala", "Belize", "Honduras", "El Salvador", "Nicaragua", "Costa Rica",
+        "Panama"],
+    "Andean (Quechua–Aymara)": ["Ecuador", "Peru", "Bolivia"],
+    "Amazonian & Southern (many families)": [
+        "Colombia", "Venezuela", "Guyana", "Suriname", "Brazil", "Paraguay", "Argentina", "Chile",
+        "Uruguay", "Cuba", "Haiti", "Dominican Republic"],
 }
 of_family = {c: fam for fam, cs in FAMILY.items() for c in cs}
 INDIA_DRAVIDIAN = {"Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana", "Puducherry"}
@@ -82,23 +86,27 @@ DIV = {
 }
 of_div = {c: lvl for lvl, cs in DIV.items() for c in cs}
 
+# spread <-> residual as a 5-step sequential scale (dark = strongest single-family expansion)
 ZONE = {
-    "Residual / accretion zone": [
-        "Papua New Guinea", "Vanuatu", "Solomon Islands", "Nepal", "Bhutan", "Myanmar", "Mexico",
-        "Guatemala", "Colombia", "Ecuador", "Peru", "Bolivia", "Venezuela", "Brazil", "Guyana",
-        "Suriname", "Nigeria", "Cameroon", "Ghana", "Ivory Coast", "Benin", "Togo", "Guinea",
-        "Guinea-Bissau", "Sierra Leone", "Liberia", "Ethiopia", "South Sudan", "Sudan", "Chad",
-        "Georgia", "Armenia"],
-    "Spread zone": [
+    "Strong spread": [
+        "Morocco", "Algeria", "Tunisia", "Libya", "Egypt", "Mauritania", "Saudi Arabia", "Yemen",
+        "Jordan", "Syria", "Iraq", "Kuwait", "Qatar", "United Arab Emirates", "Oman", "Bahrain",
+        "Russia", "Ukraine", "Belarus", "Kazakhstan", "Uzbekistan", "Turkmenistan", "Kyrgyzstan",
+        "Mongolia", "Turkey", "Azerbaijan", "Iran", "Afghanistan", "Pakistan", "Bangladesh",
+        "Madagascar", "Angola", "Zambia", "Zimbabwe", "Botswana", "Namibia", "South Africa",
+        "Mozambique", "Lesotho", "eSwatini", "Thailand", "Laos", "Vietnam", "Cambodia", "Argentina",
+        "Chile", "Uruguay", "Somalia"],
+    "Spread": [
         "Portugal", "Spain", "France", "Ireland", "United Kingdom", "Belgium", "Netherlands",
-        "Germany", "Denmark", "Norway", "Sweden", "Iceland", "Austria", "Poland", "Czechia",
-        "Slovakia", "Bulgaria", "Romania", "Ukraine", "Belarus", "Russia", "Lithuania", "Latvia",
-        "Greece", "Finland", "Estonia", "Hungary", "Turkey", "Kazakhstan", "Uzbekistan",
-        "Turkmenistan", "Kyrgyzstan", "Mongolia", "Morocco", "Algeria", "Tunisia", "Libya", "Egypt",
-        "Saudi Arabia", "Yemen", "Jordan", "Syria", "Iraq", "Iran", "Afghanistan", "Pakistan",
-        "Bangladesh", "Thailand", "Laos", "Vietnam", "Cambodia", "Angola", "Zambia", "Zimbabwe",
-        "Botswana", "Namibia", "South Africa", "Mozambique", "Madagascar", "Argentina", "Chile",
-        "Uruguay", "Somalia"],
+        "Germany", "Denmark", "Norway", "Sweden", "Iceland", "Austria", "Italy", "Poland", "Czechia",
+        "Slovakia", "Bulgaria", "Romania", "Moldova", "Lithuania", "Latvia", "Greece", "Finland",
+        "Estonia", "Hungary", "Croatia", "Republic of Serbia", "Albania", "Sri Lanka", "Sudan"],
+    "Residual": [
+        "Mexico", "Guatemala", "Colombia", "Ecuador", "Peru", "Bolivia", "Venezuela", "Brazil",
+        "Guyana", "Suriname", "Nigeria", "Cameroon", "Ghana", "Ivory Coast", "Benin", "Togo",
+        "Guinea", "Guinea-Bissau", "Sierra Leone", "Liberia", "Ethiopia", "South Sudan", "Chad",
+        "Georgia", "Armenia", "Bhutan", "Myanmar", "Nepal"],
+    "Strong residual": ["Papua New Guinea", "Vanuatu", "Solomon Islands"],
 }
 of_zone = {c: z for z, cs in ZONE.items() for c in cs}
 
@@ -115,7 +123,7 @@ def build():
                 continue
             d = G.path_d(poly)
             div[of_div.get(admin, "Moderate")].append(d)
-            zone[of_zone.get(admin, "Intermediate")].append(d)
+            zone[of_zone.get(admin, "Mixed")].append(d)
             if admin != "India" and admin in of_family:
                 fam[of_family[admin]].append(d)
     for f in G.fetch("admin1")["features"]:

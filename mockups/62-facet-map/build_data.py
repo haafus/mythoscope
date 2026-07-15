@@ -255,15 +255,17 @@ FAMILIES = [  # predominant (indigenous) language family — qualitative
     ("Turkic", "#EECA3B"), ("Uralic", "#9D755D"), ("Austroasiatic", "#FF9DA6"),
     ("Tai-Kadai", "#17BECF"), ("Japonic & Koreanic", "#D37295"), ("Mongolic", "#BAB03B"),
     ("Nilo-Saharan", "#5B5BA0"), ("Papuan (New Guinea)", "#79706E"),
-    ("Australian (Aboriginal)", "#C49C94"), ("Indigenous Americas", "#8CD17D"),
+    ("Australian (Aboriginal)", "#C49C94"),
+    ("North America (many families)", "#7FBF7B"), ("Mesoamerica (Uto-Aztecan, Maya…)", "#C7B241"),
+    ("Andean (Quechua–Aymara)", "#3E9E8F"), ("Amazonian & Southern (many families)", "#A6D96A"),
 ]
 LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark = high
     ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
     ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
 ]
-ZONES = [  # Nichols: spread vs residual/accretion
-    ("Spread zone", "#6BAED6"), ("Intermediate", "#D9D9D9"),
-    ("Residual / accretion zone", "#FB6A4A"),
+ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest spread
+    ("Strong spread", "#08519C"), ("Spread", "#3182BD"), ("Mixed", "#6BAED6"),
+    ("Residual", "#BDD7E7"), ("Strong residual", "#EFF3FF"),
 ]
 
 
@@ -619,7 +621,7 @@ def main():
         "kind": "borders",
         "cats": _geo_cats("families_geo.json", FAMILIES),
         "note": "предоминантная (коренная) языковая семья по странам; шаттер-зоны свёрнуты ареально "
-                "(Papuan, Australian, Indigenous Americas), юг Индии выделен в Dravidian",
+                "(Papuan, Australian), Америки — по 4 культур-ареальным макрогруппам, юг Индии — Dravidian",
     }
     facets["langdiv"] = {
         "label": f"Lang diversity · {len(LANGDIV)}",
@@ -632,8 +634,9 @@ def main():
         "label": f"Zones · {len(ZONES)}",
         "kind": "borders",
         "cats": _geo_cats("zones_geo.json", ZONES),
-        "note": "спред-зоны (одна семья разлилась: степь, Сахель, банту, австронезийцы, ИЕ) vs "
-                "остаточные/аккреционные зоны, где копится старое разнообразие (Николс)",
+        "note": "спред↔остаточные зоны (Николс) 5-ступенчатой шкалой: тёмное = сильная спред-зона "
+                "(одна семья разлилась — степь, Сахель, банту), светлое = аккреционная зона со старым "
+                "разнообразием (Н. Гвинея, Амазония)",
     }
 
     data = {"facets": facets,
