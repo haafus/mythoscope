@@ -31,7 +31,7 @@
   <h1>Фасеты традиций на карте</h1>
   <p><b>regions</b> — курированные традиции 14 регионов канона (<code>research/regions.md</code>) с ручными
      координатами и палитрой CARTO Prism; это <b>не</b> индекс Березкина, а собственный список каталога.
-     <b>regions · fill</b> — те же регионы, но заливкой ареала, с 60 ведущими традициями нейтральным цветом.
+     <b>regions · fill</b> — те же регионы и полный список традиций, но заливкой ареала, точки нейтральным цветом.
      Остальные фасеты раскрашивают один и тот же набор традиций Березкина. Переключай ось —
      карта перекрашивается. <b>hard layers</b> — жёсткие страты-листья рекурсивного geo-peel с поправкой
      на покрытие (мокап 45), <b>volume</b> — 14 разделов, сбалансированных по объёму фиксации Березкина
@@ -88,7 +88,7 @@ function drawMap(fid){
   if (facet.kind === "territory"){
     const land = `<path class="land" d="${window.LAND||""}"/>`;
     const wash = facet.points.map(p=>          // region colour washed over its area
-      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="8" fill="${facet.cats[p.r].color}" fill-opacity="0.20"/>`
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="6" fill="${facet.cats[p.r].color}" fill-opacity="0.13"/>`
     ).join("");
     const dots = facet.points.map(p=>          // traditions in one neutral tone
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="#2b2f36" stroke="#fff" stroke-width="0.3"><title>${esc(p.t)} · ${esc(facet.cats[p.r].name)}</title></circle>`

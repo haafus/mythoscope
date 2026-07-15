@@ -483,17 +483,10 @@ def main():
         "note": "курированные традиции канона (research/regions.md), не индекс Березкина; палитра CARTO Prism",
     }
 
-    # Territory layer — ~60 leading traditions (first few per region), region areas washed in
-    # their colour, tradition points a single neutral tone. Caps sum to 60, roughly proportional
-    # to each region's full tradition count.
-    keep = {"Sub-Saharan Africa": 7, "Near East & North Africa": 5, "Europe": 5,
-            "Caucasus & Iran": 3, "Inner Asia": 4, "South Asia": 4, "Mainland Southeast Asia": 3,
-            "East Asia": 2, "Austronesia": 6, "Papua & Aboriginal Australia": 2,
-            "Circumpolar North": 5, "Native North America": 6, "Mesoamerica & the Andes": 4,
-            "Lowland South America": 4}
+    # Territory layer — the full tradition list, region areas washed in their colour, tradition
+    # points a single neutral tone.
     terr_pts = [{"x": float(lon), "y": float(lat), "r": ri, "t": tname}
-                for ri, (rname, _, trads) in enumerate(REGIONS)
-                for tname, lat, lon in trads[:keep[rname]]]
+                for ri, (_, _, trads) in enumerate(REGIONS) for tname, lat, lon in trads]
     tgroups = defaultdict(list)
     for i, p in enumerate(terr_pts):
         tgroups[(round(p["x"]), round(p["y"]))].append(i)
@@ -511,7 +504,7 @@ def main():
         "cats": [{"name": rname, "color": rcolor, "n": tcounts.get(ri, 0)}
                  for ri, (rname, rcolor, _) in enumerate(REGIONS)],
         "points": terr_pts,
-        "note": "60 ведущих традиций (по ~4 на регион); заливка — ареал региона, точки нейтральны",
+        "note": "полный список традиций; заливка — ареал региона, точки нейтральны",
     }
 
     data = {"facets": facets,
