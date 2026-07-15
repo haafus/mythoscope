@@ -123,7 +123,7 @@ REGIONS = [
         ("Norse", 62, 10), ("Anglo-Saxon", 52, -1.5), ("Continental Germanic", 51, 10),
         ("Slavic", 51, 27), ("Baltic", 56, 24), ("Finnish", 62, 25), ("Estonian", 59, 26),
         ("Sami", 68, 22), ("Hungarian", 47, 19), ("Mordvin/Mari", 55, 46), ("Basque", 43, -2)]),
-    ("Caucasus & Iran", "#73AF48", [
+    ("Caucasus & Iran", "#6F4070", [
         ("Persian/Zoroastrian", 32, 53), ("Scythian", 47, 36), ("Sogdian", 39, 66),
         ("Ossetian", 43, 44), ("Armenian", 40, 45), ("Georgian", 42, 44), ("Circassian", 44, 40),
         ("Chechen/Vainakh", 43, 46), ("Dagestani", 42, 47.5), ("Kurdish", 37, 43), ("Azeri", 40, 48)]),
@@ -135,7 +135,7 @@ REGIONS = [
         ("Vedic", 29, 77), ("Hindu", 25, 80), ("Buddhist", 25, 85), ("Jain", 23, 78),
         ("Dravidian", 11, 78), ("Munda/Santal", 23, 86), ("Gond", 21, 80), ("Bhil", 23, 74),
         ("Sinhalese", 7, 81), ("Newar/Nepali", 28, 85), ("Sikh", 31, 75), ("Kashmiri", 34, 75)]),
-    ("Mainland Southeast Asia", "#2A8A9F", [
+    ("Mainland Southeast Asia", "#94346E", [
         ("Burmese", 21, 96), ("Mon", 16, 97), ("Thai/Tai", 15, 100), ("Lao", 18, 103),
         ("Shan", 22, 98), ("Khmer", 12, 105), ("Vietnamese", 18, 106), ("Cham", 13, 109),
         ("Hmong-Mien", 24, 104), ("Karen", 18, 97.5), ("Tibeto-Burman", 26, 95)]),
@@ -157,7 +157,7 @@ REGIONS = [
         ("Mansi", 62, 62), ("Nenets", 68, 73), ("Ket", 63, 88), ("Yupik", 61, -162),
         ("Inupiat", 70, -153), ("Kalaallit", 72, -40), ("Aleut", 53, -170), ("Dene", 62, -130),
         ("Northern Cree", 54, -80)]),
-    ("Native North America", "#6F4070", [
+    ("Native North America", "#73AF48", [
         ("Iroquois", 43, -76), ("Ojibwe", 47, -90), ("Abenaki", 45, -71), ("Lakota/Sioux", 44, -101),
         ("Cheyenne", 40, -104), ("Pawnee", 41, -98), ("Blackfoot", 49, -113), ("Nez Perce", 46, -116),
         ("Salish", 48, -120), ("Pomo", 39, -123), ("Miwok", 38, -120), ("Yokuts", 36, -119),
@@ -169,7 +169,7 @@ REGIONS = [
         ("Olmec", 18, -94), ("Toltec", 20, -99.3), ("Tarascan", 19.5, -101), ("Huichol", 22, -104),
         ("Inca/Quechua", -13, -72), ("Aymara", -16, -69), ("Moche", -8, -79), ("Chibcha/Muisca", 5, -74),
         ("Nazca", -14, -75)]),
-    ("Lowland South America", "#94346E", [
+    ("Lowland South America", "#2A8A9F", [
         ("Tupí/Guaraní", -20, -50), ("Carib", 8, -62), ("Arawak", 3, -60), ("Ge", -10, -52),
         ("Yanomami", 2, -64), ("Tucano", -1, -70), ("Jivaro/Shuar", -3, -78), ("Warao", 9, -62),
         ("Mapuche", -38, -71), ("Selk'nam", -54, -68), ("Tehuelche", -46, -70), ("Guaycuru", -24, -58)]),

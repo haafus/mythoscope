@@ -170,7 +170,7 @@ antiquity (Greek from 8th c. BCE, then Roman) → Migration Period (Germanic & S
 Anglo-Saxon · Continental Germanic · Slavic (Russian, Polish, South Slavic) · Baltic (Lithuanian,
 Latvian, Prussian) · Finnish · Estonian · Sami · Hungarian · Mordvin/Mari · Basque.
 
-### 4. Caucasus & Iran · `#73AF48`
+### 4. Caucasus & Iran · `#6F4070`
 **Description.** The Iranian/Persianate world plus the Caucasus — bound by Iranian cultural and
 linguistic threads (Zoroastrian, Scythian-Alan, Persianate). The Caucasus does not stand alone (a
 thin, internally diverse shatter zone) but its autochthonous Nart-epic peoples and its Christian
@@ -213,7 +213,7 @@ Hinduism (Mahabharata/Ramayana ~400 BCE – 400 CE; Puranas 300–1500 CE) → B
 **Traditions.** Vedic · Hindu · Buddhist · Jain · Dravidian (Tamil, Telugu, Kannada, Malayalam) ·
 Munda/Santal · Gond · Bhil · Sinhalese · Newar/Nepali · Sikh · Kashmiri.
 
-### 7. Mainland Southeast Asia · `#2A8A9F`
+### 7. Mainland Southeast Asia · `#94346E`
 **Description.** The Indianized mainland — Indochina and the Tibeto-Burman/Tai/Austroasiatic hill
 peoples whose classical mythology is Hindu-Buddhist (the Ramayana traditions). On the Indic side of
 the Indosphere/Sinosphere split, distinct from South Asia proper (periphery, not source) and from
@@ -284,7 +284,7 @@ Arctic North America to Greenland (~1000 CE) → Russian & colonial contact (rec
 Mansi · Nenets · Ket · Inuit/Eskimo (Yupik, Inupiat, Kalaallit) · Aleut · Na-Dene/Athabaskan (Dene) ·
 Northern Cree · (Ainu, Sami — boundary affinities).
 
-### 12. Native North America · `#6F4070`
+### 12. Native North America · `#73AF48`
 **Description.** Indigenous North America outside the Arctic — the temperate culture areas: Eastern
 Woodlands, Plains, Plateau, California, the Southwest, and the Northwest Coast (boundary with
 Circumpolar). "Native" distinguishes the Indigenous traditions from the modern nation.
@@ -310,7 +310,7 @@ written fixation (Popol Vuh, Florentine Codex, Huarochirí Manuscript — 16th c
 **Traditions.** Aztec/Nahua · Maya · Mixtec · Zapotec · Olmec · Toltec · Tarascan (Purépecha) ·
 Huichol · Inca/Quechua · Aymara · Moche · Chibcha/Muisca · Nazca.
 
-### 14. Lowland South America · `#94346E`
+### 14. Lowland South America · `#2A8A9F`
 **Description.** The tropical and temperate lowlands of South America — Amazonia, the Guianas, the
 Gran Chaco, and the Southern Cone: the densest concentration of small-scale Amerindian oral
 traditions, the terminal end of the human expansion. Distinct from the Andean highlands (#13).
@@ -362,19 +362,27 @@ neighbour distinction (per-pair contrast is deliberately not maximised).
 
 Each region has a **base** (its map colour) plus **light**/**dark** ramp ends for sub-traditions.
 
+**Two swaps break the strict arc for legibility.** The arc's tail (purples→magentas) piled four
+similar hues into the New World, where they read as one blur. So two American regions trade colours
+with Old-World neighbours whose own clusters were also too tight: **Native North America ↔ Caucasus &
+Iran** (green ⇄ dark-purple) and **Lowland South America ↔ Mainland Southeast Asia** (teal ⇄ magenta).
+The Americas now carry purple (Circumpolar) · green (N. America) · orchid (Meso & Andes) · teal
+(Lowland S. Am.); the swap also loosens the Caucasus/Inner-Asia greens and the South/SE/East-Asia teals.
+Because the two hemispheres never share map space, the borrowed hues collide with nothing.
+
 | # | region | base | light | dark | source |
 |---|---|---|---|---|---|
 | 1 | Sub-Saharan Africa | `#CC503E` | `#D79389` | `#953223` | Prism red |
 | 2 | Near East & North Africa | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange |
 | 3 | Europe | `#EDAD08` | `#EDC55F` | `#9B7208` | Prism gold |
-| 4 | Caucasus & Iran | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green |
+| 4 | Caucasus & Iran | `#6F4070` | `#9F67A0` | `#3C223D` | Prism dark-purple (↔ N. America) |
 | 5 | Inner Asia | `#0F8554` | `#26C583` | `#075534` | Prism green |
 | 6 | South Asia | `#38A6A5` | `#70C5C4` | `#216B6A` | Prism teal |
-| 7 | Mainland Southeast Asia | `#2A8A9F` | `#59B3C7` | `#175361` | insert (teal↔blue) |
+| 7 | Mainland Southeast Asia | `#94346E` | `#BD6299` | `#591D41` | Prism magenta (↔ Lowland S. Am.) |
 | 8 | East Asia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue |
 | 9 | Austronesia | `#2A4895` | `#5473C2` | `#162857` | insert (blue↔purple) |
 | 10 | Papua & Aboriginal Australia | `#383793` | `#6666BB` | `#201F59` | insert (blue↔purple) |
 | 11 | Circumpolar North | `#5F4690` | `#8C78B5` | `#3A2A5A` | Prism purple |
-| 12 | Native North America | `#6F4070` | `#9F67A0` | `#3C223D` | Prism dark-purple |
+| 12 | Native North America | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green (↔ Caucasus) |
 | 13 | Mesoamerica & the Andes | `#994E95` | `#B984B7` | `#643162` | Prism orchid |
-| 14 | Lowland South America | `#94346E` | `#BD6299` | `#591D41` | Prism magenta |
+| 14 | Lowland South America | `#2A8A9F` | `#59B3C7` | `#175361` | insert teal↔blue (↔ Mainland SE Asia) |
