@@ -235,6 +235,19 @@ def religion_borders():
     return [{"name": name, "color": color, "d": geo.get(name, "")} for name, color in RELIGIONS]
 
 
+# substrate-strength choropleth — a sequential earth ramp (strong = dark), precomputed by
+# build_substrate_geo.py; how strongly the pre-scriptural indigenous layer survives as practice
+SUBSTRATE = [
+    ("Very strong", "#5C3A1A"), ("Strong", "#8A5E30"), ("Moderate", "#B5895A"),
+    ("Weak", "#CBB187"), ("Very weak", "#E0CFB0"),
+]
+
+
+def substrate_borders():
+    geo = json.loads((Path(__file__).resolve().parent / "substrate_geo.json").read_text())
+    return [{"name": name, "color": color, "d": geo.get(name, "")} for name, color in SUBSTRATE]
+
+
 def main():
     geo = _load("_geo", MOCKS / "_geo.py")
     f21 = _load("_f21", MOCKS / "21-facet-population" / "build_data.py")
@@ -566,10 +579,20 @@ def main():
                 "а не коренной пласт, который красит карта areas",
     }
 
+    # Substrate layer — how strongly the pre-scriptural indigenous/folk layer survives as living
+    # practice beneath the nominal religion (the mirror of `religions`); illustrative estimate
+    facets["substrate"] = {
+        "label": f"Substrate · {len(SUBSTRATE)}",
+        "kind": "borders",
+        "cats": substrate_borders(),
+        "note": "сила субстрата — насколько доскриптурный коренной/народный пласт выживает как живая "
+                "практика под номинальной религией (экспертная оценка, не перепись); зеркало religions",
+    }
+
     data = {"facets": facets,
-            "order": ["regions", "borders", "territory", "religions", "hardlayers", "volume", "area",
-                      "family", "narrative", "subsistence", "diversity", "depth", "cosmology",
-                      "peopling"],
+            "order": ["regions", "borders", "territory", "religions", "substrate", "hardlayers",
+                      "volume", "area", "family", "narrative", "subsistence", "diversity", "depth",
+                      "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
