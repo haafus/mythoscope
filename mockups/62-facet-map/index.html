@@ -68,6 +68,7 @@ const KEY = { hardlayers:"h", volume:"v", area:"a", family:"f", narrative:"n", s
 let active = "regions";
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const darken = (h,f=0.5) => `rgb(${hex2rgb(h).map(v=>Math.round(v*f)).join(",")})`;
 function rampColor(ramp, x){          // x in [0,1] → interpolated colour on the ramp
   x = Math.max(0, Math.min(1, x));
   const n = ramp.length-1, i = Math.min(n-1, Math.floor(x*n)), t = x*n - i;
@@ -104,7 +105,7 @@ function drawMap(fid){
       `<path d="${c.d}" fill="${c.color}" fill-opacity="0.4" stroke="${c.color}" stroke-width="0.4" stroke-opacity="0.4"><title>${esc(c.name)}</title></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
-      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="#5c3d24" `+
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${darken(facet.cats[p.r].color)}" `+
       `stroke="#fff" stroke-width="0.35"><title>${esc(p.t)} · ${esc(facet.cats[p.r].name)}</title></circle>`
     ).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
