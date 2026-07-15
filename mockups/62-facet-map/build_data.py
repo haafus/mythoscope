@@ -263,9 +263,9 @@ LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark 
     ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
     ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
 ]
-ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest spread
-    ("Strong spread", "#08519C"), ("Spread", "#3182BD"), ("Mixed", "#6BAED6"),
-    ("Residual", "#BDD7E7"), ("Strong residual", "#EFF3FF"),
+ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest residual
+    ("Strong spread", "#EFF3FF"), ("Spread", "#BDD7E7"), ("Mixed", "#6BAED6"),
+    ("Residual", "#3182BD"), ("Strong residual", "#08519C"),
 ]
 
 
