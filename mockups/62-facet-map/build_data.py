@@ -263,8 +263,10 @@ LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark 
     ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
     ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
 ]
-ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest residual
-    ("Strong spread", "#EFF3FF"), ("Spread", "#BDD7E7"), ("Mixed", "#6BAED6"),
+ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest residual.
+    # lightest step lifted off #EFF3FF (≈ ocean #eef3f4) to a clear pale blue: at the
+    # facet's 0.4 fill-opacity #EFF3FF dissolved into the sea and the land read as hollow.
+    ("Strong spread", "#C4D8EF"), ("Spread", "#BDD7E7"), ("Mixed", "#6BAED6"),
     ("Residual", "#3182BD"), ("Strong residual", "#08519C"),
 ]
 
