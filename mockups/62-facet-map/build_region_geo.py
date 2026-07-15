@@ -142,6 +142,11 @@ def main():
                 if ((names[ri] in ("Inner Asia", "Native North America") and lat >= 60)
                         or (names[ri] == "Europe" and lat >= 72)):
                     ri = rname_i["Circumpolar North"]
+                # eastern subarctic: Labrador (Innu/Naskapi taiga) is Circumpolar like the
+                # adjacent Québec, but its centroid is nearer an NNA anchor; the Newfoundland
+                # island part (~48N) stays temperate Native North America
+                if pr.get("name") == "Newfoundland and Labrador" and lat >= 52:
+                    ri = rname_i["Circumpolar North"]
                 paths[names[ri]].append(path_d(poly))
 
     out = {n: "".join(paths[n]) for n in names}
