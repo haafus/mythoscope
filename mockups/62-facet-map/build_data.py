@@ -113,7 +113,7 @@ REGIONS = [
         ("Baganda", 0, 32), ("Luba", -8, 24), ("Fang", 1, 11), ("Dinka", 8, 30), ("Nuer", 9, 32),
         ("Maasai", -2, 36), ("Azande", 5, 27), ("San", -22, 21), ("Khoekhoe", -29, 19),
         ("Mbuti", 1, 28), ("Ethiopian", 11, 39)]),
-    ("Near East & North Africa", "#E17C05", [
+    ("Near East & North Africa", "#2A4895", [
         ("Sumerian", 31, 46), ("Akkadian", 33, 44), ("Babylonian", 32, 44.5), ("Assyrian", 36, 43),
         ("Egyptian", 26, 31), ("Hittite", 39, 33), ("Hurrian", 37, 41), ("Ugaritic", 35, 36),
         ("Phoenician", 34, 35), ("Elamite", 32, 48), ("pre-Islamic Arabian", 24, 45),
@@ -139,10 +139,10 @@ REGIONS = [
         ("Burmese", 21, 96), ("Mon", 16, 97), ("Thai/Tai", 15, 100), ("Lao", 18, 103),
         ("Shan", 22, 98), ("Khmer", 12, 105), ("Vietnamese", 18, 106), ("Cham", 13, 109),
         ("Hmong-Mien", 24, 104), ("Karen", 18, 97.5), ("Tibeto-Burman", 26, 95)]),
-    ("East Asia", "#1D6996", [
+    ("East Asia", "#E17C05", [
         ("Chinese", 34, 110), ("Korean", 37, 128), ("Japanese", 36, 138), ("Ryukyuan", 26, 128),
         ("Ainu", 43, 143), ("Yi", 26, 102)]),
-    ("Austronesia", "#2A4895", [
+    ("Austronesia", "#1D6996", [
         ("Formosan", 23.5, 121), ("Javanese", -7, 110), ("Balinese", -8, 115), ("Sundanese", -7, 107),
         ("Batak", 2, 99), ("Dayak", 0, 114), ("Toraja", -3, 120), ("Filipino", 15, 121),
         ("Malay", 3, 102), ("Maori", -41, 175), ("Hawaiian", 20, -157), ("Tahitian", -17, -149),

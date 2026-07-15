@@ -139,7 +139,7 @@ Sahelian Islam via the trans-Saharan trade (from ~8th c. CE) → Ethiopian Chris
 Yombe · Zulu · Xhosa · Shona · Kikuyu · Baganda · Luba · Fang · Dinka · Nuer · Maasai · Azande · San
 (Bushman) · Khoekhoe · Mbuti · (Ethiopian/Amhara — boundary with Near East).
 
-### 2. Near East & North Africa · `#E17C05`
+### 2. Near East & North Africa · `#2A4895`
 **Description.** The Ancient Near East plus North Africa and the Abrahamic homelands — the earliest
 literate mythologies (cuneiform, hieroglyphic) and the source region of the three Abrahamic religions.
 Distinguished as the Bronze-Age/antiquity core of the Old World, anchored by written text. Includes
@@ -226,7 +226,7 @@ Angkor 9th–15th c. CE — from ~1st–5th c.) → Sinic overlay in Vietnam (Ch
 **Traditions.** Burmese · Mon · Thai/Tai · Lao · Shan · Khmer · Vietnamese (Viet/Muong) · Cham
 (boundary — Austronesian) · Hmong-Mien · Karen · Tibeto-Burman highlanders.
 
-### 8. East Asia · `#1D6996`
+### 8. East Asia · `#E17C05`
 **Description.** The Sinosphere — China, Korea, Japan — sharing the Chinese classical, Taoist,
 Confucian and Mahayana-Buddhist textual world. The clean CJK core (Vietnam, though Sinicized, is left
 in mainland SE Asia). Ainu is a boundary case (indigenous Japan, Circumpolar affinity).
@@ -239,7 +239,7 @@ Shinto codification (Kojiki 712 CE, Nihon Shoki 720 CE) → vernacular-novel fix
 **Traditions.** Chinese (Han; Taoist, Confucian, Chinese folk, Chinese Buddhist) · Korean · Japanese
 (Shinto) · Ryukyuan · Ainu (boundary) · southern-China ethnic minorities (Yi; boundary with SE Asia).
 
-### 9. Austronesia · `#2A4895`
+### 9. Austronesia · `#1D6996`
 **Description.** The Austronesian cultural area — one language family and one Neolithic maritime
 expansion, from the Taiwan homeland through island Southeast Asia to the Pacific and Madagascar. Its
 own region to keep this cohesive descent-based area intact (crit 2), anchored by the Formosan
@@ -370,17 +370,25 @@ The Americas now carry purple (Circumpolar) · green (N. America) · orchid (Mes
 (Lowland S. Am.); the swap also loosens the Caucasus/Inner-Asia greens and the South/SE/East-Asia teals.
 Because the two hemispheres never share map space, the borrowed hues collide with nothing.
 
+**A third rotation lifts the East-Asian / Pacific cluster,** which had piled blue (East Asia),
+dark-blue (Austronesia) and indigo (Papua) into one quadrant. A 3-cycle across East Asia, Austronesia
+and West Asia: **East Asia takes orange** (from Near East & North Africa) so it pops among the
+surrounding greens/blues/purples; **Austronesia takes East Asia's medium blue**, a lighter cyan that
+now reads clearly against Papua's indigo across the Sahul seam; and **Near East & North Africa takes
+Austronesia's dark-blue**, distinct against its red/yellow/purple Mediterranean neighbours. This trades
+away the warm Mediterranean orange, but the East-Asian legibility is worth it.
+
 | # | region | base | light | dark | source |
 |---|---|---|---|---|---|
 | 1 | Sub-Saharan Africa | `#CC503E` | `#D79389` | `#953223` | Prism red |
-| 2 | Near East & North Africa | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange |
+| 2 | Near East & North Africa | `#2A4895` | `#5473C2` | `#162857` | insert blue↔purple (↔ Austronesia via E. Asia) |
 | 3 | Europe | `#EDAD08` | `#EDC55F` | `#9B7208` | Prism gold |
 | 4 | Caucasus & Iran | `#6F4070` | `#9F67A0` | `#3C223D` | Prism dark-purple (↔ N. America) |
 | 5 | Inner Asia | `#0F8554` | `#26C583` | `#075534` | Prism green |
 | 6 | South Asia | `#38A6A5` | `#70C5C4` | `#216B6A` | Prism teal |
 | 7 | Mainland Southeast Asia | `#94346E` | `#BD6299` | `#591D41` | Prism magenta (↔ Lowland S. Am.) |
-| 8 | East Asia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue |
-| 9 | Austronesia | `#2A4895` | `#5473C2` | `#162857` | insert (blue↔purple) |
+| 8 | East Asia | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange (↔ Near East) |
+| 9 | Austronesia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue (↔ E. Asia) |
 | 10 | Papua & Aboriginal Australia | `#383793` | `#6666BB` | `#201F59` | insert (blue↔purple) |
 | 11 | Circumpolar North | `#5F4690` | `#8C78B5` | `#3A2A5A` | Prism purple |
 | 12 | Native North America | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green (↔ Caucasus) |
