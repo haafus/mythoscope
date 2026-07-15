@@ -287,7 +287,7 @@ def main():
                     "(мокапы 22/24)",
         },
         "peopling": {
-            "label": "Peopling",
+            "label": "Peopling age",
             "kind": "continuous", "key": "e", "unit": "ky BP",
             "min": min(peos), "max": max(peos),
             # sequential green: recently peopled (pale) → anciently peopled (dark).
