@@ -248,6 +248,30 @@ def substrate_borders():
     return [{"name": name, "color": color, "d": geo.get(name, "")} for name, color in SUBSTRATE]
 
 
+# language facets, precomputed by build_lang_geo.py (illustrative groupings, see that file)
+FAMILIES = [  # predominant (indigenous) language family — qualitative
+    ("Indo-European", "#4C78A8"), ("Sino-Tibetan", "#E45756"), ("Niger-Congo", "#F58518"),
+    ("Afroasiatic", "#72B7B2"), ("Austronesian", "#54A24B"), ("Dravidian", "#B279A2"),
+    ("Turkic", "#EECA3B"), ("Uralic", "#9D755D"), ("Austroasiatic", "#FF9DA6"),
+    ("Tai-Kadai", "#17BECF"), ("Japonic & Koreanic", "#D37295"), ("Mongolic", "#BAB03B"),
+    ("Nilo-Saharan", "#5B5BA0"), ("Papuan (New Guinea)", "#79706E"),
+    ("Australian (Aboriginal)", "#C49C94"), ("Indigenous Americas", "#8CD17D"),
+]
+LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark = high
+    ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
+    ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
+]
+ZONES = [  # Nichols: spread vs residual/accretion
+    ("Spread zone", "#6BAED6"), ("Intermediate", "#D9D9D9"),
+    ("Residual / accretion zone", "#FB6A4A"),
+]
+
+
+def _geo_cats(filename, palette):
+    geo = json.loads((Path(__file__).resolve().parent / filename).read_text())
+    return [{"name": name, "color": color, "d": geo.get(name, "")} for name, color in palette]
+
+
 def main():
     geo = _load("_geo", MOCKS / "_geo.py")
     f21 = _load("_f21", MOCKS / "21-facet-population" / "build_data.py")
@@ -589,10 +613,33 @@ def main():
                 "практика под номинальной религией (экспертная оценка, не перепись); зеркало religions",
     }
 
+    # Language facets (illustrative groupings, build_lang_geo.py)
+    facets["families"] = {
+        "label": f"Families · {len(FAMILIES)}",
+        "kind": "borders",
+        "cats": _geo_cats("families_geo.json", FAMILIES),
+        "note": "предоминантная (коренная) языковая семья по странам; шаттер-зоны свёрнуты ареально "
+                "(Papuan, Australian, Indigenous Americas), юг Индии выделен в Dravidian",
+    }
+    facets["langdiv"] = {
+        "label": f"Lang diversity · {len(LANGDIV)}",
+        "kind": "borders",
+        "cats": _geo_cats("langdiv_geo.json", LANGDIV),
+        "note": "языковое разнообразие / фрагментация (много языков на ареал) — тёмное в шаттер-зонах "
+                "(Н. Гвинея, Амазония, В. Африка, Кавказ), бледное в спред-зонах",
+    }
+    facets["zones"] = {
+        "label": f"Zones · {len(ZONES)}",
+        "kind": "borders",
+        "cats": _geo_cats("zones_geo.json", ZONES),
+        "note": "спред-зоны (одна семья разлилась: степь, Сахель, банту, австронезийцы, ИЕ) vs "
+                "остаточные/аккреционные зоны, где копится старое разнообразие (Николс)",
+    }
+
     data = {"facets": facets,
-            "order": ["regions", "borders", "territory", "religions", "substrate", "hardlayers",
-                      "volume", "area", "family", "narrative", "subsistence", "diversity", "depth",
-                      "cosmology", "peopling"],
+            "order": ["regions", "borders", "territory", "religions", "substrate", "families",
+                      "langdiv", "zones", "hardlayers", "volume", "area", "family", "narrative",
+                      "subsistence", "diversity", "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")

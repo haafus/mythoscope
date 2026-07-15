@@ -51,7 +51,7 @@
 
 <div class="card">
   <div class="seg" id="facetsMain"></div>
-  <div class="seg nowrap" id="facetsCurated"></div>
+  <div class="seg" id="facetsCurated"></div>
   <div class="facet-note" id="note"></div>
 </div>
 
@@ -173,7 +173,7 @@ function render(){
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "zones"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
