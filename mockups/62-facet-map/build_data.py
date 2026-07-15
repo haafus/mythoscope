@@ -197,12 +197,23 @@ def _haversine(lat, lon, lats, lons):
     return 6371.0 * 2 * np.arcsin(np.sqrt(h))
 
 
+# dark ramp end per region (regions.md §8) — used for the tradition dots on the areas facet
+REGION_DARK = {
+    "Sub-Saharan Africa": "#953223", "Near East & North Africa": "#162857", "Europe": "#9B7208",
+    "Caucasus & Iran": "#3C223D", "Inner Asia": "#0E3A54", "South Asia": "#216B6A",
+    "Mainland Southeast Asia": "#591D41", "East Asia": "#8D5007", "Austronesia": "#075534",
+    "Papua & Aboriginal Australia": "#201F59", "Circumpolar North": "#3A2A5A",
+    "Native North America": "#4D772E", "Mesoamerica & the Andes": "#643162",
+    "Lowland South America": "#175361",
+}
+
+
 def region_borders(regions):
     """Region areas as filled polygons draped over real vector borders (Natural Earth
     countries/provinces), precomputed by build_region_geo.py into regions_geo.json.
     Returns a cat per region with its combined SVG path; Antarctica is left blank."""
     geo = json.loads((Path(__file__).resolve().parent / "regions_geo.json").read_text())
-    return [{"name": name, "color": color, "d": geo.get(name, "")}
+    return [{"name": name, "color": color, "dark": REGION_DARK[name], "d": geo.get(name, "")}
             for name, color, _ in regions]
 
 
