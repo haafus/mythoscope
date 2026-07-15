@@ -110,6 +110,64 @@ splitting the heavyweight literate regions). Key decisions, in order:
   toward scheme C, and the oral regions would stay pooled. That is a re-weighting of the same
   material, not a defect of the backbone.
 
+### The central axis of compromise — distinctiveness vs documentation
+
+Underneath the four criteria sits **one dominant tension**, and it sets the granularity of the whole
+scheme. Two forces pull region size in opposite directions:
+
+- **Cultural distinctiveness** would cut finely where diversity is highest — and diversity is highest
+  in the **oral** world. Sub-Saharan Africa alone spans three-plus unrelated language phyla; Native
+  North America, Circumpolar, and Amazonia are each internally deep.
+- **Volume of documentation** (corpus-first, crit 4) would cut finely where the **text** is deepest —
+  and text concentrates in the **literate** Old World (South Asia, Near East, East Asia, Europe).
+
+These point *against* each other: the most culturally distinct regions are the least documented, and
+the best-documented are internally the most uniform. Where they conflict, **documentation wins the
+granularity call**: the literate spheres are split fine (Indosphere/Sinosphere; South / SE / East /
+Inner Asia), while the more diverse oral regions stay pooled (one Sub-Saharan Africa, one Lowland South
+America) with their internal diversity demoted to sub-rubrics. This asymmetry is deliberate and
+load-bearing, not an oversight — **by pure distinctiveness the first region to split would be
+Sub-Saharan Africa, not any part of Asia or Europe.** Keeping the axis explicit is what stops the
+scheme from being read as a claim that Asia is "more diverse" than Africa; it is only better recorded.
+
+### Clinality — the scheme cuts discrete lines through continua
+
+Mythological and cultural variation is **clinal**: a bundle of overlapping gradients (language,
+subsistence, religion, descent, diffusion) that shade continuously into one another, not a mosaic of
+sharp-edged cells. Any 14-region partition therefore draws **hard lines across soft gradients**.
+Regions are well-founded where several gradients **bundle and steepen together** — a cultural
+watershed: the Sahara, the Indosphere/Sinosphere seam, the Austronesian sea-frontier, the Bering
+crossing. They are arbitrary where a single gradient is shallow — the Caucasus shatter-zone, the
+Cree/Innu taiga, the Andean–Amazon flank, the temperate ↔ Arctic transition. The **boundary cases
+(§6)** are not failures but exactly the places where the cline is caught mid-slope — Yakut (Turkic ↔
+Arctic), Sami (Finno-Ugric ↔ reindeer), Vietnam (Austroasiatic ↔ Sinic), Anatolia, Ecuador (Andes ↔
+Amazon), the Antilles (Arawak/Carib ↔ Mesoamerica). Each is assigned by whichever gradient we
+privilege and **flagged**, so the underlying continuity is never mistaken for a wall. On the map this
+is why some between-region borders are "harder" than others, and why an internal spread (Europe:
+Homer ↔ Kalevala ↔ Basque) can exceed a between-region gap (South Asia ↔ mainland SE Asia, both
+Indosphere).
+
+### Strata — a synchronic cut through vertically layered material
+
+The region scheme is a **horizontal slice through a vertically stratified reality.** Every region is a
+stack of historical layers — a **substrate → expansion(s) → literate / colonial overlay** sequence,
+recorded with datings in each region's **Strata** field (Khoisan forager substrate → Bantu expansion →
+Sahelian Islam → Christian overlay; PIE steppe → Classical antiquity → Christianization → Eddic
+fixation). Three consequences:
+
+- **The same ground belongs to different regions at different depths.** European Russia is
+  Uralic-then-Slavic; the Hexi Corridor is Tibetan/Tocharian-then-Han; the Antilles are
+  Arawak-then-colonial. The `areas` map colours the **deepest attested indigenous stratum**, not the
+  modern political surface — which is why Madagascar reads Austronesian and the Caribbean reads with
+  lowland South America.
+- **A region's coherence lives at one particular stratum.** Austronesia coheres at the Neolithic
+  maritime-expansion layer, the Near East at the Bronze-Age-and-earlier layer, Europe at the PIE
+  layer. Compared at the wrong depth, a grouping can look wrong (e.g. modern Vietnam is Sinicized on
+  the surface but Austroasiatic in the substrate).
+- **Space and time are two axes of one catalogue.** `region` partitions space; the dated `Strata`
+  partition time. The `areas` map is one horizontal cut; a future "strata" view would cut the other
+  way, showing how a single region is assembled layer by layer.
+
 ## 4. Ordering — the out-of-Africa arc
 
 Ordered as a human-dispersal arc: cradle → exit corridor → the whole contiguous Old World → the one
