@@ -256,7 +256,7 @@ def main():
     facets = {
         "area": facet(f"Area · {len(f21.AREAS12)}", f21.AREAS12, "a"),
         "family": facet(f"Family · {len(f21.FAMILIES11)}", f21.FAMILIES11, "f"),
-        "narrative": facet(f"Narrative · {K_CLUSTERS}", cluster_names, "n"),
+        "narrative": facet(f"Narrative profile · {K_CLUSTERS}", cluster_names, "n"),
         "subsistence": facet("Subsistence · 4",
                              [SUB_LABEL[s] for s in SUB_ORDER], "s", sub_colors),
         "diversity": {
@@ -278,13 +278,13 @@ def main():
                     ">0 = глубже, чем предсказывает каталогизация (мокапы 17/39)",
         },
         "cosmology": {
-            "label": "Cosmology",
+            "label": "Cosmology share",
             "kind": "continuous", "key": "c", "unit": "доля Категории A",
             "min": round(min(cosmos), 2), "max": round(max(cosmos), 2),
             # sequential purple: low (adventure-heavy) → high (cosmology-heavy).
             "ramp": ["#f3eef8", "#c8a8dd", "#9151d8", "#4a1e77"],
-            "note": "cosmology share A/(A+B) — доля мотивов Категории A (космогония/этиология) "
-                    "против B (приключения) (мокапы 22/24)",
+            "note": "доля мотивов Категории A — космогония/этиология против приключений "
+                    "(мокапы 22/24)",
         },
         "peopling": {
             "label": "Peopling",
@@ -297,8 +297,8 @@ def main():
     }
     facets["area"]["note"] = "12 макроареалов, детерминированно из areal_path (мокап 21)"
     facets["family"]["note"] = "~11 языковых/религиозных семей из языковой цепочки (мокап 21)"
-    facets["narrative"]["note"] = ("narrative profile — кластер традиции по жанровому балансу, "
-                                   "KMeans k=8 над 16-мерным профилем (мокапы 41/43)")
+    facets["narrative"]["note"] = ("кластер традиции по нарративному профилю — KMeans k=8 "
+                                   "над 16-мерным профилем (мокапы 41/43)")
     facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
     data = {"facets": facets,
