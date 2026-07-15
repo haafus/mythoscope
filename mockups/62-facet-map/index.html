@@ -13,7 +13,9 @@
   svg.map { width:100%; height:auto; background:#eef3f4; border-radius:8px; display:block; }
   .land { fill:#e4e9e3; stroke:#d3d9d0; stroke-width:0.3; }
   .ocean { fill:#eef3f4; }
-  .seg { display:inline-flex; flex-wrap:wrap; gap:6px; }
+  .seg { display:flex; flex-wrap:wrap; gap:6px; }
+  .seg + .seg { margin-top:8px; }
+  .seg.nowrap { flex-wrap:nowrap; }
   .seg button { font:inherit; font-size:13px; padding:6px 14px; border:1px solid #e7e2d7; background:#fff;
                 color:var(--ink); border-radius:20px; cursor:pointer; }
   .seg button.on { background:#2f6fed; border-color:#2f6fed; color:#fff; }
@@ -46,7 +48,8 @@
 </header>
 
 <div class="card">
-  <div class="seg" id="facets"></div>
+  <div class="seg" id="facetsMain"></div>
+  <div class="seg nowrap" id="facetsCurated"></div>
   <div class="facet-note" id="note"></div>
 </div>
 
@@ -164,15 +167,19 @@ function render(){
   document.getElementById("map").innerHTML = facet.disabled ? drawMap("__none__") : drawMap(active);
   document.getElementById("legend").innerHTML = facet.disabled ? "" : drawLegend(active);
   document.getElementById("note").textContent = facet.disabled ? ("⚠ " + (facet.note||"нет данных")) : (facet.note || "");
-  document.querySelectorAll("#facets button").forEach(b=>b.classList.toggle("on", b.dataset.f===active));
+  document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>b.classList.toggle("on", b.dataset.f===active));
 }
 
-document.getElementById("facets").innerHTML = D.order.map(fid=>{
+// the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
+const CURATED = new Set(["regions", "borders", "territory"]);
+const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
   return `<button data-f="${fid}"${f.disabled?" disabled":""}${title}${fid===active?' class="on"':""}>${esc(f.label)}</button>`;
-}).join("");
-document.querySelectorAll("#facets button").forEach(b=>{
+};
+document.getElementById("facetsMain").innerHTML = D.order.filter(f=>!CURATED.has(f)).map(btnHTML).join("");
+document.getElementById("facetsCurated").innerHTML = D.order.filter(f=>CURATED.has(f)).map(btnHTML).join("");
+document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
 render();
