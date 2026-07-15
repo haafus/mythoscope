@@ -37,6 +37,10 @@ SPLIT = {"Russia", "China", "United States of America", "Canada",
 OVERRIDE = {"Libya": "Near East & North Africa", "Turkey": "Caucasus & Iran",
             "Oman": "Near East & North Africa", "United Arab Emirates": "Near East & North Africa",
             "Ecuador": "Mesoamerica & the Andes"}  # Andean highland heartland, not its Amazon Oriente
+# admin-1 (province) overrides: coastal Han provinces snap to Taiwan's Austronesian
+# (Formosan) anchor just offshore — they are Han Chinese, i.e. East Asia
+PROVINCE_OVERRIDE = {"Fujian": "East Asia", "Zhejiang": "East Asia", "Guangdong": "East Asia",
+                     "Jiangxi": "East Asia", "Shanghai": "East Asia"}
 
 
 def fetch(name):
@@ -126,12 +130,17 @@ def main():
                     continue
                 if admin in OVERRIDE:
                     ri = rname_i[OVERRIDE[admin]]
+                elif src == "a1" and pr.get("name") in PROVINCE_OVERRIDE:
+                    ri = rname_i[PROVINCE_OVERRIDE[pr["name"]]]
                 else:
                     ri = int(rr[tree.query([lon, lat], k=1)[1]])
                 # keep the Circumpolar ring intact: high-latitude Arctic land reads
                 # territorially as Circumpolar (Sakha in Siberia; the Canadian Arctic
-                # archipelago) even where the nearest tradition is Inner Asian / N. American
-                if names[ri] in ("Inner Asia", "Native North America") and lat >= 60:
+                # archipelago; Svalbard) even where the nearest tradition is Inner Asian /
+                # N. American / European. Europe uses a higher bar so mainland Scandinavia
+                # (North Cape ~71N) stays European while the Arctic islands flip.
+                if ((names[ri] in ("Inner Asia", "Native North America") and lat >= 60)
+                        or (names[ri] == "Europe" and lat >= 72)):
                     ri = rname_i["Circumpolar North"]
                 paths[names[ri]].append(path_d(poly))
 
