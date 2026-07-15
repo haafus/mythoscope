@@ -116,7 +116,7 @@ function drawMap(fid){
     ).join("");
     // coastline on top — keeps a continent contour even where a fill (e.g. the palest
     // spread-zone step) is near-identical to the ocean colour and would otherwise vanish
-    const coast = `<path d="${window.LAND||""}" fill="none" stroke="#aab1a7" stroke-width="0.45" stroke-opacity="0.8"/>`;
+    const coast = `<path d="${window.LAND||""}" fill="none" stroke="#828a7d" stroke-width="0.5" stroke-opacity="0.9"/>`;
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
       `<rect class="ocean" width="360" height="180"/>${polys}${coast}${pts}</svg>`;
   }
