@@ -104,7 +104,7 @@ function drawMap(fid){
       `<path d="${c.d}" fill="${c.color}" fill-opacity="0.4" stroke="${c.color}" stroke-width="0.4" stroke-opacity="0.4"><title>${esc(c.name)}</title></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
-      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="#2b2f36" `+
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="#3a2416" `+
       `stroke="#fff" stroke-width="0.35"><title>${esc(p.t)} · ${esc(facet.cats[p.r].name)}</title></circle>`
     ).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
