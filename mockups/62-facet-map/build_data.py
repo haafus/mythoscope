@@ -221,9 +221,10 @@ def region_borders(regions):
 # East Asian = red); paths precomputed by build_religions_geo.py into religions_geo.json
 RELIGIONS = [
     ("Catholic Christianity", "#2C6FB3"), ("Orthodox Christianity", "#7048B6"),
-    ("Protestant / other Christian", "#6FB1DE"), ("Sunni Islam", "#35945F"),
-    ("Shia Islam", "#146356"), ("Judaism", "#16365C"), ("Hinduism", "#E07B1A"),
+    ("Protestant / other Christian", "#6FB1DE"), ("Sunni Islam", "#3E9B57"),
+    ("Shia Islam", "#14A3A3"), ("Judaism", "#16365C"), ("Hinduism", "#E07B1A"),
     ("Buddhism", "#E6B93E"), ("East Asian (folk / syncretic)", "#C0392B"),
+    ("Ethnic / traditional", "#8A5A32"),
 ]
 
 

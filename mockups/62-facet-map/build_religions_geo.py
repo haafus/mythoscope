@@ -47,7 +47,7 @@ RELIGION = {
         "Saint Pierre and Miquelon", "Saint Helena",
         "South Africa", "Namibia", "Botswana", "Zimbabwe", "Zambia", "Malawi", "Lesotho", "eSwatini",
         "Kenya", "Uganda", "United Republic of Tanzania", "Ghana", "Liberia", "Cameroon",
-        "Central African Republic", "South Sudan", "Mozambique", "Madagascar", "Togo", "Benin",
+        "Central African Republic", "Mozambique", "Madagascar",
         "Jamaica", "Trinidad and Tobago", "Guyana", "Suriname", "Belize", "The Bahamas", "Barbados"],
     "Sunni Islam": [
         "Morocco", "Algeria", "Tunisia", "Libya", "Egypt", "Sudan", "Mauritania", "Mali", "Niger",
@@ -66,6 +66,9 @@ RELIGION = {
     "East Asian (folk / syncretic)": [
         "China", "Japan", "North Korea", "South Korea", "Taiwan", "Vietnam", "Singapore",
         "Hong Kong S.A.R.", "Macao S.A.R"],
+    # the few states where indigenous/ethnic religion is still plurality or the defining stratum —
+    # the West-African Vodun/animist belt and South Sudan (elsewhere it survives only as substrate)
+    "Ethnic / traditional": ["Benin", "Togo", "South Sudan"],
 }
 of_country = {c: rel for rel, cs in RELIGION.items() for c in cs}
 
