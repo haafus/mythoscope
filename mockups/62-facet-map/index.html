@@ -32,7 +32,7 @@
   <p><b>regions</b> — курированные традиции 14 регионов канона (<code>research/regions.md</code>) с ручными
      координатами и палитрой CARTO Prism; это <b>не</b> индекс Березкина, а собственный список каталога.
      <b>regions · fill</b> — те же регионы и полный список традиций, но заливкой ареала, точки нейтральным цветом.
-     <b>regions · areas</b> — ареалы регионов на реальных векторных границах (Natural Earth), только заливка, без точек.
+     <b>regions · areas</b> — ареалы регионов на реальных векторных границах (Natural Earth), полупрозрачная заливка + точки курируемых традиций.
      Остальные фасеты раскрашивают один и тот же набор традиций Березкина. Переключай ось —
      карта перекрашивается. <b>hard layers</b> — жёсткие страты-листья рекурсивного geo-peel с поправкой
      на покрытие (мокап 45), <b>volume</b> — 14 разделов, сбалансированных по объёму фиксации Березкина
@@ -97,13 +97,18 @@ function drawMap(fid){
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${wash}${dots}</svg>`;
   }
   if (facet.kind === "borders"){
-    // region areas on real vector borders; fills only (same-colour hairline stroke
-    // just seals the gaps between independently-simplified province edges — not a line)
+    // region areas on real vector borders — translucent fills (same-colour hairline
+    // stroke at the same opacity just seals gaps between simplified province edges),
+    // with the curated tradition points drawn on top
     const polys = facet.cats.map(c=>
-      `<path d="${c.d}" fill="${c.color}" stroke="${c.color}" stroke-width="0.4"><title>${esc(c.name)}</title></path>`
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="0.4" stroke="${c.color}" stroke-width="0.4" stroke-opacity="0.4"><title>${esc(c.name)}</title></path>`
+    ).join("");
+    const pts = (facet.points||[]).map(p=>
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${facet.cats[p.r].color}" `+
+      `stroke="#fff" stroke-width="0.35"><title>${esc(p.t)} · ${esc(facet.cats[p.r].name)}</title></circle>`
     ).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
-      `<rect class="ocean" width="360" height="180"/>${polys}</svg>`;
+      `<rect class="ocean" width="360" height="180"/>${polys}${pts}</svg>`;
   }
   const key = KEY[fid], cont = facet.kind === "continuous";
   const colors = (facet.cats || []).map(c => c.color);
