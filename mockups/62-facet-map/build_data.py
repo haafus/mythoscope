@@ -222,9 +222,9 @@ def region_borders(regions):
 RELIGIONS = [
     ("Catholic Christianity", "#2C6FB3"), ("Orthodox Christianity", "#7048B6"),
     ("Protestant / other Christian", "#6FB1DE"), ("Sunni Islam", "#3E9B57"),
-    ("Shia Islam", "#0F8B8B"), ("Judaism", "#16365C"), ("Hinduism", "#E07B1A"),
+    ("Shia Islam", "#0B7A7A"), ("Judaism", "#16365C"), ("Hinduism", "#E07B1A"),
     ("Buddhism", "#E6B93E"), ("East Asian (folk / syncretic)", "#C0392B"),
-    ("Ethnic / traditional", "#8A5A32"),
+    ("Ethnic / traditional", "#744A28"),
 ]
 
 
