@@ -313,7 +313,7 @@ Malay world (13th–16th c.) → colonial/Christian (16th c.+).
 Batak · Dayak · Toraja · Filipino (Tagalog, Ifugao) · Malay · Polynesian (Maori, Hawaiian, Tahitian,
 Samoan, Tongan, Rapa Nui) · Micronesian · Fijian (coastal Melanesian) · Malagasy.
 
-### 10. Papua & Aboriginal Australia · `#383793`
+### 10. Papua & Aboriginal Australia · `#A9773F`
 **Description.** The non-Austronesian deep-Pacific — the Pleistocene **Sahul** population: Papuan /
 highland New Guinea peoples and Aboriginal Australians (the Dreaming). Distinguished from Austronesia
 by descent and antiquity (Sahul was settled ~50 ky ago, long before the Neolithic Austronesian
@@ -435,8 +435,15 @@ surrounding greens/blues/purples; East Asia's medium blue then passes on to **In
 East & North Africa takes Austronesia's dark-blue**, distinct against its red/yellow/purple
 Mediterranean neighbours. This trades away the warm Mediterranean orange, but the East-Asian legibility
 is worth it. A final trade — **Austronesia ↔ Inner Asia** (blue ⇄ green) — gives Austronesia the Prism
-green: it now reads clearly against Papua's indigo across the Sahul seam, and Inner Asia carries the
-blue among the greens and purples of the steppe.
+green, clear across the Sahul seam, and Inner Asia carries the blue among the greens and purples of the
+steppe.
+
+**Papua & Aboriginal Australia leaves the arc for a warm ochre** (`#A9773F`). At the blue→purple tail it
+was near-indistinguishable from the Near East's dark-blue, and the two are hard to tell apart even far
+apart on the map. Moved into the warm gap between the reds/oranges and the greens, it now separates
+cleanly from every neighbour (Austronesian green around it, the dark-blue Near East) — and ochre is apt
+for the Aboriginal "red centre". This is the one region placed purely for contrast rather than arc
+position.
 
 | # | region | base | light | dark | source |
 |---|---|---|---|---|---|
@@ -449,7 +456,7 @@ blue among the greens and purples of the steppe.
 | 7 | Mainland Southeast Asia | `#94346E` | `#BD6299` | `#591D41` | Prism magenta (↔ Lowland S. Am.) |
 | 8 | East Asia | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange (↔ Near East) |
 | 9 | Austronesia | `#0F8554` | `#26C583` | `#075534` | Prism green (↔ Inner Asia) |
-| 10 | Papua & Aboriginal Australia | `#383793` | `#6666BB` | `#201F59` | insert (blue↔purple) |
+| 10 | Papua & Aboriginal Australia | `#A9773F` | `#C9A578` | `#6E4C24` | warm ochre (off the arc — see note) |
 | 11 | Circumpolar North | `#5F4690` | `#8C78B5` | `#3A2A5A` | Prism purple |
 | 12 | Native North America | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green (↔ Caucasus) |
 | 13 | Mesoamerica & the Andes | `#994E95` | `#B984B7` | `#643162` | Prism orchid |

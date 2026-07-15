@@ -35,6 +35,7 @@
      координатами и палитрой CARTO Prism; это <b>не</b> индекс Березкина, а собственный список каталога.
      <b>regions · fill</b> — те же регионы и полный список традиций, но заливкой ареала, точки нейтральным цветом.
      <b>regions · areas</b> — ареалы регионов на реальных векторных границах (Natural Earth), полупрозрачная заливка + точки курируемых традиций.
+     <b>religions</b> — предоминантная религия по странам (современная письменная надстройка).
      Остальные фасеты раскрашивают один и тот же набор традиций Березкина. Переключай ось —
      карта перекрашивается. <b>hard layers</b> — жёсткие страты-листья рекурсивного geo-peel с поправкой
      на покрытие (мокап 45), <b>volume</b> — 14 разделов, сбалансированных по объёму фиксации Березкина
@@ -171,7 +172,7 @@ function render(){
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";

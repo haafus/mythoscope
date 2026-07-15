@@ -148,7 +148,7 @@ REGIONS = [
         ("Malay", 3, 102), ("Maori", -41, 175), ("Hawaiian", 20, -157), ("Tahitian", -17, -149),
         ("Samoan", -14, -172), ("Tongan", -21, -175), ("Rapa Nui", -27, -109), ("Micronesian", 7, 150),
         ("Fijian", -18, 178), ("Malagasy", -19, 47)]),
-    ("Papua & Aboriginal Australia", "#383793", [
+    ("Papua & Aboriginal Australia", "#A9773F", [
         ("Arrernte", -24, 134), ("Yolngu", -12, 136), ("Warlpiri", -20, 131), ("Pitjantjatjara", -26, 131),
         ("Enga", -5.5, 143.5), ("Huli", -6, 143), ("Melanesian", -6, 147)]),
     ("Circumpolar North", "#5F4690", [
@@ -202,7 +202,7 @@ REGION_DARK = {
     "Sub-Saharan Africa": "#953223", "Near East & North Africa": "#162857", "Europe": "#9B7208",
     "Caucasus & Iran": "#3C223D", "Inner Asia": "#0E3A54", "South Asia": "#216B6A",
     "Mainland Southeast Asia": "#591D41", "East Asia": "#8D5007", "Austronesia": "#075534",
-    "Papua & Aboriginal Australia": "#201F59", "Circumpolar North": "#3A2A5A",
+    "Papua & Aboriginal Australia": "#6E4C24", "Circumpolar North": "#3A2A5A",
     "Native North America": "#4D772E", "Mesoamerica & the Andes": "#643162",
     "Lowland South America": "#175361",
 }
@@ -215,6 +215,23 @@ def region_borders(regions):
     geo = json.loads((Path(__file__).resolve().parent / "regions_geo.json").read_text())
     return [{"name": name, "color": color, "dark": REGION_DARK[name], "d": geo.get(name, "")}
             for name, color, _ in regions]
+
+
+# predominant-religion choropleth palette (Abrahamic = cool, Islam = green, Indic = warm,
+# East Asian = red); paths precomputed by build_religions_geo.py into religions_geo.json
+RELIGIONS = [
+    ("Catholic Christianity", "#2C6FB3"), ("Orthodox Christianity", "#7048B6"),
+    ("Protestant / other Christian", "#6FB1DE"), ("Sunni Islam", "#35945F"),
+    ("Shia Islam", "#146356"), ("Judaism", "#16365C"), ("Hinduism", "#E07B1A"),
+    ("Buddhism", "#E6B93E"), ("East Asian (folk / syncretic)", "#C0392B"),
+]
+
+
+def religion_borders():
+    """Predominant religion per country as filled polygons (same Natural Earth borders as
+    the regions areas facet), precomputed by build_religions_geo.py into religions_geo.json."""
+    geo = json.loads((Path(__file__).resolve().parent / "religions_geo.json").read_text())
+    return [{"name": name, "color": color, "d": geo.get(name, "")} for name, color in RELIGIONS]
 
 
 def main():
@@ -538,9 +555,20 @@ def main():
                 "Антарктида не раскрашена",
     }
 
+    # Religions layer — predominant religion per country (the modern scriptural overlay stratum,
+    # not the deep indigenous layer the areas map colours)
+    facets["religions"] = {
+        "label": f"Religions · {len(RELIGIONS)}",
+        "kind": "borders",
+        "cats": religion_borders(),
+        "note": "предоминантная религия по странам (плюрализм) — современная письменная надстройка, "
+                "а не коренной пласт, который красит карта areas",
+    }
+
     data = {"facets": facets,
-            "order": ["regions", "borders", "territory", "hardlayers", "volume", "area", "family",
-                      "narrative", "subsistence", "diversity", "depth", "cosmology", "peopling"],
+            "order": ["regions", "borders", "territory", "religions", "hardlayers", "volume", "area",
+                      "family", "narrative", "subsistence", "diversity", "depth", "cosmology",
+                      "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
