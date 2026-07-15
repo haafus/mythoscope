@@ -265,3 +265,31 @@ traditions, the terminal end of the human expansion. Distinct from the Andean hi
   Central Asia, because Iran/the Persianate is a separate region); **Mainland Southeast Asia** (not
   Indochina, which is colonial-tinged and narrowly read); **Circumpolar North** (not "Circumpolar &
   Arctic", a tautology).
+
+## 8. Colour palette
+
+Built on **CARTOColors Prism** — a cartographer-designed qualitative palette (https://carto.com/carto-colors/).
+Prism's 11 coloured hues map onto the arc in spectral order (its 12th, a neutral grey, is dropped); the
+3 remaining slots are filled by colours interpolated *in Prism's style* into its two widest hue gaps
+(teal↔blue and blue↔purple), leaving the 11 originals untouched. The result is a continuous spectral
+ribbon along the out-of-Africa arc — hue carries the sequence, and the map's borders + labels carry the
+neighbour distinction (per-pair contrast is deliberately not maximised).
+
+Each region has a **base** (its map colour) plus **light**/**dark** ramp ends for sub-traditions.
+
+| # | region | base | light | dark | source |
+|---|---|---|---|---|---|
+| 1 | Sub-Saharan Africa | `#CC503E` | `#D79389` | `#953223` | Prism red |
+| 2 | Near East & North Africa | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange |
+| 3 | Europe | `#EDAD08` | `#EDC55F` | `#9B7208` | Prism gold |
+| 4 | Caucasus & Iran | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green |
+| 5 | Inner Asia | `#0F8554` | `#26C583` | `#075534` | Prism green |
+| 6 | South Asia | `#38A6A5` | `#70C5C4` | `#216B6A` | Prism teal |
+| 7 | Mainland Southeast Asia | `#2A8A9F` | `#59B3C7` | `#175361` | insert (teal↔blue) |
+| 8 | East Asia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue |
+| 9 | Austronesia | `#2A4895` | `#5473C2` | `#162857` | insert (blue↔purple) |
+| 10 | Papua & Aboriginal Australia | `#383793` | `#6666BB` | `#201F59` | insert (blue↔purple) |
+| 11 | Circumpolar North | `#5F4690` | `#8C78B5` | `#3A2A5A` | Prism purple |
+| 12 | Native North America | `#6F4070` | `#9F67A0` | `#3C223D` | Prism dark-purple |
+| 13 | Mesoamerica & the Andes | `#994E95` | `#B984B7` | `#643162` | Prism orchid |
+| 14 | Lowland South America | `#94346E` | `#BD6299` | `#591D41` | Prism magenta |
