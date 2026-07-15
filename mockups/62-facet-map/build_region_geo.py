@@ -42,10 +42,20 @@ OVERRIDE = {"Libya": "Near East & North Africa", "Turkey": "Caucasus & Iran",
             "Cuba": "Lowland South America", "Haiti": "Lowland South America",
             "Jamaica": "Lowland South America", "The Bahamas": "Lowland South America",
             "Aruba": "Lowland South America"}
-# admin-1 (province) overrides: coastal Han provinces snap to Taiwan's Austronesian
-# (Formosan) anchor just offshore — they are Han Chinese, i.e. East Asia
+# admin-1 (province) overrides where a province's centroid snaps to the wrong anchor:
+#  - coastal Han provinces are nearest Taiwan's Austronesian (Formosan) anchor offshore,
+#    but they are Han Chinese → East Asia;
+#  - the US Gulf/Southeast coast (Florida peninsula, Gulf shore) is nearest the Mesoamerican
+#    anchor across the Gulf, but it is the Southeastern culture area (Timucua, Calusa,
+#    Seminole, Muskogee) → Native North America;
+#  - western-Amazonian Brazilian states sit nearest the Andean anchor but are Amazon
+#    rainforest → Lowland South America.
 PROVINCE_OVERRIDE = {"Fujian": "East Asia", "Zhejiang": "East Asia", "Guangdong": "East Asia",
-                     "Jiangxi": "East Asia", "Shanghai": "East Asia"}
+                     "Jiangxi": "East Asia", "Shanghai": "East Asia",
+                     "Florida": "Native North America", "Louisiana": "Native North America",
+                     "Texas": "Native North America", "Alabama": "Native North America",
+                     "Mississippi": "Native North America",
+                     "Acre": "Lowland South America", "Rondônia": "Lowland South America"}
 
 
 def fetch(name):
