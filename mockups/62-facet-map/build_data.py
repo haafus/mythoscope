@@ -283,8 +283,8 @@ def main():
             "min": round(min(cosmos), 2), "max": round(max(cosmos), 2),
             # sequential purple: low (adventure-heavy) → high (cosmology-heavy).
             "ramp": ["#f3eef8", "#c8a8dd", "#9151d8", "#4a1e77"],
-            "note": "доля мотивов Категории A — космогония/этиология против приключений "
-                    "(мокапы 22/24)",
+            "note": "cosmology share A/(A+B) — доля мотивов Категории A (космогония/этиология) "
+                    "против B (приключения) (мокапы 22/24)",
         },
         "peopling": {
             "label": "Peopling",
@@ -297,8 +297,8 @@ def main():
     }
     facets["area"]["note"] = "12 макроареалов, детерминированно из areal_path (мокап 21)"
     facets["family"]["note"] = "~11 языковых/религиозных семей из языковой цепочки (мокап 21)"
-    facets["narrative"]["note"] = ("кластер традиции по нарративному профилю — KMeans k=8 "
-                                   "над 16-мерным профилем (мокапы 41/43)")
+    facets["narrative"]["note"] = ("narrative profile — кластер традиции по жанровому балансу, "
+                                   "KMeans k=8 над 16-мерным профилем (мокапы 41/43)")
     facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
     data = {"facets": facets,
