@@ -128,7 +128,10 @@ def main():
                     ri = rname_i[OVERRIDE[admin]]
                 else:
                     ri = int(rr[tree.query([lon, lat], k=1)[1]])
-                if names[ri] == "Inner Asia" and lat >= 62:  # keep the Circumpolar ring intact
+                # keep the Circumpolar ring intact: high-latitude Arctic land reads
+                # territorially as Circumpolar (Sakha in Siberia; the Canadian Arctic
+                # archipelago) even where the nearest tradition is Inner Asian / N. American
+                if names[ri] in ("Inner Asia", "Native North America") and lat >= 60:
                     ri = rname_i["Circumpolar North"]
                 paths[names[ri]].append(path_d(poly))
 
