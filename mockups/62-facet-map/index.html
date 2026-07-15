@@ -30,7 +30,8 @@
 <header>
   <h1>Фасеты традиций на карте</h1>
   <p>Один и тот же набор традиций Березкина, раскрашенный по выбранному фасету. Переключай ось —
-     карта перекрашивается. <b>area</b> выводится из <code>areal_path</code>, <b>family</b> — из языковой
+     карта перекрашивается. <b>hard layers</b> — жёсткие страты-листья рекурсивного geo-peel с поправкой
+     на покрытие (мокап 45), <b>area</b> выводится из <code>areal_path</code>, <b>family</b> — из языковой
      цепочки, <b>narrative</b> — кластер традиции по её нарративному профилю (KMeans k=8 над 16-мерным
      профилем мокапа 41 — как в мокапе 43), <b>subsistence</b> — из D-PLACE (ближайшее общество ≤ 250 км),
      <b>diversity</b> — β-turnover разнообразия мотивов по макроареалу (мокап 52), <b>depth</b> — средний
@@ -58,8 +59,8 @@
 <script>
 const D = window.DATA, GREY = "#c4c8cd";
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const KEY = { area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p", cosmology:"c", peopling:"e" };
-let active = "area";
+const KEY = { hardlayers:"h", area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p", cosmology:"c", peopling:"e" };
+let active = "hardlayers";
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 function rampColor(ramp, x){          // x in [0,1] → interpolated colour on the ramp

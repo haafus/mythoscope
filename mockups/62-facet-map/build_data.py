@@ -65,6 +65,13 @@ def main():
     f21 = _load("_f21", MOCKS / "21-facet-population" / "build_data.py")
     coords = geo.berezkin_coords()
 
+    # Hard layers: the coverage-corrected recursive geo-peel of mockup 45. Importing it runs
+    # the peel; each kept tradition lands in a leaf stratum with its own name and colour.
+    m45 = _load("_m45", MOCKS / "45-stratigraphic-peeling" / "build_data.py")
+    hard_cats = [{"name": nd["name"], "color": nd["color"]} for nd in m45.leaves]
+    hard_ix = {nd["id"]: i for i, nd in enumerate(m45.leaves)}
+    tid_hard = {m45.keep[i]: hard_ix[lid] for i, lid in m45.leaf_of.items() if lid in hard_ix}
+
     with open(ROOT / "outputs" / "motifs" / "berezkin.json", encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
@@ -230,6 +237,7 @@ def main():
                if r[3] >= 0 and f21.AREAS12[r[3]] in PEOPLING}
 
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
+               "h": tid_hard.get(r[0], -1),
                "a": r[3], "f": r[4], "n": r[5], "s": r[6],
                "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None,
                "p": round(depth_eq[r[0]], 3) if r[0] in depth_eq else None,
@@ -250,7 +258,6 @@ def main():
     # slate-blue / terracotta / teal-green / plum. Contrasting but not flat primaries.
     sub_colors = ["#3f6f9e", "#cc7a33", "#2f8f6b", "#9c4576"]
     betas = list(tid_beta.values())
-    depths = list(tid_depth.values())
     cosmos = list(tid_cosmo.values())
     peos = list(tid_peo.values())
     facets = {
@@ -295,6 +302,13 @@ def main():
             "note": "возраст первого заселения макроареала, тыс. лет назад (мокап 39)",
         },
     }
+    hc = Counter(p["h"] for p in points if p["h"] >= 0)
+    facets["hardlayers"] = {
+        "label": f"Hard layers · {len(hard_cats)}",
+        "cats": [{"name": c["name"], "color": c["color"], "n": hc.get(i, 0)}
+                 for i, c in enumerate(hard_cats)],
+        "note": "рекурсивный geo-peel с поправкой на покрытие — жёсткие страты-листья (мокап 45)",
+    }
     facets["area"]["note"] = "12 макроареалов, детерминированно из areal_path (мокап 21)"
     facets["family"]["note"] = "~11 языковых/религиозных семей из языковой цепочки (мокап 21)"
     facets["narrative"]["note"] = ("кластер традиции по нарративному профилю — KMeans k=8 "
@@ -302,8 +316,8 @@ def main():
     facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
     data = {"facets": facets,
-            "order": ["area", "family", "narrative", "subsistence", "diversity", "depth",
-                      "cosmology", "peopling"],
+            "order": ["hardlayers", "area", "family", "narrative", "subsistence", "diversity",
+                      "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
