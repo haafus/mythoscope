@@ -32,8 +32,10 @@ FILES = {"admin0": "ne_50m_admin_0_countries.geojson",
 # countries with admin-1 provinces here — split these, they straddle regions
 SPLIT = {"Russia", "China", "United States of America", "Canada",
          "Indonesia", "India", "Brazil", "Australia"}
-# canon overrides where a unit's centroid snaps to the wrong region
-OVERRIDE = {"Libya": "Near East & North Africa", "Turkey": "Caucasus & Iran"}
+# canon overrides where a unit's centroid snaps to the wrong region (e.g. the Arab
+# SE-Arabian shore is closer to an Iranian anchor across the narrow Gulf than to ours)
+OVERRIDE = {"Libya": "Near East & North Africa", "Turkey": "Caucasus & Iran",
+            "Oman": "Near East & North Africa", "United Arab Emirates": "Near East & North Africa"}
 
 
 def fetch(name):
