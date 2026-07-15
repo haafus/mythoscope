@@ -40,7 +40,53 @@ Known conflicts: geography vs volume (Europe is small in area but huge in text);
 commonality vs volume (the literate Old World is few traditions / vast text; the oral world is many
 traditions / little text); expressiveness vs volume (balance-driven merges read oddly as sections).
 
+## Chosen scheme — `region` (14)
+
+The single top-level classification. Field name: **`region`** (14 values); the two-level model is
+`region` → `tradition` (Greek, Norse, …). `region` supersedes the retired `major_tradition` and the
+Berezkin `area` as the one primary axis. (Alternative field name if `area` is kept alongside:
+`sphere`.) Descends from candidate B below, refined over many passes (Europe merged to one; Caucasus
+paired with Iran; Asia split by cultural sphere — Indosphere vs Sinosphere; Austronesia and Sahul
+separated by descent; names checked for language/clarity/brevity).
+
+Ordered as an **out-of-Africa arc**: cradle → exit corridor → the whole contiguous Old World → the
+one deliberate seam at the Old-World/New-World boundary → the Americas, ending at the terminal tip of
+human settlement. Every Old-World transition is geographically contiguous; the single seam is
+`Papua & Aboriginal Australia → Circumpolar North` (the Pacific dead-end crossing to the New World
+via the Bering bridge).
+
+| # | region | contents |
+|---|---|---|
+| 1 | **Sub-Saharan Africa** | Niger-Congo/Bantu, Nilo-Saharan, Cushitic, Khoisan |
+| 2 | **Near East & North Africa** | Mesopotamia, Egypt, Levant, Arabia, Anatolia (Hittite), Maghreb; Abrahamic origins |
+| 3 | **Europe** | Greek, Roman, Celtic, Germanic/Norse, Slavic, Baltic, Finno-Ugric (Classical/Northern as sub-rubrics) |
+| 4 | **Caucasus & Iran** | Caucasian peoples + Nart epic; Persian/Zoroastrian/Iranian; Armenian, Georgian |
+| 5 | **Inner Asia** | Turco-Mongol steppe (Turkestan, southern Siberia–Mongolia); Tengrist, nomadic |
+| 6 | **South Asia** | Vedic, Hindu, Buddhist, Jain, Dravidian |
+| 7 | **Mainland Southeast Asia** | Burmese, Thai, Lao, Khmer, Vietnamese, Tibeto-Burman/Hmong hill peoples (Indianized) |
+| 8 | **East Asia** | China, Korea, Japan (Sinosphere; culturally Sinicized only) |
+| 9 | **Austronesia** | Taiwan (Formosan homeland) + island SE Asia + Pacific Austronesians + Madagascar |
+| 10 | **Papua & Aboriginal Australia** | non-Austronesian Sahul: Papuan/highland New Guinea + Aboriginal Australia |
+| 11 | **Circumpolar North** | NE Siberia + boreal taiga + Beringia + Arctic/Subarctic North America + Greenland |
+| 12 | **Native North America** | Woodlands, Plains, Plateau, California, Southwest |
+| 13 | **Mesoamerica & the Andes** | Maya, Aztec/Nahua, Inca/Quechua, Chibcha |
+| 14 | **Lowland South America** | Tupí, Carib, Ge, Arawak; Amazonia, Chaco, Guiana |
+
+Resolved boundary calls: **Vietnam → Mainland Southeast Asia** (Austroasiatic + geography + Berezkin
+grouping outweigh the Sinic literary overlay); **island SE Asia (Nusantara) → Austronesia**, not
+mainland SE Asia or a vague "Oceania" (keeps the Austronesian cultural area intact, anchored by
+Taiwan). Naming conventions: add the indigenous qualifier only where the bare name reads as the
+modern nation — **Native** North America, **Aboriginal** Australia — not elsewhere.
+
+*Note on granularity vs the corpus:* this is the cultural-areal answer. Measured against the
+obtainable full-text corpus (criterion 4), it still concentrates text in a few Old-World regions and
+leaves the oral regions text-thin; if the catalogue is later re-weighted by text, the heavyweight
+regions (South Asia, Near East, Europe) would split toward scheme **C**, and the oral regions would
+stay pooled. `region` is the browsing/navigation backbone; the corpus fills it unevenly by design.
+
 ## Candidate schemes
+
+*(History — the chosen scheme above evolved from candidate B.)*
 
 ### A — Volume-balanced (14), renamed for clarity
 
