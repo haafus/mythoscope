@@ -127,7 +127,7 @@ REGIONS = [
         ("Persian/Zoroastrian", 32, 53), ("Scythian", 47, 36), ("Sogdian", 39, 66),
         ("Ossetian", 43, 44), ("Armenian", 40, 45), ("Georgian", 42, 44), ("Circassian", 44, 40),
         ("Chechen/Vainakh", 43, 46), ("Dagestani", 42, 47.5), ("Kurdish", 37, 43), ("Azeri", 40, 48)]),
-    ("Inner Asia", "#0F8554", [
+    ("Inner Asia", "#1D6996", [
         ("Turkic", 50, 88), ("Kyrgyz", 41, 75), ("Kazakh", 48, 68), ("Uyghur", 42, 82),
         ("Yakut/Sakha", 62, 130), ("Mongol", 47, 105), ("Buryat", 52, 108), ("Kalmyk", 46, 45),
         ("Tuvan", 51, 94), ("Altai", 50, 86), ("Tibetan", 30, 90), ("Manchu", 44, 125)]),
@@ -142,7 +142,7 @@ REGIONS = [
     ("East Asia", "#E17C05", [
         ("Chinese", 34, 110), ("Korean", 37, 128), ("Japanese", 36, 138), ("Ryukyuan", 26, 128),
         ("Ainu", 43, 143), ("Yi", 26, 102)]),
-    ("Austronesia", "#1D6996", [
+    ("Austronesia", "#0F8554", [
         ("Formosan", 23.5, 121), ("Javanese", -7, 110), ("Balinese", -8, 115), ("Sundanese", -7, 107),
         ("Batak", 2, 99), ("Dayak", 0, 114), ("Toraja", -3, 120), ("Filipino", 15, 121),
         ("Malay", 3, 102), ("Maori", -41, 175), ("Hawaiian", 20, -157), ("Tahitian", -17, -149),

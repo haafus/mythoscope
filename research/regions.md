@@ -185,7 +185,7 @@ literary epic (Shahnameh ~1000 CE).
 **Traditions.** Persian/Zoroastrian · Scythian · Sogdian · Ossetian (Nart) · Armenian · Georgian ·
 Circassian (Nart) · Chechen/Vainakh (Nart) · Dagestani peoples · (Kurdish · Azeri).
 
-### 5. Inner Asia · `#0F8554`
+### 5. Inner Asia · `#1D6996`
 **Description.** The Turco-Mongol nomadic steppe — the pastoralist, shamanic, Tengrist interior of
 Asia, with its own great oral epics. "Inner Asia" (not "Central Asia") because Iran/the Persianate
 oasis is in #4; this region is specifically the nomadic steppe belt. Tibet is a boundary case (Bon /
@@ -239,7 +239,7 @@ Shinto codification (Kojiki 712 CE, Nihon Shoki 720 CE) → vernacular-novel fix
 **Traditions.** Chinese (Han; Taoist, Confucian, Chinese folk, Chinese Buddhist) · Korean · Japanese
 (Shinto) · Ryukyuan · Ainu (boundary) · southern-China ethnic minorities (Yi; boundary with SE Asia).
 
-### 9. Austronesia · `#1D6996`
+### 9. Austronesia · `#0F8554`
 **Description.** The Austronesian cultural area — one language family and one Neolithic maritime
 expansion, from the Taiwan homeland through island Southeast Asia to the Pacific and Madagascar. Its
 own region to keep this cohesive descent-based area intact (crit 2), anchored by the Formosan
@@ -373,10 +373,12 @@ Because the two hemispheres never share map space, the borrowed hues collide wit
 **A third rotation lifts the East-Asian / Pacific cluster,** which had piled blue (East Asia),
 dark-blue (Austronesia) and indigo (Papua) into one quadrant. A 3-cycle across East Asia, Austronesia
 and West Asia: **East Asia takes orange** (from Near East & North Africa) so it pops among the
-surrounding greens/blues/purples; **Austronesia takes East Asia's medium blue**, a lighter cyan that
-now reads clearly against Papua's indigo across the Sahul seam; and **Near East & North Africa takes
-Austronesia's dark-blue**, distinct against its red/yellow/purple Mediterranean neighbours. This trades
-away the warm Mediterranean orange, but the East-Asian legibility is worth it.
+surrounding greens/blues/purples; East Asia's medium blue then passes on to **Inner Asia**, and **Near
+East & North Africa takes Austronesia's dark-blue**, distinct against its red/yellow/purple
+Mediterranean neighbours. This trades away the warm Mediterranean orange, but the East-Asian legibility
+is worth it. A final trade — **Austronesia ↔ Inner Asia** (blue ⇄ green) — gives Austronesia the Prism
+green: it now reads clearly against Papua's indigo across the Sahul seam, and Inner Asia carries the
+blue among the greens and purples of the steppe.
 
 | # | region | base | light | dark | source |
 |---|---|---|---|---|---|
@@ -384,11 +386,11 @@ away the warm Mediterranean orange, but the East-Asian legibility is worth it.
 | 2 | Near East & North Africa | `#2A4895` | `#5473C2` | `#162857` | insert blue↔purple (↔ Austronesia via E. Asia) |
 | 3 | Europe | `#EDAD08` | `#EDC55F` | `#9B7208` | Prism gold |
 | 4 | Caucasus & Iran | `#6F4070` | `#9F67A0` | `#3C223D` | Prism dark-purple (↔ N. America) |
-| 5 | Inner Asia | `#0F8554` | `#26C583` | `#075534` | Prism green |
+| 5 | Inner Asia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue (↔ Austronesia) |
 | 6 | South Asia | `#38A6A5` | `#70C5C4` | `#216B6A` | Prism teal |
 | 7 | Mainland Southeast Asia | `#94346E` | `#BD6299` | `#591D41` | Prism magenta (↔ Lowland S. Am.) |
 | 8 | East Asia | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange (↔ Near East) |
-| 9 | Austronesia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue (↔ E. Asia) |
+| 9 | Austronesia | `#0F8554` | `#26C583` | `#075534` | Prism green (↔ Inner Asia) |
 | 10 | Papua & Aboriginal Australia | `#383793` | `#6666BB` | `#201F59` | insert (blue↔purple) |
 | 11 | Circumpolar North | `#5F4690` | `#8C78B5` | `#3A2A5A` | Prism purple |
 | 12 | Native North America | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green (↔ Caucasus) |
