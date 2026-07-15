@@ -483,9 +483,40 @@ def main():
         "note": "курированные традиции канона (research/regions.md), не индекс Березкина; палитра CARTO Prism",
     }
 
+    # Territory layer — ~60 leading traditions (first few per region), region areas washed in
+    # their colour, tradition points a single neutral tone. Caps sum to 60, roughly proportional
+    # to each region's full tradition count.
+    keep = {"Sub-Saharan Africa": 7, "Near East & North Africa": 5, "Europe": 5,
+            "Caucasus & Iran": 3, "Inner Asia": 4, "South Asia": 4, "Mainland Southeast Asia": 3,
+            "East Asia": 2, "Austronesia": 6, "Papua & Aboriginal Australia": 2,
+            "Circumpolar North": 5, "Native North America": 6, "Mesoamerica & the Andes": 4,
+            "Lowland South America": 4}
+    terr_pts = [{"x": float(lon), "y": float(lat), "r": ri, "t": tname}
+                for ri, (rname, _, trads) in enumerate(REGIONS)
+                for tname, lat, lon in trads[:keep[rname]]]
+    tgroups = defaultdict(list)
+    for i, p in enumerate(terr_pts):
+        tgroups[(round(p["x"]), round(p["y"]))].append(i)
+    for members in tgroups.values():
+        if len(members) > 1:
+            span = 2.0 * math.sqrt(len(members))
+            for j, i in enumerate(members):
+                ox, oy = _sunflower(j, len(members))
+                terr_pts[i]["x"] = round(terr_pts[i]["x"] + ox * span, 2)
+                terr_pts[i]["y"] = round(terr_pts[i]["y"] + oy * span, 2)
+    tcounts = Counter(p["r"] for p in terr_pts)
+    facets["territory"] = {
+        "label": f"Regions · fill · {len(terr_pts)}",
+        "kind": "territory",
+        "cats": [{"name": rname, "color": rcolor, "n": tcounts.get(ri, 0)}
+                 for ri, (rname, rcolor, _) in enumerate(REGIONS)],
+        "points": terr_pts,
+        "note": "60 ведущих традиций (по ~4 на регион); заливка — ареал региона, точки нейтральны",
+    }
+
     data = {"facets": facets,
-            "order": ["regions", "hardlayers", "volume", "area", "family", "narrative", "subsistence",
-                      "diversity", "depth", "cosmology", "peopling"],
+            "order": ["regions", "territory", "hardlayers", "volume", "area", "family", "narrative",
+                      "subsistence", "diversity", "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
