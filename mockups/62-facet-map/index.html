@@ -29,7 +29,9 @@
 <main>
 <header>
   <h1>Фасеты традиций на карте</h1>
-  <p>Один и тот же набор традиций Березкина, раскрашенный по выбранному фасету. Переключай ось —
+  <p><b>regions</b> — курированные традиции 14 регионов канона (<code>research/regions.md</code>) с ручными
+     координатами и палитрой CARTO Prism; это <b>не</b> индекс Березкина, а собственный список каталога.
+     Остальные фасеты раскрашивают один и тот же набор традиций Березкина. Переключай ось —
      карта перекрашивается. <b>hard layers</b> — жёсткие страты-листья рекурсивного geo-peel с поправкой
      на покрытие (мокап 45), <b>volume</b> — 14 разделов, сбалансированных по объёму фиксации Березкина
      (~8–10k атрибуций на раздел), <b>area</b> выводится из <code>areal_path</code>, <b>family</b> — из языковой
@@ -61,7 +63,7 @@
 const D = window.DATA, GREY = "#c4c8cd";
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const KEY = { hardlayers:"h", volume:"v", area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p", cosmology:"c", peopling:"e" };
-let active = "hardlayers";
+let active = "regions";
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 function rampColor(ramp, x){          // x in [0,1] → interpolated colour on the ramp
@@ -72,7 +74,17 @@ function rampColor(ramp, x){          // x in [0,1] → interpolated colour on t
 }
 
 function drawMap(fid){
-  const facet = D.facets[fid] || {}, key = KEY[fid], cont = facet.kind === "continuous";
+  const facet = D.facets[fid] || {};
+  if (facet.kind === "regions"){
+    const cols = facet.cats.map(c=>c.color);
+    const land = `<path class="land" d="${window.LAND||""}"/>`;
+    const pts = facet.points.map(p=>
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.9" fill="${cols[p.r]}" `+
+      `fill-opacity="0.95" stroke="#fff" stroke-width="0.35"><title>${esc(p.t)} · ${esc(facet.cats[p.r].name)}</title></circle>`
+    ).join("");
+    return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${pts}</svg>`;
+  }
+  const key = KEY[fid], cont = facet.kind === "continuous";
   const colors = (facet.cats || []).map(c => c.color);
   const has = p => cont ? p[key] != null : p[key] >= 0;
   const land = `<path class="land" d="${window.LAND||""}"/>`;
@@ -91,6 +103,11 @@ function drawMap(fid){
 
 function drawLegend(fid){
   const facet = D.facets[fid], key = KEY[fid];
+  if (facet.kind === "regions"){
+    return facet.cats.map(c=>
+      `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)} <span class="n">${c.n}</span></span>`
+    ).join("");
+  }
   if (facet.kind === "continuous"){
     const uncol = D.points.filter(p=>p[key]==null).length;
     const grad = `linear-gradient(to right, ${facet.ramp.join(",")})`;

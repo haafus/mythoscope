@@ -102,6 +102,80 @@ def section_of(ap):
     return None
 
 
+# The 14 canonical regions (research/regions.md) with their curated traditions and hand coordinates
+# (lat, lon). This is NOT the Berezkin index — it is the catalogue's own tradition list, coloured by
+# the CARTOColors Prism region palette (regions.md §8).
+REGIONS = [
+    ("Sub-Saharan Africa", "#CC503E", [
+        ("Yoruba", 8, 4), ("Igbo", 6, 7), ("Akan/Ashanti", 7, -2), ("Fon", 7, 2), ("Dogon", 14, -3),
+        ("Bambara", 13, -6), ("Serer", 14, -16), ("Kongo", -6, 14), ("Yombe", -5, 13),
+        ("Zulu", -28, 31), ("Xhosa", -32, 27), ("Shona", -19, 30), ("Kikuyu", -1, 37),
+        ("Baganda", 0, 32), ("Luba", -8, 24), ("Fang", 1, 11), ("Dinka", 8, 30), ("Nuer", 9, 32),
+        ("Maasai", -2, 36), ("Azande", 5, 27), ("San", -22, 21), ("Khoekhoe", -29, 19),
+        ("Mbuti", 1, 28), ("Ethiopian", 11, 39)]),
+    ("Near East & North Africa", "#E17C05", [
+        ("Sumerian", 31, 46), ("Akkadian", 33, 44), ("Babylonian", 32, 44.5), ("Assyrian", 36, 43),
+        ("Egyptian", 26, 31), ("Hittite", 39, 33), ("Hurrian", 37, 41), ("Ugaritic", 35, 36),
+        ("Phoenician", 34, 35), ("Elamite", 32, 48), ("pre-Islamic Arabian", 24, 45),
+        ("Jewish", 31.5, 35), ("Christian", 31.8, 35.4), ("Islamic", 21, 40), ("Berber", 31, 3)]),
+    ("Europe", "#EDAD08", [
+        ("Greek", 39, 22), ("Roman", 42, 12.5), ("Etruscan", 43, 11.5), ("Celtic", 53, -8),
+        ("Norse", 62, 10), ("Anglo-Saxon", 52, -1.5), ("Continental Germanic", 51, 10),
+        ("Slavic", 51, 27), ("Baltic", 56, 24), ("Finnish", 62, 25), ("Estonian", 59, 26),
+        ("Sami", 68, 22), ("Hungarian", 47, 19), ("Mordvin/Mari", 55, 46), ("Basque", 43, -2)]),
+    ("Caucasus & Iran", "#73AF48", [
+        ("Persian/Zoroastrian", 32, 53), ("Scythian", 47, 36), ("Sogdian", 39, 66),
+        ("Ossetian", 43, 44), ("Armenian", 40, 45), ("Georgian", 42, 44), ("Circassian", 44, 40),
+        ("Chechen/Vainakh", 43, 46), ("Dagestani", 42, 47.5), ("Kurdish", 37, 43), ("Azeri", 40, 48)]),
+    ("Inner Asia", "#0F8554", [
+        ("Turkic", 50, 88), ("Kyrgyz", 41, 75), ("Kazakh", 48, 68), ("Uyghur", 42, 82),
+        ("Yakut/Sakha", 62, 130), ("Mongol", 47, 105), ("Buryat", 52, 108), ("Kalmyk", 46, 45),
+        ("Tuvan", 51, 94), ("Altai", 50, 86), ("Tibetan", 30, 90), ("Manchu", 44, 125)]),
+    ("South Asia", "#38A6A5", [
+        ("Vedic", 29, 77), ("Hindu", 25, 80), ("Buddhist", 25, 85), ("Jain", 23, 78),
+        ("Dravidian", 11, 78), ("Munda/Santal", 23, 86), ("Gond", 21, 80), ("Bhil", 23, 74),
+        ("Sinhalese", 7, 81), ("Newar/Nepali", 28, 85), ("Sikh", 31, 75), ("Kashmiri", 34, 75)]),
+    ("Mainland Southeast Asia", "#2A8A9F", [
+        ("Burmese", 21, 96), ("Mon", 16, 97), ("Thai/Tai", 15, 100), ("Lao", 18, 103),
+        ("Shan", 22, 98), ("Khmer", 12, 105), ("Vietnamese", 18, 106), ("Cham", 13, 109),
+        ("Hmong-Mien", 24, 104), ("Karen", 18, 97.5), ("Tibeto-Burman", 26, 95)]),
+    ("East Asia", "#1D6996", [
+        ("Chinese", 34, 110), ("Korean", 37, 128), ("Japanese", 36, 138), ("Ryukyuan", 26, 128),
+        ("Ainu", 43, 143), ("Yi", 26, 102)]),
+    ("Austronesia", "#2A4895", [
+        ("Formosan", 23.5, 121), ("Javanese", -7, 110), ("Balinese", -8, 115), ("Sundanese", -7, 107),
+        ("Batak", 2, 99), ("Dayak", 0, 114), ("Toraja", -3, 120), ("Filipino", 15, 121),
+        ("Malay", 3, 102), ("Maori", -41, 175), ("Hawaiian", 20, -157), ("Tahitian", -17, -149),
+        ("Samoan", -14, -172), ("Tongan", -21, -175), ("Rapa Nui", -27, -109), ("Micronesian", 7, 150),
+        ("Fijian", -18, 178), ("Malagasy", -19, 47)]),
+    ("Papua & Aboriginal Australia", "#383793", [
+        ("Arrernte", -24, 134), ("Yolngu", -12, 136), ("Warlpiri", -20, 131), ("Pitjantjatjara", -26, 131),
+        ("Enga", -5.5, 143.5), ("Huli", -6, 143), ("Melanesian", -6, 147)]),
+    ("Circumpolar North", "#5F4690", [
+        ("Chukchi", 66, 175), ("Koryak", 62, 166), ("Yukaghir", 68, 150), ("Nivkh", 53, 142),
+        ("Itelmen", 56, 159), ("Evenki", 60, 100), ("Even", 63, 140), ("Khanty", 62, 70),
+        ("Mansi", 62, 62), ("Nenets", 68, 73), ("Ket", 63, 88), ("Yupik", 61, -162),
+        ("Inupiat", 70, -153), ("Kalaallit", 72, -40), ("Aleut", 53, -170), ("Dene", 62, -130),
+        ("Northern Cree", 54, -80)]),
+    ("Native North America", "#6F4070", [
+        ("Iroquois", 43, -76), ("Ojibwe", 47, -90), ("Abenaki", 45, -71), ("Lakota/Sioux", 44, -101),
+        ("Cheyenne", 40, -104), ("Pawnee", 41, -98), ("Blackfoot", 49, -113), ("Nez Perce", 46, -116),
+        ("Salish", 48, -120), ("Pomo", 39, -123), ("Miwok", 38, -120), ("Yokuts", 36, -119),
+        ("Navajo", 36, -109), ("Hopi", 36, -110.5), ("Zuni", 35, -108.5), ("Pueblo", 35.5, -106),
+        ("Apache", 33, -109.5), ("Tlingit", 58, -134), ("Haida", 53, -132), ("Kwakwaka'wakw", 51, -127),
+        ("Tsimshian", 54, -130)]),
+    ("Mesoamerica & the Andes", "#994E95", [
+        ("Aztec/Nahua", 19, -99), ("Maya", 17, -89), ("Mixtec", 17, -97), ("Zapotec", 17, -96),
+        ("Olmec", 18, -94), ("Toltec", 20, -99.3), ("Tarascan", 19.5, -101), ("Huichol", 22, -104),
+        ("Inca/Quechua", -13, -72), ("Aymara", -16, -69), ("Moche", -8, -79), ("Chibcha/Muisca", 5, -74),
+        ("Nazca", -14, -75)]),
+    ("Lowland South America", "#94346E", [
+        ("Tupí/Guaraní", -20, -50), ("Carib", 8, -62), ("Arawak", 3, -60), ("Ge", -10, -52),
+        ("Yanomami", 2, -64), ("Tucano", -1, -70), ("Jivaro/Shuar", -3, -78), ("Warao", 9, -62),
+        ("Mapuche", -38, -71), ("Selk'nam", -54, -68), ("Tehuelche", -46, -70), ("Guaycuru", -24, -58)]),
+]
+
+
 def _load(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
     m = importlib.util.module_from_spec(spec)
@@ -385,8 +459,32 @@ def main():
                                    "над 16-мерным профилем (мокапы 41/43)")
     facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
+    # Regions layer — the catalogue's own curated traditions (research/regions.md), its own point set
+    # (not the Berezkin index), coloured by the CARTOColors Prism region palette.
+    region_pts = [{"x": float(lon), "y": float(lat), "r": ri, "t": tname}
+                  for ri, (_, _, trads) in enumerate(REGIONS) for tname, lat, lon in trads]
+    rgroups = defaultdict(list)
+    for i, p in enumerate(region_pts):
+        rgroups[(round(p["x"]), round(p["y"]))].append(i)
+    for members in rgroups.values():
+        if len(members) > 1:
+            span = 1.5 * math.sqrt(len(members))
+            for j, i in enumerate(members):
+                ox, oy = _sunflower(j, len(members))
+                region_pts[i]["x"] = round(region_pts[i]["x"] + ox * span, 2)
+                region_pts[i]["y"] = round(region_pts[i]["y"] + oy * span, 2)
+    rcounts = Counter(p["r"] for p in region_pts)
+    facets["regions"] = {
+        "label": f"Regions · {len(REGIONS)}",
+        "kind": "regions",
+        "cats": [{"name": rname, "color": rcolor, "n": rcounts.get(ri, 0)}
+                 for ri, (rname, rcolor, _) in enumerate(REGIONS)],
+        "points": region_pts,
+        "note": "курированные традиции канона (research/regions.md), не индекс Березкина; палитра CARTO Prism",
+    }
+
     data = {"facets": facets,
-            "order": ["hardlayers", "volume", "area", "family", "narrative", "subsistence",
+            "order": ["regions", "hardlayers", "volume", "area", "family", "narrative", "subsistence",
                       "diversity", "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
