@@ -36,7 +36,12 @@ SPLIT = {"Russia", "China", "United States of America", "Canada",
 # SE-Arabian shore is closer to an Iranian anchor across the narrow Gulf than to ours)
 OVERRIDE = {"Libya": "Near East & North Africa", "Turkey": "Caucasus & Iran",
             "Oman": "Near East & North Africa", "United Arab Emirates": "Near East & North Africa",
-            "Ecuador": "Mesoamerica & the Andes"}  # Andean highland heartland, not its Amazon Oriente
+            "Ecuador": "Mesoamerica & the Andes",  # Andean highland heartland, not its Amazon Oriente
+            # the Antilles are Arawak/Taíno/Carib (South-American expansions), not the literate
+            # Meso/Andean states; the Greater Antilles snap to the Maya anchor, so pin them to Lowland SA
+            "Cuba": "Lowland South America", "Haiti": "Lowland South America",
+            "Jamaica": "Lowland South America", "The Bahamas": "Lowland South America",
+            "Aruba": "Lowland South America"}
 # admin-1 (province) overrides: coastal Han provinces snap to Taiwan's Austronesian
 # (Formosan) anchor just offshore — they are Han Chinese, i.e. East Asia
 PROVINCE_OVERRIDE = {"Fujian": "East Asia", "Zhejiang": "East Asia", "Guangdong": "East Asia",
