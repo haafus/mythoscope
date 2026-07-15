@@ -38,6 +38,69 @@ RAMP = ["#2f6fed", "#12a150", "#d97706", "#9151d8", "#0e9aa7", "#c2410c",
         "#e11d48", "#7d8b3a", "#0891b2", "#a3457e", "#4338ca", "#65a30d",
         "#be123c", "#0f766e", "#7c3aed", "#b45309"]
 
+# Volume-balanced sections: Berezkin's areal subregions binned into 14 sections of roughly
+# equal documentation volume (~8–10k motif attestations each), so no section is a heap and
+# none is a single tradition. Heavy blocks (Europe, West Asia, N America) are split by
+# areal_path subregion; thin ones (Oceania, Australia, East Asia) are pooled.
+SECTIONS_VOL = [
+    "Southern & Western Europe", "Slavic & Balkan", "Baltic, Scandinavia & Finno-Ugric",
+    "Near East & North Africa", "Caucasus & Asia Minor", "South Asia & Himalaya",
+    "East & Mainland SE Asia", "Austronesia & Oceania", "Sub-Saharan Africa", "Siberia",
+    "Arctic & Northwest America", "North America - Plains, Woodlands & Southwest",
+    "Mesoamerica & Andes", "Amazonia & Lowland South America",
+]
+
+
+def section_of(ap):
+    """Assign a tradition (by its areal_path) to one volume-balanced section."""
+    if not ap or not ap[0]:
+        return None
+    m0 = ap[0][1].upper()
+    sub = ap[1][1].upper() if len(ap) > 1 and ap[1] else ""
+    hs = lambda *ks: any(k in sub for k in ks)   # noqa: E731
+    hm = lambda *ks: any(k in m0 for k in ks)    # noqa: E731
+    if m0 == "WESTERN EUROPE, NORTH AFRICA":
+        if hs("NORTH AFRICA", "HORN"):
+            return "Near East & North Africa"
+        if hs("BALKAN"):
+            return "Slavic & Balkan"
+        return "Southern & Western Europe"
+    if m0 == "NORTHERN AND EASTERN EUROPE":
+        return "Slavic & Balkan" if hs("SLAV") else "Baltic, Scandinavia & Finno-Ugric"
+    if "SOUTHWEST AND CENTRAL ASIA" in m0 or hm("ARYAN INDIA"):
+        if hs("CAUCASUS"):
+            return "Caucasus & Asia Minor"
+        if hs("ARYAN AND SOUTH INDIA"):
+            return "South Asia & Himalaya"
+        return "Near East & North Africa"
+    if hm("TIBET") and hm("SOUTHEAST ASIA"):
+        if hs("BURMA", "INDOCHINA"):
+            return "East & Mainland SE Asia"
+        if hs("NUSANTARA"):
+            return "Austronesia & Oceania"
+        return "South Asia & Himalaya"
+    if hm("SIBERIA") and hm("MONGOLIA"):
+        return "Siberia"
+    if "NORTH AMERICA: NORTH AND WEST" in m0:
+        if hs("SUBARCTIC", "NORTHWEST COAST", "PLATEAU"):
+            return "Arctic & Northwest America"
+        return "North America - Plains, Woodlands & Southwest"
+    if hm("EAST ASIA"):
+        return "East & Mainland SE Asia"
+    if hm("OCEANIA", "AUSTRALIA", "MADAGASCAR"):
+        return "Austronesia & Oceania"
+    if hm("SUB-SAHARAN AFRICA"):
+        return "Sub-Saharan Africa"
+    if hm("BERINGIA"):
+        return "Arctic & Northwest America"
+    if hm("PLAINS AND SOUTHEAST"):
+        return "North America - Plains, Woodlands & Southwest"
+    if hm("MEXICO"):
+        return "Mesoamerica & Andes"
+    if hm("EASTERN SOUTH AMERICA", "SOUTHERN SOUTH AMERICA"):
+        return "Amazonia & Lowland South America"
+    return None
+
 
 def _load(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -236,8 +299,12 @@ def main():
     tid_peo = {r[0]: PEOPLING[f21.AREAS12[r[3]]] for r in recs
                if r[3] >= 0 and f21.AREAS12[r[3]] in PEOPLING}
 
+    vsec_ix = {s: i for i, s in enumerate(SECTIONS_VOL)}
+    tid_vsec = {t: vsec_ix.get(section_of(v.get("areal_path") or []), -1)
+                for t, v in T.items()}
+
     points = [{"x": xy_by_i[i][0], "y": xy_by_i[i][1],
-               "h": tid_hard.get(r[0], -1),
+               "h": tid_hard.get(r[0], -1), "v": tid_vsec.get(r[0], -1),
                "a": r[3], "f": r[4], "n": r[5], "s": r[6],
                "d": round(tid_beta[r[0]], 3) if r[0] in tid_beta else None,
                "p": round(depth_eq[r[0]], 3) if r[0] in depth_eq else None,
@@ -302,6 +369,9 @@ def main():
             "note": "возраст первого заселения макроареала, тыс. лет назад (мокап 39)",
         },
     }
+    facets["volume"] = facet(f"Volume · {len(SECTIONS_VOL)}", SECTIONS_VOL, "v")
+    facets["volume"]["note"] = ("разделы, сбалансированные по объёму фиксации Березкина — "
+                                "~8–10k атрибуций на раздел (без скопа и одиночек)")
     hc = Counter(p["h"] for p in points if p["h"] >= 0)
     facets["hardlayers"] = {
         "label": f"Hard layers · {len(hard_cats)}",
@@ -316,8 +386,8 @@ def main():
     facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
     data = {"facets": facets,
-            "order": ["hardlayers", "area", "family", "narrative", "subsistence", "diversity",
-                      "depth", "cosmology", "peopling"],
+            "order": ["hardlayers", "volume", "area", "family", "narrative", "subsistence",
+                      "diversity", "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
