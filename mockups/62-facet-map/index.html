@@ -114,8 +114,11 @@ function drawMap(fid){
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mix(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color)}" `+
       `stroke="#fff" stroke-width="0.35"><title>${esc(p.t)} · ${esc(facet.cats[p.r].name)}</title></circle>`
     ).join("");
+    // coastline on top — keeps a continent contour even where a fill (e.g. the palest
+    // spread-zone step) is near-identical to the ocean colour and would otherwise vanish
+    const coast = `<path d="${window.LAND||""}" fill="none" stroke="#aab1a7" stroke-width="0.45" stroke-opacity="0.8"/>`;
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
-      `<rect class="ocean" width="360" height="180"/>${polys}${pts}</svg>`;
+      `<rect class="ocean" width="360" height="180"/>${polys}${coast}${pts}</svg>`;
   }
   const key = KEY[fid], cont = facet.kind === "continuous";
   const colors = (facet.cats || []).map(c => c.color);
