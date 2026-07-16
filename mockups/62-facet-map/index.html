@@ -21,7 +21,9 @@
   .seg button.on { background:#2f6fed; border-color:#2f6fed; color:#fff; }
   .seg .sep { align-self:center; color:#b3b8bd; font-weight:700; padding:0 3px; user-select:none; }
   .tip { position:fixed; z-index:30; pointer-events:none; background:#111827; color:#fff;
-         padding:5px 9px; border-radius:6px; font-size:12px; line-height:1.25; max-width:280px; display:none; }
+         padding:5px 9px; border-radius:6px; font-size:12px; line-height:1.25; max-width:280px;
+         opacity:0; transition:opacity .16s ease; }
+  .tip.show { opacity:1; }
   /* the hovered tradition point eases as it grows */
   svg.map circle[data-tip] { transition: r .1s ease-out; }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
@@ -230,42 +232,45 @@ function setPoint(c){
 // above the point itself (stable while the cursor jiggles on it); a region area waits for a
 // short dwell and follows the cursor. Both hide the moment the pointer moves off / keeps moving.
 let tipTimer = null;
-const DWELL = 130;
-function placeOverPoint(circle){
-  const r = circle.getBoundingClientRect();
-  let left = r.left + r.width / 2 - tip.offsetWidth / 2;
+const DWELL = 500;
+// place the tip centred horizontally on `cx`, sitting `gap` px above `anchorTop`
+// (flips below when there is no room); both the point and the cursor anchor this way
+function placeAbove(cx, anchorTop, gap){
+  let left = cx - tip.offsetWidth / 2;
   left = Math.max(4, Math.min(left, window.innerWidth - tip.offsetWidth - 4));
-  let top = r.top - tip.offsetHeight - 6;
-  if (top < 4) top = r.bottom + 6;                // flip below if there is no room above
+  let top = anchorTop - tip.offsetHeight - gap;
+  if (top < 4) top = anchorTop + gap + 6;
   tip.style.left = left + "px";
   tip.style.top = top + "px";
+}
+function fillTip(el){
+  const sub = el.getAttribute("data-sub");
+  const name = esc(el.getAttribute("data-tip"));
+  // region-area names read in the same muted grey as the region subtitle on tradition points
+  const primary = el.getAttribute("data-muted") ? `<span style="opacity:.7">${name}</span>` : `<b>${name}</b>`;
+  tip.innerHTML = primary + (sub ? `<br><span style="opacity:.7">${esc(sub)}</span>` : "");
 }
 mapBox.addEventListener("mousemove", e => {
   const el = e.target.closest && e.target.closest("[data-tip]");
   setPoint(el && el.tagName === "circle" ? el : null);
   if (tipTimer) clearTimeout(tipTimer);
-  if (!el) { tip.style.display = "none"; return; }
-  const sub = el.getAttribute("data-sub");
-  const name = esc(el.getAttribute("data-tip"));
-  // region-area names read in the same muted grey as the region subtitle on tradition points
-  const primary = el.getAttribute("data-muted") ? `<span style="opacity:.7">${name}</span>` : `<b>${name}</b>`;
-  const html = primary + (sub ? `<br><span style="opacity:.7">${esc(sub)}</span>` : "");
-  if (el.tagName === "circle") {                  // point: immediate, anchored to the point
-    tip.innerHTML = html;
-    tip.style.display = "block";
-    placeOverPoint(el);
-  } else {                                        // region: dwell, anchored to the cursor
-    tip.style.display = "none";
+  if (!el) { tip.classList.remove("show"); return; }
+  if (el.tagName === "circle") {                  // point: fade in immediately, anchored to the point
+    const r = el.getBoundingClientRect();
+    fillTip(el);
+    placeAbove(r.left + r.width / 2, r.top, 6);
+    tip.classList.add("show");
+  } else {                                        // region: fade in after a dwell, above the cursor
+    tip.classList.remove("show");
     const x = e.clientX, y = e.clientY;
     tipTimer = setTimeout(() => {
-      tip.innerHTML = html;
-      tip.style.display = "block";
-      tip.style.left = (x + 14) + "px";
-      tip.style.top = (y + 10) + "px";
+      fillTip(el);
+      placeAbove(x, y, 12);
+      tip.classList.add("show");
     }, DWELL);
   }
 });
-mapBox.addEventListener("mouseleave", () => { if (tipTimer) clearTimeout(tipTimer); tip.style.display = "none"; setPoint(null); });
+mapBox.addEventListener("mouseleave", () => { if (tipTimer) clearTimeout(tipTimer); tip.classList.remove("show"); setPoint(null); });
 
 render();
 </script>
