@@ -25,7 +25,7 @@
   /* smooth hover highlight: region fill/outline and the enlarged tradition point ease in/out */
   svg.map path[data-muted] { transition: fill-opacity .18s ease, stroke .18s ease,
                              stroke-width .18s ease, stroke-opacity .18s ease; }
-  svg.map circle[data-tip] { transition: r .15s ease; }
+  svg.map circle[data-tip] { transition: r .22s cubic-bezier(.34,1.7,.5,1); }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
                 height:1.5em; line-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -92,6 +92,7 @@ let active = "borders";
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const darken = (h,f=0.5) => `rgb(${hex2rgb(h).map(v=>Math.round(v*f)).join(",")})`;
 const mix = (a,b) => { const x=hex2rgb(a), y=hex2rgb(b); return `rgb(${x.map((v,i)=>Math.round((v+y[i])/2)).join(",")})`; };
+const mixw = (a,b,t) => { const x=hex2rgb(a), y=hex2rgb(b); return `rgb(${x.map((v,i)=>Math.round(v*(1-t)+y[i]*t)).join(",")})`; };
 function rampColor(ramp, x){          // x in [0,1] → interpolated colour on the ramp
   x = Math.max(0, Math.min(1, x));
   const n = ramp.length-1, i = Math.min(n-1, Math.floor(x*n)), t = x*n - i;
@@ -128,7 +129,7 @@ function drawMap(fid){
     // lighter so the dots stand out; the pure choropleths keep the standard 0.4
     const op = fid === "borders" ? 0.32 : 0.4;
     const polys = facet.cats.map(c=>
-      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1" data-hi="${mix(c.color, c.dark)}"`:""}></path>`
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1" data-hi="${mixw(c.color, c.dark, 0.3)}"`:""}></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mix(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color)}" `+
@@ -235,7 +236,7 @@ function setPoint(c){
   if (hiPt === c) return;
   if (hiPt) hiPt.style.r = "";                         // reverts to the r attribute (animated via CSS)
   hiPt = c;
-  if (hiPt) hiPt.style.r = (parseFloat(hiPt.getAttribute("r")) * 1.6).toFixed(2) + "px";
+  if (hiPt) hiPt.style.r = (parseFloat(hiPt.getAttribute("r")) * 1.9).toFixed(2) + "px";
 }
 mapBox.addEventListener("mousemove", e => {
   const el = e.target.closest && e.target.closest("[data-tip]");
