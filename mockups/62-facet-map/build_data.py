@@ -636,40 +636,49 @@ def main():
         "note": "языковое разнообразие / фрагментация (много языков на ареал) — тёмное в шаттер-зонах "
                 "(Н. Гвинея, Амазония, В. Африка, Кавказ), бледное в спред-зонах",
     }
-    # Motif-diversity choropleth — the `diversity` β-turnover aggregated to each canon region
-    # (mean β of the nearest Berezkin traditions), drawn as a 5-level regional fill like langdiv.
-    _ranchor, _rreg = [], []
-    for _ri, (_, _, _trads) in enumerate(REGIONS):
-        for _, _lat, _lon in _trads:
-            _ranchor.append((_lon, _lat)); _rreg.append(_ri)
-    _ranchor = np.array(_ranchor, float)
-    _rtree = cKDTree(np.vstack([_ranchor, _ranchor + [360, 0], _ranchor - [360, 0]]))
-    _rreg3 = np.array(_rreg * 3)
-    _acc = defaultdict(list)
-    for _p in points:
-        if _p["d"] is not None:
-            _acc[int(_rreg3[_rtree.query([_p["x"], _p["y"]])[1]])].append(_p["d"])
-    _rbeta = {ri: float(np.mean(v)) for ri, v in _acc.items() if v}
-    _rnames = [r[0] for r in REGIONS]
-    _geo = json.loads((Path(__file__).resolve().parent / "regions_geo.json").read_text())
-    _bmin, _bmax = min(_rbeta.values()), max(_rbeta.values())
+    # Motif-diversity choropleth — colour each country (admin-1 province for the split countries)
+    # by the β of the nearest Berezkin β-point. Filling per country, not per canon region, keeps
+    # within-region gradation (β varies by macro-area, so Europe is banded S/N/Balkan rather than
+    # flattened to one shade). Local import: build_region_geo imports REGIONS from us (avoid cycle).
+    import build_region_geo as G  # noqa: PLC0415
+    _bpts = np.array([[p["x"], p["y"]] for p in points if p["d"] is not None], float)
+    _bval = np.array([p["d"] for p in points if p["d"] is not None], float)
+    _btree = cKDTree(np.vstack([_bpts, _bpts + [360, 0], _bpts - [360, 0]]))
+    _bval3 = np.concatenate([_bval, _bval, _bval])
+    _bmin, _bmax = float(_bval.min()), float(_bval.max())
 
     def _ramp(stops, t):                                               # interpolate a hex ramp at t∈[0,1]
         t = max(0.0, min(1.0, t)); s = t * (len(stops) - 1)
         i = min(len(stops) - 2, int(s)); f = s - i
         a = [int(stops[i][j:j + 2], 16) for j in (1, 3, 5)]
         b = [int(stops[i + 1][j:j + 2], 16) for j in (1, 3, 5)]
-        return "rgb(%d,%d,%d)" % tuple(round(a[k] + (b[k] - a[k]) * f) for k in range(3))
+        c = [round(a[k] + (b[k] - a[k]) * f) for k in range(3)]
+        return f"rgb({c[0]},{c[1]},{c[2]})"
 
+    _mdcats = []
+    for _src, _feats in (("a0", G.fetch("admin0")["features"]), ("a1", G.fetch("admin1")["features"])):
+        for _f in _feats:
+            _pr = _f["properties"]
+            _admin = _pr.get("admin") or _pr.get("ADMIN") or _pr.get("name")
+            if _src == "a0" and (_admin in G.SPLIT or _admin == "Antarctica"):
+                continue
+            if _src == "a1" and _admin not in G.SPLIT:
+                continue
+            for _poly in G.parts_of(_f["geometry"]):
+                _lon, _lat = G.centroid(_poly)
+                if _lat < -60:
+                    continue
+                _b = float(_bval3[_btree.query([_lon, _lat])[1]])
+                _mdcats.append({"name": _admin,
+                                "color": _ramp(MOTIFDIV_RAMP, (_b - _bmin) / (_bmax - _bmin + 1e-9)),
+                                "d": G.path_d(_poly)})
     facets["motifdiv"] = {
         "label": "Motif diversity",
         "kind": "borders",
-        "ramp": MOTIFDIV_RAMP, "min": round(_bmin, 2), "max": round(_bmax, 2), "unit": "β = γ/α",
-        "cats": [{"name": _rnames[ri], "color": _ramp(MOTIFDIV_RAMP, (b - _bmin) / (_bmax - _bmin + 1e-9)),
-                  "d": _geo.get(_rnames[ri], "")}
-                 for ri, b in sorted(_rbeta.items(), key=lambda kv: kv[1])],
-        "note": "β-turnover разнообразия мотивов (мокап 52), агрегированный по 14 регионам канона "
-                "(средняя β ближайших традиций Березкина), непрерывной шкалой; тёмное = высокое",
+        "ramp": MOTIFDIV_RAMP, "min": round(_bmin, 1), "max": round(_bmax, 1), "unit": "β = γ/α",
+        "cats": _mdcats,
+        "note": "β-turnover разнообразия мотивов (мокап 52): каждая страна окрашена по β ближайшего "
+                "очага (Березкин), непрерывной шкалой; тёмное = высокое разнообразие",
     }
     facets["zones"] = {
         "label": f"Zones · {len(ZONES)}",
