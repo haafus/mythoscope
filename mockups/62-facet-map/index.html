@@ -25,8 +25,15 @@
          opacity:0; transition:opacity .16s ease, transform .16s ease; }
   .tip.rise { transform:translateY(3px); }        /* region only: rise-in on appearance */
   .tip.show { opacity:1; transform:translateY(0); }
-  /* the hovered tradition point eases as it grows */
-  svg.map circle[data-tip] { transition: r .1s ease-out; }
+  /* points keep a constant screen size when zoomed: the stroke via non-scaling-stroke, the
+     radius via --z (no non-scaling equivalent exists for the circle radius) */
+  svg.map circle[data-tip] {
+    r: calc(var(--pr, 1.5) * var(--z, 1) * 1px);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+    transition: r .1s ease-out;
+  }
+  svg.map circle[data-tip].hi { r: calc(var(--pr, 1.5) * var(--z, 1) * 1.5px); }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
                 height:1.5em; line-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -194,8 +201,9 @@ function drawLegend(fid){
 function render(){
   const facet = D.facets[active];
   document.getElementById("map").innerHTML = facet.disabled ? drawMap("__none__") : drawMap(active);
-  const svgEl = document.querySelector("#map svg.map");   // keep the current zoom/pan across re-renders
-  if (svgEl) svgEl.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+  const svgEl = document.querySelector("#map svg.map");   // base point radius/stroke per facet
+  if (svgEl) svgEl.style.setProperty("--pr", active === "regions" ? "1.9" : "1.5");
+  applyView();                                            // keep zoom/pan (viewBox + --z) across re-renders
   document.getElementById("legend").innerHTML = facet.disabled ? "" : drawLegend(active);
   document.getElementById("note").textContent = facet.disabled ? ("⚠ " + (facet.note||"нет данных")) : (facet.note || "");
   document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>b.classList.toggle("on", b.dataset.f===active));
@@ -228,9 +236,9 @@ const mapBox = document.getElementById("map");
 let hiPt = null;
 function setPoint(c){
   if (hiPt === c) return;
-  if (hiPt) hiPt.style.r = "";                         // reverts to the r attribute (animated via CSS)
+  if (hiPt) hiPt.classList.remove("hi");               // radius handled in CSS (zoom-aware)
   hiPt = c;
-  if (hiPt) hiPt.style.r = (parseFloat(hiPt.getAttribute("r")) * 1.5).toFixed(2) + "px";
+  if (hiPt) hiPt.classList.add("hi");
 }
 // Tooltip behaviour differs by target: a tradition point shows immediately and is anchored
 // above the point itself (stable while the cursor jiggles on it); a region area waits for a
@@ -278,31 +286,49 @@ mapBox.addEventListener("mousemove", e => {
 });
 mapBox.addEventListener("mouseleave", () => { if (tipTimer) clearTimeout(tipTimer); tip.classList.remove("show"); setPoint(null); });
 
-// --- wheel zoom (towards the cursor) + drag pan + double-click reset -------------------
+// --- Google-Maps-style zoom: each wheel tick sets a TARGET; the view eases toward it every
+// frame (rAF), anchored under the cursor. Drag pans instantly; double-click resets. -------
 const MINW = 60;                                // deepest zoom (360/60 = 6×); full extent = 360
+const target = { ...view };                     // goal viewBox; `view` is the animated current
+let zraf = null;
 function applyView(){
   const svg = mapBox.querySelector("svg.map");
-  if (svg) svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+  if (!svg) return;
+  svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+  svg.style.setProperty("--z", (view.w / 360).toFixed(4));      // points counter-scale by this
 }
-function clampXY(){
-  view.x = Math.max(0, Math.min(360 - view.w, view.x));
-  view.y = Math.max(0, Math.min(180 - view.h, view.y));
+function clampTarget(){
+  target.w = Math.min(360, Math.max(MINW, target.w)); target.h = target.w / 2;
+  target.x = Math.max(0, Math.min(360 - target.w, target.x));
+  target.y = Math.max(0, Math.min(180 - target.h, target.y));
 }
+function animateZoom(){
+  const k = 0.28;                               // easing per frame — the "rubbery" feel
+  view.x += (target.x - view.x) * k;
+  view.y += (target.y - view.y) * k;
+  view.w += (target.w - view.w) * k;  view.h = view.w / 2;
+  applyView();
+  if (Math.abs(target.w - view.w) > 0.05 || Math.abs(target.x - view.x) > 0.05 || Math.abs(target.y - view.y) > 0.05)
+    zraf = requestAnimationFrame(animateZoom);
+  else { Object.assign(view, target); applyView(); zraf = null; }
+}
+function kickZoom(){ if (!zraf) zraf = requestAnimationFrame(animateZoom); }
 mapBox.addEventListener("wheel", e => {
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
   e.preventDefault();
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
-  const sx = view.x + px * view.w, sy = view.y + py * view.h;   // svg point under the cursor
-  const w = Math.min(360, Math.max(MINW, view.w * (e.deltaY < 0 ? 0.83 : 1 / 0.83)));
-  view.w = w; view.h = w / 2;                                    // keep the 2:1 aspect
-  view.x = sx - px * view.w; view.y = sy - py * view.h;          // keep that point under the cursor
-  clampXY(); applyView();
+  const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
+  target.w *= (e.deltaY < 0 ? 0.8 : 1 / 0.8);
+  clampTarget();
+  target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
+  clampTarget();
+  kickZoom();
 }, { passive: false });
 let drag = null;
 mapBox.addEventListener("mousedown", e => {
-  if (view.w >= 360) return;                                     // nothing to pan at full extent
+  if (view.w >= 360) return;                                            // nothing to pan at full extent
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y };
   mapBox.style.cursor = "grabbing";
 });
@@ -310,15 +336,16 @@ window.addEventListener("mouseup", () => { drag = null; mapBox.style.cursor = ""
 mapBox.addEventListener("mousemove", e => {
   if (!drag) return;
   const svg = mapBox.querySelector("svg.map"); if (!svg) return;
+  if (zraf) { cancelAnimationFrame(zraf); zraf = null; }               // panning is instant
   const rect = svg.getBoundingClientRect();
-  view.x = drag.vx - (e.clientX - drag.x) / rect.width * view.w;
-  view.y = drag.vy - (e.clientY - drag.y) / rect.height * view.h;
-  clampXY(); applyView();
-  tip.classList.remove("show");                                 // hide the tooltip while panning
-});
-mapBox.addEventListener("dblclick", () => {                     // reset to full extent
-  Object.assign(view, { x: 0, y: 0, w: 360, h: 180 });
+  view.x = target.x = Math.max(0, Math.min(360 - view.w, drag.vx - (e.clientX - drag.x) / rect.width * view.w));
+  view.y = target.y = Math.max(0, Math.min(180 - view.h, drag.vy - (e.clientY - drag.y) / rect.height * view.h));
   applyView();
+  tip.classList.remove("show");                                        // hide the tooltip while panning
+});
+mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
+  Object.assign(target, { x: 0, y: 0, w: 360, h: 180 });
+  kickZoom();
 });
 
 render();
