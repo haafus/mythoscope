@@ -6,6 +6,33 @@ entries at the top.
 
 ---
 
+## Cross-index reference/inference system between motif indexes is noisy and redundant
+
+**Status:** flagged — needs a dedicated review to compress; not started.
+
+The web of **cross-references and inferred parallels** linking the motif indexes to one another
+(TMI ↔ ATU ↔ Berezkin, plus reasoned/derived links and unresolved citations — see
+`docs/motifs/crosswalk/` and `src/motifs/sources/`) has grown **noisy and redundant**: overlapping links,
+low-signal or speculative parallels, and duplicated assumptions that add volume without adding
+information.
+
+Where it bites:
+
+- **Signal-to-noise.** Weak/duplicate links dilute the genuine cross-index parallels; downstream
+  analysis inherits the noise.
+- **Maintenance surface.** More links and assumptions than are load-bearing means more to keep correct
+  and reconcile on every source update.
+
+Resolution:
+
+- **Do a review and compress it.** Audit the cross-reference/inference layer end to end, drop the
+  redundant and low-confidence links, and keep a tighter, higher-confidence set. Scope and criteria to
+  be defined by that review. *(This is separate from the tradition `region` work — it is the motif-index
+  side; see the "do not touch the motif-index region system" decision in
+  `docs/proposals/region-implementation.md` §2.7.)*
+
+---
+
 ## Chunk text and metadata are duplicated across every collection
 
 **Status:** by design — inherent to the per-variant collection layout; Option A adds one more copy.
