@@ -33,6 +33,10 @@ it serves), and **where it stands**. "Proposal" = designed, not built; "partly d
   `Tradition` entity**; `area` becomes the single region vocabulary; colour derived as a gradient within
   macro-area; `major_tradition` retired. **Goal:** kill the fragile string-join, the six overlapping region
   schemes, and non-deterministic colour in one coherent model. *Proposal; 6-phase migration not started.*
+- [`map-palette-and-projection.md`](map-palette-and-projection.md) — ADR: region-map palette (CARTOColors
+  Prism as canon; the associative palette explored, not adopted), map projection (equirectangular engine +
+  Winkel Tripel atlas view), basemap tiles (CARTO Positron + the tiles↔projection constraint), and the
+  presentation constants. **Goal:** record the reasoning so it survives past the conversation. *Decision record.*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
   (curated `content_start/end` + exclude) **done**; Layer 2 (cue-strip on interleaved notes) pending.*
