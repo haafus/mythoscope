@@ -264,8 +264,8 @@ LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark 
     ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
     ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
 ]
-MOTIFDIV_RAMP = [  # motif β-turnover (mockup 52) per canon region — continuous OrRd, dark = high
-    "#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000",
+MOTIFDIV_RAMP = [  # motif β-turnover (mockup 52) — muted dusty-rose sequential, calm & low-contrast
+    "#f4eaee", "#e7d0d8", "#d4aebc", "#bd8b9e", "#a56882", "#874c66",
 ]
 ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest residual.
     # lightest step lifted off #EFF3FF (≈ ocean #eef3f4) to a clear pale blue: at the
