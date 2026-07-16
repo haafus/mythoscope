@@ -192,6 +192,23 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 >    path.
 > 3. **The catalog `id` field and the search reference** both presuppose (1).
 >
+> **The underlying question — name-as-id vs a stable id, per level.** `name = id` (§2.2) makes the display
+> string the identity, which fails in known ways: renaming a name breaks every reference (config caught by
+> validation, but chunks go stale → re-embed); two distinct names that sanitise to the same path collide; and,
+> at the **document** level, the chunk id is `normalize_catalog_id(title)` — **title only** — so two books that
+> share a title (generic ones like "Creation", "Folk Tales") collide at the embedding layer already. These bite
+> unevenly:
+> - **tradition / region** — names are short, unique, and rarely renamed; `name = id` is tolerable (the main
+>   risk — a rename forcing a re-embed — is a rare deliberate edit).
+> - **document** — `title = id` is the weakest: generic-title collisions are real, not hypothetical, and it is
+>   the id that reaches `/documents`, the catalog, the search reference, and the chunk metadata.
+>
+> **Leaning:** keep `name = id` for **tradition / region**; give the **document** a separate stable `id` (not
+> the title). That id is then the one used across `/catalog`, `/documents?id=`, the search reference, and the
+> chunk metadata (settles 1 and 3), and it narrows the layout (2) to `corpus/<id>.txt` or
+> `corpus/<tradition>/<title>.txt`. Open sub-question: how the document id is minted (slug of
+> `tradition + title`, or a synthetic stable key).
+>
 > **Not decided.** Working default until then: `/documents` and the path use `(title, tradition)` with region
 > out of the path; search carries `id` = `normalize_catalog_id(title)`.
 
