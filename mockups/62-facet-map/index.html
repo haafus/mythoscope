@@ -90,6 +90,7 @@ let active = "borders";
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const darken = (h,f=0.5) => `rgb(${hex2rgb(h).map(v=>Math.round(v*f)).join(",")})`;
 const mix = (a,b) => { const x=hex2rgb(a), y=hex2rgb(b); return `rgb(${x.map((v,i)=>Math.round((v+y[i])/2)).join(",")})`; };
+const mixw = (a,b,t) => { const x=hex2rgb(a), y=hex2rgb(b); return `rgb(${x.map((v,i)=>Math.round(v*(1-t)+y[i]*t)).join(",")})`; };
 function rampColor(ramp, x){          // x in [0,1] → interpolated colour on the ramp
   x = Math.max(0, Math.min(1, x));
   const n = ramp.length-1, i = Math.min(n-1, Math.floor(x*n)), t = x*n - i;
@@ -129,7 +130,7 @@ function drawMap(fid){
       `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1"`:""}></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
-      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${facet.cats[p.r].color}" `+
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mixw(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color, 1/3)}" `+
       `stroke="#fff" stroke-width="0.35" data-tip="${escA(p.t)}" data-sub="${escA(facet.cats[p.r].name)}"></circle>`
     ).join("");
     // coastline on top — keeps a continent contour even where a fill (e.g. the palest
