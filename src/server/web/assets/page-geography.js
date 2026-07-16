@@ -1,4 +1,5 @@
 import { app, escapeHtml, loadTraditionInfo, onCleanup, CATEGORY_NONE } from "./core.js";
+import { REGIONS_GEOJSON } from "./regions-geo.js";
 
 export async function renderGeography() {
     app.innerHTML = `
@@ -195,6 +196,16 @@ function initializeGeographyMap(traditions) {
         noWrap: true,
         bounds: worldBounds,
         attribution: "Tiles &copy; Esri",
+    }).addTo(map);
+
+    // Canon regions (mockup 62) as a translucent overlay; non-interactive so it never
+    // intercepts the tradition markers' hover/click or the map's pan.
+    L.geoJSON(REGIONS_GEOJSON, {
+        interactive: false,
+        style: (f) => ({
+            color: f.properties.color, weight: 1, opacity: 0.55,
+            fillColor: f.properties.color, fillOpacity: 0.35,
+        }),
     }).addTo(map);
 
     const { bounds: markerBounds, markers } = renderMarkers(map, traditions);
