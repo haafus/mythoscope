@@ -71,7 +71,7 @@
 const D = window.DATA, GREY = "#c4c8cd";
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const KEY = { hardlayers:"h", volume:"v", area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p", cosmology:"c", peopling:"e" };
-let active = "regions";
+let active = "borders";
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const darken = (h,f=0.5) => `rgb(${hex2rgb(h).map(v=>Math.round(v*f)).join(",")})`;
