@@ -338,7 +338,7 @@ mapBox.addEventListener("wheel", e => {
   let d = e.deltaY;
   if (e.deltaMode === 1) d *= 16;                                       // line units → ~pixels
   d = Math.max(-50, Math.min(50, d));                                   // cap one event's kick
-  target.w *= Math.exp(d * 0.002);
+  target.w *= Math.exp(d * 0.0026);
   clampTarget();
   target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
   clampTarget();
