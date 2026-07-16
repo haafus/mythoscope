@@ -65,7 +65,7 @@ is not wired in.
     "subdivision": "…",                  // regions.md §5
     "strata": "…",                       // regions.md §5
     "traditions": {                      // ONLY traditions that currently have texts
-      "Yoruba": { "description": "…", "coordinates": [8, 4] }
+      "Yoruba": { "description": "…", "coordinates": [8, 4], "dating": "…" }
     }
   }
   // … all 14 regions …
@@ -74,10 +74,22 @@ is not wired in.
 
 `regions.md` stays the human canon; this file is its machine copy for the pipeline.
 
-**`description` exists at all three levels and is optional at each**, with a distinct role: **region** — why
-the region is one unit (taxonomy rationale); **tradition** — what the mythology is (the subject); **document**
-(`config/corpus.json`) — what the specific text/edition is (the source). `region.subdivision` and
-`region.strata` are likewise optional curated fields.
+**`description` carries *what*; a separate field carries *when* — both optional at every level, and the date
+never goes in `description`.**
+
+| Entity | *what* → `description` | *when* → its own field |
+|---|---|---|
+| **region** | why the region is one unit (taxonomy rationale) | `strata` — dated historical layers |
+| **tradition** | what the mythology is (the subject) | `dating` — culture + fixation |
+| **document** (`config/corpus.json`) | what the specific text/edition is (the source) | `dating` — source composition + edition/translation |
+
+`dating` is **free text** — ranges, `~`, BCE/CE — for example:
+- tradition `"Culture ~8th–13th c. CE (Viking Age); written down (Eddas) ~13th c. CE"` (culture and fixation
+  often diverge for oral traditions; they nearly coincide for early-literate ones like Sumerian/Egyptian);
+- document `"OT ~1200–165 BCE, NT ~50–120 CE; KJV translation 1611"` (a text's composition and the edition we
+  hold are two dates).
+
+`region.subdivision`, `region.strata`, and every `description` / `dating` field are optional.
 
 **2.2 Name = id.** The region node key is the canon region name; the tradition key is the tradition name.
 No slugs, no separate id field, anywhere.
@@ -112,9 +124,9 @@ truth; `/api/corpus/traditions` returns its tree as-is. `_update_traditions` and
 `outputs/corpus/traditions.json` are removed.
 
 **2.10 The catalog carries the tradition only.** `/api/corpus/catalog` documents carry `tradition` (the
-reference) and per-document fields (`title`, `url`, counts, `description`, `source`, and a document `id` —
-pending §3 to-discuss) — **no `major_tradition`, no `region`, no `colour`**. Region is resolved from the
-tradition via the tree; colour from the region.
+reference) and per-document fields (`title`, `url`, counts, `description`, `dating`, `source`, and a document
+`id` — pending §3 to-discuss) — **no `major_tradition`, no `region`, no `colour`**. Region is resolved from
+the tradition via the tree; colour from the region.
 
 **2.11 Filename sanitisation.** Any name that ends up in a file path (`sanitize_filename`) is made
 filesystem- and URL-safe deterministically: trim; replace every run of whitespace with a single `_`; replace
@@ -144,11 +156,11 @@ Two data endpoints (two projections) + one text fetch + search; the front loads 
 once (globally, cached, §2.8) and composes every view. Overlap is trimmed to the `tradition` key.
 
 - **`GET /api/corpus/traditions`** → the `region → traditions` tree, canon order:
-  `region → { colour, description, subdivision, strata, traditions: [ { name, coordinates, description } ] }`.
+  `region → { colour, description, subdivision, strata, traditions: [ { name, coordinates, description, dating } ] }`.
   No books, no per-tradition colour. Consumers: atlas (coordinates + book-join), embeddings (colour via
   region + coordinates), corpus browser (grouping skeleton + order).
 - **`GET /api/corpus/catalog`** → documents: `[ { title, tradition, url, word/sentence/char counts,
-  description, source } ]` (+ a document `id`, pending — see “To discuss”). Tradition only; region/colour
+  description, dating, source } ]` (+ a document `id`, pending — see “To discuss”). Tradition only; region/colour
   resolved on the front from the tree; the front joins books from these documents.
 - **`GET /api/corpus/documents`** → the raw text of one document, located by `(title, tradition)` (the
   `major_tradition` param is dropped with §2.5).
