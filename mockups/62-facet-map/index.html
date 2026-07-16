@@ -321,33 +321,60 @@ mapBox.addEventListener("wheel", e => {
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
   e.preventDefault();
+  stopInertia();
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
   const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
-  target.w *= (e.deltaY < 0 ? 0.95 : 1 / 0.95);
+  // zoom in proportion to how much was actually scrolled (not a fixed step per event) — a
+  // high-res wheel / trackpad fires many events per gesture and a fixed step jumps to the limit
+  let d = e.deltaY;
+  if (e.deltaMode === 1) d *= 16;                                       // line units → ~pixels
+  d = Math.max(-50, Math.min(50, d));                                   // cap one event's kick
+  target.w *= Math.exp(d * 0.0013);
   clampTarget();
   target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
   clampTarget();
   kickZoom();
 }, { passive: false });
-let drag = null;
+let drag = null, iraf = null;
+const vel = { x: 0, y: 0 };                                            // pan velocity (view units/frame)
+function stopInertia(){ if (iraf) { cancelAnimationFrame(iraf); iraf = null; } vel.x = vel.y = 0; }
+function panTo(x, y){
+  view.x = target.x = Math.max(0, Math.min(360 - view.w, x));
+  view.y = target.y = Math.max(0, Math.min(180 - view.h, y));
+  applyView();
+}
+function inertia(){                                                    // glide on after release, with friction
+  vel.x *= 0.88; vel.y *= 0.88;
+  const px = view.x, py = view.y;
+  panTo(view.x + vel.x, view.y + vel.y);
+  if (view.x === px) vel.x = 0;                                        // hit a wall — stop that axis
+  if (view.y === py) vel.y = 0;
+  iraf = (Math.abs(vel.x) > 0.02 || Math.abs(vel.y) > 0.02) ? requestAnimationFrame(inertia) : null;
+}
 mapBox.addEventListener("mousedown", e => {
   if (view.w >= 360) return;                                            // nothing to pan at full extent
+  stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y };
   mapBox.style.cursor = "grabbing";
 });
-window.addEventListener("mouseup", () => { drag = null; mapBox.style.cursor = ""; });
+window.addEventListener("mouseup", () => {
+  if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
+  drag = null; mapBox.style.cursor = "";
+});
 mapBox.addEventListener("mousemove", e => {
   if (!drag) return;
   const svg = mapBox.querySelector("svg.map"); if (!svg) return;
-  if (zraf) { cancelAnimationFrame(zraf); zraf = null; }               // panning is instant
   const rect = svg.getBoundingClientRect();
-  view.x = target.x = Math.max(0, Math.min(360 - view.w, drag.vx - (e.clientX - drag.x) / rect.width * view.w));
-  view.y = target.y = Math.max(0, Math.min(180 - view.h, drag.vy - (e.clientY - drag.y) / rect.height * view.h));
-  applyView();
+  const px = view.x, py = view.y;
+  panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
+        drag.vy - (e.clientY - drag.y) / rect.height * view.h);
+  vel.x = vel.x * 0.4 + (view.x - px) * 0.6;                           // smoothed recent velocity
+  vel.y = vel.y * 0.4 + (view.y - py) * 0.6;
   tip.classList.remove("show");                                        // hide the tooltip while panning
 });
 mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
+  stopInertia();
   Object.assign(target, { x: 0, y: 0, w: 360, h: 180 });
   kickZoom();
 });
