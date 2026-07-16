@@ -100,9 +100,13 @@ that currently have corpus texts. An **empty region is valid**, not a broken joi
 **2.4 Curated, not derived.** The tradition list is our own curated artifact — `regions.md` §5 is the
 composition reference. Nothing is imported or derived from Berezkin, `areal_path`, or any index.
 
-**2.5 `major_tradition` → `region` = rename + re-partition.** Rename the field everywhere in code
-(field / param / variable). Re-author the top-level grouping from the 13 eclectic groups into the 14 canon
-regions (Greek/Norse/Celtic → `Europe`; `Mesopotamian` + `Abrahamic` → `Near East & North Africa`; …).
+**2.5 `major_tradition` → `region` = re-partition + remove from records.** In the **config tree**, the
+top-level grouping is re-authored from the 13 eclectic groups into the 14 canon regions (Greek/Norse/Celtic →
+`Europe`; `Mesopotamian` + `Abrahamic` → `Near East & North Africa`; …). In **code**, `major_tradition` is
+retired: where it was a **stored field** (corpus rows, chunk metadata, `SearchResult`, the `/documents` query
+param) it is **removed** — region is resolved from the tradition via the tree, never persisted on a record;
+where code **grouped** by it, grouping is now by `region` through the tree. It is a renamed *concept*, not a
+field that survives on records.
 
 **2.6 Colour comes from the region and is not stored.** A tradition's colour is its region node's `colour`
 in `config/traditions.json`, computed `tradition → region → colour` at display. `get_tradition_color` /
@@ -139,8 +143,12 @@ to-discuss).
 one of the 14 canon names — otherwise the build fails. Replaces the silent `.get(...)` degradations
 (`builder.py:210`, `services/corpus.py:25`).
 
-**2.13 Embeddings untouched.** `region` is resolved from a chunk's `tradition` via the tree at query time; no
-chunk-metadata change, no re-embedding.
+**2.13 Chunks carry the tradition only; no re-embedding.** A chunk's metadata keeps the `tradition` reference
+(FK) and `url`; `region` is resolved from `tradition` via the tree at query time and is **not** stored on the
+chunk. New builds stop writing `major_tradition`/`region` into chunk metadata; existing chunks keep their stale
+`major_tradition` (ignored, gone on the next natural rebuild) — nothing is re-embedded. `region` is
+deliberately not baked in: a tradition's region is re-annotatable, and baking it would force a re-embed on
+every re-annotation.
 
 **2.14 One `UNASSIGNED`** id/label across `schemas.py`, `iterator.py`, and the front end (extend the front's
 `CATEGORY_NONE` down to the value layer).
@@ -213,14 +221,18 @@ group by region, attach books, colour by region; one 14-region legend; reused by
 
 1. **Author the config + validation.** Build `config/traditions.json`: 14 region nodes in canon order, each
    with its canon fields (`colour` base + `description`/`subdivision`/`strata`) and only its texted
-   traditions; `config/corpus.json` books reference the tradition by name; build-time fail-loud validation
-   (unknown tradition / non-canon region). *(Highest value-to-risk — closes the silent join.)*
-2. **`major_tradition` → `region`; drop it from records and trim search.** Rename the field across
-   `builder.py`, `iterator.py`, `CorpusFileInfo`, `schemas.py`, services, and the front; values come from the
-   re-partitioned tree. Remove `SearchResult.major_tradition` and trim search hits to chunk data + a document
-   reference (`tradition`/`url`/`region`/`colour` resolved on the front). Stop writing `major`/`region` onto
-   document rows. Move the file layout per the §3 identity decision (working default
-   `corpus/<tradition>/<title>.txt`); `/documents` located by `(title, tradition)`.
+   traditions. **Reconcile the dirty corpus tradition strings to canonical keys** (e.g. `"Australian"` vs
+   `"Australian Aboriginal"` → one canonical name) and repoint every `config/corpus.json` book at its
+   canonical tradition; then add build-time fail-loud validation (unknown tradition / non-canon region).
+   *(Highest value-to-risk — closes the silent join.)*
+2. **Retire `major_tradition`; group by region; trim search.** Re-partition the config tree to regions; update
+   the code that **grouped** by `major_tradition` (`builder.py`, `iterator.py`, `schemas.py`, services, front)
+   to group/resolve by `region` through the tree. Remove `major_tradition` as a **stored field**: from corpus
+   rows, from `CorpusFileInfo`/chunk metadata (new builds; existing chunks not re-embedded), from the
+   `/documents` query param; delete `SearchResult.major_tradition` and trim search hits to chunk data + a
+   document reference (`tradition`/`url`/`region`/`colour` resolved on the front). Move the file layout per the
+   §3 identity decision (working default `corpus/<tradition>/<title>.txt`); `/documents` located by
+   `(title, tradition)`.
 3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
    colour + fields, no books); a tradition's colour is its region's, computed at display; strip `region` and
