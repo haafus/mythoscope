@@ -124,7 +124,7 @@ function drawMap(fid){
     // lighter so the dots stand out; the pure choropleths keep the standard 0.4
     const op = fid === "borders" ? 0.32 : 0.4;
     const polys = facet.cats.map(c=>
-      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"></path>`
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?' data-muted="1"':""}></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mix(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color)}" `+
@@ -220,8 +220,10 @@ mapBox.addEventListener("mousemove", e => {
   const el = e.target.closest && e.target.closest("[data-tip]");
   if (!el) { tip.style.display = "none"; return; }
   const sub = el.getAttribute("data-sub");
-  tip.innerHTML = `<b>${esc(el.getAttribute("data-tip"))}</b>`
-    + (sub ? ` — <span style="opacity:.7">${esc(sub)}</span>` : "");
+  const name = esc(el.getAttribute("data-tip"));
+  // region-area names read in the same muted grey as the region subtitle on tradition points
+  const primary = el.getAttribute("data-muted") ? `<span style="opacity:.7">${name}</span>` : `<b>${name}</b>`;
+  tip.innerHTML = primary + (sub ? ` — <span style="opacity:.7">${esc(sub)}</span>` : "");
   tip.style.display = "block";
   tip.style.left = (e.clientX + 14) + "px";
   tip.style.top = (e.clientY + 10) + "px";
