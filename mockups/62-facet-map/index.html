@@ -143,12 +143,12 @@ function drawMap(fid){
       `<path d="${r.d}" fill="${facet.cats[i].color}" fill-opacity="0.35" stroke="${facet.cats[i].color}" `+
       `stroke-width="1" stroke-opacity="0.55" data-tip="${escA(facet.cats[i].name)}" data-muted="1"></path>`
     ).join("");
-    // curated tradition points on top (same set / behaviour as the Regions facet); dot colour is
-    // the region hue nudged 1/3 toward a darkened shade so it reads on its own translucent fill
+    // curated tradition points on top — identical rendering to the Regions facet: the region hue
+    // nudged 1/3 toward its dark ramp end (facet.cats[].dark) so it reads on its own translucent fill
     const pts = wg.points.map(p=>{
-      const col = facet.cats[p.r].color;
-      return `<circle cx="${p.x}" cy="${p.y}" r="1.5" fill="${mixw(col, "#000000", 0.42)}" `+
-        `stroke="#fff" stroke-width="0.35" data-tip="${escA(p.t)}" data-sub="${escA(facet.cats[p.r].name)}"></circle>`;
+      const c = facet.cats[p.r];
+      return `<circle cx="${p.x}" cy="${p.y}" r="1.5" fill="${mixw(c.color, c.dark||c.color, 1/3)}" `+
+        `stroke="#fff" stroke-width="0.35" data-tip="${escA(p.t)}" data-sub="${escA(c.name)}"></circle>`;
     }).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
       `<rect width="360" height="180" fill="#ffffff"/>`+

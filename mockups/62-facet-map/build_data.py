@@ -9,6 +9,7 @@ mockup 16's coordinate resolution + jitter.
 
 Run:  python mockups/62-facet-map/build_data.py
 """
+import colorsys
 import importlib.util
 import json
 import math
@@ -230,6 +231,16 @@ INTUITIVE_REGIONS = {
     "Native North America": "#3AA6A0", "Mesoamerica & the Andes": "#C99A2E",
     "Lowland South America": "#2E8B4E",
 }
+
+def _dark_variant(hex_color):
+    """Synthesise a region's dark ramp end for palettes without a hand-tuned one (the intuitive
+    palette). Mirrors how REGION_DARK relates to the Prism base: lightness ×0.62, saturation
+    lifted a touch — so points nudged 1/3 toward it read the same way as on the Regions facet."""
+    r, g, b = (int(hex_color[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    r2, g2, b2 = colorsys.hls_to_rgb(h, l * 0.62, min(1.0, s * 1.12))
+    return "#%02X%02X%02X" % (round(r2 * 255), round(g2 * 255), round(b2 * 255))
+
 
 _WINK_PHI1 = math.acos(2 / math.pi)
 
@@ -799,8 +810,13 @@ def main():
     # facet just carries its palette and which projection to read.
     projgeo = {"winkel": build_projgeo(_winkel, region_pts),
                "equirect": build_projgeo(_equirect, region_pts)}
-    _prism = [{"name": name, "color": color} for name, color, _ in REGIONS]
-    _intu = [{"name": name, "color": INTUITIVE_REGIONS[name]} for name, _, _ in REGIONS]
+    # dark ramp end per cat → tradition points nudge 1/3 toward it, exactly as the Regions facet.
+    # Prism reuses the hand-tuned REGION_DARK (points come out identical to Regions); the intuitive
+    # palette gets synthesised darks of matching depth.
+    _prism = [{"name": name, "color": color, "dark": REGION_DARK[name]}
+              for name, color, _ in REGIONS]
+    _intu = [{"name": name, "color": INTUITIVE_REGIONS[name], "dark": _dark_variant(INTUITIVE_REGIONS[name])}
+             for name, _, _ in REGIONS]
     facets["winkel"] = {
         "label": "Regions · Winkel",
         "kind": "winkel", "proj": "winkel", "cats": _prism,
