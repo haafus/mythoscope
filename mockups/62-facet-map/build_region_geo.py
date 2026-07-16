@@ -165,12 +165,6 @@ def main():
                 paths[names[ri]].append(path_d(poly))
 
     out = {n: "".join(paths[n]) for n in names}
-    # Antarctica is not a canon region (nobody lives there) but is emitted as a neutral
-    # base path so the vector-border facet can render it as plain land, not a gap
-    ant = [path_d(poly) for f in a0["features"]
-           if (f["properties"].get("ADMIN")) == "Antarctica"
-           for poly in parts_of(f["geometry"])]
-    out["Antarctica"] = "".join(ant)
     dest = HERE / "regions_geo.json"
     dest.write_text(json.dumps(out, ensure_ascii=False))
     print(f"{sum(len(v) for v in paths.values())} units → regions_geo.json "
