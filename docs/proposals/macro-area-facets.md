@@ -7,6 +7,11 @@
 > [`research/regions.md`](../../research/regions.md) — the definitive **14-region** `region` classification
 > (names, descriptions, subdivisions, strata, traditions, palette), the corpus-first successor to Berezkin's
 > 12-area `area`. Where this document and `regions.md` diverge, **`regions.md` is authoritative.**
+>
+> **Single-axis decision (2026-07):** the multi-facet entity model in this proposal (region + `family` +
+> `subsistence`/transmission) is **not adopted** — a tradition has one classification axis, `region`, and no
+> facet layer. `family`/`subsistence` are dropped; the material here is retained only as the exploration that
+> led to that decision.
 
 Extends [`troubleshooting.md`](../troubleshooting.md) §"competing macro-area
 schemes". A first draft of this proposal treated *area · family · transmission*

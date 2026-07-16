@@ -8,6 +8,11 @@ each facet, the settled vocabularies, where to see it applied, and its productio
 > the definitive **14-region** classification. The "12 macro-areas" (`area`) named throughout this note are
 > Berezkin's areal scaffold; `regions.md` is the corpus-first successor that supersedes it. Where the two
 > diverge, **`regions.md` is authoritative.**
+>
+> **Single-axis decision (2026-07):** the multi-facet Tradition model in this note (`family`, `subsistence`,
+> `theme_profile`) is **not adopted** — a tradition has one classification axis, `region`, and no facet layer.
+> `family`/`subsistence` are dropped; the facet material here is retained only as the exploration that led to
+> that decision.
 
 ## The one thing that changed
 

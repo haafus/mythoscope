@@ -10,6 +10,15 @@ many traditions; a tradition is a single mythology such as Greek or Norse). `reg
 retired `major_tradition` and the Berezkin `area` as the one primary axis. (Alternative field name if
 `area` is kept alongside: `sphere`.)
 
+> **Single-axis decision (2026-07).** `region` is the **only** top-level classification of a tradition. The
+> multi-facet Tradition model once proposed — `family`, `subsistence`, `theme_profile` facets, see
+> [`../docs/proposals/tradition-architecture-unified.md`](../docs/proposals/tradition-architecture-unified.md)
+> and [`../docs/proposals/macro-area-facets.md`](../docs/proposals/macro-area-facets.md) — is **not adopted.**
+> There is **no facet layer**: no `family`, no `subsistence`. A tradition carries one classification axis,
+> `region`, and nothing else. (Motif-level `theme` and `stratum` are properties of *motifs*, a separate entity,
+> and are unaffected by this decision. `family`/`subsistence` survive only as exploratory facets inside the
+> analysis mockups, never as product architecture.)
+
 Companion docs: `research/tradition-classification.md` (criteria + candidate history),
 `research/mythology-encyclopedias-survey.md` (how reference works carve the world),
 `research/corpus-sourcing-survey.md` (obtainable full text).

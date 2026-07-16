@@ -10,6 +10,11 @@ whose geographic axis (`area`) is the single region vocabulary, and from which c
 > palette). It is the corpus-first successor to the retired `major_tradition` and to Berezkin's 12-area `area`
 > scaffold this proposal still calls `area` below; **where this document and `regions.md` diverge, `regions.md`
 > is authoritative.**
+>
+> **Single-axis decision (2026-07):** the multi-facet Tradition model below (`family`, `subsistence`,
+> `theme_profile`) is **not adopted** — a tradition has one classification axis, `region`, and no facet layer.
+> `family`/`subsistence` are dropped; the facet material here is retained only as the exploration that led to
+> that decision.
 
 Sources folded in:
 [`../reviews/tradition-review.md`](../reviews/tradition-review.md) ·
