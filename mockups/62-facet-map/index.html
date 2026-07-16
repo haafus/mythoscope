@@ -305,9 +305,12 @@ function clampTarget(){
 }
 function animateZoom(){
   const k = 0.16;                               // easing per frame — the "rubbery" feel (lower = slower glide)
+  // ease the zoom in LOG space so zoom-in and zoom-out feel identical (constant multiplicative
+  // rate); a linear w-glide would speed up visually as w shrinks — making zoom-in feel faster
+  view.w = Math.exp(Math.log(view.w) + (Math.log(target.w) - Math.log(view.w)) * k);
+  view.h = view.w / 2;
   view.x += (target.x - view.x) * k;
   view.y += (target.y - view.y) * k;
-  view.w += (target.w - view.w) * k;  view.h = view.w / 2;
   applyView();
   if (Math.abs(target.w - view.w) > 0.05 || Math.abs(target.x - view.x) > 0.05 || Math.abs(target.y - view.y) > 0.05)
     zraf = requestAnimationFrame(animateZoom);
