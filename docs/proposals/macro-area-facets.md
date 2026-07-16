@@ -3,6 +3,11 @@
 > Stage 3 (**systematics**) of the overall arc in
 > [`analysis-program.md`](analysis-program.md): collect → describe → **classify** → explain.
 
+> **Canon.** The region axis this proposal models is canonically specified in
+> [`research/regions.md`](../../research/regions.md) — the definitive **14-region** `region` classification
+> (names, descriptions, subdivisions, strata, traditions, palette), the corpus-first successor to Berezkin's
+> 12-area `area`. Where this document and `regions.md` diverge, **`regions.md` is authoritative.**
+
 Extends [`troubleshooting.md`](../troubleshooting.md) §"competing macro-area
 schemes". A first draft of this proposal treated *area · family · transmission*
 as three facets **of a tradition**. That was wrong on one point, and fixing it

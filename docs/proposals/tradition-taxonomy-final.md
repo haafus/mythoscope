@@ -4,6 +4,11 @@ A single orientation point for "how are traditions and macro-areas classified?" 
 each facet, the settled vocabularies, where to see it applied, and its production status. Distils
 [`macro-area-facets.md`](macro-area-facets.md), the adequacy audit (mockup 32), and Element ch. 5 / 8.
 
+> **Canon.** The `region` axis is canonically specified in [`research/regions.md`](../../research/regions.md) —
+> the definitive **14-region** classification. The "12 macro-areas" (`area`) named throughout this note are
+> Berezkin's areal scaffold; `regions.md` is the corpus-first successor that supersedes it. Where the two
+> diverge, **`regions.md` is authoritative.**
+
 ## The one thing that changed
 
 There is **no single "major-tradition" hierarchy**. A tradition is described by **several facets at once**,

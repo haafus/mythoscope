@@ -4,6 +4,10 @@ Working design note for the single top-level classification of mythological and 
 traditions ("sections"/`разделы`) of mythoscope. Supersedes the ad-hoc facet discussion; records
 the criteria, the corpus-first principle, and the candidate schemes.
 
+> **Canon.** This note records the *criteria and candidate history*. The converged result — the definitive
+> **14-region** `region` classification (final list, descriptions, subdivisions, strata, traditions, palette) —
+> lives in [`regions.md`](regions.md), which is authoritative.
+
 ## Guiding principle — corpus-first, not index-first
 
 The catalogue is **not** built on Berezkin's motif index. We assemble a **full-text corpus** of
