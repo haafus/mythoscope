@@ -578,7 +578,7 @@ def main():
                 terr_pts[i]["y"] = round(terr_pts[i]["y"] + oy * span, 2)
     tcounts = Counter(p["r"] for p in terr_pts)
     facets["territory"] = {
-        "label": f"Regions · fill · {len(terr_pts)}",
+        "label": f"Regions fill · {len(terr_pts)}",
         "kind": "territory",
         "cats": [{"name": rname, "color": rcolor, "n": tcounts.get(ri, 0)}
                  for ri, (rname, rcolor, _) in enumerate(REGIONS)],
