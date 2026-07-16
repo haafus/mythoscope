@@ -22,8 +22,7 @@
   .seg .sep { align-self:center; color:#b3b8bd; font-weight:700; padding:0 3px; user-select:none; }
   .tip { position:fixed; z-index:30; pointer-events:none; background:#111827; color:#fff;
          padding:5px 9px; border-radius:6px; font-size:12px; max-width:280px; display:none; }
-  /* smooth hover highlight: region fill/outline and the enlarged tradition point ease in/out */
-  svg.map path[data-muted] { transition: fill-opacity .18s ease; }
+  /* the hovered tradition point eases as it grows */
   svg.map circle[data-tip] { transition: r .1s ease-out; }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
@@ -220,15 +219,8 @@ document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b
 const tip = document.getElementById("tip");
 const mapBox = document.getElementById("map");
 
-// hover highlight: soft-fill + dark outline the whole region (one merged path), and slightly
-// enlarge the hovered tradition point. Both revert cleanly; only the Regions facet has regions.
-let hiReg = null, hiPt = null;
-function setRegion(path){
-  if (hiReg === path) return;
-  if (hiReg) hiReg.style.fillOpacity = "";
-  hiReg = path;
-  if (hiReg) hiReg.style.fillOpacity = "0.5";   // highlight by fill only — leave the outline as is
-}
+// hover: slightly enlarge the tradition point under the cursor (reverts cleanly)
+let hiPt = null;
 function setPoint(c){
   if (hiPt === c) return;
   if (hiPt) hiPt.style.r = "";                         // reverts to the r attribute (animated via CSS)
@@ -237,7 +229,7 @@ function setPoint(c){
 }
 mapBox.addEventListener("mousemove", e => {
   const el = e.target.closest && e.target.closest("[data-tip]");
-  if (!el) { tip.style.display = "none"; setRegion(null); setPoint(null); return; }
+  if (!el) { tip.style.display = "none"; setPoint(null); return; }
   const sub = el.getAttribute("data-sub");
   const name = esc(el.getAttribute("data-tip"));
   // region-area names read in the same muted grey as the region subtitle on tradition points
@@ -246,17 +238,9 @@ mapBox.addEventListener("mousemove", e => {
   tip.style.display = "block";
   tip.style.left = (e.clientX + 14) + "px";
   tip.style.top = (e.clientY + 10) + "px";
-  // enlarge the point under the cursor (any facet); highlight the region (Regions facet only)
-  const isPoint = el.tagName === "circle";
-  setPoint(isPoint ? el : null);
-  let rp = null;
-  if (active === "borders"){
-    if (el.hasAttribute("data-muted")) rp = el;
-    else if (sub) rp = [...mapBox.querySelectorAll("path[data-muted]")].find(p => p.getAttribute("data-tip") === sub) || null;
-  }
-  setRegion(rp);
+  setPoint(el.tagName === "circle" ? el : null);
 });
-mapBox.addEventListener("mouseleave", () => { tip.style.display = "none"; setRegion(null); setPoint(null); });
+mapBox.addEventListener("mouseleave", () => { tip.style.display = "none"; setPoint(null); });
 
 render();
 </script>
