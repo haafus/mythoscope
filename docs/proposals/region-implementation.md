@@ -95,7 +95,8 @@ never goes in `description`.**
 No slugs, no separate id field, anywhere.
 
 **2.3 All 14 regions, only texted traditions.** Every region node is present; under each are only traditions
-that currently have corpus texts. An **empty region is valid**, not a broken join.
+that currently have corpus texts. An **empty region is valid**, not a broken join. *(Consequence: the atlas and
+any tradition map show only texted traditions — fewer points than the ~194-tradition mockup, by design.)*
 
 **2.4 Curated, not derived.** The tradition list is our own curated artifact — `regions.md` §5 is the
 composition reference. Nothing is imported or derived from Berezkin, `areal_path`, or any index.
