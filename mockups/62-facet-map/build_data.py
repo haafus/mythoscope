@@ -592,9 +592,11 @@ def main():
         "kind": "borders",
         "cats": region_borders(REGIONS),
         "points": region_pts,
+        "antarctica": json.loads(
+            (Path(__file__).resolve().parent / "regions_geo.json").read_text()).get("Antarctica", ""),
         "note": "ареалы регионов на реальных границах (Natural Earth: страны + провинции крупных стран, "
                 "раздел по ближайшей традиции); полупрозрачная заливка + точки курируемых традиций; "
-                "Антарктида не раскрашена",
+                "Антарктида — нейтральная суша",
     }
 
     # Religions layer — predominant religion per country (the modern scriptural overlay stratum,
