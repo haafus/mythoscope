@@ -192,10 +192,11 @@ function initializeGeographyMap(traditions) {
         maxBoundsViscosity: 0.5,
     });
 
-    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", {
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
         noWrap: true,
         bounds: worldBounds,
-        attribution: "Tiles &copy; Esri",
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
     }).addTo(map);
 
     // Canon regions (mockup 62) as a translucent overlay; non-interactive so it never
