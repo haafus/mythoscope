@@ -68,6 +68,7 @@
 <div class="card">
   <div class="seg" id="facetsMain"></div>
   <div class="seg" id="facetsCurated"></div>
+  <div class="seg" id="facetsProj"></div>
   <div class="facet-note" id="note"></div>
 </div>
 
@@ -130,6 +131,24 @@ function drawMap(fid){
     ).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${wash}${dots}</svg>`;
   }
+  if (facet.kind === "winkel"){
+    // region areas re-projected to Winkel Tripel (geometry in D.winkelgeo, fitted into the same
+    // 0..360/0..180 canvas so zoom/pan still work). Layers: beige page · ocean envelope · 30°
+    // graticule · land base · white Antarctica · region fills at the atlas transparency.
+    const wg = D.winkelgeo;
+    const grat = wg.grat.map(g=>
+      `<path d="${g.d}" fill="none" stroke="${g.e?"#8fa3b0":"#9fb0bb"}" stroke-width="${g.e?0.7:0.5}" stroke-opacity="${g.e?0.7:0.45}"/>`
+    ).join("");
+    const regs = wg.regions.map((r,i)=>
+      `<path d="${r.d}" fill="${facet.cats[i].color}" fill-opacity="0.35" stroke="${facet.cats[i].color}" `+
+      `stroke-width="1" stroke-opacity="0.55" data-tip="${escA(facet.cats[i].name)}" data-muted="1"></path>`
+    ).join("");
+    return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
+      `<rect width="360" height="180" fill="#f4f1ea"/>`+
+      `<path d="${wg.env}" fill="#eef3f4" stroke="none"/>`+ grat +
+      `<path d="${wg.land}" fill="#e6ebe3" stroke="#c2ccbe" stroke-width="0.5"/>`+
+      `<path d="${wg.ant}" fill="#ffffff" stroke="#c2ccbe" stroke-width="0.5"/>`+ regs +`</svg>`;
+  }
   if (facet.kind === "borders"){
     // region areas on real vector borders — translucent fills (same-colour hairline
     // stroke at the same opacity just seals gaps between simplified province edges),
@@ -172,6 +191,11 @@ function drawMap(fid){
 
 function drawLegend(fid){
   const facet = D.facets[fid], key = KEY[fid];
+  if (facet.kind === "winkel"){
+    return facet.cats.map(c=>
+      `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</span>`
+    ).join("");
+  }
   if (facet.kind === "regions" || facet.kind === "territory"){
     return facet.cats.map(c=>
       `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)} <span class="n">${c.n}</span></span>`
@@ -213,11 +237,11 @@ function render(){
   applyView();                                            // keep zoom/pan (viewBox + --z) across re-renders
   document.getElementById("legend").innerHTML = facet.disabled ? "" : drawLegend(active);
   document.getElementById("note").textContent = facet.disabled ? ("⚠ " + (facet.note||"нет данных")) : (facet.note || "");
-  document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>b.classList.toggle("on", b.dataset.f===active));
+  document.querySelectorAll("#facetsMain button, #facetsCurated button, #facetsProj button").forEach(b=>b.classList.toggle("on", b.dataset.f===active));
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
@@ -230,7 +254,9 @@ const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
                         "langdiv", "zones", "motifdiv", "|", "regions", "territory"];
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
-document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>{
+// third row: the same region areas re-projected to Winkel Tripel (Prism · intuitive)
+document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu"].map(btnHTML).join("");
+document.querySelectorAll("#facetsMain button, #facetsCurated button, #facetsProj button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
 

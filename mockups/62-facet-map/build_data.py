@@ -12,6 +12,7 @@ Run:  python mockups/62-facet-map/build_data.py
 import importlib.util
 import json
 import math
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -216,6 +217,99 @@ def region_borders(regions):
     geo = json.loads((Path(__file__).resolve().parent / "regions_geo.json").read_text())
     return [{"name": name, "color": color, "dark": REGION_DARK[name], "d": geo.get(name, "")}
             for name, color, _ in regions]
+
+
+# "Intuitive" (associative) region palette — colours chosen by imagery anchors (ochre Australia,
+# saffron South Asia, imperial vermilion East Asia, Amazon emerald…). Circumpolar is a deepened
+# steel-blue (not pale ice) so it stays distinct from the ocean fill under the 0.35 overlay.
+INTUITIVE_REGIONS = {
+    "Sub-Saharan Africa": "#BF6B3A", "Near East & North Africa": "#E0B45E", "Europe": "#4F7A4E",
+    "Caucasus & Iran": "#9E4A6E", "Inner Asia": "#2E7CB8", "South Asia": "#E8952F",
+    "Mainland Southeast Asia": "#3E9E64", "East Asia": "#C0392B", "Austronesia": "#1596A8",
+    "Papua & Aboriginal Australia": "#A9773F", "Circumpolar North": "#5F86A6",
+    "Native North America": "#3AA6A0", "Mesoamerica & the Andes": "#C99A2E",
+    "Lowland South America": "#2E8B4E",
+}
+
+_WINK_PHI1 = math.acos(2 / math.pi)
+
+
+def _winkel(lon, lat):
+    """Winkel Tripel forward projection (standard parallel arccos(2/π)); returns north-up (x, -y)."""
+    lam, phi = math.radians(lon), math.radians(lat)
+    a = math.acos(max(-1.0, min(1.0, math.cos(phi) * math.cos(lam / 2))))
+    sinc = 1.0 if a == 0 else math.sin(a) / a
+    x = 0.5 * (lam * math.cos(_WINK_PHI1) + 2 * math.cos(phi) * math.sin(lam / 2) / sinc)
+    y = 0.5 * (phi + math.sin(phi) / sinc)
+    return x, -y
+
+
+def _rings_from_baked(d):
+    """Parse an SVG path baked in equirectangular map coords (x=lon+180, y=90-lat) back to
+    lists of (lon, lat) rings — one per Z-terminated subpath."""
+    out = []
+    for part in d.split("Z"):
+        nums = re.findall(r"-?\d[\d.]*", part)
+        if len(nums) < 6:
+            continue
+        out.append([(float(nums[i]) - 180.0, 90.0 - float(nums[i + 1]))
+                    for i in range(0, len(nums) - 1, 2)])
+    return out
+
+
+def build_winkelgeo():
+    """Project the region areas + coastline + graticule to Winkel Tripel, fitted into the same
+    0..360 / 0..180 canvas the mockup already uses (so zoom/pan keep working). Antarctica is
+    split off so the client can paint it white. Returns one shared geometry blob (both palette
+    facets reference it — geometry stored once)."""
+    here = Path(__file__).resolve().parent
+    geo = json.loads((here / "regions_geo.json").read_text())
+    land_src = (here / "land.js").read_text()
+    land_path = re.search(r'window\.LAND="(.*?)"', land_src, re.S).group(1)
+
+    land_rings = _rings_from_baked(land_path)
+    land_main = [r for r in land_rings if max(la for _, la in r) >= -60]
+    ant_rings = [r for r in land_rings if max(la for _, la in r) < -60]
+    reg_rings = {name: _rings_from_baked(geo[name]) for name, _, _ in REGIONS}
+
+    # projection envelope (encloses everything) + 30° graticule, in lon/lat
+    env_ll = ([(lo, 90) for lo in range(-180, 181, 2)]
+              + [(180, la) for la in range(90, -91, -2)]
+              + [(lo, -90) for lo in range(180, -181, -2)]
+              + [(-180, la) for la in range(-90, 91, 2)])
+    grat_ll = ([(abs(lo) == 180, [(lo, la) for la in range(-90, 91, 2)]) for lo in range(-180, 181, 30)]
+               + [(abs(la) == 90, [(lo, la) for lo in range(-180, 181, 2)]) for la in range(-90, 91, 30)])
+
+    env_proj = [_winkel(lo, la) for lo, la in env_ll]
+    minx = min(x for x, _ in env_proj); maxx = max(x for x, _ in env_proj)
+    miny = min(y for _, y in env_proj); maxy = max(y for _, y in env_proj)
+    W, H, pad = 360.0, 180.0, 3.0
+    s = min((W - 2 * pad) / (maxx - minx), (H - 2 * pad) / (maxy - miny))
+    offx = pad + (W - 2 * pad - (maxx - minx) * s) / 2 - minx * s
+    offy = pad + (H - 2 * pad - (maxy - miny) * s) / 2 - miny * s
+
+    def T(lo, la):
+        x, y = _winkel(lo, la)
+        return offx + x * s, offy + y * s
+
+    def rings_d(rings):
+        segs = []
+        for r in rings:
+            pts = [T(lo, la) for lo, la in r]
+            segs.append("M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + "Z")
+        return "".join(segs)
+
+    def line_d(pts_ll):
+        pts = [T(lo, la) for lo, la in pts_ll]
+        return "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts)
+
+    return {
+        "regions": [{"name": name, "d": rings_d(reg_rings[name])} for name, _, _ in REGIONS],
+        "land": rings_d(land_main),
+        "ant": rings_d(ant_rings),
+        "grat": [{"e": edge, "d": line_d(pts)} for edge, pts in grat_ll],
+        "env": line_d(env_ll) + "Z",
+    }
 
 
 # predominant-religion choropleth palette (Abrahamic = cool, Islam = green, Indic = warm,
@@ -689,10 +783,30 @@ def main():
                 "разнообразием (Н. Гвинея, Амазония)",
     }
 
+    # Winkel Tripel views of the region areas — one CARTO Prism, one intuitive palette. Both
+    # reference the shared projected geometry (winkelgeo), stored once.
+    winkelgeo = build_winkelgeo()
+    facets["winkel"] = {
+        "label": "Regions · Winkel",
+        "kind": "winkel",
+        "cats": [{"name": name, "color": color} for name, color, _ in REGIONS],
+        "note": "те же ареалы регионов в проекции Winkel Tripel (без полярного растяжения); "
+                "палитра CARTO Prism, как на фасете Regions",
+    }
+    facets["winkelintu"] = {
+        "label": "Regions · Winkel (intuitive)",
+        "kind": "winkel",
+        "cats": [{"name": name, "color": INTUITIVE_REGIONS[name]} for name, _, _ in REGIONS],
+        "note": "то же в проекции Winkel Tripel, но интуитивной (ассоциативной) палитрой "
+                "(охра — Австралия, шафран — Юж. Азия, вермильон — Вост. Азия…)",
+    }
+
     data = {"facets": facets,
             "order": ["regions", "borders", "territory", "religions", "substrate", "families",
-                      "langdiv", "motifdiv", "zones", "hardlayers", "volume", "area", "family",
-                      "narrative", "subsistence", "diversity", "depth", "cosmology", "peopling"],
+                      "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "hardlayers",
+                      "volume", "area", "family", "narrative", "subsistence", "diversity",
+                      "depth", "cosmology", "peopling"],
+            "winkelgeo": winkelgeo,
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
