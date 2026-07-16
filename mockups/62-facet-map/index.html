@@ -321,7 +321,7 @@ mapBox.addEventListener("wheel", e => {
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
   const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
-  target.w *= (e.deltaY < 0 ? 0.9 : 1 / 0.9);
+  target.w *= (e.deltaY < 0 ? 0.93 : 1 / 0.93);
   clampTarget();
   target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
   clampTarget();
