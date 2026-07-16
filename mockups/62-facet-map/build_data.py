@@ -244,6 +244,11 @@ def _winkel(lon, lat):
     return x, -y
 
 
+def _equirect(lon, lat):
+    """Equirectangular (Plate Carrée) forward projection; north-up (x, -y)."""
+    return math.radians(lon), -math.radians(lat)
+
+
 def _rings_from_baked(d):
     """Parse an SVG path baked in equirectangular map coords (x=lon+180, y=90-lat) back to
     lists of (lon, lat) rings — one per Z-terminated subpath."""
@@ -257,11 +262,11 @@ def _rings_from_baked(d):
     return out
 
 
-def build_winkelgeo():
-    """Project the region areas + coastline + graticule to Winkel Tripel, fitted into the same
+def build_projgeo(project):
+    """Project the region areas + coastline + graticule with `project`, fitted into the same
     0..360 / 0..180 canvas the mockup already uses (so zoom/pan keep working). Antarctica is
-    split off so the client can paint it white. Returns one shared geometry blob (both palette
-    facets reference it — geometry stored once)."""
+    split off so the client can paint it white. Returns one shared geometry blob (palette
+    facets reference it — geometry stored once per projection)."""
     here = Path(__file__).resolve().parent
     geo = json.loads((here / "regions_geo.json").read_text())
     land_src = (here / "land.js").read_text()
@@ -280,7 +285,7 @@ def build_winkelgeo():
     grat_ll = ([(abs(lo) == 180, [(lo, la) for la in range(-90, 91, 2)]) for lo in range(-180, 181, 30)]
                + [(abs(la) == 90, [(lo, la) for lo in range(-180, 181, 2)]) for la in range(-90, 91, 30)])
 
-    env_proj = [_winkel(lo, la) for lo, la in env_ll]
+    env_proj = [project(lo, la) for lo, la in env_ll]
     minx = min(x for x, _ in env_proj); maxx = max(x for x, _ in env_proj)
     miny = min(y for _, y in env_proj); maxy = max(y for _, y in env_proj)
     W, H, pad = 360.0, 180.0, 3.0
@@ -289,7 +294,7 @@ def build_winkelgeo():
     offy = pad + (H - 2 * pad - (maxy - miny) * s) / 2 - miny * s
 
     def T(lo, la):
-        x, y = _winkel(lo, la)
+        x, y = project(lo, la)
         return offx + x * s, offy + y * s
 
     def rings_d(rings):
@@ -783,30 +788,37 @@ def main():
                 "разнообразием (Н. Гвинея, Амазония)",
     }
 
-    # Winkel Tripel views of the region areas — one CARTO Prism, one intuitive palette. Both
-    # reference the shared projected geometry (winkelgeo), stored once.
-    winkelgeo = build_winkelgeo()
+    # Projection views of the region areas (preview style: graticule + land base + white
+    # Antarctica + ocean envelope). Geometry is stored once per projection in projgeo; each
+    # facet just carries its palette and which projection to read.
+    projgeo = {"winkel": build_projgeo(_winkel), "equirect": build_projgeo(_equirect)}
+    _prism = [{"name": name, "color": color} for name, color, _ in REGIONS]
+    _intu = [{"name": name, "color": INTUITIVE_REGIONS[name]} for name, _, _ in REGIONS]
     facets["winkel"] = {
         "label": "Regions · Winkel",
-        "kind": "winkel",
-        "cats": [{"name": name, "color": color} for name, color, _ in REGIONS],
+        "kind": "winkel", "proj": "winkel", "cats": _prism,
         "note": "те же ареалы регионов в проекции Winkel Tripel (без полярного растяжения); "
                 "палитра CARTO Prism, как на фасете Regions",
     }
     facets["winkelintu"] = {
         "label": "Regions · Winkel (intuitive)",
-        "kind": "winkel",
-        "cats": [{"name": name, "color": INTUITIVE_REGIONS[name]} for name, _, _ in REGIONS],
+        "kind": "winkel", "proj": "winkel", "cats": _intu,
         "note": "то же в проекции Winkel Tripel, но интуитивной (ассоциативной) палитрой "
                 "(охра — Австралия, шафран — Юж. Азия, вермильон — Вост. Азия…)",
+    }
+    facets["equirectintu"] = {
+        "label": "Regions · equirect (intuitive)",
+        "kind": "winkel", "proj": "equirect", "cats": _intu,
+        "note": "те же ареалы регионов в экваториальной проекции (Plate Carrée) с интуитивной "
+                "(ассоциативной) палитрой",
     }
 
     data = {"facets": facets,
             "order": ["regions", "borders", "territory", "religions", "substrate", "families",
-                      "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "hardlayers",
-                      "volume", "area", "family", "narrative", "subsistence", "diversity",
-                      "depth", "cosmology", "peopling"],
-            "winkelgeo": winkelgeo,
+                      "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu",
+                      "hardlayers", "volume", "area", "family", "narrative", "subsistence",
+                      "diversity", "depth", "cosmology", "peopling"],
+            "projgeo": projgeo,
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")

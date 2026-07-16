@@ -132,10 +132,10 @@ function drawMap(fid){
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet"><rect class="ocean" width="360" height="180"/>${land}${wash}${dots}</svg>`;
   }
   if (facet.kind === "winkel"){
-    // region areas re-projected to Winkel Tripel (geometry in D.winkelgeo, fitted into the same
-    // 0..360/0..180 canvas so zoom/pan still work). Layers: beige page · ocean envelope · 30°
-    // graticule · land base · white Antarctica · region fills at the atlas transparency.
-    const wg = D.winkelgeo;
+    // region areas re-projected (Winkel Tripel or equirect — geometry in D.projgeo[facet.proj],
+    // fitted into the same 0..360/0..180 canvas so zoom/pan still work). Layers: white page ·
+    // ocean envelope · 30° graticule · land base · white Antarctica · region fills.
+    const wg = D.projgeo[facet.proj];
     const grat = wg.grat.map(g=>
       `<path d="${g.d}" fill="none" stroke="${g.e?"#8fa3b0":"#9fb0bb"}" stroke-width="${g.e?0.7:0.5}" stroke-opacity="${g.e?0.7:0.45}"/>`
     ).join("");
@@ -144,7 +144,7 @@ function drawMap(fid){
       `stroke-width="1" stroke-opacity="0.55" data-tip="${escA(facet.cats[i].name)}" data-muted="1"></path>`
     ).join("");
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
-      `<rect width="360" height="180" fill="#f4f1ea"/>`+
+      `<rect width="360" height="180" fill="#ffffff"/>`+
       `<path d="${wg.env}" fill="#eef3f4" stroke="none"/>`+ grat +
       `<path d="${wg.land}" fill="#e6ebe3" stroke="#c2ccbe" stroke-width="0.5"/>`+
       `<path d="${wg.ant}" fill="#ffffff" stroke="#c2ccbe" stroke-width="0.5"/>`+ regs +`</svg>`;
@@ -241,7 +241,7 @@ function render(){
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
@@ -255,7 +255,7 @@ const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
 // third row: the same region areas re-projected to Winkel Tripel (Prism · intuitive)
-document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu"].map(btnHTML).join("");
+document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "equirectintu"].map(btnHTML).join("");
 document.querySelectorAll("#facetsMain button, #facetsCurated button, #facetsProj button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
