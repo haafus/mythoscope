@@ -25,8 +25,7 @@
   /* smooth hover highlight: region fill/outline and the enlarged tradition point ease in/out */
   svg.map path[data-muted] { transition: fill-opacity .18s ease, stroke .18s ease,
                              stroke-width .18s ease, stroke-opacity .18s ease; }
-  svg.map circle[data-tip] { transition: r .22s cubic-bezier(.34,1.7,.5,1); }
-  svg.map .hiOutline { transition: stroke-opacity .18s ease; }
+  svg.map circle[data-tip] { transition: r .18s ease-out; }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
                 height:1.5em; line-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -141,10 +140,8 @@ function drawMap(fid){
     // Antarctica — not a canon region; white ice-sheet fill of the coastline's own geometry
     // (no stroke of its own — the shared coastline layer below outlines the same path)
     const ant = ANTARCTICA_D ? `<path d="${ANTARCTICA_D}" fill="#ffffff" stroke="none"/>` : "";
-    // empty white-outline overlay on top; the hover handler fills in its d for the hovered region
-    const hiOutline = `<path class="hiOutline" fill="none" stroke="#ffffff" stroke-width="0.7" stroke-opacity="0" style="pointer-events:none"/>`;
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
-      `<rect class="ocean" width="360" height="180"/>${ant}${polys}${coast}${pts}${hiOutline}</svg>`;
+      `<rect class="ocean" width="360" height="180"/>${ant}${polys}${coast}${pts}</svg>`;
   }
   const key = KEY[fid], cont = facet.kind === "continuous";
   const colors = (facet.cats || []).map(c => c.color);
@@ -229,13 +226,11 @@ const mapBox = document.getElementById("map");
 let hiReg = null, hiPt = null;
 function setRegion(path){
   if (hiReg === path) return;
-  if (hiReg) hiReg.style.fillOpacity = "";
+  if (hiReg){ const s = hiReg.style; s.fillOpacity = s.stroke = s.strokeWidth = s.strokeOpacity = ""; }
   hiReg = path;
-  const ov = mapBox.querySelector(".hiOutline");   // white outline drawn above coast + points
-  if (hiReg){
-    hiReg.style.fillOpacity = "0.5";
-    if (ov){ ov.setAttribute("d", hiReg.getAttribute("d")); ov.style.strokeOpacity = "1"; }
-  } else if (ov){ ov.style.strokeOpacity = "0"; }
+  if (hiReg){ const s = hiReg.style;
+    s.fillOpacity = "0.5"; s.stroke = hiReg.getAttribute("fill");   // region base colour, full brightness
+    s.strokeWidth = "0.6"; s.strokeOpacity = "1"; }
 }
 function setPoint(c){
   if (hiPt === c) return;
