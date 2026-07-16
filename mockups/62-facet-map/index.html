@@ -240,7 +240,7 @@ mapBox.addEventListener("mousemove", e => {
   const name = esc(el.getAttribute("data-tip"));
   // region-area names read in the same muted grey as the region subtitle on tradition points
   const primary = el.getAttribute("data-muted") ? `<span style="opacity:.7">${name}</span>` : `<b>${name}</b>`;
-  const html = primary + (sub ? ` <span style="opacity:.7">— ${esc(sub)}</span>` : "");
+  const html = primary + (sub ? `<br><span style="opacity:.7">${esc(sub)}</span>` : "");
   const x = e.clientX, y = e.clientY;
   tipTimer = setTimeout(() => {
     tip.innerHTML = html;
