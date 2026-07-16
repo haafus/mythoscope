@@ -328,7 +328,7 @@ mapBox.addEventListener("wheel", e => {
   if (!svg) return;
   e.preventDefault();
   stopInertia();
-  tip.classList.remove("show");                                        // the map moves under a still
+  tip.classList.remove("show"); setPoint(null);                        // the map moves under a still
   if (tipTimer) clearTimeout(tipTimer);                                // cursor while zooming → desync
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
