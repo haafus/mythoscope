@@ -74,6 +74,11 @@ is not wired in.
 
 `regions.md` stays the human canon; this file is its machine copy for the pipeline.
 
+**`description` exists at all three levels and is optional at each**, with a distinct role: **region** — why
+the region is one unit (taxonomy rationale); **tradition** — what the mythology is (the subject); **document**
+(`config/corpus.json`) — what the specific text/edition is (the source). `region.subdivision` and
+`region.strata` are likewise optional curated fields.
+
 **2.2 Name = id.** The region node key is the canon region name; the tradition key is the tradition name.
 No slugs, no separate id field, anywhere.
 
