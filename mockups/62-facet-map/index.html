@@ -23,9 +23,8 @@
   .tip { position:fixed; z-index:30; pointer-events:none; background:#111827; color:#fff;
          padding:5px 9px; border-radius:6px; font-size:12px; max-width:280px; display:none; }
   /* smooth hover highlight: region fill/outline and the enlarged tradition point ease in/out */
-  svg.map path[data-muted] { transition: fill-opacity .18s ease, stroke .18s ease,
-                             stroke-width .18s ease, stroke-opacity .18s ease; }
-  svg.map circle[data-tip] { transition: r .18s ease-out; }
+  svg.map path[data-muted] { transition: fill-opacity .18s ease; }
+  svg.map circle[data-tip] { transition: r .1s ease-out; }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
                 height:1.5em; line-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -226,11 +225,9 @@ const mapBox = document.getElementById("map");
 let hiReg = null, hiPt = null;
 function setRegion(path){
   if (hiReg === path) return;
-  if (hiReg){ const s = hiReg.style; s.fillOpacity = s.stroke = s.strokeWidth = s.strokeOpacity = ""; }
+  if (hiReg) hiReg.style.fillOpacity = "";
   hiReg = path;
-  if (hiReg){ const s = hiReg.style;
-    s.fillOpacity = "0.5"; s.stroke = hiReg.getAttribute("fill");   // region base colour, full brightness
-    s.strokeWidth = "0.55"; s.strokeOpacity = "0.9"; }
+  if (hiReg) hiReg.style.fillOpacity = "0.5";   // highlight by fill only — leave the outline as is
 }
 function setPoint(c){
   if (hiPt === c) return;
