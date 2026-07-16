@@ -6,6 +6,33 @@ entries at the top.
 
 ---
 
+## Motifs page names/colours regions with two non-aligned vocabularies
+
+**Status:** flagged — motif-index side, fix deferred with the cross-index review below; not started.
+
+On one screen (`src/server/web/assets/page-motifs.js`) two region vocabularies coexist and don't line up:
+
+- **The data.** `services/motifs.py::_berezkin_region` groups Berezkin area codes 10–74 into **11 names**:
+  `Africa · Europe · Near East · Central Asia · Oceania · Asia · Siberia · Arctic · North America ·
+  Mesoamerica & Caribbean · South America`.
+- **The palette.** `page-motifs.js::REGION_COLORS` has **17 keys**: the 11 above **plus** `South Asia`,
+  `East Asia`, `Southeast Asia`, `Mesoamerica`, `Caribbean` (and `—`).
+
+Concrete conflicts:
+
+- **`Asia`** — the data lumps codes 21–26 into a single `Asia` bucket, while the palette also carries
+  `South Asia`/`East Asia`/`Southeast Asia`: colours for a split the data never emits.
+- **`Mesoamerica` / `Mesoamerica & Caribbean` / `Caribbean`** — the data emits only `Mesoamerica & Caribbean`;
+  the palette holds all three, so two keys are dead.
+- So `South Asia`, `East Asia`, `Southeast Asia`, `Mesoamerica`, `Caribbean` in the palette **never match** a
+  data name — dead entries — and `Asia` is named at two granularities on the same page.
+
+Resolution: fold into the cross-index review below (align the palette to the actual `_berezkin_region`
+output, or vice versa, and drop the dead keys). Untouched by the tradition `region` work
+(`docs/proposals/region-implementation.md` §2.7).
+
+---
+
 ## Cross-index reference/inference system between motif indexes is noisy and redundant
 
 **Status:** flagged — needs a dedicated review to compress; not started.
