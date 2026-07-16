@@ -61,7 +61,6 @@
 </div>
 
 <div class="card">
-  <h2 id="maptitle"></h2>
   <div id="map"></div>
   <div class="tip" id="tip"></div>
   <div class="legend" id="legend"></div>
@@ -190,7 +189,6 @@ function drawLegend(fid){
 
 function render(){
   const facet = D.facets[active];
-  document.getElementById("maptitle").textContent = "Карта — раскраска: " + facet.label;
   document.getElementById("map").innerHTML = facet.disabled ? drawMap("__none__") : drawMap(active);
   document.getElementById("legend").innerHTML = facet.disabled ? "" : drawLegend(active);
   document.getElementById("note").textContent = facet.disabled ? ("⚠ " + (facet.note||"нет данных")) : (facet.note || "");
