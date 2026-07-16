@@ -22,7 +22,8 @@
   .seg .sep { align-self:center; color:#b3b8bd; font-weight:700; padding:0 3px; user-select:none; }
   .tip { position:fixed; z-index:30; pointer-events:none; background:#111827; color:#fff;
          padding:5px 9px; border-radius:6px; font-size:12px; line-height:1.25; max-width:280px;
-         opacity:0; transform:translateY(3px); transition:opacity .16s ease, transform .16s ease; }
+         opacity:0; transition:opacity .16s ease, transform .16s ease; }
+  .tip.rise { transform:translateY(3px); }        /* region only: rise-in on appearance */
   .tip.show { opacity:1; transform:translateY(0); }
   /* the hovered tradition point eases as it grows */
   svg.map circle[data-tip] { transition: r .1s ease-out; }
@@ -259,9 +260,11 @@ mapBox.addEventListener("mousemove", e => {
     const r = el.getBoundingClientRect();
     fillTip(el);
     placeAbove(r.left + r.width / 2, r.top, 6);
+    tip.classList.remove("rise");                 // point: no y rise — it moves with the radius
     tip.classList.add("show");
-  } else {                                        // region: fade in after a dwell, above the cursor
+  } else {                                        // region: fade + rise-in after a dwell, above the cursor
     tip.classList.remove("show");
+    tip.classList.add("rise");                    // from-offset so the region tooltip rises in
     const x = e.clientX, y = e.clientY;
     tipTimer = setTimeout(() => {
       fillTip(el);
