@@ -262,11 +262,11 @@ def _rings_from_baked(d):
     return out
 
 
-def build_projgeo(project):
-    """Project the region areas + coastline + graticule with `project`, fitted into the same
-    0..360 / 0..180 canvas the mockup already uses (so zoom/pan keep working). Antarctica is
-    split off so the client can paint it white. Returns one shared geometry blob (palette
-    facets reference it — geometry stored once per projection)."""
+def build_projgeo(project, pts):
+    """Project the region areas + coastline + graticule + tradition points with `project`,
+    fitted into the same 0..360 / 0..180 canvas the mockup already uses (so zoom/pan keep
+    working). Antarctica is split off so the client can paint it white. Returns one shared
+    geometry blob (palette facets reference it — geometry stored once per projection)."""
     here = Path(__file__).resolve().parent
     geo = json.loads((here / "regions_geo.json").read_text())
     land_src = (here / "land.js").read_text()
@@ -308,12 +308,18 @@ def build_projgeo(project):
         pts = [T(lo, la) for lo, la in pts_ll]
         return "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts)
 
+    proj_pts = []
+    for p in pts:
+        x, y = T(p["x"], p["y"])
+        proj_pts.append({"x": round(x, 1), "y": round(y, 1), "r": p["r"], "t": p["t"]})
+
     return {
         "regions": [{"name": name, "d": rings_d(reg_rings[name])} for name, _, _ in REGIONS],
         "land": rings_d(land_main),
         "ant": rings_d(ant_rings),
-        "grat": [{"e": edge, "d": line_d(pts)} for edge, pts in grat_ll],
+        "grat": [{"e": edge, "d": line_d(gp)} for edge, gp in grat_ll],
         "env": line_d(env_ll) + "Z",
+        "points": proj_pts,
     }
 
 
@@ -791,7 +797,8 @@ def main():
     # Projection views of the region areas (preview style: graticule + land base + white
     # Antarctica + ocean envelope). Geometry is stored once per projection in projgeo; each
     # facet just carries its palette and which projection to read.
-    projgeo = {"winkel": build_projgeo(_winkel), "equirect": build_projgeo(_equirect)}
+    projgeo = {"winkel": build_projgeo(_winkel, region_pts),
+               "equirect": build_projgeo(_equirect, region_pts)}
     _prism = [{"name": name, "color": color} for name, color, _ in REGIONS]
     _intu = [{"name": name, "color": INTUITIVE_REGIONS[name]} for name, _, _ in REGIONS]
     facets["winkel"] = {
