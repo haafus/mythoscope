@@ -211,7 +211,7 @@ function render(){
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "zones"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
@@ -221,7 +221,7 @@ document.getElementById("facetsMain").innerHTML = D.order.filter(f=>!CURATED.has
 // explicit curated layout: choropleths · language-spread · the two point/fill regions views;
 // "|" renders a dot separator
 const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
-                        "langdiv", "zones", "|", "regions", "territory"];
+                        "langdiv", "motifdiv", "zones", "|", "regions", "territory"];
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
 document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>{
@@ -322,6 +322,8 @@ mapBox.addEventListener("wheel", e => {
   if (!svg) return;
   e.preventDefault();
   stopInertia();
+  tip.classList.remove("show");                                        // the map moves under a still
+  if (tipTimer) clearTimeout(tipTimer);                                // cursor while zooming → desync
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
   const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
@@ -330,7 +332,7 @@ mapBox.addEventListener("wheel", e => {
   let d = e.deltaY;
   if (e.deltaMode === 1) d *= 16;                                       // line units → ~pixels
   d = Math.max(-50, Math.min(50, d));                                   // cap one event's kick
-  target.w *= Math.exp(d * 0.0013);
+  target.w *= Math.exp(d * 0.002);
   clampTarget();
   target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
   clampTarget();

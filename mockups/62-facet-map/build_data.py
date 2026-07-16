@@ -16,6 +16,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
+from scipy.spatial import cKDTree
 from scipy.stats import rankdata
 from sklearn.cluster import KMeans
 
@@ -262,6 +263,10 @@ FAMILIES = [  # predominant (indigenous) language family — qualitative
 LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark = high
     ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
     ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
+]
+MOTIFDIV = [  # motif β-turnover (mockup 52) per canon region — sequential OrRd, dark = high
+    ("Very low", "#FEF0D9"), ("Low", "#FDCC8A"), ("Moderate", "#FC8D59"),
+    ("High", "#E34A33"), ("Very high", "#B30000"),
 ]
 ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest residual.
     # lightest step lifted off #EFF3FF (≈ ocean #eef3f4) to a clear pale blue: at the
@@ -632,6 +637,34 @@ def main():
         "note": "языковое разнообразие / фрагментация (много языков на ареал) — тёмное в шаттер-зонах "
                 "(Н. Гвинея, Амазония, В. Африка, Кавказ), бледное в спред-зонах",
     }
+    # Motif-diversity choropleth — the `diversity` β-turnover aggregated to each canon region
+    # (mean β of the nearest Berezkin traditions), drawn as a 5-level regional fill like langdiv.
+    _ranchor, _rreg = [], []
+    for _ri, (_, _, _trads) in enumerate(REGIONS):
+        for _, _lat, _lon in _trads:
+            _ranchor.append((_lon, _lat)); _rreg.append(_ri)
+    _ranchor = np.array(_ranchor, float)
+    _rtree = cKDTree(np.vstack([_ranchor, _ranchor + [360, 0], _ranchor - [360, 0]]))
+    _rreg3 = np.array(_rreg * 3)
+    _acc = defaultdict(list)
+    for _p in points:
+        if _p["d"] is not None:
+            _acc[int(_rreg3[_rtree.query([_p["x"], _p["y"]])[1]])].append(_p["d"])
+    _rbeta = {ri: float(np.mean(v)) for ri, v in _acc.items() if v}
+    _order = sorted(_rbeta, key=lambda ri: _rbeta[ri])                  # low β … high β
+    _lvl_of = {ri: min(len(MOTIFDIV) - 1, k * len(MOTIFDIV) // max(1, len(_order)))
+               for k, ri in enumerate(_order)}
+    _rnames = [r[0] for r in REGIONS]
+    _geo = json.loads((Path(__file__).resolve().parent / "regions_geo.json").read_text())
+    facets["motifdiv"] = {
+        "label": f"Motif diversity · {len(MOTIFDIV)}",
+        "kind": "borders",
+        "cats": [{"name": lab, "color": col,
+                  "d": "".join(_geo.get(_rnames[ri], "") for ri in _order if _lvl_of[ri] == lv)}
+                 for lv, (lab, col) in enumerate(MOTIFDIV)],
+        "note": "β-turnover разнообразия мотивов (мокап 52), агрегированный по 14 регионам канона "
+                "(средняя β ближайших традиций Березкина); тёмное = высокое разнообразие",
+    }
     facets["zones"] = {
         "label": f"Zones · {len(ZONES)}",
         "kind": "borders",
@@ -643,8 +676,8 @@ def main():
 
     data = {"facets": facets,
             "order": ["regions", "borders", "territory", "religions", "substrate", "families",
-                      "langdiv", "zones", "hardlayers", "volume", "area", "family", "narrative",
-                      "subsistence", "diversity", "depth", "cosmology", "peopling"],
+                      "langdiv", "motifdiv", "zones", "hardlayers", "volume", "area", "family",
+                      "narrative", "subsistence", "diversity", "depth", "cosmology", "peopling"],
             "points": points, "n": len(points), "min_motifs": MIN_MOTIFS}
     OUT.write_text("window.DATA = " + json.dumps(data, ensure_ascii=False) + ";",
                    encoding="utf-8")
