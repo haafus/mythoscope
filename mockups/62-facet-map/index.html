@@ -11,7 +11,8 @@
   .card { background:#fff; border:1px solid #e7e2d7; border-radius:12px; padding:18px 20px; margin:16px 0; }
   h2 { font-size:15px; margin:0 0 10px; }
   svg.map { width:100%; height:auto; background:#eef3f4; border-radius:8px; display:block; }
-  .land { fill:#e4e9e3; stroke:#d3d9d0; stroke-width:0.3; }
+  .land { fill:#e4e9e3; stroke:#d3d9d0; stroke-width:0.9px; }
+  svg.map path { vector-effect:non-scaling-stroke; }   /* contour widths stay fixed on zoom */
   .ocean { fill:#eef3f4; }
   .seg { display:flex; flex-wrap:wrap; gap:6px; }
   .seg + .seg { margin-top:8px; }
@@ -137,7 +138,7 @@ function drawMap(fid){
     // lighter so the dots stand out; the pure choropleths keep the standard 0.4
     const op = fid === "borders" ? 0.32 : 0.4;
     const polys = facet.cats.map(c=>
-      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1"`:""}></path>`
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="1.2" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1"`:""}></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mixw(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color, 1/3)}" `+
@@ -145,7 +146,7 @@ function drawMap(fid){
     ).join("");
     // coastline on top — keeps a continent contour even where a fill (e.g. the palest
     // spread-zone step) is near-identical to the ocean colour and would otherwise vanish
-    const coast = `<path d="${window.LAND||""}" fill="none" stroke="#aab1a7" stroke-width="0.45" stroke-opacity="0.8"/>`;
+    const coast = `<path d="${window.LAND||""}" fill="none" stroke="#aab1a7" stroke-width="1.35" stroke-opacity="0.8"/>`;
     // Antarctica — not a canon region; white ice-sheet fill of the coastline's own geometry
     // (no stroke of its own — the shared coastline layer below outlines the same path)
     const ant = ANTARCTICA_D ? `<path d="${ANTARCTICA_D}" fill="#ffffff" stroke="none"/>` : "";
@@ -320,7 +321,7 @@ mapBox.addEventListener("wheel", e => {
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
   const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
-  target.w *= (e.deltaY < 0 ? 0.8 : 1 / 0.8);
+  target.w *= (e.deltaY < 0 ? 0.9 : 1 / 0.9);
   clampTarget();
   target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
   clampTarget();
