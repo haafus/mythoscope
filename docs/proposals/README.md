@@ -33,6 +33,11 @@ it serves), and **where it stands**. "Proposal" = designed, not built; "partly d
   `Tradition` entity**; `area` becomes the single region vocabulary; colour derived as a gradient within
   macro-area; `major_tradition` retired. **Goal:** kill the fragile string-join, the six overlapping region
   schemes, and non-deterministic colour in one coherent model. *Proposal; 6-phase migration not started.*
+- [`region-implementation.md`](region-implementation.md) — **the open code layer** after taxonomy/presentation
+  were closed: wire `region` into production (id-keyed registry, fail-loud validation, retire
+  `major_tradition`, region-derived colour, normalised served/chunk model), the current state with file:line,
+  and the key decision-forks (authored-vs-derived region, scope, TMI reconciliation). Supersedes
+  `tradition-architecture-unified.md` §4/§6. **Goal:** a decision-reconciled implementation plan. *Proposal; not started.*
 - [`map-palette-and-projection.md`](map-palette-and-projection.md) — ADR: region-map palette (CARTOColors
   Prism as canon; the associative palette explored, not adopted), map projection (equirectangular engine +
   Winkel Tripel atlas view), basemap tiles (CARTO Positron + the tiles↔projection constraint), and the

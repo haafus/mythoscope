@@ -98,6 +98,11 @@ per-tradition shade.)* Consequences:
 
 ## 4. Architecture / code / pipeline layer
 
+> **Superseded by [`region-implementation.md`](region-implementation.md).** §4 and §6 below still assume the
+> retired facet model (`area`/`family`/`subsistence`, area-gradient colour, facet selector). The live,
+> decision-reconciled code plan — region only, colour from the region palette — is in `region-implementation.md`;
+> read that for implementation. §4/§6 here are kept as the reasoning that led to it.
+
 **4.1 One source of truth, id-keyed.** `config/traditions.json` becomes a registry keyed by `id`; each entry
 carries `name` + facets (`area`, `family`, `subsistence`, `coordinates`, `language`, `areal_id`). Books in
 `config/corpus.json` reference `tradition_id`, not a display string.
