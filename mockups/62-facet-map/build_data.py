@@ -264,9 +264,8 @@ LANGDIV = [  # linguistic diversity / fragmentation — sequential purple, dark 
     ("Very high", "#54278F"), ("High", "#756BB1"), ("Moderate", "#9E9AC8"),
     ("Low", "#CBC9E2"), ("Very low", "#EFEDF5"),
 ]
-MOTIFDIV = [  # motif β-turnover (mockup 52) per canon region — sequential OrRd, dark = high
-    ("Very low", "#FEF0D9"), ("Low", "#FDCC8A"), ("Moderate", "#FC8D59"),
-    ("High", "#E34A33"), ("Very high", "#B30000"),
+MOTIFDIV_RAMP = [  # motif β-turnover (mockup 52) per canon region — continuous OrRd, dark = high
+    "#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000",
 ]
 ZONES = [  # Nichols spread<->residual as a sequential blue ramp, dark = strongest residual.
     # lightest step lifted off #EFF3FF (≈ ocean #eef3f4) to a clear pale blue: at the
@@ -651,19 +650,26 @@ def main():
         if _p["d"] is not None:
             _acc[int(_rreg3[_rtree.query([_p["x"], _p["y"]])[1]])].append(_p["d"])
     _rbeta = {ri: float(np.mean(v)) for ri, v in _acc.items() if v}
-    _order = sorted(_rbeta, key=lambda ri: _rbeta[ri])                  # low β … high β
-    _lvl_of = {ri: min(len(MOTIFDIV) - 1, k * len(MOTIFDIV) // max(1, len(_order)))
-               for k, ri in enumerate(_order)}
     _rnames = [r[0] for r in REGIONS]
     _geo = json.loads((Path(__file__).resolve().parent / "regions_geo.json").read_text())
+    _bmin, _bmax = min(_rbeta.values()), max(_rbeta.values())
+
+    def _ramp(stops, t):                                               # interpolate a hex ramp at t∈[0,1]
+        t = max(0.0, min(1.0, t)); s = t * (len(stops) - 1)
+        i = min(len(stops) - 2, int(s)); f = s - i
+        a = [int(stops[i][j:j + 2], 16) for j in (1, 3, 5)]
+        b = [int(stops[i + 1][j:j + 2], 16) for j in (1, 3, 5)]
+        return "rgb(%d,%d,%d)" % tuple(round(a[k] + (b[k] - a[k]) * f) for k in range(3))
+
     facets["motifdiv"] = {
-        "label": f"Motif diversity · {len(MOTIFDIV)}",
+        "label": "Motif diversity",
         "kind": "borders",
-        "cats": [{"name": lab, "color": col,
-                  "d": "".join(_geo.get(_rnames[ri], "") for ri in _order if _lvl_of[ri] == lv)}
-                 for lv, (lab, col) in enumerate(MOTIFDIV)],
+        "ramp": MOTIFDIV_RAMP, "min": round(_bmin, 2), "max": round(_bmax, 2), "unit": "β = γ/α",
+        "cats": [{"name": _rnames[ri], "color": _ramp(MOTIFDIV_RAMP, (b - _bmin) / (_bmax - _bmin + 1e-9)),
+                  "d": _geo.get(_rnames[ri], "")}
+                 for ri, b in sorted(_rbeta.items(), key=lambda kv: kv[1])],
         "note": "β-turnover разнообразия мотивов (мокап 52), агрегированный по 14 регионам канона "
-                "(средняя β ближайших традиций Березкина); тёмное = высокое разнообразие",
+                "(средняя β ближайших традиций Березкина), непрерывной шкалой; тёмное = высокое",
     }
     facets["zones"] = {
         "label": f"Zones · {len(ZONES)}",

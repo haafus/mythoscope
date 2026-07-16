@@ -178,6 +178,12 @@ function drawLegend(fid){
     ).join("");
   }
   if (facet.kind === "borders"){
+    if (facet.ramp){                                   // continuous choropleth (e.g. Motif diversity)
+      const grad = `linear-gradient(to right, ${facet.ramp.join(",")})`;
+      return `<span class="lg"><span class="n">${facet.min}</span>`+
+        `<span style="display:inline-block;width:200px;height:11px;border-radius:6px;margin:0 4px;background:${grad}"></span>`+
+        `<span class="n">${facet.max}</span>${facet.unit?` <span class="n">(${esc(facet.unit)})</span>`:""}</span>`;
+    }
     return facet.cats.map(c=>
       `<span class="lg"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</span>`
     ).join("");
