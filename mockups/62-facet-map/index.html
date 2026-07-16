@@ -129,7 +129,7 @@ function drawMap(fid){
       `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1"`:""}></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
-      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mix(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color)}" `+
+      `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${facet.cats[p.r].color}" `+
       `stroke="#fff" stroke-width="0.35" data-tip="${escA(p.t)}" data-sub="${escA(facet.cats[p.r].name)}"></circle>`
     ).join("");
     // coastline on top — keeps a continent contour even where a fill (e.g. the palest
