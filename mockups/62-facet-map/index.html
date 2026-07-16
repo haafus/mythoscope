@@ -144,13 +144,14 @@ function drawMap(fid){
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mixw(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color, 1/3)}" `+
       `stroke="#fff" stroke-width="0.35" data-tip="${escA(p.t)}" data-sub="${escA(facet.cats[p.r].name)}"></circle>`
     ).join("");
-    // no separate land-silhouette coastline: it came from a different Natural Earth dataset than
-    // the admin fills, so their coasts were offset (double contour). The fills' own admin-0 edge
-    // is the single coastline now. Antarctica has no region fill, so it keeps its own outline.
-    const ant = ANTARCTICA_D
-      ? `<path d="${ANTARCTICA_D}" fill="#ffffff" stroke="#aab1a7" stroke-width="1.2" stroke-opacity="0.8"/>` : "";
+    // coastline on top — keeps a continent contour even where a fill (e.g. the palest
+    // spread-zone step) is near-identical to the ocean colour and would otherwise vanish
+    const coast = `<path d="${window.LAND||""}" fill="none" stroke="#aab1a7" stroke-width="1.35" stroke-opacity="0.8"/>`;
+    // Antarctica — not a canon region; white ice-sheet fill of the coastline's own geometry
+    // (no stroke of its own — the shared coastline layer below outlines the same path)
+    const ant = ANTARCTICA_D ? `<path d="${ANTARCTICA_D}" fill="#ffffff" stroke="none"/>` : "";
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
-      `<rect class="ocean" width="360" height="180"/>${ant}${polys}${pts}</svg>`;
+      `<rect class="ocean" width="360" height="180"/>${ant}${polys}${coast}${pts}</svg>`;
   }
   const key = KEY[fid], cont = facet.kind === "continuous";
   const colors = (facet.cats || []).map(c => c.color);
