@@ -121,8 +121,9 @@ function drawMap(fid){
     // coastline on top — keeps a continent contour even where a fill (e.g. the palest
     // spread-zone step) is near-identical to the ocean colour and would otherwise vanish
     const coast = `<path d="${window.LAND||""}" fill="none" stroke="#aab1a7" stroke-width="0.45" stroke-opacity="0.8"/>`;
-    // Antarctica — not a canon region; drawn as neutral land (same grey as the dots facet)
-    const ant = facet.antarctica ? `<path d="${facet.antarctica}" class="land"/>` : "";
+    // Antarctica — not a canon region; drawn as a white ice sheet so it reads as land
+    const ant = facet.antarctica
+      ? `<path d="${facet.antarctica}" fill="#ffffff" stroke="#c7ccc4" stroke-width="0.4"/>` : "";
     return `<svg class="map" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet">`+
       `<rect class="ocean" width="360" height="180"/>${ant}${polys}${coast}${pts}</svg>`;
   }
