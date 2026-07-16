@@ -19,6 +19,7 @@
   .seg button { font:inherit; font-size:13px; padding:6px 14px; border:1px solid #e7e2d7; background:#fff;
                 color:var(--ink); border-radius:20px; cursor:pointer; }
   .seg button.on { background:#2f6fed; border-color:#2f6fed; color:#fff; }
+  .seg .sep { align-self:center; color:#b3b8bd; font-weight:700; padding:0 3px; user-select:none; }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
                 height:1.5em; line-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -107,8 +108,11 @@ function drawMap(fid){
     // region areas on real vector borders — translucent fills (same-colour hairline
     // stroke at the same opacity just seals gaps between simplified province edges),
     // with the curated tradition points drawn on top
+    // regions·areas (the only borders facet with tradition points on top) reads a touch
+    // lighter so the dots stand out; the pure choropleths keep the standard 0.4
+    const op = fid === "borders" ? 0.32 : 0.4;
     const polys = facet.cats.map(c=>
-      `<path d="${c.d}" fill="${c.color}" fill-opacity="0.4" stroke="${c.color}" stroke-width="0.4" stroke-opacity="0.4"><title>${esc(c.name)}</title></path>`
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}"><title>${esc(c.name)}</title></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mix(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color)}" `+
@@ -183,7 +187,12 @@ const btnHTML = fid => {
   return `<button data-f="${fid}"${f.disabled?" disabled":""}${title}${fid===active?' class="on"':""}>${esc(f.label)}</button>`;
 };
 document.getElementById("facetsMain").innerHTML = D.order.filter(f=>!CURATED.has(f)).map(btnHTML).join("");
-document.getElementById("facetsCurated").innerHTML = D.order.filter(f=>CURATED.has(f)).map(btnHTML).join("");
+// explicit curated layout: choropleths · language-spread · the two point/fill regions views;
+// "|" renders a dot separator
+const CURATED_LAYOUT = ["borders", "religions", "families", "substrate", "|",
+                        "langdiv", "zones", "|", "regions", "territory"];
+document.getElementById("facetsCurated").innerHTML =
+  CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
 document.querySelectorAll("#facetsMain button, #facetsCurated button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
