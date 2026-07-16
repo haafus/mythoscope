@@ -84,8 +84,10 @@ similarity; the residual gets a future **connectivity** axis. (Full detail:
 selectable axis — `area`, `family`, or `subsistence` — instead of the single hard-wired `major_tradition`
 tree. The user picks the lens; the two theme views add an etiological ↔ narrative axis toggle (Element ch. 8).
 
-**Colour is a deterministic gradient within the macro-area** (the colour-review "future" item): `hue =
-area_base(area)`, `L/S = f(index of tradition within its area)`. Consequences:
+**Colour lives only at the region level** (single-colour decision, 2026-07): a tradition has no colour of its
+own — it takes its **region's** colour. *(This supersedes the earlier per-tradition "gradient within the
+macro-area" — `L/S = f(index of tradition within its area)` — struck below; there is no within-region
+per-tradition shade.)* Consequences:
 
 - kin traditions share a **family tone** (Greek/Roman/Norse read as one Indo-European hue band);
 - an `area` is recognisable by hue in **every** view — corpus map, motif region bars, embeddings scatter;

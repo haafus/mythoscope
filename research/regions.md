@@ -427,7 +427,13 @@ Prism's 11 coloured hues map onto the arc in spectral order (its 12th, a neutral
 ribbon along the out-of-Africa arc — hue carries the sequence, and the map's borders + labels carry the
 neighbour distinction (per-pair contrast is deliberately not maximised).
 
-Each region has a **base** (its map colour) plus **light**/**dark** ramp ends for sub-traditions.
+Each region has a **base** (its map colour) plus **light**/**dark** ramp ends.
+
+> **Colour lives only at the region level (2026-07).** A tradition has **no colour of its own** — it takes its
+> **region's** colour. There is no per-tradition colour and no within-region gradient keyed to a tradition
+> (superseding the earlier "gradient within area" idea in `tradition-architecture-unified.md` §3). The
+> `light`/`dark` ramp ends are region-level UI shades (hover, point-on-fill legibility), not tradition
+> identities.
 
 **Two swaps break the strict arc for legibility.** The arc's tail (purples→magentas) piled four
 similar hues into the New World, where they read as one blur. So two American regions trade colours
