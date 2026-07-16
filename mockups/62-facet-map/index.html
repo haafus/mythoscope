@@ -22,6 +22,10 @@
   .seg .sep { align-self:center; color:#b3b8bd; font-weight:700; padding:0 3px; user-select:none; }
   .tip { position:fixed; z-index:30; pointer-events:none; background:#111827; color:#fff;
          padding:5px 9px; border-radius:6px; font-size:12px; max-width:280px; display:none; }
+  /* smooth hover highlight: region fill/outline and the enlarged tradition point ease in/out */
+  svg.map path[data-muted] { transition: fill-opacity .18s ease, stroke .18s ease,
+                             stroke-width .18s ease, stroke-opacity .18s ease; }
+  svg.map circle[data-tip] { transition: r .15s ease; }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
   .facet-note { font-size:11.5px; color:var(--muted); margin-top:8px;
                 height:1.5em; line-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -124,7 +128,7 @@ function drawMap(fid){
     // lighter so the dots stand out; the pure choropleths keep the standard 0.4
     const op = fid === "borders" ? 0.32 : 0.4;
     const polys = facet.cats.map(c=>
-      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1" data-dark="${c.dark}"`:""}></path>`
+      `<path d="${c.d}" fill="${c.color}" fill-opacity="${op}" stroke="${c.color}" stroke-width="0.4" stroke-opacity="${op}" data-tip="${escA(c.name)}"${fid==="borders"?` data-muted="1" data-hi="${mix(c.color, c.dark)}"`:""}></path>`
     ).join("");
     const pts = (facet.points||[]).map(p=>
       `<circle cx="${(p.x+180).toFixed(2)}" cy="${(90-p.y).toFixed(2)}" r="1.5" fill="${mix(facet.cats[p.r].color, facet.cats[p.r].dark||facet.cats[p.r].color)}" `+
@@ -219,19 +223,19 @@ const mapBox = document.getElementById("map");
 
 // hover highlight: soft-fill + dark outline the whole region (one merged path), and slightly
 // enlarge the hovered tradition point. Both revert cleanly; only the Regions facet has regions.
-let hiReg = null, hiPt = null, hiPtR = null;
+let hiReg = null, hiPt = null;
 function setRegion(path){
   if (hiReg === path) return;
   if (hiReg){ const s = hiReg.style; s.fillOpacity = s.stroke = s.strokeWidth = s.strokeOpacity = ""; }
   hiReg = path;
   if (hiReg){ const s = hiReg.style;
-    s.fillOpacity = "0.5"; s.stroke = hiReg.getAttribute("data-dark"); s.strokeWidth = "0.55"; s.strokeOpacity = "0.9"; }
+    s.fillOpacity = "0.5"; s.stroke = hiReg.getAttribute("data-hi"); s.strokeWidth = "0.55"; s.strokeOpacity = "0.9"; }
 }
 function setPoint(c){
   if (hiPt === c) return;
-  if (hiPt) hiPt.setAttribute("r", hiPtR);
+  if (hiPt) hiPt.style.r = "";                         // reverts to the r attribute (animated via CSS)
   hiPt = c;
-  if (hiPt){ hiPtR = hiPt.getAttribute("r"); hiPt.setAttribute("r", (parseFloat(hiPtR) * 1.6).toFixed(2)); }
+  if (hiPt) hiPt.style.r = (parseFloat(hiPt.getAttribute("r")) * 1.6).toFixed(2) + "px";
 }
 mapBox.addEventListener("mousemove", e => {
   const el = e.target.closest && e.target.closest("[data-tip]");
