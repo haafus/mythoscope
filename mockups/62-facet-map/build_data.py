@@ -554,7 +554,7 @@ def main():
                 region_pts[i]["y"] = round(region_pts[i]["y"] + oy * span, 2)
     rcounts = Counter(p["r"] for p in region_pts)
     facets["regions"] = {
-        "label": f"Regions · {len(REGIONS)}",
+        "label": f"regions dots · {len(REGIONS)}",
         "kind": "regions",
         "cats": [{"name": rname, "color": rcolor, "n": rcounts.get(ri, 0)}
                  for ri, (rname, rcolor, _) in enumerate(REGIONS)],
@@ -588,7 +588,7 @@ def main():
 
     # Borders layer — region areas as filled polygons (nearest-region partition), no points
     facets["borders"] = {
-        "label": "Regions · areas",
+        "label": "regions",
         "kind": "borders",
         "cats": region_borders(REGIONS),
         "points": region_pts,

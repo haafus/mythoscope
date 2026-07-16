@@ -189,7 +189,7 @@ const btnHTML = fid => {
 document.getElementById("facetsMain").innerHTML = D.order.filter(f=>!CURATED.has(f)).map(btnHTML).join("");
 // explicit curated layout: choropleths · language-spread · the two point/fill regions views;
 // "|" renders a dot separator
-const CURATED_LAYOUT = ["borders", "religions", "families", "substrate", "|",
+const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
                         "langdiv", "zones", "|", "regions", "territory"];
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
