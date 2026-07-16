@@ -304,7 +304,7 @@ function clampTarget(){
   target.y = Math.max(0, Math.min(180 - target.h, target.y));
 }
 function animateZoom(){
-  const k = 0.28;                               // easing per frame — the "rubbery" feel
+  const k = 0.16;                               // easing per frame — the "rubbery" feel (lower = slower glide)
   view.x += (target.x - view.x) * k;
   view.y += (target.y - view.y) * k;
   view.w += (target.w - view.w) * k;  view.h = view.w / 2;
@@ -321,7 +321,7 @@ mapBox.addEventListener("wheel", e => {
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
   const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
-  target.w *= (e.deltaY < 0 ? 0.93 : 1 / 0.93);
+  target.w *= (e.deltaY < 0 ? 0.95 : 1 / 0.95);
   clampTarget();
   target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
   clampTarget();
