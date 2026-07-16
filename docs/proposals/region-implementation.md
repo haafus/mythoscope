@@ -85,24 +85,22 @@ composition reference. Nothing is imported or derived from Berezkin, `areal_path
 regions (Greek/Norse/Celtic → `Europe`; `Mesopotamian` + `Abrahamic` → `Near East & North Africa`; …). The
 `<major>` file-path segment **stays** — its value is now the region name.
 
-**2.6 Colour comes from the region; region and colour are stored once, never copied onto records.** A
-tradition's colour is its region node's single `colour`; drop `get_tradition_color` / `random`. `region` is
-stored once (the tradition's place in the tree), `colour` once (the region node). The built document records
-(`outputs/corpus/corpus.json` rows), the `/api/corpus/catalog` response, and `SearchResult` carry **only the
-tradition** (the reference) — **no `region`, no `colour`** on them; both are resolved by lookup (region from
-the tree, colour from the region). This deletes today's per-row/per-chunk copies of `major_tradition`/`colour`
-(`builder.py:58-64,208-213`, `services/corpus.py:29`, chunk metadata) and the drift they cause (random colour
-reshuffles the copies; the served-store asymmetry — `major` present on `/catalog` rows, absent from
-`/traditions`, `builder.py:160-181` — disappears). *(Renaming `major_tradition`→`region` and normalising are
-separate changes; the rename does not require keeping the copies.)*
+**2.6 Colour comes from the region and is not stored.** A tradition's colour is its region node's `colour`
+in `config/traditions.json`, computed `tradition → region → colour` at display. `region` and `colour` are
+kept only there: the `outputs/corpus/corpus.json` rows, the `/api/corpus/catalog` response, and `SearchResult`
+carry only the tradition; region is resolved from the tree, colour from the region. `get_tradition_color` /
+`random` and the colour injection in `get_catalog_documents` are removed.
 
 **2.7 The motif-index region system is untouched.** Berezkin/ATU/TMI regions and their palette
 (`services/motifs.py`, `sources/atu_regions.py`, `sources/culture_dict.py`, `page-motifs.js::REGION_COLORS`)
 stay exactly as they are. This is a different entity (motif areas, not tradition regions).
 
-**2.8 Grouping is served by the backend.** The tree already holds the exact `region → traditions` grouping in
-canon order; the server emits it ready-made. Remove the client-side `groupDocuments` — this fixes category
-order, and saves the resources/footprint of re-grouping denormalised rows on the front.
+**2.8 Serve the config directly; no generated `traditions.json`.** `config/traditions.json` is the source of
+truth. `/api/corpus/traditions` returns its `region → traditions` tree as-is (canon order, region colour +
+fields), attaching each tradition's `books` — the list of its corpus documents — computed at request time by
+grouping the `corpus.json` rows by tradition. `_update_traditions` and the built `outputs/corpus/traditions.json`
+are removed. The front renders this server-provided grouping directly; the client-side `groupDocuments` is
+removed.
 
 **2.9 Fail-loud validation.** Every `corpus.tradition` must exist in the tree, and every region key must be one
 of the 14 canon names — otherwise the build fails. Replaces the silent `.get(...)` degradations
@@ -122,18 +120,17 @@ chunk-metadata change, no re-embedding.
 ## 3. Data flow (target)
 
 ```
-config/traditions.json   region → {colour(base §8), description, subdivision, strata, traditions{name:{desc,coords}}}
+config/traditions.json   region → {colour(base §8), description, subdivision, strata, traditions{name:{desc,coords}}}   ← source of truth; region+colour live here only
 config/corpus.json       book → tradition (name)
-        │  build: validate every book tradition ∈ tree & every region key ∈ 14 canon (fail loud);
-        │         colour of a tradition = its region node's base colour
+        │  build: text files at corpus/<region>/<tradition>/<title>.txt; validate every book tradition ∈ tree
+        │          & every region key ∈ 14 canon (fail loud). No generated traditions.json; no colour written.
         ▼
-outputs/corpus/corpus.json      rows carry tradition ONLY (the reference) — NO region, NO colour, NO major
-outputs/corpus/traditions.json  region → {colour, description, subdivision, strata, traditions:{…, books}}   ← the one place region+colour live
-outputs/embeddings/*            chunk metadata: tradition, url (stale major on old chunks is ignored; not re-embedded); region resolved at query
-        ▼  server
-/api/corpus/traditions   the region → traditions grouping, ready, in canon order (region carries colour + fields)
+outputs/corpus/corpus.json      rows carry tradition ONLY (the reference) — no region, no colour, no major
+outputs/embeddings/*            chunk metadata: tradition, url; region resolved at query; not re-embedded
+        ▼  server  (reads config/traditions.json + outputs/corpus/corpus.json, joins at request)
+/api/corpus/traditions   config region → traditions tree (canon order, region colour + fields); each tradition's books attached at request
 /api/corpus/catalog      documents carry tradition ONLY; region/colour resolved by lookup; no client-side re-grouping
-/api/similarity/*        SearchResult: tradition ONLY; major_tradition removed; region/colour resolved if needed field
+/api/similarity/*        SearchResult: tradition ONLY (major_tradition removed); region/colour resolved from the tree if needed
         ▼  front
 one 14-region legend; render the server-provided grouping in order; colour = region base
 ```
@@ -150,12 +147,13 @@ one 14-region legend; render the server-provided grouping in order; colour = reg
    `iterator.py`, `CorpusFileInfo`, `schemas.py`, services, and the front; values come from the re-partitioned
    tree; the `<major>` path segment keeps its place as the region name. **Remove `SearchResult.major_tradition`
    outright** (dead payload — nothing on the front reads it). Stop writing `major`/`region` onto document rows.
-3. **Normalise region + colour, from the region.** Remove `random` colour; a tradition's colour = its region
-   node's base. Strip `region` and `colour` from the document records (`corpus.json` rows), `/catalog`, and
-   `SearchResult` — both resolved by lookup (region from the tree, colour from the region), stored once each;
-   one 14-region legend everywhere.
-4. **Served grouping + normalised model.** `/api/corpus/traditions` emits the ready `region → traditions`
-   grouping (region carrying colour + fields) in canon order; remove the client `groupDocuments`.
+3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
+   `get_tradition_color`; `/api/corpus/traditions` serves `config/traditions.json` directly (region tree,
+   region colour + fields) with each tradition's `books` attached at request. A tradition's colour is its
+   region's, computed at display; strip `region` and `colour` from the `corpus.json` rows, `/catalog`, and
+   `SearchResult`.
+4. **Front renders the served grouping.** Remove the client-side `groupDocuments`; render the
+   `region → traditions` tree in canon order; colour = region base.
 5. **One `UNASSIGNED`** across `schemas.py`, `iterator.py`, and the front end.
 
 Tests are rewritten to the new model as each phase lands.
