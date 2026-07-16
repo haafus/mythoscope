@@ -34,11 +34,12 @@ it serves), and **where it stands**. "Proposal" = designed, not built; "partly d
   macro-area; `major_tradition` retired. **Goal:** kill the fragile string-join, the six overlapping region
   schemes, and non-deterministic colour in one coherent model. *Proposal; 6-phase migration not started.*
 - [`region-implementation.md`](region-implementation.md) — **the code plan** for wiring `region` into
-  production after taxonomy/presentation closed: authored `region` in a `config/regions.json` + id-keyed
-  `config/traditions.json` registry, fail-loud validation, delete `major_tradition`, region-derived colour,
-  normalised served/chunk model, one `UNASSIGNED`. Current state with file:line + settled decisions + config
-  shapes + phased migration. Supersedes `tradition-architecture-unified.md` §4/§6. **Goal:** an executable
-  implementation plan. *Proposal; not started.*
+  production after taxonomy/presentation closed: one curated `config/traditions.json` tree (14 region nodes in
+  canon order, each with its canon fields + base colour, holding only texted traditions), `major_tradition`
+  renamed+re-partitioned to `region`, region-inherited colour (no random), backend-served grouping, fail-loud
+  validation, one `UNASSIGNED`; the motif-index region system and embeddings untouched. Current state with
+  file:line + settled decisions + config shape + phased migration. Supersedes
+  `tradition-architecture-unified.md` §4/§6. **Goal:** an executable implementation plan. *Proposal; not started.*
 - [`map-palette-and-projection.md`](map-palette-and-projection.md) — ADR: region-map palette (CARTOColors
   Prism as canon; the associative palette explored, not adopted), map projection (equirectangular engine +
   Winkel Tripel atlas view), basemap tiles (CARTO Positron + the tiles↔projection constraint), and the
