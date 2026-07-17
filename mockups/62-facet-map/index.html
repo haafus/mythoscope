@@ -415,34 +415,35 @@ mapBox.addEventListener("mousedown", e => {
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, hist: [[performance.now(), e.clientX, e.clientY]] };
   mapBox.style.cursor = "grabbing";
 });
-// only fling if the pointer actually travelled ≥ MICRO_PX pixels over the last STILL_MS. This rejects
-// a micro-nudge or a hold-still-then-release (whose stale smoothed `vel` would otherwise fling the map
-// — worse now that friction is lower / the glide longer). Measured over a time window, not a single
-// event, so it is independent of mouse polling rate (a fast flick fires many tiny steps).
-const MICRO_PX = 3, STILL_MS = 60;
-function pointerMovingAtRelease(){
-  if (!drag) return false;
+// The fling velocity is measured from the pointer's travel over the last VEL_WINDOW_MS at the moment of
+// release — NOT accumulated per move. That kills the stale-velocity bug at its root: a pause before
+// release (or a micro-nudge) leaves ~zero recent travel → ~zero launch velocity → no fling, with no
+// special-case threshold. Time-windowed, so it is independent of mouse polling rate.
+const VEL_WINDOW_MS = 60, FRAME_MS = 16.7;
+function releaseVelocity(){
   const h = drag.hist, now = performance.now(), last = h[h.length - 1];
-  if (now - last[0] >= STILL_MS) return false;                         // no move in the last window → still
+  if (now - last[0] > FRAME_MS * 2) return;                            // pointer already stopped → no fling
   let ref = h[0];
-  for (const s of h) if (now - s[0] <= STILL_MS) { ref = s; break; }   // oldest sample inside the window
-  return Math.hypot(last[1] - ref[1], last[2] - ref[2]) >= MICRO_PX;    // travel over the window
+  for (const s of h) if (now - s[0] <= VEL_WINDOW_MS) { ref = s; break; }  // oldest sample in the window
+  const dt = last[0] - ref[0];
+  if (dt <= 0) return;
+  const svg = mapBox.querySelector("svg.map"); if (!svg) return;
+  const rect = svg.getBoundingClientRect(), k = FRAME_MS / dt;         // window travel → per-frame
+  vel.x = -(last[1] - ref[1]) / rect.width  * view.w * k;              // view.x pans opposite the pointer
+  vel.y = -(last[2] - ref[2]) / rect.height * view.h * k;
 }
 window.addEventListener("mouseup", () => {
-  if (drag && pointerMovingAtRelease() && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03))
-    iraf = requestAnimationFrame(inertia);
+  if (drag) { vel.x = vel.y = 0; releaseVelocity(); }
+  if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
   drag = null; mapBox.style.cursor = "";
 });
 mapBox.addEventListener("mousemove", e => {
   if (!drag) return;
   const svg = mapBox.querySelector("svg.map"); if (!svg) return;
   const rect = svg.getBoundingClientRect();
-  const px = view.x, py = view.y;
   panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
         drag.vy - (e.clientY - drag.y) / rect.height * view.h);
-  vel.x = vel.x * 0.4 + (view.x - px) * 0.6;                           // smoothed recent velocity
-  vel.y = vel.y * 0.4 + (view.y - py) * 0.6;
-  const t = performance.now();                                        // pointer-travel history (release gate)
+  const t = performance.now();                                        // pointer-travel samples → release velocity
   drag.hist.push([t, e.clientX, e.clientY]);
   while (drag.hist.length > 2 && t - drag.hist[0][0] > 120) drag.hist.shift();
   tip.classList.remove("show");                                        // hide the tooltip while panning
