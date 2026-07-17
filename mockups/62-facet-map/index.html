@@ -400,10 +400,8 @@ function panTo(x, y){
   view.y = target.y = Math.max(0, Math.min(180 - view.h, y));
   applyView();
 }
-const LAUNCH = 1.5;                                                    // release kick: stronger throw (initial
-                                                                      // speed), not a floatier tail (friction)
 function inertia(){                                                    // glide on after release, with friction
-  vel.x *= 0.88; vel.y *= 0.88;                                        // friction per frame (lower = firmer stop)
+  vel.x *= 0.90; vel.y *= 0.90;                                        // higher = less friction = longer glide
   const px = view.x, py = view.y;
   panTo(view.x + vel.x, view.y + vel.y);
   if (view.x === px) vel.x = 0;                                        // hit a wall — stop that axis
@@ -418,10 +416,7 @@ mapBox.addEventListener("mousedown", e => {
   mapBox.style.cursor = "grabbing";
 });
 window.addEventListener("mouseup", () => {
-  if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) {
-    vel.x *= LAUNCH; vel.y *= LAUNCH;                                    // stronger throw at release
-    iraf = requestAnimationFrame(inertia);
-  }
+  if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
   drag = null; mapBox.style.cursor = "";
 });
 mapBox.addEventListener("mousemove", e => {
