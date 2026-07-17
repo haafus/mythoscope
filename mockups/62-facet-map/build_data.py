@@ -839,10 +839,16 @@ def main():
         "note": "те же ареалы регионов в экваториальной проекции (Plate Carrée) с интуитивной "
                 "(ассоциативной) палитрой",
     }
+    facets["equirectintuplain"] = {
+        "label": "Regions · equirect (intuitive, no grid)",
+        "kind": "winkel", "proj": "equirect", "cats": _intu, "nogrid": True,
+        "note": "то же, что equirect (intuitive), но без градусной сетки (меридианов и параллелей)",
+    }
 
     data = {"facets": facets,
             "order": ["regions", "borders", "territory", "religions", "substrate", "families",
                       "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu",
+                      "equirectintuplain",
                       "hardlayers", "volume", "area", "family", "narrative", "subsistence",
                       "diversity", "depth", "cosmology", "peopling"],
             "projgeo": projgeo,

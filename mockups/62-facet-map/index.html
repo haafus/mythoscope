@@ -140,7 +140,7 @@ function drawMap(fid){
     // fitted into the same 0..360/0..180 canvas so zoom/pan still work). Layers: white page ·
     // ocean envelope · 30° graticule · land base · white Antarctica · region fills.
     const wg = D.projgeo[facet.proj];
-    const grat = wg.grat.map(g=>
+    const grat = facet.nogrid ? "" : wg.grat.map(g=>
       `<path d="${g.d}" fill="none" stroke="${g.e?"#8fa3b0":"#9fb0bb"}" stroke-width="${g.e?0.7:0.5}" stroke-opacity="${g.e?0.7:0.45}"/>`
     ).join("");
     const regs = wg.regions.map((r,i)=>
@@ -252,7 +252,7 @@ function render(){
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu", "equirectintuplain"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
@@ -266,7 +266,7 @@ const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
 // third row: the same region areas re-projected to Winkel Tripel (Prism · intuitive)
-document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "equirectintu"].map(btnHTML).join("");
+document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "equirectintu", "equirectintuplain"].map(btnHTML).join("");
 document.querySelectorAll("#facetsMain button, #facetsCurated button, #facetsProj button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
