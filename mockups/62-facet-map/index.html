@@ -401,7 +401,7 @@ function panTo(x, y){
   applyView();
 }
 function inertia(){                                                    // glide on after release, with friction
-  vel.x *= 0.88; vel.y *= 0.88;
+  vel.x *= 0.90; vel.y *= 0.90;                                        // higher = less friction = longer glide
   const px = view.x, py = view.y;
   panTo(view.x + vel.x, view.y + vel.y);
   if (view.x === px) vel.x = 0;                                        // hit a wall — stop that axis
@@ -412,11 +412,25 @@ mapBox.addEventListener("mousedown", e => {
   if (view.w >= 360) return;                                            // nothing to pan at full extent
   stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
   zoomAnchor = null;                                                    // pan detaches the zoom focal pin
-  drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y };
+  drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, hist: [[performance.now(), e.clientX, e.clientY]] };
   mapBox.style.cursor = "grabbing";
 });
+// only fling if the pointer actually travelled ≥ MICRO_PX pixels over the last STILL_MS. This rejects
+// a micro-nudge or a hold-still-then-release (whose stale smoothed `vel` would otherwise fling the map
+// — worse now that friction is lower / the glide longer). Measured over a time window, not a single
+// event, so it is independent of mouse polling rate (a fast flick fires many tiny steps).
+const MICRO_PX = 3, STILL_MS = 60;
+function pointerMovingAtRelease(){
+  if (!drag) return false;
+  const h = drag.hist, now = performance.now(), last = h[h.length - 1];
+  if (now - last[0] >= STILL_MS) return false;                         // no move in the last window → still
+  let ref = h[0];
+  for (const s of h) if (now - s[0] <= STILL_MS) { ref = s; break; }   // oldest sample inside the window
+  return Math.hypot(last[1] - ref[1], last[2] - ref[2]) >= MICRO_PX;    // travel over the window
+}
 window.addEventListener("mouseup", () => {
-  if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
+  if (drag && pointerMovingAtRelease() && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03))
+    iraf = requestAnimationFrame(inertia);
   drag = null; mapBox.style.cursor = "";
 });
 mapBox.addEventListener("mousemove", e => {
@@ -428,6 +442,9 @@ mapBox.addEventListener("mousemove", e => {
         drag.vy - (e.clientY - drag.y) / rect.height * view.h);
   vel.x = vel.x * 0.4 + (view.x - px) * 0.6;                           // smoothed recent velocity
   vel.y = vel.y * 0.4 + (view.y - py) * 0.6;
+  const t = performance.now();                                        // pointer-travel history (release gate)
+  drag.hist.push([t, e.clientX, e.clientY]);
+  while (drag.hist.length > 2 && t - drag.hist[0][0] > 120) drag.hist.shift();
   tip.classList.remove("show");                                        // hide the tooltip while panning
 });
 mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
