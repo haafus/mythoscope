@@ -100,7 +100,7 @@ const ANTARCTICA_D = (window.LAND || "").split("Z").filter(s => s.trim())
 const esc = s => (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const escA = s => esc(s).replace(/"/g,"&quot;");   // for HTML attribute values (data-tip)
 const KEY = { hardlayers:"h", volume:"v", area:"a", family:"f", narrative:"n", subsistence:"s", diversity:"d", depth:"p", cosmology:"c", peopling:"e" };
-let active = "borders";
+let active = "equirectintuplain";
 const view = { x: 0, y: 0, w: 360, h: 180 };   // current viewBox — wheel-zoom / drag-pan
 
 const hex2rgb = h => [1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
