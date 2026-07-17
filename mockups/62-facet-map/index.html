@@ -446,11 +446,17 @@ function inertia(ts){                                                  // glide 
   if (Math.abs(vel.x) > 0.02 || Math.abs(vel.y) > 0.02) iraf = requestAnimationFrame(inertia);
   else { iraf = null; iPrev = 0; }
 }
-mapBox.addEventListener("mousedown", e => {
+mapBox.addEventListener("pointerdown", e => {
+  if (e.button !== 0) return;                                           // primary (left) button only
   if (view.w >= 360) return;                                            // nothing to pan at full extent
   stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
   resetGlide = null;                                                    // a pan cancels an in-flight reset glide
-  drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, hist: [[performance.now(), e.clientX, e.clientY]] };
+  // Capture the pointer: every subsequent move/up for it retargets to mapBox, so once the drag
+  // starts no button, tooltip or other element under the cursor gets hover/pointer events — the
+  // gesture is owned by the map until release, even when the cursor leaves the map box entirely.
+  try { mapBox.setPointerCapture(e.pointerId); } catch {}
+  drag = { id: e.pointerId, x: e.clientX, y: e.clientY, vx: view.x, vy: view.y,
+           hist: [[performance.now(), e.clientX, e.clientY]] };
   mapBox.style.cursor = "grabbing";
 });
 // The fling velocity is measured from the pointer's travel over the last VEL_WINDOW_MS at the moment of
@@ -471,13 +477,15 @@ function releaseVelocity(){
   vel.x = -(last[1] - ref[1]) / rect.width  * view.w * k;              // view.x pans opposite the pointer
   vel.y = -(last[2] - ref[2]) / rect.height * view.h * k;
 }
-window.addEventListener("mouseup", () => {
+function endDrag(){                                                    // pointer released or capture lost
   if (drag) { vel.x = vel.y = 0; releaseVelocity(); }
   if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
   drag = null; mapBox.style.cursor = "";
-});
-window.addEventListener("mousemove", e => {                            // on window so a drag keeps tracking
-  if (!drag) return;                                                   // even when the cursor leaves the map box
+}
+window.addEventListener("pointerup", e => { if (drag && e.pointerId === drag.id) endDrag(); });
+window.addEventListener("pointercancel", e => { if (drag && e.pointerId === drag.id) endDrag(); });
+window.addEventListener("pointermove", e => {                          // capture retargets moves to mapBox;
+  if (!drag || e.pointerId !== drag.id) return;                       // they bubble here so the drag tracks on
   const svg = mapBox.querySelector("svg.map"); if (!svg) return;
   const rect = svg.getBoundingClientRect();
   panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
