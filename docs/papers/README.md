@@ -40,5 +40,5 @@ Related, kept separate on purpose:
 
 - Raw field-survey notes and the labs/venues landscape → [`../research/`](../research/).
 - The full data-driven theme re-derivation vs Berezkin's themes →
-  [`../proposals/theme-taxonomy-comparison.md`](../proposals/theme-taxonomy-comparison.md).
+  [`../proposals/archive/theme-taxonomy-comparison.md`](../proposals/archive/theme-taxonomy-comparison.md).
 - Per-result method and figures → the individual `mockups/*/README.md`.

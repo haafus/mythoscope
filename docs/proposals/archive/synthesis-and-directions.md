@@ -2,7 +2,7 @@
 
 A joint reading of everything built so far — the program arc
 ([`analysis-program.md`](analysis-program.md)), the two proposals
-([`macro-area-facets.md`](macro-area-facets.md),
+([`macro-area-facets.md`](../macro-area-facets.md),
 [`stratum-derivation.md`](stratum-derivation.md)), the taxonomies, and mockups 01–23. Not a
 recap of conclusions (those live in each doc's "cumulative conclusions"); this is the
 cross-cutting analysis: **what influences what, what reinforces what, how to combine it, the

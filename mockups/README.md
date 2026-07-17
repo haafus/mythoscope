@@ -11,7 +11,7 @@ real data slice directly and open with no build.
 Build one, then open the page.
 
 > These are the lab bench for the analysis arc in
-> [`docs/proposals/analysis-program.md`](../docs/proposals/analysis-program.md)
+> [`docs/proposals/archive/analysis-program.md`](../docs/proposals/archive/analysis-program.md)
 > (collect → describe → classify → explain). Roughly: 01–14 are stages 1–2
 > (collection & morphology), 15–16, 21 & 23 are stage 3 (systematics), 17–20 & 22 are
 > stage 4 (phylogeny & etiology).
@@ -230,7 +230,7 @@ Mesoamerica–Andes with Tibet/SE-Asia and Ancient Greece). See
 
 ### 17 · Motif depth-score
 A first prototype of **Method A** from
-[`stratum-derivation.md`](../docs/proposals/stratum-derivation.md): estimate a
+[`stratum-derivation.md`](../docs/proposals/archive/stratum-derivation.md): estimate a
 motif's time-depth from the shape of its areal distribution alone (prevalence, spread,
 fragmentation, language-family span, mega-set span). Shows two scores — PC1 and a
 disjunction-weighted variant. The most prevalent motifs top PC1 (the swan-maiden leads,
@@ -257,7 +257,7 @@ descent-minority, geography (A) handles the areal majority. See
 **Finding.** Only ~1% are broad *and* clade-clustered (Eurasian märchen — recovering the published result); the rest spread areally → **geography is primary**.
 
 ### 19 · Combined stratum (gated A × B)
-Realises [`stratum-derivation.md`](../docs/proposals/stratum-derivation.md) §12 —
+Realises [`stratum-derivation.md`](../docs/proposals/archive/stratum-derivation.md) §12 —
 A and B in **one gated pipeline**, not two scores. **B** (phylo-signal) picks the *mode*
 (descent vs areal); the mode picks the dating instrument (clade depth for descent,
 geographic disjunction / deep mega-set span for areal); confidence comes from A–B
@@ -566,7 +566,7 @@ now fans across 1.43–1.96. Limit: breadth/span proxy conflates descent with di
 39). See [`44-narrative-stratum/README.md`](44-narrative-stratum/README.md).
 
 ### 45 · Stratigraphic peeling
-Interactive realisation of [`stratigraphic-peeling.md`](../docs/proposals/stratigraphic-peeling.md):
+Interactive realisation of [`stratigraphic-peeling.md`](../docs/proposals/archive/stratigraphic-peeling.md):
 coverage-corrected recursive peel of the attestation matrix into nested **layers**, by geography and
 motif core, with a dating proxy, bootstrap stability, and a parallel **soft-factor (NMF)** view.
 **Q.** Do data-driven layers (not a priori Laurasia/Gondwana) reveal a datable stratigraphy?

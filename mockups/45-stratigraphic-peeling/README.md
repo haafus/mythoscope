@@ -1,6 +1,6 @@
 # 45 · Stratigraphic peeling
 
-An interactive realisation of [`stratigraphic-peeling.md`](../../docs/proposals/stratigraphic-peeling.md):
+An interactive realisation of [`stratigraphic-peeling.md`](../../docs/proposals/archive/stratigraphic-peeling.md):
 **recursive, coverage-corrected peeling** of the Berezkin attestation matrix into nested **layers**, shown
 by layer, geography and motif composition — with a **dating proxy**, **bootstrap stability**, and a parallel
 **soft-factor (NMF)** view.

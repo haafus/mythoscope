@@ -1,7 +1,7 @@
 # 58 · Higher-order structure (synergy triples + the topology of trait-space)
 
 The third Tier-A text-free experiment from
-[`synthesis-and-directions.md`](../../docs/proposals/synthesis-and-directions.md). The pairwise view
+[`synthesis-and-directions.md`](../../docs/proposals/archive/synthesis-and-directions.md). The pairwise view
 (mockups 53 / 56) is blind to two things: irreducible **three-way packages** and the **global shape** of
 the motif cloud. This mockup goes after both — and reports two honest negatives that sharpen the project's
 central result.

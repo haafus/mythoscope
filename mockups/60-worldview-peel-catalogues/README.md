@@ -39,7 +39,7 @@ see which index carries a global signal and which mostly carries its own collect
 
 ATU and TMI have **no per-tradition coordinates** and are heavily **Euro-/literary-biased**, so their "deep" register is
 partly the over-catalogued European core, not antiquity — the continent bar on every node keeps that visible (this is
-[direction 6, the effort confound](../../docs/proposals/synthesis-and-directions.md), made legible rather than hidden).
+[direction 6, the effort confound](../../docs/proposals/archive/synthesis-and-directions.md), made legible rather than hidden).
 Continents for ATU come from attestation region labels, for TMI from a country/people gazetteer (~80% of cultures
 placed; the rest shown as `?`). The depth index is a relative breadth proxy, not a calendar age.
 

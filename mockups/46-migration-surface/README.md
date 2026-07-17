@@ -1,7 +1,7 @@
 # 46 · Migration surface
 
 The tradition × motif presence matrix read as a **landscape-genetics** dataset — the population-genetics
-angle from the [stratigraphic-peeling](../../docs/proposals/stratigraphic-peeling.md) discussion made
+angle from the [stratigraphic-peeling](../../docs/proposals/archive/stratigraphic-peeling.md) discussion made
 concrete. Our soft-factor model (mockup 45 · M38 Poisson) is already an *admixture* model; this prototype
 adds the three complementary tools genetics uses on the *same* kind of presence matrix.
 

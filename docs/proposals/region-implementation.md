@@ -5,9 +5,9 @@
   Taxonomy and presentation are closed (§0). Supersedes the code sections of
   [`tradition-architecture-unified.md`](tradition-architecture-unified.md) §4/§6.
 
-Grounded in the three field audits ([`../reviews/tradition-review.md`](../reviews/tradition-review.md),
-[`../reviews/major-tradition-review.md`](../reviews/major-tradition-review.md),
-[`../reviews/color-system-review.md`](../reviews/color-system-review.md)) and the canon
+Grounded in the three field audits ([`../reviews/archive/tradition-review.md`](../reviews/archive/tradition-review.md),
+[`../reviews/archive/major-tradition-review.md`](../reviews/archive/major-tradition-review.md),
+[`../reviews/archive/color-system-review.md`](../reviews/archive/color-system-review.md)) and the canon
 [`research/regions.md`](../../research/regions.md).
 
 ---

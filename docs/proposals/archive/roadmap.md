@@ -105,7 +105,7 @@ only ~36% of motif-similarity (block ARI = continuous R² = 0.36), a large ~64% 
 convergence residual** = the set is *incomplete* (the missing axis M34/M35 target); **granularity**
 — 12 areas / 11 families beat coarser and finer (which overfit held-out attestation). Spec below.
 
-**Motivation.** The entity model of [`macro-area-facets.md`](macro-area-facets.md) rests on an
+**Motivation.** The entity model of [`macro-area-facets.md`](../macro-area-facets.md) rests on an
 untested design choice: that `area · family · subsistence · theme_profile` are the *right* and
 *~orthogonal* set of tradition facets (one of the program-level assumptions not yet folded into
 `stratum-derivation.md` §0). A first probe already

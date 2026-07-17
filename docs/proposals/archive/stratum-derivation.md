@@ -3,7 +3,7 @@
 > Stage 4 (**phylogeny & etiology**) of the overall arc in
 > [`analysis-program.md`](analysis-program.md): collect → describe → classify → **explain**.
 
-Companion to [`macro-area-facets.md`](macro-area-facets.md). That doc defines a motif's
+Companion to [`macro-area-facets.md`](../macro-area-facets.md). That doc defines a motif's
 `stratum` as the one **inferred, probabilistic** field (area/family/subsistence/theme
 are given or deterministic; stratum is not). This doc is the full method: the theory
 and its limits, the exact per-motif features, two derivation algorithms (a heuristic
@@ -243,7 +243,7 @@ Notes:
 The model-based route folklorists actually use to date tales (phylomemetics; Tehrani,
 d'Huy, Ross). It handles homoplasy natively because it *counts independent gains*.
 
-**Prototyped** in [`mockups/18-motif-phylostrata`](../../mockups/18-motif-phylostrata/)
+**Prototyped** in [`mockups/18-motif-phylostrata`](../../../mockups/18-motif-phylostrata/)
 on the interim coarse tree (our `language` chains) with Fitch parsimony + a
 phylogenetic-signal test. Key finding: only ~1% of motifs are broad *and* clade-clustered
 (genuine descent) — and those are Eurasian fairy-tale types, recovering the published

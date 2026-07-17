@@ -17,9 +17,9 @@ whose geographic axis (`area`) is the single region vocabulary, and from which c
 > that decision.
 
 Sources folded in:
-[`../reviews/tradition-review.md`](../reviews/tradition-review.md) ·
-[`../reviews/major-tradition-review.md`](../reviews/major-tradition-review.md) ·
-[`../reviews/color-system-review.md`](../reviews/color-system-review.md) ·
+[`../reviews/archive/tradition-review.md`](../reviews/archive/tradition-review.md) ·
+[`../reviews/archive/major-tradition-review.md`](../reviews/archive/major-tradition-review.md) ·
+[`../reviews/archive/color-system-review.md`](../reviews/archive/color-system-review.md) ·
 [`tradition-taxonomy-final.md`](tradition-taxonomy-final.md) ·
 [`macro-area-facets.md`](macro-area-facets.md) ·
 [`../known-issues.md`](../known-issues.md) §competing macro-area schemes.

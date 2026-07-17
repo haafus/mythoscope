@@ -24,7 +24,7 @@ then plotted on the world map coloured by cluster.
 
 Raw proportions are confounded by **attestation intensity** (a densely catalogued
 corpus reflects what was recorded). For analysis use the bias-corrected weights of
-[`stratum-derivation.md`](../../docs/proposals/stratum-derivation.md) §5; here
+[`stratum-derivation.md`](../../docs/proposals/archive/stratum-derivation.md) §5; here
 the raw profile is enough to show the signal exists.
 
 ## Run

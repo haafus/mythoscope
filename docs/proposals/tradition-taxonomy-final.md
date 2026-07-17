@@ -90,7 +90,7 @@ This faceted model is proposed and empirically validated (the mockups above), **
 pipeline.** Today's operational classification is still the earlier, eclectic tree in
 `config/traditions.json` — **12 `major_tradition` groups over 23 corpus traditions**, mixing linguistic,
 religious, geographic and ethnic axes, and denormalised across the stack (see
-[`../reviews/major-tradition-review.md`](../reviews/major-tradition-review.md)). Productionising the facet
+[`../reviews/archive/major-tradition-review.md`](../reviews/archive/major-tradition-review.md)). Productionising the facet
 recipe (a `region_facets.py` from mockup 21) and the two-axis theme taxonomy is an **open milestone**
 (Element ch. 10, milestone 3).
 

@@ -1,7 +1,7 @@
 # 59 · Infinite-K (a Bayesian-nonparametric latent model)
 
 The fourth Tier-A text-free experiment from
-[`synthesis-and-directions.md`](../../docs/proposals/synthesis-and-directions.md). Mockup 47's admixture
+[`synthesis-and-directions.md`](../../docs/proposals/archive/synthesis-and-directions.md). Mockup 47's admixture
 cross-validation curve just **plateaus** — there is no clean number of populations K. The principled response
 is a model that never fixes K in the first place.
 

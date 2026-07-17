@@ -193,7 +193,7 @@ anchoring, not a crisp modular hierarchy read off internal separation.
    residual re-clustering → null-model check.
 3. Ship as a new mockup (e.g. `45-stratigraphic-peeling`) and a section in
    [`stratum-derivation.md`](stratum-derivation.md); feed the dated layers back into the tradition
-   `stratum-stack` of [`macro-area-facets.md`](macro-area-facets.md).
+   `stratum-stack` of [`macro-area-facets.md`](../macro-area-facets.md).
 
 ## Recommendation — what to do with this
 
@@ -219,7 +219,7 @@ In one line: **peeling is right for *seeing and naming* layers; dating and count
 soft factorisation that already exists — not to a deeper hard tree.**
 
 This recommendation is realised as an interactive mockup —
-[`45-stratigraphic-peeling`](../../mockups/45-stratigraphic-peeling/) — visualising the layers, their
+[`45-stratigraphic-peeling`](../../../mockups/45-stratigraphic-peeling/) — visualising the layers, their
 geography, motif composition, proxy dating, bootstrap stability, and the soft-factor cross-check.
 
 ### The payoff realised — dated soft layers

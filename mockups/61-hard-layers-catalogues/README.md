@@ -38,7 +38,7 @@ largest leaf.
 **The clean geographic stratification is a property of Berezkin's areal sampling design, not a universal feature of
 folklore indexes.** ATU and TMI — motif/tale-type indexes compiled from world literature without areal design — carry
 almost no extractable geographic layering: their footprints are dominated by a shared pan-regional core. That is
-[direction 6, the effort/universality confound](../../docs/proposals/synthesis-and-directions.md), seen from the
+[direction 6, the effort/universality confound](../../docs/proposals/archive/synthesis-and-directions.md), seen from the
 geography side, and the mirror image of [mockup 60](../60-worldview-peel-catalogues/)'s worldview result.
 
 ## Unit thresholds and robustness

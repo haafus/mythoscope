@@ -3,13 +3,13 @@
 - **Status:** accepted (with one open sub-decision, §2.3)
 - **Date:** 2026-07-16
 - **Scope:** how region maps are coloured and projected across the mockups (esp. 62) and the app Atlas.
-- **Supersedes/extends:** the palette canon in [`research/regions.md`](../../research/regions.md) §8 remains
+- **Supersedes/extends:** the palette canon in [`research/regions.md`](../../../research/regions.md) §8 remains
   authoritative for the *values*; this ADR records the *reasoning* behind palette and projection choices and
   the decisions that have no other home (projection, basemap tiles, presentation constants).
 
-Cross-refs: [`research/regions.md`](../../research/regions.md) §8 (palette table),
-[`../reviews/color-system-review.md`](../reviews/color-system-review.md),
-[`tradition-architecture-unified.md`](tradition-architecture-unified.md) §3.
+Cross-refs: [`research/regions.md`](../../../research/regions.md) §8 (palette table),
+[`../reviews/archive/color-system-review.md`](../../reviews/archive/color-system-review.md),
+[`tradition-architecture-unified.md`](../tradition-architecture-unified.md) §3.
 
 ---
 
@@ -128,5 +128,5 @@ and skip tiles.
   carry their own coastline.
 - §2.3 (intuitive Near East/Mesoamerica) is the only open item; it does not touch the Prism canon.
 - If the palette is ever moved to the derived area-gradient of
-  [`tradition-architecture-unified.md`](tradition-architecture-unified.md) §3, this
+  [`tradition-architecture-unified.md`](../tradition-architecture-unified.md) §3, this
   ADR and `regions.md` §8 are the two documents to revise together.

@@ -1,7 +1,7 @@
 # 56 · Motif coupling (inverse-Ising / pairwise MaxEnt)
 
 The first of the "Tier-A" text-free experiments from
-[`synthesis-and-directions.md`](../../docs/proposals/synthesis-and-directions.md). The minimal model
+[`synthesis-and-directions.md`](../../docs/proposals/archive/synthesis-and-directions.md). The minimal model
 reproducing the observed pairwise motif co-occurrences is the Ising / Boltzmann model
 `P(s) ∝ exp( Σ hᵢsᵢ + Σ Jᵢⱼsᵢsⱼ )`. Its couplings **Jᵢⱼ are the *direct* links** — what remains after
 every transitive path through other motifs is removed.

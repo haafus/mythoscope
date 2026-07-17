@@ -4,7 +4,7 @@ How to put a **time axis** on the Berezkin motif material (3488 motifs × ~1000 
 with coordinates, `language`, and `atu_refs`). Compiled 2026-07 from web validation of the
 computational-mythology literature plus method transfer from population genetics, archaeology,
 climate science and single-cell biology. Companion to
-[`../proposals/stratigraphic-peeling.md`](../proposals/stratigraphic-peeling.md) (the M17 depth
+[`../proposals/archive/stratigraphic-peeling.md`](../proposals/archive/stratigraphic-peeling.md) (the M17 depth
 proxy and mockups 45–48) — this doc is the *method landscape* for going from a depth *proxy* to a
 defensible *chronology*.
 

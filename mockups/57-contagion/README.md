@@ -1,7 +1,7 @@
 # 57 · Contagion (simple vs complex spreading as a generative model)
 
 The second Tier-A text-free experiment from
-[`synthesis-and-directions.md`](../../docs/proposals/synthesis-and-directions.md). Borrowed from the
+[`synthesis-and-directions.md`](../../docs/proposals/archive/synthesis-and-directions.md). Borrowed from the
 **epidemiology of representations**: two competing spreading rules leave different geographic signatures,
 so the observed footprints can be scored against both as a *model comparison*.
 
