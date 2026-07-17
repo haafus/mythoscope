@@ -468,7 +468,10 @@ window.addEventListener("mousemove", e => {                            // on win
 });
 mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
   stopInertia();
-  zoomAnchor = null;                                                   // reset glides x/y plainly
+  // Zoom OUT around the current view centre (pinned at screen centre), not by easing x/y independently
+  // of w. The plain glide eased log-space w against linear x/y (unclamped), so the centre traced a
+  // curved, lurching path; the centre pin reuses the straight wheel-zoom path, and the clamp recentres.
+  zoomAnchor = { fx: 0.5, fy: 0.5, wx: view.x + view.w / 2, wy: view.y + view.h / 2 };
   Object.assign(target, { x: 0, y: 0, w: 360, h: 180 });
   kickZoom();
 });
