@@ -32,7 +32,8 @@
     r: calc(var(--pr, 1.5) * var(--z, 1) * 1px);
     stroke-width: 1px;
     vector-effect: non-scaling-stroke;
-    transition: r .1s ease-out;
+    /* no transition on r: it would lag the per-frame --z during zoom → points "breathe".
+       hover grow (.hi) is therefore instant. */
   }
   svg.map circle[data-tip].hi { r: calc(var(--pr, 1.5) * var(--z, 1) * 1.5px); }
   .seg button:disabled { color:#b3b8bd; cursor:not-allowed; background:#f7f5ef; }
@@ -43,10 +44,6 @@
   .dot { width:11px; height:11px; border-radius:50%; display:inline-block; flex:none; }
   .lg .n { color:var(--muted); font-variant-numeric:tabular-nums; }
   .muted { color:var(--muted); font-size:11.5px; }
-  #fps { position:absolute; top:26px; right:30px; z-index:20; pointer-events:none;
-         font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace; color:#5a6570;
-         background:rgba(255,255,255,.82); border:1px solid #e7e2d7; border-radius:6px;
-         padding:2px 7px; font-variant-numeric:tabular-nums; }
 </style>
 <main>
 <header>
@@ -76,9 +73,8 @@
   <div class="facet-note" id="note"></div>
 </div>
 
-<div class="card" style="position:relative">
+<div class="card">
   <div id="map"></div>
-  <div id="fps">— fps</div>
   <div class="tip" id="tip"></div>
   <div class="legend" id="legend"></div>
   <div class="muted" style="margin-top:10px">Точка — традиция; где реальной координаты нет, взят центроид ареального
@@ -467,21 +463,4 @@ mapBox.addEventListener("dblclick", () => {                            // ease b
 });
 
 render();
-
-// FPS meter — measures the rAF cadence (the loop rate that drives the animations, so it reveals
-// the "slow-motion" that a per-frame scheme would suffer when a frame takes longer than 1/refresh).
-// Note: this is the main-thread frame rate; off-thread raster stalls may not show here.
-const fpsEl = document.getElementById("fps");
-let fpsPrev = 0, fpsEma = FRAME_MS, fpsWorst = 0, fpsSince = 0;
-function fpsTick(ts){
-  if (fpsPrev){
-    const dt = ts - fpsPrev;
-    fpsEma = fpsEma * 0.9 + dt * 0.1;                 // smoothed frame time
-    if (ts - fpsSince > 400){ fpsWorst = dt; fpsSince = ts; } else fpsWorst = Math.max(fpsWorst, dt);
-    fpsEl.textContent = `${(1000 / fpsEma).toFixed(0)} fps · ${fpsEma.toFixed(1)} ms · peak ${fpsWorst.toFixed(0)} ms`;
-  }
-  fpsPrev = ts;
-  requestAnimationFrame(fpsTick);
-}
-requestAnimationFrame(fpsTick);
 </script>
