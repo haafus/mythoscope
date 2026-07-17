@@ -273,11 +273,15 @@ def _rings_from_baked(d):
     return out
 
 
-def build_projgeo(project, pts):
+def build_projgeo(project, pts, pad=3.0):
     """Project the region areas + coastline + graticule + tradition points with `project`,
     fitted into the same 0..360 / 0..180 canvas the mockup already uses (so zoom/pan keep
     working). Antarctica is split off so the client can paint it white. Returns one shared
-    geometry blob (palette facets reference it — geometry stored once per projection)."""
+    geometry blob (palette facets reference it — geometry stored once per projection).
+
+    `pad` is the fit margin in canvas units. Equirectangular is exactly 2:1, so pad=0 makes it
+    fill the canvas edge-to-edge — identical framing to the plate-carrée `regions` facet; Winkel
+    (~1.64:1) keeps a small pad, its side margins being the projection's own shape."""
     here = Path(__file__).resolve().parent
     geo = json.loads((here / "regions_geo.json").read_text())
     land_src = (here / "land.js").read_text()
@@ -299,7 +303,7 @@ def build_projgeo(project, pts):
     env_proj = [project(lo, la) for lo, la in env_ll]
     minx = min(x for x, _ in env_proj); maxx = max(x for x, _ in env_proj)
     miny = min(y for _, y in env_proj); maxy = max(y for _, y in env_proj)
-    W, H, pad = 360.0, 180.0, 3.0
+    W, H = 360.0, 180.0
     s = min((W - 2 * pad) / (maxx - minx), (H - 2 * pad) / (maxy - miny))
     offx = pad + (W - 2 * pad - (maxx - minx) * s) / 2 - minx * s
     offy = pad + (H - 2 * pad - (maxy - miny) * s) / 2 - miny * s
@@ -809,7 +813,7 @@ def main():
     # Antarctica + ocean envelope). Geometry is stored once per projection in projgeo; each
     # facet just carries its palette and which projection to read.
     projgeo = {"winkel": build_projgeo(_winkel, region_pts),
-               "equirect": build_projgeo(_equirect, region_pts)}
+               "equirect": build_projgeo(_equirect, region_pts, pad=0.0)}
     # dark ramp end per cat → tradition points nudge 1/3 toward it, exactly as the Regions facet.
     # Prism reuses the hand-tuned REGION_DARK (points come out identical to Regions); the intuitive
     # palette gets synthesised darks of matching depth.

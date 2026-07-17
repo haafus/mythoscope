@@ -331,6 +331,11 @@ mapBox.addEventListener("mouseleave", () => { if (tipTimer) clearTimeout(tipTime
 const MINW = 60;                                // deepest zoom (360/60 = 6×); full extent = 360
 const target = { ...view };                     // goal viewBox; `view` is the animated current
 let zraf = null;
+// wheel-zoom focal anchor: the world point (wx,wy) under the cursor and the cursor's screen
+// fraction (fx,fy). While set, the animation pins this point under the cursor every frame, so
+// zoom tracks straight to the cursor instead of arcing (w eases in log space, x/y must follow it,
+// not ease independently). Cleared for pan / dbl-click reset, which want a plain x/y glide.
+let zoomAnchor = null;
 function applyView(){
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
@@ -348,8 +353,13 @@ function animateZoom(){
   // rate); a linear w-glide would speed up visually as w shrinks — making zoom-in feel faster
   view.w = Math.exp(Math.log(view.w) + (Math.log(target.w) - Math.log(view.w)) * k);
   view.h = view.w / 2;
-  view.x += (target.x - view.x) * k;
-  view.y += (target.y - view.y) * k;
+  if (zoomAnchor){                               // pin the cursor's world point → straight zoom
+    view.x = Math.max(0, Math.min(360 - view.w, zoomAnchor.wx - zoomAnchor.fx * view.w));
+    view.y = Math.max(0, Math.min(180 - view.h, zoomAnchor.wy - zoomAnchor.fy * view.h));
+  } else {
+    view.x += (target.x - view.x) * k;
+    view.y += (target.y - view.y) * k;
+  }
   applyView();
   if (Math.abs(target.w - view.w) > 0.05 || Math.abs(target.x - view.x) > 0.05 || Math.abs(target.y - view.y) > 0.05)
     zraf = requestAnimationFrame(animateZoom);
@@ -366,6 +376,7 @@ mapBox.addEventListener("wheel", e => {
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
   const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
+  zoomAnchor = { fx: px, fy: py, wx: sx, wy: sy };                      // pin it for the glide
   // zoom in proportion to how much was actually scrolled (not a fixed step per event) — a
   // high-res wheel / trackpad fires many events per gesture and a fixed step jumps to the limit
   let d = e.deltaY;
@@ -396,6 +407,7 @@ function inertia(){                                                    // glide 
 mapBox.addEventListener("mousedown", e => {
   if (view.w >= 360) return;                                            // nothing to pan at full extent
   stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
+  zoomAnchor = null;                                                    // pan detaches the zoom focal pin
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y };
   mapBox.style.cursor = "grabbing";
 });
@@ -416,6 +428,7 @@ mapBox.addEventListener("mousemove", e => {
 });
 mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
   stopInertia();
+  zoomAnchor = null;                                                   // reset glides x/y plainly
   Object.assign(target, { x: 0, y: 0, w: 360, h: 180 });
   kickZoom();
 });
