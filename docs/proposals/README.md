@@ -53,7 +53,7 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
   distribution** (Method A depth score + a phylogenetic model). *Method 17 prototyped; full method not built.*
 - [`stratigraphic-peeling.md`](archive/stratigraphic-peeling.md) — **recursive data-driven stratigraphy**:
   let the statistics define layers, date and peel them, recurse. *Proposal + probes + mockup 45 (dated soft
-  layers); production wiring remains — see the open-steps table.*
+  layers); production wiring remains.*
 - [`theme-taxonomy-comparison.md`](archive/theme-taxonomy-comparison.md) — the two theme axes (etiological vs
   narrative). *Validated (mockups 41–43); productionisation is its own open step.*
 - [`chunk-preprocessing-redesign.md`](archive/chunk-preprocessing-redesign.md) — the embedding-variant /
@@ -65,20 +65,3 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
   (CARTOColors Prism as canon; the associative palette explored, not adopted), map projection (equirectangular
   engine + Winkel Tripel atlas view), basemap tiles (CARTO Positron + the tiles↔projection constraint), and the
   presentation constants. *Accepted decision record (one open sub-decision, §2.3).*
-
-## Open next steps (proposed, not built) — with their goal
-
-| Next step | Goal — why it's needed | Home |
-|---|---|---|
-| **`region_facets.py`** — productionise the 12 macro-areas + `area/family/subsistence` recipe | Turn the validated facet model into the pipeline's real classification; collapses the six region schemes onto one `area` | archive/macro-area-facets |
-| **Tradition architecture migration** (id identity + build validation → facet registry → area-gradient colour → retire `major_tradition` → collapse region schemes → one `UNASSIGNED` default) | Remove silent join breakage, denormalisation, non-deterministic colour; make region unambiguous | archive/tradition-architecture-unified / region-implementation |
-| **Editorial Layer 2** — cue-strip of interleaved `[N]` notes on annotated editions | Clean the ~5 critical editions (Edda, Beowulf, Babylonian…) that start/stop can't reach | corpus-editorial-filtering |
-| **Two-axis theme taxonomy** in the pipeline (etiological + narrative) | Make both theme facets standing infrastructure, not a prototype result | archive/theme-taxonomy-comparison |
-| **Peeling production wiring** — real M38 factors + calibrated M17/clade ages + full M24 weights + bootstrap/clade validation | Turn the proof-of-concept dated soft layers into a defensible **dated stratigraphy** (the one path here that could add a *new result*, not just rigour) | archive/stratigraphic-peeling |
-| **GPU embedding run** — enable qwen-4b + story-emb, compute embeddings | Benchmark narrative-similarity embedders for the induction task (SemEval-2026 Task 4) | ../embeddings-gpu-howto.md |
-| **Connectivity axis** — fine genetics + trade-route networks + node-level dating | Close the ~64% convergence residual the facets leave (the expensive, result-bearing joins) | archive/macro-area-facets / archive/mockup-roadmap-24-59 |
-
-**Reading the table:** most of these are **rigour / engineering** — they make results defensible, the code
-clean, and the corpus honest, but they do **not** move the scientific conclusions. The one row that could
-yield a *new* finding is **peeling production wiring** (dated soft layers); everything else strengthens what
-already stands.
