@@ -340,11 +340,16 @@ let zraf = null, zPrev = 0, iPrev = 0;          // zPrev/iPrev: previous rAF tim
 // zoom tracks straight to the cursor instead of arcing (w eases in log space, x/y must follow it,
 // not ease independently). Cleared for pan / dbl-click reset, which want a plain x/y glide.
 let zoomAnchor = null;
+// Points don't FULLY counter-scale. --z = (view.w/360)^R_COMP with R_COMP<1, so the on-screen radius
+// goes as (view.w/360)^(R_COMP-1) — it grows a little on zoom-in instead of staying pixel-constant.
+// Full compensation (R_COMP=1) makes the dots feel small once the map's line detail sharpens; this
+// keeps their *perceived* size. At full extent (view.w=360) it's 1, so the default view is unchanged.
+const R_COMP = 0.85;
 function applyView(){
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
   svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
-  svg.style.setProperty("--z", (view.w / 360).toFixed(4));      // points counter-scale by this
+  svg.style.setProperty("--z", Math.pow(view.w / 360, R_COMP).toFixed(4));   // partial counter-scale
 }
 function clampTarget(){
   target.w = Math.min(360, Math.max(MINW, target.w)); target.h = target.w / 2;
