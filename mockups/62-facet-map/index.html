@@ -375,8 +375,12 @@ mapBox.addEventListener("wheel", e => {
   if (tipTimer) clearTimeout(tipTimer);                                // cursor while zooming → desync
   const rect = svg.getBoundingClientRect();
   const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
-  const sx = target.x + px * target.w, sy = target.y + py * target.h;   // point under the cursor
-  zoomAnchor = { fx: px, fy: py, wx: sx, wy: sy };                      // pin it for the glide
+  // anchor to the point under the cursor in the CURRENT (animated) frame, not the target frame:
+  // this makes setting the anchor continuous (wx - px·view.w == view.x right now), so re-anchoring
+  // as the cursor moves mid-zoom doesn't snap the map. Deriving it from `target` (the lagging goal)
+  // instead put a target-frame point under a still-easing view → a visible jerk on every mouse move.
+  const wx = view.x + px * view.w, wy = view.y + py * view.h;          // point under the cursor NOW
+  zoomAnchor = { fx: px, fy: py, wx: wx, wy: wy };
   // zoom in proportion to how much was actually scrolled (not a fixed step per event) — a
   // high-res wheel / trackpad fires many events per gesture and a fixed step jumps to the limit
   let d = e.deltaY;
@@ -384,7 +388,7 @@ mapBox.addEventListener("wheel", e => {
   d = Math.max(-50, Math.min(50, d));                                   // cap one event's kick
   target.w *= Math.exp(d * 0.0026);
   clampTarget();
-  target.x = sx - px * target.w; target.y = sy - py * target.h;         // keep it under the cursor
+  target.x = wx - px * target.w; target.y = wy - py * target.h;         // keep that point under the cursor
   clampTarget();
   kickZoom();
 }, { passive: false });
