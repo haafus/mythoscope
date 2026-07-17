@@ -140,7 +140,10 @@ function drawMap(fid){
     // fitted into the same 0..360/0..180 canvas so zoom/pan still work). Layers: white page ·
     // ocean envelope · 30° graticule · land base · white Antarctica · region fills.
     const wg = D.projgeo[facet.proj];
+    // On the rectangular equirect map the boundary graticule (±180 / ±90) sits exactly on the viewBox
+    // edge and renders as a clipped bright half-line — drop it. Winkel keeps it: there it outlines the globe.
     const grat = facet.nogrid ? "" : wg.grat.map(g=>
+      (g.e && facet.proj === "equirect") ? "" :
       `<path d="${g.d}" fill="none" stroke="${g.e?"#8fa3b0":"#9fb0bb"}" stroke-width="${g.e?0.7:0.5}" stroke-opacity="${g.e?0.7:0.45}"/>`
     ).join("");
     const regs = wg.regions.map((r,i)=>
