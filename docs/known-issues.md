@@ -1,8 +1,8 @@
-# Troubleshooting & known issues
+# Known issues & caveats
 
-Running log of cross-cutting problems across the project (motifs, embeddings, …):
-what's wrong, why, where it bites, and the options for fixing it. Append new
-entries at the top.
+Register of known issues, caveats and design tensions across the project (motifs,
+embeddings, …): what's wrong or by-design, why, where it bites, and the options.
+Append new entries at the top.
 
 ---
 

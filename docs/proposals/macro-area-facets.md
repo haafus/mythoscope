@@ -13,7 +13,7 @@
 > facet layer. `family`/`subsistence` are dropped; the material here is retained only as the exploration that
 > led to that decision.
 
-Extends [`troubleshooting.md`](../troubleshooting.md) §"competing macro-area
+Extends [`known-issues.md`](../known-issues.md) §"competing macro-area
 schemes". A first draft of this proposal treated *area · family · transmission*
 as three facets **of a tradition**. That was wrong on one point, and fixing it
 simplifies the rest: the three things do not live on the same entity.
@@ -33,7 +33,7 @@ small vocabulary, not three columns on one table.
 Evidence base: Berezkin's authoritative 16 macro-areas and their `areal_path`
 subregions; the per-tradition `language` families; the 14 biclusters of
 [`15-berezkin-clusters-report`](../../mockups/15-berezkin-clusters-report/); the
-five existing schemes (troubleshooting §schemes; this proposal's `area` is the sixth, the target).
+five existing schemes (known-issues §schemes; this proposal's `area` is the sixth, the target).
 
 ## Berezkin's own method: analyse the catalogue in parts
 

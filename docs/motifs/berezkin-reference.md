@@ -263,7 +263,7 @@ Motif **equivalence** runs two ways:
 
 A direct **geographic** alignment of Berezkin areas ↔ TMI cultures (via a shared
 region taxonomy) is *not* built — the two use non-aligned macro-region schemes;
-see `../troubleshooting.md` ("Competing macro-area schemes (six vocabularies)").
+see `../known-issues.md` ("Competing macro-area schemes (six vocabularies)").
 
 ---
 

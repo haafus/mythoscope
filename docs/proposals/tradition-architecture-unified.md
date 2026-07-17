@@ -22,7 +22,7 @@ Sources folded in:
 [`../reviews/color-system-review.md`](../reviews/color-system-review.md) ·
 [`tradition-taxonomy-final.md`](tradition-taxonomy-final.md) ·
 [`macro-area-facets.md`](macro-area-facets.md) ·
-[`../troubleshooting.md`](../troubleshooting.md) §competing macro-area schemes.
+[`../known-issues.md`](../known-issues.md) §competing macro-area schemes.
 
 ---
 

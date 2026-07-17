@@ -7,7 +7,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 [`tmi-reference.md`](tmi-reference.md), [`atu-reference.md`](atu-reference.md),
 [`berezkin-reference.md`](berezkin-reference.md),
 [`tmi-bibliography-key.md`](tmi-bibliography-key.md); известные проблемы — в
-[`../troubleshooting.md`](../troubleshooting.md).*
+[`../known-issues.md`](../known-issues.md).*
 
 > Этот документ описывает систему **как она построена**. Ранее здесь лежал
 > предварительный обзор-план с более осторожной оценкой (в частности, «Берёзкина
@@ -64,7 +64,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
   прямых TMI-ссылок и традиций (graceful degradation, проверено на пайплайне и
   фронте). `folkmasa`, `areasofmyths`, Trilogy — открытые, без кредов.
 - Экспорт (`mytho export`) кладёт готовые `outputs/motifs/*.json`, но **не** сырые
-  снапшоты `raw/**` — их волатильность отмечена в `../troubleshooting.md`.
+  снапшоты `raw/**` — их волатильность отмечена в `../known-issues.md`.
 
 ## Источники (используемые)
 
