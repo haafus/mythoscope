@@ -401,7 +401,7 @@ function panTo(x, y){
   applyView();
 }
 function inertia(){                                                    // glide on after release, with friction
-  vel.x *= 0.90; vel.y *= 0.90;                                        // higher = less friction = longer glide
+  vel.x *= 0.88; vel.y *= 0.88;
   const px = view.x, py = view.y;
   panTo(view.x + vel.x, view.y + vel.y);
   if (view.x === px) vel.x = 0;                                        // hit a wall — stop that axis
