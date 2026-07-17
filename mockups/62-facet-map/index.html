@@ -340,7 +340,7 @@ const target = { ...view };                     // goal viewBox; `view` is the a
 let zraf = null, zPrev = 0, iPrev = 0;          // zPrev/iPrev: previous rAF timestamp per loop (for dt)
 let resetMode = false;                          // dbl-click reset: uniform blend to full extent (see animateZoom)
 let resetGlide = null;                          // active dbl-click reset: {x0,y0,w0} start; target creeps to fit
-const RESET_STEP = 0.09;                         // max log-w the reset TARGET advances per 60-Hz frame (wheel-like)
+const RESET_STEP = 0.13;                         // max log-w the reset TARGET advances per 60-Hz frame (= a max wheel tick)
 // wheel-zoom focal anchor: the world point (wx,wy) under the cursor and the cursor's screen
 // fraction (fx,fy). While set, the animation pins this point under the cursor every frame, so
 // zoom tracks straight to the cursor instead of arcing (w eases in log space, x/y must follow it,
