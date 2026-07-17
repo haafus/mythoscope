@@ -338,6 +338,7 @@ mapBox.addEventListener("mouseleave", () => { if (tipTimer) clearTimeout(tipTime
 const MINW = 60, FRAME_MS = 16.7, DT_MAX = 50; // deepest zoom (360/60 = 6×); FRAME_MS/DT_MAX drive time-based anim
 const target = { ...view };                     // goal viewBox; `view` is the animated current
 let zraf = null, zPrev = 0, iPrev = 0;          // zPrev/iPrev: previous rAF timestamp per loop (for dt)
+let resetMode = false;                          // dbl-click reset: uniform blend to full extent (see animateZoom)
 // wheel-zoom focal anchor: the world point (wx,wy) under the cursor and the cursor's screen
 // fraction (fx,fy). While set, the animation pins this point under the cursor every frame, so
 // zoom tracks straight to the cursor instead of arcing (w eases in log space, x/y must follow it,
@@ -364,25 +365,36 @@ function clampTarget(){
 function animateZoom(ts){
   const dt = zPrev ? Math.min(DT_MAX, ts - zPrev) : FRAME_MS; zPrev = ts;
   const k = 1 - Math.pow(1 - 0.16, dt / FRAME_MS);
-  // ease the zoom in LOG space so zoom-in and zoom-out feel identical (constant multiplicative rate)
-  view.w = Math.exp(Math.log(view.w) + (Math.log(target.w) - Math.log(view.w)) * k);
-  view.h = view.w / 2;
-  if (zoomAnchor){                               // pin the cursor's world point → straight zoom
-    view.x = Math.max(0, Math.min(360 - view.w, zoomAnchor.wx - zoomAnchor.fx * view.w));
-    view.y = Math.max(0, Math.min(180 - view.h, zoomAnchor.wy - zoomAnchor.fy * view.h));
-  } else {
+  if (resetMode){
+    // dbl-click reset: ease x, y AND w by the SAME factor (w linearly, not in log space) so the whole
+    // viewBox stays a uniform blend start→target. All four move in sync → the centre travels a straight
+    // line and every intermediate box is in-bounds, so no clamp (the clamp is what made it spiral).
+    view.w += (target.w - view.w) * k;
+    view.h = view.w / 2;
     view.x += (target.x - view.x) * k;
     view.y += (target.y - view.y) * k;
+  } else {
+    // ease the zoom in LOG space so zoom-in and zoom-out feel identical (constant multiplicative rate)
+    view.w = Math.exp(Math.log(view.w) + (Math.log(target.w) - Math.log(view.w)) * k);
+    view.h = view.w / 2;
+    if (zoomAnchor){                             // pin the cursor's world point → straight zoom
+      view.x = Math.max(0, Math.min(360 - view.w, zoomAnchor.wx - zoomAnchor.fx * view.w));
+      view.y = Math.max(0, Math.min(180 - view.h, zoomAnchor.wy - zoomAnchor.fy * view.h));
+    } else {
+      view.x += (target.x - view.x) * k;
+      view.y += (target.y - view.y) * k;
+    }
   }
   applyView();
   if (Math.abs(target.w - view.w) > 0.05 || Math.abs(target.x - view.x) > 0.05 || Math.abs(target.y - view.y) > 0.05)
     zraf = requestAnimationFrame(animateZoom);
-  else { Object.assign(view, target); applyView(); zraf = null; zPrev = 0; }
+  else { Object.assign(view, target); applyView(); zraf = null; zPrev = 0; resetMode = false; }
 }
 function kickZoom(){ if (!zraf) { zPrev = 0; zraf = requestAnimationFrame(animateZoom); } }
 mapBox.addEventListener("wheel", e => {
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
+  resetMode = false;                                                   // a wheel mid-reset switches back to zoom
   e.preventDefault();
   stopInertia();
   tip.classList.remove("show"); setPoint(null);                        // the map moves under a still
@@ -428,7 +440,7 @@ function inertia(ts){                                                  // glide 
 mapBox.addEventListener("mousedown", e => {
   if (view.w >= 360) return;                                            // nothing to pan at full extent
   stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
-  zoomAnchor = null;                                                    // pan detaches the zoom focal pin
+  zoomAnchor = null; resetMode = false;                                 // pan detaches the zoom focal pin / reset
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, hist: [[performance.now(), e.clientX, e.clientY]] };
   mapBox.style.cursor = "grabbing";
 });
@@ -468,10 +480,7 @@ window.addEventListener("mousemove", e => {                            // on win
 });
 mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
   stopInertia();
-  // Zoom OUT around the current view centre (pinned at screen centre), not by easing x/y independently
-  // of w. The plain glide eased log-space w against linear x/y (unclamped), so the centre traced a
-  // curved, lurching path; the centre pin reuses the straight wheel-zoom path, and the clamp recentres.
-  zoomAnchor = { fx: 0.5, fy: 0.5, wx: view.x + view.w / 2, wy: view.y + view.h / 2 };
+  zoomAnchor = null; resetMode = true;                                 // uniform blend to full extent (straight)
   Object.assign(target, { x: 0, y: 0, w: 360, h: 180 });
   kickZoom();
 });
