@@ -328,9 +328,9 @@ mapBox.addEventListener("mouseleave", () => { if (tipTimer) clearTimeout(tipTime
 
 // --- Google-Maps-style zoom: each wheel tick sets a TARGET; the view eases toward it every
 // frame (rAF), anchored under the cursor. Drag pans instantly; double-click resets. -------
-const MINW = 60;                                // deepest zoom (360/60 = 6×); full extent = 360
+const MINW = 60, FRAME_MS = 16.7, DT_MAX = 50; // deepest zoom (360/60 = 6×); FRAME_MS/DT_MAX drive time-based anim
 const target = { ...view };                     // goal viewBox; `view` is the animated current
-let zraf = null;
+let zraf = null, zPrev = 0, iPrev = 0;          // zPrev/iPrev: previous rAF timestamp per loop (for dt)
 // wheel-zoom focal anchor: the world point (wx,wy) under the cursor and the cursor's screen
 // fraction (fx,fy). While set, the animation pins this point under the cursor every frame, so
 // zoom tracks straight to the cursor instead of arcing (w eases in log space, x/y must follow it,
@@ -347,10 +347,12 @@ function clampTarget(){
   target.x = Math.max(0, Math.min(360 - target.w, target.x));
   target.y = Math.max(0, Math.min(180 - target.h, target.y));
 }
-function animateZoom(){
-  const k = 0.16;                               // easing per frame — the "rubbery" feel (lower = slower glide)
-  // ease the zoom in LOG space so zoom-in and zoom-out feel identical (constant multiplicative
-  // rate); a linear w-glide would speed up visually as w shrinks — making zoom-in feel faster
+// time-based easing: dt from the rAF timestamp (clamped so a stalled frame doesn't lurch) → identical
+// feel at 60/120/144 Hz. The 60-Hz per-frame factor 0.16 becomes 1-(1-0.16)^(dt/FRAME_MS).
+function animateZoom(ts){
+  const dt = zPrev ? Math.min(DT_MAX, ts - zPrev) : FRAME_MS; zPrev = ts;
+  const k = 1 - Math.pow(1 - 0.16, dt / FRAME_MS);
+  // ease the zoom in LOG space so zoom-in and zoom-out feel identical (constant multiplicative rate)
   view.w = Math.exp(Math.log(view.w) + (Math.log(target.w) - Math.log(view.w)) * k);
   view.h = view.w / 2;
   if (zoomAnchor){                               // pin the cursor's world point → straight zoom
@@ -363,9 +365,9 @@ function animateZoom(){
   applyView();
   if (Math.abs(target.w - view.w) > 0.05 || Math.abs(target.x - view.x) > 0.05 || Math.abs(target.y - view.y) > 0.05)
     zraf = requestAnimationFrame(animateZoom);
-  else { Object.assign(view, target); applyView(); zraf = null; }
+  else { Object.assign(view, target); applyView(); zraf = null; zPrev = 0; }
 }
-function kickZoom(){ if (!zraf) zraf = requestAnimationFrame(animateZoom); }
+function kickZoom(){ if (!zraf) { zPrev = 0; zraf = requestAnimationFrame(animateZoom); } }
 mapBox.addEventListener("wheel", e => {
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
@@ -393,20 +395,23 @@ mapBox.addEventListener("wheel", e => {
   kickZoom();
 }, { passive: false });
 let drag = null, iraf = null;
-const vel = { x: 0, y: 0 };                                            // pan velocity (view units/frame)
-function stopInertia(){ if (iraf) { cancelAnimationFrame(iraf); iraf = null; } vel.x = vel.y = 0; }
+const vel = { x: 0, y: 0 };                                            // pan velocity, view units per FRAME_MS
+function stopInertia(){ if (iraf) { cancelAnimationFrame(iraf); iraf = null; } vel.x = vel.y = 0; iPrev = 0; }
 function panTo(x, y){
   view.x = target.x = Math.max(0, Math.min(360 - view.w, x));
   view.y = target.y = Math.max(0, Math.min(180 - view.h, y));
   applyView();
 }
-function inertia(){                                                    // glide on after release, with friction
-  vel.x *= 0.90; vel.y *= 0.90;                                        // higher = less friction = longer glide
+function inertia(ts){                                                  // glide on after release, with friction
+  const dt = iPrev ? Math.min(DT_MAX, ts - iPrev) : FRAME_MS; iPrev = ts;
+  const f = dt / FRAME_MS;
+  vel.x *= Math.pow(0.90, f); vel.y *= Math.pow(0.90, f);             // time-based decay (0.90 per FRAME_MS)
   const px = view.x, py = view.y;
-  panTo(view.x + vel.x, view.y + vel.y);
+  panTo(view.x + vel.x * f, view.y + vel.y * f);
   if (view.x === px) vel.x = 0;                                        // hit a wall — stop that axis
   if (view.y === py) vel.y = 0;
-  iraf = (Math.abs(vel.x) > 0.02 || Math.abs(vel.y) > 0.02) ? requestAnimationFrame(inertia) : null;
+  if (Math.abs(vel.x) > 0.02 || Math.abs(vel.y) > 0.02) iraf = requestAnimationFrame(inertia);
+  else { iraf = null; iPrev = 0; }
 }
 mapBox.addEventListener("mousedown", e => {
   if (view.w >= 360) return;                                            // nothing to pan at full extent
@@ -419,7 +424,7 @@ mapBox.addEventListener("mousedown", e => {
 // release — NOT accumulated per move. That kills the stale-velocity bug at its root: a pause before
 // release (or a micro-nudge) leaves ~zero recent travel → ~zero launch velocity → no fling, with no
 // special-case threshold. Time-windowed, so it is independent of mouse polling rate.
-const VEL_WINDOW_MS = 60, FRAME_MS = 16.7;
+const VEL_WINDOW_MS = 60;                                             // FRAME_MS is defined up top
 function releaseVelocity(){
   const h = drag.hist, now = performance.now(), last = h[h.length - 1];
   if (now - last[0] > FRAME_MS * 2) return;                            // pointer already stopped → no fling
@@ -437,8 +442,8 @@ window.addEventListener("mouseup", () => {
   if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
   drag = null; mapBox.style.cursor = "";
 });
-mapBox.addEventListener("mousemove", e => {
-  if (!drag) return;
+window.addEventListener("mousemove", e => {                            // on window so a drag keeps tracking
+  if (!drag) return;                                                   // even when the cursor leaves the map box
   const svg = mapBox.querySelector("svg.map"); if (!svg) return;
   const rect = svg.getBoundingClientRect();
   panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
