@@ -400,22 +400,29 @@ mapBox.addEventListener("wheel", e => {
   tip.classList.remove("show"); setPoint(null);                        // the map moves under a still
   if (tipTimer) clearTimeout(tipTimer);                                // cursor while zooming → desync
   const rect = svg.getBoundingClientRect();
-  const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
-  // anchor to the point under the cursor in the CURRENT (animated) frame, not the target frame:
-  // this makes setting the anchor continuous (wx - px·view.w == view.x right now), so re-anchoring
-  // as the cursor moves mid-zoom doesn't snap the map. Deriving it from `target` (the lagging goal)
-  // instead put a target-frame point under a still-easing view → a visible jerk on every mouse move.
-  const wx = view.x + px * view.w, wy = view.y + py * view.h;          // point under the cursor NOW
-  zoomAnchor = { fx: px, fy: py, wx: wx, wy: wy };
   // zoom in proportion to how much was actually scrolled (not a fixed step per event) — a
   // high-res wheel / trackpad fires many events per gesture and a fixed step jumps to the limit
   let d = e.deltaY;
   if (e.deltaMode === 1) d *= 16;                                       // line units → ~pixels
   d = Math.max(-50, Math.min(50, d));                                   // cap one event's kick
-  target.w *= Math.exp(d * 0.0026);
-  clampTarget();
-  target.x = wx - px * target.w; target.y = wy - py * target.h;         // keep that point under the cursor
-  clampTarget();
+  // Focal point of the zoom: the CURSOR when zooming IN (inspect what you point at); the MAP CENTRE
+  // (world 180,90) when zooming OUT — as if the cursor sat at the map centre, so the map recedes AROUND
+  // its own centre. It's a pure zoom around the focal (log-w, pinned), not a pan/slide. The anchor is
+  // taken at the focal's CURRENT screen fraction, so setting it is continuous (no jump): for the map
+  // centre, fx=(180-view.x)/view.w gives back view.x, so the first frame doesn't move.
+  let fx, fy, wx, wy;
+  if (d > 0){                                    // zoom OUT → focal = map centre
+    wx = 180; wy = 90;
+    fx = (180 - view.x) / view.w; fy = (90 - view.y) / view.h;
+  } else {                                       // zoom IN → focal = cursor
+    fx = (e.clientX - rect.left) / rect.width; fy = (e.clientY - rect.top) / rect.height;
+    wx = view.x + fx * view.w; wy = view.y + fy * view.h;
+  }
+  zoomAnchor = { fx: fx, fy: fy, wx: wx, wy: wy };
+  target.w = Math.min(360, Math.max(MINW, target.w * Math.exp(d * 0.0026)));
+  target.h = target.w / 2;
+  target.x = Math.max(0, Math.min(360 - target.w, wx - fx * target.w));
+  target.y = Math.max(0, Math.min(180 - target.h, wy - fy * target.h));
   kickZoom();
 }, { passive: false });
 let drag = null, iraf = null;
