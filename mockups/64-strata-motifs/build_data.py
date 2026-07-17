@@ -1,7 +1,7 @@
 """Precompute strata × motif set-algebra for mockup 64 → gitignored data.js.
 
 The regions map (mockup 62) is a *horizontal* cut through vertically layered material
-(research/regions.md §3: substrate → expansion → literate overlay). This mockup makes the
+(docs/proposals/regions.md §3: substrate → expansion → literate overlay). This mockup makes the
 *vertical* cut: it groups traditions by the historical layer they share, then intersects
 those groups with the Berezkin motif index to derive the motif set characteristic of each
 layer — using set algebra, not statistical enrichment.
@@ -33,7 +33,7 @@ bz = json.loads((ROOT / "outputs/motifs/berezkin.json").read_text())
 AREAS, MOT = bz["areas"], bz["motifs"]  # AREAS: {id: ru label}; MOT: list of motif dicts
 
 # 65 Berezkin areas → our 14 canon regions (re-mapped to OUR classification, not raw Berezkin
-# macro-areas). Kept identical to research/regions.md's region assignments.
+# macro-areas). Kept identical to docs/proposals/regions.md's region assignments.
 A2R = {
     "10": "Sub-Saharan Africa", "11": "Sub-Saharan Africa", "12": "Sub-Saharan Africa",
     "13": "Sub-Saharan Africa",
@@ -60,7 +60,7 @@ A2R = {
 }
 assert set(A2R) == set(AREAS), set(AREAS) - set(A2R)
 
-# each canon region → the depth band at which it *coheres* (research/regions.md §3, "a region's
+# each canon region → the depth band at which it *coheres* (docs/proposals/regions.md §3, "a region's
 # coherence lives at one particular stratum"). Illustrative expert classification, 5 / 5 / 4.
 BAND = {
     "Sub-Saharan Africa": "I", "Circumpolar North": "I", "Papua & Aboriginal Australia": "I",

@@ -105,7 +105,7 @@ def section_of(ap):
     return None
 
 
-# The 14 canonical regions (research/regions.md) with their curated traditions and hand coordinates
+# The 14 canonical regions (docs/proposals/regions.md) with their curated traditions and hand coordinates
 # (lat, lon). This is NOT the Berezkin index — it is the catalogue's own tradition list, coloured by
 # the CARTOColors Prism region palette (regions.md §8).
 REGIONS = [
@@ -658,7 +658,7 @@ def main():
                                    "над 16-мерным профилем (мокапы 41/43)")
     facets["subsistence"]["note"] = f"ближайшее общество D-PLACE в пределах {MATCH_KM:.0f} км (мокап 22)"
 
-    # Regions layer — the catalogue's own curated traditions (research/regions.md), its own point set
+    # Regions layer — the catalogue's own curated traditions (docs/proposals/regions.md), its own point set
     # (not the Berezkin index), coloured by the CARTOColors Prism region palette.
     region_pts = [{"x": float(lon), "y": float(lat), "r": ri, "t": tname}
                   for ri, (_, _, trads) in enumerate(REGIONS) for tname, lat, lon in trads]
@@ -679,7 +679,7 @@ def main():
         "cats": [{"name": rname, "color": rcolor, "n": rcounts.get(ri, 0)}
                  for ri, (rname, rcolor, _) in enumerate(REGIONS)],
         "points": region_pts,
-        "note": "курированные традиции канона (research/regions.md), не индекс Березкина; палитра CARTO Prism",
+        "note": "курированные традиции канона (docs/proposals/regions.md), не индекс Березкина; палитра CARTO Prism",
     }
 
     # Territory layer — the full tradition list, region areas washed in their colour, tradition

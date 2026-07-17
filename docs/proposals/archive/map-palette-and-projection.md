@@ -3,11 +3,11 @@
 - **Status:** accepted (with one open sub-decision, §2.3)
 - **Date:** 2026-07-16
 - **Scope:** how region maps are coloured and projected across the mockups (esp. 62) and the app Atlas.
-- **Supersedes/extends:** the palette canon in [`research/regions.md`](../../../research/regions.md) §8 remains
+- **Supersedes/extends:** the palette canon in [`regions.md`](../regions.md) §8 remains
   authoritative for the *values*; this ADR records the *reasoning* behind palette and projection choices and
   the decisions that have no other home (projection, basemap tiles, presentation constants).
 
-Cross-refs: [`research/regions.md`](../../../research/regions.md) §8 (palette table),
+Cross-refs: [`regions.md`](../regions.md) §8 (palette table),
 [`../reviews/archive/color-system-review.md`](../../reviews/archive/color-system-review.md),
 [`tradition-architecture-unified.md`](../tradition-architecture-unified.md) §3.
 

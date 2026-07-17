@@ -1,7 +1,7 @@
 """Precompute language-community polygons for mockup 62's three language facets.
 
 Three legible reductions of the ~140-family / ~7000-language mess (see the strata idea
-in research/regions.md), all illustrative expert groupings, not a database:
+in docs/proposals/regions.md), all illustrative expert groupings, not a database:
 
   families  — predominant (indigenous) language family per country; shatter zones bundled
               areally (Papuan, Australian, Indigenous Americas); south India split off as

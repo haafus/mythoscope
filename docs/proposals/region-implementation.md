@@ -8,7 +8,7 @@
 Grounded in the three field audits ([`../reviews/archive/tradition-review.md`](../reviews/archive/tradition-review.md),
 [`../reviews/archive/major-tradition-review.md`](../reviews/archive/major-tradition-review.md),
 [`../reviews/archive/color-system-review.md`](../reviews/archive/color-system-review.md)) and the canon
-[`research/regions.md`](../../research/regions.md).
+[`regions.md`](regions.md).
 
 ---
 

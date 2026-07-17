@@ -8,6 +8,10 @@ not as live work.
 
 ## Active — the science
 
+- [`regions.md`](regions.md) — **the canon**: the definitive **14-region** `region` classification (names,
+  descriptions, subdivisions, strata, per-region traditions, CARTOColors Prism palette). **Goal:** one
+  authoritative region vocabulary; where any other doc diverges, this is authoritative. *Canon reference
+  (drives `region-implementation.md`).*
 - [`macro-area-facets.md`](macro-area-facets.md) — the **entity model**: a tradition carries `area` (12
   macro-areas) · `family` · `subsistence` · `theme_profile`; depth (`stratum`) is a **motif** property.
   **Goal:** replace the eclectic single `major_tradition` tree with a principled, audited multi-facet model.
@@ -57,6 +61,9 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
   narrative). *Validated (mockups 41–43); productionisation is its own open step.*
 - [`chunk-preprocessing-redesign.md`](archive/chunk-preprocessing-redesign.md) — the embedding-variant /
   preprocessing registry redesign. *Implemented (2026-07).*
+- [`tradition-classification.md`](archive/tradition-classification.md) — the criteria and candidate history
+  behind the `region` canon (what counts as a tradition, how the axis was chosen). *Superseded by the closed
+  canon in `regions.md`; kept for the reasoning trail.*
 - [`map-palette-and-projection.md`](archive/map-palette-and-projection.md) — ADR: region-map palette
   (CARTOColors Prism as canon; the associative palette explored, not adopted), map projection (equirectangular
   engine + Winkel Tripel atlas view), basemap tiles (CARTO Positron + the tiles↔projection constraint), and the

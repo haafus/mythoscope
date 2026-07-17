@@ -5,7 +5,7 @@ five overlapping, string-driven ad-hoc systems with **one canonical, id-keyed, f
 whose geographic axis (`area`) is the single region vocabulary, and from which colour and grouping are
 **derived deterministically** rather than authored or randomised.
 
-> **Canon.** The `region` axis is canonically specified in [`research/regions.md`](../../research/regions.md) —
+> **Canon.** The `region` axis is canonically specified in [`regions.md`](regions.md) —
 > the definitive **14-region** classification (names, descriptions, subdivisions, strata, per-region traditions,
 > palette). It is the corpus-first successor to the retired `major_tradition` and to Berezkin's 12-area `area`
 > scaffold this proposal still calls `area` below; **where this document and `regions.md` diverge, `regions.md`

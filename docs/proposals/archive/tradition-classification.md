@@ -6,7 +6,7 @@ the criteria, the corpus-first principle, and the candidate schemes.
 
 > **Canon.** This note records the *criteria and candidate history*. The converged result — the definitive
 > **14-region** `region` classification (final list, descriptions, subdivisions, strata, traditions, palette) —
-> lives in [`regions.md`](regions.md), which is authoritative.
+> lives in [`regions.md`](../regions.md), which is authoritative.
 
 ## Guiding principle — corpus-first, not index-first
 
@@ -165,5 +165,5 @@ more than A or B once obtainability is settled.
 
 ## Companion documents
 
-- `research/mythology-encyclopedias-survey.md` — how the major reference works carve the world.
-- `research/corpus-sourcing-survey.md` — what full text is actually obtainable (in progress).
+- `../../research/mythology-encyclopedias-survey.md` — how the major reference works carve the world.
+- `../../research/corpus-sourcing-survey.md` — what full text is actually obtainable (in progress).

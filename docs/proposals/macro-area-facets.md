@@ -4,7 +4,7 @@
 > [`analysis-program.md`](archive/analysis-program.md): collect → describe → **classify** → explain.
 
 > **Canon.** The region axis this proposal models is canonically specified in
-> [`research/regions.md`](../../research/regions.md) — the definitive **14-region** `region` classification
+> [`regions.md`](regions.md) — the definitive **14-region** `region` classification
 > (names, descriptions, subdivisions, strata, traditions, palette), the corpus-first successor to Berezkin's
 > 12-area `area`. Where this document and `regions.md` diverge, **`regions.md` is authoritative.**
 >
