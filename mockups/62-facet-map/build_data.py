@@ -833,6 +833,11 @@ def main():
         "note": "то же в проекции Winkel Tripel, но интуитивной (ассоциативной) палитрой "
                 "(охра — Австралия, шафран — Юж. Азия, вермильон — Вост. Азия…)",
     }
+    facets["winkelintuplain"] = {
+        "label": "Regions · Winkel (intuitive, no grid)",
+        "kind": "winkel", "proj": "winkel", "cats": _intu, "nogrid": True,
+        "note": "то же, что Winkel (intuitive), но без градусной сетки (меридианов и параллелей)",
+    }
     facets["equirectintu"] = {
         "label": "Regions · equirect (intuitive)",
         "kind": "winkel", "proj": "equirect", "cats": _intu,
@@ -847,8 +852,8 @@ def main():
 
     data = {"facets": facets,
             "order": ["regions", "borders", "territory", "religions", "substrate", "families",
-                      "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu",
-                      "equirectintuplain",
+                      "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "winkelintuplain",
+                      "equirectintu", "equirectintuplain",
                       "hardlayers", "volume", "area", "family", "narrative", "subsistence",
                       "diversity", "depth", "cosmology", "peopling"],
             "projgeo": projgeo,

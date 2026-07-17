@@ -255,7 +255,7 @@ function render(){
 }
 
 // the curated catalogue facets get their own explicit second row (no auto-wrap into the main row)
-const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "equirectintu", "equirectintuplain"]);
+const CURATED = new Set(["regions", "borders", "territory", "religions", "substrate", "families", "langdiv", "motifdiv", "zones", "winkel", "winkelintu", "winkelintuplain", "equirectintu", "equirectintuplain"]);
 const btnHTML = fid => {
   const f = D.facets[fid];
   const title = f.disabled && f.note ? ` title="${esc(f.note)}"` : "";
@@ -269,7 +269,7 @@ const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
 // third row: the same region areas re-projected to Winkel Tripel (Prism · intuitive)
-document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "equirectintu", "equirectintuplain"].map(btnHTML).join("");
+document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "winkelintuplain", "equirectintu", "equirectintuplain"].map(btnHTML).join("");
 document.querySelectorAll("#facetsMain button, #facetsCurated button, #facetsProj button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
