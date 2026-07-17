@@ -344,7 +344,7 @@ let zoomAnchor = null;
 // goes as (view.w/360)^(R_COMP-1) — it grows a little on zoom-in instead of staying pixel-constant.
 // Full compensation (R_COMP=1) makes the dots feel small once the map's line detail sharpens; this
 // keeps their *perceived* size. At full extent (view.w=360) it's 1, so the default view is unchanged.
-const R_COMP = 0.85;
+const R_COMP = 0.87;
 function applyView(){
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
