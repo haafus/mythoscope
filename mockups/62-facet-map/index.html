@@ -339,6 +339,8 @@ const MINW = 60, FRAME_MS = 16.7, DT_MAX = 50; // deepest zoom (360/60 = 6×); F
 const target = { ...view };                     // goal viewBox; `view` is the animated current
 let zraf = null, zPrev = 0, iPrev = 0;          // zPrev/iPrev: previous rAF timestamp per loop (for dt)
 let resetMode = false;                          // dbl-click reset: uniform blend to full extent (see animateZoom)
+let resetGlide = null;                          // active dbl-click reset: {x0,y0,w0} start; target creeps to fit
+const RESET_STEP = 0.09;                         // max log-w the reset TARGET advances per 60-Hz frame (wheel-like)
 // wheel-zoom focal anchor: the world point (wx,wy) under the cursor and the cursor's screen
 // fraction (fx,fy). While set, the animation pins this point under the cursor every frame, so
 // zoom tracks straight to the cursor instead of arcing (w eases in log space, x/y must follow it,
@@ -366,9 +368,21 @@ function animateZoom(ts){
   const dt = zPrev ? Math.min(DT_MAX, ts - zPrev) : FRAME_MS; zPrev = ts;
   const k = 1 - Math.pow(1 - 0.16, dt / FRAME_MS);
   if (resetMode){
-    // dbl-click reset: ease x, y AND w by the SAME factor (w linearly, not in log space) so the whole
-    // viewBox stays a uniform blend start→target. All four move in sync → the centre travels a straight
-    // line and every intermediate box is in-bounds, so no clamp (the clamp is what made it spiral).
+    if (resetGlide){
+      // Move the TARGET toward full extent at a capped, wheel-like rate (log-w), staying on the straight
+      // line from the reset start to (0,0,360,180). The view follows (below) with the usual exp-decay, so
+      // the capped target speed turns a plain ease-out into ease-in-out — an auto "scroll out to fit".
+      const g = resetGlide;
+      const step = Math.min(RESET_STEP * dt / FRAME_MS, Math.log(360) - Math.log(target.w));
+      target.w = Math.exp(Math.log(target.w) + step);
+      if (target.w >= 359.9){ target.w = 360; resetGlide = null; }     // target arrived → let the view settle
+      target.h = target.w / 2;
+      const s = (360 - g.w0) > 0.01 ? (target.w - g.w0) / (360 - g.w0) : 1;   // progress along the line
+      target.x = g.x0 * (1 - s);
+      target.y = g.y0 * (1 - s);
+    }
+    // the view follows the target: ease x, y AND w by the SAME factor (uniform linear blend) so the box
+    // stays on the straight line — centre travels straight, always in-bounds, no clamp.
     view.w += (target.w - view.w) * k;
     view.h = view.w / 2;
     view.x += (target.x - view.x) * k;
@@ -396,6 +410,7 @@ mapBox.addEventListener("wheel", e => {
   if (!svg) return;
   e.preventDefault();
   stopInertia();
+  resetGlide = null;                                                   // a wheel interrupts a reset glide
   tip.classList.remove("show"); setPoint(null);                        // the map moves under a still
   if (tipTimer) clearTimeout(tipTimer);                                // cursor while zooming → desync
   const rect = svg.getBoundingClientRect();
@@ -449,7 +464,7 @@ function inertia(ts){                                                  // glide 
 mapBox.addEventListener("mousedown", e => {
   if (view.w >= 360) return;                                            // nothing to pan at full extent
   stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
-  zoomAnchor = null; resetMode = false;                                 // pan detaches the zoom focal pin / reset
+  zoomAnchor = null; resetMode = false; resetGlide = null;             // pan detaches the zoom focal pin / reset
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, hist: [[performance.now(), e.clientX, e.clientY]] };
   mapBox.style.cursor = "grabbing";
 });
@@ -489,8 +504,9 @@ window.addEventListener("mousemove", e => {                            // on win
 });
 mapBox.addEventListener("dblclick", () => {                            // ease back to full extent
   stopInertia();
-  zoomAnchor = null; resetMode = true;                                 // uniform blend to full extent (straight)
-  Object.assign(target, { x: 0, y: 0, w: 360, h: 180 });
+  zoomAnchor = null; resetMode = true;
+  resetGlide = { x0: view.x, y0: view.y, w0: view.w };                 // target creeps from here to full extent
+  Object.assign(target, { x: view.x, y: view.y, w: view.w, h: view.h }); // start AT the current view (no jump)
   kickZoom();
 });
 
