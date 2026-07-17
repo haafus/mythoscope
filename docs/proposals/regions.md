@@ -12,8 +12,8 @@ retired `major_tradition` and the Berezkin `area` as the one primary axis. (Alte
 
 > **Single-axis decision (2026-07).** `region` is the **only** top-level classification of a tradition. The
 > multi-facet Tradition model once proposed — `family`, `subsistence`, `theme_profile` facets, see
-> [`../docs/proposals/tradition-architecture-unified.md`](tradition-architecture-unified.md)
-> and [`../docs/proposals/macro-area-facets.md`](macro-area-facets.md) — is **not adopted.**
+> [`../docs/proposals/archive/tradition-architecture-unified.md`](archive/tradition-architecture-unified.md)
+> and [`../docs/proposals/archive/macro-area-facets.md`](archive/macro-area-facets.md) — is **not adopted.**
 > There is **no facet layer**: no `family`, no `subsistence`. (Motif-level `theme` and `stratum` are properties
 > of *motifs*, a separate entity, and are unaffected by this decision. `family`/`subsistence` survive only as
 > exploratory facets inside the analysis mockups.)

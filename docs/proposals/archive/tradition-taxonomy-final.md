@@ -4,7 +4,7 @@ A single orientation point for "how are traditions and macro-areas classified?" 
 each facet, the settled vocabularies, where to see it applied, and its production status. Distils
 [`macro-area-facets.md`](macro-area-facets.md), the adequacy audit (mockup 32), and Element ch. 5 / 8.
 
-> **Canon.** The `region` axis is canonically specified in [`regions.md`](regions.md) —
+> **Canon.** The `region` axis is canonically specified in [`regions.md`](../regions.md) —
 > the definitive **14-region** classification. The "12 macro-areas" (`area`) named throughout this note are
 > Berezkin's areal scaffold; `regions.md` is the corpus-first successor that supersedes it. Where the two
 > diverge, **`regions.md` is authoritative.**
@@ -90,7 +90,7 @@ This faceted model is proposed and empirically validated (the mockups above), **
 pipeline.** Today's operational classification is still the earlier, eclectic tree in
 `config/traditions.json` — **12 `major_tradition` groups over 23 corpus traditions**, mixing linguistic,
 religious, geographic and ethnic axes, and denormalised across the stack (see
-[`../reviews/archive/major-tradition-review.md`](../reviews/archive/major-tradition-review.md)). Productionising the facet
+[`../reviews/archive/major-tradition-review.md`](../../reviews/archive/major-tradition-review.md)). Productionising the facet
 recipe (a `region_facets.py` from mockup 21) and the two-axis theme taxonomy is an **open milestone**
 (Element ch. 10, milestone 3).
 

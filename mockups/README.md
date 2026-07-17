@@ -218,7 +218,7 @@ catalogue labels and the Russian column is the index's own `name_rus`. See
 
 ### 16 · Tradition thematic profiles
 Tests the `theme_profile` idea from
-[`macro-area-facets.md`](../docs/proposals/macro-area-facets.md): each Berezkin
+[`macro-area-facets.md`](../docs/proposals/archive/macro-area-facets.md): each Berezkin
 tradition is a 13-dim vector of the proportion of its motifs in each thematic group, and
 the 840 traditions with ≥30 motifs are clustered **by that profile alone** (k-means),
 then mapped. 38% of the profile variance is explained by macro-area — a strong regional

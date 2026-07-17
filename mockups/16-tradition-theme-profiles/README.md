@@ -1,7 +1,7 @@
 # 16 · Tradition thematic profiles
 
 Tests the idea (from
-[`macro-area-facets.md`](../../docs/proposals/macro-area-facets.md) —
+[`macro-area-facets.md`](../../docs/proposals/archive/macro-area-facets.md) —
 `tradition.theme_profile`) that a tradition's **genre balance** is a signal.
 
 Each Berezkin tradition becomes a **13-dim vector** — the proportion of its attested

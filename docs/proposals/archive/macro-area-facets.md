@@ -1,10 +1,10 @@
 # Proposal: an entity model for region, culture and time-depth
 
 > Stage 3 (**systematics**) of the overall arc in
-> [`analysis-program.md`](archive/analysis-program.md): collect → describe → **classify** → explain.
+> [`analysis-program.md`](analysis-program.md): collect → describe → **classify** → explain.
 
 > **Canon.** The region axis this proposal models is canonically specified in
-> [`regions.md`](regions.md) — the definitive **14-region** `region` classification
+> [`regions.md`](../regions.md) — the definitive **14-region** `region` classification
 > (names, descriptions, subdivisions, strata, traditions, palette), the corpus-first successor to Berezkin's
 > 12-area `area`. Where this document and `regions.md` diverge, **`regions.md` is authoritative.**
 >
@@ -13,7 +13,7 @@
 > facet layer. `family`/`subsistence` are dropped; the material here is retained only as the exploration that
 > led to that decision.
 
-Extends [`known-issues.md`](../known-issues.md) §"competing macro-area
+Extends [`known-issues.md`](../../known-issues.md) §"competing macro-area
 schemes". A first draft of this proposal treated *area · family · transmission*
 as three facets **of a tradition**. That was wrong on one point, and fixing it
 simplifies the rest: the three things do not live on the same entity.
@@ -32,7 +32,7 @@ small vocabulary, not three columns on one table.
 
 Evidence base: Berezkin's authoritative 16 macro-areas and their `areal_path`
 subregions; the per-tradition `language` families; the 14 biclusters of
-[`15-berezkin-clusters-report`](../../mockups/15-berezkin-clusters-report/); the
+[`15-berezkin-clusters-report`](../../../mockups/15-berezkin-clusters-report/); the
 five existing schemes (known-issues §schemes; this proposal's `area` is the sixth, the target).
 
 ## Berezkin's own method: analyse the catalogue in parts
@@ -212,7 +212,7 @@ stress-test a naive "B = late" rule fails and the distributional signal passes.
 The *mapping* of theme groups onto areas, onto each other, and onto depth is itself
 informative — theme is a statistical **prior** on stratum (not a substitute; the two stay
 orthogonal per motif). Visualised in
-[`mockups/23-theme-geography`](../../mockups/23-theme-geography/) — a lift heatmap, a
+[`mockups/23-theme-geography`](../../../mockups/23-theme-geography/) — a lift heatmap, a
 seriated theme × theme co-occurrence matrix, a traditions × themes co-cluster map, and a
 per-theme picker. Measured over the catalogue:
 
@@ -264,12 +264,12 @@ only the **prehistoric strata 1–4** are derivable from distribution; the **axi
 (6)** and **colonial/modern (7)** layers are transmission channels read from
 `family`/religion + recency, a separate path, not an A × B output. And the **African
 substratum (1)** has no distinct distributional signature yet (Africa folds into the
-Continental mega-set). See [`stratum-derivation.md` §8, §14](archive/stratum-derivation.md).
+Continental mega-set). See [`stratum-derivation.md` §8, §14](stratum-derivation.md).
 
 ## Deriving `stratum` ourselves (not from Berezkin's labels)
 
 > Full method — theory, features, both algorithms, controls, validation, schema — in
-> [`stratum-derivation.md`](archive/stratum-derivation.md). Summary below.
+> [`stratum-derivation.md`](stratum-derivation.md). Summary below.
 
 `stratum` is the one field that is **inferred, not given** — so if we want it as a key
 divider we must compute it reproducibly and honestly. The premise (areal folkloristics
@@ -279,7 +279,7 @@ inheritance from independent reinvention or diffusion-then-loss (homoplasy, Galt
 problem). Every stratum is therefore a hypothesis with uncertainty, not a fact.
 
 **Founding assumptions (enumerated in full at
-[`stratum-derivation.md` §0](archive/stratum-derivation.md)).** The computation rests on
+[`stratum-derivation.md` §0](stratum-derivation.md)).** The computation rests on
 *substantive hypotheses* — distribution dates a motif; spread is descent-or-diffusion;
 breadth + cross-barrier disjunction ⇒ old; the language tree proxies descent lineages;
 geographic span maps to time via the known **peopling sequence** (Africa → Sahul →
@@ -488,9 +488,9 @@ rows); `theme`, `area`, and the `family` seed are computed.
 ## Cumulative conclusions
 
 The whole investigation, in one place (prototypes: mockups 15–29; method detail in
-[`stratum-derivation.md`](archive/stratum-derivation.md) §12–14; the overall arc in
-[`analysis-program.md`](archive/analysis-program.md); forward directions in
-[`synthesis-and-directions.md`](archive/synthesis-and-directions.md)):
+[`stratum-derivation.md`](stratum-derivation.md) §12–14; the overall arc in
+[`analysis-program.md`](analysis-program.md); forward directions in
+[`synthesis-and-directions.md`](synthesis-and-directions.md)):
 
 1. **"Region" was three axes crammed into one.** Split cleanly into **entities**: a
    *tradition* carries `area` (12, from `areal_path`), `family` (from `language` +

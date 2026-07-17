@@ -1,6 +1,6 @@
 # The analysis programme — a natural-history arc for folklore motifs
 
-The umbrella over [`macro-area-facets.md`](../macro-area-facets.md) (the entity model),
+The umbrella over [`macro-area-facets.md`](macro-area-facets.md) (the entity model),
 [`stratum-derivation.md`](stratum-derivation.md) (the per-motif time-depth method), and
 [`stratigraphic-peeling.md`](stratigraphic-peeling.md) (its recursive, corpus-level
 generalisation — a **data-driven stratigraphy** that peels and dates one layer at a time,

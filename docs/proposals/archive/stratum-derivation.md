@@ -3,7 +3,7 @@
 > Stage 4 (**phylogeny & etiology**) of the overall arc in
 > [`analysis-program.md`](analysis-program.md): collect → describe → classify → **explain**.
 
-Companion to [`macro-area-facets.md`](../macro-area-facets.md). That doc defines a motif's
+Companion to [`macro-area-facets.md`](macro-area-facets.md). That doc defines a motif's
 `stratum` as the one **inferred, probabilistic** field (area/family/subsistence/theme
 are given or deterministic; stratum is not). This doc is the full method: the theory
 and its limits, the exact per-motif features, two derivation algorithms (a heuristic

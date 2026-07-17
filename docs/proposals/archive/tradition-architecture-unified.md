@@ -5,7 +5,7 @@ five overlapping, string-driven ad-hoc systems with **one canonical, id-keyed, f
 whose geographic axis (`area`) is the single region vocabulary, and from which colour and grouping are
 **derived deterministically** rather than authored or randomised.
 
-> **Canon.** The `region` axis is canonically specified in [`regions.md`](regions.md) —
+> **Canon.** The `region` axis is canonically specified in [`regions.md`](../regions.md) —
 > the definitive **14-region** classification (names, descriptions, subdivisions, strata, per-region traditions,
 > palette). It is the corpus-first successor to the retired `major_tradition` and to Berezkin's 12-area `area`
 > scaffold this proposal still calls `area` below; **where this document and `regions.md` diverge, `regions.md`
@@ -17,12 +17,12 @@ whose geographic axis (`area`) is the single region vocabulary, and from which c
 > that decision.
 
 Sources folded in:
-[`../reviews/archive/tradition-review.md`](../reviews/archive/tradition-review.md) ·
-[`../reviews/archive/major-tradition-review.md`](../reviews/archive/major-tradition-review.md) ·
-[`../reviews/archive/color-system-review.md`](../reviews/archive/color-system-review.md) ·
+[`../reviews/archive/tradition-review.md`](../../reviews/archive/tradition-review.md) ·
+[`../reviews/archive/major-tradition-review.md`](../../reviews/archive/major-tradition-review.md) ·
+[`../reviews/archive/color-system-review.md`](../../reviews/archive/color-system-review.md) ·
 [`tradition-taxonomy-final.md`](tradition-taxonomy-final.md) ·
 [`macro-area-facets.md`](macro-area-facets.md) ·
-[`../known-issues.md`](../known-issues.md) §competing macro-area schemes.
+[`../known-issues.md`](../../known-issues.md) §competing macro-area schemes.
 
 ---
 
@@ -98,7 +98,7 @@ per-tradition shade.)* Consequences:
 
 ## 4. Architecture / code / pipeline layer
 
-> **Superseded by [`region-implementation.md`](region-implementation.md).** §4 and §6 below still assume the
+> **Superseded by [`region-implementation.md`](../region-implementation.md).** §4 and §6 below still assume the
 > retired facet model (`area`/`family`/`subsistence`, area-gradient colour, facet selector). The live,
 > decision-reconciled code plan — region only, colour from the region palette — is in `region-implementation.md`;
 > read that for implementation. §4/§6 here are kept as the reasoning that led to it.

@@ -1,7 +1,7 @@
 # 23 · Theme × geography
 
 Visualises the **theme × area signal** that
-[`macro-area-facets.md`](../../docs/proposals/macro-area-facets.md) only states in
+[`macro-area-facets.md`](../../docs/proposals/archive/macro-area-facets.md) only states in
 prose ("Category B is 74–77% of European attestations but 27% in Mesoamerica–Andes";
 "cosmology is pan-global, tales are regional"). Four views over the Berezkin catalogue.
 

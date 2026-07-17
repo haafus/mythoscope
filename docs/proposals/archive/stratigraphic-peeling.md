@@ -193,7 +193,7 @@ anchoring, not a crisp modular hierarchy read off internal separation.
    residual re-clustering → null-model check.
 3. Ship as a new mockup (e.g. `45-stratigraphic-peeling`) and a section in
    [`stratum-derivation.md`](stratum-derivation.md); feed the dated layers back into the tradition
-   `stratum-stack` of [`macro-area-facets.md`](../macro-area-facets.md).
+   `stratum-stack` of [`macro-area-facets.md`](macro-area-facets.md).
 
 ## Recommendation — what to do with this
 

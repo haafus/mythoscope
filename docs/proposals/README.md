@@ -12,22 +12,9 @@ not as live work.
   descriptions, subdivisions, strata, per-region traditions, CARTOColors Prism palette). **Goal:** one
   authoritative region vocabulary; where any other doc diverges, this is authoritative. *Canon reference
   (drives `region-implementation.md`).*
-- [`macro-area-facets.md`](macro-area-facets.md) — the **entity model**: a tradition carries `area` (12
-  macro-areas) · `family` · `subsistence` · `theme_profile`; depth (`stratum`) is a **motif** property.
-  **Goal:** replace the eclectic single `major_tradition` tree with a principled, audited multi-facet model.
-  *Validated (mockups 21/32/42); the multi-facet layer (`family`/`subsistence`) was not adopted — single-axis
-  `region` won; the `area`→`region` geography survives via `region-implementation.md`.*
 
 ## Active — data / architecture (the engineering)
 
-- [`tradition-taxonomy-final.md`](tradition-taxonomy-final.md) — one-page reference for the converged
-  classification. **Goal:** a single orientation point instead of three scattered ones. *Reference (its
-  multi-facet target superseded by the single-axis `region` decision).*
-- [`tradition-architecture-unified.md`](tradition-architecture-unified.md) — **one id-keyed, faceted
-  `Tradition` entity**; `area` becomes the single region vocabulary; colour derived as a gradient within
-  macro-area; `major_tradition` retired. **Goal:** kill the fragile string-join, the six overlapping region
-  schemes, and non-deterministic colour in one coherent model. *Parent synthesis (§1–3); §4/§6 superseded by
-  `region-implementation.md`.*
 - [`region-implementation.md`](region-implementation.md) — **the code plan** for wiring `region` into
   production after taxonomy/presentation closed: one curated `config/traditions.json` tree (14 region nodes in
   canon order, each with its canon fields + base colour, holding only texted traditions), `major_tradition`
@@ -47,6 +34,16 @@ not as live work.
 
 Spent, shipped, or validated-but-not-productionised — kept for the reasoning trail under [`archive/`](archive/).
 
+- [`macro-area-facets.md`](archive/macro-area-facets.md) — the **entity model**: a tradition carries `area` (12
+  macro-areas) · `family` · `subsistence` · `theme_profile`; depth (`stratum`) is a **motif** property.
+  *Validated (mockups 21/32/42); the multi-facet layer (`family`/`subsistence`) was not adopted — single-axis
+  `region` won; the `area`→`region` geography survives via `region-implementation.md`.*
+- [`tradition-architecture-unified.md`](archive/tradition-architecture-unified.md) — **one id-keyed, faceted
+  `Tradition` entity**; `area` becomes the single region vocabulary; colour derived as a gradient within
+  macro-area; `major_tradition` retired. *Parent synthesis (§1–3); §4/§6 superseded by `region-implementation.md`
+  — which now carries the live plan.*
+- [`tradition-taxonomy-final.md`](archive/tradition-taxonomy-final.md) — one-page reference for the converged
+  classification. *Its multi-facet target superseded by the single-axis `region` decision.*
 - [`analysis-program.md`](archive/analysis-program.md) — the natural-history arc **collect → describe →
   classify → explain** that orders every mockup and proposal. *Umbrella doc; framing, not live work.*
 - [`synthesis-and-directions.md`](archive/synthesis-and-directions.md) / [`roadmap.md`](archive/roadmap.md) —
@@ -73,13 +70,13 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
 
 | Next step | Goal — why it's needed | Home |
 |---|---|---|
-| **`region_facets.py`** — productionise the 12 macro-areas + `area/family/subsistence` recipe | Turn the validated facet model into the pipeline's real classification; collapses the six region schemes onto one `area` | macro-area-facets |
-| **Tradition architecture migration** (id identity + build validation → facet registry → area-gradient colour → retire `major_tradition` → collapse region schemes → one `UNASSIGNED` default) | Remove silent join breakage, denormalisation, non-deterministic colour; make region unambiguous | tradition-architecture-unified / region-implementation |
+| **`region_facets.py`** — productionise the 12 macro-areas + `area/family/subsistence` recipe | Turn the validated facet model into the pipeline's real classification; collapses the six region schemes onto one `area` | archive/macro-area-facets |
+| **Tradition architecture migration** (id identity + build validation → facet registry → area-gradient colour → retire `major_tradition` → collapse region schemes → one `UNASSIGNED` default) | Remove silent join breakage, denormalisation, non-deterministic colour; make region unambiguous | archive/tradition-architecture-unified / region-implementation |
 | **Editorial Layer 2** — cue-strip of interleaved `[N]` notes on annotated editions | Clean the ~5 critical editions (Edda, Beowulf, Babylonian…) that start/stop can't reach | corpus-editorial-filtering |
 | **Two-axis theme taxonomy** in the pipeline (etiological + narrative) | Make both theme facets standing infrastructure, not a prototype result | archive/theme-taxonomy-comparison |
 | **Peeling production wiring** — real M38 factors + calibrated M17/clade ages + full M24 weights + bootstrap/clade validation | Turn the proof-of-concept dated soft layers into a defensible **dated stratigraphy** (the one path here that could add a *new result*, not just rigour) | archive/stratigraphic-peeling |
 | **GPU embedding run** — enable qwen-4b + story-emb, compute embeddings | Benchmark narrative-similarity embedders for the induction task (SemEval-2026 Task 4) | ../embeddings-gpu-howto.md |
-| **Connectivity axis** — fine genetics + trade-route networks + node-level dating | Close the ~64% convergence residual the facets leave (the expensive, result-bearing joins) | macro-area-facets / archive/roadmap |
+| **Connectivity axis** — fine genetics + trade-route networks + node-level dating | Close the ~64% convergence residual the facets leave (the expensive, result-bearing joins) | archive/macro-area-facets / archive/roadmap |
 
 **Reading the table:** most of these are **rigour / engineering** — they make results defensible, the code
 clean, and the corpus honest, but they do **not** move the scientific conclusions. The one row that could

@@ -9,7 +9,7 @@
 
 Cross-refs: [`regions.md`](../regions.md) §8 (palette table),
 [`../reviews/archive/color-system-review.md`](../../reviews/archive/color-system-review.md),
-[`tradition-architecture-unified.md`](../tradition-architecture-unified.md) §3.
+[`tradition-architecture-unified.md`](tradition-architecture-unified.md) §3.
 
 ---
 
@@ -128,5 +128,5 @@ and skip tiles.
   carry their own coastline.
 - §2.3 (intuitive Near East/Mesoamerica) is the only open item; it does not touch the Prism canon.
 - If the palette is ever moved to the derived area-gradient of
-  [`tradition-architecture-unified.md`](../tradition-architecture-unified.md) §3, this
+  [`tradition-architecture-unified.md`](tradition-architecture-unified.md) §3, this
   ADR and `regions.md` §8 are the two documents to revise together.

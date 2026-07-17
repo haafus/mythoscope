@@ -150,7 +150,7 @@ overview chart and another way in its Traditions section.
 | 3 | Berezkin areal hierarchy (major traditions) | **16** | `areal_path[0]` in `outputs/motifs/mapsofmyths_traditions.json` | Berezkin (authoritative) | Berezkin per-motif "Traditions" distribution grouping |
 | 4 | Corpus tradition families (`major_tradition`) | **12** | `config/traditions.json` | us (hand-authored) | Geography map + corpus grouping — **different dataset (our texts), not motifs** |
 | 5 | `REGION_COLORS` motif-region palette | **~16** | `REGION_COLORS` / `regionColor()` in `src/server/web/assets/page-motifs.js` | us (ad-hoc) | **Colour layer**, not a partition: maps region *names* → hex for the #1/#3 bars and attestation accordions. Its keys (`Central Asia`, `Southeast Asia`, `Caribbean`, `Asia`, `—`…) union #1+#2 names, so its vocabulary matches neither cleanly. See [`reviews/archive/color-system-review.md`](reviews/archive/color-system-review.md) §7 |
-| 6 | Proposed `area` facet (**target**) | **12** | `docs/proposals/macro-area-facets.md` → mockup 21; not yet in code (`region_facets.py` unwritten) | us (derived from #3's `areal_path`) | The converged geographic axis of a tradition in the entity model — the intended replacement that folds #1/#3/#5 into one deterministic 12-area vocabulary |
+| 6 | Proposed `area` facet (**target**) | **12** | `docs/proposals/archive/macro-area-facets.md` → mockup 21; not yet in code (`region_facets.py` unwritten) | us (derived from #3's `areal_path`) | The converged geographic axis of a tradition in the entity model — the intended replacement that folds #1/#3/#5 into one deterministic 12-area vocabulary |
 
 ### Why they conflict
 
@@ -206,7 +206,7 @@ overview chart and another way in its Traditions section.
   `_berezkin_region`.
 - **#4 stays separate** by design (different axis, different dataset).
 - **Or model the entities instead of picking one list** — see
-  [`proposals/macro-area-facets.md`](proposals/macro-area-facets.md): an entity model
+  [`proposals/archive/macro-area-facets.md`](proposals/archive/macro-area-facets.md): an entity model
   where a **tradition** carries `area` (12, derived from `areal_path` — this is scheme
   #6), `family` and `subsistence`, while time-depth (`stratum`) is a **motif** property,
   not a tradition one. Folds #1/#3 into `area` (#6), lets #5's palette re-key to those

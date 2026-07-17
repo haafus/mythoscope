@@ -2,7 +2,7 @@
 
 One world map, a facet switcher. The same set of Berezkin traditions is coloured by whichever
 **tradition facet** you pick — the four axes of the converged taxonomy
-([`tradition-taxonomy-final.md`](../../docs/proposals/tradition-taxonomy-final.md)) side by side on
+([`tradition-taxonomy-final.md`](../../docs/proposals/archive/tradition-taxonomy-final.md)) side by side on
 the geography, so you can *see* how each cross-cuts the map.
 
 Answers the open UI gap from `docs/reviews/2026-07-repo-review.md` **F7** (`family`/areal facet in the
