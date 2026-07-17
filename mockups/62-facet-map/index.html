@@ -269,7 +269,7 @@ const CURATED_LAYOUT = ["borders", "religions", "families", "|", "substrate",
 document.getElementById("facetsCurated").innerHTML =
   CURATED_LAYOUT.map(x => x === "|" ? '<span class="sep">·</span>' : btnHTML(x)).join("");
 // third row: the same region areas re-projected to Winkel Tripel (Prism · intuitive)
-document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "winkelintuplain", "equirectintu", "equirectintuplain"].map(btnHTML).join("");
+document.getElementById("facetsProj").innerHTML = ["winkel", "winkelintu", "equirectintu", "winkelintuplain", "equirectintuplain"].map(btnHTML).join("");
 document.querySelectorAll("#facetsMain button, #facetsCurated button, #facetsProj button").forEach(b=>{
   if (!b.disabled) b.onclick = () => { active = b.dataset.f; render(); };
 });
