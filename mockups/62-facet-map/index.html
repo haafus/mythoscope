@@ -394,28 +394,37 @@ function kickZoom(){ if (!zraf) { zPrev = 0; zraf = requestAnimationFrame(animat
 mapBox.addEventListener("wheel", e => {
   const svg = mapBox.querySelector("svg.map");
   if (!svg) return;
-  resetMode = false;                                                   // a wheel mid-reset switches back to zoom
   e.preventDefault();
   stopInertia();
   tip.classList.remove("show"); setPoint(null);                        // the map moves under a still
   if (tipTimer) clearTimeout(tipTimer);                                // cursor while zooming → desync
   const rect = svg.getBoundingClientRect();
-  const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
-  // anchor to the point under the cursor in the CURRENT (animated) frame, not the target frame:
-  // this makes setting the anchor continuous (wx - px·view.w == view.x right now), so re-anchoring
-  // as the cursor moves mid-zoom doesn't snap the map. Deriving it from `target` (the lagging goal)
-  // instead put a target-frame point under a still-easing view → a visible jerk on every mouse move.
-  const wx = view.x + px * view.w, wy = view.y + py * view.h;          // point under the cursor NOW
-  zoomAnchor = { fx: px, fy: py, wx: wx, wy: wy };
   // zoom in proportion to how much was actually scrolled (not a fixed step per event) — a
   // high-res wheel / trackpad fires many events per gesture and a fixed step jumps to the limit
   let d = e.deltaY;
   if (e.deltaMode === 1) d *= 16;                                       // line units → ~pixels
   d = Math.max(-50, Math.min(50, d));                                   // cap one event's kick
-  target.w *= Math.exp(d * 0.0026);
-  clampTarget();
-  target.x = wx - px * target.w; target.y = wy - py * target.h;         // keep that point under the cursor
-  clampTarget();
+  target.w = Math.min(360, Math.max(MINW, target.w * Math.exp(d * 0.0026)));
+  target.h = target.w / 2;
+  if (d > 0){
+    // zoom OUT heads straight for the centred full-extent view: move x,y toward 0 in proportion to how
+    // far w has advanced toward 360, so the map centre reaches the SCREEN centre exactly at full extent
+    // (a uniform blend along that line — gentle & directional, not an immediate yank to centre).
+    zoomAnchor = null; resetMode = true;
+    const denom = 360 - view.w;
+    const s = denom > 0.01 ? (target.w - view.w) / denom : 0;           // fraction of the way to full extent
+    target.x = view.x * (1 - s);
+    target.y = view.y * (1 - s);
+  } else {
+    // zoom IN toward the cursor. Anchor to the point under the cursor in the CURRENT frame (not the
+    // lagging target) so re-anchoring as the scroll continues is continuous (wx - px·view.w == view.x).
+    resetMode = false;
+    const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
+    const wx = view.x + px * view.w, wy = view.y + py * view.h;
+    zoomAnchor = { fx: px, fy: py, wx: wx, wy: wy };
+    target.x = Math.max(0, Math.min(360 - target.w, wx - px * target.w));
+    target.y = Math.max(0, Math.min(180 - target.h, wy - py * target.h));
+  }
   kickZoom();
 }, { passive: false });
 let drag = null, iraf = null;
