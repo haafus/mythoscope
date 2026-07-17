@@ -25,4 +25,4 @@ Then read the rest by topic.
 - [`../proposals/`](../proposals/) — forward-looking designs (Mellmann migration, browser UI, region/culture/time-depth entity model + motif-stratum derivation), each partly implemented
 
 Elsewhere in the repo: [`../research/`](../research/) for the field surveys, and
-[`../how_to.md`](../how_to.md) for the run commands.
+[`../how-to.md`](../how-to.md) for the run commands.

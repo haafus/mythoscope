@@ -83,7 +83,7 @@ Sections: `embedding.models` (active, visible to code) vs `embedding.inactive` (
 **Tails to update / clean:**
 - Frontend: "Summary UMAP" drops from the dropdown once `summaries_umap` leaves `PROJECTION_METHODS` (no dedicated code).
 - Stale on-disk artefacts: `outputs/projections/<model>/summaries_umap.json`, `summaries.jsonl` → orphaned, cleaned via `clean --caches`.
-- Help/docstrings mentioning summaries: `cli.py` `--caches` help, `chunk_cache.py` docstring, `export_bundle.py`, `docs/how_to.md` (`--summaries` / Summary UMAP).
+- Help/docstrings mentioning summaries: `cli.py` `--caches` help, `chunk_cache.py` docstring, `export_bundle.py`, `docs/how-to.md` (`--summaries` / Summary UMAP).
 - Tests: audit for summaries references (`test_cli`, …).
 
 **Keep:** the `summary` key in `config/prompts.json` — now the target of `preprocess_prompt`.
@@ -102,7 +102,7 @@ Add to `embedding.inactive` an example variant:
 
 ## Documentation
 
-Add a full **embedding-entry schema** section to `docs/how_to.md` (the table above — most existing
+Add a full **embedding-entry schema** section to `docs/how-to.md` (the table above — most existing
 fields are currently undocumented), state the `*_prompt` = reference / `*_prefix` = inline rule
 explicitly, note the model-specific nature of prefixes (E5 `passage:` / Qwen & BGE query-only), and
 remove the `--summaries` / Summary-UMAP references.
