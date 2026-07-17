@@ -23,6 +23,7 @@ Full write-ups live in each mockup's own `README.md`; the complete index is [`RE
 | [46](46-migration-surface/) | Population-genetics-style migration/resistance surface; confirms the clinal + moderate-areal picture with permutation tests. |
 | [48](48-teleconnections/) | A climate-model-style network of long-distance motifs that co-vary across disjunct, non-adjacent regions. |
 | [52](52-diversity-turnover/) | Separates α-diversity (= cataloguing effort) from β-diversity (turnover = the real geographic signal). |
+| [62](62-facet-map/) | One world map, a facet switcher: the same Berezkin traditions coloured by each tradition facet (region / area / family / …) side by side, with equirectangular and Winkel Tripel region views. |
 
 ## Temporal dimension & processes
 
