@@ -188,7 +188,7 @@ Ranked by what each *newly enables*, not by ease:
 | **Historical polities + contact networks** (historical-basemaps, OWTRAD, Seshat, DARMC; Hellenthal admixture for direction) | open/curated | dated diffusion edges that date the historical strata distribution can't; direction for back-migration (M35) |
 
 > The actionable, significance-ranked sequencing of everything below — as concrete next
-> mockups (M24…) — is in [`roadmap.md`](roadmap.md).
+> mockups (M24…) — is in [`mockup-roadmap-24-59.md`](mockup-roadmap-24-59.md).
 
 ## 8. New algorithms that could give strong results
 

@@ -46,7 +46,7 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
   classification. *Its multi-facet target superseded by the single-axis `region` decision.*
 - [`analysis-program.md`](archive/analysis-program.md) — the natural-history arc **collect → describe →
   classify → explain** that orders every mockup and proposal. *Umbrella doc; framing, not live work.*
-- [`synthesis-and-directions.md`](archive/synthesis-and-directions.md) / [`roadmap.md`](archive/roadmap.md) —
+- [`synthesis-and-directions.md`](archive/synthesis-and-directions.md) / [`mockup-roadmap-24-59.md`](archive/mockup-roadmap-24-59.md) —
   the findings synthesis and the ranked mockup queue. *Living history of the mockup run (M24–M59); the queue is
   worked through.*
 - [`stratum-derivation.md`](archive/stratum-derivation.md) — deriving a motif's **time-depth from its
@@ -76,7 +76,7 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
 | **Two-axis theme taxonomy** in the pipeline (etiological + narrative) | Make both theme facets standing infrastructure, not a prototype result | archive/theme-taxonomy-comparison |
 | **Peeling production wiring** — real M38 factors + calibrated M17/clade ages + full M24 weights + bootstrap/clade validation | Turn the proof-of-concept dated soft layers into a defensible **dated stratigraphy** (the one path here that could add a *new result*, not just rigour) | archive/stratigraphic-peeling |
 | **GPU embedding run** — enable qwen-4b + story-emb, compute embeddings | Benchmark narrative-similarity embedders for the induction task (SemEval-2026 Task 4) | ../embeddings-gpu-howto.md |
-| **Connectivity axis** — fine genetics + trade-route networks + node-level dating | Close the ~64% convergence residual the facets leave (the expensive, result-bearing joins) | archive/macro-area-facets / archive/roadmap |
+| **Connectivity axis** — fine genetics + trade-route networks + node-level dating | Close the ~64% convergence residual the facets leave (the expensive, result-bearing joins) | archive/macro-area-facets / archive/mockup-roadmap-24-59 |
 
 **Reading the table:** most of these are **rigour / engineering** — they make results defensible, the code
 clean, and the corpus honest, but they do **not** move the scientific conclusions. The one row that could

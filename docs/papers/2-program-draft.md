@@ -203,5 +203,5 @@ research programme.
 - Pagel, M. (1994). Detecting correlated evolution on phylogenies. *Proc. R. Soc. B* 255, 37–45.
 - **MythoScope design notes** — `docs/proposals/archive/analysis-program.md` (the arc),
   `macro-area-facets.md` (the entity model & assumptions), `stratum-derivation.md` (axioms & method),
-  `roadmap.md`; companion papers `3-machine-draft.md` (framework), `4-findings-draft.md` (findings),
+  `mockup-roadmap-24-59.md`; companion papers `3-machine-draft.md` (framework), `4-findings-draft.md` (findings),
   `1-field-draft.md` (survey).
