@@ -343,7 +343,7 @@ const MINW = 60, FRAME_MS = 16.7, DT_MAX = 50; // deepest zoom (360/60 = 6×); F
 const target = { ...view };                     // goal viewBox; `view` is the animated current
 let zraf = null, zPrev = 0, iPrev = 0;          // zPrev/iPrev: previous rAF timestamp per loop (for dt)
 let resetGlide = null;                          // active dbl-click reset: {x0,y0,w0} start; target creeps to fit
-const RESET_STEP = 0.09;                         // max log-w the reset TARGET advances per 60-Hz frame (wheel-like)
+const RESET_STEP = 0.13;                         // max log-w the reset TARGET advances per 60-Hz frame (wheel-like)
 // Points don't FULLY counter-scale. --z = (view.w/360)^R_COMP with R_COMP<1, so the on-screen radius
 // goes as (view.w/360)^(R_COMP-1) — it grows a little on zoom-in instead of staying pixel-constant.
 // Full compensation (R_COMP=1) makes the dots feel small once the map's line detail sharpens; this
