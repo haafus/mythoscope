@@ -189,6 +189,25 @@ is geographically contiguous; the single seam is `Papua & Aboriginal Australia �
 Each entry: **Description** (what/why) · **Subdivision** (the next level of splitting that makes sense) ·
 **Strata** (the historical layers at work, with datings) · **Traditions** · colour (`base`, see §8).
 
+> **This list vs the mockup's "194".** The **Traditions** lines below hold **183** entries; the facet-map
+> mockup (`mockups/62-facet-map/build_data.py`, `REGIONS`) derives **194** point-traditions from *this same
+> list*. This is the canonical source; the 194 is a plotting projection of it. The two differ for two reasons:
+>
+> - **Cleaned point labels (no count change).** The mockup strips the parenthetical glosses/qualifiers used
+>   here — `San (Bushman)`→`San`, `Berber (Amazigh)`→`Berber`, `Turkic/Tengrist`→`Turkic`,
+>   `Navajo (Diné)`→`Navajo`, `Ugaritic/Canaanite`→`Ugaritic` — and does not carry the pure boundary-affinity
+>   parentheticals that are not plottable points (`(Ainu, Sami — boundary affinities)`, `(Kurdish · Azeri)`
+>   stay one entry). Same traditions either way.
+> - **Umbrella entries un-bundled into member peoples (+11 → 194).** Five collective entries here become
+>   individual map points there, each needing its own coordinates: `Polynesian` → 6 (Maori, Hawaiian, Tahitian,
+>   Samoan, Tongan, Rapa Nui; **+5**); `Aboriginal Australian` → 4 (Arrernte, Yolngu, Warlpiri, Pitjantjatjara;
+>   **+3**); `Papuan highland groups` → 2 (Enga, Huli; **+1**); `Inuit/Eskimo` → 3 (Yupik, Inupiat, Kalaallit;
+>   **+2**, less 1 for the dropped boundary parenthetical); `Algonquian` → 2 plotted (Ojibwe, Abenaki; **+1** —
+>   Cree-south is plotted under Circumpolar as Northern Cree). Net **183 + 11 = 194**.
+>
+> To make them match 1-for-1, either expand these five umbrellas in-place here, or keep them as umbrellas and
+> treat the 194 as the derived point set — **not** as a second, divergent list.
+
 ### 1. Sub-Saharan Africa · `#CC503E`
 
 **Description.** The mythologies of Africa south of the Sahara — the world's densest concentration of distinct oral traditions, spanning several unrelated language phyla. Distinguished as one region because Berezkin does not subdivide it and both candidate halves (West/Central vs East/Southern) are text-thin; encyclopedias treat "Black Africa" as one. Predominantly oral; the open textual assets are the Yoruba Ifá corpus and Ethiopian Ge'ez (boundary — Semitic/Christian).
