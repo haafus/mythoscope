@@ -142,13 +142,6 @@
     "description": "The mythic and heroic sagas of the K'iche' Maya, including creation narratives, the Hero Twins, divine ancestry, and sacred history."
   },
   {
-    "title": "Myths of the Australian Aborigines",
-    "tradition": "Australian",
-    "url": "https://www.gutenberg.org/cache/epub/71940/pg71940.txt",
-    "description": "A collection of myths about the Dreamtime and traditional beliefs of the indigenous peoples of Australia.",
-    "exclude": true
-  },
-  {
     "title": "The Odyssey",
     "tradition": "Greek",
     "url": "https://www.gutenberg.org/cache/epub/1727/pg1727.txt",
