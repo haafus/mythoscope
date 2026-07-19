@@ -335,8 +335,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Circassian (Nart)
 - Chechen/Vainakh (Nart)
 - Dagestani peoples
-- (Kurdish
-- Azeri)
+- (Kurdish · Azeri)
 
 ### 5. Inner Asia · `#1D6996`
 
