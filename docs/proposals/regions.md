@@ -190,204 +190,463 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 **Strata** (the historical layers at work, with datings) · **Traditions** · colour (`base`, see §8).
 
 ### 1. Sub-Saharan Africa · `#CC503E`
-**Description.** The mythologies of Africa south of the Sahara — the world's densest concentration of
-distinct oral traditions, spanning several unrelated language phyla. Distinguished as one region
-because Berezkin does not subdivide it and both candidate halves (West/Central vs East/Southern) are
-text-thin; encyclopedias treat "Black Africa" as one. Predominantly oral; the open textual assets are
-the Yoruba Ifá corpus and Ethiopian Ge'ez (boundary — Semitic/Christian).
-**Subdivision.** West African (Niger-Congo: Yoruba, Akan, Fon, Igbo) · Central & Southern Bantu ·
-Nilotic & Cushitic East Africa · Khoisan foragers.
-**Strata.** Khoisan forager substrate (deepest, pre-agricultural, >20 ka) → Bantu expansion carrying
-agriculture + iron across Central/Southern Africa (~1000 BCE – 500 CE) → Nilotic pastoralist spread →
-Sahelian Islam via the trans-Saharan trade (from ~8th c. CE) → Ethiopian Christian literate layer
-(Ge'ez, from 4th c. CE) → colonial/Christian overlay (16th–20th c.).
-**Traditions.** Yoruba · Igbo · Akan/Ashanti · Fon (Dahomey) · Dogon · Bambara · Serer · Kongo ·
-Yombe · Zulu · Xhosa · Shona · Kikuyu · Baganda · Luba · Fang · Dinka · Nuer · Maasai · Azande · San
-(Bushman) · Khoekhoe · Mbuti · (Ethiopian/Amhara — boundary with Near East).
+
+**Description.** The mythologies of Africa south of the Sahara — the world's densest concentration of distinct oral traditions, spanning several unrelated language phyla. Distinguished as one region because Berezkin does not subdivide it and both candidate halves (West/Central vs East/Southern) are text-thin; encyclopedias treat "Black Africa" as one. Predominantly oral; the open textual assets are the Yoruba Ifá corpus and Ethiopian Ge'ez (boundary — Semitic/Christian).
+
+**Subdivision.**
+- West African (Niger-Congo: Yoruba, Akan, Fon, Igbo)
+- Central & Southern Bantu
+- Nilotic & Cushitic East Africa
+- Khoisan foragers
+
+**Strata.**
+- Khoisan forager substrate (deepest, pre-agricultural, >20 ka)
+- Bantu expansion carrying agriculture + iron across Central/Southern Africa (~1000 BCE – 500 CE)
+- Nilotic pastoralist spread
+- Sahelian Islam via the trans-Saharan trade (from ~8th c. CE)
+- Ethiopian Christian literate layer (Ge'ez, from 4th c. CE)
+- colonial/Christian overlay (16th–20th c.)
+
+**Traditions.**
+- Yoruba
+- Igbo
+- Akan/Ashanti
+- Fon (Dahomey)
+- Dogon
+- Bambara
+- Serer
+- Kongo
+- Yombe
+- Zulu
+- Xhosa
+- Shona
+- Kikuyu
+- Baganda
+- Luba
+- Fang
+- Dinka
+- Nuer
+- Maasai
+- Azande
+- San (Bushman)
+- Khoekhoe
+- Mbuti
+- (Ethiopian/Amhara — boundary with Near East)
 
 ### 2. Near East & North Africa · `#2A4895`
-**Description.** The Ancient Near East plus North Africa and the Abrahamic homelands — the earliest
-literate mythologies (cuneiform, hieroglyphic) and the source region of the three Abrahamic religions.
-Distinguished as the Bronze-Age/antiquity core of the Old World, anchored by written text. Includes
-Anatolia (Hittite) and the Maghreb; "Near East" chosen over "Middle East" for its ancient material.
-**Subdivision.** Mesopotamian (Sumer/Akkad/Babylon/Assyria) · Egyptian · Levantine-Anatolian (Ugarit,
-Hittite, Canaan, Phoenicia) · Arabian · Abrahamic (Judaism/Christianity/Islam) · Maghreb-Berber.
-**Strata.** Sumerian (cuneiform from ~3200 BCE) → Akkadian-Babylonian-Assyrian (2nd–1st mill. BCE) →
-Egyptian (Pyramid Texts ~2400 BCE) → Hittite (~1650–1180 BCE) & Ugaritic (~1400–1200 BCE) → Iron-Age
-Levant / Hebrew (1st mill. BCE) → Abrahamic overlay: Judaism (Second-Temple era), Christianity
-(1st c. CE), Islam (7th c. CE) → Arab-Islamic spread (7th–8th c. CE).
-**Traditions.** Sumerian · Akkadian · Babylonian · Assyrian · Egyptian · Hittite · Hurrian ·
-Ugaritic/Canaanite · Phoenician · Elamite · pre-Islamic Arabian · Jewish · Christian · Islamic ·
-Berber (Amazigh).
+
+**Description.** The Ancient Near East plus North Africa and the Abrahamic homelands — the earliest literate mythologies (cuneiform, hieroglyphic) and the source region of the three Abrahamic religions. Distinguished as the Bronze-Age/antiquity core of the Old World, anchored by written text. Includes Anatolia (Hittite) and the Maghreb; "Near East" chosen over "Middle East" for its ancient material.
+
+**Subdivision.**
+- Mesopotamian (Sumer/Akkad/Babylon/Assyria)
+- Egyptian
+- Levantine-Anatolian (Ugarit, Hittite, Canaan, Phoenicia)
+- Arabian
+- Abrahamic (Judaism/Christianity/Islam)
+- Maghreb-Berber
+
+**Strata.**
+- Sumerian (cuneiform from ~3200 BCE)
+- Akkadian-Babylonian-Assyrian (2nd–1st mill. BCE)
+- Egyptian (Pyramid Texts ~2400 BCE)
+- Hittite (~1650–1180 BCE) & Ugaritic (~1400–1200 BCE)
+- Iron-Age Levant / Hebrew (1st mill. BCE)
+- Abrahamic overlay: Judaism (Second-Temple era), Christianity (1st c. CE), Islam (7th c. CE)
+- Arab-Islamic spread (7th–8th c. CE)
+
+**Traditions.**
+- Sumerian
+- Akkadian
+- Babylonian
+- Assyrian
+- Egyptian
+- Hittite
+- Hurrian
+- Ugaritic/Canaanite
+- Phoenician
+- Elamite
+- pre-Islamic Arabian
+- Jewish
+- Christian
+- Islamic
+- Berber (Amazigh)
 
 ### 3. Europe · `#EDAD08`
-**Description.** The mythologies of Europe — predominantly Indo-European (with Uralic Finno-Ugric),
-sharing deep Proto-Indo-European roots. One region (not split) because by text it is lighter than the
-single Near East region and internally more uniform than one-region Sub-Saharan Africa. The
-Classical Mediterranean vs Northern/Eastern division is a **sub-rubric**.
-**Subdivision.** Greco-Roman (Classical Mediterranean) · Celtic · Germanic-Norse · Slavic · Baltic ·
-Finno-Ugric / Uralic.
-**Strata.** Pre-IE Neolithic-farmer & "Old European" substrate (Basque relic; farmers from ~7000 BCE)
-→ Proto-Indo-European steppe expansion (~3000–2500 BCE) branching into the IE mythologies → Classical
-antiquity (Greek from 8th c. BCE, then Roman) → Migration Period (Germanic & Slavic expansions,
-4th–9th c. CE) → Christianization absorbing the pagan layer (4th–12th c. CE) → late written fixation
-(Eddas ~13th c.; Kalevala compiled 1835–49).
-**Traditions.** Greek · Roman · Etruscan · Celtic (Irish, Welsh, Gaulish, Breton) · Norse ·
-Anglo-Saxon · Continental Germanic · Slavic (Russian, Polish, South Slavic) · Baltic (Lithuanian,
-Latvian, Prussian) · Finnish · Estonian · Sami · Hungarian · Mordvin/Mari · Basque.
+
+**Description.** The mythologies of Europe — predominantly Indo-European (with Uralic Finno-Ugric), sharing deep Proto-Indo-European roots. One region (not split) because by text it is lighter than the single Near East region and internally more uniform than one-region Sub-Saharan Africa. The Classical Mediterranean vs Northern/Eastern division is a **sub-rubric**.
+
+**Subdivision.**
+- Greco-Roman (Classical Mediterranean)
+- Celtic
+- Germanic-Norse
+- Slavic
+- Baltic
+- Finno-Ugric / Uralic
+
+**Strata.**
+- Pre-IE Neolithic-farmer & "Old European" substrate (Basque relic; farmers from ~7000 BCE)
+- Proto-Indo-European steppe expansion (~3000–2500 BCE) branching into the IE mythologies
+- Classical antiquity (Greek from 8th c. BCE, then Roman)
+- Migration Period (Germanic & Slavic expansions, 4th–9th c. CE)
+- Christianization absorbing the pagan layer (4th–12th c. CE)
+- late written fixation (Eddas ~13th c.; Kalevala compiled 1835–49)
+
+**Traditions.**
+- Greek
+- Roman
+- Etruscan
+- Celtic (Irish, Welsh, Gaulish, Breton)
+- Norse
+- Anglo-Saxon
+- Continental Germanic
+- Slavic (Russian, Polish, South Slavic)
+- Baltic (Lithuanian, Latvian, Prussian)
+- Finnish
+- Estonian
+- Sami
+- Hungarian
+- Mordvin/Mari
+- Basque
 
 ### 4. Caucasus & Iran · `#6F4070`
-**Description.** The Iranian/Persianate world plus the Caucasus — bound by Iranian cultural and
-linguistic threads (Zoroastrian, Scythian-Alan, Persianate). The Caucasus does not stand alone (a
-thin, internally diverse shatter zone) but its autochthonous Nart-epic peoples and its Christian
-literate peoples (Armenian, Georgian) attach here, following the Haussig "Caucasian and Iranian"
-pairing and the Iranian–Alan core of the Nart sagas.
-**Subdivision.** Iranian (Persian/Zoroastrian, Scythian-Alan, Ossetian) · South Caucasian (Georgian,
-Armenian) · North Caucasian (Circassian, Chechen/Vainakh, Dagestani — Nart).
-**Strata.** Autochthonous Caucasian Nart substrate → Indo-Iranian / Scythian-Alan layer (1st mill.
-BCE; the Iranian core of the Nart sagas) → Zoroastrian (Avesta oral ~1000 BCE; Sasanian codification
-3rd–7th c. CE) → Christian Armenia & Georgia (from 4th c. CE) → Islam (7th–8th c. CE) → Persian
-literary epic (Shahnameh ~1000 CE).
-**Traditions.** Persian/Zoroastrian · Scythian · Sogdian · Ossetian (Nart) · Armenian · Georgian ·
-Circassian (Nart) · Chechen/Vainakh (Nart) · Dagestani peoples · (Kurdish · Azeri).
+
+**Description.** The Iranian/Persianate world plus the Caucasus — bound by Iranian cultural and linguistic threads (Zoroastrian, Scythian-Alan, Persianate). The Caucasus does not stand alone (a thin, internally diverse shatter zone) but its autochthonous Nart-epic peoples and its Christian literate peoples (Armenian, Georgian) attach here, following the Haussig "Caucasian and Iranian" pairing and the Iranian–Alan core of the Nart sagas.
+
+**Subdivision.**
+- Iranian (Persian/Zoroastrian, Scythian-Alan, Ossetian)
+- South Caucasian (Georgian, Armenian)
+- North Caucasian (Circassian, Chechen/Vainakh, Dagestani — Nart)
+
+**Strata.**
+- Autochthonous Caucasian Nart substrate
+- Indo-Iranian / Scythian-Alan layer (1st mill. BCE; the Iranian core of the Nart sagas)
+- Zoroastrian (Avesta oral ~1000 BCE; Sasanian codification 3rd–7th c. CE)
+- Christian Armenia & Georgia (from 4th c. CE)
+- Islam (7th–8th c. CE)
+- Persian literary epic (Shahnameh ~1000 CE)
+
+**Traditions.**
+- Persian/Zoroastrian
+- Scythian
+- Sogdian
+- Ossetian (Nart)
+- Armenian
+- Georgian
+- Circassian (Nart)
+- Chechen/Vainakh (Nart)
+- Dagestani peoples
+- (Kurdish
+- Azeri)
 
 ### 5. Inner Asia · `#1D6996`
-**Description.** The Turco-Mongol nomadic steppe — the pastoralist, shamanic, Tengrist interior of
-Asia, with its own great oral epics. "Inner Asia" (not "Central Asia") because Iran/the Persianate
-oasis is in #4; this region is specifically the nomadic steppe belt. Tibet is a boundary case (Bon /
-Tibeto-Mongolian Vajrayana) placed here for its Inner-Asian Buddhist ties.
-**Subdivision.** Turkic (Kyrgyz/Manas, Kazakh, Yakut, Uyghur) · Mongolic (Mongol/Geser, Buryat,
-Kalmyk/Jangar) · Tibetan (Bon / Vajrayana — boundary).
-**Strata.** Ancient shamanic-Tengrist substrate → Scythian/Xiongnu nomad era (1st mill. BCE) → Turkic
-Khaganates (Old Turkic runic, 6th–8th c. CE) → Mongol Empire spreading the Geser epic cycle (13th c.)
-→ Tibetan-Buddhist (Vajrayana) overlay (Mongol conversion 16th c.) → western-Turkestan Islam
-(from ~10th c.).
-**Traditions.** Turkic/Tengrist · Kyrgyz (Manas) · Kazakh · Uyghur · Yakut/Sakha · Mongol (Geser,
-Tengri) · Buryat · Kalmyk (Jangar) · Tuvan · Altai · Tibetan (Bon; boundary) · Manchu (boundary).
+
+**Description.** The Turco-Mongol nomadic steppe — the pastoralist, shamanic, Tengrist interior of Asia, with its own great oral epics. "Inner Asia" (not "Central Asia") because Iran/the Persianate oasis is in #4; this region is specifically the nomadic steppe belt. Tibet is a boundary case (Bon / Tibeto-Mongolian Vajrayana) placed here for its Inner-Asian Buddhist ties.
+
+**Subdivision.**
+- Turkic (Kyrgyz/Manas, Kazakh, Yakut, Uyghur)
+- Mongolic (Mongol/Geser, Buryat, Kalmyk/Jangar)
+- Tibetan (Bon / Vajrayana — boundary)
+
+**Strata.**
+- Ancient shamanic-Tengrist substrate
+- Scythian/Xiongnu nomad era (1st mill. BCE)
+- Turkic Khaganates (Old Turkic runic, 6th–8th c. CE)
+- Mongol Empire spreading the Geser epic cycle (13th c.)
+- Tibetan-Buddhist (Vajrayana) overlay (Mongol conversion 16th c.)
+- western-Turkestan Islam (from ~10th c.)
+
+**Traditions.**
+- Turkic/Tengrist
+- Kyrgyz (Manas)
+- Kazakh
+- Uyghur
+- Yakut/Sakha
+- Mongol (Geser, Tengri)
+- Buryat
+- Kalmyk (Jangar)
+- Tuvan
+- Altai
+- Tibetan (Bon; boundary)
+- Manchu (boundary)
 
 ### 6. South Asia · `#38A6A5`
-**Description.** The Indian subcontinent — the single largest textual tradition on Earth (the Vedic
-corpus, Sanskrit epics, the Puranas, the Buddhist and Jain canons). Its own region on the strength of
-both volume (crit 4) and civilizational distinctness (crit 2); India is the source of the Indosphere,
-distinct from its Indianized periphery.
-**Subdivision.** Vedic-Hindu (Indo-Aryan) · Dravidian · Buddhist · Jain · tribal (Munda/Austroasiatic)
-· Sinhalese · Himalayan.
-**Strata.** Indus-Valley / Harappan + Dravidian & tribal substrate (~2600–1900 BCE) → Vedic
-(Indo-Aryan, Rigveda ~1500–1200 BCE) → Buddhism & Jainism (founders ~5th c. BCE) → epic-Puranic
-Hinduism (Mahabharata/Ramayana ~400 BCE – 400 CE; Puranas 300–1500 CE) → Bhakti / medieval → Islamic
-(from ~11th c.), Sikh (15th c.).
-**Traditions.** Vedic · Hindu · Buddhist · Jain · Dravidian (Tamil, Telugu, Kannada, Malayalam) ·
-Munda/Santal · Gond · Bhil · Sinhalese · Newar/Nepali · Sikh · Kashmiri.
+
+**Description.** The Indian subcontinent — the single largest textual tradition on Earth (the Vedic corpus, Sanskrit epics, the Puranas, the Buddhist and Jain canons). Its own region on the strength of both volume (crit 4) and civilizational distinctness (crit 2); India is the source of the Indosphere, distinct from its Indianized periphery.
+
+**Subdivision.**
+- Vedic-Hindu (Indo-Aryan)
+- Dravidian
+- Buddhist
+- Jain
+- tribal (Munda/Austroasiatic)
+- Sinhalese
+- Himalayan
+
+**Strata.**
+- Indus-Valley / Harappan + Dravidian & tribal substrate (~2600–1900 BCE)
+- Vedic (Indo-Aryan, Rigveda ~1500–1200 BCE)
+- Buddhism & Jainism (founders ~5th c. BCE)
+- epic-Puranic Hinduism (Mahabharata/Ramayana ~400 BCE – 400 CE; Puranas 300–1500 CE)
+- Bhakti / medieval
+- Islamic (from ~11th c.), Sikh (15th c.)
+
+**Traditions.**
+- Vedic
+- Hindu
+- Buddhist
+- Jain
+- Dravidian (Tamil, Telugu, Kannada, Malayalam)
+- Munda/Santal
+- Gond
+- Bhil
+- Sinhalese
+- Newar/Nepali
+- Sikh
+- Kashmiri
 
 ### 7. Mainland Southeast Asia · `#94346E`
-**Description.** The Indianized mainland — Indochina and the Tibeto-Burman/Tai/Austroasiatic hill
-peoples whose classical mythology is Hindu-Buddhist (the Ramayana traditions). On the Indic side of
-the Indosphere/Sinosphere split, distinct from South Asia proper (periphery, not source) and from
-Sinic East Asia. Vietnam is here (Austroasiatic + geography outweigh its Sinic literary overlay).
-**Subdivision.** Burmese · Tai (Thai/Lao/Shan) · Khmer · Vietnamese · Tibeto-Burman & Hmong-Mien hill
-peoples.
-**Strata.** Austroasiatic / animist substrate → Indianization (Hindu-Buddhist states — Funan, Champa,
-Angkor 9th–15th c. CE — from ~1st–5th c.) → Sinic overlay in Vietnam (Chinese rule 111 BCE – 938 CE)
-→ Tai migrations south (~8th–13th c.) → Theravada-Buddhist dominance (from ~11th c.).
-**Traditions.** Burmese · Mon · Thai/Tai · Lao · Shan · Khmer · Vietnamese (Viet/Muong) · Cham
-(boundary — Austronesian) · Hmong-Mien · Karen · Tibeto-Burman highlanders.
+
+**Description.** The Indianized mainland — Indochina and the Tibeto-Burman/Tai/Austroasiatic hill peoples whose classical mythology is Hindu-Buddhist (the Ramayana traditions). On the Indic side of the Indosphere/Sinosphere split, distinct from South Asia proper (periphery, not source) and from Sinic East Asia. Vietnam is here (Austroasiatic + geography outweigh its Sinic literary overlay).
+
+**Subdivision.**
+- Burmese
+- Tai (Thai/Lao/Shan)
+- Khmer
+- Vietnamese
+- Tibeto-Burman & Hmong-Mien hill peoples
+
+**Strata.**
+- Austroasiatic / animist substrate
+- Indianization (Hindu-Buddhist states — Funan, Champa, Angkor 9th–15th c. CE — from ~1st–5th c.)
+- Sinic overlay in Vietnam (Chinese rule 111 BCE – 938 CE)
+- Tai migrations south (~8th–13th c.)
+- Theravada-Buddhist dominance (from ~11th c.)
+
+**Traditions.**
+- Burmese
+- Mon
+- Thai/Tai
+- Lao
+- Shan
+- Khmer
+- Vietnamese (Viet/Muong)
+- Cham (boundary — Austronesian)
+- Hmong-Mien
+- Karen
+- Tibeto-Burman highlanders
 
 ### 8. East Asia · `#E17C05`
-**Description.** The Sinosphere — China, Korea, Japan — sharing the Chinese classical, Taoist,
-Confucian and Mahayana-Buddhist textual world. The clean CJK core (Vietnam, though Sinicized, is left
-in mainland SE Asia). Ainu is a boundary case (indigenous Japan, Circumpolar affinity).
-**Subdivision.** Chinese (Han; Taoist, Confucian, Chinese-Buddhist, folk) · Korean · Japanese (Shinto)
-· Ainu (boundary) · Ryukyuan.
-**Strata.** Neolithic-shamanic substrate (Shang oracle bones ~1200 BCE) → classical Chinese (Zhou;
-Confucianism & Taoism 6th–3rd c. BCE) → Buddhism arrival (China ~1st c. CE, Korea 4th, Japan 6th) →
-Shinto codification (Kojiki 712 CE, Nihon Shoki 720 CE) → vernacular-novel fixation (Ming, e.g.
-*Journey to the West* 16th c.).
-**Traditions.** Chinese (Han; Taoist, Confucian, Chinese folk, Chinese Buddhist) · Korean · Japanese
-(Shinto) · Ryukyuan · Ainu (boundary) · southern-China ethnic minorities (Yi; boundary with SE Asia).
+
+**Description.** The Sinosphere — China, Korea, Japan — sharing the Chinese classical, Taoist, Confucian and Mahayana-Buddhist textual world. The clean CJK core (Vietnam, though Sinicized, is left in mainland SE Asia). Ainu is a boundary case (indigenous Japan, Circumpolar affinity).
+
+**Subdivision.**
+- Chinese (Han; Taoist, Confucian, Chinese-Buddhist, folk)
+- Korean
+- Japanese (Shinto)
+- Ainu (boundary)
+- Ryukyuan
+
+**Strata.**
+- Neolithic-shamanic substrate (Shang oracle bones ~1200 BCE)
+- classical Chinese (Zhou; Confucianism & Taoism 6th–3rd c. BCE)
+- Buddhism arrival (China ~1st c. CE, Korea 4th, Japan 6th)
+- Shinto codification (Kojiki 712 CE, Nihon Shoki 720 CE)
+- vernacular-novel fixation (Ming, e.g. *Journey to the West* 16th c.)
+
+**Traditions.**
+- Chinese (Han; Taoist, Confucian, Chinese folk, Chinese Buddhist)
+- Korean
+- Japanese (Shinto)
+- Ryukyuan
+- Ainu (boundary)
+- southern-China ethnic minorities (Yi; boundary with SE Asia)
 
 ### 9. Austronesia · `#0F8554`
-**Description.** The Austronesian cultural area — one language family and one Neolithic maritime
-expansion, from the Taiwan homeland through island Southeast Asia to the Pacific and Madagascar. Its
-own region to keep this cohesive descent-based area intact (crit 2), anchored by the Formosan
-peoples. Island SE Asia (Nusantara) sits here, not in mainland SE Asia or a vague "Oceania"; the
-Indianized Javanese/Balinese are the literate exception within it.
-**Subdivision.** Formosan (Taiwan homeland) · western Malayo-Polynesian (island SE Asia + Madagascar)
-· Oceanic (Polynesian, Micronesian, coastal Melanesian).
-**Strata.** Austronesian expansion out of Taiwan (~3000 BCE) — the base layer, one language family →
-Lapita / Oceanic dispersal into the Pacific (~1500–1000 BCE; Polynesia settled ~900 BCE – 1200 CE) →
-Indianization of western Nusantara (Java/Bali Hindu-Buddhist, 4th–15th c. CE) → Islamization of the
-Malay world (13th–16th c.) → colonial/Christian (16th c.+).
-**Traditions.** Taiwan Formosan (Atayal, Bunun, Paiwan, Ami, Tsou) · Javanese · Balinese · Sundanese ·
-Batak · Dayak · Toraja · Filipino (Tagalog, Ifugao) · Malay · Polynesian (Maori, Hawaiian, Tahitian,
-Samoan, Tongan, Rapa Nui) · Micronesian · Fijian (coastal Melanesian) · Malagasy.
+
+**Description.** The Austronesian cultural area — one language family and one Neolithic maritime expansion, from the Taiwan homeland through island Southeast Asia to the Pacific and Madagascar. Its own region to keep this cohesive descent-based area intact (crit 2), anchored by the Formosan peoples. Island SE Asia (Nusantara) sits here, not in mainland SE Asia or a vague "Oceania"; the Indianized Javanese/Balinese are the literate exception within it.
+
+**Subdivision.**
+- Formosan (Taiwan homeland)
+- western Malayo-Polynesian (island SE Asia + Madagascar)
+- Oceanic (Polynesian, Micronesian, coastal Melanesian)
+
+**Strata.**
+- Austronesian expansion out of Taiwan (~3000 BCE) — the base layer, one language family
+- Lapita / Oceanic dispersal into the Pacific (~1500–1000 BCE; Polynesia settled ~900 BCE – 1200 CE)
+- Indianization of western Nusantara (Java/Bali Hindu-Buddhist, 4th–15th c. CE)
+- Islamization of the Malay world (13th–16th c.)
+- colonial/Christian (16th c.+)
+
+**Traditions.**
+- Taiwan Formosan (Atayal, Bunun, Paiwan, Ami, Tsou)
+- Javanese
+- Balinese
+- Sundanese
+- Batak
+- Dayak
+- Toraja
+- Filipino (Tagalog, Ifugao)
+- Malay
+- Polynesian (Maori, Hawaiian, Tahitian, Samoan, Tongan, Rapa Nui)
+- Micronesian
+- Fijian (coastal Melanesian)
+- Malagasy
 
 ### 10. Papua & Aboriginal Australia · `#A9773F`
-**Description.** The non-Austronesian deep-Pacific — the Pleistocene **Sahul** population: Papuan /
-highland New Guinea peoples and Aboriginal Australians (the Dreaming). Distinguished from Austronesia
-by descent and antiquity (Sahul was settled ~50 ky ago, long before the Neolithic Austronesian
-arrival). "Aboriginal" marks the Indigenous tradition against the modern nation.
-**Subdivision.** Aboriginal Australian (many language blocks) · Papuan / highland New Guinea
-(Trans-New-Guinea and other phyla) · non-Austronesian Melanesian.
-**Strata.** Deep Sahul settlement (~50,000+ BP) — among the oldest continuous living traditions (the
-Dreaming) → Australia sea-isolated as sea levels rose (~8000 BCE) → independent New Guinea highland
-agriculture (~7000 BCE) → Austronesian coastal contact (from ~1500 BCE; the interior stays Papuan) →
-minimal external overlay until colonial contact (recent).
-**Traditions.** Aboriginal Australian (Arrernte, Yolngu, Warlpiri, Pitjantjatjara, and many others) ·
-Papuan highland groups (Enga, Huli, …) · non-Austronesian Melanesian.
+
+**Description.** The non-Austronesian deep-Pacific — the Pleistocene **Sahul** population: Papuan / highland New Guinea peoples and Aboriginal Australians (the Dreaming). Distinguished from Austronesia by descent and antiquity (Sahul was settled ~50 ky ago, long before the Neolithic Austronesian arrival). "Aboriginal" marks the Indigenous tradition against the modern nation.
+
+**Subdivision.**
+- Aboriginal Australian (many language blocks)
+- Papuan / highland New Guinea (Trans-New-Guinea and other phyla)
+- non-Austronesian Melanesian
+
+**Strata.**
+- Deep Sahul settlement (~50,000+ BP) — among the oldest continuous living traditions (the Dreaming)
+- Australia sea-isolated as sea levels rose (~8000 BCE)
+- independent New Guinea highland agriculture (~7000 BCE)
+- Austronesian coastal contact (from ~1500 BCE; the interior stays Papuan)
+- minimal external overlay until colonial contact (recent)
+
+**Traditions.**
+- Aboriginal Australian (Arrernte, Yolngu, Warlpiri, Pitjantjatjara, and many others)
+- Papuan highland groups (Enga, Huli, …)
+- non-Austronesian Melanesian
 
 ### 11. Circumpolar North · `#5F4690`
-**Description.** The continuous circumpolar Arctic/boreal belt spanning both continents across the
-Bering Strait — Arctic and Subarctic hunter-shaman cultures that geography joins but the continental
-boundary would tear. Includes NE Siberian palaeo-Asiatics, the boreal taiga peoples, Beringia, and
-Arctic/Subarctic North America. The Bering bridge into the New World.
-**Subdivision.** NE Siberian palaeo-Asiatic (Chukchi, Koryak, Yukaghir, Nivkh) · boreal Tungus &
-Uralic Siberian (Evenki, Khanty, Nenets) · Eskimo-Aleut (Inuit/Yupik/Aleut) · Na-Dene / Subarctic
-Athabaskan.
-**Strata.** Upper-Palaeolithic circumpolar hunter-shaman substrate → Beringian peopling-of-the-Americas
-layer (~20,000–15,000 BP crossings) → Na-Dene dispersal → late Eskimo-Aleut / Thule expansion across
-Arctic North America to Greenland (~1000 CE) → Russian & colonial contact (recent, 17th c.+).
-**Traditions.** Chukchi · Koryak · Yukaghir · Nivkh · Itelmen · Evenki (Tungus) · Even · Khanty ·
-Mansi · Nenets · Ket · Inuit/Eskimo (Yupik, Inupiat, Kalaallit) · Aleut · Na-Dene/Athabaskan (Dene) ·
-Northern Cree · (Ainu, Sami — boundary affinities).
+
+**Description.** The continuous circumpolar Arctic/boreal belt spanning both continents across the Bering Strait — Arctic and Subarctic hunter-shaman cultures that geography joins but the continental boundary would tear. Includes NE Siberian palaeo-Asiatics, the boreal taiga peoples, Beringia, and Arctic/Subarctic North America. The Bering bridge into the New World.
+
+**Subdivision.**
+- NE Siberian palaeo-Asiatic (Chukchi, Koryak, Yukaghir, Nivkh)
+- boreal Tungus & Uralic Siberian (Evenki, Khanty, Nenets)
+- Eskimo-Aleut (Inuit/Yupik/Aleut)
+- Na-Dene / Subarctic Athabaskan
+
+**Strata.**
+- Upper-Palaeolithic circumpolar hunter-shaman substrate
+- Beringian peopling-of-the-Americas layer (~20,000–15,000 BP crossings)
+- Na-Dene dispersal
+- late Eskimo-Aleut / Thule expansion across Arctic North America to Greenland (~1000 CE)
+- Russian & colonial contact (recent, 17th c.+)
+
+**Traditions.**
+- Chukchi
+- Koryak
+- Yukaghir
+- Nivkh
+- Itelmen
+- Evenki (Tungus)
+- Even
+- Khanty
+- Mansi
+- Nenets
+- Ket
+- Inuit/Eskimo (Yupik, Inupiat, Kalaallit)
+- Aleut
+- Na-Dene/Athabaskan (Dene)
+- Northern Cree
+- (Ainu, Sami — boundary affinities)
 
 ### 12. Native North America · `#73AF48`
-**Description.** Indigenous North America outside the Arctic — the temperate culture areas: Eastern
-Woodlands, Plains, Plateau, California, the Southwest, and the Northwest Coast (boundary with
-Circumpolar). "Native" distinguishes the Indigenous traditions from the modern nation.
-**Subdivision.** Eastern Woodlands (Iroquois, Algonquian) · Plains (Siouan, Caddoan) · Plateau ·
-California · Southwest (Pueblo; Athabaskan Navajo/Apache) · Northwest Coast (boundary).
-**Strata.** Palaeo-Indian founding (Clovis ~13,000 BP) → Archaic regional differentiation →
-agricultural Mississippian mound-builders (~800–1600 CE) → Athabaskan (Navajo/Apache) southward
-migration (~1400 CE) → post-contact equestrian Plains transformation (17th–19th c.).
-**Traditions.** Iroquois (Haudenosaunee) · Algonquian (Ojibwe, Cree-south, Abenaki) · Lakota/Sioux ·
-Cheyenne · Pawnee · Blackfoot · Nez Perce · Salish · Pomo · Miwok · Yokuts · Navajo (Diné) · Hopi ·
-Zuni · Pueblo · Apache · Tlingit · Haida · Kwakwaka'wakw · Tsimshian.
+
+**Description.** Indigenous North America outside the Arctic — the temperate culture areas: Eastern Woodlands, Plains, Plateau, California, the Southwest, and the Northwest Coast (boundary with Circumpolar). "Native" distinguishes the Indigenous traditions from the modern nation.
+
+**Subdivision.**
+- Eastern Woodlands (Iroquois, Algonquian)
+- Plains (Siouan, Caddoan)
+- Plateau
+- California
+- Southwest (Pueblo; Athabaskan Navajo/Apache)
+- Northwest Coast (boundary)
+
+**Strata.**
+- Palaeo-Indian founding (Clovis ~13,000 BP)
+- Archaic regional differentiation
+- agricultural Mississippian mound-builders (~800–1600 CE)
+- Athabaskan (Navajo/Apache) southward migration (~1400 CE)
+- post-contact equestrian Plains transformation (17th–19th c.)
+
+**Traditions.**
+- Iroquois (Haudenosaunee)
+- Algonquian (Ojibwe, Cree-south, Abenaki)
+- Lakota/Sioux
+- Cheyenne
+- Pawnee
+- Blackfoot
+- Nez Perce
+- Salish
+- Pomo
+- Miwok
+- Yokuts
+- Navajo (Diné)
+- Hopi
+- Zuni
+- Pueblo
+- Apache
+- Tlingit
+- Haida
+- Kwakwaka'wakw
+- Tsimshian
 
 ### 13. Mesoamerica & the Andes · `#994E95`
-**Description.** The high civilizations of the Americas — the two literate/state-level New-World myth
-complexes, with codices and colonial chronicles (Popol Vuh, the Florentine Codex, the Huarochirí
-Manuscript). Grouped together as the Americas' textual heartland, distinct from the surrounding
-tribal lowlands.
-**Subdivision.** Mesoamerican (Maya, Aztec/Nahua, Mixtec, Zapotec, Olmec/Toltec) · Andean
-(Inca/Quechua, Aymara, Moche, Chibcha/Muisca).
-**Strata.** Formative/Preclassic (Olmec ~1500–400 BCE; Andean Chavín ~900–200 BCE) → Classic (Maya
-~250–900 CE; Moche, Nazca) → Postclassic (Toltec; Aztec 14th–16th c.; Inca 15th–16th c.) → colonial
-written fixation (Popol Vuh, Florentine Codex, Huarochirí Manuscript — 16th c. CE).
-**Traditions.** Aztec/Nahua · Maya · Mixtec · Zapotec · Olmec · Toltec · Tarascan (Purépecha) ·
-Huichol · Inca/Quechua · Aymara · Moche · Chibcha/Muisca · Nazca.
+
+**Description.** The high civilizations of the Americas — the two literate/state-level New-World myth complexes, with codices and colonial chronicles (Popol Vuh, the Florentine Codex, the Huarochirí Manuscript). Grouped together as the Americas' textual heartland, distinct from the surrounding tribal lowlands.
+
+**Subdivision.**
+- Mesoamerican (Maya, Aztec/Nahua, Mixtec, Zapotec, Olmec/Toltec)
+- Andean (Inca/Quechua, Aymara, Moche, Chibcha/Muisca)
+
+**Strata.**
+- Formative/Preclassic (Olmec ~1500–400 BCE; Andean Chavín ~900–200 BCE)
+- Classic (Maya ~250–900 CE; Moche, Nazca)
+- Postclassic (Toltec; Aztec 14th–16th c.; Inca 15th–16th c.)
+- colonial written fixation (Popol Vuh, Florentine Codex, Huarochirí Manuscript — 16th c. CE)
+
+**Traditions.**
+- Aztec/Nahua
+- Maya
+- Mixtec
+- Zapotec
+- Olmec
+- Toltec
+- Tarascan (Purépecha)
+- Huichol
+- Inca/Quechua
+- Aymara
+- Moche
+- Chibcha/Muisca
+- Nazca
 
 ### 14. Lowland South America · `#2A8A9F`
-**Description.** The tropical and temperate lowlands of South America — Amazonia, the Guianas, the
-Gran Chaco, and the Southern Cone: the densest concentration of small-scale Amerindian oral
-traditions, the terminal end of the human expansion. Distinct from the Andean highlands (#13).
-**Subdivision.** Amazonian (Tupí-Guaraní, Carib, Arawak, Ge/Macro-Ge, Tucano, Pano) · Gran Chaco ·
-Guiana · Southern Cone / Patagonia (Selk'nam, Tehuelche; Mapuche — boundary).
-**Strata.** Deep post-Beringian Amerindian settlement (reaching southern South America ~12,000+ BP) →
-Amazonian language-family dispersals (Arawak, Tupí, Carib expansions, ~2000 BCE – 1500 CE) → complex
-pre-Columbian Amazonian societies (*terra preta*, ~500 BCE – 1500 CE) → ethnographic recording amid
-colonial disruption (19th–20th c.).
-**Traditions.** Tupí/Guaraní · Carib · Arawak · Ge (Kayapó, Bororo) · Yanomami · Tucano · Jivaro
-(Shuar) · Warao · Mapuche (boundary — sub-Andean) · Selk'nam/Ona · Tehuelche · Guaycuru.
+
+**Description.** The tropical and temperate lowlands of South America — Amazonia, the Guianas, the Gran Chaco, and the Southern Cone: the densest concentration of small-scale Amerindian oral traditions, the terminal end of the human expansion. Distinct from the Andean highlands (#13).
+
+**Subdivision.**
+- Amazonian (Tupí-Guaraní, Carib, Arawak, Ge/Macro-Ge, Tucano, Pano)
+- Gran Chaco
+- Guiana
+- Southern Cone / Patagonia (Selk'nam, Tehuelche; Mapuche — boundary)
+
+**Strata.**
+- Deep post-Beringian Amerindian settlement (reaching southern South America ~12,000+ BP)
+- Amazonian language-family dispersals (Arawak, Tupí, Carib expansions, ~2000 BCE – 1500 CE)
+- complex pre-Columbian Amazonian societies (*terra preta*, ~500 BCE – 1500 CE)
+- ethnographic recording amid colonial disruption (19th–20th c.)
+
+**Traditions.**
+- Tupí/Guaraní
+- Carib
+- Arawak
+- Ge (Kayapó, Bororo)
+- Yanomami
+- Tucano
+- Jivaro (Shuar)
+- Warao
+- Mapuche (boundary — sub-Andean)
+- Selk'nam/Ona
+- Tehuelche
+- Guaycuru
 
 ---
 
