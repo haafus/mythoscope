@@ -128,7 +128,7 @@ documents), colouring by region. Books are **not** baked into the traditions pay
 truth; `/api/corpus/traditions` returns its tree as-is. `_update_traditions` and the built
 `outputs/corpus/traditions.json` are removed.
 
-**2.10 The catalog carries the tradition only.** `/api/corpus/catalog` documents carry `tradition` (the
+**2.10 The documents list carries the tradition only.** `/api/corpus/documents` (renamed from `/catalog`) documents carry `tradition` (the
 reference) and per-document fields (`title`, `url`, counts, `description`, `dating`, `source`, and a document
 `id` — pending §3 to-discuss) — **no `major_tradition`, no `region`, no `colour`**. Region is resolved from
 the tradition via the tree; colour from the region.
@@ -164,15 +164,22 @@ every re-annotation.
 Two data endpoints (two projections) + one text fetch + search; the front loads the tree and the documents
 once (globally, cached, §2.8) and composes every view. Overlap is trimmed to the `tradition` key.
 
+> **Endpoint rename (planned).** `/catalog` → **`/documents`** (the documents list) and the old one-text
+> `/documents` → **`/document`** (one text, by `?id=`). This aligns with the codebase's single-item idiom
+> `GET /api/motifs/{index}/motif?id=` — **plural = the collection, singular + `?id=` = one item.** Throughout
+> this doc: `/documents` is the list, `/document?id=` is one raw text. (Any lingering `/catalog` / one-text
+> `/documents` below reads under this mapping.)
+
 - **`GET /api/corpus/traditions`** → the `region → traditions` tree, canon order:
   `region → { colour, description, subdivision, strata, traditions: [ { name, coordinates, description, dating } ] }`.
   No books, no per-tradition colour. Consumers: atlas (coordinates + book-join), embeddings (colour via
   region + coordinates), corpus browser (grouping skeleton + order).
-- **`GET /api/corpus/catalog`** → documents: `[ { title, tradition, url, word/sentence/char counts,
+- **`GET /api/corpus/documents`** *(renamed from `/catalog`)* → documents: `[ { title, tradition, url, word/sentence/char counts,
   description, dating, source } ]` (+ a document `id`, pending — see “To discuss”). Tradition only; region/colour
   resolved on the front from the tree; the front joins books from these documents.
-- **`GET /api/corpus/documents`** → the raw text of one document, located by `(title, tradition)` (the
-  `major_tradition` param is dropped with §2.5).
+- **`GET /api/corpus/document`** *(renamed from `/documents`)* → the raw text of one document, addressed by
+  `?id=` once the stable id lands (working default: `(title, tradition)`); the `major_tradition` param is
+  dropped with §2.5.
 - **`GET /api/similarity/*`** → search hits, one per chunk: `{ id, chunk_index, similarity_score, text,
   source_text }` **plus the document reference it belongs to**. `major_tradition` is removed; `tradition`,
   `url`, `region`, and `colour` are **not** carried — the front resolves them from the globally-cached
@@ -182,9 +189,9 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 > **To discuss — document identity & location (one connected decision, items 1/2/4).** Three entangled
 > questions, answered together:
 > 1. **A single stable document `id`.** Today a document is addressed by the tuple `(title, tradition)` in
->    `/documents`, while an embedding chunk is one id (`normalize_catalog_id(title)`). One stable `id`, used
->    by `/catalog`, `/documents?id=`, the search reference, and the chunk metadata, collapses the multi-param
->    locator and aligns identity across catalog / documents / embeddings / search.
+>    the one-text endpoint, while an embedding chunk is one id (`normalize_catalog_id(title)`). One stable `id`, used
+>    by `/documents` (list), `/document?id=`, the search reference, and the chunk metadata, collapses the multi-param
+>    locator and aligns identity across list / document / embeddings / search.
 > 2. **File layout — follows from (1).** `corpus/<region>/<tradition>/<title>.txt` (region in the path),
 >    `corpus/<tradition>/<title>.txt` (region out, keyed by the stable tradition), or `corpus/<id>.txt` (keyed
 >    by the id, no classification in the path). More decoupling ⇢ fewer file moves on re-annotation, less
@@ -204,12 +211,12 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 >   the id that reaches `/documents`, the catalog, the search reference, and the chunk metadata.
 >
 > **Leaning:** keep `name = id` for **tradition / region**; give the **document** a separate stable `id` (not
-> the title). That id is then the one used across `/catalog`, `/documents?id=`, the search reference, and the
+> the title). That id is then the one used across `/documents` (list), `/document?id=`, the search reference, and the
 > chunk metadata (settles 1 and 3), and it narrows the layout (2) to `corpus/<id>.txt` or
 > `corpus/<tradition>/<title>.txt`. Open sub-question: how the document id is minted (slug of
 > `tradition + title`, or a synthetic stable key).
 >
-> **Not decided.** Working default until then: `/documents` and the path use `(title, tradition)` with region
+> **Not decided.** Working default until then: `/document` and the path use `(title, tradition)` with region
 > out of the path; search carries `id` = `normalize_catalog_id(title)`.
 
 ---
@@ -226,8 +233,8 @@ outputs/corpus/corpus.json      rows carry tradition ONLY (the reference) — no
 outputs/embeddings/*            chunk metadata: tradition, url; region resolved at query; not re-embedded
         ▼  server  (reads config/traditions.json + outputs/corpus/corpus.json)
 /api/corpus/traditions   config region → traditions tree (canon order, region colour + fields); no books
-/api/corpus/catalog      documents: tradition + per-doc fields; no region, no colour
-/api/corpus/documents    raw text, located by (title, tradition)
+/api/corpus/documents    documents list: tradition + per-doc fields; no region, no colour   (renamed from /catalog)
+/api/corpus/document     one raw text, by ?id= (working default (title, tradition))          (renamed from /documents)
 /api/similarity/*        search hits: chunk data + document reference; no major/region/colour
         ▼  front  (loads the tree + the documents ONCE, global cache, and composes)
 group by region, attach books, colour by region; one 14-region legend; reused by corpus/atlas/embeddings/search
@@ -247,15 +254,15 @@ group by region, attach books, colour by region; one 14-region legend; reused by
    the code that **grouped** by `major_tradition` (`builder.py`, `iterator.py`, `schemas.py`, services, front)
    to group/resolve by `region` through the tree. Remove `major_tradition` as a **stored field**: from corpus
    rows, from `CorpusFileInfo`/chunk metadata (new builds; existing chunks not re-embedded), from the
-   `/documents` query param; delete `SearchResult.major_tradition` and trim search hits to chunk data + a
+   one-text endpoint's query param; delete `SearchResult.major_tradition` and trim search hits to chunk data + a
    document reference (`tradition`/`url`/`region`/`colour` resolved on the front). Move the file layout per the
-   §3 identity decision (working default `corpus/<tradition>/<title>.txt`); `/documents` located by
-   `(title, tradition)`.
+   §3 identity decision (working default `corpus/<tradition>/<title>.txt`). **Rename the endpoints** (§3):
+   `/catalog` → `/documents` (list), `/documents` → `/document` (one text) located by `(title, tradition)`.
 3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
    colour + fields, no books); a tradition's colour is its region's, computed at display; strip `region` and
-   `colour` from the `corpus.json` rows and `/catalog`.
-4. **Front composes from one global load.** Fetch `/traditions` + `/catalog` once into shared state; remove the
+   `colour` from the `corpus.json` rows and `/documents` (the renamed list).
+4. **Front composes from one global load.** Fetch `/traditions` + `/documents` once into shared state; remove the
    client-side `groupDocuments`; render the `region → traditions` tree in canon order; attach books from the
    documents; colour = region base; reuse the cache in corpus/atlas/embeddings/search.
 5. **One `UNASSIGNED`** across `schemas.py`, `iterator.py`, and the front end.
