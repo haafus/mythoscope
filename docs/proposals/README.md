@@ -64,4 +64,8 @@ Spent, shipped, or validated-but-not-productionised — kept for the reasoning t
 - [`map-palette-and-projection.md`](archive/map-palette-and-projection.md) — ADR: region-map palette
   (CARTOColors Prism as canon; the associative palette explored, not adopted), map projection (equirectangular
   engine + Winkel Tripel atlas view), basemap tiles (CARTO Positron + the tiles↔projection constraint), and the
-  presentation constants. *Accepted decision record (one open sub-decision, §2.3).*
+  presentation constants. *Accepted decision record (one open sub-decision, §2.3). **Palette choice later
+  reversed (2026-07): the associative palette is now canon — see `region-palette-prism.md`.***
+- [`region-palette-prism.md`](archive/region-palette-prism.md) — the former **CARTOColors-Prism** region
+  palette (spectral out-of-Africa arc, hand-tuned swaps, `base` + `light`/`dark` ramp ends). *Superseded
+  (2026-07): `regions.md` §8 now uses the **intuitive/associative** palette, `base`-only; kept for provenance.*

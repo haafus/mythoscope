@@ -208,7 +208,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 > To make them match 1-for-1, either expand these five umbrellas in-place here, or keep them as umbrellas and
 > treat the 194 as the derived point set — **not** as a second, divergent list.
 
-### 1. Sub-Saharan Africa · `#CC503E`
+### 1. Sub-Saharan Africa · `#BF6B3A`
 
 **Description.** The mythologies of Africa south of the Sahara — the world's densest concentration of distinct oral traditions, spanning several unrelated language phyla. Distinguished as one region because Berezkin does not subdivide it and both candidate halves (West/Central vs East/Southern) are text-thin; encyclopedias treat "Black Africa" as one. Predominantly oral; the open textual assets are the Yoruba Ifá corpus and Ethiopian Ge'ez (boundary — Semitic/Christian).
 
@@ -252,7 +252,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Mbuti
 - (Ethiopian/Amhara — boundary with Near East)
 
-### 2. Near East & North Africa · `#2A4895`
+### 2. Near East & North Africa · `#E0B45E`
 
 **Description.** The Ancient Near East plus North Africa and the Abrahamic homelands — the earliest literate mythologies (cuneiform, hieroglyphic) and the source region of the three Abrahamic religions. Distinguished as the Bronze-Age/antiquity core of the Old World, anchored by written text. Includes Anatolia (Hittite) and the Maghreb; "Near East" chosen over "Middle East" for its ancient material.
 
@@ -290,7 +290,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Islamic
 - Berber (Amazigh)
 
-### 3. Europe · `#EDAD08`
+### 3. Europe · `#4F7A4E`
 
 **Description.** The mythologies of Europe — predominantly Indo-European (with Uralic Finno-Ugric), sharing deep Proto-Indo-European roots. One region (not split) because by text it is lighter than the single Near East region and internally more uniform than one-region Sub-Saharan Africa. The Classical Mediterranean vs Northern/Eastern division is a **sub-rubric**.
 
@@ -327,7 +327,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Mordvin/Mari
 - Basque
 
-### 4. Caucasus & Iran · `#6F4070`
+### 4. Caucasus & Iran · `#9E4A6E`
 
 **Description.** The Iranian/Persianate world plus the Caucasus — bound by Iranian cultural and linguistic threads (Zoroastrian, Scythian-Alan, Persianate). The Caucasus does not stand alone (a thin, internally diverse shatter zone) but its autochthonous Nart-epic peoples and its Christian literate peoples (Armenian, Georgian) attach here, following the Haussig "Caucasian and Iranian" pairing and the Iranian–Alan core of the Nart sagas.
 
@@ -356,7 +356,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Dagestani peoples
 - (Kurdish · Azeri)
 
-### 5. Inner Asia · `#1D6996`
+### 5. Inner Asia · `#2E7CB8`
 
 **Description.** The Turco-Mongol nomadic steppe — the pastoralist, shamanic, Tengrist interior of Asia, with its own great oral epics. "Inner Asia" (not "Central Asia") because Iran/the Persianate oasis is in #4; this region is specifically the nomadic steppe belt. Tibet is a boundary case (Bon / Tibeto-Mongolian Vajrayana) placed here for its Inner-Asian Buddhist ties.
 
@@ -387,7 +387,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Tibetan (Bon; boundary)
 - Manchu (boundary)
 
-### 6. South Asia · `#38A6A5`
+### 6. South Asia · `#E8952F`
 
 **Description.** The Indian subcontinent — the single largest textual tradition on Earth (the Vedic corpus, Sanskrit epics, the Puranas, the Buddhist and Jain canons). Its own region on the strength of both volume (crit 4) and civilizational distinctness (crit 2); India is the source of the Indosphere, distinct from its Indianized periphery.
 
@@ -422,7 +422,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Sikh
 - Kashmiri
 
-### 7. Mainland Southeast Asia · `#94346E`
+### 7. Mainland Southeast Asia · `#3E9E64`
 
 **Description.** The Indianized mainland — Indochina and the Tibeto-Burman/Tai/Austroasiatic hill peoples whose classical mythology is Hindu-Buddhist (the Ramayana traditions). On the Indic side of the Indosphere/Sinosphere split, distinct from South Asia proper (periphery, not source) and from Sinic East Asia. Vietnam is here (Austroasiatic + geography outweigh its Sinic literary overlay).
 
@@ -453,7 +453,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Karen
 - Tibeto-Burman highlanders
 
-### 8. East Asia · `#E17C05`
+### 8. East Asia · `#C0392B`
 
 **Description.** The Sinosphere — China, Korea, Japan — sharing the Chinese classical, Taoist, Confucian and Mahayana-Buddhist textual world. The clean CJK core (Vietnam, though Sinicized, is left in mainland SE Asia). Ainu is a boundary case (indigenous Japan, Circumpolar affinity).
 
@@ -479,7 +479,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Ainu (boundary)
 - southern-China ethnic minorities (Yi; boundary with SE Asia)
 
-### 9. Austronesia · `#0F8554`
+### 9. Austronesia · `#1596A8`
 
 **Description.** The Austronesian cultural area — one language family and one Neolithic maritime expansion, from the Taiwan homeland through island Southeast Asia to the Pacific and Madagascar. Its own region to keep this cohesive descent-based area intact (crit 2), anchored by the Formosan peoples. Island SE Asia (Nusantara) sits here, not in mainland SE Asia or a vague "Oceania"; the Indianized Javanese/Balinese are the literate exception within it.
 
@@ -531,7 +531,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Papuan highland groups (Enga, Huli, …)
 - non-Austronesian Melanesian
 
-### 11. Circumpolar North · `#5F4690`
+### 11. Circumpolar North · `#5F86A6`
 
 **Description.** The continuous circumpolar Arctic/boreal belt spanning both continents across the Bering Strait — Arctic and Subarctic hunter-shaman cultures that geography joins but the continental boundary would tear. Includes NE Siberian palaeo-Asiatics, the boreal taiga peoples, Beringia, and Arctic/Subarctic North America. The Bering bridge into the New World.
 
@@ -566,7 +566,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Northern Cree
 - (Ainu, Sami — boundary affinities)
 
-### 12. Native North America · `#73AF48`
+### 12. Native North America · `#3AA6A0`
 
 **Description.** Indigenous North America outside the Arctic — the temperate culture areas: Eastern Woodlands, Plains, Plateau, California, the Southwest, and the Northwest Coast (boundary with Circumpolar). "Native" distinguishes the Indigenous traditions from the modern nation.
 
@@ -607,7 +607,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Kwakwaka'wakw
 - Tsimshian
 
-### 13. Mesoamerica & the Andes · `#994E95`
+### 13. Mesoamerica & the Andes · `#C99A2E`
 
 **Description.** The high civilizations of the Americas — the two literate/state-level New-World myth complexes, with codices and colonial chronicles (Popol Vuh, the Florentine Codex, the Huarochirí Manuscript). Grouped together as the Americas' textual heartland, distinct from the surrounding tribal lowlands.
 
@@ -636,7 +636,7 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 - Chibcha/Muisca
 - Nazca
 
-### 14. Lowland South America · `#2A8A9F`
+### 14. Lowland South America · `#2E8B4E`
 
 **Description.** The tropical and temperate lowlands of South America — Amazonia, the Guianas, the Gran Chaco, and the Southern Cone: the densest concentration of small-scale Amerindian oral traditions, the terminal end of the human expansion. Distinct from the Andean highlands (#13).
 
@@ -696,59 +696,37 @@ Each entry: **Description** (what/why) · **Subdivision** (the next level of spl
 
 ## 8. Colour palette
 
-Built on **CARTOColors Prism** — a cartographer-designed qualitative palette (https://carto.com/carto-colors/).
-Prism's 11 coloured hues map onto the arc in spectral order (its 12th, a neutral grey, is dropped); the
-3 remaining slots are filled by colours interpolated *in Prism's style* into its two widest hue gaps
-(teal↔blue and blue↔purple), leaving the 11 originals untouched. The result is a continuous spectral
-ribbon along the out-of-Africa arc — hue carries the sequence, and the map's borders + labels carry the
-neighbour distinction (per-pair contrast is deliberately not maximised).
+The canonical palette is **intuitive (associative)**: each region's hue is chosen to *evoke* the place —
+saffron for South Asia, cinnabar-red for East Asia, red-centre ochre for Aboriginal Australia, ocean teal
+for Austronesia, steppe-sky blue for Inner Asia — rather than to trace a spectral arc. This trades the strict
+out-of-Africa hue sequence (and some global per-pair distinctiveness — several greens and blues sit near
+each other) for immediate legibility of *what* a region is; the map's borders + labels carry the
+neighbour distinction, as before.
 
-Each region has a **base** (its map colour) plus **light**/**dark** ramp ends.
+Only **`base`** is canonical — one colour per region. There are no `light`/`dark` ramp ends any more; any
+hover / point-on-fill shading a UI needs is derived from `base` at render time.
 
-> **Colour lives only at the region level (2026-07).** A tradition has **no colour of its own** — it takes its
-> **region's** colour. There is no per-tradition colour and no within-region gradient keyed to a tradition
-> (superseding the earlier "gradient within area" idea in `tradition-architecture-unified.md` §3). The
-> `light`/`dark` ramp ends are region-level UI shades (hover, point-on-fill legibility), not tradition
-> identities.
+> **Colour lives only at the region level.** A tradition has **no colour of its own** — it takes its
+> **region's** `base`. There is no per-tradition colour and no within-region gradient keyed to a tradition
+> (superseding the earlier "gradient within area" idea in `archive/tradition-architecture-unified.md` §3).
 
-**Two swaps break the strict arc for legibility.** The arc's tail (purples→magentas) piled four
-similar hues into the New World, where they read as one blur. So two American regions trade colours
-with Old-World neighbours whose own clusters were also too tight: **Native North America ↔ Caucasus &
-Iran** (green ⇄ dark-purple) and **Lowland South America ↔ Mainland Southeast Asia** (teal ⇄ magenta).
-The Americas now carry purple (Circumpolar) · green (N. America) · orchid (Meso & Andes) · teal
-(Lowland S. Am.); the swap also loosens the Caucasus/Inner-Asia greens and the South/SE/East-Asia teals.
-Because the two hemispheres never share map space, the borrowed hues collide with nothing.
+> **The previous Prism palette is archived.** The earlier CARTOColors-Prism spectral-arc palette — with its
+> hand-tuned swaps and `light`/`dark` ramp ends — is kept for provenance in
+> [`archive/region-palette-prism.md`](archive/region-palette-prism.md). It is no longer the live palette.
 
-**A third rotation lifts the East-Asian / Pacific cluster,** which had piled blue (East Asia),
-dark-blue (Austronesia) and indigo (Papua) into one quadrant. A 3-cycle across East Asia, Austronesia
-and West Asia: **East Asia takes orange** (from Near East & North Africa) so it pops among the
-surrounding greens/blues/purples; East Asia's medium blue then passes on to **Inner Asia**, and **Near
-East & North Africa takes Austronesia's dark-blue**, distinct against its red/yellow/purple
-Mediterranean neighbours. This trades away the warm Mediterranean orange, but the East-Asian legibility
-is worth it. A final trade — **Austronesia ↔ Inner Asia** (blue ⇄ green) — gives Austronesia the Prism
-green, clear across the Sahul seam, and Inner Asia carries the blue among the greens and purples of the
-steppe.
-
-**Papua & Aboriginal Australia leaves the arc for a warm ochre** (`#A9773F`). At the blue→purple tail it
-was near-indistinguishable from the Near East's dark-blue, and the two are hard to tell apart even far
-apart on the map. Moved into the warm gap between the reds/oranges and the greens, it now separates
-cleanly from every neighbour (Austronesian green around it, the dark-blue Near East) — and ochre is apt
-for the Aboriginal "red centre". This is the one region placed purely for contrast rather than arc
-position.
-
-| # | region | base | light | dark | source |
-|---|---|---|---|---|---|
-| 1 | Sub-Saharan Africa | `#CC503E` | `#D79389` | `#953223` | Prism red |
-| 2 | Near East & North Africa | `#2A4895` | `#5473C2` | `#162857` | insert blue↔purple (↔ Austronesia via E. Asia) |
-| 3 | Europe | `#EDAD08` | `#EDC55F` | `#9B7208` | Prism gold |
-| 4 | Caucasus & Iran | `#6F4070` | `#9F67A0` | `#3C223D` | Prism dark-purple (↔ N. America) |
-| 5 | Inner Asia | `#1D6996` | `#3F97CB` | `#0E3A54` | Prism blue (↔ Austronesia) |
-| 6 | South Asia | `#38A6A5` | `#70C5C4` | `#216B6A` | Prism teal |
-| 7 | Mainland Southeast Asia | `#94346E` | `#BD6299` | `#591D41` | Prism magenta (↔ Lowland S. Am.) |
-| 8 | East Asia | `#E17C05` | `#EDA550` | `#8D5007` | Prism orange (↔ Near East) |
-| 9 | Austronesia | `#0F8554` | `#26C583` | `#075534` | Prism green (↔ Inner Asia) |
-| 10 | Papua & Aboriginal Australia | `#A9773F` | `#C9A578` | `#6E4C24` | warm ochre (off the arc — see note) |
-| 11 | Circumpolar North | `#5F4690` | `#8C78B5` | `#3A2A5A` | Prism purple |
-| 12 | Native North America | `#73AF48` | `#A2C688` | `#4D772E` | Prism yellow-green (↔ Caucasus) |
-| 13 | Mesoamerica & the Andes | `#994E95` | `#B984B7` | `#643162` | Prism orchid |
-| 14 | Lowland South America | `#2A8A9F` | `#59B3C7` | `#175361` | insert teal↔blue (↔ Mainland SE Asia) |
+| # | region | base | evokes |
+|---|---|---|---|
+| 1 | Sub-Saharan Africa | `#BF6B3A` | terracotta / savanna earth |
+| 2 | Near East & North Africa | `#E0B45E` | desert sand & gold |
+| 3 | Europe | `#4F7A4E` | temperate forest green |
+| 4 | Caucasus & Iran | `#9E4A6E` | Persian wine / rose |
+| 5 | Inner Asia | `#2E7CB8` | Tengri eternal-blue steppe sky |
+| 6 | South Asia | `#E8952F` | saffron |
+| 7 | Mainland Southeast Asia | `#3E9E64` | monsoon jungle green |
+| 8 | East Asia | `#C0392B` | cinnabar / vermillion red |
+| 9 | Austronesia | `#1596A8` | Pacific ocean teal |
+| 10 | Papua & Aboriginal Australia | `#A9773F` | red-centre ochre |
+| 11 | Circumpolar North | `#5F86A6` | arctic ice slate-blue |
+| 12 | Native North America | `#3AA6A0` | turquoise |
+| 13 | Mesoamerica & the Andes | `#C99A2E` | codex gold |
+| 14 | Lowland South America | `#2E8B4E` | rainforest green |
