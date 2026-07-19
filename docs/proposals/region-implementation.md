@@ -186,6 +186,11 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
   document and tree via the reference. The per-hit payload is the smallest it can be: chunk-specific data + a
   pointer.
 
+> **Resolved → see [`data-model-and-ids.md`](data-model-and-ids.md).** Document identity, the three
+> registries, field decomposition, `slugify` and the join keys are worked out there: `document_id =
+> slugify(title)` (single key, not composite; uniqueness-checked), ids minted once and stored, `slugify`
+> run only on the backend. The original open questions are kept below for the reasoning trail.
+>
 > **To discuss — document identity & location (one connected decision, items 1/2/4).** Three entangled
 > questions, answered together:
 > 1. **A single stable document `id`.** Today a document is addressed by the tuple `(title, tradition)` in

@@ -9,7 +9,8 @@ not as live work.
 ## Active — the science
 
 - [`regions.md`](regions.md) — **the canon**: the definitive **14-region** `region` classification (names,
-  descriptions, subdivisions, strata, per-region traditions, CARTOColors Prism palette). **Goal:** one
+  descriptions, subdivisions, strata, per-region traditions, intuitive/associative palette — one `color` per
+  region). **Goal:** one
   authoritative region vocabulary; where any other doc diverges, this is authoritative. *Canon reference
   (drives `region-implementation.md`).*
 
@@ -17,11 +18,16 @@ not as live work.
 
 - [`region-implementation.md`](region-implementation.md) — **the code plan** for wiring `region` into
   production after taxonomy/presentation closed: one curated `config/traditions.json` tree (14 region nodes in
-  canon order, each with its canon fields + base colour, holding only texted traditions), `major_tradition`
+  canon order, each with its canon fields + single `color`, holding only texted traditions), `major_tradition`
   renamed+re-partitioned to `region`, region-inherited colour (no random), backend-served grouping, fail-loud
   validation, one `UNASSIGNED`; the motif-index region system and embeddings untouched. Current state with
   file:line + settled decisions + config shape + phased migration. Supersedes
   `tradition-architecture-unified.md` §4/§6. **Goal:** an executable implementation plan. *Proposal; not started.*
+- [`data-model-and-ids.md`](data-model-and-ids.md) — how corpus data is split across the three registries
+  (tree / documents / embeddings), what is stored where vs resolved via load-once front indexes, and how ids
+  are minted: one `slugify(name)→id` (three mint sites), `document_id = slugify(title)` as a single stored key,
+  ids minted once and passed as data, the chunk id as a bare PK. Resolves `region-implementation.md` §3's
+  document-identity question. **Goal:** a decided data-decomposition & id/join spec. *Proposal; not started.*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
   (curated `content_start/end` + exclude) **done**; Layer 2 (cue-strip on interleaved notes) pending.*
