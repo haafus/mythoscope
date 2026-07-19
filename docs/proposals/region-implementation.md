@@ -15,7 +15,7 @@ Grounded in the three field audits ([`../reviews/archive/tradition-review.md`](.
 ## 0. Closed decisions (context — not reopened)
 
 - **`region` (14) is the sole classification axis** of a tradition. No facet layer. Canon: `regions.md`.
-- **Colour lives only at the region level** — a tradition inherits its region's colour (single base colour,
+- **Colour lives only at the region level** — a tradition inherits its region's colour (single `color`,
   `regions.md` §8).
 - **Out of scope:** motif `theme`/`stratum`, the connectivity axis and dating (science), and **the entire
   motif-areal region system** (§2.7).
@@ -60,7 +60,7 @@ is not wired in.
 // config/traditions.json  — regions in canon order (out-of-Africa arc, regions.md §4); no order field
 {
   "Sub-Saharan Africa": {
-    "colour": "#CC503E",                 // single base colour, regions.md §8
+    "color": "#CC503E",                  // single color, regions.md §8
     "description": "…",                  // regions.md §5
     "subdivision": "…",                  // regions.md §5
     "strata": "…",                       // regions.md §5
@@ -224,7 +224,7 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 ## 4. Data flow (target)
 
 ```
-config/traditions.json   region → {colour(base §8), description, subdivision, strata, traditions{name:{desc,coords}}}   ← source of truth; region+colour live here only
+config/traditions.json   region → {color(§8), description, subdivision, strata, traditions{name:{desc,coords}}}   ← source of truth; region+color live here only
 config/corpus.json       book → tradition (name)
         │  build: text files under corpus/… (layout pending — §3); validate every book tradition ∈ tree
         │          & every region key ∈ 14 canon (fail loud). No generated traditions.json; no colour written.
@@ -245,7 +245,7 @@ group by region, attach books, colour by region; one 14-region legend; reused by
 ## 5. Migration order (region-only; each phase shippable)
 
 1. **Author the config + validation.** Build `config/traditions.json`: 14 region nodes in canon order, each
-   with its canon fields (`colour` base + `description`/`subdivision`/`strata`) and only its texted
+   with its canon fields (`color` + `description`/`subdivision`/`strata`) and only its texted
    traditions. **Reconcile the dirty corpus tradition strings to canonical keys** (e.g. `"Australian"` vs
    `"Australian Aboriginal"` → one canonical name) and repoint every `config/corpus.json` book at its
    canonical tradition; then add build-time fail-loud validation (unknown tradition / non-canon region).
@@ -264,7 +264,7 @@ group by region, attach books, colour by region; one 14-region legend; reused by
    `colour` from the `corpus.json` rows and `/documents` (the renamed list).
 4. **Front composes from one global load.** Fetch `/traditions` + `/documents` once into shared state; remove the
    client-side `groupDocuments`; render the `region → traditions` tree in canon order; attach books from the
-   documents; colour = region base; reuse the cache in corpus/atlas/embeddings/search.
+   documents; color = region `color`; reuse the cache in corpus/atlas/embeddings/search.
 5. **One `UNASSIGNED`** across `schemas.py`, `iterator.py`, and the front end.
 
 Tests are rewritten to the new model as each phase lands.

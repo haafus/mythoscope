@@ -187,7 +187,7 @@ is geographically contiguous; the single seam is `Papua & Aboriginal Australia �
 ## 5. The 14 regions
 
 Each entry: **Description** (what/why) · **Subdivision** (the next level of splitting that makes sense) ·
-**Strata** (the historical layers at work, with datings) · **Traditions** · colour (`base`, see §8).
+**Strata** (the historical layers at work, with datings) · **Traditions** · colour (`color`, see §8).
 
 > **This list vs the mockup's "194".** The **Traditions** lines below hold **183** entries; the facet-map
 > mockup (`mockups/62-facet-map/build_data.py`, `REGIONS`) derives **194** point-traditions from *this same
@@ -703,18 +703,18 @@ out-of-Africa hue sequence (and some global per-pair distinctiveness — several
 each other) for immediate legibility of *what* a region is; the map's borders + labels carry the
 neighbour distinction, as before.
 
-Only **`base`** is canonical — one colour per region. There are no `light`/`dark` ramp ends any more; any
-hover / point-on-fill shading a UI needs is derived from `base` at render time.
+Only **`color`** is canonical — one colour per region. There are no `light`/`dark` ramp ends any more; any
+hover / point-on-fill shading a UI needs is derived from `color` at render time.
 
 > **Colour lives only at the region level.** A tradition has **no colour of its own** — it takes its
-> **region's** `base`. There is no per-tradition colour and no within-region gradient keyed to a tradition
+> **region's** `color`. There is no per-tradition colour and no within-region gradient keyed to a tradition
 > (superseding the earlier "gradient within area" idea in `archive/tradition-architecture-unified.md` §3).
 
 > **The previous Prism palette is archived.** The earlier CARTOColors-Prism spectral-arc palette — with its
 > hand-tuned swaps and `light`/`dark` ramp ends — is kept for provenance in
 > [`archive/region-palette-prism.md`](archive/region-palette-prism.md). It is no longer the live palette.
 
-| # | region | base | evokes |
+| # | region | color | evokes |
 |---|---|---|---|
 | 1 | Sub-Saharan Africa | `#BF6B3A` | terracotta / savanna earth |
 | 2 | Near East & North Africa | `#E0B45E` | desert sand & gold |
