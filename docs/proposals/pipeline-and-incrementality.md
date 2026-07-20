@@ -433,11 +433,12 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
   `hash(locator)` (§9.5-D1); once that anchor lands, rename-churn is fixed too (it is out of *this* minimal
   staleness-only tier, but no longer blocked on a decision).
 - **(2) transform_version per stage** — code/param edits invalidate; cheap.
-- **(3) fp manifest + DAG cascade** — targeted rebuild instead of `--force`; moderate (skippable at our size).
+- **(3) stateless fp cascade** — recompute fps on the fly from sidecars for a targeted rebuild instead of
+  `--force`; moderate (skippable at our size). No central manifest (D7).
 - **(4)** extend `status` to "what to rebuild" (orphan detection is already there).
 
-Full Bazel/Nix is overkill for this size — **a small content-addressed manifest + transform versions** is the
-right amount.
+Full Bazel/Nix is overkill for this size — **content-addressed sidecar fps + transform versions, computed
+statelessly** is the right amount.
 
 ### Implementation order — **Part 2 of 3: incrementality hardening** (nothing here blocks shipping Part 1)
 
@@ -461,8 +462,8 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
    re-embed-on-edit bug); add the projection-fp gate for coherence (§9.2). *(D2 decided: doc-level `md5`.)*
 4. **Atomicity** — write the artifact *then* its fp; atomic swap for the catalog/collection — §9.4. Land it
    with item 3.
-5. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild".
-   *(decide D7: manifest vs stateless.)*
+5. **Stateless** fp gate + set-diff GC — §2.6, §3; recompute fps on the fly from per-artifact sidecars, compare
+   config-expected vs on-disk (D7: stateless, **no central manifest**); extend `status` to "what to rebuild".
 6. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
 7. ~~**Parametric projections**~~ — **decided (D3): keep the full refit** (cheap at this size) — §9.2. *No work.*
 8. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
@@ -482,8 +483,9 @@ actually needed.
 
 D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
 canonical name, no slug), so Part 1 is fully unblocked. Decided since: **D2** (doc-level `md5`), **D3** (full
-refit), **D4** (uniform param-hash + manual `algo_version`, not per-stage), **D5** (unified-diff patch — Part 3).
-Still-open sub-decisions: **D6/D7** (both Part 2).
+refit), **D4** (uniform param-hash + manual `algo_version`, not per-stage), **D5** (unified-diff patch — Part 3),
+**D7** (stateless, no manifest). Still-open: **D6** (build engine — build-your-own vs DVC) — and D6 is
+effectively settled by D7 (stateless in-process ⇒ build-your-own; DVC only at scale).
 
 ---
 
@@ -531,12 +533,23 @@ refit is still needed; not all methods transform. **Decided (D3): full refit** �
 is cheap, it is simpler, method-agnostic, and avoids drift; the parametric path is not worth its complexity
 here.
 
-### 9.3 Manifest vs stateless
+### 9.3 Manifest vs stateless — DECIDED (D7): stateless
 
-The sidecar+manifest machinery may be over-built for this size. Alternative: **stateless** — no manifest;
-each build compares config-expected-set vs on-disk and recomputes fps on the fly. *Pros:* nothing to drift or
-corrupt. *Cons:* slower `status` (recompute). At ~27 docs, stateless is likely simpler and enough; the manifest
-is a scale optimization, not a day-one need.
+**Decided: stateless** — no central index; each build/`status` compares the config-expected set vs on-disk and
+recomputes fps on the fly (fps live in per-artifact sidecars). Why it wins here:
+
+- A **correct** "what's stale" must hash the current inputs either way (you can't know content changed without
+  hashing it — mtime lies), so the manifest saves only *reading previous fps from one file vs N sidecars* —
+  trivial. A "fast" manifest that skips re-hashing is fast only by **trusting a possibly-stale cache** — which
+  sacrifices the currency we care about.
+- "What depends on X" is a **static** fact of this pipeline (graphs ← prompts, etc. — known from the code), not
+  something needing stored edges; the manifest only pays off for dynamic, fine-grained dependency graphs we
+  don't have.
+- Stateless **never drifts**: out-of-band deletion/corruption, a mid-build crash, a git-branch switch, or
+  concurrent builds all self-heal because it reads on-disk truth, not a cached index.
+
+The manifest's only genuine residual edge is historical **lineage/audit** and avoiding a directory walk at
+large scale — both nice-to-have, revisit if the corpus grows or lineage debugging becomes a real need.
 
 ### 9.4 Atomicity / partial-build failure (unaddressed gap)
 
@@ -555,11 +568,11 @@ never sees a half-written index. This must be specified before the fp machinery 
 | ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.4 |
 | ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 3) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
-| **D7** | manifest vs stateless | central index vs recompute-on-the-fly | §9.3 |
+| ~~**D7**~~ | manifest vs stateless — **DECIDED: stateless** | ~~central index vs~~ recompute-on-the-fly from sidecars (never drifts; correct staleness needs re-hashing either way) | §9.3 |
 | ~~**D8**~~ | ~~`slugify` transliteration~~ — **DISSOLVED** | there is no slug: `region_id`/`tradition_id` = the canonical name (data-model §5), documents = `hash(locator)` | — |
 
 **Proportionality.** This is a spec for ~27 documents. The immediate, high-ROI work is small: the §4
-embeddings key (D1 + D2 both decided) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
+embeddings key (D1 + D2 both decided) + the graphs build/serve fix. The stateless fp cascade and GC tiers
 are "when it grows" — do not read the whole doc as "build now".
 
 ## Appendix — why mtime lies
