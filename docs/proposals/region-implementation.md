@@ -240,11 +240,11 @@ group by region, attach books, colour = region base + derived per-tradition shad
 ## 5. Migration order (region-only; each phase shippable)
 
 1. **Author the config + validation.** Build `config/traditions.json`: 14 region nodes in canon order, each
-   with its canon fields (`color` + `description`/`subdivision`/`strata`) and only its texted
-   traditions. **Reconcile the dirty corpus tradition strings to canonical keys** (e.g. `"Australian"` vs
-   `"Australian Aboriginal"` → one canonical name) and repoint every `config/corpus.json` book at its
-   canonical tradition; then add build-time fail-loud validation (unknown tradition / non-canon region).
-   *(Highest value-to-risk — closes the silent join.)*
+   with its canon fields (`color` + `description`/`subdivision`/`strata`) and only its texted traditions
+   (`region_id`/`tradition_id` = the canonical **name**, no slug — §6). **Reconcile the dirty corpus tradition
+   strings to the canonical keys per the decided table (§6.1)** — incl. the canon extension `Euahlayi` — and
+   repoint every `config/corpus.json` book at its canonical tradition; then add build-time fail-loud validation
+   (unknown tradition / non-canon region; name-uniqueness). *(Highest value-to-risk — closes the silent join.)*
 2. **Retire `major_tradition`; group by region; trim chunk metadata to one reference (B1).** Re-partition the
    config tree to regions; update the code that **grouped** by `major_tradition` (`builder.py`, `iterator.py`,
    `schemas.py`, services, front) to group/resolve by `region` through the tree. Reduce **chunk metadata to a
@@ -257,15 +257,19 @@ group by region, attach books, colour = region base + derived per-tradition shad
    documents server-side from the catalog and filters `where {document_id: {$nin: docs-of-that-tradition}}`
    (was a `tradition`-equality clause). Move the file layout to the decided
    `corpus/<Region>/<Tradition>/<Title>.txt` (§6). **Rename the endpoints** (§3): `/catalog` → `/documents` (list),
-   `/documents` → `/document` (one text) located by `(title, tradition)`.
+   `/documents` → `/document` (one text) located by `?id=document_id` (D1). *(Prerequisite: `document_id`
+   persisted in the catalog first — data-model §8.1.)*
 3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
-   colour + fields, no books); a tradition's colour is a within-region shade derived from its region base at
-   display (regions.md §8.1), not stored; strip `region` and `colour` from the `corpus.json` rows and
-   `/documents` (the renamed list).
+   colour + fields, no books); strip `region` and `colour` from the `corpus.json` rows and `/documents` (the
+   renamed list). **Implement the per-tradition shade function** (new work — regions.md §8.1): OKLCH, fix
+   `H`/`C`, vary `L` on the safe band, grow-then-clamp centred on the base, order by longitude, L×C lattice for
+   N > 12, light/dark bands. Pure function of `(region base, tradition index, region count)`, computed at
+   display — nothing stored.
 4. **Front composes from one global load.** Fetch `/traditions` + `/documents` once into shared state; remove the
    client-side `groupDocuments`; render the `region → traditions` tree in canon order; attach books from the
-   documents; color = region `color`; reuse the cache in corpus/atlas/embeddings/search.
+   documents; **colour = the derived per-tradition shade off the region base (§8.1)**; reuse the cache in
+   corpus/atlas/embeddings/search.
 5. **One `UNASSIGNED`** across `schemas.py`, `iterator.py`, and the front end.
 
 Tests are rewritten to the new model as each phase lands.
