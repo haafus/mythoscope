@@ -44,7 +44,7 @@ Distilled from every frontend section (corpus browser, atlas, embeddings scatter
   section keys on it. It lives on the **tree (PK)** and the **document (ref)** — **not** on the chunk.
 - **`document_id` (= `hash(locator)`, D1) is the document key.** Corpus text fetch, graphs, and chunk→document
   all use it. It is a **single key, not a composite** (see §5), opaque and rename-stable, and *is* the
-  raw-archive key `corpus/raw/<sha1(url)>`.
+  raw-archive key `corpus/raw/<blake2b(url)>`.
 - **A chunk carries exactly ONE upward reference: `document_id`** (+ `chunk_index` and its intrinsic
   text/vector). Everything else — `tradition`, region, color, url, title — is resolved from `document_id`
   through the load-once catalog + tree (§4).
@@ -174,14 +174,14 @@ Chroma, no re-embed — B1/D1).
 
 **The document id is *not* a name at all — `document_id = hash(locator)` (Decided, D1).** The locator is the
 document's upstream address (the URL, or the `sources/` path), normalized (scheme/host/trailing-slash/%-decode)
-then hashed — which is **already the raw-archive key `corpus/raw/<sha1(url)>`**, so `document_id` *is* that key,
+then hashed (`blake2b`) — which is the raw-archive key `corpus/raw/<blake2b(url)>`, so `document_id` *is* that key,
 reused with zero new code. A hash is fixed-length, always fs/url/Chroma-safe, collision-free, and — crucially —
 **invariant under any title/tradition/region rename** (the id tracks the source, not the display string).
 Titles are free to churn and collide; the id does not. See §9-D1 for the full rationale.
 
 **The document id is *not* slugified — `document_id = hash(locator)` (Decided, D1).** The locator is the
 document's upstream address (the URL, or the `sources/` path), normalized (scheme/host/trailing-slash/%-decode)
-then hashed — which is **already the raw-archive key `corpus/raw/<sha1(url)>`**, so `document_id` *is* that key,
+then hashed (`blake2b`) — which is the raw-archive key `corpus/raw/<blake2b(url)>`, so `document_id` *is* that key,
 reused with zero new code. This deliberately keeps documents off `slugify`: a hash is fixed-length,
 always fs/url/Chroma-safe, collision-free, and — crucially — **invariant under any title/tradition/region
 rename** (the id tracks the source, not the display string). Titles are free to churn and collide; the id does
@@ -201,8 +201,9 @@ upward reference (B1, §2/§3): `tradition` is not stored on the chunk — it, r
 > `sources/`-path), normalized then hashed — **not** on the title. This is **rename- and edit-stable**
 > (a title/tradition/region change never moves the id), collision-free, and unifies identity + raw-archive key
 > + the incremental anchor in one value ([`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §4
-> assumes exactly this). It is already the raw key `corpus/raw/<sha1(url)>`, so `document_id` reuses it with
-> zero new code. The rejected alternative, `slugify(title)`, was **not rename-stable** (a title edit changes
+> assumes exactly this). It *is* the raw key `corpus/raw/<blake2b(url)>` (hash = `blake2b`, one algorithm
+> everywhere — the archive moves off `sha1` by a one-time rename, §9-D1). The rejected alternative,
+> `slugify(title)`, was **not rename-stable** (a title edit changes
 > the id) and collided when two documents share a title — and it needed the locator as a hidden second match
 > key anyway (§9-D1). The only cost — an opaque id — is a non-issue: navigability lives in the file path (a
 > rendering bridged by the catalog), never in the id.
@@ -333,7 +334,7 @@ raw-archive key — so identity stops tracking the title. The deltas:
 
 | # | today | target |
 |---|---|---|
-| 0 | document identity = `text_id = slug(title)` (title-anchored, churns on rename, collides on shared titles) | `document_id = hash(locator)` (D1) — the existing raw key `corpus/raw/<sha1(url)>`; opaque, rename-stable, collision-free |
+| 0 | document identity = `text_id = slug(title)` (title-anchored, churns on rename, collides on shared titles) | `document_id = hash(locator)` (D1) — the raw key `corpus/raw/<blake2b(url)>`; opaque, rename-stable, collision-free |
 | 1 | `text_id` is ephemeral (computed in `iterator`, in-memory, absent from `corpus.json`) | **persist** `document_id` in the catalog ("populate once") |
 | 2 | `tradition` stored raw; region has no id | `region_id`/`tradition_id` = **the canonical name** (kept verbatim; boundaries already sanitise — `sanitize_filename`/`encodeURIComponent`/`escapeHtml`) |
 | 3 | `normalize_catalog_id` mints the document `text_id` (`\s+`→`_`) | **repurposed, not retired**: documents drop it (id = `hash(locator)`); it now just whitespace-canonicalises `region_id`/`tradition_id`. **No `slugify`, no transliteration.** |
@@ -387,12 +388,13 @@ Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline
     match-key + raw-archive key into one; a stored title-slug adds a redundant, drift- and collision-prone id
     on top of a locator match you already need.
   - *`slug` vs `hash` for the locator (the form of the anchor).* `hash(locator)` beats `slug(locator)`:
-    fixed-length, always fs/url/Chroma-safe (no slugify for documents at all), unique, and **it is already the
-    raw-archive key** (`corpus/raw/<sha1(url)>`) → `document_id` = raw key with zero new code. `slug(locator)`
-    only adds mnemonic value, which is weak (URLs slug long and unreadable) and which the file path already
-    carries. Opacity is fine — the catalog is the `id → {title, url}` lookup. Keep `sha1(url)` to avoid
-    re-keying the archive; normalize the locator (scheme/host/trailing-slash/%-decode) before hashing. (Both
-    slug and hash need that normalization.)
+    fixed-length, always fs/url/Chroma-safe (no slugify for documents at all), unique, and **it is the
+    raw-archive key** (`corpus/raw/<blake2b(url)>`). `slug(locator)` only adds mnemonic value, which is weak
+    (URLs slug long and unreadable) and which the file path already carries. Opacity is fine — the catalog is
+    the `id → {title, url}` lookup. **Hash = `blake2b`** (one algorithm across identity + fingerprints —
+    pipeline §2.4; the archive was `sha1(url)`, a one-time rename to `blake2b(url)` off the config, no
+    re-download). Normalize the locator (scheme/host/trailing-slash/%-decode) before hashing. (Both slug and
+    hash need that normalization.)
   - *Why a name-derived id is fine for `tradition_id`/`region_id` but was feared for `document_id`.* The issue
     is never the transform but **what the id primary-keys** × **how churny/collision-prone the name is**.
     `document_id` primary-keys the **expensive, persisted, content-addressed** per-document artifacts (chunk ids
@@ -412,14 +414,14 @@ Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline
       registry (lose it → every doc re-mints → total orphaning), or be hand-authored per entry in config
       (friction + a redundant field beside the locator). `hash(locator)` needs no registry — the id is
       `f(config)`, and the catalog is a rebuildable *cache*, not a source of truth for identity.
-    - **A second key.** The raw archive is locator-addressed by nature (`corpus/raw/<sha1(url)>`), so a uuid
-      identity sits *on top* and reintroduces the join uuid ↔ `sha1(url)` — the very "two identifiers" problem
+    - **A second key.** The raw archive is locator-addressed by nature (`corpus/raw/<blake2b(url)>`), so a uuid
+      identity sits *on top* and reintroduces the join uuid ↔ `blake2b(url)` — the very "two identifiers" problem
       `hash(locator)` collapses into one.
     - **Lost free dedup + a new failure mode.** Same locator listed twice → same hash (caught for free) but two
       uuids (silent duplicate). Plus a mint-once read-modify-write with its own atomicity/crash concerns.
     - **Architectural incoherence.** The pipeline is already content-addressed / derive-from-source (Nix model,
-      `sha1(url)`, `md5(text)`, fp cascade); `hash(locator)` continues it, a uuid would be an island of
-      stateful identity.
+      `blake2b(url)` identity + content-hash versions, fp cascade); `hash(locator)` continues it, a uuid would be
+      an island of stateful identity.
 
     A uuid is the **right** choice only when a document has **no stable locator** (user uploads, generated
     content, mutable primary keys) — provenance is then not a usable handle. Mythoscope's locators are stable

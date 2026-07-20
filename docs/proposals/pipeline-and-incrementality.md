@@ -19,7 +19,7 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 | # | stage | inputs | artifacts (`outputs/`) | caches | cost |
 |---|---|---|---|---|---|
 | 0 | **config** (hand-authored) | `config/corpus.json` (title, tradition, url, content_start/end, exclude), `config/traditions.json` (tree), `config/models.json`, `config/prompts.json`, `sources/` | — | — | — |
-| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<sha1(url)>` (raw snapshot; `sha1(url) = document_id`, D1), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (sha1 url), extraction | network (~s/doc); clean/trim CPU-cheap |
+| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<blake2b(url)>` (raw snapshot; `blake2b(url) = document_id`, D1), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (blake2b url), extraction | network (~s/doc); clean/trim CPU-cheap |
 | 1.5 | **Preprocess** (variant, optional) | cleaned text + variant config | `preprocessed/…` | preprocessing | **always an LLM transform when present** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited**. There is no cheap preprocess: a variant either enables it (LLM) or skips it entirely (embeds the base cleaned text) |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
 | 3 | **Projections** | vectors (embeddings) + method | `projections/<model>/<method>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
@@ -269,7 +269,7 @@ Each artifact gets a fingerprint:
 fp(artifact) = hash( fp(each input)  +  transform_version(stage)  +  output-affecting params )
 ```
 
-- **Inputs by content hash**, not mtime (we already have `sha1(url)`, `md5(text)`).
+- **Inputs by content hash**, not mtime (we already hash content — the raw file and the cleaned text).
 - **transform_version** — bumped when the stage's code/params change (§2.5). Closes "code changed → outputs
   not rebuilt".
 - Rebuild **iff fp changed** (or the output is missing); else skip. Cascade is emergent (§2.6).
@@ -295,12 +295,13 @@ Granularity per stage:
 
 For change-detection / cache keys (non-adversarial) **any works** — accidental collision is astronomically
 unlikely at our scale. Crypto strength matters only if fps become a trust boundary (a shared/remote cache
-where a poisoned entry is dangerous). **Decided: `blake2b`** (fastest + strong + stdlib) for the fingerprint
-machinery. **One exception on purpose:** `document_id` stays **`sha1(url)`** — it *is* the existing raw-archive
-key (`corpus/raw/<sha1(url)>`, D1), and reusing it avoids re-keying the whole archive; identity and fingerprint
-are different jobs, so a different hash for each is fine. The current sha1/md5 split elsewhere is legacy —
-migrate those fingerprints to `blake2b`. Note the *roles*: `sha1(url)` = **identity** ("which source");
-the content hash = **version** ("what content").
+where a poisoned entry is dangerous). **Decided: `blake2b` everywhere** (fastest + strong + stdlib) — the
+fingerprint machinery *and* `document_id` (so the raw-archive key becomes `corpus/raw/<blake2b(url)>`). This
+drops the broken `sha1` from persistent keys and leaves one hash to reason about. The cost of moving the raw
+key off `sha1` is only a **one-time rename** of the ~27 raw files (their `url` is known from config — a
+deterministic `mv`, no re-download), and it rides the D1 migration, which rebuilds all derived artifacts on the
+new key anyway. Note the *roles* are still distinct even under one algorithm: `blake2b(url)` = **identity**
+("which source"); a content hash = **version** ("what content").
 
 ### 2.5 Transform version — where it lives, how it is bumped
 
@@ -487,7 +488,7 @@ receive an updated version. They must be handled identically.
 ### 6.1 The unifying abstraction
 
 ```
-upstream (URL | sources/-file) ──ingest──► RAW snapshot (immutable, sha1(locator))
+upstream (URL | sources/-file) ──ingest──► RAW snapshot (immutable, blake2b(locator))
                                                  │
                                        + override layer (shared):
                                           content_start/end, exclude (config)
@@ -496,7 +497,7 @@ upstream (URL | sources/-file) ──ingest──► RAW snapshot (immutable, sh
                                           CURATED (derived)
 ```
 
-The raw key is **already unified** (`corpus/raw/<sha1(locator)>` for both; for local the "url" is the file
+The raw key is **unified** (`corpus/raw/<blake2b(locator)>` for both; for local the "url" is the file
 locator). Only the *policy* differs today (local auto-re-ingests on hash change; web fetch-once), and neither
 has a manual-edit layer.
 
@@ -733,7 +734,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 
 | id | decision | options | blocks |
 |---|---|---|---|
-| ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `hash(upstream-locator)` (= raw key `sha1(url)`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
+| ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `blake2b(upstream-locator)` (= raw key `corpus/raw/<blake2b(url)>`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
 | ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.3 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.5 |

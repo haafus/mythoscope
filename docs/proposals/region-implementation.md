@@ -199,7 +199,8 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 > **Resolved → see [`data-model-and-ids.md`](data-model-and-ids.md).** Document identity, the three registries,
 > field decomposition, `slugify` and the join keys are worked out there. The two load-bearing decisions:
 > - **D1 (decided): `document_id = hash(locator)`** — the document id anchors on its upstream locator (URL /
->   `sources/`-path), normalized then hashed, which **is already the raw-archive key `corpus/raw/<sha1(url)>`**.
+>   `sources/`-path), normalized then hashed with **`blake2b`**, which is the raw-archive key
+>   `corpus/raw/<blake2b(url)>` (one algorithm everywhere; the archive moves off `sha1` by a one-time rename).
 >   It is opaque, rename-/edit-stable, collision-free, and one value serving identity + archive key + the
 >   incremental anchor. It is **not** `slugify(title)` — titles churn and collide (generic ones like "Creation"
 >   collide at the embedding layer), and a title-slug would need the locator as a hidden match key anyway.
@@ -258,7 +259,8 @@ front resolution before any field is trimmed off a chunk/hit → then the trim �
    repoint every `config/corpus.json` book at its canonical tradition; then add build-time fail-loud validation
    (unknown tradition / non-canon region; name-uniqueness). *(Highest value-to-risk — closes the silent join.)*
 2. **Persist identity.** Persist `document_id = hash(locator)` in the built catalog (normalize the locator
-   first; it is the existing raw key `sha1(url)`) and return it from the documents endpoint; mint
+   first, then `blake2b`; it is the raw-archive key `corpus/raw/<blake2b(url)>` — one-time rename off `sha1`)
+   and return it from the documents endpoint; mint
    `region_id`/`tradition_id` = the canonical name in the tree + as each document's `tradition` ref. `id = the
    name` verbatim — no slug, no transliteration, no new function; the boundaries already sanitise
    (`sanitize_filename` FS / `encodeURIComponent` URL / `escapeHtml` HTML) — spec in data-model §5. *(Must
@@ -296,7 +298,7 @@ Tests are rewritten to the new model as each step lands.
 
 **Prerequisite decisions.** The document-identity anchor and its knock-ons live in
 [`data-model-and-ids.md`](data-model-and-ids.md) §9. **Decided:** **D1** `document_id = hash(locator)` (the
-existing raw key `sha1(url)`; opaque, rename-stable; *not* `slugify(title)`); **`region_id`/`tradition_id` = the
+raw key `corpus/raw/<blake2b(url)>`; opaque, rename-stable; *not* `slugify(title)`); **`region_id`/`tradition_id` = the
 canonical name** (kept verbatim, at most the existing `normalize_catalog_id` for whitespace; no slug, no
 transliteration, no new function — boundaries already sanitise via `sanitize_filename`/`encodeURIComponent`/`escapeHtml` — `data-model` §5; **D8
 dissolved**); the **tradition reconciliation** table (§6.1 below); and the **file layout** — **decided: full
