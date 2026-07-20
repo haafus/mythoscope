@@ -378,15 +378,14 @@ The adopt path (diff → adopt → re-apply override) is shared.
 
 - **config markers** (`content_start/end`, `exclude`) — for structural trims/skip. Structured, tiny,
   git-friendly.
-- **per-doc text override** — for point text fixes. Two forms (**open — §9**):
-  - **unified-diff patch** (`overrides/<document_id>.patch`): stores only the changes, shows exactly what
-    diverged in git, re-applies deterministically; a patch that no longer applies after `refresh` is the
-    merge-conflict signal. **But curators don't hand-write diffs** — this needs an "edit → we snapshot the
-    diff" tool.
-  - **full curated override** (`overrides/<document_id>.txt`): the curator edits the file directly; the diff
-    is computed *on demand* against raw when provenance is needed. More ergonomic; provenance is recoverable.
-    Downside: duplicates content, no inline diff.
-  Leaning: **full override** (curator-friendly; provenance is recoverable by diffing vs raw), but not decided.
+- **per-doc text override** — for point text fixes. **Decided (D5): the unified-diff patch**
+  (`overrides/<document_id>.patch`). It stores only the delta (not a near-copy of the derived text), shows
+  exactly what diverged in git, re-applies deterministically, and a patch that no longer applies after a
+  `refresh` **is** the merge-conflict / re-curate signal. The rejected **full override**
+  (`overrides/<document_id>.txt`) stores the whole curated text — a ~99 % copy of the derived text per doc, and
+  it *freezes*: on an upstream update it cannot merge, so the fix must be re-done by hand. The patch's only
+  extra cost is an **apply** step (`git apply` — git is already the repo — or `patch-ng`); the `curate`
+  edit-then-snapshot workflow is needed either way, so it is shared, not a patch-only tax.
 
 Layer order: `curated = trim(clean(apply_patch(base)), content_start/end)`. The patch base is best the
 *cleaned* text (boilerplate stripped — what a curator reads); if `clean_version` bumps and the patch fails,
@@ -395,16 +394,15 @@ that is a re-curate signal.
 **Curator workflow (the curator never writes a diff — a tool does).** Edit-then-snapshot:
 
 ```
-curate <document_id>          # materialize the current curated text (raw→clean→trim→[+prior override])
+curate <document_id>          # materialize the current curated text (raw→clean→trim→[+prior patch])
                               # into a working file; the curator edits it in their editor
-curate --save <document_id>   # store the result: full-override = copy the file; diff-form = difflib against
-                              # the base. Also stamp a base-fingerprint (hash of the cleaned base at edit time)
+curate --save <document_id>   # store difflib(base, edited) → overrides/<id>.patch; also stamp a
+                              # base-fingerprint (hash of the cleaned base at edit time)
 ```
 
-On build, the base-fingerprint is compared to the current base; if the base moved (new upstream / bumped
-`clean_version`), flag "override may be stale → re-review" (for full-override) or fail the patch apply (for
-diff-form) — the merge signal. So both storage forms need the stored base-fingerprint; only the storage of
-the edit itself differs (D5).
+On build, `curated = trim(clean(apply_patch(base)), content_start/end)`, and the base-fingerprint is compared
+to the current base; if the base moved (new upstream / bumped `clean_version`) and the patch no longer applies,
+that failure **is** the merge / re-curate signal.
 
 ### 6.5 Web-specific priority
 
@@ -441,7 +439,7 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 Full Bazel/Nix is overkill for this size — **a small content-addressed manifest + transform versions** is the
 right amount.
 
-### Implementation order — **Part 2 of 2** (nothing here is required to ship Part 1)
+### Implementation order — **Part 2 of 3: incrementality hardening** (nothing here blocks shipping Part 1)
 
 **Part 1 (the data-model + region migration) is the single list in
 [`region-implementation.md`](region-implementation.md) §5 — not repeated here.** Part 2 is the incrementality
@@ -450,7 +448,7 @@ runs strictly after. Two tiers by timing:
 
 - **items 1–4 — do-soon / independent:** isolated bug-fixes *not* gated on Part 1 (do them whenever — before,
   during, or after the migration).
-- **items 5–9 — when it grows / optional.**
+- **items 5–8 — when it grows / optional.**
 
 (The one incrementality win that lands *inside* Part 1 — the embeddings key on `document_id`, which fixes
 rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*; full list in §9.5.
@@ -466,14 +464,26 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
 5. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild".
    *(decide D7: manifest vs stateless.)*
 6. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
-7. **Override / curation layer** — the `curate` edit-then-snapshot workflow — §6.2–§6.4. *(decide D5.)*
-8. ~~**Parametric projections**~~ — **decided (D3): keep the full refit** (cheap at this size) — §9.2. *No work.*
-9. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
+7. ~~**Parametric projections**~~ — **decided (D3): keep the full refit** (cheap at this size) — §9.2. *No work.*
+8. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
+
+### Implementation order — **Part 3 of 3: manual text curation** (editorial; independent of Parts 1–2)
+
+The human ability to hand-fix a document's text (OCR typo, an interleaved note the markers can't catch) as an
+**override layer** that never mutates raw or upstream. It is its own part because it is an **editorial
+workflow**, not required to ship the migration *or* to make rebuilds incremental — add it when curation is
+actually needed.
+
+1. **The override layer + `curate` workflow** — `overrides/<document_id>.patch` (**D5: unified-diff patch**);
+   `curate` materialises the current curated text, the curator edits it, `curate --save` snapshots
+   `difflib(base, edited)` + stamps the base-fingerprint; build applies the patch (`git apply`) — §6.2–§6.4.
+   Prerequisite: the fetch/build split + `refresh` (Part 2 item 6) so an upstream update re-applies the patch
+   (or raises the re-curate conflict) cleanly.
 
 D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
 canonical name, no slug), so Part 1 is fully unblocked. Decided since: **D2** (doc-level `md5`), **D3** (full
-refit), **D4** (uniform param-hash + manual `algo_version`, not per-stage). Part 2 still-open sub-decisions:
-**D5/D6/D7**.
+refit), **D4** (uniform param-hash + manual `algo_version`, not per-stage), **D5** (unified-diff patch — Part 3).
+Still-open sub-decisions: **D6/D7** (both Part 2).
 
 ---
 
@@ -543,7 +553,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.2 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.4 |
-| **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
+| ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 3) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
 | **D7** | manifest vs stateless | central index vs recompute-on-the-fly | §9.3 |
 | ~~**D8**~~ | ~~`slugify` transliteration~~ — **DISSOLVED** | there is no slug: `region_id`/`tradition_id` = the canonical name (data-model §5), documents = `hash(locator)` | — |

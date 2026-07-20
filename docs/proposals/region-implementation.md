@@ -238,14 +238,14 @@ group by region, attach books, colour = region base + derived per-tradition shad
 
 ---
 
-## 5. Implementation order — **Part 1 of 2: the data-model + region migration** (run before Part 2)
+## 5. Implementation order — **Part 1 of 3: the data-model + region migration** (the priority)
 
 **This is the single, ordered task list for the whole migration** — not "region" alone: it ships the **id/data
 model** (`document_id = hash(locator)`, name-ids, the B1 chunk, the file layout) *and* the **`region` feature**
 (the 14-region tree, region-derived colour, grouping). It is self-contained — the id/data tasks are folded in
-here, so `data-model` §8 only points back. **Part 2** = the incrementality hardening in
-[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §7, run **after** this. The two parts run
-one after another; nothing here repeats there. Each step below is shippable.
+here, so `data-model` §8 only points back. The other two parts live in
+[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §7 and **do not block this one**: **Part 2**
+= incrementality hardening, **Part 3** = manual text curation (editorial). Each step below is shippable.
 
 Dependency spine: silent join first (pure config) → `document_id` persisted before anything references it →
 front resolution before any field is trimmed off a chunk/hit → then the trim → colour → cleanup.
