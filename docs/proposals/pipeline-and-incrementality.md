@@ -371,6 +371,20 @@ Layer order: `curated = trim(clean(apply_patch(base)), content_start/end)`. The 
 *cleaned* text (boilerplate stripped — what a curator reads); if `clean_version` bumps and the patch fails,
 that is a re-curate signal.
 
+**Curator workflow (the curator never writes a diff — a tool does).** Edit-then-snapshot:
+
+```
+curate <document_id>          # materialize the current curated text (raw→clean→trim→[+prior override])
+                              # into a working file; the curator edits it in their editor
+curate --save <document_id>   # store the result: full-override = copy the file; diff-form = difflib against
+                              # the base. Also stamp a base-fingerprint (hash of the cleaned base at edit time)
+```
+
+On build, the base-fingerprint is compared to the current base; if the base moved (new upstream / bumped
+`clean_version`), flag "override may be stale → re-review" (for full-override) or fail the patch apply (for
+diff-form) — the merge signal. So both storage forms need the stored base-fingerprint; only the storage of
+the edit itself differs (D5).
+
 ### 6.5 Web-specific priority
 
 Upstream (e.g. Gutenberg) is near-immutable; the real risk is **disappearance (404)**, not change. So
@@ -391,11 +405,19 @@ archival + reproducibility strategy.
 | **Immutable / versioned (Nix)** | never mutate; new version = new artifact | only if rollback / A-B models wanted |
 | **Manual + audit (current)** | human runs build; `status` shows orphans | as a check, not the policy |
 
-Minimal path, by value: **(1) content_md5 in the embeddings key** (fixes the real staleness bug + rename
-churn; cheap, high value); **(2) transform_version per stage** (code edits invalidate; cheap); **(3) fp
-manifest + DAG cascade** (targeted rebuild instead of `--force`; moderate); **(4)** extend `status` to "what to
-rebuild" (orphan detection is already there). Full Bazel/Nix is overkill for this size — **a small
-content-addressed manifest + transform versions** is the right amount.
+Minimal path, by value — items (1) and (2) collapse into **one per-document fingerprint gate on the
+expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff its
+`fp = hash(content_md5, model, chunk params, prompt/algo_version)` changed:
+
+- **(1) content_md5 in the key** — fixes the real *staleness* bug (a text edit not re-embedding). Note this
+  alone does **not** fix rename *churn* — that needs the rename-stable `document_id` anchor (§9.5-D1), so
+  rename-churn is out of the minimal tier.
+- **(2) transform_version per stage** — code/param edits invalidate; cheap.
+- **(3) fp manifest + DAG cascade** — targeted rebuild instead of `--force`; moderate (skippable at our size).
+- **(4)** extend `status` to "what to rebuild" (orphan detection is already there).
+
+Full Bazel/Nix is overkill for this size — **a small content-addressed manifest + transform versions** is the
+right amount.
 
 ---
 
@@ -410,22 +432,29 @@ use atomic artifact swaps or a `status`-driven "stale" flag.
 
 ## 9. Weak spots, alternatives & open decisions
 
-### 9.1 Big alternative — adopt a tool instead of building our own
+### 9.1 Big alternative — adopt a ready-made engine instead of building our own
 
-Everything here (content-addressed DAG, fingerprints, cache, GC, lineage) is what **[DVC](https://dvc.org)**
-does out of the box (and snakemake / Nextflow to a degree): `dvc.yaml` declares stages with deps/outs,
-`dvc repro` rebuilds only what changed by content hash, `dvc.lock` stores hashes, a remote holds the raw
-archive.
+Everything here (content-addressed DAG, fingerprints, cache, GC, lineage) is what existing data-pipeline
+engines already do. **Selection criteria for us:** (a) content-addressed caching — the whole point; (b)
+in-process Python vs shell-out (our stages are Python functions); (c) weight/dependency; (d) remote artifact
+storage (raw archive + large embeddings); (e) our size (~27 docs argues against heavy tools).
 
-| | build-your-own (this doc) | adopt DVC |
-|---|---|---|
-| cost | write & maintain fp/manifest/GC | almost free, battle-tested |
-| control | full, in-process Python | stages shell out; less "in-process" |
-| dependency | none | heavy, opinionated |
-| provenance / remote / GC | build ourselves | included |
+| engine | class | content-cache | model | weight | notes |
+|---|---|---|---|---|---|
+| **DVC** | data/ML versioning | ✔ | shell-out stages | medium | `dvc.yaml` DAG, `dvc repro` = minimal rebuild, `dvc.lock` hashes, remotes for raw/embeddings. Our `cli.py` already exposes per-stage commands → wrapping is cheap. **Best off-the-shelf fit.** |
+| **Dagster** (assets) | orchestrator | ✔ | Python in-process | med-heavy | software-defined assets: deps, materialization, freshness, partial re-materialize, lineage. Fits when this becomes a scheduled multi-asset product. |
+| **Snakemake** | DAG runner | ✔ (content triggers) | shell-out | medium | mature file-DAG, bioinformatics-flavored/shell-oriented. |
+| **Nextflow / Pachyderm** | DAG / k8s | ✔ | containers | heavy | HPC/cloud/k8s — wrong weight for us. |
+| **Luigi** | orchestrator | partial | Python | light | task+target deps; older, no strong content cache. |
+| **Airflow** | scheduler | ✗ | Python | heavy | scheduling, not content-caching — wrong tool. |
+| **Make** | build | ✗ (mtime) | shell-out | trivial | mtime lies (appendix) — reject. |
+| **build-your-own** | — | ✔ | in-process | ~few hundred LOC | full control, no heavy dep; we write fp/manifest/GC. |
 
-**Open fork:** build-your-own vs adopt. Even if we decline DVC, the decision should be explicit ("not DVC,
-because …"), not defaulted.
+**Recommendation:** at ~27 docs, **build-your-own minimal** (the §7 gate + a small fp sidecar) is the best
+ROI — in-process, no new heavy dependency. **Adopt DVC** when the corpus/artifacts grow enough that a remote
+archive + free lineage/caching outweigh the shell-out process boundary. **Dagster** only if this becomes a
+scheduled product with many assets. Avoid Pachyderm/Nextflow/Airflow (weight/purpose), Make (mtime). Whatever
+we pick, **the fork should be explicit** ("not DVC, because …"), not defaulted (D6).
 
 ### 9.2 Projections defeat "minimal rebuild"
 

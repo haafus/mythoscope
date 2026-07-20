@@ -217,6 +217,13 @@ chunk, or a hit loses the data with nothing to resolve it.
   key and the incremental anchor (pipeline §4), and how `graphs/<document_id>/` dirs behave. **Resolve first**;
   much of §8 (persist `document_id`, the embeddings key) depends on it. Leaning: the upstream-locator anchor
   (unifies more), but not decided.
+  - *Match-key argument (strengthens the locator anchor).* Stability across rebuilds is not about what the id
+    *looks like* but about the **match key** used to decide "same document, reuse its id". A *stored*
+    `slugify(title)` is rename-stable only if you separately match entries by their **locator** (url/path) —
+    because matching by title breaks on rename. So a stored title-slug needs the locator as a hidden second
+    key anyway (and it then drifts from the current title and can collide). `hash(locator)` collapses id +
+    match-key + raw-archive key into one; a stored title-slug adds a redundant, drift- and collision-prone id
+    on top of a locator match you already need.
 - **`slugify` transliteration is under-specified.** "Transliterate non-ASCII" needs a concrete library/rules
   (Python has no stdlib transliteration — `unidecode` or hand rules); it is lossy and can itself collide as the
   corpus grows. The fail-loud uniqueness check *detects* a collision but does not *resolve* it. Decide the
