@@ -169,6 +169,14 @@ still folded in); `embeddings:<variant>` and `graphs` both `→ [corpus]`; `proj
 `parallels → [crosswalk, sources]`, `semantic → [sources]`. The factory is the single, explicit home of this
 topology — not duplicated anywhere, the opposite of the rotting external inspector.
 
+**Fetch is the one edge still folded in.** Today `corpus` both downloads the raw (`fetch_to_cache` /
+`sources/` copy) *and* cleans it, so it has no upstream stage. But fetch is a different animal — **network,
+non-deterministic, archival** — from the pure offline build (§5). Part 2 item 4 splits it into its own upstream
+stage `fetch` (key = `document_id`; `desired()` = one key per book in `config/corpus.json`; `actual()` = what's
+present in `corpus/raw/<sha1(url)>`; `build(docs)` = download/copy the raw). Then `corpus.inputs() = [fetch]`
+and corpus stops touching the network. That split is also what cleanly separates `--force` (rebuild derived
+from raw) from `refresh` (re-fetch upstream) — §5, §6.5. Until it lands, treat `corpus` as fetch+build in one.
+
 **Atomisation of the current blocks.** "Atomise" = split each code module into the smallest
 independently-buildable **stages**, so that within one stage *every artifact is keyed the same way*. A **key**
 is the identity of one buildable/checkable item inside a stage, derived from config — it comes in two shapes:
