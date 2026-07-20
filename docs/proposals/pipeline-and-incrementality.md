@@ -115,62 +115,58 @@ The organising idea the rest of §2 hangs off. Today hygiene is **external and h
 builder writes it, the inspector re-derives it) so the two drift, and it **silently rots** when a naming scheme
 changes ("`clean` won't find files that fell out of the scheme").
 
-Instead, **each stage carries its own hygiene.** A stage is any module that already produces artifacts
-(`builder.py`, `build_embeddings.py`, `visualization.py`, graphs, motifs). The interface below is **validated
-against those real stages** (three shapes it must respect, called out inline):
+Instead, **each stage carries its own hygiene**, and a stage is **atomic** — one key-space, so the stage *is*
+its artifact family (no separate `ArtifactFamily` type). A module exposes `stages()`; the driver flattens all
+modules into one topological list. Interface (validated against the real stages):
 
 ```python
 class Stage:
-    def inputs(self) -> list[Stage]: ...        # upstream STAGES → cascade order + fp composition
-    def outputs(self) -> list[ArtifactFamily]:  # a stage owns SEVERAL keyed families, not one
-        ...                                      #   corpus = texts + catalog; projections = per method; motifs = sources/crosswalk/parallels
-
-class ArtifactFamily:
-    def expected_keys(self) -> set[key]: ...    # what SHOULD exist, from config
-    def scan(self) -> dict[key, fp]: ...        # ONE pass: existing = scan().keys(), stored_fp = scan()[k]
+    def inputs(self) -> list[Stage]: ...       # upstream STAGES → cascade order + fp composition
+    def expected_keys(self) -> set[key]: ...   # what SHOULD exist, from config
+    def scan(self) -> dict[key, fp]: ...        # ONE store read: existing = keys, stored_fp = value
     def fingerprint(self, key) -> str: ...      # current fp, composed from inputs' fps (§2.3)
-    def build(self, keys: set) -> None: ...     # BATCHED — the family owns GPU batching / the thread pool
+    def build(self, keys: set) -> None: ...     # BATCHED — the stage owns GPU batching / the pool
     def delete(self, keys: set) -> None: ...
+
+def stages() -> list[Stage]: ...               # per module; grouping for the CLI (`mytho embeddings` …)
 ```
 
-The three shapes that killed the naïve `one-family / build(key) / separate expected+existing+fp` sketch:
-1. **`outputs()` is a list of families** — corpus writes N texts *and* one `corpus.json` catalog; projections
-   write scatter/heatmap/distribution per `(model, method)`; motifs is a sub-pipeline. One family per stage
-   doesn't express them.
-2. **`build(keys)` takes a set** — no expensive stage is one-item-at-a-time: embeddings batches on the GPU,
-   corpus uses a thread pool, graphs is concurrent per chunk, projections is global over all points. Per-key
-   build would wreck throughput.
-3. **`scan()` is one pass** — `existing`, `stored_fp` (and the compare) come from a single store read, not
-   three re-scans of the same Chroma collection / directory.
+**Atomisation of the current blocks** (a `key` is a document id, or a singleton for a global reduce):
 
-One generic **driver** derives every operation, per stage (topological) × family:
+| module `stages()` | key | notes |
+|---|---|---|
+| `corpus` (1) | `document_id` | `corpus.json` is this stage's **sidecar store** (`scan()` reads it), not a separate artifact |
+| `embeddings:<variant>` (per variant) | `document_id` | each variant = its own collection; `build(docs)` chunks + **GPU-batches** inside |
+| `projections:<model>:<plot>` (scatter/heatmap/dist × method) | singleton | global reduce over the model's embeddings; `build` = full refit (D3) |
+| `graphs` (1) | `document_id` | the per-chunk LLM `chunk_hash` cache stays **internal** (a resumable GC tier §3), *not* a driver stage — else content-addressed orphan-GC |
+| `motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic` | singleton | atomising makes the motifs sub-DAG explicit via `inputs()` |
+
+Two shapes the atomic interface still must respect: **`build(keys)` is batched** (no expensive stage is
+one-item-at-a-time — GPU / pool / global), and **`scan()` is one pass** (not separate existing + fp re-scans).
+
+One generic **driver** derives every operation, per stage (topological):
 
 ```
-S = family.scan()                                         # one read → {key: stored_fp}
-missing = family.expected_keys() - S.keys()               # → build
-orphans = S.keys() - family.expected_keys()               # → clean / GC
-stale   = {k in S ∩ expected : family.fingerprint(k) != S[k]}   # → rebuild
+S = stage.scan()                                          # one read → {key: stored_fp}
+missing = stage.expected_keys() - S.keys()                # → build
+orphans = S.keys() - stage.expected_keys()                # → clean / GC
+stale   = {k in S ∩ expected : stage.fingerprint(k) != S[k]}   # → rebuild
 ```
 
-`status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths. **This traversal *is* the
-"build-your-own minimal" engine (D6)** — a few hundred LOC — and it is **stateless (D7) by construction**: the
-"registry" is the stage list already in `cli.py`; the state is `scan()` (disk/store) — no central manifest.
+`status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths — the "build-your-own minimal"
+engine (D6), **stateless (D7)**: the "registry" is `stages()`; the state is `scan()` (disk/store), no manifest.
+**Why it can't rot:** each store's layout lives in **one** place (the stage that writes it); adding a
+variant/method/source = adding a `Stage` → it appears in status/clean/build automatically.
 
-**Data split (one fix):** the content version (`doc_md5`, D2) lives **once per document in the catalog**, not
-smeared onto every chunk's Chroma metadata; embeddings reads it via `inputs()` (it already reads the catalog).
-
-**Why it can't rot:** each store's layout lives in **one** place — the family that writes it — and build and
-clean reach it only through `expected_keys`/`scan`. You can't write a path the cleaner doesn't know; adding a
-stage = implementing the interface once → it appears in status/clean/build automatically. **vs today:**
-`pipeline_inspect.py`'s per-store functions and `cli._clean`'s wiring move *into* each family; the external
-inspector thins to the driver loop.
-
-**This lands on the *post*-Part-1/2 code, not today's:** it presupposes the fixes those parts make —
-content-fp (not id-existence) dedup in embeddings, fp-not-presence corpus reuse, colour out of the build fp
-graph, `document_id` paths. On today's code it would not sit cleanly.
+**Sequencing (this is a big refactor — Part 4, not Part 2).** Part 2 does the small, high-ROI fp work *inside
+the existing stages* (the embeddings content-fp gate, `transform_version`, `doc_md5` once per doc in the
+catalog) — which **prepares the base**: the fp sidecars this protocol reads. **Part 4** is the atomisation
+itself — porting `pipeline_inspect.py`'s per-store functions + `cli._clean`'s wiring into the stages and the
+generic driver. It also presupposes Part 1 (content-fp dedup, `document_id` paths, colour out of the fp graph),
+so it lands last.
 
 The sections below are this protocol's pieces: §2.3 is `fingerprint()`, §2.6 is the driver's topological walk,
-§2.7 is `existing − expected`, §2.8 is `scan()`'s stored fp (sidecars, no manifest), §3 is orphan GC.
+§2.7 is `scan − expected`, §2.8 is `scan()`'s stored fp (sidecars, no manifest), §3 is orphan GC.
 
 ### 2.3 Fingerprints — what `fingerprint()` computes
 
@@ -501,56 +497,55 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 Full Bazel/Nix is overkill for this size — **content-addressed sidecar fps + transform versions, computed
 statelessly** is the right amount.
 
-### Implementation order — **Part 2 of 3: incrementality hardening** (nothing here blocks shipping Part 1)
+### Implementation order — **Part 2 of 4: incrementality base** (small, high-ROI; inside the existing stages)
 
 **Part 1 (the data-model + region migration) is the single list in
-[`region-implementation.md`](region-implementation.md) §5 — not repeated here.** Part 2 is the incrementality
-work; it is "Part 2" only in the sense that **none of it blocks shipping the migration** — *not* that it all
-runs strictly after.
+[`region-implementation.md`](region-implementation.md) §5.** Part 2 is the **small** fp work done *inside the
+existing stages* — no protocol refactor yet. It **prepares the base** (the fp sidecars) that Part 4 later
+harvests. None of it blocks shipping Part 1. Sub-decisions flagged *(decide Dx)*; full list in §9.5.
 
-The list is ordered by the architecture, not as loose bug-fixes: **item 1 is the stage protocol + driver
-(§2.2); everything after is a method on it or a consequence** — nothing bolted on from outside. None of it is
-gated on Part 1 (the one win that lands *inside* Part 1 — the embeddings key on `document_id`, fixing
-rename-churn for free — is step 4 there). Sub-decisions flagged *(decide Dx)*; full list in §9.5.
-
-1. **The stage protocol + generic driver (§2.2, validated against the real stages)** — port
-   `pipeline_inspect.py`'s per-store `*_status`/`*_orphans` and `cli._clean`'s wiring *into* each stage as
-   `outputs()` families (`expected_keys`/`scan`/`fingerprint`/`build(keys)`/`delete(keys)`); `status`/`clean`/
-   `build`/GC become one traversal over the stage list in `cli.py`. Respect the three shapes: **several families
-   per stage** (corpus texts + catalog; projections per method; motifs sub-pipeline), **batched `build(keys)`**
-   (GPU / pool / global), **single `scan()`** per store. Stateless, no manifest (D7); the traversal **is**
-   build-your-own (D6). Folds in the old "graphs build/serve unify + traversal guard".
-2. **Fill `fingerprint()`** — the uniform param-hash + one manual `algo_version` per stage (D4, §2.5) with the
-   doc-level `md5` content version (D2, §2.3). The **staleness gate falls out** of the driver's `stale` set
-   (fixes the re-embed-on-edit bug); add the projection fp for coherence (§9.2).
-3. **Atomicity as the `build()` contract** — write the artifact *then* its fp sidecar; atomic swap for the
-   catalog/collection — §9.4. So `stored_fp` never lies under a mid-build crash.
-4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5. This also splits `--force`'s two
-   meanings cleanly: **`--force` = treat all `expected` as stale → rebuild derived from raw** (the driver path);
-   **`refresh` = re-fetch upstream**. Today corpus's `--force` conflates them (it re-downloads).
-5. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
-   so this is "when to switch," not "what to build now."
+1. **Embeddings content-fp staleness gate** — replace the id-existence dedup with `(document_id, doc_md5,
+   model, ver)`; store `doc_md5` **once per doc in the catalog** (D2, §2.3), embeddings reads it. Fixes the
+   real re-embed-on-edit bug; the rename-churn half comes free from Part 1's `document_id` anchor.
+2. **`transform_version`** — uniform param-hash + one manual `algo_version` per stage (D4, §2.5).
+3. **Atomicity** — write the artifact *then* its fp sidecar; atomic swap for the catalog/collection — §9.4, so
+   a stored fp never lies under a mid-build crash.
+4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5. Splits `--force`'s two meanings:
+   **`--force` = rebuild derived from raw**; **`refresh` = re-fetch upstream** (today corpus conflates them).
+5. Graphs build/serve unify + traversal guard (isolated bug; also in Part 1 §5 step 6 — do wherever first).
 
 *(D3 decided — keep the full UMAP refit, no parametric work — §9.2.)*
 
-### Implementation order — **Part 3 of 3: manual text curation** (editorial; independent of Parts 1–2)
+### Implementation order — **Part 3 of 4: manual text curation** (editorial; independent)
 
-The human ability to hand-fix a document's text (OCR typo, an interleaved note the markers can't catch) as an
-**override layer** that never mutates raw or upstream. It is its own part because it is an **editorial
-workflow**, not required to ship the migration *or* to make rebuilds incremental — add it when curation is
-actually needed.
+Hand-fixing a document's text (OCR typo, an interleaved note the markers can't catch) as an **override layer**
+that never mutates raw or upstream — an editorial workflow, not required to ship the migration or to make
+rebuilds incremental.
 
 1. **The override layer + `curate` workflow** — `overrides/<document_id>.patch` (**D5: unified-diff patch**);
    `curate` materialises the current curated text, the curator edits it, `curate --save` snapshots
    `difflib(base, edited)` + stamps the base-fingerprint; build applies the patch (`git apply`) — §6.2–§6.4.
-   Prerequisite: the fetch/build split + `refresh` (Part 2 item 6) so an upstream update re-applies the patch
-   (or raises the re-curate conflict) cleanly.
+   Prerequisite: the fetch/build split + `refresh` (Part 2 item 4).
 
-D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
-canonical name, no slug), so Part 1 is fully unblocked. Decided since: **D2** (doc-level `md5`), **D3** (full
-refit), **D4** (uniform param-hash + manual `algo_version`, not per-stage), **D5** (unified-diff patch — Part 3),
-**D7** (stateless, no manifest). Still-open: **D6** (build engine — build-your-own vs DVC) — and D6 is
-effectively settled by D7 (stateless in-process ⇒ build-your-own; DVC only at scale).
+### Implementation order — **Part 4 of 4: the stage-protocol refactor** (big; deferred; consumes Part 2's base)
+
+The **self-describing-stage** architecture (§2.2): atomise each block into `stages()`, port
+`pipeline_inspect.py`'s per-store `*_status`/`*_orphans` and `cli._clean`'s wiring *into* the stages, and make
+`status`/`clean`/`build`/GC **one generic-driver traversal**. It ends the "external inspector rots" failure mode
+structurally. Deferred because it is the **largest** refactor and touches every stage + `cli.py`; it consumes
+the fp sidecars Part 2 laid, and presupposes Part 1 (content-fp dedup, `document_id` paths, colour out of the
+fp graph).
+
+1. Atomise the blocks per §2.2's table (`corpus`, `embeddings:<variant>`, `projections:<model>:<plot>`,
+   `graphs`, `motifs:*`); implement `inputs/expected_keys/scan/fingerprint/build(keys)/delete` on each.
+2. The generic driver over `stages()`; retire `pipeline_inspect` + `cli._clean` per-store wiring.
+3. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
+   so this is "when to switch," not "what to build now."
+
+D1 is decided — `document_id = hash(locator)` — and **D8 is dissolved**, so Part 1 is fully unblocked. Decided
+since: **D2** (doc-level `md5`), **D3** (full refit), **D4** (uniform param-hash + manual `algo_version`), **D5**
+(unified-diff patch — Part 3), **D7** (stateless, no manifest). Still-open: **D6** (build engine) — effectively
+settled by D7 (stateless in-process ⇒ build-your-own; DVC only at scale), decided formally in Part 4.
 
 ---
 
