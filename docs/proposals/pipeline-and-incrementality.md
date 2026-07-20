@@ -121,15 +121,44 @@ modules into one topological list. Interface (validated against the real stages)
 
 ```python
 class Stage:
-    def inputs(self) -> list[Stage]: ...       # upstream STAGES → cascade order + fp composition
-    def expected_keys(self) -> set[key]: ...   # what SHOULD exist, from config
-    def scan(self) -> dict[key, fp]: ...        # ONE store read: existing = keys, stored_fp = value
-    def fingerprint(self, key) -> str: ...      # current fp, composed from inputs' fps (§2.3)
-    def build(self, keys: set) -> None: ...     # BATCHED — the stage owns GPU batching / the pool
+    def inputs(self) -> list[Stage]: ...            # upstream STAGES → topological order + wiring
+    def expected_keys(self) -> set[key]: ...        # what SHOULD exist, from config
+    def scan(self) -> dict[key, fp]: ...             # ONE store read: STORED fps → existing = keys
+    def output_fingerprints(self) -> dict[key, fp]:  # this stage's {output key → CURRENT fp} — the map
+        ...                                          #   the driver and dependents read (§2.3)
+    def build(self, keys: set) -> None: ...          # BATCHED — the stage owns GPU batching / the pool
     def delete(self, keys: set) -> None: ...
 
-def stages() -> list[Stage]: ...               # per module; grouping for the CLI (`mytho embeddings` …)
+def stages() -> list[Stage]: ...                    # per module; grouping for the CLI (`mytho embeddings` …)
 ```
+
+There is **no single `fingerprint(key)`** in the interface: the driver always works with the whole map, so a
+stage exposes only `output_fingerprints()`; computing one key's fp is an internal step of building that map
+(`{k: compose(...) for k in expected_keys()}`).
+
+**How dependencies flow — a stage reads its inputs' fp maps, nothing more.** What a dependent needs from
+upstream is not the stage object but the **fingerprints of the upstream artifacts** (to fold into its own).
+Each stage exposes `output_fingerprints() -> {key: fp}`; a dependent builds *its* map by *looking up* the
+entries it needs in its inputs' maps — no recursion, no recompute. The driver walks topologically, so an
+input's map is always ready first. Example (`corpus → embeddings`, "Iliad"): corpus's map is
+`{"iliad": "abc", …}`, so embeddings' entry for "iliad" is `hash("abc" + model + version)`. Fan-in is the same
+shape — a projection's single entry is `hash(⊕ embeddings:M.output_fingerprints().values() + method_v)`.
+
+**Wiring** is a small typed `build_pipeline()` factory that constructs the stages and passes each its upstream
+**as constructor arguments** — so `inputs()` returns held, type-checked references (a wrong stage type fails at
+construction, not silently at runtime), and the parameterised fan-out (per variant / per model) is just a loop:
+
+```python
+def build_pipeline(config) -> list[Stage]:
+    corpus = CorpusStage()
+    emb = {v.model: EmbeddingsStage(variant=v, corpus=corpus) for v in config.embedding_variants}
+    return [corpus, GraphsStage(corpus=corpus), *emb.values(),
+            *(ProjectionStage(model=m, plot=p, embeddings=emb[m]) for m, p in config.projection_plots),
+            *motif_stages(config)]
+```
+
+The factory is the single, explicit, type-checked home of the topology — not duplicated anywhere, the opposite
+of the rotting external inspector.
 
 **Atomisation of the current blocks.** "Atomise" = split each code module into the smallest
 independently-buildable **stages**, so that within one stage *every artifact is keyed the same way*. A **key**
@@ -160,10 +189,11 @@ one-item-at-a-time — GPU / pool / global), and **`scan()` is one pass** (not s
 One generic **driver** derives every operation, per stage (topological):
 
 ```
-S = stage.scan()                                          # one read → {key: stored_fp}
-missing = stage.expected_keys() - S.keys()                # → build
-orphans = S.keys() - stage.expected_keys()                # → clean / GC
-stale   = {k in S ∩ expected : stage.fingerprint(k) != S[k]}   # → rebuild
+stored  = stage.scan()                    # {key: stored fp}      — one store read
+current = stage.output_fingerprints()     # {key: current fp}     — folds inputs' maps
+missing = stage.expected_keys() - stored.keys()               # → build
+orphans = stored.keys() - stage.expected_keys()               # → clean / GC
+stale   = {k for k in stored.keys() & current.keys() if current[k] != stored[k]}   # → rebuild
 ```
 
 `status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths — the "build-your-own minimal"
@@ -178,10 +208,11 @@ itself — porting `pipeline_inspect.py`'s per-store functions + `cli._clean`'s 
 generic driver. It also presupposes Part 1 (content-fp dedup, `document_id` paths, colour out of the fp graph),
 so it lands last.
 
-The sections below are this protocol's pieces: §2.3 is `fingerprint()`, §2.6 is the driver's topological walk,
-§2.7 is `scan − expected`, §2.8 is `scan()`'s stored fp (sidecars, no manifest), §3 is orphan GC.
+The sections below are this protocol's pieces: §2.3 is how `output_fingerprints()` compose, §2.6 is the
+driver's topological walk, §2.7 is `scan − expected`, §2.8 is `scan()`'s stored fp (sidecars, no manifest),
+§3 is orphan GC.
 
-### 2.3 Fingerprints — what `fingerprint()` computes
+### 2.3 Fingerprints — how `output_fingerprints()` compose
 
 Each artifact gets a fingerprint:
 
@@ -222,7 +253,7 @@ is interchangeable.
 
 ### 2.5 Transform version — where it lives, how it is bumped
 
-A module-level constant per stage, beside the code it versions, folded into that stage's `fingerprint()`:
+A module-level constant per stage, beside the code it versions, folded into that stage's `output_fingerprints()`:
 
 ```python
 # corpus/clean_gutenberg.py
@@ -267,10 +298,9 @@ The driver's topological walk (§2.2), using each stage's `inputs()`. Because an
 inputs' fps*, cascade is emergent — no per-edge "invalidate downstream" logic:
 
 ```
-in topological order (stage.inputs()); per family, S = family.scan():
-  new_fp = family.fingerprint(key)          # = hash(current input fps + transform_version)
-  if new_fp ≠ S[key] (or key missing): build, write new fp sidecar
-  else: skip
+in topological order (stage.inputs()); stored = stage.scan(); current = stage.output_fingerprints():
+  for key: if current[key] ≠ stored[key] (or key missing): build, write new fp sidecar
+           else: skip
 ```
 
 A rebuilt node gets a new fp → it is an input to its dependents → they see a changed input fp → they rebuild.
@@ -283,7 +313,7 @@ fp-diff catches **changed/new** inputs but **not removed** ones (they leave orph
 driver's second set (§2.2) — no separate mechanism:
 
 ```
-family.scan().keys()  −  family.expected_keys()  =  orphans → collect
+stage.scan().keys()  −  stage.expected_keys()  =  orphans → collect
 ```
 
 Per deletion type it falls out for free: url/doc removed from corpus.json → its text, chunks (Chroma ids with
@@ -295,7 +325,7 @@ auto-collected — §3, §6.)
 
 ### 2.8 `scan()` — sidecars, no manifest (D7)
 
-`family.scan()` reads the stored fps written *beside* the artifacts last build (in `corpus.json` rows — incl.
+`stage.scan()` reads the stored fps written *beside* the artifacts last build (in `corpus.json` rows — incl.
 the per-doc `doc_md5`, Chroma collection/chunk metadata, `graphs/<id>/.fp`) in **one pass** → `{key: stored_fp}`.
 Sidecars are the **source of truth**: they survive partial builds, need no single write-lock, and cannot drift
 from their artifact. There is **no central index** (D7 — §9.3): a manifest would only cache what `scan()` +
