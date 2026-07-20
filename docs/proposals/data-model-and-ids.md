@@ -329,6 +329,17 @@ chunk, or a hit loses the data with nothing to resolve it.
   settled in favour of the locator hash (see §4/§5). It decides rename/edit stability, unifies identity with
   the raw-archive key and the incremental anchor (pipeline §4), and makes `graphs/<document_id>/` dirs
   rename-invariant. The rationale below is retained as the justification, not an open question.
+  - *The governing principle: **identity = provenance**, not the label.* A **title is a label** — it churns,
+    collides, and says nothing about *what* the text is; anchoring identity on it is the mistake D1 fixes. A
+    **locator is what the text *is*** — where it was drawn from. So the two axes separate cleanly and each does
+    the right thing: a **rename** (label changed) leaves the id fixed → the expensive stores are reused (free);
+    a **re-source** (URL / `sources/`-path changed) *is* a different provenance → the id changes → the
+    document re-derives (re-fetch, re-embed, re-graph). **That re-derive is the intended behaviour, not a
+    cost** — you changed where the text comes from, so a fresh derivation is exactly what you want; the old
+    id's artifacts orphan and GC. The only degenerate case — an *identical-bytes* move (a mirror / upstream
+    re-release at a new URL) — costs one idempotent re-embed (same vectors) plus a re-graph of unchanged text;
+    rare, cheap at this scale, and avoidable by keeping the URL pinned or remapping the catalog `locator → old
+    id` by hand. No schema complexity is worth buying that edge case out.
   - *Match-key argument (strengthens the locator anchor).* Stability across rebuilds is not about what the id
     *looks like* but about the **match key** used to decide "same document, reuse its id". A *stored*
     `slugify(title)` is rename-stable only if you separately match entries by their **locator** (url/path) —
