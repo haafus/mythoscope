@@ -9,8 +9,8 @@ not as live work.
 ## Active — the science
 
 - [`regions.md`](regions.md) — **the canon**: the definitive **14-region** `region` classification (names,
-  descriptions, subdivisions, strata, per-region traditions, intuitive/associative palette — one `color` per
-  region). **Goal:** one
+  descriptions, subdivisions, strata, per-region traditions, intuitive/associative palette — one stored
+  `color` per region, with per-tradition shades **derived** off it (OKLCH gradient, §8.1)). **Goal:** one
   authoritative region vocabulary; where any other doc diverges, this is authoritative. *Canon reference
   (drives `region-implementation.md`).*
 

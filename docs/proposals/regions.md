@@ -706,9 +706,71 @@ neighbour distinction, as before.
 Only **`color`** is canonical — one colour per region. There are no `light`/`dark` ramp ends any more; any
 hover / point-on-fill shading a UI needs is derived from `color` at render time.
 
-> **Colour lives only at the region level.** A tradition has **no colour of its own** — it takes its
-> **region's** `color`. There is no per-tradition colour and no within-region gradient keyed to a tradition
-> (superseding the earlier "gradient within area" idea in `archive/tradition-architecture-unified.md` §3).
+> **Canonical storage is still one `color` per region.** Only the 14 region `color`s are authored/stored;
+> the legend stays 14-colour (region swatch = its base `color`). A **per-tradition shade is a *derived
+> rendering*, not stored data** — computed on display from the region base by the rule in §8.1. This keeps the
+> data-model invariant (colour is resolved, never denormalized — see `data-model-and-ids.md`): a tradition's
+> shade is a pure function of `(region base color, tradition's index in region, region's tradition count)`.
+
+### 8.1 Per-tradition within-region shades (2026-07 — reverses the earlier "no gradient" rule)
+
+This **supersedes** the previous decision (and the older "gradient within area" idea in
+`archive/tradition-architecture-unified.md` §3) that a tradition had no colour of its own. Traditions now get
+their own shade, derived as a **lightness (and, when needed, chroma) gradient off the region base**, keeping
+the region's **hue** so every shade still reads unmistakably as that region.
+
+**Work in OKLCH, not HSL.** Fix the region base **H**; fix **C** (gamut-clipped per step); vary only **L** on a
+perceptually-uniform axis. HSL lightness is not perceptual (equal steps look unequal; the hue-identity of the
+region collapses toward the black/white ends). A bonus of a lightness axis: it is **colour-blind-robust by
+construction** — lightness survives all dichromacies, so within-region shades stay ordered/separable for CVD
+viewers (the region itself is already distinguished by hue in the validated 14-colour palette).
+
+**Safe band & step (light basemap, e.g. Positron).** Keep shades in `L ∈ [0.42, 0.80]` OKLab (below 0.42 dark
+marks lose hue; above 0.80 they wash into the surface). Comfortable per-step separation for small map/scatter
+marks is `ΔL ≈ 0.045` (noticeable ~0.03, unusable < 0.02). The full band therefore yields only **~8 comfortably
+distinct lightness steps** (`0.38 / 0.045`), ~12 at a squeeze — this ceiling drives the adaptive scheme below.
+
+**Grow-then-clamp, centred on the base** (unifies "fixed segment" and "grow with N" — small regions cluster
+tightly around the canonical colour; big regions expand only to the safe cap, never into the washed-out ends):
+
+```
+W        = min(W_safe, (N-1) · ΔL_target)      # W_safe ≈ 0.38 ; ΔL_target ≈ 0.045
+L_i      = L_base − W/2 + i · W/(N-1)           # i = 0..N-1 ; if N==1 → L_base
+                                                # then clip the whole band into [0.42, 0.80]
+H_i = H_base ;  C_i = clip_to_gamut(C_base, L_i)
+```
+
+**Ordering `i` within a region:** by **longitude** (west→east) so lightness weakly encodes geography and the
+ramp is not arbitrary; fall back to `tradition_id` order for determinism when coordinates are absent.
+
+**Two consumers — different distinguishability needs:**
+
+- **Atlas / facet-map — distinguishability is *optional*.** Points already separate by **coordinates**, so
+  colour need not resolve individual traditions. The choice is a free rendering spectrum: **(a) flat** — every
+  tradition takes the region base (calmest map); **(b) coarse** — quantise L to a few key buckets (light
+  texture without full resolution); **(c) full** — the same computed shade used on the similarity screen
+  (cross-screen consistency). Any is valid because the colour is derived, not stored — pick per aesthetics /
+  performance.
+- **Similarity / embedding scatter — distinguishability *matters*.** There is **no geography** to lean on, so
+  the shade is the only within-region identity cue. This screen drives the adaptive scheme and the L×C
+  fallback below.
+
+**Adapting the subdivision to N (1 → max = 24):**
+
+| N (traditions in region) | scheme | separability |
+|---|---|---|
+| **1** | shade = region base `L_base` exactly (the swatch itself) | n/a |
+| **2 – 8** | pure L-ramp, `W = (N−1)·ΔL_target` centred on `L_base`, comfortable `ΔL ≈ 0.045` | full — every tradition clearly distinct (serves similarity completely) |
+| **9 – 12** | L-ramp across the **full** safe band, `ΔL = W_safe/(N−1)` compresses toward ~0.03 | good — still usable on similarity, tighter |
+| **13 – 24** | **add chroma as a 2nd axis → L×C lattice** (L alone tops out ~12) | full again, up to ~8×3 = 24 cells |
+
+**The L×C lattice (large N, similarity screen).** Hold **H = region hue** throughout (still "this region").
+Build `n_L = 8` lightness rows across the safe band and `n_C = ceil(N / n_L)` chroma columns stepping from
+`C_base` down to ~`0.45·C_base` (don't go greyer — it starts reading as a different/muddy region). Place
+tradition `i` on the grid **boustrophedon** (serpentine) so consecutive ids differ maximally in L. With
+`n_L = 8`, three chroma columns cover the worst case (Sub-Saharan Africa, 24). For the **texted corpus** (≤ ~6
+per region today) none of this triggers — the plain L-ramp is always sufficient; the lattice only exists for
+the full-atlas similarity view of large oral regions.
 
 > **The previous Prism palette is archived.** The earlier CARTOColors-Prism spectral-arc palette — with its
 > hand-tuned swaps and `light`/`dark` ramp ends — is kept for provenance in

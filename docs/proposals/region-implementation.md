@@ -15,8 +15,8 @@ Grounded in the three field audits ([`../reviews/archive/tradition-review.md`](.
 ## 0. Closed decisions (context — not reopened)
 
 - **`region` (14) is the sole classification axis** of a tradition. No facet layer. Canon: `regions.md`.
-- **Colour lives only at the region level** — a tradition inherits its region's colour (single `color`,
-  `regions.md` §8).
+- **Only the region `color` is stored** (single value, `regions.md` §8) — a tradition's colour is a
+  within-region **shade derived** from that base at display (OKLCH lightness/chroma gradient, `regions.md` §8.1).
 - **Out of scope:** motif `theme`/`stratum`, the connectivity axis and dating (science), and **the entire
   motif-areal region system** (§2.7).
 
@@ -109,9 +109,15 @@ param) it is **removed** — region is resolved from the tradition via the tree,
 where code **grouped** by it, grouping is now by `region` through the tree. It is a renamed *concept*, not a
 field that survives on records.
 
-**2.6 Colour comes from the region and is not stored.** A tradition's colour is its region node's `colour`
-in `config/traditions.json`, computed `tradition → region → colour` at display. `get_tradition_color` /
-`random` and the colour injection in `get_catalog_documents` are removed; colour appears in no record.
+**2.6 Colour comes from the region and is not stored — including the per-tradition shade.** Only the region
+node's single `colour` is stored in `config/traditions.json`. A tradition's colour is **derived at display**
+as a within-region shade off that base — `tradition → region base → shade(index, region tradition-count)` —
+per the OKLCH lightness/chroma rule in [`regions.md`](regions.md) §8.1 (reverses the old flat-inherit rule).
+`get_tradition_color` / `random` and the colour injection in `get_catalog_documents` are removed; **no colour
+— region or tradition — appears in any record.** The per-tradition shade is a pure function of `(region base,
+tradition index, count)`, so it stays fully resolved, never denormalized — the same invariant as B1/D1 (colour,
+like tradition and region, is computed from stable references, not written into the derived stores). The shade
+is deterministic given the tree, so the front computes it from the globally-cached tree with no new payload.
 
 **2.7 The motif-index region system is untouched.** Berezkin/ATU/TMI regions and their palette
 (`services/motifs.py`, `sources/atu_regions.py`, `sources/culture_dict.py`, `page-motifs.js::REGION_COLORS`)
@@ -226,7 +232,7 @@ outputs/embeddings/*            chunk metadata: document_id + chunk_index ONLY (
 /api/corpus/document     one raw text, by ?id= (working default (title, tradition))          (renamed from /documents)
 /api/similarity/*        search hits: chunk data + document_id reference (B1); no tradition/major/region/colour
         ▼  front  (loads the tree + the documents ONCE, global cache, and composes)
-group by region, attach books, colour by region; one 14-region legend; reused by corpus/atlas/embeddings/search
+group by region, attach books, colour = region base + derived per-tradition shade (regions.md §8.1); 14-region legend; reused by corpus/atlas/embeddings/search
 ```
 
 ---
@@ -254,8 +260,9 @@ group by region, attach books, colour by region; one 14-region legend; reused by
    `/documents` → `/document` (one text) located by `(title, tradition)`.
 3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
-   colour + fields, no books); a tradition's colour is its region's, computed at display; strip `region` and
-   `colour` from the `corpus.json` rows and `/documents` (the renamed list).
+   colour + fields, no books); a tradition's colour is a within-region shade derived from its region base at
+   display (regions.md §8.1), not stored; strip `region` and `colour` from the `corpus.json` rows and
+   `/documents` (the renamed list).
 4. **Front composes from one global load.** Fetch `/traditions` + `/documents` once into shared state; remove the
    client-side `groupDocuments`; render the `region → traditions` tree in canon order; attach books from the
    documents; color = region `color`; reuse the cache in corpus/atlas/embeddings/search.
