@@ -20,7 +20,7 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 |---|---|---|---|---|---|
 | 0 | **config** (hand-authored) | `config/corpus.json` (title, tradition, url, content_start/end, exclude), `config/traditions.json` (tree), `config/models.json`, `config/prompts.json`, `sources/` | — | — | — |
 | 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<sha1(url)>` (raw snapshot; `sha1(url) = document_id`, D1), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (sha1 url), extraction | network (~s/doc); clean/trim CPU-cheap |
-| 1.5 | **Preprocess** (variants) | cleaned text + variant config | `preprocessed/…` | preprocessing | CPU cheap–moderate |
+| 1.5 | **Preprocess** (variants) | cleaned text + variant config | `preprocessed/…` | preprocessing | **cost depends on the variant**: plain = CPU-cheap; a `preprocess_prompt` variant runs an **LLM** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited** |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
 | 3 | **Projections** | vectors (embeddings) + method | `projections/<model>/<method>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
 | 4 | **Graphs** | cleaned text + prompts.json + LLM | `graphs/<document_id>/…` (`document_id = hash(locator)`, D1) | chunk-cache (LLM responses) | **LLM — $$, rate-limited**; per-chunk |
