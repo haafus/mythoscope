@@ -233,6 +233,14 @@ source is just *adding a stage* — it shows up in `status`/`clean`/`build` for 
 Two shapes the atomic interface still must respect: **`build(keys)` is batched** (no expensive stage is
 one-item-at-a-time — GPU / pool / global), and **`actual()` is one store pass** (not separate key + fp reads).
 
+A third: **`build(keys)` isolates per-key failure.** One document failing (a 404, a bad decode, an LLM
+rate-limit) must **not** abort the rest of the batch — it builds the keys it can, logs the ones it can't, and
+simply **does not write their fp sidecar**. That is not a special error path: a key with no sidecar is absent
+from `actual()`, so it stays `missing` and is retried on the next run — the same self-healing that covers a
+mid-build crash (§9.4). `build_corpus` already behaves this way (`_download_and_process` returns `None` on
+failure and the loop continues); the protocol just makes "partial success leaves the failed keys rebuildable"
+an explicit contract for every stage, not an accident of one.
+
 One generic **driver** derives every operation as a **diff of the two maps**. It first puts the stages in
 **topological order** — each stage after all of its `inputs()` — by a plain topological sort of the `inputs()`
 edges (repeatedly take a stage whose inputs are all already placed; if some stages remain but none can be
@@ -664,6 +672,16 @@ With content-addressing, coherence is guaranteed **at build completion** (every 
 Between builds (config edited, not yet rebuilt) the serve layer reads whatever is on disk. For a
 single-user research tool the **build-then-serve** model is sufficient; if on-the-fly coherence is needed,
 use atomic artifact swaps or a `status`-driven "stale" flag.
+
+**Stated assumption — one builder at a time.** This whole design assumes a **single-user, single-build**
+setting: at most one `build` runs at a time, and serving reads the last completed build. That is what lets
+`actual()` trust on-disk sidecars and the driver stay stateless (§9.3). It is an *assumption*, not a guarantee —
+§9.3's "concurrent builds self-heal" holds only in the weak sense that each run re-reads truth, **not** that two
+`build` processes may safely race on the same store (the `corpus.json` atomic swap serialises one writer, but two
+concurrent writers to the same collection are out of scope, and `test_concurrency.py` covers the LLM
+`map_concurrent` fan-out *within* a build, not competing builds). If this ever becomes multi-writer (a scheduled
+service, a shared remote cache), add a per-store build lock — but that is a different product than the one
+these docs spec.
 
 ---
 

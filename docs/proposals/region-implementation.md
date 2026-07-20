@@ -290,7 +290,24 @@ front resolution before any field is trimmed off a chunk/hit → then the trim �
 6. **Cleanup.** One `UNASSIGNED` across `schemas.py`, `iterator.py`, the front; graphs — unify build/serve on
    the stored `document_id` + traversal guard.
 
-Tests are rewritten to the new model as each step lands.
+**Tests — rewrite to the new model, and pin the invariants the migration exists to protect.** The suite (36
+files) is written against the *old* model (`text_id = slug(title)`, `tradition`/`major_tradition` on the chunk),
+so "rewrite as each step lands" is not enough on its own — the point of the migration is a set of behaviours that
+must not silently regress, so name them as regressions rather than trusting green tests written to the old shape:
+
+- **id stability** — a `title`/`tradition`/`region` rename leaves `document_id` (and the Chroma PKs, graph dir)
+  byte-identical; a `url`/`sources`-path change *does* move it (D1);
+- **locator normalization** — the two cosmetic-variant URLs of data-model §5 (host case, trailing slash,
+  `%7E`≡`~`, dropped fragment) hash to the **same** id; a query-string or path-case difference does **not**;
+- **the fp gate (the original bug)** — editing `content_start/end` or the cleaned text **re-embeds** the doc's
+  chunks (flaw 2 fixed); a pure rename does **not** re-embed (flaw 1 fixed);
+- **B1 resolution** — `document_id → tradition → region → colour` resolves correctly with **nothing**
+  tradition/region/colour on the chunk; a tradition re-annotation changes the resolved colour with **zero**
+  Chroma writes;
+- **cross-tradition filter** — `get_point` returns the `document_id $nin` set equivalent to the old
+  `tradition != X` clause;
+- **fail-loud** — an unknown `corpus.tradition`, a non-canon region key, or a duplicate name **fails the build**
+  (not a silent `.get()` default).
 
 ---
 

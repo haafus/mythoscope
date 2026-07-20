@@ -172,20 +172,34 @@ construction (unique by fiat in the curated 14 + ~194 vocabulary); it only catch
 whitespace-variants of one name. Rename = edit the config string + repoint books (cheap, validated; touches no
 Chroma, no re-embed — B1/D1).
 
-**The document id is *not* a name at all — `document_id = hash(locator)` (Decided, D1).** The locator is the
-document's upstream address (the URL, or the `sources/` path), normalized (scheme/host/trailing-slash/%-decode)
-then hashed (`blake2b`) — which is the raw-archive key `corpus/raw/<blake2b(url)>`, so `document_id` *is* that key,
-reused with zero new code. A hash is fixed-length, always fs/url/Chroma-safe, collision-free, and — crucially —
+**The document id is *not* a name and *not* a slug — `document_id = hash(locator)` (Decided, D1).** The locator
+is the document's upstream address (the URL, or the `sources/` path), **normalized** (rule below) then hashed
+(`blake2b`) — which is the raw-archive key `corpus/raw/<blake2b(url)>`, so `document_id` *is* that key, reused
+with zero new code. A hash is fixed-length, always fs/url/Chroma-safe, collision-free, and — crucially —
 **invariant under any title/tradition/region rename** (the id tracks the source, not the display string).
 Titles are free to churn and collide; the id does not. See §9-D1 for the full rationale.
 
-**The document id is *not* slugified — `document_id = hash(locator)` (Decided, D1).** The locator is the
-document's upstream address (the URL, or the `sources/` path), normalized (scheme/host/trailing-slash/%-decode)
-then hashed (`blake2b`) — which is the raw-archive key `corpus/raw/<blake2b(url)>`, so `document_id` *is* that key,
-reused with zero new code. This deliberately keeps documents off `slugify`: a hash is fixed-length,
-always fs/url/Chroma-safe, collision-free, and — crucially — **invariant under any title/tradition/region
-rename** (the id tracks the source, not the display string). Titles are free to churn and collide; the id does
-not. See §5 and §9-D1 for the full rationale.
+> **The locator-normalization rule — the identity boundary.** Because `document_id = hash(locator)`, *what we
+> hash* **is** the definition of "the same document," so the rule must be pinned, not hand-waved. Today the raw
+> key is `sha1(url)` over the **raw** config string, with **no** normalization (`fetch_cache.cache_path`,
+> `hashlib.sha1(url.encode())`); the target adds one canonical pass **before** hashing. The design intent is
+> narrow: **fold only cosmetic edits to the locator** (so a trivial re-typing of the config URL does not
+> re-mint the id and orphan every derived artifact), and **never merge two genuinely distinct sources.** So the
+> rule is conservative — it touches only the parts of a URL that RFC 3986 defines as case-insensitive or
+> non-identifying:
+>
+> - **Web locator** (`http`/`https`): strip surrounding whitespace; lowercase the **scheme** and **host** only;
+>   drop the default port (`:80` for http, `:443` for https); drop the **fragment** (`#…` never names a
+>   different document); percent-decode only the RFC-3986 **unreserved** set (`A–Z a–z 0–9 - . _ ~`, so `%7E`≡`~`);
+>   collapse a **single trailing `/`** on the path. **Keep verbatim:** the **path case** (paths are
+>   case-sensitive) and the **entire query string** (it can select a real resource). Nothing else is altered.
+> - **Local locator** (a `sources/` file): the locator is the file path **relative to `sources/`**,
+>   whitespace-trimmed and POSIX-normalized (forward slashes, drop `./` and redundant separators); **case is
+>   preserved** (the config path is authoritative). No percent/scheme handling.
+>
+> Whatever the exact rule, it is **frozen once ids are minted** — it feeds the durable Chroma PKs and graph
+> dir names, so changing it later silently re-mints and orphans (exactly the "Store the ids; never regenerate"
+> hazard below). A future rule change is therefore a *migration* (re-mint + rebuild-from-raw), not a hot edit.
 
 > The model registry (`model_registry.py`) uses the inverse pattern — an **authored** safe key plus a
 > `key → label` humanizer — because its keys are hand-written. That does not fit free-form names, so we do
@@ -393,8 +407,10 @@ Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline
     (URLs slug long and unreadable) and which the file path already carries. Opacity is fine — the catalog is
     the `id → {title, url}` lookup. **Hash = `blake2b`** (one algorithm across identity + fingerprints —
     pipeline §2.4; the archive was `sha1(url)`, a one-time rename to `blake2b(url)` off the config, no
-    re-download). Normalize the locator (scheme/host/trailing-slash/%-decode) before hashing. (Both slug and
-    hash need that normalization.)
+    re-download). Normalize the locator before hashing per the **pinned rule in §5** (the identity boundary:
+    fold only cosmetic URL variation — scheme/host case, default port, fragment, unreserved %-escapes, one
+    trailing slash — keep path case + query verbatim; local = POSIX path relative to `sources/`). Both slug and
+    hash need that normalization; today's `sha1(url)` does *none*, so this pass is new work landing with D1.
   - *Why a name-derived id is fine for `tradition_id`/`region_id` but was feared for `document_id`.* The issue
     is never the transform but **what the id primary-keys** × **how churny/collision-prone the name is**.
     `document_id` primary-keys the **expensive, persisted, content-addressed** per-document artifacts (chunk ids
