@@ -116,24 +116,27 @@ builder writes it, the inspector re-derives it) so the two drift, and it **silen
 changes ("`clean` won't find files that fell out of the scheme").
 
 Instead, **each stage carries its own hygiene**, and a stage is **atomic** — one key-space, so the stage *is*
-its artifact family (no separate `ArtifactFamily` type). A module exposes `stages()`; the driver flattens all
-modules into one topological list. Interface (validated against the real stages):
+its artifact family (no separate `ArtifactFamily` type). A single `build_pipeline()` factory (below) constructs
+and wires every stage — it is **the one registry**; the driver flattens its output into a topological list, and
+CLI grouping (`mytho embeddings`) comes from the stage's name prefix (`embeddings:*`), not a separate per-module
+list. Interface (validated against the real stages):
 
 ```python
 class Stage:
     def inputs(self) -> list[Stage]: ...    # upstream STAGES → topological order + wiring
     def desired(self) -> dict[key, fp]: ...  # what SHOULD exist + the fp each should have (config + inputs)
-    def actual(self)  -> dict[key, fp]: ...  # what IS in the store + the fp it was built with (sidecars)
+    def actual(self)  -> dict[key, fp]: ...  # what IS built (artifact + its fp sidecar both present) → its stored fp
     def build(self, keys: set) -> None: ...  # BATCHED — the stage owns GPU batching / the pool
     def delete(self, keys: set) -> None: ...
-
-def stages() -> list[Stage]: ...            # per module; grouping for the CLI (`mytho embeddings` …)
 ```
 
 The two maps are the **same shape** (`{key → fp}`) and named by the *state* they describe, not an action:
 **`desired()`** = the spec (from config: which keys should exist, and what fp each should hash to now);
-**`actual()`** = reality (from the store: which keys are there, and the fp they were built with). A single key's
-fp is never exposed on its own — the driver always works with the whole map.
+**`actual()`** = reality (from the store: which keys are built, and the fp they were built with). A key is in
+`actual()` only if **both** its artifact *and* its fp sidecar are present — a build that crashed after writing
+the artifact but before its fp leaves the key *out* of `actual()`, so it shows up as `missing` and is rebuilt
+(that is how the crash-recovery rule of §9.4 falls out of the model). A single key's fp is never exposed on its
+own — the driver always works with the whole map.
 
 **How dependencies flow — a stage reads its inputs' `desired()` maps, nothing more.** A dependent's target fp
 folds in its inputs' target fps. So a dependent builds *its* `desired()` by *looking up* the entries it needs
@@ -243,7 +246,7 @@ stale   = {k for k in d.keys() & a.keys() if d[k] != a[k]}   # exists, fp diverg
 ```
 
 `status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths — the "build-your-own minimal"
-engine (D6), **stateless (D7)**: the "registry" is `stages()`; the state is `actual()` (disk/store), no manifest.
+engine (D6), **stateless (D7)**: the "registry" is `build_pipeline()`'s output; the state is `actual()` (disk/store), no manifest.
 **Why it can't rot:** each store's layout lives in **one** place (the stage that writes it); adding a
 variant/method/source = adding a `Stage` → it appears in status/clean/build automatically.
 
