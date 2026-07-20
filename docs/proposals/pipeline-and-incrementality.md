@@ -184,8 +184,9 @@ external checker that drifts.
 driven by config. `corpus` and `graphs` are one stage each. **Embeddings is one stage per embedding model**
 listed in `config/models.json` — three models means three stages, all reading the same corpus. **Projections
 fan out further** — one stage per (model × chart type), each wired to the embeddings of its own model. Motifs
-is a fixed handful. The fan-out is nothing clever: it's a loop in the factory that walks the config lists and
-makes one stage object per entry. Add a model to the config and a new stage appears on the next build (its
+is a fixed handful. The fan-out is nothing clever: it's a loop in the factory over the models in the config
+(the projection *chart types* are code constants, not config) that makes one stage object per entry. Add a
+model to the config and a new stage appears on the next build (its
 whole collection is "missing", so it embeds all the books just for that model, leaving the others alone);
 remove a model and its stage — and its now-orphaned collection — is cleaned.
 
@@ -279,8 +280,8 @@ Granularity per stage:
 |---|---|---|
 | document text | `hash(raw_bytes + content_start/end + patch + clean_v)` | document |
 | **chunk embedding** | **(document_id, doc_md5, model, preprocess_v)** — content version is **doc-level** (D2) | **per-doc decision** (a text edit re-embeds all the doc's chunks) — fixes both flaws of §1.4 |
-| projection | `hash(⊕ member chunk fps + method_v)` | **global per (model, method)** — UMAP is indivisible |
-| graph | `hash(text + prompt_v + llm_model)` | document/chunk |
+| projection | `hash(⊕ that model's embeddings `desired()` values + method_v)` (per-doc fps, D2 — not per-chunk) | **global per (model, method)** — UMAP is indivisible |
+| graph | `hash(text fp + prompt_v + llm_model)` | **document** (per-chunk LLM cache is internal) |
 | serve-resolve (tree + colour, incl. per-tradition shade) | — | **not an artifact** — region colour *and* its derived per-tradition OKLCH shade (regions.md §8.1) are computed at runtime → tree/colour edits are free |
 
 ### 2.4 Hash choice
@@ -294,10 +295,12 @@ Granularity per stage:
 
 For change-detection / cache keys (non-adversarial) **any works** — accidental collision is astronomically
 unlikely at our scale. Crypto strength matters only if fps become a trust boundary (a shared/remote cache
-where a poisoned entry is dangerous). **Standardize on one — `blake2b` (fast + strong + stdlib) or
-`sha256`.** The current sha1/md5 split is legacy, not a decision. Note the *roles* differ and are meaningful:
-`sha1(url)` = **identity** ("which source"); `md5(text)` = **version** ("what content") — but the algorithm
-is interchangeable.
+where a poisoned entry is dangerous). **Decided: `blake2b`** (fastest + strong + stdlib) for the fingerprint
+machinery. **One exception on purpose:** `document_id` stays **`sha1(url)`** — it *is* the existing raw-archive
+key (`corpus/raw/<sha1(url)>`, D1), and reusing it avoids re-keying the whole archive; identity and fingerprint
+are different jobs, so a different hash for each is fine. The current sha1/md5 split elsewhere is legacy —
+migrate those fingerprints to `blake2b`. Note the *roles*: `sha1(url)` = **identity** ("which source");
+the content hash = **version** ("what content").
 
 ### 2.5 Transform version — where it lives, how it is bumped
 
@@ -352,8 +355,8 @@ in topological order (stage.inputs()); d = stage.desired(); a = stage.actual():
 ```
 
 A rebuilt node gets a new fp → it is an input to its dependents → they see a changed input fp → they rebuild.
-The projection is the special node (`fp = hash(⊕ chunk fps + method_v)`): **any** chunk change → whole
-projection rebuilds (inherent to global UMAP).
+The projection is the special node (`fp = hash(⊕ its model's per-doc embedding fps + method_v)`): **any**
+document change → whole projection rebuilds (inherent to global UMAP).
 
 ### 2.7 Deletions — `actual − desired`
 
@@ -405,7 +408,8 @@ age; keep-last-N (for versioned stores); pinning (never-collect); tiered (per cl
 - **raw archive** → **pin / keep-forever** (durability, provenance); explicit `purge` only — *not* auto-
   deleted even when its doc leaves the config (retired ≠ purged).
 - **resumable caches** (extraction/preprocess/LLM chunk-cache/motif scrape) → **TTL or reachability**, safe to
-  drop, regenerable; `clean --caches`.
+  drop, regenerable; `clean --caches`. **`--force` does *not* touch these** — only `--caches` does (§5), so a
+  forced rebuild never re-pays for LLM/scrape work whose inputs are unchanged.
 
 This matches the existing `clean` flags (`--caches`, `--apply`).
 
@@ -457,10 +461,20 @@ Separate **fetch** (network, into the immutable raw archive — non-deterministi
   rebuilds downstream.
 
 So acquire-if-missing is automatic; **upstream re-fetch is deliberately manual** — build stays offline and
-deterministic.
+deterministic. **Motif source stages behave the same way**: they scrape fixed sites once into a cache and
+restage only when their config/`algo_version` changes; a changed upstream site is picked up only by the same
+explicit `refresh` (or `--caches`), never auto-detected.
 
-**Escape-hatch** = `--force`: rebuild everything, ignoring fps/caches. Kept because fingerprinting can have
-bugs (a forgotten `algo_version` bump), corruption/partial builds happen, or you just want a guaranteed-clean
+**Escape-hatch, in two levels** (they are *not* the same):
+
+- **`--force`** = rebuild every derived artifact from the raw, **ignoring fingerprints** — but the **resumable
+  caches stay** (the LLM chunk-cache, extraction cache). So graphs reassemble from the cache, embeddings
+  re-encode, projections refit; the expensive LLM calls are **not** re-paid when their input chunks are
+  unchanged. This is for "my fp logic might be buggy / partial build — rebuild the tree."
+- **`--caches`** = also drop the resumable caches → re-run the LLM / re-scrape. This is the only thing that
+  re-pays for `$$` work. (Today `graphs --force` conflates these by clearing the cache; the split fixes that.)
+
+Kept because fingerprinting can have bugs (a forgotten `algo_version` bump) or you just want a guaranteed-clean
 rebuild. Every incremental system keeps one (Make `-B`, Bazel clean, Nix `--rebuild`).
 
 ---
@@ -586,14 +600,17 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 - **(4)** extend `status` to "what to rebuild" (orphan detection is already there).
 
 Full Bazel/Nix is overkill for this size — **content-addressed sidecar fps + transform versions, computed
-statelessly** is the right amount.
+statelessly** is the right amount. (This minimal path is exactly what **Part 2** below implements; the
+protocol/driver of §2.2 is the later **Part 3** generalisation of it.)
 
 ### Implementation order — **Part 2 of 4: incrementality base** (small, high-ROI; inside the existing stages)
 
 **Part 1 (the data-model + region migration) is the single list in
 [`region-implementation.md`](region-implementation.md) §5.** Part 2 is the **small** fp work done *inside the
 existing stages* — no protocol refactor yet. It **prepares the base** (the fp sidecars) that Part 3 later
-harvests. None of it blocks shipping Part 1. Sub-decisions flagged *(decide Dx)*; full list in §9.5.
+harvests, so it must write each fp in the shape Part 3's `actual()` will read it back — `blake2b`, stored per
+doc in the `corpus.json` row / per collection in Chroma metadata / `graphs/<id>/.fp` — or Part 3 reworks it.
+None of it blocks shipping Part 1. Sub-decisions flagged *(decide Dx)*; full list in §9.5.
 
 1. **Embeddings content-fp staleness gate** — replace the id-existence dedup with `(document_id, doc_md5,
    model, ver)`; store `doc_md5` **once per doc in the catalog** (D2, §2.3), embeddings reads it. Fixes the
@@ -696,8 +713,11 @@ recomputes fps on the fly (fps live in per-artifact sidecars). Why it wins here:
 - "What depends on X" is a **static** fact of this pipeline (graphs ← prompts, etc. — known from the code), not
   something needing stored edges; the manifest only pays off for dynamic, fine-grained dependency graphs we
   don't have.
-- Stateless **never drifts**: out-of-band deletion/corruption, a mid-build crash, a git-branch switch, or
-  concurrent builds all self-heal because it reads on-disk truth, not a cached index.
+- Stateless doesn't carry a stale index: an out-of-band **deletion**, a mid-build crash, a git-branch switch, or
+  concurrent builds all self-heal because it reads on-disk truth each run. *(Caveat: `actual()` reads the fp
+  the artifact was **built with**, not a re-hash of the artifact's current bytes — so a silent out-of-band
+  **edit** of an already-built artifact is **not** detected. That is out of scope for input-based staleness;
+  `--force` is the recovery, or a separate output-integrity check if it ever matters.)*
 
 The manifest's only genuine residual edge is historical **lineage/audit** and avoiding a directory walk at
 large scale — both nice-to-have, revisit if the corpus grows or lineage debugging becomes a real need.
