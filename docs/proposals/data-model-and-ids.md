@@ -2,7 +2,9 @@
 
 How corpus data is split across three registries, how the pieces address and join each other, and how
 identifiers are minted. This resolves the document-identity question left open in
-[`region-implementation.md`](region-implementation.md) §3 ("To discuss").
+[`region-implementation.md`](region-implementation.md) §3 ("To discuss"). Companion:
+[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) — *when* artifacts rebuild, caches, GC and
+source management.
 
 The guiding principle throughout: **store each field at its natural owner; denormalize downward only for
 a server-side need; resolve everything else upward through load-once front indexes.**

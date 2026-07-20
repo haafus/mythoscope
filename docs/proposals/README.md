@@ -28,6 +28,12 @@ not as live work.
   are minted: one `slugify(name)→id` (three mint sites), `document_id = slugify(title)` as a single stored key,
   ids minted once and passed as data, the chunk id as a bare PK. Resolves `region-implementation.md` §3's
   document-identity question. **Goal:** a decided data-decomposition & id/join spec. *Proposal; not started.*
+- [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) — the build pipeline as a
+  content-addressed DAG: stage/artifact/cache map, fingerprints + per-stage transform versions (why not
+  mtime/code-hash), downstream invalidation, deletions via set-reconciliation, GC tiers, the `(id, md5)`
+  embeddings key, fetch-vs-build separation, and a unified web+local source model (immutable raw archive +
+  override-diff layer). Companion to `data-model-and-ids.md`. **Goal:** automatic, minimal, coherent rebuilds.
+  *Proposal; not started.*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
   (curated `content_start/end` + exclude) **done**; Layer 2 (cue-strip on interleaved notes) pending.*
