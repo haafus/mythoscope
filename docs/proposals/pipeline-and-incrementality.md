@@ -116,41 +116,61 @@ builder writes it, the inspector re-derives it) so the two drift, and it **silen
 changes ("`clean` won't find files that fell out of the scheme").
 
 Instead, **each stage carries its own hygiene.** A stage is any module that already produces artifacts
-(`builder.py`, `build_embeddings.py`, `visualization.py`, graphs, motifs); beside the code that writes its
-layout it exposes:
+(`builder.py`, `build_embeddings.py`, `visualization.py`, graphs, motifs). The interface below is **validated
+against those real stages** (three shapes it must respect, called out inline):
 
 ```python
-inputs()         -> list[Stage]     # upstream deps → cascade order
-expected_keys()  -> set[key]        # what SHOULD exist, from config
-existing_keys()  -> set[key]        # what IS on disk / in the store
-fingerprint(key) -> str             # current fp of that artifact's inputs (§2.3)
-stored_fp(key)   -> str | None      # the fp sidecar from the last build (§2.8)
-build(key); delete(key)
+class Stage:
+    def inputs(self) -> list[Stage]: ...        # upstream STAGES → cascade order + fp composition
+    def outputs(self) -> list[ArtifactFamily]:  # a stage owns SEVERAL keyed families, not one
+        ...                                      #   corpus = texts + catalog; projections = per method; motifs = sources/crosswalk/parallels
+
+class ArtifactFamily:
+    def expected_keys(self) -> set[key]: ...    # what SHOULD exist, from config
+    def scan(self) -> dict[key, fp]: ...        # ONE pass: existing = scan().keys(), stored_fp = scan()[k]
+    def fingerprint(self, key) -> str: ...      # current fp, composed from inputs' fps (§2.3)
+    def build(self, keys: set) -> None: ...     # BATCHED — the family owns GPU batching / the thread pool
+    def delete(self, keys: set) -> None: ...
 ```
 
-One generic **driver** derives every operation from these — no per-store code:
+The three shapes that killed the naïve `one-family / build(key) / separate expected+existing+fp` sketch:
+1. **`outputs()` is a list of families** — corpus writes N texts *and* one `corpus.json` catalog; projections
+   write scatter/heatmap/distribution per `(model, method)`; motifs is a sub-pipeline. One family per stage
+   doesn't express them.
+2. **`build(keys)` takes a set** — no expensive stage is one-item-at-a-time: embeddings batches on the GPU,
+   corpus uses a thread pool, graphs is concurrent per chunk, projections is global over all points. Per-key
+   build would wreck throughput.
+3. **`scan()` is one pass** — `existing`, `stored_fp` (and the compare) come from a single store read, not
+   three re-scans of the same Chroma collection / directory.
+
+One generic **driver** derives every operation, per stage (topological) × family:
 
 ```
-for stage in STAGES (topological, via inputs()):
-    exp, ex = stage.expected_keys(), stage.existing_keys()
-    missing = exp - ex                                        # → build
-    orphans = ex - exp                                        # → clean / GC
-    stale   = {k in ex∩exp : fingerprint(k) != stored_fp(k)}  # → rebuild
+S = family.scan()                                         # one read → {key: stored_fp}
+missing = family.expected_keys() - S.keys()               # → build
+orphans = S.keys() - family.expected_keys()               # → clean / GC
+stale   = {k in S ∩ expected : family.fingerprint(k) != S[k]}   # → rebuild
 ```
 
 `status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths. **This traversal *is* the
 "build-your-own minimal" engine (D6)** — a few hundred LOC — and it is **stateless (D7) by construction**: the
-"registry" is the stage list already in `cli.py` (static, in code); the state is `existing_keys()` (disk) +
-`stored_fp()` (sidecars); no central manifest to drift.
+"registry" is the stage list already in `cli.py`; the state is `scan()` (disk/store) — no central manifest.
 
-**Why it can't rot:** each store's layout/naming lives in **one** place — the stage that writes it — and both
-the build and the cleaner reach it only through `expected_keys`/`existing_keys`. You can't write to a path the
-cleaner doesn't know, and adding a stage = implementing the methods once → it appears in status/clean/build
-automatically. **vs today:** `pipeline_inspect.py`'s per-store functions and `cli._clean`'s wiring move *into*
-each stage as its methods; the external inspector thins to the driver loop.
+**Data split (one fix):** the content version (`doc_md5`, D2) lives **once per document in the catalog**, not
+smeared onto every chunk's Chroma metadata; embeddings reads it via `inputs()` (it already reads the catalog).
+
+**Why it can't rot:** each store's layout lives in **one** place — the family that writes it — and build and
+clean reach it only through `expected_keys`/`scan`. You can't write a path the cleaner doesn't know; adding a
+stage = implementing the interface once → it appears in status/clean/build automatically. **vs today:**
+`pipeline_inspect.py`'s per-store functions and `cli._clean`'s wiring move *into* each family; the external
+inspector thins to the driver loop.
+
+**This lands on the *post*-Part-1/2 code, not today's:** it presupposes the fixes those parts make —
+content-fp (not id-existence) dedup in embeddings, fp-not-presence corpus reuse, colour out of the build fp
+graph, `document_id` paths. On today's code it would not sit cleanly.
 
 The sections below are this protocol's pieces: §2.3 is `fingerprint()`, §2.6 is the driver's topological walk,
-§2.7 is `expected − existing`, §2.8 is `stored_fp` (sidecars, no manifest), §3 is orphan GC — all one mechanism.
+§2.7 is `existing − expected`, §2.8 is `scan()`'s stored fp (sidecars, no manifest), §3 is orphan GC.
 
 ### 2.3 Fingerprints — what `fingerprint()` computes
 
@@ -238,9 +258,9 @@ The driver's topological walk (§2.2), using each stage's `inputs()`. Because an
 inputs' fps*, cascade is emergent — no per-edge "invalidate downstream" logic:
 
 ```
-in topological order (stage.inputs()):
-  new_fp = fingerprint(key)                 # = hash(current input fps + transform_version)
-  if new_fp ≠ stored_fp(key) (or output missing): build, write new fp sidecar
+in topological order (stage.inputs()); per family, S = family.scan():
+  new_fp = family.fingerprint(key)          # = hash(current input fps + transform_version)
+  if new_fp ≠ S[key] (or key missing): build, write new fp sidecar
   else: skip
 ```
 
@@ -248,29 +268,30 @@ A rebuilt node gets a new fp → it is an input to its dependents → they see a
 The projection is the special node (`fp = hash(⊕ chunk fps + method_v)`): **any** chunk change → whole
 projection rebuilds (inherent to global UMAP).
 
-### 2.7 Deletions — `existing_keys − expected_keys`
+### 2.7 Deletions — `scan().keys() − expected_keys`
 
 fp-diff catches **changed/new** inputs but **not removed** ones (they leave orphans). This is exactly the
 driver's second set (§2.2) — no separate mechanism:
 
 ```
-stage.existing_keys()  −  stage.expected_keys()  =  orphans → collect
+family.scan().keys()  −  family.expected_keys()  =  orphans → collect
 ```
 
 Per deletion type it falls out for free: url/doc removed from corpus.json → its text, chunks (Chroma ids with
 that `document_id`), graph dir drop out of `expected_keys`; model removed → its Chroma collection + projections;
 method removed → its `<model>/<method>.json`. Today `pipeline_inspect` **detects** these by hand; under the
-protocol each stage's own `expected/existing` supplies them, and the driver GCs behind a dry-run confirm. So:
-**fp-diff for changes, `existing − expected` for removals.** (Raw snapshots are an archive tier, *not*
+protocol each family's own `expected_keys`/`scan` supplies them, and the driver GCs behind a dry-run confirm. So:
+**fp-diff for changes, `scan − expected` for removals.** (Raw snapshots are an archive tier, *not*
 auto-collected — §3, §6.)
 
-### 2.8 `stored_fp` — sidecars, no manifest (D7)
+### 2.8 `scan()` — sidecars, no manifest (D7)
 
-`stored_fp(key)` reads the fp written *beside* the artifact last build (in `corpus.json` rows, Chroma chunk
-metadata, `graphs/<id>/.fp`). Sidecars are the **source of truth**: they survive partial builds, need no single
-write-lock, and cannot drift from their artifact. There is **no central index** (D7 — §9.3): a manifest would
-only cache what `expected_keys()` + `stored_fp()` already give, and a *correct* staleness check must re-hash
-inputs either way, so the cache buys ~nothing while adding a thing that drifts. The stateless driver reads disk
+`family.scan()` reads the stored fps written *beside* the artifacts last build (in `corpus.json` rows — incl.
+the per-doc `doc_md5`, Chroma collection/chunk metadata, `graphs/<id>/.fp`) in **one pass** → `{key: stored_fp}`.
+Sidecars are the **source of truth**: they survive partial builds, need no single write-lock, and cannot drift
+from their artifact. There is **no central index** (D7 — §9.3): a manifest would only cache what `scan()` +
+`expected_keys()` already give, and a *correct* staleness check must re-hash inputs either way, so the cache
+buys ~nothing while adding a thing that drifts. The stateless driver reads disk
 + sidecars each run — always current. (If lineage/audit or large-scale directory-walk cost ever justify it, a
 derived `outputs/.build-state.json` index can be *added* on top without changing the sidecar source of truth.)
 
@@ -485,24 +506,28 @@ statelessly** is the right amount.
 **Part 1 (the data-model + region migration) is the single list in
 [`region-implementation.md`](region-implementation.md) §5 — not repeated here.** Part 2 is the incrementality
 work; it is "Part 2" only in the sense that **none of it blocks shipping the migration** — *not* that it all
-runs strictly after. Two tiers by timing:
+runs strictly after.
 
 The list is ordered by the architecture, not as loose bug-fixes: **item 1 is the stage protocol + driver
 (§2.2); everything after is a method on it or a consequence** — nothing bolted on from outside. None of it is
 gated on Part 1 (the one win that lands *inside* Part 1 — the embeddings key on `document_id`, fixing
 rename-churn for free — is step 4 there). Sub-decisions flagged *(decide Dx)*; full list in §9.5.
 
-1. **The stage protocol + generic driver (§2.2)** — port `pipeline_inspect.py`'s per-store `*_status`/`*_orphans`
-   and `cli._clean`'s wiring *into* each stage as `expected_keys/existing_keys/fingerprint/stored_fp/build/delete`;
-   `status`/`clean`/`build`/GC become one traversal over the stage list in `cli.py`. Stateless, no manifest (D7);
-   this traversal **is** build-your-own (D6). Folds in the old "graphs build/serve unify + traversal guard" (it
-   becomes graphs' `build`/`fingerprint`).
+1. **The stage protocol + generic driver (§2.2, validated against the real stages)** — port
+   `pipeline_inspect.py`'s per-store `*_status`/`*_orphans` and `cli._clean`'s wiring *into* each stage as
+   `outputs()` families (`expected_keys`/`scan`/`fingerprint`/`build(keys)`/`delete(keys)`); `status`/`clean`/
+   `build`/GC become one traversal over the stage list in `cli.py`. Respect the three shapes: **several families
+   per stage** (corpus texts + catalog; projections per method; motifs sub-pipeline), **batched `build(keys)`**
+   (GPU / pool / global), **single `scan()`** per store. Stateless, no manifest (D7); the traversal **is**
+   build-your-own (D6). Folds in the old "graphs build/serve unify + traversal guard".
 2. **Fill `fingerprint()`** — the uniform param-hash + one manual `algo_version` per stage (D4, §2.5) with the
    doc-level `md5` content version (D2, §2.3). The **staleness gate falls out** of the driver's `stale` set
    (fixes the re-embed-on-edit bug); add the projection fp for coherence (§9.2).
 3. **Atomicity as the `build()` contract** — write the artifact *then* its fp sidecar; atomic swap for the
    catalog/collection — §9.4. So `stored_fp` never lies under a mid-build crash.
-4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5.
+4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5. This also splits `--force`'s two
+   meanings cleanly: **`--force` = treat all `expected` as stale → rebuild derived from raw** (the driver path);
+   **`refresh` = re-fetch upstream**. Today corpus's `--force` conflates them (it re-downloads).
 5. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
    so this is "when to switch," not "what to build now."
 
