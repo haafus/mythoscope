@@ -719,41 +719,46 @@ This **supersedes** the previous decision (and the older "gradient within area" 
 their own shade, derived as a **lightness (and, when needed, chroma) gradient off the region base**, keeping
 the region's **hue** so every shade still reads unmistakably as that region.
 
+> **Decided defaults (all closed — no open sub-choices).** Space: **OKLCH**. Light-theme band
+> **`L ∈ [0.42, 0.80]`**, dark-theme band **`L ∈ [0.55, 0.92]`**. Step target **`ΔL = 0.045`**,
+> `W_safe = band width`. Ordering: **by longitude** (west→east), tiebreak `tradition_id`. Rendering: **one
+> computed shade used on every screen** (atlas *and* similarity — no flat/coarse variant). Large-N
+> (`> 12`): **build the L×C lattice** (`n_L = 8`, chroma `C_base → 0.45·C_base`). These are the spec; a build
+> may expose them as constants but needs no further decision.
+
 **Work in OKLCH, not HSL.** Fix the region base **H**; fix **C** (gamut-clipped per step); vary only **L** on a
 perceptually-uniform axis. HSL lightness is not perceptual (equal steps look unequal; the hue-identity of the
 region collapses toward the black/white ends). A bonus of a lightness axis: it is **colour-blind-robust by
 construction** — lightness survives all dichromacies, so within-region shades stay ordered/separable for CVD
 viewers (the region itself is already distinguished by hue in the validated 14-colour palette).
 
-**Safe band & step (light basemap, e.g. Positron).** Keep shades in `L ∈ [0.42, 0.80]` OKLab (below 0.42 dark
-marks lose hue; above 0.80 they wash into the surface). Comfortable per-step separation for small map/scatter
-marks is `ΔL ≈ 0.045` (noticeable ~0.03, unusable < 0.02). The full band therefore yields only **~8 comfortably
-distinct lightness steps** (`0.38 / 0.045`), ~12 at a squeeze — this ceiling drives the adaptive scheme below.
+**Safe band & step.** Light theme (basemap e.g. Positron): shades in `L ∈ [0.42, 0.80]` OKLab (below 0.42 dark
+marks lose hue; above 0.80 they wash into the surface). **Dark theme:** `L ∈ [0.55, 0.92]` (lifted so marks
+contrast against the dark surface) — same `H`/`C`, same formula, just the band substituted; each shade is
+re-derived per theme, never a flip of the light value. Per-step separation for small map/scatter marks is
+`ΔL = 0.045` (noticeable ~0.03, unusable < 0.02). The ~0.38-wide band therefore yields **~8 comfortably distinct
+lightness steps**, ~12 at a squeeze — this ceiling drives the adaptive scheme below.
 
 **Grow-then-clamp, centred on the base** (unifies "fixed segment" and "grow with N" — small regions cluster
 tightly around the canonical colour; big regions expand only to the safe cap, never into the washed-out ends):
 
 ```
-W        = min(W_safe, (N-1) · ΔL_target)      # W_safe ≈ 0.38 ; ΔL_target ≈ 0.045
-L_i      = L_base − W/2 + i · W/(N-1)           # i = 0..N-1 ; if N==1 → L_base
-                                                # then clip the whole band into [0.42, 0.80]
+band     = [0.42, 0.80] (light) | [0.55, 0.92] (dark)     # per theme
+W        = min(width(band), (N-1) · 0.045)                # ΔL_target = 0.045
+L_i      = L_base − W/2 + i · W/(N-1)                      # i = 0..N-1 ; if N==1 → L_base
+                                                          # then clip the whole band into `band`
 H_i = H_base ;  C_i = clip_to_gamut(C_base, L_i)
 ```
 
 **Ordering `i` within a region:** by **longitude** (west→east) so lightness weakly encodes geography and the
 ramp is not arbitrary; fall back to `tradition_id` order for determinism when coordinates are absent.
 
-**Two consumers — different distinguishability needs:**
-
-- **Atlas / facet-map — distinguishability is *optional*.** Points already separate by **coordinates**, so
-  colour need not resolve individual traditions. The choice is a free rendering spectrum: **(a) flat** — every
-  tradition takes the region base (calmest map); **(b) coarse** — quantise L to a few key buckets (light
-  texture without full resolution); **(c) full** — the same computed shade used on the similarity screen
-  (cross-screen consistency). Any is valid because the colour is derived, not stored — pick per aesthetics /
-  performance.
-- **Similarity / embedding scatter — distinguishability *matters*.** There is **no geography** to lean on, so
-  the shade is the only within-region identity cue. This screen drives the adaptive scheme and the L×C
-  fallback below.
+**One shade, every screen (decided).** The same derived shade is used on **both** the atlas/facet-map and the
+similarity/embedding scatter — no flat/coarse atlas variant. Rationale: on the **similarity** screen there is
+no geography, so the shade is the *only* within-region identity cue and must resolve individual traditions
+(this drives the adaptive scheme + L×C lattice below); on the **atlas** points also separate by coordinates, so
+the shade is merely redundant reinforcement there — but reusing the one colour function is simpler and keeps a
+tradition the same colour across screens. (The colour is derived, not stored, so this costs nothing.)
 
 **Adapting the subdivision to N (1 → max = 24):**
 
