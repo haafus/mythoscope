@@ -416,6 +416,20 @@ the dry-run confirm; the raw archive is untouched (raw is keyed by document, not
 re-embedded (their stages are live, `desired = actual`), and any preprocess cache for `M`'s variant is a
 resumable tier dropped only by `--caches` (§3). Removing a single *document* instead stays entirely at level 1.
 
+**Why level 2 is inherent, not a design wart.** Both sides of the GC set-difference need the same two inputs:
+the **reachable set** (from `build_pipeline()` — identical whether or not a store exists) and **what physically
+exists**. Only the second differs. To learn "collection `M` exists" after `M`'s stage is gone from the code,
+*something* must either **(a) scan the physical store** (`chroma.list_collections()`, `ls projections/`) or
+**(b) read a persistent record of `M` kept somewhere not tied to `M`'s stage** (a manifest). There is no third
+way. A stateless design has no such record, so it **must** scan — level 2 is therefore *logically entailed by
+statelessness*, not an accident: you cannot be stateless **and** find removed stores without scanning. The two
+mechanisms yield the **same orphan set** for a local collection; they differ only in that the **scan reads
+ground truth** (always current, can't drift) while a manifest is **faster but can drift** (a crash between
+writing `M` and recording it leaves the record lying). So for the removed-*local*-collection task, scan-vs-record
+is a wash on the result — the manifest earns its keep only where a scan structurally *cannot* reach: a **remote**
+artifact (not locally present to scan) or **history** (past runs, gone from current state). Those are exactly
+§9.1's triggers (a)/(b), and until one fires, the scan loses nothing.
+
 ### 2.8 `actual()` — sidecars, no manifest (D7)
 
 `stage.actual()` reads the stored fps written *beside* the artifacts last build (in `corpus.json` rows — incl.
@@ -425,7 +439,10 @@ from their artifact. There is **no central index** (D7 — §9.3): a manifest wo
 `actual()` already give, and a *correct* staleness check must re-hash inputs either way, so the cache
 buys ~nothing while adding a thing that drifts. The stateless driver reads disk
 + sidecars each run — always current. (If lineage/audit or large-scale directory-walk cost ever justify it, a
-derived `outputs/.build-state.json` index can be *added* on top without changing the sidecar source of truth.)
+derived `outputs/.build-state.json` index can be *added* on top without changing the sidecar source of truth —
+but note a *derived* index is only a **cache of the level-2 store scan** (§2.7): it must itself be built *by*
+scanning, so it speeds up the walk (trigger c) but does **not** remove the scan or make the GC one-level. True
+one-level GC needs a *persistent, build-maintained* inventory — which is stateful, i.e. what D7 rejected.)
 
 ---
 
@@ -831,6 +848,21 @@ recomputes fps on the fly (fps live in per-artifact sidecars). Why it wins here:
 
 The manifest's only genuine residual edge is historical **lineage/audit** and avoiding a directory walk at
 large scale — both nice-to-have, revisit if the corpus grows or lineage debugging becomes a real need.
+
+**Two manifest flavours, don't conflate them (they answer different questions):**
+
+- a ***derived* manifest** is regenerated from on-disk truth — i.e. **built by the level-2 store scan** (§2.7).
+  It is a **cache of the scan**, so it can only *speed up* the directory walk; it does not remove the scan and
+  does not make GC one-level. Safe (rebuildable, can't drift), because it never claims to know more than disk.
+- a ***persistent, build-maintained* manifest** is mutated **incrementally by builds** — append `M`'s store
+  address the moment `M` is built, remove it only when GC collects it — and **never touched by config edits**.
+  *This* is what removes level 2: because the record of `M` survives the config forgetting `M`, GC finds the
+  removed collection by `recorded − reachable` with **no scan**. But it is **stateful** — a crash between
+  writing `M` and appending its entry leaves the manifest lying (the exact drift D7 weighed and rejected).
+
+So one-level GC is not free: it is bought with the persistent stateful manifest. **Stateless ⇔ two-level GC** is
+an *implication*, not a coincidence — the scan is the price, and the only thing that buys it away is the state we
+declined.
 
 ### 9.4 Atomicity / partial-build failure — ADDRESSED (Part 2 item 3 + §2.2)
 
