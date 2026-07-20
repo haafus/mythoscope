@@ -432,13 +432,19 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 Full Bazel/Nix is overkill for this size — **a small content-addressed manifest + transform versions** is the
 right amount.
 
-### Implementation order — **Part 2 of 2** (run after Part 1)
+### Implementation order — **Part 2 of 2** (nothing here is required to ship Part 1)
 
-**Part 1 (ship `region`: config, ids, B1, colour) is the single list in
-[`region-implementation.md`](region-implementation.md) §5 — not repeated here.** This section is only the
-incrementality hardening, run **after** Part 1. (The one incrementality win that lands *inside* Part 1 — the
-embeddings key on `document_id`, which fixes rename-churn for free — is step 4 there.) Sub-decisions flagged
-*(decide Dx)*; full list in §9.5.
+**Part 1 (the data-model + region migration) is the single list in
+[`region-implementation.md`](region-implementation.md) §5 — not repeated here.** Part 2 is the incrementality
+work; it is "Part 2" only in the sense that **none of it blocks shipping the migration** — *not* that it all
+runs strictly after. Two tiers by timing:
+
+- **items 1–4 — do-soon / independent:** isolated bug-fixes *not* gated on Part 1 (do them whenever — before,
+  during, or after the migration).
+- **items 5–9 — when it grows / optional.**
+
+(The one incrementality win that lands *inside* Part 1 — the embeddings key on `document_id`, which fixes
+rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*; full list in §9.5.
 
 1. Graphs build/serve unify + traversal guard. *(Pure isolated bug — may equally land in Part 1 step 6; do
    whichever comes first.)*
@@ -455,9 +461,6 @@ embeddings key on `document_id`, which fixes rename-churn for free — is step 4
 7. **Override / curation layer** — the `curate` edit-then-snapshot workflow — §6.2–§6.4. *(decide D5.)*
 8. **Parametric projections** — `.transform()` instead of a full refit — §9.2 (D3).
 9. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
-
-Ordering within Part 2: items 1–4 are the light "do-soon" tier (independent bug fixes + the staleness gate);
-5–9 are "when it grows / optional".
 
 D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
 canonical name, no slug), so Part 1 is fully unblocked; Part 2 above still needs only the light sub-decisions
