@@ -695,8 +695,9 @@ fp graph).
    and the `projections/*/` listing — as the driver's level-2 pass (store-vs-live-stages, §2.7): they catch a
    *removed whole stage*, which the per-stage key-diff structurally cannot.** Retire `cli._clean`'s per-store
    wiring.
-3. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
-   so this is "when to switch," not "what to build now."
+3. (D6 decided — build-your-own.) Re-evaluate **DVC/Dagster** only if one of §9.1's explicit triggers fires
+   (remote store / lineage / walk cost); the driver already *is* build-your-own, so this is "when to switch,"
+   not "what to build now."
 
 ### Implementation order — **Part 4 of 4: manual text curation** (editorial; independent; last)
 
@@ -711,8 +712,8 @@ rebuilds incremental, so it goes last.
 
 D1 is decided — `document_id = hash(locator)` — and **D8 is dissolved**, so Part 1 is fully unblocked. Decided
 since: **D2** (doc-level `md5`), **D3** (full refit), **D4** (uniform param-hash + manual `algo_version`), **D5**
-(unified-diff patch — Part 4), **D7** (stateless, no manifest). Still-open: **D6** (build engine) — effectively
-settled by D7 (stateless in-process ⇒ build-your-own; DVC only at scale), decided formally in Part 3.
+(unified-diff patch — Part 4), **D7** (stateless, no manifest), **D6** (build engine — **build-your-own**, the
+§2.2 protocol; DVC only when §9.1's explicit trigger fires). **No open decisions remain.**
 
 ---
 
@@ -755,11 +756,20 @@ storage (raw archive + large embeddings); (e) our size (~27 docs argues against 
 | **Make** | build | ✗ (mtime) | shell-out | trivial | mtime lies (appendix) — reject. |
 | **build-your-own** | — | ✔ | in-process | ~few hundred LOC | full control, no heavy dep; the stage protocol + driver (§2.2) — stateless fp/GC, no manifest. |
 
-**Recommendation:** at ~27 docs, **build-your-own minimal** (the §7 gate + a small fp sidecar) is the best
-ROI — in-process, no new heavy dependency. **Adopt DVC** when the corpus/artifacts grow enough that a remote
-archive + free lineage/caching outweigh the shell-out process boundary. **Dagster** only if this becomes a
-scheduled product with many assets. Avoid Pachyderm/Nextflow/Airflow (weight/purpose), Make (mtime). Whatever
-we pick, **the fork should be explicit** ("not DVC, because …"), not defaulted (D6).
+**Decided (D6): build-your-own** — at ~27 docs the §2.2 stage protocol + driver (the §7 gate + small fp
+sidecars, stateless fp/GC, no manifest) is the best ROI: in-process, no new heavy dependency, and it follows
+directly from D7 (stateless in-process ⇒ no reason to take on DVC's shell-out process boundary and `dvc.lock`
+state). The fork is thus **explicit, not defaulted**, in *both* directions — and so is the reverse fork:
+**reevaluate DVC when, and only when, one of these triggers fires** —
+
+- **(a) remote artifact store** — the raw archive + embeddings outgrow the git repo / local disk and need an
+  S3-style remote (DVC's remotes are its main draw; build-your-own has none);
+- **(b) cross-run lineage/audit** becomes a recurring debugging need — the one thing stateless deliberately
+  gives up (§9.3);
+- **(c) directory-walk cost** — the corpus grows large enough that re-scanning every store per run is felt.
+
+Until one fires, build-your-own is strictly better here. **Dagster** only if this becomes a scheduled
+multi-asset product. Avoid Pachyderm/Nextflow/Airflow (weight/purpose), Make (mtime).
 
 ### 9.2 Projections defeat "minimal rebuild"
 
@@ -791,12 +801,15 @@ recomputes fps on the fly (fps live in per-artifact sidecars). Why it wins here:
 The manifest's only genuine residual edge is historical **lineage/audit** and avoiding a directory walk at
 large scale — both nice-to-have, revisit if the corpus grows or lineage debugging becomes a real need.
 
-### 9.4 Atomicity / partial-build failure (unaddressed gap)
+### 9.4 Atomicity / partial-build failure — ADDRESSED (Part 2 item 3 + §2.2)
 
 Builds crash mid-way (network, GPU OOM, LLM rate-limit — the graph stage already handles the last). Then an
 artifact and its fp can disagree. Rule: **write the artifact first, then its fp**; treat *artifact-present /
-fp-absent* as "rebuild". For the catalog/collection, prefer atomic swap (write to temp, rename) so a reader
-never sees a half-written index. This must be specified before the fp machinery is trusted.
+fp-absent* as "rebuild" (a key with no fp sidecar is absent from `actual()` → shows as `missing` → rebuilt).
+For the catalog/collection, prefer atomic swap (write to temp, rename) so a reader never sees a half-written
+index. This is now a shipped step — **Part 2 item 3** specifies it before the fp machinery is trusted — and its
+per-key counterpart, **`build(keys)` failure isolation**, is the explicit contract in §2.2 (one failed key
+writes no sidecar and is retried next run, the rest of the batch proceeds).
 
 ### 9.5 Consolidated open decisions
 
@@ -807,7 +820,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.5 |
 | ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 4) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |
-| **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
+| ~~**D6**~~ | build engine — **DECIDED: build-your-own** (the §2.2 protocol) | ~~adopt DVC now vs~~ build-your-own in-process (follows from D7 + ~27-doc scale); DVC only when the **explicit trigger** in §9.1 fires | §9.1 |
 | ~~**D7**~~ | manifest vs stateless — **DECIDED: stateless** | ~~central index vs~~ recompute-on-the-fly from sidecars (never drifts; correct staleness needs re-hashing either way) | §9.3 |
 | ~~**D8**~~ | ~~`slugify` transliteration~~ — **DISSOLVED** | there is no slug: `region_id`/`tradition_id` = the canonical name (data-model §5), documents = `hash(locator)` | — |
 
