@@ -163,11 +163,18 @@ def build_pipeline(config) -> list[Stage]:
 > `inputs()` only needs to *identify* dependencies. Refs avoid a parallel name-space; that is the
 > whole (weak) preference — a Part-3 implementation detail, not a principle.
 
-The actual edges: `corpus.inputs() = []` (its inputs are config + the raw archive, not another stage — fetch is
-still folded in); `embeddings:<variant>` and `graphs` both `→ [corpus]`; `projections:<model>:<plot>
-→ [embeddings:<model>]`; and inside motifs, the source stages have `[]`, `crosswalk → [sources]`,
-`parallels → [crosswalk, sources]`, `semantic → [sources]`. The factory is the single, explicit home of this
-topology — not duplicated anywhere, the opposite of the rotting external inspector.
+Concretely, who depends on whom:
+
+- **corpus** depends on nothing — its inputs are the config and the raw files, not another stage (because fetch
+  is still folded into it, below).
+- each **embeddings** stage, and **graphs**, depend on **corpus** — they read its cleaned texts.
+- each **projection** depends on the embeddings of *its own model* — it reduces those vectors to a 2-D layout.
+- inside **motifs**: the source stages depend on nothing (they scrape external sites); the **crosswalk** depends
+  on the sources; the **parallels** depend on the crosswalk and the sources; the **semantic** layer depends on
+  the sources.
+
+This whole map of who-feeds-whom lives in **one** place — the factory — instead of being re-derived in an
+external checker that drifts.
 
 **Fetch is the one step still bundled in.** Right now the `corpus` stage does two different jobs at once: it
 **downloads** each book's raw file (from a web address, or copies it from a local `sources/` folder) *and then*
