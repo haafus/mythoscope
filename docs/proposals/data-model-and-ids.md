@@ -135,38 +135,37 @@ rationale as B1.)*
 
 ### The region/tradition id **is the canonical name**; the document id is `hash(locator)`
 
-**Decided: `region_id` / `tradition_id` are the canonical name itself** — no slug. The earlier plan (a
-`slugify` to a lowercase, `-`-collapsed, transliterated token) was **over-built**, because the two hard
-constraints that motivated it are gone:
+**Decided: `region_id` / `tradition_id` are the canonical name itself** — no slug, no transliteration, and
+**no new function**. The earlier plan (a `slugify` to a lowercase, `-`-collapsed, transliterated token) was
+**over-built**: the two hard constraints that motivated it are gone, *and* the boundaries that stay are already
+defended by existing, in-use code.
+
+The constraints that fell away:
 
 - **Chroma-safe** — moot under **B1**: `tradition`/`region` are never stored on the chunk (nor in graphs or
   projections, which key on `document_id`). The id never enters an embedding store.
-- **Filesystem-safe** — moot under **path-is-a-rendering**: on-disk paths are built by
-  `sanitize_filename(name)` (region-implementation §2.11) from the **name**, never from the id. The filesystem
-  never sees the raw id.
+- **Filesystem-safe** — moot under **path-is-a-rendering**: on-disk paths are built from the **name**, never
+  the id (below).
 
-What remains is a **weak** bar — the id only needs to be a *stable join key* and *safe in a URL parameter*. So
-the id is the name, canonicalized just enough to prevent silent join misses:
+**The boundaries are already filtered by existing code — reuse it, don't pre-mangle the id:**
 
-```
-tradition_key(name) = " ".join( unicodedata.normalize("NFC", name).split() )   # trim + collapse whitespace
-```
+| boundary | existing filter (in use today) |
+|---|---|
+| **filesystem** | `sanitize_filename` (`corpus/utils.py:17`) — `/`→`_`, space→`_`, `\ * ? : " < > |`→`_`, `..`→`_`; already applied per path segment in `text_path` (`utils.py:63`) + an `is_relative_to` traversal guard in `read_document` |
+| **URL** | `encodeURIComponent` / `URLSearchParams` — already used everywhere the front builds a query/path (`page-geography.js:98` `?tradition=${encodeURIComponent(...)}`, `page-graphs.js`, `search-utils.js`, …); handles `&`, `/`, spaces |
+| **HTML** | `escapeHtml` — already on `data-tradition` attrs (`tree-traditions.js:19`, `tree-sources.js:34`) |
 
-It **keeps case, accents, apostrophes, spaces, `&` and `/`** (`Near East & North Africa`, `Tupí/Guaraní`,
-`Akan/Ashanti`, `Selk'nam` are their own ids, verbatim). Two mint sites: `region_id = tradition_key(region
-name)`, `tradition_id = tradition_key(tradition name)`. This retires `normalize_catalog_id`; **there is no
-`slugify` and no transliteration** (dissolves D8 — see §9).
+So the id is simply the **canonical name**, at most whitespace-canonicalized with the *existing*
+`normalize_catalog_id` (`utils.py:28`, `\s+`→`_`) to prevent silent double-space join misses. It **keeps case,
+accents, apostrophes, `&`, `/`** verbatim (`Near East & North Africa`, `Tupí/Guaraní`, `Akan/Ashanti`,
+`Selk'nam`). Two mint sites: `region_id`, `tradition_id`. **There is no `slugify` and no transliteration**
+(dissolves D8 — see §9).
 
-**Safety lives at the boundaries, not in mangling the id** — the one invariant to hold:
-> **Never splice a raw `region_id`/`tradition_id` into a path or route.** URL use → `encodeURIComponent(id)`
-> (handles `&`, `/`, spaces); path use → `sanitize_filename(name)`. Then `&`/`/` in an id are harmless.
-
-> **⚠ Open sub-choice (A vs B) — how to treat the two structural hazards `/` and `&`.** *A (written above):*
-> `name = id` verbatim, keep `/` and `&`, rely on the boundary invariant. *B (gentle-minimal):* neutralize just
-> those two at mint — `& → and`, `/ → -` (`Akan/Ashanti → Akan-Ashanti`, `Near East & North Africa → Near East
-> and North Africa`) — keeping case/accents/apostrophes/spaces, so the id is **structurally** URL/route-safe and
-> needs no discipline for `/`/`&`. Only ~10 names carry either char. Leaning **B** (removes the footgun for ~0
-> readability cost); spaces are never a hazard either way (keep, or `→ -`, free). Pending confirmation.
+> **The one invariant (already satisfied in the codebase):** never splice a raw `region_id`/`tradition_id`
+> into a path or route — use `sanitize_filename`(FS) / `encodeURIComponent`(URL) / `escapeHtml`(HTML). All three
+> are already in place and consistently used, so keeping `&`/`/` in the id is safe *by existing construction*,
+> not by new discipline. (This closes the earlier A-vs-B sub-choice: no gentle `&→and`/`/→-` transform is
+> needed — the boundaries already neutralize those chars.)
 
 The **uniqueness check** still runs but is now near-vacuous: distinct canonical names are distinct ids by
 construction (unique by fiat in the curated 14 + ~194 vocabulary); it only catches a name listed twice or two
@@ -329,8 +328,8 @@ raw-archive key — so identity stops tracking the title. The deltas:
 |---|---|---|
 | 0 | document identity = `text_id = slug(title)` (title-anchored, churns on rename, collides on shared titles) | `document_id = hash(locator)` (D1) — the existing raw key `corpus/raw/<sha1(url)>`; opaque, rename-stable, collision-free |
 | 1 | `text_id` is ephemeral (computed in `iterator`, in-memory, absent from `corpus.json`) | **persist** `document_id` in the catalog ("populate once") |
-| 2 | `tradition` stored raw (unsafe for paths); region has no id | give tradition & region their own **slugified ids** |
-| 3 | `normalize_catalog_id` (whitespace-only, misnamed) mints the document id | retired: documents use `hash(locator)`; `region_id`/`tradition_id` = **the canonical name** (whitespace-canonical, no slug, no transliteration) |
+| 2 | `tradition` stored raw; region has no id | `region_id`/`tradition_id` = **the canonical name** (kept verbatim; boundaries already sanitise — `sanitize_filename`/`encodeURIComponent`/`escapeHtml`) |
+| 3 | `normalize_catalog_id` mints the document `text_id` (`\s+`→`_`) | **repurposed, not retired**: documents drop it (id = `hash(locator)`); it now just whitespace-canonicalises `region_id`/`tradition_id`. **No `slugify`, no transliteration.** |
 | 4 | chunk carries `text_id, tradition, major_tradition, url` | chunk = **one ref** `document_id` (+ `chunk_index`); drop `tradition`/`major_tradition`/`url` (B1) |
 | 5 | graphs: build writes raw `text_id`, serve re-normalizes it (idempotent today, latent divergence; not a traversal guard) | **unify** build/serve on the stored id + a real `sanitize`+`is_relative_to` guard |
 | 6 | front reconstructs the title (`bookTitleFromId`, lossy) | resolve exact title from `docIndex[document_id]` |
@@ -348,10 +347,11 @@ chunk, or a hit loses the data with nothing to resolve it.
    (scheme/host/trailing-slash/%-decode) before hashing.
 2. Mint `region_id` / `tradition_id` in the tree (and as the document's `tradition` ref in the catalog); the
    chunk carries **no** `tradition` (B1).
-3. `region_id`/`tradition_id` = `tradition_key(name)` (NFC + whitespace-collapse — keeps case/accents/`&`/`/`);
-   **no `slugify`, no transliteration**; retire `normalize_catalog_id` (documents use `hash(locator)`). Add the
-   fail-loud uniqueness check (name-collision for region/tradition; distinct-locator for documents) and the
-   boundary rule (never splice a raw id into a path/route — `encodeURIComponent` / `sanitize_filename`).
+3. `region_id`/`tradition_id` = the **canonical name** (at most `normalize_catalog_id` for whitespace — keeps
+   case/accents/`&`/`/`); **no `slugify`, no transliteration, no new function.** Documents drop
+   `normalize_catalog_id` (id = `hash(locator)`). Add the fail-loud uniqueness check (name-collision for
+   region/tradition; distinct-locator for documents). No boundary work to add — `sanitize_filename` (FS),
+   `encodeURIComponent` (URL) and `escapeHtml` (HTML) are already in place and used.
 4. Chunk metadata → `{document_id, chunk_index}` (B1); drop `tradition`/`url`/`major_tradition`. Change the
    `get_point` cross-tradition filter from `where {tradition != X}` to `where {document_id $nin …}` (server
    resolves the tradition's document set from the catalog).
@@ -428,8 +428,8 @@ chunk, or a hit loses the data with nothing to resolve it.
     ever arises.
 - **~~D8 (`slugify` transliteration)~~ — DISSOLVED.** The former open question (which transliteration
   library/rules for the slug) no longer exists: **there is no slug.** `document_id = hash(locator)` (D1) never
-  slugged, and `region_id`/`tradition_id` are now the **canonical name itself** (`tradition_key` = NFC +
-  whitespace-collapse), which keeps accents rather than transliterating them. Nothing to decide. The only
+  slugged, and `region_id`/`tradition_id` are now the **canonical name itself** (at most the existing
+  `normalize_catalog_id` for whitespace), which keeps accents rather than transliterating them. Nothing to decide. The only
   residual check is the near-vacuous name-uniqueness over the closed 14 + ~194 vocabulary (verified: the 194
   names are already distinct as-is). Locators need normalization, not transliteration, and are exact.
 - **B1 depends on the server resolving `tradition ↔ documents` for the cross-tradition filter.** `get_point`

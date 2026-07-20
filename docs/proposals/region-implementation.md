@@ -277,7 +277,8 @@ Tests are rewritten to the new model as each phase lands.
 **Prerequisite decisions.** The document-identity anchor and its knock-ons live in
 [`data-model-and-ids.md`](data-model-and-ids.md) §9. **Decided:** **D1** `document_id = hash(locator)` (the
 existing raw key `sha1(url)`; opaque, rename-stable; *not* `slugify(title)`); **`region_id`/`tradition_id` = the
-canonical name** (whitespace-canonical `tradition_key`, no slug, no transliteration — `data-model` §5; **D8
+canonical name** (kept verbatim, at most the existing `normalize_catalog_id` for whitespace; no slug, no
+transliteration, no new function — boundaries already sanitise via `sanitize_filename`/`encodeURIComponent`/`escapeHtml` — `data-model` §5; **D8
 dissolved**); and the **tradition reconciliation** table (§6.1 below). **Still open:** only the **file layout**
 (`corpus/<Region>/<Tradition>/<Title>.txt` vs flat by-id — a navigability/rename-churn trade, independent of the
 opaque id).
