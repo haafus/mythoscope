@@ -273,6 +273,16 @@ Correct on all cases (given D1 + a content version): rename (same content) → s
 1); text edit → new version → **re-embed** (fixes flaw 2); new doc → new id → embed. The non-buzzword value of
 ids is precisely this: **`(id, version)` as the incremental cache key.**
 
+**The chunk id stays positional (`document_id::chunk_index`), not content-addressed.** A content-addressed
+chunk id (`hash(chunk_text)`) would dedup identical chunks, but it buys an orphan-GC problem — a text edit
+mints a *new* id and strands the old one, so you must enumerate a doc's chunks (`where document_id == X`),
+diff stored vs new, and delete the difference — plus **reference counting**, because identical chunks can be
+shared across documents (delete only when no doc still references the id). Positional ids avoid both: an edit
+at position *i* re-uses the same id → **upsert overwrites** (no orphan), and deletion is needed **only when the
+chunk count shrinks** → drop trailing `document_id::i` for `i ≥ new_count`. This is why the content lives in a
+metadata **version field**, not in the id (see "the chunk id is a bare PK", `data-model-and-ids.md` §5): the
+`document_id` metadata is the handle both for this truncation and for deleting a removed document's chunks.
+
 ---
 
 ## 5. Fetch vs build; the escape-hatch
