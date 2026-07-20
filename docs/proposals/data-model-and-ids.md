@@ -40,11 +40,19 @@ Distilled from every frontend section (corpus browser, atlas, embeddings scatter
 `motifs` is a separate domain and does not join this triple):
 
 - **`tradition_id` is the universal presentational join.** Color, geography, grouping, attribution — every
-  section keys on it. It lives on the tree (PK), the document (ref) and the chunk (ref + filter).
+  section keys on it. It lives on the **tree (PK)** and the **document (ref)** — **not** on the chunk.
 - **`document_id` (= `text_id`) is the document key.** Corpus text fetch, graphs, and chunk→document all use
   it. It is a **single key, not a composite** (see §5).
-- **A chunk carries exactly two upward references: `document_id` and `tradition_id`.** Nothing else
-  document- or region-level is stored on it.
+- **A chunk carries exactly ONE upward reference: `document_id`** (+ `chunk_index` and its intrinsic
+  text/vector). Everything else — `tradition`, region, color, url, title — is resolved from `document_id`
+  through the load-once catalog + tree (§4).
+
+> **Decided (B1): no `tradition_id` on the chunk.** The chunk's only ref is `document_id`. The one thing that
+> seemed to need `tradition` on the chunk — the server-side cross-tradition `where`-filter — instead resolves
+> the clicked point's tradition and its document set from the catalog (server-side) and filters
+> `where {document_id: {$nin: docs-of-that-tradition}}`. So `tradition` is never denormalized onto the chunk,
+> and a tradition **rename or re-annotation touches nothing in Chroma** (it is resolved from `document_id` at
+> query time). See §3.
 
 `major_tradition` is **not** a join axis — it is redundant (a function of `tradition`) and is dropped.
 
@@ -73,7 +81,7 @@ responses).
 |---|---|---|---|
 | vector, text, source_text, chunk_index | chunk | **yes** | intrinsic |
 | `document_id` (ref) | chunk↔document | **yes** | irreducible upward pointer to the document |
-| `tradition_id` (ref) | document→tree | **yes** | (a) Chroma `where` cross-tradition filter; (b) 1-hop `chunk→region/color` without loading the catalog |
+| `tradition_id` (ref) | document→tree | **no** (B1) | resolved from `document_id` via the catalog; the cross-tradition filter uses `document_id $nin` (§3 below) |
 | title | document | no | resolve via `docIndex[document_id]` — exact, no reconstruction |
 | url | document | no | document-level; resolve on demand from the catalog |
 | counts, description, source | document | no | corpus browser reads them from the catalog |
@@ -81,16 +89,21 @@ responses).
 | **color** | tree (via region) | no | pure function of region + volatile (palette) — always resolve |
 | coordinates, dating, subdivision, strata | tree | no | tree-only |
 
-`tradition_id` on the chunk is justified by **exactly one** thing: **the server-side Chroma `where`
-cross-tradition filter** — Chroma filters on stored fields before the client can resolve, and the client's
-globally-cached catalog can't help server-side. (It is **not** part of the document pointer — that is
-`document_id` alone, §5.) The other candidate justification — a 1-hop `chunk→region/color` resolve — **does
-not survive §2.8**: since the front loads the tree *and* the catalog once globally, region/color are reached
-from `document_id → docIndex → tradition → treeIndex` for free (one extra Map lookup), so nothing needs
-`tradition` inlined on the front. Even the filter (a) could technically be `where {document_id: {$nin:
-docs-of-that-tradition}}`, so `tradition_id` on the chunk is fundamentally a **cheap denormalization**,
-justified only by the far-simpler filter. Because it is *stable* while region/color are resolved *live*
-through the tree, a palette change or region re-annotation never stales it.
+**`tradition` is not stored on the chunk at all (B1).** Two candidate justifications both fall away:
+
+- *1-hop `chunk→region/color` resolve* — **does not survive §2.8**: the front loads the tree *and* the
+  catalog once globally, so region/color are reached from `document_id → docIndex → tradition → treeIndex` for
+  free (one extra Map lookup). Nothing needs `tradition` inlined on the front (the scatter, hits, atlas all
+  resolve from `document_id`).
+- *server-side cross-tradition `where`-filter* — the only thing that seemed to force a stored field. But it,
+  too, can key on `document_id`: the server resolves the clicked point's tradition and that tradition's
+  document set from the catalog, then filters `where {document_id: {$nin: docs-of-that-tradition}}`. The
+  `$nin` list is bounded by books-per-tradition (small), the resolution is an in-memory catalog lookup.
+
+So the chunk is the pure minimum `{document_id, chunk_index}` (+ text/vector). `tradition` lives only on the
+tree and the document; a tradition rename/re-annotation touches **nothing** in Chroma or the projections —
+it is resolved from `document_id` at query time. The single localized change is the cross-tradition query in
+`get_point` (from `where {tradition != X}` to `where {document_id $nin …}`).
 
 ---
 
@@ -106,17 +119,13 @@ Denormalization belongs **not in Chroma chunk metadata**, but in two places:
 2. **Build-time materialized catalog** — `outputs/corpus/corpus.json` stores the document-level fields plus
    *expensive-but-stable* computed values (`word/sentence/char counts`, `md5`). A legitimate precompute.
 
-**The projection view is the exemplar of the right pattern.** Today `projections/<model>/<method>.json`
-holds every chunk as `{ id, tradition, chunk_index, text(preview), x, y }` — no url/title/region/**color**;
-color is resolved on the front from `treeIndex`, which is why the palette swap did not require rebuilding the
-projections (the volatile mapping → color is resolved live).
-
-> **Under §2.8, drop the inlined `tradition` too — store only `{ id (=document_id), chunk_index, x, y,
-> text(preview) }`.** The embeddings page currently inlines `tradition` because it loads only the tree, not the
-> catalog. But §2.8 loads the catalog globally → `tradition` (and thus region/color) is reachable from
-> `id → docIndex → treeIndex` for free. So the *minimal* projection carries only the pointer + coords, and a
-> **tradition rename never touches the projection** (`document_id` is invariant). Inlining `tradition` is a
-> pre-§2.8 crutch, not the target.
+**The projection view is the exemplar of the right pattern.** The projection stores every chunk as
+`{ id (=document_id), chunk_index, x, y, text(preview) }` — pointer + coords only, **no** tradition / url /
+title / region / **color**. The front resolves tradition (→ region → color) from `id` via `docIndex` +
+`treeIndex` at render, so a palette swap, a region re-annotation, or a **tradition rename never touches the
+projection** (`document_id` is invariant). *(The current code inlines `tradition` because the embeddings page
+loads only the tree, not the catalog; under §2.8 that inline is a pre-target crutch and is dropped — same
+rationale as B1.)*
 
 ---
 
@@ -141,8 +150,9 @@ Three mint sites: `region_id = slugify(region name)`, `tradition_id = slugify(tr
 
 ### `document_id` is a single key, not composite
 
-`document_id` is a **single key** (not a `(tradition, title)` composite): `tradition_id` on the chunk is for
-filtering and region resolution, **not** for document identity.
+`document_id` is a **single key** (not a `(tradition, title)` composite), and it is the chunk's **only**
+upward reference (B1, §2/§3): `tradition` is not stored on the chunk — it, region and color all resolve from
+`document_id` through the catalog + tree, including the cross-tradition filter (via `document_id $nin`).
 
 > **⚠ Open decision — what does `document_id` anchor on? (not resolved; see §9-D1.)** Two candidates, and this
 > doc does **not** yet pick:
@@ -178,7 +188,7 @@ outside**: the front holds `(document_id, chunk_index)`; the only look-up (`get_
 `f"{document_id}::{chunk_index}"` internally, and could equally query `where {document_id, chunk_index}` —
 both fields are stored metadata. So the chunk id's **content is not a contract**; nothing should parse it. It
 may be `document_id::chunk_index` (free, debuggable) or an opaque uuid — either way it is a bare PK, and all
-real addressing is via the `document_id` and `tradition_id` fields.
+real addressing is via the stored `document_id` and `chunk_index` fields (the only chunk metadata, B1).
 
 ---
 
@@ -215,11 +225,11 @@ the path to be prettier, not the reverse. Consequences:
 **A region/tradition rename *does* touch disk — but only the cheap layer.** If the path embeds `region_id` /
 `tradition_id`, renaming or re-annotating one moves the cleaned-text folders (detect + relocate). That is
 real, but bounded: it touches only the **regenerable cleaned-text tree** (a rebuild-from-raw or `git mv` —
-CPU), plus a `tradition_id` metadata-field update (`collection.update`, no re-encode) and a tree key. It does
-**not** touch the **expensive stores** (embeddings, graphs), because those are keyed by `document_id` — and
-with the `hash(locator)` anchor (§9-D1), `document_id` is **invariant** under any region/tradition/title
-rename. So the re-layout is absorbed by a normal rebuild (new paths written, old GC'd); an explicit `git mv`
-is only needed for an *incremental* rename without a rebuild.
+CPU) and a tree key. It does **not** touch Chroma at all — under B1 the chunk carries no `tradition`, so there
+is no metadata field to update — and it does **not** touch the **expensive stores** (embeddings, graphs),
+because those are keyed by `document_id` — and with the `hash(locator)` anchor (§9-D1), `document_id` is
+**invariant** under any region/tradition/title rename. So the re-layout is absorbed by a normal rebuild (new
+paths written, old GC'd); an explicit `git mv` is only needed for an *incremental* rename without a rebuild.
 
 **The disk-touch on rename is the price of on-disk navigability — an explicit layout sub-fork:**
 
@@ -235,36 +245,32 @@ sub-decision of the file-layout choice (region-implementation §6 prerequisites)
 
 ### Rename operations (the operational payoff)
 
-Because `document_id = hash(locator)` is invariant under every name change, **no rename ever recomputes the
-expensive stores** (embeddings, graphs, or the UMAP layout). A rename only edits config, updates the tree,
-`git mv`s the path renderings, and — for a tradition — rewrites **one** metadata field (the Chroma
-`tradition_id`, for the `where`-filter). Under §2.8 (catalog loaded globally) the projection carries only
-`document_id`, so it is untouched by any rename.
+Because `document_id = hash(locator)` is invariant under every name change **and** no name is denormalized
+onto the chunk or the projection (B1, §2/§3), a rename touches **neither Chroma nor the projections at all** —
+only config, the tree, and the `git mv`'d path renderings.
 
-| rename | config edit | Chroma chunks | projection files † | text file | graph dir | re-embed / re-fit UMAP |
+| rename | config edit | Chroma chunks | projection files | text file | graph dir | re-embed / re-fit UMAP |
 |---|---|---|---|---|---|---|
-| **region** | tree (region node) | — (region not on chunk) | — | `git mv` region folder * | `git mv` * | no |
-| **tradition** | tree + repoint `corpus.json` books | rewrite `tradition_id` field (`collection.update`) * | — | `git mv` tradition folder * | `git mv` * | no |
-| **book (title)** | `corpus.json` `title` | — (title not on chunk) | — | `git mv` the file * | `git mv` the dir * | no |
+| **region** | tree (region node) | — | — | `git mv` region folder * | `git mv` * | no |
+| **tradition** | tree + repoint `corpus.json` books | — (no `tradition` on chunk, B1) | — | `git mv` tradition folder * | `git mv` * | no |
+| **book (title)** | `corpus.json` `title` | — | — | `git mv` the file * | `git mv` the dir * | no |
 
 \* only where that path segment is in the readable layout; opaque path → nothing.
-† under §2.8 the projection stores only `document_id` (+ coords/preview) → untouched by any rename. *Caveat:*
-a **pre-§2.8** projection that still inlines `tradition` would need that field rewritten on a tradition rename
-(a cheap field-rewrite, never a UMAP re-fit — coords depend on the invariant vectors).
 
-**The rule:** every *denormalized copy* of the renamed value must be rewritten. Under the target the only such
-copy is the Chroma `tradition_id` (kept solely for the server-side `where`-filter, §3), rewritten with a
-`collection.update` — never a re-embed, UMAP re-fit, or re-LLM.
+**The rule:** every *denormalized copy* of the renamed value must be rewritten — and after B1 there are **no
+denormalized copies** of `tradition`/region/title in the derived stores. `tradition` lives only on the tree
+and the catalog; the cross-tradition filter resolves it from `document_id` at query time (§3). So a rename is
+pure config + `git mv`.
 
-**Unified incremental procedure:** (1) edit config; (2) rewrite the one denormalized copy — a tradition
-rename → the `tradition_id` field on its chunks (`collection.update`); a region/book rename → none; (3)
-`git mv` the changed path segment (region folder / tradition folder / file + graph dir); (4) rebuild the
-catalog + front `treeIndex`/`docIndex`; (5) **never re-embed / re-fit UMAP / re-LLM** (`document_id`
-invariant); (6) re-run fail-loud uniqueness + `status`.
+**Unified incremental procedure:** (1) edit config (tree for region/tradition; `corpus.json` for
+repoint/title); (2) `git mv` the changed path segment (region folder / tradition folder / file + graph dir);
+(3) rebuild the catalog + front `treeIndex`/`docIndex`; (4) **never re-embed / re-fit UMAP / re-LLM / touch
+Chroma** (`document_id` invariant, nothing name-derived on the chunk); (5) re-run fail-loud uniqueness +
+`status`.
 
-The feared case — a **book rename** — is the cheapest: a `title` edit + a `git mv`, with zero chunk and zero
-projection change (title is stored nowhere derived). This is only for a *single* incremental rename; a full
-wipe-rebuild (region-implementation §6) is for large scheme migrations, not one rename.
+The once-feared case — a **book rename** — is a `title` edit + a `git mv`, nothing else. This is only for a
+*single* incremental rename; a full wipe-rebuild (region-implementation §6) is for large scheme migrations,
+not one rename.
 
 ---
 
@@ -278,7 +284,7 @@ slug(title)` and addresses chunks/graphs by it. The deltas:
 | 1 | `text_id` is ephemeral (computed in `iterator`, in-memory, absent from `corpus.json`) | **persist** it in the catalog ("populate once") |
 | 2 | `tradition` stored raw (unsafe for paths); region has no id | give tradition & region their own **slugified ids** |
 | 3 | `normalize_catalog_id` (whitespace-only, misnamed, not fs-safe) | one shared **`slugify`** |
-| 4 | chunk carries `text_id, tradition, major_tradition, url` | chunk = **two refs** `(document_id, tradition_id)`; drop `url`/`major_tradition` |
+| 4 | chunk carries `text_id, tradition, major_tradition, url` | chunk = **one ref** `document_id` (+ `chunk_index`); drop `tradition`/`major_tradition`/`url` (B1) |
 | 5 | graphs: build writes raw `text_id`, serve re-normalizes it (idempotent today, latent divergence; not a traversal guard) | **unify** build/serve on the stored id + a real `sanitize`+`is_relative_to` guard |
 | 6 | front reconstructs the title (`bookTitleFromId`, lossy) | resolve exact title from `docIndex[document_id]` |
 | 7 | no id validity/uniqueness check | build-time **fail-loud uniqueness** check |
@@ -291,10 +297,13 @@ chunk, or a hit loses the data with nothing to resolve it.
 ## 8. Follow-ups (concrete tasks)
 
 1. Persist `document_id` in the built catalog; return it from the documents endpoint.
-2. Mint `region_id` / `tradition_id` in the tree; carry `tradition_id` (not raw name) as the chunk ref.
+2. Mint `region_id` / `tradition_id` in the tree (and as the document's `tradition` ref in the catalog); the
+   chunk carries **no** `tradition` (B1).
 3. Write one `slugify` (transliterate/lowercase/collapse); retire `normalize_catalog_id`; add the fail-loud
    uniqueness check.
-4. Chunk metadata → `{document_id, tradition_id, chunk_index}`; drop `url`/`major_tradition`.
+4. Chunk metadata → `{document_id, chunk_index}` (B1); drop `tradition`/`url`/`major_tradition`. Change the
+   `get_point` cross-tradition filter from `where {tradition != X}` to `where {document_id $nin …}` (server
+   resolves the tradition's document set from the catalog).
 5. Graphs: unify build/serve on the stored id; add the traversal guard.
 6. Front: `treeIndex` + `docIndex`; delete `bookTitleFromId`; resolve title/url/color from the indexes.
 
@@ -325,22 +334,22 @@ chunk, or a hit loses the data with nothing to resolve it.
     mechanism (identical for all three) but **what the id primary-keys** × **how churny/collision-prone the
     name is**. `document_id` primary-keys the **expensive, persisted, content-addressed** per-document
     artifacts (chunk ids `document_id::i`, `graphs/<document_id>/`, the raw anchor), and titles churn and
-    collide → changing it re-embeds/re-graphs + orphans. `tradition_id`/`region_id` are a **metadata field / a
-    tree key** on a small closed **curated** vocabulary (14 + ~194, unique by fiat, renamed ~never) — changing
-    one touches only the cheap regenerable layer (a `tradition_id` field update + the text-tree re-layout, §6),
+    collide → changing it re-embeds/re-graphs + orphans. `tradition_id`/`region_id` are a **tree key** on a small
+    closed **curated** vocabulary (14 + ~194, unique by fiat, renamed ~never), never stored on the chunk (B1) —
+    changing one touches only the cheap regenerable layer (the text-tree re-layout, §6; no Chroma update),
     never the expensive stores. With `document_id = hash(locator)`, those stores are shielded from *every*
     human-name rename, which is exactly what makes region/tradition/title all cheap to rename.
 - **`slugify` transliteration is under-specified.** "Transliterate non-ASCII" needs a concrete library/rules
   (Python has no stdlib transliteration — `unidecode` or hand rules); it is lossy and can itself collide as the
   corpus grows. The fail-loud uniqueness check *detects* a collision but does not *resolve* it. Decide the
   transliteration source and confirm collision-freedom on the full name set, not just the 194 traditions.
-- **`tradition_id` on the chunk goes stale on a book re-annotation.** Re-annotating a *book's tradition* (not
-  its region) changes `chunk.tradition_id` — but this is a **metadata-field update** (`collection.update`, no
-  re-encode), **not** a re-embed: `document_id` is unchanged, so the chunk id and vectors stand. We lean on
-  "tradition is stable" for *renames*; a re-annotation is the case that touches the field, cheaply.
-- **The front resolves title/url from `docIndex`, so the embeddings/search pages must load the full catalog.**
-  Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url, tradition}` projection over
-  shipping every per-document field. Not urgent.
+- **B1 depends on the server resolving `tradition ↔ documents` for the cross-tradition filter.** `get_point`
+  must load (or cache) the catalog server-side to build the `document_id $nin` set. Cheap (an in-memory map,
+  small lists), but it is the one new server-side dependency B1 introduces; a re-annotation is then picked up
+  *automatically* at query time (nothing stored on the chunk to update).
+- **The front resolves title/url/tradition from `docIndex`, so the embeddings/search pages must load the full
+  catalog** (§2.8). Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url,
+  tradition}` projection over shipping every per-document field. Not urgent.
 - **Proportionality.** This is a spec for a corpus of ~27 documents. The single high-value, low-cost change is
-  carrying `document_id` + `tradition_id` as the chunk's two refs and dropping `url`/`major_tradition`; the
-  rest is formalization. Do not read the whole doc as "must build now".
+  making the chunk carry only `document_id` (B1) and dropping `tradition`/`url`/`major_tradition`; the rest is
+  formalization. Do not read the whole doc as "must build now".

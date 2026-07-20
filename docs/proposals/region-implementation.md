@@ -144,12 +144,16 @@ to-discuss).
 one of the 14 canon names — otherwise the build fails. Replaces the silent `.get(...)` degradations
 (`builder.py:210`, `services/corpus.py:25`).
 
-**2.13 Chunks carry the tradition only; no re-embedding.** A chunk's metadata keeps the `tradition` reference
-(FK) and `url`; `region` is resolved from `tradition` via the tree at query time and is **not** stored on the
-chunk. New builds stop writing `major_tradition`/`region` into chunk metadata; existing chunks keep their stale
-`major_tradition` (ignored, gone on the next natural rebuild) — nothing is re-embedded. `region` is
-deliberately not baked in: a tradition's region is re-annotatable, and baking it would force a re-embed on
-every re-annotation.
+**2.13 Chunks carry one document reference only (B1); no re-embedding.** A chunk's metadata is exactly
+`{document_id, chunk_index}` — **no** `tradition`, `major_tradition`, `region`, `url`, or `colour`. Everything
+else is resolved from `document_id` at query time: `document_id → document` gives `tradition`/`url`/title (via
+the catalog), and `tradition → region → colour` follows the tree. New builds stop writing
+`tradition`/`major_tradition`/`region` into chunk metadata; existing chunks keep their stale fields (ignored,
+gone on the next natural rebuild) — nothing is re-embedded. Nothing name-derived is baked in: tradition,
+region, and colour are all re-annotatable config, and baking any of them would force a re-embed on every
+re-annotation. **This makes the cross-tradition search filter the single localized consequence** — with no
+`tradition` on the chunk, `get_point` resolves tradition → documents server-side and filters
+`where {document_id: {$nin: docs-of-that-tradition}}` (see §5.2).
 
 **2.14 One `UNASSIGNED`** id/label across `schemas.py`, `iterator.py`, and the front end (extend the front's
 `CATEGORY_NONE` down to the value layer).
@@ -235,12 +239,12 @@ config/corpus.json       book → tradition (name)
         │          & every region key ∈ 14 canon (fail loud). No generated traditions.json; no colour written.
         ▼
 outputs/corpus/corpus.json      rows carry tradition ONLY (the reference) — no region, no colour, no major
-outputs/embeddings/*            chunk metadata: tradition, url; region resolved at query; not re-embedded
+outputs/embeddings/*            chunk metadata: document_id + chunk_index ONLY (B1); tradition/region/url resolved at query; not re-embedded
         ▼  server  (reads config/traditions.json + outputs/corpus/corpus.json)
 /api/corpus/traditions   config region → traditions tree (canon order, region colour + fields); no books
 /api/corpus/documents    documents list: tradition + per-doc fields; no region, no colour   (renamed from /catalog)
 /api/corpus/document     one raw text, by ?id= (working default (title, tradition))          (renamed from /documents)
-/api/similarity/*        search hits: chunk data + document reference; no major/region/colour
+/api/similarity/*        search hits: chunk data + document_id reference (B1); no tradition/major/region/colour
         ▼  front  (loads the tree + the documents ONCE, global cache, and composes)
 group by region, attach books, colour by region; one 14-region legend; reused by corpus/atlas/embeddings/search
 ```
@@ -255,14 +259,19 @@ group by region, attach books, colour by region; one 14-region legend; reused by
    `"Australian Aboriginal"` → one canonical name) and repoint every `config/corpus.json` book at its
    canonical tradition; then add build-time fail-loud validation (unknown tradition / non-canon region).
    *(Highest value-to-risk — closes the silent join.)*
-2. **Retire `major_tradition`; group by region; trim search.** Re-partition the config tree to regions; update
-   the code that **grouped** by `major_tradition` (`builder.py`, `iterator.py`, `schemas.py`, services, front)
-   to group/resolve by `region` through the tree. Remove `major_tradition` as a **stored field**: from corpus
-   rows, from `CorpusFileInfo`/chunk metadata (new builds; existing chunks not re-embedded), from the
-   one-text endpoint's query param; delete `SearchResult.major_tradition` and trim search hits to chunk data + a
-   document reference (`tradition`/`url`/`region`/`colour` resolved on the front). Move the file layout per the
-   §3 identity decision (working default `corpus/<tradition>/<title>.txt`). **Rename the endpoints** (§3):
-   `/catalog` → `/documents` (list), `/documents` → `/document` (one text) located by `(title, tradition)`.
+2. **Retire `major_tradition`; group by region; trim chunk metadata to one reference (B1).** Re-partition the
+   config tree to regions; update the code that **grouped** by `major_tradition` (`builder.py`, `iterator.py`,
+   `schemas.py`, services, front) to group/resolve by `region` through the tree. Reduce **chunk metadata to a
+   single document reference `{document_id, chunk_index}` (B1)** — drop `major_tradition`, `tradition`, and
+   `url` as stored chunk fields (new builds; existing chunks not re-embedded). Correspondingly drop these from
+   corpus rows / `CorpusFileInfo` and from the one-text endpoint's query param; delete
+   `SearchResult.major_tradition` and trim search hits to chunk data + the document reference
+   (`tradition`/`url`/`region`/`colour` resolved on the front from `document_id`). **Cross-tradition search
+   filter (B1):** with no `tradition` on the chunk, `get_point`'s tradition filter resolves tradition →
+   documents server-side from the catalog and filters `where {document_id: {$nin: docs-of-that-tradition}}`
+   (was a `tradition`-equality clause). Move the file layout per the §3 identity decision (working default
+   `corpus/<tradition>/<title>.txt`). **Rename the endpoints** (§3): `/catalog` → `/documents` (list),
+   `/documents` → `/document` (one text) located by `(title, tradition)`.
 3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
    colour + fields, no books); a tradition's colour is its region's, computed at display; strip `region` and
@@ -308,8 +317,9 @@ every source** (fetch and build are not yet separated) — needless, and risky i
    - `raw/` sits *inside* `outputs/corpus/`, so target carefully (e.g.
      `find outputs/corpus -mindepth 1 -maxdepth 1 ! -name raw -exec rm -rf {} +`), not `rm -rf outputs/corpus`.
 4. **Plain `build` (no `--force`).** With `corpus.json` gone but `raw/` present, `fetch_to_cache(force=False)`
-   short-circuits on the cached raw → **no network**; the pipeline re-cleans, re-embeds (new
-   `document_id`/`tradition_id`, no `major_tradition`), and re-graphs from raw + the new config. Local sources
+   short-circuits on the cached raw → **no network**; the pipeline re-cleans, re-embeds (chunk metadata =
+   `{document_id, chunk_index}` only — B1; no `tradition`/`major_tradition`), and re-graphs from raw + the new
+   config. Local sources
    re-read from `sources/` (their upstream) — still offline. **Fail-loud validation** (every corpus tradition
    ∈ tree; every region ∈ the 14 canon; `slugify` uniqueness across region/tradition/document) is the integrity
    gate.

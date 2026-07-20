@@ -50,7 +50,7 @@ never a built artifact.
 | | change `url` | raw → text → embeddings(its chunks) → projection(whole model) → graph(doc) |
 | | edit `content_start/end` | text → embeddings(chunks) → projection → graph |
 | | rename `title` | *today:* everything below (title-anchored); *should:* nothing if content is unchanged |
-| | change `tradition` | paths/refs; embeddings need not (content unchanged) |
+| | change `tradition` | path rendering + catalog ref only; embeddings **never** touched (tradition isn't on the chunk — B1) |
 | | `exclude` on/off | add/remove from everything below |
 | **traditions.json** | rename/re-annotate region, color, coordinates | **serve-resolve only** — no artifact rebuild |
 | **sources/** local file | byte edit / new version delivered | raw(hash) → below |
@@ -449,8 +449,9 @@ Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
 5. Resolve **D1** (document_id anchor).
 6. One `slugify` + fail-loud uniqueness — §8.3. *(decide D8: transliteration library/rules.)*
 7. Persist `document_id` per the chosen anchor; mint `region_id`/`tradition_id` — §8.1, §8.2.
-8. Chunk refs → `(document_id, tradition_id)`; drop `url`/`major_tradition` — §8.4 (do *after* the front can
-   resolve, so no hit loses data).
+8. Chunk refs → `(document_id, chunk_index)` **only** (B1); drop `tradition`/`url`/`major_tradition` — §8.4
+   (do *after* the front can resolve, so no hit loses data). The cross-tradition search filter moves to
+   `where {document_id $nin docs-of-that-tradition}` (server resolves tradition → documents).
 9. Front `treeIndex`/`docIndex`; delete `bookTitleFromId` — §8.6.
    *Result:* the embeddings key now keys on the stable anchor → **rename-churn is fixed automatically** (§4).
 
