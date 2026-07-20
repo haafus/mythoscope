@@ -161,10 +161,13 @@ def build_pipeline(config) -> list[Stage]:
 > stage" at startup — both before any real work), and *neither* catches a wired-to-the-wrong-but-valid stage.
 > Since fp flow is via each stage's `desired()` map (stages no longer reach through refs to compute anything),
 > `inputs()` only needs to *identify* dependencies. Refs avoid a parallel name-space; that is the
-> whole (weak) preference — a Part-4 implementation detail, not a principle.
+> whole (weak) preference — a Part-3 implementation detail, not a principle.
 
-The factory is the single, explicit home of the topology — not duplicated anywhere, the opposite
-of the rotting external inspector.
+The actual edges: `corpus.inputs() = []` (its inputs are config + the raw archive, not another stage — fetch is
+still folded in); `embeddings:<variant>` and `graphs` both `→ [corpus]`; `projections:<model>:<plot>
+→ [embeddings:<model>]`; and inside motifs, the source stages have `[]`, `crosswalk → [sources]`,
+`parallels → [crosswalk, sources]`, `semantic → [sources]`. The factory is the single, explicit home of this
+topology — not duplicated anywhere, the opposite of the rotting external inspector.
 
 **Atomisation of the current blocks.** "Atomise" = split each code module into the smallest
 independently-buildable **stages**, so that within one stage *every artifact is keyed the same way*. A **key**
