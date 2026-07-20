@@ -107,7 +107,52 @@ inputs change. They differ in *how* they detect change:
 Our target is the common denominator: **a target is a pure function of its inputs; cache/reuse keyed by a
 hash of (inputs + transform); rebuild on hash change; propagate down the DAG.**
 
-### 2.2 Fingerprints
+### 2.2 The stage as a self-describing asset — the spine
+
+The organising idea the rest of §2 hangs off. Today hygiene is **external and hand-coded per store**:
+`pipeline_inspect.py` has a `*_status`/`*_orphans` pair for each of corpus / embeddings / projections / graphs
+/ motifs, and `cli._clean` wires them one by one. That **duplicates each store's layout knowledge** (the
+builder writes it, the inspector re-derives it) so the two drift, and it **silently rots** when a naming scheme
+changes ("`clean` won't find files that fell out of the scheme").
+
+Instead, **each stage carries its own hygiene.** A stage is any module that already produces artifacts
+(`builder.py`, `build_embeddings.py`, `visualization.py`, graphs, motifs); beside the code that writes its
+layout it exposes:
+
+```python
+inputs()         -> list[Stage]     # upstream deps → cascade order
+expected_keys()  -> set[key]        # what SHOULD exist, from config
+existing_keys()  -> set[key]        # what IS on disk / in the store
+fingerprint(key) -> str             # current fp of that artifact's inputs (§2.3)
+stored_fp(key)   -> str | None      # the fp sidecar from the last build (§2.8)
+build(key); delete(key)
+```
+
+One generic **driver** derives every operation from these — no per-store code:
+
+```
+for stage in STAGES (topological, via inputs()):
+    exp, ex = stage.expected_keys(), stage.existing_keys()
+    missing = exp - ex                                        # → build
+    orphans = ex - exp                                        # → clean / GC
+    stale   = {k in ex∩exp : fingerprint(k) != stored_fp(k)}  # → rebuild
+```
+
+`status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths. **This traversal *is* the
+"build-your-own minimal" engine (D6)** — a few hundred LOC — and it is **stateless (D7) by construction**: the
+"registry" is the stage list already in `cli.py` (static, in code); the state is `existing_keys()` (disk) +
+`stored_fp()` (sidecars); no central manifest to drift.
+
+**Why it can't rot:** each store's layout/naming lives in **one** place — the stage that writes it — and both
+the build and the cleaner reach it only through `expected_keys`/`existing_keys`. You can't write to a path the
+cleaner doesn't know, and adding a stage = implementing the methods once → it appears in status/clean/build
+automatically. **vs today:** `pipeline_inspect.py`'s per-store functions and `cli._clean`'s wiring move *into*
+each stage as its methods; the external inspector thins to the driver loop.
+
+The sections below are this protocol's pieces: §2.3 is `fingerprint()`, §2.6 is the driver's topological walk,
+§2.7 is `expected − existing`, §2.8 is `stored_fp` (sidecars, no manifest), §3 is orphan GC — all one mechanism.
+
+### 2.3 Fingerprints — what `fingerprint()` computes
 
 Each artifact gets a fingerprint:
 
@@ -116,9 +161,9 @@ fp(artifact) = hash( fp(each input)  +  transform_version(stage)  +  output-affe
 ```
 
 - **Inputs by content hash**, not mtime (we already have `sha1(url)`, `md5(text)`).
-- **transform_version** — bumped when the stage's code/params change (§2.4). Closes "code changed → outputs
+- **transform_version** — bumped when the stage's code/params change (§2.5). Closes "code changed → outputs
   not rebuilt".
-- Rebuild **iff fp changed** (or the output is missing); else skip. Cascade is emergent (§2.5).
+- Rebuild **iff fp changed** (or the output is missing); else skip. Cascade is emergent (§2.6).
 
 Granularity per stage:
 
@@ -130,7 +175,7 @@ Granularity per stage:
 | graph | `hash(text + prompt_v + llm_model)` | document/chunk |
 | serve-resolve (tree + colour, incl. per-tradition shade) | — | **not an artifact** — region colour *and* its derived per-tradition OKLCH shade (regions.md §8.1) are computed at runtime → tree/colour edits are free |
 
-### 2.3 Hash choice
+### 2.4 Hash choice
 
 | | bits | crypto strength | speed |
 |---|---|---|---|
@@ -146,9 +191,9 @@ where a poisoned entry is dangerous). **Standardize on one — `blake2b` (fast +
 `sha1(url)` = **identity** ("which source"); `md5(text)` = **version** ("what content") — but the algorithm
 is interchangeable.
 
-### 2.4 Transform version — where it lives, how it is bumped
+### 2.5 Transform version — where it lives, how it is bumped
 
-A module-level constant per stage, beside the code it versions, included in that stage's fp:
+A module-level constant per stage, beside the code it versions, folded into that stage's `fingerprint()`:
 
 ```python
 # corpus/clean_gutenberg.py
@@ -187,15 +232,15 @@ core function(s) + pinned dep versions.
 > (misses changed helpers/libs); and cost isn't even per-stage (preprocess flips cheap↔$$ by variant config).
 > One mechanism, applied the same way to every stage.
 
-### 2.5 Downstream invalidation via fp composition
+### 2.6 Downstream invalidation via fp composition
 
-Because an artifact's fp *includes its inputs' fps*, cascade is emergent — no per-edge "invalidate
-downstream" logic:
+The driver's topological walk (§2.2), using each stage's `inputs()`. Because an artifact's fp *includes its
+inputs' fps*, cascade is emergent — no per-edge "invalidate downstream" logic:
 
 ```
-in topological order:
-  new_fp = hash(current input fps + transform_version)
-  if new_fp ≠ stored fp (or output missing): rebuild, store new_fp
+in topological order (stage.inputs()):
+  new_fp = fingerprint(key)                 # = hash(current input fps + transform_version)
+  if new_fp ≠ stored_fp(key) (or output missing): build, write new fp sidecar
   else: skip
 ```
 
@@ -203,48 +248,43 @@ A rebuilt node gets a new fp → it is an input to its dependents → they see a
 The projection is the special node (`fp = hash(⊕ chunk fps + method_v)`): **any** chunk change → whole
 projection rebuilds (inherent to global UMAP).
 
-### 2.6 Deletions
+### 2.7 Deletions — `existing_keys − expected_keys`
 
-fp-diff catches **changed/new** inputs but **not removed** ones (they leave orphans). A second mechanism —
-**set reconciliation** — is needed:
+fp-diff catches **changed/new** inputs but **not removed** ones (they leave orphans). This is exactly the
+driver's second set (§2.2) — no separate mechanism:
 
 ```
-expected artifacts (from config)  −  present on disk  =  orphans → collect
+stage.existing_keys()  −  stage.expected_keys()  =  orphans → collect
 ```
 
-Per deletion type: url/doc removed from corpus.json → its text, chunks (Chroma ids with that `document_id`),
-graph dir orphan; local file removed → same; model removed from models.json → its Chroma collection +
-projections orphan; projection method removed → its `<model>/<method>.json` orphan. `pipeline_inspect`
-already **detects** these; the missing piece is linking the *expected set* to auto-GC (behind a dry-run
-confirm). So: **fp-diff for changes, set-diff for removals.** (Raw snapshots are an archive tier and are
-*not* auto-collected — §3, §6.)
+Per deletion type it falls out for free: url/doc removed from corpus.json → its text, chunks (Chroma ids with
+that `document_id`), graph dir drop out of `expected_keys`; model removed → its Chroma collection + projections;
+method removed → its `<model>/<method>.json`. Today `pipeline_inspect` **detects** these by hand; under the
+protocol each stage's own `expected/existing` supplies them, and the driver GCs behind a dry-run confirm. So:
+**fp-diff for changes, `existing − expected` for removals.** (Raw snapshots are an archive tier, *not*
+auto-collected — §3, §6.)
 
-### 2.7 Manifest & sidecars
+### 2.8 `stored_fp` — sidecars, no manifest (D7)
 
-Two complementary stores; the index is derivable from the sidecars:
-
-- **Sidecars** (fp *with* the artifact — in `corpus.json` rows, in Chroma chunk metadata, `graphs/<id>/.fp`)
-  = **source of truth**: survive partial builds, no single write-lock, cannot drift from their artifact. Lose
-  the index → rebuild it by walking sidecars.
-- **Central index** (`outputs/.build-state.json`, optional) = a **derived cache for fast global queries**
-  ("what's stale", "what depends on X", "what to rebuild") + the **GC root** (expected-key set). Contents:
-  `artifact_key → {fp, input_fps, transform_version, path, ts}` + the expected-key set.
-
-**"Small"** = one entry per *artifact* (document, per-model collection, projection, graph) storing *hashes and
-paths, not content*; per-chunk fp lives in Chroma metadata and is rolled up into a document fp. O(artifact
-count) × a few short fields ≈ hundreds of KB even for a large corpus, vs GB of artifacts.
-
-For our scale **sidecars alone suffice for correctness**; the central index is an optional speed layer — adopt
-it only when global-status queries get slow.
+`stored_fp(key)` reads the fp written *beside* the artifact last build (in `corpus.json` rows, Chroma chunk
+metadata, `graphs/<id>/.fp`). Sidecars are the **source of truth**: they survive partial builds, need no single
+write-lock, and cannot drift from their artifact. There is **no central index** (D7 — §9.3): a manifest would
+only cache what `expected_keys()` + `stored_fp()` already give, and a *correct* staleness check must re-hash
+inputs either way, so the cache buys ~nothing while adding a thing that drifts. The stateless driver reads disk
++ sidecars each run — always current. (If lineage/audit or large-scale directory-walk cost ever justify it, a
+derived `outputs/.build-state.json` index can be *added* on top without changing the sidecar source of truth.)
 
 ---
 
-## 3. Garbage collection
+## 3. Garbage collection — the driver's `orphans` set
+
+GC is not a separate subsystem: it is the driver's `existing_keys − expected_keys` (§2.2/§2.7), collected
+behind a dry-run confirm.
 
 **Immutable vs overwrite.** Nix-style immutability (new fp = new path, old kept) accumulates stale artifacts
 and needs GC; overwrite-in-place (current) accumulates nothing but gives no rollback and a mid-build failure
 leaves inconsistency. **For our size, overwrite + orphan-GC suffices**; adopt immutability only if rollback /
-A-B model comparison is wanted, and then GC by reachability from the manifest root.
+A-B model comparison is wanted, and then GC by reachability from the stages' `expected_keys` (no manifest root).
 
 **Policy catalog:** reachability (delete what's unreachable from the root — our orphan detection); TTL by
 age; keep-last-N (for versioned stores); pinning (never-collect); tiered (per class); manual + dry-run
@@ -447,26 +487,26 @@ statelessly** is the right amount.
 work; it is "Part 2" only in the sense that **none of it blocks shipping the migration** — *not* that it all
 runs strictly after. Two tiers by timing:
 
-- **items 1–4 — do-soon / independent:** isolated bug-fixes *not* gated on Part 1 (do them whenever — before,
-  during, or after the migration).
-- **items 5–8 — when it grows / optional.**
+The list is ordered by the architecture, not as loose bug-fixes: **item 1 is the stage protocol + driver
+(§2.2); everything after is a method on it or a consequence** — nothing bolted on from outside. None of it is
+gated on Part 1 (the one win that lands *inside* Part 1 — the embeddings key on `document_id`, fixing
+rename-churn for free — is step 4 there). Sub-decisions flagged *(decide Dx)*; full list in §9.5.
 
-(The one incrementality win that lands *inside* Part 1 — the embeddings key on `document_id`, which fixes
-rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*; full list in §9.5.
+1. **The stage protocol + generic driver (§2.2)** — port `pipeline_inspect.py`'s per-store `*_status`/`*_orphans`
+   and `cli._clean`'s wiring *into* each stage as `expected_keys/existing_keys/fingerprint/stored_fp/build/delete`;
+   `status`/`clean`/`build`/GC become one traversal over the stage list in `cli.py`. Stateless, no manifest (D7);
+   this traversal **is** build-your-own (D6). Folds in the old "graphs build/serve unify + traversal guard" (it
+   becomes graphs' `build`/`fingerprint`).
+2. **Fill `fingerprint()`** — the uniform param-hash + one manual `algo_version` per stage (D4, §2.5) with the
+   doc-level `md5` content version (D2, §2.3). The **staleness gate falls out** of the driver's `stale` set
+   (fixes the re-embed-on-edit bug); add the projection fp for coherence (§9.2).
+3. **Atomicity as the `build()` contract** — write the artifact *then* its fp sidecar; atomic swap for the
+   catalog/collection — §9.4. So `stored_fp` never lies under a mid-build crash.
+4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5.
+5. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
+   so this is "when to switch," not "what to build now."
 
-1. Graphs build/serve unify + traversal guard. *(Pure isolated bug — may equally land in Part 1 step 6; do
-   whichever comes first.)*
-2. `transform_version` = the **uniform** param-hash + one manual `algo_version` per stage — §2.4. *(D4
-   decided: uniform, not per-stage-by-cost.)*
-3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4, *staleness half* (fixes the
-   re-embed-on-edit bug); add the projection-fp gate for coherence (§9.2). *(D2 decided: doc-level `md5`.)*
-4. **Atomicity** — write the artifact *then* its fp; atomic swap for the catalog/collection — §9.4. Land it
-   with item 3.
-5. **Stateless** fp gate + set-diff GC — §2.6, §3; recompute fps on the fly from per-artifact sidecars, compare
-   config-expected vs on-disk (D7: stateless, **no central manifest**); extend `status` to "what to rebuild".
-6. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
-7. ~~**Parametric projections**~~ — **decided (D3): keep the full refit** (cheap at this size) — §9.2. *No work.*
-8. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
+*(D3 decided — keep the full UMAP refit, no parametric work — §9.2.)*
 
 ### Implementation order — **Part 3 of 3: manual text curation** (editorial; independent of Parts 1–2)
 
@@ -516,7 +556,7 @@ storage (raw archive + large embeddings); (e) our size (~27 docs argues against 
 | **Luigi** | orchestrator | partial | Python | light | task+target deps; older, no strong content cache. |
 | **Airflow** | scheduler | ✗ | Python | heavy | scheduling, not content-caching — wrong tool. |
 | **Make** | build | ✗ (mtime) | shell-out | trivial | mtime lies (appendix) — reject. |
-| **build-your-own** | — | ✔ | in-process | ~few hundred LOC | full control, no heavy dep; we write fp/manifest/GC. |
+| **build-your-own** | — | ✔ | in-process | ~few hundred LOC | full control, no heavy dep; the stage protocol + driver (§2.2) — stateless fp/GC, no manifest. |
 
 **Recommendation:** at ~27 docs, **build-your-own minimal** (the §7 gate + a small fp sidecar) is the best
 ROI — in-process, no new heavy dependency. **Adopt DVC** when the corpus/artifacts grow enough that a remote
@@ -563,9 +603,9 @@ never sees a half-written index. This must be specified before the fp machinery 
 | id | decision | options | blocks |
 |---|---|---|---|
 | ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `hash(upstream-locator)` (= raw key `sha1(url)`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
-| ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.2 / §4 |
+| ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.3 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
-| ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.4 |
+| ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.5 |
 | ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 3) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
 | ~~**D7**~~ | manifest vs stateless — **DECIDED: stateless** | ~~central index vs~~ recompute-on-the-fly from sidecars (never drifts; correct staleness needs re-hashing either way) | §9.3 |
