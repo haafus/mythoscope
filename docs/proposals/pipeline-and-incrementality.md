@@ -741,9 +741,12 @@ these docs spec.
 ### 9.1 Big alternative — adopt a ready-made engine instead of building our own
 
 Everything here (content-addressed DAG, fingerprints, cache, GC, lineage) is what existing data-pipeline
-engines already do. **Selection criteria for us:** (a) content-addressed caching — the whole point; (b)
-in-process Python vs shell-out (our stages are Python functions); (c) weight/dependency; (d) remote artifact
-storage (raw archive + large embeddings); (e) our size (~27 docs argues against heavy tools).
+engines already do — the field is large and well-mapped; the canonical index is
+**[awesome-pipeline](https://github.com/pditommaso/awesome-pipeline)** (a curated list of workflow/pipeline
+frameworks — the tools compared below and dozens more). **Selection criteria for us:** (a) content-addressed
+caching — the whole point; (b) in-process Python vs shell-out (our stages are Python functions); (c)
+weight/dependency; (d) remote artifact storage (raw archive + large embeddings); (e) our size (~27 docs argues
+against heavy tools).
 
 | engine | class | content-cache | model | weight | notes |
 |---|---|---|---|---|---|
