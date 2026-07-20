@@ -754,7 +754,10 @@ storage (raw archive + large embeddings); (e) our size (~27 docs argues against 
 | **Luigi** | orchestrator | partial | Python | light | task+target deps; older, no strong content cache. |
 | **Airflow** | scheduler | ✗ | Python | heavy | scheduling, not content-caching — wrong tool. |
 | **Make** | build | ✗ (mtime) | shell-out | trivial | mtime lies (appendix) — reject. |
-| **build-your-own** | — | ✔ | in-process | ~few hundred LOC | full control, no heavy dep; the stage protocol + driver (§2.2) — stateless fp/GC, no manifest. |
+| **doit** | build (Python) | ✔ (md5) | Python in-process | light | make-in-Python: `file_dep` checked by **md5 content signature** (not mtime), `uptodate` callables for *computed* staleness, DAG, signatures in a small `.doit.db`. **This is essentially our "build-your-own" already written** — the §7 gate + sidecar store, packaged. |
+| **redun** (insitro) | task memoization | ✔ (content) | Python in-process | light-med | **Nix-model in Python**: hashes each task by name + **source code** + input hashes → content-addressed value store; near-1:1 with our `fp = hash(inputs + transform)`. Note it **auto-hashes the task source** — exactly the D4 alternative we *rejected* as over-invalidating (§2.5); we chose param-hash + manual `algo_version`. |
+| **targets** (R; ← drake) | pipeline | ✔ (content) | R in-process | medium | the **canonical** dependency-graph-skips-unchanged tool: skips targets whose "code, data, and upstream" are unchanged — our `desired/actual` + cascade, in R. Wrong language for us, but the reference implementation of this exact idea. |
+| **build-your-own** | — | ✔ | in-process | ~few hundred LOC | full control, no heavy dep; the stage protocol + driver (§2.2) — stateless fp/GC, no manifest. **But see `doit`/`redun` above — much of this is off-the-shelf.** |
 
 **Decided (D6): build-your-own** — at ~27 docs the §2.2 stage protocol + driver (the §7 gate + small fp
 sidecars, stateless fp/GC, no manifest) is the best ROI: in-process, no new heavy dependency, and it follows
@@ -770,6 +773,29 @@ state). The fork is thus **explicit, not defaulted**, in *both* directions — a
 
 Until one fires, build-your-own is strictly better here. **Dagster** only if this becomes a scheduled
 multi-asset product. Avoid Pachyderm/Nextflow/Airflow (weight/purpose), Make (mtime).
+
+**"Build-your-own" ≠ "from scratch" — the explicit fork against `doit`/`redun`.** Both are Python, in-process,
+content-addressed, and light; either could *be* the engine instead of hand-rolled code. The fork:
+
+- **not `doit`, because** its `uptodate`/`file_dep` model is file-oriented and would still need our two-shape
+  key layer (per-`document_id` vs singleton), the two-level orphan GC (§2.7), and the Chroma-collection /
+  projections store adapters written on top — it saves the *driver skeleton*, not the parts that are actually
+  ours. Reasonable to lift its md5-signature-store idea rather than reimplement it, though.
+- **not `redun`, because** it auto-hashes each task's **source code** — the D4 alternative we rejected as
+  over-invalidating (a comment/refactor re-embeds); adopting it would re-open a decision we closed. It also
+  wants its own value store, duplicating Chroma/the catalog as the artifact home.
+
+So D6 stays build-your-own, but the honest framing is **"a thin driver over our own stores, borrowing `doit`'s
+content-signature trick,"** not "a novel engine." If Part 3's driver ever feels heavy, `doit` is the first
+off-the-shelf fallback to reconsider.
+
+**Cross-tool validation of the model.** The design is not exotic — mature engines use the *same* shapes, which
+is reassurance, not a gap: **Flyte**'s cache key = `Cache Version + Task Signature + Task Input Values` is our
+`hash(transform_version + params + input fps)` almost symbol-for-symbol, and its default **"hash the storage
+location, opt into a content hash"** is exactly our split of `hash(locator)` (identity) vs `doc_md5` (version).
+**Dagster**'s "software-defined asset" with materialization + freshness is our "stage as a self-describing
+asset." We re-derived a standard content-addressed pipeline; the only genuinely non-standard piece is the
+*identity* layer (see the provenance-addressed note in `data-model-and-ids.md` §5).
 
 ### 9.2 Projections defeat "minimal rebuild"
 

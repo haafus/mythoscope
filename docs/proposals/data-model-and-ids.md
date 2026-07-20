@@ -201,6 +201,20 @@ Titles are free to churn and collide; the id does not. See §9-D1 for the full r
 > dir names, so changing it later silently re-mints and orphans (exactly the "Store the ids; never regenerate"
 > hazard below). A future rule change is therefore a *migration* (re-mint + rebuild-from-raw), not a hot edit.
 
+> **Provenance-addressed, not content-addressed — the one genuinely non-standard choice.** Classic
+> content-addressed stores — **git** blobs, **Nix** store paths, **IPFS** CIDs — hash the *content*, so
+> identical bytes get one id (deduplication is the goal). We deliberately hash the **locator**, so the *same
+> source* keeps one id **even after its content is edited** (rename-/edit-stability is the goal). The two are
+> not the same axis, and mixing them up is the mistake D1 avoids: we want identity to survive a text fix, which
+> content-addressing at the identity layer would break (every edit = new id = re-embed + orphan). So the system
+> is **provenance-addressed at the identity layer** (`document_id = hash(locator)`) and **content-addressed
+> only at the version layer** (`doc_md5`, the fingerprints of pipeline §2.3) — the design splits the single
+> hash that git/Nix/CAS conflate into the two roles it actually plays here (which is *which* source vs *what*
+> content). Mature pipeline engines make the same split under other names — e.g. Flyte hashes a dataset's
+> **storage location** by default and lets you opt into a **content hash** (pipeline §9.1). There is no library
+> that hands you this data model; it is application schema design (a star-schema-shaped registry split) plus
+> this provenance-addressed id.
+
 > The model registry (`model_registry.py`) uses the inverse pattern — an **authored** safe key plus a
 > `key → label` humanizer — because its keys are hand-written. That does not fit free-form names, so we do
 > not reuse its key regex as a validator; we write a name→id transform instead.
