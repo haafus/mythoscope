@@ -363,6 +363,31 @@ chunk, or a hit loses the data with nothing to resolve it.
     changing one touches only the cheap regenerable layer (the text-tree re-layout, §6; no Chroma update),
     never the expensive stores. With `document_id = hash(locator)`, those stores are shielded from *every*
     human-name rename, which is exactly what makes region/tradition/title all cheap to rename.
+  - *Rejected alternative — a synthetic `uuid` (identity decoupled from both title **and** locator).* The real
+    axis is **derivable-from-source vs synthetic-stored**, not readability (both a uuid and a hash are opaque).
+    A uuid buys exactly **one** capability — *re-source without re-identify*: change a document's URL but keep
+    its id, so an identical-bytes move preserves the expensive LLM graph and you get an explicit "same document
+    / new document" knob. Its costs are structural and permanent:
+    - **Statefulness.** A uuid is random → it must live in a primary, **unrebuildable** `locator → uuid`
+      registry (lose it → every doc re-mints → total orphaning), or be hand-authored per entry in config
+      (friction + a redundant field beside the locator). `hash(locator)` needs no registry — the id is
+      `f(config)`, and the catalog is a rebuildable *cache*, not a source of truth for identity.
+    - **A second key.** The raw archive is locator-addressed by nature (`corpus/raw/<sha1(url)>`), so a uuid
+      identity sits *on top* and reintroduces the join uuid ↔ `sha1(url)` — the very "two identifiers" problem
+      `hash(locator)` collapses into one.
+    - **Lost free dedup + a new failure mode.** Same locator listed twice → same hash (caught for free) but two
+      uuids (silent duplicate). Plus a mint-once read-modify-write with its own atomicity/crash concerns.
+    - **Architectural incoherence.** The pipeline is already content-addressed / derive-from-source (Nix model,
+      `sha1(url)`, `md5(text)`, fp cascade); `hash(locator)` continues it, a uuid would be an island of
+      stateful identity.
+
+    A uuid is the **right** choice only when a document has **no stable locator** (user uploads, generated
+    content, mutable primary keys) — provenance is then not a usable handle. Mythoscope's locators are stable
+    and pinned in config, so that precondition fails. The one case a uuid would handle better — preserving a
+    graph across an *identical-bytes* address move — is covered without going stateful by an **optional
+    `alias` / `id_override` in config** (pin "treat this locator as the same identity as `<old id>`"): 99 %
+    stays stateless, the rare case gets a manual knob. Prefer that escape hatch to a uuid space if the need
+    ever arises.
 - **`slugify` transliteration is under-specified (D8) — but D1 shrinks it.** "Transliterate non-ASCII" needs a
   concrete library/rules (Python has no stdlib transliteration — `unidecode` or hand rules); it is lossy and
   can itself collide. **D1 narrows this to region/tradition names only** — documents no longer slug (id =
