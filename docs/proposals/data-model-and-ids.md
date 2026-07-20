@@ -173,6 +173,25 @@ real addressing is via the `document_id` and `tradition_id` fields.
 The file tree is kept **for human navigation** (browse, grep, git diffs). It is a *rendering*, not the
 identity: the path segments are a regenerable mirror of the tree, not part of any id.
 
+**The cleaned-text path can be fully human-readable — including the book title — precisely because
+`document_id` is opaque.** Since the path never doubles as the id (identity = `document_id = hash(locator)`,
+§9-D1), it carries no id constraints (uniqueness, lowercase, URL/Chroma-safe charset); it needs only mild
+**fs-safety**. So the layout is `corpus/<Region Name>/<Tradition Name>/<Book Title>.txt` with only
+`sanitize_filename` (keeps spaces/case/`&`, strips `/ : * ? < > |`) — readable, not slugged (e.g.
+`Europe/Norse/The Poetic Edda.txt`). The current `text_path` already does this. An opaque id thus *liberates*
+the path to be prettier, not the reverse. Consequences:
+
+- **The catalog is the id↔path bridge.** Reads go `document_id → catalog row → path`; the path is **never
+  parsed** for identity.
+- **The path is not guaranteed unique.** Two books sharing `(tradition, title)` render to one path, though
+  `document_id` (by locator) does not collide — so **disambiguate the file** (append a short suffix, e.g.
+  `…-9f3a.txt`), since a path clash is cosmetic, not an identity clash. Rare.
+- Only the cleaned text needs navigability; the other stores stay opaque by design — raw at
+  `corpus/raw/<hash(locator)>`, chunks keyed by `document_id`, graphs at `graphs/<document_id>/` (render those
+  to readable paths too if ever wanted — same approach).
+- Path segments may use the pretty region/tradition **names** (fs-sanitized) for max readability, or the slug
+  ids — a minor sub-choice; the catalog bridges either way.
+
 **A region/tradition rename *does* touch disk — but only the cheap layer.** If the path embeds `region_id` /
 `tradition_id`, renaming or re-annotating one moves the cleaned-text folders (detect + relocate). That is
 real, but bounded: it touches only the **regenerable cleaned-text tree** (a rebuild-from-raw or `git mv` —
