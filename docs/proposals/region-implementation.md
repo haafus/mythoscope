@@ -1,6 +1,7 @@
 # Proposal: wiring `region` into production — the plan
 
-- **Status:** proposal (open, decisions settled; one item flagged to discuss — §3). Not implemented.
+- **Status:** proposal — **all decisions settled** (the §3 document-identity question is resolved: D1 =
+  `document_id = hash(locator)`; the file layout is decided in §6). Not implemented.
 - **Scope:** the **code layer only** — one config, build, serve, front — for the text-processing pipeline.
   Taxonomy and presentation are closed (§0). Supersedes the code sections of
   [`tradition-architecture-unified.md`](archive/tradition-architecture-unified.md) §4/§6.
@@ -135,16 +136,16 @@ truth; `/api/corpus/traditions` returns its tree as-is. `_update_traditions` and
 `outputs/corpus/traditions.json` are removed.
 
 **2.10 The documents list carries the tradition only.** `/api/corpus/documents` (renamed from `/catalog`) documents carry `tradition` (the
-reference) and per-document fields (`title`, `url`, counts, `description`, `dating`, `source`, and a document
-`id` — pending §3 to-discuss) — **no `major_tradition`, no `region`, no `colour`**. Region is resolved from
-the tradition via the tree; colour from the region.
+reference) and per-document fields (`title`, `url`, counts, `description`, `dating`, `source`, and the
+`document_id` = `hash(locator)`, D1) — **no `major_tradition`, no `region`, no `colour`**. Region is resolved
+from the tradition via the tree; colour is the region's derived per-tradition shade (§8.1).
 
 **2.11 Filename sanitisation.** Any name that ends up in a file path (`sanitize_filename`) is made
 filesystem- and URL-safe deterministically: trim; replace every run of whitespace with a single `_`; replace
 `/ \ * ? : " < > | & % # '` and control characters with `_`; collapse repeated `_`; strip leading/trailing
 `_` and dots; forbid `..`. Case is preserved (the name is the key). This closes the current gap — `&` (region
-names), `%`, `#`, `'` — and applies to whichever names the chosen file layout puts in the path (§3
-to-discuss).
+names), `%`, `#`, `'` — and applies to the region/tradition/title names the decided file layout puts in the
+path (`corpus/<Region>/<Tradition>/<Title>.txt` — §6).
 
 **2.12 Fail-loud validation.** Every `corpus.tradition` must exist in the tree, and every region key must be
 one of the 14 canon names — otherwise the build fails. Replaces the silent `.get(...)` degradations
