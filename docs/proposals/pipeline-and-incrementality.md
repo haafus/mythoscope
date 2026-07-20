@@ -254,6 +254,10 @@ orphans = a.keys() - d.keys()                       # exists, shouldn't         
 stale   = {k for k in d.keys() & a.keys() if d[k] != a[k]}   # exists, fp diverged → rebuild
 ```
 
+This per-stage `orphans` set catches only orphan *keys inside a surviving stage* (a removed document). Removing a
+whole stage (a model / plot / motif source) makes it vanish from `build_pipeline()`, so it never enters this
+traversal at all — its now-unowned store is caught by a **second, store-level orphan pass** (§2.7, level 2).
+
 `status`, `clean`, `build`, GC become **one traversal**, not four bespoke paths — the "build-your-own minimal"
 engine (D6), **stateless (D7)**: the "registry" is `build_pipeline()`'s output; the state is `actual()` (disk/store), no manifest.
 **Why it can't rot:** each store's layout lives in **one** place (the stage that writes it); adding a
@@ -376,12 +380,41 @@ driver's second set (§2.2) — no separate mechanism:
 stage.actual().keys()  −  stage.desired().keys()  =  orphans → collect
 ```
 
-Per deletion type it falls out for free: url/doc removed from corpus.json → its text, chunks (Chroma ids with
-that `document_id`), graph dir drop out of `desired()`; model removed → its Chroma collection + projections;
-method removed → its `<model>/<method>.json`. Today `pipeline_inspect` **detects** these by hand; under the
-protocol each stage's own `desired()`/`actual()` supplies them, and the driver GCs behind a dry-run confirm. So:
-**fp-diff for changes, `actual − desired` for removals.** (Raw snapshots are an archive tier, *not*
-auto-collected — §3, §6.)
+But there are **two kinds of removal**, and the per-stage key-diff above catches only the first:
+
+- **an orphan *key* inside a stage that is still alive** — remove a **document** from `corpus.json`: its text,
+  its chunks (Chroma ids carrying that `document_id`), and its graph dir drop out of the *surviving* corpus /
+  embeddings / graphs stages' `desired()` while staying in their `actual()`. This is exactly `actual − desired`
+  above.
+- **an orphan *whole stage (store)*** — remove an **embedding model**, a **projection plot**, or a **motif
+  source**: the entire stage vanishes from `build_pipeline()`, so there is **no live stage object to call
+  `.actual()` on** — a dead stage enumerates nothing, and the key-diff never sees its Chroma collection or its
+  `projections/<model>/` files. **This removal cascades through the *factory*, not the fp graph:** dropping model
+  `M` from the config removes `EmbeddingsStage(M)` *and*, in the same construction loop, every `ProjectionStage(M,
+  *)` (projections fan out over the *live* models), so the stage and its dependents disappear together — their
+  artifacts are now stores **owned by no live stage**.
+
+So orphan detection is **two levels**, and the whole-stage case needs a *store-level reconciliation* the
+key-diff cannot supply:
+
+```
+level 1 (key):    live_stage.actual().keys() − live_stage.desired().keys()        # removed document
+level 2 (store):  {physical stores of a class} − {stores owned by a live stage}   # removed model/plot/source
+```
+
+Level 2 is precisely what `pipeline_inspect.embeddings_orphan_collections` does **today** — it lists *every*
+Chroma collection (`list_collections()`) and subtracts the configured variants; the leftover collections are the
+removed models. Under the protocol this scan must be **ported as a stage-level orphan pass** (enumerate each
+store class — Chroma collections, `projections/*/`, `motifs/*` — and subtract the live stages' claims), **not**
+assumed to fall out of `actual − desired`. Both levels then feed the same dry-run GC. So: **fp-diff for changes;
+`actual − desired` for removed keys; store-vs-live-stages for removed stages.** (Raw snapshots are an archive
+tier, *not* auto-collected — §3, §6.)
+
+Worked example — **drop model `M`**: its Chroma collection (level 2) and its `projections/M/*.json` (level 2,
+stages gone from the factory) become orphan stores; `status` reports them, `clean --apply` collects them behind
+the dry-run confirm; the raw archive is untouched (raw is keyed by document, not model), no other model is
+re-embedded (their stages are live, `desired = actual`), and any preprocess cache for `M`'s variant is a
+resumable tier dropped only by `--caches` (§3). Removing a single *document* instead stays entirely at level 1.
 
 ### 2.8 `actual()` — sidecars, no manifest (D7)
 
@@ -419,6 +452,19 @@ age; keep-last-N (for versioned stores); pinning (never-collect); tiered (per cl
 - **resumable caches** (extraction/preprocess/LLM chunk-cache/motif scrape) → **TTL or reachability**, safe to
   drop, regenerable; `clean --caches`. **`--force` does *not* touch these** — only `--caches` does (§5), so a
   forced rebuild never re-pays for LLM/scrape work whose inputs are unchanged.
+
+**The tier is a property of the artifact *class*, not the stage — one stage can span tiers.** So GC policy is
+applied per artifact class *within* a stage, not per stage wholesale, and the three escape-hatches map one-to-one
+onto the three tiers: `--force` rebuilds derived (keeps resumable), `--caches` also drops resumable (the only
+thing that re-pays for `$$`), `purge` touches raw. How each stage's outputs land in the tiers:
+
+| stage | derived — reachability GC, `clean --apply` | raw archive — pin, `purge` only | resumable cache — `clean --caches`, `--force` skips |
+|---|---|---|---|
+| **corpus** | `.txt` tree + `corpus.json` | `corpus/raw/<blake2b(url)>` | extraction |
+| **embeddings:M** | the Chroma collection — at **both** granularities: whole collection (level 2, model removed) and chunks within (level 1, doc removed / count shrank) | — | preprocess (LLM variant) |
+| **projections:M:plot** | the JSON (singleton; level-2 reachability on removal, else stale-rebuild) | — | — |
+| **graphs** | `graphs/<document_id>/` (reachability, per-doc) | — | the internal per-chunk LLM `chunk_hash` cache — **deliberately not a driver stage** (§2.2): a cache tier, dropped only by `--caches`, never by orphan-GC |
+| **motifs:\*** | motif JSONs (singleton; reachability when a source stage is removed) | — | motif raw-scrape |
 
 This matches the existing `clean` flags (`--caches`, `--apply`).
 
@@ -644,7 +690,11 @@ fp graph).
 
 1. Atomise the blocks per §2.2's table (`corpus`, `embeddings:<variant>`, `projections:<model>:<plot>`,
    `graphs`, `motifs:*`); implement `inputs/desired/actual/build(keys)/delete` on each.
-2. The generic driver over `stages()`; retire `pipeline_inspect` + `cli._clean` per-store wiring.
+2. The generic driver over `stages()`; **retire `pipeline_inspect`'s per-key scans into each stage's
+   `desired()`/`actual()` (level-1 orphans), but *port* its store-level scans — `embeddings_orphan_collections`
+   and the `projections/*/` listing — as the driver's level-2 pass (store-vs-live-stages, §2.7): they catch a
+   *removed whole stage*, which the per-stage key-diff structurally cannot.** Retire `cli._clean`'s per-store
+   wiring.
 3. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
    so this is "when to switch," not "what to build now."
 
