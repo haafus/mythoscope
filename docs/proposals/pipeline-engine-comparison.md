@@ -2,7 +2,7 @@
 
 A side-by-side of **our build-your-own stage protocol** ([`pipeline-and-incrementality.md`](pipeline-and-incrementality.md)
 §2.2) against the ready-made engines surveyed in §9.1. Purpose: see, concretely, which of our features are
-**off-the-shelf standard**, which are **convergent** (we re-derived what mature tools do), and which are
+**off-the-shelf standard**, which are **convergent** (we re-derived what existing tools do), and which are
 **genuinely ours**. The canonical index of the whole field is
 [awesome-pipeline](https://github.com/pditommaso/awesome-pipeline); this doc compares the twelve most relevant.
 
@@ -44,10 +44,13 @@ Legend: **✓** yes / first-class · **~** partial, opt-in, or needs user code �
 | **Airflow** | none (schedule/trigger) | — | ✗ | ✗ | ✗ order only, not staleness |
 | **Make** | **mtime** | file times | ✗ | ✗ | ✓ via mtime prereqs |
 
-**Read:** everyone serious is content-based (Luigi/Airflow/Make are the laggards). The one real *design* split
-is **how a code change is caught**: **auto source-hash** (redun, targets, Hamilton — over-invalidates: a
-comment/refactor re-runs) vs a **manual version bump** (Flyte `cache_version`, Dagster `code_version`, ours
-`algo_version`). We landed with the manual camp (D4, §2.5) — the same choice as the two most mature orchestrators.
+**Read:** every content-based tool caches; the one real *design* split is **how a code change is caught**, and
+it is a genuine trade with no "better" side — **auto source-hash** (redun, targets, Hamilton) is zero-bookkeeping
+but *over-invalidates* (a comment or refactor re-runs an expensive stage), while a **manual version bump** (Flyte
+`cache_version`, Dagster `code_version`, ours `algo_version`) has *no false triggers* but relies on the developer
+remembering to bump. We took the manual side (D4, §2.5) because our stages are expensive (re-embed / re-LLM), so
+a false trigger costs more than the bookkeeping; a tool with cheap stages can reasonably choose the opposite.
+Luigi/Airflow/Make don't do content-caching at all.
 
 ---
 
@@ -72,9 +75,16 @@ comment/refactor re-runs) vs a **manual version bump** (Flyte `cache_version`, D
 or metadata dir (only Make is also DB-free, and it pays with mtime). That is a deliberate trade (D7, §9.3): we
 give up **remote storage** and **lineage/history**, which redun (call graph), DVC (git), Dagster (catalog), and
 targets (metadata) all provide first-class. Those two gaps are exactly our §9.1 switch-triggers (a) and (b).
-Our **two-level GC** (orphan *key* inside a live stage + orphan *whole store* from a removed stage, §2.7) is more
-than most: targets/DVC/redun GC by reachability but do not distinguish "removed one item" from "removed a whole
-parametrized branch," which for us is the model-removal case.
+
+**On GC specifically — our "two levels" is not an edge, it is the *cost* of being stateless.** A central-store
+tool (DVC, targets, redun, Dagster) GCs with **one** uniform sweep: the store records *every* artifact that was
+ever built, keyed independently of the live task graph, so "garbage = recorded-in-store − reachable-from-current-config"
+covers a removed *document* and a removed *whole collection/model* **identically** — the store still lists the
+removed model's outputs even though its producing task is gone from the code. We have **no** such record, so our
+`actual()` is computed by *asking each live stage*; a removed stage isn't there to ask, which is exactly why we
+need a **second** store-scanning pass (§2.7 level 2). So the honest read is the reverse of a boast: **their
+single-level reachability GC is cleaner, and it is bought by the very central store we chose not to keep.** Our
+two-level scheme is what statelessness costs, not what it wins.
 
 ---
 
@@ -101,23 +111,25 @@ which is why D6 stayed build-your-own and Dagster is gated to "if this becomes a
 
 ---
 
-## Matrix D — our distinctive design decisions vs the field
+## Matrix D — each engine's signature design decision
 
-The follow-up axis: not "which features," but "which of our *design choices* is actually ours." For each, the
-closest thing any analog does.
+Not "which features," but the **one idea that defines each tool** — the choice you adopt (or reject) the whole
+tool for — with its distinctive strength and its notable limitation. Ours is one row among the rest.
 
-| our decision | what it is | any analog? | closest | verdict |
-|---|---|---|---|---|
-| **Provenance-addressed id** (`hash(locator)`, not `hash(content)`) | id tracks the *source*, survives a content edit → rename/edit-stable | mostly **no** — CAS tools (git/Nix/IPFS, and redun's value hashing) address by *content* → an edit is a new id | **Flyte** hashes a dataset's *storage location* by default (opt-in content hash) | **distinctive** |
-| **Split identity-hash vs version-hash** | two hashes, two roles: *which* source (`hash(locator)`) vs *what* content (`doc_md5`/fp) | git/Nix/CAS **conflate** them into one content hash | **Flyte** (location vs content) | **distinctive** |
-| **Stateless — sidecars, no central DB/manifest** | state = on-disk truth, re-read each run; never drifts | most keep a DB/lock (redun SQLite, targets `_targets/`, DVC `dvc.lock`, Dagster instance DB, doit `.doit.db`) | **Make** (also DB-free, but mtime) | **distinctive** (deliberate D7) |
-| **Self-describing stage** (`desired()`/`actual()` owns its own hygiene) | each stage declares its spec + reality; driver diffs | **yes, convergent** | **Dagster** software-defined asset (materialization + freshness) | **convergent** (validated, not unique) |
-| **Two-level orphan GC** (key **and** whole-store) | catches a removed *document* (key) *and* a removed *model/plot* (whole store) | reachability GC exists (targets/DVC/redun) but single-level | **targets** `tar_prune` (one level) | **partly distinctive** (whole-store-via-factory is ours) |
-| **Transform-version = param-hash + manual `algo_version`** (reject source-hash) | precise: params catch expensive-stage behaviour, a thin manual net for pure-logic edits | split field: **auto source-hash** (redun/targets/Hamilton) vs **manual version** (Flyte/Dagster) | **Flyte** `cache_version`, **Dagster** `code_version` | **convergent** with Flyte/Dagster; **opposite** of redun/targets |
-| **Doc-level content version** (coarse; positional chunks re-embed whole doc) | the incremental unit is the document, not the chunk (per-chunk precision illusory under positional chunking, D2) | most tools are file- or task-grained, not "sub-artifact but coarsened on purpose" | — | **domain-specific** |
-| **Path-as-rendering** (identity decoupled from on-disk layout; catalog bridges id↔path) | files are a human view; a rename is a `git mv`, never a re-key | in **file-DAG** tools the path **is** the key (Make/Snakemake/DVC) → a rename re-keys | **Dagster** (asset key ≠ storage path, via I/O manager) | **distinctive** vs file-DAG tools |
-| **Three-registry resolve-upward model** (tree / documents / chunks; resolve at serve) | normalized schema, denormalize only for a server-side filter | **not a pipeline concern** — this is app data-modeling | — (a star-schema shape) | **out of scope** for these engines |
-| **Fan-out via factory; removal cascades through construction** | drop a config entry → its stage *and* its dependents vanish from `build_pipeline()` together | dynamic tasks are common; removal-then-GC semantics differ | **Dagster** (deleting an asset def) | **convergent-ish** |
+| engine | signature design decision | distinctive strength | notable limitation |
+|---|---|---|---|
+| **MythoScope** | **provenance-addressed identity** (`hash(locator)`, not content) + **stateless** sidecars, no central DB | id survives a content edit *and* a filesystem rename; state can never drift (re-read from disk each run) | no remote store, no lineage/history, no distributed exec; identity-hash split is bespoke code |
+| **doit** | **`uptodate` — arbitrary Python predicates decide staleness** (not just file times/hashes) | staleness is *programmable*: any callable, `config_changed`, `result_dep` | file-oriented; no code-change detection unless you write it; no orphan GC |
+| **redun** | **expression graph + graph reduction**; a task's own **source code** is part of its content hash | "code *and* data reactivity" — edit the function, it re-runs; full call-graph provenance | over-invalidates on any source edit; requires a SQL backend DB |
+| **targets** (← drake) | **targets as first-class objects** with a reproducibility *proof* — "all up to date" is evidence results match code+data | strongest reproducibility guarantee; dynamic branching; visual dep graph | R-only; single `_targets/` metadata store |
+| **DVC** | **git-for-data** — data/models versioned like source (`.dvc` pointers, content cache, remotes) | data versioning + remote storage + `dvc repro` ride on the git workflow you already have | the DAG is secondary; stages shell out; heavier than a pure cache |
+| **Dagster** | **software-defined assets** — you declare the *data asset* (the output), not the task | asset catalog, freshness policies, auto-materialize, lineage UI as first-class | needs an instance + DB; med-heavy for a single-user tool |
+| **Snakemake** | **wildcard/pattern rules over filenames** — one rule with `{sample}` expands into a file DAG | concise implicit DAG for thousands of files; cluster/k8s submission built in | shell/file-centric; mtime heritage; rebuild logic tied to paths |
+| **Flyte** | **strongly-typed, containerized, k8s-native tasks** — every task is a typed container | type-safe interfaces + hard isolation + reproducible envs at org scale | heavy; needs k8s + a control plane; wrong weight below team scale |
+| **Hamilton** | **the DAG *is* the function graph** — param names of a function are its dependencies | zero explicit wiring; the code is the lineage; extremely light | scoped to in-process dataflow/transforms, not orchestration/scheduling |
+| **Luigi** | **`Target` abstraction** — a task is done iff its output `Target` exists | dead-simple mental model; pluggable targets (file, S3, DB) | completion = existence, not content → stale outputs undetected; dated |
+| **Airflow** | **time-based scheduling of DAGs** — the *scheduler* is the product | cron-for-DAGs, sensors, backfill, huge operator ecosystem | not a build/cache system at all — no staleness, no content-caching |
+| **Make** | **mtime-based prerequisite rules** — rebuild if a prerequisite is newer | trivial, universal, declarative; the ancestor of all of this | mtime lies (git resets it); blind to code/flag changes |
 
 ---
 
@@ -127,8 +139,10 @@ closest thing any analog does.
   (`inputs + version + params`), the self-describing asset, the manual transform-version, downstream cascade by
   fp composition. Flyte and Dagster match these almost symbol-for-symbol — reassurance, not a red flag.
 - **Genuinely ours:** the **provenance-addressed identity** and the **identity/version hash split**;
-  **stateless-with-no-DB** (everyone content-based keeps a store); **whole-store GC via the factory**; and
-  **path-as-rendering**. None of these is exotic, but no single tool packages them this way.
+  **stateless-with-no-DB** (everyone content-based keeps a store); and **path-as-rendering**. None of these is
+  exotic, but no single tool packages them this way. *(Our two-level GC is **not** on this list — it is the
+  price of statelessness, not a feature; a central store handles collection removal in one uniform sweep, §
+  Matrix B.)*
 - **Not a pipeline question at all:** the **three-registry data model** — no engine addresses it because it is
   application schema, not build orchestration ([`data-model-and-ids.md`](data-model-and-ids.md)).
 - **What the comparison costs us (all already flagged):** no **remote artifact store** (redun/DVC/Flyte/Dagster
