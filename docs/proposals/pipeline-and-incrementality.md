@@ -432,48 +432,36 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 Full Bazel/Nix is overkill for this size — **a small content-addressed manifest + transform versions** is the
 right amount.
 
-### Implementation order (cross-cutting; references tasks in both docs, does not restate them)
+### Implementation order — **Part 2 of 2** (run after Part 1)
 
-Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
+**Part 1 (ship `region`: config, ids, B1, colour) is the single list in
+[`region-implementation.md`](region-implementation.md) §5 — not repeated here.** This section is only the
+incrementality hardening, run **after** Part 1. (The one incrementality win that lands *inside* Part 1 — the
+embeddings key on `document_id`, which fixes rename-churn for free — is step 4 there.) Sub-decisions flagged
+*(decide Dx)*; full list in §9.5.
 
-**Phase 0 — independent of D1, do now (light tier):**
+1. Graphs build/serve unify + traversal guard. *(Pure isolated bug — may equally land in Part 1 step 6; do
+   whichever comes first.)*
+2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4. *(decide D4: per-stage
+   auto vs manual.)*
+3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4, *staleness half* (fixes the
+   re-embed-on-edit bug); add the projection-fp gate for coherence (§9.2). *(decide D2: per-chunk hash vs
+   doc-md5.)*
+4. **Atomicity** — write the artifact *then* its fp; atomic swap for the catalog/collection — §9.4. Land it
+   with item 3.
+5. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild".
+   *(decide D7: manifest vs stateless.)*
+6. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
+7. **Override / curation layer** — the `curate` edit-then-snapshot workflow — §6.2–§6.4. *(decide D5.)*
+8. **Parametric projections** — `.transform()` instead of a full refit — §9.2 (D3).
+9. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
 
-1. Graphs build/serve unify + traversal guard — `data-model-and-ids.md` §8.5. Pure bug, isolated.
-2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4 / §7(2). *(decide D4:
-   per-stage auto vs manual.)*
-3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4 / §7(1), *staleness half only* (keys on
-   the current id; fixes the re-embed-on-edit bug). Add the projection-fp gate for coherence (§9.2). *(decide
-   D2: per-chunk hash vs doc-md5.)*
-4. **Atomicity** — write the artifact *then* its fp; atomic swap (write-temp-then-rename) for the catalog /
-   collection — §9.4. Prerequisite for trusting any fp under a mid-build failure; land it with item 3.
+Ordering within Part 2: items 1–4 are the light "do-soon" tier (independent bug fixes + the staleness gate);
+5–9 are "when it grows / optional".
 
-**Phase 1 — D1 decided (`document_id = hash(locator)`, `data-model-and-ids.md` §9-D1):**
-
-5. **D1 is settled: `document_id = hash(locator)`** — the existing raw key `sha1(url)` surfaced as identity.
-   No decision to make; proceed.
-6. `region_id`/`tradition_id` = the **canonical name** (at most the existing `normalize_catalog_id` for
-   whitespace) + fail-loud uniqueness — data-model §5. **No `slugify`, no transliteration** (D8 dissolved);
-   boundaries already sanitise (`sanitize_filename`/`encodeURIComponent`/`escapeHtml`).
-7. Persist `document_id = hash(locator)` (the normalized-locator hash / raw key); mint `region_id`/`tradition_id`
-   — §8.1, §8.2.
-8. Chunk refs → `(document_id, chunk_index)` **only** (B1); drop `tradition`/`url`/`major_tradition` — §8.4
-   (do *after* the front can resolve, so no hit loses data). The cross-tradition search filter moves to
-   `where {document_id $nin docs-of-that-tradition}` (server resolves tradition → documents).
-9. Front `treeIndex`/`docIndex`; delete `bookTitleFromId` — §8.6.
-   *Result:* the embeddings key now keys on the stable anchor → **rename-churn is fixed automatically** (§4).
-
-**Phase 2 — when it grows / optional:**
-
-10. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild" — §7(4).
-    *(decide D7: manifest vs stateless.)*
-11. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
-12. **Override / curation layer** — manual edits as an override layer + the `curate` edit-then-snapshot
-    workflow — §6.2–§6.4. *(decide D5: unified-diff vs full-override.)*
-13. **Parametric projections** — `.transform()` new/changed points instead of a full refit — §9.2 (D3).
-14. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
-
-D1 (the former hard gate) is now decided — `document_id = hash(locator)` — so Phase 1 is unblocked; **D8 is
-dissolved** (id = the canonical name, no slug); Phase 0 still needs only the light sub-decisions D2/D4.
+D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
+canonical name, no slug), so Part 1 is fully unblocked; Part 2 above still needs only the light sub-decisions
+D2/D4/D5/D7 where flagged.
 
 ---
 

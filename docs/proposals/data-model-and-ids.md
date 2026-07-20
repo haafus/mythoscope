@@ -347,23 +347,18 @@ chunk, or a hit loses the data with nothing to resolve it.
 
 ---
 
-## 8. Follow-ups (concrete tasks)
+## 8. Follow-ups → sequenced in the single implementation list
 
-1. Persist `document_id = hash(locator)` (D1) in the built catalog — the existing raw key `sha1(url)`, now
-   surfaced as the document identity; return it from the documents endpoint. Normalize the locator
-   (scheme/host/trailing-slash/%-decode) before hashing.
-2. Mint `region_id` / `tradition_id` in the tree (and as the document's `tradition` ref in the catalog); the
-   chunk carries **no** `tradition` (B1).
-3. `region_id`/`tradition_id` = the **canonical name** (at most `normalize_catalog_id` for whitespace — keeps
-   case/accents/`&`/`/`); **no `slugify`, no transliteration, no new function.** Documents drop
-   `normalize_catalog_id` (id = `hash(locator)`). Add the fail-loud uniqueness check (name-collision for
-   region/tradition; distinct-locator for documents). No boundary work to add — `sanitize_filename` (FS),
-   `encodeURIComponent` (URL) and `escapeHtml` (HTML) are already in place and used.
-4. Chunk metadata → `{document_id, chunk_index}` (B1); drop `tradition`/`url`/`major_tradition`. Change the
-   `get_point` cross-tradition filter from `where {tradition != X}` to `where {document_id $nin …}` (server
-   resolves the tradition's document set from the catalog).
-5. Graphs: unify build/serve on the stored id; add the traversal guard.
-6. Front: `treeIndex` + `docIndex`; delete `bookTitleFromId`; resolve title/url/color from the indexes.
+**The concrete tasks from this spec are not listed separately here** (that only created a parallel list that
+drifts). They are folded, in dependency order, into the **single implementation list —
+[`region-implementation.md`](region-implementation.md) §5 (Part 1)**:
+
+- persist `document_id = hash(locator)` + mint `region_id`/`tradition_id` = name → §5 step 2;
+- front `treeIndex`/`docIndex` + resolution, delete `bookTitleFromId` → §5 step 3;
+- chunk → `{document_id, chunk_index}` (B1) + the `get_point` `$nin` filter → §5 step 4;
+- graphs build/serve unify + traversal guard → §5 step 6.
+
+Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline-and-incrementality.md` §7.
 
 ---
 

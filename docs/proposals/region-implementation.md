@@ -237,7 +237,17 @@ group by region, attach books, colour = region base + derived per-tradition shad
 
 ---
 
-## 5. Migration order (region-only; each phase shippable)
+## 5. Implementation order — **Part 1 of 2: the data-model + region migration** (run before Part 2)
+
+**This is the single, ordered task list for the whole migration** — not "region" alone: it ships the **id/data
+model** (`document_id = hash(locator)`, name-ids, the B1 chunk, the file layout) *and* the **`region` feature**
+(the 14-region tree, region-derived colour, grouping). It is self-contained — the id/data tasks are folded in
+here, so `data-model` §8 only points back. **Part 2** = the incrementality hardening in
+[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §7, run **after** this. The two parts run
+one after another; nothing here repeats there. Each step below is shippable.
+
+Dependency spine: silent join first (pure config) → `document_id` persisted before anything references it →
+front resolution before any field is trimmed off a chunk/hit → then the trim → colour → cleanup.
 
 1. **Author the config + validation.** Build `config/traditions.json`: 14 region nodes in canon order, each
    with its canon fields (`color` + `description`/`subdivision`/`strata`) and only its texted traditions
@@ -245,34 +255,36 @@ group by region, attach books, colour = region base + derived per-tradition shad
    strings to the canonical keys per the decided table (§6.1)** — incl. the canon extension `Euahlayi` — and
    repoint every `config/corpus.json` book at its canonical tradition; then add build-time fail-loud validation
    (unknown tradition / non-canon region; name-uniqueness). *(Highest value-to-risk — closes the silent join.)*
-2. **Retire `major_tradition`; group by region; trim chunk metadata to one reference (B1).** Re-partition the
+2. **Persist identity.** Persist `document_id = hash(locator)` in the built catalog (normalize the locator
+   first; it is the existing raw key `sha1(url)`) and return it from the documents endpoint; mint
+   `region_id`/`tradition_id` = the canonical name in the tree + as each document's `tradition` ref. *(Must
+   precede B1 and the `?id=` endpoint.)*
+3. **Front indexes + resolution — before any trim.** Fetch `/traditions` + `/documents` once into shared state
+   → `treeIndex`/`docIndex`; resolve `document_id → document → tradition → region → colour`; delete
+   `bookTitleFromId`. *(Order-critical: the front must resolve from the reference before step 4 strips fields,
+   or a hit loses data with nothing to resolve it.)*
+4. **Retire `major_tradition`; group by region; trim chunk metadata to one reference (B1).** Re-partition the
    config tree to regions; update the code that **grouped** by `major_tradition` (`builder.py`, `iterator.py`,
    `schemas.py`, services, front) to group/resolve by `region` through the tree. Reduce **chunk metadata to a
    single document reference `{document_id, chunk_index}` (B1)** — drop `major_tradition`, `tradition`, and
    `url` as stored chunk fields (new builds; existing chunks not re-embedded). Correspondingly drop these from
-   corpus rows / `CorpusFileInfo` and from the one-text endpoint's query param; delete
-   `SearchResult.major_tradition` and trim search hits to chunk data + the document reference
-   (`tradition`/`url`/`region`/`colour` resolved on the front from `document_id`). **Cross-tradition search
-   filter (B1):** with no `tradition` on the chunk, `get_point`'s tradition filter resolves tradition →
-   documents server-side from the catalog and filters `where {document_id: {$nin: docs-of-that-tradition}}`
-   (was a `tradition`-equality clause). Move the file layout to the decided
-   `corpus/<Region>/<Tradition>/<Title>.txt` (§6). **Rename the endpoints** (§3): `/catalog` → `/documents` (list),
-   `/documents` → `/document` (one text) located by `?id=document_id` (D1). *(Prerequisite: `document_id`
-   persisted in the catalog first — data-model §8.1.)*
-3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
+   corpus rows / `CorpusFileInfo`; delete `SearchResult.major_tradition` and trim search hits to chunk data +
+   the document reference. **Cross-tradition search filter (B1):** `get_point` resolves tradition → documents
+   server-side and filters `where {document_id: {$nin: docs-of-that-tradition}}` (was a `tradition`-equality
+   clause). Move the file layout to `corpus/<Region>/<Tradition>/<Title>.txt` (§6). Switch the embeddings dedup
+   key to `(document_id, content_md5, model, ver)` — **rename-churn is fixed here for free**. **Rename the
+   endpoints** (§3): `/catalog` → `/documents` (list), `/documents` → `/document` (one text) by `?id=document_id`.
+5. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
-   colour + fields, no books); strip `region` and `colour` from the `corpus.json` rows and `/documents` (the
-   renamed list). **Implement the per-tradition shade function** (new work — regions.md §8.1): OKLCH, fix
-   `H`/`C`, vary `L` on the safe band, grow-then-clamp centred on the base, order by longitude, L×C lattice for
-   N > 12, light/dark bands. Pure function of `(region base, tradition index, region count)`, computed at
-   display — nothing stored.
-4. **Front composes from one global load.** Fetch `/traditions` + `/documents` once into shared state; remove the
-   client-side `groupDocuments`; render the `region → traditions` tree in canon order; attach books from the
-   documents; **colour = the derived per-tradition shade off the region base (§8.1)**; reuse the cache in
-   corpus/atlas/embeddings/search.
-5. **One `UNASSIGNED`** across `schemas.py`, `iterator.py`, and the front end.
+   colour + fields, no books); strip `region` and `colour` from the `corpus.json` rows and `/documents`.
+   **Implement the per-tradition shade function** (new work — regions.md §8.1): OKLCH, fix `H`/`C`, vary `L`
+   on the safe band, grow-then-clamp centred on the base, order by longitude, L×C lattice for N > 12,
+   light/dark bands. Pure function of `(region base, tradition index, region count)`, computed at display —
+   nothing stored. The front then colours by this derived shade.
+6. **Cleanup.** One `UNASSIGNED` across `schemas.py`, `iterator.py`, the front; graphs — unify build/serve on
+   the stored `document_id` + traversal guard.
 
-Tests are rewritten to the new model as each phase lands.
+Tests are rewritten to the new model as each step lands.
 
 ---
 
