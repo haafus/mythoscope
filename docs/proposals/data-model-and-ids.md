@@ -228,26 +228,34 @@ sub-decision of the file-layout choice (region-implementation §6 prerequisites)
 ### Rename operations (the operational payoff)
 
 Because `document_id = hash(locator)` is invariant under every name change, **no rename ever recomputes the
-expensive stores** (embeddings, graphs). A rename only edits config, updates the tree, `git mv`s the path
-renderings, and — for a tradition — updates one metadata field.
+expensive stores** (embeddings, graphs, or the UMAP layout). A rename only edits config, updates the tree,
+`git mv`s the path renderings, and — for a tradition — **rewrites the `tradition` value in its two
+denormalized copies** (chunk metadata *and* the projection artifacts). All of those are cheap.
 
-| rename | config edit | Chroma chunks | text file | graph dir | re-embed | re-LLM |
+| rename | config edit | Chroma chunks | **projection files** | text file | graph dir | re-embed / re-fit UMAP |
 |---|---|---|---|---|---|---|
-| **region** | tree (region node) | — (region not on chunk) | `git mv` region folder * | `git mv` * | no | no |
-| **tradition** | tree + repoint `corpus.json` books | update `tradition_id` field (`collection.update`, no re-encode) * | `git mv` tradition folder * | `git mv` * | no | no |
-| **book (title)** | `corpus.json` `title` | — (title not on chunk) | `git mv` the file * | `git mv` the dir * | no | no |
+| **region** | tree (region node) | — (region not on chunk) | — (region not inlined; color via tree) | `git mv` region folder * | `git mv` * | no |
+| **tradition** | tree + repoint `corpus.json` books | rewrite `tradition_id` field (`collection.update`) * | **rewrite the inlined `tradition`** (scatter points + distribution) * | `git mv` tradition folder * | `git mv` * | no |
+| **book (title)** | `corpus.json` `title` | — (title not on chunk) | — (only `document_id` inlined, invariant; title not inlined) | `git mv` the file * | `git mv` the dir * | no |
 
-\* only for path segments actually in the readable layout; opaque path → nothing. The `tradition_id` field
-update is the one Chroma touch, and only for a tradition rename/re-annotation.
+\* only where that value/segment is actually present (readable-layout path segments; the projection's inlined
+`tradition`). A **tradition** rename is the one that touches every denormalized copy; region/book do not.
 
-**Unified incremental procedure:** (1) edit config; (2) update stored refs to the *old name* — tradition
-rename → `tradition_id` field on its chunks; region/book → none; (3) `git mv` the changed path segment
-(region folder / tradition folder / file + graph dir); (4) rebuild the catalog + front `treeIndex`/`docIndex`;
-(5) **never re-embed / re-LLM** (`document_id` invariant); (6) re-run fail-loud uniqueness + `status`.
+**The rule:** every *denormalized copy* of the renamed value must be rewritten — and `tradition` has **two**
+(chunk metadata + projection points), a field-rewrite each, never a re-embed or UMAP re-fit (coordinates
+depend on the invariant vectors, not the name). This is exactly the price of inlining `tradition` for the
+catalog-free scatter coloring (§4 (b)); storing only `document_id` in the projection would remove the
+projection rewrite at the cost of resolving `tradition` from the catalog at render.
 
-The feared case — a **book rename** — is the cheapest: a `title` edit + a `git mv`, with zero chunk change
-(title is not stored on the chunk). This is only for a *single* incremental rename; a full wipe-rebuild
-(region-implementation §6) is for large scheme migrations, not one rename.
+**Unified incremental procedure:** (1) edit config; (2) rewrite every denormalized copy of the *old value* —
+a tradition rename → the `tradition_id` field on its chunks **and** the inlined `tradition` in its projection
+points/distribution; a region/book rename → none; (3) `git mv` the changed path segment (region folder /
+tradition folder / file + graph dir); (4) rebuild the catalog + front `treeIndex`/`docIndex`; (5) **never
+re-embed / re-fit UMAP / re-LLM** (`document_id` invariant); (6) re-run fail-loud uniqueness + `status`.
+
+The feared case — a **book rename** — is the cheapest: a `title` edit + a `git mv`, with zero chunk and zero
+projection change (title is stored nowhere derived). This is only for a *single* incremental rename; a full
+wipe-rebuild (region-implementation §6) is for large scheme migrations, not one rename.
 
 ---
 
