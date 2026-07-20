@@ -131,15 +131,28 @@ class Stage:
 def stages() -> list[Stage]: ...               # per module; grouping for the CLI (`mytho embeddings` …)
 ```
 
-**Atomisation of the current blocks** (a `key` is a document id, or a singleton for a global reduce):
+**Atomisation of the current blocks.** "Atomise" = split each code module into the smallest
+independently-buildable **stages**, so that within one stage *every artifact is keyed the same way*. A **key**
+is the identity of one buildable/checkable item inside a stage; it comes in two shapes:
 
-| module `stages()` | key | notes |
-|---|---|---|
-| `corpus` (1) | `document_id` | `corpus.json` is this stage's **sidecar store** (`scan()` reads it), not a separate artifact |
-| `embeddings:<variant>` (per variant) | `document_id` | each variant = its own collection; `build(docs)` chunks + **GPU-batches** inside |
-| `projections:<model>:<plot>` (scatter/heatmap/dist × method) | singleton | global reduce over the model's embeddings; `build` = full refit (D3) |
-| `graphs` (1) | `document_id` | the per-chunk LLM `chunk_hash` cache stays **internal** (a resumable GC tier §3), *not* a driver stage — else content-addressed orphan-GC |
-| `motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic` | singleton | atomising makes the motifs sub-DAG explicit via `inputs()` |
+- **`document_id`** — the stage has **one artifact per document**, so it has *many* keys; build and staleness
+  are decided per document (`build({doc_ids})`, `scan() -> {document_id: fp}`).
+- **singleton** — the stage produces **one artifact total** (a *global reduce* over all its inputs), so it has
+  exactly one key; `build` regenerates the whole thing.
+
+A module's `stages()` may return one stage or several (e.g. one per embedding variant). The table:
+
+| module → `stages()` | how many | key | what one build does |
+|---|---|---|---|
+| **`corpus`** | 1 | `document_id` | fetch→clean→trim→write one `.txt` per document. `corpus.json` (the catalog) is **not** a second stage — it is *where this stage stores* each doc's metadata + fp, i.e. its sidecar, which `scan()` reads. |
+| **`embeddings:<variant>`** | one **per variant** in `models.json` | `document_id` | each variant is its own Chroma collection → its own stage. `build({docs})` chunks those docs and **GPU-batches** the encode; the per-chunk rows share one per-doc `doc_md5` (D2), so the unit is the document, not the chunk. |
+| **`projections:<model>:<plot>`** | one **per (model × plot × method)** | **singleton** | UMAP/heatmap/distribution run over **all** of a model's points to emit one file — it can't be built "per document," so its whole output is a single key; `build` = full refit (D3). |
+| **`graphs`** | 1 | `document_id` | one knowledge-graph per document; `build({docs})` assembles them. The expensive per-chunk LLM step keeps its own **internal** `chunk_hash` cache (a resumable GC tier, §3) — deliberately *not* a driver stage, else a content-addressed key drags in orphan-GC + refcounting. |
+| **`motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic`** | several | **singleton** each | motifs is a mini-pipeline; each step emits one artifact. Atomising it makes the internal order explicit via `inputs()` (crosswalk depends on the sources, parallels on the crosswalk, …) — which the current monolithic `build_motifs` hides. |
+
+So after atomisation **every stage has a single key shape** (per-doc or singleton) → the `Stage` *is* the family
+and no `ArtifactFamily` wrapper is needed. Bonus: adding an embedding variant, a projection method, or a motif
+source is just *adding a stage* — it shows up in `status`/`clean`/`build` for free.
 
 Two shapes the atomic interface still must respect: **`build(keys)` is batched** (no expensive stage is
 one-item-at-a-time — GPU / pool / global), and **`scan()` is one pass** (not separate existing + fp re-scans).
