@@ -179,9 +179,13 @@ core function(s) + pinned dep versions.
 
 > **Caveat — the manual bump reintroduces the human-bookkeeping this doc set out to avoid.** A forgotten
 > `algo_version` bump = silent staleness (the very bug we fix), "caught by `--force`" only if someone runs it.
-> Mitigation: **choose auto vs manual *per stage by cost*.** Cheap stages (clean/trim/chunk — CPU-ms) → a
-> **code/AST-hash** (over-invalidation is cheap, so no discipline needed). Expensive stages (embeddings/LLM) →
-> the manual `algo_version` (over-invalidation is costly, so pay the discipline there). Not a global choice.
+> A *per-stage-by-cost* split (auto code-hash on cheap stages, manual on expensive) was considered as a
+> mitigation and **rejected (D4): use the uniform hybrid everywhere.** It adds ~nothing here: the expensive
+> stages' behaviour is already a **parameter** the param-hash catches for free (embeddings = model id + pinned
+> lib version; graphs = prompt text; preprocess = `preprocess_prompt`), so the manual bump is only a thin net
+> for rare pure-logic edits; auto-hash on cheap stages saves only a cheap rebuild and carries a scope trap
+> (misses changed helpers/libs); and cost isn't even per-stage (preprocess flips cheap↔$$ by variant config).
+> One mechanism, applied the same way to every stage.
 
 ### 2.5 Downstream invalidation via fp composition
 
@@ -453,8 +457,8 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
 
 1. Graphs build/serve unify + traversal guard. *(Pure isolated bug — may equally land in Part 1 step 6; do
    whichever comes first.)*
-2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4. *(decide D4: per-stage
-   auto vs manual.)*
+2. `transform_version` = the **uniform** param-hash + one manual `algo_version` per stage — §2.4. *(D4
+   decided: uniform, not per-stage-by-cost.)*
 3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4, *staleness half* (fixes the
    re-embed-on-edit bug); add the projection-fp gate for coherence (§9.2). *(D2 decided: doc-level `md5`.)*
 4. **Atomicity** — write the artifact *then* its fp; atomic swap for the catalog/collection — §9.4. Land it
@@ -468,7 +472,8 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
 
 D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
 canonical name, no slug), so Part 1 is fully unblocked. Decided since: **D2** (doc-level `md5`), **D3** (full
-refit). Part 2 still-open sub-decisions: **D4/D5/D6/D7**.
+refit), **D4** (uniform param-hash + manual `algo_version`, not per-stage). Part 2 still-open sub-decisions:
+**D5/D6/D7**.
 
 ---
 
@@ -537,7 +542,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `hash(upstream-locator)` (= raw key `sha1(url)`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
 | ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.2 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
-| **D4** | manual `algo_version` vs per-stage-by-cost auto | global manual vs code/AST-hash on cheap stages | §2.4 |
+| ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.4 |
 | **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
 | **D7** | manifest vs stateless | central index vs recompute-on-the-fly | §9.3 |
