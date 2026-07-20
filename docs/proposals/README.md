@@ -25,9 +25,11 @@ not as live work.
   `tradition-architecture-unified.md` §4/§6. **Goal:** an executable implementation plan. *Proposal; not started.*
 - [`data-model-and-ids.md`](data-model-and-ids.md) — how corpus data is split across the three registries
   (tree / documents / embeddings), what is stored where vs resolved via load-once front indexes, and how ids
-  are minted: one `slugify(name)→id` (three mint sites), `document_id = slugify(title)` as a single stored key,
-  ids minted once and passed as data, the chunk id as a bare PK. Resolves `region-implementation.md` §3's
-  document-identity question. **Goal:** a decided data-decomposition & id/join spec. *Proposal; not started.*
+  are minted: `slugify(name)→id` for `region_id`/`tradition_id` (two mint sites), **`document_id = hash(locator)`
+  (D1 decided** — the existing raw-archive key `sha1(url)`; opaque, rename-stable, single stored key), the chunk
+  as one bare ref `{document_id, chunk_index}` (B1), ids minted once and passed as data. Resolves
+  `region-implementation.md` §3's document-identity question. **Goal:** a decided data-decomposition & id/join
+  spec. *Proposal; not started.*
 - [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) — the build pipeline as a
   content-addressed DAG: stage/artifact/cache map, fingerprints + per-stage transform versions (why not
   mtime/code-hash), downstream invalidation, deletions via set-reconciliation, GC tiers, the `(id, md5)`

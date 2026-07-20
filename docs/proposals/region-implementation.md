@@ -178,55 +178,35 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
   `region → { colour, description, subdivision, strata, traditions: [ { name, coordinates, description, dating } ] }`.
   No books, no per-tradition colour. Consumers: atlas (coordinates + book-join), embeddings (colour via
   region + coordinates), corpus browser (grouping skeleton + order).
-- **`GET /api/corpus/documents`** *(renamed from `/catalog`)* → documents: `[ { title, tradition, url, word/sentence/char counts,
-  description, dating, source } ]` (+ a document `id`, pending — see “To discuss”). Tradition only; region/colour
-  resolved on the front from the tree; the front joins books from these documents.
+- **`GET /api/corpus/documents`** *(renamed from `/catalog`)* → documents: `[ { document_id, title, tradition, url,
+  word/sentence/char counts, description, dating, source } ]`, where `document_id = hash(locator)` (D1).
+  Tradition only; region/colour resolved on the front from the tree; the front joins books from these documents.
 - **`GET /api/corpus/document`** *(renamed from `/documents`)* → the raw text of one document, addressed by
-  `?id=` once the stable id lands (working default: `(title, tradition)`); the `major_tradition` param is
-  dropped with §2.5.
+  `?id=document_id` (D1, = the raw-archive key); the `major_tradition` param is dropped with §2.5.
 - **`GET /api/similarity/*`** → search hits, one per chunk: `{ id, chunk_index, similarity_score, text,
   source_text }` **plus the document reference it belongs to**. `major_tradition` is removed; `tradition`,
   `url`, `region`, and `colour` are **not** carried — the front resolves them from the globally-cached
   document and tree via the reference. The per-hit payload is the smallest it can be: chunk-specific data + a
   pointer.
 
-> **Resolved → see [`data-model-and-ids.md`](data-model-and-ids.md).** Document identity, the three
-> registries, field decomposition, `slugify` and the join keys are worked out there: `document_id =
-> slugify(title)` (single key, not composite; uniqueness-checked), ids minted once and stored, `slugify`
-> run only on the backend. The original open questions are kept below for the reasoning trail.
+> **Resolved → see [`data-model-and-ids.md`](data-model-and-ids.md).** Document identity, the three registries,
+> field decomposition, `slugify` and the join keys are worked out there. The two load-bearing decisions:
+> - **D1 (decided): `document_id = hash(locator)`** — the document id anchors on its upstream locator (URL /
+>   `sources/`-path), normalized then hashed, which **is already the raw-archive key `corpus/raw/<sha1(url)>`**.
+>   It is opaque, rename-/edit-stable, collision-free, and one value serving identity + archive key + the
+>   incremental anchor. It is **not** `slugify(title)` — titles churn and collide (generic ones like "Creation"
+>   collide at the embedding layer), and a title-slug would need the locator as a hidden match key anyway.
+>   `slugify` is reserved for `region_id`/`tradition_id`; documents never slug.
+> - **The single stable `id`** is this `document_id`, used across `/documents` (list), `/document?id=`, the
+>   search reference, and the chunk metadata — collapsing the old `(title, tradition)` locator and the
+>   ephemeral `normalize_catalog_id(title)` into one persisted key.
 >
-> **To discuss — document identity & location (one connected decision, items 1/2/4).** Three entangled
-> questions, answered together:
-> 1. **A single stable document `id`.** Today a document is addressed by the tuple `(title, tradition)` in
->    the one-text endpoint, while an embedding chunk is one id (`normalize_catalog_id(title)`). One stable `id`, used
->    by `/documents` (list), `/document?id=`, the search reference, and the chunk metadata, collapses the multi-param
->    locator and aligns identity across list / document / embeddings / search.
-> 2. **File layout — follows from (1).** `corpus/<region>/<tradition>/<title>.txt` (region in the path),
->    `corpus/<tradition>/<title>.txt` (region out, keyed by the stable tradition), or `corpus/<id>.txt` (keyed
->    by the id, no classification in the path). More decoupling ⇢ fewer file moves on re-annotation, less
->    on-disk navigability. `sanitize_filename` (§2.11) covers whatever names the chosen layout puts in the
->    path.
-> 3. **The catalog `id` field and the search reference** both presuppose (1).
->
-> **The underlying question — name-as-id vs a stable id, per level.** `name = id` (§2.2) makes the display
-> string the identity, which fails in known ways: renaming a name breaks every reference (config caught by
-> validation, but chunks go stale → re-embed); two distinct names that sanitise to the same path collide; and,
-> at the **document** level, the chunk id is `normalize_catalog_id(title)` — **title only** — so two books that
-> share a title (generic ones like "Creation", "Folk Tales") collide at the embedding layer already. These bite
-> unevenly:
-> - **tradition / region** — names are short, unique, and rarely renamed; `name = id` is tolerable (the main
->   risk — a rename forcing a re-embed — is a rare deliberate edit).
-> - **document** — `title = id` is the weakest: generic-title collisions are real, not hypothetical, and it is
->   the id that reaches `/documents`, the catalog, the search reference, and the chunk metadata.
->
-> **Leaning:** keep `name = id` for **tradition / region**; give the **document** a separate stable `id` (not
-> the title). That id is then the one used across `/documents` (list), `/document?id=`, the search reference, and the
-> chunk metadata (settles 1 and 3), and it narrows the layout (2) to `corpus/<id>.txt` or
-> `corpus/<tradition>/<title>.txt`. Open sub-question: how the document id is minted (slug of
-> `tradition + title`, or a synthetic stable key).
->
-> **Not decided.** Working default until then: `/document` and the path use `(title, tradition)` with region
-> out of the path; search carries `id` = `normalize_catalog_id(title)`.
+> **File layout is independent of the id (a rendering, not the identity).** Because `document_id` is opaque, the
+> on-disk path is free to stay fully human-readable — `corpus/<Region>/<Tradition>/<Title>.txt` — and the
+> catalog bridges `document_id ↔ path`. A region/tradition/title rename is then a `git mv` of the readable path
+> (or a rebuild-from-raw), touching **neither** Chroma nor graphs (both keyed by the invariant `document_id`).
+> The layout sub-choice (how much classification sits in the path vs a flat `corpus/<id>.txt`) trades on-disk
+> navigability against rename disk-churn only — never re-embedding — and is settled in data-model §6.
 
 ---
 
@@ -287,13 +267,16 @@ Tests are rewritten to the new model as each phase lands.
 
 ## 6. Migration & data integrity
 
-**Prerequisite decisions (fix before touching code).** The document-identity anchor and its knock-ons live in
-[`data-model-and-ids.md`](data-model-and-ids.md) §9 — decide these first: **D1** (`document_id` = `slugify(title)`
-vs `slug/hash(upstream-locator)`), the **file layout** (`corpus/<region>/<tradition>/<title>.txt` vs
-`.../<tradition>/<title>.txt` vs by-id), the **`slugify` transliteration** library/rules, and the **tradition
-reconciliation** policy (the corpus's coarse strings — `Hinduism`, `West African`, `Confucianism`/`Taoism`,
-`Ancient Egyptian` — mapped to canonical fine-grained `tradition_id`s, since the current
-`config/traditions.json` is the *old* 12-group scheme, not the 14-region canon).
+**Prerequisite decisions.** The document-identity anchor and its knock-ons live in
+[`data-model-and-ids.md`](data-model-and-ids.md) §9. **D1 is now decided: `document_id = hash(locator)`** (the
+existing raw-archive key `sha1(url)`, normalized-locator-hashed — opaque, rename-stable, collision-free; *not*
+`slugify(title)`). Still to fix before touching code: the **file layout** (`corpus/<Region>/<Tradition>/<Title>.txt`
+vs flat by-id — a navigability/rename-churn trade only, independent of the opaque id), the **`slugify`
+transliteration** library/rules (D8 — now scoped to `region_id`/`tradition_id` only, a small closed vocabulary,
+since documents no longer slug), and the **tradition reconciliation** policy (the corpus's coarse strings —
+`Hinduism`, `West African`, `Confucianism`/`Taoism`, `Ancient Egyptian` — mapped to canonical fine-grained
+`tradition_id`s, since the current `config/traditions.json` is the *old* 12-group scheme, not the 14-region
+canon).
 
 **Integrity principle.** Everything under `outputs/` below `corpus/raw/` is **derived and regenerable**; the
 only sources of truth are **`corpus/raw/` (the archive), `config/`, and `sources/`**. So coherence after the

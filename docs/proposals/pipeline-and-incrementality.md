@@ -23,7 +23,7 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 | 1.5 | **Preprocess** (variants) | cleaned text + variant config | `preprocessed/…` | preprocessing | CPU cheap–moderate |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
 | 3 | **Projections** | vectors (embeddings) + method | `projections/<model>/<method>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
-| 4 | **Graphs** | cleaned text + prompts.json + LLM | `graphs/<text_id>/…` | chunk-cache (LLM responses) | **LLM — $$, rate-limited**; per-chunk |
+| 4 | **Graphs** | cleaned text + prompts.json + LLM | `graphs/<document_id>/…` (`document_id = hash(locator)`, D1) | chunk-cache (LLM responses) | **LLM — $$, rate-limited**; per-chunk |
 | 5 | **Motifs** | motif sources (TMI/ATU/Berezkin) | `motifs/*.json` | motif raw-scrape | CPU moderate; **independent** of the corpus |
 | S | **Serve** | traditions.json + corpus.json + embeddings + projections + graphs + motifs | (runtime) | front load-once indexes | — |
 
@@ -262,15 +262,16 @@ The single highest-value change. Replace "skip if `chunk_id` exists" with a two-
 re-embed a chunk  ⇔  (stable_id, content_md5, model, preprocess_version)  not already present
 ```
 
-- **stable_id** — **requires the rename-stable `document_id` anchor** (`data-model-and-ids.md` §9-D1, *open*).
-  If `document_id = slugify(title)` is chosen instead, this key does **not** fix rename-churn — flaw 1 stays.
-  So this payoff is contingent on D1.
+- **stable_id** — the rename-stable `document_id` anchor, **decided as `hash(locator)`** (`data-model-and-ids.md`
+  §9-D1). Because the id tracks the upstream locator, not the title, a rename leaves the key unchanged and this
+  cache correctly skips the re-embed — flaw 1 is fixed. (The rejected `slugify(title)` anchor would *not* have
+  fixed rename-churn; flaw 1 would have stayed. That risk is now closed.)
 - **content version** — **granularity is an open choice (§9):** the `md5` already computed in `_finalize_text`
   is **document-level**, so a one-chunk edit re-embeds *all* the doc's chunks; a **per-chunk `hash(chunk_text)`**
   (as in §2.2) is precise but must be stored/compared per chunk. §2.2 and this line must be reconciled.
 
-Correct on all cases (given D1 + a content version): rename (same content) → same key → **skip** (fixes flaw
-1); text edit → new version → **re-embed** (fixes flaw 2); new doc → new id → embed. The non-buzzword value of
+Correct on all cases (D1 = `hash(locator)` + a content version): rename (same content) → same key → **skip**
+(fixes flaw 1); text edit → new version → **re-embed** (fixes flaw 2); new doc → new id → embed. The non-buzzword value of
 ids is precisely this: **`(id, version)` as the incremental cache key.**
 
 **The chunk id stays positional (`document_id::chunk_index`), not content-addressed.** A content-addressed
@@ -420,8 +421,9 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 `fp = hash(content_md5, model, chunk params, prompt/algo_version)` changed:
 
 - **(1) content_md5 in the key** — fixes the real *staleness* bug (a text edit not re-embedding). Note this
-  alone does **not** fix rename *churn* — that needs the rename-stable `document_id` anchor (§9.5-D1), so
-  rename-churn is out of the minimal tier.
+  alone does **not** fix rename *churn* — that needs the rename-stable `document_id` anchor, now decided as
+  `hash(locator)` (§9.5-D1); once that anchor lands, rename-churn is fixed too (it is out of *this* minimal
+  staleness-only tier, but no longer blocked on a decision).
 - **(2) transform_version per stage** — code/param edits invalidate; cheap.
 - **(3) fp manifest + DAG cascade** — targeted rebuild instead of `--force`; moderate (skippable at our size).
 - **(4)** extend `status` to "what to rebuild" (orphan detection is already there).
@@ -444,11 +446,15 @@ Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
 4. **Atomicity** — write the artifact *then* its fp; atomic swap (write-temp-then-rename) for the catalog /
    collection — §9.4. Prerequisite for trusting any fp under a mid-build failure; land it with item 3.
 
-**Phase 1 — after D1 is resolved (`data-model-and-ids.md` §9-D1):**
+**Phase 1 — D1 decided (`document_id = hash(locator)`, `data-model-and-ids.md` §9-D1):**
 
-5. Resolve **D1** (document_id anchor).
-6. One `slugify` + fail-loud uniqueness — §8.3. *(decide D8: transliteration library/rules.)*
-7. Persist `document_id` per the chosen anchor; mint `region_id`/`tradition_id` — §8.1, §8.2.
+5. **D1 is settled: `document_id = hash(locator)`** — the existing raw key `sha1(url)` surfaced as identity.
+   No decision to make; proceed.
+6. One `slugify` + fail-loud uniqueness for `region_id`/`tradition_id` **only** (documents don't slug — id =
+   `hash(locator)`) — §8.3. *(decide D8: transliteration library/rules — now scoped to the closed
+   region/tradition vocabulary.)*
+7. Persist `document_id = hash(locator)` (the normalized-locator hash / raw key); mint `region_id`/`tradition_id`
+   — §8.1, §8.2.
 8. Chunk refs → `(document_id, chunk_index)` **only** (B1); drop `tradition`/`url`/`major_tradition` — §8.4
    (do *after* the front can resolve, so no hit loses data). The cross-tradition search filter moves to
    `where {document_id $nin docs-of-that-tradition}` (server resolves tradition → documents).
@@ -465,7 +471,8 @@ Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
 13. **Parametric projections** — `.transform()` new/changed points instead of a full refit — §9.2 (D3).
 14. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
 
-D1 is the only hard gate: Phase 0 needs no decision (only the light sub-decisions D2/D4); Phase 1 waits on D1.
+D1 (the former hard gate) is now decided — `document_id = hash(locator)` — so Phase 1 is unblocked; Phase 0
+still needs only the light sub-decisions D2/D4.
 
 ---
 
@@ -529,17 +536,17 @@ never sees a half-written index. This must be specified before the fp machinery 
 
 | id | decision | options | blocks |
 |---|---|---|---|
-| **D1** | `document_id` anchor | `slugify(title)` vs `slug/hash(upstream-locator)` | doc coherence, §4 rename-stability, persist-id |
+| ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `hash(upstream-locator)` (= raw key `sha1(url)`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
 | **D2** | embedding content-version granularity | per-chunk `hash(chunk_text)` vs doc-level `md5` | §2.2 ↔ §4 |
 | **D3** | projections incrementality | parametric `.transform()` vs full refit | §9.2 |
 | **D4** | manual `algo_version` vs per-stage-by-cost auto | global manual vs code/AST-hash on cheap stages | §2.4 |
 | **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
 | **D7** | manifest vs stateless | central index vs recompute-on-the-fly | §9.3 |
-| **D8** | `slugify` transliteration | library/rules (`unidecode`? hand rules?) | id minting |
+| **D8** | `slugify` transliteration | library/rules (`unidecode`? hand rules?) — **scoped to `region_id`/`tradition_id` only** (documents use `hash(locator)`, D1) | id minting |
 
 **Proportionality.** This is a spec for ~27 documents. The immediate, high-ROI work is small: the §4
-embeddings key (once D1/D2 are picked) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
+embeddings key (D1 decided; D2 still to pick) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
 are "when it grows" — do not read the whole doc as "build now".
 
 ## Appendix — why mtime lies
