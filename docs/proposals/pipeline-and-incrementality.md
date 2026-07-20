@@ -459,7 +459,7 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
    *(decide D7: manifest vs stateless.)*
 6. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
 7. **Override / curation layer** — the `curate` edit-then-snapshot workflow — §6.2–§6.4. *(decide D5.)*
-8. **Parametric projections** — `.transform()` instead of a full refit — §9.2 (D3).
+8. ~~**Parametric projections**~~ — **decided (D3): keep the full refit** (cheap at this size) — §9.2. *No work.*
 9. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
 
 D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
@@ -508,7 +508,9 @@ we pick, **the fork should be explicit** ("not DVC, because …"), not defaulted
 A global UMAP means **any** chunk change rebuilds the *whole* projection (all points). Alternative:
 **parametric projection** — `fit` once, `.transform()` new/changed points into the existing space (UMAP
 supports this). *Pros:* incremental, cheap. *Cons:* the embedding drifts vs the original fit → a periodic full
-refit is still needed; not all methods transform. **Open:** parametric-transform vs periodic full refit.
+refit is still needed; not all methods transform. **Decided (D3): full refit** — at this corpus size a refit
+is cheap, it is simpler, method-agnostic, and avoids drift; the parametric path is not worth its complexity
+here.
 
 ### 9.3 Manifest vs stateless
 
@@ -530,7 +532,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 |---|---|---|---|
 | ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `hash(upstream-locator)` (= raw key `sha1(url)`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
 | **D2** | embedding content-version granularity | per-chunk `hash(chunk_text)` vs doc-level `md5` | §2.2 ↔ §4 |
-| **D3** | projections incrementality | parametric `.transform()` vs full refit | §9.2 |
+| ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | **D4** | manual `algo_version` vs per-stage-by-cost auto | global manual vs code/AST-hash on cheap stages | §2.4 |
 | **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
