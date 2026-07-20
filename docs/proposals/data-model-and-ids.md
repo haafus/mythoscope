@@ -81,9 +81,15 @@ responses).
 | **color** | tree (via region) | no | pure function of region + volatile (palette) — always resolve |
 | coordinates, dating, subdivision, strata | tree | no | tree-only |
 
-`tradition_id` earns its place on the chunk three ways, all free once it is the ref half: **`where`-filter,
-1-hop region/color resolve, and the pointer needed anyway.** Because it is *stable* while region/color are
-resolved *live* through the tree, a palette change or region re-annotation never stales a chunk.
+`tradition_id` on the chunk has **two** justifications (it is **not** part of the document pointer — that is
+`document_id` alone, §5): **(a)** the server-side Chroma `where` cross-tradition filter — the *only strict*
+need, since Chroma filters on stored fields before the client can resolve; **(b)** a 1-hop `chunk→region/color`
+resolve without loading the catalog — a *convenience*, since region/color are otherwise reachable from
+`document_id → docIndex → tradition → treeIndex` (a 2-hop). Strictly, even (a) could be done as
+`where {document_id: {$nin: docs-of-that-tradition}}` — so `tradition_id` on the chunk is fundamentally a
+**cheap denormalization**, justified mainly by the far-simpler filter and the free extra hop. Because it is
+*stable* while region/color are resolved *live* through the tree, a palette change or region re-annotation
+never stales a chunk.
 
 ---
 
@@ -219,6 +225,30 @@ Want zero disk-touch on rename → drop region/tradition from the path (flat by 
 navigability. Want navigability → pay the cheap text-tree re-layout on rename (never a re-embed). This is a
 sub-decision of the file-layout choice (region-implementation §6 prerequisites).
 
+### Rename operations (the operational payoff)
+
+Because `document_id = hash(locator)` is invariant under every name change, **no rename ever recomputes the
+expensive stores** (embeddings, graphs). A rename only edits config, updates the tree, `git mv`s the path
+renderings, and — for a tradition — updates one metadata field.
+
+| rename | config edit | Chroma chunks | text file | graph dir | re-embed | re-LLM |
+|---|---|---|---|---|---|---|
+| **region** | tree (region node) | — (region not on chunk) | `git mv` region folder * | `git mv` * | no | no |
+| **tradition** | tree + repoint `corpus.json` books | update `tradition_id` field (`collection.update`, no re-encode) * | `git mv` tradition folder * | `git mv` * | no | no |
+| **book (title)** | `corpus.json` `title` | — (title not on chunk) | `git mv` the file * | `git mv` the dir * | no | no |
+
+\* only for path segments actually in the readable layout; opaque path → nothing. The `tradition_id` field
+update is the one Chroma touch, and only for a tradition rename/re-annotation.
+
+**Unified incremental procedure:** (1) edit config; (2) update stored refs to the *old name* — tradition
+rename → `tradition_id` field on its chunks; region/book → none; (3) `git mv` the changed path segment
+(region folder / tradition folder / file + graph dir); (4) rebuild the catalog + front `treeIndex`/`docIndex`;
+(5) **never re-embed / re-LLM** (`document_id` invariant); (6) re-run fail-loud uniqueness + `status`.
+
+The feared case — a **book rename** — is the cheapest: a `title` edit + a `git mv`, with zero chunk change
+(title is not stored on the chunk). This is only for a *single* incremental rename; a full wipe-rebuild
+(region-implementation §6) is for large scheme migrations, not one rename.
+
 ---
 
 ## 7. What this changes vs today
@@ -288,8 +318,9 @@ chunk, or a hit loses the data with nothing to resolve it.
   corpus grows. The fail-loud uniqueness check *detects* a collision but does not *resolve* it. Decide the
   transliteration source and confirm collision-freedom on the full name set, not just the 194 traditions.
 - **`tradition_id` on the chunk goes stale on a book re-annotation.** Re-annotating a *book's tradition* (not
-  its region) changes `chunk.tradition_id` and forces a re-embed. We lean on "tradition is stable", which is
-  true for *renames* but not for *re-annotation*; acceptable but worth stating.
+  its region) changes `chunk.tradition_id` — but this is a **metadata-field update** (`collection.update`, no
+  re-encode), **not** a re-embed: `document_id` is unchanged, so the chunk id and vectors stand. We lean on
+  "tradition is stable" for *renames*; a re-annotation is the case that touches the field, cheaply.
 - **The front resolves title/url from `docIndex`, so the embeddings/search pages must load the full catalog.**
   Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url, tradition}` projection over
   shipping every per-document field. Not urgent.
