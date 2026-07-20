@@ -419,6 +419,33 @@ expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff it
 Full Bazel/Nix is overkill for this size — **a small content-addressed manifest + transform versions** is the
 right amount.
 
+### Implementation order (cross-cutting; references tasks in both docs, does not restate them)
+
+**Phase 0 — independent of D1, do now (light tier):**
+
+1. Graphs build/serve unify + traversal guard — `data-model-and-ids.md` §8.5. Pure bug, isolated.
+2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4 / §7(2).
+3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4 / §7(1), *staleness half only* (keys on
+   the current id; fixes the re-embed-on-edit bug). Add the projection-fp gate for coherence (§9.2).
+
+**Phase 1 — after D1 is resolved (`data-model-and-ids.md` §9-D1):**
+
+4. Resolve **D1** (document_id anchor).
+5. One `slugify` + fail-loud uniqueness — §8.3.
+6. Persist `document_id` per the chosen anchor; mint `region_id`/`tradition_id` — §8.1, §8.2.
+7. Chunk refs → `(document_id, tradition_id)`; drop `url`/`major_tradition` — §8.4 (do *after* the front can
+   resolve, so no hit loses data).
+8. Front `treeIndex`/`docIndex`; delete `bookTitleFromId` — §8.6.
+   *Result:* the embeddings key now keys on the stable anchor → **rename-churn is fixed automatically** (§4).
+
+**Phase 2 — when it grows / optional:**
+
+9. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild" — §7(4).
+10. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.
+11. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
+
+D1 is the only hard gate: Phase 0 needs no decision; Phase 1 waits on it.
+
 ---
 
 ## 8. Coherence between builds
