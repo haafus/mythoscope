@@ -81,15 +81,16 @@ responses).
 | **color** | tree (via region) | no | pure function of region + volatile (palette) — always resolve |
 | coordinates, dating, subdivision, strata | tree | no | tree-only |
 
-`tradition_id` on the chunk has **two** justifications (it is **not** part of the document pointer — that is
-`document_id` alone, §5): **(a)** the server-side Chroma `where` cross-tradition filter — the *only strict*
-need, since Chroma filters on stored fields before the client can resolve; **(b)** a 1-hop `chunk→region/color`
-resolve without loading the catalog — a *convenience*, since region/color are otherwise reachable from
-`document_id → docIndex → tradition → treeIndex` (a 2-hop). Strictly, even (a) could be done as
-`where {document_id: {$nin: docs-of-that-tradition}}` — so `tradition_id` on the chunk is fundamentally a
-**cheap denormalization**, justified mainly by the far-simpler filter and the free extra hop. Because it is
-*stable* while region/color are resolved *live* through the tree, a palette change or region re-annotation
-never stales a chunk.
+`tradition_id` on the chunk is justified by **exactly one** thing: **the server-side Chroma `where`
+cross-tradition filter** — Chroma filters on stored fields before the client can resolve, and the client's
+globally-cached catalog can't help server-side. (It is **not** part of the document pointer — that is
+`document_id` alone, §5.) The other candidate justification — a 1-hop `chunk→region/color` resolve — **does
+not survive §2.8**: since the front loads the tree *and* the catalog once globally, region/color are reached
+from `document_id → docIndex → tradition → treeIndex` for free (one extra Map lookup), so nothing needs
+`tradition` inlined on the front. Even the filter (a) could technically be `where {document_id: {$nin:
+docs-of-that-tradition}}`, so `tradition_id` on the chunk is fundamentally a **cheap denormalization**,
+justified only by the far-simpler filter. Because it is *stable* while region/color are resolved *live*
+through the tree, a palette change or region re-annotation never stales it.
 
 ---
 
@@ -105,10 +106,17 @@ Denormalization belongs **not in Chroma chunk metadata**, but in two places:
 2. **Build-time materialized catalog** — `outputs/corpus/corpus.json` stores the document-level fields plus
    *expensive-but-stable* computed values (`word/sentence/char counts`, `md5`). A legitimate precompute.
 
-**The projection view is the exemplar of the right pattern.** `projections/<model>/<method>.json` holds every
-chunk as `{ id, tradition_id, chunk_index, text(preview), x, y }` — no url/title/region/**color**. Color is
-resolved on the front from `treeIndex`. This is exactly why the palette swap did not require rebuilding the
-projections: the *stable* key (`tradition_id`) is inlined, the *volatile* mapping (→ color) is resolved live.
+**The projection view is the exemplar of the right pattern.** Today `projections/<model>/<method>.json`
+holds every chunk as `{ id, tradition, chunk_index, text(preview), x, y }` — no url/title/region/**color**;
+color is resolved on the front from `treeIndex`, which is why the palette swap did not require rebuilding the
+projections (the volatile mapping → color is resolved live).
+
+> **Under §2.8, drop the inlined `tradition` too — store only `{ id (=document_id), chunk_index, x, y,
+> text(preview) }`.** The embeddings page currently inlines `tradition` because it loads only the tree, not the
+> catalog. But §2.8 loads the catalog globally → `tradition` (and thus region/color) is reachable from
+> `id → docIndex → treeIndex` for free. So the *minimal* projection carries only the pointer + coords, and a
+> **tradition rename never touches the projection** (`document_id` is invariant). Inlining `tradition` is a
+> pre-§2.8 crutch, not the target.
 
 ---
 
@@ -229,29 +237,30 @@ sub-decision of the file-layout choice (region-implementation §6 prerequisites)
 
 Because `document_id = hash(locator)` is invariant under every name change, **no rename ever recomputes the
 expensive stores** (embeddings, graphs, or the UMAP layout). A rename only edits config, updates the tree,
-`git mv`s the path renderings, and — for a tradition — **rewrites the `tradition` value in its two
-denormalized copies** (chunk metadata *and* the projection artifacts). All of those are cheap.
+`git mv`s the path renderings, and — for a tradition — rewrites **one** metadata field (the Chroma
+`tradition_id`, for the `where`-filter). Under §2.8 (catalog loaded globally) the projection carries only
+`document_id`, so it is untouched by any rename.
 
-| rename | config edit | Chroma chunks | **projection files** | text file | graph dir | re-embed / re-fit UMAP |
+| rename | config edit | Chroma chunks | projection files † | text file | graph dir | re-embed / re-fit UMAP |
 |---|---|---|---|---|---|---|
-| **region** | tree (region node) | — (region not on chunk) | — (region not inlined; color via tree) | `git mv` region folder * | `git mv` * | no |
-| **tradition** | tree + repoint `corpus.json` books | rewrite `tradition_id` field (`collection.update`) * | **rewrite the inlined `tradition`** (scatter points + distribution) * | `git mv` tradition folder * | `git mv` * | no |
-| **book (title)** | `corpus.json` `title` | — (title not on chunk) | — (only `document_id` inlined, invariant; title not inlined) | `git mv` the file * | `git mv` the dir * | no |
+| **region** | tree (region node) | — (region not on chunk) | — | `git mv` region folder * | `git mv` * | no |
+| **tradition** | tree + repoint `corpus.json` books | rewrite `tradition_id` field (`collection.update`) * | — | `git mv` tradition folder * | `git mv` * | no |
+| **book (title)** | `corpus.json` `title` | — (title not on chunk) | — | `git mv` the file * | `git mv` the dir * | no |
 
-\* only where that value/segment is actually present (readable-layout path segments; the projection's inlined
-`tradition`). A **tradition** rename is the one that touches every denormalized copy; region/book do not.
+\* only where that path segment is in the readable layout; opaque path → nothing.
+† under §2.8 the projection stores only `document_id` (+ coords/preview) → untouched by any rename. *Caveat:*
+a **pre-§2.8** projection that still inlines `tradition` would need that field rewritten on a tradition rename
+(a cheap field-rewrite, never a UMAP re-fit — coords depend on the invariant vectors).
 
-**The rule:** every *denormalized copy* of the renamed value must be rewritten — and `tradition` has **two**
-(chunk metadata + projection points), a field-rewrite each, never a re-embed or UMAP re-fit (coordinates
-depend on the invariant vectors, not the name). This is exactly the price of inlining `tradition` for the
-catalog-free scatter coloring (§4 (b)); storing only `document_id` in the projection would remove the
-projection rewrite at the cost of resolving `tradition` from the catalog at render.
+**The rule:** every *denormalized copy* of the renamed value must be rewritten. Under the target the only such
+copy is the Chroma `tradition_id` (kept solely for the server-side `where`-filter, §3), rewritten with a
+`collection.update` — never a re-embed, UMAP re-fit, or re-LLM.
 
-**Unified incremental procedure:** (1) edit config; (2) rewrite every denormalized copy of the *old value* —
-a tradition rename → the `tradition_id` field on its chunks **and** the inlined `tradition` in its projection
-points/distribution; a region/book rename → none; (3) `git mv` the changed path segment (region folder /
-tradition folder / file + graph dir); (4) rebuild the catalog + front `treeIndex`/`docIndex`; (5) **never
-re-embed / re-fit UMAP / re-LLM** (`document_id` invariant); (6) re-run fail-loud uniqueness + `status`.
+**Unified incremental procedure:** (1) edit config; (2) rewrite the one denormalized copy — a tradition
+rename → the `tradition_id` field on its chunks (`collection.update`); a region/book rename → none; (3)
+`git mv` the changed path segment (region folder / tradition folder / file + graph dir); (4) rebuild the
+catalog + front `treeIndex`/`docIndex`; (5) **never re-embed / re-fit UMAP / re-LLM** (`document_id`
+invariant); (6) re-run fail-loud uniqueness + `status`.
 
 The feared case — a **book rename** — is the cheapest: a `title` edit + a `git mv`, with zero chunk and zero
 projection change (title is stored nowhere derived). This is only for a *single* incremental rename; a full
