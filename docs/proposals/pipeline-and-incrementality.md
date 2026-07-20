@@ -207,12 +207,11 @@ engine (D6), **stateless (D7)**: the "registry" is `stages()`; the state is `act
 **Why it can't rot:** each store's layout lives in **one** place (the stage that writes it); adding a
 variant/method/source = adding a `Stage` → it appears in status/clean/build automatically.
 
-**Sequencing (this is a big refactor — Part 4, not Part 2).** Part 2 does the small, high-ROI fp work *inside
+**Sequencing (this is a big refactor — Part 3, not Part 2).** Part 2 does the small, high-ROI fp work *inside
 the existing stages* (the embeddings content-fp gate, `transform_version`, `doc_md5` once per doc in the
-catalog) — which **prepares the base**: the fp sidecars this protocol reads. **Part 4** is the atomisation
+catalog) — which **prepares the base**: the fp sidecars this protocol reads. **Part 3** is the atomisation
 itself — porting `pipeline_inspect.py`'s per-store functions + `cli._clean`'s wiring into the stages and the
-generic driver. It also presupposes Part 1 (content-fp dedup, `document_id` paths, colour out of the fp graph),
-so it lands last.
+generic driver. It also presupposes Part 1 (content-fp dedup, `document_id` paths, colour out of the fp graph).
 
 The sections below are this protocol's pieces: §2.3 is how a stage's `desired()` fps compose, §2.6 is the
 driver's topological walk, §2.7 is `actual − desired`, §2.8 is `actual()`'s stored fp (sidecars, no manifest),
@@ -550,7 +549,7 @@ statelessly** is the right amount.
 
 **Part 1 (the data-model + region migration) is the single list in
 [`region-implementation.md`](region-implementation.md) §5.** Part 2 is the **small** fp work done *inside the
-existing stages* — no protocol refactor yet. It **prepares the base** (the fp sidecars) that Part 4 later
+existing stages* — no protocol refactor yet. It **prepares the base** (the fp sidecars) that Part 3 later
 harvests. None of it blocks shipping Part 1. Sub-decisions flagged *(decide Dx)*; full list in §9.5.
 
 1. **Embeddings content-fp staleness gate** — replace the id-existence dedup with `(document_id, doc_md5,
@@ -565,18 +564,7 @@ harvests. None of it blocks shipping Part 1. Sub-decisions flagged *(decide Dx)*
 
 *(D3 decided — keep the full UMAP refit, no parametric work — §9.2.)*
 
-### Implementation order — **Part 3 of 4: manual text curation** (editorial; independent)
-
-Hand-fixing a document's text (OCR typo, an interleaved note the markers can't catch) as an **override layer**
-that never mutates raw or upstream — an editorial workflow, not required to ship the migration or to make
-rebuilds incremental.
-
-1. **The override layer + `curate` workflow** — `overrides/<document_id>.patch` (**D5: unified-diff patch**);
-   `curate` materialises the current curated text, the curator edits it, `curate --save` snapshots
-   `difflib(base, edited)` + stamps the base-fingerprint; build applies the patch (`git apply`) — §6.2–§6.4.
-   Prerequisite: the fetch/build split + `refresh` (Part 2 item 4).
-
-### Implementation order — **Part 4 of 4: the stage-protocol refactor** (big; deferred; consumes Part 2's base)
+### Implementation order — **Part 3 of 4: the stage-protocol refactor** (big; deferred; consumes Part 2's base)
 
 The **self-describing-stage** architecture (§2.2): atomise each block into `stages()`, port
 `pipeline_inspect.py`'s per-store `*_status`/`*_orphans` and `cli._clean`'s wiring *into* the stages, and make
@@ -591,10 +579,21 @@ fp graph).
 3. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6); the driver already *is* build-your-own,
    so this is "when to switch," not "what to build now."
 
+### Implementation order — **Part 4 of 4: manual text curation** (editorial; independent; last)
+
+Hand-fixing a document's text (OCR typo, an interleaved note the markers can't catch) as an **override layer**
+that never mutates raw or upstream — an editorial workflow, not required to ship the migration or to make
+rebuilds incremental, so it goes last.
+
+1. **The override layer + `curate` workflow** — `overrides/<document_id>.patch` (**D5: unified-diff patch**);
+   `curate` materialises the current curated text, the curator edits it, `curate --save` snapshots
+   `difflib(base, edited)` + stamps the base-fingerprint; build applies the patch (`git apply`) — §6.2–§6.4.
+   Prerequisite: the fetch/build split + `refresh` (Part 2 item 4).
+
 D1 is decided — `document_id = hash(locator)` — and **D8 is dissolved**, so Part 1 is fully unblocked. Decided
 since: **D2** (doc-level `md5`), **D3** (full refit), **D4** (uniform param-hash + manual `algo_version`), **D5**
-(unified-diff patch — Part 3), **D7** (stateless, no manifest). Still-open: **D6** (build engine) — effectively
-settled by D7 (stateless in-process ⇒ build-your-own; DVC only at scale), decided formally in Part 4.
+(unified-diff patch — Part 4), **D7** (stateless, no manifest). Still-open: **D6** (build engine) — effectively
+settled by D7 (stateless in-process ⇒ build-your-own; DVC only at scale), decided formally in Part 3.
 
 ---
 
@@ -675,7 +674,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.3 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.5 |
-| ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 3) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |
+| ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 4) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
 | ~~**D7**~~ | manifest vs stateless — **DECIDED: stateless** | ~~central index vs~~ recompute-on-the-fly from sidecars (never drifts; correct staleness needs re-hashing either way) | §9.3 |
 | ~~**D8**~~ | ~~`slugify` transliteration~~ — **DISSOLVED** | there is no slug: `region_id`/`tradition_id` = the canonical name (data-model §5), documents = `hash(locator)` | — |

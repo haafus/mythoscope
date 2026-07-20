@@ -245,8 +245,8 @@ model** (`document_id = hash(locator)`, name-ids, the B1 chunk, the file layout)
 (the 14-region tree, region-derived colour, grouping). It is self-contained — the id/data tasks are folded in
 here, so `data-model` §8 only points back. The other three parts live in
 [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §7 and **do not block this one**: **Part 2**
-= incrementality base, **Part 3** = manual text curation, **Part 4** = the stage-protocol refactor (big;
-deferred). Each step below is shippable.
+= incrementality base, **Part 3** = the stage-protocol refactor (big; deferred), **Part 4** = manual text
+curation. Each step below is shippable.
 
 Dependency spine: silent join first (pure config) → `document_id` persisted before anything references it →
 front resolution before any field is trimmed off a chunk/hit → then the trim → colour → cleanup.
