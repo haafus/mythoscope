@@ -421,30 +421,40 @@ right amount.
 
 ### Implementation order (cross-cutting; references tasks in both docs, does not restate them)
 
+Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
+
 **Phase 0 — independent of D1, do now (light tier):**
 
 1. Graphs build/serve unify + traversal guard — `data-model-and-ids.md` §8.5. Pure bug, isolated.
-2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4 / §7(2).
+2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4 / §7(2). *(decide D4:
+   per-stage auto vs manual.)*
 3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4 / §7(1), *staleness half only* (keys on
-   the current id; fixes the re-embed-on-edit bug). Add the projection-fp gate for coherence (§9.2).
+   the current id; fixes the re-embed-on-edit bug). Add the projection-fp gate for coherence (§9.2). *(decide
+   D2: per-chunk hash vs doc-md5.)*
+4. **Atomicity** — write the artifact *then* its fp; atomic swap (write-temp-then-rename) for the catalog /
+   collection — §9.4. Prerequisite for trusting any fp under a mid-build failure; land it with item 3.
 
 **Phase 1 — after D1 is resolved (`data-model-and-ids.md` §9-D1):**
 
-4. Resolve **D1** (document_id anchor).
-5. One `slugify` + fail-loud uniqueness — §8.3.
-6. Persist `document_id` per the chosen anchor; mint `region_id`/`tradition_id` — §8.1, §8.2.
-7. Chunk refs → `(document_id, tradition_id)`; drop `url`/`major_tradition` — §8.4 (do *after* the front can
+5. Resolve **D1** (document_id anchor).
+6. One `slugify` + fail-loud uniqueness — §8.3. *(decide D8: transliteration library/rules.)*
+7. Persist `document_id` per the chosen anchor; mint `region_id`/`tradition_id` — §8.1, §8.2.
+8. Chunk refs → `(document_id, tradition_id)`; drop `url`/`major_tradition` — §8.4 (do *after* the front can
    resolve, so no hit loses data).
-8. Front `treeIndex`/`docIndex`; delete `bookTitleFromId` — §8.6.
+9. Front `treeIndex`/`docIndex`; delete `bookTitleFromId` — §8.6.
    *Result:* the embeddings key now keys on the stable anchor → **rename-churn is fixed automatically** (§4).
 
 **Phase 2 — when it grows / optional:**
 
-9. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild" — §7(4).
-10. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.
-11. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
+10. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild" — §7(4).
+    *(decide D7: manifest vs stateless.)*
+11. fetch/build split + explicit `refresh` + pin raw archive — §5, §6.5.
+12. **Override / curation layer** — manual edits as an override layer + the `curate` edit-then-snapshot
+    workflow — §6.2–§6.4. *(decide D5: unified-diff vs full-override.)*
+13. **Parametric projections** — `.transform()` new/changed points instead of a full refit — §9.2 (D3).
+14. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
 
-D1 is the only hard gate: Phase 0 needs no decision; Phase 1 waits on it.
+D1 is the only hard gate: Phase 0 needs no decision (only the light sub-decisions D2/D4); Phase 1 waits on D1.
 
 ---
 
