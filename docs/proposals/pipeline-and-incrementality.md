@@ -20,12 +20,16 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 |---|---|---|---|---|---|
 | 0 | **config** (hand-authored) | `config/corpus.json` (title, tradition, url, content_start/end, exclude), `config/traditions.json` (tree), `config/models.json`, `config/prompts.json`, `sources/` | — | — | — |
 | 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<sha1(url)>` (raw snapshot; `sha1(url) = document_id`, D1), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (sha1 url), extraction | network (~s/doc); clean/trim CPU-cheap |
-| 1.5 | **Preprocess** (variants) | cleaned text + variant config | `preprocessed/…` | preprocessing | **cost depends on the variant**: plain = CPU-cheap; a `preprocess_prompt` variant runs an **LLM** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited** |
+| 1.5 | **Preprocess** (variant, optional) | cleaned text + variant config | `preprocessed/…` | preprocessing | **always an LLM transform when present** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited**. There is no cheap preprocess: a variant either enables it (LLM) or skips it entirely (embeds the base cleaned text) |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
 | 3 | **Projections** | vectors (embeddings) + method | `projections/<model>/<method>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
 | 4 | **Graphs** | cleaned text + prompts.json + LLM | `graphs/<document_id>/…` (`document_id = hash(locator)`, D1) | chunk-cache (LLM responses) | **LLM — $$, rate-limited**; per-chunk |
-| 5 | **Motifs** | motif sources (TMI/ATU/Berezkin) | `motifs/*.json` | motif raw-scrape | CPU moderate; **independent** of the corpus |
+| 5 | **Motifs** (a 5-step sub-pipeline) | motif sources (TMI/ATU/Berezkin) | `motifs/*.json` | motif raw-scrape | scrape sources → crosswalk → inline relations → lexical parallels → semantic/reasoned parallels → store. **Independent** of the corpus. CPU-moderate **only because** the one GPU part — BGE-M3 *semantic* parallels — is **precomputed offline** (`scripts/build_semantic_parallels.py`) + committed, and the build just copies it |
 | S | **Serve** | traditions.json + corpus.json + embeddings + projections + graphs + motifs | (runtime) | front load-once indexes | — |
+
+**No separate `download`/`fetch` stage** — network fetch is folded *inside* Corpus (`corpus` = "Download and
+build") and Motifs (`build_motifs` scrapes/downloads its sources), cached by `sha1(url)` / raw-scrape. §5
+(fetch-vs-build) is exactly the proposal to split it into a first-class stage (Part 2 item 6).
 
 ### 1.2 Dependency DAG
 
