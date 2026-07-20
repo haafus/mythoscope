@@ -121,7 +121,7 @@ Granularity per stage:
 | artifact | fp key | granularity |
 |---|---|---|
 | document text | `hash(raw_bytes + content_start/end + patch + clean_v)` | document |
-| **chunk embedding** | `hash(chunk_text + model + preprocess_v)` = **(stable_id, md5, model, ver)** | **chunk** — fixes both flaws of §1.4 |
+| **chunk embedding** | **(document_id, doc_md5, model, preprocess_v)** — content version is **doc-level** (D2) | **per-doc decision** (a text edit re-embeds all the doc's chunks) — fixes both flaws of §1.4 |
 | projection | `hash(⊕ member chunk fps + method_v)` | **global per (model, method)** — UMAP is indivisible |
 | graph | `hash(text + prompt_v + llm_model)` | document/chunk |
 | serve-resolve (tree + colour, incl. per-tradition shade) | — | **not an artifact** — region colour *and* its derived per-tradition OKLCH shade (regions.md §8.1) are computed at runtime → tree/colour edits are free |
@@ -267,9 +267,10 @@ re-embed a chunk  ⇔  (stable_id, content_md5, model, preprocess_version)  not 
   §9-D1). Because the id tracks the upstream locator, not the title, a rename leaves the key unchanged and this
   cache correctly skips the re-embed — flaw 1 is fixed. (The rejected `slugify(title)` anchor would *not* have
   fixed rename-churn; flaw 1 would have stayed. That risk is now closed.)
-- **content version** — **granularity is an open choice (§9):** the `md5` already computed in `_finalize_text`
-  is **document-level**, so a one-chunk edit re-embeds *all* the doc's chunks; a **per-chunk `hash(chunk_text)`**
-  (as in §2.2) is precise but must be stored/compared per chunk. §2.2 and this line must be reconciled.
+- **content version** — **decided (D2): document-level `md5`** (the `md5` already computed in
+  `_finalize_text`). A text edit re-embeds *all* of that doc's chunks — over-embedding within a doc, but cheap
+  at our scale (tens of chunks = seconds), and the per-chunk alternative's precision is largely illusory anyway
+  (positional chunking → an insert shifts every downstream chunk's text, so most chunk hashes change regardless).
 
 Correct on all cases (D1 = `hash(locator)` + a content version): rename (same content) → same key → **skip**
 (fixes flaw 1); text edit → new version → **re-embed** (fixes flaw 2); new doc → new id → embed. The non-buzzword value of
@@ -451,8 +452,7 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
 2. `transform_version` (param-hash + `algo_version`) on the expensive stages — §2.4. *(decide D4: per-stage
    auto vs manual.)*
 3. Per-doc **content-fp staleness gate** on embeddings & graphs — §4, *staleness half* (fixes the
-   re-embed-on-edit bug); add the projection-fp gate for coherence (§9.2). *(decide D2: per-chunk hash vs
-   doc-md5.)*
+   re-embed-on-edit bug); add the projection-fp gate for coherence (§9.2). *(D2 decided: doc-level `md5`.)*
 4. **Atomicity** — write the artifact *then* its fp; atomic swap for the catalog/collection — §9.4. Land it
    with item 3.
 5. fp manifest + DAG cascade + set-diff GC — §2.6, §2.7, §3; extend `status` to "what to rebuild".
@@ -463,8 +463,8 @@ rename-churn for free — is step 4 there.) Sub-decisions flagged *(decide Dx)*;
 9. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
 
 D1 (the former hard gate) is decided — `document_id = hash(locator)` — and **D8 is dissolved** (id = the
-canonical name, no slug), so Part 1 is fully unblocked; Part 2 above still needs only the light sub-decisions
-D2/D4/D5/D7 where flagged.
+canonical name, no slug), so Part 1 is fully unblocked. Decided since: **D2** (doc-level `md5`), **D3** (full
+refit). Part 2 still-open sub-decisions: **D4/D5/D6/D7**.
 
 ---
 
@@ -531,7 +531,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | id | decision | options | blocks |
 |---|---|---|---|
 | ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `hash(upstream-locator)` (= raw key `sha1(url)`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
-| **D2** | embedding content-version granularity | per-chunk `hash(chunk_text)` vs doc-level `md5` | §2.2 ↔ §4 |
+| ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `md5`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level `md5` (cheap here; per-chunk precision illusory under positional chunking) | §2.2 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | **D4** | manual `algo_version` vs per-stage-by-cost auto | global manual vs code/AST-hash on cheap stages | §2.4 |
 | **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
@@ -540,7 +540,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | ~~**D8**~~ | ~~`slugify` transliteration~~ — **DISSOLVED** | there is no slug: `region_id`/`tradition_id` = the canonical name (data-model §5), documents = `hash(locator)` | — |
 
 **Proportionality.** This is a spec for ~27 documents. The immediate, high-ROI work is small: the §4
-embeddings key (D1 decided; D2 still to pick) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
+embeddings key (D1 + D2 both decided) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
 are "when it grows" — do not read the whole doc as "build now".
 
 ## Appendix — why mtime lies
