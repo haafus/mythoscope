@@ -186,9 +186,15 @@ the path to be prettier, not the reverse. Consequences:
 - **The path is not guaranteed unique.** Two books sharing `(tradition, title)` render to one path, though
   `document_id` (by locator) does not collide — so **disambiguate the file** (append a short suffix, e.g.
   `…-9f3a.txt`), since a path clash is cosmetic, not an identity clash. Rare.
-- Only the cleaned text needs navigability; the other stores stay opaque by design — raw at
-  `corpus/raw/<hash(locator)>`, chunks keyed by `document_id`, graphs at `graphs/<document_id>/` (render those
-  to readable paths too if ever wanted — same approach).
+- **The graph directory is a rendering too — it can be human-readable the same way.** A graph is keyed by
+  `document_id`, so its on-disk path is a *rendering*, not the address: it may stay opaque
+  (`graphs/<document_id>/`) or mirror the text tree (`graphs/<Region>/<Tradition>/<Title>/`) via the same
+  catalog bridge. Crucially, a region/tradition/title rename then **relocates the graph dir with a `git mv`,
+  not an LLM re-run** — the expensive graph *content* is invariant (keyed by the unchanged `document_id`);
+  only the path rendering moves. Opaque path → zero disk-touch on rename; readable path → a cheap move. Same
+  trade as the text tree (§6 above), never a recompute.
+- The remaining stores stay opaque by design: raw at `corpus/raw/<hash(locator)>` (an archive, not browsed for
+  content) and chunks keyed by `document_id` in Chroma.
 - Path segments may use the pretty region/tradition **names** (fs-sanitized) for max readability, or the slug
   ids — a minor sub-choice; the catalog bridges either way.
 
