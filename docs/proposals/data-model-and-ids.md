@@ -170,11 +170,29 @@ real addressing is via the `document_id` and `tradition_id` fields.
 
 ## 6. On-disk layout
 
-The full folder tree `region_id/tradition_id/document_id.txt` is kept **for human navigation** (browse,
-grep, git diffs). But it is a *rendering*, not the identity: `region_id` is a **regenerable mirror of the
-tree**, not part of any id (region is volatile — re-annotation would otherwise move identity). Re-annotating
-a document's region is a cheap `git mv`; the stored `document_id`/`tradition_id` and every reference are
-**unchanged**, because they are stored keys, not path derivations.
+The file tree is kept **for human navigation** (browse, grep, git diffs). It is a *rendering*, not the
+identity: the path segments are a regenerable mirror of the tree, not part of any id.
+
+**A region/tradition rename *does* touch disk — but only the cheap layer.** If the path embeds `region_id` /
+`tradition_id`, renaming or re-annotating one moves the cleaned-text folders (detect + relocate). That is
+real, but bounded: it touches only the **regenerable cleaned-text tree** (a rebuild-from-raw or `git mv` —
+CPU), plus a `tradition_id` metadata-field update (`collection.update`, no re-encode) and a tree key. It does
+**not** touch the **expensive stores** (embeddings, graphs), because those are keyed by `document_id` — and
+with the `hash(locator)` anchor (§9-D1), `document_id` is **invariant** under any region/tradition/title
+rename. So the re-layout is absorbed by a normal rebuild (new paths written, old GC'd); an explicit `git mv`
+is only needed for an *incremental* rename without a rebuild.
+
+**The disk-touch on rename is the price of on-disk navigability — an explicit layout sub-fork:**
+
+| layout | region rename | tradition rename | on-disk navigability |
+|---|---|---|---|
+| `region_id/tradition_id/<title>.txt` | relocate all under the region | relocate the tradition folder | ✔ full |
+| `tradition_id/<title>.txt` | **nothing** | relocate the tradition folder | ✔ by tradition |
+| `document_id.txt` (flat) | **nothing** | **nothing** | ✖ (navigate via app / catalog) |
+
+Want zero disk-touch on rename → drop region/tradition from the path (flat by `document_id`), losing on-disk
+navigability. Want navigability → pay the cheap text-tree re-layout on rename (never a re-embed). This is a
+sub-decision of the file-layout choice (region-implementation §6 prerequisites).
 
 ---
 
@@ -224,6 +242,22 @@ chunk, or a hit loses the data with nothing to resolve it.
     key anyway (and it then drifts from the current title and can collide). `hash(locator)` collapses id +
     match-key + raw-archive key into one; a stored title-slug adds a redundant, drift- and collision-prone id
     on top of a locator match you already need.
+  - *`slug` vs `hash` for the locator (the form of the anchor).* `hash(locator)` beats `slug(locator)`:
+    fixed-length, always fs/url/Chroma-safe (no slugify for documents at all), unique, and **it is already the
+    raw-archive key** (`corpus/raw/<sha1(url)>`) → `document_id` = raw key with zero new code. `slug(locator)`
+    only adds mnemonic value, which is weak (URLs slug long and unreadable) and which the file path already
+    carries. Opacity is fine — the catalog is the `id → {title, url}` lookup. Keep `sha1(url)` to avoid
+    re-keying the archive; normalize the locator (scheme/host/trailing-slash/%-decode) before hashing. (Both
+    slug and hash need that normalization.)
+  - *Why `slug` is fine for `tradition_id`/`region_id` but feared for `document_id`.* The fear is not the slug
+    mechanism (identical for all three) but **what the id primary-keys** × **how churny/collision-prone the
+    name is**. `document_id` primary-keys the **expensive, persisted, content-addressed** per-document
+    artifacts (chunk ids `document_id::i`, `graphs/<document_id>/`, the raw anchor), and titles churn and
+    collide → changing it re-embeds/re-graphs + orphans. `tradition_id`/`region_id` are a **metadata field / a
+    tree key** on a small closed **curated** vocabulary (14 + ~194, unique by fiat, renamed ~never) — changing
+    one touches only the cheap regenerable layer (a `tradition_id` field update + the text-tree re-layout, §6),
+    never the expensive stores. With `document_id = hash(locator)`, those stores are shielded from *every*
+    human-name rename, which is exactly what makes region/tradition/title all cheap to rename.
 - **`slugify` transliteration is under-specified.** "Transliterate non-ASCII" needs a concrete library/rules
   (Python has no stdlib transliteration — `unidecode` or hand rules); it is lossy and can itself collide as the
   corpus grows. The fail-loud uniqueness check *detects* a collision but does not *resolve* it. Decide the
