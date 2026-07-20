@@ -347,6 +347,14 @@ chunk, or a hit loses the data with nothing to resolve it.
   must load (or cache) the catalog server-side to build the `document_id $nin` set. Cheap (an in-memory map,
   small lists), but it is the one new server-side dependency B1 introduces; a re-annotation is then picked up
   *automatically* at query time (nothing stored on the chunk to update).
+  - *This is the **only** cost of B1, and it serves an **experimental** feature — "search only within other
+    traditions".* If that feature does not survive, B1 becomes **unconditional**: the chunk is a pure
+    `{document_id, chunk_index}` pointer and no query resolves `tradition` at all. In that case the
+    store-`slug(tradition)`-on-chunk alternative would instead leave a **dead denormalized field** on every
+    chunk — read by nothing, still needing a strip-migration or left to rot and drift. B1 keeps the entire
+    footprint of this experiment in **one server function**: adding *or* removing it is a `get_point` edit with
+    **zero data migration**, whereas store-on-chunk couples the feature's on/off to a Chroma backfill/strip. So
+    B1 is precisely the design that respects the feature's provisional status.
 - **The front resolves title/url/tradition from `docIndex`, so the embeddings/search pages must load the full
   catalog** (§2.8). Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url,
   tradition}` projection over shipping every per-document field. Not urgent.
