@@ -276,7 +276,55 @@ Tests are rewritten to the new model as each phase lands.
 
 ---
 
-## 6. Out of scope
+## 6. Migration & data integrity
+
+**Prerequisite decisions (fix before touching code).** The document-identity anchor and its knock-ons live in
+[`data-model-and-ids.md`](data-model-and-ids.md) §9 — decide these first: **D1** (`document_id` = `slugify(title)`
+vs `slug/hash(upstream-locator)`), the **file layout** (`corpus/<region>/<tradition>/<title>.txt` vs
+`.../<tradition>/<title>.txt` vs by-id), the **`slugify` transliteration** library/rules, and the **tradition
+reconciliation** policy (the corpus's coarse strings — `Hinduism`, `West African`, `Confucianism`/`Taoism`,
+`Ancient Egyptian` — mapped to canonical fine-grained `tradition_id`s, since the current
+`config/traditions.json` is the *old* 12-group scheme, not the 14-region canon).
+
+**Integrity principle.** Everything under `outputs/` below `corpus/raw/` is **derived and regenerable**; the
+only sources of truth are **`corpus/raw/` (the archive), `config/`, and `sources/`**. So coherence after the
+migration is *restored by a clean rebuild from raw*, not by in-place metadata surgery. At ~27 documents this
+is cheap.
+
+**Do NOT use `build --force`.** `--force` propagates to `fetch_to_cache(force=True)`, which **re-downloads
+every source** (fetch and build are not yet separated) — needless, and risky if an upstream changed or 404s.
+
+**Procedure — wipe derived, keep raw, then a plain `build`:**
+
+1. **Back up / commit** the current state (`outputs/embeddings/`, `outputs/graphs/`, `config/`) for rollback.
+   Do not touch `corpus/raw/`.
+2. **Author + reconcile:** write the new `config/traditions.json` (14 regions, canon order, texted traditions
+   with coordinates); repoint every `config/corpus.json` book at its canonical `tradition`.
+3. **Blanket-wipe the derived artifacts, keep `corpus/raw/`** — deterministic, so no orphan-hunting and no
+   reliance on the per-scanner orphan detection catching scheme-renamed files:
+   - **keep:** `outputs/corpus/raw/`, `config/`, `sources/`
+   - **delete:** everything else under `outputs/corpus/` (the `.txt` tree + `corpus.json`),
+     `outputs/embeddings/`, `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`.
+   - `raw/` sits *inside* `outputs/corpus/`, so target carefully (e.g.
+     `find outputs/corpus -mindepth 1 -maxdepth 1 ! -name raw -exec rm -rf {} +`), not `rm -rf outputs/corpus`.
+4. **Plain `build` (no `--force`).** With `corpus.json` gone but `raw/` present, `fetch_to_cache(force=False)`
+   short-circuits on the cached raw → **no network**; the pipeline re-cleans, re-embeds (new
+   `document_id`/`tradition_id`, no `major_tradition`), and re-graphs from raw + the new config. Local sources
+   re-read from `sources/` (their upstream) — still offline. **Fail-loud validation** (every corpus tradition
+   ∈ tree; every region ∈ the 14 canon; `slugify` uniqueness across region/tradition/document) is the integrity
+   gate.
+5. **Front in lockstep** with the API change (endpoint renames, dropped fields, `treeIndex`/`docIndex`, remove
+   `bookTitleFromId`) — or the UI breaks.
+6. **Verify with `status`** — orphan detection should report zero (nothing was left behind, since the derived
+   tree was wiped before the rebuild).
+
+Because the rebuild derives everything from the intact `raw/` under fail-loud validation, the post-migration
+state is coherent by construction; the archive and `config/` are the only things that must be protected (git /
+backup).
+
+---
+
+## 7. Out of scope
 
 Motif `theme`/`stratum`; the connectivity axis, dating, the residual (science); the motif-areal region system
 (§2.7); any facet (`family`/`subsistence`/`theme_profile`); catalogue imports/joins; re-validation of the
