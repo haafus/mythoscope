@@ -257,7 +257,9 @@ front resolution before any field is trimmed off a chunk/hit → then the trim �
    (unknown tradition / non-canon region; name-uniqueness). *(Highest value-to-risk — closes the silent join.)*
 2. **Persist identity.** Persist `document_id = hash(locator)` in the built catalog (normalize the locator
    first; it is the existing raw key `sha1(url)`) and return it from the documents endpoint; mint
-   `region_id`/`tradition_id` = the canonical name in the tree + as each document's `tradition` ref. *(Must
+   `region_id`/`tradition_id` = the canonical name in the tree + as each document's `tradition` ref. `id = the
+   name` verbatim — no slug, no transliteration, no new function; the boundaries already sanitise
+   (`sanitize_filename` FS / `encodeURIComponent` URL / `escapeHtml` HTML) — spec in data-model §5. *(Must
    precede B1 and the `?id=` endpoint.)*
 3. **Front indexes + resolution — before any trim.** Fetch `/traditions` + `/documents` once into shared state
    → `treeIndex`/`docIndex`; resolve `document_id → document → tradition → region → colour`; delete
