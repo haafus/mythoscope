@@ -144,9 +144,9 @@ input's map is always ready first. Example (`corpus → embeddings`, "Iliad"): c
 `{"iliad": "abc", …}`, so embeddings' entry for "iliad" is `hash("abc" + model + version)`. Fan-in is the same
 shape — a projection's single entry is `hash(⊕ embeddings:M.output_fingerprints().values() + method_v)`.
 
-**Wiring** is a small typed `build_pipeline()` factory that constructs the stages and passes each its upstream
-**as constructor arguments** — so `inputs()` returns held, type-checked references (a wrong stage type fails at
-construction, not silently at runtime), and the parameterised fan-out (per variant / per model) is just a loop:
+**Wiring** is a small `build_pipeline()` factory that constructs the stages and passes each its upstream as
+constructor arguments, so `inputs()` returns held references — the parameterised fan-out (per variant / per
+model) is just a loop:
 
 ```python
 def build_pipeline(config) -> list[Stage]:
@@ -157,7 +157,14 @@ def build_pipeline(config) -> list[Stage]:
             *motif_stages(config)]
 ```
 
-The factory is the single, explicit, type-checked home of the topology — not duplicated anywhere, the opposite
+> **Refs vs names is *not* load-bearing.** Object refs (above) and string-name `inputs()` resolved by the
+> driver both fail loud on a *non-existent* dependency (a `NameError` at the factory vs a driver "unknown
+> stage" at startup — both before any real work), and *neither* catches a wired-to-the-wrong-but-valid stage.
+> Since fp flow is driver-mediated via `output_fingerprints()` (stages no longer reach through refs to compute
+> anything), `inputs()` only needs to *identify* dependencies. Refs avoid a parallel name-space; that is the
+> whole (weak) preference — a Part-4 implementation detail, not a principle.
+
+The factory is the single, explicit home of the topology — not duplicated anywhere, the opposite
 of the rotting external inspector.
 
 **Atomisation of the current blocks.** "Atomise" = split each code module into the smallest
