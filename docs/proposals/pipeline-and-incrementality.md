@@ -172,6 +172,12 @@ a small manual `algo_version`** for pure-logic changes. Middle grounds if fuller
 AST-hash (ignores comments/format, still triggers on no-op refactors), or scope the code-hash to the stage's
 core function(s) + pinned dep versions.
 
+> **Caveat — the manual bump reintroduces the human-bookkeeping this doc set out to avoid.** A forgotten
+> `algo_version` bump = silent staleness (the very bug we fix), "caught by `--force`" only if someone runs it.
+> Mitigation: **choose auto vs manual *per stage by cost*.** Cheap stages (clean/trim/chunk — CPU-ms) → a
+> **code/AST-hash** (over-invalidation is cheap, so no discipline needed). Expensive stages (embeddings/LLM) →
+> the manual `algo_version` (over-invalidation is costly, so pay the discipline there). Not a global choice.
+
 ### 2.5 Downstream invalidation via fp composition
 
 Because an artifact's fp *includes its inputs' fps*, cascade is emergent — no per-edge "invalidate
@@ -256,12 +262,16 @@ The single highest-value change. Replace "skip if `chunk_id` exists" with a two-
 re-embed a chunk  ⇔  (stable_id, content_md5, model, preprocess_version)  not already present
 ```
 
-- **stable_id** — see §6/`data-model-and-ids.md`; anchored so a rename does not churn it.
-- **content_md5** — already computed in `_finalize_text`, just unused here.
+- **stable_id** — **requires the rename-stable `document_id` anchor** (`data-model-and-ids.md` §9-D1, *open*).
+  If `document_id = slugify(title)` is chosen instead, this key does **not** fix rename-churn — flaw 1 stays.
+  So this payoff is contingent on D1.
+- **content version** — **granularity is an open choice (§9):** the `md5` already computed in `_finalize_text`
+  is **document-level**, so a one-chunk edit re-embeds *all* the doc's chunks; a **per-chunk `hash(chunk_text)`**
+  (as in §2.2) is precise but must be stored/compared per chunk. §2.2 and this line must be reconciled.
 
-Correct on all cases: rename (same content) → same key → **skip** (fixes flaw 1); text edit (same title) →
-new md5 → **re-embed** (fixes flaw 2); new doc → new id → embed. The non-buzzword value of ids is precisely
-this: **`(id, version)` as the incremental cache key.**
+Correct on all cases (given D1 + a content version): rename (same content) → same key → **skip** (fixes flaw
+1); text edit → new version → **re-embed** (fixes flaw 2); new doc → new id → embed. The non-buzzword value of
+ids is precisely this: **`(id, version)` as the incremental cache key.**
 
 ---
 
@@ -347,10 +357,15 @@ The adopt path (diff → adopt → re-apply override) is shared.
 
 - **config markers** (`content_start/end`, `exclude`) — for structural trims/skip. Structured, tiny,
   git-friendly.
-- **per-doc unified-diff patch** (`overrides/<document_id>.patch`) — for point text fixes. **Diff beats a full
-  override file**: it stores only the changes (small), shows exactly what diverged (provenance), reviews in
-  git, and re-applies deterministically. A patch that no longer applies after `refresh` is the merge/conflict
-  signal → re-curate.
+- **per-doc text override** — for point text fixes. Two forms (**open — §9**):
+  - **unified-diff patch** (`overrides/<document_id>.patch`): stores only the changes, shows exactly what
+    diverged in git, re-applies deterministically; a patch that no longer applies after `refresh` is the
+    merge-conflict signal. **But curators don't hand-write diffs** — this needs an "edit → we snapshot the
+    diff" tool.
+  - **full curated override** (`overrides/<document_id>.txt`): the curator edits the file directly; the diff
+    is computed *on demand* against raw when provenance is needed. More ergonomic; provenance is recoverable.
+    Downside: duplicates content, no inline diff.
+  Leaning: **full override** (curator-friendly; provenance is recoverable by diffing vs raw), but not decided.
 
 Layer order: `curated = trim(clean(apply_patch(base)), content_start/end)`. The patch base is best the
 *cleaned* text (boilerplate stripped — what a curator reads); if `clean_version` bumps and the patch fails,
@@ -392,6 +407,63 @@ single-user research tool the **build-then-serve** model is sufficient; if on-th
 use atomic artifact swaps or a `status`-driven "stale" flag.
 
 ---
+
+## 9. Weak spots, alternatives & open decisions
+
+### 9.1 Big alternative — adopt a tool instead of building our own
+
+Everything here (content-addressed DAG, fingerprints, cache, GC, lineage) is what **[DVC](https://dvc.org)**
+does out of the box (and snakemake / Nextflow to a degree): `dvc.yaml` declares stages with deps/outs,
+`dvc repro` rebuilds only what changed by content hash, `dvc.lock` stores hashes, a remote holds the raw
+archive.
+
+| | build-your-own (this doc) | adopt DVC |
+|---|---|---|
+| cost | write & maintain fp/manifest/GC | almost free, battle-tested |
+| control | full, in-process Python | stages shell out; less "in-process" |
+| dependency | none | heavy, opinionated |
+| provenance / remote / GC | build ourselves | included |
+
+**Open fork:** build-your-own vs adopt. Even if we decline DVC, the decision should be explicit ("not DVC,
+because …"), not defaulted.
+
+### 9.2 Projections defeat "minimal rebuild"
+
+A global UMAP means **any** chunk change rebuilds the *whole* projection (all points). Alternative:
+**parametric projection** — `fit` once, `.transform()` new/changed points into the existing space (UMAP
+supports this). *Pros:* incremental, cheap. *Cons:* the embedding drifts vs the original fit → a periodic full
+refit is still needed; not all methods transform. **Open:** parametric-transform vs periodic full refit.
+
+### 9.3 Manifest vs stateless
+
+The sidecar+manifest machinery may be over-built for this size. Alternative: **stateless** — no manifest;
+each build compares config-expected-set vs on-disk and recomputes fps on the fly. *Pros:* nothing to drift or
+corrupt. *Cons:* slower `status` (recompute). At ~27 docs, stateless is likely simpler and enough; the manifest
+is a scale optimization, not a day-one need.
+
+### 9.4 Atomicity / partial-build failure (unaddressed gap)
+
+Builds crash mid-way (network, GPU OOM, LLM rate-limit — the graph stage already handles the last). Then an
+artifact and its fp can disagree. Rule: **write the artifact first, then its fp**; treat *artifact-present /
+fp-absent* as "rebuild". For the catalog/collection, prefer atomic swap (write to temp, rename) so a reader
+never sees a half-written index. This must be specified before the fp machinery is trusted.
+
+### 9.5 Consolidated open decisions
+
+| id | decision | options | blocks |
+|---|---|---|---|
+| **D1** | `document_id` anchor | `slugify(title)` vs `slug/hash(upstream-locator)` | doc coherence, §4 rename-stability, persist-id |
+| **D2** | embedding content-version granularity | per-chunk `hash(chunk_text)` vs doc-level `md5` | §2.2 ↔ §4 |
+| **D3** | projections incrementality | parametric `.transform()` vs full refit | §9.2 |
+| **D4** | manual `algo_version` vs per-stage-by-cost auto | global manual vs code/AST-hash on cheap stages | §2.4 |
+| **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
+| **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
+| **D7** | manifest vs stateless | central index vs recompute-on-the-fly | §9.3 |
+| **D8** | `slugify` transliteration | library/rules (`unidecode`? hand rules?) | id minting |
+
+**Proportionality.** This is a spec for ~27 documents. The immediate, high-ROI work is small: the §4
+embeddings key (once D1/D2 are picked) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
+are "when it grows" — do not read the whole doc as "build now".
 
 ## Appendix — why mtime lies
 

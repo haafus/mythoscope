@@ -127,10 +127,21 @@ Three mint sites: `region_id = slugify(region name)`, `tradition_id = slugify(tr
 
 ### `document_id` is a single key, not composite
 
-`document_id = slugify(title)`. This is unique **as long as no two documents share a title**, which holds at
-book granularity (qualified titles). Guard it with the uniqueness check above; only if a real title
-collision ever appears do we fold `tradition_id` into the slug. `tradition_id` on the chunk is for filtering
-and region resolution — **not** for document identity. So: no composite key.
+`document_id` is a **single key** (not a `(tradition, title)` composite): `tradition_id` on the chunk is for
+filtering and region resolution, **not** for document identity.
+
+> **⚠ Open decision — what does `document_id` anchor on? (not resolved; see §9-D1.)** Two candidates, and this
+> doc does **not** yet pick:
+> - **`slugify(title)`** — human-readable, but **not rename-stable** (a title edit changes the id) and can
+>   collide when two documents share a title (guard with the uniqueness check; fold `tradition_id` in only if a
+>   real collision appears).
+> - **`slug/hash(upstream-locator)`** (the URL / `sources/`-path — already the raw-archive key) — **rename- and
+>   edit-stable**, collision-free, unifies identity + archive key + the incremental anchor
+>   ([`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §4 wants exactly this), at the cost of
+>   an opaque id (acceptable — navigability lives in the file path, not the id).
+>
+> The two docs currently lean different ways (this one wrote `slugify(title)`; pipeline §4 assumes a
+> rename-stable anchor). **They must converge on one before implementation** — see §9-D1.
 
 ### Store the ids; never regenerate
 
@@ -196,3 +207,26 @@ chunk, or a hit loses the data with nothing to resolve it.
 4. Chunk metadata → `{document_id, tradition_id, chunk_index}`; drop `url`/`major_tradition`.
 5. Graphs: unify build/serve on the stored id; add the traversal guard.
 6. Front: `treeIndex` + `docIndex`; delete `bookTitleFromId`; resolve title/url/color from the indexes.
+
+---
+
+## 9. Weak spots & open decisions
+
+- **D1 — `document_id` anchor (blocking).** `slugify(title)` vs `slug/hash(upstream-locator)` — see §5. This
+  is the load-bearing open choice: it decides rename/edit stability, whether it unifies with the raw-archive
+  key and the incremental anchor (pipeline §4), and how `graphs/<document_id>/` dirs behave. **Resolve first**;
+  much of §8 (persist `document_id`, the embeddings key) depends on it. Leaning: the upstream-locator anchor
+  (unifies more), but not decided.
+- **`slugify` transliteration is under-specified.** "Transliterate non-ASCII" needs a concrete library/rules
+  (Python has no stdlib transliteration — `unidecode` or hand rules); it is lossy and can itself collide as the
+  corpus grows. The fail-loud uniqueness check *detects* a collision but does not *resolve* it. Decide the
+  transliteration source and confirm collision-freedom on the full name set, not just the 194 traditions.
+- **`tradition_id` on the chunk goes stale on a book re-annotation.** Re-annotating a *book's tradition* (not
+  its region) changes `chunk.tradition_id` and forces a re-embed. We lean on "tradition is stable", which is
+  true for *renames* but not for *re-annotation*; acceptable but worth stating.
+- **The front resolves title/url from `docIndex`, so the embeddings/search pages must load the full catalog.**
+  Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url, tradition}` projection over
+  shipping every per-document field. Not urgent.
+- **Proportionality.** This is a spec for a corpus of ~27 documents. The single high-value, low-cost change is
+  carrying `document_id` + `tradition_id` as the chunk's two refs and dropping `url`/`major_tradition`; the
+  rest is formalization. Do not read the whole doc as "must build now".
