@@ -211,8 +211,8 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 > on-disk path is free to stay fully human-readable — `corpus/<Region>/<Tradition>/<Title>.txt` — and the
 > catalog bridges `document_id ↔ path`. A region/tradition/title rename is then a `git mv` of the readable path
 > (or a rebuild-from-raw), touching **neither** Chroma nor graphs (both keyed by the invariant `document_id`).
-> The layout sub-choice (how much classification sits in the path vs a flat `corpus/<id>.txt`) trades on-disk
-> navigability against rename disk-churn only — never re-embedding — and is settled in data-model §6.
+> **Decided: the full nested `corpus/<Region>/<Tradition>/<Title>.txt`** (data-model §6) — it optimises the
+> rendering layer for browsability, and the only cost (disk-churn on rename) is negligible and never a re-embed.
 
 ---
 
@@ -221,7 +221,7 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 ```
 config/traditions.json   region → {color(§8), description, subdivision, strata, traditions{name:{desc,coords}}}   ← source of truth; region+color live here only
 config/corpus.json       book → tradition (name)
-        │  build: text files under corpus/… (layout pending — §3); validate every book tradition ∈ tree
+        │  build: text files at corpus/<Region>/<Tradition>/<Title>.txt (§6, sanitize_filename); validate every book tradition ∈ tree
         │          & every region key ∈ 14 canon (fail loud). No generated traditions.json; no colour written.
         ▼
 outputs/corpus/corpus.json      rows carry tradition ONLY (the reference) — no region, no colour, no major
@@ -229,7 +229,7 @@ outputs/embeddings/*            chunk metadata: document_id + chunk_index ONLY (
         ▼  server  (reads config/traditions.json + outputs/corpus/corpus.json)
 /api/corpus/traditions   config region → traditions tree (canon order, region colour + fields); no books
 /api/corpus/documents    documents list: tradition + per-doc fields; no region, no colour   (renamed from /catalog)
-/api/corpus/document     one raw text, by ?id= (working default (title, tradition))          (renamed from /documents)
+/api/corpus/document     one raw text, by ?id=document_id (hash(locator), D1)                (renamed from /documents)
 /api/similarity/*        search hits: chunk data + document_id reference (B1); no tradition/major/region/colour
         ▼  front  (loads the tree + the documents ONCE, global cache, and composes)
 group by region, attach books, colour = region base + derived per-tradition shade (regions.md §8.1); 14-region legend; reused by corpus/atlas/embeddings/search
@@ -255,8 +255,8 @@ group by region, attach books, colour = region base + derived per-tradition shad
    (`tradition`/`url`/`region`/`colour` resolved on the front from `document_id`). **Cross-tradition search
    filter (B1):** with no `tradition` on the chunk, `get_point`'s tradition filter resolves tradition →
    documents server-side from the catalog and filters `where {document_id: {$nin: docs-of-that-tradition}}`
-   (was a `tradition`-equality clause). Move the file layout per the §3 identity decision (working default
-   `corpus/<tradition>/<title>.txt`). **Rename the endpoints** (§3): `/catalog` → `/documents` (list),
+   (was a `tradition`-equality clause). Move the file layout to the decided
+   `corpus/<Region>/<Tradition>/<Title>.txt` (§6). **Rename the endpoints** (§3): `/catalog` → `/documents` (list),
    `/documents` → `/document` (one text) located by `(title, tradition)`.
 3. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
@@ -279,9 +279,12 @@ Tests are rewritten to the new model as each phase lands.
 existing raw key `sha1(url)`; opaque, rename-stable; *not* `slugify(title)`); **`region_id`/`tradition_id` = the
 canonical name** (kept verbatim, at most the existing `normalize_catalog_id` for whitespace; no slug, no
 transliteration, no new function — boundaries already sanitise via `sanitize_filename`/`encodeURIComponent`/`escapeHtml` — `data-model` §5; **D8
-dissolved**); and the **tradition reconciliation** table (§6.1 below). **Still open:** only the **file layout**
-(`corpus/<Region>/<Tradition>/<Title>.txt` vs flat by-id — a navigability/rename-churn trade, independent of the
-opaque id).
+dissolved**); the **tradition reconciliation** table (§6.1 below); and the **file layout** — **decided: full
+nested `corpus/<Region>/<Tradition>/<Title>.txt`** (`sanitize_filename`-cleaned names; opaque `document_id`
+stays out of the path, the catalog bridges id ↔ path). The `.txt` tree is a pure human-rendering layer —
+identity is decoupled (Chroma/graphs key on `document_id`, never move on rename), so the path optimises for
+browsability; churn is negligible (27 files, regenerable, `git mv`) and the 14-region canon is stable. Flat-by-id
+and tradition-only were rejected (`data-model` §6). **Nothing left open.**
 
 ### 6.1 Tradition reconciliation (decided 2026-07)
 

@@ -275,17 +275,24 @@ because those are keyed by `document_id` — and with the `hash(locator)` anchor
 **invariant** under any region/tradition/title rename. So the re-layout is absorbed by a normal rebuild (new
 paths written, old GC'd); an explicit `git mv` is only needed for an *incremental* rename without a rebuild.
 
-**The disk-touch on rename is the price of on-disk navigability — an explicit layout sub-fork:**
+**The disk-touch on rename is the price of on-disk navigability — decided in favour of navigability:**
 
 | layout | region rename | tradition rename | on-disk navigability |
 |---|---|---|---|
-| `region_id/tradition_id/<title>.txt` | relocate all under the region | relocate the tradition folder | ✔ full |
-| `tradition_id/<title>.txt` | **nothing** | relocate the tradition folder | ✔ by tradition |
-| `document_id.txt` (flat) | **nothing** | **nothing** | ✖ (navigate via app / catalog) |
+| **`<Region>/<Tradition>/<Title>.txt` — DECIDED** | relocate under the region | relocate the tradition folder | ✔ full |
+| `<Tradition>/<Title>.txt` | **nothing** | relocate the tradition folder | ✔ by tradition |
+| `<document_id>.txt` (flat) | **nothing** | **nothing** | ✖ (navigate via app / catalog) |
 
-Want zero disk-touch on rename → drop region/tradition from the path (flat by `document_id`), losing on-disk
-navigability. Want navigability → pay the cheap text-tree re-layout on rename (never a re-embed). This is a
-sub-decision of the file-layout choice (region-implementation §6 prerequisites).
+**Decided: full nested `corpus/<Region>/<Tradition>/<Title>.txt`** (names, `sanitize_filename`-cleaned; the
+opaque `document_id` is *not* in the path — the catalog bridges id ↔ path). Rationale: the `.txt` tree is a
+**pure human-rendering layer** — identity is already fully decoupled (`document_id = hash(locator)`; Chroma and
+graphs never move on any rename), so the path is free to be the most browsable thing, which is the full nested
+tree. The disk-churn against it is negligible (27 files, regenerable from raw + catalog, `git mv` for an
+incremental rename, never a re-embed), and the 14-region canon is closed/stable so region re-annotation rarely
+fires. The flat-by-id option was rejected: it throws away the one purpose of the cleaned-text tree — being the
+readable layer — to save a churn cost that is already absorbed elsewhere; `<Tradition>/…` was rejected as a
+muddle (pays tradition/title churn while giving up region grouping). *(If region re-annotation ever became
+frequent, drop region from the path → `<Tradition>/…`; the catalog makes that a cheap, reversible re-render.)*
 
 ### Rename operations (the operational payoff)
 
