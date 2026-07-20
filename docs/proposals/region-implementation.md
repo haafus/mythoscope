@@ -239,27 +239,6 @@ group by region, attach books, colour = region base + derived per-tradition shad
 
 ## 5. Migration order (region-only; each phase shippable)
 
-> **Canonical implementation order (across all three docs — this supersedes the split lists; §5 steps below,
-> `data-model` §8 and `pipeline` §7 are the per-doc detail).** Dependency invariants: silent join first (pure
-> config); `document_id` persisted before anything references it; front resolution before any field is trimmed
-> off a chunk/hit; rename-churn is fixed for free once `document_id` anchors the chunk.
->
-> **Phase 1 — ship `region`:**
-> A. Config + reconcile (§6.1) + fail-loud validation — *closes the silent join* — §5.1
-> B. Persist `document_id = hash(locator)`; mint `region_id`/`tradition_id` = name — `data-model` §8.1-8.3
-> C. Front indexes (`treeIndex`/`docIndex`) + resolution — **before any trim** — `data-model` §8.6 / §5.4
-> D. Retire `major_tradition`; **B1** chunk `{document_id, chunk_index}` + `get_point` filter; file layout;
->    endpoint rename; embeddings key → `(document_id, content_md5, model, ver)` (rename-churn fixed here) —
->    §5.2 / `data-model` §8.4
-> E. Colour: OKLCH shade fn (regions.md §8.1) + serve config tree — §5.3-5.4
-> F. `UNASSIGNED`; graphs build/serve unify + traversal guard — §5.5 / `data-model` §8.5
->
-> **Phase 2 — incrementality hardening (after the feature; "when it grows"):** `pipeline` §7 —
-> G. staleness-gate + `transform_version` + atomicity → H. fp manifest + DAG cascade + set-diff GC →
-> I. fetch/build split + `refresh` + pin raw → J. override/curation layer → K. parametric projections; DVC eval.
-> *(Exception: if staleness-on-edit actively bites, pull G's staleness-gate forward — it doesn't depend on the
-> migration.)*
-
 1. **Author the config + validation.** Build `config/traditions.json`: 14 region nodes in canon order, each
    with its canon fields (`color` + `description`/`subdivision`/`strata`) and only its texted traditions
    (`region_id`/`tradition_id` = the canonical **name**, no slug — §6). **Reconcile the dirty corpus tradition
