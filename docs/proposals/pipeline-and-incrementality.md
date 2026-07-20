@@ -743,7 +743,9 @@ these docs spec.
 Everything here (content-addressed DAG, fingerprints, cache, GC, lineage) is what existing data-pipeline
 engines already do — the field is large and well-mapped; the canonical index is
 **[awesome-pipeline](https://github.com/pditommaso/awesome-pipeline)** (a curated list of workflow/pipeline
-frameworks — the tools compared below and dozens more). **Selection criteria for us:** (a) content-addressed
+frameworks — the tools compared below and dozens more). A full feature-by-feature matrix of our design against
+the twelve most relevant engines (incl. our distinctive design decisions) is in
+**[`pipeline-engine-comparison.md`](pipeline-engine-comparison.md)**; the table below is the summary. **Selection criteria for us:** (a) content-addressed
 caching — the whole point; (b) in-process Python vs shell-out (our stages are Python functions); (c)
 weight/dependency; (d) remote artifact storage (raw archive + large embeddings); (e) our size (~27 docs argues
 against heavy tools).
