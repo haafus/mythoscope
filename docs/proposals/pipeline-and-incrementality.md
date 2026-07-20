@@ -19,7 +19,7 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 | # | stage | inputs | artifacts (`outputs/`) | caches | cost |
 |---|---|---|---|---|---|
 | 0 | **config** (hand-authored) | `config/corpus.json` (title, tradition, url, content_start/end, exclude), `config/traditions.json` (tree), `config/models.json`, `config/prompts.json`, `sources/` | — | — | — |
-| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<sha1(url)>` (raw snapshot), `corpus/<major>/<trad>/<title>.txt` (cleaned text), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (sha1 url), extraction | network (~s/doc); clean/trim CPU-cheap |
+| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<sha1(url)>` (raw snapshot; `sha1(url) = document_id`, D1), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (sha1 url), extraction | network (~s/doc); clean/trim CPU-cheap |
 | 1.5 | **Preprocess** (variants) | cleaned text + variant config | `preprocessed/…` | preprocessing | CPU cheap–moderate |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
 | 3 | **Projections** | vectors (embeddings) + method | `projections/<model>/<method>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
@@ -57,7 +57,7 @@ never a built artifact.
 | **external URL** upstream | Gutenberg re-release | raw → below (not detected without a re-fetch) |
 | **models.json** | add/change model | embeddings(model) → projections(model) |
 | **prompts.json** | change prompt | graphs(all) |
-| **stage CODE** | clean/trim, `chunk_size/overlap`, projection method, slugify | **all outputs of that stage — today not detected at all** |
+| **stage CODE** | clean/trim, `chunk_size/overlap`, projection method | **all outputs of that stage — today not detected at all** |
 | **motif sources** | new crosswalk | motifs |
 
 ### 1.4 What incrementality exists today (and its two flaws)
@@ -65,7 +65,8 @@ never a built artifact.
 - **raw-fetch** — content-addressed by `sha1(url)` (rename-proof). ✔
 - **Corpus reuse** — keyed by `title` (`_load_existing_metadata` → `{row["title"]: row}`; reuse if the output
   file is present / for local, if the raw-snapshot hash is unchanged). ✖ rename-fragile.
-- **Embeddings dedup** — by `chunk_id = slug(title)::i`, on **id existence, not content**. ✖
+- **Embeddings dedup** — by `chunk_id = normalize_catalog_id(title)::i` (title-anchored today), on **id
+  existence, not content**. ✖  *(target: `document_id::i` with `document_id = hash(locator)`.)*
 - **Projections/Graphs** — coarse reuse (file/dir presence).
 - **`status` / orphan detection** (`pipeline_inspect`: `corpus_orphans`, `embeddings_orphan_chunks/collections`,
   `projections_orphans`, graphs) — detects drift, but does not auto-fix or cascade.
@@ -123,7 +124,7 @@ Granularity per stage:
 | **chunk embedding** | `hash(chunk_text + model + preprocess_v)` = **(stable_id, md5, model, ver)** | **chunk** — fixes both flaws of §1.4 |
 | projection | `hash(⊕ member chunk fps + method_v)` | **global per (model, method)** — UMAP is indivisible |
 | graph | `hash(text + prompt_v + llm_model)` | document/chunk |
-| serve-resolve (color/tree) | — | **not an artifact** — resolved at runtime → tree edits are free |
+| serve-resolve (tree + colour, incl. per-tradition shade) | — | **not an artifact** — region colour *and* its derived per-tradition OKLCH shade (regions.md §8.1) are computed at runtime → tree/colour edits are free |
 
 ### 2.3 Hash choice
 
@@ -167,7 +168,7 @@ Two rejected auto-alternatives:
   timestamp, but blunt for expensive stages.
 
 **Chosen: hybrid.** Hash the **output-affecting parameters** (chunk_size/overlap, model id + pinned lib
-version, prompt text, content markers, slugify rules) — these are *data*, precise, no false triggers — **plus
+version, prompt text, content markers) — these are *data*, precise, no false triggers — **plus
 a small manual `algo_version`** for pure-logic changes. Middle grounds if fuller automation is wanted:
 AST-hash (ignores comments/format, still triggers on no-op refactors), or scope the code-hash to the stage's
 core function(s) + pinned dep versions.
@@ -450,9 +451,9 @@ Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
 
 5. **D1 is settled: `document_id = hash(locator)`** — the existing raw key `sha1(url)` surfaced as identity.
    No decision to make; proceed.
-6. One `slugify` + fail-loud uniqueness for `region_id`/`tradition_id` **only** (documents don't slug — id =
-   `hash(locator)`) — §8.3. *(decide D8: transliteration library/rules — now scoped to the closed
-   region/tradition vocabulary.)*
+6. `region_id`/`tradition_id` = the **canonical name** (at most the existing `normalize_catalog_id` for
+   whitespace) + fail-loud uniqueness — data-model §5. **No `slugify`, no transliteration** (D8 dissolved);
+   boundaries already sanitise (`sanitize_filename`/`encodeURIComponent`/`escapeHtml`).
 7. Persist `document_id = hash(locator)` (the normalized-locator hash / raw key); mint `region_id`/`tradition_id`
    — §8.1, §8.2.
 8. Chunk refs → `(document_id, chunk_index)` **only** (B1); drop `tradition`/`url`/`major_tradition` — §8.4
@@ -471,8 +472,8 @@ Sub-decisions are flagged inline as *(decide Dx)*; the full list lives in §9.5.
 13. **Parametric projections** — `.transform()` new/changed points instead of a full refit — §9.2 (D3).
 14. Re-evaluate build-your-own vs **DVC/Dagster** at scale — §9.1 (D6).
 
-D1 (the former hard gate) is now decided — `document_id = hash(locator)` — so Phase 1 is unblocked; Phase 0
-still needs only the light sub-decisions D2/D4.
+D1 (the former hard gate) is now decided — `document_id = hash(locator)` — so Phase 1 is unblocked; **D8 is
+dissolved** (id = the canonical name, no slug); Phase 0 still needs only the light sub-decisions D2/D4.
 
 ---
 
@@ -543,7 +544,7 @@ never sees a half-written index. This must be specified before the fp machinery 
 | **D5** | override format | unified-diff patch vs full override + on-demand diff | §6.4 |
 | **D6** | build engine | build-your-own vs adopt DVC | §9.1 |
 | **D7** | manifest vs stateless | central index vs recompute-on-the-fly | §9.3 |
-| **D8** | `slugify` transliteration | library/rules (`unidecode`? hand rules?) — **scoped to `region_id`/`tradition_id` only** (documents use `hash(locator)`, D1) | id minting |
+| ~~**D8**~~ | ~~`slugify` transliteration~~ — **DISSOLVED** | there is no slug: `region_id`/`tradition_id` = the canonical name (data-model §5), documents = `hash(locator)` | — |
 
 **Proportionality.** This is a spec for ~27 documents. The immediate, high-ROI work is small: the §4
 embeddings key (D1 decided; D2 still to pick) + the graphs build/serve fix. The manifest, DAG cascade, and GC tiers
