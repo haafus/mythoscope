@@ -177,6 +177,15 @@ Concretely, who depends on whom:
 This whole map of who-feeds-whom lives in **one** place — the factory — instead of being re-derived in an
 external checker that drifts.
 
+**Fan-out — one stage per config entry.** Some blocks are a single stage; others produce a *variable* number,
+driven by config. `corpus` and `graphs` are one stage each. **Embeddings is one stage per embedding model**
+listed in `config/models.json` — three models means three stages, all reading the same corpus. **Projections
+fan out further** — one stage per (model × chart type), each wired to the embeddings of its own model. Motifs
+is a fixed handful. The fan-out is nothing clever: it's a loop in the factory that walks the config lists and
+makes one stage object per entry. Add a model to the config and a new stage appears on the next build (its
+whole collection is "missing", so it embeds all the books just for that model, leaving the others alone);
+remove a model and its stage — and its now-orphaned collection — is cleaned.
+
 **Fetch is the one step still bundled in.** Right now the `corpus` stage does two different jobs at once: it
 **downloads** each book's raw file (from a web address, or copies it from a local `sources/` folder) *and then*
 **cleans** that text into the readable form. Because it downloads its own inputs, it doesn't depend on any
@@ -220,7 +229,11 @@ source is just *adding a stage* — it shows up in `status`/`clean`/`build` for 
 Two shapes the atomic interface still must respect: **`build(keys)` is batched** (no expensive stage is
 one-item-at-a-time — GPU / pool / global), and **`actual()` is one store pass** (not separate key + fp reads).
 
-One generic **driver** derives every operation as a **diff of the two maps**, per stage (topological):
+One generic **driver** derives every operation as a **diff of the two maps**. It first puts the stages in
+**topological order** — each stage after all of its `inputs()` — by a plain topological sort of the `inputs()`
+edges (repeatedly take a stage whose inputs are all already placed; if some stages remain but none can be
+placed, that's a dependency cycle, and it errors). This ordering is what guarantees an input's `desired()` map
+is already computed before a dependent asks for it. Then, per stage in that order:
 
 ```
 d, a = stage.desired(), stage.actual()             # {key: fp} each
