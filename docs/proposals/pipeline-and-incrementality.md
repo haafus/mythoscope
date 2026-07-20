@@ -159,9 +159,10 @@ def build_pipeline(config) -> list[Stage]:
 > **Refs vs names is *not* load-bearing.** Object refs (above) and string-name `inputs()` resolved by the
 > driver both fail loud on a *non-existent* dependency (a `NameError` at the factory vs a driver "unknown
 > stage" at startup — both before any real work), and *neither* catches a wired-to-the-wrong-but-valid stage.
-> Since fp flow is via each stage's `desired()` map (stages no longer reach through refs to compute anything),
-> `inputs()` only needs to *identify* dependencies. Refs avoid a parallel name-space; that is the
-> whole (weak) preference — a Part-3 implementation detail, not a principle.
+> A stage *does* reach into its inputs — it calls each input's `desired()` to fold their fingerprints into its
+> own — but the *only* thing it needs from an input is that one call, so `inputs()` just has to hand it
+> something to call `desired()` on (a held object, or a name the driver resolves to one). Refs avoid a parallel
+> name-space; that is the whole (weak) preference — a Part-3 implementation detail, not a principle.
 
 Concretely, who depends on whom:
 
