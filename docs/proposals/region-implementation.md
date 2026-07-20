@@ -275,15 +275,47 @@ Tests are rewritten to the new model as each phase lands.
 ## 6. Migration & data integrity
 
 **Prerequisite decisions.** The document-identity anchor and its knock-ons live in
-[`data-model-and-ids.md`](data-model-and-ids.md) §9. **D1 is now decided: `document_id = hash(locator)`** (the
-existing raw-archive key `sha1(url)`, normalized-locator-hashed — opaque, rename-stable, collision-free; *not*
-`slugify(title)`). Still to fix before touching code: the **file layout** (`corpus/<Region>/<Tradition>/<Title>.txt`
-vs flat by-id — a navigability/rename-churn trade only, independent of the opaque id), the **`slugify`
-transliteration** library/rules (D8 — now scoped to `region_id`/`tradition_id` only, a small closed vocabulary,
-since documents no longer slug), and the **tradition reconciliation** policy (the corpus's coarse strings —
-`Hinduism`, `West African`, `Confucianism`/`Taoism`, `Ancient Egyptian` — mapped to canonical fine-grained
-`tradition_id`s, since the current `config/traditions.json` is the *old* 12-group scheme, not the 14-region
-canon).
+[`data-model-and-ids.md`](data-model-and-ids.md) §9. **Decided:** **D1** `document_id = hash(locator)` (the
+existing raw key `sha1(url)`; opaque, rename-stable; *not* `slugify(title)`); **`region_id`/`tradition_id` = the
+canonical name** (whitespace-canonical `tradition_key`, no slug, no transliteration — `data-model` §5; **D8
+dissolved**); and the **tradition reconciliation** table (§6.1 below). **Still open:** only the **file layout**
+(`corpus/<Region>/<Tradition>/<Title>.txt` vs flat by-id — a navigability/rename-churn trade, independent of the
+opaque id).
+
+### 6.1 Tradition reconciliation (decided 2026-07)
+
+The corpus carries 22 dirty `tradition` strings across 27 books; the current `config/traditions.json` is the
+*old* 12-group scheme. Each book is repointed to a **canonical tradition** under the **14-region canon**
+(`regions.md` §5 / the 194-tradition list). The canon **is a mix** — ethnolinguistic where natural, but with
+religion-level nodes (Christian, Islamic, Jewish, Hindu, Vedic, Buddhist, Jain, Sikh, Zoroastrian) — so most
+religion strings map **directly**; only **East Asia** is religion-free, which is why the Confucian/Taoist/
+Japanese-Buddhist strings collapse to their ethnolinguistic node.
+
+| corpus `tradition` (books) | → canonical tradition | region | kind |
+|---|---|---|---|
+| Ancient Egyptian | **Egyptian** | Near East & N. Africa | rename |
+| Babylonian ×2 | Babylonian | Near East & N. Africa | direct |
+| Greek ×2, Norse, Roman, Celtic, Finnish, Anglo-Saxon | *(unchanged)* | Europe | direct |
+| Germanic (Nibelungenlied) | **Continental Germanic** | Europe | rename |
+| Chinese | Chinese | East Asia | direct |
+| Maori | Maori | Austronesia | direct |
+| Maya | Maya | Mesoamerica & the Andes | direct |
+| Christianity (KJV Bible) | **Christian** | Near East & N. Africa | religion → canon religion |
+| Islam (Koran) | **Islamic** | Near East & N. Africa | religion → canon religion |
+| Buddhism (Dhammapada) | **Buddhist** | South Asia | religion → canon religion |
+| Hinduism ×4 | **Hindu** | South Asia | religion → canon (all 4; **not** split Vedic) |
+| Confucianism (Analects) | **Chinese** | East Asia | **collapse** (no canon Confucian node) |
+| Taoism (Tao Teh King) | **Chinese** | East Asia | **collapse** |
+| Japanese Buddhism (Buddhist Psalms) | **Japanese** | East Asia | **collapse** to ethnolinguistic |
+| West African (Anansi tales) | **Akan/Ashanti** | Sub-Saharan Africa | Gold-Coast/Anansi source |
+| Polynesian (Westervelt, Māui) | **Hawaiian** | Austronesia | pan-Polynesian text; Hawaiian-dominant |
+| Australian Aboriginal (K.L. Parker) | **Euahlayi** | Papua & Aboriginal Australia | source = Euahlayi (NSW) |
+
+**Canon extension:** `Euahlayi` is **added** to the 14-region canon (Papua & Aboriginal Australia) — the
+Parker tales are specifically Euahlayi/Noongahburrah and no existing node fits. This grows that region's
+tradition list (and the 194→195 count); update `regions.md` §5 and the canon tradition list accordingly when
+the config is authored. (`Confucianism`+`Taoism`+`Chinese` collapsing to one `Chinese` node, and `Japanese
+Buddhism`→`Japanese`, are deliberate — East Asia is modelled ethnolinguistically.)
 
 **Integrity principle.** Everything under `outputs/` below `corpus/raw/` is **derived and regenerable**; the
 only sources of truth are **`corpus/raw/` (the archive), `config/`, and `sources/`**. So coherence after the

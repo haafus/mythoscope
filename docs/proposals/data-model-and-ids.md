@@ -133,17 +133,52 @@ rationale as B1.)*
 
 ## 5. Identifiers
 
-### Two ids from names via `slugify`; the document id is `hash(locator)`
+### The region/tradition id **is the canonical name**; the document id is `hash(locator)`
 
-**Region and tradition** names are **free-form display strings** — they may contain `&`, spaces, non-ASCII,
-`/`, apostrophes (`Near East & North Africa`, `Tupí/Guaraní`, `Selk'nam`). They are **not** constrained.
-Instead **one shared `slugify(name) → id`** derives a Chroma-, filesystem- and URL-safe id (transliterate
-non-ASCII, lowercase, `&`→`and`, collapse the rest to `-`). It is **total** — it always *produces* a safe id
-by construction, so there is no charset validator gate. The only build-time check is **uniqueness: fail loud
-if two distinct names slug to the same id** (verified today: the 194 traditions slug without collision). This
-replaces `normalize_catalog_id` (whitespace-only, misnamed, not fs-safe).
+**Decided: `region_id` / `tradition_id` are the canonical name itself** — no slug. The earlier plan (a
+`slugify` to a lowercase, `-`-collapsed, transliterated token) was **over-built**, because the two hard
+constraints that motivated it are gone:
 
-Two mint sites: `region_id = slugify(region name)`, `tradition_id = slugify(tradition name)`.
+- **Chroma-safe** — moot under **B1**: `tradition`/`region` are never stored on the chunk (nor in graphs or
+  projections, which key on `document_id`). The id never enters an embedding store.
+- **Filesystem-safe** — moot under **path-is-a-rendering**: on-disk paths are built by
+  `sanitize_filename(name)` (region-implementation §2.11) from the **name**, never from the id. The filesystem
+  never sees the raw id.
+
+What remains is a **weak** bar — the id only needs to be a *stable join key* and *safe in a URL parameter*. So
+the id is the name, canonicalized just enough to prevent silent join misses:
+
+```
+tradition_key(name) = " ".join( unicodedata.normalize("NFC", name).split() )   # trim + collapse whitespace
+```
+
+It **keeps case, accents, apostrophes, spaces, `&` and `/`** (`Near East & North Africa`, `Tupí/Guaraní`,
+`Akan/Ashanti`, `Selk'nam` are their own ids, verbatim). Two mint sites: `region_id = tradition_key(region
+name)`, `tradition_id = tradition_key(tradition name)`. This retires `normalize_catalog_id`; **there is no
+`slugify` and no transliteration** (dissolves D8 — see §9).
+
+**Safety lives at the boundaries, not in mangling the id** — the one invariant to hold:
+> **Never splice a raw `region_id`/`tradition_id` into a path or route.** URL use → `encodeURIComponent(id)`
+> (handles `&`, `/`, spaces); path use → `sanitize_filename(name)`. Then `&`/`/` in an id are harmless.
+
+> **⚠ Open sub-choice (A vs B) — how to treat the two structural hazards `/` and `&`.** *A (written above):*
+> `name = id` verbatim, keep `/` and `&`, rely on the boundary invariant. *B (gentle-minimal):* neutralize just
+> those two at mint — `& → and`, `/ → -` (`Akan/Ashanti → Akan-Ashanti`, `Near East & North Africa → Near East
+> and North Africa`) — keeping case/accents/apostrophes/spaces, so the id is **structurally** URL/route-safe and
+> needs no discipline for `/`/`&`. Only ~10 names carry either char. Leaning **B** (removes the footgun for ~0
+> readability cost); spaces are never a hazard either way (keep, or `→ -`, free). Pending confirmation.
+
+The **uniqueness check** still runs but is now near-vacuous: distinct canonical names are distinct ids by
+construction (unique by fiat in the curated 14 + ~194 vocabulary); it only catches a name listed twice or two
+whitespace-variants of one name. Rename = edit the config string + repoint books (cheap, validated; touches no
+Chroma, no re-embed — B1/D1).
+
+**The document id is *not* a name at all — `document_id = hash(locator)` (Decided, D1).** The locator is the
+document's upstream address (the URL, or the `sources/` path), normalized (scheme/host/trailing-slash/%-decode)
+then hashed — which is **already the raw-archive key `corpus/raw/<sha1(url)>`**, so `document_id` *is* that key,
+reused with zero new code. A hash is fixed-length, always fs/url/Chroma-safe, collision-free, and — crucially —
+**invariant under any title/tradition/region rename** (the id tracks the source, not the display string).
+Titles are free to churn and collide; the id does not. See §9-D1 for the full rationale.
 
 **The document id is *not* slugified — `document_id = hash(locator)` (Decided, D1).** The locator is the
 document's upstream address (the URL, or the `sources/` path), normalized (scheme/host/trailing-slash/%-decode)
@@ -179,16 +214,16 @@ Ids are **minted once at build and persisted** (`region_id`/`tradition_id` in th
 catalog and as the chunk's `document_id` ref). They are **not** recomputed on the fly. This matters because
 **ids are durable external keys** — Chroma PKs and graph-directory names, written with a specific value:
 
-- if `slugify` improves (region/tradition) or the locator-normalization rule changes (documents),
-  *recomputing* silently changes the id → reads miss the writes (orphaned vectors, lost graph folders).
-  *Storing* freezes the id at write time so reads always match. This is the concrete content of "populate
-  once" — it is load-bearing only because ids persist. (Note `document_id = hash(locator)` is already immune to
-  the common driver — a title/tradition rename — since the locator is unchanged; the residual risk is only a
-  change to the normalization rule itself.)
+- if the locator-normalization rule changes (documents) or the name-canonicalization rule changes
+  (region/tradition), *recomputing* silently changes the id → reads miss the writes (orphaned vectors, lost
+  graph folders). *Storing* freezes the id at write time so reads always match. This is the concrete content of
+  "populate once" — it is load-bearing only because ids persist. (`document_id = hash(locator)` is already
+  immune to the common driver — a title/tradition rename — since the locator is unchanged; and the
+  region/tradition id being the raw name means there is barely a rule to drift.)
 
-For **joins**, pass the **stored** ids; do not regenerate — especially not on the front (that would
-reimplement `slugify` in JS and diverge from Python, the same class of bug as build/serve divergence in the
-graphs path). **`slugify` lives in one place, runs once, and its output is data.**
+For **joins**, pass the **stored** ids; do not regenerate — especially not on the front (recomputing a
+canonicalization in JS could diverge from Python, the same class of bug as build/serve divergence in the graphs
+path). **The id is minted once and its output is data.**
 
 ### The chunk id is a mandatory PK with no meaningful content
 
@@ -228,8 +263,9 @@ the path to be prettier, not the reverse. Consequences:
   trade as the text tree (§6 above), never a recompute.
 - The remaining stores stay opaque by design: raw at `corpus/raw/<hash(locator)>` (an archive, not browsed for
   content) and chunks keyed by `document_id` in Chroma.
-- Path segments may use the pretty region/tradition **names** (fs-sanitized) for max readability, or the slug
-  ids — a minor sub-choice; the catalog bridges either way.
+- Path segments use the region/tradition **names**, `sanitize_filename`-cleaned, for max readability. (Since
+  the id now *is* the name, "name vs id in the path" is no longer a real sub-choice — only the fs-sanitization
+  differs; the catalog bridges either way.)
 
 **A region/tradition rename *does* touch disk — but only the cheap layer.** If the path embeds `region_id` /
 `tradition_id`, renaming or re-annotating one moves the cleaned-text folders (detect + relocate). That is
@@ -294,7 +330,7 @@ raw-archive key — so identity stops tracking the title. The deltas:
 | 0 | document identity = `text_id = slug(title)` (title-anchored, churns on rename, collides on shared titles) | `document_id = hash(locator)` (D1) — the existing raw key `corpus/raw/<sha1(url)>`; opaque, rename-stable, collision-free |
 | 1 | `text_id` is ephemeral (computed in `iterator`, in-memory, absent from `corpus.json`) | **persist** `document_id` in the catalog ("populate once") |
 | 2 | `tradition` stored raw (unsafe for paths); region has no id | give tradition & region their own **slugified ids** |
-| 3 | `normalize_catalog_id` (whitespace-only, misnamed, not fs-safe) mints the document id | retired for documents (id = `hash(locator)`); **one shared `slugify`** mints only `region_id`/`tradition_id` |
+| 3 | `normalize_catalog_id` (whitespace-only, misnamed) mints the document id | retired: documents use `hash(locator)`; `region_id`/`tradition_id` = **the canonical name** (whitespace-canonical, no slug, no transliteration) |
 | 4 | chunk carries `text_id, tradition, major_tradition, url` | chunk = **one ref** `document_id` (+ `chunk_index`); drop `tradition`/`major_tradition`/`url` (B1) |
 | 5 | graphs: build writes raw `text_id`, serve re-normalizes it (idempotent today, latent divergence; not a traversal guard) | **unify** build/serve on the stored id + a real `sanitize`+`is_relative_to` guard |
 | 6 | front reconstructs the title (`bookTitleFromId`, lossy) | resolve exact title from `docIndex[document_id]` |
@@ -312,9 +348,10 @@ chunk, or a hit loses the data with nothing to resolve it.
    (scheme/host/trailing-slash/%-decode) before hashing.
 2. Mint `region_id` / `tradition_id` in the tree (and as the document's `tradition` ref in the catalog); the
    chunk carries **no** `tradition` (B1).
-3. Write one `slugify` (transliterate/lowercase/collapse) for `region_id`/`tradition_id` **only**; retire
-   `normalize_catalog_id` (documents no longer need a name-slug — the id is `hash(locator)`); add the fail-loud
-   uniqueness check (slug-collision for region/tradition; distinct-locator for documents).
+3. `region_id`/`tradition_id` = `tradition_key(name)` (NFC + whitespace-collapse — keeps case/accents/`&`/`/`);
+   **no `slugify`, no transliteration**; retire `normalize_catalog_id` (documents use `hash(locator)`). Add the
+   fail-loud uniqueness check (name-collision for region/tradition; distinct-locator for documents) and the
+   boundary rule (never splice a raw id into a path/route — `encodeURIComponent` / `sanitize_filename`).
 4. Chunk metadata → `{document_id, chunk_index}` (B1); drop `tradition`/`url`/`major_tradition`. Change the
    `get_point` cross-tradition filter from `where {tradition != X}` to `where {document_id $nin …}` (server
    resolves the tradition's document set from the catalog).
@@ -354,12 +391,13 @@ chunk, or a hit loses the data with nothing to resolve it.
     carries. Opacity is fine — the catalog is the `id → {title, url}` lookup. Keep `sha1(url)` to avoid
     re-keying the archive; normalize the locator (scheme/host/trailing-slash/%-decode) before hashing. (Both
     slug and hash need that normalization.)
-  - *Why `slug` is fine for `tradition_id`/`region_id` but feared for `document_id`.* The fear is not the slug
-    mechanism (identical for all three) but **what the id primary-keys** × **how churny/collision-prone the
-    name is**. `document_id` primary-keys the **expensive, persisted, content-addressed** per-document
-    artifacts (chunk ids `document_id::i`, `graphs/<document_id>/`, the raw anchor), and titles churn and
-    collide → changing it re-embeds/re-graphs + orphans. `tradition_id`/`region_id` are a **tree key** on a small
-    closed **curated** vocabulary (14 + ~194, unique by fiat, renamed ~never), never stored on the chunk (B1) —
+  - *Why a name-derived id is fine for `tradition_id`/`region_id` but was feared for `document_id`.* The issue
+    is never the transform but **what the id primary-keys** × **how churny/collision-prone the name is**.
+    `document_id` primary-keys the **expensive, persisted, content-addressed** per-document artifacts (chunk ids
+    `document_id::i`, `graphs/<document_id>/`, the raw anchor), and titles churn and collide → a name-derived
+    document id re-embeds/re-graphs + orphans (hence `hash(locator)`). `tradition_id`/`region_id` are a **tree
+    key** on a small closed **curated** vocabulary (14 + ~194, unique by fiat, renamed ~never), never stored on
+    the chunk (B1) — so using the name directly (no slug) is safe;
     changing one touches only the cheap regenerable layer (the text-tree re-layout, §6; no Chroma update),
     never the expensive stores. With `document_id = hash(locator)`, those stores are shielded from *every*
     human-name rename, which is exactly what makes region/tradition/title all cheap to rename.
@@ -388,13 +426,12 @@ chunk, or a hit loses the data with nothing to resolve it.
     `alias` / `id_override` in config** (pin "treat this locator as the same identity as `<old id>`"): 99 %
     stays stateless, the rare case gets a manual knob. Prefer that escape hatch to a uuid space if the need
     ever arises.
-- **`slugify` transliteration is under-specified (D8) — but D1 shrinks it.** "Transliterate non-ASCII" needs a
-  concrete library/rules (Python has no stdlib transliteration — `unidecode` or hand rules); it is lossy and
-  can itself collide. **D1 narrows this to region/tradition names only** — documents no longer slug (id =
-  `hash(locator)`), so the surface is now a **small closed curated vocabulary** (14 regions + ~194 traditions,
-  unique by fiat), not the open-ended, growing document-title set. The fail-loud uniqueness check *detects* a
-  collision but does not *resolve* it; confirm collision-freedom over that closed set (already verified for the
-  194 traditions). Locators — the document key — need normalization, not transliteration, and are exact.
+- **~~D8 (`slugify` transliteration)~~ — DISSOLVED.** The former open question (which transliteration
+  library/rules for the slug) no longer exists: **there is no slug.** `document_id = hash(locator)` (D1) never
+  slugged, and `region_id`/`tradition_id` are now the **canonical name itself** (`tradition_key` = NFC +
+  whitespace-collapse), which keeps accents rather than transliterating them. Nothing to decide. The only
+  residual check is the near-vacuous name-uniqueness over the closed 14 + ~194 vocabulary (verified: the 194
+  names are already distinct as-is). Locators need normalization, not transliteration, and are exact.
 - **B1 depends on the server resolving `tradition ↔ documents` for the cross-tradition filter.** `get_point`
   must load (or cache) the catalog server-side to build the `document_id $nin` set. Cheap (an in-memory map,
   small lists), but it is the one new server-side dependency B1 introduces; a re-annotation is then picked up
