@@ -169,13 +169,21 @@ still folded in); `embeddings:<variant>` and `graphs` both `→ [corpus]`; `proj
 `parallels → [crosswalk, sources]`, `semantic → [sources]`. The factory is the single, explicit home of this
 topology — not duplicated anywhere, the opposite of the rotting external inspector.
 
-**Fetch is the one edge still folded in.** Today `corpus` both downloads the raw (`fetch_to_cache` /
-`sources/` copy) *and* cleans it, so it has no upstream stage. But fetch is a different animal — **network,
-non-deterministic, archival** — from the pure offline build (§5). Part 2 item 4 splits it into its own upstream
-stage `fetch` (key = `document_id`; `desired()` = one key per book in `config/corpus.json`; `actual()` = what's
-present in `corpus/raw/<sha1(url)>`; `build(docs)` = download/copy the raw). Then `corpus.inputs() = [fetch]`
-and corpus stops touching the network. That split is also what cleanly separates `--force` (rebuild derived
-from raw) from `refresh` (re-fetch upstream) — §5, §6.5. Until it lands, treat `corpus` as fetch+build in one.
+**Fetch is the one step still bundled in.** Right now the `corpus` stage does two different jobs at once: it
+**downloads** each book's raw file (from a web address, or copies it from a local `sources/` folder) *and then*
+**cleans** that text into the readable form. Because it downloads its own inputs, it doesn't depend on any
+earlier stage — that's why `corpus.inputs()` is empty.
+
+But downloading is a different *kind* of work from building. Downloading hits the network: it's slow, it can
+fail, and its result is an archive you want to keep forever. Building is pure and offline — from the same raw
+files it always produces the same output. Bundling the two means you can't rebuild without risking a
+re-download.
+
+So Part 2 (item 4) pulls fetch out into its own stage that sits *above* corpus. Fetch's only job is to get each
+book's raw file and drop it in the archive folder (`corpus/raw/`), one per book listed in the config. After
+that, `corpus` depends on fetch, reads the already-downloaded raw, and never touches the network itself. This
+split is also what lets `--force` mean "rebuild from the raw I already have" while a separate `refresh` means
+"go download fresh from the web" — today the single corpus command muddles both (§5).
 
 **Atomisation of the current blocks.** "Atomise" = split each code module into the smallest
 independently-buildable **stages**, so that within one stage *every artifact is keyed the same way*. A **key**
