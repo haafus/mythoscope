@@ -123,11 +123,13 @@ list. Interface (validated against the real stages):
 
 ```python
 class Stage:
+    store: Store                             # WHICH backend its artifact lives in (ChromaStore/FileStore) — for L2 GC, §2.7
+    id: str                                  # this stage's id in that store (collection name / path) — from config, §2.7
     def inputs(self) -> list[Stage]: ...    # upstream STAGES → topological order + wiring
     def desired(self) -> dict[key, fp]: ...  # what SHOULD exist + the fp each should have (config + inputs)
     def actual(self)  -> dict[key, fp]: ...  # what IS built (artifact + its fp sidecar both present) → its stored fp
     def build(self, keys: set) -> None: ...  # BATCHED — the stage owns GPU batching / the pool
-    def delete(self, keys: set) -> None: ...
+    def delete(self, keys: set) -> None: ...  # L1: drop these keys WITHIN its store (rows/files); ≠ Store.delete(id) which drops a whole store (L2, §2.7)
 ```
 
 The two maps are the **same shape** (`{key → fp}`) and named by the *state* they describe, not an action:
