@@ -779,6 +779,19 @@ None of it blocks shipping Part 1. Each item references its (already-decided) Dx
    **`--force` = rebuild derived from raw**; **`refresh` = re-fetch upstream** (today corpus conflates them).
 5. Graphs build/serve unify + traversal guard (isolated bug; also in Part 1 §5 step 6 — do wherever first).
 
+**Migration story — Part 2 does NOT re-fetch, and needs no rebuild-from-raw.** The one re-fetch happens once, in
+Part 1's migration (region §6); the raw archive is already in its blake2b form and Part 2 touches neither the raw
+keys nor the sources. Part 2 changes the **staleness-decision** machinery, not artifact **content** (vectors,
+graphs, text are unchanged), so its transition is only to give the Part-1 artifacts the `fingerprint`s they lack:
+
+- **land Part 1 + Part 2 together** → the single Part-1 rebuild writes the fingerprints from the start → **no
+  separate Part-2 migration at all**;
+- **land Part 2 after Part 1** → a **metadata-only backfill** (no network / GPU / LLM): compute the per-doc
+  `fingerprint` from the on-disk `.txt` into the catalog; add each chunk's `fingerprint` via a Chroma
+  **metadata update** (no re-encode); write each graph's `.fp`. Or, if you skip the backfill, the first plain
+  `build` sees "no fingerprint" everywhere and **re-embeds once** (GPU, still no network) — acceptable at ~27
+  docs, avoidable via the backfill. **Either way there is never a second re-fetch.**
+
 *(D3 decided — keep the full UMAP refit, no parametric work — §9.2.)*
 
 ### Implementation order — **Part 3 of 4: the stage-protocol refactor** (big; deferred; consumes Part 2's base)
