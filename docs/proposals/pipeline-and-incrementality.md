@@ -818,7 +818,12 @@ fp graph).
 3. (D6 decided — build-your-own.) Re-evaluate **DVC/Dagster** only if one of §9.1's explicit triggers fires
    (remote store / lineage / walk cost); the driver already *is* build-your-own, so this is "when to switch,"
    not "what to build now."
-4. **Rewire `export_bundle.py` onto the driver** — it is the one *other* consumer of the retired
+4. **Optional `scope` on `status`/`build`/`clean`** — a **stage** (`embeddings`) or **variant**
+   (`embeddings:bge-m3`) token, matched by prefix over `stages()` (`id == token or id.startswith(token + ":")`).
+   Not needed for correctness (full incrementality already rebuilds exactly the stale set) — it is the rare
+   manual escape for **deferring an expensive stage** or a **scoped `--force`**. Separator `:` (uniform across
+   filesystem and Chroma stores). No key-level / `--doc` / wildcard. Ships thin or last.
+5. **Rewire `export_bundle.py` onto the driver** — it is the one *other* consumer of the retired
    `pipeline_inspect`. Today `orphan_summary()` imports `corpus_orphans` / `embeddings_orphan_chunks` /
    `embeddings_orphan_collections` / `projections_orphans` / `graphs_orphans` (`export_bundle.py:27–35`) and
    `_is_cache` hardcodes the cache filenames (`export_bundle.py:41,60`). Retiring `pipeline_inspect` **breaks
@@ -832,7 +837,7 @@ carry. It is affected at every part, but only Part 3 *breaks* it:
 |---|---|
 | **Part 1** | layout changes (`corpus/<Region>/…`, `graphs/<document_id>/`, blake2b raw) are **auto-absorbed** — export `rglob`s each dir. **Decided:** `corpus/raw/` is a **cache, not a product — exclude it** (extend `_is_cache` to `corpus/raw/**`, matching `motifs/raw`, `export_bundle.py:62`). The bundle ships the cleaned corpus + derived artifacts; raw is rebuild-fuel, re-fetchable via `refresh`. |
 | **Part 2** | **`.fp` sidecars ride along automatically** (`rglob`, not treated as cache) — **required for a coherent bundle** (else the target's first `status` sees no fingerprints → all stale). **New:** exclude `*.partial` / `*.tmp` (the atomic-write staging, item 3) so staging junk never travels. |
-| **Part 3** | **breaks the `pipeline_inspect` imports → item 4 above** (rewire `orphan_summary` + cache-exclusion onto the driver). |
+| **Part 3** | **breaks the `pipeline_inspect` imports → item 5 above** (rewire `orphan_summary` + cache-exclusion onto the driver). |
 | **motifs** | `.partial` staging covered by Part 2's temp-exclusion; `.absent` markers already sit under the excluded `motifs/raw`. |
 
 Principle: **a bundle must carry each artifact together with its fingerprint** so the target's `status` reads
