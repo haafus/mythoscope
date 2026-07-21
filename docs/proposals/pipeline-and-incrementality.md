@@ -815,6 +815,15 @@ fp graph).
    (remote store / lineage / walk cost); the driver already *is* build-your-own, so this is "when to switch,"
    not "what to build now."
 
+**Migration story — Part 3 needs no data migration; it is code-only.** It changes *how the pipeline is
+orchestrated* (a generic driver over self-describing stages), not artifact content, fingerprints, or their
+location: the fingerprints are already on disk in the shape Part 3's `actual()` reads (Part 2 wrote them; the
+formula is unchanged, so the values match), and atomisation is a code split — the Chroma collections,
+`projections/*/`, `graphs/`, and the `corpus/` tree stay put; `store`/`id` merely *name* them. So no re-fetch, no
+re-embed, no re-LLM, no artifact move. The only possible one-time cost: any artifact Part 2 did not fingerprint
+(e.g. projections, motif sub-steps if out of Part 2's scope) is recomputed once on the first driver run — cheap
+(UMAP refit / motif reassembly, no network, not GPU-dominant), and avoidable if Part 2 fingerprinted it.
+
 ### Implementation order — **Part 4 of 4: manual text curation** (editorial; independent; last)
 
 Hand-fixing a document's text (OCR typo, an interleaved note the markers can't catch) as an **override layer**
@@ -825,6 +834,23 @@ rebuilds incremental, so it goes last.
    `curate` materialises the current curated text, the curator edits it, `curate --save` snapshots
    `difflib(base, edited)` + stamps the base-fingerprint; build applies the patch (`git apply`) — §6.2–§6.4.
    Prerequisite: the fetch/build split + `refresh` (Part 2 item 4).
+
+**Migration story — Part 4 is additive; it touches no existing artifact.** It only *adds* `overrides/*.patch`
+files; existing raw, text, embeddings, and graphs are unchanged. Applying a new patch re-derives that one
+document on the next build (cheap, offline). No re-fetch, no bulk re-embed.
+
+### Migration cost across the four parts
+
+**All the heavy work — the one re-fetch and the one full rebuild — is Part 1. Nothing after it re-fetches or
+bulk-re-embeds.** (Rows are *incremental* cost if the parts land in sequence; landing Part 1+2 together folds
+Part 2's backfill into Part 1's rebuild.)
+
+| part | network (re-fetch) | GPU (re-embed) | LLM (graphs) | what the transition actually is |
+|---|---|---|---|---|
+| **Part 1** | **once** | full | full | the heavy migration: re-key raw `sha1→blake2b` **by re-fetch**, then full rebuild (region §6) |
+| **Part 2** | — | — (backfill) / once if lazy | — | **metadata-only** fingerprint backfill onto Part-1 artifacts |
+| **Part 3** | — | — (rare one-off*) | — | **code-only** refactor; reads Part 2's fingerprints (*maybe a one-off refit of un-fingerprinted projections/motifs) |
+| **Part 4** | — | — | — (per edited doc) | **additive**: new `overrides/*.patch`; re-derives only the edited document |
 
 D1 is decided — `document_id = hash(locator)` — and **D8 is dissolved**, so Part 1 is fully unblocked. Decided
 since: **D2** (doc-level `fingerprint` = `blake2b`), **D3** (full refit), **D4** (uniform param-hash + manual `algo_version`), **D5**
