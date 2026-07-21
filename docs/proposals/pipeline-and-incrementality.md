@@ -179,10 +179,16 @@ Concretely, who depends on whom:
 - each **embeddings** stage, and **graphs**, depend on **corpus** — they read its cleaned texts.
 - each **projection** depends on the embeddings of *its own model* — it reduces those vectors to a 2-D layout.
 - inside **motifs**: the source stages depend on nothing (they scrape external sites); the **crosswalk** depends
-  on the sources; the **parallels** depend on the crosswalk and the sources; the **semantic** layer is a
-  **copy-in** of the committed, precomputed BGE-M3 file (`scripts/build_semantic_parallels.py`, run offline) — so
-  it depends on *that committed artifact*, **not** on the live sources: its `desired()` fp is the committed
-  file's hash, and `build()` copies the file (it never re-runs BGE-M3 in the pipeline).
+  on the sources; the **parallels** depend on the crosswalk and the sources; the **semantic** layer **also
+  depends on the sources** (the source motifs — *not* on corpus documents). That dependency is **real and
+  permanent**. What is *temporary* is only how `build()` is implemented: the semantic step is a GPU BGE-M3 pass
+  that is expensive and non-deterministic in-build, so — exactly like fetch for corpus (§5) — it is **currently
+  pulled out to a manual offline step** (`scripts/build_semantic_parallels.py`, run + committed by hand) and the
+  pipeline **copies the committed result**. In this copy-in mode the source→semantic edge is *mediated* by that
+  manual regen: `desired()` keys on the committed file, and a source change is adopted only after an offline
+  re-run + commit (the deliberate-manual pattern of §5 — not a spurious in-build rebuild). **Drop the shortcut
+  and `motifs:semantic` becomes an ordinary source-dependent stage**: `build()` re-runs BGE-M3, `desired()` folds
+  the sources + model version, a source change re-runs it — the same shape as graphs.
 
 This whole map of who-feeds-whom lives in **one** place — the factory — instead of being re-derived in an
 external checker that drifts.
@@ -231,7 +237,7 @@ A module's `stages()` may return one stage or several (e.g. one per embedding va
 | **`embeddings:<variant>`** | one **per variant** in `models.json` | `document_id` | each variant is its own Chroma collection → its own stage. `build({docs})` chunks those docs and **GPU-batches** the encode; the per-chunk rows share one per-doc `doc_md5` (D2), so the unit is the document, not the chunk. |
 | **`projections:<model>:<plot>`** | one **per (model × plot)** — `plot` = the reduction/chart kind (umap/tsne/pca…), a code constant | **singleton** | the reduction runs over **all** of a model's points to emit one `<model>/<plot>.json` — it can't be built "per document," so its whole output is a single key; `build` = full refit (D3). |
 | **`graphs`** | 1 | `document_id` | one knowledge-graph per document; `build({docs})` assembles them. The expensive per-chunk LLM step keeps its own **internal** `chunk_hash` cache (a resumable GC tier, §3) — deliberately *not* a driver stage, else a content-addressed key drags in orphan-GC + refcounting. |
-| **`motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic`** | several | **singleton** each | motifs is a mini-pipeline; each step emits one artifact. Atomising it makes the internal order explicit via `inputs()` (crosswalk depends on the sources, parallels on the crosswalk, …) — which the current monolithic `build_motifs` hides. **`motifs:semantic` is a copy-in**: its `desired()` keys on the committed precomputed BGE-M3 file's hash (**not** the sources), and `build()` copies it — never re-runs the GPU step. |
+| **`motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic`** | several | **singleton** each | motifs is a mini-pipeline; each step emits one artifact. Atomising it makes the internal order explicit via `inputs()` (crosswalk depends on the sources, parallels on the crosswalk, …) — which the current monolithic `build_motifs` hides. **`motifs:semantic` depends on the sources** (source motifs, not corpus), but its GPU BGE-M3 step is **temporarily offline + committed** (§5-style deliberate-manual): `build()` copies the committed file and `desired()` keys on it, so a source change is adopted only via an offline re-run + commit. Drop the shortcut → a normal source-dependent stage (`build()` re-runs BGE-M3, `desired()` folds the sources). |
 
 So after atomisation **every stage has a single key shape** (per-doc or singleton) → the `Stage` *is* the family
 and no `ArtifactFamily` wrapper is needed. Bonus: adding an embedding variant, a projection method, or a motif
