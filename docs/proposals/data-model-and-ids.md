@@ -93,7 +93,7 @@ responses).
 
 **`tradition` is not stored on the chunk at all (B1).** Two candidate justifications both fall away:
 
-- *1-hop `chunk→region/color` resolve* — **does not survive §2.8**: the front loads the tree *and* the
+- *1-hop `chunk→region/color` resolve* — **does not survive the one-global-load decision (region-implementation §2.8)**: the front loads the tree *and* the
   catalog once globally, so region/color are reached from `document_id → docIndex → tradition → treeIndex` for
   free (one extra Map lookup). Nothing needs `tradition` inlined on the front (the scatter, hits, atlas all
   resolve from `document_id`).
@@ -126,7 +126,7 @@ Denormalization belongs **not in Chroma chunk metadata**, but in two places:
 title / region / **color**. The front resolves tradition (→ region → color) from `id` via `docIndex` +
 `treeIndex` at render, so a palette swap, a region re-annotation, or a **tradition rename never touches the
 projection** (`document_id` is invariant). *(The current code inlines `tradition` because the embeddings page
-loads only the tree, not the catalog; under §2.8 that inline is a pre-target crutch and is dropped — same
+loads only the tree, not the catalog; under the one-global-load target (region-implementation §2.8) that inline is a pre-target crutch and is dropped — same
 rationale as B1.)*
 
 ---
@@ -479,7 +479,7 @@ Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline
     **zero data migration**, whereas store-on-chunk couples the feature's on/off to a Chroma backfill/strip. So
     B1 is precisely the design that respects the feature's provisional status.
 - **The front resolves title/url/tradition from `docIndex`, so the embeddings/search pages must load the full
-  catalog** (§2.8). Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url,
+  catalog** (region-implementation §2.8). Fine at book scale; if the catalog grows large, prefer a lean `id → {title, url,
   tradition}` projection over shipping every per-document field. Not urgent.
 - **Proportionality.** This is a spec for a corpus of ~27 documents. The single high-value, low-cost change is
   making the chunk carry only `document_id` (B1) and dropping `tradition`/`url`/`major_tradition`; the rest is

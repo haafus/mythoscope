@@ -19,17 +19,17 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 | # | stage | inputs | artifacts (`outputs/`) | caches | cost |
 |---|---|---|---|---|---|
 | 0 | **config** (hand-authored) | `config/corpus.json` (title, tradition, url, content_start/end, exclude), `config/traditions.json` (tree), `config/models.json`, `config/prompts.json`, `sources/` | — | — | — |
-| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<blake2b(url)>` (raw snapshot; `blake2b(url) = document_id`, D1), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (blake2b url), extraction | network (~s/doc); clean/trim CPU-cheap |
-| 1.5 | **Preprocess** (variant, optional) | cleaned text + variant config | `preprocessed/…` | preprocessing | **always an LLM transform when present** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited**. There is no cheap preprocess: a variant either enables it (LLM) or skips it entirely (embeds the base cleaned text) |
+| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<hash(locator)>` raw snapshot (**today `sha1(url)`; D1 target `blake2b(normalized-locator)` = `document_id`**), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + md5) | raw-fetch (locator hash), extraction | network (~s/doc); clean/trim CPU-cheap |
+| 1.5 | **Preprocess** (variant, optional) | cleaned text + variant config | *(no first-class artifact — an internal step of the embeddings variant)* | preprocessing (**resumable cache**) | **always an LLM transform when present** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited**. **Not a separate driver stage** — it is folded into `embeddings:<variant>` (§2.2) as a resumable cache tier (§3); a variant either enables it (LLM) or skips it (embeds the base cleaned text) |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
-| 3 | **Projections** | vectors (embeddings) + method | `projections/<model>/<method>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
+| 3 | **Projections** | vectors (embeddings) + plot | `projections/<model>/<plot>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
 | 4 | **Graphs** | cleaned text + prompts.json + LLM | `graphs/<document_id>/…` (`document_id = hash(locator)`, D1) | chunk-cache (LLM responses) | **LLM — $$, rate-limited**; per-chunk |
 | 5 | **Motifs** (a 5-step sub-pipeline) | motif sources (TMI/ATU/Berezkin) | `motifs/*.json` | motif raw-scrape | scrape sources → crosswalk → inline relations → lexical parallels → semantic/reasoned parallels → store. **Independent** of the corpus. CPU-moderate **only because** the one GPU part — BGE-M3 *semantic* parallels — is **precomputed offline** (`scripts/build_semantic_parallels.py`) + committed, and the build just copies it |
 | S | **Serve** | traditions.json + corpus.json + embeddings + projections + graphs + motifs | (runtime) | front load-once indexes | — |
 
 **No separate `download`/`fetch` stage** — network fetch is folded *inside* Corpus (`corpus` = "Download and
 build") and Motifs (`build_motifs` scrapes/downloads its sources), cached by `sha1(url)` / raw-scrape. §5
-(fetch-vs-build) is exactly the proposal to split it into a first-class stage (Part 2 item 6).
+(fetch-vs-build) is exactly the proposal to split it into a first-class stage (Part 2 item 4).
 
 ### 1.2 Dependency DAG
 
@@ -37,7 +37,7 @@ build") and Motifs (`build_motifs` scrapes/downloads its sources), cached by `sh
 config/corpus.json ─┐
 sources/           ─┼─► raw ─► clean/trim ─► [text .txt] ─► corpus.json (catalog)
 config/traditions ──┘                          │
-(serve-time only: color/tree/grouping)         ├─► preprocess ─► EMBEDDINGS ─► PROJECTIONS (global per model)
+(serve-time only: color/tree/grouping)         ├─► [preprocess: internal to embeddings] ─► EMBEDDINGS ─► PROJECTIONS (global per model)
                                                └─► + prompts.json ─► GRAPHS (per doc)
 motif sources ───────────────────────────────────────────────► MOTIFS (independent branch)
 ```
@@ -123,13 +123,15 @@ list. Interface (validated against the real stages):
 
 ```python
 class Stage:
-    store: Store                             # WHICH backend its artifact lives in (ChromaStore/FileStore) — for L2 GC, §2.7
-    id: str                                  # this stage's id in that store (collection name / path) — from config, §2.7
+    # store/id are CLASS-level and only on fan-out / singleton stages (embeddings, projections, motifs), for L2 GC (§2.7).
+    # Per-document stages (corpus, graphs) set store = None and rely wholly on L1 (their per-doc desired/actual).
+    store: Store | None = None               # WHICH backend its artifact lives in — a *shared* ChromaStore/FileStore (§2.7)
+    id: str                                  # this stage's id in that store (collection name / relative path) — from config (§2.7)
     def inputs(self) -> list[Stage]: ...    # upstream STAGES → topological order + wiring
     def desired(self) -> dict[key, fp]: ...  # what SHOULD exist + the fp each should have (config + inputs)
     def actual(self)  -> dict[key, fp]: ...  # what IS built (artifact + its fp sidecar both present) → its stored fp
     def build(self, keys: set) -> None: ...  # BATCHED — the stage owns GPU batching / the pool
-    def delete(self, keys: set) -> None: ...  # L1: drop these keys WITHIN its store (rows/files); ≠ Store.delete(id) which drops a whole store (L2, §2.7)
+    def delete(self, keys: set) -> None: ...  # L1: drop these KEYS within its own store (chunk rows / doc files) — ≠ Store.delete(id), which drops one whole fan-out artifact (a collection/file), L2 §2.7
 ```
 
 The two maps are the **same shape** (`{key → fp}`) and named by the *state* they describe, not an action:
@@ -145,7 +147,8 @@ folds in its inputs' target fps. So a dependent builds *its* `desired()` by *loo
 in its inputs' `desired()` maps — no recursion, no recompute; topological order means an input's map is ready
 first. Example (`corpus → embeddings`, "Iliad"): corpus's `desired()` is `{"iliad": "abc", …}`, so embeddings'
 `desired()["iliad"] = hash("abc" + model + version)`. Fan-in is the same shape — a projection's single entry is
-`hash(⊕ embeddings:M.desired().values() + method_v)`. If corpus's text changes, its `"iliad"` fp changes →
+`hash(⊕ embeddings:M.desired().values() + plot_v)`, where `⊕` folds the `desired()` entries **sorted by key**
+(a defined order → the fp is deterministic across runs). If corpus's text changes, its `"iliad"` fp changes →
 embeddings' does too → embeddings is stale (its `desired` ≠ its `actual`).
 
 **Wiring** is a small `build_pipeline()` factory that constructs the stages and passes each its upstream as
@@ -157,8 +160,8 @@ def build_pipeline(config) -> list[Stage]:
     corpus = CorpusStage()
     emb = {v.model: EmbeddingsStage(variant=v, corpus=corpus) for v in config.embedding_variants}
     return [corpus, GraphsStage(corpus=corpus), *emb.values(),
-            *(ProjectionStage(model=m, plot=p, embeddings=emb[m]) for m, p in config.projection_plots),
-            *motif_stages(config)]
+            *(ProjectionStage(model=m, plot=p, embeddings=emb[m]) for m in emb for p in PROJECTION_PLOTS),
+            *motif_stages(config)]   # PROJECTION_PLOTS: code constants (umap/tsne/pca…); models: from config
 ```
 
 > **Refs vs names is *not* load-bearing.** Object refs (above) and string-name `inputs()` resolved by the
@@ -176,8 +179,10 @@ Concretely, who depends on whom:
 - each **embeddings** stage, and **graphs**, depend on **corpus** — they read its cleaned texts.
 - each **projection** depends on the embeddings of *its own model* — it reduces those vectors to a 2-D layout.
 - inside **motifs**: the source stages depend on nothing (they scrape external sites); the **crosswalk** depends
-  on the sources; the **parallels** depend on the crosswalk and the sources; the **semantic** layer depends on
-  the sources.
+  on the sources; the **parallels** depend on the crosswalk and the sources; the **semantic** layer is a
+  **copy-in** of the committed, precomputed BGE-M3 file (`scripts/build_semantic_parallels.py`, run offline) — so
+  it depends on *that committed artifact*, **not** on the live sources: its `desired()` fp is the committed
+  file's hash, and `build()` copies the file (it never re-runs BGE-M3 in the pipeline).
 
 This whole map of who-feeds-whom lives in **one** place — the factory — instead of being re-derived in an
 external checker that drifts.
@@ -185,9 +190,9 @@ external checker that drifts.
 **Fan-out — one stage per config entry.** Some blocks are a single stage; others produce a *variable* number,
 driven by config. `corpus` and `graphs` are one stage each. **Embeddings is one stage per embedding model**
 listed in `config/models.json` — three models means three stages, all reading the same corpus. **Projections
-fan out further** — one stage per (model × chart type), each wired to the embeddings of its own model. Motifs
+fan out further** — one stage per (model × **plot**), each wired to the embeddings of its own model. Motifs
 is a fixed handful. The fan-out is nothing clever: it's a loop in the factory over the models in the config
-(the projection *chart types* are code constants, not config) that makes one stage object per entry. Add a
+(the projection **plots** — the reduction/chart kinds — are code constants, not config) that makes one stage object per entry. Add a
 model to the config and a new stage appears on the next build (its
 whole collection is "missing", so it embeds all the books just for that model, leaving the others alone);
 remove a model and its stage — and its now-orphaned collection — is cleaned.
@@ -213,7 +218,7 @@ independently-buildable **stages**, so that within one stage *every artifact is 
 is the identity of one buildable/checkable item inside a stage, derived from config — it comes in two shapes:
 
 - **`document_id`** — the stage has **one artifact per document**, so it has *many* keys, one per book listed in
-  `config/corpus.json` (`document_id = hash(url)`). Build and staleness are decided per document
+  `config/corpus.json` (`document_id = hash(locator)`). Build and staleness are decided per document
   (`build({doc_ids})`, `actual() -> {document_id: fp}`).
 - **singleton** — the stage produces **one artifact total** (a *global reduce* over all its inputs), so it has
   exactly one key; `build` regenerates the whole thing.
@@ -224,9 +229,9 @@ A module's `stages()` may return one stage or several (e.g. one per embedding va
 |---|---|---|---|
 | **`corpus`** | 1 | `document_id` | fetch→clean→trim→write one `.txt` per document. `corpus.json` (the catalog) is **not** a second stage — it is *where this stage stores* each doc's metadata + fp, i.e. its sidecar, which `actual()` reads. |
 | **`embeddings:<variant>`** | one **per variant** in `models.json` | `document_id` | each variant is its own Chroma collection → its own stage. `build({docs})` chunks those docs and **GPU-batches** the encode; the per-chunk rows share one per-doc `doc_md5` (D2), so the unit is the document, not the chunk. |
-| **`projections:<model>:<plot>`** | one **per (model × plot × method)** | **singleton** | UMAP/heatmap/distribution run over **all** of a model's points to emit one file — it can't be built "per document," so its whole output is a single key; `build` = full refit (D3). |
+| **`projections:<model>:<plot>`** | one **per (model × plot)** — `plot` = the reduction/chart kind (umap/tsne/pca…), a code constant | **singleton** | the reduction runs over **all** of a model's points to emit one `<model>/<plot>.json` — it can't be built "per document," so its whole output is a single key; `build` = full refit (D3). |
 | **`graphs`** | 1 | `document_id` | one knowledge-graph per document; `build({docs})` assembles them. The expensive per-chunk LLM step keeps its own **internal** `chunk_hash` cache (a resumable GC tier, §3) — deliberately *not* a driver stage, else a content-addressed key drags in orphan-GC + refcounting. |
-| **`motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic`** | several | **singleton** each | motifs is a mini-pipeline; each step emits one artifact. Atomising it makes the internal order explicit via `inputs()` (crosswalk depends on the sources, parallels on the crosswalk, …) — which the current monolithic `build_motifs` hides. |
+| **`motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic`** | several | **singleton** each | motifs is a mini-pipeline; each step emits one artifact. Atomising it makes the internal order explicit via `inputs()` (crosswalk depends on the sources, parallels on the crosswalk, …) — which the current monolithic `build_motifs` hides. **`motifs:semantic` is a copy-in**: its `desired()` keys on the committed precomputed BGE-M3 file's hash (**not** the sources), and `build()` copies it — never re-runs the GPU step. |
 
 So after atomisation **every stage has a single key shape** (per-doc or singleton) → the `Stage` *is* the family
 and no `ArtifactFamily` wrapper is needed. Bonus: adding an embedding variant, a projection method, or a motif
@@ -293,8 +298,8 @@ Granularity per stage:
 | artifact | fp key | granularity |
 |---|---|---|
 | document text | `hash(raw_bytes + content_start/end + patch + clean_v)` | document |
-| **chunk embedding** | **(document_id, doc_md5, model, preprocess_v)** — content version is **doc-level** (D2) | **per-doc decision** (a text edit re-embeds all the doc's chunks) — fixes both flaws of §1.4 |
-| projection | `hash(⊕ that model's embeddings `desired()` values + method_v)` (per-doc fps, D2 — not per-chunk) | **global per (model, method)** — UMAP is indivisible |
+| **chunk embedding** | **(document_id, doc_md5, model, transform_v)** — content version is **doc-level** `doc_md5` (D2); `transform_v` is the stage's full `transform_version` (§2.5) and **covers `chunk_size`/`overlap`, the pinned model lib, and the preprocess prompt** — so a chunk-param change re-embeds | **per-doc decision** (a text edit re-embeds all the doc's chunks) — fixes both flaws of §1.4 |
+| projection | `hash(⊕ that model's embeddings `desired()` values + plot_v)` — `⊕` = a fold over `desired()` entries **sorted by key** (deterministic; per-doc fps, D2 — not per-chunk) | **global per (model, plot)** — UMAP is indivisible |
 | graph | `hash(text fp + prompt_v + llm_model)` | **document** (per-chunk LLM cache is internal) |
 | serve-resolve (tree + colour, incl. per-tradition shade) | — | **not an artifact** — region colour *and* its derived per-tradition OKLCH shade (regions.md §8.1) are computed at runtime → tree/colour edits are free |
 
@@ -370,7 +375,7 @@ in topological order (stage.inputs()); d = stage.desired(); a = stage.actual():
 ```
 
 A rebuilt node gets a new fp → it is an input to its dependents → they see a changed input fp → they rebuild.
-The projection is the special node (`fp = hash(⊕ its model's per-doc embedding fps + method_v)`): **any**
+The projection is the special node (`fp = hash(⊕ its model's per-doc embedding fps + plot_v)`, `⊕` sorted by key): **any**
 document change → whole projection rebuilds (inherent to global UMAP).
 
 ### 2.7 Deletions — `actual − desired`
@@ -547,13 +552,16 @@ This matches the existing `clean` flags (`--caches`, `--apply`).
 
 ## 4. The embeddings key — the concrete payoff
 
-The single highest-value change. Replace "skip if `chunk_id` exists" with a two-part key:
+The single highest-value change. Replace "skip if `chunk_id` exists" with a **positional id + a stored
+version-fp**, compared (not a content-keyed tuple checked by set-membership — that would strand old rows, the
+very orphan problem positional ids avoid, below):
 
 ```
-re-embed a chunk  ⇔  (stable_id, content_md5, model, preprocess_version)  not already present
+chunk id  =  document_id::chunk_index          # positional PK — UPSERTED, never content-keyed
+re-embed a chunk  ⇔  its stored version-fp  ≠  hash(doc_md5, model, transform_version)   # else skip
 ```
 
-- **stable_id** — the rename-stable `document_id` anchor, **decided as `hash(locator)`** (`data-model-and-ids.md`
+- **document_id** — the rename-stable anchor, **decided as `hash(locator)`** (`data-model-and-ids.md`
   §9-D1). Because the id tracks the upstream locator, not the title, a rename leaves the key unchanged and this
   cache correctly skips the re-embed — flaw 1 is fixed. (The rejected `slugify(title)` anchor would *not* have
   fixed rename-churn; flaw 1 would have stayed. That risk is now closed.)
@@ -740,7 +748,7 @@ protocol/driver of §2.2 is the later **Part 3** generalisation of it.)
 existing stages* — no protocol refactor yet. It **prepares the base** (the fp sidecars) that Part 3 later
 harvests, so it must write each fp in the shape Part 3's `actual()` will read it back — `blake2b`, stored per
 doc in the `corpus.json` row / per collection in Chroma metadata / `graphs/<id>/.fp` — or Part 3 reworks it.
-None of it blocks shipping Part 1. Sub-decisions flagged *(decide Dx)*; full list in §9.5.
+None of it blocks shipping Part 1. Each item references its (already-decided) Dx; full list in §9.5.
 
 1. **Embeddings content-fp staleness gate** — replace the id-existence dedup with `(document_id, doc_md5,
    model, ver)`; store `doc_md5` **once per doc in the catalog** (D2, §2.3), embeddings reads it. Fixes the
@@ -764,7 +772,8 @@ the fp sidecars Part 2 laid, and presupposes Part 1 (content-fp dedup, `document
 fp graph).
 
 1. Atomise the blocks per §2.2's table (`corpus`, `embeddings:<variant>`, `projections:<model>:<plot>`,
-   `graphs`, `motifs:*`); implement `inputs/desired/actual/build(keys)/delete` on each.
+   `graphs`, `motifs:*`); implement `inputs/desired/actual/build(keys)/delete` on each, and declare `store` +
+   `id` on the fan-out/singleton stages (per-doc `corpus`/`graphs` set `store = None`) for the level-2 reaper (§2.7).
 2. The generic driver over `stages()`; **retire `pipeline_inspect`'s per-key scans into each stage's
    `desired()`/`actual()` (level-1 orphans), but *port* its store-level scans — `embeddings_orphan_collections`
    and the `projections/*/` listing — as the driver's level-2 pass (store-vs-live-stages, §2.7): they catch a

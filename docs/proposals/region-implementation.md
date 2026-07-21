@@ -28,7 +28,7 @@ Grounded in the three field audits ([`../reviews/archive/tradition-review.md`](.
 The live axis is still `tradition` (free string) → `major_tradition` (derived) → `colour` (random); `region`
 is not wired in.
 
-- **Free-string identity & join.** Books hold a hand-written `tradition` string (`config/corpus.json`, 28
+- **Free-string identity & join.** Books hold a hand-written `tradition` string (`config/corpus.json`, 27
   books) joined to `config/traditions.json` by exact string equality — no validation. Misses degrade
   **silently**: `builder.py:210` → `""`; `services/corpus.py:25-26` → `{}` then colour `"#6b7280"`. Strings
   are dirty (`"Australian"` vs `"Australian Aboriginal"`).
@@ -155,12 +155,15 @@ one of the 14 canon names — otherwise the build fails. Replaces the silent `.g
 `{document_id, chunk_index}` — **no** `tradition`, `major_tradition`, `region`, `url`, or `colour`. Everything
 else is resolved from `document_id` at query time: `document_id → document` gives `tradition`/`url`/title (via
 the catalog), and `tradition → region → colour` follows the tree. New builds stop writing
-`tradition`/`major_tradition`/`region` into chunk metadata; existing chunks keep their stale fields (ignored,
-gone on the next natural rebuild) — nothing is re-embedded. Nothing name-derived is baked in: tradition,
+`tradition`/`major_tradition`/`region` into chunk metadata. **Dropping those fields on its own forces no
+re-embed** (they are metadata, not vectors — existing chunks keep the stale fields, ignored, gone on the next
+rebuild). *(Part 1 as a whole still re-embeds everything, but for a different reason — the `document_id`
+re-anchor changes every chunk PK, so the §6 wipe-and-rebuild re-embeds regardless; the B1 point is only that B1
+adds no re-embed cost of its own.)* Nothing name-derived is baked in: tradition,
 region, and colour are all re-annotatable config, and baking any of them would force a re-embed on every
 re-annotation. **This makes the cross-tradition search filter the single localized consequence** — with no
 `tradition` on the chunk, `get_point` resolves tradition → documents server-side and filters
-`where {document_id: {$nin: docs-of-that-tradition}}` (see §5.2).
+`where {document_id: {$nin: docs-of-that-tradition}}` (see §5 step 4).
 
 **2.14 One `UNASSIGNED`** id/label across `schemas.py`, `iterator.py`, and the front end (extend the front's
 `CATEGORY_NONE` down to the value layer).
@@ -197,14 +200,14 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
   pointer.
 
 > **Resolved → see [`data-model-and-ids.md`](data-model-and-ids.md).** Document identity, the three registries,
-> field decomposition, `slugify` and the join keys are worked out there. The two load-bearing decisions:
+> field decomposition, id minting (no slug — D8 dissolved), and the join keys are worked out there. The two load-bearing decisions:
 > - **D1 (decided): `document_id = hash(locator)`** — the document id anchors on its upstream locator (URL /
 >   `sources/`-path), normalized then hashed with **`blake2b`**, which is the raw-archive key
 >   `corpus/raw/<blake2b(url)>` (one algorithm everywhere; the archive moves off `sha1` by a one-time rename).
 >   It is opaque, rename-/edit-stable, collision-free, and one value serving identity + archive key + the
 >   incremental anchor. It is **not** `slugify(title)` — titles churn and collide (generic ones like "Creation"
 >   collide at the embedding layer), and a title-slug would need the locator as a hidden match key anyway.
->   `slugify` is reserved for `region_id`/`tradition_id`; documents never slug.
+>   `region_id`/`tradition_id` are the **canonical name itself** (no slug — D8 dissolved); documents use `hash(locator)`. There is no `slugify` anywhere.
 > - **The single stable `id`** is this `document_id`, used across `/documents` (list), `/document?id=`, the
 >   search reference, and the chunk metadata — collapsing the old `(title, tradition)` locator and the
 >   ephemeral `normalize_catalog_id(title)` into one persisted key.
@@ -278,7 +281,9 @@ front resolution before any field is trimmed off a chunk/hit → then the trim �
    the document reference. **Cross-tradition search filter (B1):** `get_point` resolves tradition → documents
    server-side and filters `where {document_id: {$nin: docs-of-that-tradition}}` (was a `tradition`-equality
    clause). Move the file layout to `corpus/<Region>/<Tradition>/<Title>.txt` (§6). Switch the embeddings dedup
-   key to `(document_id, content_md5, model, ver)` — **rename-churn is fixed here for free**. **Rename the
+   **anchor** from `slug(title)::i` to `document_id::i` — **rename-churn is fixed here for free**; the
+   content-`md5` *staleness* gate that completes the key `(document_id, doc_md5, model, transform_v)` is **Part 2**
+   (pipeline §7 item 1), not this step. **Rename the
    endpoints** (§3): `/catalog` → `/documents` (list), `/documents` → `/document` (one text) by `?id=document_id`.
 5. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and
    `get_tradition_color`; `/api/corpus/traditions` serves the config tree directly (region tree, region
@@ -381,13 +386,18 @@ every source** (fetch and build are not yet separated) — needless, and risky i
      `outputs/embeddings/`, `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`.
    - `raw/` sits *inside* `outputs/corpus/`, so target carefully (e.g.
      `find outputs/corpus -mindepth 1 -maxdepth 1 ! -name raw -exec rm -rf {} +`), not `rm -rf outputs/corpus`.
-4. **Plain `build` (no `--force`).** With `corpus.json` gone but `raw/` present, `fetch_to_cache(force=False)`
-   short-circuits on the cached raw → **no network**; the pipeline re-cleans, re-embeds (chunk metadata =
-   `{document_id, chunk_index}` only — B1; no `tradition`/`major_tradition`), and re-graphs from raw + the new
-   config. Local sources
-   re-read from `sources/` (their upstream) — still offline. **Fail-loud validation** (every corpus tradition
-   ∈ tree; every region ∈ the 14 canon; `slugify` uniqueness across region/tradition/document) is the integrity
-   gate.
+4. **Re-key the raw archive `sha1 → blake2b`, then a plain `build` (no `--force`).** D1 moves the raw key to
+   `corpus/raw/<blake2b(normalized-locator)>` and the migrated code looks for `blake2b` names — but the on-disk
+   files are still `sha1(url)`-named. So **first rename** each `corpus/raw/<sha1(url)>` →
+   `corpus/raw/<blake2b(normalized-locator)>`, deterministically from config (normalize the locator per
+   data-model §5, then hash) — a pure `mv`, **no re-download**. *Without this rename, the build below computes
+   the new `blake2b` path, misses the `sha1`-named file, and re-downloads every source — the exact hazard this
+   procedure exists to avoid.* Then, with `corpus.json` gone but `raw/` present (now `blake2b`-named),
+   `fetch_to_cache(force=False)` short-circuits on the cached raw → **no network**; the pipeline re-cleans,
+   re-embeds (chunk metadata = `{document_id, chunk_index}` only — B1; no `tradition`/`major_tradition`), and
+   re-graphs from raw + the new config. Local sources re-read from `sources/` (their upstream) — still offline.
+   **Fail-loud validation** (every corpus tradition ∈ tree; every region ∈ the 14 canon; name-uniqueness across
+   region/tradition + a `document_id` collision check) is the integrity gate.
 5. **Front in lockstep** with the API change (endpoint renames, dropped fields, `treeIndex`/`docIndex`, remove
    `bookTitleFromId`) — or the UI breaks.
 6. **Verify with `status`** — orphan detection should report zero (nothing was left behind, since the derived
