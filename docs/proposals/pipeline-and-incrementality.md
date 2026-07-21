@@ -774,7 +774,8 @@ None of it blocks shipping Part 1. Each item references its (already-decided) Dx
    real re-embed-on-edit bug; the rename-churn half comes free from Part 1's `document_id` anchor.
 2. **`transform_version`** — uniform param-hash + one manual `algo_version` per stage (D4, §2.5).
 3. **Atomicity** — write the artifact *then* its fp sidecar; atomic swap for the catalog/collection — §9.4, so
-   a stored fp never lies under a mid-build crash.
+   a stored fp never lies under a mid-build crash. (Export consequence: `.fp` sidecars must ride along in the
+   bundle, `*.partial`/`*.tmp` staging must not — see Part 3's *Export impact*.)
 4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5. Splits `--force`'s two meanings:
    **`--force` = rebuild derived from raw**; **`refresh` = re-fetch upstream** (today corpus conflates them).
 5. Graphs build/serve unify + traversal guard (isolated bug; also in Part 1 §5 step 6 — do wherever first).
@@ -814,6 +815,26 @@ fp graph).
 3. (D6 decided — build-your-own.) Re-evaluate **DVC/Dagster** only if one of §9.1's explicit triggers fires
    (remote store / lineage / walk cost); the driver already *is* build-your-own, so this is "when to switch,"
    not "what to build now."
+4. **Rewire `export_bundle.py` onto the driver** — it is the one *other* consumer of the retired
+   `pipeline_inspect`. Today `orphan_summary()` imports `corpus_orphans` / `embeddings_orphan_chunks` /
+   `embeddings_orphan_collections` / `projections_orphans` / `graphs_orphans` (`export_bundle.py:27–35`) and
+   `_is_cache` hardcodes the cache filenames (`export_bundle.py:41,60`). Retiring `pipeline_inspect` **breaks
+   these imports**, so: point `orphan_summary()` at the driver's `clean --dry-run` plan (same set-reconciliation),
+   and drive cache-exclusion from each stage's declared cache tier (§3) instead of the hardcoded list.
+
+**Export impact across the parts** — `export_bundle.py` bundles `outputs/` and reports the orphans it would
+carry. It is affected at every part, but only Part 3 *breaks* it:
+
+| part | export effect |
+|---|---|
+| **Part 1** | layout changes (`corpus/<Region>/…`, `graphs/<document_id>/`, blake2b raw) are **auto-absorbed** — export `rglob`s each dir. **Decide:** `corpus/raw/` is currently *included* (unlike `motifs/raw`, excluded as cache, `export_bundle.py:62`); under pinned-raw that is arguably right (a self-sufficient offline-rebuildable bundle), but it is bulk — product or rebuild-fuel? |
+| **Part 2** | **`.fp` sidecars ride along automatically** (`rglob`, not treated as cache) — **required for a coherent bundle** (else the target's first `status` sees no fingerprints → all stale). **New:** exclude `*.partial` / `*.tmp` (the atomic-write staging, item 3) so staging junk never travels. |
+| **Part 3** | **breaks the `pipeline_inspect` imports → item 4 above** (rewire `orphan_summary` + cache-exclusion onto the driver). |
+| **motifs** | `.partial` staging covered by Part 2's temp-exclusion; `.absent` markers already sit under the excluded `motifs/raw`. |
+
+Principle: **a bundle must carry each artifact together with its fingerprint** so the target's `status` reads
+"current", not "all stale" — already true today (Chroma copied file-for-file carries the metadata fp; `.fp`
+files ride along) and must survive the temp-exclusion.
 
 **Migration story — Part 3 needs no data migration; it is code-only.** It changes *how the pipeline is
 orchestrated* (a generic driver over self-describing stages), not artifact content, fingerprints, or their

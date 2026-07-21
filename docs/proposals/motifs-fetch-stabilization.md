@@ -120,3 +120,7 @@ All of this is **code**, independent of the CLI/driver design decisions in
 [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md). It does not require the `refresh` / plan-apply
 machinery — it is the same principle applied locally to the motif sources, and it hardens the shared
 `fetch_cache.py` layer that the corpus downloader also uses.
+
+**Export note:** the Phase-1 `<cache>.partial` staging files must be excluded from `export_bundle.py` (the same
+`*.partial` temp-exclusion Part 2's atomicity needs — see that doc's *Export impact*). The `.absent` markers
+already sit under `motifs/raw/`, which export excludes as cache (`export_bundle.py:62`).
