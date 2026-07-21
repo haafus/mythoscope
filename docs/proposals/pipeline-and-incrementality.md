@@ -394,41 +394,97 @@ But there are **two kinds of removal**, and the per-stage key-diff above catches
   *)` (projections fan out over the *live* models), so the stage and its dependents disappear together — their
   artifacts are now stores **owned by no live stage**.
 
-So orphan detection is **two levels**, and the whole-stage case needs a *store-level reconciliation* the
-key-diff cannot supply:
+So orphan detection is **two levels**, because "what physically exists" is known at two granularities:
 
 ```
-level 1 (key):    live_stage.actual().keys() − live_stage.desired().keys()        # removed document
-level 2 (store):  {physical stores of a class} − {stores owned by a live stage}   # removed model/plot/source
+level 1 (key):    live_stage.actual().keys() − live_stage.desired().keys()   # removed document (within a live store)
+level 2 (store):  store.list() − {id of every live stage on that store}      # removed model / plot / source (a whole store)
 ```
 
-Level 2 is precisely what `pipeline_inspect.embeddings_orphan_collections` does **today** — it lists *every*
-Chroma collection (`list_collections()`) and subtracts the configured variants; the leftover collections are the
-removed models. Under the protocol this scan must be **ported as a stage-level orphan pass** (enumerate each
-store class — Chroma collections, `projections/*/`, `motifs/*` — and subtract the live stages' claims), **not**
-assumed to fall out of `actual − desired`. Both levels then feed the same dry-run GC. So: **fp-diff for changes;
-`actual − desired` for removed keys; store-vs-live-stages for removed stages.** (Raw snapshots are an archive
-tier, *not* auto-collected — §3, §6.)
+**The store abstraction (level 2).** There are exactly **two storage backends** — files on disk and Chroma
+collections — so the mechanics live in two small `*Store` objects that stages hold by **composition** (a stage
+*has-a* store; it is not a subclass of one). Each `*Store` knows how to **enumerate** its scope and **delete by
+id**; neither needs a stage instance:
 
-Worked example — **drop model `M`**: its Chroma collection (level 2) and its `projections/M/*.json` (level 2,
-stages gone from the factory) become orphan stores; `status` reports them, `clean --apply` collects them behind
-the dry-run confirm; the raw archive is untouched (raw is keyed by document, not model), no other model is
-re-embedded (their stages are live, `desired = actual`), and any preprocess cache for `M`'s variant is a
-resumable tier dropped only by `--caches` (§3). Removing a single *document* instead stays entirely at level 1.
+```python
+class ChromaStore:
+    def list(self):        return {c.name for c in chroma_manager.list_collections()}
+    def delete(self, id):  chroma_manager.delete_collection(id)
 
-**Why level 2 is inherent, not a design wart.** Both sides of the GC set-difference need the same two inputs:
-the **reachable set** (from `build_pipeline()` — identical whether or not a store exists) and **what physically
-exists**. Only the second differs. To learn "collection `M` exists" after `M`'s stage is gone from the code,
-*something* must either **(a) scan the physical store** (`chroma.list_collections()`, `ls projections/`) or
-**(b) read a persistent record of `M` kept somewhere not tied to `M`'s stage** (a manifest). There is no third
-way. A stateless design has no such record, so it **must** scan — level 2 is therefore *logically entailed by
-statelessness*, not an accident: you cannot be stateless **and** find removed stores without scanning. The two
-mechanisms yield the **same orphan set** for a local collection; they differ only in that the **scan reads
-ground truth** (always current, can't drift) while a manifest is **faster but can drift** (a crash between
-writing `M` and recording it leaves the record lying). So for the removed-*local*-collection task, scan-vs-record
-is a wash on the result — the manifest earns its keep only where a scan structurally *cannot* reach: a **remote**
-artifact (not locally present to scan) or **history** (past runs, gone from current state). Those are exactly
-§9.1's triggers (a)/(b), and until one fires, the scan loses nothing.
+class FileStore:
+    def __init__(self, root, glob): self.root, self.glob = Path(root), glob
+    def list(self):        return {rel_to_root(p) for p in self.root.glob(self.glob)}   # scoped to THIS root
+    def delete(self, id):  rmtree_or_unlink(self.root / id)
+
+CHROMA      = ChromaStore()
+PROJECTIONS = FileStore("outputs/projections", "*/*.json")      # one store object per file-family
+```
+
+A stage carries only its **`id`** in that store — its collection name or relative path — assigned by the factory
+from the very config value it fanned out on (`variant.key`, `f"{model}/{plot}.json"`), so `id` needs no new
+naming rule:
+
+```python
+class EmbeddingsStage(Stage):
+    store = CHROMA
+    def __init__(self, variant, corpus): self.id = variant.key; ...
+class ProjectionStage(Stage):
+    store = PROJECTIONS
+    def __init__(self, model, plot, embeddings): self.id = f"{model}/{plot}.json"; ...
+```
+
+The reaper groups live stages by their shared store and reconciles **per store**:
+
+```python
+def reap(stages, *, apply=False):
+    live = {}                                     # store → {ids of live stages on it}
+    for s in stages:
+        if getattr(s, "store", None):
+            live.setdefault(s.store, set()).add(s.id)
+    for store, live_ids in live.items():
+        for orphan in store.list() - live_ids:    # scan THIS store's scope only
+            if apply: store.delete(orphan)        # delete by id — the orphan's stage is gone
+```
+
+Three properties, each a constraint we hit along the way:
+
+- **Delete is by `id`, not `self`.** An orphan's stage no longer exists (it left the factory), so deletion
+  cannot route through an instance; it is a store operation parameterised by the id the scan returned.
+- **The scan is scoped per store, never a blanket walk of `outputs/`.** `raw/` (the pinned archive) and the
+  resumable caches have **no `*Store`**, so they are never enumerated and never collected — safety *by
+  construction*, not by an exclude-list. A single "delete everything under `outputs/` not claimed" would nuke
+  the archive.
+- **Naming is single-sourced.** `list()`/`delete()` live once on the shared `*Store`; the stage contributes only
+  its `id`. No per-instance duplication of namespace knowledge (a lone collection can't and shouldn't know its
+  siblings; the reaper aggregates them).
+
+This is deliberately **not** a "reaper *stage*." L2's unit is the **store** (a family/namespace), not a stage
+instance, so a GC-only pseudo-stage would sit at the wrong altitude and abuse the `Stage` contract
+(`build`/`missing`/`stale` all degenerate). It is an **explicit pass**, fed by the live stages' own `store`+`id`
+declarations — which is why it can't rot (each store's layout lives in one place) yet stays outside the per-stage
+`desired/actual` loop. It is also what `pipeline_inspect.embeddings_orphan_collections` already does today
+(`list_collections()` minus configured variants); the protocol ports that scan into the reaper instead of a
+hand-wired per-store checker.
+
+So: **fp-diff for changes; `actual − desired` for removed keys (level 1); `store.list() − live ids` for removed
+stores (level 2).** (Raw snapshots are an archive tier, *not* auto-collected — §3, §6.)
+
+Worked example — **drop model `M`**: its `CHROMA` collection and its `PROJECTIONS` files (`M/*.json`) are ids no
+live stage claims → orphans on their stores; `status` reports them, `clean --apply` deletes them **by id**; the
+raw archive is untouched (no store; keyed by document, not model), no other model re-embeds (their stages are
+live, `desired = actual`), and `M`'s preprocess cache is a resumable tier dropped only by `--caches` (§3).
+Removing a single *document* instead stays entirely at level 1.
+
+**Why level 2 is inherent, not a wart.** Both sides of the difference need the same two inputs: the **reachable
+set** (the live stages' ids, from `build_pipeline()`) and **what physically exists** — only the second differs
+from level 1. To learn "collection `M` exists" after `M`'s stage is gone, *something* must either **(a) scan the
+store** (`store.list()`) or **(b) read a persistent record of `M` not tied to `M`'s stage** (a manifest). There
+is no third way, so **statelessness logically entails the scan**: you cannot be stateless *and* find removed
+stores without scanning. Scan and manifest yield the **same** orphan set for a local store; the scan reads
+**ground truth** (can't drift; self-heals across crashes / branch-switches / manual `rm`), a manifest is
+**faster but drifts** and needs an fsck-scan to be trusted (§9.3). A manifest only reaches what a scan cannot — a
+**remote** store or **history** — which are §9.1's growth triggers (a)/(b). At our ~dozen stores the scan is
+instant, so it wins now.
 
 ### 2.8 `actual()` — sidecars, no manifest (D7)
 
