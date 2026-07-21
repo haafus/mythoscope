@@ -282,7 +282,7 @@ front resolution before any field is trimmed off a chunk/hit → then the trim �
    server-side and filters `where {document_id: {$nin: docs-of-that-tradition}}` (was a `tradition`-equality
    clause). Move the file layout to `corpus/<Region>/<Tradition>/<Title>.txt` (§6). Switch the embeddings dedup
    **anchor** from `slug(title)::i` to `document_id::i` — **rename-churn is fixed here for free**; the
-   content-hash *staleness* gate that completes the key `(document_id, doc_hash, model, transform_v)` is **Part 2**
+   content-`fingerprint` *staleness* gate that completes the key (chunk `fingerprint` = `hash(doc fingerprint, model, transform_v)`) is **Part 2**
    (pipeline §7 item 1), not this step. **Rename the
    endpoints** (§3): `/catalog` → `/documents` (list), `/documents` → `/document` (one text) by `?id=document_id`.
 5. **Colour from region; serve the config, drop the generated file.** Remove `_update_traditions` and

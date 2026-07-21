@@ -19,7 +19,7 @@ Build order (`cli.py`): Corpus → Embeddings → Projections → Graphs → Mot
 | # | stage | inputs | artifacts (`outputs/`) | caches | cost |
 |---|---|---|---|---|---|
 | 0 | **config** (hand-authored) | `config/corpus.json` (title, tradition, url, content_start/end, exclude), `config/traditions.json` (tree), `config/models.json`, `config/prompts.json`, `sources/` | — | — | — |
-| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<hash(locator)>` raw snapshot (**today `sha1(url)`; D1 target `blake2b(normalized-locator)` = `document_id`**), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + `doc_hash`) | raw-fetch (locator hash), extraction | network (~s/doc); clean/trim CPU-cheap |
+| 1 | **Corpus** | corpus.json + traditions.json + sources | `corpus/raw/<hash(locator)>` raw snapshot (**today `sha1(url)`; D1 target `blake2b(normalized-locator)` = `document_id`**), `corpus/<Region>/<Tradition>/<Title>.txt` (cleaned text — decided layout, data-model §6), `corpus/corpus.json` (catalog + counts + per-doc `fingerprint`) | raw-fetch (locator hash), extraction | network (~s/doc); clean/trim CPU-cheap |
 | 1.5 | **Preprocess** (variant, optional) | cleaned text + variant config | *(no first-class artifact — an internal step of the embeddings variant)* | preprocessing (**resumable cache**) | **always an LLM transform when present** (`preprocess.py` → `LLMProcessor`, per-chunk) = **$$, rate-limited**. **Not a separate driver stage** — it is folded into `embeddings:<variant>` (§2.2) as a resumable cache tier (§3); a variant either enables it (LLM) or skips it (embeds the base cleaned text) |
 | 2 | **Embeddings** | cleaned text (+ variant) + models.json | `embeddings/` (Chroma collections per model) | chunk-cache; the collection itself is a store (dedup by chunk_id) | **GPU — dominant**; per-chunk |
 | 3 | **Projections** | vectors (embeddings) + plot | `projections/<model>/<plot>.json` | — | moderate; **UMAP is global** (over all points), not per-chunk |
@@ -234,7 +234,7 @@ A module's `stages()` may return one stage or several (e.g. one per embedding va
 | module → `stages()` | how many | key | what one build does |
 |---|---|---|---|
 | **`corpus`** | 1 | `document_id` | fetch→clean→trim→write one `.txt` per document. `corpus.json` (the catalog) is **not** a second stage — it is *where this stage stores* each doc's metadata + fp, i.e. its sidecar, which `actual()` reads. |
-| **`embeddings:<variant>`** | one **per variant** in `models.json` | `document_id` | each variant is its own Chroma collection → its own stage. `build({docs})` chunks those docs and **GPU-batches** the encode; the per-chunk rows share one per-doc `doc_hash` (D2), so the unit is the document, not the chunk. |
+| **`embeddings:<variant>`** | one **per variant** in `models.json` | `document_id` | each variant is its own Chroma collection → its own stage. `build({docs})` chunks those docs and **GPU-batches** the encode; the per-chunk rows share one per-doc `fingerprint` (D2), so the unit is the document, not the chunk. |
 | **`projections:<model>:<plot>`** | one **per (model × plot)** — `plot` = the reduction/chart kind (umap/tsne/pca…), a code constant | **singleton** | the reduction runs over **all** of a model's points to emit one `<model>/<plot>.json` — it can't be built "per document," so its whole output is a single key; `build` = full refit (D3). |
 | **`graphs`** | 1 | `document_id` | one knowledge-graph per document; `build({docs})` assembles them. The expensive per-chunk LLM step keeps its own **internal** `chunk_hash` cache (a resumable GC tier, §3) — deliberately *not* a driver stage, else a content-addressed key drags in orphan-GC + refcounting. |
 | **`motifs:source:<tmi/atu/berezkin>`, `motifs:crosswalk`, `motifs:parallels`, `motifs:semantic`** | several | **singleton** each | motifs is a mini-pipeline; each step emits one artifact. Atomising it makes the internal order explicit via `inputs()` (crosswalk depends on the sources, parallels on the crosswalk, …) — which the current monolithic `build_motifs` hides. **`motifs:semantic` depends on the sources** (source motifs, not corpus), but its GPU BGE-M3 step is **temporarily offline + committed** (§5-style deliberate-manual): `build()` copies the committed file and `desired()` keys on it, so a source change is adopted only via an offline re-run + commit. Drop the shortcut → a normal source-dependent stage (`build()` re-runs BGE-M3, `desired()` folds the sources). |
@@ -277,7 +277,7 @@ engine (D6), **stateless (D7)**: the "registry" is `build_pipeline()`'s output; 
 variant/method/source = adding a `Stage` → it appears in status/clean/build automatically.
 
 **Sequencing (this is a big refactor — Part 3, not Part 2).** Part 2 does the small, high-ROI fp work *inside
-the existing stages* (the embeddings content-fp gate, `transform_version`, `doc_hash` once per doc in the
+the existing stages* (the embeddings content-fp gate, `transform_version`, the per-doc `fingerprint` once in the
 catalog) — which **prepares the base**: the fp sidecars this protocol reads. **Part 3** is the atomisation
 itself — porting `pipeline_inspect.py`'s per-store functions + `cli._clean`'s wiring into the stages and the
 generic driver. It also presupposes Part 1 (content-fp dedup, `document_id` paths, colour out of the fp graph).
@@ -304,9 +304,9 @@ Granularity per stage:
 | artifact | fp key | granularity |
 |---|---|---|
 | document text | `hash(raw_bytes + content_start/end + patch + clean_v)` | document |
-| **chunk embedding** | **(document_id, doc_hash, model, transform_v)** — content version is **doc-level** `doc_hash` = `blake2b(cleaned text)` (D2, same algorithm as everywhere — §2.4); `transform_v` is the stage's full `transform_version` (§2.5) and **covers `chunk_size`/`overlap`, the pinned model lib, and the preprocess prompt** — so a chunk-param change re-embeds | **per-doc decision** (a text edit re-embeds all the doc's chunks) — fixes both flaws of §1.4 |
+| **chunk embedding** | `fingerprint = hash(doc_fingerprint, model, transform_v)`, stored **in each chunk's Chroma metadata** (so it is written atomically *with* the vector by the same `upsert` — §4); the doc fingerprint = `blake2b(cleaned text)` is **doc-level** (D2, same algorithm everywhere — §2.4), and `transform_v` (the full `transform_version`, §2.5) **covers `chunk_size`/`overlap`, the pinned model lib, and the preprocess prompt** — so a chunk-param change re-embeds | **per-doc decision** (a text edit re-embeds all the doc's chunks) — fixes both flaws of §1.4 |
 | projection | `hash(⊕ that model's embeddings `desired()` values + plot_v)` — `⊕` = a fold over `desired()` entries **sorted by key** (deterministic; per-doc fps, D2 — not per-chunk) | **global per (model, plot)** — UMAP is indivisible |
-| graph | `hash(text fp + prompt_v + llm_model)` | **document** (per-chunk LLM cache is internal) |
+| graph | `fingerprint = hash(doc fingerprint + prompt_v + llm_model)` — **one `graphs/<document_id>/.fp` per document**, covering the whole graph (all sub-graphs: beings/relations/locations/time) | **document** — distinct from the internal **per-chunk** LLM cache (`chunk_hash`, many per doc; a resumable tier §3, *not* the `.fp`) |
 | serve-resolve (tree + colour, incl. per-tradition shade) | — | **not an artifact** — region colour *and* its derived per-tradition OKLCH shade (regions.md §8.1) are computed at runtime → tree/colour edits are free |
 
 ### 2.4 Hash choice
@@ -323,7 +323,7 @@ unlikely at our scale. Crypto strength matters only if fps become a trust bounda
 where a poisoned entry is dangerous). **Decided: `blake2b` everywhere, `digest_size=16` (32 hex)** (fastest +
 strong + stdlib; 128 bits is ample collision margin here and keeps raw filenames short) — across **all three
 roles**: `document_id` / the raw-archive key (`corpus/raw/<blake2b(locator)>`), every **fingerprint**, *and* the
-per-doc **content version** (`doc_hash` = `blake2b(cleaned text)`, D2 — replacing the old `md5` that
+per-doc **content version** (the doc `fingerprint` = `blake2b(cleaned text)`, D2 — replacing the old `md5` that
 `_finalize_text` computed; a one-line swap). This drops **both** broken hashes (`sha1` *and* `md5`) from every
 persistent key and leaves genuinely **one algorithm, one length** to reason about. The cost of moving the raw
 key off `sha1` is only a **one-time repopulation** of the ~27 raw files — the D1 migration re-fetches them into
@@ -506,7 +506,7 @@ instant, so it wins now.
 ### 2.8 `actual()` — sidecars, no manifest (D7)
 
 `stage.actual()` reads the stored fps written *beside* the artifacts last build (in `corpus.json` rows — incl.
-the per-doc `doc_hash`, Chroma collection/chunk metadata, `graphs/<id>/.fp`) in **one pass** → `{key: stored_fp}`.
+the per-doc `fingerprint`, Chroma collection/chunk metadata, `graphs/<id>/.fp`) in **one pass** → `{key: stored fingerprint}`.
 Sidecars are the **source of truth**: they survive partial builds, need no single write-lock, and cannot drift
 from their artifact. There is **no central index** (D7 — §9.3): a manifest would only cache what `desired()` +
 `actual()` already give, and a *correct* staleness check must re-hash inputs either way, so the cache
@@ -563,21 +563,28 @@ This matches the existing `clean` flags (`--caches`, `--apply`).
 ## 4. The embeddings key — the concrete payoff
 
 The single highest-value change. Replace "skip if `chunk_id` exists" with a **positional id + a stored
-version-fp**, compared (not a content-keyed tuple checked by set-membership — that would strand old rows, the
+`fingerprint`**, compared (not a content-keyed tuple checked by set-membership — that would strand old rows, the
 very orphan problem positional ids avoid, below):
 
 ```
-chunk id  =  document_id::chunk_index          # positional PK — UPSERTED, never content-keyed
-re-embed a chunk  ⇔  its stored version-fp  ≠  hash(doc_hash, model, transform_version)   # else skip
+chunk id  =  document_id::chunk_index                 # positional PK — UPSERTED, never content-keyed
+re-embed a chunk  ⇔  its stored fingerprint  ≠  hash(doc fingerprint, model, transform_version)   # else skip
 ```
+
+The chunk's `fingerprint` lives **in its own Chroma metadata**, so a single `upsert` writes the vector *and*
+its fingerprint together — **one atomic row-write, no "artifact-then-fp" window** (that separation applies only
+where the two are distinct writes, e.g. graphs' dir + `.fp` file, §9.4). A crash mid-document leaves some chunks
+upserted and the rest absent; the next `build` re-embeds exactly the absent-or-stale ones (upsert overwrites the
+present ones by their positional id — **never a duplicate**), then drops any trailing `document_id::i` for
+`i ≥ new_count` (the only deletion case).
 
 - **document_id** — the rename-stable anchor, **decided as `hash(locator)`** (`data-model-and-ids.md`
   §9-D1). Because the id tracks the upstream locator, not the title, a rename leaves the key unchanged and this
   cache correctly skips the re-embed — flaw 1 is fixed. (The rejected `slugify(title)` anchor would *not* have
   fixed rename-churn; flaw 1 would have stayed. That risk is now closed.)
-- **content version** — **decided (D2): document-level `doc_hash` = `blake2b(cleaned text)`** (the same one
-  algorithm — §2.4; a one-line swap of the `md5` `_finalize_text` computes today). A text edit re-embeds *all* of
-  that doc's chunks — over-embedding within a doc, but cheap
+- **content version** — the **doc `fingerprint`**, **decided (D2): document-level `blake2b(cleaned text)`** (the
+  same one algorithm — §2.4; a one-line swap of the `md5` `_finalize_text` computes today). A text edit re-embeds
+  *all* of that doc's chunks — over-embedding within a doc, but cheap
   at our scale (tens of chunks = seconds), and the per-chunk alternative's precision is largely illusory anyway
   (positional chunking → an insert shifts every downstream chunk's text, so most chunk hashes change regardless).
 
@@ -737,9 +744,9 @@ archival + reproducibility strategy.
 
 Minimal path, by value — items (1) and (2) collapse into **one per-document fingerprint gate on the
 expensive stages** (embeddings, graphs): re-run a document's chunks/graph iff its
-`fp = hash(doc_hash, model, chunk params, prompt/algo_version)` changed:
+`fingerprint = hash(doc fingerprint, model, chunk params, prompt/algo_version)` changed:
 
-- **(1) `doc_hash` in the key** — fixes the real *staleness* bug (a text edit not re-embedding). Note this
+- **(1) the doc `fingerprint` in the key** — fixes the real *staleness* bug (a text edit not re-embedding). Note this
   alone does **not** fix rename *churn* — that needs the rename-stable `document_id` anchor, now decided as
   `hash(locator)` (§9.5-D1); once that anchor lands, rename-churn is fixed too (it is out of *this* minimal
   staleness-only tier, but no longer blocked on a decision).
@@ -761,9 +768,9 @@ harvests, so it must write each fp in the shape Part 3's `actual()` will read it
 doc in the `corpus.json` row / per collection in Chroma metadata / `graphs/<id>/.fp` — or Part 3 reworks it.
 None of it blocks shipping Part 1. Each item references its (already-decided) Dx; full list in §9.5.
 
-1. **Embeddings content-fp staleness gate** — replace the id-existence dedup with `(document_id, doc_hash,
-   model, ver)`; store `doc_hash` = `blake2b(text)` **once per doc in the catalog** (D2, §2.3; the `blake2b`
-   swap of today's `_finalize_text` md5), embeddings reads it. Fixes the
+1. **Embeddings content-fp staleness gate** — replace the id-existence dedup with a stored chunk `fingerprint`
+   = `hash(doc fingerprint, model, ver)`; store the per-doc `fingerprint` = `blake2b(text)` **once in the
+   catalog** (D2, §2.3; the `blake2b` swap of today's `_finalize_text` md5), embeddings reads it. Fixes the
    real re-embed-on-edit bug; the rename-churn half comes free from Part 1's `document_id` anchor.
 2. **`transform_version`** — uniform param-hash + one manual `algo_version` per stage (D4, §2.5).
 3. **Atomicity** — write the artifact *then* its fp sidecar; atomic swap for the catalog/collection — §9.4, so
@@ -807,7 +814,7 @@ rebuilds incremental, so it goes last.
    Prerequisite: the fetch/build split + `refresh` (Part 2 item 4).
 
 D1 is decided — `document_id = hash(locator)` — and **D8 is dissolved**, so Part 1 is fully unblocked. Decided
-since: **D2** (doc-level `doc_hash` = `blake2b`), **D3** (full refit), **D4** (uniform param-hash + manual `algo_version`), **D5**
+since: **D2** (doc-level `fingerprint` = `blake2b`), **D3** (full refit), **D4** (uniform param-hash + manual `algo_version`), **D5**
 (unified-diff patch — Part 4), **D7** (stateless, no manifest), **D6** (build engine — **build-your-own**, the
 §2.2 protocol; DVC only when §9.1's explicit trigger fires). **No open decisions remain.**
 
@@ -893,7 +900,7 @@ off-the-shelf fallback to reconsider.
 **Cross-tool validation of the model.** The design is not exotic — mature engines use the *same* shapes, which
 is reassurance, not a gap: **Flyte**'s cache key = `Cache Version + Task Signature + Task Input Values` is our
 `hash(transform_version + params + input fps)` almost symbol-for-symbol, and its default **"hash the storage
-location, opt into a content hash"** is exactly our split of `hash(locator)` (identity) vs `doc_hash` (version).
+location, opt into a content hash"** is exactly our split of `hash(locator)` (identity) vs the doc `fingerprint` (version).
 **Dagster**'s "software-defined asset" with materialization + freshness is our "stage as a self-describing
 asset." We re-derived a standard content-addressed pipeline; the only genuinely non-standard piece is the
 *identity* layer (see the provenance-addressed note in `data-model-and-ids.md` §5).
@@ -964,7 +971,7 @@ writes no sidecar and is retried next run, the rest of the batch proceeds).
 | id | decision | options | blocks |
 |---|---|---|---|
 | ~~**D1**~~ | `document_id` anchor — **DECIDED: `hash(locator)`** | ~~`slugify(title)` vs~~ `blake2b(upstream-locator)` (= raw key `corpus/raw/<blake2b(url)>`) | doc coherence, §4 rename-stability, persist-id — *unblocked* |
-| ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `doc_hash` = `blake2b(text)`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level hash (cheap here; per-chunk precision illusory under positional chunking); algorithm = `blake2b`, one hash everywhere (§2.4) | §2.3 / §4 |
+| ~~**D2**~~ | embedding content-version granularity — **DECIDED: doc-level `fingerprint` = `blake2b(text)`** | ~~per-chunk `hash(chunk_text)` vs~~ doc-level (cheap here; per-chunk precision illusory under positional chunking); algorithm = `blake2b`, one hash everywhere (§2.4) | §2.3 / §4 |
 | ~~**D3**~~ | projections incrementality — **DECIDED: full refit** | ~~parametric `.transform()` vs~~ full refit (cheap at this size, simpler, no drift) | §9.2 |
 | ~~**D4**~~ | transform_version — **DECIDED: uniform** param-hash + one manual `algo_version` | ~~per-stage-by-cost auto/manual vs~~ uniform (params cover expensive-stage behaviour; split adds ~nothing) | §2.5 |
 | ~~**D5**~~ | override format — **DECIDED: unified-diff patch** (Part 4) | ~~full override (near-copy, freezes on upstream update) vs~~ unified-diff patch (delta only, auto-re-applies / clean conflict) | §6.4 |

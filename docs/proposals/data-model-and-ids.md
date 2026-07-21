@@ -119,7 +119,7 @@ Denormalization belongs **not in Chroma chunk metadata**, but in two places:
    - `docIndex: Map<document_id, documentRow>` — from the catalog. Powers chunk→document (title, url,
      counts). Single-key, because `document_id` alone is unique (§5).
 2. **Build-time materialized catalog** — `outputs/corpus/corpus.json` stores the document-level fields plus
-   *expensive-but-stable* computed values (`word/sentence/char counts`, `doc_hash` = `blake2b(text)`). A legitimate precompute.
+   *expensive-but-stable* computed values (`word/sentence/char counts`, the per-doc `fingerprint` = `blake2b(text)`). A legitimate precompute.
 
 **The projection view is the exemplar of the right pattern.** The projection stores every chunk as
 `{ id (=document_id), chunk_index, x, y, text(preview) }` — pointer + coords only, **no** tradition / url /
@@ -208,7 +208,7 @@ Titles are free to churn and collide; the id does not. See §9-D1 for the full r
 > not the same axis, and mixing them up is the mistake D1 avoids: we want identity to survive a text fix, which
 > content-addressing at the identity layer would break (every edit = new id = re-embed + orphan). So the system
 > is **provenance-addressed at the identity layer** (`document_id = hash(locator)`) and **content-addressed
-> only at the version layer** (`doc_hash`, the fingerprints of pipeline §2.3) — the design splits the single
+> only at the version layer** (the per-doc `fingerprint` and the other fingerprints of pipeline §2.3) — the design splits the single
 > hash that git/Nix/CAS conflate into the two roles it actually plays here (which is *which* source vs *what*
 > content). Mature pipeline engines make the same split under other names — e.g. Flyte hashes a dataset's
 > **storage location** by default and lets you opt into a **content hash** (pipeline §9.1). There is no library
