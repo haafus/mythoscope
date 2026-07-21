@@ -774,8 +774,11 @@ None of it blocks shipping Part 1. Each item references its (already-decided) Dx
    real re-embed-on-edit bug; the rename-churn half comes free from Part 1's `document_id` anchor.
 2. **`transform_version`** — uniform param-hash + one manual `algo_version` per stage (D4, §2.5).
 3. **Atomicity** — write the artifact *then* its fp sidecar; atomic swap for the catalog/collection — §9.4, so
-   a stored fp never lies under a mid-build crash. (Export consequence: `.fp` sidecars must ride along in the
-   bundle, `*.partial`/`*.tmp` staging must not — see Part 3's *Export impact*.)
+   a stored fp never lies under a mid-build crash. **The swap is `os.replace(<target>.partial, <target>)` — an
+   atomic rename, never copy-then-delete.** Rename *consumes* the staging file (it *becomes* the target), so a
+   successful commit needs no apply-time cleanup and leaves no window where both exist; a rejected write instead
+   discards `<target>.partial`, leaving the live file untouched. (Export consequence: `.fp` sidecars must ride
+   along in the bundle, `*.partial`/`*.tmp` staging must not — see Part 3's *Export impact*.)
 4. **fetch/build split** + explicit `refresh` + pin raw archive — §5, §6.5. Splits `--force`'s two meanings:
    **`--force` = rebuild derived from raw**; **`refresh` = re-fetch upstream** (today corpus conflates them).
 5. Graphs build/serve unify + traversal guard (isolated bug; also in Part 1 §5 step 6 — do wherever first).

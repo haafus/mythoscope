@@ -60,9 +60,13 @@ drops only the destruction.
 ### Phase 1 — Non-destructive fetch (shared layer, `fetch_cache.py`)
 
 1. Add **staging-with-validator** to `fetch_to_cache`: download to `<cache>.partial`, run an optional
-   `validate(bytes) -> bool`, then `os.replace` onto the live path **only if valid**; on exception or invalid,
-   discard `.partial` and **leave the live cache untouched**. (Today a raise skips the write — this makes the
-   atomicity explicit *and* covers "downloaded but degraded", which the current code can only fix by deleting.)
+   `validate(bytes) -> bool`, then **`os.replace(<cache>.partial, <cache>)`** onto the live path **only if
+   valid** — an atomic rename, not copy-then-delete, so the commit *consumes* the staging file (no apply-time
+   cleanup) and never leaves a window where both exist. A **reject** is either signal — the download **raised**
+   (transport/HTTP) or the **validator returned `False`** (content: unparseable / degraded / empty); on reject,
+   discard `.partial` and **leave the live cache untouched**. (Today a raise skips the write, but the degraded
+   check runs *after* `fetch_to_cache` already overwrote the cache — hence the `unlink` to undo. Running
+   `validate` on `.partial` *before* the rename means a reject simply never renames: nothing to undo.)
 2. Return the **outcome** to the caller: `fresh` / `served-pinned` (fetch failed but a cache exists → serve it)
    / `nothing` (no fetch, no cache). The "non-empty cache short-circuits unless force" rule is unchanged.
 
