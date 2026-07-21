@@ -323,9 +323,10 @@ unlikely at our scale. Crypto strength matters only if fps become a trust bounda
 where a poisoned entry is dangerous). **Decided: `blake2b` everywhere** (fastest + strong + stdlib) — the
 fingerprint machinery *and* `document_id` (so the raw-archive key becomes `corpus/raw/<blake2b(url)>`). This
 drops the broken `sha1` from persistent keys and leaves one hash to reason about. The cost of moving the raw
-key off `sha1` is only a **one-time rename** of the ~27 raw files (their `url` is known from config — a
-deterministic `mv`, no re-download), and it rides the D1 migration, which rebuilds all derived artifacts on the
-new key anyway. Note the *roles* are still distinct even under one algorithm: `blake2b(url)` = **identity**
+key off `sha1` is only a **one-time repopulation** of the ~27 raw files — the D1 migration re-fetches them into
+the new blake2b-keyed archive (stable public-domain sources, committed raw as 404 fallback; region §6), or an
+offline `mv` from config if you'd rather not touch the network — and it rides that same migration, which
+rebuilds all derived artifacts on the new key anyway. Note the *roles* are still distinct even under one algorithm: `blake2b(url)` = **identity**
 ("which source"); a content hash = **version** ("what content").
 
 ### 2.5 Transform version — where it lives, how it is bumped

@@ -203,7 +203,7 @@ once (globally, cached, §2.8) and composes every view. Overlap is trimmed to th
 > field decomposition, id minting (no slug — D8 dissolved), and the join keys are worked out there. The two load-bearing decisions:
 > - **D1 (decided): `document_id = hash(locator)`** — the document id anchors on its upstream locator (URL /
 >   `sources/`-path), normalized then hashed with **`blake2b`**, which is the raw-archive key
->   `corpus/raw/<blake2b(url)>` (one algorithm everywhere; the archive moves off `sha1` by a one-time rename).
+>   `corpus/raw/<blake2b(url)>` (one algorithm everywhere; the archive moves off `sha1` by a one-time re-fetch on migration, §6 — or an offline rename).
 >   It is opaque, rename-/edit-stable, collision-free, and one value serving identity + archive key + the
 >   incremental anchor. It is **not** `slugify(title)` — titles churn and collide (generic ones like "Creation"
 >   collide at the embedding layer), and a title-slug would need the locator as a hidden match key anyway.
@@ -262,7 +262,7 @@ front resolution before any field is trimmed off a chunk/hit → then the trim �
    repoint every `config/corpus.json` book at its canonical tradition; then add build-time fail-loud validation
    (unknown tradition / non-canon region; name-uniqueness). *(Highest value-to-risk — closes the silent join.)*
 2. **Persist identity.** Persist `document_id = hash(locator)` in the built catalog (normalize the locator
-   first, then `blake2b`; it is the raw-archive key `corpus/raw/<blake2b(url)>` — one-time rename off `sha1`)
+   first, then `blake2b`; it is the raw-archive key `corpus/raw/<blake2b(url)>` — repopulated off `sha1` by the §6 re-fetch)
    and return it from the documents endpoint; mint
    `region_id`/`tradition_id` = the canonical name in the tree + as each document's `tradition` ref. `id = the
    name` verbatim — no slug, no transliteration, no new function; the boundaries already sanitise
@@ -367,37 +367,34 @@ Buddhism`→`Japanese`, are deliberate — East Asia is modelled ethnolinguistic
 
 **Integrity principle.** Everything under `outputs/` below `corpus/raw/` is **derived and regenerable**; the
 only sources of truth are **`corpus/raw/` (the archive), `config/`, and `sources/`**. So coherence after the
-migration is *restored by a clean rebuild from raw*, not by in-place metadata surgery. At ~27 documents this
-is cheap.
+migration is *restored by a clean rebuild*, not by in-place metadata surgery. At ~27 documents this is cheap.
 
-**Do NOT use `build --force`.** `--force` propagates to `fetch_to_cache(force=True)`, which **re-downloads
-every source** (fetch and build are not yet separated) — needless, and risky if an upstream changed or 404s.
+**Why this migration re-fetches (and why that's fine).** D1 re-keys the raw archive `sha1(url) → blake2b(locator)`,
+so the migrated code finds **no** blake2b-named raw and re-fetches each web source once. We accept that: the
+sources are **stable public-domain** texts, it is a **one-time** ~27-file download, and the committed `sha1` raw
+(§6.5 — commit the archive) is the **fallback** for any 404. (The offline alternative — a one-time `mv` of each
+`sha1`-named file to its `blake2b` name — is available if you'd rather not touch the network, but is not needed
+here.) A plain `build` already does the full re-fetch, so **`--force` is not needed** (its collection-clear is
+redundant after the wipe below).
 
-**Procedure — wipe derived, keep raw, then a plain `build`:**
+**Procedure — full rebuild, re-fetching into the new blake2b-keyed archive:**
 
-1. **Back up / commit** the current state (`outputs/embeddings/`, `outputs/graphs/`, `config/`) for rollback.
-   Do not touch `corpus/raw/`.
+1. **Commit the current state — *including* `corpus/raw/`** (§6.5). The committed `sha1`-named raw is the
+   rollback + the fallback if a web source 404s on re-fetch.
 2. **Author + reconcile:** write the new `config/traditions.json` (14 regions, canon order, texted traditions
    with coordinates); repoint every `config/corpus.json` book at its canonical `tradition`.
-3. **Blanket-wipe the derived artifacts, keep `corpus/raw/`** — deterministic, so no orphan-hunting and no
-   reliance on the per-scanner orphan detection catching scheme-renamed files:
-   - **keep:** `outputs/corpus/raw/`, `config/`, `sources/`
-   - **delete:** everything else under `outputs/corpus/` (the `.txt` tree + `corpus.json`),
-     `outputs/embeddings/`, `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`.
-   - `raw/` sits *inside* `outputs/corpus/`, so target carefully (e.g.
-     `find outputs/corpus -mindepth 1 -maxdepth 1 ! -name raw -exec rm -rf {} +`), not `rm -rf outputs/corpus`.
-4. **Re-key the raw archive `sha1 → blake2b`, then a plain `build` (no `--force`).** D1 moves the raw key to
-   `corpus/raw/<blake2b(normalized-locator)>` and the migrated code looks for `blake2b` names — but the on-disk
-   files are still `sha1(url)`-named. So **first rename** each `corpus/raw/<sha1(url)>` →
-   `corpus/raw/<blake2b(normalized-locator)>`, deterministically from config (normalize the locator per
-   data-model §5, then hash) — a pure `mv`, **no re-download**. *Without this rename, the build below computes
-   the new `blake2b` path, misses the `sha1`-named file, and re-downloads every source — the exact hazard this
-   procedure exists to avoid.* Then, with `corpus.json` gone but `raw/` present (now `blake2b`-named),
-   `fetch_to_cache(force=False)` short-circuits on the cached raw → **no network**; the pipeline re-cleans,
-   re-embeds (chunk metadata = `{document_id, chunk_index}` only — B1; no `tradition`/`major_tradition`), and
-   re-graphs from raw + the new config. Local sources re-read from `sources/` (their upstream) — still offline.
-   **Fail-loud validation** (every corpus tradition ∈ tree; every region ∈ the 14 canon; name-uniqueness across
-   region/tradition + a `document_id` collision check) is the integrity gate.
+3. **Blanket-wipe the derived artifacts.** Delete the `.txt` tree + `corpus.json`, `outputs/embeddings/`,
+   `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`. The old `sha1`-named `corpus/raw/` may be
+   left (it becomes pinned orphans under the new keying — a later `purge` clears them) or wiped (git holds the
+   fallback); either way the build re-fetches under the new blake2b names.
+4. **Plain `build`.** With no blake2b-named raw present, `fetch_to_cache(force=False)` **re-fetches** each web
+   source once into `corpus/raw/<blake2b(normalized-locator)>` (normalize the locator per data-model §5, then
+   hash), then re-cleans, re-embeds (chunk metadata = `{document_id, chunk_index}` only — B1; no
+   `tradition`/`major_tradition`), and re-graphs from the new config. Local `sources/` files re-read from disk
+   (offline). **If a web source 404s**, restore its committed `sha1` raw from git and rename it to its `blake2b`
+   name — the archived bytes, no re-download. **Fail-loud validation** (every corpus tradition ∈ tree; every
+   region ∈ the 14 canon; name-uniqueness across region/tradition + a `document_id` collision check) is the
+   integrity gate.
 5. **Front in lockstep** with the API change (endpoint renames, dropped fields, `treeIndex`/`docIndex`, remove
    `bookTitleFromId`) — or the UI breaks.
 6. **Verify with `status`** — orphan detection should report zero (nothing was left behind, since the derived
