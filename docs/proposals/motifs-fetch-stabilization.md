@@ -106,8 +106,6 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 6. After building, compute the **delta** for each index count and each enrichment field vs the prior build.
 7. Flag a **regression** when a count drops beyond a threshold (to 0, or by more than ~10%). Log it loudly
    (`REGRESSION: Ashliman variants 0 (was 340)`) and record a `regressions` block in `meta.json`.
-8. Add a `--strict` flag (`build_motifs` + CLI): exit non-zero if any regression is flagged. Default off
-   (best-effort), so CI/automation can opt in while interactive builds stay lenient.
 
 ### Phase 4 — Observability of degraded state
 
