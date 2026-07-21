@@ -57,6 +57,19 @@ drops only the destruction.
 
 ## 3. The plan
 
+### Phase 0 — Hole-only fix (no functional change, no new machinery)
+
+The pure "stop destroying good raw" fix — remove the two `unlink`s where the failed re-fetch never overwrote
+the live copy, so it is preserved with zero behaviour change on the happy path:
+
+1. **Ashliman `_fetch_page`** (`ashliman.py:253`): on 404 with an existing cache → **keep + serve it**, do not
+   `unlink`, do not write `.absent`. `.absent` + `None` only when there is no cache (never-existed derived name).
+2. **atu_wikidata** (`atu_wikidata.py:170`): on a **raised** fetch (transport/HTTP) → drop the `unlink`; the
+   old good copy survives (the raise skipped the overwrite anyway).
+
+Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degraded** Wikidata reply
+(`atu_wikidata.py:185`) — those bytes were already written, so keeping them needs validate-before-commit → Phase 1.
+
 ### Phase 1 — Non-destructive fetch (shared layer, `fetch_cache.py`)
 
 1. Add **staging-with-validator** to `fetch_to_cache`: download to `<cache>.partial`, run an optional
