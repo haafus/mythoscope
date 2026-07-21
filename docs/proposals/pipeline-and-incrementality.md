@@ -920,6 +920,12 @@ So one-level GC is not free: it is bought with the persistent stateful manifest.
 an *implication*, not a coincidence — the scan is the price, and the only thing that buys it away is the state we
 declined.
 
+> **Not now — neither manifest is built.** The **shipped** mechanism is the stateless scan (§2.7): decided
+> stateless (D7), and at our ~dozen stores the scan is instant. A manifest — derived (a scan cache, for
+> directory-walk cost) or persistent build-maintained (for one-level GC / remote / lineage) — is a **growth-trigger
+> option only**, added *if and when* a §9.1 trigger (a)/(b)/(c) fires. Until then there is no manifest to build,
+> maintain, or fsck.
+
 ### 9.4 Atomicity / partial-build failure — ADDRESSED (Part 2 item 3 + §2.2)
 
 Builds crash mid-way (network, GPU OOM, LLM rate-limit — the graph stage already handles the last). Then an
