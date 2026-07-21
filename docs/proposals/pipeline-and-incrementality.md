@@ -606,6 +606,13 @@ metadata **version field**, not in the id (see "the chunk id is a bare PK", `dat
 
 ## 5. Fetch vs build; the escape-hatch
 
+**CLI surface — decided: four verbs** over one content-addressed diff. `status [scope]` (read-only view of
+what's stale/missing/orphaned), `build [scope] [--force]` (make current; `--force` = ignore fingerprints in
+that scope), `refresh [documents|motifs]` (re-fetch upstream; preview → `--apply`), `clean [scope] [--apply]
+[--caches]` (orphans / cache tier, preview → `--apply`). Destructive/overwrite ops default to preview and
+require `--apply`; `build` is non-destructive and runs directly. `scope` is the optional stage/variant escape
+(Part 3 item 4).
+
 Separate **fetch** (network, into the immutable raw archive — non-deterministic, slow, archival) from
 **build** (a pure, offline, reproducible function of raw + config + code).
 
