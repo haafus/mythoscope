@@ -36,6 +36,13 @@ not as live work.
   embeddings key, fetch-vs-build separation, and a unified web+local source model (immutable raw archive +
   override-diff layer). Companion to `data-model-and-ids.md`. **Goal:** automatic, minimal, coherent rebuilds.
   *Proposal; not started.*
+- [`motifs-fetch-stabilization.md`](motifs-fetch-stabilization.md) — harden the motif source fetch so an
+  upstream link that dies, 404s, degrades, or stops parsing can **never delete previously-good raw** (two
+  sources call `cache.unlink()` on a forced re-fetch failure) and can **never degrade the output silently**
+  (no yield-vs-last-build check today). Validate-before-commit staging in the shared `fetch_cache.py`, keep the
+  pinned copy + warn instead of unlinking, and a regression guard with an opt-in `--strict`. The motif-specific
+  instance of `pipeline-and-incrementality.md`'s pinned-raw / no-unconfirmed-deletion principle, shippable now.
+  **Goal:** fetch failures never uncover good data or silently shrink the indexes. *Proposal; not started.*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
   (curated `content_start/end` + exclude) **done**; Layer 2 (cue-strip on interleaved notes) pending.*
