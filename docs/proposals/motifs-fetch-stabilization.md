@@ -104,8 +104,23 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 5. Before `save_json(store.meta_path(), meta)` (`build_motifs.py:266`), **load the previous `meta.json`** if
    present and capture prior `counts` + `enrichment`.
 6. After building, compute the **delta** for each index count and each enrichment field vs the prior build.
-7. Flag a **regression** when a count drops beyond a threshold (to 0, or by more than ~10%). Log it loudly
+7. Flag a **regression** when a count drops (to 0, or below the prior). Log it loudly
    (`REGRESSION: Ashliman variants 0 (was 340)`) and record a `regressions` block in `meta.json`.
+8. **Root-discovery set** — the key number for a *parse-root* (an index page whose parse yields the sub-page
+   links: Ashliman `folktexts*.html`, berezkin index, mapsofmyths `/motifs_full`) is **how many links it
+   yielded**. Store the **discovered set** (not just its size) in `meta.enrichment[source].discovered`, and diff
+   it against the previous build — **no threshold; any change is the signal**:
+   - **appeared** (`now − prev`) → **fetch the new sub-pages** (additive, auto — nothing to lose);
+   - **vanished** (`prev − now`) → **keep the previously-fetched sub-pages, do not delete**, and report.
+   ```python
+   prev = set(prev_meta["enrichment"][source].get("discovered", []))
+   now  = set(_HREF.findall(index_html))
+   for slug in now - prev:  fetch(slug)          # new — fetch
+   if prev - now:           report(prev - now)   # vanished — keep + surface
+   ```
+   Same invariant as everywhere (acquire-if-missing auto / never delete pinned), applied to the discovery set —
+   which catches a fan-out collapse (a degraded root returning fewer links) that per-sub-page health checks
+   cannot see.
 
 ### Phase 4 — Observability of degraded state
 
