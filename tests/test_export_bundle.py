@@ -74,9 +74,13 @@ class TestExport:
 
     def test_archive_name_and_layout(self, built_outputs):
         result = eb.export_outputs(out_dir=built_outputs, timestamp="20260629-120000")
-        assert result.path.name == "mythoscope-export-20260629-120000.zip"
+        assert result.path.name == "mythoscope-20260629-120000.zip"
         assert all(n.startswith("outputs/") for n in _names(result))
         assert set(result.components) == {"corpus", "embeddings", "projections", "graphs", "motifs"}
+
+    def test_archive_name_caches_tag(self, built_outputs):
+        result = eb.export_outputs(out_dir=built_outputs, timestamp="20260629-120000", include_caches=True)
+        assert result.path.name == "mythoscope-caches-20260629-120000.zip"
 
     def test_includes_file_sources(self, built_outputs):
         from settings import settings

@@ -457,8 +457,8 @@ mytho clean --caches --apply    # удалить орфаны И все кэши
 Упаковывает построенные данные `outputs/` в переносимый zip, чтобы развернуть их на другой машине (без GPU/интернета/LLM, профиль `viewer`). Отдельной команды `import` нет — восстановление это просто распаковка.
 
 ```bash
-mytho export            # mythoscope-export-<timestamp>.zip в корне проекта
-mytho export --caches   # дополнительно включить resumable-кэши
+mytho export            # mythoscope-<timestamp>.zip в корне проекта
+mytho export --caches   # mythoscope-caches-<timestamp>.zip — плюс кэши (тег -caches в имени)
 ```
 
 Что внутри:
@@ -468,7 +468,7 @@ mytho export --caches   # дополнительно включить resumable-
 Члены архива — пути `outputs/...` (и `sources/...` для файловых источников), поэтому на целевой машине:
 
 ```bash
-unzip mythoscope-export-<timestamp>.zip   # из корня проекта → воссоздаст outputs/ (и sources/)
+unzip mythoscope-<timestamp>.zip   # (или mythoscope-caches-…) из корня проекта → воссоздаст outputs/ (и sources/)
 mytho server
 ```
 

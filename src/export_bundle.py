@@ -109,7 +109,8 @@ def orphan_summary() -> list[str]:
 
 
 def export_outputs(*, include_caches: bool = False, out_dir: Path | None = None, timestamp: str = "") -> ExportResult:
-    """Zip the built outputs into ``mythoscope-export-<timestamp>.zip``.
+    """Zip the built outputs into ``mythoscope-<timestamp>.zip`` (``mythoscope-caches-<timestamp>.zip``
+    when ``include_caches`` — the ``-caches`` tag marks a bundle that carries the raw/cache tiers).
 
     Returns an :class:`ExportResult`; ``path`` is None when nothing is built (no
     archive is written). ``out_dir`` defaults to the current directory and
@@ -117,7 +118,8 @@ def export_outputs(*, include_caches: bool = False, out_dir: Path | None = None,
     """
     result = ExportResult(included_caches=include_caches)
     out_dir = out_dir or Path.cwd()
-    archive = out_dir / f"mythoscope-export-{timestamp}.zip"
+    tag = "-caches" if include_caches else ""
+    archive = out_dir / f"mythoscope{tag}-{timestamp}.zip"
 
     # Gather files first so we can skip writing an empty archive.
     plan: list[tuple[Path, str, int]] = []  # (file, arcname, size)
