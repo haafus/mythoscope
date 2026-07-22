@@ -156,12 +156,21 @@ flag lives until its cause is gone). This is the persistent form of *surface, do
     "auto_action": "kept-pinned",                  # what the system already did
     "first_seen": "<build-id>"}
    ```
-10. **Stateful lifecycle**, like a linter's open findings — **no manual "close":**
-    - **raise** — the condition is detected (invariant failed / hash changed / discovery set shrank / count
-      dropped) → record created;
-    - **persist** — every build re-checks; still true → the flag stays (`first_seen` untouched);
-    - **auto-clear** — the condition is gone (the human adopted/fixed it, the next fetch is healthy) → the
-      record drops itself.
+10. **Stateful lifecycle**, like a linter's open findings — **no free-form dismiss** (a still-true condition
+    can never be hidden, or a real problem gets silenced). A flag is *"a divergence from the current definition
+    of normal"* and clears exactly two ways, which force the human to say **which**:
+    - **raise** — the condition is detected (invariant failed / hash changed / discovery shrank / count dropped)
+      → record created; **persist** — every build re-checks; still true → the flag stays (`first_seen` untouched).
+    - **auto-clear = "the world returned to normal."** The trouble was **technical/transient** (a transient
+      recovered) or we **fixed it** (repaired the parser, shrank the query) and upstream again yields what it
+      used to — **nothing permanent changed**, the baseline does not move.
+    - **move-the-baseline = "normal changed."** The condition will *not* self-clear because this is a **new
+      stable state we accept as correct**: the source really updated (`adopt`), really disappeared
+      (`remove-from-config`), or the yield is legitimately lower (`reset the high-water / union mark`). The human
+      shifts the definition of normal to reality, and the flag then clears against the new normal.
+
+    So a flag is closed only by resolving *which category the divergence is* — a technical glitch (world
+    recovers, auto) or a new system state (baseline moves, manual) — never by hiding it.
 11. **Surfaced** three ways: the build-time `WARNING`, a list in `status` / `mytho flags`, and the `refresh
     --check` preview. **Never blocking** — a flag never aborts the build (best-effort); the build proceeds on
     the pinned state, the flag just makes the situation visible and un-losable. The human then decides whether
