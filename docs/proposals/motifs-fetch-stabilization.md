@@ -52,6 +52,14 @@ drops only the destruction.
 - **Validate before commit.** A fetched response replaces the live cache only after passing a validity check;
   otherwise the live cache is kept and the new (bad) bytes are discarded.
 - **No silent regression.** Every build compares its yield to the last and flags drops.
+- **One auto-reaction.** Every trouble case — upstream *changed* / *disappeared* / *degraded* / *no longer
+  parses* — takes the **same** automatic action: **keep the pinned artifact unchanged, commit nothing new, and
+  raise a flag** (`url — what happened`). "Reject" is built into commit (validate-before-commit discards the
+  arriving bytes); where nothing arrived (a 404) the reject is simply vacuous. The wording variants
+  (*keep / keep pinned / keep raw*) are the same act. The **only** thing that varies is the flag's **diagnosis**
+  (which of the four) — attribution for the human, not a different mechanism. The human decides whether to leave
+  the pinned state (adopt / remove-from-config / retry / fix-parser); the automatic layer never loses or poisons
+  data.
 
 ---
 
