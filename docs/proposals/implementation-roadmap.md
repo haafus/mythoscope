@@ -44,6 +44,11 @@ proven on low-stakes territory first.
 4. motifs **Phase 3 + 4** — surface degradation + durable flags
 5. motifs **Phase 5** — tests
 
+**Verify** — **build:** `build motifs` (cheap, from the raw cache — no re-scrape). **Check:** the Motifs section
+renders; index/cross-walk counts are sane; degradation/flag machinery writes to the log + `meta.flags` /
+`meta.highwater` and self-initialises (no spurious `yield-drop` on first run); tests + lint green. *Front: the
+Motifs section only.*
+
 ### Stage II — Part 2 incrementality base *(code + fp sidecars · before the migration)*
 
 Land the fingerprint + atomicity machinery **before** the data migration, so the rebuild writes fingerprints in
@@ -55,6 +60,11 @@ one pass (no separate backfill — this is the "Part 1 + 2 together" optimisatio
 9. Part 2 **item 4** fetch/build split + general `refresh` + pin raw *(on the motifs-proven model)*
 10. Part 2 **item 5 = Part 1 step 6** graphs build/serve unify + traversal guard *(shared — do once, here)*
 
+**Verify** — **build:** tests + a tiny end-to-end (embed 2–3 docs on the *current* scheme — the old data is
+still in place). **Check:** the fp gate behaves — editing a doc's text re-embeds it, an unchanged doc is
+skipped; `transform_version` bump re-embeds; `os.replace` writes are atomic (no half-written catalog on a kill);
+graphs build == serve. *Front: unchanged — smoke-check it still loads; no data-model change yet.*
+
 ### Stage III — Part 1 data-model + region migration *(the single irreversible step)*
 
 Now, with the code proven on motifs and fingerprints+atomicity in place.
@@ -64,6 +74,12 @@ Now, with the code proven on motifs and fingerprints+atomicity in place.
     (re-fetch + rebuild, now fingerprint-aware) → front in lockstep → `status` reports zero orphans. *The one
     one-way step; re-runnable from the committed raw.*
 
+**Verify** — **build:** the full rebuild of step 12 (re-fetch + re-embed + re-graph). **Check (the deep one —
+this is the only front-affecting stage):** region grouping and per-region colours; document resolution
+(`document_id = hash(locator)`, titles, links); the renamed endpoints + dropped fields with `treeIndex` /
+`docIndex`; every view that touched `major_tradition`; one `UNASSIGNED`; `status` = **zero orphans**; counts
+match expectation. *Front: full, in lockstep with the API change.*
+
 ### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)*
 
 Consumes Part 2's fp base; presupposes Part 1. Reverts via `git`.
@@ -72,6 +88,12 @@ Consumes Part 2's fp base; presupposes Part 1. Reverts via `git`.
 14. Part 3 **item 5** — rewire `export_bundle` onto the driver
 15. Part 3 **item 4** — scope (stage / variant)
 16. Part 3 **item 3** — DVC/Dagster re-eval *(decision only; likely no-op)*
+
+**Verify** — **build:** `status` then a `build` that should be a **no-op** (nothing stale after step 12), plus a
+one-off cheap fp-init for anything Part 2 didn't fingerprint (projection refit / motif reassembly — no re-fetch,
+no re-LLM). **Check:** `status` / `clean --dry-run` = zero orphans; the driver reproduces the *same* artifacts
+(diff the outputs — a code refactor must not change data); `export` still bundles correctly; tests green. *Front:
+unchanged — smoke-check.*
 
 ### Stage V — Part 4 manual curation *(editorial · independent · last)*
 
