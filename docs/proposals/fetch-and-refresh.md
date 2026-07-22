@@ -246,3 +246,78 @@ The only baseline moves that happen **inside** the pipeline:
 
 Everything else is resolved **outside the pipeline**, regardless of whether it is (2) or (3): `gone` → edit the
 config (remove the expected entry); `degraded` / `no-parse` → wait for recovery or fix the query/parser code.
+
+---
+
+## 7. Two-layer architecture — source-units vs stages
+
+The fetch/build split is realised as **two layers**, validated on both corpus (one generic source) and motifs
+(seven bespoke sources, one shared).
+
+**Layer 1 — fetchable source-units** own the *fetch*: a raw dir, the `key → locator` mapping, any auth, and the
+**`acquire`/`refresh`** operations. `acquire(key)` **dispatches by source type** internally — `http(s)://` →
+network fetch-to-cache, `file:` / bare path → local read (confined to `sources_dir`) — both landing in the same
+raw cache, so the caller never sees "web vs disk". `refresh` re-checks a present source (§2 flow).
+
+**Layer 2 — stages** own the *parse + store*: they read raw via a source-unit's `acquire`, transform (extract /
+clean / parse), and write their output `store`. A stage's `store` is 1:1 with the stage (may be several
+artifacts — corpus writes the `.txt` tree **and** `corpus.json`).
+
+**No separate `RawStore` object.** The fetch capability rides on the entity that already exists — a source
+module today (sources already expose `refresh()`), a **stage object in Part 3** (fetchable stages carry
+`acquire`/`refresh` as methods with bound config; non-fetchable stages — `embeddings`/`graphs` — simply don't,
+and read their input from a prior stage's `store`). `acquire` and `refresh` are **two faces of one `upstream`
+capability**: a stage has both or neither — design them together, never as a standalone raw object beside a
+separate `refresh` field.
+
+**acquire-on-miss (auto) vs refresh (explicit)** — the divide is the core principle applied per-key:
+- **new key with no raw** (cold start *or* a document newly added to config) → `acquire`: fetch + validate +
+  commit. Nothing to lose → **automatic on build**. Present raw is **never re-fetched** (build stays offline for
+  what is present — the invariant is "don't re-fetch present", not "never touch the network").
+- **existing raw, upstream may have changed** → **`refresh`, explicit** (diff / flag / adopt). Never automatic.
+
+**Shared sources need no driver aggregation.** Sources are a **registry deduped by id**; each stage declares
+`sources = [ids]` it reads. A source used by two stages (e.g. `trilogy` → `tmi` + `atu`) is deduped for free:
+- **build** — both stages call `SOURCES["trilogy"].acquire(...)`; acquire-on-miss means the network is hit
+  **once** (the second is a cache hit);
+- **refresh** — iterates the **set** of distinct sources in scope → `trilogy` refreshed **once**.
+
+The driver never models sources as DAG nodes (that would put fetch back in the graph — it is the boundary). A
+new source = add to the registry + name it in a stage's `sources`; sharing = one id in two lists.
+
+```python
+SOURCES = {"trilogy": Trilogy(), "wikidata": Wikidata(), "ashliman": Ashliman(), ...}   # dedup by id
+
+class AtuStage:                       # Layer 2
+    sources = ["trilogy", "wikidata", "ashliman"]
+    def build(self):
+        rows = SOURCES["trilogy"].acquire("atu_df")   # cache-deduped with TmiStage
+
+def refresh(scope):
+    for sid in {s for st in stages_in(scope) for s in st.sources}:   # set -> trilogy once
+        SOURCES[sid].refresh()
+```
+
+Motifs map to **3 index stores** (`berezkin`/`tmi`/`atu` → one JSON each) over **~7 source-units**
+(`areasofmyths` · `mapsofmyths` · `trilogy` shared · `folkmasa` · `mellmann` · `wikidata` · `ashliman`);
+`crosswalk` / `parallels` / `semantic` are downstream stages with **no upstream** (they read index stores, not
+raw). Corpus maps to **one generic source-unit** (scheme-dispatch, per-document keys) → the `corpus` stage →
+the `.txt` tree + catalog.
+
+## 8. Open items (pin at implementation, Part 3 era)
+
+This architecture is the **target form** — converged and validated, not yet a code-ready spec. Still to pin:
+
+1. **Source-unit API** — exact signatures of `acquire(key)` / `refresh(*, apply)` / the `validate` hook, and how
+   `key → locator` resolves.
+2. **Shared-source keys** — `trilogy`'s file-keys and how `tmi` / `atu` name what they read.
+3. **Motif raw in export** — decide whether to ship the hard-to-re-fetch sources (`mapsofmyths` auth, `wikidata`
+   flaky, mortal sites) rather than exclude all raw as cache — a motif-specific decision, *not* inherited from
+   the corpus `raw = cache` call.
+4. **fetch/parse split** — mechanically move parse out of the sources' current `refresh()` functions into the
+   index stages' `build` (today they conflate fetch + parse).
+5. **Edges not yet walked** — parse-root discovery (berezkin detail pages found by parsing the index) under the
+   fetch/parse split; the `mapsofmyths` POST endpoint; per-source auth; per-source validators.
+
+Near-term work (motifs Phases 0–5, pipeline Part 2) does **not** depend on this — it lands with the Part 3
+stage-protocol refactor.
