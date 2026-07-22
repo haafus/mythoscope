@@ -13,6 +13,14 @@ the user** — fix it as **temporary** (the world recovers, or you patch the cod
 permanent** (`refresh --rebaseline` / a config edit). The automatic layer's whole job is to **never lose or
 poison data**; every judgement call is surfaced, never silently made.
 
+**Best-effort, not fail-fast.** A build **degrades rather than aborts**: a source down / degraded / unparsed
+produces a *smaller but coherent* output plus a flag, never a failed build. This fits third-party flaky sources,
+an exploratory output (a slightly smaller motif index is still useful), and a single user with no SLA — so a
+partial result beats no result. The opposite choice (**fail-fast** — abort so a degraded artifact never exists)
+is right when a downstream consumer needs guaranteed-complete data (a release artifact, a payment flow); it is
+*not* this pipeline. This is why flags **never block** the build — the guard is *visibility* (a durable flag),
+not *abort*.
+
 ---
 
 ## 1. Fetch is the DAG boundary, not a stage
