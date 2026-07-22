@@ -48,8 +48,8 @@ not as live work.
   upstream link that dies, 404s, degrades, or stops parsing can **never delete previously-good raw** (two
   sources call `cache.unlink()` on a forced re-fetch failure) and can **never degrade the output silently**
   (no yield-vs-last-build check today). Validate-before-commit staging in the shared `fetch_cache.py`, keep the
-  pinned copy + warn instead of unlinking, and a regression guard with an opt-in `--strict`. The motif-specific
-  instance of `pipeline-and-incrementality.md`'s pinned-raw / no-unconfirmed-deletion principle, shippable now.
+  pinned copy + flag instead of unlinking, and a durable regression/degradation flag guard. The motifs application
+  of the canonical [`fetch-and-refresh.md`](fetch-and-refresh.md) model, shippable now.
   **Goal:** fetch failures never uncover good data or silently shrink the indexes. *Proposal; not started.*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
