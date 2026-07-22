@@ -159,6 +159,20 @@ flag lives until its cause is gone). This is the persistent form of *surface, do
 **baseline/discovery diff** (build-time, aggregate — every payload is individually fine but the whole yield or
 the fan-out shrank, which no per-payload check can see).
 
+12. **Aggregate flags are durable off a high-water mark** — not a one-shot delta vs the previous build. Pin each
+    aggregate counter's **max ever seen** in `meta.highwater`; a flag stays raised while `current < max` and
+    **auto-clears only when the counter recovers to the mark**:
+    ```python
+    if current < mx:  flag("below-high-water", detail=f"{counter}: {current} < max {mx}")
+    ```
+    For the **discovery set** (not a number) the high-water is the **accumulated union** of every link ever
+    discovered; flag while `current ⊊ accumulated`. This makes `yield-drop` / `discovery-changed` persist until
+    the source actually recovers, instead of clearing the next build just because the (now-lower) value stopped
+    changing.
+    - **Risk — a spurious high poisons the mark** (a dedup bug counts double → `max` sticks, everything flags
+      below it forever). Mitigation: **advance the mark only on a trusted build** (no active per-payload flags);
+      a dirty spike does not move it.
+
 ### Phase 5 — Tests & verification (`tests/test_motifs.py`)
 
 10. Add cases:
