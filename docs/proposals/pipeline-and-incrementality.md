@@ -778,7 +778,15 @@ Full Bazel/Nix is overkill for this size — **content-addressed sidecar fps + t
 statelessly** is the right amount. (This minimal path is exactly what **Part 2** below implements; the
 protocol/driver of §2.2 is the later **Part 3** generalisation of it.)
 
-### Implementation order — **Part 2 of 4: incrementality base** (small, high-ROI; inside the existing stages)
+### Implementation order — **Part 2 of 4: incrementality base** (small, high-ROI; inside the existing stages) — ✅ DONE
+
+> **Status: shipped (Stage II).** Items 1–5 below are implemented inside the existing stages, tests are the
+> acceptance gate (`test_embeddings_transform.py`'s `embed_plan` cases = edit→re-embed / unchanged→skip /
+> version-bump→re-embed / shrink→drop-trailing; `test_corpus_refresh.py`; `test_graphs_store.py`). Two things
+> are **deliberately deferred to Part 3**, not skipped: the **rename-churn** half of item 1 (needs Part 1's
+> `document_id` anchor — today's anchor is still `slug(title)`), and the **generalised per-source staged
+> `refresh`** / source-unit layer of item 4 (`fetch-and-refresh.md` §7 — `refresh motifs` currently re-scrapes
+> wholesale rather than per-source-diffing). The fingerprints are written in the shape Part 3's `actual()` reads.
 
 **Part 1 (the data-model + region migration) is the single list in
 [`region-implementation.md`](region-implementation.md) §5.** Part 2 is the **small** fp work done *inside the

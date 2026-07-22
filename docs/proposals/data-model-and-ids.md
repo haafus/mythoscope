@@ -367,7 +367,7 @@ raw-archive key — so identity stops tracking the title. The deltas:
 | 2 | `tradition` stored raw; region has no id | `region_id`/`tradition_id` = **the canonical name** (kept verbatim; boundaries already sanitise — `sanitize_filename`/`encodeURIComponent`/`escapeHtml`) |
 | 3 | `normalize_catalog_id` mints the document `text_id` (`\s+`→`_`) | **repurposed, not retired**: documents drop it (id = `hash(locator)`); it now just whitespace-canonicalises `region_id`/`tradition_id`. **No `slugify`, no transliteration.** |
 | 4 | chunk carries `text_id, tradition, major_tradition, url` | chunk = **one ref** `document_id` (+ `chunk_index`); drop `tradition`/`major_tradition`/`url` (B1) |
-| 5 | graphs: build writes raw `text_id`, serve re-normalizes it (idempotent today, latent divergence; not a traversal guard) | **unify** build/serve on the stored id + a real `sanitize`+`is_relative_to` guard |
+| 5 | graphs: build writes raw `text_id`, serve re-normalizes it (idempotent today, latent divergence; not a traversal guard) | ✅ **DONE (Part 2 item 5)** — both call one `graphs.store.graph_dir`, with `sanitize`+`is_relative_to` confinement (still keyed on `text_id` until Part 1's `document_id` lands) |
 | 6 | front reconstructs the title (`bookTitleFromId`, lossy) | resolve exact title from `docIndex[document_id]` |
 | 7 | no id validity/uniqueness check | build-time **fail-loud uniqueness** check |
 
@@ -385,7 +385,8 @@ drifts). They are folded, in dependency order, into the **single implementation 
 - persist `document_id = hash(locator)` + mint `region_id`/`tradition_id` = name → §5 step 2;
 - front `treeIndex`/`docIndex` + resolution, delete `bookTitleFromId` → §5 step 3;
 - chunk → `{document_id, chunk_index}` (B1) + the `get_point` `$nin` filter → §5 step 4;
-- graphs build/serve unify + traversal guard → §5 step 6.
+- graphs build/serve unify + traversal guard → §5 step 6. ✅ **shipped early in Part 2 (item 5)** — the isolated
+  guard did not need the migration; the build/serve helper re-keys onto `document_id` for free when step 6 lands.
 
 Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline-and-incrementality.md` §7.
 

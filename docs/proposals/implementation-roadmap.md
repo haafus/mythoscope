@@ -56,16 +56,23 @@ Motifs section only.*
 `yield-drop` fires) **are** the acceptance gate; no separate script.
 **Review:** light — `/code-review` on the stage diff + green tests.
 
-### Stage II — Part 2 incrementality base *(code + fp sidecars · before the migration)*
+### Stage II — Part 2 incrementality base *(code + fp sidecars · before the migration)* — ✅ DONE
 
 Land the fingerprint + atomicity machinery **before** the data migration, so the rebuild writes fingerprints in
 one pass (no separate backfill — this is the "Part 1 + 2 together" optimisation).
 
-6. Part 2 **item 3** atomicity (`os.replace`) *(reuses the staging pattern from motifs Phase 1)*
-7. Part 2 **item 2** `transform_version`
-8. Part 2 **item 1** embeddings content-fp gate
-9. Part 2 **item 4** fetch/build split + general `refresh` + pin raw *(on the motifs-proven model)*
-10. Part 2 **item 5 = Part 1 step 6** graphs build/serve unify + traversal guard *(shared — do once, here)*
+6. Part 2 **item 3** atomicity (`os.replace`) *(reuses the staging pattern from motifs Phase 1)* — ✅ `corpus.json`
+   via the atomic `save_json`; `.fp`-bearing writes already atomic.
+7. Part 2 **item 2** `transform_version` — ✅ `embeddings/transform.py` (param-hash + manual `EMBED_ALGO_VERSION`),
+   folded into the chunk fingerprint.
+8. Part 2 **item 1** embeddings content-fp gate — ✅ stored per-chunk fingerprint compared vs
+   `hash(doc fingerprint, transform_version)`; doc `fingerprint` = `blake2b(cleaned text)` in the catalog; the
+   decision is the pure `embed_plan()`. *(rename-churn half still awaits Part 1's `document_id` anchor.)*
+9. Part 2 **item 4** fetch/build split + `refresh` + pin raw — ✅ `--force` no longer re-fetches (raw pinned);
+   new `mytho refresh [documents|motifs]` (staged diff, keep-pinned, `--apply`). *(The generalised per-source
+   staged refresh / source-unit layer is deferred to Part 3, §7 of `fetch-and-refresh.md`.)*
+10. Part 2 **item 5 = Part 1 step 6** graphs build/serve unify + traversal guard — ✅ one `graphs.store.graph_dir`
+    used by build + serve, with `sanitize` + `is_relative_to` confinement.
 
 **Verify** — **build:** tests + a tiny end-to-end (embed 2–3 docs on the *current* scheme — the old data is
 still in place). **Check:** the fp gate behaves — editing a doc's text re-embeds it, an unchanged doc is
