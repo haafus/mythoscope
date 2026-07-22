@@ -84,6 +84,27 @@ class TestIterCorpusFiles:
         info = list(iter_files(corpus))[0]
         assert info.read_text() == "hello world"
 
+    def test_carries_stored_fingerprint(self, tmp_path):
+        corpus = self._create_corpus(tmp_path, [
+            {"title": "a", "tradition": "t", "major_tradition": "m",
+             "path": "m/t/a/a.txt", "content": "body", "fingerprint": "deadbeef"},
+        ])
+        info = list(iter_files(corpus))[0]
+        assert info.fingerprint == "deadbeef"
+        assert info.content_fingerprint() == "deadbeef"  # stored value used as-is
+
+    def test_content_fingerprint_falls_back_when_absent(self, tmp_path):
+        # A pre-Stage-II catalog stored no fingerprint → recompute from the text on disk.
+        from corpus.utils import content_fingerprint
+
+        corpus = self._create_corpus(tmp_path, [
+            {"title": "a", "tradition": "t", "major_tradition": "m",
+             "path": "m/t/a/a.txt", "content": "body text"},
+        ])
+        info = list(iter_files(corpus))[0]
+        assert info.fingerprint == ""
+        assert info.content_fingerprint() == content_fingerprint(b"body text")
+
     def test_missing_corpus_json_raises(self, tmp_path):
         corpus_dir = tmp_path / "corpus"
         corpus_dir.mkdir()

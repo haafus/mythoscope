@@ -25,6 +25,12 @@ def md5(data: bytes) -> str:
     return hashlib.md5(data).hexdigest()
 
 
+# Change-detection fingerprint (non-adversarial): blake2b, digest_size=16 (32 hex).
+# One algorithm everywhere (pipeline §2.4) — fast, stdlib, ample collision margin.
+def content_fingerprint(data: bytes) -> str:
+    return hashlib.blake2b(data, digest_size=16).hexdigest()
+
+
 def normalize_catalog_id(value: Any) -> str:
     return re.sub(r"\s+", "_", str(value or "").strip())
 

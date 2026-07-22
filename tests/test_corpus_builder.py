@@ -231,6 +231,50 @@ class TestFileSourceDispatch:
         assert builder._download_and_process(item) is None
 
 
+class TestFinalizeText:
+    def test_stores_blake2b_fingerprint(self):
+        from corpus.builder import _finalize_text
+        from corpus.utils import content_fingerprint
+
+        data, stats = _finalize_text("Hello world.", "http://x", "T")
+        assert "md5" not in stats  # the broken hash is dropped from the catalog (D2)
+        assert stats["fingerprint"] == content_fingerprint(data)
+
+    def test_fingerprint_changes_with_text(self):
+        from corpus.builder import _finalize_text
+
+        _, a = _finalize_text("The hero sailed home.", "http://x", "T")
+        _, b = _finalize_text("The hero stayed home.", "http://x", "T")
+        assert a["fingerprint"] != b["fingerprint"]  # a text edit → new fp → re-embed
+
+
+class TestPinnedRaw:
+    def test_force_does_not_refetch(self, tmp_path, monkeypatch):
+        # --force rebuilds derived from the pinned raw; it must NOT re-fetch upstream.
+        from fetch_cache import cache_path
+        from settings import settings
+
+        corpus_dir = tmp_path / "corpus"
+        corpus_dir.mkdir()
+        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
+        monkeypatch.setattr(settings, "sources_dir", tmp_path / "sources")
+
+        raw = cache_path(corpus_dir / "raw", "https://example.com/iliad")
+        raw.parent.mkdir(parents=True, exist_ok=True)
+        raw.write_bytes(b"pinned raw text")
+
+        def boom(url, auth=None):
+            raise AssertionError("build re-fetched upstream — raw must be pinned")
+
+        import corpus.downloader as dl
+        monkeypatch.setattr(dl, "download_file", boom)
+
+        item = {"title": "Iliad", "tradition": "Greek", "major_tradition": "Hellenic",
+                "url": "https://example.com/iliad", "description": ""}
+        meta = builder._download_and_process(item)
+        assert meta is not None  # rebuilt from pinned raw, no network
+
+
 class TestUpdateTraditions:
     def _setup(self, tmp_path, monkeypatch, *, books=None, traditions=None):
         from settings import settings

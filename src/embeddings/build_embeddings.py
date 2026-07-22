@@ -15,6 +15,7 @@ from . import chroma_manager
 from .chunking import chunk_text
 from .model_manager import EmbeddingEncoder
 from .preprocess import preprocess_texts
+from .transform import chunk_fingerprint, embed_plan, transform_version
 
 logger = logging.getLogger(__name__)
 
@@ -68,13 +69,23 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
         metadata={"key": key, "model": encoder.model_name, "hnsw:space": "cosine"},
     )
 
-    existing_ids = collection.existing_ids()
-    if existing_ids:
-        logger.info(f"Collection '{collection.name}' has {len(existing_ids)} existing chunks, resuming")
+    transform_v = transform_version(cfg, emb.chunk_size, emb.chunk_overlap)
+
+    # Stored chunk fingerprints from the last build: {chunk_id -> fingerprint}. A chunk is
+    # up-to-date iff it is present AND its stored fp equals the one its document hashes to
+    # now — so a text edit (new doc fp) re-embeds, a pure rename does not (pipeline §4).
+    prev = collection.get(include=["metadatas"])
+    existing_fp = {
+        cid: (meta or {}).get("fingerprint")
+        for cid, meta in zip(prev["ids"], prev["metadatas"], strict=True)
+    }
+    if existing_fp:
+        logger.info(f"Collection '{collection.name}' has {len(existing_fp)} existing chunks, resuming")
 
     added_total = 0
     skipped_total = 0
     total_chunks = 0
+    stale_removed = 0
     encode_seconds = 0.0
 
     logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
@@ -82,9 +93,10 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     total = 0
     initial = 0
     for fi in files_info:
+        expected = chunk_fingerprint(fi.content_fingerprint(), transform_v)
         n = sum(1 for c in chunk_text(fi.read_text(), emb.chunk_size, emb.chunk_overlap) if c.strip())
         total += n
-        initial += sum(1 for i in range(n) if chunk_id(fi.text_id, i) in existing_ids)
+        initial += sum(1 for i in range(n) if existing_fp.get(chunk_id(fi.text_id, i)) == expected)
 
     t0 = time.monotonic()
     with tqdm(total=total, initial=initial, desc="Embedding", unit="chunk") as pbar:
@@ -95,13 +107,18 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
                 continue
             n_chunks = len(chunks)
             total_chunks += n_chunks
+            expected = chunk_fingerprint(file_info.content_fingerprint(), transform_v)
             try:
-                ids, metadatas = _build_chroma_entries(chunks, file_info)
+                ids, metadatas = _build_chroma_entries(chunks, file_info, expected)
 
-                missing = [
-                    (i, chunk) for i, (cid, chunk) in enumerate(zip(ids, chunks, strict=True))
-                    if cid not in existing_ids
-                ]
+                to_embed, stale = embed_plan(file_info.text_id, n_chunks, expected, existing_fp)
+                # Drop trailing chunks a now-shorter document no longer has (the only
+                # deletion case; positional ids upsert-overwrite the rest, never orphan §4).
+                if stale:
+                    collection.delete(ids=stale)
+                    stale_removed += len(stale)
+
+                missing = [(i, chunks[i]) for i in to_embed]
                 skipped_total += n_chunks - len(missing)
                 if not missing:
                     continue
@@ -165,19 +182,24 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
         "model": encoder.model_name,
         "chunk_size": emb.chunk_size,
         "total_chunks": total_chunks,
+        "transform_version": transform_v,
     })
 
     elapsed = time.monotonic() - t0
-    logger.info(f"Done: {added_total} added, {skipped_total} skipped, {total_chunks} total in '{collection.name}' ({elapsed:.1f}s)")
+    removed = f", {stale_removed} stale removed" if stale_removed else ""
+    logger.info(f"Done: {added_total} added, {skipped_total} skipped{removed}, {total_chunks} total in '{collection.name}' ({elapsed:.1f}s)")
     if encode_seconds > 0 and added_total > 0:
         speed = added_total / encode_seconds
         logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")
 
 
 def _build_chroma_entries(
-    chunks: list[str], info: CorpusFileInfo,
+    chunks: list[str], info: CorpusFileInfo, fingerprint: str,
 ) -> tuple[list[str], list[dict[str, Any]]]:
     ids = [chunk_id(info.text_id, i) for i in range(len(chunks))]
     base = {k: v for k, v in dataclasses.asdict(info).items() if not k.startswith("_")}
-    metadatas = [{**base, "chunk_index": i} for i in range(len(chunks))]
+    # `fingerprint` here is the per-chunk staleness key (hash of the doc fp + transform
+    # version), written into the row's metadata so the next build's gate can compare it;
+    # it overrides the doc-level `fingerprint` that asdict(info) carries.
+    metadatas = [{**base, "chunk_index": i, "fingerprint": fingerprint} for i in range(len(chunks))]
     return ids, metadatas

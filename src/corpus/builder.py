@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fetch_cache import cache_path, fetch_to_cache
+from json_utils import save_json
 from settings import settings
 
 from .clean_gutenberg import clean_gutenberg_in_builder, trim_to_content
@@ -20,11 +21,11 @@ from .sources import (
     source_scheme,
 )
 from .utils import (
+    content_fingerprint,
     count_sentences,
     count_words,
     ensure_dir,
     get_tradition_color,
-    md5,
     normalize_text,
     text_path,
 )
@@ -47,7 +48,10 @@ def _finalize_text(
     text = trim_to_content(text, content_start, content_end, title)
     data_utf8 = text.encode("utf-8")
     stats = {
-        "md5": md5(data_utf8),
+        # Per-doc content fingerprint (D2): blake2b of the cleaned text. Stored once in
+        # the catalog; the embeddings stage folds it into each chunk's staleness key so a
+        # text edit re-embeds and a pure rename does not (pipeline §4).
+        "fingerprint": content_fingerprint(data_utf8),
         "char_count": len(text),
         "word_count": count_words(text),
         "sentence_count": count_sentences(text),
@@ -88,7 +92,7 @@ def _extract_text(data: bytes, url: str, title: str, content_type: str = "") -> 
     return _decode_bytes(data)
 
 
-def _download_and_process(item: dict, force: bool = False) -> dict | None:
+def _download_and_process(item: dict) -> dict | None:
     title = item["title"]
     url = item["url"]
 
@@ -96,7 +100,10 @@ def _download_and_process(item: dict, force: bool = False) -> dict | None:
         raw_cache = cache_path(Path(settings.corpus_dir) / "raw", url)
         scheme = source_scheme(url)
         if scheme in WEB_SCHEMES:
-            data = fetch_to_cache(url, raw_cache, force=force)
+            # Raw is a pinned, immutable archive: build only acquires-if-missing and never
+            # re-fetches (fetch/build split, pipeline §5). `--force` rebuilds the derived
+            # text from this raw; re-fetching upstream is the separate `mytho refresh`.
+            data = fetch_to_cache(url, raw_cache, force=False)
         elif is_file_source(url):
             data = read_local_to_cache(url, raw_cache, settings.sources_dir)
         else:
@@ -248,7 +255,7 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         # draining the whole queue (shutdown(wait=True) on a `with` exit would block).
         executor = concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers)
         try:
-            futures = {executor.submit(_download_and_process, item, force): item for item in to_download}
+            futures = {executor.submit(_download_and_process, item): item for item in to_download}
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
                 if result:
@@ -259,8 +266,9 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         metadata.extend(new_metadata)
         logger.info(f"Downloaded: {len(new_metadata)}, failed: {len(to_download) - len(new_metadata)}")
 
-    with open(settings.corpus_dir / "corpus.json", "w", encoding="utf-8") as f:
-        json.dump(metadata, f, ensure_ascii=False, indent=2)
+    # Atomic swap (write .tmp then os.replace) so a crash mid-write can't leave a
+    # truncated catalog whose stored fingerprints would lie to the next build (§9.4).
+    save_json(settings.corpus_dir / "corpus.json", metadata, indent=2)
 
     logger.info("Corpus build complete. Total: %d texts", len(metadata))
 

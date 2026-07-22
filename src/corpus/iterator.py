@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
 
-from .utils import normalize_catalog_id
+from .utils import content_fingerprint, normalize_catalog_id
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,9 @@ class CorpusFileInfo:
     major_tradition: str
     tradition: str
     url: str
+    # Per-doc content fingerprint (blake2b of the cleaned text) from the catalog; the
+    # embeddings staleness gate folds it into each chunk's key (pipeline §4).
+    fingerprint: str = ""
 
     @property
     def filename(self) -> str:
@@ -23,6 +26,11 @@ class CorpusFileInfo:
 
     def read_text(self) -> str:
         return self._path.read_text(encoding="utf-8")
+
+    def content_fingerprint(self) -> str:
+        """The stored doc fingerprint, or recomputed from disk for a pre-fingerprint
+        catalog (older builds stored no `fingerprint`) so the gate still works."""
+        return self.fingerprint or content_fingerprint(self.read_text().encode("utf-8"))
 
 
 def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
@@ -57,4 +65,5 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
             major_tradition=item.get("major_tradition", "unknown"),
             tradition=item.get("tradition", "unknown"),
             url=item.get("url", ""),
+            fingerprint=item.get("fingerprint", ""),
         )
