@@ -1,14 +1,17 @@
 # Implementation roadmap — order across the five proposals
 
 The consolidated build order for the pipeline/data/fetch redesign. It sequences every phase of every proposal
-by the **reversibility ladder**: code and additive data first (freely revertible), the one irreversible data
-migration as late as possible and only once the code around it is proven. Source of truth for *what* each phase
+by the **reversibility ladder**: code and additive data first (freely revertible), the heaviest step (the Part 1
+§6 rebuild) as late as possible and only once the code around it is proven. Source of truth for *what* each phase
 does stays in the individual proposals linked below; this doc owns *the order and why*.
 
-Guiding rule: **the fear is proportional to irreversibility.** Only one step (the Part 1 §6 migration) is a
-one-way data commitment — and even it is re-runnable from the on-disk raw (re-keyed in place, not re-fetched).
-Everything else is `git revert` or
-a recompute.
+Guiding rule: **the fear is proportional to irreversibility — and after the re-key decision, nothing here is
+truly one-way.** The Part 1 §6 migration is the *heaviest* step (a full re-embed/re-graph), but **reversible**:
+raw is **re-keyed in place** (a `sha1→blake2b` rename, no re-fetch — reverse it by renaming back), derived is
+wiped and recomputable, and `config`/code roll back via git. Nothing pre-existing can be lost (no network in the
+migration; a dead source only bites a *genuinely-new* doc, as a normal flag). The pre-migration snapshot is a
+*convenience* — it saves re-paying the GPU rebuild on a rollback, not a guard against data loss. Everything else
+is `git revert` or a recompute.
 
 ---
 
@@ -74,8 +77,9 @@ Now, with the code proven on motifs and fingerprints+atomicity in place.
 12. Part 1 **§6 migration** — **snapshot `corpus/` + `embeddings/` first** → wipe derived → **write + run the
     one-off `scripts/rekey_raw.py`** (config-driven `sha1(url) → blake2b(locator)` rename in place, no network)
     → plain `build` (finds re-keyed raw present, rebuilds fingerprint-aware, **no re-fetch**) → front in lockstep
-    → `status` reports zero orphans. *The one one-way step; raw re-keyed in place (a dead source can't lose data),
-    a throwaway migration script, not pipeline code.*
+    → `status` reports zero orphans. *The heaviest step (full re-embed/re-graph), but **reversible** — raw
+    re-keyed in place (rename back to undo; a dead source can't lose data), derived recomputable, config/code via
+    git. The re-key is a throwaway migration script, not pipeline code.*
 
 **Verify** — **build:** the full rebuild of step 12 (offline re-key + re-embed + re-graph — no re-fetch). **Check (the deep one —
 this is the only front-affecting stage):** region grouping and per-region colours; document resolution
@@ -106,18 +110,19 @@ unchanged — smoke-check.*
 
 ## Why this order
 
-- **The irreversible step (12) is exactly one, and last-but-one** — after the code is proven on motifs (I) and
-  the fp + atomicity rails are in place (II).
+- **The heaviest step (12) is exactly one, and last-but-one** — after the code is proven on motifs (I) and the
+  fp + atomicity rails are in place (II). Heaviest ≠ irreversible: the re-key makes it undoable.
 - **Motifs first** — isolated from the corpus, cheap, and it proves the whole fetch/refresh/flag model before
   any corpus risk.
 - **Part 2 before Part 1** — so the migration's rebuild writes fingerprints directly (no separate backfill).
 - **graphs build/serve unify** appears in both Part 1 step 6 and Part 2 item 5 → done once, at step 10.
-- **Everything except step 12 is reversible** (`git revert` or recompute); step 12 is snapshot-guarded and
-  re-runnable from raw.
+- **Nothing is truly one-way** — step 12 is reversible (raw re-key renames back, derived recomputes,
+  config/code via git); the snapshot only saves re-paying the rebuild.
 
 ## Reversibility ladder (increasing commitment)
 
 1. **code-only** (motifs Phase 0; Part 3) — revert in one command
 2. **additive data** (flags in `meta`, `.fp` sidecars) — does not touch existing artifacts
 3. **metadata backfill** (Part 2 fingerprints) — recomputable, loses nothing
-4. **one-way data migration** (Part 1 §6) — the single real commitment → snapshot first; re-runnable from raw
+4. **heavy but reversible rebuild** (Part 1 §6) — raw re-keyed in place (rename back to undo), derived
+   recomputed; snapshot first only to skip re-paying the GPU rebuild on a rollback
