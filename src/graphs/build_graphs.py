@@ -9,6 +9,7 @@ from llm import LLMProcessor, map_concurrent
 from settings import settings
 
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
+from .store import graph_dir
 from .graph_generator import (
     filter_by_names,
     generate_ages_graph,
@@ -81,7 +82,7 @@ def build_graphs(
     for file_info in files:
         text_id = file_info.text_id
 
-        book_out_dir = settings.graphs_dir / text_id
+        book_out_dir = graph_dir(text_id)
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
         text = file_info.read_text()

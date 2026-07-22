@@ -1,15 +1,17 @@
 import json
 
-from corpus.utils import normalize_catalog_id
-from settings import settings
-
-GRAPH_TYPES = {"beings", "realms", "ages"}
+from graphs.store import GRAPH_TYPES, graph_dir
 
 
 def get_graph_data(text_id: str, graph_type: str) -> dict | None:
     if graph_type not in GRAPH_TYPES:
         return None
-    book_dir = settings.graphs_dir / normalize_catalog_id(text_id)
+    try:
+        # Shared with the build path + confined under graphs_dir: a hostile id
+        # (e.g. '../../secret') is rejected rather than read from outside the tree.
+        book_dir = graph_dir(text_id)
+    except ValueError:
+        return None
     json_path = book_dir / f"{graph_type}.json"
     if not json_path.exists():
         return None
