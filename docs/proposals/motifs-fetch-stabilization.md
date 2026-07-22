@@ -172,7 +172,17 @@ flag lives until its cause is gone). This is the persistent form of *surface, do
 **baseline/discovery diff** (build-time, aggregate — every payload is individually fine but the whole yield or
 the fan-out shrank, which no per-payload check can see).
 
-12. **Aggregate flags are durable off a high-water mark** — not a one-shot delta vs the previous build. Pin each
+12. **Non-decision outcomes are logged, not flagged.** Situations with nothing for a human to *decide* never
+    become one of the six review-flags — they are a `WARNING`/`INFO` line **and** a per-source `fetch_outcome`
+    in `meta.enrichment`, so they are visible and greppable without cluttering the flag list:
+    - **`B`** (fetch failed, no cache) → log + retry next build;
+    - **`G`** (transient failure, cache present) → **retry in-pass**; if unrecovered → `served-pinned-transient`
+      + log (serve the pinned copy, just wait for the source — no decision);
+    - **`I`** (precondition absent, e.g. mapsofmyths without credentials) → `skipped-<reason>` + log **must**
+      appear (it already does: `mapsofmyths.py` warns, `build_motifs` logs `SKIPPED`).
+    Only if such an outcome *persists across many builds* (long-stale pinned data) is durable awareness useful —
+    still an observability line, not a per-pass decision.
+13. **Aggregate flags are durable off a high-water mark** — not a one-shot delta vs the previous build. Pin each
     aggregate counter's **max ever seen** in `meta.highwater`; a flag stays raised while `current < max` and
     **auto-clears only when the counter recovers to the mark**:
     ```python
