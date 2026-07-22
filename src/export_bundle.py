@@ -58,9 +58,11 @@ def _components() -> list[tuple[str, Path, str]]:
 
 
 def _is_cache(component: str, rel: Path) -> bool:
-    # outputs/motifs/raw/** is the scrape cache; the jsonl files are resumable caches.
+    # outputs/motifs/raw/** is the scrape cache; the jsonl files are resumable caches;
+    # *.partial are validate-before-commit staging files (normally consumed by os.replace,
+    # but a crash mid-write can leave one behind — never ship staging as a product).
     in_raw_dir = component == "motifs" and bool(rel.parts) and rel.parts[0] == _RAW_DIR_NAME
-    return rel.name in _CACHE_FILENAMES or in_raw_dir
+    return rel.name in _CACHE_FILENAMES or in_raw_dir or rel.suffix in (".partial", ".tmp")
 
 
 @dataclass

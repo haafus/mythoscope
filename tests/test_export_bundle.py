@@ -82,6 +82,12 @@ class TestExport:
         result = eb.export_outputs(out_dir=built_outputs, timestamp="20260629-120000", include_caches=True)
         assert result.path.name == "mythoscope-caches-20260629-120000.zip"
 
+    def test_partial_staging_is_cache(self):
+        from pathlib import Path
+        assert eb._is_cache("corpus", Path("raw/abc.partial"))     # validate-before-commit staging
+        assert eb._is_cache("motifs", Path("x.tmp"))
+        assert not eb._is_cache("corpus", Path("Region/Trad/Book.txt"))
+
     def test_includes_file_sources(self, built_outputs):
         from settings import settings
 

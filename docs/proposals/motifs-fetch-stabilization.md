@@ -78,7 +78,7 @@ whole job is to **never lose or poison data**; every judgement call is surfaced,
 
 ## 3. The plan
 
-### Phase 0 — Hole-only fix (no functional change, no new machinery)
+### Phase 0 — Hole-only fix (no functional change, no new machinery) — ✅ DONE
 
 The pure "stop destroying good raw" fix — remove the two `unlink`s where the failed re-fetch never overwrote
 the live copy, so it is preserved with zero behaviour change on the happy path:
@@ -91,7 +91,7 @@ the live copy, so it is preserved with zero behaviour change on the happy path:
 Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degraded** Wikidata reply
 (`atu_wikidata.py:185`) — those bytes were already written, so keeping them needs validate-before-commit → Phase 1.
 
-### Phase 1 — Non-destructive fetch (shared layer, `fetch_cache.py`)
+### Phase 1 — Non-destructive fetch (shared layer, `fetch_cache.py`) — ✅ DONE
 
 1. Add **staging-with-validator** to `fetch_to_cache`: download to `<cache>.partial`, run an optional
    `validate(bytes) -> bool`, then **`os.replace(<cache>.partial, <cache>)`** onto the live path **only if
@@ -108,7 +108,7 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 `refresh` is not a boolean `force=True` — are the canonical [`fetch-and-refresh.md`](fetch-and-refresh.md) §2. The
 staging/validator added here is exactly what that flow's `commit`/`reject`/`validate` calls into.)*
 
-### Phase 2 — Fix the two deleters
+### Phase 2 — Fix the two deleters — ✅ DONE
 
 3. **Ashliman `_fetch_page`** (`ashliman.py:246–256`):
    - Remove `cache.unlink()` on 404.
@@ -125,6 +125,14 @@ staging/validator added here is exactly what that flow's `commit`/`reject`/`vali
    - Remove both `cache.unlink()` calls (lines 170, 185).
 
 ### Phase 3 — Surface silent degradation (`build_motifs.py`)
+
+> **Implementation split (build-time vs refresh-time).** The **build path** cannot detect `changed` / `gone` /
+> `degraded` per-payload — those need an **upstream diff**, and `build` only acquires-or-uses-cache. So the
+> **aggregate, build-time** guard ships in Stage I: `yield-drop`, `highwater`, `meta.flags` (durable, self-clearing),
+> and per-source `fetch_outcomes` — **✅ DONE** (`build_motifs._degradation_check`, items 5–7, 10–13, minus the
+> discovery-union). The **per-payload flags** (`changed`/`gone`/`degraded`/`no-parse`) are inherently
+> **refresh-time** and land with `refresh` (Part 2/3). The **root-discovery union** (item 8) needs the fetch/parse
+> split (§ open items) and lands in **Part 3**. This is principled, not a shortcut: build can't diff upstream.
 
 5. Before `save_json(store.meta_path(), meta)` (`build_motifs.py:266`), **load the previous `meta.json`** if
    present and capture prior `counts` + `enrichment`.
@@ -252,7 +260,7 @@ the fan-out shrank, which no per-payload check can see).
       below it forever). Mitigation: **advance the mark only on a trusted build** (no active per-payload flags);
       a dirty spike does not move it.
 
-### Phase 5 — Tests & verification (`tests/test_motifs.py`)
+### Phase 5 — Tests & verification (`tests/test_motifs.py`) — ✅ DONE (woven through 0–4)
 
 14. Add cases:
     - forced re-fetch with a 404 and an existing cache → cache kept and served (no `unlink`, no `.absent`);
