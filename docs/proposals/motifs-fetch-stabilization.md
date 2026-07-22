@@ -190,6 +190,20 @@ default bias is **wait** (auto-clear is free and safe); (1) is a per-reviewed-so
 deliberate single act. Only (1) and (3) move the baseline; (2) never does — it is fixed by the world recovering
 or by you changing code/config.
 
+**Everything reduces to two `refresh` knobs** — the only baseline moves that happen *inside* the pipeline:
+
+- **`refresh <src> --apply`** — accept **new content** (semantics 1, `changed`): promote the fetched bytes to the
+  pinned raw (`os.replace`), fp-cascade re-derives. A **fetch-level** act.
+- **`refresh <src> --rebaseline`** — reconcile the **counter marks** (the counter half of semantics 3,
+  `yield-drop` / `discovery-shrank`): write `meta.highwater[counter] = current` and the discovery union `=
+  current`. A **build-level** act (the marks are set post-build). Legitimizes a lower yield / a reorganized root
+  when you have confirmed it is real.
+
+Everything else is resolved **outside the pipeline**, regardless of whether it is (2) or (3): `gone` → edit the
+config (remove the expected entry); `degraded` / `no-parse` → wait for recovery or fix the query/parser code.
+(The two knobs are different layers — fetch vs build — but both live on `refresh` as the one "reconcile the
+pipeline with reality" verb.)
+
 *Two trigger points feed the same flag* (§2's single auto-reaction, seen at two layers): **validate-before-commit**
 (fetch-time, per self-contained payload — this page/response is broken/degraded/changed) and the
 **baseline/discovery diff** (build-time, aggregate — every payload is individually fine but the whole yield or
