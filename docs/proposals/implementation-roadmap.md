@@ -123,6 +123,36 @@ additions). An orchestration refactor **must not change data**; this single diff
 
 ---
 
+## Review cadence
+
+Review **at each stage boundary (per PR), not after every phase** — phases are small increments; the stage's
+diff is the right unit. Two passes, AI first to cut the human load:
+
+1. **AI self-review** — run **`/code-review`** on the working diff *before* opening/finishing the PR (see below);
+   run the stage's tests + `Validate` script; fix what survives.
+2. **Human review** — of the **surviving findings + architecture** (not raw noise), against the source proposal.
+3. **Merge** — CI runs tests + lint + the `Validate`/`golden_diff` script, so review starts from green.
+
+**Depth by risk** (the ladder again):
+
+| stage | review depth | focus |
+|---|---|---|
+| **I / II** | **light** — one `/code-review` pass + green tests | fp-gate / flag behaviour; git is the net |
+| **III** (migration) | **deep, *before running*** | the re-key script + `validate_migration.py` + the §6 gate — a bug here wastes a full rebuild, so review *before* you run step 12, not after |
+| **IV** (refactor) | **architectural** | conformance to the stage protocol / design; behaviour is guarded by `golden_diff` |
+
+`/security-review` is not needed — the security surface does not change (a local pipeline, no new external inputs).
+
+**How to run the review:**
+- **`/code-review`** — reviews the **current working diff** (uncommitted + committed-not-pushed). Run it at a
+  stage boundary before the PR; it reports ranked findings, which I verify and fix, then surface only the real
+  ones to you.
+- **`/review`** — reviews an **open GitHub PR** (by URL/number) — use once the stage's PR exists, for the
+  human-facing pass.
+- **`/security-review`** — pending-changes security scan; **skip** for these stages (no security surface).
+
+---
+
 ## Why this order
 
 - **The heaviest step (12) is exactly one, and last-but-one** — after the code is proven on motifs (I) and the
