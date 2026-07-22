@@ -25,7 +25,7 @@ from urllib.parse import unquote, urlencode
 
 from settings import settings
 
-from .fetch import fetch_text
+from .fetch import FetchRejected, fetch_text
 
 logger = logging.getLogger(__name__)
 
@@ -155,41 +155,43 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     """Fetch Wikidata and attach ``names`` / ``wikipedia`` / ``wikidata`` /
     ``concordances`` to each type, in place. ``{"skipped": ...}`` if the fetch failed."""
     cache = Path(settings.motifs_dir) / OUT
-    # Split fetch from parse: a *transport/HTTP* failure raises before the cache is overwritten, so the pinned
-    # copy is intact — keep it. A *parse* failure means the fetch already overwrote the cache with bad bytes, so
-    # that poison must be dropped. (Open enrichment — never fatal to the build.)
+    ids = {t["id"] for t in atu_types}
+
+    def _healthy(content: bytes) -> bool:
+        """Validate-before-commit: a healthy full reply parses **and**, when substantial, carries some
+        Wikipedia sitelinks. Rows-but-zero-sitelinks is a degraded WDQS reply (the heavy OPTIONALs timed
+        out during an outage while cheap ``rdfs:label`` lookups still return); rejecting it here means it
+        never overwrites the pinned copy — no more ``unlink`` to undo a poisoned cache."""
+        try:
+            rows = json.loads(content)["results"]["bindings"]
+        except Exception:
+            return False
+        return not (len(rows) >= 50 and not any(m["wikipedia"] for m in parse_bindings(rows, ids).values()))
+
     try:
-        raw = fetch_text(query_url(), cache, force=force)
+        raw = fetch_text(query_url(), cache, force=force, validate=_healthy)
+    except FetchRejected:
+        # Downloaded but unhealthy (unparseable or degraded) — the cache was NOT overwritten. Serve the
+        # pinned copy if we have one (enrich from the last good reply); else skip this enrichment.
+        if cache.exists() and cache.stat().st_size > 0:
+            logger.warning("ATU Wikidata: reply unparseable or degraded (rows but no sitelinks) — serving the "
+                           "pinned cached copy; re-run with --force once query.wikidata.org recovers")
+            raw = cache.read_text(encoding="utf-8", errors="replace")
+        else:
+            logger.warning("ATU Wikidata: reply unparseable or degraded and no pinned copy — skipping this "
+                           "enrichment; re-run with --force once query.wikidata.org recovers")
+            return {"skipped": "degraded-or-unparseable"}
     except Exception as exc:
-        # Name the failure so the log and meta/status say *what* went wrong: an HTTP status (429 = WDQS
-        # rate-limiting/outage) when the response carried one, else a generic fetch error.
+        # Transport/HTTP failure — raised before any write, so the pinned copy is intact; keep it. Name the
+        # reason (429 = WDQS rate-limiting/outage) when the response carried one, else a generic fetch error.
         status = getattr(getattr(exc, "response", None), "status_code", None)
         reason = f"http-{status}" if status else "fetch-error"
         logger.warning("ATU Wikidata: SPARQL fetch failed [%s] (%s) — keeping the pinned cached copy; re-run "
                        "with --force once query.wikidata.org recovers", reason, exc)
-        return {"skipped": reason}               # no unlink: the fetch raised before overwriting the cache
-    try:
-        rows = json.loads(raw)["results"]["bindings"]
-    except Exception as exc:
-        logger.warning("ATU Wikidata: response not parseable (%s) — dropping the bad reply; re-run with "
-                       "--force once query.wikidata.org recovers", exc)
-        cache.unlink(missing_ok=True)            # the fetch just overwrote the cache with unparseable bytes
-        return {"skipped": "parse-error"}
+        return {"skipped": reason}
 
-    ids = {t["id"] for t in atu_types}
+    rows = json.loads(raw)["results"]["bindings"]
     mapping = parse_bindings(rows, ids)
-
-    # A live endpoint always returns some Wikipedia sitelinks across the matched
-    # tale-type items; a substantial response with zero of them is a degraded
-    # reply (WDQS timing out the heavy OPTIONALs during an outage, while cheap
-    # rdfs:label lookups still return). Don't accept or cache it as success —
-    # that would poison offline re-runs with names-only, zero Wikipedia links.
-    if len(rows) >= 50 and not any(m["wikipedia"] for m in mapping.values()):
-        logger.warning("ATU Wikidata: %d rows but zero sitelinks — degraded response "
-                       "(WDQS outage?); not caching. Re-run with --force after the "
-                       "endpoint recovers.", len(rows))
-        cache.unlink(missing_ok=True)
-        return {"skipped": "degraded-no-sitelinks"}
 
     n_names = n_wiki = n_src = n_conc = 0
     for t in atu_types:

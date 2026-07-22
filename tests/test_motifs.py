@@ -414,6 +414,37 @@ class TestAtuWikidataPhase0:
         assert result == {"skipped": "http-429"}
         assert cache.exists()                                # pinned copy kept, not unlinked
 
+    def test_rejected_reply_serves_pinned_copy(self, tmp_path, monkeypatch):
+        # Phase 1+2: a downloaded-but-unhealthy reply (unparseable/degraded) raises FetchRejected from the
+        # validate-before-commit layer; with a pinned copy present, refresh serves it (enriches, not skipped)
+        # and never touches the cache.
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+        cache = tmp_path / atu_wikidata.OUT
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        pinned = '{"results": {"bindings": []}}'
+        cache.write_text(pinned, encoding="utf-8")
+
+        def fake_fetch(url, cache_file, *, force=False, validate=None, **kw):
+            raise atu_wikidata.FetchRejected(url)            # downloaded but unhealthy — cache NOT overwritten
+
+        monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
+        result = atu_wikidata.refresh([], force=True)
+        assert "skipped" not in result                      # served the pinned copy, enrichment ran
+        assert cache.read_text() == pinned                  # pinned copy untouched
+
+    def test_rejected_reply_no_cache_skips(self, tmp_path, monkeypatch):
+        # Same rejection but no pinned copy to fall back on -> skip this enrichment (no crash, no cache).
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+
+        def fake_fetch(url, cache_file, *, force=False, validate=None, **kw):
+            raise atu_wikidata.FetchRejected(url)
+
+        monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
+        result = atu_wikidata.refresh([], force=True)
+        assert result == {"skipped": "degraded-or-unparseable"}
+
 
 class TestAtuRegions:
     def test_canonical_folds_variants(self):

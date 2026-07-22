@@ -12,7 +12,16 @@ require the corpus HTTP extra.
 from __future__ import annotations
 
 import hashlib
+import os
+from collections.abc import Callable
 from pathlib import Path
+
+
+class FetchRejected(Exception):
+    """A freshly-downloaded response failed ``validate`` — so it was **not** committed
+    to the cache (the live copy, if any, is left untouched). Distinct from a transport
+    error: the bytes arrived but are unhealthy. The caller decides whether to serve a
+    pinned copy or skip."""
 
 
 def cache_path(base_dir: str | Path, url: str) -> Path:
@@ -22,11 +31,20 @@ def cache_path(base_dir: str | Path, url: str) -> Path:
 
 
 def fetch_to_cache(url: str, cache_file: str | Path, *, force: bool = False,
-                   auth: tuple[str, str] | None = None) -> bytes:
+                   auth: tuple[str, str] | None = None,
+                   validate: Callable[[bytes], bool] | None = None) -> bytes:
     """Return the bytes for ``url``, reading/writing ``cache_file``.
 
     A non-empty cached file short-circuits the request unless ``force``. ``auth`` is
     an optional ``(user, password)`` for HTTP basic auth (e.g. mapsofmyths.com).
+
+    **Validate before commit.** When ``validate`` is given it runs on the freshly
+    downloaded bytes *before* they touch the live cache: if it returns falsy the bytes
+    are discarded and :class:`FetchRejected` is raised — the live copy is never
+    overwritten with an unhealthy reply. The write itself is atomic (staged to a
+    ``.partial`` sibling, then ``os.replace``), so a crash mid-write can never leave a
+    half-written cache. A *transport* failure (``download_file`` raising) propagates
+    unchanged — it happens before any write, so the live copy is likewise untouched.
     """
     cache_file = Path(cache_file)
     if not force and cache_file.exists() and cache_file.stat().st_size > 0:
@@ -34,12 +52,19 @@ def fetch_to_cache(url: str, cache_file: str | Path, *, force: bool = False,
 
     from corpus.downloader import download_file  # lazy: requests lives in the corpus extra
 
-    content = download_file(url, auth=auth)
+    content = download_file(url, auth=auth)      # transport failure raises here — never touches the cache
+    if validate is not None and not validate(content):
+        raise FetchRejected(url)                 # unhealthy reply: do not commit, keep the live copy
+
     cache_file.parent.mkdir(parents=True, exist_ok=True)
-    cache_file.write_bytes(content)
+    partial = cache_file.with_name(cache_file.name + ".partial")
+    partial.write_bytes(content)
+    os.replace(partial, cache_file)              # atomic commit — consumes the staging file
     return content
 
 
 def fetch_text(url: str, cache_file: str | Path, *, encoding: str = "utf-8",
-               force: bool = False, auth: tuple[str, str] | None = None) -> str:
-    return fetch_to_cache(url, cache_file, force=force, auth=auth).decode(encoding, errors="replace")
+               force: bool = False, auth: tuple[str, str] | None = None,
+               validate: Callable[[bytes], bool] | None = None) -> str:
+    return fetch_to_cache(url, cache_file, force=force, auth=auth,
+                          validate=validate).decode(encoding, errors="replace")
