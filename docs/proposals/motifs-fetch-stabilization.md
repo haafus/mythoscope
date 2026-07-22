@@ -129,11 +129,35 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
    flag (item 7) says *"variants fell"*, the discovery diff says *whether the root shrank* vs *pages degraded
    individually* — the one signal per-sub-page health checks cannot see.
 
-### Phase 4 — Observability of degraded state
+### Phase 4 — Flags (observability of state needing review)
 
-9. Record the per-source **fetch outcome** in `meta.enrichment`: `ok` / `served-pinned-upstream-404` /
-   `skipped-<reason>` / `degraded-kept-previous`. Then the log, `meta`, and (later) `status` / `refresh
-   --preview` show **which sources are serving pinned/stale data** rather than live.
+A **flag is a durable "needs-review" record**, not a one-shot log line (a log line scrolls away and is lost; a
+flag lives until its cause is gone). This is the persistent form of *surface, don't swallow*.
+
+9. **Store flags in `meta.json`** (`meta.flags`), one record per incident, plus a loud `WARNING` when raised:
+   ```python
+   {"source": "atu_wikidata",
+    "key": "https://query.wikidata.org/sparql",   # url / page / slug
+    "kind": "degraded",                            # changed | gone | degraded | no-parse
+    "detail": "rows=200 sitelinks=0",              # human-readable cause
+    "auto_action": "kept-pinned",                  # what the system already did
+    "first_seen": "<build-id>"}
+   ```
+10. **Stateful lifecycle**, like a linter's open findings — **no manual "close":**
+    - **raise** — the condition is detected (invariant failed / hash changed / discovery set shrank / count
+      dropped) → record created;
+    - **persist** — every build re-checks; still true → the flag stays (`first_seen` untouched);
+    - **auto-clear** — the condition is gone (the human adopted/fixed it, the next fetch is healthy) → the
+      record drops itself.
+11. **Surfaced** three ways: the build-time `WARNING`, a list in `status` / `mytho flags`, and the `refresh
+    --check` preview. **Never blocking** — a flag never aborts the build (best-effort); the build proceeds on
+    the pinned state, the flag just makes the situation visible and un-losable. The human then decides whether
+    to leave pinned: **adopt / remove-from-config / retry / fix-parser**.
+
+*Two trigger points feed the same flag* (§2's single auto-reaction, seen at two layers): **validate-before-commit**
+(fetch-time, per self-contained payload — this page/response is broken/degraded/changed) and the
+**baseline/discovery diff** (build-time, aggregate — every payload is individually fine but the whole yield or
+the fan-out shrank, which no per-payload check can see).
 
 ### Phase 5 — Tests & verification (`tests/test_motifs.py`)
 
