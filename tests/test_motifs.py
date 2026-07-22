@@ -446,6 +446,46 @@ class TestAtuWikidataPhase0:
         assert result == {"skipped": "degraded-or-unparseable"}
 
 
+class TestDegradationGuard:
+    """Phase 3+4 — the build-time yield-drop / high-water / fetch-outcome guard (`_degradation_check`)."""
+
+    def test_first_build_sets_marks_no_flags(self):
+        hw, flags, outcomes = bm._degradation_check(
+            {"index.atu": 100, "index.tmi": 200}, {"trilogy": {"n": 1}}, {}, "T0")
+        assert hw == {"index.atu": 100, "index.tmi": 200}   # self-initialised
+        assert flags == []                                  # no prior -> nothing below mark
+        assert outcomes == {"trilogy": "ok"}
+
+    def test_yield_drop_flags_below_high_water(self):
+        prior = {"highwater": {"index.atu": 100}, "flags": []}
+        hw, flags, _ = bm._degradation_check({"index.atu": 40}, {}, prior, "T1")
+        assert hw["index.atu"] == 100                       # mark holds (trusted advance is max(100,40))
+        assert len(flags) == 1
+        assert flags[0]["kind"] == "yield-drop" and flags[0]["key"] == "index.atu"
+        assert flags[0]["first_seen"] == "T1"
+
+    def test_flag_persists_first_seen(self):
+        prior = {"highwater": {"index.atu": 100},
+                 "flags": [{"kind": "yield-drop", "key": "index.atu", "first_seen": "T1"}]}
+        _, flags, _ = bm._degradation_check({"index.atu": 40}, {}, prior, "T5")
+        assert flags[0]["first_seen"] == "T1"               # carried forward, not re-stamped
+
+    def test_recovery_auto_clears_flag(self):
+        prior = {"highwater": {"index.atu": 100},
+                 "flags": [{"kind": "yield-drop", "key": "index.atu", "first_seen": "T1"}]}
+        hw, flags, _ = bm._degradation_check({"index.atu": 100}, {}, prior, "T6")
+        assert flags == []                                  # recovered to the mark -> gone
+        assert hw["index.atu"] == 100
+
+    def test_untrusted_build_does_not_advance_mark(self):
+        prior = {"highwater": {"index.atu": 100}}
+        hw, flags, outcomes = bm._degradation_check(
+            {"index.atu": 150}, {"wikidata": {"skipped": "http-429"}}, prior, "T7")
+        assert hw["index.atu"] == 100                       # a skipped source -> mark not advanced to 150
+        assert flags == []                                  # 150 >= 100, no drop
+        assert outcomes == {"wikidata": "skipped-http-429"}
+
+
 class TestAtuRegions:
     def test_canonical_folds_variants(self):
         assert atu_regions.canonical("Indian") == "India"          # bare Indian = India in Uther

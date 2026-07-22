@@ -42,6 +42,41 @@ def _applied(records: list[dict], pred) -> int:
     return sum(1 for r in records if pred(r))
 
 
+def _flat_metrics(counts: dict, crosswalk_counts: dict) -> dict[str, int]:
+    """The named counters whose drop is a degradation signal: index sizes + cross-walk link totals."""
+    m = {f"index.{k}": v for k, v in counts.items()}
+    m.update({f"crosswalk.{k}": v for k, v in crosswalk_counts.items()})
+    return m
+
+
+def _degradation_check(metrics: dict[str, int], enrichment: dict, prior: dict,
+                       built_at: str) -> tuple[dict, list, dict]:
+    """Build-time degradation guard. Compare each metric to its all-time **high-water** mark
+    (``meta.highwater``) and raise a durable **``yield-drop``** flag while it sits below. The mark
+    advances only on a *trusted* build — one where no source was skipped/degraded — so a spurious
+    spike can't poison it; a genuine drop persists (``first_seen`` carried forward) and **auto-clears**
+    once the metric recovers to the mark. Also records a per-source ``fetch_outcome``. (Per-payload
+    ``changed``/``gone``/``degraded`` flags are refresh-time — they need an upstream diff — and land
+    with ``refresh``.)"""
+    prior_hw = prior.get("highwater", {})
+    prior_flags = {(f["kind"], f["key"]): f for f in prior.get("flags", [])}
+    trusted = not any(isinstance(e, dict) and e.get("skipped") for e in enrichment.values())
+    highwater: dict[str, int] = {}
+    flags: list[dict] = []
+    for name, val in sorted(metrics.items()):
+        mark = max(prior_hw.get(name, val), val) if trusted else prior_hw.get(name, val)
+        highwater[name] = mark
+        if val < mark:
+            first_seen = prior_flags.get(("yield-drop", name), {}).get("first_seen", built_at)
+            flags.append({"source": "build", "key": name, "kind": "yield-drop",
+                          "detail": f"{val} < high-water {mark}", "auto_action": "kept-going",
+                          "first_seen": first_seen})
+            logger.warning("REGRESSION [yield-drop]: %s = %d, below high-water %d", name, val, mark)
+    fetch_outcomes = {src: (f"skipped-{e['skipped']}" if isinstance(e, dict) and e.get("skipped") else "ok")
+                      for src, e in enrichment.items()}
+    return highwater, flags, fetch_outcomes
+
+
 def build_motifs(*, force: bool = False) -> None:
     """Build the motif database, always re-parsing/regenerating from the raw cache.
 
@@ -263,6 +298,12 @@ def build_motifs(*, force: bool = False) -> None:
         "parallels": par_counts,  # heuristic look-alikes with no recorded link
         "sources": sources,
     }
+    # Degradation guard: load the prior meta, carry forward the high-water marks + flags, and flag any
+    # metric now below its mark. Written into meta so it is durable and self-clearing across builds.
+    meta["highwater"], meta["flags"], meta["fetch_outcomes"] = _degradation_check(
+        _flat_metrics(counts, meta["crosswalk"]), enrichment, store.load_meta(), meta["built_at"])
+    if meta["flags"]:
+        logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
     store.clear_cache()
 
