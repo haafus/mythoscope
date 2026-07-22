@@ -613,6 +613,18 @@ that scope), `refresh [documents|motifs]` (re-fetch upstream; preview → `--app
 require `--apply`; `build` is non-destructive and runs directly. `scope` is the optional stage/variant escape
 (Part 3 item 4).
 
+**Fetch is the DAG boundary, not a stage** — and the full fetch/refresh/flag model lives in its own canonical
+doc, [`fetch-and-refresh.md`](fetch-and-refresh.md) (referenced here and from `motifs-fetch-stabilization.md`).
+Why a boundary: a stage's staleness is decidable *offline from fingerprints* (network *to produce* an output is
+fine — the LLM graph stage — because the output is content-addressed by its input); a fetch's "is my copy still
+current vs upstream?" is **undecidable offline**, so it cannot be a build node. The deeper reason it is a
+**human-gated** boundary rather than an automatic node: ordinary stages are **purely transforming** — their
+output is always re-derivable from the raw on disk, so an automatic mistake costs only recompute and **data loss
+is impossible**. Fetch is the only step that touches **raw itself, the one irreplaceable input**; an automatic
+overwrite/drop there could destroy it forever. So the human gate sits exactly where an automatic mistake would be
+*irreversible*. `refresh` generalises via an `upstream` capability on stages (`corpus`, `motifs:source` have it;
+`embeddings`/`projections`/`graphs` do not) and is **not in the topological build order**.
+
 Separate **fetch** (network, into the immutable raw archive — non-deterministic, slow, archival) from
 **build** (a pure, offline, reproducible function of raw + config + code).
 

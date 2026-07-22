@@ -36,6 +36,14 @@ not as live work.
   embeddings key, fetch-vs-build separation, and a unified web+local source model (immutable raw archive +
   override-diff layer). Companion to `data-model-and-ids.md`. **Goal:** automatic, minimal, coherent rebuilds.
   *Proposal; not started.*
+- [`fetch-and-refresh.md`](fetch-and-refresh.md) — **canonical** model for how the pipeline acquires raw and
+  reconciles it with a changing upstream: fetch is the **DAG boundary, not a stage** (human-gated because it
+  touches the one irreplaceable input — raw — where an automatic mistake is irreversible, unlike purely
+  transforming stages); `build` acquire-if-missing vs the staged/validate/diff `refresh`; `.partial` +
+  `os.replace`; the situation taxonomy, the six flags, their auto-clear-vs-move-baseline lifecycle and three
+  resolution semantics; high-water marks; the `--apply` / `--rebaseline` knobs. Referenced by
+  `pipeline-and-incrementality.md` (wiring) and `motifs-fetch-stabilization.md` (application). **Goal:** never
+  lose or poison data; every judgement surfaced. *Proposal; not started.*
 - [`motifs-fetch-stabilization.md`](motifs-fetch-stabilization.md) — harden the motif source fetch so an
   upstream link that dies, 404s, degrades, or stops parsing can **never delete previously-good raw** (two
   sources call `cache.unlink()` on a forced re-fetch failure) and can **never degrade the output silently**
