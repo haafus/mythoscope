@@ -33,9 +33,6 @@ class ChromaCollection:
     def count(self) -> int:
         return self._collection.count()
 
-    def existing_ids(self) -> set[str]:
-        return set(self._collection.get(include=[])["ids"])
-
     def get(self, **kwargs) -> dict:
         return self._collection.get(**kwargs)
 

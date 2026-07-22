@@ -220,10 +220,14 @@ def _refresh_documents(apply: bool):
         click.echo(click.style(f"  {'adopted' if apply else 'changed':<12} {title} ({verb})", fg=color))
 
     click.echo(f"  {r.unchanged} unchanged, {r.skipped_local} local (checked on build)")
+    problems = len(r.unreachable) + len(r.degraded)
     if apply and r.adopted:
         click.echo(click.style(f"[done]  adopted {len(r.adopted)} — run `mytho build` to re-derive.", fg="green"))
     elif r.changed or r.new:
         click.echo(click.style("Preview only. Re-run with --apply to adopt.", fg="yellow"))
+    elif problems:
+        # Nothing to adopt, but some sources were kept pinned — don't claim all-clear.
+        click.echo(click.style(f"[done]  Refresh — {problems} source(s) kept pinned (see above).", fg="yellow"))
     else:
         click.echo(click.style("[done]  Refresh — everything current.", fg="green"))
 

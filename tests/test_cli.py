@@ -79,6 +79,17 @@ class TestRefreshCommand:
         assert "changed" in result.output
         assert "--apply" in result.output
 
+    def test_summary_flags_kept_pinned_not_all_clear(self, monkeypatch):
+        # A degraded/unreachable source must not be summarised as "everything current".
+        from corpus.refresh import RefreshResult
+
+        monkeypatch.setattr("corpus.refresh.refresh_corpus",
+                            lambda **kw: RefreshResult(degraded=[("A", "empty-body")]))
+        result = runner.invoke(mytho, ["refresh", "documents", "--apply"])
+        assert result.exit_code == 0
+        assert "kept pinned" in result.output
+        assert "everything current" not in result.output
+
     def test_motifs_preview_does_not_refetch(self, monkeypatch):
         called = []
         monkeypatch.setattr("cli._build_motifs", lambda **kw: called.append(kw))
