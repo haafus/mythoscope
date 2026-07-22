@@ -83,10 +83,10 @@ whole job is to **never lose or poison data**; every judgement call is surfaced,
 The pure "stop destroying good raw" fix — remove the two `unlink`s where the failed re-fetch never overwrote
 the live copy, so it is preserved with zero behaviour change on the happy path:
 
-1. **Ashliman `_fetch_page`** (`ashliman.py:253`): on 404 with an existing cache → **keep + serve it**, do not
-   `unlink`, do not write `.absent`. `.absent` + `None` only when there is no cache (never-existed derived name).
-2. **atu_wikidata** (`atu_wikidata.py:170`): on a **raised** fetch (transport/HTTP) → drop the `unlink`; the
-   old good copy survives (the raise skipped the overwrite anyway).
+- **Ashliman `_fetch_page`** (`ashliman.py:253`): on 404 with an existing cache → **keep + serve it**, do not
+  `unlink`, do not write `.absent`. `.absent` + `None` only when there is no cache (never-existed derived name).
+- **atu_wikidata** (`atu_wikidata.py:170`): on a **raised** fetch (transport/HTTP) → drop the `unlink`; the
+  old good copy survives (the raise skipped the overwrite anyway).
 
 Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degraded** Wikidata reply
 (`atu_wikidata.py:185`) — those bytes were already written, so keeping them needs validate-before-commit → Phase 1.
