@@ -47,6 +47,13 @@ drops only the destruction.
 
 ## 2. Principle to encode
 
+**In one paragraph.** We **never delete already-fetched content**. Automatically we **only add new content**.
+A **change to existing content** is adopted only through **review + explicit confirmation** (`refresh --apply`).
+On a **degradation** we report to the user in detail *what happened* (a durable flag: `url — what — auto-action`);
+**finding the cause and deciding is on the user** — fix it as **temporary** (the world recovers, or you patch
+the code) or **accept and pin it as permanent** (`refresh --rebaseline` / a config edit). The automatic layer's
+whole job is to **never lose or poison data**; every judgement call is surfaced, never silently made.
+
 - **Pinned raw.** Once written, the cache is the source of truth. An upstream problem degrades to *"serve the
   pinned copy + warn"*, never to *"delete."*
 - **Validate before commit.** A fetched response replaces the live cache only after passing a validity check;
