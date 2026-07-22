@@ -74,7 +74,12 @@ class TestBuildCorpusForce:
         corpus_dir.mkdir()
         sources_dir = tmp_path / "sources"
         sources_dir.mkdir()
-        (config_dir / "traditions.json").write_text("{}")
+        # A valid canon tree: place every used tradition under a canon region so the
+        # build-time fail-loud validation (§2.12) passes.
+        used = sorted({i.get("tradition") for i in items if i.get("tradition")})
+        (config_dir / "traditions.json").write_text(
+            json.dumps({"Europe": {"traditions": {t: {} for t in used}}})
+        )
         monkeypatch.setattr(settings, "config_dir", config_dir)
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
         monkeypatch.setattr(settings, "sources_dir", sources_dir)

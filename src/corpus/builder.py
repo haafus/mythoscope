@@ -20,6 +20,7 @@ from .sources import (
     read_local_to_cache,
     source_scheme,
 )
+from .traditions_config import load_traditions_tree, validate_traditions
 from .utils import (
     content_fingerprint,
     count_sentences,
@@ -207,6 +208,11 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     download_list = load_download_list()
     if max_texts is not None:
         download_list = download_list[:max_texts]
+
+    # Fail loud before any work: an unknown tradition or a non-canon region must stop the
+    # build, not silently degrade to "" / a grey default (§2.12).
+    tree = load_traditions_tree(settings.config_dir)
+    validate_traditions(tree, download_list)
 
     _update_traditions(force)
 

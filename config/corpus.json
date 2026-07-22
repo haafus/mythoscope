@@ -1,32 +1,32 @@
 [
   {
     "title": "The King James Version of the Bible",
-    "tradition": "Christianity",
+    "tradition": "Christian",
     "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt",
     "description": "The canonical King James English translation of the Bible, central to Christian scripture and influential in English-language religious literature."
   },
   {
     "title": "The Koran",
-    "tradition": "Islam",
+    "tradition": "Islamic",
     "url": "https://www.gutenberg.org/cache/epub/7440/pg7440.txt",
     "description": "An English translation of the Qur'an, the central sacred text of Islam, presenting revelations associated with the Prophet Muhammad.",
     "content_start": "PRAISE be to GOD, the LORD of all creatures"
   },
   {
     "title": "The Analects of Confucius",
-    "tradition": "Confucianism",
+    "tradition": "Chinese",
     "url": "https://www.gutenberg.org/cache/epub/4094/pg4094.txt",
     "description": "The foundational text of Confucianism, a record of the sayings of Confucius and his conversations with his disciples."
   },
   {
     "title": "The Upanishads",
-    "tradition": "Hinduism",
+    "tradition": "Hindu",
     "url": "https://www.gutenberg.org/cache/epub/3283/pg3283.txt",
     "description": "Ancient Indian philosophical and religious texts that explore Brahman, Atman, liberation, and the foundations of Vedantic thought."
   },
   {
     "title": "The Ramayan of Valmiki",
-    "tradition": "Hinduism",
+    "tradition": "Hindu",
     "url": "https://www.gutenberg.org/cache/epub/24869/pg24869.txt",
     "description": "An English verse translation of the Ramayana, one of India's great mythological epics, narrating the deeds of Rama, Sita, Hanuman, and Ravana.",
     "content_start": "bird of charming song",
@@ -34,13 +34,13 @@
   },
   {
     "title": "The Dhammapada",
-    "tradition": "Buddhism",
+    "tradition": "Buddhist",
     "url": "https://www.gutenberg.org/cache/epub/2017/pg2017.txt",
     "description": "A celebrated collection of sayings attributed to the Buddha, emphasizing ethics, mindfulness, wisdom, and the path to liberation."
   },
   {
     "title": "The Tao Teh King",
-    "tradition": "Taoism",
+    "tradition": "Chinese",
     "url": "https://www.gutenberg.org/cache/epub/216/pg216.txt",
     "description": "James Legge's English translation of the Tao Te Ching, a foundational Daoist text on the Way, virtue, simplicity, and non-action."
   },
@@ -53,14 +53,14 @@
   },
   {
     "title": "Buddhist Psalms",
-    "tradition": "Japanese Buddhism",
+    "tradition": "Japanese",
     "url": "https://www.gutenberg.org/cache/epub/7015/pg7015.txt",
     "description": "English translations of devotional Japanese Buddhist poems associated with Shinran Shonin and Pure Land religious thought.",
     "content_start": "Since He who is Infinite attained unto the Wisdom Supreme"
   },
   {
     "title": "The Book of the Dead",
-    "tradition": "Ancient Egyptian",
+    "tradition": "Egyptian",
     "url": "https://www.gutenberg.org/cache/epub/7145/pg7145.txt",
     "description": "An English rendering of ancient Egyptian funerary texts intended to guide the deceased through judgment and the afterlife."
   },
@@ -99,14 +99,14 @@
   },
   {
     "title": "The Nibelungenlied",
-    "tradition": "Germanic",
+    "tradition": "Continental Germanic",
     "url": "https://www.gutenberg.org/cache/epub/7321/pg7321.txt",
     "description": "A medieval German heroic epic involving Siegfried, Kriemhild, dragons, treasure, betrayal, and mythic heroic tradition.",
     "content_start": "To us in olden story"
   },
   {
     "title": "West African Folk-Tales",
-    "tradition": "West African",
+    "tradition": "Akan/Ashanti",
     "url": "https://www.gutenberg.org/cache/epub/66923/pg66923.txt",
     "description": "A collection of West African folktales, including trickster and animal stories often associated with Anansi and oral storytelling traditions.",
     "content_start": "In the olden days all the stories which men told were stories of Nyankupon",
@@ -114,7 +114,7 @@
   },
   {
     "title": "Australian Legendary Tales",
-    "tradition": "Australian Aboriginal",
+    "tradition": "Euahlayi",
     "url": "https://www.gutenberg.org/cache/epub/3833/pg3833.txt",
     "description": "A collection of Aboriginal Australian legends and Dreaming-related stories recorded from oral traditions.",
     "content_start": "Dinewan the emu, being the largest",
@@ -129,7 +129,7 @@
   },
   {
     "title": "Legends of Ma-ui a Demi God of Polynesia",
-    "tradition": "Polynesian",
+    "tradition": "Hawaiian",
     "url": "https://www.gutenberg.org/cache/epub/32601/pg32601.txt",
     "description": "A collection of Polynesian legends about Maui, the trickster and culture hero known for feats such as fishing up islands and slowing the sun.",
     "content_start": "Maui is a demi god whose name should probably be pronounced",
@@ -150,7 +150,7 @@
   },
   {
     "title": "The Bhagavad Gita",
-    "tradition": "Hinduism",
+    "tradition": "Hindu",
     "url": "https://www.gutenberg.org/cache/epub/2388/pg2388.txt",
     "description": "A central sacred scripture of Hinduism, presenting a philosophical dialogue between Prince Arjuna and the god Krishna on duty, honor, and the nature of reality.",
     "content_start": "Ranged thus for battle on the sacred plain"
@@ -176,7 +176,7 @@
   },
   {
     "title": "The Mahabharata",
-    "tradition": "Hinduism",
+    "tradition": "Hindu",
     "url": "https://www.gutenberg.org/cache/epub/15474/pg15474.txt",
     "description": "A massive ancient Indian epic that narrates the Kurukshetra War between the Pandava and Kaurava princes, alongside vast philosophical and religious treatises.",
     "content_start": "Om! Having bowed down to Narayana and Nara"

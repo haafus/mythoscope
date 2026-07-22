@@ -1,211 +1,268 @@
 {
-  "Near Eastern": {
+  "Sub-Saharan Africa": {
+    "color": "#BF6B3A",
+    "description": "The mythologies of Africa south of the Sahara — the world's densest concentration of distinct oral traditions, spanning several unrelated language phyla. Distinguished as one region because Berezkin does not subdivide it and both candidate halves (West/Central vs East/Southern) are text-thin; encyclopedias treat \"Black Africa\" as one. Predominantly oral; the open textual assets are the Yoruba Ifá corpus and Ethiopian Ge'ez (boundary — Semitic/Christian).",
+    "subdivision": "West African (Niger-Congo: Yoruba, Akan, Fon, Igbo); Central & Southern Bantu; Nilotic & Cushitic East Africa; Khoisan foragers",
+    "strata": "Khoisan forager substrate (deepest, pre-agricultural, >20 ka); Bantu expansion carrying agriculture + iron across Central/Southern Africa (~1000 BCE – 500 CE); Nilotic pastoralist spread; Sahelian Islam via the trans-Saharan trade (from ~8th c. CE); Ethiopian Christian literate layer (Ge'ez, from 4th c. CE); colonial/Christian overlay (16th–20th c.)",
     "traditions": {
-      "Ancient Egyptian": {
-        "description": "An ancient polytheistic religion and mythology of Northeast Africa, centered around deities such as Ra, Osiris, and Isis, with a strong focus on the afterlife.",
+      "Akan/Ashanti": {
+        "description": "The folklore of the Akan/Ashanti peoples of the Gold Coast (Ghana), centered on the Anansi trickster-spider tales.",
+        "coordinates": [
+          7.9465,
+          -1.0232
+        ],
+        "dating": "Oral tradition; recorded early 20th c. CE"
+      }
+    }
+  },
+  "Near East & North Africa": {
+    "color": "#E0B45E",
+    "description": "The Ancient Near East plus North Africa and the Abrahamic homelands — the earliest literate mythologies (cuneiform, hieroglyphic) and the source region of the three Abrahamic religions. Distinguished as the Bronze-Age/antiquity core of the Old World, anchored by written text. Includes Anatolia (Hittite) and the Maghreb; \"Near East\" chosen over \"Middle East\" for its ancient material.",
+    "subdivision": "Mesopotamian (Sumer/Akkad/Babylon/Assyria); Egyptian; Levantine-Anatolian (Ugarit, Hittite, Canaan, Phoenicia); Arabian; Abrahamic (Judaism/Christianity/Islam); Maghreb-Berber",
+    "strata": "Sumerian (cuneiform from ~3200 BCE); Akkadian-Babylonian-Assyrian (2nd–1st mill. BCE); Egyptian (Pyramid Texts ~2400 BCE); Hittite (~1650–1180 BCE) & Ugaritic (~1400–1200 BCE); Iron-Age Levant / Hebrew (1st mill. BCE); Abrahamic overlay: Judaism (Second-Temple era), Christianity (1st c. CE), Islam (7th c. CE); Arab-Islamic spread (7th–8th c. CE)",
+    "traditions": {
+      "Egyptian": {
+        "description": "The ancient polytheistic religion and mythology of Northeast Africa, centered on deities such as Ra, Osiris, and Isis, with a strong focus on the afterlife.",
         "coordinates": [
           26.8206,
           30.8025
-        ]
-      }
-    }
-  },
-  "Indo-European": {
-    "traditions": {
-      "Anglo-Saxon": {
-        "description": "The Germanic paganism and subsequent heroic folklore practiced by the early medieval inhabitants of England before their conversion to Christianity.",
-        "coordinates": [
-          52.3555,
-          -1.1743
-        ]
+        ],
+        "dating": "Pyramid Texts ~2400 BCE; Book of the Dead compiled ~1550 BCE onward"
       },
-      "Celtic": {
-        "description": "The polytheistic religion and animistic mythology of the ancient Celtic peoples, primarily preserved in the traditions of Ireland, Scotland, and Wales.",
-        "coordinates": [
-          53.1424,
-          -7.6921
-        ]
-      },
-      "Germanic": {
-        "description": "The historical religion and mythology of the Germanic peoples, encompassing heroic sagas and a pantheon of gods that influenced Northern and Central Europe.",
-        "coordinates": [
-          51.1657,
-          10.4515
-        ]
-      },
-      "Greek": {
-        "description": "The body of myths and religious teachings belonging to the ancient Greeks, concerning their polytheistic pantheon of gods, heroes, and the origins of the world.",
-        "coordinates": [
-          39.0742,
-          21.8243
-        ]
-      },
-      "Norse": {
-        "description": "The mythology of the North Germanic peoples, derived from Norse paganism, featuring gods such as Odin and Thor, and the cosmological framework of Yggdrasil.",
-        "coordinates": [
-          60.472,
-          8.4689
-        ]
-      },
-      "Roman": {
-        "description": "The mythology and religious system of ancient Rome, heavily influenced by Greek tradition but uniquely focused on statehood, historical foundations, and civic duty.",
-        "coordinates": [
-          41.9028,
-          12.4964
-        ]
-      }
-    }
-  },
-  "Indigenous Australian": {
-    "traditions": {
-      "Australian": {
-        "description": "The diverse folklore, myths, and legends recorded on the Australian continent, frequently intersecting with the oral traditions of its Indigenous peoples.",
-        "coordinates": [
-          -25.2744,
-          133.7751
-        ]
-      },
-      "Australian Aboriginal": {
-        "description": "The deeply rooted spiritual belief system of Indigenous Australians, characterized by animism and a mythological era known as the Dreamtime.",
-        "coordinates": [
-          -25.2744,
-          133.7751
-        ]
-      }
-    }
-  },
-  "Mesopotamian": {
-    "traditions": {
       "Babylonian": {
-        "description": "The mythology and religious practices of ancient Mesopotamia, featuring a pantheon headed by Marduk and epic creation narratives.",
+        "description": "The mythology and religious practice of ancient Mesopotamia, featuring a pantheon headed by Marduk and epic creation narratives.",
         "coordinates": [
           32.5364,
           44.4208
-        ]
-      }
-    }
-  },
-  "Indian": {
-    "traditions": {
-      "Buddhism": {
-        "description": "A major world religion and philosophy originating in ancient India, based on the teachings of Siddhartha Gautama (the Buddha), emphasizing the path to enlightenment.",
-        "coordinates": [
-          24.6951,
-          84.9913
-        ]
+        ],
+        "dating": "Enuma Elish ~2nd mill. BCE; Code of Hammurabi ~1750 BCE"
       },
-      "Hinduism": {
-        "description": "One of the world's oldest religions, originating in the Indian subcontinent, characterized by a diverse range of philosophies, a vast pantheon of deities, and concepts like karma and dharma.",
-        "coordinates": [
-          20.5937,
-          78.9629
-        ]
-      }
-    }
-  },
-  "Chinese": {
-    "traditions": {
-      "Chinese": {
-        "description": "A complex collection of cultural history, folktales, and ancient religious beliefs from China, integrating natural forces, ancestor worship, and mythological figures.",
-        "coordinates": [
-          35.8617,
-          104.1954
-        ]
-      },
-      "Confucianism": {
-        "description": "An ancient Chinese philosophical and ethical system formulated by Confucius, focusing on morality, family hierarchy, and social harmony.",
-        "coordinates": [
-          35.5959,
-          116.9853
-        ]
-      },
-      "Taoism": {
-        "description": "An ancient Chinese philosophical and spiritual tradition emphasizing living in harmony with the Tao (the Way), focusing on balance, naturalness, and non-action (wu wei).",
-        "coordinates": [
-          34.3227,
-          108.5505
-        ]
-      }
-    }
-  },
-  "Abrahamic": {
-    "traditions": {
-      "Christianity": {
+      "Christian": {
         "description": "An Abrahamic monotheistic religion based on the life, teachings, and resurrection of Jesus of Nazareth.",
         "coordinates": [
           31.7683,
           35.2137
-        ]
+        ],
+        "dating": "OT ~1200–165 BCE, NT ~50–120 CE; KJV translation 1611"
       },
-      "Islam": {
-        "description": "An Abrahamic monotheistic religion articulating that there is only one God (Allah), and that Muhammad is His messenger, centered around the Quran.",
+      "Islamic": {
+        "description": "An Abrahamic monotheistic religion holding that there is one God (Allah) and that Muhammad is His messenger, centered on the Quran.",
         "coordinates": [
           21.4225,
           39.8262
-        ]
+        ],
+        "dating": "Quran ~610–632 CE"
       }
     }
   },
-  "Finno-Ugric": {
+  "Europe": {
+    "color": "#4F7A4E",
+    "description": "The mythologies of Europe — predominantly Indo-European (with Uralic Finno-Ugric), sharing deep Proto-Indo-European roots. One region (not split) because by text it is lighter than the single Near East region and internally more uniform than one-region Sub-Saharan Africa. The Classical Mediterranean vs Northern/Eastern division is a **sub-rubric**.",
+    "subdivision": "Greco-Roman (Classical Mediterranean); Celtic; Germanic-Norse; Slavic; Baltic; Finno-Ugric / Uralic",
+    "strata": "Pre-IE Neolithic-farmer & \"Old European\" substrate (Basque relic; farmers from ~7000 BCE); Proto-Indo-European steppe expansion (~3000–2500 BCE) branching into the IE mythologies; Classical antiquity (Greek from 8th c. BCE, then Roman); Migration Period (Germanic & Slavic expansions, 4th–9th c. CE); Christianization absorbing the pagan layer (4th–12th c. CE); late written fixation (Eddas ~13th c.; Kalevala compiled 1835–49)",
     "traditions": {
+      "Greek": {
+        "description": "The myths and religious teachings of the ancient Greeks, concerning a polytheistic pantheon of gods, heroes, and the origins of the world.",
+        "coordinates": [
+          39.0742,
+          21.8243
+        ],
+        "dating": "Homeric epics ~8th c. BCE"
+      },
+      "Norse": {
+        "description": "The mythology of the North Germanic peoples, featuring gods such as Odin and Thor and the cosmological framework of Yggdrasil.",
+        "coordinates": [
+          60.472,
+          8.4689
+        ],
+        "dating": "Culture ~8th–13th c. CE; Eddas written down ~13th c. CE"
+      },
+      "Roman": {
+        "description": "The mythology and religious system of ancient Rome, influenced by Greek tradition but focused on statehood, foundation, and civic duty.",
+        "coordinates": [
+          41.9028,
+          12.4964
+        ],
+        "dating": "Aeneid ~29–19 BCE"
+      },
+      "Celtic": {
+        "description": "The polytheistic religion and animistic mythology of the ancient Celtic peoples, preserved chiefly in the traditions of Ireland and Wales.",
+        "coordinates": [
+          53.1424,
+          -7.6921
+        ],
+        "dating": "Mabinogion compiled ~12th–13th c. CE from older oral matter"
+      },
       "Finnish": {
-        "description": "The traditional pagan religion and mythological folklore of Finland, characterized by shamanism, nature spirits, and epic poetry.",
+        "description": "The traditional pagan religion and mythological folklore of Finland — shamanism, nature spirits, and epic poetry.",
         "coordinates": [
           61.9241,
           25.7482
-        ]
+        ],
+        "dating": "Oral runo tradition; Kalevala compiled 1835–1849"
+      },
+      "Anglo-Saxon": {
+        "description": "The Germanic paganism and heroic folklore of early medieval England before Christian conversion.",
+        "coordinates": [
+          52.3555,
+          -1.1743
+        ],
+        "dating": "Beowulf ~8th–11th c. CE"
+      },
+      "Continental Germanic": {
+        "description": "The heroic sagas and mythology of the continental Germanic peoples of Central Europe.",
+        "coordinates": [
+          51.1657,
+          10.4515
+        ],
+        "dating": "Nibelungenlied ~1200 CE from older heroic legend"
       }
     }
   },
-  "Buddhist": {
+  "Caucasus & Iran": {
+    "color": "#9E4A6E",
+    "description": "The Iranian/Persianate world plus the Caucasus — bound by Iranian cultural and linguistic threads (Zoroastrian, Scythian-Alan, Persianate). The Caucasus does not stand alone (a thin, internally diverse shatter zone) but its autochthonous Nart-epic peoples and its Christian literate peoples (Armenian, Georgian) attach here, following the Haussig \"Caucasian and Iranian\" pairing and the Iranian–Alan core of the Nart sagas.",
+    "subdivision": "Iranian (Persian/Zoroastrian, Scythian-Alan, Ossetian); South Caucasian (Georgian, Armenian); North Caucasian (Circassian, Chechen/Vainakh, Dagestani — Nart)",
+    "strata": "Autochthonous Caucasian Nart substrate; Indo-Iranian / Scythian-Alan layer (1st mill. BCE; the Iranian core of the Nart sagas); Zoroastrian (Avesta oral ~1000 BCE; Sasanian codification 3rd–7th c. CE); Christian Armenia & Georgia (from 4th c. CE); Islam (7th–8th c. CE); Persian literary epic (Shahnameh ~1000 CE)",
+    "traditions": {}
+  },
+  "Inner Asia": {
+    "color": "#2E7CB8",
+    "description": "The Turco-Mongol nomadic steppe — the pastoralist, shamanic, Tengrist interior of Asia, with its own great oral epics. \"Inner Asia\" (not \"Central Asia\") because Iran/the Persianate oasis is in #4; this region is specifically the nomadic steppe belt. Tibet is a boundary case (Bon / Tibeto-Mongolian Vajrayana) placed here for its Inner-Asian Buddhist ties.",
+    "subdivision": "Turkic (Kyrgyz/Manas, Kazakh, Yakut, Uyghur); Mongolic (Mongol/Geser, Buryat, Kalmyk/Jangar); Tibetan (Bon / Vajrayana — boundary)",
+    "strata": "Ancient shamanic-Tengrist substrate; Scythian/Xiongnu nomad era (1st mill. BCE); Turkic Khaganates (Old Turkic runic, 6th–8th c. CE); Mongol Empire spreading the Geser epic cycle (13th c.); Tibetan-Buddhist (Vajrayana) overlay (Mongol conversion 16th c.); western-Turkestan Islam (from ~10th c.)",
+    "traditions": {}
+  },
+  "South Asia": {
+    "color": "#E8952F",
+    "description": "The Indian subcontinent — the single largest textual tradition on Earth (the Vedic corpus, Sanskrit epics, the Puranas, the Buddhist and Jain canons). Its own region on the strength of both volume (crit 4) and civilizational distinctness (crit 2); India is the source of the Indosphere, distinct from its Indianized periphery.",
+    "subdivision": "Vedic-Hindu (Indo-Aryan); Dravidian; Buddhist; Jain; tribal (Munda/Austroasiatic); Sinhalese; Himalayan",
+    "strata": "Indus-Valley / Harappan + Dravidian & tribal substrate (~2600–1900 BCE); Vedic (Indo-Aryan, Rigveda ~1500–1200 BCE); Buddhism & Jainism (founders ~5th c. BCE); epic-Puranic Hinduism (Mahabharata/Ramayana ~400 BCE – 400 CE; Puranas 300–1500 CE); Bhakti / medieval; Islamic (from ~11th c.), Sikh (15th c.)",
     "traditions": {
-      "Japanese Buddhism": {
-        "description": "The adaptation and practice of Buddhism in Japan, characterized by unique sects like Zen and Pure Land, and its historical syncretism with native Shinto beliefs.",
+      "Hindu": {
+        "description": "One of the world's oldest living religions, of the Indian subcontinent, with a vast pantheon and concepts such as karma and dharma.",
+        "coordinates": [
+          20.5937,
+          78.9629
+        ],
+        "dating": "Vedas ~1500–500 BCE; epics (Mahabharata, Ramayana) ~4th c. BCE–4th c. CE"
+      },
+      "Buddhist": {
+        "description": "A major religion and philosophy originating in ancient India from the teachings of Siddhartha Gautama, emphasizing the path to enlightenment.",
+        "coordinates": [
+          24.6951,
+          84.9913
+        ],
+        "dating": "Buddha ~5th c. BCE; Dhammapada compiled ~3rd c. BCE onward"
+      }
+    }
+  },
+  "Mainland Southeast Asia": {
+    "color": "#3E9E64",
+    "description": "The Indianized mainland — Indochina and the Tibeto-Burman/Tai/Austroasiatic hill peoples whose classical mythology is Hindu-Buddhist (the Ramayana traditions). On the Indic side of the Indosphere/Sinosphere split, distinct from South Asia proper (periphery, not source) and from Sinic East Asia. Vietnam is here (Austroasiatic + geography outweigh its Sinic literary overlay).",
+    "subdivision": "Burmese; Tai (Thai/Lao/Shan); Khmer; Vietnamese; Tibeto-Burman & Hmong-Mien hill peoples",
+    "strata": "Austroasiatic / animist substrate; Indianization (Hindu-Buddhist states — Funan, Champa, Angkor 9th–15th c. CE — from ~1st–5th c.); Sinic overlay in Vietnam (Chinese rule 111 BCE – 938 CE); Tai migrations south (~8th–13th c.); Theravada-Buddhist dominance (from ~11th c.)",
+    "traditions": {}
+  },
+  "East Asia": {
+    "color": "#C0392B",
+    "description": "The Sinosphere — China, Korea, Japan — sharing the Chinese classical, Taoist, Confucian and Mahayana-Buddhist textual world. The clean CJK core (Vietnam, though Sinicized, is left in mainland SE Asia). Ainu is a boundary case (indigenous Japan, Circumpolar affinity).",
+    "subdivision": "Chinese (Han; Taoist, Confucian, Chinese-Buddhist, folk); Korean; Japanese (Shinto); Ainu (boundary); Ryukyuan",
+    "strata": "Neolithic-shamanic substrate (Shang oracle bones ~1200 BCE); classical Chinese (Zhou; Confucianism & Taoism 6th–3rd c. BCE); Buddhism arrival (China ~1st c. CE, Korea 4th, Japan 6th); Shinto codification (Kojiki 712 CE, Nihon Shoki 720 CE); vernacular-novel fixation (Ming, e.g. *Journey to the West* 16th c.)",
+    "traditions": {
+      "Chinese": {
+        "description": "A collection of cultural history, folktale, and ancient religious belief from China, integrating natural forces, ancestor worship, and mythic figures — the ethnolinguistic node also carrying its Confucian and Taoist textual layers.",
+        "coordinates": [
+          35.8617,
+          104.1954
+        ],
+        "dating": "Classical texts ~6th c. BCE onward"
+      },
+      "Japanese": {
+        "description": "The mythology and folklore of Japan, including its Buddhist textual layer and syncretism with native Shinto belief.",
         "coordinates": [
           36.2048,
           138.2529
-        ]
+        ],
+        "dating": "Buddhist Psalms medieval; native myth (Kojiki) 712 CE"
       }
     }
   },
-  "Polynesian": {
+  "Austronesia": {
+    "color": "#1596A8",
+    "description": "The Austronesian cultural area — one language family and one Neolithic maritime expansion, from the Taiwan homeland through island Southeast Asia to the Pacific and Madagascar. Its own region to keep this cohesive descent-based area intact (crit 2), anchored by the Formosan peoples. Island SE Asia (Nusantara) sits here, not in mainland SE Asia or a vague \"Oceania\"; the Indianized Javanese/Balinese are the literate exception within it.",
+    "subdivision": "Formosan (Taiwan homeland); western Malayo-Polynesian (island SE Asia + Madagascar); Oceanic (Polynesian, Micronesian, coastal Melanesian)",
+    "strata": "Austronesian expansion out of Taiwan (~3000 BCE) — the base layer, one language family; Lapita / Oceanic dispersal into the Pacific (~1500–1000 BCE; Polynesia settled ~900 BCE – 1200 CE); Indianization of western Nusantara (Java/Bali Hindu-Buddhist, 4th–15th c. CE); Islamization of the Malay world (13th–16th c.); colonial/Christian (16th c.+)",
     "traditions": {
       "Maori": {
-        "description": "The rich mythological and cultural traditions of the indigenous Polynesian people of New Zealand, featuring tales of creation, demigods like Maui, and ancestral spirits.",
+        "description": "The mythological and cultural traditions of the indigenous Polynesian people of New Zealand — creation tales, demigods such as Maui, and ancestral spirits.",
         "coordinates": [
           -40.9006,
           174.886
-        ]
+        ],
+        "dating": "Oral tradition; recorded 19th c. CE"
       },
-      "Polynesian": {
-        "description": "The oral traditions, folklore, and mythological narratives shared by the peoples of the Polynesian triangle in the Pacific Ocean.",
+      "Hawaiian": {
+        "description": "The mythology of the Hawaiian islands within the wider Polynesian tradition — the Maui demigod cycle and island creation lore.",
         "coordinates": [
-          -16.8396,
-          -149.6766
-        ]
+          21.3069,
+          -157.8583
+        ],
+        "dating": "Oral tradition; recorded (Westervelt) late 19th–early 20th c. CE"
       }
     }
   },
-  "Mesoamerican": {
+  "Papua & Aboriginal Australia": {
+    "color": "#A9773F",
+    "description": "The non-Austronesian deep-Pacific — the Pleistocene **Sahul** population: Papuan / highland New Guinea peoples and Aboriginal Australians (the Dreaming). Distinguished from Austronesia by descent and antiquity (Sahul was settled ~50 ky ago, long before the Neolithic Austronesian arrival). \"Aboriginal\" marks the Indigenous tradition against the modern nation.",
+    "subdivision": "Aboriginal Australian (many language blocks); Papuan / highland New Guinea (Trans-New-Guinea and other phyla); non-Austronesian Melanesian",
+    "strata": "Deep Sahul settlement (~50,000+ BP) — among the oldest continuous living traditions (the Dreaming); Australia sea-isolated as sea levels rose (~8000 BCE); independent New Guinea highland agriculture (~7000 BCE); Austronesian coastal contact (from ~1500 BCE; the interior stays Papuan); minimal external overlay until colonial contact (recent)",
+    "traditions": {
+      "Euahlayi": {
+        "description": "The Dreaming lore of the Euahlayi/Noongahburrah people of northern New South Wales, recorded in K. L. Parker's Australian Legendary Tales.",
+        "coordinates": [
+          -29.5,
+          147.5
+        ],
+        "dating": "Oral tradition; recorded 1896 onward"
+      }
+    }
+  },
+  "Circumpolar North": {
+    "color": "#5F86A6",
+    "description": "The continuous circumpolar Arctic/boreal belt spanning both continents across the Bering Strait — Arctic and Subarctic hunter-shaman cultures that geography joins but the continental boundary would tear. Includes NE Siberian palaeo-Asiatics, the boreal taiga peoples, Beringia, and Arctic/Subarctic North America. The Bering bridge into the New World.",
+    "subdivision": "NE Siberian palaeo-Asiatic (Chukchi, Koryak, Yukaghir, Nivkh); boreal Tungus & Uralic Siberian (Evenki, Khanty, Nenets); Eskimo-Aleut (Inuit/Yupik/Aleut); Na-Dene / Subarctic Athabaskan",
+    "strata": "Upper-Palaeolithic circumpolar hunter-shaman substrate; Beringian peopling-of-the-Americas layer (~20,000–15,000 BP crossings); Na-Dene dispersal; late Eskimo-Aleut / Thule expansion across Arctic North America to Greenland (~1000 CE); Russian & colonial contact (recent, 17th c.+)",
+    "traditions": {}
+  },
+  "Native North America": {
+    "color": "#3AA6A0",
+    "description": "Indigenous North America outside the Arctic — the temperate culture areas: Eastern Woodlands, Plains, Plateau, California, the Southwest, and the Northwest Coast (boundary with Circumpolar). \"Native\" distinguishes the Indigenous traditions from the modern nation.",
+    "subdivision": "Eastern Woodlands (Iroquois, Algonquian); Plains (Siouan, Caddoan); Plateau; California; Southwest (Pueblo; Athabaskan Navajo/Apache); Northwest Coast (boundary)",
+    "strata": "Palaeo-Indian founding (Clovis ~13,000 BP); Archaic regional differentiation; agricultural Mississippian mound-builders (~800–1600 CE); Athabaskan (Navajo/Apache) southward migration (~1400 CE); post-contact equestrian Plains transformation (17th–19th c.)",
+    "traditions": {}
+  },
+  "Mesoamerica & the Andes": {
+    "color": "#C99A2E",
+    "description": "The high civilizations of the Americas — the two literate/state-level New-World myth complexes, with codices and colonial chronicles (Popol Vuh, the Florentine Codex, the Huarochirí Manuscript). Grouped together as the Americas' textual heartland, distinct from the surrounding tribal lowlands.",
+    "subdivision": "Mesoamerican (Maya, Aztec/Nahua, Mixtec, Zapotec, Olmec/Toltec); Andean (Inca/Quechua, Aymara, Moche, Chibcha/Muisca)",
+    "strata": "Formative/Preclassic (Olmec ~1500–400 BCE; Andean Chavín ~900–200 BCE); Classic (Maya ~250–900 CE; Moche, Nazca); Postclassic (Toltec; Aztec 14th–16th c.; Inca 15th–16th c.); colonial written fixation (Popol Vuh, Florentine Codex, Huarochirí Manuscript — 16th c. CE)",
     "traditions": {
       "Maya": {
-        "description": "The Mesoamerican mythology of the Maya civilization, heavily intertwined with precise astronomy, natural cycles, and a complex pantheon of deities.",
+        "description": "The Mesoamerican mythology of the Maya civilization, intertwined with astronomy, natural cycles, and a complex pantheon.",
         "coordinates": [
           16.7369,
           -89.6268
-        ]
+        ],
+        "dating": "Popol Vuh ~16th c. CE from older tradition"
       }
     }
   },
-  "African": {
-    "traditions": {
-      "West African": {
-        "description": "The diverse and rich collection of traditional religions, folklore, and mythologies belonging to the various ethnic groups of West Africa, often featuring trickster spirits and complex pantheons.",
-        "coordinates": [
-          9.082,
-          8.6753
-        ]
-      }
-    }
+  "Lowland South America": {
+    "color": "#2E8B4E",
+    "description": "The tropical and temperate lowlands of South America — Amazonia, the Guianas, the Gran Chaco, and the Southern Cone: the densest concentration of small-scale Amerindian oral traditions, the terminal end of the human expansion. Distinct from the Andean highlands (#13).",
+    "subdivision": "Amazonian (Tupí-Guaraní, Carib, Arawak, Ge/Macro-Ge, Tucano, Pano); Gran Chaco; Guiana; Southern Cone / Patagonia (Selk'nam, Tehuelche; Mapuche — boundary)",
+    "strata": "Deep post-Beringian Amerindian settlement (reaching southern South America ~12,000+ BP); Amazonian language-family dispersals (Arawak, Tupí, Carib expansions, ~2000 BCE – 1500 CE); complex pre-Columbian Amazonian societies (*terra preta*, ~500 BCE – 1500 CE); ethnographic recording amid colonial disruption (19th–20th c.)",
+    "traditions": {}
   }
 }
