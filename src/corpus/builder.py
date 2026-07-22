@@ -6,14 +6,14 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fetch_cache import cache_path, fetch_to_cache
+from fetch_cache import fetch_to_cache
 from json_utils import save_json
 from settings import settings
 
 from .clean_gutenberg import clean_gutenberg_in_builder, trim_to_content
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
-from .locator import document_id
+from .locator import corpus_raw_path, document_id
 from .sources import (
     WEB_SCHEMES,
     file_source_unchanged,
@@ -101,7 +101,7 @@ def _download_and_process(item: dict, region: str) -> dict | None:
     url = item["url"]
 
     try:
-        raw_cache = cache_path(Path(settings.corpus_dir) / "raw", url)
+        raw_cache = corpus_raw_path(Path(settings.corpus_dir) / "raw", url)
         scheme = source_scheme(url)
         if scheme in WEB_SCHEMES:
             # Raw is a pinned, immutable archive: build only acquires-if-missing and never
@@ -184,7 +184,7 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         # snapshot lives in corpus/raw, so no hash is stored in the metadata. Web
         # sources are reused whenever their output file is still present.
         if output_present and is_file_source(url):
-            raw_cache = cache_path(Path(settings.corpus_dir) / "raw", url)
+            raw_cache = corpus_raw_path(Path(settings.corpus_dir) / "raw", url)
             reuse = file_source_unchanged(url, raw_cache, settings.sources_dir)
         else:
             reuse = output_present

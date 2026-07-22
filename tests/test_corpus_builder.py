@@ -144,14 +144,14 @@ class TestBuildCorpusForce:
 
     def test_file_source_unchanged_is_skipped(self, tmp_path, monkeypatch):
         # File source whose content matches the previous raw snapshot is reused.
-        from fetch_cache import cache_path
+        from corpus.locator import corpus_raw_path
 
         items = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt"}]
         existing = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt", "path": "Local.txt"}]
         corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
         (corpus_dir / "Local.txt").write_text("out")  # output present
         (tmp_path / "sources" / "local.txt").write_bytes(b"same content")
-        raw = cache_path(corpus_dir / "raw", "file:local.txt")
+        raw = corpus_raw_path(corpus_dir / "raw", "file:local.txt")
         raw.parent.mkdir(parents=True, exist_ok=True)
         raw.write_bytes(b"same content")  # snapshot matches the source
 
@@ -160,14 +160,14 @@ class TestBuildCorpusForce:
 
     def test_file_source_changed_is_reprocessed(self, tmp_path, monkeypatch):
         # File source whose content differs from the raw snapshot is re-ingested.
-        from fetch_cache import cache_path
+        from corpus.locator import corpus_raw_path
 
         items = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt"}]
         existing = [{"title": "Local", "tradition": "Greek", "url": "file:local.txt", "path": "Local.txt"}]
         corpus_dir, processed = self._setup(tmp_path, monkeypatch, items, existing=existing)
         (corpus_dir / "Local.txt").write_text("out")
         (tmp_path / "sources" / "local.txt").write_bytes(b"new content")
-        raw = cache_path(corpus_dir / "raw", "file:local.txt")
+        raw = corpus_raw_path(corpus_dir / "raw", "file:local.txt")
         raw.parent.mkdir(parents=True, exist_ok=True)
         raw.write_bytes(b"old content")  # snapshot differs from the edited source
 
@@ -273,7 +273,7 @@ class TestDocumentIdInCatalog:
 class TestPinnedRaw:
     def test_force_does_not_refetch(self, tmp_path, monkeypatch):
         # --force rebuilds derived from the pinned raw; it must NOT re-fetch upstream.
-        from fetch_cache import cache_path
+        from corpus.locator import corpus_raw_path
         from settings import settings
 
         corpus_dir = tmp_path / "corpus"
@@ -281,7 +281,7 @@ class TestPinnedRaw:
         monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
         monkeypatch.setattr(settings, "sources_dir", tmp_path / "sources")
 
-        raw = cache_path(corpus_dir / "raw", "https://example.com/iliad")
+        raw = corpus_raw_path(corpus_dir / "raw", "https://example.com/iliad")
         raw.parent.mkdir(parents=True, exist_ok=True)
         raw.write_bytes(b"pinned raw text")
 

@@ -15,10 +15,11 @@ import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from fetch_cache import cache_path, commit_bytes
+from fetch_cache import commit_bytes
 from settings import settings
 
 from .downloader import load_download_list
+from .locator import corpus_raw_path
 from .sources import WEB_SCHEMES, source_scheme
 
 logger = logging.getLogger(__name__)
@@ -82,7 +83,7 @@ def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> Refr
             result.skipped_local += 1
             continue
 
-        raw = cache_path(raw_dir, url)
+        raw = corpus_raw_path(raw_dir, url)
         try:
             fresh = download_file(url)
         except Exception as exc:  # transport / 404 — keep pinned, report (situations F/G)

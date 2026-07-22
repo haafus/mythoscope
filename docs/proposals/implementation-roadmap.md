@@ -82,17 +82,20 @@ graphs build == serve. *Front: unchanged — smoke-check it still loads; no data
 are the acceptance gate; no separate script.
 **Review:** light — `/code-review` on the stage diff + green tests.
 
-### Stage III — Part 1 data-model + region migration *(the heaviest step — but reversible via the re-key)*
+### Stage III — Part 1 data-model + region migration *(the heaviest step — but reversible via the re-key)* — code ✅ DONE; §6 migration = scripted, user-run
 
 Now, with the code proven on motifs and fingerprints+atomicity in place.
 
-11. Part 1 **steps 1–5** — config, `document_id`, front indexes, region regroup + B1, colour *(code)*
-12. Part 1 **§6 migration** — **snapshot `corpus/` + `embeddings/` first** → wipe derived → **write + run the
-    one-off `scripts/rekey_raw.py`** (config-driven `sha1(url) → blake2b(locator)` rename in place, no network)
-    → plain `build` (finds re-keyed raw present, rebuilds fingerprint-aware, **no re-fetch**) → front in lockstep
-    → `status` reports zero orphans. *The heaviest step (full re-embed/re-graph), but **reversible** — raw
-    re-keyed in place (rename back to undo; a dead source can't lose data), derived recomputable, config/code via
-    git. The re-key is a throwaway migration script, not pipeline code.*
+11. Part 1 **steps 1–6** — ✅ **DONE** (code, committed): config + fail-loud validation · `document_id =
+    blake2b(locator)` (+ corpus raw re-keyed to it) · front `treeIndex`/`docIndex` + resolution · region regroup
+    + B1 chunk + endpoint renames + `$nin` filter · region-derived OKLCH colour · cleanup (graphs on
+    `document_id`, one `UNASSIGNED`). Validated by 526 py + 17 JS tests and a live Playwright pass (9/9).
+12. Part 1 **§6 migration** — ✅ **SCRIPTED** (`scripts/migrate_region.py` orchestrates: baseline → wipe derived
+    → `scripts/rekey_raw.py --apply` config-driven `sha1(url) → blake2b(locator)` rename in place, no network) →
+    plain `mytho build` (finds the re-keyed raw present, rebuilds **no re-fetch**) → `scripts/validate_migration.py`
+    (gates a–d) → `status` zero orphans. Tested end-to-end on real data (offline rebuild succeeded). **Run by the
+    user on their data** (the heavy GPU/LLM rebuild is never triggered silently). Reversible — raw re-keyed in
+    place, derived recomputable, config/code via git. See [`../../scripts/README.md`](../../scripts/README.md).
 
 **Verify** — **build:** the full rebuild of step 12 (offline re-key + re-embed + re-graph — no re-fetch). **Check (the deep one —
 this is the only front-affecting stage):** region grouping and per-region colours; document resolution

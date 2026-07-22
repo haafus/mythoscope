@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import posixpath
 import re
+from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from .utils import content_fingerprint
@@ -63,3 +64,10 @@ def normalize_locator(url: str) -> str:
 def document_id(url: str) -> str:
     """The stable `document_id` (D1): blake2b of the normalized locator, 32 hex."""
     return content_fingerprint(normalize_locator(url).encode("utf-8"))
+
+
+def corpus_raw_path(raw_dir: str | Path, url: str) -> Path:
+    """The corpus raw-archive path for a locator: ``<raw_dir>/<document_id>``. The archive is
+    keyed by ``document_id = blake2b(locator)`` (D1) — one value for identity + archive key.
+    The old ``sha1(url)`` key is retired by the one-off ``scripts/rekey_raw.py`` re-key (§6)."""
+    return Path(raw_dir) / document_id(url)

@@ -3,8 +3,8 @@
 import pytest
 
 from corpus import refresh as refresh_mod
+from corpus.locator import corpus_raw_path
 from corpus.refresh import refresh_corpus
-from fetch_cache import cache_path
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def _download(monkeypatch, mapping):
 
 
 def _pin(corpus_dir, url, content):
-    raw = cache_path(corpus_dir / "raw", url)
+    raw = corpus_raw_path(corpus_dir / "raw", url)
     raw.parent.mkdir(parents=True, exist_ok=True)
     raw.write_bytes(content)
     return raw
@@ -77,7 +77,7 @@ class TestRefreshCorpus:
         url = "https://x/new"
         _items(monkeypatch, [{"title": "N", "url": url}])
         _download(monkeypatch, {url: b"fresh"})
-        raw = cache_path(env / "raw", url)
+        raw = corpus_raw_path(env / "raw", url)
 
         preview = refresh_corpus(apply=False)
         assert preview.new == ["N"] and not raw.exists()
