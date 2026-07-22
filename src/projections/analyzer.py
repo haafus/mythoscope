@@ -5,6 +5,7 @@ from typing import Any, NamedTuple
 
 import numpy as np
 
+from corpus.utils import UNASSIGNED
 from embeddings import chroma_manager
 from settings import settings
 
@@ -21,11 +22,11 @@ def _attach_tradition(records: list[dict[str, Any]]) -> None:
         try:
             for row in json.loads(catalog.read_text(encoding="utf-8")):
                 if row.get("document_id"):
-                    id_to_tradition[row["document_id"]] = row.get("tradition", "unknown")
+                    id_to_tradition[row["document_id"]] = row.get("tradition", UNASSIGNED)
         except (OSError, json.JSONDecodeError) as exc:
             logger.warning("Could not read catalog for tradition join: %s", exc)
     for record in records:
-        record["tradition"] = id_to_tradition.get(record.get("id"), "unknown")
+        record["tradition"] = id_to_tradition.get(record.get("id"), UNASSIGNED)
 
 
 class ModelData(NamedTuple):

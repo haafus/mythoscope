@@ -52,12 +52,14 @@ class TestIterCorpusFiles:
         assert filenames == {"file1.txt", "file2.txt"}
 
     def test_metadata_populates_fields(self, tmp_path):
+        # B1: CorpusFileInfo carries only the identity (document_id) + label (text_id) +
+        # fingerprint — tradition/region/url resolve from document_id at query time.
         corpus = self._create_corpus(tmp_path, [
             {
                 "title": "mytext",
                 "tradition": "Buddhism",
-                "major_tradition": "Eastern",
-                "url": "http://example.com",
+                "document_id": "abc123",
+                "fingerprint": "deadbeef",
                 "path": "Eastern/Buddhism/mytext/mytext.txt",
             },
         ])
@@ -65,10 +67,10 @@ class TestIterCorpusFiles:
         results = list(iter_files(corpus))
         assert len(results) == 1
         info = results[0]
-        assert info.tradition == "Buddhism"
-        assert info.major_tradition == "Eastern"
-        assert info.url == "http://example.com"
         assert info.text_id == "mytext"
+        assert info.document_id == "abc123"
+        assert info.fingerprint == "deadbeef"
+        assert not hasattr(info, "major_tradition")  # B1: dropped from CorpusFileInfo
 
     def test_returns_corpus_file_info(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [

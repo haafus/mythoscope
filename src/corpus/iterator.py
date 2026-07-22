@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
 
-from .utils import UNASSIGNED, content_fingerprint, normalize_catalog_id
+from .utils import content_fingerprint, normalize_catalog_id
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +12,10 @@ logger = logging.getLogger(__name__)
 @dataclass(frozen=True, slots=True)
 class CorpusFileInfo:
     _path: Path
-    text_id: str
-    major_tradition: str
-    tradition: str
-    url: str
-    # The stable document identity (D1) from the catalog — the embeddings chunk anchor
-    # and the single reference stored on each chunk after B1.
+    text_id: str  # normalize_catalog_id(title) — a readable label (graph logs); NOT an identity
+    # The stable document identity (D1) from the catalog — the embeddings chunk anchor,
+    # graph dir key, and the single reference stored on each chunk after B1. tradition/
+    # region/url are resolved from it at query time, never carried here.
     document_id: str = ""
     # Per-doc content fingerprint (blake2b of the cleaned text) from the catalog; the
     # embeddings staleness gate folds it into each chunk's key (pipeline §4).
@@ -65,9 +63,6 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
         yield CorpusFileInfo(
             _path=txt_file,
             text_id=normalize_catalog_id(title),
-            major_tradition=item.get("major_tradition", UNASSIGNED),
-            tradition=item.get("tradition", UNASSIGNED),
-            url=item.get("url", ""),
             document_id=item.get("document_id", ""),
             fingerprint=item.get("fingerprint", ""),
         )

@@ -39,18 +39,25 @@ def _sha256(path: Path) -> str:
 
 def plan_rekey(config: list[dict], raw_dir: Path) -> list[dict]:
     plan = []
+    claimed: dict[str, str] = {}  # new-key -> the first config title that claims it
     for item in config:
         url = item.get("url", "")
         if not url:
             continue
+        new_key = document_id(url)
         old = raw_dir / _old_key(url)
-        new = raw_dir / document_id(url)
-        if new.exists() and new.stat().st_size > 0:
+        new = raw_dir / new_key
+        if new_key in claimed:
+            # Two distinct config locators normalize to one document_id — the second would
+            # be served the first's raw. Flag it regardless of on-disk state (never rename).
+            status = "collision"
+        elif new.exists() and new.stat().st_size > 0:
             status = "already-rekeyed"
         elif old.exists():
-            status = "collision" if new.exists() else "rename"
+            status = "rename"
         else:
             status = "missing-raw"
+        claimed.setdefault(new_key, item.get("title", url))
         plan.append({"title": item.get("title", url), "old": old, "new": new, "status": status})
     return plan
 

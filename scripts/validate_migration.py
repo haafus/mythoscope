@@ -98,11 +98,19 @@ def gate_fail_loud() -> list[str]:
 
 def gate_counts() -> list[str]:
     problems: list[str] = []
-    docs, chunks, graphs = len(_catalog()), _chunk_count(), _graph_count()
-    expected_docs = len([d for d in _config_docs() if not d.get("exclude")])
-    print(f"    documents={docs} (config expects {expected_docs}), chunks={chunks}, graphs={graphs}")
-    if docs != expected_docs:
-        problems.append(f"catalog has {docs} docs, config expects {expected_docs}")
+    catalog = _catalog()
+    docs, chunks, graphs = len(catalog), _chunk_count(), _graph_count()
+    config = [d for d in _config_docs() if not d.get("exclude")]
+    print(f"    documents={docs} (config expects {len(config)}), chunks={chunks}, graphs={graphs}")
+    if docs == 0:
+        problems.append("catalog is empty — corpus did not rebuild")
+    else:
+        # A shortfall is a WARNING, not a failure: a dead/404 *new* source that never fetched
+        # (acquire-on-miss) is a normal best-effort flag, not a broken migration (fetch-and-refresh).
+        built = {r.get("document_id") for r in catalog}
+        missing = [d.get("title") for d in config if document_id(d.get("url", "")) not in built]
+        if missing:
+            print(f"    ⚠ {len(missing)} config doc(s) did not build (dead source? review flags): {missing}")
     if chunks == 0:
         problems.append("no embedded chunks — embeddings did not rebuild")
     base = _load_json(BASELINE, None)

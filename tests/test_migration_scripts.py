@@ -35,6 +35,17 @@ class TestRekeyPlan:
         plan[0]["old"].rename(plan[0]["new"])  # simulate --apply
         assert rekey_raw.plan_rekey(config, raw)[0]["status"] == "already-rekeyed"
 
+    def test_document_id_collision_flagged(self, tmp_path):
+        # Two locators normalizing to one id: the second is 'collision', never renamed.
+        raw = tmp_path / "raw"
+        raw.mkdir()
+        (raw / _sha1("https://X.com/i/")).write_bytes(b"a")
+        (raw / _sha1("https://x.com/i")).write_bytes(b"b")
+        plan = rekey_raw.plan_rekey(
+            [{"title": "A", "url": "https://X.com/i/"}, {"title": "B", "url": "https://x.com/i"}], raw)
+        assert plan[0]["status"] == "rename"
+        assert plan[1]["status"] == "collision"
+
     def test_missing_raw_is_flagged_not_fatal(self, tmp_path):
         raw = tmp_path / "raw"
         raw.mkdir()
