@@ -95,6 +95,34 @@ class TestRefreshCorpus:
         assert r.unreachable and r.unreachable[0][0] == "A"
         assert raw.read_bytes() == b"good"  # never overwritten on failure
 
+    def test_empty_body_kept_pinned(self, env, monkeypatch):
+        # A 200 with an empty/whitespace body is degraded — never overwrite the pinned copy.
+        url = "https://x/a"
+        _items(monkeypatch, [{"title": "A", "url": url}])
+        raw = _pin(env, url, b"good")
+        _download(monkeypatch, {url: b"   \n  "})
+
+        r = refresh_corpus(apply=True)
+        assert r.degraded and r.degraded[0][0] == "A"
+        assert r.adopted == []
+        assert raw.read_bytes() == b"good"  # degraded reply rejected, last-good kept
+
+    def test_adopt_invalidates_derived_output(self, env, monkeypatch):
+        # After adopting new raw, the stale .txt is removed so a plain `build` re-derives it.
+        import json
+
+        url = "https://x/a"
+        _items(monkeypatch, [{"title": "A", "url": url}])
+        raw = _pin(env, url, b"old")
+        _download(monkeypatch, {url: b"new"})
+        (env / "A.txt").write_text("derived-from-old")
+        (env / "corpus.json").write_text(json.dumps([{"title": "A", "url": url, "path": "A.txt"}]))
+
+        r = refresh_corpus(apply=True)
+        assert r.adopted == ["A"]
+        assert raw.read_bytes() == b"new"
+        assert not (env / "A.txt").exists()  # invalidated → next plain build re-derives
+
     def test_local_sources_skipped(self, env, monkeypatch):
         _items(monkeypatch, [{"title": "L", "url": "file:local.txt"}])
         r = refresh_corpus(apply=False)

@@ -10,6 +10,7 @@ on every build (a free hash check), so refresh leaves them to the build.
 
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -30,7 +31,8 @@ class RefreshResult:
     changed: list[str] = field(default_factory=list)              # upstream drift, kept pinned
     new: list[str] = field(default_factory=list)                  # no pinned raw yet (first acquire)
     adopted: list[str] = field(default_factory=list)              # committed this run (--apply)
-    unreachable: list[tuple[str, str]] = field(default_factory=list)  # (title, reason)
+    unreachable: list[tuple[str, str]] = field(default_factory=list)  # (title, reason): transport/404
+    degraded: list[tuple[str, str]] = field(default_factory=list)     # (title, reason): 200 but unhealthy
 
 
 def _reason(exc: Exception) -> str:
@@ -40,6 +42,21 @@ def _reason(exc: Exception) -> str:
     if status:
         return f"http-{status}"
     return "fetch-error"
+
+
+def _invalidate_output(url: str, corpus_dir: Path) -> None:
+    """Delete the derived ``.txt`` for ``url`` so a plain ``mytho build`` re-derives it from
+    the newly-adopted raw. Web reuse keys on output-presence (not raw-vs-output), so without
+    this an adopted change would not propagate until ``build --force`` (which re-embeds all)."""
+    catalog = corpus_dir / "corpus.json"
+    try:
+        rows = json.loads(catalog.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    for row in rows:
+        if row.get("url") == url and row.get("path"):
+            (corpus_dir / row["path"]).unlink(missing_ok=True)
+            return
 
 
 def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> RefreshResult:
@@ -52,7 +69,8 @@ def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> Refr
     from .downloader import download_file  # lazy: requests lives in the corpus extra
 
     result = RefreshResult()
-    raw_dir = Path(settings.corpus_dir) / "raw"
+    corpus_dir = Path(settings.corpus_dir)
+    raw_dir = corpus_dir / "raw"
     items = load_download_list()
     if max_texts is not None:
         items = items[:max_texts]
@@ -73,11 +91,20 @@ def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> Refr
             logger.warning("refresh: %s unreachable (%s) — keeping pinned raw", title, reason)
             continue
 
+        # Validate before commit (situation H): a 200 with an empty/whitespace body is a
+        # degraded reply (soft error, anti-bot stub, truncation) — never adopt it over the
+        # pinned last-good copy. Richer per-source validators are Part 3 (fetch-and-refresh §8).
+        if not fresh.strip():
+            result.degraded.append((title, "empty-body"))
+            logger.warning("refresh: %s returned an empty/degraded body — keeping pinned raw", title)
+            continue
+
         pinned = raw.read_bytes() if (raw.exists() and raw.stat().st_size > 0) else None
         if pinned is None:                       # A: never acquired — first fetch
             result.new.append(title)
             if apply:
                 commit_bytes(raw, fresh)
+                _invalidate_output(url, corpus_dir)
                 result.adopted.append(title)
         elif fresh == pinned:                    # D: identical — no-op
             result.unchanged += 1
@@ -85,6 +112,7 @@ def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> Refr
             result.changed.append(title)
             if apply:
                 commit_bytes(raw, fresh)
+                _invalidate_output(url, corpus_dir)   # so a plain `build` re-derives this doc
                 result.adopted.append(title)
             else:
                 logger.info("refresh: %s changed upstream — rerun with --apply to adopt", title)

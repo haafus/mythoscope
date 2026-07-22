@@ -209,6 +209,8 @@ def _refresh_documents(apply: bool):
 
     for title, reason in r.unreachable:
         click.echo(click.style(f"  unreachable  {title} ({reason}) — kept pinned", fg="yellow"))
+    for title, reason in r.degraded:
+        click.echo(click.style(f"  degraded     {title} ({reason}) — kept pinned", fg="yellow"))
     for title in r.new:
         verb = "acquired" if apply else "would acquire"
         click.echo(f"  new          {title} ({verb})")

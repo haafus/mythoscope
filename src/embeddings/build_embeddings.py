@@ -103,21 +103,22 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
         for file_info in files_info:
             content = file_info.read_text()
             chunks = [c for c in chunk_text(content, emb.chunk_size, emb.chunk_overlap) if c.strip()]
-            if not chunks:
-                continue
             n_chunks = len(chunks)
-            total_chunks += n_chunks
             expected = chunk_fingerprint(file_info.content_fingerprint(), transform_v)
             try:
-                ids, metadatas = _build_chroma_entries(chunks, file_info, expected)
-
                 to_embed, stale = embed_plan(file_info.text_id, n_chunks, expected, existing_fp)
-                # Drop trailing chunks a now-shorter document no longer has (the only
-                # deletion case; positional ids upsert-overwrite the rest, never orphan §4).
+                # Drop chunks a shorter (or now-empty) document no longer has — the only
+                # deletion case; positional ids upsert-overwrite the rest, never orphan (§4).
+                # Runs before the empty-doc skip so a doc edited down to zero chunks does
+                # not strand its old vectors.
                 if stale:
                     collection.delete(ids=stale)
                     stale_removed += len(stale)
+                if not chunks:
+                    continue
+                total_chunks += n_chunks
 
+                ids, metadatas = _build_chroma_entries(chunks, file_info, expected)
                 missing = [(i, chunks[i]) for i in to_embed]
                 skipped_total += n_chunks - len(missing)
                 if not missing:

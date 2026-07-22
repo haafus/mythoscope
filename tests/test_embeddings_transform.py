@@ -83,6 +83,13 @@ class TestEmbedPlan:
         assert to_embed == []
         assert stale == ["A::2"]
 
+    def test_shrunk_to_zero_drops_all(self):
+        # A doc edited down to no chunks must drop ALL its old chunks (review finding 3).
+        existing = {"A::0": self.fp, "A::1": self.fp}
+        to_embed, stale = embed_plan("A", 0, self.fp, existing)
+        assert to_embed == []
+        assert sorted(stale) == ["A::0", "A::1"]
+
     def test_other_documents_untouched(self):
         # A doc whose id is a prefix of another's must not steal its chunks.
         existing = {"A::0": self.fp, "AB::0": self.fp, "AB::1": self.fp}
