@@ -874,6 +874,9 @@ re-embed, no re-LLM, no artifact move. The only possible one-time cost: any arti
 
 ### Implementation order — **Part 4 of 4: manual text curation** (editorial; independent; last)
 
+> **⏸ PAUSED — not now.** Deferred deliberately; do not start until explicitly resumed. It is editorial and
+> fully independent (blocks nothing else), so pausing it costs nothing to the other parts.
+
 Hand-fixing a document's text (OCR typo, an interleaved note the markers can't catch) as an **override layer**
 that never mutates raw or upstream — an editorial workflow, not required to ship the migration or to make
 rebuilds incremental, so it goes last.
