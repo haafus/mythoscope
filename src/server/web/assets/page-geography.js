@@ -1,4 +1,4 @@
-import { app, escapeHtml, loadTraditionInfo, onCleanup, CATEGORY_NONE } from "./core.js";
+import { app, escapeHtml, ensureCorpusData, state, traditionColor, onCleanup } from "./core.js";
 import { REGIONS_GEOJSON } from "./regions-geo.js";
 
 export async function renderGeography() {
@@ -42,27 +42,35 @@ function normalizeCoordinates(value) {
     return [lat, lon];
 }
 
-function normalizeTraditions(raw) {
-    return Object.entries(raw || {})
-        .map(([name, info]) => {
-            const coordinates = normalizeCoordinates(info && info.coordinates);
-            if (!coordinates) return null;
-
-            return {
-                name,
-                description: info.description || "",
-                coordinates,
-                color: isValidColor(info.color) ? info.color : CATEGORY_NONE,
-                books: Array.isArray(info.books) ? info.books.filter(Boolean) : [],
-            };
-        })
-        .filter(Boolean)
-        .sort((a, b) => a.name.localeCompare(b.name));
-}
-
+// Build the atlas points from the region tree (per-tradition coordinates) and join each
+// tradition's book titles from the documents — colour is the derived region shade (§8.1),
+// never stored. Region/colour/books all resolve from the stable references (§2.8).
 async function fetchTraditions() {
-    const raw = await loadTraditionInfo();
-    return normalizeTraditions(raw);
+    await ensureCorpusData();
+
+    const booksByTradition = new Map();
+    (state.corpusDocuments || []).forEach((doc) => {
+        const t = doc.tradition || "Unknown";
+        if (!booksByTradition.has(t)) booksByTradition.set(t, []);
+        booksByTradition.get(t).push(doc.title);
+    });
+
+    const points = [];
+    for (const [region, node] of Object.entries(state.traditionTree || {})) {
+        for (const [name, info] of Object.entries(node.traditions || {})) {
+            const coordinates = normalizeCoordinates(info && info.coordinates);
+            if (!coordinates) continue;
+            points.push({
+                name,
+                region,
+                description: (info && info.description) || "",
+                coordinates,
+                color: traditionColor(name),
+                books: (booksByTradition.get(name) || []).slice().sort(),
+            });
+        }
+    }
+    return points.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function buildCoordinateGroups(traditions) {

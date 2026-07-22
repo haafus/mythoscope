@@ -1,5 +1,7 @@
 // ===== App root & shared state =====
 
+import { traditionShade } from "./region-color.js";
+
 export const app = document.getElementById("app");
 
 // The single fallback colour for any category/tradition that has no colour of
@@ -11,11 +13,13 @@ export const state = {
     models: [],
     selectedModel: localStorage.getItem("selectedModel") || "",
     corpusDocuments: [],
+    docIndex: null,            // document_id -> document (built with the documents)
     selectedCorpusDoc: null,
     corpusOpenTraditions: new Set(),
     corpusOpenTraditionsInitialized: false,
     corpusCollapsedMajors: new Set(),
-    traditionInfo: null,
+    traditionTree: null,       // region -> { color, description, subdivision, strata, traditions }
+    treeIndex: null,           // tradition -> { region, regionColor, coordinates, index, count, … }
     analysisSearchRequestId: 0,
     similarityMethods: [],
     textSearch: true, // from /api/similarity/models; false hides text search
@@ -156,61 +160,130 @@ export function renderModelOptions(selectedKey = state.selectedModel) {
     `).join("");
 }
 
-// ===== Corpus =====
+// ===== Region tree + resolution =====
+// The front loads the region → tradition tree and the documents ONCE, then resolves
+// everything from the stable references (document_id, tradition) — nothing region/colour
+// is carried on a document or a chunk (§2.8, B1).
+
+export async function ensureTraditionTree() {
+    if (!state.traditionTree) {
+        try {
+            const data = await api("/api/corpus/traditions");
+            state.traditionTree = data.traditions || {};
+        } catch {
+            state.traditionTree = {};
+        }
+        buildTreeIndex();
+    }
+    return state.traditionTree;
+}
+
+function buildTreeIndex() {
+    // tradition -> { region, regionColor, coordinates, description, dating, index, count }.
+    // `index` is the within-region order by longitude (west→east) so the derived lightness
+    // shade weakly encodes geography (§8.1); `count` sizes the ramp.
+    const index = new Map();
+    for (const [region, node] of Object.entries(state.traditionTree || {})) {
+        const ordered = Object.entries(node.traditions || {}).sort((a, b) => {
+            const la = (a[1].coordinates || [])[1], lb = (b[1].coordinates || [])[1];
+            if (la != null && lb != null && la !== lb) return la - lb;
+            return a[0].localeCompare(b[0]);
+        });
+        ordered.forEach(([name, info], i) => index.set(name, {
+            region,
+            regionColor: node.color || CATEGORY_NONE,
+            coordinates: info.coordinates || null,
+            description: info.description || "",
+            dating: info.dating || "",
+            index: i,
+            count: ordered.length,
+        }));
+    }
+    state.treeIndex = index;
+}
+
+export function regionOf(tradition) {
+    return ((state.treeIndex && state.treeIndex.get(tradition)) || {}).region || "";
+}
+
+export function regionColor(tradition) {
+    const e = state.treeIndex && state.treeIndex.get(tradition);
+    return e ? e.regionColor : CATEGORY_NONE;
+}
+
+function isDarkTheme() {
+    const attr = document.documentElement.getAttribute("data-theme");
+    if (attr) return attr === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+
+// The per-tradition within-region OKLCH shade (regions.md §8.1), derived from the region
+// base + the tradition's order/count — never stored.
+export function traditionColor(tradition) {
+    const e = state.treeIndex && state.treeIndex.get(tradition);
+    if (!e) return CATEGORY_NONE;
+    return traditionShade(e.regionColor, e.index, e.count, isDarkTheme());
+}
+
+export function traditionInfo(tradition) {
+    return (state.treeIndex && state.treeIndex.get(tradition)) || null;
+}
+
+// ===== Corpus documents =====
 
 export async function ensureCorpusDocuments() {
     if (!state.corpusDocuments.length) {
-        const data = await api("/api/corpus/catalog");
+        const data = await api("/api/corpus/documents");
         state.corpusDocuments = Array.isArray(data.documents) ? data.documents : [];
+        state.docIndex = new Map(state.corpusDocuments.map((d) => [d.document_id, d]));
     }
     return state.corpusDocuments;
 }
 
+// Load both the tree and the documents (the front's one global load).
+export async function ensureCorpusData() {
+    await ensureTraditionTree();
+    await ensureCorpusDocuments();
+    return state.corpusDocuments;
+}
+
+export function documentById(id) {
+    return (state.docIndex && state.docIndex.get(id)) || null;
+}
+
 export function buildCorpusApiUrl(doc) {
-    const params = new URLSearchParams({
-        title: doc.title || "",
-        major_tradition: doc.major_tradition || "",
-        tradition: doc.tradition || "",
-        source: doc.source || "corpus",
-    });
-    return `/api/corpus/documents?${params.toString()}`;
+    return `/api/corpus/document?id=${encodeURIComponent((doc && doc.document_id) || "")}`;
 }
 
-export function corpusTraditionKey(major, tradition) {
-    return `${major || "Other"}|${tradition || "Unknown"}`;
+export function corpusTraditionKey(region, tradition) {
+    return `${region || "Other"}|${tradition || "Unknown"}`;
 }
 
+// Group documents by region → tradition, in the served tree's canon order (§2.8: the
+// structure and order come from the tree, not a client-side reconstruction).
 export function groupDocuments(items) {
-    const grouped = new Map();
-
+    const byTradition = new Map();
     items.forEach((doc) => {
-        const major = doc.major_tradition || "Other";
-        const tradition = doc.tradition || "Unknown";
-
-        if (!grouped.has(major)) grouped.set(major, new Map());
-        const majorGroup = grouped.get(major);
-        if (!majorGroup.has(tradition)) majorGroup.set(tradition, []);
-        majorGroup.get(tradition).push(doc);
+        const t = doc.tradition || "Unknown";
+        if (!byTradition.has(t)) byTradition.set(t, []);
+        byTradition.get(t).push(doc);
     });
 
-    return grouped;
-}
-
-// A point/chunk id is the book title with spaces turned into underscores
-// (normalize_catalog_id), so the title is recovered by reversing that.
-export function bookTitleFromId(value) {
-    return String(value || "").replace(/\.txt$/i, "").replace(/_/g, " ").trim();
-}
-
-// ===== Traditions =====
-
-export async function loadTraditionInfo() {
-    if (state.traditionInfo) return state.traditionInfo;
-    try {
-        const data = await api("/api/corpus/traditions");
-        state.traditionInfo = data.traditions || {};
-    } catch {
-        state.traditionInfo = {};
+    const grouped = new Map();
+    for (const [region, node] of Object.entries(state.traditionTree || {})) {
+        for (const tradition of Object.keys(node.traditions || {})) {
+            const docs = byTradition.get(tradition);
+            if (!docs || !docs.length) continue;
+            if (!grouped.has(region)) grouped.set(region, new Map());
+            grouped.get(region).set(tradition, docs);
+        }
     }
-    return state.traditionInfo;
+    // A document whose tradition is not in the tree shouldn't occur post-validation; bucket
+    // it under "Other" rather than dropping it silently.
+    for (const [tradition, docs] of byTradition) {
+        if (regionOf(tradition)) continue;
+        if (!grouped.has("Other")) grouped.set("Other", new Map());
+        grouped.get("Other").set(tradition, docs);
+    }
+    return grouped;
 }

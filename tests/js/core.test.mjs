@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
-    bookTitleFromId,
     buildCorpusApiUrl,
     corpusTraditionKey,
     escapeHtml,
@@ -11,6 +10,8 @@ import {
     formatNumber,
     groupDocuments,
     normalizePreviewText,
+    regionOf,
+    state,
 } from "../../src/server/web/assets/core.js";
 
 test("escapeHtml neutralizes all five HTML metacharacters", () => {
@@ -37,27 +38,33 @@ test("formatNumber groups thousands and falls back to 0", () => {
 });
 
 test("corpusTraditionKey supplies Other/Unknown defaults", () => {
-    assert.equal(corpusTraditionKey("Indo-European", "Greek"), "Indo-European|Greek");
+    assert.equal(corpusTraditionKey("Europe", "Greek"), "Europe|Greek");
     assert.equal(corpusTraditionKey("", ""), "Other|Unknown");
 });
 
-test("bookTitleFromId reverses the id normalization", () => {
-    assert.equal(bookTitleFromId("The_Iliad.txt"), "The Iliad");
-    assert.equal(bookTitleFromId(""), "");
+test("buildCorpusApiUrl addresses a document by document_id", () => {
+    assert.equal(buildCorpusApiUrl({ document_id: "abc123", title: "A B" }),
+        "/api/corpus/document?id=abc123");
+    assert.equal(buildCorpusApiUrl({}), "/api/corpus/document?id=");
 });
 
-test("buildCorpusApiUrl encodes params and defaults source", () => {
-    const url = buildCorpusApiUrl({ title: "A B", major_tradition: "E", tradition: "Greek" });
-    assert.equal(url, "/api/corpus/documents?title=A+B&major_tradition=E&tradition=Greek&source=corpus");
-});
-
-test("groupDocuments nests by major then tradition, with defaults", () => {
-    const grouped = groupDocuments([
-        { major_tradition: "European", tradition: "Greek" },
-        { major_tradition: "European", tradition: "Norse" },
-        {},
+test("groupDocuments buckets by region via the tree, in tree order", () => {
+    // groupDocuments reads state.traditionTree for structure + order.
+    state.traditionTree = {
+        Europe: { color: "#4F7A4E", traditions: { Greek: {}, Norse: {} } },
+        "East Asia": { color: "#C0392B", traditions: { Chinese: {} } },
+    };
+    state.treeIndex = new Map([
+        ["Greek", { region: "Europe" }], ["Norse", { region: "Europe" }],
+        ["Chinese", { region: "East Asia" }],
     ]);
-    assert.equal(grouped.get("European").get("Greek").length, 1);
-    assert.equal(grouped.get("European").get("Norse").length, 1);
-    assert.equal(grouped.get("Other").get("Unknown").length, 1);
+    const grouped = groupDocuments([
+        { tradition: "Greek", title: "Iliad" },
+        { tradition: "Norse", title: "Edda" },
+        { tradition: "Chinese", title: "Journey" },
+    ]);
+    assert.deepEqual([...grouped.keys()], ["Europe", "East Asia"]);  // tree order
+    assert.equal(grouped.get("Europe").get("Greek").length, 1);
+    assert.equal(grouped.get("East Asia").get("Chinese").length, 1);
+    assert.equal(regionOf("Greek"), "Europe");
 });

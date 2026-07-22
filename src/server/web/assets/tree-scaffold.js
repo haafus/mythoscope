@@ -1,4 +1,4 @@
-import { state, ensureCorpusDocuments, groupDocuments, escapeHtml } from "./core.js";
+import { state, ensureCorpusData, groupDocuments, escapeHtml } from "./core.js";
 
 // Shared scaffold for both trees: renders collapsible major sections; the caller
 // fills each major body (renderBody) and wires its leaves (bindLeaves).
@@ -7,7 +7,7 @@ export async function renderMajorTree(container, { emptyMessage, prepare, render
     container.innerHTML = "Loading...";
 
     try {
-        const documents = await ensureCorpusDocuments();
+        const documents = await ensureCorpusData();  // tree + documents (groupDocuments needs the tree)
         if (!documents.length) {
             container.innerHTML = `<div class="empty-state">${escapeHtml(emptyMessage)}</div>`;
             return;

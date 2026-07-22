@@ -1,4 +1,10 @@
-import { api, bookTitleFromId, escapeHtml, escapeRegex, normalizePreviewText, state } from "./core.js";
+import { api, documentById, escapeHtml, escapeRegex, normalizePreviewText, state } from "./core.js";
+
+// A hit carries only the document reference (B1); title + tradition are resolved from the
+// globally-cached document, not carried on the hit.
+function hitDocument(item) {
+    return documentById(item && item.document_id) || null;
+}
 
 export function scoreClass(similarityScore) {
     const percent = Math.round(Number(similarityScore || 0) * 100);
@@ -9,7 +15,13 @@ export function scoreClass(similarityScore) {
 }
 
 export function resultBookTitle(item) {
-    return bookTitleFromId(item.filename || item.id) || "Unknown book";
+    const doc = hitDocument(item);
+    return (doc && doc.title) || "Unknown book";
+}
+
+export function resultTradition(item) {
+    const doc = hitDocument(item);
+    return (doc && doc.tradition) || "Unknown";
 }
 
 export function chunkMetaLine(item) {
@@ -18,7 +30,7 @@ export function chunkMetaLine(item) {
 
 // "— Tradition" / "Title" / "chunk N[, score 0.76]" shown under a fragment.
 export function attributionLine(item, { withScore = false } = {}) {
-    const tradition = item.tradition || "Unknown";
+    const tradition = resultTradition(item);
     const title = resultBookTitle(item);
     let meta = `chunk ${item.chunk_index ?? 0}`;
     if (withScore && item.similarity_score != null) {
@@ -42,7 +54,7 @@ export function pointTooltipHtml(item) {
 }
 
 export function searchResultMetaLine(item) {
-    return `Tradition: ${item.tradition || "Unknown"} | ${chunkMetaLine(item)}`;
+    return `Tradition: ${resultTradition(item)} | ${chunkMetaLine(item)}`;
 }
 
 export function highlightText(text, query) {
@@ -76,7 +88,7 @@ export function renderSearchResultItem(result, data) {
     return `
         <div class="search-result-item">
             <span class="search-result-topline">
-                <span class="result-tradition">${escapeHtml(result.tradition)}</span>
+                <span class="result-tradition">${escapeHtml(resultTradition(result))}</span>
                 <span class="result-score ${cls}">${percent}% similarity</span>
             </span>
             <span class="search-result-meta">${escapeHtml(searchResultMetaLine(result))}</span>

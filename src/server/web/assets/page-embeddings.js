@@ -2,9 +2,8 @@ import {
     api, app, state,
     ensureModels, onCleanup,
     escapeHtml, reflowHtml,
-    loadTraditionInfo,
+    ensureCorpusData, traditionColor,
     persistSelectedModel, renderModelOptions,
-    CATEGORY_NONE,
 } from "./core.js";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js";
 import {
@@ -15,15 +14,10 @@ import {
 } from "./search-utils.js";
 import { renderTraditionList } from "./tree-traditions.js?v=2";
 
-function getTraditionColor(name) {
-    const info = state.traditionInfo || {};
-    return (info[name] && info[name].color) || CATEGORY_NONE;
-}
-
 function getColorMap(traditions) {
     const map = {};
     traditions.forEach((tradition) => {
-        map[tradition] = getTraditionColor(tradition);
+        map[tradition] = traditionColor(tradition);  // derived region shade (§8.1)
     });
     return map;
 }
@@ -212,7 +206,7 @@ async function loadVisualization() {
     try {
         const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
 
-        await loadTraditionInfo();
+        await ensureCorpusData();
         const chartType = (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
         await CHART_RENDERERS[chartType](scatterPlot, data);
 
@@ -268,7 +262,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
         if (neighbors.length > 0) {
             html += neighbors.map((neighbor) => `
-                <div class="neighbor-item" data-neighbor-id="${escapeHtml(neighbor.id)}" data-neighbor-chunk="${escapeHtml(neighbor.chunk_index)}">
+                <div class="neighbor-item" data-neighbor-id="${escapeHtml(neighbor.document_id)}" data-neighbor-chunk="${escapeHtml(neighbor.chunk_index)}">
                     <div class="fragment-text"${sourceAttr(neighbor)}>${reflowHtml(neighbor.text || "")}</div>
                     ${attributionLine(neighbor, { withScore: true })}
                 </div>
@@ -294,7 +288,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 }
 
 async function initializeAnalysisLibrary() {
-    await loadTraditionInfo();
+    await ensureCorpusData();
 
     const container = document.getElementById("tree-container");
     if (!container) return;

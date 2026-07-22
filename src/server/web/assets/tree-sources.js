@@ -1,4 +1,4 @@
-import { state, groupDocuments, corpusTraditionKey, escapeHtml, CATEGORY_NONE } from "./core.js";
+import { state, groupDocuments, corpusTraditionKey, escapeHtml, traditionColor } from "./core.js";
 import { renderMajorTree } from "./tree-scaffold.js";
 
 export async function renderLibraryTree(container) {
@@ -28,7 +28,7 @@ function renderTraditionGroups(traditions, major, docIndex) {
     traditions.forEach((docs, tradition) => {
         const key = corpusTraditionKey(major, tradition);
         const isOpen = state.corpusOpenTraditions.has(key);
-        const color = docs[0] && docs[0].color ? docs[0].color : CATEGORY_NONE;
+        const color = traditionColor(tradition);  // derived region shade (§8.1), not stored
 
         html += `
             <div class="tradition-group${isOpen ? " open" : ""}" data-tradition="${escapeHtml(tradition)}">

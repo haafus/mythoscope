@@ -10,23 +10,23 @@ class _FakeCollection:
 
 
 class TestLoadData:
-    def test_renames_text_id_without_mutating_source(self):
-        meta = {"text_id": "Book", "tradition": "Greek", "chunk_index": 0}
+    def test_exposes_document_id_as_id_without_mutating_source(self):
+        # B1: the chunk carries document_id (not text_id); load_data surfaces it as `id`.
+        meta = {"document_id": "doc-fp", "chunk_index": 0}
         result = {"metadatas": [meta], "documents": ["hello"], "embeddings": [[0.1, 0.2]]}
 
         records, embeddings = ChromaCollection(_FakeCollection(result)).load_data()
 
-        assert records[0]["id"] == "Book"
-        assert "text_id" not in records[0]  # renamed, not duplicated
-        assert records[0]["tradition"] == "Greek"
+        assert records[0]["id"] == "doc-fp"
+        assert "document_id" not in records[0]  # surfaced as id, not duplicated
         assert records[0]["text"] == "hello"
-        assert "text_id" in meta  # source dict left untouched
+        assert "document_id" in meta  # source dict left untouched
         assert embeddings.shape == (1, 2)
 
-    def test_missing_text_id_does_not_crash(self):
-        result = {"metadatas": [{"tradition": "X"}], "documents": ["d"], "embeddings": [[1.0]]}
+    def test_missing_document_id_does_not_crash(self):
+        result = {"metadatas": [{"chunk_index": 2}], "documents": ["d"], "embeddings": [[1.0]]}
 
         records, _ = ChromaCollection(_FakeCollection(result)).load_data()
 
         assert records[0]["id"] == ""
-        assert records[0]["tradition"] == "X"
+        assert records[0]["chunk_index"] == 2

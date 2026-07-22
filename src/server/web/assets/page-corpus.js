@@ -1,7 +1,7 @@
 import {
     app, api, state,
     buildCorpusApiUrl, escapeHtml, formatNumber,
-    CATEGORY_NONE,
+    regionOf, traditionColor,
 } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=4";
 
@@ -66,8 +66,8 @@ function renderBookInfo(doc) {
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
-            <span class="info-dot" style="--book-color:${escapeHtml(doc.color || CATEGORY_NONE)}"></span>
-            <span>${escapeHtml(doc.major_tradition || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
+            <span class="info-dot" style="--book-color:${escapeHtml(traditionColor(doc.tradition))}"></span>
+            <span>${escapeHtml(regionOf(doc.tradition) || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
         </div>
 
         <div class="stats-grid">
