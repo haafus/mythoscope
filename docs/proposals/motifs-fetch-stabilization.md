@@ -98,6 +98,44 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 2. Return the **outcome** to the caller: `fresh` / `served-pinned` (fetch failed but a cache exists → serve it)
    / `nothing` (no fetch, no cache). The "non-empty cache short-circuits unless force" rule is unchanged.
 
+#### The two fetch paths (so `refresh` is not mistaken for `force=True`)
+
+**`build` = acquire-if-missing** — a purely *local* decision, no network for what is already present (real today,
+`fetch_cache.py:32`):
+```python
+def build_fetch(url, cache):
+    if cache.exists() and cache.size() > 0:
+        return cache.read()               # present -> use it, NO network
+    return fetch_to_cache(url, cache)     # absent -> download once, pin it
+```
+
+**`refresh` = re-check present raw against upstream** — a *networked, manual* operation, and **much more than a
+boolean `force`**: it stages, validates, diffs, classifies, and by default keeps pinned:
+```python
+def refresh(source, *, apply=False):          # --check (preview) is apply=False
+    for url, cache in source.fetchables():
+        try:
+            staged = download(url)                       # ALWAYS hit the net, into <cache>.partial
+        except Exception as e:
+            record(cache, outcome_or_flag(e))            # gone(F)/transient(G): keep pinned, discard staged
+            continue
+        if not cache.exists():                           # first acquire happened via refresh
+            commit(cache, staged); continue              # os.replace(.partial -> cache)
+        if staged == cache.read():                       # D: unchanged
+            discard(staged); continue
+        if not source.validate(staged):                  # H/J: degraded / no-parse
+            flag(cache, "degraded" | "no-parse"); discard(staged); continue   # reject, keep pinned
+        # E: valid AND changed — the only adopt case, and only on confirmation
+        if apply:
+            commit(cache, staged)                        # os.replace(.partial -> cache) -> fp-cascade
+        else:
+            keep(staged); flag(cache, "changed")         # keep pinned + .partial for the diff, await --apply
+```
+So `refresh` never blindly overwrites (today's crude `force=True` does — the very thing this replaces). `commit`
+is the atomic `os.replace(<cache>.partial, <cache>)` of Phase 1. The **aggregate** flags (`yield-drop` /
+`discovery-shrank`) are not in this loop — they are computed post-build and reconciled by `--rebaseline`, a
+separate build-level act.
+
 ### Phase 2 — Fix the two deleters
 
 3. **Ashliman `_fetch_page`** (`ashliman.py:246–256`):
