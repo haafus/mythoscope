@@ -155,20 +155,26 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     """Fetch Wikidata and attach ``names`` / ``wikipedia`` / ``wikidata`` /
     ``concordances`` to each type, in place. ``{"skipped": ...}`` if the fetch failed."""
     cache = Path(settings.motifs_dir) / OUT
+    # Split fetch from parse: a *transport/HTTP* failure raises before the cache is overwritten, so the pinned
+    # copy is intact — keep it. A *parse* failure means the fetch already overwrote the cache with bad bytes, so
+    # that poison must be dropped. (Open enrichment — never fatal to the build.)
     try:
         raw = fetch_text(query_url(), cache, force=force)
-        rows = json.loads(raw)["results"]["bindings"]
-    except Exception as exc:  # open enrichment — never fatal to the build
-        # Name the failure so the log and meta/status say *what* went wrong: an
-        # HTTP status (429 = WDQS rate-limiting/outage) when the response carried
-        # one, else a generic fetch/parse error.
+    except Exception as exc:
+        # Name the failure so the log and meta/status say *what* went wrong: an HTTP status (429 = WDQS
+        # rate-limiting/outage) when the response carried one, else a generic fetch error.
         status = getattr(getattr(exc, "response", None), "status_code", None)
         reason = f"http-{status}" if status else "fetch-error"
-        logger.warning("ATU Wikidata: SPARQL fetch/parse failed [%s] (%s) — skipping this "
-                       "enrichment; re-run with --force once query.wikidata.org recovers",
-                       reason, exc)
-        cache.unlink(missing_ok=True)
-        return {"skipped": reason}
+        logger.warning("ATU Wikidata: SPARQL fetch failed [%s] (%s) — keeping the pinned cached copy; re-run "
+                       "with --force once query.wikidata.org recovers", reason, exc)
+        return {"skipped": reason}               # no unlink: the fetch raised before overwriting the cache
+    try:
+        rows = json.loads(raw)["results"]["bindings"]
+    except Exception as exc:
+        logger.warning("ATU Wikidata: response not parseable (%s) — dropping the bad reply; re-run with "
+                       "--force once query.wikidata.org recovers", exc)
+        cache.unlink(missing_ok=True)            # the fetch just overwrote the cache with unparseable bytes
+        return {"skipped": "parse-error"}
 
     ids = {t["id"] for t in atu_types}
     mapping = parse_bindings(rows, ids)

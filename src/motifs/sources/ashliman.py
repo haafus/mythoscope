@@ -234,11 +234,12 @@ def _fetch_page(page: str, force: bool) -> str | None:
     a network call unless ``force`` (as elsewhere in the pipeline). Returns ``None``
     when the page is absent or unreachable.
 
-    A page that 404s is remembered in a sibling ``.absent`` marker so it is **not
+    A page that 404s **and was never cached** is remembered in a sibling ``.absent`` marker so it is **not
     re-requested** on later builds — the site derives many ``type{N}.html`` names that
     do not exist (e.g. ``type0778J.html``), and without this every build would re-hit
-    all of them. A *transient* error is not remembered (so it retries next time), and
-    ``force`` re-checks everything, clearing the marker once a page is found present."""
+    all of them. But a page with an **existing pinned copy** that now 404s upstream is **kept and served** — we
+    never delete good raw over an upstream disappearance (Phase 0). A *transient* error is not remembered (so it
+    retries next time), and ``force`` re-checks everything, clearing the marker once a page is found present."""
     cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
     absent = cache.with_name(page + ".absent")
     if not force and absent.exists():
@@ -250,9 +251,12 @@ def _fetch_page(page: str, force: bool) -> str | None:
     except Exception as exc:
         status = getattr(getattr(exc, "response", None), "status_code", None)
         if status == 404:
-            cache.unlink(missing_ok=True)
+            if cache.exists() and cache.stat().st_size > 0:
+                # upstream 404 but we hold a pinned copy: keep + serve it, do not unlink, do not mark absent.
+                logger.warning("Ashliman: %s now 404s upstream — serving the pinned cached copy", page)
+                return cache.read_text(encoding="utf-8", errors="replace")
             absent.parent.mkdir(parents=True, exist_ok=True)
-            absent.touch()                       # remember it is definitively absent
+            absent.touch()                       # never existed here — remember it is absent
         return None
 
 

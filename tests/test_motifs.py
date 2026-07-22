@@ -9,7 +9,7 @@ import pytest  # noqa: E402
 
 from motifs import build_motifs as bm  # noqa: E402
 from motifs import crosswalk, parallels, store  # noqa: E402
-from motifs.sources import ashliman, atu_regions, berezkin, culture_dict, tmi_notes, trilogy
+from motifs.sources import ashliman, atu_regions, atu_wikidata, berezkin, culture_dict, tmi_notes, trilogy
 from motifs.sources import berezkin_bibliography as bbib
 from server.services import motifs as svc
 
@@ -325,6 +325,29 @@ class TestAshliman:
         ashliman._fetch_page("type0778J.html", True)
         assert len(calls) == 2
 
+    def test_fetch_page_404_keeps_and_serves_pinned_copy(self, tmp_path, monkeypatch):
+        # Phase 0: a page with an existing cached copy that now 404s upstream is KEPT and served —
+        # never unlinked, and no `.absent` marker is written (we don't lose good raw over a disappearance).
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+        cache = tmp_path / "raw" / "ashliman" / "type0510A.html"
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text("<html>pinned Ashliman page</html>", encoding="utf-8")
+
+        class _Resp:
+            status_code = 404
+
+        def fake_fetch(url, cache_file, *, force=False, **kw):
+            exc = Exception("gone")
+            exc.response = _Resp()
+            raise exc
+
+        monkeypatch.setattr(ashliman, "fetch_text", fake_fetch)
+        out = ashliman._fetch_page("type0510A.html", True)          # force re-check, upstream now 404s
+        assert out == "<html>pinned Ashliman page</html>"           # served from the pinned copy
+        assert cache.exists()                                       # not unlinked
+        assert not cache.with_name("type0510A.html.absent").exists()  # no absent marker written
+
     def test_parse_variants_filters_noise_and_dedupes(self):
         html = (
             '<a href="#contents">table of contents</a>'
@@ -366,6 +389,30 @@ class TestAshliman:
         assert ashliman._probe_filename("779J*") == "type0779J.html"   # star never in a filename
         assert ashliman._atu_range("676") is True
         assert ashliman._atu_range("3000") is False                    # Christiansen migratory legend
+
+
+class TestAtuWikidataPhase0:
+    def test_transport_failure_keeps_pinned_cache(self, tmp_path, monkeypatch):
+        # Phase 0: a transport/HTTP failure raises before the cache is overwritten, so the pinned copy is
+        # KEPT (not unlinked); refresh reports skipped with the HTTP reason.
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+        cache = tmp_path / atu_wikidata.OUT
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text('{"results": {"bindings": []}}', encoding="utf-8")
+
+        class _Resp:
+            status_code = 429
+
+        def fake_fetch(url, cache_file, *, force=False, **kw):
+            exc = Exception("rate limited")
+            exc.response = _Resp()
+            raise exc
+
+        monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
+        result = atu_wikidata.refresh([{"id": "1"}], force=True)
+        assert result == {"skipped": "http-429"}
+        assert cache.exists()                                # pinned copy kept, not unlinked
 
 
 class TestAtuRegions:
