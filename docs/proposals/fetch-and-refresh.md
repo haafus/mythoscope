@@ -311,9 +311,10 @@ This architecture is the **target form** — converged and validated, not yet a 
 1. **Source-unit API** — exact signatures of `acquire(key)` / `refresh(*, apply)` / the `validate` hook, and how
    `key → locator` resolves.
 2. **Shared-source keys** — `trilogy`'s file-keys and how `tmi` / `atu` name what they read.
-3. **Motif raw in export** — decide whether to ship the hard-to-re-fetch sources (`mapsofmyths` auth, `wikidata`
-   flaky, mortal sites) rather than exclude all raw as cache — a motif-specific decision, *not* inherited from
-   the corpus `raw = cache` call.
+3. ~~**Motif raw in export**~~ — **DECIDED: all raw is a cache, uniformly.** Never committed (neither corpus nor
+   motifs); excluded from export by default; shipped **only with `--caches`**, in all cases. No selective /
+   motif-specific rule. (Consequence: the region migration re-keys raw **in place** — `sha1→blake2b` rename, no
+   re-fetch, no committed fallback — see `region-implementation.md` §6.)
 4. **fetch/parse split** — mechanically move parse out of the sources' current `refresh()` functions into the
    index stages' `build` (today they conflate fetch + parse).
 5. **Edges not yet walked** — parse-root discovery (berezkin detail pages found by parsing the index) under the

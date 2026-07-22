@@ -365,44 +365,47 @@ tradition list (and the 194→195 count); update `regions.md` §5 and the canon 
 the config is authored. (`Confucianism`+`Taoism`+`Chinese` collapsing to one `Chinese` node, and `Japanese
 Buddhism`→`Japanese`, are deliberate — East Asia is modelled ethnolinguistically.)
 
-**Integrity principle.** Everything under `outputs/` below `corpus/raw/` is **derived and regenerable**; the
-only sources of truth are **`corpus/raw/` (the archive), `config/`, and `sources/`**. So coherence after the
-migration is *restored by a clean rebuild*, not by in-place metadata surgery. At ~27 documents this is cheap.
+**Integrity principle.** Everything under `outputs/` is **derived and regenerable**. The committed sources of
+truth are **`config/` and `sources/`** (local `file:` inputs); **`corpus/raw/` is a cache** — authoritative
+on disk while present, but re-fetchable from `config` (a `--caches`-only export, never committed). Coherence
+after the migration is *restored by a clean rebuild* off the re-keyed raw, not by in-place metadata surgery. At
+~27 documents this is cheap.
 
-**Why this migration re-fetches (and why that's fine).** D1 re-keys the raw archive `sha1(url) → blake2b(locator)`,
-so the migrated code finds **no** blake2b-named raw and re-fetches each web source once. We accept that: the
-sources are **stable public-domain** texts, it is a **one-time** ~27-file download, and the committed `sha1` raw
-(§6.5 — commit the archive) is the **fallback** for any 404. (The offline alternative — a one-time `mv` of each
-`sha1`-named file to its `blake2b` name — is available if you'd rather not touch the network, but is not needed
-here.) A plain `build` already does the full re-fetch, so **`--force` is not needed** (its collection-clear is
-redundant after the wipe below).
+**Why this migration re-keys offline (no re-fetch).** D1 re-keys the raw archive `sha1(url) → blake2b(locator)`.
+Since **raw is a cache, never committed** (decided — raw is `--caches`-only in export, held on disk, not in git),
+there is no committed fallback to restore from, so the migration does **not** re-fetch: it **re-keys the existing
+on-disk raw in place** — for each config document compute `old = sha1(url)`, `new = blake2b(normalized-locator)`,
+and `mv old new`. The bytes are identical; only the key changes. This needs no network, so a dead/404 source
+during migration **cannot lose data** (nothing is re-downloaded). Only a genuinely-**missing** doc (new in
+config, no raw) is fetched — ordinary acquire-on-miss. `--force` is not needed.
 
 **Procedure — full rebuild, re-fetching into the new blake2b-keyed archive:**
 
-1. **Commit the current state — *including* `corpus/raw/`** (§6.5). The committed `sha1`-named raw is the
-   rollback + the fallback if a web source 404s on re-fetch.
+1. **Commit `config/` + code** (the only committed sources of truth). **Do not commit `corpus/raw/`** — raw is a
+   cache (never committed, `--caches`-only in export). The rollback is git for config/code; the raw bytes are
+   preserved simply by *not deleting* them (the re-key renames them in place — step 4).
 2. **Author + reconcile:** write the new `config/traditions.json` (14 regions, canon order, texted traditions
    with coordinates); repoint every `config/corpus.json` book at its canonical `tradition`.
 3. **Blanket-wipe the derived artifacts.** Delete the `.txt` tree + `corpus.json`, `outputs/embeddings/`,
-   `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`. The old `sha1`-named `corpus/raw/` may be
-   left (it becomes pinned orphans under the new keying — a later `purge` clears them) or wiped (git holds the
-   fallback); either way the build re-fetches under the new blake2b names.
-4. **Plain `build`.** With no blake2b-named raw present, `fetch_to_cache(force=False)` **re-fetches** each web
-   source once into `corpus/raw/<blake2b(normalized-locator)>` (normalize the locator per data-model §5, then
-   hash), then re-cleans, re-embeds (chunk metadata = `{document_id, chunk_index}` only — B1; no
-   `tradition`/`major_tradition`), and re-graphs from the new config. Local `sources/` files re-read from disk
-   (offline). **If a web source 404s**, restore its committed `sha1` raw from git and rename it to its `blake2b`
-   name — the archived bytes, no re-download. **Fail-loud validation** (every corpus tradition ∈ tree; every
-   region ∈ the 14 canon; name-uniqueness across region/tradition + a `document_id` collision check) is the
-   integrity gate.
+   `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`. **Leave `corpus/raw/` in place** — it is
+   about to be re-keyed, not wiped.
+4. **Re-key the raw in place, then plain `build`.** For each `config/corpus.json` document rename its raw file
+   `sha1(url) → blake2b(normalized-locator)` (normalize per data-model §5, then hash) — same bytes, new key, no
+   network. Then `build`: `fetch_to_cache(force=False)` now **finds the re-keyed raw present** (offline), re-cleans,
+   re-embeds (chunk metadata = `{document_id, chunk_index}` only — B1; no `tradition`/`major_tradition`), and
+   re-graphs from the new config. Local `sources/` files re-read from disk. Only a doc **new in config** (no raw)
+   is fetched — ordinary acquire-on-miss; a dead source there is a normal flag, not data loss (nothing existing
+   is re-fetched). **Fail-loud validation** (every corpus tradition ∈ tree; every region ∈ the 14 canon;
+   name-uniqueness across region/tradition + a `document_id` collision check) is the integrity gate.
 5. **Front in lockstep** with the API change (endpoint renames, dropped fields, `treeIndex`/`docIndex`, remove
    `bookTitleFromId`) — or the UI breaks.
 6. **Verify with `status`** — orphan detection should report zero (nothing was left behind, since the derived
    tree was wiped before the rebuild).
 
-Because the rebuild derives everything from the intact `raw/` under fail-loud validation, the post-migration
-state is coherent by construction; the archive and `config/` are the only things that must be protected (git /
-backup).
+Because the rebuild derives everything from the intact (re-keyed) `raw/` under fail-loud validation, the
+post-migration state is coherent by construction. The only things that must be protected in **git** are
+**`config/` and `sources/`**; `corpus/raw/` is a cache (protect on disk / `--caches` backup if you want to avoid
+a re-fetch, but it is regenerable from `config`).
 
 ---
 

@@ -854,7 +854,7 @@ carry. It is affected at every part, but only Part 3 *breaks* it:
 
 | part | export effect |
 |---|---|
-| **Part 1** | layout changes (`corpus/<Region>/…`, `graphs/<document_id>/`, blake2b raw) are **auto-absorbed** — export `rglob`s each dir. **Decided:** `corpus/raw/` is a **cache, not a product — exclude it** (extend `_is_cache` to `corpus/raw/**`, matching `motifs/raw`, `export_bundle.py:62`). The bundle ships the cleaned corpus + derived artifacts; raw is rebuild-fuel, re-fetchable via `refresh`. |
+| **Part 1** | layout changes (`corpus/<Region>/…`, `graphs/<document_id>/`, blake2b raw) are **auto-absorbed** — export `rglob`s each dir. **Decided (uniform, all sources):** **all raw is a cache** — `corpus/raw/` **and** `motifs/raw/` are excluded by default and shipped **only with `--caches`** (extend `_is_cache` to `corpus/raw/**`, matching the existing `motifs/raw` rule, `export_bundle.py:62`; both then honour the existing `include_caches` flag). Raw is never committed; the bundle ships cleaned corpus + derived artifacts, raw is rebuild-fuel re-fetchable from `config`. |
 | **Part 2** | **`.fp` sidecars ride along automatically** (`rglob`, not treated as cache) — **required for a coherent bundle** (else the target's first `status` sees no fingerprints → all stale). **New:** exclude `*.partial` / `*.tmp` (the atomic-write staging, item 3) so staging junk never travels. |
 | **Part 3** | **breaks the `pipeline_inspect` imports → item 5 above** (rewire `orphan_summary` + cache-exclusion onto the driver). |
 | **motifs** | `.partial` staging covered by Part 2's temp-exclusion; `.absent` markers already sit under the excluded `motifs/raw`. |
