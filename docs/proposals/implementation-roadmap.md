@@ -99,6 +99,7 @@ tree, every region ∈ the 14 canon, name-uniqueness across region/tradition, `d
 **(c) counts vs a pre-migration baseline** — documents / chunks / graphs match (modulo intended changes);
 **(d)** `status` = zero orphans. Run it right after step 12, before trusting the state.
 **Review:** deep — `/code-review` the re-key script + `validate_migration.py` **before running step 12** (a bug wastes a full rebuild).
+**Dead code:** `ruff` + `vulture` sweep after the step-6 removals (`_update_traditions`, `bookTitleFromId`, generated file); confirm dynamic refs before deleting.
 
 ### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)*
 
@@ -120,6 +121,7 @@ artifact** (`corpus.json` + `.txt` tree, Chroma vectors + metadata, `projections
 additions). An orchestration refactor **must not change data**; this single diff catches any drift the per-key
 `status` cannot.
 **Review:** architectural — `/code-review` the stage diff for stage-protocol/design conformance; `golden_diff` guards behaviour.
+**Dead code:** `ruff` + `vulture` sweep (biggest here — the driver retires `pipeline_inspect` + `cli._clean`); confirm the driver's dynamic `getattr(stage, "refresh")`-style refs before deleting.
 
 ### Stage V — Part 4 manual curation *(editorial · independent · last)*
 
