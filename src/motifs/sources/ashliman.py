@@ -22,7 +22,7 @@ from pathlib import Path
 
 from settings import settings
 
-from .fetch import fetch_text
+from .fetch import fetch_text, read_pinned
 
 logger = logging.getLogger(__name__)
 
@@ -251,10 +251,11 @@ def _fetch_page(page: str, force: bool) -> str | None:
     except Exception as exc:
         status = getattr(getattr(exc, "response", None), "status_code", None)
         if status == 404:
-            if cache.exists() and cache.stat().st_size > 0:
+            pinned = read_pinned(cache)
+            if pinned is not None:
                 # upstream 404 but we hold a pinned copy: keep + serve it, do not unlink, do not mark absent.
                 logger.warning("Ashliman: %s now 404s upstream — serving the pinned cached copy", page)
-                return cache.read_text(encoding="utf-8", errors="replace")
+                return pinned
             absent.parent.mkdir(parents=True, exist_ok=True)
             absent.touch()                       # never existed here — remember it is absent
         return None

@@ -63,7 +63,10 @@ def _degradation_check(metrics: dict[str, int], enrichment: dict, prior: dict,
     trusted = not any(isinstance(e, dict) and e.get("skipped") for e in enrichment.values())
     highwater: dict[str, int] = {}
     flags: list[dict] = []
-    for name, val in sorted(metrics.items()):
+    # Iterate the union of current metrics and prior marks: a counter present in a prior build but absent
+    # now (a source disabled / a count key gone) reads as 0 and still trips its high-water mark.
+    for name in sorted(set(metrics) | set(prior_hw)):
+        val = metrics.get(name, 0)
         mark = max(prior_hw.get(name, val), val) if trusted else prior_hw.get(name, val)
         highwater[name] = mark
         if val < mark:

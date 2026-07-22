@@ -25,7 +25,7 @@ from urllib.parse import unquote, urlencode
 
 from settings import settings
 
-from .fetch import FetchRejected, fetch_text
+from .fetch import FetchRejected, fetch_text, read_pinned
 
 logger = logging.getLogger(__name__)
 
@@ -156,31 +156,36 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     ``concordances`` to each type, in place. ``{"skipped": ...}`` if the fetch failed."""
     cache = Path(settings.motifs_dir) / OUT
     ids = {t["id"] for t in atu_types}
+    parsed: dict = {}   # the validator hands the parsed rows/mapping to the caller — parse once, reuse
 
     def _healthy(content: bytes) -> bool:
         """Validate-before-commit: a healthy full reply parses **and**, when substantial, carries some
         Wikipedia sitelinks. Rows-but-zero-sitelinks is a degraded WDQS reply (the heavy OPTIONALs timed
         out during an outage while cheap ``rdfs:label`` lookups still return); rejecting it here means it
-        never overwrites the pinned copy — no more ``unlink`` to undo a poisoned cache."""
+        never overwrites the pinned copy. Any parse/structure error is unhealthy too — caught here, never
+        raised out of the validator (else it would be mistaken for a transport failure)."""
         try:
             rows = json.loads(content)["results"]["bindings"]
+            mapping = parse_bindings(rows, ids)
         except Exception:
             return False
-        return not (len(rows) >= 50 and not any(m["wikipedia"] for m in parse_bindings(rows, ids).values()))
+        if len(rows) >= 50 and not any(m["wikipedia"] for m in mapping.values()):
+            return False
+        parsed.update(rows=rows, mapping=mapping)   # reused by the caller on the fresh path (no re-parse)
+        return True
 
     try:
         raw = fetch_text(query_url(), cache, force=force, validate=_healthy)
     except FetchRejected:
-        # Downloaded but unhealthy (unparseable or degraded) — the cache was NOT overwritten. Serve the
-        # pinned copy if we have one (enrich from the last good reply); else skip this enrichment.
-        if cache.exists() and cache.stat().st_size > 0:
-            logger.warning("ATU Wikidata: reply unparseable or degraded (rows but no sitelinks) — serving the "
-                           "pinned cached copy; re-run with --force once query.wikidata.org recovers")
-            raw = cache.read_text(encoding="utf-8", errors="replace")
-        else:
+        # Downloaded but unhealthy (unparseable or degraded) — the cache was NOT overwritten. Serve the last
+        # good pinned copy if there is one; it is parsed (guarded) below.
+        raw = read_pinned(cache)
+        if raw is None:
             logger.warning("ATU Wikidata: reply unparseable or degraded and no pinned copy — skipping this "
                            "enrichment; re-run with --force once query.wikidata.org recovers")
             return {"skipped": "degraded-or-unparseable"}
+        logger.warning("ATU Wikidata: reply unparseable or degraded — serving the pinned cached copy; re-run "
+                       "with --force once query.wikidata.org recovers")
     except Exception as exc:
         # Transport/HTTP failure — raised before any write, so the pinned copy is intact; keep it. Name the
         # reason (429 = WDQS rate-limiting/outage) when the response carried one, else a generic fetch error.
@@ -190,8 +195,18 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
                        "with --force once query.wikidata.org recovers", reason, exc)
         return {"skipped": reason}
 
-    rows = json.loads(raw)["results"]["bindings"]
-    mapping = parse_bindings(rows, ids)
+    # The fresh fetch already parsed inside the validator. A cache-hit short-circuit (force=False, cache
+    # present) or a served-pinned copy was NOT validated, so parse `raw` here — guarded, so a bad reply skips
+    # the enrichment rather than aborting the whole build.
+    if not parsed:
+        try:
+            rows = json.loads(raw)["results"]["bindings"]
+            parsed.update(rows=rows, mapping=parse_bindings(rows, ids))
+        except Exception as exc:
+            logger.warning("ATU Wikidata: cached/pinned reply not parseable (%s) — skipping this enrichment; "
+                           "re-run with --force once query.wikidata.org recovers", exc)
+            return {"skipped": "cache-unparseable"}
+    rows, mapping = parsed["rows"], parsed["mapping"]
 
     n_names = n_wiki = n_src = n_conc = 0
     for t in atu_types:

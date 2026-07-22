@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import tempfile
 from collections.abc import Callable
 from pathlib import Path
 
@@ -28,6 +29,16 @@ def cache_path(base_dir: str | Path, url: str) -> Path:
     """A stable cache file for ``url`` under ``base_dir`` (hashed, so any URL is a
     safe filename). Use when there is no natural per-page name to key on."""
     return Path(base_dir) / hashlib.sha1(url.encode("utf-8")).hexdigest()
+
+
+def read_pinned(cache_file: str | Path, *, encoding: str = "utf-8") -> str | None:
+    """The pinned cached **text** if a non-empty copy exists, else ``None``. The shared
+    serve-pinned primitive: when a fresh fetch is rejected or unavailable, a source falls
+    back to the last good copy through this one place (same existence + encoding rule)."""
+    cache_file = Path(cache_file)
+    if cache_file.exists() and cache_file.stat().st_size > 0:
+        return cache_file.read_text(encoding=encoding, errors="replace")
+    return None
 
 
 def fetch_to_cache(url: str, cache_file: str | Path, *, force: bool = False,
@@ -57,9 +68,16 @@ def fetch_to_cache(url: str, cache_file: str | Path, *, force: bool = False,
         raise FetchRejected(url)                 # unhealthy reply: do not commit, keep the live copy
 
     cache_file.parent.mkdir(parents=True, exist_ok=True)
-    partial = cache_file.with_name(cache_file.name + ".partial")
-    partial.write_bytes(content)
-    os.replace(partial, cache_file)              # atomic commit — consumes the staging file
+    # Stage to a UNIQUE temp in the same dir (so concurrent fetches of the same URL never share a
+    # staging path), then os.replace atomically. The `.partial` suffix keeps it out of exports.
+    fd, tmp = tempfile.mkstemp(dir=cache_file.parent, prefix=cache_file.name + ".", suffix=".partial")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(content)
+        os.replace(tmp, cache_file)              # atomic commit — consumes the staging file
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)        # never leave a staging file behind on failure
+        raise
     return content
 
 

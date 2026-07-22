@@ -445,6 +445,34 @@ class TestAtuWikidataPhase0:
         result = atu_wikidata.refresh([], force=True)
         assert result == {"skipped": "degraded-or-unparseable"}
 
+    def test_rejected_pinned_unparseable_skips_not_crash(self, tmp_path, monkeypatch):
+        # Fix #1 — a served-pinned copy that is itself unparseable must SKIP (never abort the build).
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+        cache = tmp_path / atu_wikidata.OUT
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_text("not valid json", encoding="utf-8")
+
+        def fake_fetch(url, cache_file, *, force=False, validate=None, **kw):
+            raise atu_wikidata.FetchRejected(url)
+
+        monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
+        result = atu_wikidata.refresh([], force=True)          # must NOT raise
+        assert result == {"skipped": "cache-unparseable"}
+
+    def test_cache_hit_parses_without_validator(self, tmp_path, monkeypatch):
+        # A cache-hit short-circuit returns cached text without running the validator; refresh must still
+        # parse it via the guarded fallback (parsed holder empty), not KeyError.
+        from settings import settings
+        monkeypatch.setattr(settings, "motifs_dir", tmp_path)
+
+        def fake_fetch(url, cache_file, *, force=False, validate=None, **kw):
+            return '{"results": {"bindings": []}}'            # short-circuit: validator not called
+
+        monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
+        result = atu_wikidata.refresh([], force=False)
+        assert "skipped" not in result and result.get("rows") == 0
+
 
 class TestDegradationGuard:
     """Phase 3+4 — the build-time yield-drop / high-water / fetch-outcome guard (`_degradation_check`)."""
@@ -484,6 +512,14 @@ class TestDegradationGuard:
         assert hw["index.atu"] == 100                       # a skipped source -> mark not advanced to 150
         assert flags == []                                  # 150 >= 100, no drop
         assert outcomes == {"wikidata": "skipped-http-429"}
+
+    def test_vanished_metric_flags(self):
+        # Fix #6 — a metric present in a prior build but absent now (source disabled) reads as 0 and trips.
+        prior = {"highwater": {"index.berezkin": 3488}, "flags": []}
+        hw, flags, _ = bm._degradation_check({}, {}, prior, "T8")
+        assert hw["index.berezkin"] == 3488
+        assert len(flags) == 1 and flags[0]["key"] == "index.berezkin"
+        assert "0 < high-water 3488" in flags[0]["detail"]
 
 
 class TestAtuRegions:

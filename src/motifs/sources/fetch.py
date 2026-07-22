@@ -6,4 +6,10 @@ the one caching implementation is shared with the corpus downloader.
 
 from __future__ import annotations
 
-from fetch_cache import FetchRejected, cache_path, fetch_text, fetch_to_cache  # noqa: F401
+from fetch_cache import (  # noqa: F401
+    FetchRejected,
+    cache_path,
+    fetch_text,
+    fetch_to_cache,
+    read_pinned,
+)
