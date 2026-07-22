@@ -379,7 +379,7 @@ and `mv old new`. The bytes are identical; only the key changes. This needs no n
 during migration **cannot lose data** (nothing is re-downloaded). Only a genuinely-**missing** doc (new in
 config, no raw) is fetched — ordinary acquire-on-miss. `--force` is not needed.
 
-**Procedure — full rebuild, re-fetching into the new blake2b-keyed archive:**
+**Procedure — full rebuild off the re-keyed (not re-fetched) blake2b archive:**
 
 1. **Commit `config/` + code** (the only committed sources of truth). **Do not commit `corpus/raw/`** — raw is a
    cache (never committed, `--caches`-only in export). The rollback is git for config/code; the raw bytes are
