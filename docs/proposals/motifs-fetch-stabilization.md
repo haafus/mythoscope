@@ -119,8 +119,9 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 5. Before `save_json(store.meta_path(), meta)` (`build_motifs.py:266`), **load the previous `meta.json`** if
    present and capture prior `counts` + `enrichment`.
 6. After building, compute the **delta** for each index count and each enrichment field vs the prior build.
-7. Flag a **regression** when a count drops (to 0, or below the prior). Log it loudly
-   (`REGRESSION: Ashliman variants 0 (was 340)`) and record a `regressions` block in `meta.json`.
+7. Raise a **`yield-drop` flag** when a count drops **below its high-water mark** (item 13 — *not* merely below
+   the previous build). Log it loudly (`REGRESSION: Ashliman variants 0 (was 340)`); the durable record lives in
+   `meta.flags` (§Phase 4), not a separate block.
    **How a `yield-drop` even arises** (it is the backstop for losses the per-payload nets miss): a payload that
    **passes the deliberately-loose invariant but contributes fewer records** (a page edited from 20 variants to
    2 still clears `≥1`); a **skipped source's aggregate consequence** (mapsofmyths without creds → its English /
@@ -158,7 +159,7 @@ flag lives until its cause is gone). This is the persistent form of *surface, do
    ```python
    {"source": "atu_wikidata",
     "key": "https://query.wikidata.org/sparql",   # url / page / slug
-    "kind": "degraded",                            # changed | gone | degraded | no-parse
+    "kind": "degraded",                            # per-payload: changed|gone|degraded|no-parse; aggregate: yield-drop|discovery-shrank
     "detail": "rows=200 sitelinks=0",              # human-readable cause
     "auto_action": "kept-pinned",                  # what the system already did
     "first_seen": "<build-id>"}
@@ -243,26 +244,31 @@ the fan-out shrank, which no per-payload check can see).
 
 ### Phase 5 — Tests & verification (`tests/test_motifs.py`)
 
-10. Add cases:
+14. Add cases:
     - forced re-fetch with a 404 and an existing cache → cache kept and served (no `unlink`, no `.absent`);
     - 404 with no cache → `.absent` written, `None` returned (optimisation preserved);
     - degraded Wikidata reply → previous cache kept (no `unlink`);
-    - regression detector fires when counts drop.
-11. Run the existing motif tests + lint; a small end-to-end build to confirm counts are unchanged when nothing
+    - `yield-drop` flag fires when a count falls below its high-water mark.
+15. Run the existing motif tests + lint; a small end-to-end build to confirm counts are unchanged when nothing
     changed.
 
 ---
 
 ## 4. Sequencing
 
-- **Phases 1–2** are the urgent, self-contained fix for the live deletion foot-gun — one PR.
-- **Phases 3–4** are a separable degradation guard.
-- **Phase 5** covers both.
+- **Phase 0** ships first, alone — the pure hole-only deletion fix, zero functional change.
+- **Phases 1–2** complete the non-destructive fetch (staging-with-validator + the degraded case) — the live
+  foot-gun is fully closed here.
+- **Phases 3–4** are a separable degradation / flag guard.
+- **Phase 5** covers all of it.
 
-All of this is **code**, independent of the CLI/driver design decisions in
-[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md). It does not require the `refresh` / plan-apply
-machinery — it is the same principle applied locally to the motif sources, and it hardens the shared
-`fetch_cache.py` layer that the corpus downloader also uses.
+All of this is **code**. The **core (Phases 0–3: stop deleting, validate-before-commit, surface degradation)**
+does **not** require the `refresh` / plan-apply machinery — it is the same principle applied locally to the
+motif sources, and it hardens the shared `fetch_cache.py` layer the corpus downloader also uses. The flag
+**resolution** verbs — `refresh --apply` (adopt) / `refresh --rebaseline` (reconcile marks), §Phase 4 — are the
+same ones proposed in [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md); the motif flags slot
+into them when they land. Until then a flag is resolved by a plain re-fetch (adopt) or a manual `meta.highwater`
+edit (rebaseline).
 
 **Export note:** the Phase-1 `<cache>.partial` staging files must be excluded from `export_bundle.py` (the same
 `*.partial` temp-exclusion Part 2's atomicity needs — see that doc's *Export impact*). The `.absent` markers
