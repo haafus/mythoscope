@@ -69,7 +69,7 @@ still in place). **Check:** the fp gate behaves — editing a doc's text re-embe
 skipped; `transform_version` bump re-embeds; `os.replace` writes are atomic (no half-written catalog on a kill);
 graphs build == serve. *Front: unchanged — smoke-check it still loads; no data-model change yet.*
 
-### Stage III — Part 1 data-model + region migration *(the single irreversible step)*
+### Stage III — Part 1 data-model + region migration *(the heaviest step — but reversible via the re-key)*
 
 Now, with the code proven on motifs and fingerprints+atomicity in place.
 
