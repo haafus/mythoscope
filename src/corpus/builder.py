@@ -13,6 +13,7 @@ from settings import settings
 from .clean_gutenberg import clean_gutenberg_in_builder, trim_to_content
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
+from .locator import document_id
 from .sources import (
     WEB_SCHEMES,
     file_source_unchanged,
@@ -63,6 +64,9 @@ def _finalize_text(
 def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
     return {
         **item,
+        # Stable identity (D1): blake2b of the normalized locator — rename-/edit-stable,
+        # and the raw-archive key after the §6 re-key. Persisted once, never regenerated.
+        "document_id": document_id(item["url"]),
         "date_downloaded": datetime.now(timezone.utc).isoformat(),
         "path": path,
         **stats,
@@ -247,6 +251,9 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
             reuse = output_present
 
         if reuse:
+            # Populate-once: an older catalog row predates document_id — backfill it (the
+            # locator rule is deterministic, so this equals what a rebuild would mint).
+            prev.setdefault("document_id", document_id(url))
             metadata.append(prev)
             logger.debug(f"{title}: already in corpus, skipping")
         else:

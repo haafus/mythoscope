@@ -253,6 +253,25 @@ class TestFinalizeText:
         assert a["fingerprint"] != b["fingerprint"]  # a text edit → new fp → re-embed
 
 
+class TestDocumentIdInCatalog:
+    def test_build_metadata_persists_document_id(self):
+        from corpus.builder import _build_metadata
+        from corpus.locator import document_id
+
+        item = {**_BASE_ITEM, "title": "Iliad", "url": "http://example.com/iliad"}
+        meta = _build_metadata(item, path="x.txt", stats={"fingerprint": "f"})
+        assert meta["document_id"] == document_id("http://example.com/iliad")
+
+    def test_rename_keeps_document_id_stable(self):
+        # document_id anchors on the locator, so a title/tradition change must not move it.
+        from corpus.builder import _build_metadata
+
+        a = _build_metadata({**_BASE_ITEM, "title": "Iliad", "url": "http://x/i"}, path="a", stats={})
+        b = _build_metadata({**_BASE_ITEM, "title": "The Iliad", "tradition": "Roman", "url": "http://x/i"},
+                            path="b", stats={})
+        assert a["document_id"] == b["document_id"]
+
+
 class TestPinnedRaw:
     def test_force_does_not_refetch(self, tmp_path, monkeypatch):
         # --force rebuilds derived from the pinned raw; it must NOT re-fetch upstream.
