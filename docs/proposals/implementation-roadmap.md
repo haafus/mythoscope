@@ -1,0 +1,98 @@
+# Implementation roadmap — order across the five proposals
+
+The consolidated build order for the pipeline/data/fetch redesign. It sequences every phase of every proposal
+by the **reversibility ladder**: code and additive data first (freely revertible), the one irreversible data
+migration as late as possible and only once the code around it is proven. Source of truth for *what* each phase
+does stays in the individual proposals linked below; this doc owns *the order and why*.
+
+Guiding rule: **the fear is proportional to irreversibility.** Only one step (the Part 1 §6 migration) is a
+one-way data commitment — and even it is re-runnable from the committed raw. Everything else is `git revert` or
+a recompute.
+
+---
+
+## All phases (source proposals)
+
+- **[`motifs-fetch-stabilization.md`](motifs-fetch-stabilization.md)** — Phase 0 remove the two `unlink`s ·
+  1 staging+validator in `fetch_cache.py` · 2 fix the two deleters · 3 surface degradation (yield / discovery /
+  high-water) · 4 flags (`meta.flags`) · 5 tests. *(Applies the canonical
+  [`fetch-and-refresh.md`](fetch-and-refresh.md) model.)*
+- **[`region-implementation.md`](region-implementation.md) — Part 1** (§5 + §6) — 1 `config/traditions.json` +
+  validation · 2 `document_id = hash(locator)` · 3 front indexes before the trim · 4 retire `major_tradition` →
+  region + B1 chunk · 5 colour from region, serve the config · 6 cleanup + graphs build/serve unify · **§6 the
+  data migration** (commit raw → wipe derived → plain build re-fetch+rebuild → front in lockstep → verify
+  `status`).
+- **[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) — Part 2** (incrementality base) —
+  1 embeddings content-fp gate · 2 `transform_version` · 3 atomicity (`os.replace`) · 4 fetch/build split +
+  refresh + pin raw · 5 graphs build/serve unify + traversal guard.
+- **Part 3** (stage-protocol refactor) — 1 atomise stages · 2 generic driver + retire `pipeline_inspect` /
+  `cli._clean` · 3 DVC/Dagster re-eval (decision only) · 4 scope · 5 rewire `export_bundle`.
+- **Part 4** (manual text curation) — override layer + `curate`. **⏸ PAUSED — not now.**
+
+---
+
+## The order — by the reversibility ladder
+
+### Stage I — Motifs stabilization *(isolated · code + additive data · nothing irreversible)*
+
+The confidence starter: motifs are **independent of the corpus data**, so the whole `fetch-and-refresh` model is
+proven on low-stakes territory first.
+
+1. motifs **Phase 0** — remove the two `unlink`s ← *first safe move; zero functional change, one-command revert*
+2. motifs **Phase 1** — staging + validator in `fetch_cache.py` *(also hardens the shared layer corpus uses)*
+3. motifs **Phase 2** — fix the two deleters (keep pinned + flag)
+4. motifs **Phase 3 + 4** — surface degradation + durable flags
+5. motifs **Phase 5** — tests
+
+### Stage II — Part 2 incrementality base *(code + fp sidecars · before the migration)*
+
+Land the fingerprint + atomicity machinery **before** the data migration, so the rebuild writes fingerprints in
+one pass (no separate backfill — this is the "Part 1 + 2 together" optimisation).
+
+6. Part 2 **item 3** atomicity (`os.replace`) *(reuses the staging pattern from motifs Phase 1)*
+7. Part 2 **item 2** `transform_version`
+8. Part 2 **item 1** embeddings content-fp gate
+9. Part 2 **item 4** fetch/build split + general `refresh` + pin raw *(on the motifs-proven model)*
+10. Part 2 **item 5 = Part 1 step 6** graphs build/serve unify + traversal guard *(shared — do once, here)*
+
+### Stage III — Part 1 data-model + region migration *(the single irreversible step)*
+
+Now, with the code proven on motifs and fingerprints+atomicity in place.
+
+11. Part 1 **steps 1–5** — config, `document_id`, front indexes, region regroup + B1, colour *(code)*
+12. Part 1 **§6 migration** — **snapshot `corpus/` + `embeddings/` first** → wipe derived → plain `build`
+    (re-fetch + rebuild, now fingerprint-aware) → front in lockstep → `status` reports zero orphans. *The one
+    one-way step; re-runnable from the committed raw.*
+
+### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)*
+
+Consumes Part 2's fp base; presupposes Part 1. Reverts via `git`.
+
+13. Part 3 **items 1–2** — atomise stages + generic driver + retire `pipeline_inspect` / `cli._clean`
+14. Part 3 **item 5** — rewire `export_bundle` onto the driver
+15. Part 3 **item 4** — scope (stage / variant)
+16. Part 3 **item 3** — DVC/Dagster re-eval *(decision only; likely no-op)*
+
+### Stage V — Part 4 manual curation *(editorial · independent · last)*
+
+**⏸ PAUSED — not now.** Blocks nothing; resume only when explicitly un-paused.
+
+---
+
+## Why this order
+
+- **The irreversible step (12) is exactly one, and last-but-one** — after the code is proven on motifs (I) and
+  the fp + atomicity rails are in place (II).
+- **Motifs first** — isolated from the corpus, cheap, and it proves the whole fetch/refresh/flag model before
+  any corpus risk.
+- **Part 2 before Part 1** — so the migration's rebuild writes fingerprints directly (no separate backfill).
+- **graphs build/serve unify** appears in both Part 1 step 6 and Part 2 item 5 → done once, at step 10.
+- **Everything except step 12 is reversible** (`git revert` or recompute); step 12 is snapshot-guarded and
+  re-runnable from raw.
+
+## Reversibility ladder (increasing commitment)
+
+1. **code-only** (motifs Phase 0; Part 3) — revert in one command
+2. **additive data** (flags in `meta`, `.fp` sidecars) — does not touch existing artifacts
+3. **metadata backfill** (Part 2 fingerprints) — recomputable, loses nothing
+4. **one-way data migration** (Part 1 §6) — the single real commitment → snapshot first; re-runnable from raw

@@ -36,6 +36,11 @@ not as live work.
   embeddings key, fetch-vs-build separation, and a unified web+local source model (immutable raw archive +
   override-diff layer). Companion to `data-model-and-ids.md`. **Goal:** automatic, minimal, coherent rebuilds.
   *Proposal; not started.*
+- [`implementation-roadmap.md`](implementation-roadmap.md) — **the build order** across all five proposals,
+  sequenced by the reversibility ladder: motifs stabilization first (isolated, code+additive), then Part 2's
+  fingerprint/atomicity base, then the one irreversible Part 1 data migration (snapshot-guarded, re-runnable
+  from raw), then Part 3's code-only driver refactor; Part 4 paused. **Goal:** ship radical change with the
+  single one-way step last and everything else revertible. *Plan; not started.*
 - [`fetch-and-refresh.md`](fetch-and-refresh.md) — **canonical** model for how the pipeline acquires raw and
   reconciles it with a changing upstream: fetch is the **DAG boundary, not a stage** (human-gated because it
   touches the one irreplaceable input — raw — where an automatic mistake is irreversible, unlike purely
