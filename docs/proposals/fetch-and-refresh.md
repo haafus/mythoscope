@@ -13,13 +13,24 @@ the user** — fix it as **temporary** (the world recovers, or you patch the cod
 permanent** (`refresh --rebaseline` / a config edit). The automatic layer's whole job is to **never lose or
 poison data**; every judgement call is surfaced, never silently made.
 
-**Best-effort, not fail-fast.** A build **degrades rather than aborts**: a source down / degraded / unparsed
-produces a *smaller but coherent* output plus a flag, never a failed build. This fits third-party flaky sources,
-an exploratory output (a slightly smaller motif index is still useful), and a single user with no SLA — so a
-partial result beats no result. The opposite choice (**fail-fast** — abort so a degraded artifact never exists)
-is right when a downstream consumer needs guaranteed-complete data (a release artifact, a payment flow); it is
-*not* this pipeline. This is why flags **never block** the build — the guard is *visibility* (a durable flag),
-not *abort*.
+**Building the corpus/DB is fundamentally *iterative*, not a one-shot job — this is the base premise the whole
+model serves.** Concretely:
+
+- the **sources are inherently external, unstable, and expanding** — new ones get added over time;
+- the **delivery path is itself technologically unstable** — many *transient* failures are normal, not
+  exceptional;
+- **integrating and processing each source is complex and iterative** — the working loop is *debug → add →
+  verify*, repeated;
+- so **corpus/DB growth is a long-running process measured in years**, not a single build — and the
+  **already-built part must stay in a stable, coherent state across every update**.
+
+**Best-effort, not fail-fast** falls out of that premise. A build **degrades rather than aborts**: a source
+down / degraded / unparsed yields a *smaller but coherent* output plus a flag, never a failed build — because
+the built part must survive the next flaky increment untouched. A partial result beats no result here. The
+opposite (**fail-fast** — abort so a degraded artifact never exists) fits a *one-shot* pipeline whose downstream
+needs guaranteed-complete data (a release artifact, a payment flow); it is not this one. This is why flags
+**never block** the build, why we **never delete pinned raw**, and why every change is **staged and reviewed**:
+all of it keeps the standing corpus stable while it grows and is fixed incrementally, perhaps for years.
 
 ---
 
