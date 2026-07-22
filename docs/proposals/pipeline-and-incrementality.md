@@ -326,9 +326,9 @@ roles**: `document_id` / the raw-archive key (`corpus/raw/<blake2b(locator)>`), 
 per-doc **content version** (the doc `fingerprint` = `blake2b(cleaned text)`, D2 — replacing the old `md5` that
 `_finalize_text` computed; a one-line swap). This drops **both** broken hashes (`sha1` *and* `md5`) from every
 persistent key and leaves genuinely **one algorithm, one length** to reason about. The cost of moving the raw
-key off `sha1` is only a **one-time repopulation** of the ~27 raw files — the D1 migration re-fetches them into
-the new blake2b-keyed archive (stable public-domain sources, committed raw as 404 fallback; region §6), or an
-offline `mv` from config if you'd rather not touch the network — and it rides that same migration, which
+key off `sha1` is only a **one-time re-key** of the ~27 raw files — the D1 migration **renames them offline**
+`sha1(url) → blake2b(locator)` from config (same bytes, no network, no re-fetch; region §6), and it rides that
+same migration, which
 rebuilds all derived artifacts on the new key anyway. Note the *roles* are still distinct even under one algorithm: `blake2b(url)` = **identity**
 ("which source"); a content hash = **version** ("what content").
 
@@ -802,9 +802,10 @@ None of it blocks shipping Part 1. Each item references its (already-decided) Dx
    **`--force` = rebuild derived from raw**; **`refresh` = re-fetch upstream** (today corpus conflates them).
 5. Graphs build/serve unify + traversal guard (isolated bug; also in Part 1 §5 step 6 — do wherever first).
 
-**Migration story — Part 2 does NOT re-fetch, and needs no rebuild-from-raw.** The one re-fetch happens once, in
-Part 1's migration (region §6); the raw archive is already in its blake2b form and Part 2 touches neither the raw
-keys nor the sources. Part 2 changes the **staleness-decision** machinery, not artifact **content** (vectors,
+**Migration story — Part 2 does NOT re-fetch, and needs no rebuild-from-raw.** Part 1's migration itself does not
+re-fetch either (it re-keys the raw in place, region §6); the raw archive is already in its blake2b form and Part
+2 touches neither the raw keys nor the sources. Part 2 changes the **staleness-decision** machinery, not artifact
+**content** (vectors,
 graphs, text are unchanged), so its transition is only to give the Part-1 artifacts the `fingerprint`s they lack:
 
 - **land Part 1 + Part 2 together** → the single Part-1 rebuild writes the fingerprints from the start → **no
@@ -813,7 +814,7 @@ graphs, text are unchanged), so its transition is only to give the Part-1 artifa
   `fingerprint` from the on-disk `.txt` into the catalog; add each chunk's `fingerprint` via a Chroma
   **metadata update** (no re-encode); write each graph's `.fp`. Or, if you skip the backfill, the first plain
   `build` sees "no fingerprint" everywhere and **re-embeds once** (GPU, still no network) — acceptable at ~27
-  docs, avoidable via the backfill. **Either way there is never a second re-fetch.**
+  docs, avoidable via the backfill. **Either way there is no re-fetch — not in Part 1, not here.**
 
 *(D3 decided — keep the full UMAP refit, no parametric work — §9.2.)*
 
@@ -892,13 +893,13 @@ document on the next build (cheap, offline). No re-fetch, no bulk re-embed.
 
 ### Migration cost across the four parts
 
-**All the heavy work — the one re-fetch and the one full rebuild — is Part 1. Nothing after it re-fetches or
-bulk-re-embeds.** (Rows are *incremental* cost if the parts land in sequence; landing Part 1+2 together folds
-Part 2's backfill into Part 1's rebuild.)
+**All the heavy work — the one full rebuild — is Part 1, and it is GPU/LLM, not network: the migration re-keys
+the raw in place (no re-fetch). Nothing re-fetches or bulk-re-embeds after it.** (Rows are *incremental* cost if
+the parts land in sequence; landing Part 1+2 together folds Part 2's backfill into Part 1's rebuild.)
 
 | part | network (re-fetch) | GPU (re-embed) | LLM (graphs) | what the transition actually is |
 |---|---|---|---|---|
-| **Part 1** | **once** | full | full | the heavy migration: re-key raw `sha1→blake2b` **by re-fetch**, then full rebuild (region §6) |
+| **Part 1** | **none** (raw re-keyed in place) | full | full | the heavy migration: rename raw `sha1→blake2b` offline, then full rebuild off it (region §6) |
 | **Part 2** | — | — (backfill) / once if lazy | — | **metadata-only** fingerprint backfill onto Part-1 artifacts |
 | **Part 3** | — | — (rare one-off*) | — | **code-only** refactor; reads Part 2's fingerprints (*maybe a one-off refit of un-fingerprinted projections/motifs) |
 | **Part 4** | — | — | — (per edited doc) | **additive**: new `overrides/*.patch`; re-derives only the edited document |

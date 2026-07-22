@@ -230,7 +230,7 @@ upward reference (B1, §2/§3): `tradition` is not stored on the chunk — it, r
 > (a title/tradition/region change never moves the id), collision-free, and unifies identity + raw-archive key
 > + the incremental anchor in one value ([`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) §4
 > assumes exactly this). It *is* the raw key `corpus/raw/<blake2b(url)>` (hash = `blake2b`, one algorithm
-> everywhere — the archive moves off `sha1` by a one-time re-fetch on migration, or an offline rename, §9-D1). The rejected alternative,
+> everywhere — the archive moves off `sha1` by a one-time offline re-key (rename, no re-fetch) on migration, §9-D1). The rejected alternative,
 > `slugify(title)`, was **not rename-stable** (a title edit changes
 > the id) and collided when two documents share a title — and it needed the locator as a hidden second match
 > key anyway (§9-D1). The only cost — an opaque id — is a non-issue: navigability lives in the file path (a
@@ -420,8 +420,8 @@ Incrementality tasks (embeddings key, fingerprints, GC) are Part 2 — `pipeline
     raw-archive key** (`corpus/raw/<blake2b(url)>`). `slug(locator)` only adds mnemonic value, which is weak
     (URLs slug long and unreadable) and which the file path already carries. Opacity is fine — the catalog is
     the `id → {title, url}` lookup. **Hash = `blake2b`** (one algorithm across identity + fingerprints —
-    pipeline §2.4; the archive was `sha1(url)`, repopulated to `blake2b(locator)` on migration — re-fetched
-    (stable sources, committed raw as fallback) or renamed offline from config, region §6). Normalize the locator before hashing per the **pinned rule in §5** (the identity boundary:
+    pipeline §2.4; the archive was `sha1(url)`, re-keyed to `blake2b(locator)` on migration by an **offline
+    rename** from config — no re-fetch, raw is an uncommitted cache — region §6). Normalize the locator before hashing per the **pinned rule in §5** (the identity boundary:
     fold only cosmetic URL variation — scheme/host case, default port, fragment, unreserved %-escapes, one
     trailing slash — keep path case + query verbatim; local = POSIX path relative to `sources/`). Both slug and
     hash need that normalization; today's `sha1(url)` does *none*, so this pass is new work landing with D1.

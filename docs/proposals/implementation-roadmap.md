@@ -6,7 +6,8 @@ migration as late as possible and only once the code around it is proven. Source
 does stays in the individual proposals linked below; this doc owns *the order and why*.
 
 Guiding rule: **the fear is proportional to irreversibility.** Only one step (the Part 1 §6 migration) is a
-one-way data commitment — and even it is re-runnable from the committed raw. Everything else is `git revert` or
+one-way data commitment — and even it is re-runnable from the on-disk raw (re-keyed in place, not re-fetched).
+Everything else is `git revert` or
 a recompute.
 
 ---
@@ -20,7 +21,7 @@ a recompute.
 - **[`region-implementation.md`](region-implementation.md) — Part 1** (§5 + §6) — 1 `config/traditions.json` +
   validation · 2 `document_id = hash(locator)` · 3 front indexes before the trim · 4 retire `major_tradition` →
   region + B1 chunk · 5 colour from region, serve the config · 6 cleanup + graphs build/serve unify · **§6 the
-  data migration** (commit raw → wipe derived → plain build re-fetch+rebuild → front in lockstep → verify
+  data migration** (wipe derived → offline re-key raw `sha1→blake2b` → plain build rebuild → front in lockstep → verify
   `status`).
 - **[`pipeline-and-incrementality.md`](pipeline-and-incrementality.md) — Part 2** (incrementality base) —
   1 embeddings content-fp gate · 2 `transform_version` · 3 atomicity (`os.replace`) · 4 fetch/build split +
@@ -76,7 +77,7 @@ Now, with the code proven on motifs and fingerprints+atomicity in place.
     → `status` reports zero orphans. *The one one-way step; raw re-keyed in place (a dead source can't lose data),
     a throwaway migration script, not pipeline code.*
 
-**Verify** — **build:** the full rebuild of step 12 (re-fetch + re-embed + re-graph). **Check (the deep one —
+**Verify** — **build:** the full rebuild of step 12 (offline re-key + re-embed + re-graph — no re-fetch). **Check (the deep one —
 this is the only front-affecting stage):** region grouping and per-region colours; document resolution
 (`document_id = hash(locator)`, titles, links); the renamed endpoints + dropped fields with `treeIndex` /
 `docIndex`; every view that touched `major_tradition`; one `UNASSIGNED`; `status` = **zero orphans**; counts
