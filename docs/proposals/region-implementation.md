@@ -389,9 +389,13 @@ config, no raw) is fetched — ordinary acquire-on-miss. `--force` is not needed
 3. **Blanket-wipe the derived artifacts.** Delete the `.txt` tree + `corpus.json`, `outputs/embeddings/`,
    `outputs/graphs/`, `outputs/projections/`, `outputs/preprocessed/`. **Leave `corpus/raw/` in place** — it is
    about to be re-keyed, not wiped.
-4. **Re-key the raw in place, then plain `build`.** For each `config/corpus.json` document rename its raw file
-   `sha1(url) → blake2b(normalized-locator)` (normalize per data-model §5, then hash) — same bytes, new key, no
-   network. Then `build`: `fetch_to_cache(force=False)` now **finds the re-keyed raw present** (offline), re-cleans,
+4. **Re-key the raw in place, then plain `build`.** The re-key is a **one-off migration script** (e.g.
+   `scripts/rekey_raw.py`) — *not* pipeline code (it is neither `build` nor `refresh`), written and run once for
+   this step, then discarded. It is **config-driven**: iterate `config/corpus.json`, and for each document
+   rename its raw file `sha1(url) → blake2b(normalized-locator)` (normalize per data-model §5, then hash) — same
+   bytes, new key, no network. (Drive from config, not the raw dir: `sha1(url)` is computable from the `url`, but
+   not reversible from a filename; a raw file for a doc no longer in config is left as an orphan for a later
+   `purge`.) Then `build`: `fetch_to_cache(force=False)` now **finds the re-keyed raw present** (offline), re-cleans,
    re-embeds (chunk metadata = `{document_id, chunk_index}` only — B1; no `tradition`/`major_tradition`), and
    re-graphs from the new config. Local `sources/` files re-read from disk. Only a doc **new in config** (no raw)
    is fetched — ordinary acquire-on-miss; a dead source there is a normal flag, not data loss (nothing existing

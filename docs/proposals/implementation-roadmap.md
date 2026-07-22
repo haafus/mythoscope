@@ -70,9 +70,11 @@ graphs build == serve. *Front: unchanged — smoke-check it still loads; no data
 Now, with the code proven on motifs and fingerprints+atomicity in place.
 
 11. Part 1 **steps 1–5** — config, `document_id`, front indexes, region regroup + B1, colour *(code)*
-12. Part 1 **§6 migration** — **snapshot `corpus/` + `embeddings/` first** → wipe derived → plain `build`
-    (re-fetch + rebuild, now fingerprint-aware) → front in lockstep → `status` reports zero orphans. *The one
-    one-way step; re-runnable from the committed raw.*
+12. Part 1 **§6 migration** — **snapshot `corpus/` + `embeddings/` first** → wipe derived → **write + run the
+    one-off `scripts/rekey_raw.py`** (config-driven `sha1(url) → blake2b(locator)` rename in place, no network)
+    → plain `build` (finds re-keyed raw present, rebuilds fingerprint-aware, **no re-fetch**) → front in lockstep
+    → `status` reports zero orphans. *The one one-way step; raw re-keyed in place (a dead source can't lose data),
+    a throwaway migration script, not pipeline code.*
 
 **Verify** — **build:** the full rebuild of step 12 (re-fetch + re-embed + re-graph). **Check (the deep one —
 this is the only front-affecting stage):** region grouping and per-region colours; document resolution
