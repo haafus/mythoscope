@@ -36,7 +36,7 @@ def chunk_fingerprint(doc_fingerprint: str, transform_v: str) -> str:
     """The staleness key stored in every chunk's Chroma metadata. Per-document (all of
     a doc's chunks share it): a text edit changes ``doc_fingerprint`` → re-embed; a
     pure rename leaves it (and the ``document_id`` anchor) unchanged → skip (§4)."""
-    return content_fingerprint(f"{doc_fingerprint}|{transform_v}".encode("utf-8"))
+    return content_fingerprint(f"{doc_fingerprint}|{transform_v}".encode())
 
 
 def embed_plan(

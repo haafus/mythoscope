@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 COMMAND_SECTIONS = [
     ("Pipeline", ["corpus", "embeddings", "projections", "graphs", "motifs"]),
-    ("Management", ["build", "status", "clean", "export", "server"]),
+    ("Management", ["build", "refresh", "status", "clean", "export", "server"]),
 ]
 
 # Number of texts processed by `build --sample` (quick smoke run).
@@ -181,6 +181,59 @@ def _build_motifs(force: bool = False):
     from motifs.build_motifs import build_motifs
 
     build_motifs(force=force)
+
+
+@mytho.command()
+@click.argument("target", type=click.Choice(["documents", "motifs"]), default="documents")
+@click.option("--apply", is_flag=True, help="Adopt upstream changes (default previews and keeps the pinned copy).")
+def refresh(target: str, apply: bool):
+    """Re-fetch upstream into the pinned raw archive (networked; preview then --apply).
+
+    Unlike `build` (which never re-fetches present raw) and `--force` (which rebuilds
+    derived from that raw), `refresh` is the deliberate, human-gated re-check of upstream.
+    """
+    try:
+        if target == "documents":
+            _refresh_documents(apply)
+        else:
+            _refresh_motifs(apply)
+    except Exception as e:
+        _fail("Refresh", e)
+
+
+def _refresh_documents(apply: bool):
+    from corpus.refresh import refresh_corpus
+
+    click.echo(click.style("[start] Refresh documents", fg="cyan", bold=True))
+    r = refresh_corpus(apply=apply)
+
+    for title, reason in r.unreachable:
+        click.echo(click.style(f"  unreachable  {title} ({reason}) — kept pinned", fg="yellow"))
+    for title in r.new:
+        verb = "acquired" if apply else "would acquire"
+        click.echo(f"  new          {title} ({verb})")
+    for title in r.changed:
+        verb = "adopted" if apply else "changed — rerun with --apply to adopt"
+        color = "green" if apply else "yellow"
+        click.echo(click.style(f"  {'adopted' if apply else 'changed':<12} {title} ({verb})", fg=color))
+
+    click.echo(f"  {r.unchanged} unchanged, {r.skipped_local} local (checked on build)")
+    if apply and r.adopted:
+        click.echo(click.style(f"[done]  adopted {len(r.adopted)} — run `mytho build` to re-derive.", fg="green"))
+    elif r.changed or r.new:
+        click.echo(click.style("Preview only. Re-run with --apply to adopt.", fg="yellow"))
+    else:
+        click.echo(click.style("[done]  Refresh — everything current.", fg="green"))
+
+
+def _refresh_motifs(apply: bool):
+    # Motif sources re-scrape wholesale (no cheap per-source diff yet — the per-source
+    # staged refresh is the Part 3 source-unit work); --apply re-fetches, else previews.
+    if not apply:
+        click.echo("Would re-scrape all motif sources (Berezkin, TMI, ATU + enrichment).")
+        click.echo(click.style("Preview only. Re-run with --apply to re-fetch.", fg="yellow"))
+        return
+    _run("Refresh motifs", _build_motifs, force=True)
 
 
 @mytho.command()

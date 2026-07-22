@@ -9,7 +9,6 @@ from llm import LLMProcessor, map_concurrent
 from settings import settings
 
 from .extraction import deduplicate_entities, deduplicate_relations, extract_from_chunk
-from .store import graph_dir
 from .graph_generator import (
     filter_by_names,
     generate_ages_graph,
@@ -17,6 +16,7 @@ from .graph_generator import (
     generate_realms_graph,
     top_mentioned_names,
 )
+from .store import graph_dir
 
 logger = logging.getLogger(__name__)
 

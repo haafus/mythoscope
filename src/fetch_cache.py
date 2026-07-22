@@ -31,6 +31,23 @@ def cache_path(base_dir: str | Path, url: str) -> Path:
     return Path(base_dir) / hashlib.sha1(url.encode("utf-8")).hexdigest()
 
 
+def commit_bytes(cache_file: str | Path, content: bytes) -> None:
+    """Atomically write ``content`` to ``cache_file`` (validate-before-commit staging):
+    stage to a UNIQUE ``.partial`` sibling, then ``os.replace``. A crash mid-write leaves
+    only an inert ``.partial``, never a half-written live file. Shared by the fetch layer
+    and ``refresh`` so both adopt bytes the same atomic way (fetch-and-refresh §3)."""
+    cache_file = Path(cache_file)
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=cache_file.parent, prefix=cache_file.name + ".", suffix=".partial")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(content)
+        os.replace(tmp, cache_file)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
+
+
 def read_pinned(cache_file: str | Path, *, encoding: str = "utf-8") -> str | None:
     """The pinned cached **text** if a non-empty copy exists, else ``None``. The shared
     serve-pinned primitive: when a fresh fetch is rejected or unavailable, a source falls
@@ -67,17 +84,9 @@ def fetch_to_cache(url: str, cache_file: str | Path, *, force: bool = False,
     if validate is not None and not validate(content):
         raise FetchRejected(url)                 # unhealthy reply: do not commit, keep the live copy
 
-    cache_file.parent.mkdir(parents=True, exist_ok=True)
-    # Stage to a UNIQUE temp in the same dir (so concurrent fetches of the same URL never share a
-    # staging path), then os.replace atomically. The `.partial` suffix keeps it out of exports.
-    fd, tmp = tempfile.mkstemp(dir=cache_file.parent, prefix=cache_file.name + ".", suffix=".partial")
-    try:
-        with os.fdopen(fd, "wb") as f:
-            f.write(content)
-        os.replace(tmp, cache_file)              # atomic commit — consumes the staging file
-    except BaseException:
-        Path(tmp).unlink(missing_ok=True)        # never leave a staging file behind on failure
-        raise
+    # Stage to a UNIQUE temp in the same dir (so concurrent fetches of the same URL never
+    # share a staging path), then os.replace atomically. `.partial` keeps it out of exports.
+    commit_bytes(cache_file, content)
     return content
 
 
