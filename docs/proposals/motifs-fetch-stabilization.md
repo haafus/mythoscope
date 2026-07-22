@@ -114,6 +114,12 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 6. After building, compute the **delta** for each index count and each enrichment field vs the prior build.
 7. Flag a **regression** when a count drops (to 0, or below the prior). Log it loudly
    (`REGRESSION: Ashliman variants 0 (was 340)`) and record a `regressions` block in `meta.json`.
+   **How a `yield-drop` even arises** (it is the backstop for losses the per-payload nets miss): a payload that
+   **passes the deliberately-loose invariant but contributes fewer records** (a page edited from 20 variants to
+   2 still clears `≥1`); a **skipped source's aggregate consequence** (mapsofmyths without creds → its English /
+   TMI / tradition counts fall); a **derive/crosswalk code change**; a **cross-source cascade** (trilogy yields
+   fewer ATU ids → wikidata/ashliman match fewer); or an intentional **config change** (you confirm it). Most of
+   this is downstream of fetch (in crosswalk) or in cross-source aggregation — which no single payload sees.
 8. **Root-discovery set — iterate the union; the diff is diagnostic only.** For a *parse-root* (an index page
    whose parse yields the sub-page links: Ashliman `folktexts*.html`, berezkin index, mapsofmyths
    `/motifs_full`), a source builds over **`cached ∪ discovered`**, not just the current discovery. This makes
@@ -128,6 +134,13 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
    dropped links it used to list) is the signal. Its value is **attribution** — the general count-drop flag
    (item 7) says *"variants fell"*, the discovery shrink says *whether the root shrank* vs *pages degraded
    individually* — the one signal per-sub-page health checks cannot see.
+
+   **Why it fires even though we build over the union:** the flag is *not* raised from the run (the union never
+   shrinks, so the output never loses anything). It is a **separate** comparison — the current root parse vs the
+   accumulated mark — and is a signal about the **health of the live root**, orthogonal to the output. This
+   matters precisely *because* the union **masks** root degradation: the output stays full off the pinned copies
+   while the live source quietly rots, so without this watch a dying source would be invisible until the root
+   returns nothing (or the pinned copies themselves go stale). discovery-shrank un-masks it early.
 
 ### Phase 4 — Flags (observability of state needing review)
 
