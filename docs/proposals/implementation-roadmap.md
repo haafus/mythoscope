@@ -52,6 +52,8 @@ proven on low-stakes territory first.
 renders; index/cross-walk counts are sane; degradation/flag machinery writes to the log + `meta.flags` /
 `meta.highwater` and self-initialises (no spurious `yield-drop` on first run); tests + lint green. *Front: the
 Motifs section only.*
+**Validate:** *covered by tests* — the Phase 5 `test_motifs.py` cases (kept-cache-on-404, degraded-keeps-cache,
+`yield-drop` fires) **are** the acceptance gate; no separate script.
 
 ### Stage II — Part 2 incrementality base *(code + fp sidecars · before the migration)*
 
@@ -68,6 +70,8 @@ one pass (no separate backfill — this is the "Part 1 + 2 together" optimisatio
 still in place). **Check:** the fp gate behaves — editing a doc's text re-embeds it, an unchanged doc is
 skipped; `transform_version` bump re-embeds; `os.replace` writes are atomic (no half-written catalog on a kill);
 graphs build == serve. *Front: unchanged — smoke-check it still loads; no data-model change yet.*
+**Validate:** *covered by tests* — the fp-gate behaviour tests (edit→re-embed, unchanged→skip, version→re-embed)
+are the acceptance gate; no separate script.
 
 ### Stage III — Part 1 data-model + region migration *(the heaviest step — but reversible via the re-key)*
 
@@ -86,6 +90,12 @@ this is the only front-affecting stage):** region grouping and per-region colour
 (`document_id = hash(locator)`, titles, links); the renamed endpoints + dropped fields with `treeIndex` /
 `docIndex`; every view that touched `major_tradition`; one `UNASSIGNED`; `status` = **zero orphans**; counts
 match expectation. *Front: full, in lockstep with the API change.*
+**Validate (script — high value, one-shot migration):** write `scripts/validate_migration.py` that gates the
+transition: **(a) re-key byte-identity** — for each config doc, the renamed raw file's content hash is unchanged
+(proves the re-key lost nothing and is invertible); **(b) the §6 fail-loud gate** — every corpus tradition ∈
+tree, every region ∈ the 14 canon, name-uniqueness across region/tradition, `document_id` collision check;
+**(c) counts vs a pre-migration baseline** — documents / chunks / graphs match (modulo intended changes);
+**(d)** `status` = zero orphans. Run it right after step 12, before trusting the state.
 
 ### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)*
 
@@ -101,6 +111,11 @@ one-off cheap fp-init for anything Part 2 didn't fingerprint (projection refit /
 no re-LLM). **Check:** `status` / `clean --dry-run` = zero orphans; the driver reproduces the *same* artifacts
 (diff the outputs — a code refactor must not change data); `export` still bundles correctly; tests green. *Front:
 unchanged — smoke-check.*
+**Validate (script — high value, the refactor's one guard):** write `scripts/golden_diff.py` — hash **every
+artifact** (`corpus.json` + `.txt` tree, Chroma vectors + metadata, `projections/*`, `graphs/*`, `motifs/*`)
+**before** the Part 3 refactor, then **assert byte-identical after** (allowing only the intended fp-init
+additions). An orchestration refactor **must not change data**; this single diff catches any drift the per-key
+`status` cannot.
 
 ### Stage V — Part 4 manual curation *(editorial · independent · last)*
 
