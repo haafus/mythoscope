@@ -106,21 +106,20 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
 6. After building, compute the **delta** for each index count and each enrichment field vs the prior build.
 7. Flag a **regression** when a count drops (to 0, or below the prior). Log it loudly
    (`REGRESSION: Ashliman variants 0 (was 340)`) and record a `regressions` block in `meta.json`.
-8. **Root-discovery set** — the key number for a *parse-root* (an index page whose parse yields the sub-page
-   links: Ashliman `folktexts*.html`, berezkin index, mapsofmyths `/motifs_full`) is **how many links it
-   yielded**. Store the **discovered set** (not just its size) in `meta.enrichment[source].discovered`, and diff
-   it against the previous build — **no threshold; any change is the signal**:
-   - **appeared** (`now − prev`) → **fetch the new sub-pages** (additive, auto — nothing to lose);
-   - **vanished** (`prev − now`) → **keep the previously-fetched sub-pages, do not delete**, and report.
-   ```python
-   prev = set(prev_meta["enrichment"][source].get("discovered", []))
-   now  = set(_HREF.findall(index_html))
-   for slug in now - prev:  fetch(slug)          # new — fetch
-   if prev - now:           report(prev - now)   # vanished — keep + surface
-   ```
-   Same invariant as everywhere (acquire-if-missing auto / never delete pinned), applied to the discovery set —
-   which catches a fan-out collapse (a degraded root returning fewer links) that per-sub-page health checks
-   cannot see.
+8. **Root-discovery set — iterate the union; the diff is diagnostic only.** For a *parse-root* (an index page
+   whose parse yields the sub-page links: Ashliman `folktexts*.html`, berezkin index, mapsofmyths
+   `/motifs_full`), a source builds over **`cached ∪ discovered`**, not just the current discovery. This makes
+   the two behaviours *fall out of the general rules* with no special-casing:
+   - a **newly-appeared** link is just an un-cached member of the union → acquire-if-missing fetches it;
+   - a link that **vanished from the root** is still in `cached`, its pinned page **kept and still contributing**
+     to the output (we do not trust "the root dropped it" as authoritative — same E/F caution, never lose data).
+
+   So there is **no fetch/keep logic to write** — the union iteration + acquire-if-missing + never-delete already
+   do it. Persist the **discovered set** in `meta.enrichment[source].discovered` and diff it vs the prior build
+   purely as **diagnostics** (no threshold — any change is reported): `now − prev` = links the root gained,
+   `prev − now` = links it dropped (kept via the union). Its value is **attribution** — the general count-drop
+   flag (item 7) says *"variants fell"*, the discovery diff says *whether the root shrank* vs *pages degraded
+   individually* — the one signal per-sub-page health checks cannot see.
 
 ### Phase 4 — Observability of degraded state
 
