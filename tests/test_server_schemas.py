@@ -2,8 +2,8 @@ import pytest
 from pydantic import ValidationError
 
 from server.schemas import (
-    CatalogResponse,
     CorpusDocument,
+    DocumentsResponse,
     ModelListResponse,
     ModelSummary,
     SearchRequest,
@@ -36,51 +36,47 @@ class TestSearchRequest:
 
 class TestSearchResult:
     def test_defaults(self):
-        r = SearchResult(id="1", similarity_score=0.95)
-        assert r.tradition == "Unknown"
-        assert r.major_tradition == ""
+        # B1: a hit carries the document reference + chunk data only.
+        r = SearchResult(similarity_score=0.95)
+        assert r.document_id == ""
         assert r.chunk_index == 0
         assert r.text == ""
 
-    def test_all_fields(self):
-        r = SearchResult(
-            id="doc1",
-            tradition="Greek",
-            major_tradition="European",
-            chunk_index=3,
-            similarity_score=0.9,
-            text="full text",
-            filename="doc.txt",
-        )
-        assert r.filename == "doc.txt"
+    def test_carries_document_reference(self):
+        r = SearchResult(document_id="d1", chunk_index=3, similarity_score=0.9, text="t")
+        assert r.document_id == "d1" and r.chunk_index == 3
+
+    def test_no_tradition_or_colour_on_hit(self):
+        # tradition/region/url/colour are resolved on the front, never on the hit.
+        r = SearchResult(document_id="d1", tradition="Greek", color="#f00", similarity_score=0.5)
+        assert not hasattr(r, "tradition") or getattr(r, "tradition", None) is None
+        assert not hasattr(r, "color") or getattr(r, "color", None) is None
 
 
 class TestCorpusDocument:
     def test_defaults(self):
         doc = CorpusDocument(title="test")
-        assert doc.color == "#6b7280"
+        assert doc.document_id == ""
         assert doc.word_count == 0
-        assert doc.major_tradition == ""
+        assert not hasattr(doc, "major_tradition") or doc.major_tradition == ""
 
-    def test_all_fields(self):
-        doc = CorpusDocument(
-            title="Iliad",
-            major_tradition="European",
-            tradition="Greek",
-            language="en",
-            type="epic",
-            word_count=12000,
-        )
-        assert doc.tradition == "Greek"
+    def test_reference_fields(self):
+        doc = CorpusDocument(document_id="d1", title="Iliad", tradition="Greek",
+                             dating="~8th c. BCE", word_count=12000)
+        assert doc.tradition == "Greek" and doc.dating == "~8th c. BCE"
+
+    def test_no_colour_field(self):
+        doc = CorpusDocument(title="x", color="#f00")  # color ignored (resolved on front)
+        assert not hasattr(doc, "color") or getattr(doc, "color", None) is None
 
 
-class TestCatalogResponse:
+class TestDocumentsResponse:
     def test_empty(self):
-        resp = CatalogResponse(documents=[], total=0)
+        resp = DocumentsResponse(documents=[], total=0)
         assert resp.total == 0
 
     def test_with_documents(self):
-        resp = CatalogResponse(
+        resp = DocumentsResponse(
             documents=[CorpusDocument(title="d1"), CorpusDocument(title="d2")],
             total=2,
         )

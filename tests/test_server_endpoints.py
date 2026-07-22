@@ -38,8 +38,8 @@ class TestModelsEndpoint:
 
 
 class TestCorpusCatalog:
-    def test_catalog_returns_list(self):
-        response = client.get("/api/corpus/catalog")
+    def test_documents_returns_list(self):
+        response = client.get("/api/corpus/documents")
         assert response.status_code == 200
         data = response.json()
         assert "documents" in data
@@ -47,8 +47,8 @@ class TestCorpusCatalog:
         assert isinstance(data["documents"], list)
         assert data["total"] == len(data["documents"])
 
-    def test_catalog_ignores_unknown_params(self):
-        response = client.get("/api/corpus/catalog?source=anything")
+    def test_documents_ignores_unknown_params(self):
+        response = client.get("/api/corpus/documents?source=anything")
         assert response.status_code == 200
 
 
@@ -62,20 +62,13 @@ class TestTraditionsEndpoint:
 
 
 class TestCorpusDocumentEndpoint:
-    def test_missing_params(self):
-        response = client.get("/api/corpus/documents")
+    def test_missing_id(self):
+        response = client.get("/api/corpus/document")
         assert response.status_code == 422
 
     def test_nonexistent_document(self):
-        response = client.get(
-            "/api/corpus/documents",
-            params={
-                "title": "nonexistent_xyz",
-                "major_tradition": "none",
-                "tradition": "none",
-            },
-        )
-        assert response.status_code in (403, 404)
+        response = client.get("/api/corpus/document", params={"id": "nonexistent_xyz"})
+        assert response.status_code == 404
 
 
 class TestSimilarityEndpoints:

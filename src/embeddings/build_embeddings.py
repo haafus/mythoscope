@@ -1,4 +1,3 @@
-import dataclasses
 import logging
 import time
 from typing import Any
@@ -96,7 +95,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
         expected = chunk_fingerprint(fi.content_fingerprint(), transform_v)
         n = sum(1 for c in chunk_text(fi.read_text(), emb.chunk_size, emb.chunk_overlap) if c.strip())
         total += n
-        initial += sum(1 for i in range(n) if existing_fp.get(chunk_id(fi.text_id, i)) == expected)
+        initial += sum(1 for i in range(n) if existing_fp.get(chunk_id(fi.document_id, i)) == expected)
 
     t0 = time.monotonic()
     with tqdm(total=total, initial=initial, desc="Embedding", unit="chunk") as pbar:
@@ -106,7 +105,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
             n_chunks = len(chunks)
             expected = chunk_fingerprint(file_info.content_fingerprint(), transform_v)
             try:
-                to_embed, stale = embed_plan(file_info.text_id, n_chunks, expected, existing_fp)
+                to_embed, stale = embed_plan(file_info.document_id, n_chunks, expected, existing_fp)
                 # Drop chunks a shorter (or now-empty) document no longer has — the only
                 # deletion case; positional ids upsert-overwrite the rest, never orphan (§4).
                 # Runs before the empty-doc skip so a doc edited down to zero chunks does
@@ -197,10 +196,13 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
 def _build_chroma_entries(
     chunks: list[str], info: CorpusFileInfo, fingerprint: str,
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    ids = [chunk_id(info.text_id, i) for i in range(len(chunks))]
-    base = {k: v for k, v in dataclasses.asdict(info).items() if not k.startswith("_")}
-    # `fingerprint` here is the per-chunk staleness key (hash of the doc fp + transform
-    # version), written into the row's metadata so the next build's gate can compare it;
-    # it overrides the doc-level `fingerprint` that asdict(info) carries.
-    metadatas = [{**base, "chunk_index": i, "fingerprint": fingerprint} for i in range(len(chunks))]
+    # B1: a chunk carries exactly one document reference `{document_id, chunk_index}` plus
+    # its staleness `fingerprint` (the hash of the doc fp + transform version, compared by
+    # the next build's gate). tradition/region/url/colour are resolved from document_id at
+    # query time (data-model §2.13) — never denormalized onto the chunk.
+    ids = [chunk_id(info.document_id, i) for i in range(len(chunks))]
+    metadatas = [
+        {"document_id": info.document_id, "chunk_index": i, "fingerprint": fingerprint}
+        for i in range(len(chunks))
+    ]
     return ids, metadatas

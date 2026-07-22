@@ -8,6 +8,18 @@ from corpus.utils import chunk_id
 logger = logging.getLogger(__name__)
 
 
+def _hit(meta: dict, text: str, score: float) -> dict:
+    """A search hit: chunk data + the document reference only (B1). tradition/region/url/
+    colour are resolved on the front from the reference — never carried on the hit (§3)."""
+    return {
+        "document_id": meta.get("document_id", ""),
+        "chunk_index": meta.get("chunk_index", 0),
+        "text": text,
+        "source_text": meta.get("source_text", ""),
+        "similarity_score": score,
+    }
+
+
 class SimilarityService:
     def __init__(self):
         self._encoder = None
@@ -15,23 +27,25 @@ class SimilarityService:
         # search don't race into a double model load on a cold process.
         self._encode_lock = threading.Lock()
 
-    def get_point(self, model_key: str, text_id: str, chunk_index: int,
+    def get_point(self, model_key: str, document_id: str, chunk_index: int,
                   top_k: int = 1, cross_tradition: bool = False) -> list[dict]:
         collection = self._get_collection(model_key)
-        cid = chunk_id(text_id, chunk_index)
+        cid = chunk_id(document_id, chunk_index)
         point = collection.get(ids=[cid], include=["embeddings", "metadatas", "documents"])
         if not point["ids"]:
             return []
         embedding = point["embeddings"][0]
         if not cross_tradition:
             return self._query(collection, embedding, top_k)
-        # Keep the clicked chunk as the head; pull neighbors only from other
-        # traditions so the list surfaces cross-cultural parallels.
-        meta = dict(point["metadatas"][0])
-        tradition = meta.get("tradition")
-        head = {**meta, "id": meta.pop("text_id"), "text": point["documents"][0],
-                "similarity_score": 1.0}
-        where = {"tradition": {"$ne": tradition}} if tradition else None
+        # Keep the clicked chunk as the head; pull neighbors only from other traditions so
+        # the list surfaces cross-cultural parallels. With no tradition on the chunk (B1),
+        # resolve it from document_id and exclude that tradition's documents by id (§5 step 4).
+        from server.services.corpus import document_ids_for_tradition, tradition_of_document
+
+        head = _hit(dict(point["metadatas"][0]), point["documents"][0], 1.0)
+        tradition = tradition_of_document(document_id)
+        exclude = sorted(document_ids_for_tradition(tradition)) if tradition else []
+        where = {"document_id": {"$nin": exclude}} if exclude else None
         return [head, *self._query(collection, embedding, top_k, where=where)]
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
@@ -62,8 +76,7 @@ class SimilarityService:
             **({"where": where} if where else {}),
         )
         return [
-            {**meta, "id": meta.pop("text_id"), "text": doc,
-             "similarity_score": round(1 - dist, 6)}
+            _hit(meta, doc, round(1 - dist, 6))
             for meta, doc, dist in zip(
                 raw["metadatas"][0], raw["documents"][0],
                 raw["distances"][0], strict=True,

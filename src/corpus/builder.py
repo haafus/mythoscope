@@ -21,13 +21,12 @@ from .sources import (
     read_local_to_cache,
     source_scheme,
 )
-from .traditions_config import load_traditions_tree, validate_traditions
+from .traditions_config import flat_traditions, load_traditions_tree, validate_traditions
 from .utils import (
     content_fingerprint,
     count_sentences,
     count_words,
     ensure_dir,
-    get_tradition_color,
     normalize_text,
     text_path,
 )
@@ -97,7 +96,7 @@ def _extract_text(data: bytes, url: str, title: str, content_type: str = "") -> 
     return _decode_bytes(data)
 
 
-def _download_and_process(item: dict) -> dict | None:
+def _download_and_process(item: dict, region: str) -> dict | None:
     title = item["title"]
     url = item["url"]
 
@@ -123,7 +122,7 @@ def _download_and_process(item: dict) -> dict | None:
             text, url, title, item.get("content_start"), item.get("content_end")
         )
 
-        filename = text_path(settings.corpus_dir, item["major_tradition"], item["tradition"], title)
+        filename = text_path(settings.corpus_dir, region, item["tradition"], title)
 
         with data_lock:
             ensure_dir(filename.parent)
@@ -137,60 +136,6 @@ def _download_and_process(item: dict) -> dict | None:
     except Exception:
         logger.exception("%s: Processing error", title)
         return None
-
-
-# config/traditions.json is a category tree: major -> {traditions: {tradition -> info}}.
-# major_tradition lives here, once per tradition (not duplicated per book).
-def _load_traditions_config() -> dict:
-    path = settings.config_dir / "traditions.json"
-    if not path.exists():
-        return {}
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        logger.exception("Error reading %s", path)
-        return {}
-
-
-def _flat_tradition_info(tree: dict) -> dict[str, dict]:
-    flat: dict[str, dict] = {}
-    for node in tree.values():
-        for trad, info in (node.get("traditions") or {}).items():
-            flat[trad] = info
-    return flat
-
-
-def _tradition_major_map(tree: dict) -> dict[str, str]:
-    mapping: dict[str, str] = {}
-    for major, node in tree.items():
-        for trad in (node.get("traditions") or {}):
-            mapping[trad] = major
-    return mapping
-
-
-def _update_traditions(force: bool) -> None:
-    output_path = settings.corpus_dir / "traditions.json"
-    flat = _flat_tradition_info(_load_traditions_config())
-
-    corpus_traditions: set[str] = set()
-    corpus_config = settings.config_dir / "corpus.json"
-    if corpus_config.exists():
-        with open(corpus_config, encoding="utf-8") as f:
-            for item in json.load(f):
-                if "tradition" in item:
-                    corpus_traditions.add(item["tradition"])
-
-    # Built corpus/traditions.json stays flat (tradition -> info) so nothing
-    # downstream changes; the tree is only the source of truth in config/.
-    result: dict = {}
-    for trad in sorted(corpus_traditions | set(flat.keys())):
-        info = dict(flat.get(trad, {"description": "", "coordinates": []}))
-        info["color"] = get_tradition_color(trad)
-        result[trad] = info
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
 
 
 def _load_existing_metadata() -> dict[str, dict]:
@@ -218,16 +163,10 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
     tree = load_traditions_tree(settings.config_dir)
     validate_traditions(tree, download_list)
 
-    _update_traditions(force)
-
-    # Books carry only `tradition`; resolve major_tradition from the tree so the
-    # file path and the metadata row keep it (downstream is unchanged).
-    trad_major = _tradition_major_map(_load_traditions_config())
-    for item in download_list:
-        item["major_tradition"] = trad_major.get(item.get("tradition"), "")
-        if not item["major_tradition"]:
-            logger.warning("No major_tradition for tradition %r (title=%r)",
-                           item.get("tradition"), item.get("title"))
+    # Region groups the file layout (corpus/<Region>/<Tradition>/<Title>.txt, §6) but is
+    # NOT stored on the row — books carry `tradition` only; region/colour resolve from the
+    # tree at serve time (B1). `traditions.json` is no longer generated (config is served, §2.9).
+    trad_region = flat_traditions(tree)
 
     existing = {} if force else _load_existing_metadata()
 
@@ -268,7 +207,10 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
         # draining the whole queue (shutdown(wait=True) on a `with` exit would block).
         executor = concurrent.futures.ThreadPoolExecutor(max_workers=settings.corpus.max_workers)
         try:
-            futures = {executor.submit(_download_and_process, item): item for item in to_download}
+            futures = {
+                executor.submit(_download_and_process, item, trad_region[item["tradition"]]): item
+                for item in to_download
+            }
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
                 if result:

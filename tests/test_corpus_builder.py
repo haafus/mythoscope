@@ -21,10 +21,9 @@ if not hasattr(fu_mod, "UserAgent"):
 from datetime import datetime
 
 from corpus import builder
-from corpus.builder import _build_metadata, _update_traditions, build_corpus
+from corpus.builder import _build_metadata, build_corpus
 
 _BASE_ITEM = {
-    "major_tradition": "Greek",
     "tradition": "Hellenic",
     "url": "http://example.com/text",
     "description": "",
@@ -91,7 +90,7 @@ class TestBuildCorpusForce:
         # Record which titles get (re)processed; write a file so the path check passes.
         processed = []
 
-        def fake_process(item, force=False):
+        def fake_process(item, region=None):
             processed.append(item["title"])
             path = corpus_dir / f"{item['title']}.txt"
             path.write_text("content")
@@ -204,14 +203,14 @@ class TestFileSourceDispatch:
         item = {
             "title": "Local Myth",
             "tradition": "Greek",
-            "major_tradition": "Hellenic",
             "url": "file:myth.txt",
             "description": "",
         }
-        meta = builder._download_and_process(item)
+        meta = builder._download_and_process(item, "Europe")
 
         assert meta is not None
         assert meta["word_count"] > 0
+        assert "major_tradition" not in meta  # region is not stored on the row (B1)
         assert (corpus_dir / meta["path"]).exists()
         # raw snapshot cached under corpus/raw for reproducibility
         assert list((corpus_dir / "raw").iterdir())
@@ -229,11 +228,10 @@ class TestFileSourceDispatch:
         item = {
             "title": "Missing",
             "tradition": "Greek",
-            "major_tradition": "Hellenic",
             "url": "file:nope.txt",
             "description": "",
         }
-        assert builder._download_and_process(item) is None
+        assert builder._download_and_process(item, "Europe") is None
 
 
 class TestFinalizeText:
@@ -293,75 +291,10 @@ class TestPinnedRaw:
         import corpus.downloader as dl
         monkeypatch.setattr(dl, "download_file", boom)
 
-        item = {"title": "Iliad", "tradition": "Greek", "major_tradition": "Hellenic",
+        item = {"title": "Iliad", "tradition": "Greek",
                 "url": "https://example.com/iliad", "description": ""}
-        meta = builder._download_and_process(item)
+        meta = builder._download_and_process(item, "Europe")
         assert meta is not None  # rebuilt from pinned raw, no network
-
-
-class TestUpdateTraditions:
-    def _setup(self, tmp_path, monkeypatch, *, books=None, traditions=None):
-        from settings import settings
-
-        config_dir = tmp_path / "config"
-        config_dir.mkdir()
-        corpus_dir = tmp_path / "corpus"
-        corpus_dir.mkdir()
-
-        (config_dir / "corpus.json").write_text(json.dumps(books or []))
-        (config_dir / "traditions.json").write_text(json.dumps(traditions or {}))
-
-        monkeypatch.setattr(settings, "config_dir", config_dir)
-        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
-        return corpus_dir
-
-    def test_merges_config_with_color(self, tmp_path, monkeypatch):
-        traditions = {"Indo-European": {"traditions": {"Greek": {"description": "Ancient Greek mythology", "coordinates": [37.9, 23.7]}}}}
-        books = [{"title": "Iliad", "tradition": "Greek"}]
-        corpus_dir = self._setup(tmp_path, monkeypatch, books=books, traditions=traditions)
-
-        _update_traditions(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert data["Greek"]["description"] == "Ancient Greek mythology"
-        assert data["Greek"]["coordinates"] == [37.9, 23.7]
-        assert data["Greek"]["color"].startswith("#")
-
-    def test_creates_stub_for_unknown_tradition(self, tmp_path, monkeypatch):
-        books = [{"title": "Edda", "tradition": "Norse"}]
-        corpus_dir = self._setup(tmp_path, monkeypatch, books=books)
-
-        _update_traditions(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert "Norse" in data
-        assert data["Norse"]["description"] == ""
-        assert data["Norse"]["color"].startswith("#")
-
-    def test_includes_traditions_from_both_sources(self, tmp_path, monkeypatch):
-        traditions = {"Indo-European": {"traditions": {"Celtic": {"description": "Celtic myths", "coordinates": [53.1, -7.7]}}}}
-        books = [{"title": "Edda", "tradition": "Norse"}]
-        corpus_dir = self._setup(tmp_path, monkeypatch, books=books, traditions=traditions)
-
-        _update_traditions(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert "Celtic" in data
-        assert "Norse" in data
-
-    def test_no_sources(self, tmp_path, monkeypatch):
-        from settings import settings
-
-        config_dir = tmp_path / "empty_config"
-        corpus_dir = tmp_path / "corpus"
-        corpus_dir.mkdir()
-        monkeypatch.setattr(settings, "config_dir", config_dir)
-        monkeypatch.setattr(settings, "corpus_dir", corpus_dir)
-
-        _update_traditions(force=False)
-
-        data = json.loads((corpus_dir / "traditions.json").read_text())
-        assert data == {}
 
 
 class TestLoadDownloadListExclude:

@@ -33,7 +33,7 @@ from server.run_server import create_app
 from fastapi.testclient import TestClient
 
 client = TestClient(create_app())
-for _path in ("/api/corpus/catalog", "/api/corpus/traditions"):
+for _path in ("/api/corpus/documents", "/api/corpus/traditions"):
     _status = client.get(_path).status_code
     assert _status == 200, (_path, _status)
 

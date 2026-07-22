@@ -1,24 +1,20 @@
 import hashlib
-import json
-import logging
-import random
 import re
-import threading
 import unicodedata
 from pathlib import Path
 from typing import Any
 
-_color_lock = threading.Lock()
-_used_colors: set[str] = set()
-_tradition_colors: dict[str, str] = {}
-logger = logging.getLogger(__name__)
-
 
 def sanitize_filename(name: str) -> str:
-    name = (name or "").strip().replace("/", "_").replace(" ", "_")
-    name = re.sub(r'[\\*?:"<>|]', "_", name)
+    # Make any name that lands in a file path filesystem- and URL-safe (§2.11): trim,
+    # whitespace-runs → one `_`, replace unsafe/control chars (now incl. & % # ' — region
+    # names carry &), forbid `..`, collapse repeats, strip edge `_`/`.`. Case is preserved.
+    name = (name or "").strip()
+    name = re.sub(r"\s+", "_", name)
+    name = re.sub(r'[\\/*?:"<>|&%#\'\x00-\x1f]', "_", name)
     name = name.replace("..", "_")
-    return name
+    name = re.sub(r"_+", "_", name)
+    return name.strip("_.")
 
 
 def md5(data: bytes) -> str:
@@ -73,37 +69,3 @@ def text_path(corpus_dir: Path, major_tradition: str, tradition: str, title: str
     return corpus_dir / major / trad / f"{title}.txt"
 
 
-def read_document(corpus_dir: Path, title: str, major_tradition: str, tradition: str) -> tuple[str, str]:
-    file_path = text_path(corpus_dir, major_tradition, tradition, title)
-    resolved = file_path.resolve()
-    if not resolved.is_relative_to(corpus_dir.resolve()):
-        raise PermissionError("Access denied")
-    if not resolved.exists():
-        raise FileNotFoundError(str(resolved))
-    return resolved.read_text(encoding="utf-8"), sanitize_filename(title)
-
-
-def read_traditions(corpus_dir: Path) -> dict:
-    path = corpus_dir / "traditions.json"
-    if not path.exists():
-        return {}
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-        return data if isinstance(data, dict) else {}
-    except (OSError, json.JSONDecodeError) as e:
-        logger.warning("Failed to read %s: %s", path, e)
-    return {}
-
-
-def get_tradition_color(tradition: str) -> str:
-    with _color_lock:
-        if tradition in _tradition_colors:
-            return _tradition_colors[tradition]
-
-        while True:
-            color = f"#{random.randint(0, 0xFFFFFF):06X}"
-            if color not in _used_colors:
-                _used_colors.add(color)
-                _tradition_colors[tradition] = color
-                return color

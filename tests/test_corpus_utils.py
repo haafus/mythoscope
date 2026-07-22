@@ -26,7 +26,6 @@ normalize_text = _mod.normalize_text
 count_words = _mod.count_words
 count_sentences = _mod.count_sentences
 ensure_dir = _mod.ensure_dir
-get_tradition_color = _mod.get_tradition_color
 
 
 class TestSanitizeFilename:
@@ -143,18 +142,13 @@ class TestEnsureDir:
         ensure_dir(tmp_path)
 
 
-class TestGetTraditionColor:
-    def test_returns_hex_color(self):
-        color = get_tradition_color("test_tradition_unique_1")
-        assert color.startswith("#")
-        assert len(color) == 7
+class TestSanitizeRegionNames:
+    # §2.11: region names carry & (and %, #, '), which must not pass through into a path.
+    def test_ampersand_and_repeats_collapse(self):
+        assert sanitize_filename("Near East & North Africa") == "Near_East_North_Africa"
+        assert sanitize_filename("Mesoamerica & the Andes") == "Mesoamerica_the_Andes"
 
-    def test_same_tradition_same_color(self):
-        c1 = get_tradition_color("test_tradition_unique_2")
-        c2 = get_tradition_color("test_tradition_unique_2")
-        assert c1 == c2
-
-    def test_different_traditions_different_colors(self):
-        c1 = get_tradition_color("test_tradition_unique_3")
-        c2 = get_tradition_color("test_tradition_unique_4")
-        assert c1 != c2
+    def test_other_unsafe_chars(self):
+        assert "%" not in sanitize_filename("a%b")
+        assert "#" not in sanitize_filename("a#b")
+        assert "'" not in sanitize_filename("a'b")

@@ -81,17 +81,17 @@ def warmup(request: WarmupRequest) -> dict:
     return {"status": "warmed", "model": request.model}
 
 
-@router.get("/points/{model}/{text_id}", response_model=list[SearchResult])
+@router.get("/points/{model}/{document_id}", response_model=list[SearchResult])
 def point_info(
     model: str,
-    text_id: str,
+    document_id: str,
     chunk_index: int = Query(...),
     top_k: int = Query(1, ge=1, le=100),
     cross_tradition: bool = Query(False),
 ):
     _require_collection(model)
     return similarity_service.get_point(
-        model, text_id, chunk_index, top_k=top_k, cross_tradition=cross_tradition,
+        model, document_id, chunk_index, top_k=top_k, cross_tradition=cross_tradition,
     )
 
 

@@ -1,36 +1,28 @@
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import PlainTextResponse
 
-from corpus.utils import read_document
-from server.schemas import CatalogResponse, TraditionsResponse
-from server.services.corpus import get_catalog_documents, traditions_with_books
-from settings import settings
+from server.schemas import DocumentsResponse, TraditionsResponse
+from server.services.corpus import get_document_text, get_documents, get_traditions_tree
 
 router = APIRouter(prefix="/api/corpus", tags=["corpus"])
 
 
-@router.get("/catalog", response_model=CatalogResponse)
-def catalog():
-    documents = get_catalog_documents()
-    return {"documents": documents, "total": len(documents)}
+# Plural = the collection; singular + ?id= = one item (aligns with /api/motifs/{index}/motif).
+@router.get("/documents", response_model=DocumentsResponse)
+def documents():
+    docs = get_documents()
+    return {"documents": docs, "total": len(docs)}
 
 
-@router.get("/documents", response_class=PlainTextResponse)
-def document(
-    title: str = Query(...),
-    major_tradition: str = Query(...),
-    tradition: str = Query(...),
-):
-    try:
-        text, _ = read_document(settings.corpus_dir, title, major_tradition, tradition)
-        return text
-    except PermissionError as exc:
-        raise HTTPException(status_code=403, detail="Access denied") from exc
-    except FileNotFoundError as exc:
-        raise HTTPException(status_code=404, detail="Document not found") from exc
+@router.get("/document", response_class=PlainTextResponse)
+def document(id: str = Query(..., description="document_id = hash(locator), D1")):
+    text = get_document_text(id)
+    if text is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return text
 
 
 @router.get("/traditions", response_model=TraditionsResponse)
 def traditions() -> dict:
-    data = traditions_with_books()
-    return {"traditions": data, "total": len(data)}
+    tree = get_traditions_tree()
+    return {"traditions": tree, "total": len(tree)}

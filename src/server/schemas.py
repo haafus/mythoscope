@@ -25,33 +25,31 @@ class WarmupRequest(BaseModel):
 
 
 class SearchResult(BaseModel):
-    id: str
-    tradition: str = "Unknown"
-    major_tradition: str = ""
+    # B1: a hit carries chunk data + the document reference only; tradition/region/url/
+    # colour are resolved on the front from the globally-cached document + tree (§3).
+    document_id: str = ""
     chunk_index: int = 0
     similarity_score: float
     text: str = ""
-    filename: str = ""
-    url: str = ""
     # Original chunk for preprocessing variants (the embedded `text` is the
     # transformed version); empty for raw variants, where `text` is the source.
     source_text: str = ""
 
 
 class CorpusDocument(BaseModel):
+    document_id: str = ""
     title: str
-    major_tradition: str = ""
     tradition: str = ""
     url: str = ""
     word_count: int = 0
     sentence_count: int = 0
     char_count: int = 0
-    color: str = "#6b7280"
     description: str = ""
+    dating: str = ""
     source: str = ""
 
 
-class CatalogResponse(BaseModel):
+class DocumentsResponse(BaseModel):
     documents: list[CorpusDocument]
     total: int
 

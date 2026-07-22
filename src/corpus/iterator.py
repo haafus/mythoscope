@@ -16,6 +16,9 @@ class CorpusFileInfo:
     major_tradition: str
     tradition: str
     url: str
+    # The stable document identity (D1) from the catalog — the embeddings chunk anchor
+    # and the single reference stored on each chunk after B1.
+    document_id: str = ""
     # Per-doc content fingerprint (blake2b of the cleaned text) from the catalog; the
     # embeddings staleness gate folds it into each chunk's key (pipeline §4).
     fingerprint: str = ""
@@ -65,5 +68,6 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
             major_tradition=item.get("major_tradition", "unknown"),
             tradition=item.get("tradition", "unknown"),
             url=item.get("url", ""),
+            document_id=item.get("document_id", ""),
             fingerprint=item.get("fingerprint", ""),
         )
