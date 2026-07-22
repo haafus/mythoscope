@@ -54,6 +54,7 @@ renders; index/cross-walk counts are sane; degradation/flag machinery writes to 
 Motifs section only.*
 **Validate:** *covered by tests* — the Phase 5 `test_motifs.py` cases (kept-cache-on-404, degraded-keeps-cache,
 `yield-drop` fires) **are** the acceptance gate; no separate script.
+**Review:** light — `/code-review` on the stage diff + green tests.
 
 ### Stage II — Part 2 incrementality base *(code + fp sidecars · before the migration)*
 
@@ -72,6 +73,7 @@ skipped; `transform_version` bump re-embeds; `os.replace` writes are atomic (no 
 graphs build == serve. *Front: unchanged — smoke-check it still loads; no data-model change yet.*
 **Validate:** *covered by tests* — the fp-gate behaviour tests (edit→re-embed, unchanged→skip, version→re-embed)
 are the acceptance gate; no separate script.
+**Review:** light — `/code-review` on the stage diff + green tests.
 
 ### Stage III — Part 1 data-model + region migration *(the heaviest step — but reversible via the re-key)*
 
@@ -96,6 +98,7 @@ transition: **(a) re-key byte-identity** — for each config doc, the renamed ra
 tree, every region ∈ the 14 canon, name-uniqueness across region/tradition, `document_id` collision check;
 **(c) counts vs a pre-migration baseline** — documents / chunks / graphs match (modulo intended changes);
 **(d)** `status` = zero orphans. Run it right after step 12, before trusting the state.
+**Review:** deep — `/code-review` the re-key script + `validate_migration.py` **before running step 12** (a bug wastes a full rebuild).
 
 ### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)*
 
@@ -116,40 +119,11 @@ artifact** (`corpus.json` + `.txt` tree, Chroma vectors + metadata, `projections
 **before** the Part 3 refactor, then **assert byte-identical after** (allowing only the intended fp-init
 additions). An orchestration refactor **must not change data**; this single diff catches any drift the per-key
 `status` cannot.
+**Review:** architectural — `/code-review` the stage diff for stage-protocol/design conformance; `golden_diff` guards behaviour.
 
 ### Stage V — Part 4 manual curation *(editorial · independent · last)*
 
 **⏸ PAUSED — not now.** Blocks nothing; resume only when explicitly un-paused.
-
----
-
-## Review cadence
-
-Review **at each stage boundary (per PR), not after every phase** — phases are small increments; the stage's
-diff is the right unit. Two passes, AI first to cut the human load:
-
-1. **AI self-review** — run **`/code-review`** on the working diff *before* opening/finishing the PR (see below);
-   run the stage's tests + `Validate` script; fix what survives.
-2. **Human review** — of the **surviving findings + architecture** (not raw noise), against the source proposal.
-3. **Merge** — CI runs tests + lint + the `Validate`/`golden_diff` script, so review starts from green.
-
-**Depth by risk** (the ladder again):
-
-| stage | review depth | focus |
-|---|---|---|
-| **I / II** | **light** — one `/code-review` pass + green tests | fp-gate / flag behaviour; git is the net |
-| **III** (migration) | **deep, *before running*** | the re-key script + `validate_migration.py` + the §6 gate — a bug here wastes a full rebuild, so review *before* you run step 12, not after |
-| **IV** (refactor) | **architectural** | conformance to the stage protocol / design; behaviour is guarded by `golden_diff` |
-
-`/security-review` is not needed — the security surface does not change (a local pipeline, no new external inputs).
-
-**How to run the review:**
-- **`/code-review`** — reviews the **current working diff** (uncommitted + committed-not-pushed). Run it at a
-  stage boundary before the PR; it reports ranked findings, which I verify and fix, then surface only the real
-  ones to you.
-- **`/review`** — reviews an **open GitHub PR** (by URL/number) — use once the stage's PR exists, for the
-  human-facing pass.
-- **`/security-review`** — pending-changes security scan; **skip** for these stages (no security surface).
 
 ---
 
