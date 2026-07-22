@@ -9,6 +9,10 @@ export const app = document.getElementById("app");
 // with the --category-none token in app.css.
 export const CATEGORY_NONE = "#6b7280";
 
+// The single "no category" value-layer sentinel (§2.14) — the CATEGORY_NONE of the value
+// layer. A genuinely-absent tradition/region reads as this everywhere, not a friendly label.
+export const UNASSIGNED = "UNASSIGNED";
+
 export const state = {
     models: [],
     selectedModel: localStorage.getItem("selectedModel") || "",
@@ -256,7 +260,7 @@ export function buildCorpusApiUrl(doc) {
 }
 
 export function corpusTraditionKey(region, tradition) {
-    return `${region || "Other"}|${tradition || "Unknown"}`;
+    return `${region || UNASSIGNED}|${tradition || UNASSIGNED}`;
 }
 
 // Group documents by region → tradition, in the served tree's canon order (§2.8: the
@@ -264,7 +268,7 @@ export function corpusTraditionKey(region, tradition) {
 export function groupDocuments(items) {
     const byTradition = new Map();
     items.forEach((doc) => {
-        const t = doc.tradition || "Unknown";
+        const t = doc.tradition || UNASSIGNED;
         if (!byTradition.has(t)) byTradition.set(t, []);
         byTradition.get(t).push(doc);
     });
@@ -282,8 +286,8 @@ export function groupDocuments(items) {
     // it under "Other" rather than dropping it silently.
     for (const [tradition, docs] of byTradition) {
         if (regionOf(tradition)) continue;
-        if (!grouped.has("Other")) grouped.set("Other", new Map());
-        grouped.get("Other").set(tradition, docs);
+        if (!grouped.has(UNASSIGNED)) grouped.set(UNASSIGNED, new Map());
+        grouped.get(UNASSIGNED).set(tradition, docs);
     }
     return grouped;
 }

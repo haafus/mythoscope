@@ -86,7 +86,7 @@ export async function renderGraphPage(graphType) {
     const bookList = document.getElementById("graphBookList");
     bookList.addEventListener("book-select", (e) => {
         setActiveBook(bookList, e.detail.doc);
-        loadGraphData(e.detail.doc.title, graphType);
+        loadGraphData(e.detail.doc.document_id, graphType);  // graphs keyed by document_id (D1)
     });
     await renderLibraryTree(bookList);
 }

@@ -1,4 +1,4 @@
-import { api, documentById, escapeHtml, escapeRegex, normalizePreviewText, state } from "./core.js";
+import { api, documentById, escapeHtml, escapeRegex, normalizePreviewText, state, UNASSIGNED } from "./core.js";
 
 // A hit carries only the document reference (B1); title + tradition are resolved from the
 // globally-cached document, not carried on the hit.
@@ -21,7 +21,7 @@ export function resultBookTitle(item) {
 
 export function resultTradition(item) {
     const doc = hitDocument(item);
-    return (doc && doc.tradition) || "Unknown";
+    return (doc && doc.tradition) || UNASSIGNED;
 }
 
 export function chunkMetaLine(item) {

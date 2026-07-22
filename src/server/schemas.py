@@ -2,6 +2,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from corpus.utils import UNASSIGNED
+
 
 class ModelSummary(BaseModel):
     name: str
@@ -39,7 +41,7 @@ class SearchResult(BaseModel):
 class CorpusDocument(BaseModel):
     document_id: str = ""
     title: str
-    tradition: str = ""
+    tradition: str = UNASSIGNED
     url: str = ""
     word_count: int = 0
     sentence_count: int = 0

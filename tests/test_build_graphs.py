@@ -6,7 +6,6 @@ def test_default_rebuilds_from_cache_without_llm(tmp_path, monkeypatch):
     makes no LLM call (the processor is constructed lazily, so it works offline /
     with no API key when nothing needs extracting)."""
     from chunk_cache import append_cache, chunk_hash
-    from corpus.utils import normalize_catalog_id
     from embeddings.chunking import chunk_text
     from settings import settings
 
@@ -18,12 +17,13 @@ def test_default_rebuilds_from_cache_without_llm(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "graphs_dir", graphs)
 
     text = "Moses led the people out. Aaron spoke to Pharaoh in Egypt."
+    doc_id = "book0000fp"  # graphs are keyed by document_id (D1), not the title
     (corpus / "book.txt").write_text(text, encoding="utf-8")
     (corpus / "corpus.json").write_text(
-        json.dumps([{"title": "Book", "path": "book.txt"}]), encoding="utf-8"
+        json.dumps([{"title": "Book", "path": "book.txt", "document_id": doc_id}]), encoding="utf-8"
     )
 
-    book_dir = graphs / normalize_catalog_id("Book")
+    book_dir = graphs / doc_id
     book_dir.mkdir(parents=True)
     cache_path = book_dir / "extraction_cache.jsonl"
     chunks = chunk_text(text, settings.graphs.chunk_size, settings.graphs.chunk_overlap)

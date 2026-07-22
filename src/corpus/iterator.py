@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
 
-from .utils import content_fingerprint, normalize_catalog_id
+from .utils import UNASSIGNED, content_fingerprint, normalize_catalog_id
 
 logger = logging.getLogger(__name__)
 
@@ -65,8 +65,8 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
         yield CorpusFileInfo(
             _path=txt_file,
             text_id=normalize_catalog_id(title),
-            major_tradition=item.get("major_tradition", "unknown"),
-            tradition=item.get("tradition", "unknown"),
+            major_tradition=item.get("major_tradition", UNASSIGNED),
+            tradition=item.get("tradition", UNASSIGNED),
             url=item.get("url", ""),
             document_id=item.get("document_id", ""),
             fingerprint=item.get("fingerprint", ""),

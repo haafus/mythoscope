@@ -4,6 +4,11 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+# The single "no category" sentinel (§2.14) — one value across the backend and front, so a
+# genuinely-absent tradition/region is diagnosable rather than hidden behind a friendly
+# "Unknown"/"Other". Validation (§2.12) makes it a should-never-happen for corpus documents.
+UNASSIGNED = "UNASSIGNED"
+
 
 def sanitize_filename(name: str) -> str:
     # Make any name that lands in a file path filesystem- and URL-safe (§2.11): trim,

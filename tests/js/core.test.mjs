@@ -37,9 +37,9 @@ test("formatNumber groups thousands and falls back to 0", () => {
     assert.equal(formatNumber("abc"), "0");
 });
 
-test("corpusTraditionKey supplies Other/Unknown defaults", () => {
+test("corpusTraditionKey supplies the UNASSIGNED sentinel", () => {
     assert.equal(corpusTraditionKey("Europe", "Greek"), "Europe|Greek");
-    assert.equal(corpusTraditionKey("", ""), "Other|Unknown");
+    assert.equal(corpusTraditionKey("", ""), "UNASSIGNED|UNASSIGNED");
 });
 
 test("buildCorpusApiUrl addresses a document by document_id", () => {

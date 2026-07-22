@@ -80,9 +80,11 @@ def build_graphs(
 
     stopped = False
     for file_info in files:
-        text_id = file_info.text_id
+        text_id = file_info.text_id  # readable label for logs only
 
-        book_out_dir = graph_dir(text_id)
+        # Graphs are keyed by the stable document_id (D1) — invariant under a title/tradition
+        # rename, so a rename never orphans a graph dir (unify build/serve, data-model §5 step 6).
+        book_out_dir = graph_dir(file_info.document_id)
         book_out_dir.mkdir(parents=True, exist_ok=True)
 
         text = file_info.read_text()
