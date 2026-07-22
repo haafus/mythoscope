@@ -123,10 +123,10 @@ Ships alone, no `fetch_cache.py` change. *Excluded here on purpose:* the **degra
      to the output (we do not trust "the root dropped it" as authoritative — same E/F caution, never lose data).
 
    So there is **no fetch/keep logic to write** — the union iteration + acquire-if-missing + never-delete already
-   do it. Persist the **discovered set** in `meta.enrichment[source].discovered` and diff it vs the prior build
-   purely as **diagnostics** (no threshold — any change is reported): `now − prev` = links the root gained,
-   `prev − now` = links it dropped (kept via the union). Its value is **attribution** — the general count-drop
-   flag (item 7) says *"variants fell"*, the discovery diff says *whether the root shrank* vs *pages degraded
+   do it. Persist the **discovered set** in `meta.enrichment[source].discovered`. **Only a shrink is flagged** —
+   `now ⊋ prev` (the root gained links) is additive, auto-fetched, no concern; `now ⊊ accumulated` (the root
+   dropped links it used to list) is the signal. Its value is **attribution** — the general count-drop flag
+   (item 7) says *"variants fell"*, the discovery shrink says *whether the root shrank* vs *pages degraded
    individually* — the one signal per-sub-page health checks cannot see.
 
 ### Phase 4 — Flags (observability of state needing review)
@@ -166,7 +166,8 @@ the fan-out shrank, which no per-payload check can see).
     if current < mx:  flag("below-high-water", detail=f"{counter}: {current} < max {mx}")
     ```
     For the **discovery set** (not a number) the high-water is the **accumulated union** of every link ever
-    discovered; flag while `current ⊊ accumulated`. This makes `yield-drop` / `discovery-changed` persist until
+    discovered; **flag only a shrink** — `current ⊊ accumulated` (growth just extends the mark, never flags).
+    This makes `yield-drop` / `discovery-shrank` persist until
     the source actually recovers, instead of clearing the next build just because the (now-lower) value stopped
     changing.
     - **Risk — a spurious high poisons the mark** (a dedup bug counts double → `max` sticks, everything flags
