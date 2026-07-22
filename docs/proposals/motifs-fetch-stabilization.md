@@ -173,8 +173,22 @@ flag lives until its cause is gone). This is the persistent form of *surface, do
     recovers, auto) or a new system state (baseline moves, manual) — never by hiding it.
 11. **Surfaced** three ways: the build-time `WARNING`, a list in `status` / `mytho flags`, and the `refresh
     --check` preview. **Never blocking** — a flag never aborts the build (best-effort); the build proceeds on
-    the pinned state, the flag just makes the situation visible and un-losable. The human then decides whether
-    to leave pinned: **adopt / remove-from-config / retry / fix-parser**.
+    the pinned state, the flag just makes the situation visible and un-losable.
+
+**Three resolution semantics.** Every flag resolves as exactly one of three — the `kind` *narrows* which, but
+often only time/investigation *determines* it (which is why there is no blanket accept):
+
+| # | semantics | flags | human action | what actually happens |
+|---|---|---|---|---|
+| **1. new data, all normal** | a valid update arrived — review it and bring it in | `changed` | review the diff, `refresh <src> --apply` | **move baseline *up*** — promote new bytes to pinned raw, fp-cascade re-derives. Has reviewable content. |
+| **2. temporary malfunction** | a fault — cannot be accepted or rejected | `degraded`, `no-parse` (+ outcomes `G`/`B`) | **wait** (transient) **or fix** | **resolved *outside the pipeline*** — either technical conditions self-restore (→ auto-clear), or you update code/config to the new reality. The baseline is **never** moved to a malfunction. |
+| **3. permanent divergence** | a real new stable state — legitimize it | `gone` (permanent), `yield-drop`, `discovery-shrank` | `remove-from-config` / `reset the mark` | **move baseline *down*** — needed **only where you cannot fix and must reconcile the counters/expectations**. Legitimizes an absence/reduction (nothing to "adopt"). |
+
+The trap that forbids a blanket `--apply`: the same `kind` (`gone` / `yield-drop` / `discovery-shrank`) can be
+**(2) transient — wait** *or* **(3) permanent — legitimize**, and at flag-time you often cannot tell. So the
+default bias is **wait** (auto-clear is free and safe); (1) is a per-reviewed-source `adopt`; (3) is a
+deliberate single act. Only (1) and (3) move the baseline; (2) never does — it is fixed by the world recovering
+or by you changing code/config.
 
 *Two trigger points feed the same flag* (§2's single auto-reaction, seen at two layers): **validate-before-commit**
 (fetch-time, per self-contained payload — this page/response is broken/degraded/changed) and the
