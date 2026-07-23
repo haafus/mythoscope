@@ -186,13 +186,22 @@ function renderCytoscapeGraph(container, data, graphType) {
 
     const cy = graphCy;
 
-    // Measure the canvas before laying out — at construction it can still be 0-sized, and then
-    // fcose can't fit (graph stays tiny at the origin/corner, labels unscaled).
+    // Measure the canvas, then run fcose HEADLESS so it also fits the viewport (centre + right
+    // zoom) up front — fcose's own animation instead plays from the (0,0) corner and only fits at
+    // the end. With the viewport already framed, animate the nodes from a slight inward collapse
+    // out to their final spots: a visible settle that stays centred, no corner, no zoom jump.
     cy.resize();
     cy.layout({
-        name: "fcose", animate: true, randomize: true,
+        name: "fcose", animate: false, randomize: true,
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
     }).run();
+
+    const finals = cy.nodes().map((n) => ({n, x: n.position("x"), y: n.position("y")}));
+    const bb = cy.elements().boundingBox();
+    const cx = (bb.x1 + bb.x2) / 2;
+    const cyc = (bb.y1 + bb.y2) / 2;
+    cy.batch(() => finals.forEach((f) => f.n.position({x: cx + (f.x - cx) * 0.4, y: cyc + (f.y - cyc) * 0.4})));
+    finals.forEach((f) => f.n.animate({position: {x: f.x, y: f.y}}, {duration: 650, easing: "ease-out"}));
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
