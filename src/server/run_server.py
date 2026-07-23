@@ -25,8 +25,7 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     def index() -> FileResponse:
-        # no-cache so a changed shell (script tags, routes) always lands without a hard refresh.
-        return FileResponse(settings.web_root / "index.html", headers={"Cache-Control": "no-cache"})
+        return FileResponse(settings.web_root / "index.html")
 
     return app
 
