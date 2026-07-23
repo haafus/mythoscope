@@ -690,7 +690,7 @@ body.has-main-navbar {
 .atlas-ocean { fill: #eef3f4; }
 .atlas-land { fill: #e6ebe3; stroke: #c2ccbe; stroke-width: 0.5; }
 .atlas-antarctica { fill: #ffffff; stroke: #c2ccbe; stroke-width: 0.5; }
-.atlas-region { fill-opacity: 0.35; stroke-opacity: 0.55; stroke-width: 1; pointer-events: none; }
+.atlas-region { fill-opacity: 0.35; stroke-opacity: 0.55; stroke-width: 1; }
 
 /* Points keep a near-constant screen size on zoom: radius via --z, non-scaling stroke (mockup 62). */
 .atlas-dot {
@@ -725,6 +725,8 @@ body.has-main-navbar {
 .geo-tip .popup-description { color: rgba(255, 255, 255, 0.82); font-size: 12.5px; }
 .geo-tip .popup-book-link { color: #8ab4f8; }
 .geo-tip .popup-books { margin-top: 10px; }
+.geo-tip.region { width: auto; padding: 5px 9px; }
+.geo-tip .popup-region-only { color: rgba(255, 255, 255, 0.85); font-size: 12px; white-space: nowrap; }
 
 .popup-title {
     display: flex;

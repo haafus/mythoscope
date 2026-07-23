@@ -114,7 +114,7 @@ function buildPopupHtml(item) {
 function buildSvgMarkup(placed) {
     const regions = Object.entries(REGION_PATHS).map(([name, d]) => {
         const c = (state.traditionTree[name] || {}).color || "#8a8a8a";
-        return `<path d="${d}" class="atlas-region" fill="${escapeHtml(c)}" stroke="${escapeHtml(c)}"/>`;
+        return `<path d="${d}" class="atlas-region" data-region="${escapeHtml(name)}" fill="${escapeHtml(c)}" stroke="${escapeHtml(c)}"/>`;
     }).join("");
     const dots = placed.map((p, i) =>
         `<circle cx="${p.cx.toFixed(2)}" cy="${p.cy.toFixed(2)}" fill="${escapeHtml(p.item.color)}" class="atlas-dot" data-i="${i}"/>`
@@ -290,6 +290,7 @@ function initAtlas(container, traditions) {
         const item = placed[Number(circle.dataset.i)] && placed[Number(circle.dataset.i)].item;
         if (!item) return;
         tip.innerHTML = buildPopupHtml(item);
+        tip.classList.remove("region");
         tip.classList.add("show");
         const cr = circle.getBoundingClientRect(), fr = container.getBoundingClientRect();
         const anchorX = cr.left - fr.left + cr.width / 2, anchorTop = cr.top - fr.top;
@@ -300,21 +301,51 @@ function initAtlas(container, traditions) {
         tip.style.top = top + "px";
     };
 
+    // Regions (mockup 62): a short dwell then the region name, muted, above the cursor.
+    const showRegionTip = (name, clientX, clientY) => {
+        tip.innerHTML = `<div class="popup-region-only">${escapeHtml(name)}</div>`;
+        tip.classList.add("region");
+        tip.classList.add("show");
+        const fr = container.getBoundingClientRect();
+        const cx = clientX - fr.left, cy = clientY - fr.top;
+        const tr = tip.getBoundingClientRect();
+        let top = cy - tr.height - 12;
+        if (top < 4) top = cy + 16;
+        tip.style.left = Math.max(4, Math.min(fr.width - tr.width - 4, cx - tr.width / 2)) + "px";
+        tip.style.top = top + "px";
+    };
+
+    let regionTimer = null;
+    const DWELL = 700;
+    const clearRegionTimer = () => { if (regionTimer) { clearTimeout(regionTimer); regionTimer = null; } };
+
     svg.addEventListener("mousemove", (e) => {
         if (drag) return;
-        const c = e.target.closest && e.target.closest(".atlas-dot");
-        if (!c || c === curDot) return;
-        curDot = c; setPoint(c); cancelClose(); showTipFor(c);
+        clearRegionTimer();
+        const dot = e.target.closest && e.target.closest(".atlas-dot");
+        if (dot) {
+            setPoint(dot);
+            if (dot === curDot) return;
+            curDot = dot; cancelClose(); showTipFor(dot);
+            return;
+        }
+        setPoint(null);
+        const region = e.target.closest && e.target.closest(".atlas-region");
+        if (region) {
+            curDot = null; cancelClose(); tip.classList.remove("show");
+            const name = region.dataset.region, x = e.clientX, y = e.clientY;
+            regionTimer = setTimeout(() => showRegionTip(name, x, y), DWELL);
+        } else {
+            curDot = null; scheduleClose();
+        }
     });
-    svg.addEventListener("mouseout", (e) => {
-        if (e.target.closest && e.target.closest(".atlas-dot")) { curDot = null; scheduleClose(); }
-    });
+    svg.addEventListener("mouseleave", () => { clearRegionTimer(); curDot = null; scheduleClose(); });
     tip.addEventListener("mouseenter", cancelClose);
     tip.addEventListener("mouseleave", scheduleClose);
 
     onCleanup(() => {
         stopInertia(); if (zraf) cancelAnimationFrame(zraf);
-        cancelClose();
+        cancelClose(); clearRegionTimer();
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
         window.removeEventListener("pointermove", onPointerMove);
