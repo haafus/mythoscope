@@ -684,7 +684,6 @@ body.has-main-navbar {
     background: #eef3f4;
     touch-action: none;
     user-select: none;
-    cursor: grab;
 }
 .atlas-svg path { vector-effect: non-scaling-stroke; }  /* contour widths stay fixed on zoom (mockup 62) */
 
@@ -702,7 +701,6 @@ body.has-main-navbar {
     transform-box: fill-box;
     transform-origin: center;
     transition: transform 0.1s ease-out;
-    cursor: pointer;
 }
 .atlas-dot.hi { transform: scale(1.5); }
 
@@ -726,6 +724,7 @@ body.has-main-navbar {
 .geo-tip .popup-region { margin: 0 0 8px 22px; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
 .geo-tip .popup-description { color: rgba(255, 255, 255, 0.82); font-size: 12.5px; }
 .geo-tip .popup-book-link { color: #8ab4f8; }
+.geo-tip .popup-books { margin-top: 10px; }
 
 .popup-title {
     display: flex;
