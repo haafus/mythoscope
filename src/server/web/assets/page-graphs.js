@@ -123,6 +123,18 @@ function renderCytoscapeGraph(container, data, graphType) {
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
 
+    // Lay out directly inside the visible frame so cose optimizes into the centred position
+    // from the start — no post-layout fit/pan "drive". The initial viewport (zoom 1, pan 0)
+    // maps model coords [0,w]×[0,h] onto the container pixels 1:1, so a padded box in those
+    // coords lands the settled graph framed and centred with no separate motion.
+    const pad = 40;
+    const boundingBox = {
+        x1: pad,
+        y1: pad,
+        w: Math.max(100, container.clientWidth - 2 * pad),
+        h: Math.max(100, container.clientHeight - 2 * pad),
+    };
+
     graphCy = cytoscape({
         container,
         elements: [...nodes, ...edges],
@@ -177,26 +189,20 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        // Keep the settling animation visible, but make it pleasant. randomize:true spreads
-        // nodes first so they relax INTO place instead of exploding out of a clump (the jerky
-        // part). fit:false drops cose's hard viewport snap on the last frame; a smooth animated
-        // fit is done on layoutstop below so the view eases in instead of jumping.
+        // Optimize within `boundingBox` (the visible frame) so the graph settles already framed
+        // and centred; fit:false keeps the viewport put — no end-of-layout snap and no separate
+        // drive. randomize:true spreads nodes first so they relax INTO place, visibly, instead of
+        // exploding out of a clump.
         layout: {
             name: "cose",
-            idealEdgeLength: 5, padding: 50, spacingFactor: 5,
+            idealEdgeLength: 5, spacingFactor: 5,
             nodeRepulsion: 40000, gravity: 0.0005, numIter: 10000,
-            animate: true, randomize: true, fit: false,
+            animate: true, randomize: true, fit: false, boundingBox,
         },
         wheelSensitivity: 0.5,
     });
 
     const cy = graphCy;
-
-    // Replace cose's instant end-of-layout fit with a smooth eased one, so the viewport
-    // glides onto the settled graph instead of snapping on the final frame.
-    cy.one("layoutstop", () => {
-        cy.animate({fit: {eles: cy.elements(), padding: 50}, duration: 500, easing: "ease-in-out"});
-    });
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
