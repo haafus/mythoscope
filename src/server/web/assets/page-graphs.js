@@ -83,7 +83,7 @@ export async function renderGraphPage(graphType) {
 
     onCleanup(destroyGraph);
 
-    const onResize = () => { if (graphCy) { graphCy.resize(); graphCy.fit(graphCy.elements(), 40); } };
+    const onResize = () => { if (graphCy) graphCy.resize(); };  // keep current zoom/pan, just match the new canvas size
     window.addEventListener("resize", onResize);
     onCleanup(() => window.removeEventListener("resize", onResize));
 
