@@ -196,17 +196,12 @@ function renderCytoscapeGraph(container, data, graphType) {
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
     }).run();
 
-    const positions = {};
-    cy.nodes().forEach((n) => { positions[n.id()] = {x: n.position("x"), y: n.position("y")}; });
+    const finals = cy.nodes().map((n) => ({n, x: n.position("x"), y: n.position("y")}));
     const bb = cy.elements().boundingBox();
     const cx = (bb.x1 + bb.x2) / 2;
     const cyc = (bb.y1 + bb.y2) / 2;
-    cy.batch(() => cy.nodes().forEach((n) => {
-        const p = positions[n.id()];
-        n.position({x: cx + (p.x - cx) * 0.4, y: cyc + (p.y - cyc) * 0.4});
-    }));
-    // preset animates the nodes to the precomputed spots; fit:false keeps the already-framed viewport.
-    cy.layout({name: "preset", positions, animate: true, animationDuration: 650, animationEasing: "ease-out", fit: false}).run();
+    cy.batch(() => finals.forEach((f) => f.n.position({x: cx + (f.x - cx) * 0.4, y: cyc + (f.y - cyc) * 0.4})));
+    finals.forEach((f) => f.n.animate({position: {x: f.x, y: f.y}}, {duration: 650, easing: "ease-out"}));
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
