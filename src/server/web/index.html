@@ -11,6 +11,11 @@
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script defer src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <!-- fcose layout + its deps (load order: layout-base -> cose-base -> fcose, all after cytoscape).
+         defer scripts execute in document order; fcose auto-registers itself against window.cytoscape. -->
+    <script defer src="https://cdn.jsdelivr.net/npm/layout-base@2.0.1/layout-base.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/cose-base@2.2.0/cose-base.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.2.0/cytoscape-fcose.js"></script>
     <link rel="stylesheet" href="/assets/app.css?v=252">
 </head>
 <body class="has-main-navbar">

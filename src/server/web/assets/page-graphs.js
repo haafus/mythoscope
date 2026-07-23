@@ -193,18 +193,22 @@ function renderCytoscapeGraph(container, data, graphType) {
 
     const cy = graphCy;
 
-    // Run cose fully headless — ZERO motion of any kind, ever. animate:false and fit:false, so
-    // nothing glides, drives, or re-fits. The one-time framing is an INSTANT cy.fit() (no animate
-    // arg → no transition), done while the canvas is still hidden; then we reveal, so the first
-    // and only painted frame is the finished, framed layout.
-    // Shorter edges: idealEdgeLength (the target) was overwhelmed by a high nodeRepulsion +
-    // spacingFactor; pull both in and raise gravity so connected nodes sit closer / stay compact.
-    const layout = cy.layout({
-        name: "cose",
-        idealEdgeLength: 5, spacingFactor: 1.5,
-        nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
-        animate: false, randomize: true, fit: false,
-    });
+    // Prefer fcose (spectral init → faster, higher-quality, more stable than built-in cose); fall
+    // back to cose if the extension didn't load. EITHER WAY: animate:false, fit:false → ZERO motion,
+    // ever — nothing glides, drives, or re-fits. The single framing is an INSTANT cy.fit() (no
+    // animate arg → no transition) done while the canvas is hidden; then reveal, so the first and
+    // only painted frame is the finished, framed layout. idealEdgeLength keeps edges short.
+    const FCOSE_OPTS = {
+        name: "fcose", quality: "proof", animate: false, randomize: true, fit: false,
+        idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25, numIter: 2500,
+    };
+    const COSE_OPTS = {
+        name: "cose", animate: false, randomize: true, fit: false,
+        idealEdgeLength: 5, spacingFactor: 1.5, nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
+    };
+    // cytoscape("layout", name) is the registration getter — truthy only if the extension loaded.
+    const fcoseReady = typeof cytoscape === "function" && !!cytoscape("layout", "fcose");
+    const layout = cy.layout(fcoseReady ? FCOSE_OPTS : COSE_OPTS);
     const reveal = () => {
         cy.fit(cy.elements(), 40);  // instant, one-time framing — no animation
         container.style.visibility = "visible";
