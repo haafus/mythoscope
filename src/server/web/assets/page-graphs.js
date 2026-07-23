@@ -180,7 +180,7 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        layout: {name: "preset"},
+        layout: {name: "preset", fit: false},  // fit:false — don't zoom onto the (0,0) cluster (huge nodes)
         wheelSensitivity: 0.5,
     });
 
