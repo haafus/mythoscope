@@ -36,6 +36,20 @@ class TestModelsEndpoint:
         assert response.status_code == 200
         assert response.json()["text_search"] is False
 
+    def test_settings_flag_gates_text_search_and_warmup(self):
+        from unittest.mock import patch
+
+        from settings import settings
+
+        with patch.object(settings.server, "text_search", False):
+            # /models reports it off even with deps present…
+            with patch("server.api.similarity.chroma_manager") as mock_cm:
+                mock_cm.get_available_models.return_value = []
+                assert client.get("/api/similarity/models").json()["text_search"] is False
+            # …and warmup skips the heavy load instead of running it.
+            r = client.post("/api/similarity/warmup", json={"model": "any"})
+            assert r.status_code == 200 and r.json()["status"] == "skipped"
+
 
 class TestCorpusCatalog:
     def test_documents_returns_list(self):

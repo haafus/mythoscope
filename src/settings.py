@@ -67,6 +67,9 @@ class ServerSettings(BaseModel):
     host: str = "127.0.0.1"
     port: int = 8000
     gzip_minimum_size: int = 1024
+    # Gate the text-query search UI and its heavy model warmup. Off => no search panel, no
+    # warmup, even where the embedding deps are installed (they're still required when on).
+    text_search: bool = True
 
 
 class Settings(BaseSettings):
