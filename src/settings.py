@@ -67,7 +67,7 @@ class ServerSettings(BaseModel):
     host: str = "127.0.0.1"
     port: int = 8000
     gzip_minimum_size: int = 1024
-    text_search: bool = True
+    text_search: bool = False
 
 
 class Settings(BaseSettings):
