@@ -566,6 +566,42 @@ body.has-main-navbar {
     font-size: 14px;
 }
 
+/* Region / tradition detail shown in the reader when its tree row is clicked. */
+.corpus-page .facet-info {
+    max-width: 680px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: normal;
+}
+.corpus-page .facet-kind {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.corpus-page .facet-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 6px 0 22px;
+    color: #111;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.corpus-page .facet-title .info-dot { flex: none; width: 13px; height: 13px; }
+.corpus-page .facet-field { margin-bottom: 16px; }
+.corpus-page .facet-field-label {
+    margin-bottom: 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.corpus-page .facet-field-value { color: #374151; }
+
 .corpus-page a.original-url-link {
     display: block;
     margin-top: 18px;

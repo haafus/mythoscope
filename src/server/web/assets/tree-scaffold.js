@@ -41,6 +41,7 @@ function bindMajorToggles(container) {
             state.corpusOpenMajor = state.corpusOpenMajor === major ? null : major;  // opening one closes the rest
             container.querySelectorAll(".major-section").forEach((s) =>
                 s.classList.toggle("collapsed", (s.dataset.major || "Other") !== state.corpusOpenMajor));
+            container.dispatchEvent(new CustomEvent("region-select", { detail: { region: major }, bubbles: true }));
         });
     });
 }

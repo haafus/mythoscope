@@ -70,6 +70,10 @@ function bindTreeLeaves(container, documents) {
                 const toggle = g.querySelector(".tradition-toggle");
                 if (toggle) toggle.textContent = open ? "▾" : "▸";
             });
+            container.dispatchEvent(new CustomEvent("tradition-select", {
+                detail: { tradition: group.dataset.tradition, region: section?.dataset.major },
+                bubbles: true,
+            }));
         });
     });
 

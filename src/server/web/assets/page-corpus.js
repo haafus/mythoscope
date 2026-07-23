@@ -3,7 +3,7 @@ import {
     buildCorpusApiUrl, escapeHtml, formatNumber,
     regionOf, traditionColor,
 } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=5";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=6";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `
@@ -28,6 +28,8 @@ export async function renderCorpus(params = new URLSearchParams()) {
 
     const libraryTree = document.getElementById("libraryTree");
     libraryTree.addEventListener("book-select", (e) => openCorpusDocument(e.detail.doc));
+    libraryTree.addEventListener("region-select", (e) => showRegionInfo(e.detail.region));
+    libraryTree.addEventListener("tradition-select", (e) => showTraditionInfo(e.detail.tradition, e.detail.region));
     renderBookInfo(null);
 
     await renderLibraryTree(libraryTree);
@@ -86,6 +88,50 @@ function renderBookInfo(doc) {
 
         ${originalUrl}
     `;
+}
+
+function facetField(label, value) {
+    if (!value) return "";
+    return `<div class="facet-field">
+        <div class="facet-field-label">${escapeHtml(label)}</div>
+        <div class="facet-field-value">${escapeHtml(value)}</div>
+    </div>`;
+}
+
+function renderFacetInfo(color, kind, name, fields) {
+    const readerContent = document.getElementById("readerContent");
+    if (!readerContent) return;
+    readerContent.innerHTML = `
+        <div class="facet-info">
+            <div class="facet-kind">${escapeHtml(kind)}</div>
+            <div class="facet-title">
+                <span class="info-dot" style="--book-color:${escapeHtml(color)}"></span>
+                <span>${escapeHtml(name)}</span>
+            </div>
+            ${fields}
+        </div>
+    `;
+    readerContent.scrollTop = 0;
+}
+
+function showRegionInfo(region) {
+    const node = (state.traditionTree || {})[region];
+    if (!node) return;
+    const fields = facetField("Description", node.description)
+        + facetField("Subdivision", node.subdivision)
+        + facetField("Strata", node.strata);
+    renderFacetInfo(node.color || "#8a8a8a", "Region", region, fields);
+}
+
+function showTraditionInfo(tradition, region) {
+    const info = ((state.traditionTree || {})[region] || {}).traditions?.[tradition];
+    if (!info) return;
+    const coords = Array.isArray(info.coordinates) ? info.coordinates.join(", ") : "";
+    const fields = facetField("Region", region)
+        + facetField("Description", info.description)
+        + facetField("Dating", info.dating)
+        + facetField("Coordinates", coords);
+    renderFacetInfo(traditionColor(tradition), "Tradition", tradition, fields);
 }
 
 async function openCorpusDocument(doc) {
