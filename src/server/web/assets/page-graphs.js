@@ -123,12 +123,8 @@ function renderCytoscapeGraph(container, data, graphType) {
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
 
-    // The "reorganization on the last frame" is two cytoscape behaviours compounding: (1) it
-    // paints the elements once at their default all-at-origin positions BEFORE the layout runs,
-    // and (2) cose maps the raw simulation coords into their framed positions (fit/boundingBox)
-    // as a discrete final step. Rather than fight either, hide the canvas, run cose fully headless
-    // (animate:false), and reveal only after layoutstop — so the very first thing painted is the
-    // finished, fitted layout. visibility:hidden (not display:none) keeps the box measurable for fit.
+    // Hide until the layout finishes so the first painted frame is the settled graph, not the
+    // pre-layout origin clump. visibility (not display:none) keeps the box measurable for fit.
     container.style.visibility = "hidden";
 
     graphCy = cytoscape({
@@ -185,19 +181,13 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        // No auto-layout in the constructor (that would paint the origin clump first); the real
-        // cose run is fired below, gated so the canvas is only revealed once it finishes.
-        layout: {name: "preset"},
+        layout: {name: "preset"},  // real layout runs below, gated on reveal
         wheelSensitivity: 0.5,
     });
 
     const cy = graphCy;
 
-    // Prefer fcose (spectral init → faster, higher-quality, more stable than built-in cose); fall
-    // back to cose if the extension didn't load. EITHER WAY: animate:false, fit:false → ZERO motion,
-    // ever — nothing glides, drives, or re-fits. The single framing is an INSTANT cy.fit() (no
-    // animate arg → no transition) done while the canvas is hidden; then reveal, so the first and
-    // only painted frame is the finished, framed layout. idealEdgeLength keeps edges short.
+    // fcose when the extension loaded, else built-in cose. Both: animate/fit false — no motion.
     const FCOSE_OPTS = {
         name: "fcose", quality: "proof", animate: false, randomize: true, fit: false,
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25, numIter: 2500,
@@ -206,11 +196,10 @@ function renderCytoscapeGraph(container, data, graphType) {
         name: "cose", animate: false, randomize: true, fit: false,
         idealEdgeLength: 5, spacingFactor: 1.5, nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
     };
-    // cytoscape("layout", name) is the registration getter — truthy only if the extension loaded.
     const fcoseReady = typeof cytoscape === "function" && !!cytoscape("layout", "fcose");
     const layout = cy.layout(fcoseReady ? FCOSE_OPTS : COSE_OPTS);
     const reveal = () => {
-        cy.fit(cy.elements(), 40);  // instant, one-time framing — no animation
+        cy.fit(cy.elements(), 40);  // instant, no animation
         container.style.visibility = "visible";
     };
     layout.one("layoutstop", reveal);
