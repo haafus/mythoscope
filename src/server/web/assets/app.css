@@ -880,11 +880,11 @@ body.has-main-navbar {
     width: max-content;
     max-width: min(360px, calc(100% - 20px));
     padding: 10px 12px;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
-    background: #fff;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
-    color: #212529;
+    background: #111827;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.32);
+    color: #f1f3f5;
     font-size: 12px;
     line-height: 1.45;
     pointer-events: none;
@@ -896,12 +896,12 @@ body.has-main-navbar {
 }
 
 .analysis-page .plot-hover-text {
-    color: #343a40;
+    color: #f1f3f5;
 }
 
 .analysis-page .fragment-attribution {
     margin-top: 8px;
-    color: var(--muted-soft);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 12px;
     line-height: 1.4;
     text-align: right;
@@ -1291,10 +1291,12 @@ body.has-main-navbar {
 
 .graph-edge-tooltip {
     position: absolute;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
+    background: #111827;
+    color: #f1f3f5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 4px 8px;
     border-radius: 6px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.32);
     font-size: 12px;
     pointer-events: none;
     z-index: 1000;
