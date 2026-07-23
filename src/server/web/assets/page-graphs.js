@@ -177,7 +177,16 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        layout: {name: "cose", idealEdgeLength: 5, padding: 50, spacingFactor: 5, nodeRepulsion: 40000, gravity: 0.0005, numIter: 10000},
+        // animate:"end" runs the whole force simulation headless, then glides nodes to their
+        // final positions in ONE smooth pass — instead of redrawing every tick (the jerky
+        // twitching) and snapping the viewport with a fit() on the last frame. The fit rides
+        // the same eased animation, so there's no final jump.
+        layout: {
+            name: "cose",
+            idealEdgeLength: 5, padding: 50, spacingFactor: 5,
+            nodeRepulsion: 40000, gravity: 0.0005, numIter: 10000,
+            animate: "end", animationDuration: 600, animationEasing: "ease-out", fit: true,
+        },
         wheelSensitivity: 0.5,
     });
 
