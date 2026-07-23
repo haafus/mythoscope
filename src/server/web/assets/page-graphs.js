@@ -176,14 +176,19 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        layout: {
-            name: "fcose", animate: true, randomize: true,
-            idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
-        },
+        layout: {name: "preset"},
         wheelSensitivity: 0.5,
     });
 
     const cy = graphCy;
+
+    // Measure the canvas before laying out — at construction it can still be 0-sized, and then
+    // fcose can't fit (graph stays tiny at the origin/corner, labels unscaled).
+    cy.resize();
+    cy.layout({
+        name: "fcose", animate: true, randomize: true,
+        idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
+    }).run();
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
