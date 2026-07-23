@@ -64,12 +64,9 @@ def orphan_chunk_ids(
     stored_metas: list[dict | None],
     current_document_ids: set[str],
 ) -> list[str]:
-    """Chunk-ids in the collection whose ``document_id`` is no longer in the corpus — a
-    removed book, or (one-off) every document after a re-key migration whose ``document_id``
-    changed. ``embed_plan``'s ``stale`` only trims chunks *within* a surviving document; this
-    is the cross-document counterpart, pruning whole vanished documents that would otherwise
-    linger as orphaned chunks and surface in search with an unresolvable ``document_id``
-    ("unknown book"). A no-op on a steady corpus, since ``document_id`` is rename-stable."""
+    """Chunk-ids whose ``document_id`` is no longer in the corpus. The cross-document
+    counterpart to ``embed_plan``'s within-document ``stale``; prunes whole vanished
+    documents (removed book, or a re-key migration) so they don't orphan in the collection."""
     return [
         cid
         for cid, meta in zip(stored_ids, stored_metas, strict=True)

@@ -30,10 +30,8 @@ def setup_logging() -> None:
         ],
     )
 
-    # httpx/httpcore emit one INFO line per HTTP request, so a 429 logs twice — their
-    # request line plus our own WARNING in llm.client. Quiet them to WARNING so each 429 is
-    # a single message (and successful calls stop logging a line each). Kept verbose at DEBUG,
-    # where the raw request/response lines are actually wanted.
+    # httpx/httpcore log one INFO line per request, doubling every 429 (their line + our
+    # WARNING). Quiet to WARNING unless the app is at DEBUG.
     if level > logging.DEBUG:
         for noisy in ("httpx", "httpcore"):
             logging.getLogger(noisy).setLevel(logging.WARNING)

@@ -7,10 +7,8 @@ logger = logging.getLogger(__name__)
 # How often (in requests) the governor logs a mid-run usage/utilization snapshot.
 USAGE_LOG_EVERY = 25
 
-# Aim below the provider's hard ceiling. Leaves room for token-estimate error and the
-# provider's own output-token reservation, and — with a cold-started bucket — bounds any
-# post-idle burst to this fraction of the limit. A 429 means we clipped the ceiling; this
-# keeps steady-state and bursts underneath it.
+# Aim below the provider ceiling — room for estimate error + the provider's output-token
+# reservation, and (cold-started) it caps any burst to this fraction of the limit.
 LIMIT_HEADROOM = 0.9
 
 
@@ -38,9 +36,8 @@ class TokenBucket:
     ) -> None:
         self.capacity = float(capacity)
         self.rate = refill_per_sec if refill_per_sec is not None else self.capacity / 60.0
-        # Start full by default; callers pass initial=0 to *cold-start* against a rolling-window
-        # provider limit, where a full bucket would hand out a free `capacity`-sized burst on
-        # top of the refill and blow past the window in the first minute.
+        # initial=0 cold-starts against a rolling window (a full bucket would grant a free
+        # capacity-sized burst on top of the refill and blow the first minute's limit).
         self._level = float(capacity if initial is None else initial)
         self._updated = time.monotonic()
         self._lock = threading.Lock()
@@ -97,9 +94,7 @@ class RateGovernor:
         self.rpm = rpm  # the true provider limits, kept for utilization reporting
         self.tpm = tpm
         self.rpd = rpd
-        # Buckets are shaded to LIMIT_HEADROOM of the limit and cold-started (initial=0): the
-        # first minute then obeys the refill rate instead of releasing a full-capacity burst,
-        # which against a rolling-window limit is what produces the classic 429 storm.
+        # Shaded to LIMIT_HEADROOM and cold-started so the first minute obeys the refill rate.
         self._req_bucket = TokenBucket(rpm * LIMIT_HEADROOM, initial=0.0) if rpm else None
         self._tok_bucket = TokenBucket(tpm * LIMIT_HEADROOM, initial=0.0) if tpm else None
         self._breaker_threshold = breaker_threshold

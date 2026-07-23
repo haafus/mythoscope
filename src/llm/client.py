@@ -38,12 +38,9 @@ class FatalLLMError(Exception):
 def _estimate_tokens(messages: list[dict], output_estimate: int = 800) -> int:
     """Conservative pre-flight token estimate for the rate limiter.
 
-    Latin/ASCII text runs ~4 chars/token, but CJK/Indic/Cyrillic and other non-ASCII
-    scripts are far denser (often ~1 token/char), so a flat chars//4 badly under-counts
-    the corpus's multilingual chunks and lets the TPM bucket over-admit them. Count ASCII
-    at ~4 chars/token and every non-ASCII char as ~1 token — a deliberate over-estimate,
-    since reconcile() corrects the running total from real usage and only the in-flight
-    admission gate stays cautious. Provider-agnostic (no tokenizer dependency).
+    ASCII ~4 chars/token; non-ASCII (CJK/Indic/Cyrillic) ~1 token/char, where a flat chars//4
+    badly under-counts and lets the TPM bucket over-admit. Deliberate over-estimate — reconcile()
+    corrects the running total from real usage, so only the in-flight gate stays cautious.
     """
     ascii_chars = wide_chars = 0
     for message in messages:
