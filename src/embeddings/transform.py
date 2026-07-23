@@ -57,3 +57,21 @@ def embed_plan(
         if sep and did == text_id and idx.isdigit() and int(idx) >= n_chunks:
             stale.append(cid)
     return to_embed, stale
+
+
+def orphan_chunk_ids(
+    stored_ids: list[str],
+    stored_metas: list[dict | None],
+    current_document_ids: set[str],
+) -> list[str]:
+    """Chunk-ids in the collection whose ``document_id`` is no longer in the corpus — a
+    removed book, or (one-off) every document after a re-key migration whose ``document_id``
+    changed. ``embed_plan``'s ``stale`` only trims chunks *within* a surviving document; this
+    is the cross-document counterpart, pruning whole vanished documents that would otherwise
+    linger as orphaned chunks and surface in search with an unresolvable ``document_id``
+    ("unknown book"). A no-op on a steady corpus, since ``document_id`` is rename-stable."""
+    return [
+        cid
+        for cid, meta in zip(stored_ids, stored_metas, strict=True)
+        if (meta or {}).get("document_id") not in current_document_ids
+    ]

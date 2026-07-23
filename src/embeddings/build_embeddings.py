@@ -14,7 +14,7 @@ from . import chroma_manager
 from .chunking import chunk_text
 from .model_manager import EmbeddingEncoder
 from .preprocess import preprocess_texts
-from .transform import chunk_fingerprint, embed_plan, transform_version
+from .transform import chunk_fingerprint, embed_plan, orphan_chunk_ids, transform_version
 
 logger = logging.getLogger(__name__)
 
@@ -81,10 +81,24 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     if existing_fp:
         logger.info(f"Collection '{collection.name}' has {len(existing_fp)} existing chunks, resuming")
 
+    # Prune chunks whose document is no longer in the corpus. The positional gate below only
+    # trims chunks *within* a surviving document_id; a document that left the corpus — a
+    # removed book, or (one-off) every doc after a re-key migration, whose document_id
+    # changed — would otherwise linger as orphaned chunks and surface in search with an
+    # unresolvable document_id ("unknown book"). document_ids are normally stable, so this is
+    # a no-op on a steady corpus.
+    current_ids = {fi.document_id for fi in files_info}
+    orphan_ids = orphan_chunk_ids(prev["ids"], prev["metadatas"], current_ids)
+    if orphan_ids:
+        collection.delete(ids=orphan_ids)
+        for cid in orphan_ids:
+            existing_fp.pop(cid, None)
+        logger.info(f"Pruned {len(orphan_ids)} orphaned chunk(s) from documents no longer in the corpus")
+
     added_total = 0
     skipped_total = 0
     total_chunks = 0
-    stale_removed = 0
+    stale_removed = len(orphan_ids)
     encode_seconds = 0.0
 
     logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")

@@ -8,6 +8,7 @@ does not, and a shrunk document drops its trailing chunks.
 from embeddings.transform import (
     chunk_fingerprint,
     embed_plan,
+    orphan_chunk_ids,
     transform_version,
 )
 
@@ -103,3 +104,35 @@ class TestEmbedPlan:
         to_embed, stale = embed_plan("A::B", 1, self.fp, existing)
         assert to_embed == []
         assert stale == ["A::B::1"]
+
+
+class TestOrphanChunkIds:
+    """Cross-document prune: chunks whose document left the corpus (removed book, or every
+    doc after a re-key migration) must be dropped so they don't surface in search with an
+    unresolvable document_id ("unknown book / UNASSIGNED")."""
+
+    def _prev(self, *doc_ids):
+        # One chunk per (doc_id, index=0), mimicking the collection.get() snapshot.
+        ids = [f"{d}::0" for d in doc_ids]
+        metas = [{"document_id": d, "chunk_index": 0, "fingerprint": "fp"} for d in doc_ids]
+        return ids, metas
+
+    def test_no_orphans_when_all_present(self):
+        ids, metas = self._prev("a", "b")
+        assert orphan_chunk_ids(ids, metas, {"a", "b"}) == []
+
+    def test_removed_document_is_orphaned(self):
+        ids, metas = self._prev("a", "b")
+        assert orphan_chunk_ids(ids, metas, {"a"}) == ["b::0"]
+
+    def test_rekey_orphans_every_old_id(self):
+        # The migration case: the collection holds old ids, the corpus now has new ones.
+        ids, metas = self._prev("old1", "old2")
+        assert orphan_chunk_ids(ids, metas, {"new1", "new2"}) == ["old1::0", "old2::0"]
+
+    def test_missing_document_id_metadata_is_orphaned(self):
+        # A chunk with no document_id can never resolve — prune it.
+        assert orphan_chunk_ids(["x::0"], [{"chunk_index": 0}], {"a"}) == ["x::0"]
+
+    def test_empty_collection(self):
+        assert orphan_chunk_ids([], [], {"a"}) == []
