@@ -197,8 +197,11 @@ function renderCytoscapeGraph(container, data, graphType) {
         // (no snap, no drive). randomize seeds the headless sim off a degenerate all-at-origin start.
         layout: {
             name: "cose",
-            idealEdgeLength: 5, spacingFactor: 5,
-            nodeRepulsion: 40000, gravity: 0.0005, numIter: 10000,
+            // Shorter edges: idealEdgeLength is the target, but a very high nodeRepulsion and
+            // spacingFactor were blowing connected nodes apart and overwhelming it. Pull both in
+            // and raise gravity so connected nodes sit closer / the graph stays compact.
+            idealEdgeLength: 5, spacingFactor: 1.5,
+            nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
             animate: "end", animationDuration: 800, animationEasing: "ease-out",
             randomize: true, fit: false, boundingBox,
         },
