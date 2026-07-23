@@ -1,4 +1,4 @@
-import { app, api, escapeHtml, onCleanup, CATEGORY_NONE } from "./core.js";
+import { app, api, escapeHtml, onCleanup, state, CATEGORY_NONE } from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=5";
 
 let graphCy = null;
@@ -89,10 +89,17 @@ export async function renderGraphPage(graphType) {
 
     const bookList = document.getElementById("graphBookList");
     bookList.addEventListener("book-select", (e) => {
+        state.selectedCorpusDoc = e.detail.doc;   // shared across sources + all graph pages
         setActiveBook(bookList, e.detail.doc);
         loadGraphData(e.detail.doc.document_id, graphType);  // graphs keyed by document_id (D1)
     });
     await renderLibraryTree(bookList);
+
+    // Restore the selection carried over from another section.
+    if (state.selectedCorpusDoc) {
+        setActiveBook(bookList, state.selectedCorpusDoc);
+        loadGraphData(state.selectedCorpusDoc.document_id, graphType);
+    }
 }
 
 async function loadGraphData(bookId, graphType) {
