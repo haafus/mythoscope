@@ -193,17 +193,22 @@ function renderCytoscapeGraph(container, data, graphType) {
 
     const cy = graphCy;
 
-    // Run cose fully headless, then reveal. animate:false → no glide/drive; fit frames the settled
-    // graph; the reveal on layoutstop means the first painted frame is already the final layout.
+    // Run cose fully headless — ZERO motion of any kind, ever. animate:false and fit:false, so
+    // nothing glides, drives, or re-fits. The one-time framing is an INSTANT cy.fit() (no animate
+    // arg → no transition), done while the canvas is still hidden; then we reveal, so the first
+    // and only painted frame is the finished, framed layout.
     // Shorter edges: idealEdgeLength (the target) was overwhelmed by a high nodeRepulsion +
     // spacingFactor; pull both in and raise gravity so connected nodes sit closer / stay compact.
     const layout = cy.layout({
         name: "cose",
         idealEdgeLength: 5, spacingFactor: 1.5,
         nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
-        animate: false, randomize: true, fit: true, padding: 40,
+        animate: false, randomize: true, fit: false,
     });
-    const reveal = () => { container.style.visibility = "visible"; };
+    const reveal = () => {
+        cy.fit(cy.elements(), 40);  // instant, one-time framing — no animation
+        container.style.visibility = "visible";
+    };
     layout.one("layoutstop", reveal);
     setTimeout(reveal, 4000);  // safety: never leave the canvas hidden if layoutstop is missed
     layout.run();
