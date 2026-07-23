@@ -20,14 +20,23 @@ def setup_logging() -> None:
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     log_file = log_dir / f"app-{stamp}-{os.getpid()}.log"
 
+    level = getattr(logging, settings.log_level.upper(), logging.INFO)
     logging.basicConfig(
-        level=getattr(logging, settings.log_level.upper(), logging.INFO),
+        level=level,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.FileHandler(log_file, encoding="utf-8"),
             logging.StreamHandler(),
         ],
     )
+
+    # httpx/httpcore emit one INFO line per HTTP request, so a 429 logs twice — their
+    # request line plus our own WARNING in llm.client. Quiet them to WARNING so each 429 is
+    # a single message (and successful calls stop logging a line each). Kept verbose at DEBUG,
+    # where the raw request/response lines are actually wanted.
+    if level > logging.DEBUG:
+        for noisy in ("httpx", "httpcore"):
+            logging.getLogger(noisy).setLevel(logging.WARNING)
 
     _prune_old_logs(log_dir, settings.logs_max_files)
 
