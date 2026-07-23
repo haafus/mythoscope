@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 import time
 from datetime import datetime, timedelta
@@ -10,14 +9,6 @@ from log_setup import setup_logging
 from pipeline_inspect import format_size
 
 logger = logging.getLogger(__name__)
-
-# macOS libmalloc prints "MallocStackLogging: can't turn off ... because it was not enabled"
-# from every child process (torch/OpenMP workers, SSL helpers, ...) when this var is present
-# in the environment but stack logging isn't actually on — a common Sequoia-era noise. It has
-# no effect on results; strip it so nothing the pipeline spawns inherits the half-configured
-# state. Runs at import (well before any child is spawned), so the child env is already clean.
-os.environ.pop("MallocStackLogging", None)
-os.environ.pop("MallocStackLoggingNoCompact", None)
 
 COMMAND_SECTIONS = [
     ("Pipeline", ["corpus", "embeddings", "projections", "graphs", "motifs"]),
