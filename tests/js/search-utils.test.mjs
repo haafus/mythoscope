@@ -7,6 +7,7 @@ import {
     attributionLine,
     chunkMetaLine,
     highlightText,
+    pointTooltipHtml,
     resultBookTitle,
     scoreClass,
     searchResultMetaLine,
@@ -43,6 +44,17 @@ test("attributionLine resolves tradition from the reference and appends score on
     assert.ok(html.includes("score 0.76"));
     const plain = attributionLine({ document_id: "d1", chunk_index: 1, similarity_score: 0.756 });
     assert.ok(!plain.includes("score"));
+});
+
+test("pointTooltipHtml resolves the scatter point via document_id", () => {
+    // The chart.js scatter tooltip must key its object `document_id` (not `id`): the
+    // resolver reads item.document_id, so a legacy `{ id }` object left every point
+    // unresolved ("unknown book / UNASSIGNED"). Lock the contract both ways.
+    const resolved = pointTooltipHtml({ document_id: "d1", chunk_index: 0, text: "hi" });
+    assert.ok(resolved.includes("Greek") && resolved.includes("A B"));
+
+    const wrongKey = pointTooltipHtml({ id: "d1", chunk_index: 0, text: "hi" });
+    assert.ok(wrongKey.includes("Unknown book") && wrongKey.includes("UNASSIGNED"));
 });
 
 test("highlightText wraps long query words and escapes the rest", () => {

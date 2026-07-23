@@ -173,9 +173,11 @@ function bindTooltip(plotEl) {
         if (!point) return hide();
 
         const custom = Array.isArray(point.customdata) ? point.customdata : [];
+        // custom[0] is the document_id (chroma surfaces it as the point id); attributionLine
+        // resolves title+tradition from it via documentById, so it must be keyed document_id —
+        // not `id`, which left every tooltip unresolved ("unknown book / UNASSIGNED").
         tooltip.innerHTML = pointTooltipHtml({
-            id: custom[0],
-            tradition: custom[1],
+            document_id: custom[0],
             chunk_index: custom[2],
             text: custom[3],
         });
