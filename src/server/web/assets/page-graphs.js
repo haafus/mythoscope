@@ -186,22 +186,15 @@ function renderCytoscapeGraph(container, data, graphType) {
 
     const cy = graphCy;
 
-    // Measure the canvas, then run fcose HEADLESS so it also fits the viewport (centre + right
-    // zoom) up front — fcose's own animation instead plays from the (0,0) corner and only fits at
-    // the end. With the viewport already framed, animate the nodes from a slight inward collapse
-    // out to their final spots: a visible settle that stays centred, no corner, no zoom jump.
+    // Scatter nodes around the viewport centre first, then run fcose animated — starting off-centre
+    // (not the (0,0) corner) sidesteps the fcose fit-with-animate bug, so the settle stays centred.
     cy.resize();
+    const w = container.clientWidth, h = container.clientHeight, r = Math.min(w, h) / 3;
+    cy.nodes().forEach((n) => n.position({x: w / 2 + (Math.random() - 0.5) * 2 * r, y: h / 2 + (Math.random() - 0.5) * 2 * r}));
     cy.layout({
-        name: "fcose", animate: false, randomize: true,
+        name: "fcose", animate: true, randomize: false, fit: true,
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
     }).run();
-
-    const finals = cy.nodes().map((n) => ({n, x: n.position("x"), y: n.position("y")}));
-    const bb = cy.elements().boundingBox();
-    const cx = (bb.x1 + bb.x2) / 2;
-    const cyc = (bb.y1 + bb.y2) / 2;
-    cy.batch(() => finals.forEach((f) => f.n.position({x: cx + (f.x - cx) * 0.4, y: cyc + (f.y - cyc) * 0.4})));
-    finals.forEach((f) => f.n.animate({position: {x: f.x, y: f.y}}, {duration: 650, easing: "ease-out"}));
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
