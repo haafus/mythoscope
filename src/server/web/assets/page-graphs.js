@@ -201,7 +201,7 @@ function renderCytoscapeGraph(container, data, graphType) {
     const cx = (bb.x1 + bb.x2) / 2;
     const cyc = (bb.y1 + bb.y2) / 2;
     cy.batch(() => finals.forEach((f) => f.n.position({x: cx + (f.x - cx) * 0.4, y: cyc + (f.y - cyc) * 0.4})));
-    finals.forEach((f) => f.n.animate({position: {x: f.x, y: f.y}}, {duration: 650, easing: "ease-out"}));
+    finals.forEach((f) => f.n.animate({position: {x: f.x, y: f.y}}, {duration: 350, easing: "ease-out"}));
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
