@@ -149,7 +149,6 @@ function renderCytoscapeGraph(container, data, graphType) {
                     "line-color": "#aaa",
                     "target-arrow-color": "#aaa",
                     "target-arrow-shape": "triangle",
-                    "target-arrow-scale": 0.1,
                     "arrow-scale": 0.1,
                     "curve-style": "bezier",
                     label: "data(relation)",
