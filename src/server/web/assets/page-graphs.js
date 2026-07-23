@@ -123,18 +123,6 @@ function renderCytoscapeGraph(container, data, graphType) {
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
 
-    // fcose when the extension loaded, else built-in cose. Runs in the constructor with its own
-    // visible animation.
-    const FCOSE_OPTS = {
-        name: "fcose", quality: "proof", animate: true, animationDuration: 600, randomize: true,
-        idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25, numIter: 2500,
-    };
-    const COSE_OPTS = {
-        name: "cose", animate: true, randomize: true,
-        idealEdgeLength: 5, spacingFactor: 1.5, nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
-    };
-    const fcoseReady = typeof cytoscape === "function" && !!cytoscape("layout", "fcose");
-
     graphCy = cytoscape({
         container,
         elements: [...nodes, ...edges],
@@ -189,7 +177,10 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        layout: fcoseReady ? FCOSE_OPTS : COSE_OPTS,
+        layout: {
+            name: "fcose", animate: true, randomize: true,
+            idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
+        },
         wheelSensitivity: 0.5,
     });
 
