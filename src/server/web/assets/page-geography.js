@@ -1,6 +1,16 @@
 import { app, escapeHtml, ensureCorpusData, state, traditionColor, onCleanup } from "./core.js";
 import { LAND, REGION_PATHS } from "./atlas-geo.js";
 
+// Antarctica lifted from the shared coastline (its far-south subpaths, lat <= -58 → y >= 149):
+// filling those exact subpaths white shares one geometry with the coastline — no seam.
+const ANTARCTICA_D = (LAND || "").split("Z").filter((s) => s.trim())
+    .filter((s) => {
+        const nums = s.match(/-?\d[\d.]*/g) || [];
+        const ys = nums.filter((_, i) => i % 2).map(Number);
+        return ys.length && Math.min(...ys) >= 149;
+    })
+    .map((s) => s + "Z").join("");
+
 export async function renderGeography() {
     app.innerHTML = `
         <main class="geography-page container">
@@ -30,8 +40,6 @@ function normalizeCoordinates(value) {
     return [lat, lon];
 }
 
-// Points from the region tree (per-tradition coordinates) joined with each tradition's book
-// titles from the documents; colour is the derived region shade (§8.1), never stored.
 async function fetchTraditions() {
     await ensureCorpusData();
 
@@ -92,47 +100,31 @@ function buildPopupHtml(item) {
                const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
                return `<li><a class="popup-book-link" href="${escapeHtml(href)}">${escapeHtml(book)}</a></li>`;
            }).join("")}</ul>`
-        : `<div class="popup-empty">No texts yet</div>`;
-
+        : "";
     return `
         <div class="popup-title">
             <span class="popup-color" style="background:${escapeHtml(item.color)}"></span>
             <span>${escapeHtml(item.name)}</span>
         </div>
         <div class="popup-region">${escapeHtml(item.region)}</div>
-        <div class="popup-description">${escapeHtml(item.description)}</div>
+        ${item.description ? `<div class="popup-description">${escapeHtml(item.description)}</div>` : ""}
         ${booksHtml}
     `;
 }
 
 function buildSvgMarkup(placed) {
-    const ocean = `<rect x="0" y="0" width="360" height="180" class="atlas-ocean"/>`;
-    const land = `<path d="${LAND}" class="atlas-land"/>`;
     const regions = Object.entries(REGION_PATHS).map(([name, d]) => {
         const c = (state.traditionTree[name] || {}).color || "#8a8a8a";
         return `<path d="${d}" class="atlas-region" fill="${escapeHtml(c)}" stroke="${escapeHtml(c)}"/>`;
     }).join("");
-    const dots = placed.map((p, i) => {
-        const attrs = p.item.books.length
-            ? `fill="${escapeHtml(p.item.color)}"`
-            : `fill="none" stroke="${escapeHtml(p.item.color)}" opacity="0.6"`;  // known, no texts yet
-        return `<circle cx="${p.cx.toFixed(2)}" cy="${p.cy.toFixed(2)}" r="1.7" ${attrs} class="atlas-dot" data-i="${i}"/>`;
-    }).join("");
-    return `<svg class="atlas-svg">${ocean}${land}${regions}${dots}</svg>`;
-}
-
-// Initial viewBox: the dots' bounding box (padded, clamped to the 0..360 / 0..180 canvas).
-function fitViewBox(placed) {
-    if (!placed.length) return { x: 0, y: 0, w: 360, h: 180 };
-    let minX = 360, minY = 180, maxX = 0, maxY = 0;
-    placed.forEach((p) => {
-        minX = Math.min(minX, p.cx); maxX = Math.max(maxX, p.cx);
-        minY = Math.min(minY, p.cy); maxY = Math.max(maxY, p.cy);
-    });
-    const padX = (maxX - minX) * 0.06 + 6, padY = (maxY - minY) * 0.06 + 6;
-    minX = Math.max(0, minX - padX); minY = Math.max(0, minY - padY);
-    maxX = Math.min(360, maxX + padX); maxY = Math.min(180, maxY + padY);
-    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    const dots = placed.map((p, i) =>
+        `<circle cx="${p.cx.toFixed(2)}" cy="${p.cy.toFixed(2)}" fill="${escapeHtml(p.item.color)}" class="atlas-dot" data-i="${i}"/>`
+    ).join("");
+    return `<svg class="atlas-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" style="--pr:1.7">`
+        + `<rect class="atlas-ocean" width="360" height="180"/>`
+        + `<path class="atlas-land" d="${LAND}"/>`
+        + (ANTARCTICA_D ? `<path class="atlas-antarctica" d="${ANTARCTICA_D}"/>` : "")
+        + `${regions}${dots}</svg>`;
 }
 
 function initAtlas(container, traditions) {
@@ -141,90 +133,194 @@ function initAtlas(container, traditions) {
     container.innerHTML = buildSvgMarkup(placed);
     const svg = container.querySelector(".atlas-svg");
 
-    const view = { ...fitViewBox(placed) };
-    const maxW = view.w, maxH = view.h;             // fit view is the zoom-out floor (no zooming past it)
-    const minW = maxW / 8;
-    const apply = () => svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
-    const pxScale = () => {
-        const r = svg.getBoundingClientRect();
-        return Math.min(r.width / view.w, r.height / view.h);  // preserveAspectRatio="meet"
-    };
-    const clamp = () => {
-        view.w = Math.min(maxW, view.w); view.h = Math.min(maxH, view.h);
-        view.x = Math.max(0, Math.min(360 - view.w, view.x));
-        view.y = Math.max(0, Math.min(180 - view.h, view.y));
-    };
-    apply();
+    // ============================================================================
+    // Zoom / pan / double-click — ported from mockup 62 (Google-Maps-style rAF ease).
+    // ============================================================================
+    const MINW = 60, FRAME_MS = 16.7, DT_MAX = 50, R_COMP = 0.86, RESET_STEP = 0.13;
+    const view = { x: 0, y: 0, w: 360, h: 180 };   // animated current viewBox
+    const target = { ...view };                     // goal viewBox
+    let zraf = null, zPrev = 0, iPrev = 0, resetGlide = null;
 
-    let dragging = false, lastX = 0, lastY = 0, moved = false;
+    const applyView = () => {
+        svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+        svg.style.setProperty("--z", Math.pow(view.w / 360, R_COMP).toFixed(4));  // partial counter-scale of dots
+    };
 
-    svg.addEventListener("wheel", (e) => {
+    // Uniform lerp of all four viewBox components toward the target keeps the focal point pinned.
+    function animateZoom(ts) {
+        const dt = zPrev ? Math.min(DT_MAX, ts - zPrev) : FRAME_MS; zPrev = ts;
+        const k = 1 - Math.pow(1 - 0.16, dt / FRAME_MS);
+        if (resetGlide) {
+            const g = resetGlide;
+            const step = Math.min(RESET_STEP * dt / FRAME_MS, Math.log(360) - Math.log(target.w));
+            target.w = Math.exp(Math.log(target.w) + step);
+            if (target.w >= 359.9) { target.w = 360; resetGlide = null; }
+            target.h = target.w / 2;
+            const s = (360 - g.w0) > 0.01 ? (target.w - g.w0) / (360 - g.w0) : 1;
+            target.x = g.x0 * (1 - s);
+            target.y = g.y0 * (1 - s);
+        }
+        view.w += (target.w - view.w) * k;
+        view.h = view.w / 2;
+        view.x += (target.x - view.x) * k;
+        view.y += (target.y - view.y) * k;
+        applyView();
+        if (Math.abs(target.w - view.w) > 0.05 || Math.abs(target.x - view.x) > 0.05 || Math.abs(target.y - view.y) > 0.05) {
+            zraf = requestAnimationFrame(animateZoom);
+        } else { Object.assign(view, target); applyView(); zraf = null; zPrev = 0; }
+    }
+    const kickZoom = () => { if (!zraf) { zPrev = 0; zraf = requestAnimationFrame(animateZoom); } };
+
+    const onWheel = (e) => {
         e.preventDefault();
-        const r = svg.getBoundingClientRect();
-        const s = pxScale();
-        const offX = (r.width - view.w * s) / 2, offY = (r.height - view.h * s) / 2;
-        const cx = view.x + (e.clientX - r.left - offX) / s;   // canvas point under cursor (held fixed)
-        const cy = view.y + (e.clientY - r.top - offY) / s;
-        const factor = e.deltaY < 0 ? 0.85 : 1 / 0.85;
-        const nw = Math.min(maxW, Math.max(minW, view.w * factor));
-        const nh = nw * (view.h / view.w);
-        view.x = cx - (cx - view.x) * (nw / view.w);
-        view.y = cy - (cy - view.y) * (nh / view.h);
-        view.w = nw; view.h = nh;
-        clamp(); apply();
-    }, { passive: false });
-
-    svg.addEventListener("pointerdown", (e) => {
-        dragging = true; moved = false; lastX = e.clientX; lastY = e.clientY;
-        svg.setPointerCapture(e.pointerId); svg.classList.add("dragging");
-    });
-    svg.addEventListener("pointermove", (e) => {
-        if (!dragging) return;
-        const s = pxScale();
-        view.x -= (e.clientX - lastX) / s;
-        view.y -= (e.clientY - lastY) / s;
-        lastX = e.clientX; lastY = e.clientY; moved = true;
-        clamp(); apply();
-    });
-    const endDrag = (e) => {
-        dragging = false; svg.classList.remove("dragging");
-        try { svg.releasePointerCapture(e.pointerId); } catch { /* not captured */ }
+        stopInertia();
+        resetGlide = null;
+        hideTip();
+        const rect = svg.getBoundingClientRect();
+        let d = e.deltaY;
+        if (e.deltaMode === 1) d *= 16;
+        d = Math.max(-50, Math.min(50, d));
+        target.w = Math.min(360, Math.max(MINW, target.w * Math.exp(d * 0.0026)));
+        target.h = target.w / 2;
+        if (d > 0) {   // zoom out → straight to the centred full-extent view
+            const denom = 360 - view.w;
+            const s = denom > 0.01 ? (target.w - view.w) / denom : 0;
+            target.x = view.x * (1 - s);
+            target.y = view.y * (1 - s);
+        } else {       // zoom in toward the cursor (holds its world point pinned)
+            const px = (e.clientX - rect.left) / rect.width, py = (e.clientY - rect.top) / rect.height;
+            const wx = view.x + px * view.w, wy = view.y + py * view.h;
+            target.x = Math.max(0, Math.min(360 - target.w, wx - px * target.w));
+            target.y = Math.max(0, Math.min(180 - target.h, wy - py * target.h));
+        }
+        kickZoom();
     };
-    svg.addEventListener("pointerup", endDrag);
-    svg.addEventListener("pointercancel", endDrag);
+    svg.addEventListener("wheel", onWheel, { passive: false });
 
-    // --- hover tooltip (name + region + description + books; book links stay clickable) ---
+    // --- drag pan with release inertia ---
+    let drag = null, iraf = null;
+    const vel = { x: 0, y: 0 };
+    const stopInertia = () => { if (iraf) { cancelAnimationFrame(iraf); iraf = null; } vel.x = vel.y = 0; iPrev = 0; };
+    const panTo = (x, y) => {
+        view.x = target.x = Math.max(0, Math.min(360 - view.w, x));
+        view.y = target.y = Math.max(0, Math.min(180 - view.h, y));
+        applyView();
+    };
+    function inertia(ts) {
+        const dt = iPrev ? Math.min(DT_MAX, ts - iPrev) : FRAME_MS; iPrev = ts;
+        const f = dt / FRAME_MS;
+        vel.x *= Math.pow(0.90, f); vel.y *= Math.pow(0.90, f);
+        const px = view.x, py = view.y;
+        panTo(view.x + vel.x * f, view.y + vel.y * f);
+        if (view.x === px) vel.x = 0;
+        if (view.y === py) vel.y = 0;
+        if (Math.abs(vel.x) > 0.02 || Math.abs(vel.y) > 0.02) iraf = requestAnimationFrame(inertia);
+        else { iraf = null; iPrev = 0; }
+    }
+    const onPointerDown = (e) => {
+        if (e.button !== 0 || view.w >= 360) return;   // nothing to pan at full extent
+        stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
+        resetGlide = null;
+        try { svg.setPointerCapture(e.pointerId); } catch { /* not capturable */ }
+        drag = { id: e.pointerId, x: e.clientX, y: e.clientY, vx: view.x, vy: view.y,
+                 hist: [[performance.now(), e.clientX, e.clientY]] };
+        svg.style.cursor = "grabbing";
+    };
+    const VEL_WINDOW_MS = 60, MICRO_PX = 3;
+    function releaseVelocity() {
+        const h = drag.hist, now = performance.now(), last = h[h.length - 1];
+        if (now - last[0] > FRAME_MS * 2) return;
+        let ref = h[0];
+        for (const s of h) if (now - s[0] <= VEL_WINDOW_MS) { ref = s; break; }
+        const dt = last[0] - ref[0];
+        if (dt <= 0) return;
+        if (Math.hypot(last[1] - ref[1], last[2] - ref[2]) < MICRO_PX) return;
+        const rect = svg.getBoundingClientRect(), k = FRAME_MS / dt;
+        vel.x = -(last[1] - ref[1]) / rect.width * view.w * k;
+        vel.y = -(last[2] - ref[2]) / rect.height * view.h * k;
+    }
+    const endDrag = () => {
+        if (drag) { vel.x = vel.y = 0; releaseVelocity(); }
+        if (drag && (Math.abs(vel.x) > 0.03 || Math.abs(vel.y) > 0.03)) iraf = requestAnimationFrame(inertia);
+        drag = null; svg.style.cursor = "";
+    };
+    const onPointerUp = (e) => { if (drag && e.pointerId === drag.id) endDrag(); };
+    const onPointerMove = (e) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const rect = svg.getBoundingClientRect();
+        panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
+              drag.vy - (e.clientY - drag.y) / rect.height * view.h);
+        const t = performance.now();
+        drag.hist.push([t, e.clientX, e.clientY]);
+        while (drag.hist.length > 2 && t - drag.hist[0][0] > 120) drag.hist.shift();
+        hideTip();
+    };
+    const onDblClick = () => {
+        stopInertia();
+        resetGlide = { x0: view.x, y0: view.y, w0: view.w };
+        Object.assign(target, { x: view.x, y: view.y, w: view.w, h: view.h });
+        kickZoom();
+    };
+    svg.addEventListener("pointerdown", onPointerDown);
+    svg.addEventListener("dblclick", onDblClick);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+    window.addEventListener("pointermove", onPointerMove);
+    applyView();
+
+    // ============================================================================
+    // Tooltip — dark card anchored above the hovered point (mockup 62 tip styling);
+    // rich content (name · region · description · books), links stay clickable.
+    // ============================================================================
     const tip = document.createElement("div");
     tip.className = "geo-tip";
-    tip.style.display = "none";
     container.appendChild(tip);
-    let closeTimer = null;
+
+    let hiDot = null, curDot = null, closeTimer = null;
+    const setPoint = (c) => {
+        if (hiDot === c) return;
+        if (hiDot) hiDot.classList.remove("hi");
+        hiDot = c;
+        if (hiDot) hiDot.classList.add("hi");
+    };
     const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
-    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(() => { tip.style.display = "none"; }, 200); };
-    const showTip = (circle) => {
-        if (dragging || moved) return;
+    const hideTip = () => { tip.classList.remove("show"); setPoint(null); curDot = null; };
+    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(hideTip, 200); };
+
+    const showTipFor = (circle) => {
         const item = placed[Number(circle.dataset.i)] && placed[Number(circle.dataset.i)].item;
         if (!item) return;
-        cancelClose();
         tip.innerHTML = buildPopupHtml(item);
-        tip.style.display = "block";
+        tip.classList.add("show");
         const cr = circle.getBoundingClientRect(), fr = container.getBoundingClientRect();
-        const anchorX = cr.left - fr.left + cr.width / 2, anchorY = cr.top - fr.top;
+        const anchorX = cr.left - fr.left + cr.width / 2, anchorTop = cr.top - fr.top;
         const tr = tip.getBoundingClientRect();
+        let top = anchorTop - tr.height - 8;
+        if (top < 4) top = anchorTop + cr.height + 8;   // flip below when no room above
         tip.style.left = Math.max(4, Math.min(fr.width - tr.width - 4, anchorX - tr.width / 2)) + "px";
-        tip.style.top = Math.max(4, anchorY - tr.height - 8) + "px";
+        tip.style.top = top + "px";
     };
-    svg.addEventListener("mouseover", (e) => {
-        const c = e.target.closest(".atlas-dot");
-        if (c) showTip(c);
+
+    svg.addEventListener("mousemove", (e) => {
+        if (drag) return;
+        const c = e.target.closest && e.target.closest(".atlas-dot");
+        if (!c || c === curDot) return;
+        curDot = c; setPoint(c); cancelClose(); showTipFor(c);
     });
     svg.addEventListener("mouseout", (e) => {
-        if (e.target.closest(".atlas-dot")) scheduleClose();
+        if (e.target.closest && e.target.closest(".atlas-dot")) { curDot = null; scheduleClose(); }
     });
     tip.addEventListener("mouseenter", cancelClose);
     tip.addEventListener("mouseleave", scheduleClose);
 
-    onCleanup(() => { cancelClose(); tip.remove(); });
+    onCleanup(() => {
+        stopInertia(); if (zraf) cancelAnimationFrame(zraf);
+        cancelClose();
+        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("pointercancel", onPointerUp);
+        window.removeEventListener("pointermove", onPointerMove);
+        tip.remove();
+    });
 }
 
 function showGeographyError(message) {

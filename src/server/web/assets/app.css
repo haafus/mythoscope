@@ -681,39 +681,52 @@ body.has-main-navbar {
     display: block;
     width: 100%;
     height: 100%;
+    background: #eef3f4;
     touch-action: none;
+    user-select: none;
     cursor: grab;
 }
-.atlas-svg.dragging { cursor: grabbing; }
+.atlas-svg path { vector-effect: non-scaling-stroke; }  /* contour widths stay fixed on zoom (mockup 62) */
 
 .atlas-ocean { fill: #eef3f4; }
 .atlas-land { fill: #e6ebe3; stroke: #c2ccbe; stroke-width: 0.5; }
-.atlas-region { fill-opacity: 0.30; stroke-opacity: 0.5; stroke-width: 0.5; pointer-events: none; }
+.atlas-antarctica { fill: #ffffff; stroke: #c2ccbe; stroke-width: 0.5; }
+.atlas-region { fill-opacity: 0.35; stroke-opacity: 0.55; stroke-width: 1; pointer-events: none; }
 
+/* Points keep a near-constant screen size on zoom: radius via --z, non-scaling stroke (mockup 62). */
 .atlas-dot {
+    r: calc(var(--pr, 1.5) * var(--z, 1) * 1px);
     stroke: #fff;
-    stroke-width: 0.4;
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.1s ease-out;
     cursor: pointer;
-    transition: r 0.12s ease;
 }
-.atlas-dot:hover { stroke-width: 0.7; }
+.atlas-dot.hi { transform: scale(1.5); }
 
-/* Hover tooltip: custom card anchored above the dot; keeps pointer events so book links click. */
+/* Tooltip: mockup 62 dark tip (rise/fade-in); rich card content, links stay clickable. */
 .geo-tip {
     position: absolute;
     z-index: 500;
     width: min(320px, 72vw);
-    padding: 14px 16px;
-    background: #fff;
+    padding: 12px 14px;
+    background: #111827;
+    color: #f1f3f5;
     border-radius: 8px;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.32);
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+    pointer-events: none;
 }
-
-.popup-region {
-    margin: -4px 0 8px 24px;
-    color: var(--muted);
-    font-size: 12px;
-}
+.geo-tip.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.geo-tip .popup-title { color: #fff; font-size: 15px; margin-bottom: 4px; gap: 8px; }
+.geo-tip .popup-region { margin: 0 0 8px 22px; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
+.geo-tip .popup-description { color: rgba(255, 255, 255, 0.82); font-size: 12.5px; }
+.geo-tip .popup-books-title { color: rgba(255, 255, 255, 0.55); margin: 10px 0 6px; }
+.geo-tip .popup-book-link { color: #8ab4f8; }
 
 .popup-title {
     display: flex;
