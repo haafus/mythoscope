@@ -14,9 +14,12 @@ export async function renderMajorTree(container, { emptyMessage, prepare, render
         }
 
         const ctx = prepare ? prepare(documents) : {};
+        const grouped = groupDocuments(documents);
+        if (state.corpusOpenMajor === null) state.corpusOpenMajor = grouped.keys().next().value ?? null;
+
         let html = "";
-        groupDocuments(documents).forEach((traditions, major) => {
-            const collapsed = state.corpusCollapsedMajors.has(major);
+        grouped.forEach((traditions, major) => {
+            const collapsed = state.corpusOpenMajor !== major;  // accordion: only the one open region
             html += `<section class="major-section${collapsed ? " collapsed" : ""}" data-major="${escapeHtml(major)}">
                 <button class="major-title" type="button">${escapeHtml(major)}</button>
                 <div class="major-body">${renderBody(traditions, major, ctx)}</div>
@@ -34,11 +37,10 @@ export async function renderMajorTree(container, { emptyMessage, prepare, render
 function bindMajorToggles(container) {
     container.querySelectorAll(".major-title").forEach((button) => {
         button.addEventListener("click", () => {
-            const section = button.closest(".major-section");
-            section.classList.toggle("collapsed");
-            const major = section.dataset.major || "Other";
-            if (section.classList.contains("collapsed")) state.corpusCollapsedMajors.add(major);
-            else state.corpusCollapsedMajors.delete(major);
+            const major = button.closest(".major-section").dataset.major || "Other";
+            state.corpusOpenMajor = state.corpusOpenMajor === major ? null : major;  // opening one closes the rest
+            container.querySelectorAll(".major-section").forEach((s) =>
+                s.classList.toggle("collapsed", (s.dataset.major || "Other") !== state.corpusOpenMajor));
         });
     });
 }

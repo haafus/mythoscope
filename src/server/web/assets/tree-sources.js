@@ -5,7 +5,7 @@ export async function renderLibraryTree(container) {
     await renderMajorTree(container, {
         emptyMessage: "No literature found.",
         prepare: (documents) => {
-            initOpenTraditions(documents);
+            initTreeOpen(documents);
             return { documents, docIndex: new Map(documents.map((doc, i) => [doc, i])) };
         },
         renderBody: (traditions, major, ctx) => renderTraditionGroups(traditions, major, ctx.docIndex),
@@ -13,21 +13,23 @@ export async function renderLibraryTree(container) {
     });
 }
 
-function initOpenTraditions(documents) {
-    if (state.corpusOpenTraditionsInitialized) return;
-    groupDocuments(documents).forEach((traditions, major) => {
-        traditions.forEach((_, tradition) => {
-            state.corpusOpenTraditions.add(corpusTraditionKey(major, tradition));
-        });
-    });
-    state.corpusOpenTraditionsInitialized = true;
+function initTreeOpen(documents) {
+    if (state.corpusTreeInitialized) return;
+    const grouped = groupDocuments(documents);
+    const firstMajor = grouped.keys().next().value;
+    if (firstMajor != null) {
+        state.corpusOpenMajor = firstMajor;
+        const firstTradition = grouped.get(firstMajor).keys().next().value;
+        if (firstTradition != null) state.corpusOpenTradition = corpusTraditionKey(firstMajor, firstTradition);
+    }
+    state.corpusTreeInitialized = true;
 }
 
 function renderTraditionGroups(traditions, major, docIndex) {
     let html = "";
     traditions.forEach((docs, tradition) => {
         const key = corpusTraditionKey(major, tradition);
-        const isOpen = state.corpusOpenTraditions.has(key);
+        const isOpen = state.corpusOpenTradition === key;
         const color = traditionColor(tradition);  // derived region shade (§8.1), not stored
 
         html += `
@@ -58,13 +60,16 @@ function bindTreeLeaves(container, documents) {
     container.querySelectorAll(".tradition-title").forEach((button) => {
         button.addEventListener("click", () => {
             const group = button.closest(".tradition-group");
-            group.classList.toggle("open");
             const section = button.closest(".major-section");
             const key = corpusTraditionKey(section?.dataset.major, group.dataset.tradition);
-            if (group.classList.contains("open")) state.corpusOpenTraditions.add(key);
-            else state.corpusOpenTraditions.delete(key);
-            const toggle = group.querySelector(".tradition-toggle");
-            if (toggle) toggle.textContent = group.classList.contains("open") ? "▾" : "▸";
+            state.corpusOpenTradition = state.corpusOpenTradition === key ? null : key;  // opening one closes the rest
+            container.querySelectorAll(".tradition-group").forEach((g) => {
+                const s = g.closest(".major-section");
+                const open = corpusTraditionKey(s?.dataset.major, g.dataset.tradition) === state.corpusOpenTradition;
+                g.classList.toggle("open", open);
+                const toggle = g.querySelector(".tradition-toggle");
+                if (toggle) toggle.textContent = open ? "▾" : "▸";
+            });
         });
     });
 

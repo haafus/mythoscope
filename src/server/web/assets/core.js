@@ -19,9 +19,9 @@ export const state = {
     corpusDocuments: [],
     docIndex: null,            // document_id -> document (built with the documents)
     selectedCorpusDoc: null,
-    corpusOpenTraditions: new Set(),
-    corpusOpenTraditionsInitialized: false,
-    corpusCollapsedMajors: new Set(),
+    corpusOpenMajor: null,        // accordion: the one open region
+    corpusOpenTradition: null,    // accordion: the one open tradition key
+    corpusTreeInitialized: false,
     traditionTree: null,       // region -> { color, description, subdivision, strata, traditions }
     treeIndex: null,           // tradition -> { region, regionColor, coordinates, index, count, … }
     analysisSearchRequestId: 0,
