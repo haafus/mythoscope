@@ -123,17 +123,13 @@ function renderCytoscapeGraph(container, data, graphType) {
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
 
-    // Lay out directly inside the visible frame so cose optimizes into the centred position
-    // from the start — no post-layout fit/pan "drive". The initial viewport (zoom 1, pan 0)
-    // maps model coords [0,w]×[0,h] onto the container pixels 1:1, so a padded box in those
-    // coords lands the settled graph framed and centred with no separate motion.
-    const pad = 40;
-    const boundingBox = {
-        x1: pad,
-        y1: pad,
-        w: Math.max(100, container.clientWidth - 2 * pad),
-        h: Math.max(100, container.clientHeight - 2 * pad),
-    };
+    // The "reorganization on the last frame" is two cytoscape behaviours compounding: (1) it
+    // paints the elements once at their default all-at-origin positions BEFORE the layout runs,
+    // and (2) cose maps the raw simulation coords into their framed positions (fit/boundingBox)
+    // as a discrete final step. Rather than fight either, hide the canvas, run cose fully headless
+    // (animate:false), and reveal only after layoutstop — so the very first thing painted is the
+    // finished, fitted layout. visibility:hidden (not display:none) keeps the box measurable for fit.
+    container.style.visibility = "hidden";
 
     graphCy = cytoscape({
         container,
@@ -189,23 +185,28 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        // No animation: compute the layout headless and place nodes straight into their final
-        // centred positions — the graph just appears laid out, no glide/drive of any kind.
-        // boundingBox = the visible frame → framed & centred; fit:false keeps the viewport put.
-        // randomize seeds the headless sim off a degenerate all-at-origin start.
-        layout: {
-            name: "cose",
-            // Shorter edges: idealEdgeLength is the target, but a very high nodeRepulsion and
-            // spacingFactor were blowing connected nodes apart and overwhelming it. Pull both in
-            // and raise gravity so connected nodes sit closer / the graph stays compact.
-            idealEdgeLength: 5, spacingFactor: 1.5,
-            nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
-            animate: false, randomize: true, fit: false, boundingBox,
-        },
+        // No auto-layout in the constructor (that would paint the origin clump first); the real
+        // cose run is fired below, gated so the canvas is only revealed once it finishes.
+        layout: {name: "preset"},
         wheelSensitivity: 0.5,
     });
 
     const cy = graphCy;
+
+    // Run cose fully headless, then reveal. animate:false → no glide/drive; fit frames the settled
+    // graph; the reveal on layoutstop means the first painted frame is already the final layout.
+    // Shorter edges: idealEdgeLength (the target) was overwhelmed by a high nodeRepulsion +
+    // spacingFactor; pull both in and raise gravity so connected nodes sit closer / stay compact.
+    const layout = cy.layout({
+        name: "cose",
+        idealEdgeLength: 5, spacingFactor: 1.5,
+        nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
+        animate: false, randomize: true, fit: true, padding: 40,
+    });
+    const reveal = () => { container.style.visibility = "visible"; };
+    layout.one("layoutstop", reveal);
+    setTimeout(reveal, 4000);  // safety: never leave the canvas hidden if layoutstop is missed
+    layout.run();
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
