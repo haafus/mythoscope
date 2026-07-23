@@ -95,8 +95,7 @@ function placeDots(traditions) {
 
 function buildPopupHtml(item) {
     const booksHtml = item.books.length
-        ? `<div class="popup-books-title">Books</div>
-           <ul class="popup-books">${item.books.map((book) => {
+        ? `<ul class="popup-books">${item.books.map((book) => {
                const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
                return `<li><a class="popup-book-link" href="${escapeHtml(href)}">${escapeHtml(book)}</a></li>`;
            }).join("")}</ul>`
