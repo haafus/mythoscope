@@ -35,14 +35,24 @@ class FatalLLMError(Exception):
     """Unrecoverable LLM error (quota, auth, missing model) — stops the whole run."""
 
 
-def _estimate_tokens(messages: list[dict], output_estimate: int = 600) -> int:
-    """Rough pre-flight token estimate (~4 chars/token) for the rate limiter.
+def _estimate_tokens(messages: list[dict], output_estimate: int = 800) -> int:
+    """Conservative pre-flight token estimate for the rate limiter.
 
-    Only used to pre-charge the token bucket; the real count from response.usage
-    reconciles it afterwards, so a coarse estimate is fine and provider-agnostic.
+    Latin/ASCII text runs ~4 chars/token, but CJK/Indic/Cyrillic and other non-ASCII
+    scripts are far denser (often ~1 token/char), so a flat chars//4 badly under-counts
+    the corpus's multilingual chunks and lets the TPM bucket over-admit them. Count ASCII
+    at ~4 chars/token and every non-ASCII char as ~1 token — a deliberate over-estimate,
+    since reconcile() corrects the running total from real usage and only the in-flight
+    admission gate stays cautious. Provider-agnostic (no tokenizer dependency).
     """
-    chars = sum(len(m.get("content", "")) for m in messages)
-    return chars // 4 + output_estimate
+    ascii_chars = wide_chars = 0
+    for message in messages:
+        for ch in message.get("content", ""):
+            if ord(ch) < 128:
+                ascii_chars += 1
+            else:
+                wide_chars += 1
+    return ascii_chars // 4 + wide_chars + output_estimate
 
 
 def _error_body(e: Exception) -> dict:

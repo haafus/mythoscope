@@ -7,6 +7,12 @@ logger = logging.getLogger(__name__)
 # How often (in requests) the governor logs a mid-run usage/utilization snapshot.
 USAGE_LOG_EVERY = 25
 
+# Aim below the provider's hard ceiling. Leaves room for token-estimate error and the
+# provider's own output-token reservation, and — with a cold-started bucket — bounds any
+# post-idle burst to this fraction of the limit. A 429 means we clipped the ceiling; this
+# keeps steady-state and bursts underneath it.
+LIMIT_HEADROOM = 0.9
+
 
 class DailyLimitReached(Exception):
     """Rate limiting is no longer recovering (likely a daily quota) — stop the run cleanly.
@@ -24,10 +30,18 @@ class TokenBucket:
     tests so waits stay short.
     """
 
-    def __init__(self, capacity: float, refill_per_sec: float | None = None) -> None:
+    def __init__(
+        self,
+        capacity: float,
+        refill_per_sec: float | None = None,
+        initial: float | None = None,
+    ) -> None:
         self.capacity = float(capacity)
         self.rate = refill_per_sec if refill_per_sec is not None else self.capacity / 60.0
-        self._level = float(capacity)
+        # Start full by default; callers pass initial=0 to *cold-start* against a rolling-window
+        # provider limit, where a full bucket would hand out a free `capacity`-sized burst on
+        # top of the refill and blow past the window in the first minute.
+        self._level = float(capacity if initial is None else initial)
         self._updated = time.monotonic()
         self._lock = threading.Lock()
 
@@ -80,11 +94,14 @@ class RateGovernor:
         breaker_threshold: int = 3,
     ) -> None:
         self.model = model
-        self.rpm = rpm
+        self.rpm = rpm  # the true provider limits, kept for utilization reporting
         self.tpm = tpm
         self.rpd = rpd
-        self._req_bucket = TokenBucket(rpm) if rpm else None
-        self._tok_bucket = TokenBucket(tpm) if tpm else None
+        # Buckets are shaded to LIMIT_HEADROOM of the limit and cold-started (initial=0): the
+        # first minute then obeys the refill rate instead of releasing a full-capacity burst,
+        # which against a rolling-window limit is what produces the classic 429 storm.
+        self._req_bucket = TokenBucket(rpm * LIMIT_HEADROOM, initial=0.0) if rpm else None
+        self._tok_bucket = TokenBucket(tpm * LIMIT_HEADROOM, initial=0.0) if tpm else None
         self._breaker_threshold = breaker_threshold
 
         self._lock = threading.Lock()

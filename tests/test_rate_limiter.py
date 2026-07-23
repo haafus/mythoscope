@@ -6,6 +6,15 @@ from llm import rate_limiter as rl
 from llm.rate_limiter import DailyLimitReached, RateGovernor, TokenBucket, get_governor
 
 
+def _fill(g: RateGovernor) -> RateGovernor:
+    """Top the governor's cold-started buckets up to capacity so acquire() tests don't
+    wait out the refill. adjust(-x) raises the level by x (adjust consumes +delta)."""
+    for bucket in (g._req_bucket, g._tok_bucket):
+        if bucket is not None:
+            bucket.adjust(-bucket.capacity)
+    return g
+
+
 class TestTokenBucket:
     def test_acquire_within_capacity_no_wait(self):
         b = TokenBucket(100)
@@ -60,19 +69,21 @@ class TestRateGovernor:
         assert g.note_rate_limited() is True  # 4 -> trips
 
     def test_refund_returns_token_estimate(self):
-        g = RateGovernor("m", tpm=1000)
+        g = _fill(RateGovernor("m", tpm=1000))
+        level_before = g._tok_bucket._level
         g.acquire(800)
-        g.refund(800)  # estimate returned; bucket back near capacity
-        assert g._tok_bucket.acquire(900) == 0.0  # would wait if the 800 weren't refunded
+        g.refund(800)  # estimate returned to the bucket and the est counter
+        assert g._tok_bucket._level == pytest.approx(level_before, abs=1.0)  # net-zero (µs refill aside)
+        assert g._est_tokens == 0
 
     def test_reconcile_tracks_tokens(self):
-        g = RateGovernor("m", tpm=100000)
+        g = _fill(RateGovernor("m", tpm=100000))
         g.acquire(500)
         g.reconcile(500, 800)
         assert g.stats()["tokens"] == 800
 
     def test_summary_shows_utilization_with_limits(self):
-        g = RateGovernor("m", rpm=500, tpm=200000)
+        g = _fill(RateGovernor("m", rpm=500, tpm=200000))
         g.acquire(1000)
         g.reconcile(1000, 1500)
         s = g.summary()
@@ -83,11 +94,41 @@ class TestRateGovernor:
         assert "TPM" not in s and "RPM" not in s
 
     def test_acquire_logs_usage_periodically(self, caplog):
-        g = RateGovernor("m", rpm=100000, tpm=100000)
+        g = _fill(RateGovernor("m", rpm=100000, tpm=100000))
         with caplog.at_level(logging.INFO, logger="llm.rate_limiter"):
             for _ in range(rl.USAGE_LOG_EVERY):
                 g.acquire(10)
         assert "LLM usage" in caplog.text
+
+
+class TestColdStartAndHeadroom:
+    def test_buckets_shaded_by_headroom(self):
+        # Capacity aims below the provider ceiling; the reported limits stay the true values.
+        g = RateGovernor("m", rpm=500, tpm=200000)
+        assert g._tok_bucket.capacity == pytest.approx(200000 * rl.LIMIT_HEADROOM)
+        assert g._req_bucket.capacity == pytest.approx(500 * rl.LIMIT_HEADROOM)
+        assert g.tpm == 200000 and g.rpm == 500  # utilization % is vs the real limit
+
+    def test_buckets_cold_start_empty(self):
+        # A fresh governor must not hand out a free capacity-sized burst.
+        g = RateGovernor("m", rpm=500, tpm=200000)
+        assert g._tok_bucket._level == 0.0
+        assert g._req_bucket._level == 0.0
+
+    def test_cold_started_bucket_waits_before_first_burst(self):
+        # From empty, the very first acquire must wait for the refill — no free burst.
+        b = TokenBucket(1000, refill_per_sec=1000.0, initial=0.0)
+        assert b.acquire(500) > 0
+
+    def test_cold_start_pays_for_burst_that_full_start_gives_free(self):
+        # The core regression, stated as a contrast: admitting a full capacity's worth of
+        # tokens costs zero wait from a full bucket but must be paid for by the refill from a
+        # cold-started one — which is exactly what keeps the first window under the limit.
+        cap = 1000.0
+        full = TokenBucket(cap, refill_per_sec=1000.0)              # legacy: starts full
+        cold = TokenBucket(cap, refill_per_sec=1000.0, initial=0.0)  # fixed: starts empty
+        assert full.acquire(cap) == 0.0   # free burst — the old 429-storm behaviour
+        assert cold.acquire(cap) > 0.0    # paced by refill — no free burst
 
 
 class TestGetGovernor:
