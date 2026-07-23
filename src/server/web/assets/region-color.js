@@ -1,11 +1,9 @@
-// Per-tradition within-region shades (regions.md §8.1). Hold the region's hue and
-// chroma; vary only lightness on a perceptually-uniform OKLCH band so every shade still
-// reads as that region and stays colour-blind-robust. N traditions ramp across the band
-// (grow-then-clamp, centred on the base); the texted corpus is ≤ ~7/region, so the plain
-// L-ramp always suffices (the large-N L×C lattice never triggers here).
+// Per-tradition within-region shades (regions.md §8.1). Hold the region's hue and chroma;
+// vary only lightness, spread evenly across a fixed OKLCH band so every shade still reads as
+// that region and stays colour-blind-robust. Fewer traditions => wider spacing (more
+// contrast); they pack tighter as the count grows.
 
 const BAND = { light: [0.42, 0.80], dark: [0.55, 0.92] };
-const DL_TARGET = 0.045;
 
 function srgbToLinear(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
 function linearToSrgb(c) { return c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; }
@@ -70,13 +68,8 @@ export function oklchToHex(L, C, H) {
 // index is the within-region order (by longitude; caller decides), count the region size.
 export function traditionShade(regionHex, index, count, dark = false) {
     const { L: Lbase, C, H } = hexToOklch(regionHex);
-    const [lo, hi] = BAND[dark ? "dark" : "light"];
     if (!count || count <= 1) return oklchToHex(Lbase, C, H);       // N==1 → the base swatch
-    const W = Math.min(hi - lo, (count - 1) * DL_TARGET);
-    let L = Lbase - W / 2 + index * (W / (count - 1));
-    // Slide the whole ramp back inside the safe band, then clamp for safety.
-    const rampLo = Lbase - W / 2, rampHi = Lbase + W / 2;
-    if (rampLo < lo) L += lo - rampLo;
-    else if (rampHi > hi) L -= rampHi - hi;
-    return oklchToHex(Math.max(lo, Math.min(hi, L)), C, H);
+    const [lo, hi] = BAND[dark ? "dark" : "light"];
+    const L = lo + index * (hi - lo) / (count - 1);                 // spread evenly across the full band
+    return oklchToHex(L, C, H);
 }
