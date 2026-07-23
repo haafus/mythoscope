@@ -192,7 +192,8 @@ function renderCytoscapeGraph(container, data, graphType) {
     const w = container.clientWidth, h = container.clientHeight, r = Math.min(w, h) / 3;
     cy.nodes().forEach((n) => n.position({x: w / 2 + (Math.random() - 0.5) * 2 * r, y: h / 2 + (Math.random() - 0.5) * 2 * r}));
     cy.layout({
-        name: "fcose", animate: true, randomize: false, fit: true,
+        name: "fcose", animate: true, randomize: false, fit: false,  // fit:false → zoom stays 1, nodes keep final size
+        animationEasing: "ease-out",
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
     }).run();
 
