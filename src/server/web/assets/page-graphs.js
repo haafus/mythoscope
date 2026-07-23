@@ -177,20 +177,26 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        // animate:"end" runs the whole force simulation headless, then glides nodes to their
-        // final positions in ONE smooth pass — instead of redrawing every tick (the jerky
-        // twitching) and snapping the viewport with a fit() on the last frame. The fit rides
-        // the same eased animation, so there's no final jump.
+        // Keep the settling animation visible, but make it pleasant. randomize:true spreads
+        // nodes first so they relax INTO place instead of exploding out of a clump (the jerky
+        // part). fit:false drops cose's hard viewport snap on the last frame; a smooth animated
+        // fit is done on layoutstop below so the view eases in instead of jumping.
         layout: {
             name: "cose",
             idealEdgeLength: 5, padding: 50, spacingFactor: 5,
             nodeRepulsion: 40000, gravity: 0.0005, numIter: 10000,
-            animate: "end", animationDuration: 600, animationEasing: "ease-out", fit: true,
+            animate: true, randomize: true, fit: false,
         },
         wheelSensitivity: 0.5,
     });
 
     const cy = graphCy;
+
+    // Replace cose's instant end-of-layout fit with a smooth eased one, so the viewport
+    // glides onto the settled graph instead of snapping on the final frame.
+    cy.one("layoutstop", () => {
+        cy.animate({fit: {eles: cy.elements(), padding: 50}, duration: 500, easing: "ease-in-out"});
+    });
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
