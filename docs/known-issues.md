@@ -6,6 +6,46 @@ Append new entries at the top.
 
 ---
 
+## LLM concurrency is one global constant, but the right value is per-provider
+
+**Status:** flagged — single hand-tuned constant; per-provider derivation not implemented.
+
+`max_concurrent` (in-flight LLM chunks) is a single number per stage —
+`settings.GraphsSettings.max_concurrent` (8) and `settings.ProjectionsSettings.max_concurrent`
+(5) — but the value that keeps the pipe full without over-driving the provider depends on the
+**provider's rate limits and the typical call size**, which change when you switch `graphs.llm`
+(or `embeddings`/`projections` model) to a different entry in `config/models.json`.
+
+Two regimes pull the right number in opposite directions:
+
+- **TPM-bound tier (e.g. `gpt4o-mini`: 200k TPM).** Graph calls are ~13k tokens each
+  (50k-char chunks × 4 prompts/chunk), so only ~15 fit in a minute. TPM is the bind; the rate
+  limiter (`src/llm/rate_limiter.py`) paces admissions regardless, so concurrency above ~8 just
+  leaves threads idle-waiting in `acquire()`. Hence the 8 default.
+- **No configured limit (e.g. `gpt4o`, `gemini25-flash` — no `rpm`/`tpm` in `config/models.json`).**
+  The governor reports "concurrency only": in-flight concurrency is the *only* throttle, so a
+  low number needlessly serializes a provider that could take far more.
+
+Where it bites:
+
+- **Silent mis-tune on model switch.** Point `graphs.llm` at an unlimited or higher-TPM provider
+  and the run stays capped at a concurrency picked for `gpt-4o-mini` — leaving throughput on the
+  table. Point it at a *tighter* tier and 8 could be too high.
+- The number encodes an assumption about the *current* model's limits that nothing re-derives.
+
+Options:
+
+- **Accept (current).** One hand-tuned constant per stage; retune by hand when you change model.
+- **Derive it from the provider.** Compute an effective concurrency from the model's
+  `rpm`/`tpm` (in `config/models.json`) and a typical call-token estimate — e.g.
+  `min(rpm-derived, tpm / typical_call_tokens)` — falling back to a plain concurrency cap when no
+  limits are configured. The rate limiter already knows the limits; this would just size the pool
+  to match instead of relying on a separate constant.
+- **Per-provider override.** Add an optional `max_concurrent` to each `config/models.json` entry,
+  so the value travels with the model it was tuned for rather than living in stage settings.
+
+---
+
 ## Motifs page names/colours regions with two non-aligned vocabularies
 
 **Status:** flagged — motif-index side, fix deferred with the cross-index review below; not started.
