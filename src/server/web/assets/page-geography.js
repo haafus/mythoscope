@@ -1,5 +1,5 @@
 import { app, escapeHtml, ensureCorpusData, state, traditionColor, onCleanup } from "./core.js";
-import { REGIONS_GEOJSON } from "./regions-geo.js";
+import { LAND, REGION_PATHS } from "./atlas-geo.js";
 
 export async function renderGeography() {
     app.innerHTML = `
@@ -12,39 +12,26 @@ export async function renderGeography() {
         </main>
     `;
 
-    if (typeof L === "undefined") {
-        showGeographyError("Map library could not be loaded.");
-        return;
-    }
-
     try {
         const traditions = await fetchTraditions();
-        initializeGeographyMap(traditions);
+        initAtlas(document.getElementById("geography-map"), traditions);
     } catch (error) {
         console.error(error);
         showGeographyError("Could not load geography data.");
     }
 }
 
-function isValidColor(value) {
-    return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value.trim());
-}
-
 function normalizeCoordinates(value) {
     if (!Array.isArray(value) || value.length < 2) return null;
-
     const lat = Number(value[0]);
     const lon = Number(value[1]);
-
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
-
     return [lat, lon];
 }
 
-// Build the atlas points from the region tree (per-tradition coordinates) and join each
-// tradition's book titles from the documents — colour is the derived region shade (§8.1),
-// never stored. Region/colour/books all resolve from the stable references (§2.8).
+// Points from the region tree (per-tradition coordinates) joined with each tradition's book
+// titles from the documents; colour is the derived region shade (§8.1), never stored.
 async function fetchTraditions() {
     await ensureCorpusData();
 
@@ -73,9 +60,9 @@ async function fetchTraditions() {
     return points.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function buildCoordinateGroups(traditions) {
+// Fan co-located traditions out on a small ring so their dots don't overlap.
+function placeDots(traditions) {
     const groups = new Map();
-
     traditions.forEach((item) => {
         const [lat, lon] = item.coordinates;
         const key = `${lat.toFixed(4)},${lon.toFixed(4)}`;
@@ -83,20 +70,19 @@ function buildCoordinateGroups(traditions) {
         groups.get(key).push(item);
     });
 
-    return groups;
-}
-
-function getOffsetCoordinate(item, index, total) {
-    if (total <= 1) return item.coordinates;
-
-    const [lat, lon] = item.coordinates;
-    const angle = (Math.PI * 2 * index) / total;
-    const radius = 0.8;
-
-    return [
-        lat + Math.sin(angle) * radius,
-        lon + Math.cos(angle) * radius,
-    ];
+    const placed = [];
+    groups.forEach((group) => {
+        group.forEach((item, index) => {
+            let [lat, lon] = item.coordinates;
+            if (group.length > 1) {
+                const angle = (Math.PI * 2 * index) / group.length;
+                lat += Math.sin(angle) * 0.8;
+                lon += Math.cos(angle) * 0.8;
+            }
+            placed.push({ item, cx: lon + 180, cy: 90 - lat });  // equirect: x=lon+180, y=90-lat
+        });
+    });
+    return placed;
 }
 
 function buildPopupHtml(item) {
@@ -113,134 +99,132 @@ function buildPopupHtml(item) {
             <span class="popup-color" style="background:${escapeHtml(item.color)}"></span>
             <span>${escapeHtml(item.name)}</span>
         </div>
+        <div class="popup-region">${escapeHtml(item.region)}</div>
         <div class="popup-description">${escapeHtml(item.description)}</div>
         ${booksHtml}
     `;
 }
 
-function createMarkerIcon(item) {
-    return L.divIcon({
-        className: "tradition-marker",
-        html: `<button class="map-point${item.books.length ? "" : " empty"}" type="button" style="--point-color:${escapeHtml(item.color)}" aria-label="${escapeHtml(item.name)}${item.books.length ? "" : " (no texts yet)"}"></button>`,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
-        popupAnchor: [0, -11],
-    });
+function buildSvgMarkup(placed) {
+    const ocean = `<rect x="0" y="0" width="360" height="180" class="atlas-ocean"/>`;
+    const land = `<path d="${LAND}" class="atlas-land"/>`;
+    const regions = Object.entries(REGION_PATHS).map(([name, d]) => {
+        const c = (state.traditionTree[name] || {}).color || "#8a8a8a";
+        return `<path d="${d}" class="atlas-region" fill="${escapeHtml(c)}" stroke="${escapeHtml(c)}"/>`;
+    }).join("");
+    const dots = placed.map((p, i) => {
+        const attrs = p.item.books.length
+            ? `fill="${escapeHtml(p.item.color)}"`
+            : `fill="none" stroke="${escapeHtml(p.item.color)}" opacity="0.6"`;  // known, no texts yet
+        return `<circle cx="${p.cx.toFixed(2)}" cy="${p.cy.toFixed(2)}" r="1.7" ${attrs} class="atlas-dot" data-i="${i}"/>`;
+    }).join("");
+    return `<svg class="atlas-svg">${ocean}${land}${regions}${dots}</svg>`;
 }
 
-function renderMarkers(map, traditions) {
-    const bounds = [];
-    const markers = new Map();
-    const groups = buildCoordinateGroups(traditions);
+// Initial viewBox: the dots' bounding box (padded, clamped to the 0..360 / 0..180 canvas).
+function fitViewBox(placed) {
+    if (!placed.length) return { x: 0, y: 0, w: 360, h: 180 };
+    let minX = 360, minY = 180, maxX = 0, maxY = 0;
+    placed.forEach((p) => {
+        minX = Math.min(minX, p.cx); maxX = Math.max(maxX, p.cx);
+        minY = Math.min(minY, p.cy); maxY = Math.max(maxY, p.cy);
+    });
+    const padX = (maxX - minX) * 0.06 + 6, padY = (maxY - minY) * 0.06 + 6;
+    minX = Math.max(0, minX - padX); minY = Math.max(0, minY - padY);
+    maxX = Math.min(360, maxX + padX); maxY = Math.min(180, maxY + padY);
+    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+}
 
-    // Grace period before a hover-opened popup closes, so the pointer can travel
-    // from the marker into the popup to click a book link without it vanishing.
+function initAtlas(container, traditions) {
+    if (!container) return;
+    const placed = placeDots(traditions);
+    container.innerHTML = buildSvgMarkup(placed);
+    const svg = container.querySelector(".atlas-svg");
+
+    const view = { ...fitViewBox(placed) };
+    const maxW = view.w, maxH = view.h;             // fit view is the zoom-out floor (no zooming past it)
+    const minW = maxW / 8;
+    const apply = () => svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+    const pxScale = () => {
+        const r = svg.getBoundingClientRect();
+        return Math.min(r.width / view.w, r.height / view.h);  // preserveAspectRatio="meet"
+    };
+    const clamp = () => {
+        view.w = Math.min(maxW, view.w); view.h = Math.min(maxH, view.h);
+        view.x = Math.max(0, Math.min(360 - view.w, view.x));
+        view.y = Math.max(0, Math.min(180 - view.h, view.y));
+    };
+    apply();
+
+    let dragging = false, lastX = 0, lastY = 0, moved = false;
+
+    svg.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const r = svg.getBoundingClientRect();
+        const s = pxScale();
+        const offX = (r.width - view.w * s) / 2, offY = (r.height - view.h * s) / 2;
+        const cx = view.x + (e.clientX - r.left - offX) / s;   // canvas point under cursor (held fixed)
+        const cy = view.y + (e.clientY - r.top - offY) / s;
+        const factor = e.deltaY < 0 ? 0.85 : 1 / 0.85;
+        const nw = Math.min(maxW, Math.max(minW, view.w * factor));
+        const nh = nw * (view.h / view.w);
+        view.x = cx - (cx - view.x) * (nw / view.w);
+        view.y = cy - (cy - view.y) * (nh / view.h);
+        view.w = nw; view.h = nh;
+        clamp(); apply();
+    }, { passive: false });
+
+    svg.addEventListener("pointerdown", (e) => {
+        dragging = true; moved = false; lastX = e.clientX; lastY = e.clientY;
+        svg.setPointerCapture(e.pointerId); svg.classList.add("dragging");
+    });
+    svg.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        const s = pxScale();
+        view.x -= (e.clientX - lastX) / s;
+        view.y -= (e.clientY - lastY) / s;
+        lastX = e.clientX; lastY = e.clientY; moved = true;
+        clamp(); apply();
+    });
+    const endDrag = (e) => {
+        dragging = false; svg.classList.remove("dragging");
+        try { svg.releasePointerCapture(e.pointerId); } catch { /* not captured */ }
+    };
+    svg.addEventListener("pointerup", endDrag);
+    svg.addEventListener("pointercancel", endDrag);
+
+    // --- hover tooltip (name + region + description + books; book links stay clickable) ---
+    const tip = document.createElement("div");
+    tip.className = "geo-tip";
+    tip.style.display = "none";
+    container.appendChild(tip);
     let closeTimer = null;
-    const cancelClose = () => {
-        if (closeTimer) {
-            clearTimeout(closeTimer);
-            closeTimer = null;
-        }
-    };
-    const scheduleClose = (marker) => {
+    const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
+    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(() => { tip.style.display = "none"; }, 200); };
+    const showTip = (circle) => {
+        if (dragging || moved) return;
+        const item = placed[Number(circle.dataset.i)] && placed[Number(circle.dataset.i)].item;
+        if (!item) return;
         cancelClose();
-        closeTimer = setTimeout(() => marker.closePopup(), 200);
+        tip.innerHTML = buildPopupHtml(item);
+        tip.style.display = "block";
+        const cr = circle.getBoundingClientRect(), fr = container.getBoundingClientRect();
+        const anchorX = cr.left - fr.left + cr.width / 2, anchorY = cr.top - fr.top;
+        const tr = tip.getBoundingClientRect();
+        tip.style.left = Math.max(4, Math.min(fr.width - tr.width - 4, anchorX - tr.width / 2)) + "px";
+        tip.style.top = Math.max(4, anchorY - tr.height - 8) + "px";
     };
-
-    groups.forEach((group) => {
-        group.forEach((item, index) => {
-            const position = getOffsetCoordinate(item, index, group.length);
-
-            const marker = L.marker(position, {
-                icon: createMarkerIcon(item),
-                keyboard: true,
-            })
-                .addTo(map)
-                .bindPopup(buildPopupHtml(item), {
-                    className: "tradition-popup",
-                    closeButton: false,
-                    maxWidth: 340,
-                });
-
-            marker.on("mouseover", () => {
-                cancelClose();
-                marker.openPopup();
-            });
-            marker.on("mouseout", () => scheduleClose(marker));
-
-            // Keep the popup alive while the pointer is over it (so its book links
-            // stay clickable), and close it once the pointer leaves the popup.
-            marker.on("popupopen", (event) => {
-                const el = event.popup.getElement();
-                if (!el) return;
-                el.addEventListener("mouseenter", cancelClose);
-                el.addEventListener("mouseleave", () => scheduleClose(marker));
-            });
-
-            markers.set(item.name, marker);
-            bounds.push(position);
-        });
+    svg.addEventListener("mouseover", (e) => {
+        const c = e.target.closest(".atlas-dot");
+        if (c) showTip(c);
     });
-
-    return { bounds: bounds.length ? L.latLngBounds(bounds) : null, markers };
-}
-
-function initializeGeographyMap(traditions) {
-    // Real tile-covered world: ±180° longitude and the web-mercator latitude limit.
-    const worldBounds = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
-
-    // Start at 1 (whole world) so fitBounds can pick the right opening zoom; the
-    // floor is then pinned to that opening zoom below, so the map never zooms out
-    // past the start view. Zoom in goes to street level (7).
-    const map = L.map("geography-map", {
-        zoomControl: true,
-        minZoom: 1,
-        maxZoom: 7,
-        maxBounds: worldBounds,
-        maxBoundsViscosity: 0.5,
+    svg.addEventListener("mouseout", (e) => {
+        if (e.target.closest(".atlas-dot")) scheduleClose();
     });
+    tip.addEventListener("mouseenter", cancelClose);
+    tip.addEventListener("mouseleave", scheduleClose);
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        noWrap: true,
-        bounds: worldBounds,
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-    }).addTo(map);
-
-    // Canon regions (mockup 62) as a translucent overlay; non-interactive so it never
-    // intercepts the tradition markers' hover/click or the map's pan.
-    L.geoJSON(REGIONS_GEOJSON, {
-        interactive: false,
-        style: (f) => ({
-            color: f.properties.color, weight: 1, opacity: 0.55,
-            fillColor: f.properties.color, fillOpacity: 0.35,
-        }),
-    }).addTo(map);
-
-    const { bounds: markerBounds, markers } = renderMarkers(map, traditions);
-
-    // The map fills its grid cell via CSS; make sure Leaflet reads that height.
-    map.invalidateSize();
-
-    if (markerBounds) {
-        // Start with every marker in view.
-        map.fitBounds(markerBounds, { padding: [30, 30], animate: false });
-    } else {
-        map.setView([20, 15], 1);
-    }
-
-    // Pin the minimum zoom to the opening view so the user can zoom in but never
-    // back out past the initial all-markers frame.
-    map.setMinZoom(map.getZoom());
-
-    const onResize = () => map.invalidateSize();
-    window.addEventListener("resize", onResize);
-    onCleanup(() => {
-        window.removeEventListener("resize", onResize);
-        map.remove();
-    });
-
-    return { map, markers };
+    onCleanup(() => { cancelClose(); tip.remove(); });
 }
 
 function showGeographyError(message) {

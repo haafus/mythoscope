@@ -672,50 +672,47 @@ body.has-main-navbar {
 }
 
 .geography-page #geography-map {
+    position: relative;
     width: 100%;
     height: 100%;
 }
 
-/* Letterbox behind the tiles matches the Positron ocean, so there's no seam. */
-.geography-page .leaflet-container {
-    background: #d4dadc;
-}
-
-.geography-page .map-point {
+.atlas-svg {
     display: block;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    background: var(--point-color, var(--category-none));
-    box-shadow: 0 2px 9px rgba(15, 23, 42, 0.28);
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: grab;
+}
+.atlas-svg.dragging { cursor: grabbing; }
+
+.atlas-ocean { fill: #eef3f4; }
+.atlas-land { fill: #e6ebe3; stroke: #c2ccbe; stroke-width: 0.5; }
+.atlas-region { fill-opacity: 0.30; stroke-opacity: 0.5; stroke-width: 0.5; pointer-events: none; }
+
+.atlas-dot {
+    stroke: #fff;
+    stroke-width: 0.4;
     cursor: pointer;
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    transition: r 0.12s ease;
 }
+.atlas-dot:hover { stroke-width: 0.7; }
 
-.geography-page .map-point:hover,
-.geography-page .leaflet-marker-icon:focus-within .map-point {
-    transform: scale(1.25);
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.34);
-}
-
-/* Traditions known from traditions.json but with no texts in the corpus yet:
-   shown as hollow, faded markers so they read as "known, not ingested". */
-.geography-page .map-point.empty {
-    background: transparent;
-    border-color: var(--point-color, #94a3b8);
-    box-shadow: none;
-    opacity: 0.55;
-}
-
-.tradition-popup .leaflet-popup-content-wrapper {
+/* Hover tooltip: custom card anchored above the dot; keeps pointer events so book links click. */
+.geo-tip {
+    position: absolute;
+    z-index: 500;
+    width: min(320px, 72vw);
+    padding: 14px 16px;
+    background: #fff;
     border-radius: 8px;
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
 }
 
-.tradition-popup .leaflet-popup-content {
-    width: min(320px, 72vw);
-    margin: 16px;
+.popup-region {
+    margin: -4px 0 8px 24px;
+    color: var(--muted);
+    font-size: 12px;
 }
 
 .popup-title {
