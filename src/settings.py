@@ -41,9 +41,11 @@ class GraphsSettings(BaseModel):
     use_json_mode: bool = True
     chunk_size: int = 50000
     chunk_overlap: int = 1000
-    # Only bounds in-flight chunks; the rate limiter is the real throttle. 18 keeps
-    # a typical gpt-4o-mini run near its TPM ceiling.
-    max_concurrent: int = 18
+    # Only bounds in-flight chunks; the rate limiter is the real throttle. For a 200k-TPM
+    # tier the ~13k-token calls make TPM the bind (~15 fit/min), so 8 keeps the pipe full
+    # without a crowd of threads idle-waiting in acquire(). Raise it for providers with no
+    # TPM limit, where in-flight concurrency is the only throttle.
+    max_concurrent: int = 8
     max_entities: int | None = 50  # most-mentioned kept per graph; None = keep all
 
 
