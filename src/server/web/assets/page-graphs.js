@@ -189,15 +189,18 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        // Optimize within `boundingBox` (the visible frame) so the graph settles already framed
-        // and centred; fit:false keeps the viewport put — no end-of-layout snap and no separate
-        // drive. randomize:true spreads nodes first so they relax INTO place, visibly, instead of
-        // exploding out of a clump.
+        // Compute the whole layout — boundingBox scaling included — headless, THEN glide nodes to
+        // those already-framed positions (animate:"end"). With animate:true cose animates through
+        // the raw simulation and only applies the boundingBox on the final refresh, so every node
+        // repositions on the last frame; doing the box transform before the animation removes that
+        // jump. boundingBox = the visible frame → settles centred; fit:false keeps the viewport put
+        // (no snap, no drive). randomize seeds the headless sim off a degenerate all-at-origin start.
         layout: {
             name: "cose",
             idealEdgeLength: 5, spacingFactor: 5,
             nodeRepulsion: 40000, gravity: 0.0005, numIter: 10000,
-            animate: true, randomize: true, fit: false, boundingBox,
+            animate: "end", animationDuration: 800, animationEasing: "ease-out",
+            randomize: true, fit: false, boundingBox,
         },
         wheelSensitivity: 0.5,
     });
