@@ -20,8 +20,6 @@ router = APIRouter(prefix="/api/similarity", tags=["similarity"])
 
 
 def _text_search_available() -> bool:
-    """True if text-query search is enabled (settings flag) AND its embedding stack is installed
-    (absent in the viewer build). The flag lets you turn it — and the heavy warmup — off."""
     from settings import settings
 
     return settings.server.text_search and all(
@@ -73,7 +71,7 @@ def warmup(request: WarmupRequest) -> dict:
     outcome. Mirrors search()'s ImportError -> 503 so the viewer build (no
     embedding deps) responds cleanly instead of 500.
     """
-    if not _text_search_available():  # flag off (or deps absent) — don't pay the heavy load
+    if not _text_search_available():
         return {"status": "skipped", "model": request.model}
     _require_collection(request.model)
     try:
