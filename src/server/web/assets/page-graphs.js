@@ -123,9 +123,17 @@ function renderCytoscapeGraph(container, data, graphType) {
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
 
-    // Hide until the layout finishes so the first painted frame is the settled graph, not the
-    // pre-layout origin clump. visibility (not display:none) keeps the box measurable for fit.
-    container.style.visibility = "hidden";
+    // fcose when the extension loaded, else built-in cose. Runs in the constructor with its own
+    // visible animation.
+    const FCOSE_OPTS = {
+        name: "fcose", quality: "proof", animate: true, animationDuration: 600, randomize: true,
+        idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25, numIter: 2500,
+    };
+    const COSE_OPTS = {
+        name: "cose", animate: true, randomize: true,
+        idealEdgeLength: 5, spacingFactor: 1.5, nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
+    };
+    const fcoseReady = typeof cytoscape === "function" && !!cytoscape("layout", "fcose");
 
     graphCy = cytoscape({
         container,
@@ -181,30 +189,11 @@ function renderCytoscapeGraph(container, data, graphType) {
                 style: {opacity: 0.1},
             },
         ],
-        layout: {name: "preset"},  // real layout runs below, gated on reveal
+        layout: fcoseReady ? FCOSE_OPTS : COSE_OPTS,
         wheelSensitivity: 0.5,
     });
 
     const cy = graphCy;
-
-    // fcose when the extension loaded, else built-in cose. Both: animate/fit false — no motion.
-    const FCOSE_OPTS = {
-        name: "fcose", quality: "proof", animate: false, randomize: true, fit: false,
-        idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25, numIter: 2500,
-    };
-    const COSE_OPTS = {
-        name: "cose", animate: false, randomize: true, fit: false,
-        idealEdgeLength: 5, spacingFactor: 1.5, nodeRepulsion: 12000, gravity: 0.1, numIter: 10000,
-    };
-    const fcoseReady = typeof cytoscape === "function" && !!cytoscape("layout", "fcose");
-    const layout = cy.layout(fcoseReady ? FCOSE_OPTS : COSE_OPTS);
-    const reveal = () => {
-        cy.fit(cy.elements(), 40);  // instant, no animation
-        container.style.visibility = "visible";
-    };
-    layout.one("layoutstop", reveal);
-    setTimeout(reveal, 4000);  // safety: never leave the canvas hidden if layoutstop is missed
-    layout.run();
 
     let hoveredNode = null;
     let pinnedNode = null;  // click-pinned selection; survives mouseout until the next click
