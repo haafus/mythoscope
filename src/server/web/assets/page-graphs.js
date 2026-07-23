@@ -83,6 +83,10 @@ export async function renderGraphPage(graphType) {
 
     onCleanup(destroyGraph);
 
+    const onResize = () => { if (graphCy) { graphCy.resize(); graphCy.fit(graphCy.elements(), 40); } };
+    window.addEventListener("resize", onResize);
+    onCleanup(() => window.removeEventListener("resize", onResize));
+
     const bookList = document.getElementById("graphBookList");
     bookList.addEventListener("book-select", (e) => {
         setActiveBook(bookList, e.detail.doc);
