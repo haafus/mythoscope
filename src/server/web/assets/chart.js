@@ -95,7 +95,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
         displaylogo: false,
         displayModeBar: true,
         scrollZoom: true,
-        modeBarButtonsToRemove: ["zoom2d", "resetScale2d"],
+        modeBarButtonsToRemove: ["zoom2d", "autoScale2d"],
     });
     el.dataset.plotly = "1";
     bindTooltip(el);
