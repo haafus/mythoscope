@@ -1214,6 +1214,10 @@ def build_atu(config: dict, *, force: bool = False) -> tuple[dict, dict]:
         "culture_legend": atu_regions.build_legend(atu),
         "aliases": aliases,          # {old ATU number: current type id} — redirects
         "types": atu,
+        # Persist the tale-type -> ordered TMI-code map into the index so a future crosswalk
+        # stage can re-derive the ATU<->TMI walk from atu.json alone (motifs.derive); the
+        # monolith still uses the separate `seq` return below.
+        "atu_seq": seq,
     }, seq
 
 

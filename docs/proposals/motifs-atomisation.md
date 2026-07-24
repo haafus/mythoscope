@@ -55,17 +55,28 @@ separate return of `trilogy.build_atu`, consumed only by `crosswalk.build`).
 
 So the concrete tasks:
 
-1. **Persist `atu_seq`** into `atu.json` (or an `atu` sidecar).
-2. **`load_indexes() → derived`** — a helper that re-projects the eight structures above from
-   the stored JSONs, so `crosswalk`/`parallels` stages read from disk instead of in-memory.
-3. **Partition the raw cache by source** for the per-source fps (each source knows its own
+1. **Persist `atu_seq`** into `atu.json`. ✅ **DONE** — `sources.trilogy.build_atu` now embeds
+   `atu_seq` in the returned index (still returns it separately for the monolith). It appears in
+   `atu.json` on the next rebuild; older indexes read `{}` until then.
+2. **`load_indexes() → derived`** — re-project the structures crosswalk/parallels need from the
+   stored JSONs. ✅ **DONE** — `motifs.derive` (`derived_from_indexes` / `load_indexes`),
+   validated **deep-equal** to the monolith's inline derivation on the real indexes. Not yet
+   wired into `build_motifs` (that happens with the split, so it can be rebuild-validated).
+3. **Persist enrichment summaries** per source (skip status + counts) so the `meta` stage can
+   aggregate them and the degradation guard's `trusted`/`fetch_outcomes` survive the split —
+   today they live only in `meta.json`, written by the monolith. *(Deferred to the split: it
+   changes each source's output format, so it needs a rebuild to validate.)*
+4. **Partition the raw cache by source** for the per-source fps (each source knows its own
    file patterns under `outputs/motifs/raw/`).
-4. **`meta` as a final aggregator stage** — reads each stage's output for counts + the
+5. **`meta` as a final aggregator stage** — reads each stage's output for counts + the
    degradation guard (which already reads the prior meta from disk — `store.load_meta()` — so
    the "read past state from disk" shape fits).
-5. Retire the monolith `build_motifs` (and the coarse `motifs_fingerprint` gate) once the
+6. Retire the monolith `build_motifs` (and the coarse `motifs_fingerprint` gate) once the
    per-stage fps subsume it; the `MotifsStage` adapter is replaced by the stages above and the
    driver wiring in `build_pipeline()` does not otherwise change.
+
+**Prep done now (validatable without a raw cache):** tasks 1 + 2. **Remaining (need the raw
+cache to rebuild + golden-diff):** 3–6.
 
 ## Validation
 
