@@ -2076,3 +2076,10 @@ a.csbar-lab.chart-link:hover { color: var(--sec-link-strong, #0f6a60); text-deco
 }
 
 .motif-empty { color: var(--muted-soft); }
+
+/* Plotly sets `cursor: move` inline on the drag layer in pan mode; force the
+   crosshair. Heatmap/distribution stay in zoom mode where it is already a
+   crosshair, so this is a no-op for them. */
+#scatter-plot .nsewdrag {
+    cursor: crosshair !important;
+}
