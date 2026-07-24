@@ -126,11 +126,10 @@ function showRegionInfo(region) {
 function showTraditionInfo(tradition, region) {
     const info = ((state.traditionTree || {})[region] || {}).traditions?.[tradition];
     if (!info) return;
-    const coords = Array.isArray(info.coordinates) ? info.coordinates.join(", ") : "";
-    const fields = facetField("Region", region)
-        + facetField("Description", info.description)
-        + facetField("Dating", info.dating)
-        + facetField("Coordinates", coords);
+    const lead = info.description ? `<div class="facet-lead">${escapeHtml(info.description)}</div>` : "";
+    const fields = lead
+        + facetField("Region", region)
+        + facetField("Dating", info.dating);
     renderFacetInfo(traditionColor(tradition), "Tradition", tradition, fields);
 }
 

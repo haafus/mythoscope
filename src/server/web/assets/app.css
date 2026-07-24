@@ -592,6 +592,7 @@ body.has-main-navbar {
     line-height: 1.2;
 }
 .corpus-page .facet-title .info-dot { flex: none; width: 13px; height: 13px; }
+.corpus-page .facet-lead { margin-bottom: 16px; color: #374151; }
 .corpus-page .facet-field { margin-bottom: 16px; }
 .corpus-page .facet-field-label {
     margin-bottom: 3px;
