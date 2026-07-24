@@ -222,6 +222,7 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
             return mid, None
 
     nodes: dict[str, dict] = {}
+    logger.info("mapsofmyths: parsing %d motif node pages...", len(targets))
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for mid, rec in pool.map(one, targets):
             if rec:

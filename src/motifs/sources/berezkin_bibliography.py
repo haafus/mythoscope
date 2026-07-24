@@ -298,6 +298,7 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
         return m["id"], parse_attestations(html, area_index)
 
     workers = max(1, settings.motifs.max_workers)
+    logger.info("Berezkin bibliography: parsing %d cached detail pages for citations...", len(motifs))
     with ThreadPoolExecutor(max_workers=workers) as pool:
         parsed = list(pool.map(parse_one, motifs))
 
