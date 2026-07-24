@@ -148,6 +148,7 @@ function renderCytoscapeGraph(container, data, graphType) {
 
     const nodes = (data.nodes || []).map((node) => ({data: node}));
     const edges = (data.edges || []).map((edge) => ({data: edge}));
+    const edgeLabels = graphType === "beings";  // ages/realms edges are all the same relation — no label
 
     graphCy = cytoscape({
         container,
@@ -177,7 +178,7 @@ function renderCytoscapeGraph(container, data, graphType) {
                     "target-arrow-shape": "triangle",
                     "arrow-scale": 0.1,
                     "curve-style": "bezier",
-                    label: "data(relation)",
+                    label: edgeLabels ? "data(relation)" : "",
                     "font-size": "1.5px",
                     "text-rotation": "autorotate",
                     "text-margin-y": -1,
