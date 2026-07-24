@@ -157,7 +157,12 @@ def _load_existing_metadata() -> dict[str, dict]:
         return {}
 
 
-def build_corpus(force: bool = False, max_texts: int | None = None):
+def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set[str] | None = None):
+    """Build the corpus catalog + .txt tree.
+
+    ``rebuild`` (a set of document_ids) forces exactly those documents to be re-derived while
+    every other present document is reused untouched — the key-scoped entry the stage driver
+    calls as ``CorpusStage.build(keys)``. ``force`` re-derives everything (ignores the cache)."""
     ensure_dir(settings.corpus_dir)
 
     download_list = load_download_list()
@@ -194,6 +199,10 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
             reuse = file_source_unchanged(url, raw_cache, settings.sources_dir)
         else:
             reuse = output_present
+
+        # Key-scoped rebuild: the driver names exactly the stale/missing document_ids.
+        if rebuild is not None and document_id(url) in rebuild:
+            reuse = False
 
         if reuse:
             # Populate-once: an older catalog row predates document_id — backfill it (the
