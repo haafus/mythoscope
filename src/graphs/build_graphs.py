@@ -52,12 +52,12 @@ def _extract_chunks(
     )
 
 
-def _graph_fingerprint(file_info, prompts: dict, graphs_cfg) -> str:
+def _graph_fingerprint(doc_fp: str, prompts: dict, graphs_cfg) -> str:
     """Canonical per-document graph fp: the doc content fingerprint folded with everything that
     changes the generated graphs — the extraction prompts, the LLM, the keep limit and chunking.
     A book whose .fp matches (and whose three JSONs exist) needs no regeneration."""
     parts = [
-        file_info.content_fingerprint(),
+        doc_fp,
         str(graphs_cfg.llm),
         str(graphs_cfg.max_entities),
         str(graphs_cfg.chunk_size),
@@ -73,6 +73,7 @@ def _graph_fingerprint(file_info, prompts: dict, graphs_cfg) -> str:
 def build_graphs(
     force: bool = False,
     max_texts: int | None = None,
+    rebuild: set[str] | None = None,
 ) -> None:
     """Extract entities and (re)build graphs from the cached extraction.
 
@@ -81,6 +82,8 @@ def build_graphs(
     chunks not yet in ``extraction_cache.jsonl`` (and is constructed lazily, so a
     rebuild from a complete cache needs no API key), then the graphs are regenerated.
     ``force`` clears each book's cache first, forcing a full re-extraction.
+    ``rebuild`` (a set of document_ids) regenerates exactly those books (bypassing the
+    ``.fp`` skip, reusing the cache) — the key-scoped entry ``GraphsStage.build`` calls.
     """
     prompts_path = settings.config_dir / "prompts.json"
     try:
@@ -109,10 +112,11 @@ def build_graphs(
 
         # Skip a book whose inputs/params are unchanged and whose graphs are all present —
         # the extraction cache already spares the LLM; this spares the CPU regeneration too.
-        fp = _graph_fingerprint(file_info, prompts, graphs_cfg)
+        fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
         fp_path = book_out_dir / ".fp"
         outputs = [book_out_dir / f"{name}.json" for name in ("beings", "realms", "ages")]
-        if (not force and fp_path.exists()
+        scoped_out = rebuild is not None and file_info.document_id in rebuild
+        if (not force and not scoped_out and fp_path.exists()
                 and fp_path.read_text(encoding="utf-8").strip() == fp
                 and all(o.exists() for o in outputs)):
             logger.info(f"--- {text_id}: up to date, skipping ---")
