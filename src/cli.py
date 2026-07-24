@@ -165,7 +165,9 @@ def _build_embeddings(model: str | None, force: bool = False):
 
 
 def _build_projections(model: str | None, force: bool = False):
-    logger.info("Loading ML libraries (umap, chromadb)...")  # projections use no torch
+    # umap is imported lazily, only when a projection is actually regenerated, so an
+    # up-to-date run never loads it; this import pulls only chromadb (to read the collections).
+    logger.info("Loading chromadb...")
     from projections.build_projections import build_projections
 
     build_projections(model_name=model, force=force)
