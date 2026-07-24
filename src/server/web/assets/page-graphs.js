@@ -270,7 +270,7 @@ function renderCytoscapeGraph(container, data, graphType) {
         const edge = evt.target;
         const sName = cy.getElementById(edge.data("source")).data("display_name") || edge.data("source");
         const tName = cy.getElementById(edge.data("target")).data("display_name") || edge.data("target");
-        tooltipDiv.innerHTML = `${escapeHtml(sName)} &rarr; ${escapeHtml(tName)}<br><strong>${escapeHtml(edge.data("relation") || "")}</strong>`;
+        tooltipDiv.innerHTML = `${escapeHtml(sName)}<br><strong>${escapeHtml(edge.data("relation") || "")}</strong><br>${escapeHtml(tName)}`;
         tooltipDiv.style.left = (evt.originalEvent.clientX - cachedRect.left + 10) + "px";
         tooltipDiv.style.top = (evt.originalEvent.clientY - cachedRect.top + 10) + "px";
         tooltipDiv.style.display = "block";
