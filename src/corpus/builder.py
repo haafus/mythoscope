@@ -13,6 +13,7 @@ from settings import settings
 from .clean_gutenberg import clean_gutenberg_in_builder, trim_to_content
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
+from .fingerprint import source_fingerprint
 from .locator import corpus_raw_path, document_id
 from .sources import (
     WEB_SCHEMES,
@@ -60,7 +61,7 @@ def _finalize_text(
     return data_utf8, stats
 
 
-def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
+def _build_metadata(item: dict, *, path: str, stats: dict, source_fp: str) -> dict:
     return {
         **item,
         # Stable identity (D1): blake2b of the normalized locator — rename-/edit-stable,
@@ -68,6 +69,9 @@ def _build_metadata(item: dict, *, path: str, stats: dict) -> dict:
         "document_id": document_id(item["url"]),
         "date_downloaded": datetime.now(timezone.utc).isoformat(),
         "path": path,
+        # Input fingerprint (pipeline §2.3): the stage's OWN offline staleness key
+        # (raw + trim + clean_version), distinct from the output `fingerprint` in stats.
+        "source_fp": source_fp,
         **stats,
     }
 
@@ -130,7 +134,8 @@ def _download_and_process(item: dict, region: str) -> dict | None:
             filename.write_bytes(data_utf8)
 
         rel_path = str(filename.resolve().relative_to(Path(settings.corpus_dir).resolve()))
-        meta = _build_metadata(item, path=rel_path, stats=stats)
+        source_fp = source_fingerprint(data, item.get("content_start"), item.get("content_end"))
+        meta = _build_metadata(item, path=rel_path, stats=stats, source_fp=source_fp)
         logger.info(f"Saved successfully: {filename.name} (words: {stats['word_count']})")
         return meta
 
@@ -194,6 +199,14 @@ def build_corpus(force: bool = False, max_texts: int | None = None):
             # Populate-once: an older catalog row predates document_id — backfill it (the
             # locator rule is deterministic, so this equals what a rebuild would mint).
             prev.setdefault("document_id", document_id(url))
+            # One-off fp-init: rows built before source_fp existed get it from the pinned
+            # raw + config (no re-fetch, no re-clean) so the stage becomes offline-stale-aware.
+            if "source_fp" not in prev:
+                raw_cache = corpus_raw_path(Path(settings.corpus_dir) / "raw", url)
+                if raw_cache.exists():
+                    prev["source_fp"] = source_fingerprint(
+                        raw_cache.read_bytes(), item.get("content_start"), item.get("content_end")
+                    )
             metadata.append(prev)
             logger.debug(f"{title}: already in corpus, skipping")
         else:

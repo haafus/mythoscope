@@ -91,15 +91,17 @@ def _hash_file(path: Path) -> str:
 
 # The corpus catalog carries `date_downloaded` (a fetch-time wall-clock stamp — not
 # reproducible from the pinned raw) and rows in ThreadPool-completion order (unstable).
-# Hash only its reproducible content: rows sorted by document_id, the timestamp dropped.
-# The `.txt` bodies, the per-row `fingerprint`, path, and counts stay fully guarded.
+# It also carries `source_fp`, the stage's input-fingerprint sidecar (a one-off fp-init).
+# Hash only its reproducible *content*: rows sorted by document_id, those fields dropped.
+# The `.txt` bodies, the per-row output `fingerprint`, path, and counts stay fully guarded.
 _CORPUS_CATALOG = (ROOT / settings.corpus_dir / "corpus.json").resolve()
+_CATALOG_DROP = ("date_downloaded", "source_fp")
 
 
 def _hash_corpus_catalog(path: Path) -> str:
     rows = json.loads(path.read_text(encoding="utf-8"))
     norm = sorted(
-        ({k: v for k, v in r.items() if k != "date_downloaded"} for r in rows),
+        ({k: v for k, v in r.items() if k not in _CATALOG_DROP} for r in rows),
         key=lambda r: r.get("document_id", ""),
     )
     payload = json.dumps(norm, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
