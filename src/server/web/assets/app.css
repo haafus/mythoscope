@@ -1285,8 +1285,8 @@ body.has-main-navbar {
 }
 
 .graph-info-panel table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-.graph-info-panel th, .graph-info-panel td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
-.graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; }
+.graph-info-panel th, .graph-info-panel td { text-align: left; padding: 6px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+.graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; padding-right: 8px; }
 .graph-info-panel td { color: #2c3e50; width: 65%; }
 .graph-info-panel h3 { margin: 0 0 10px 0; color: #5e4b8b; }
 
