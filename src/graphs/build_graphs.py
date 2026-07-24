@@ -4,6 +4,7 @@ from itertools import islice
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from corpus.iterator import iter_files
+from corpus.utils import content_fingerprint
 from embeddings.chunking import chunk_text
 from llm import LLMProcessor, map_concurrent
 from settings import settings
@@ -51,16 +52,35 @@ def _extract_chunks(
     )
 
 
+def _graph_fingerprint(file_info, prompts: dict, graphs_cfg) -> str:
+    """Canonical per-document graph fp: the doc content fingerprint folded with everything that
+    changes the generated graphs — the extraction prompts, the LLM, the keep limit and chunking.
+    A book whose .fp matches (and whose three JSONs exist) needs no regeneration."""
+    parts = [
+        file_info.content_fingerprint(),
+        str(graphs_cfg.llm),
+        str(graphs_cfg.max_entities),
+        str(graphs_cfg.chunk_size),
+        str(graphs_cfg.chunk_overlap),
+        prompts.get("beings", ""),
+        prompts.get("relations", ""),
+        prompts.get("locations", ""),
+        prompts.get("time", ""),
+    ]
+    return content_fingerprint("\x00".join(parts).encode("utf-8"))
+
+
 def build_graphs(
     force: bool = False,
     max_texts: int | None = None,
 ) -> None:
     """Extract entities and (re)build graphs from the cached extraction.
 
-    Every run rebuilds all graphs from ``extraction_cache.jsonl``; the LLM is
-    only invoked for chunks that aren't cached yet (and is constructed lazily, so
-    rebuilding from a complete cache needs no API key). ``force`` clears each
-    book's cache first, forcing a full re-extraction.
+    A book is skipped when its ``.fp`` (doc fingerprint + prompts + LLM + limits)
+    matches and its three graphs are present. Otherwise the LLM is invoked only for
+    chunks not yet in ``extraction_cache.jsonl`` (and is constructed lazily, so a
+    rebuild from a complete cache needs no API key), then the graphs are regenerated.
+    ``force`` clears each book's cache first, forcing a full re-extraction.
     """
     prompts_path = settings.config_dir / "prompts.json"
     try:
@@ -86,6 +106,17 @@ def build_graphs(
         # rename, so a rename never orphans a graph dir (unify build/serve, data-model §5 step 6).
         book_out_dir = graph_dir(file_info.document_id)
         book_out_dir.mkdir(parents=True, exist_ok=True)
+
+        # Skip a book whose inputs/params are unchanged and whose graphs are all present —
+        # the extraction cache already spares the LLM; this spares the CPU regeneration too.
+        fp = _graph_fingerprint(file_info, prompts, graphs_cfg)
+        fp_path = book_out_dir / ".fp"
+        outputs = [book_out_dir / f"{name}.json" for name in ("beings", "realms", "ages")]
+        if (not force and fp_path.exists()
+                and fp_path.read_text(encoding="utf-8").strip() == fp
+                and all(o.exists() for o in outputs)):
+            logger.info(f"--- {text_id}: up to date, skipping ---")
+            continue
 
         text = file_info.read_text()
 
@@ -176,7 +207,8 @@ def build_graphs(
             generate_beings_graph(all_beings, all_relations, book_out_dir, keep=keep_beings)
             generate_realms_graph(all_locations, book_out_dir, keep=keep_realms)
             generate_ages_graph(top_times, book_out_dir)
-
+            if not missing:  # stamp the fp only on a complete build so a partial one retries
+                fp_path.write_text(fp, encoding="utf-8")
         except Exception:
             logger.exception("Error generating graph for %s", text_id)
 
