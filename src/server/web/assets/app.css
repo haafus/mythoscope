@@ -759,8 +759,8 @@ body.has-main-navbar {
     pointer-events: none;
 }
 .geo-tip.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.geo-tip .popup-title { color: #fff; font-size: 15px; margin-bottom: 4px; gap: 8px; }
-.geo-tip .popup-region { margin: 0 0 8px; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
+.geo-tip .popup-title { color: #fff; font-size: 15px; margin-bottom: 12px; gap: 8px; align-items: baseline; }
+.geo-tip .popup-region { margin: 0; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
 .geo-tip .popup-description { color: rgba(255, 255, 255, 0.82); font-size: 12.5px; }
 .geo-tip .popup-book-link { color: #e0b877; }
 .geo-tip .popup-book-link:hover { text-decoration: underline; }
