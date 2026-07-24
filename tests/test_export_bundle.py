@@ -1,4 +1,3 @@
-import json
 import zipfile
 
 import pytest
@@ -114,17 +113,22 @@ class TestExport:
 
 
 class TestOrphanSummary:
-    def test_reports_orphan_corpus_text(self, tmp_path, monkeypatch):
-        from settings import settings
+    """orphan_summary formats the driver's dry-run reap (a document removed from config, a
+    dropped model's store artifact). Disk strays are no longer a category — build self-prunes."""
 
-        corpus = tmp_path / "outputs" / "corpus"
-        corpus.mkdir(parents=True)
-        monkeypatch.setattr(settings, "corpus_dir", corpus)
-        # known text is listed in corpus.json; the other is an orphan
-        (corpus / "corpus.json").write_text(json.dumps([{"title": "Known", "path": "Known.txt"}]), encoding="utf-8")
-        (corpus / "Known.txt").write_text("k", encoding="utf-8")
-        (corpus / "Orphan.txt").write_text("o", encoding="utf-8")
+    def _stub(self, monkeypatch, level1, level2):
+        import pipeline
+        from pipeline.driver import CleanReport
+        monkeypatch.setattr(pipeline, "build_pipeline", lambda: [])
+        monkeypatch.setattr(pipeline, "clean", lambda stages, apply=False: CleanReport(level1=level1, level2=level2))
 
+    def test_reports_level1_and_level2(self, monkeypatch):
+        self._stub(monkeypatch, {"corpus": {"docX"}}, {"ChromaStore": {"dropped_model"}})
         lines = eb.orphan_summary()
-        assert any("Orphan.txt" in line for line in lines)
-        assert not any("Known.txt" in line for line in lines)
+        assert "corpus: orphan document docX" in lines
+        assert "ChromaStore: orphan artifact dropped_model" in lines
+
+    def test_scope_filters_to_family(self, monkeypatch):
+        self._stub(monkeypatch, {"corpus": {"docX"}, "graphs": {"docY"}}, {"ChromaStore": {"dropped_model"}})
+        lines = eb.orphan_summary(scope=("graphs",))
+        assert lines == ["graphs: orphan document docY"]  # corpus filtered out; L2 only when unscoped

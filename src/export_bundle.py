@@ -35,11 +35,14 @@ _CACHE_FILENAMES = {GRAPHS_CACHE, SUMMARIES_CACHE}
 _RAW_DIR_NAME = "raw"
 
 
-def _components() -> list[tuple[str, Path, str]]:
+def _components(scope=None) -> list[tuple[str, Path, str]]:
     """(archive name, source dir, archive root) for each exportable component, in
     order. Most live under ``outputs/``; local ``file:`` corpus sources live under
-    ``sources/`` and restore there, so they carry their own archive root."""
-    return [
+    ``sources/`` and restore there, so they carry their own archive root.
+
+    ``scope`` (stage names, e.g. ``graphs`` or ``embeddings:bge-m3``) keeps only the matching
+    components by family (the part before ``:``) — bundle just the named stage(s)."""
+    comps = [
         ("corpus", Path(settings.corpus_dir), "outputs/corpus"),
         ("embeddings", Path(settings.embeddings_dir), "outputs/embeddings"),
         ("projections", Path(settings.projections_dir), "outputs/projections"),
@@ -47,6 +50,10 @@ def _components() -> list[tuple[str, Path, str]]:
         ("motifs", Path(settings.motifs_dir), "outputs/motifs"),
         ("sources", Path(settings.sources_dir), "sources"),
     ]
+    if scope:
+        families = {s.split(":", 1)[0] for s in scope}
+        comps = [c for c in comps if c[0] in families]
+    return comps
 
 
 def _is_cache(component: str, rel: Path) -> bool:
@@ -74,10 +81,12 @@ def chromadb_version() -> str | None:
         return None
 
 
-def orphan_summary() -> list[str]:
+def orphan_summary(scope=None) -> list[str]:
     """Human-readable lines describing orphans that an export would carry along — the driver's
     dry-run reap (same categories as ``mytho clean``). Guarded so a missing optional dependency
-    (e.g. chromadb) or unreadable store never aborts the export."""
+    (e.g. chromadb) or unreadable store never aborts the export. ``scope`` restricts the
+    level-1 report to the named stage families (level-2 store orphans span stages, so they are
+    reported only for an unscoped export)."""
     try:
         from pipeline import build_pipeline
         from pipeline import clean as driver_clean
@@ -87,17 +96,21 @@ def orphan_summary() -> list[str]:
         logger.debug("orphan probe failed: %s", exc)
         return []
 
+    families = {s.split(":", 1)[0] for s in scope} if scope else None
     lines: list[str] = []
     for stage, keys in report.level1.items():
+        if families is not None and stage.split(":", 1)[0] not in families:
+            continue
         for key in sorted(keys):
             lines.append(f"{stage}: orphan document {key}")
-    for store, ids in report.level2.items():
-        for artifact_id in sorted(ids):
-            lines.append(f"{store}: orphan artifact {artifact_id}")
+    if families is None:
+        for store, ids in report.level2.items():
+            for artifact_id in sorted(ids):
+                lines.append(f"{store}: orphan artifact {artifact_id}")
     return lines
 
 
-def export_outputs(*, include_caches: bool = False, out_dir: Path | None = None, timestamp: str = "") -> ExportResult:
+def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | None = None, timestamp: str = "") -> ExportResult:
     """Zip the built outputs into ``mythoscope-<timestamp>.zip`` (``mythoscope-caches-<timestamp>.zip``
     when ``include_caches`` — the ``-caches`` tag marks a bundle that carries the raw/cache tiers).
 
@@ -112,7 +125,7 @@ def export_outputs(*, include_caches: bool = False, out_dir: Path | None = None,
 
     # Gather files first so we can skip writing an empty archive.
     plan: list[tuple[Path, str, int]] = []  # (file, arcname, size)
-    for name, src, arc_root in _components():
+    for name, src, arc_root in _components(scope):
         if not src.exists():
             continue
         comp_bytes = comp_files = 0

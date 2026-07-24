@@ -416,19 +416,22 @@ def _clean(scope, apply: bool, caches: bool):
 
 
 @mytho.command()
+@click.argument("scope", nargs=-1)
 @click.option("--caches", is_flag=True, help="Also include resumable caches (extraction/preprocessing/motif raw scrape).")
-def export(caches: bool):
-    """Bundle built outputs into a portable zip for another machine."""
+def export(scope, caches: bool):
+    """Bundle built outputs into a portable zip for another machine.
+
+    SCOPE (optional) bundles only the named stage(s)' outputs (e.g. ``graphs``, ``motifs``)."""
     from export_bundle import export_outputs, orphan_summary
 
     try:
-        orphans = orphan_summary()
+        orphans = orphan_summary(scope)
         if orphans:
             click.echo(click.style("[warn] orphans present and INCLUDED — run `mytho clean --apply` for a tidy bundle:", fg="yellow"))
             for line in orphans:
                 click.echo(f"  {line}")
 
-        result = export_outputs(include_caches=caches, timestamp=datetime.now().strftime("%Y%m%d-%H%M%S"))
+        result = export_outputs(scope=scope, include_caches=caches, timestamp=datetime.now().strftime("%Y%m%d-%H%M%S"))
     except Exception as e:
         _fail("Export", e)
 
