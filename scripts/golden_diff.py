@@ -89,6 +89,23 @@ def _hash_file(path: Path) -> str:
     return h.hexdigest()
 
 
+# The corpus catalog carries `date_downloaded` (a fetch-time wall-clock stamp — not
+# reproducible from the pinned raw) and rows in ThreadPool-completion order (unstable).
+# Hash only its reproducible content: rows sorted by document_id, the timestamp dropped.
+# The `.txt` bodies, the per-row `fingerprint`, path, and counts stay fully guarded.
+_CORPUS_CATALOG = (ROOT / settings.corpus_dir / "corpus.json").resolve()
+
+
+def _hash_corpus_catalog(path: Path) -> str:
+    rows = json.loads(path.read_text(encoding="utf-8"))
+    norm = sorted(
+        ({k: v for k, v in r.items() if k != "date_downloaded"} for r in rows),
+        key=lambda r: r.get("document_id", ""),
+    )
+    payload = json.dumps(norm, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def _iter_files(root: Path):
     for p in sorted(root.rglob("*")):
         if p.is_file() and not _SKIP_NAMES.intersection(p.parts) and p.name not in _SKIP_NAMES:
@@ -126,7 +143,8 @@ def build_manifest(out_path: Path) -> dict[str, str]:
         if not d.exists():
             continue
         for p in _iter_files(d):
-            manifest[str(p.relative_to(ROOT))] = _hash_file(p)
+            digest = _hash_corpus_catalog(p) if p.resolve() == _CORPUS_CATALOG else _hash_file(p)
+            manifest[str(p.relative_to(ROOT))] = digest
     manifest.update(_hash_chroma())
     if _under(out_path, ROOT):  # never hash the manifest into itself
         manifest.pop(str(out_path.resolve().relative_to(ROOT.resolve())), None)
