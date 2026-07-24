@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import click
 
 from log_setup import setup_logging
-from pipeline_inspect import format_size
+from pipeline.caches import format_size
 
 logger = logging.getLogger(__name__)
 
@@ -295,10 +295,6 @@ def status():
                else f"{dirty} stage(s) need work — run `mytho build` (or `mytho clean` for orphans).")
 
 
-def _header(name: str, size: int):  # used by _clean (retired with it in a later step)
-    click.echo(f"{name}:  {format_size(size)}")
-
-
 @mytho.command()
 @click.option("--apply", is_flag=True, help="Actually delete files (default is dry run).")
 @click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/preprocessing); needs --apply to delete.")
@@ -313,87 +309,38 @@ def clean(apply: bool, caches: bool):
 def _clean(apply: bool, caches: bool):
     import shutil
 
-    from pipeline_inspect import (
-        cache_files,
-        corpus_orphans,
-        embeddings_orphan_chunks,
-        embeddings_orphan_collections,
-        graphs_orphans,
-        motifs_raw_cache,
-        projections_orphans,
-    )
+    from pipeline import build_pipeline
+    from pipeline import clean as driver_clean
+    from pipeline.caches import cache_files, format_size, motifs_raw_cache
     from settings import settings
 
-    total_bytes = 0
     total_items = 0
 
-    # Corpus
-    orphans = corpus_orphans(settings)
-    if orphans:
-        _header("Corpus", sum(s for _, s in orphans))
-        for path, size in orphans:
-            total_bytes += size
-            total_items += 1
-            rel = str(path.relative_to(settings.corpus_dir))
-            click.echo(f"  {rel:<50} {format_size(size):>8}")
-            if apply:
-                path.unlink(missing_ok=True)
+    # Orphans — the driver's two-level reap over the whole pipeline: level-1 orphan keys inside
+    # a surviving stage (a document removed from config → its .txt / chunks / graph), level-2
+    # whole artifacts a dropped stage left in a shared store (a removed model's collection or
+    # projection dir). With --apply it deletes as it walks; otherwise it is a dry run.
+    report = driver_clean(build_pipeline(), apply=apply)
+    for stage, keys in report.level1.items():
+        click.echo(f"{stage}: {len(keys)} orphan document(s)")
+        for k in sorted(keys):
+            click.echo(f"  {k}")
+        total_items += len(keys)
+    for store, ids in report.level2.items():
+        click.echo(f"{store}: {len(ids)} orphan artifact(s)")
+        for i in sorted(ids):
+            click.echo(f"  {i}")
+        total_items += len(ids)
+    if not report.empty:
         click.echo()
 
-    # Embeddings orphan collections + chunks
-    orphan_cols = embeddings_orphan_collections(settings)
-    skip_col_names = {c["name"] for c in orphan_cols}
-    orphan_chunks = embeddings_orphan_chunks(settings, skip_collections=skip_col_names)
-    if orphan_cols or orphan_chunks:
-        click.echo("Embeddings:")
-        for col in orphan_cols:
-            total_items += 1
-            click.echo(f"  orphan collection: {col['model']:<30} {col['count']:>6} chunks")
-        for info in orphan_chunks:
-            n = len(info["orphan_ids"])
-            total_items += n
-            click.echo(f"  orphan chunks in {info['model']:<30} {n:>6} / {info['total_count']}")
-        if apply:
-            from embeddings import chroma_manager
-            for col in orphan_cols:
-                chroma_manager.delete_collection(col["name"])
-            for info in orphan_chunks:
-                collection = chroma_manager.get_collection(info["collection"])
-                collection.delete(ids=info["orphan_ids"])
-        click.echo()
-
-    # Projections
-    orphans = projections_orphans(settings)
-    if orphans:
-        _header("Projections", sum(m["size"] for m in orphans))
-        for m in orphans:
-            total_bytes += m["size"]
-            total_items += 1
-            click.echo(f"  {m['name']:<50} {format_size(m['size']):>8}")
-            if apply:
-                shutil.rmtree(m["path"])
-        click.echo()
-
-    # Graphs
-    orphans = graphs_orphans(settings)
-    if orphans:
-        _header("Graphs", sum(s for _, s in orphans))
-        for path, size in orphans:
-            total_bytes += size
-            total_items += 1
-            name = path.name
-            click.echo(f"  {name:<50} {format_size(size):>8}")
-            if apply:
-                shutil.rmtree(path)
-        click.echo()
-
-    # Caches (always shown; removed only with --caches --apply). The motif raw
-    # scrape cache is a directory, removed wholesale rather than file-by-file.
+    # Caches — internal resumable tiers (graph extraction, chunk preprocessing, the motif raw
+    # scrape), not orphans: always shown, removed only with --caches --apply.
     cache_list = cache_files(settings)
     motifs_cache = motifs_raw_cache(settings)
     if cache_list or motifs_cache:
         cache_bytes = sum(s for _, s in cache_list) + (motifs_cache[1] if motifs_cache else 0)
-        _header("Caches", cache_bytes)
+        click.echo(f"Caches:  {format_size(cache_bytes)}")
         outputs_root = settings.graphs_dir.parent
         for path, size in cache_list:
             try:
@@ -409,7 +356,6 @@ def _clean(apply: bool, caches: bool):
             click.echo(f"  {label + '/':<50} {format_size(motifs_cache[1]):>8}")
         if caches:
             total_items += len(cache_list) + (1 if motifs_cache else 0)
-            total_bytes += cache_bytes
             if apply:
                 for path, _ in cache_list:
                     path.unlink(missing_ok=True)
@@ -423,14 +369,10 @@ def _clean(apply: bool, caches: bool):
         click.echo(click.style("Nothing to remove.", fg="green"))
         return
 
-    summary = f"{total_items} items"
-    if total_bytes:
-        summary += f", {format_size(total_bytes)} on disk"
-
     if apply:
-        click.echo(click.style(f"Removed: {summary}", fg="green"))
+        click.echo(click.style(f"Removed: {total_items} item(s).", fg="green"))
     else:
-        click.echo(f"{summary}")
+        click.echo(f"{total_items} item(s).")
         click.echo(click.style("Dry run. Use --apply to delete.", fg="yellow"))
 
 

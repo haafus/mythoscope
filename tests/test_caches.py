@@ -3,7 +3,7 @@ import types
 from click.testing import CliRunner
 
 from graphs.completion import GRAPH_FILES, is_book_complete
-from pipeline_inspect import GRAPHS_CACHE, SUMMARIES_CACHE, cache_files, graphs_status
+from pipeline.caches import GRAPHS_CACHE, SUMMARIES_CACHE, cache_files
 
 
 def _settings(tmp_path):
@@ -53,23 +53,6 @@ class TestCacheFiles:
         owners = sorted(p.parent.name for p, _ in cache_files(s))
         # complete + partial graph caches, preprocessing cache, stale summaries cache
         assert owners == ["A", "B", "m", "preprocessed"]
-
-
-class TestGraphsStatus:
-    def test_counts_only_complete_books(self, tmp_path):
-        s = _settings(tmp_path)
-        _complete_book(s.graphs_dir / "A")
-        partial = s.graphs_dir / "B"
-        partial.mkdir(parents=True)
-        (partial / "beings.json").write_text("[]")
-        assert graphs_status(s)["count"] == 1
-
-    def test_size_excludes_cache(self, tmp_path):
-        s = _settings(tmp_path)
-        a = s.graphs_dir / "A"
-        _complete_book(a)
-        (a / GRAPHS_CACHE).write_text("X" * 1000)
-        assert graphs_status(s)["total_size"] < 1000  # cache bytes not counted
 
 
 class TestCleanCaches:

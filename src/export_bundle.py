@@ -24,15 +24,7 @@ from dataclasses import dataclass, field
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
-from pipeline_inspect import (
-    GRAPHS_CACHE,
-    SUMMARIES_CACHE,
-    corpus_orphans,
-    embeddings_orphan_chunks,
-    embeddings_orphan_collections,
-    graphs_orphans,
-    projections_orphans,
-)
+from pipeline.caches import GRAPHS_CACHE, SUMMARIES_CACHE
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -83,30 +75,25 @@ def chromadb_version() -> str | None:
 
 
 def orphan_summary() -> list[str]:
-    """Human-readable lines describing orphans that an export would carry along.
+    """Human-readable lines describing orphans that an export would carry along — the driver's
+    dry-run reap (same categories as ``mytho clean``). Guarded so a missing optional dependency
+    (e.g. chromadb) or unreadable store never aborts the export."""
+    try:
+        from pipeline import build_pipeline
+        from pipeline import clean as driver_clean
 
-    Mirrors the categories of ``mytho clean``. Each probe is guarded so a missing
-    optional dependency (e.g. chromadb) or unreadable store never aborts export.
-    """
+        report = driver_clean(build_pipeline(), apply=False)
+    except Exception as exc:  # never let orphan reporting break the export
+        logger.debug("orphan probe failed: %s", exc)
+        return []
+
     lines: list[str] = []
-
-    def _safe(fn):
-        try:
-            return fn()
-        except Exception as exc:  # never let orphan reporting break the export
-            logger.debug("orphan probe failed: %s", exc)
-            return []
-
-    for path, _ in _safe(lambda: corpus_orphans(settings)):
-        lines.append(f"corpus: orphan text {path.name}")
-    for col in _safe(lambda: embeddings_orphan_collections(settings)):
-        lines.append(f"embeddings: orphan collection {col['model']} ({col['count']} chunks)")
-    for info in _safe(lambda: embeddings_orphan_chunks(settings)):
-        lines.append(f"embeddings: orphan chunks in {info['model']} ({len(info['orphan_ids'])}/{info['total_count']})")
-    for model in _safe(lambda: projections_orphans(settings)):
-        lines.append(f"projections: orphan {model['name']}")
-    for path, _ in _safe(lambda: graphs_orphans(settings)):
-        lines.append(f"graphs: orphan directory {path.name}/")
+    for stage, keys in report.level1.items():
+        for key in sorted(keys):
+            lines.append(f"{stage}: orphan document {key}")
+    for store, ids in report.level2.items():
+        for artifact_id in sorted(ids):
+            lines.append(f"{store}: orphan artifact {artifact_id}")
     return lines
 
 
