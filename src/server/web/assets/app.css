@@ -587,9 +587,10 @@ body.has-main-navbar {
 .corpus-page .facet-field { margin-bottom: 16px; }
 .corpus-page .facet-field-label {
     margin-bottom: 3px;
-    color: #111827;
+    color: #6b4a2e;
     font-size: 11px;
     font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 .corpus-page .facet-field-value { color: #374151; }
