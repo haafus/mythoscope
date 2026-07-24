@@ -58,6 +58,21 @@ function graphFieldText(raw) {
     return s.toLowerCase() === "nan" ? "" : s;
 }
 
+// fcose has no seed option; its randomness comes from the global Math.random.
+// Run the layout under a seeded PRNG (mulberry32) so the same graph lays out
+// identically every time, then restore. Different graphs still differ.
+function runSeededLayout(cy, options, seed) {
+    const original = Math.random;
+    let s = seed >>> 0;
+    Math.random = () => {
+        s = (s + 0x6D2B79F5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    try { cy.layout(options).run(); } finally { Math.random = original; }
+}
+
 export async function renderGraphPage(graphType) {
     app.innerHTML = `
         <main class="graph-page container">
@@ -199,10 +214,10 @@ function renderCytoscapeGraph(container, data, graphType) {
     // the end. With the viewport already framed, animate the nodes from a slight inward collapse
     // out to their final spots: a visible settle that stays centred, no corner, no zoom jump.
     cy.resize();
-    cy.layout({
+    runSeededLayout(cy, {
         name: "fcose", animate: false, randomize: true,
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
-    }).run();
+    }, 1);
 
     const finals = cy.nodes().map((n) => ({n, x: n.position("x"), y: n.position("y")}));
     const bb = cy.elements().boundingBox();
