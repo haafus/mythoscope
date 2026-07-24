@@ -25,7 +25,12 @@ const GRAPH_INFO_FIELDS = {
 // Numeric metrics stay as a compact two-column table at the end of the panel.
 const GRAPH_METRIC_FIELDS = new Set(["Degree", "BetweennessCentrality"]);
 // Display labels for fields whose data key is not presentation-ready.
-const GRAPH_FIELD_LABELS = { BetweennessCentrality: "Betweenness Centrality", "Adjacent To": "Adjacent to" };
+const GRAPH_FIELD_LABELS = {
+    BetweennessCentrality: "Betweenness Centrality",
+    "Adjacent To": "Adjacent to",
+    Keyevents: "Key Events",
+    Keyactors: "Key Actors",
+};
 
 // Repair metadata joined before dicts were flattened server-side: replace any
 // leftover Python-style "{'k': 'v', ...}" fragment in a string with its values,
