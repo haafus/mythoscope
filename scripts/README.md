@@ -20,3 +20,14 @@ built motif DB (`mytho motifs`) present.
   writes the human-readable doc. Re-fetches the folkmasa page unless already cached
   under `outputs/motifs/raw/`; needs a built `tmi.json`.
   → `python scripts/build_tmi_bibliography.py`
+
+- **`golden_diff.py`** — whole-corpus byte-identity guard for the Part 3 / Stage IV
+  stage-protocol refactor. Hashes every build artifact (`corpus/`, `projections/`,
+  `graphs/`, `motifs/` files + the pinned `raw/` caches; each Chroma collection's
+  records + vectors logically) into a manifest. Snapshot **before** the refactor,
+  assert **after** — the whole-corpus guarantee `mytho status` cannot give. `assert`
+  fails on any changed/removed artifact; *added* files fail too unless they are
+  fingerprint sidecars (`.fp` / `.input-fp`) or `--allow-added` is passed (the
+  refactor's one intended fp-init). Manifest defaults to `outputs/.golden/manifest.json`
+  (gitignored). Run from a built + region-migrated tree.
+  → `python scripts/golden_diff.py snapshot` … refactor … `python scripts/golden_diff.py assert`
