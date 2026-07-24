@@ -129,7 +129,8 @@ unchanged — smoke-check.*
 artifact** (`corpus.json` + `.txt` tree, Chroma vectors + metadata, `projections/*`, `graphs/*`, `motifs/*`)
 **before** the Part 3 refactor, then **assert byte-identical after** (allowing only the intended fp-init
 additions). An orchestration refactor **must not change data**; this single diff catches any drift the per-key
-`status` cannot.
+`status` cannot. **The exact snapshot → build → assert → reset → build → assert runbook (two passes, one
+baseline) is in [`../stage-iv-validation.md`](../stage-iv-validation.md).**
 **Review:** architectural — `/code-review` the stage diff for stage-protocol/design conformance; `golden_diff` guards behaviour.
 **Dead code:** `ruff` + `vulture` sweep (biggest here — the driver retires `pipeline_inspect` + `cli._clean`); confirm the driver's dynamic `getattr(stage, "refresh")`-style refs before deleting.
 
