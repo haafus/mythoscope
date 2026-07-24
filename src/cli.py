@@ -244,107 +244,32 @@ def _refresh_motifs(apply: bool):
 
 @mytho.command()
 def status():
-    """Show the current state of the data pipeline."""
-    from pipeline_inspect import (
-        corpus_status,
-        embeddings_status,
-        graphs_status,
-        motifs_status,
-        projections_status,
-    )
-    from settings import settings
+    """Show what each stage would build, rebuild, or reap — the driver's desired/actual diff."""
+    from pipeline import build_pipeline
+    from pipeline import status as pipeline_status
 
-    total = 0
+    dirty = 0
+    for p in pipeline_status(build_pipeline()):
+        if p.clean:
+            click.echo(click.style(f"  {p.stage.name:<28} up to date", fg="green"))
+            continue
+        dirty += 1
+        bits = []
+        if p.missing:
+            bits.append(f"{len(p.missing)} to build")
+        if p.stale:
+            bits.append(f"{len(p.stale)} stale")
+        if p.orphans:
+            bits.append(f"{len(p.orphans)} orphan")
+        click.echo(click.style(f"  {p.stage.name:<28} " + ", ".join(bits), fg="yellow"))
 
-    # Corpus
-    info = corpus_status(settings)
-    total += info["total_size"]
-    _header("Corpus", info["total_size"])
-    built, cfg, missing = info["built_count"], info["config_count"], info["missing_count"]
-    click.echo(f"  {built} texts built (from {cfg} in config)")
-    if missing:
-        click.echo(click.style(f"  {missing} missing", fg="yellow"))
     click.echo()
-
-    # Embeddings
-    info = embeddings_status(settings)
-    total += info["total_size"]
-    _header("Embeddings", info["total_size"])
-    if not info["exists"]:
-        click.echo("  No embeddings found")
-    elif "error" in info:
-        click.echo(click.style(f"  Error: {info['error']}", fg="red"))
-    elif not info["collections"]:
-        click.echo("  No embedding collections")
-    else:
-        for col in sorted(info["collections"], key=lambda c: c["model"]):
-            click.echo(f"  {col['model']:<40} {col['count']:>6} chunks")
-    click.echo()
-
-    # Projections
-    info = projections_status(settings)
-    total += info["total_size"]
-    _header("Projections", info["total_size"])
-    if not info["exists"]:
-        click.echo("  No projections found")
-    elif not info["models"]:
-        click.echo("  No model results")
-    else:
-        for m in info["models"]:
-            done, tot = m["plots_done"], m["plots_total"]
-            color = "green" if done == tot else "yellow" if done > 0 else "red"
-            mark = "ok" if done == tot else f"{done}/{tot}"
-            click.echo(click.style(f"  {m['name']:<40} {mark:>5}  {format_size(m['size']):>8}", fg=color))
-    click.echo()
-
-    # Graphs
-    info = graphs_status(settings)
-    total += info["total_size"]
-    _header("Graphs", info["total_size"])
-    if not info["exists"]:
-        click.echo("  No graphs directory")
-    else:
-        click.echo(f"  {info['count']} graph files")
-    click.echo()
-
-    # Motifs
-    info = motifs_status(settings)
-    total += info["total_size"]
-    _header("Motifs", info["total_size"])
-    if not info["built"]:
-        click.echo("  No motif database")
-    else:
-        counts = info["counts"]
-        if counts:
-            click.echo("  " + ", ".join(f"{k}: {v}" for k, v in counts.items()))
-        else:
-            click.echo("  Built (no counts recorded)")
-        enr = info.get("enrichment") or {}
-        # Each enrichment is owned by an index; when that index is built but its
-        # enrichment key is absent from meta, the meta is stale/partial — flag it
-        # so "no data" (e.g. missing Wikipedia links) is diagnosable, not silent.
-        expected = [("mapsofmyths", "berezkin"), ("berezkin_bibliography", "berezkin"),
-                    ("bibliography", "tmi"), ("atu_wikidata", "atu"), ("ashliman", "atu")]
-        seen = set()
-        for source, owner in expected:
-            e = enr.get(source)
-            seen.add(source)
-            if e is None:
-                if owner in counts:
-                    click.echo(f"  {source}: not recorded (stale meta — rebuild to refresh)")
-            elif e.get("skipped"):
-                click.echo(f"  {source}: skipped ({e['skipped']})")
-            elif e:
-                click.echo(f"  {source}: " + ", ".join(f"{k} {v}" for k, v in e.items()))
-        for source, e in enr.items():  # any future enrichment not in the list above
-            if source not in seen and e:
-                click.echo(f"  {source}: " + ", ".join(f"{k} {v}" for k, v in e.items()))
-    click.echo()
-
-    click.echo(f"Total: {format_size(total)}")
+    click.echo("Everything up to date."
+               if not dirty
+               else f"{dirty} stage(s) need work — run `mytho build` (or `mytho clean` for orphans).")
 
 
-def _header(name: str, size: int):
+def _header(name: str, size: int):  # used by _clean (retired with it in a later step)
     click.echo(f"{name}:  {format_size(size)}")
 
 
