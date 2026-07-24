@@ -116,11 +116,14 @@ def server(host: str | None, port: int | None):
 @mytho.command()
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
+@click.option("--only", multiple=True, metavar="STAGE",
+              help="Build only stages matching STAGE (exact or name-prefix, e.g. 'embeddings' "
+                   "or 'graphs') plus their upstream dependencies. Repeatable.")
 @click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
               type=int, metavar="N",
               help=f"Quick run: first embedding model, limited to N texts "
                    f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
-def build(model, force, sample):
+def build(model, force, only, sample):
     """Run the full pipeline: build everything missing or stale (``--force`` rebuilds all)."""
     if sample is not None:
         # Quick dev run — the pre-driver per-stage path: first model, first N texts
@@ -142,9 +145,8 @@ def build(model, force, sample):
         return
 
     from pipeline import build as run_pipeline
-    from pipeline import build_pipeline
 
-    stages = build_pipeline()
+    stages = _scoped_pipeline(only)
     if model:
         stages = _scope_to_model(stages, model)
 
@@ -160,9 +162,31 @@ def build(model, force, sample):
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 
+def _scoped_pipeline(only):
+    """The full pipeline, or — when ``only`` names stages (exact or name-prefix) — just those
+    plus every upstream dependency, so the sub-pipeline stays self-consistent (topological)."""
+    from pipeline import build_pipeline
+
+    stages = build_pipeline()
+    if not only:
+        return stages
+    matched = [s for s in stages if any(s.name == o or s.name.startswith(o) for o in only)]
+    if not matched:
+        _fail("Scope", ValueError(f"no stage matches {list(only)} — see `mytho status`"))
+    keep = {id(s): s for s in matched}
+    frontier = list(matched)
+    while frontier:
+        for inp in frontier.pop().inputs():
+            if id(inp) not in keep:
+                keep[id(inp)] = inp
+                frontier.append(inp)
+    order = {id(s): i for i, s in enumerate(stages)}
+    return sorted(keep.values(), key=lambda s: order[id(s)])
+
+
 def _scope_to_model(stages, model):
     """Keep the whole pipeline but only the given model's embeddings/projections (corpus,
-    graphs and motifs always run) — the ``--model`` scope, pre-item-4."""
+    graphs and motifs always run) — the ``--model`` convenience atop ``--only``."""
     from model_registry import embedding_config
 
     key = embedding_config(model)["key"]
@@ -269,13 +293,14 @@ def _refresh_motifs(apply: bool):
 
 
 @mytho.command()
-def status():
+@click.option("--only", multiple=True, metavar="STAGE",
+              help="Show only stages matching STAGE (exact or name-prefix) plus their upstream. Repeatable.")
+def status(only):
     """Show what each stage would build, rebuild, or reap — the driver's desired/actual diff."""
-    from pipeline import build_pipeline
     from pipeline import status as pipeline_status
 
     dirty = 0
-    for p in pipeline_status(build_pipeline()):
+    for p in pipeline_status(_scoped_pipeline(only)):
         if p.clean:
             click.echo(click.style(f"  {p.stage.name:<28} up to date", fg="green"))
             continue
