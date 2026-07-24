@@ -156,15 +156,16 @@ def _build_corpus(force: bool = False, max_texts: int | None = None):
 
 
 def _build_embeddings(model: str | None, force: bool = False):
-    # Announce the heavy first-time import so the pause before model load isn't silent.
-    logger.info("Loading ML libraries (torch, transformers, chromadb)...")
+    # torch/sentence-transformers now load lazily inside the build — and only when a variant
+    # actually has chunks to encode — so nothing heavy loads here. The model load, when it
+    # happens, is announced by model_manager.
     from embeddings.build_embeddings import build_embeddings
 
     build_embeddings(model_name=model, force=force)
 
 
 def _build_projections(model: str | None, force: bool = False):
-    logger.info("Loading ML libraries (torch, umap, chromadb)...")
+    logger.info("Loading ML libraries (umap, chromadb)...")  # projections use no torch
     from projections.build_projections import build_projections
 
     build_projections(model_name=model, force=force)
