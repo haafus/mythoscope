@@ -26,7 +26,7 @@ export const state = {
     treeIndex: null,           // tradition -> { region, regionColor, coordinates, index, count, … }
     analysisSearchRequestId: 0,
     similarityMethods: [],
-    textSearch: true, // from /api/similarity/models; false hides text search
+    textSearch: false, // from /api/similarity/models; fail closed so a failed fetch never shows the disabled form
 };
 
 // ===== Route teardown =====
