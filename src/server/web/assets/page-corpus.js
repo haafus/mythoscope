@@ -117,7 +117,8 @@ function renderFacetInfo(color, kind, name, fields) {
 function showRegionInfo(region) {
     const node = (state.traditionTree || {})[region];
     if (!node) return;
-    const fields = facetField("Description", node.description)
+    const lead = node.description ? `<div class="facet-lead">${escapeHtml(node.description)}</div>` : "";
+    const fields = lead
         + facetField("Subdivision", node.subdivision)
         + facetField("Strata", node.strata);
     renderFacetInfo(node.color || "#8a8a8a", "Region", region, fields);
