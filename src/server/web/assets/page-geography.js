@@ -281,7 +281,7 @@ function initAtlas(container, traditions) {
     };
     const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
     const hideTip = () => { tip.classList.remove("show"); setPoint(null); curDot = null; };
-    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(hideTip, 400); };  // grace to reach the tip
+    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(hideTip, 200); };  // grace to reach the tip
 
     const showTipFor = (circle) => {
         const item = placed[Number(circle.dataset.i)] && placed[Number(circle.dataset.i)].item;
