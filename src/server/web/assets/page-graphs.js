@@ -98,7 +98,13 @@ export async function renderGraphPage(graphType) {
 
     onCleanup(destroyGraph);
 
-    const onResize = () => { if (graphCy) { graphCy.resize(); graphCy.fit(graphCy.elements(), 40); } };
+    const onResize = () => {
+        if (!graphCy) return;
+        graphCy.minZoom(1e-3);   // relax the floor so the refit isn't clamped by the old one
+        graphCy.resize();
+        graphCy.fit(graphCy.elements(), 40);
+        graphCy.minZoom(graphCy.zoom());   // re-floor at the new fit
+    };
     window.addEventListener("resize", onResize);
     onCleanup(() => window.removeEventListener("resize", onResize));
 
@@ -205,7 +211,6 @@ function renderCytoscapeGraph(container, data, graphType) {
         ],
         layout: {name: "preset", fit: false},  // fit:false — don't zoom onto the (0,0) cluster (huge nodes)
         wheelSensitivity: 0.5,
-        minZoom: 1.0,
         maxZoom: 10,
     });
 
@@ -220,6 +225,9 @@ function renderCytoscapeGraph(container, data, graphType) {
         name: "fcose", animate: false, randomize: true,
         idealEdgeLength: 15, nodeSeparation: 30, nodeRepulsion: 4500, gravity: 0.25,
     }, 1);
+    // fcose fits the graph to the viewport, so the current zoom is the "whole graph
+    // visible" level — floor min zoom there (can't zoom out past the bounding box).
+    cy.minZoom(cy.zoom());
 
     const finals = cy.nodes().map((n) => ({n, x: n.position("x"), y: n.position("y")}));
     const bb = cy.elements().boundingBox();
