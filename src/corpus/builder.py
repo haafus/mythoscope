@@ -92,6 +92,7 @@ def _extract_text(data: bytes, url: str, title: str, content_type: str = "") -> 
             data,
             include_comments=settings.corpus.html_include_comments,
             include_tables=settings.corpus.html_include_tables,
+            source=title,
         )
     return _decode_bytes(data)
 

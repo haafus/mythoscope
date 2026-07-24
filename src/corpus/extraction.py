@@ -27,11 +27,14 @@ def _decode_bytes(content: bytes) -> str:
 
 
 def html_to_text(
-    html_content: bytes, include_comments: bool = False, include_tables: bool = True, target_language: str | None = None
+    html_content: bytes, include_comments: bool = False, include_tables: bool = True,
+    target_language: str | None = None, source: str | None = None,
 ) -> str:
     if not html_content:
         return ""
 
+    label = source or "HTML document"
+    reason = "trafilatura returned no content"  # the silent case: no exception, just empty
     try:
         text = trafilatura.extract(
             html_content,
@@ -44,8 +47,11 @@ def html_to_text(
             logger.debug("HTML processed with Trafilatura")
             return text
     except Exception as e:
-        logger.warning(f"Trafilatura failed, falling back to BeautifulSoup: {e}")
+        reason = f"trafilatura error: {e}"
 
+    # Fallback path: crude boilerplate strip. Log it (with the source) so a document
+    # extracted this way — lower quality — is visible, not silently degraded.
+    logger.info("%s: falling back to BeautifulSoup extraction (%s)", label, reason)
     try:
         decoded = _decode_bytes(html_content)
         soup = BeautifulSoup(decoded, "html.parser")
