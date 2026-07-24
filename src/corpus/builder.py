@@ -61,15 +61,28 @@ def _finalize_text(
     return data_utf8, stats
 
 
-def _prune_orphan_texts(metadata: list[dict]) -> None:
-    """Delete any ``.txt`` under the corpus tree not referenced by the (full) catalog — a
-    document dropped from config. The raw archive (``corpus/raw/``, no ``.txt``) is untouched."""
+def _prune_orphan_texts(keep_paths) -> None:
+    """Delete any ``.txt`` whose document is no longer in config. ``keep_paths`` is the set of
+    every configured document's expected text path (not merely what built this run), so a
+    document that only failed to (re)build keeps its previous ``.txt``. The raw archive
+    (``corpus/raw/``, no ``.txt``) is untouched."""
     root = Path(settings.corpus_dir).resolve()
-    kept = {(root / m["path"]).resolve() for m in metadata if m.get("path")}
+    keep = {Path(p).resolve() for p in keep_paths}
     for txt in root.rglob("*.txt"):
-        if "raw" not in txt.relative_to(root).parts and txt.resolve() not in kept:
+        if "raw" not in txt.relative_to(root).parts and txt.resolve() not in keep:
             txt.unlink(missing_ok=True)
             logger.info("Pruned orphan text %s (no longer in config)", txt.relative_to(root))
+
+
+def _ensure_source_fp(row: dict, url: str, item: dict) -> None:
+    """One-off fp-init: give a row without ``source_fp`` one from the pinned raw + config
+    (no re-fetch, no re-clean), so the corpus stage can decide staleness offline."""
+    if "source_fp" not in row:
+        raw_cache = corpus_raw_path(Path(settings.corpus_dir) / "raw", url)
+        if raw_cache.exists():
+            row["source_fp"] = source_fingerprint(
+                raw_cache.read_bytes(), item.get("content_start"), item.get("content_end")
+            )
 
 
 def _build_metadata(item: dict, *, path: str, stats: dict, source_fp: str) -> dict:
@@ -169,16 +182,16 @@ def _load_existing_metadata() -> dict[str, dict]:
 
 
 def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set[str] | None = None):
-    """Build the corpus catalog + .txt tree.
+    """Build the corpus catalog + .txt tree — incrementally.
 
-    ``rebuild`` (a set of document_ids) forces exactly those documents to be re-derived while
-    every other present document is reused untouched — the key-scoped entry the stage driver
-    calls as ``CorpusStage.build(keys)``. ``force`` re-derives everything (ignores the cache)."""
+    The catalog is accumulated state: ``max_texts`` limits which documents are (re)processed
+    this run; every other configured document carries its existing built row, so a partial
+    (``--sample``) build merges into the full catalog rather than truncating it. ``rebuild``
+    (a set of document_ids) forces exactly those to be re-derived; ``force`` re-derives every
+    processed document."""
     ensure_dir(settings.corpus_dir)
 
-    download_list = load_download_list()
-    if max_texts is not None:
-        download_list = download_list[:max_texts]
+    download_list = load_download_list()  # the FULL desired set — always
 
     # Fail loud before any work: an unknown tradition or a non-canon region must stop the
     # build, not silently degrade to "" / a grey default (§2.12).
@@ -190,7 +203,9 @@ def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set
     # tree at serve time (B1). `traditions.json` is no longer generated (config is served, §2.9).
     trad_region = flat_traditions(tree)
 
-    existing = {} if force else _load_existing_metadata()
+    # `max_texts` limits only which documents are (re)processed this run; the rest carry through.
+    process_titles = {item["title"] for item in (download_list if max_texts is None else download_list[:max_texts])}
+    existing = _load_existing_metadata()  # always, so unprocessed documents carry their built row
 
     to_download = []
     metadata: list[dict] = []
@@ -201,38 +216,37 @@ def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set
         url = item.get("url", "")
         prev = existing.get(title)
         output_present = bool(prev) and (corpus_root / prev.get("path", "")).exists()
-        # A local file source is reused only if its content hash still matches the
-        # raw snapshot from the previous build (on-disk edits are re-ingested); the
-        # snapshot lives in corpus/raw, so no hash is stored in the metadata. Web
-        # sources are reused whenever their output file is still present.
+
+        if title not in process_titles:
+            # Not processed this run — carry its built row (if any) so the catalog stays full.
+            if output_present:
+                prev.setdefault("document_id", document_id(url))
+                _ensure_source_fp(prev, url, item)
+                metadata.append(prev)
+            continue
+
+        # A local file source is reused only if its content hash still matches the raw snapshot
+        # from the previous build (on-disk edits are re-ingested); web sources are reused
+        # whenever their output file is still present.
         if output_present and is_file_source(url):
             raw_cache = corpus_raw_path(Path(settings.corpus_dir) / "raw", url)
             reuse = file_source_unchanged(url, raw_cache, settings.sources_dir)
         else:
             reuse = output_present
 
-        # Key-scoped rebuild: the driver names exactly the stale/missing document_ids.
-        if rebuild is not None and document_id(url) in rebuild:
+        # force re-derives every processed document; rebuild forces the driver's named ids.
+        if force or (rebuild is not None and document_id(url) in rebuild):
             reuse = False
 
         if reuse:
-            # Populate-once: an older catalog row predates document_id — backfill it (the
-            # locator rule is deterministic, so this equals what a rebuild would mint).
             prev.setdefault("document_id", document_id(url))
-            # One-off fp-init: rows built before source_fp existed get it from the pinned
-            # raw + config (no re-fetch, no re-clean) so the stage becomes offline-stale-aware.
-            if "source_fp" not in prev:
-                raw_cache = corpus_raw_path(Path(settings.corpus_dir) / "raw", url)
-                if raw_cache.exists():
-                    prev["source_fp"] = source_fingerprint(
-                        raw_cache.read_bytes(), item.get("content_start"), item.get("content_end")
-                    )
+            _ensure_source_fp(prev, url, item)
             metadata.append(prev)
             logger.debug(f"{title}: already in corpus, skipping")
         else:
             to_download.append(item)
 
-    logger.info(f"Corpus: {len(metadata)} cached, {len(to_download)} to download")
+    logger.info(f"Corpus: {len(metadata)} cached, {len(to_download)} to (re)build")
 
     if to_download:
         new_metadata: list[dict] = []
@@ -255,12 +269,14 @@ def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set
         metadata.extend(new_metadata)
         logger.info(f"Downloaded: {len(new_metadata)}, failed: {len(to_download) - len(new_metadata)}")
 
-    # Self-prune orphans, symmetric to how build_embeddings drops chunks whose document
-    # left the corpus: a full build reaps any .txt no longer referenced by the catalog
-    # (a document removed from config), so it never lingers as an untracked stray. Skipped
-    # for a partial (`--sample`) build, whose catalog is deliberately truncated.
-    if max_texts is None:
-        _prune_orphan_texts(metadata)
+    # Self-prune orphans (symmetric to build_embeddings pruning chunks whose document left the
+    # corpus): reap any .txt whose document is no longer in config. Config-authoritative and
+    # always safe — the catalog stays full every run, so this never touches a valid text.
+    keep = {
+        text_path(settings.corpus_dir, trad_region[item["tradition"]], item["tradition"], item["title"])
+        for item in download_list
+    }
+    _prune_orphan_texts(keep)
 
     # Atomic swap (write .tmp then os.replace) so a crash mid-write can't leave a
     # truncated catalog whose stored fingerprints would lie to the next build (§9.4).
