@@ -2,5 +2,6 @@
 protocol over the existing builders. Wired together by ``build_pipeline()``."""
 
 from .corpus import CorpusStage
+from .embeddings import EmbeddingsStage
 
-__all__ = ["CorpusStage"]
+__all__ = ["CorpusStage", "EmbeddingsStage"]

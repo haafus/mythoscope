@@ -25,6 +25,7 @@ def build_embeddings(
     model_name: str | None = None,
     models: list | None = None,
     force: bool = False,
+    rebuild: set[str] | None = None,
 ) -> None:
     if model_name:
         keys = [embedding_config(model_name)["key"]]
@@ -40,7 +41,7 @@ def build_embeddings(
         for key in keys:
             if force:
                 chroma_manager.delete_collection(key)
-            encoder = _save_corpus_to_chroma(key, encoder)
+            encoder = _save_corpus_to_chroma(key, encoder, rebuild=rebuild)
     finally:
         if encoder is not None:
             encoder.unload()
@@ -48,9 +49,12 @@ def build_embeddings(
     logger.info("All embeddings saved to Chroma.")
 
 
-def _save_corpus_to_chroma(key: str, encoder):
+def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
     """Sync one variant's collection. Returns the encoder (loading it lazily the first time
-    a variant needs encoding); returns it unchanged when the collection is already current."""
+    a variant needs encoding); returns it unchanged when the collection is already current.
+
+    ``rebuild`` (a set of document_ids) forces those documents to re-embed regardless of the
+    fingerprint gate — the key-scoped entry the stage driver calls as ``EmbeddingsStage.build``."""
     cfg = embedding_config(key)
     preprocess_prompt = cfg["preprocess_prompt"]
     document_prefix = cfg["document_prefix"]
@@ -92,6 +96,13 @@ def _save_corpus_to_chroma(key: str, encoder):
         for cid in orphan_ids:
             existing_fp.pop(cid, None)
         logger.info(f"Pruned {len(orphan_ids)} orphaned chunk(s) from documents no longer in the corpus")
+
+    if rebuild:
+        # Key-scoped rebuild: forget these documents' stored fps so embed_plan re-embeds all
+        # their chunks regardless of the fingerprint gate (both the pre-pass and the encode
+        # pass share existing_fp, so one drop covers both).
+        for cid in [c for c in existing_fp if c.rpartition("::")[0] in rebuild]:
+            existing_fp.pop(cid, None)
 
     added_total = 0
     skipped_total = 0
