@@ -98,10 +98,8 @@ function facetField(label, value) {
     </div>`;
 }
 
-// Semicolon-separated strings (subdivision, strata) rendered as a bullet list.
-function facetListField(label, value) {
-    const items = (value || "").split(";").map((s) => s.trim()).filter(Boolean);
-    if (!items.length) return "";
+function facetListField(label, items) {
+    if (!Array.isArray(items) || !items.length) return "";
     return `<div class="facet-field">
         <div class="facet-field-label">${escapeHtml(label)}</div>
         <ul class="facet-field-list">${items.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
