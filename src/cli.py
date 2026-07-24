@@ -124,9 +124,11 @@ def server(host: str | None, port: int | None):
 def build(scope, model, force, sample):
     """Run the pipeline: build everything missing or stale (``--force`` rebuilds all).
 
-    SCOPE (optional, repeatable) **force-rebuilds** exactly the named stages (name/prefix, e.g.
-    ``graphs`` or ``embeddings:bge-m3``) — a stage-debug tool: upstream is not rebuilt, and the
-    downstream cascade is left for a plain ``mytho build``."""
+    SCOPE (optional, repeatable) restricts the build to exactly the named stages (name/prefix,
+    e.g. ``graphs`` or ``embeddings:bge-m3``) — built when stale/missing (a param/algo change
+    invalidates them via the fingerprint, no ``--force`` needed); ``--force`` rebuilds them
+    regardless. Upstream is not rebuilt, and the downstream cascade is left for a plain
+    ``mytho build``."""
     if sample is not None:
         # Quick dev run — the pre-driver per-stage path: first model, first N texts
         # (corpus + graphs). Sampling by doc count doesn't fit the incremental driver.
@@ -154,8 +156,10 @@ def build(scope, model, force, sample):
 
     start = time.monotonic()
     try:
-        # A scope means "force-rebuild these stages" — no separate --force needed.
-        plans = run_pipeline(stages, force=force or bool(scope), targets=targets)
+        # Scope restricts WHICH stages build; --force (separate) decides whether to ignore the
+        # fingerprint gate. A param/algo change invalidates a stage via its fp, so a scoped
+        # build rebuilds it without --force.
+        plans = run_pipeline(stages, force=force, targets=targets)
     except Exception as e:
         _fail("Build", e)
     for p in plans:
