@@ -61,6 +61,17 @@ def _finalize_text(
     return data_utf8, stats
 
 
+def _prune_orphan_texts(metadata: list[dict]) -> None:
+    """Delete any ``.txt`` under the corpus tree not referenced by the (full) catalog — a
+    document dropped from config. The raw archive (``corpus/raw/``, no ``.txt``) is untouched."""
+    root = Path(settings.corpus_dir).resolve()
+    kept = {(root / m["path"]).resolve() for m in metadata if m.get("path")}
+    for txt in root.rglob("*.txt"):
+        if "raw" not in txt.relative_to(root).parts and txt.resolve() not in kept:
+            txt.unlink(missing_ok=True)
+            logger.info("Pruned orphan text %s (no longer in config)", txt.relative_to(root))
+
+
 def _build_metadata(item: dict, *, path: str, stats: dict, source_fp: str) -> dict:
     return {
         **item,
@@ -243,6 +254,13 @@ def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set
 
         metadata.extend(new_metadata)
         logger.info(f"Downloaded: {len(new_metadata)}, failed: {len(to_download) - len(new_metadata)}")
+
+    # Self-prune orphans, symmetric to how build_embeddings drops chunks whose document
+    # left the corpus: a full build reaps any .txt no longer referenced by the catalog
+    # (a document removed from config), so it never lingers as an untracked stray. Skipped
+    # for a partial (`--sample`) build, whose catalog is deliberately truncated.
+    if max_texts is None:
+        _prune_orphan_texts(metadata)
 
     # Atomic swap (write .tmp then os.replace) so a crash mid-write can't leave a
     # truncated catalog whose stored fingerprints would lie to the next build (§9.4).
