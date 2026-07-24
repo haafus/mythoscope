@@ -205,6 +205,7 @@ function renderCytoscapeGraph(container, data, graphType) {
         layout: {name: "preset", fit: false},  // fit:false — don't zoom onto the (0,0) cluster (huge nodes)
         wheelSensitivity: 0.5,
         minZoom: 1.0,
+        maxZoom: 10,
     });
 
     const cy = graphCy;
