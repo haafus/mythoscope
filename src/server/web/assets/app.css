@@ -885,7 +885,7 @@ body.has-main-navbar {
     display: none;
     width: max-content;
     max-width: min(360px, calc(100% - 20px));
-    padding: 10px 12px;
+    padding: 16px 18px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     background: #111827;
