@@ -1,57 +1,67 @@
-"""The projection build must rebuild when its input embeddings change (added texts),
-not skip on mere file existence — the fp sidecar gates that."""
+"""Projections must rebuild when the input embeddings change, and — crucially — must decide
+that from chunk metadata alone, without loading the (large) embedding vectors, when current."""
 
-from collections import defaultdict
-
-import numpy as np
-
+import settings as settings_mod
 from projections import PROJECTION_METHODS
 from projections import build_projections as bp
 from projections.analyzer import ModelData
 
 
-def _model_data(chunks, out_dir):
+def _metas(chunks):
     # chunks: (document_id, chunk_index, fingerprint) tuples
-    data = [{"id": d, "chunk_index": i, "fingerprint": fp, "tradition": "X"} for d, i, fp in chunks]
-    return ModelData("bge", data, np.zeros((len(chunks), 3)), out_dir)
+    return [{"document_id": d, "chunk_index": i, "fingerprint": fp} for d, i, fp in chunks]
 
 
-def test_input_fingerprint_order_stable_but_content_sensitive(tmp_path):
-    base = [("a", 0, "fa"), ("b", 0, "fb")]
-    a = bp._input_fingerprint(_model_data(base, tmp_path))
-    reordered = bp._input_fingerprint(_model_data(list(reversed(base)), tmp_path))
-    with_new = bp._input_fingerprint(_model_data([*base, ("c", 0, "fc")], tmp_path))
-    edited = bp._input_fingerprint(_model_data([("a", 0, "fa2"), ("b", 0, "fb")], tmp_path))
-    assert a == reordered      # chunk order doesn't matter
-    assert a != with_new       # an added text does
-    assert a != edited         # an edit to an existing text (same id, new fp) does too
+def test_fingerprint_from_metas_order_stable_but_content_sensitive():
+    f = bp._fingerprint_from_metas
+    base = _metas([("a", 0, "fa"), ("b", 0, "fb")])
+    assert f(base) == f(list(reversed(base)))                       # order doesn't matter
+    assert f(base) != f(_metas([("a", 0, "fa"), ("b", 0, "fb"), ("c", 0, "fc")]))  # a new text
+    assert f(base) != f(_metas([("a", 0, "fa2"), ("b", 0, "fb")]))  # an edit (same id, new fp)
 
 
-def test_generate_plots_rebuilds_on_new_inputs(tmp_path, monkeypatch):
-    calls = []
+class _FakeCollection:
+    def __init__(self, metas):
+        self._metas = metas
 
-    def fake_gen(data, embeddings, output_path, **kwargs):
-        calls.append(output_path.name)
-        output_path.write_text("{}", encoding="utf-8")
+    def get(self, include=None):
+        return {"metadatas": self._metas}
 
-    chart_types = {m["chart_type"] for m in PROJECTION_METHODS}
-    monkeypatch.setattr(bp, "CHART_GENERATORS", {ct: fake_gen for ct in chart_types})
-    monkeypatch.setattr(bp, "SCATTER_TRANSFORMS", defaultdict(lambda: None))
 
-    md = _model_data([("a", 0, "fa"), ("b", 0, "fb")], tmp_path)
-    bp._generate_plots(md)
-    assert len(calls) == len(PROJECTION_METHODS)   # first build makes them all
-    assert (tmp_path / ".input-fp").exists()
+def test_build_projections_skips_vector_load_when_current(tmp_path, monkeypatch):
+    import embeddings.chroma_manager as cm
 
-    calls.clear()
-    bp._generate_plots(md)                          # unchanged input
-    assert calls == []                              # → skipped
+    metas_box = {"metas": _metas([("a", 0, "fa"), ("b", 0, "fb")])}
+    monkeypatch.setattr(settings_mod.settings, "projections_dir", tmp_path)
+    monkeypatch.setattr(cm, "get_available_models", lambda: ["v1"])
+    monkeypatch.setattr(cm, "get_collection", lambda key: _FakeCollection(metas_box["metas"]))
 
-    calls.clear()
-    grown = _model_data([("a", 0, "fa"), ("b", 0, "fb"), ("c", 0, "fc")], tmp_path)  # a new text
-    bp._generate_plots(grown)
-    assert len(calls) == len(PROJECTION_METHODS)    # → rebuilt
+    loads = []
 
-    calls.clear()
-    bp._generate_plots(grown, force=True)
-    assert len(calls) == len(PROJECTION_METHODS)    # force always rebuilds
+    def fake_load(key):
+        loads.append(key)
+        (tmp_path / key).mkdir(parents=True, exist_ok=True)
+        return ModelData(model_name=key, data=[], embeddings=None, output_dir=tmp_path / key)
+
+    monkeypatch.setattr(bp, "load_model_data", fake_load)
+
+    def gen(name):
+        def _g(data, embeddings, output_path, **kwargs):
+            output_path.write_text("{}", encoding="utf-8")
+        return _g
+
+    monkeypatch.setattr(bp, "CHART_GENERATORS", {m["chart_type"]: gen(m["chart_type"]) for m in PROJECTION_METHODS})
+    monkeypatch.setattr(bp, "SCATTER_TRANSFORMS", {m["key"]: None for m in PROJECTION_METHODS})
+
+    bp.build_projections()
+    assert loads == ["v1"]                                   # first run loads vectors + generates
+    assert (tmp_path / "v1" / ".input-fp").exists()
+
+    loads.clear()
+    bp.build_projections()                                   # inputs unchanged
+    assert loads == []                                       # → skipped WITHOUT loading vectors
+
+    loads.clear()
+    metas_box["metas"] = _metas([("a", 0, "fa"), ("b", 0, "fb"), ("c", 0, "fc")])  # a new text
+    bp.build_projections()
+    assert loads == ["v1"]                                   # → vectors loaded again, rebuilt

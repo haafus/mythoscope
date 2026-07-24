@@ -10,15 +10,22 @@ from .visualization import CHART_GENERATORS, SCATTER_TRANSFORMS
 logger = logging.getLogger(__name__)
 
 
-def _input_fingerprint(model_data: ModelData) -> str:
-    """Identity of the projection input — folds in each chunk's embeddings fingerprint
-    (the upstream stage's per-chunk fp: hash(doc_fp, model, transform_v)). So added/removed
-    texts (id set changes) AND edits to an existing text (fp changes) both rebuild it."""
+def _fingerprint_from_metas(metas: list[dict]) -> str:
+    """Identity of the projection input, from chunk metadata alone (no vectors) — folds in
+    each chunk's embeddings fingerprint (the upstream per-chunk fp: hash(doc_fp, model,
+    transform_v)). Added/removed texts (id set) and edits (fp) both change it."""
     parts = sorted(
-        f"{item.get('id', '')}:{item.get('chunk_index', '')}:{item.get('fingerprint', '')}"
-        for item in model_data.data
+        f"{(m or {}).get('document_id', '')}:{(m or {}).get('chunk_index', '')}:{(m or {}).get('fingerprint', '')}"
+        for m in metas
     )
     return content_fingerprint("\n".join(parts).encode("utf-8"))
+
+
+def _up_to_date(output_dir, current_fp: str) -> bool:
+    fp_path = output_dir / ".input-fp"
+    return (fp_path.exists()
+            and fp_path.read_text(encoding="utf-8").strip() == current_fp
+            and all((output_dir / f"{m['key']}.json").exists() for m in PROJECTION_METHODS))
 
 
 def build_projections(
@@ -27,6 +34,7 @@ def build_projections(
     force: bool = False,
 ) -> ModelData | None:
     from embeddings import chroma_manager
+    from settings import settings
 
     available = chroma_manager.get_available_models()
 
@@ -41,37 +49,38 @@ def build_projections(
     for key in keys:
         logger.info(f"Starting analysis: {key}")
 
-        model_data = load_model_data(key)
+        # Fingerprint the input from metadata only (cheap) and skip before loading the large
+        # embedding vectors when the projections are already current.
+        metas = chroma_manager.get_collection(key).get(include=["metadatas"]).get("metadatas") or []
+        if not metas:
+            logger.warning(f"No data found for variant {key}, skipping...")
+            continue
+        current_fp = _fingerprint_from_metas(metas)
+        if not force and _up_to_date(settings.projections_dir / key, current_fp):
+            logger.info("%s already up to date — skipping (no vector load)", key)
+            continue
 
+        model_data = load_model_data(key)  # loads the vectors — only when there is work
         if model_data is None:
             logger.warning(f"No data found for variant {key}, skipping...")
             continue
 
         result = model_data
         if generate_all_plots:
-            _generate_plots(model_data, force=force)
+            _generate_plots(model_data, current_fp)
 
     logger.info("Projection analysis complete.")
     return result
 
 
-def _generate_plots(model_data: ModelData, force: bool = False) -> None:
-    # Skip only when the projection is present AND its inputs are unchanged (existence
-    # alone missed new embeddings from added texts). The fp sidecar records the input set.
-    fp_path = model_data.output_dir / ".input-fp"
-    current_fp = _input_fingerprint(model_data)
-    fresh = fp_path.exists() and fp_path.read_text(encoding="utf-8").strip() == current_fp
-
+def _generate_plots(model_data: ModelData, current_fp: str) -> None:
+    # Reached only for a stale (or forced) variant, so (re)generate every method.
     ok = True
     for method in PROJECTION_METHODS:
         key = method["key"]
         chart_type = method["chart_type"]
         label = method["label"]
         output_path = model_data.output_dir / f"{key}.json"
-
-        if not force and fresh and output_path.exists():
-            logger.info("Skipping %s (up to date)", label)
-            continue
 
         logger.info("Generating %s...", label)
         generator = CHART_GENERATORS[chart_type]
@@ -85,5 +94,5 @@ def _generate_plots(model_data: ModelData, force: bool = False) -> None:
             logger.exception("Error creating %s", label)
 
     if ok:
-        fp_path.write_text(current_fp, encoding="utf-8")  # stamp inputs so an unchanged rerun skips
+        (model_data.output_dir / ".input-fp").write_text(current_fp, encoding="utf-8")  # stamp so a rerun skips
     logger.info("Visualizations for %s: %s", model_data.model_name, model_data.output_dir)
