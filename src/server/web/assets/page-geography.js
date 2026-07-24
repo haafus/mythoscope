@@ -284,7 +284,7 @@ function initAtlas(container, traditions) {
     };
     const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
     const hideTip = () => { tip.classList.remove("show"); setPoint(null); curDot = null; };
-    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(hideTip, 200); };
+    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(hideTip, 400); };  // grace to reach the tip
 
     const showTipFor = (circle) => {
         const item = placed[Number(circle.dataset.i)] && placed[Number(circle.dataset.i)].item;
@@ -332,7 +332,7 @@ function initAtlas(container, traditions) {
         setPoint(null);
         const region = e.target.closest && e.target.closest(".atlas-region");
         if (region) {
-            curDot = null; cancelClose(); tip.classList.remove("show");
+            curDot = null; scheduleClose();   // keep any book card alive through the grace so it stays reachable
             const name = region.dataset.region, x = e.clientX, y = e.clientY;
             regionTimer = setTimeout(() => showRegionTip(name, x, y), DWELL);
         } else {
@@ -340,7 +340,7 @@ function initAtlas(container, traditions) {
         }
     });
     svg.addEventListener("mouseleave", () => { clearRegionTimer(); curDot = null; scheduleClose(); });
-    tip.addEventListener("mouseenter", cancelClose);
+    tip.addEventListener("mouseenter", () => { cancelClose(); clearRegionTimer(); });
     tip.addEventListener("mouseleave", scheduleClose);
 
     onCleanup(() => {

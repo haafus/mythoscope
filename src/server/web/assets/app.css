@@ -748,7 +748,7 @@ body.has-main-navbar {
     position: absolute;
     z-index: 500;
     width: min(320px, 72vw);
-    padding: 12px 14px;
+    padding: 16px 18px;
     background: #111827;
     color: #f1f3f5;
     border-radius: 8px;
@@ -762,7 +762,8 @@ body.has-main-navbar {
 .geo-tip .popup-title { color: #fff; font-size: 15px; margin-bottom: 4px; gap: 8px; }
 .geo-tip .popup-region { margin: 0 0 8px 22px; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
 .geo-tip .popup-description { color: rgba(255, 255, 255, 0.82); font-size: 12.5px; }
-.geo-tip .popup-book-link { color: #8ab4f8; }
+.geo-tip .popup-book-link { color: #e0b877; }
+.geo-tip .popup-book-link:hover { text-decoration: underline; }
 .geo-tip .popup-books { margin-top: 10px; }
 .geo-tip.region { width: auto; padding: 5px 9px; }
 .geo-tip .popup-region-only { color: rgba(255, 255, 255, 0.85); font-size: 12px; white-space: nowrap; }
