@@ -762,9 +762,6 @@ body.has-main-navbar {
 .geo-tip .popup-title { color: #fff; font-size: 15px; margin-bottom: 2px; gap: 8px; }
 .geo-tip .popup-region { margin: 0 0 12px; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
 .geo-tip .popup-description { color: rgba(255, 255, 255, 0.82); font-size: 12.5px; }
-.geo-tip .popup-book-link { color: #e0b877; }
-.geo-tip .popup-book-link:hover { text-decoration: underline; }
-.geo-tip .popup-books { margin-top: 10px; }
 .geo-tip.region { width: auto; padding: 5px 9px; }
 .geo-tip .popup-region-only { color: rgba(255, 255, 255, 0.85); font-size: 12px; white-space: nowrap; }
 
@@ -779,55 +776,10 @@ body.has-main-navbar {
     line-height: 1.25;
 }
 
-.popup-color {
-    width: 14px;
-    height: 14px;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.2);
-    flex: 0 0 auto;
-}
-
 .popup-description {
     color: #374151;
     font-size: 13px;
     line-height: 1.5;
-}
-
-.popup-empty {
-    margin-top: 8px;
-    font-size: 12.5px;
-    font-style: italic;
-    color: var(--muted-soft);
-}
-
-.popup-books-title {
-    margin: 14px 0 7px;
-    color: #111827;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.popup-books {
-    display: grid;
-    gap: 6px;
-    list-style: none;
-}
-
-.popup-books li {
-    overflow-wrap: anywhere;
-    font-size: 13px;
-}
-
-.popup-book-link {
-    display: block;
-    color: var(--accent);
-    text-decoration: none;
-}
-
-.popup-book-link:hover {
-    text-decoration: underline;
 }
 
 .map-error {

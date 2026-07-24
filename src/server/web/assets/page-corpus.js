@@ -1,5 +1,5 @@
 import {
-    app, api, state,
+    app, api, state, ensureCorpusData, corpusTraditionKey,
     buildCorpusApiUrl, escapeHtml, formatNumber,
     regionOf, traditionColor,
 } from "./core.js";
@@ -32,11 +32,22 @@ export async function renderCorpus(params = new URLSearchParams()) {
     libraryTree.addEventListener("tradition-select", (e) => showTraditionInfo(e.detail.tradition, e.detail.region));
     renderBookInfo(null);
 
-    await renderLibraryTree(libraryTree);
-
-    // Deep link from the geography popups: #/corpus?title=…&tradition=…
     const wantedTitle = params.get("title");
     const wantedTradition = params.get("tradition");
+
+    // Deep link to a tradition (atlas point): pre-open its accordion before the tree renders.
+    if (wantedTradition && !wantedTitle) {
+        await ensureCorpusData();
+        const region = regionOf(wantedTradition);
+        if (region) {
+            state.corpusOpenMajor = region;
+            state.corpusOpenTradition = corpusTraditionKey(region, wantedTradition);
+            state.corpusTreeInitialized = true;   // keep our choice; don't let initTreeOpen override
+        }
+    }
+
+    await renderLibraryTree(libraryTree);
+
     const target = wantedTitle
         ? state.corpusDocuments.find((doc) =>
             doc.title === wantedTitle && (!wantedTradition || doc.tradition === wantedTradition))
@@ -44,6 +55,8 @@ export async function renderCorpus(params = new URLSearchParams()) {
 
     if (target) {
         openCorpusDocument(target);
+    } else if (wantedTradition) {
+        showTraditionInfo(wantedTradition, regionOf(wantedTradition));
     } else if (state.selectedCorpusDoc) {
         setActiveBook(libraryTree, state.selectedCorpusDoc);
     }

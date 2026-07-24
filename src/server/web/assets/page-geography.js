@@ -43,13 +43,6 @@ function normalizeCoordinates(value) {
 async function fetchTraditions() {
     await ensureCorpusData();
 
-    const booksByTradition = new Map();
-    (state.corpusDocuments || []).forEach((doc) => {
-        const t = doc.tradition || "Unknown";
-        if (!booksByTradition.has(t)) booksByTradition.set(t, []);
-        booksByTradition.get(t).push(doc.title);
-    });
-
     const points = [];
     for (const [region, node] of Object.entries(state.traditionTree || {})) {
         for (const [name, info] of Object.entries(node.traditions || {})) {
@@ -61,7 +54,6 @@ async function fetchTraditions() {
                 description: (info && info.description) || "",
                 coordinates,
                 color: traditionColor(name),
-                books: (booksByTradition.get(name) || []).slice().sort(),
             });
         }
     }
@@ -94,17 +86,10 @@ function placeDots(traditions) {
 }
 
 function buildPopupHtml(item) {
-    const booksHtml = item.books.length
-        ? `<ul class="popup-books">${item.books.map((book) => {
-               const href = `#/corpus?title=${encodeURIComponent(book)}&tradition=${encodeURIComponent(item.name)}`;
-               return `<li><a class="popup-book-link" href="${escapeHtml(href)}">${escapeHtml(book)}</a></li>`;
-           }).join("")}</ul>`
-        : "";
     return `
         <div class="popup-title"><span>${escapeHtml(item.name)}</span></div>
         <div class="popup-region">${escapeHtml(item.region)}</div>
         ${item.description ? `<div class="popup-description">${escapeHtml(item.description)}</div>` : ""}
-        ${booksHtml}
     `;
 }
 
@@ -213,10 +198,11 @@ function initAtlas(container, traditions) {
         if (Math.abs(vel.x) > 0.02 || Math.abs(vel.y) > 0.02) iraf = requestAnimationFrame(inertia);
         else { iraf = null; iPrev = 0; }
     }
+    let dragMoved = false;
     const onPointerDown = (e) => {
         if (e.button !== 0 || view.w >= 360) return;   // nothing to pan at full extent
         stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
-        resetGlide = null;
+        resetGlide = null; dragMoved = false;
         try { svg.setPointerCapture(e.pointerId); } catch { /* not capturable */ }
         drag = { id: e.pointerId, x: e.clientX, y: e.clientY, vx: view.x, vy: view.y,
                  hist: [[performance.now(), e.clientX, e.clientY]] };
@@ -243,6 +229,7 @@ function initAtlas(container, traditions) {
     const onPointerUp = (e) => { if (drag && e.pointerId === drag.id) endDrag(); };
     const onPointerMove = (e) => {
         if (!drag || e.pointerId !== drag.id) return;
+        if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 4) dragMoved = true;   // a real pan, not a click
         const rect = svg.getBoundingClientRect();
         panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
               drag.vy - (e.clientY - drag.y) / rect.height * view.h);
@@ -266,22 +253,20 @@ function initAtlas(container, traditions) {
 
     // ============================================================================
     // Tooltip — dark card anchored above the hovered point (mockup 62 tip styling);
-    // rich content (name · region · description · books), links stay clickable.
+    // name · region · description. Clicking a point opens it in Sources.
     // ============================================================================
     const tip = document.createElement("div");
     tip.className = "geo-tip";
     container.appendChild(tip);
 
-    let hiDot = null, curDot = null, closeTimer = null;
+    let hiDot = null, curDot = null;
     const setPoint = (c) => {
         if (hiDot === c) return;
         if (hiDot) hiDot.classList.remove("hi");
         hiDot = c;
         if (hiDot) hiDot.classList.add("hi");
     };
-    const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
     const hideTip = () => { tip.classList.remove("show"); setPoint(null); curDot = null; };
-    const scheduleClose = () => { cancelClose(); closeTimer = setTimeout(hideTip, 200); };  // grace to reach the tip
 
     const showTipFor = (circle) => {
         const item = placed[Number(circle.dataset.i)] && placed[Number(circle.dataset.i)].item;
@@ -323,26 +308,29 @@ function initAtlas(container, traditions) {
         if (dot) {
             setPoint(dot);
             if (dot === curDot) return;
-            curDot = dot; cancelClose(); showTipFor(dot);
+            curDot = dot; showTipFor(dot);
             return;
         }
-        setPoint(null);
+        setPoint(null); hideTip();
         const region = e.target.closest && e.target.closest(".atlas-region");
         if (region) {
-            curDot = null; scheduleClose();   // keep any book card alive through the grace so it stays reachable
             const name = region.dataset.region, x = e.clientX, y = e.clientY;
             regionTimer = setTimeout(() => showRegionTip(name, x, y), DWELL);
-        } else {
-            curDot = null; scheduleClose();
         }
     });
-    svg.addEventListener("mouseleave", () => { clearRegionTimer(); curDot = null; scheduleClose(); });
-    tip.addEventListener("mouseenter", () => { cancelClose(); clearRegionTimer(); });
-    tip.addEventListener("mouseleave", scheduleClose);
+    svg.addEventListener("mouseleave", () => { clearRegionTimer(); hideTip(); });
+
+    // Click a point → open that tradition in Sources (ignore the click that ends a pan).
+    svg.addEventListener("click", (e) => {
+        if (dragMoved) { dragMoved = false; return; }
+        const dot = e.target.closest && e.target.closest(".atlas-dot");
+        const item = dot && placed[Number(dot.dataset.i)] && placed[Number(dot.dataset.i)].item;
+        if (item) window.location.hash = `#/corpus?tradition=${encodeURIComponent(item.name)}`;
+    });
 
     onCleanup(() => {
         stopInertia(); if (zraf) cancelAnimationFrame(zraf);
-        cancelClose(); clearRegionTimer();
+        clearRegionTimer();
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
         window.removeEventListener("pointermove", onPointerMove);
