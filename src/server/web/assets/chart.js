@@ -90,7 +90,13 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
         yaxis: { automargin: true, gridcolor: "#edf1f5", zeroline: false, tickfont: { size: 11, color: "#6c757d" } },
     };
 
-    await Plotly.newPlot(el, traces, layout, { responsive: true, displaylogo: false, displayModeBar: true, scrollZoom: true });
+    await Plotly.newPlot(el, traces, layout, {
+        responsive: true,
+        displaylogo: false,
+        displayModeBar: true,
+        scrollZoom: true,
+        modeBarButtonsToRemove: ["zoom2d", "resetScale2d"],
+    });
     el.dataset.plotly = "1";
     bindTooltip(el);
     el.on("plotly_click", (event) => {
