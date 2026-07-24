@@ -12,9 +12,11 @@ from settings import settings
 
 from . import chroma_manager
 from .chunking import chunk_text
-from .model_manager import EmbeddingEncoder
 from .preprocess import preprocess_texts
 from .transform import chunk_fingerprint, embed_plan, orphan_chunk_ids, transform_version
+
+# NB: EmbeddingEncoder (and through it torch/sentence-transformers) is imported lazily,
+# inside _save_corpus_to_chroma, so a run with nothing to embed never loads the ML stack.
 
 logger = logging.getLogger(__name__)
 
@@ -29,28 +31,27 @@ def build_embeddings(
     else:
         keys = models or embedding_variants()
 
-    encoder = EmbeddingEncoder()
-
     logger.info("Starting embedding generation...")
     logger.info(f"   Source: {settings.corpus_dir}")
     logger.info(f"   Embeddings: {settings.embeddings_dir}")
 
+    encoder = None  # built lazily, only for a variant that actually has chunks to encode
     try:
         for key in keys:
             if force:
                 chroma_manager.delete_collection(key)
-            encoder.load(key)
-            logger.info(f"   Variant: {key} (model {encoder.model_name})")
-            _save_corpus_to_chroma(encoder)
+            encoder = _save_corpus_to_chroma(key, encoder)
     finally:
-        encoder.unload()
+        if encoder is not None:
+            encoder.unload()
 
     logger.info("All embeddings saved to Chroma.")
 
 
-def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
-    cfg = encoder.config
-    key = cfg["key"]
+def _save_corpus_to_chroma(key: str, encoder):
+    """Sync one variant's collection. Returns the encoder (loading it lazily the first time
+    a variant needs encoding); returns it unchanged when the collection is already current."""
+    cfg = embedding_config(key)
     preprocess_prompt = cfg["preprocess_prompt"]
     document_prefix = cfg["document_prefix"]
     emb = settings.embedding
@@ -61,11 +62,11 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
 
     if not files_info:
         logger.warning("No files found in corpus/. Check the folder structure.")
-        return
+        return encoder
 
     collection = chroma_manager.get_or_create_collection(
         key,
-        metadata={"key": key, "model": encoder.model_name, "hnsw:space": "cosine"},
+        metadata={"key": key, "model": cfg["model"], "hnsw:space": "cosine"},  # hf id, no model load
     )
 
     transform_v = transform_version(cfg, emb.chunk_size, emb.chunk_overlap)
@@ -98,15 +99,38 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     stale_removed = len(orphan_ids)
     encode_seconds = 0.0
 
-    logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
-
+    # Cheap pre-pass (no model): count what needs encoding and prune stale chunks in place
+    # (deletion needs no model). If nothing needs encoding, return before loading the ML stack.
     total = 0
-    initial = 0
+    to_embed_total = 0
     for fi in files_info:
+        chunks = [c for c in chunk_text(fi.read_text(), emb.chunk_size, emb.chunk_overlap) if c.strip()]
         expected = chunk_fingerprint(fi.content_fingerprint(), transform_v)
-        n = sum(1 for c in chunk_text(fi.read_text(), emb.chunk_size, emb.chunk_overlap) if c.strip())
-        total += n
-        initial += sum(1 for i in range(n) if existing_fp.get(chunk_id(fi.document_id, i)) == expected)
+        to_embed, stale = embed_plan(fi.document_id, len(chunks), expected, existing_fp)
+        if stale:
+            collection.delete(ids=stale)
+            for cid in stale:
+                existing_fp.pop(cid, None)
+            stale_removed += len(stale)
+        total += len(chunks)
+        to_embed_total += len(to_embed)
+    initial = total - to_embed_total
+
+    if to_embed_total == 0:
+        collection.modify(metadata={
+            "key": key, "model": cfg["model"], "chunk_size": emb.chunk_size,
+            "total_chunks": total, "transform_version": transform_v,
+        })
+        removed = f", {stale_removed} stale removed" if stale_removed else ""
+        logger.info(f"'{collection.name}' already current — {total} chunks, model not loaded{removed}")
+        return encoder
+
+    if encoder is None:
+        from .model_manager import EmbeddingEncoder  # defer torch/sentence-transformers to here
+        encoder = EmbeddingEncoder()
+    encoder.load(key)
+    logger.info(f"   Variant: {key} (model {encoder.model_name})")
+    logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
 
     t0 = time.monotonic()
     with tqdm(total=total, initial=initial, desc="Embedding", unit="chunk") as pbar:
@@ -190,7 +214,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
 
     collection.modify(metadata={
         "key": key,
-        "model": encoder.model_name,
+        "model": cfg["model"],
         "chunk_size": emb.chunk_size,
         "total_chunks": total_chunks,
         "transform_version": transform_v,
@@ -202,6 +226,7 @@ def _save_corpus_to_chroma(encoder: EmbeddingEncoder) -> None:
     if encode_seconds > 0 and added_total > 0:
         speed = added_total / encode_seconds
         logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")
+    return encoder
 
 
 def _build_chroma_entries(
