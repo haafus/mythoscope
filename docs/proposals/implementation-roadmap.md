@@ -116,6 +116,9 @@ tree, every region ∈ the 14 canon, name-uniqueness across region/tradition, `d
 Consumes Part 2's fp base; presupposes Part 1. Reverts via `git`.
 
 13. Part 3 **items 1–2** — atomise stages + generic driver + retire `pipeline_inspect` / `cli._clean`
+    *(done: corpus/embeddings/graphs/projections on the driver; motifs on a coarse input-fp
+    adapter — its granular per-source split is planned in [`motifs-atomisation.md`](motifs-atomisation.md),
+    deferred until a raw-cache snapshot makes it validatable)*
 14. Part 3 **item 5** — rewire `export_bundle` onto the driver
 15. Part 3 **item 4** — scope (stage / variant)
 16. Part 3 **item 3** — DVC/Dagster re-eval *(decision only; likely no-op)*
