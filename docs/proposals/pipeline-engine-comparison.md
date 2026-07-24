@@ -155,3 +155,31 @@ tool for — with its distinctive strength and its notable limitation. Ours is o
 build-your-own, already written) or `redun` (our model, minus the D4 disagreement) could replace much of Part 3
 if the hand-rolled driver ever feels heavy. The distinctive, defensible originality is on the **identity/data
 model** side, not the engine side.
+
+## Post-Part-3 decision (Stage IV item 3) — keep build-your-own
+
+Re-evaluated now that the generic driver is **built and running** (Part 3 items 1–2/4/5:
+`src/pipeline/` — the stage protocol, topological driver, two-level GC; `mytho
+build`/`status`/`clean`/`export` all ride one `desired()`/`actual()` diff). **Decision:
+we keep our own engine — DVC and Dagster are not adopted.**
+
+Why, concretely:
+
+- **They would replace what already works, and add a dependency.** The hand-rolled driver is
+  ~three small modules with no runtime service. DVC brings a `.dvc/cache` + `dvc.lock` + a
+  shell-out model; Dagster brings an instance + a DB. For a single-user research tool that is a
+  net *cost*, not a gain — the "med-heavy" / "needs an instance" cells of Matrix C/D.
+- **Their genuine added value is out of our scope.** Remote artifact store, lineage/history UI,
+  schedulers/sensors (Matrix B/C) — none of which a single-user offline pipeline needs. If a
+  scheduled *product* ever emerges, Dagster is the re-entry point (as already gated in Matrix C).
+- **The part they'd help with, we already have.** Content-addressed change detection, the
+  `inputs + version + params` cache key, downstream cascade by fp composition — our driver
+  matches these symbol-for-symbol (the Verdict's "convergent" list). Adopting an engine buys no
+  incrementality we lack.
+- **Our distinctive design is orthogonal to the engine.** Provenance-addressed identity, the
+  identity/version hash split, stateless-with-no-DB, path-as-rendering — none is an engine
+  feature; an off-the-shelf engine would not carry them and would fight the no-DB choice.
+
+The escape hatch is unchanged: if the driver ever feels heavy, `doit` (build-your-own, same
+shape) or `redun` (our model minus the D4 disagreement) can replace it without touching the
+identity/data model. Nothing observed while building it made it feel heavy.
