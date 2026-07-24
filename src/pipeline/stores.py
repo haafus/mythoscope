@@ -5,6 +5,9 @@ you hold?" so the driver can reap the ones no live stage claims (a dropped model
 
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from embeddings import chroma_manager
 
 
@@ -16,3 +19,17 @@ class ChromaStore:
 
     def delete(self, id: str) -> None:
         chroma_manager.delete_collection(id)
+
+
+class FileStore:
+    """A directory whose immediate subdirs are the fan-out artifacts (one per model), each
+    named by the id that owns it — e.g. ``projections/<model>/``."""
+
+    def __init__(self, root: Path):
+        self._root = root
+
+    def ids(self) -> set[str]:
+        return {d.name for d in self._root.iterdir() if d.is_dir()} if self._root.exists() else set()
+
+    def delete(self, id: str) -> None:
+        shutil.rmtree(self._root / id, ignore_errors=True)
