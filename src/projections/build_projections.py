@@ -1,5 +1,6 @@
 import logging
 
+from corpus.utils import content_fingerprint
 from model_registry import embedding_config
 
 from . import PROJECTION_METHODS
@@ -7,6 +8,13 @@ from .analyzer import ModelData, load_model_data
 from .visualization import CHART_GENERATORS, SCATTER_TRANSFORMS
 
 logger = logging.getLogger(__name__)
+
+
+def _input_fingerprint(model_data: ModelData) -> str:
+    """Identity of the projection input — the set of chunk ids feeding it. Changes when
+    texts are added/removed, so a projection stale against new embeddings is rebuilt."""
+    ids = sorted(str(item.get("id", "")) for item in model_data.data)
+    return content_fingerprint("\n".join(ids).encode("utf-8"))
 
 
 def build_projections(
@@ -44,14 +52,21 @@ def build_projections(
 
 
 def _generate_plots(model_data: ModelData, force: bool = False) -> None:
+    # Skip only when the projection is present AND its inputs are unchanged (existence
+    # alone missed new embeddings from added texts). The fp sidecar records the input set.
+    fp_path = model_data.output_dir / ".input-fp"
+    current_fp = _input_fingerprint(model_data)
+    fresh = fp_path.exists() and fp_path.read_text(encoding="utf-8").strip() == current_fp
+
+    ok = True
     for method in PROJECTION_METHODS:
         key = method["key"]
         chart_type = method["chart_type"]
         label = method["label"]
         output_path = model_data.output_dir / f"{key}.json"
 
-        if not force and output_path.exists():
-            logger.info("Skipping %s (already exists)", label)
+        if not force and fresh and output_path.exists():
+            logger.info("Skipping %s (up to date)", label)
             continue
 
         logger.info("Generating %s...", label)
@@ -62,6 +77,9 @@ def _generate_plots(model_data: ModelData, force: bool = False) -> None:
                 kwargs["transform"] = SCATTER_TRANSFORMS[key]
             generator(model_data.data, model_data.embeddings, output_path, model_name=model_data.model_name, **kwargs)
         except Exception:
+            ok = False
             logger.exception("Error creating %s", label)
 
+    if ok:
+        fp_path.write_text(current_fp, encoding="utf-8")  # stamp inputs so an unchanged rerun skips
     logger.info("Visualizations for %s: %s", model_data.model_name, model_data.output_dir)
