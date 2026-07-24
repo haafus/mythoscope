@@ -203,7 +203,8 @@ function initAtlas(container, traditions) {
         if (e.button !== 0 || view.w >= 360) return;   // nothing to pan at full extent
         stopInertia(); if (zraf) { cancelAnimationFrame(zraf); zraf = null; }
         resetGlide = null; dragMoved = false;
-        try { svg.setPointerCapture(e.pointerId); } catch { /* not capturable */ }
+        // Capture is deferred to the first real move (below): capturing here would
+        // retarget the ensuing click to the svg, so a plain click on a dot would miss.
         drag = { id: e.pointerId, x: e.clientX, y: e.clientY, vx: view.x, vy: view.y,
                  hist: [[performance.now(), e.clientX, e.clientY]] };
         svg.style.cursor = "grabbing";
@@ -229,7 +230,10 @@ function initAtlas(container, traditions) {
     const onPointerUp = (e) => { if (drag && e.pointerId === drag.id) endDrag(); };
     const onPointerMove = (e) => {
         if (!drag || e.pointerId !== drag.id) return;
-        if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 4) dragMoved = true;   // a real pan, not a click
+        if (!dragMoved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 4) {
+            dragMoved = true;   // a real pan, not a click — now safe to capture the pointer
+            try { svg.setPointerCapture(e.pointerId); } catch { /* not capturable */ }
+        }
         const rect = svg.getBoundingClientRect();
         panTo(drag.vx - (e.clientX - drag.x) / rect.width * view.w,
               drag.vy - (e.clientY - drag.y) / rect.height * view.h);
