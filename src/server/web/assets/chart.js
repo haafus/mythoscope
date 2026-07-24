@@ -72,6 +72,7 @@ export async function renderScatter(el, data, { colorMap, onPointClick }) {
     });
 
     const layout = {
+        dragmode: "pan",   // default modebar tool
         margin: { l: 50, r: 28, t: 28, b: 48 },
         plot_bgcolor: "#fbfcfd",
         paper_bgcolor: "#fff",
