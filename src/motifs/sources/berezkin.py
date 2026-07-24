@@ -551,10 +551,7 @@ def _attach_see_also(motifs: list[dict]) -> None:
 
 def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, force: bool) -> None:
     """Fetch detail pages and attach each motif's short definition in place."""
-    targets = motifs
-    if settings.motifs.max_motifs is not None:
-        targets = motifs[: settings.motifs.max_motifs]
-    logger.info("Berezkin: fetching %d detail pages (definitions)...", len(targets))
+    logger.info("Berezkin: fetching %d detail pages (definitions)...", len(motifs))
 
     def fetch_one(motif: dict) -> tuple[dict, str, str | None]:
         url = f"{base}/{motif['page']}"
@@ -569,7 +566,7 @@ def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, fo
     errors = 0
     no_definition = 0  # fetched fine, but the page carries no NormalLis definition
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for motif, definition, error in pool.map(fetch_one, targets):
+        for motif, definition, error in pool.map(fetch_one, motifs):
             if error:
                 errors += 1
                 logger.warning("Berezkin: detail fetch FAILED — %s %s — %s/%s: %s",

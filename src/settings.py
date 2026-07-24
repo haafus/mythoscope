@@ -54,7 +54,6 @@ class MotifsSettings(BaseModel):
     # Detail pages add per-motif definitions; the backbone (codes, names, areas)
     # comes from the index page regardless.
     berezkin_details: bool = True
-    max_motifs: int | None = None  # cap detailed motifs (None = all); used by `build --sample`
 
 
 class ProjectionsSettings(BaseModel):

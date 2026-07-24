@@ -124,11 +124,8 @@ def build(model, force, sample):
     """Run the full analysis pipeline end-to-end."""
     if sample is not None:
         from model_registry import embedding_variants
-        from settings import settings
         model = model or embedding_variants()[0]
-        max_texts = sample
-        # Keep the motif scrape light on a smoke run: only the sampled detail pages.
-        settings.motifs.max_motifs = max_texts
+        max_texts = sample  # limits corpus + graphs only; motifs always build in full
         click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
     else:
         max_texts = None
