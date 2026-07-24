@@ -11,10 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 def _input_fingerprint(model_data: ModelData) -> str:
-    """Identity of the projection input — the set of chunk ids feeding it. Changes when
-    texts are added/removed, so a projection stale against new embeddings is rebuilt."""
-    ids = sorted(str(item.get("id", "")) for item in model_data.data)
-    return content_fingerprint("\n".join(ids).encode("utf-8"))
+    """Identity of the projection input — folds in each chunk's embeddings fingerprint
+    (the upstream stage's per-chunk fp: hash(doc_fp, model, transform_v)). So added/removed
+    texts (id set changes) AND edits to an existing text (fp changes) both rebuild it."""
+    parts = sorted(
+        f"{item.get('id', '')}:{item.get('chunk_index', '')}:{item.get('fingerprint', '')}"
+        for item in model_data.data
+    )
+    return content_fingerprint("\n".join(parts).encode("utf-8"))
 
 
 def build_projections(
