@@ -69,8 +69,9 @@ one pass (no separate backfill — this is the "Part 1 + 2 together" optimisatio
    `hash(doc fingerprint, transform_version)`; doc `fingerprint` = `blake2b(cleaned text)` in the catalog; the
    decision is the pure `embed_plan()`. *(rename-churn half still awaits Part 1's `document_id` anchor.)*
 9. Part 2 **item 4** fetch/build split + `refresh` + pin raw — ✅ `--force` no longer re-fetches (raw pinned);
-   new `mytho refresh [documents|motifs]` (staged diff, keep-pinned, `--apply`). *(The generalised per-source
-   staged refresh / source-unit layer is deferred to Part 3, §7 of `fetch-and-refresh.md`.)*
+   new `mytho refresh [documents|motifs]` (staged diff, keep-pinned, `--apply`). *(Documents are fully staged;
+   `refresh motifs` is still a crude wholesale re-scrape — the per-source staged refresh / source-unit layer
+   rides the motifs source-stage split, tracked as task 7 in [`motifs-atomisation.md`](motifs-atomisation.md).)*
 10. Part 2 **item 5 = Part 1 step 6** graphs build/serve unify + traversal guard — ✅ one `graphs.store.graph_dir`
     used by build + serve, with `sanitize` + `is_relative_to` confinement.
 

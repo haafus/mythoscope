@@ -74,9 +74,16 @@ So the concrete tasks:
 6. Retire the monolith `build_motifs` (and the coarse `motifs_fingerprint` gate) once the
    per-stage fps subsume it; the `MotifsStage` adapter is replaced by the stages above and the
    driver wiring in `build_pipeline()` does not otherwise change.
+7. **Per-source staged `refresh`** — give each `motifs:source:*` stage an `acquire`/`refresh`
+   (the `upstream` capability, `fetch-and-refresh.md` §7) so `mytho refresh motifs` becomes a
+   per-source diff/preview/adopt with keep-pinned, exactly like `refresh documents` today —
+   replacing the crude wholesale re-scrape (`build_motifs(force=True)`) the current
+   `_refresh_motifs` stopgap runs. Belongs here because there is no source *unit* to
+   stage-refresh until the sources are stages; building it earlier would duplicate that
+   structure.
 
 **Prep done now (validatable without a raw cache):** tasks 1 + 2. **Remaining (need the raw
-cache to rebuild + golden-diff):** 3–6.
+cache to rebuild + golden-diff):** 3–7.
 
 ## Validation
 
