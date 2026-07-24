@@ -118,7 +118,7 @@ changes ("`clean` won't find files that fell out of the scheme").
 Instead, **each stage carries its own hygiene**, and a stage is **atomic** — one key-space, so the stage *is*
 its artifact family (no separate `ArtifactFamily` type). A single `build_pipeline()` factory (below) constructs
 and wires every stage — it is **the one registry**; the driver flattens its output into a topological list, and
-CLI grouping (`mytho embeddings`) comes from the stage's name prefix (`embeddings:*`), not a separate per-module
+CLI scope (`mytho build embeddings`) matches on the stage's name prefix (`embeddings:*`), not a separate per-module
 list. Interface (validated against the real stages):
 
 ```python

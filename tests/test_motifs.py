@@ -1701,7 +1701,7 @@ class TestService:
         # Against the built bibliography key (outputs/motifs/tmi_bibliography.json),
         # produced by the pipeline; skip when the DB hasn't been built.
         if not svc._bibliography_index():
-            pytest.skip("bibliography key not built (run `mytho motifs`)")
+            pytest.skip("bibliography key not built (run `mytho build motifs`)")
         assert "archive.org" in svc._resolve_citation("BP III").get("url", "")
         assert "Fire" in svc._resolve_citation("**Frazer Fire").get("title", "")  # multi-work author
         assert "url" not in svc._resolve_citation("Nonexistentauthor 5")

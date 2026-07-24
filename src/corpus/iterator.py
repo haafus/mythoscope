@@ -39,7 +39,7 @@ def iter_files(corpus_dir: Path) -> Generator[CorpusFileInfo, None, None]:
 
     if not metadata_file.exists():
         raise FileNotFoundError(
-            f"{metadata_file} not found. Run 'mytho corpus build' first."
+            f"{metadata_file} not found. Run 'mytho build corpus' first."
         )
 
     with open(metadata_file, encoding="utf-8") as f:

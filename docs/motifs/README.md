@@ -3,7 +3,7 @@
 This folder explains how MythoScope builds its **motif database**: how it sources,
 parses, enriches and cross-links the three traditional indexes —
 **Thompson (TMI)**, **Aarne–Thompson–Uther (ATU)**, and the **Berezkin & Duvakin**
-areal catalogue. It's the reference behind the `mytho motifs` pipeline.
+areal catalogue. It's the reference behind the `mytho build motifs` pipeline.
 
 **Start with [`motif-index-data-sources.md`](motif-index-data-sources.md)** — the
 hub that ties it together: every source, the pipeline end to end, and licensing.

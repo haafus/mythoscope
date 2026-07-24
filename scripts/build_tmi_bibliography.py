@@ -2,7 +2,7 @@
 """Refresh the TMI citation-key and regenerate its human-readable doc.
 
 The key itself is built by the pipeline (``motifs.sources.bibliography``) into
-``outputs/motifs/tmi_bibliography.json`` — the same code ``mytho motifs`` runs.
+``outputs/motifs/tmi_bibliography.json`` — the same code ``mytho build motifs`` runs.
 This wrapper rebuilds it standalone and additionally writes the committed
 ``docs/motifs/tmi-bibliography-key.md`` (a documentation artifact, not build output).
 
@@ -55,7 +55,7 @@ def write_doc(data: dict) -> None:
 def main() -> int:
     tmi_path = store.index_path("tmi")
     if not tmi_path.exists():
-        print("Build the motif database first (mytho motifs) — tmi.json is needed.", file=sys.stderr)
+        print("Build the motif database first (mytho build motifs) — tmi.json is needed.", file=sys.stderr)
         return 1
     tmi_records = json.loads(tmi_path.read_text("utf-8"))["motifs"]
     bibliography.refresh(tmi_records, force=False)

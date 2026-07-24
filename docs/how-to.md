@@ -136,16 +136,33 @@ DEEPSEEK_API_KEY=sk-...
 
 ```bash
 mytho --help
-mytho corpus --help
-mytho embeddings --help
-mytho projections --help
-mytho graphs --help
-mytho server --help
 mytho build --help
-mytho status
-mytho clean
+mytho status --help
+mytho clean --help
+mytho refresh --help
 mytho export --help
+mytho server --help
 ```
+
+**Единая точка входа — `build` со scope.** Отдельных команд на стадию (`corpus`,
+`embeddings`, …) больше нет: стадии адресуются позиционным аргументом **scope** по
+имени/префиксу. `mytho build` без scope собирает всё недостающее/устаревшее; со scope
+— только названные стадии (upstream не пересобирается). Имена стадий: `corpus`,
+`embeddings:<вариант>` (напр. `embeddings:bge-m3`), `projections:<вариант>`, `graphs`,
+`motifs`. Префикс матчит все варианты (`embeddings` → все `embeddings:*`).
+
+```bash
+mytho build                    # всё недостающее/устаревшее
+mytho build corpus             # только корпус
+mytho build embeddings         # все активные embedding-варианты
+mytho build embeddings:bge-m3  # один вариант
+mytho build graphs motifs      # несколько стадий за раз
+mytho build --force            # игнорировать fingerprint-гейт, пересобрать всё
+mytho build corpus --force     # пересобрать только корпус с нуля
+```
+
+Те же `status` / `clean` / `export` принимают опциональный scope (`mytho status graphs`,
+`mytho clean motifs`, `mytho export embeddings`).
 
 ## corpus
 
@@ -169,13 +186,13 @@ mytho export --help
 Запуск сборки корпуса:
 
 ```bash
-mytho corpus
+mytho build corpus
 ```
 
 Пересобрать с перезаписью:
 
 ```bash
-mytho corpus --force
+mytho build corpus --force
 ```
 
 ### Источники: веб и локальные файлы
@@ -228,7 +245,7 @@ mytho corpus --force
 | `dtype` | нет | `auto` | dtype энкодера. |
 | `batch_size` | нет | из настроек | Размер батча. |
 
-Конвенция имён: **`*_prompt` — ссылка в `config/prompts.json`; `*_prefix` — инлайн-литерал** при модели. Правка `preprocess_prompt`-промпта регенерит кэш препроцессинга сама (ключ по хэшу текста), но коллекцию нужно пересобрать вручную: `mytho embeddings --model <key> --force`.
+Конвенция имён: **`*_prompt` — ссылка в `config/prompts.json`; `*_prefix` — инлайн-литерал** при модели. Правка `preprocess_prompt`-промпта регенерит кэш препроцессинга сама (ключ по хэшу текста), но коллекцию нужно пересобрать вручную: `mytho build embeddings:<key> --force`.
 
 Возможности:
 - Построить эмбеддинги для нескольких моделей.
@@ -237,19 +254,19 @@ mytho corpus --force
 Сгенерировать эмбеддинги для всех активных моделей:
 
 ```bash
-mytho embeddings
+mytho build embeddings
 ```
 
-Сгенерировать для конкретной модели:
+Сгенерировать для конкретной модели (scope = имя варианта):
 
 ```bash
-mytho embeddings --model bge-m3
+mytho build embeddings:bge-m3
 ```
 
 Пересоздать с нуля:
 
 ```bash
-mytho embeddings --model bge-m3 --force
+mytho build embeddings:bge-m3 --force
 ```
 
 Загруженные модели кэшируются локально — чтобы очистить кэш и скачать модель заново, удалите её папку из кэша:
@@ -265,7 +282,6 @@ rm -rf ~/.cache/huggingface/hub/models--BAAI--bge-m3
 Основные файлы:
 - `src/projections/analyzer.py` загружает данные из Chroma и собирает статистику.
 - `src/projections/visualization.py` вычисляет UMAP-проекции, heatmap расстояний и distribution, сохраняет как JSON.
-- `src/projections/summaries.py` строит LLM-саммари сюжетов (параллельно, с кэшем `summaries.jsonl`) и summaries-UMAP по ним.
 - `src/projections/build_projections.py` оркестрирует анализ для нескольких моделей.
 
 Возможности:
@@ -276,19 +292,13 @@ rm -rf ~/.cache/huggingface/hub/models--BAAI--bge-m3
 Запустить анализ всех доступных моделей:
 
 ```bash
-mytho projections
+mytho build projections
 ```
 
-Запустить анализ одной модели:
+Запустить анализ одной модели (scope = имя варианта):
 
 ```bash
-mytho projections --model bge-m3
-```
-
-Дополнительно построить summaries-UMAP из LLM-саммари сюжетов:
-
-```bash
-mytho projections --summaries
+mytho build projections:bge-m3
 ```
 
 ## graphs
@@ -319,14 +329,14 @@ mytho projections --summaries
 Модель берётся из `settings.py` → `graphs.llm` (алиас из `config/models.json`; переопределяется через `MYTHO_GRAPHS__LLM`, например `MYTHO_GRAPHS__LLM=gemini25-flash`):
 
 ```bash
-mytho graphs
+mytho build graphs
 ```
 
-По умолчанию `mytho graphs` **каждый раз пересобирает все графы из уже извлечённого кэша** (`extraction_cache.jsonl`); LLM вызывается только для ещё не извлечённых чанков и создаётся лениво — если кэш полон, ключ не нужен (удобно после изменения логики построения графов). `--force` чистит кэш и извлекает заново через LLM:
+По умолчанию `mytho build graphs` **каждый раз пересобирает все графы из уже извлечённого кэша** (`extraction_cache.jsonl`); LLM вызывается только для ещё не извлечённых чанков и создаётся лениво — если кэш полон, ключ не нужен (удобно после изменения логики построения графов). `--force` чистит кэш и извлекает заново через LLM:
 
 ```bash
-mytho graphs           # пересобрать графы из кэша (LLM — только для новых чанков)
-mytho graphs --force   # извлечь заново с нуля (через LLM)
+mytho build graphs           # пересобрать графы из кэша (LLM — только для новых чанков)
+mytho build graphs --force   # извлечь заново с нуля (через LLM)
 ```
 
 (В отличие от `--force`, который **стирает** `extraction_cache.jsonl` и переизвлекает всё заново через LLM.)
@@ -341,12 +351,12 @@ mytho graphs --force   # извлечь заново с нуля (через LLM
 - **Прерывание `Ctrl+C`**: отменяет ещё не начатые чанки и завершается, дождавшись лишь уже летящих вызовов (потоки нельзя убить мгновенно; максимум — request-timeout 120с). На первом нажатии печатается подсказка; второе нажатие пропускает ожидание летящих вызовов. Безопасно в любой момент: кэш append-only с устойчивостью к оборванной строке, выходные графы пишутся атомарно. Для мгновенной остановки — `kill -9 <pid>` из другого терминала, тоже без порчи данных. Перезапуск продолжит с места.
 - **Сон / закрытие крышки (macOS)**: процесс не убивается — он замораживается и продолжает после пробуждения. Летящие в момент засыпания вызовы оборвутся, но это transient-ошибки → переретраиваются; прогресс не теряется. Для долгого фонового прогона держи Мак бодрым:
   ```bash
-  caffeinate -i mytho graphs      # запрет idle-сна на время прогона
+  caffeinate -i mytho build graphs   # запрет idle-сна на время прогона
   ```
   Закрытие крышки усыпит всё равно (нет внешнего монитора/питания) — держи крышку открытой.
 - В логах периодически печатается утилизация (`% TPM`/`% RPM`, throttled %), и итоговая сводка в конце.
 
-Те же механизмы (governor, `map_concurrent`, кэш) использует и `mytho projections --summaries` для LLM-саммари; его параллелизм — `projection.max_concurrent` (по умолчанию 5).
+Те же механизмы (governor, `map_concurrent`, кэш) переиспользуемы для любого LLM-шага пайплайна; параллелизм задаётся `*.max_concurrent` в настройках стадии.
 
 ### Тюнинг throughput
 
@@ -375,7 +385,6 @@ LLM usage [gpt-4o-mini]: 200 requests, 315,901 tokens, ~72 req/min, 57% TPM, 14%
 
 ```bash
 MYTHO_GRAPHS__MAX_CONCURRENT=28        # graphs
-MYTHO_PROJECTIONS__MAX_CONCURRENT=10   # summaries
 ```
 
 Нюансы:
@@ -392,7 +401,7 @@ MYTHO_PROJECTIONS__MAX_CONCURRENT=10   # summaries
 - **Trilogy** (`j-hagedorn/trilogy`, CC-BY-SA 4.0) — TMI (~46 000 мотивов Томпсона с иерархией) и ATU (~2 250 типов сказок, каждый с упорядоченным списком мотивов TMI из `atu_seq`).
 
 Основные файлы:
-- `src/motifs/build_motifs.py` — оркестратор шага (каждый запуск пересобирает из кэша `raw/`; `--force` перезагружает источники).
+- `src/motifs/build_motifs.py` — оркестратор шага (`mytho build motifs` пересобирает из кэша `raw/`; перезагрузка источников — через `mytho refresh motifs --apply`).
 - `src/motifs/sources/berezkin.py` — скрейп + парсинг каталога Березкина (парсинг отделён от загрузки и покрыт тестами).
 - `src/motifs/sources/trilogy.py` — загрузка и разбор CSV Trilogy (TMI, ATU, `atu_seq`, `atu_combos`).
 - `src/motifs/sources/fetch.py` — загрузка-в-кэш (`outputs/motifs/raw/`): повторный запуск не ходит в сеть.
@@ -402,16 +411,17 @@ MYTHO_PROJECTIONS__MAX_CONCURRENT=10   # summaries
 
 Выход (`outputs/motifs/`): `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `parallels.json`, `meta.json` и кэш сырья `raw/`.
 
-**Воспроизводимость и перезапуск.** Сырьё кэшируется в `raw/`, поэтому повторный запуск дёшев и безопасен к прерыванию. По умолчанию `mytho motifs` **каждый раз заново парсит и генерирует** данные из кэша `raw/` (недостающее докачивает); `--force` дополнительно перезагружает все источники.
+**Воспроизводимость и перезапуск.** Сырьё кэшируется в `raw/`, поэтому повторный запуск дёшев и безопасен к прерыванию. `mytho build motifs` **пересобирает из кэша `raw/`** (сеть не трогает — недостающее сырьё докачивается лениво при парсинге); перезагрузка источников из сети — отдельная сетевая команда `mytho refresh motifs --apply` (без `--apply` — предпросмотр).
 
 ```bash
-mytho motifs           # пересобрать из кэша (докачать недостающее)
-mytho motifs --force   # пересобрать с нуля (заново скачать источники)
+mytho build motifs             # пересобрать из кэша
+mytho refresh motifs           # предпросмотр: что будет пере-скачано
+mytho refresh motifs --apply   # пере-скачать источники из сети
 ```
 
 Тюнинг скрейпа Березкина — через env (см. `.env.example`): `MYTHO_MOTIFS__MAX_WORKERS` (параллельные загрузки детальных страниц), `MYTHO_MOTIFS__BEREZKIN_DETAILS` (тянуть ли определения), `MYTHO_MOTIFS__MAX_MOTIFS` (ограничить число детальных страниц — используется `build --sample`).
 
-**Обогащение из mapsofmyths.com** (английские названия/определения, таксономия type/group, прямые Thompson-id, распределение по традициям) — отдельный шаг пайплайна `mytho motifs`, кэшируется в `outputs/motifs/raw/mapsofmyths/`, результат — `outputs/motifs/mapsofmyths_*.json` (не коммитятся). Требует HTTP basic-auth: `MAPSOFMYTHS_AUTH=user:pass`; без кредов шаг пишет предупреждение и пропускается (каталог собирается без обогащения). Библиография Томпсона (folkmasa + курируемый список) — тоже шаг пайплайна, пишет `outputs/motifs/tmi_bibliography.json`. Сколько и каких сущностей дообогащено — видно в `mytho status`.
+**Обогащение из mapsofmyths.com** (английские названия/определения, таксономия type/group, прямые Thompson-id, распределение по традициям) — отдельный шаг сборки мотивов, кэшируется в `outputs/motifs/raw/mapsofmyths/`, результат — `outputs/motifs/mapsofmyths_*.json` (не коммитятся). Требует HTTP basic-auth: `MAPSOFMYTHS_AUTH=user:pass`; без кредов шаг пишет предупреждение и пропускается (каталог собирается без обогащения). Библиография Томпсона (folkmasa + курируемый список) — тоже шаг пайплайна, пишет `outputs/motifs/tmi_bibliography.json`. Сколько и каких сущностей дообогащено — видно в `mytho status`.
 
 **Об ареалах (декодирование).** Ареальные индексы (`.19.21.29.`) — это глобальные номера макро-ареалов Березкина. Названия берутся напрямую из официального ключа во введении каталога (`intro.html`, раздел «Цифры соответствуют следующим регионам») — он захардкожен как `berezkin._CANONICAL_AREAS` (`canonical_area_legend()`). Нумерация начинается с 10 и идёт до 74 (~65 макро-ареалов: Африка → Европа → Азия → Океания → Сибирь → Сев. Америка → Мезоамерика → Юж. Америка); код 58 («Дельта Ориноко») упразднён и влит в 59 («Гвиана»), но всё ещё помечает часть старых записей, поэтому сохранён в ключе. Декодирование самих ареалов не требует детальных страниц; загрузка `berezkin_details` нужна лишь для коротких определений мотивов. Per-region легенда из `areas1.html` (список этносов с другой нумерацией) для этого **не** годится и не используется.
 
@@ -601,7 +611,7 @@ mytho server
 [`mockups/README.md`](../mockups/README.md).
 
 ```bash
-# с уже собранной базой мотивов (mytho motifs):
+# с уже собранной базой мотивов (mytho build motifs):
 python mockups/07-tradition-motif-combined/build_data.py
 python -m http.server -d mockups 8890   # → http://127.0.0.1:8890/07-tradition-motif-combined/
 ```
@@ -610,11 +620,11 @@ python -m http.server -d mockups 8890   # → http://127.0.0.1:8890/07-tradition
 
 Все генерируемые данные хранятся в `outputs/`:
 
-- `outputs/corpus/` — основной текстовый корпус с метаданными (`corpus.json`) и описаниями традиций (`traditions.json`). Создается через `mytho corpus`.
-- `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho embeddings`.
-- `outputs/projections/` — результаты анализа: JSON-данные проекций (UMAP, heatmap, distribution). Создается через `mytho projections`.
-- `outputs/graphs/` — JSON-графы (characters, realms, ages) для каждого текста. Создается через `mytho graphs`.
-- `outputs/motifs/` — база мотивов: `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `parallels.json`, `meta.json` + кэш сырья `raw/`. Создается через `mytho motifs`.
+- `outputs/corpus/` — основной текстовый корпус с метаданными (`corpus.json`) и описаниями традиций (`traditions.json`). Создается через `mytho build corpus`.
+- `outputs/embeddings/` — локальная Chroma DB с векторными коллекциями. Создается через `mytho build embeddings`.
+- `outputs/projections/` — результаты анализа: JSON-данные проекций (UMAP, heatmap, distribution). Создается через `mytho build projections`.
+- `outputs/graphs/` — JSON-графы (characters, realms, ages) для каждого текста. Создается через `mytho build graphs`.
+- `outputs/motifs/` — база мотивов: `berezkin.json`, `tmi.json`, `atu.json`, `crosswalk.json`, `parallels.json`, `meta.json` + кэш сырья `raw/`. Создается через `mytho build motifs`.
 - `outputs/logs/` — логи всех пайплайнов.
 
 ## Типовой пайплайн
@@ -622,11 +632,12 @@ python -m http.server -d mockups 8890   # → http://127.0.0.1:8890/07-tradition
 Запустить всё одной командой:
 
 ```bash
-mytho build --model bge-m3
+mytho build
 ```
 
-`--model` задаёт embedding-модель; LLM-модели для графов и препроцессинга берутся
-из настроек (`MYTHO_GRAPHS__LLM`, `MYTHO_EMBEDDING__LLM`).
+`mytho build` собирает все активные embedding-варианты из `config/models.json`;
+LLM-модели для графов и препроцессинга берутся из настроек (`MYTHO_GRAPHS__LLM`,
+`MYTHO_EMBEDDING__LLM`).
 
 Быстрый прогон для проверки пайплайна — первая активная embedding-модель и ограниченное
 число текстов (по умолчанию 2). Можно передать своё число `N`, чтобы прогнать больше:
@@ -639,29 +650,29 @@ mytho build --sample 50     # переопределить: 50 текстов (�
 `N` ограничивает и корпус/графы (`max_texts`), и число детальных страниц мотивов
 (`MYTHO_MOTIFS__MAX_MOTIFS`).
 
-Или по шагам:
+Или по стадиям (scope у `build`):
 
 ```bash
 # 1. Собрать корпус (Gutenberg-тексты очищаются автоматически)
-mytho corpus
+mytho build corpus
 
 # 2. Построить эмбеддинги
-mytho embeddings
+mytho build embeddings
 
 # 3. Построить визуальный анализ эмбеддингов
-mytho projections
+mytho build projections
 
 # 4. Извлечь графы персонажей через LLM
-mytho graphs
+mytho build graphs
 
 # 5. Построить базу мотивов (Berezkin + TMI + ATU); независим от шагов 1-4
-mytho motifs
+mytho build motifs
 
 # 6. Запустить веб-интерфейс
 mytho server
 ```
 
-Каждый шаг идемпотентен — если результат уже есть, он будет пропущен. Длинные шаги (`corpus`, `graphs`, `projections --summaries`) можно безопасно прервать `Ctrl+C` в любой момент: незавершённая работа отменяется, уже сделанное сохранено (тексты на диске, графы — атомарно, LLM-кэши append-only), и повторный запуск продолжит с места. Для принудительной пересборки:
+Каждая стадия идемпотентна — если результат уже есть и не устарел, она будет пропущена. Длинные стадии (`corpus`, `graphs`) можно безопасно прервать `Ctrl+C` в любой момент: незавершённая работа отменяется, уже сделанное сохранено (тексты на диске, графы — атомарно, LLM-кэши append-only), и повторный запуск продолжит с места. Для принудительной пересборки:
 
 ```bash
 mytho build --force

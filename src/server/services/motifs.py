@@ -2,7 +2,7 @@
 
 Serves the browsable Motifs catalog: index summaries, paginated/filtered motif
 lists, and per-motif detail with resolved cross-walk links. All data is read
-from ``outputs/motifs/`` (built by ``mytho motifs``) and cached per process.
+from ``outputs/motifs/`` (built by ``mytho build motifs``) and cached per process.
 """
 
 from __future__ import annotations

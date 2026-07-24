@@ -53,7 +53,7 @@ def main():
     FAMILY_DATES = m30.FAMILY_DATES
     coords = geo.berezkin_coords()
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
     join = json.loads(_need(MOCKS / "30-dated-phylogeny" / "glottolog_join.json",

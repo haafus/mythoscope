@@ -136,7 +136,7 @@ def gaz_coord(label):
 
 # Real per-tradition coordinates for the Berezkin catalogue, from the committed snapshot
 # tradition-coords.json (areal_id -> [lat, lon], scraped from mapsofmyths.com). The motif
-# pipeline does not carry coordinates unless a coordinate-enabled `mytho motifs` refresh
+# pipeline does not carry coordinates unless a coordinate-enabled `mytho build motifs` refresh
 # has run, so this local snapshot is the source the mockups read from. Where a coordinate
 # is missing the map mockups fall back to the areal-subregion centroid.
 _BEREZKIN_COORDS = None

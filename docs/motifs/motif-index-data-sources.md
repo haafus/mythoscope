@@ -3,7 +3,7 @@
 *Как mythoscope собирает три традиционных индекса — Берёзкин (ареальный каталог),
 Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машиночитаемых
 источников, и как они связаны между собой. Реализация: шаг пайплайна
-`mytho motifs` (`src/motifs/`). Детали данных — в
+`mytho build motifs` (`src/motifs/`). Детали данных — в
 [`tmi-reference.md`](tmi-reference.md), [`atu-reference.md`](atu-reference.md),
 [`berezkin-reference.md`](berezkin-reference.md),
 [`tmi-bibliography-key.md`](tmi-bibliography-key.md); известные проблемы — в
@@ -42,7 +42,7 @@ Thompson Motif-Index (TMI) и Aarne–Thompson–Uther (ATU) — из машин
 
 ## Пайплайн и архитектура
 
-`mytho motifs` собирает базу в пять шагов (`src/motifs/build_motifs.py`):
+`mytho build motifs` собирает базу в пять шагов (`src/motifs/build_motifs.py`):
 
 ```
 [1/5] Berezkin  — scrape areasofmyths + обогащение mapsofmyths
@@ -210,7 +210,7 @@ ATU достижимо больше пар, но они слабее, поэто
 parallels» как подсказки для проверки, а не утверждённые рёбра. Помимо лексического
 есть ещё три слоя-подсказки, все описаны в `crosswalk.md`: **по рассуждению**
 (кураторский, в коде, §9), **транзитивные** inferred (§10) и **семантические** на
-эмбеддингах BGE-M3 (§11 — считаются офлайн, вне `mytho motifs`). Метод и данные —
+эмбеддингах BGE-M3 (§11 — считаются офлайн, вне `mytho build motifs`). Метод и данные —
 `crosswalk.md §8–11` и папка `crosswalk/`.
 
 ## Overview-дашборды (общий каркас графиков)

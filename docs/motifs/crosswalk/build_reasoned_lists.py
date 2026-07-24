@@ -9,7 +9,7 @@ folder:
 - ``reasoned_parallels_triads.csv`` — groups spanning all three indexes.
 - ``reasoned-parallels.md``         — the full write-up (framing + every group).
 
-Run (from the repo root, after ``mytho motifs``)::
+Run (from the repo root, after ``mytho build motifs``)::
 
     PYTHONPATH=src python3 docs/motifs/crosswalk/build_reasoned_lists.py
 """

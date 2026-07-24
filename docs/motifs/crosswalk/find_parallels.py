@@ -11,7 +11,7 @@ The *productionised* generator that feeds the on-page "Possible parallels" panel
 lives in ``src/motifs/parallels.py`` (build step ``[5/5]`` → ``parallels.json``);
 it keeps only the high-confidence tier. This script keeps both tiers for review.
 
-Run (from the repo root, after ``mytho motifs`` has built the indexes)::
+Run (from the repo root, after ``mytho build motifs`` has built the indexes)::
 
     PYTHONPATH=src python3 docs/motifs/crosswalk/find_parallels.py
 

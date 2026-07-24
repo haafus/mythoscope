@@ -6,7 +6,7 @@ Counts, per index-pair, how many links each approach established, how many were
 and the running total — plus the heuristic/reasoned suggestion layers. Writes
 ``link-accounting.md`` in this folder.
 
-Run (from the repo root, after ``mytho motifs``)::
+Run (from the repo root, after ``mytho build motifs``)::
 
     PYTHONPATH=src python3 docs/motifs/crosswalk/link_accounting.py
 """

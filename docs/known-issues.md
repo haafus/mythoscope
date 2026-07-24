@@ -151,8 +151,9 @@ cache is **gitignored and never exported** (`mytho export` skips `raw/**`)
 because it isn't reproducible:
 
 - The upstream sites are live and change over time — pages get edited, motifs
-  added or renumbered, a site can move or go down. A fresh `mytho motifs --force`
-  can therefore return **different counts** than a cache built earlier.
+  added or renumbered, a site can move or go down. A fresh `mytho refresh motifs
+  --apply` (re-scrape) can therefore return **different counts** than a cache built
+  earlier.
 - The cache is a point-in-time snapshot, not a versioned dataset; two machines
   scraping on different days may disagree.
 
@@ -164,8 +165,8 @@ Consequences and handling:
   raw cache are regenerated, not tracked. To hand a working dataset to someone
   without credentials or network, ship the built `*.json` via `mytho export`
   (which excludes `raw/**`), not the cache.
-- Refresh from upstream with `mytho motifs --force` (re-downloads); a plain
-  `mytho motifs` re-parses the existing cache without touching the network.
+- Refresh from upstream with `mytho refresh motifs --apply` (re-downloads); a plain
+  `mytho build motifs` re-parses the existing cache without touching the network.
 
 ---
 

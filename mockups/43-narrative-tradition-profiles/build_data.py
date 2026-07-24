@@ -56,7 +56,7 @@ def main():
     geo = _load("_geo.py", "geo")
     coords = geo.berezkin_coords()
     bz = json.loads(_need(ROOT / "outputs/motifs/berezkin.json",
-                          "build the motif DB first: `mytho motifs`").read_text("utf-8"))
+                          "build the motif DB first: `mytho build motifs`").read_text("utf-8"))
     T = bz["traditions"]
     tax = json.loads(_need(MOCKS / "41-theme-rederivation/narrative_taxonomy.json",
                            "run `python mockups/41-theme-rederivation/build_data.py` first"

@@ -63,7 +63,7 @@ Tier B есть ложные совпадения.
 PYTHONPATH=src python3 docs/motifs/crosswalk/find_parallels.py
 ```
 
-(после `mytho motifs`, когда индексы и cross-walk собраны; нужен scikit-learn —
+(после `mytho build motifs`, когда индексы и cross-walk собраны; нужен scikit-learn —
 объявленная зависимость проекта).
 
 ## Продакшн-версия (на страницах)

@@ -65,7 +65,7 @@ def main():
     m30 = _load("30-dated-phylogeny/build_data.py", "m30")
     FAMILY_DATES = m30.FAMILY_DATES
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
     join = json.loads(_need(MOCKS / "30-dated-phylogeny" / "glottolog_join.json",

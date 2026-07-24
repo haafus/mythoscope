@@ -11,8 +11,8 @@ from pipeline.caches import format_size
 logger = logging.getLogger(__name__)
 
 COMMAND_SECTIONS = [
-    ("Pipeline", ["corpus", "embeddings", "projections", "graphs", "motifs"]),
-    ("Management", ["build", "refresh", "status", "clean", "export", "server"]),
+    ("Pipeline", ["build", "status", "clean", "refresh", "export"]),
+    ("Server", ["server"]),
 ]
 
 # Number of texts processed by `build --sample` (quick smoke run).
@@ -67,43 +67,6 @@ def _run(name: str, fn, /, **kwargs) -> None:
 
 
 @mytho.command()
-@click.option("--force", "-f", is_flag=True, help="Overwrite existing files.")
-def corpus(force: bool):
-    """Download and build the text corpus."""
-    _run("Corpus", _build_corpus, force=force)
-
-
-@mytho.command()
-@click.option("--model", "-m", default=None, help="Embedding model to use.")
-@click.option("--force", "-f", is_flag=True, help="Regenerate even if collection exists.")
-def embeddings(model: str | None, force: bool):
-    """Generate embeddings for the corpus."""
-    _run("Embeddings", _build_embeddings, model=model, force=force)
-
-
-@mytho.command()
-@click.option("--model", "-m", default=None, help="Embedding variant key (all variants if omitted).")
-@click.option("--force", "-f", is_flag=True, help="Regenerate all plots even if they already exist.")
-def projections(model: str | None, force: bool):
-    """Generate UMAP projections and embedding visualizations."""
-    _run("Projections", _build_projections, model=model, force=force)
-
-
-@mytho.command()
-@click.option("--force", "-f", is_flag=True, help="Re-extract from scratch (clear caches); default rebuilds from cache.")
-def graphs(force: bool):
-    """Extract knowledge graphs from corpus texts using an LLM."""
-    _run("Graphs", _build_graphs, force=force)
-
-
-@mytho.command()
-@click.option("--force", "-f", is_flag=True, help="Re-fetch all sources before rebuilding (default reuses the cache).")
-def motifs(force: bool):
-    """Build the cross-referenced motif database (Berezkin, TMI, ATU)."""
-    _run("Motifs", _build_motifs, force=force)
-
-
-@mytho.command()
 @click.option("--host", "-h", default=None, help="Bind address (default from config).")
 @click.option("--port", "-p", default=None, type=int, help="Port (default from config).")
 def server(host: str | None, port: int | None):
@@ -115,13 +78,12 @@ def server(host: str | None, port: int | None):
 
 @mytho.command()
 @click.argument("scope", nargs=-1)
-@click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
               type=int, metavar="N",
               help=f"Quick run: first embedding model, limited to N texts "
                    f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
-def build(scope, model, force, sample):
+def build(scope, force, sample):
     """Run the pipeline: build everything missing or stale (``--force`` rebuilds all).
 
     SCOPE (optional, repeatable) restricts the build to exactly the named stages (name/prefix,
@@ -133,7 +95,7 @@ def build(scope, model, force, sample):
         # Quick dev run — the pre-driver per-stage path: first model, first N texts
         # (corpus + graphs). Sampling by doc count doesn't fit the incremental driver.
         from model_registry import embedding_variants
-        model = model or embedding_variants()[0]
+        model = embedding_variants()[0]
         click.echo(click.style(f"[sample] model={model}, max_texts={sample}", fg="yellow"))
         steps = [
             ("Corpus", _build_corpus, {"force": force, "max_texts": sample}),
@@ -151,8 +113,6 @@ def build(scope, model, force, sample):
     from pipeline import build as run_pipeline
 
     stages, targets = _scoped_pipeline(scope)
-    if model:
-        stages = _scope_to_model(stages, model)
 
     start = time.monotonic()
     try:
@@ -193,18 +153,6 @@ def _scoped_pipeline(scope):
                 frontier.append(inp)
     order = {id(s): i for i, s in enumerate(stages)}
     return sorted(keep.values(), key=lambda s: order[id(s)]), targets
-
-
-def _scope_to_model(stages, model):
-    """Keep the whole pipeline but only the given model's embeddings/projections (corpus,
-    graphs and motifs always run) — the ``--model`` convenience atop ``--only``."""
-    from model_registry import embedding_config
-
-    key = embedding_config(model)["key"]
-    return [
-        s for s in stages
-        if not (s.name.startswith(("embeddings:", "projections:")) and s.name.split(":", 1)[1] != key)
-    ]
 
 
 def _build_corpus(force: bool = False, max_texts: int | None = None):

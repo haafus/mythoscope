@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/motifs", tags=["motifs"])
 
 def _require_built() -> None:
     if not svc.is_built():
-        raise HTTPException(status_code=503, detail="Motif database not built. Run `mytho motifs`.")
+        raise HTTPException(status_code=503, detail="Motif database not built. Run `mytho build motifs`.")
 
 
 def _require_index(index: str) -> None:

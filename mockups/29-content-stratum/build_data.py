@@ -38,7 +38,7 @@ TN = {1: "Sun&Moon", 2: "Stars", 3: "Cosmogony", 4: "Death", 5: "Humans", 6: "Su
 
 def main():
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     M = bz["motifs"]; T = bz["traditions"]
     E = np.load(_need(ROOT / "outputs" / "motifs" / "raw" / "bge_m3.npy",

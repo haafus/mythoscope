@@ -63,7 +63,7 @@ def main():
     geo = _geo()
     coords = geo.berezkin_coords()   # {areal_id: [lat, lon]}
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
     dp = json.loads(_need(HERE / "dplace_subsistence.json",

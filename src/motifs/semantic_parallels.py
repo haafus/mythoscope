@@ -6,7 +6,7 @@ cross-walk: it embeds each motif's title + description with a transformer
 carry **no recorded cross-walk link** — the parallels that share meaning but not
 words, which the lexical matcher misses.
 
-Kept deliberately out of the normal ``mytho motifs`` build (the model is ~2 GB and
+Kept deliberately out of the normal ``mytho build motifs`` build (the model is ~2 GB and
 CPU inference is slow). It is precomputed offline by ``scripts/build_semantic_parallels.py``
 into the committed ``src/motifs/data/semantic_parallels.json``; ``store`` copies that
 into ``outputs/motifs/`` on first read, so the running app needs neither the model nor

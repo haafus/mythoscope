@@ -17,7 +17,7 @@ For MythoScope, use this configuration:
 - **Environment:** **Ubuntu + CUDA + Python 3.11**, running the models through **sentence-transformers**
   (the project's default path) — or **vLLM** if the model is supported and you want a faster serving path.
 
-> On the two engine choices: the project's `mytho embeddings` command runs **sentence-transformers** out
+> On the two engine choices: the project's `mytho build embeddings` command runs **sentence-transformers** out
 > of the box (nothing extra to set up — this is what the steps below use). **vLLM** is an optional,
 > faster alternative for serving, but it is not wired into the pipeline; use it only if you're comfortable
 > exporting vectors yourself, and note vLLM's embedding support is model-dependent.
@@ -64,7 +64,7 @@ cd mythoscope
 python3 -m venv .venv && source .venv/bin/activate
 pip install -U pip
 pip install -e ".[corpus]"
-mytho corpus            # downloads + cleans the source texts into outputs/corpus/
+mytho build corpus      # downloads + cleans the source texts into outputs/corpus/
 ```
 
 This produces `outputs/corpus/` (a few dozen text files, ~20 MB total). You'll upload this folder to the
@@ -248,14 +248,14 @@ rsync -avz -e "ssh -p 41111 -i ~/.ssh/id_ed25519" \
 
 ```bash
 pip install -e ".[corpus]"
-mytho corpus
+mytho build corpus
 ```
 
 ### 3.5 Run the embeddings (the actual GPU work)
 
 ```bash
-mytho embeddings --model qwen-4b     # first run downloads ~8 GB of weights, then embeds
-mytho embeddings --model story-emb   # first run downloads ~15 GB of weights, then embeds
+mytho build embeddings:qwen-4b     # first run downloads ~8 GB of weights, then embeds
+mytho build embeddings:story-emb   # first run downloads ~15 GB of weights, then embeds
 ```
 
 Each writes a Chroma collection into `outputs/embeddings/`. It's **resumable**: if it stops, just run the
@@ -291,7 +291,7 @@ mytho status                         # should now show the qwen-4b + story-emb c
 ```
 
 That's it — the vectors are in your local `outputs/embeddings/` and every downstream step
-(`mytho projections`, the server, the mockups) will pick them up.
+(`mytho build projections`, the server, the mockups) will pick them up.
 
 **Now go stop/destroy the GPU** (Part 1.6 or 2.5). Don't leave it running.
 
@@ -327,7 +327,7 @@ A network volume ($0.05–0.10/GB/month) means the second visit skips the downlo
   it. Pick a higher-reliability host, or pre-set `export HF_HUB_ENABLE_HF_TRANSFER=1` for faster pulls.
 - **`mytho: command not found`** → you didn't `source .venv/bin/activate`, or the install failed; re-run
   `pip install -e ".[embeddings]"`.
-- **Interrupted run** → just re-run the same `mytho embeddings --model …`; it resumes.
+- **Interrupted run** → just re-run the same `mytho build embeddings:…`; it resumes.
 
 ---
 
@@ -349,7 +349,7 @@ sequence. Fill in `<IP>` / `<PORT>` from the service's **Connect** button. GPU m
 ```bash
 # build corpus + activate the two models (edit config/models.json: move
 # qwen-4b & story-emb from "inactive" into "models"), then push
-pip install -e ".[corpus]" && mytho corpus
+pip install -e ".[corpus]" && mytho build corpus
 git add config/models.json && git commit -m "activate heavy embedders" && git push
 
 # make an SSH key if you don't have one; paste the .pub into RunPod/Vast settings
@@ -371,9 +371,9 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -U pip && pip install -e ".[embeddings]"
 python -c "import torch; print('CUDA:', torch.cuda.is_available())"   # must be True
 export HF_HOME=/workspace/hf-cache          # only if /workspace is a Network Volume
-# (corpus comes from the laptop — see rsync-up below; or build here: pip install -e ".[corpus]" && mytho corpus)
-mytho embeddings --model qwen-4b            # resumable — re-run if it stops
-mytho embeddings --model story-emb
+# (corpus comes from the laptop — see rsync-up below; or build here: pip install -e ".[corpus]" && mytho build corpus)
+mytho build embeddings:qwen-4b            # resumable — re-run if it stops
+mytho build embeddings:story-emb
 mytho status                                # check collections exist
 ```
 

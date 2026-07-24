@@ -1,7 +1,7 @@
 # Berezkin bibliography — unresolved citations
 
 Generated snapshot from `berezkin_bibliography.json` (parse output — may drift
-after a re-run of `mytho motifs`). Each citation was read as "surname year" but
+after a re-run of `mytho build motifs`). Each citation was read as "surname year" but
 still does **not** resolve to a [bibliography](http://areasofmyths.com/biblio.html) entry after diacritic,
 year-suffix and multi-author fixes. Look a citation up in the
 [Berezkin bibliography page](http://areasofmyths.com/biblio.html); links below open the motif page where

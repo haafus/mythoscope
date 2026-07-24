@@ -79,7 +79,7 @@ def main():
     geo = _load("_geo.py", "_geo")
     coords = geo.berezkin_coords()
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]; motifs = bz["motifs"]
     w_t, med = bias.coverage_weights(motifs, T)

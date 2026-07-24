@@ -13,29 +13,23 @@ class TestMythoTopLevel:
 
     def test_lists_all_commands(self):
         result = runner.invoke(mytho, ["--help"])
-        for cmd in ["corpus", "embeddings", "projections", "graphs", "server", "build", "status"]:
+        for cmd in ["build", "status", "clean", "refresh", "export", "server"]:
             assert cmd in result.output
 
 
-class TestCorpusCommand:
+class TestStatusCommand:
     def test_help(self):
-        result = runner.invoke(mytho, ["corpus", "--help"])
+        result = runner.invoke(mytho, ["status", "--help"])
         assert result.exit_code == 0
-        assert "--force" in result.output
+        # Scope is the single addressing mechanism across the pipeline commands.
+        assert "SCOPE" in result.output.upper()
 
 
-class TestProjectionCommand:
+class TestCleanCommand:
     def test_help(self):
-        result = runner.invoke(mytho, ["projections", "--help"])
+        result = runner.invoke(mytho, ["clean", "--help"])
         assert result.exit_code == 0
-        assert "--model" in result.output
-
-
-class TestGraphsCommand:
-    def test_help(self):
-        result = runner.invoke(mytho, ["graphs", "--help"])
-        assert result.exit_code == 0
-        assert "--force" in result.output
+        assert "--apply" in result.output
 
 
 class TestServerCommand:
@@ -51,7 +45,8 @@ class TestBuildCommand:
         result = runner.invoke(mytho, ["build", "--help"])
         assert result.exit_code == 0
         assert "--force" in result.output
-        assert "--model" in result.output
+        # Stages are addressed by scope, not a dedicated option.
+        assert "SCOPE" in result.output.upper()
 
 
 class TestRefreshCommand:

@@ -99,7 +99,7 @@ def _need(p, hint=""):
 
 def main():
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     T = bz["traditions"]
     join = json.loads(_need(HERE / "glottolog_join.json",

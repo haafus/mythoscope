@@ -134,7 +134,7 @@ def main():
     except ImportError as e:
         raise SystemExit("\n✗ this mockup needs umap-learn: `pip install umap-learn`\n") from e
     with open(_need(ROOT / "outputs" / "motifs" / "berezkin.json",
-                    "build the motif DB first: `mytho motifs`"), encoding="utf-8") as f:
+                    "build the motif DB first: `mytho build motifs`"), encoding="utf-8") as f:
         bz = json.load(f)
     M = bz["motifs"]
     E = np.load(_need(ROOT / "outputs" / "motifs" / "raw" / "bge_m3.npy",

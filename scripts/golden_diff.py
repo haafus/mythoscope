@@ -65,7 +65,7 @@ DEFAULT_MANIFEST = ROOT / settings.corpus_dir.parent / ".golden" / "manifest.jso
 #   * graphs      — graph .json + .fp; extraction_cache.jsonl kept → reassemble from cache
 #   * motifs      — output .json; raw/ kept → re-parse cached pages
 # embeddings (Chroma) and preprocessed/ are NEVER in the deletable set — the fp
-# gate then makes `mytho embeddings` a no-op, so nothing is re-embedded.
+# gate then makes `mytho build embeddings` a no-op, so nothing is re-embedded.
 _RESET_STAGES = {
     "corpus": dict(root=ROOT / settings.corpus_dir, protected={"raw"},
                    delete=lambda p: p.name == "corpus.json" or p.suffix == ".txt"),

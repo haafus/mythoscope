@@ -73,7 +73,7 @@ export async function renderMotifs(params = new URLSearchParams()) {
         mState.indexes = data.indexes || [];
     } catch (error) {
         const msg = /not built/i.test(error.message)
-            ? "Motif database not built yet. Run <code>mytho motifs</code> to build it."
+            ? "Motif database not built yet. Run <code>mytho build motifs</code> to build it."
             : escapeHtml(error.message);
         app.querySelector(".workspace").innerHTML = `<div class="empty-state">${msg}</div>`;
         return;

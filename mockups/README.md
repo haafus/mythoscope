@@ -22,7 +22,7 @@ Build one, then open the page.
 ## Run
 
 ```bash
-# from the repo root, with the motif DB already built (`mytho motifs`)
+# from the repo root, with the motif DB already built (`mytho build motifs`)
 . .venv/bin/activate
 python mockups/07-tradition-motif-combined/build_data.py   # build any prototype's data.js
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Precompute the BGE-M3 semantic-parallel suggestion layer, offline.
 
-This is deliberately NOT part of ``mytho motifs`` — the model is ~2 GB and CPU
+This is deliberately NOT part of ``mytho build motifs`` — the model is ~2 GB and CPU
 inference is slow. It embeds every motif (see ``motifs.semantic_parallels``) and
 writes the committed ``src/motifs/data/semantic_parallels.json``; the running app
 copies that into ``outputs/motifs/`` on first read (``store.load_semantic_parallels``),

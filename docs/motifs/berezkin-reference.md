@@ -93,7 +93,7 @@ motif ids, CC BY-NC-SA 4.0) carries an **English name and English definition** f
 almost every motif. Its `/motifs_full` page lists them as Drupal nodes.
 
 **Pipeline step.** `motifs.sources.mapsofmyths.refresh()` runs as part of
-`mytho motifs`: it fetches the pages into the resumable raw cache
+`mytho build motifs`: it fetches the pages into the resumable raw cache
 (`outputs/motifs/raw/mapsofmyths/`) and writes the parsed files next to the index
 JSONs (`outputs/motifs/mapsofmyths_*.json`). **Neither the cache nor the parsed
 files are committed** — only the code is. The step is **credential-gated** (HTTP
