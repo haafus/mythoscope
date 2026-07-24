@@ -574,18 +574,20 @@ body.has-main-navbar {
     line-height: 1.6;
     white-space: normal;
 }
+.corpus-page .facet-head { margin-bottom: 22px; }
 .corpus-page .facet-title {
-    margin: 0 0 22px;
+    margin: 0;
     color: #111;
     font-size: 24px;
     font-weight: 700;
     line-height: 1.2;
 }
+.corpus-page .facet-subtitle { margin-top: 4px; color: var(--muted); font-size: 13px; }
 .corpus-page .facet-lead { margin-bottom: 16px; color: #374151; }
 .corpus-page .facet-field { margin-bottom: 16px; }
 .corpus-page .facet-field-label {
     margin-bottom: 3px;
-    color: var(--muted);
+    color: #111827;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;

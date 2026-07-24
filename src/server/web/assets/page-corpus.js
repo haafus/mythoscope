@@ -119,12 +119,15 @@ function facetListField(label, items) {
     </div>`;
 }
 
-function renderFacetInfo(name, fields) {
+function renderFacetInfo(name, fields, subtitle) {
     const readerContent = document.getElementById("readerContent");
     if (!readerContent) return;
     readerContent.innerHTML = `
         <div class="facet-info">
-            <div class="facet-title"><span>${escapeHtml(name)}</span></div>
+            <div class="facet-head">
+                <div class="facet-title"><span>${escapeHtml(name)}</span></div>
+                ${subtitle ? `<div class="facet-subtitle">${escapeHtml(subtitle)}</div>` : ""}
+            </div>
             ${fields}
         </div>
     `;
@@ -145,10 +148,8 @@ function showTraditionInfo(tradition, region) {
     const info = ((state.traditionTree || {})[region] || {}).traditions?.[tradition];
     if (!info) return;
     const lead = info.description ? `<div class="facet-lead">${escapeHtml(info.description)}</div>` : "";
-    const fields = lead
-        + facetField("Region", region)
-        + facetField("Dating", info.dating);
-    renderFacetInfo(tradition, fields);
+    const fields = lead + facetField("Dating", info.dating);
+    renderFacetInfo(tradition, fields, region);
 }
 
 async function openCorpusDocument(doc) {
