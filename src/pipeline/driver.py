@@ -75,7 +75,8 @@ def status(stages: list[Stage]) -> list[StagePlan]:
     return [plan(s) for s in topo_order(stages)]
 
 
-def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None = None) -> list[StagePlan]:
+def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None = None,
+          sample: int | None = None) -> list[StagePlan]:
     """Build ``missing``/``stale`` per stage in topological order (``force`` → rebuild every
     ``desired()`` key, ignoring the fingerprint gate). Returns the plan acted on per stage.
 
@@ -83,6 +84,14 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
     is literal: an upstream dependency present only for wiring/ordering is **not** rebuilt, even
     if stale (a scoped ``build X`` does X and nothing else; a full ``build`` cascades). ``None``
     builds every stage.
+
+    ``sample`` (a doc-count smoke throttle) caps the per-run build of the ``sampleable`` stage
+    (the corpus root) to at most N keys — a quick end-to-end run over N documents. It limits
+    *throughput*, not the spec: ``desired()`` is untouched, so the unbuilt keys stay ``missing``
+    (not orphan) and a later full ``build`` simply completes them — no re-fetch, no churn. Plans
+    are computed per stage after its upstream builds, so the fan-out stages downstream of the
+    capped corpus see only N documents and follow automatically; ``sample`` is applied to the
+    root alone.
 
     ``build`` is offline: a stage acquires missing inputs from its own pinned cache, never the
     network — re-fetching is the separate ``refresh`` path."""
@@ -92,6 +101,8 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
             continue  # in the list only to wire/order the targets — not itself requested
         p = plan(stage)
         todo = set(stage.desired()) if force else p.to_build
+        if sample is not None and stage.sampleable:
+            todo = set(sorted(todo)[:sample])  # cap the root; downstream follows via its fps
         if todo:
             stage.build(todo)
         acted.append(p)

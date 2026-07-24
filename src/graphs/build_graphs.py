@@ -1,6 +1,5 @@
 import json
 import logging
-from itertools import islice
 
 from chunk_cache import append_cache, chunk_hash, clear_cache, load_cache
 from corpus.iterator import iter_files
@@ -72,7 +71,6 @@ def _graph_fingerprint(doc_fp: str, prompts: dict, graphs_cfg) -> str:
 
 def build_graphs(
     force: bool = False,
-    max_texts: int | None = None,
     rebuild: set[str] | None = None,
 ) -> None:
     """Extract entities and (re)build graphs from the cached extraction.
@@ -98,8 +96,6 @@ def build_graphs(
     logger.info(f"Building graphs (force={force})...")
 
     files = iter_files(settings.corpus_dir)
-    if max_texts is not None:
-        files = islice(files, max_texts)
 
     stopped = False
     for file_info in files:

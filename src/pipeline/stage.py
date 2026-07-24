@@ -47,6 +47,12 @@ class Stage(ABC):
     store: Store | None = None
     id: str = ""
 
+    #: The doc-count ``--sample`` throttle applies to this stage (only the corpus root sets it).
+    #: The driver caps *this* stage's per-run build to N keys; every downstream fan-out stage
+    #: derives its ``desired()`` from this stage's built output, so their counts follow for free
+    #: — no per-stage sample needed. Non-destructive: unbuilt keys stay ``missing``, never orphan.
+    sampleable: bool = False
+
     @abstractmethod
     def inputs(self) -> list[Stage]:
         """Upstream stages this one reads (held references → topological order + wiring)."""

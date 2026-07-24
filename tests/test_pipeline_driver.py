@@ -137,6 +137,35 @@ def test_force_rebuilds_every_desired_key():
     assert s.built == [{"a", "b"}]
 
 
+def test_sample_caps_sampleable_stage_and_leaves_rest_missing():
+    # --sample N throttles throughput, not the spec: only N of the missing keys build; the rest
+    # stay `missing` (desired unchanged), never orphan — so nothing is deleted.
+    s = FakeStage("corpus", {"a": "1", "b": "2", "c": "3"}, {})
+    s.sampleable = True
+    build([s], sample=2)
+    assert len(s.built[0]) == 2
+    assert len(s.actual()) == 2                  # the third is simply not built
+    assert plan(s).orphans == set()              # and is NOT an orphan
+    assert len(plan(s).missing) == 1             # it stays missing
+
+
+def test_sample_does_not_touch_non_sampleable_stage():
+    s = FakeStage("graphs", {"a": "1", "b": "2", "c": "3"}, {})  # sampleable defaults False
+    build([s], sample=2)
+    assert s.built == [{"a", "b", "c"}]          # a non-root stage follows its own diff, uncapped
+
+
+def test_sample_then_full_completes_without_rebuild():
+    # No churn: a later full build finishes the leftover keys and does NOT rebuild the sampled N.
+    s = FakeStage("corpus", {"a": "1", "b": "2", "c": "3"}, {})
+    s.sampleable = True
+    build([s], sample=2)
+    sampled = set(s.built[0])
+    build([s])
+    assert s.built[1] == {"a", "b", "c"} - sampled   # only the remaining key, not a rebuild
+    assert len(s.actual()) == 3
+
+
 def test_targets_build_only_named_not_stale_upstream():
     # Literal scope: corpus is missing but not a target → not built; only graphs is.
     corpus = FakeStage("corpus", {"d": "1"}, {})

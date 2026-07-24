@@ -26,6 +26,7 @@ _UNFETCHED = "unfetched"  # a document whose raw is not yet in the archive → b
 class CorpusStage(Stage):
     name = "corpus"
     store = None  # per-document: owns its whole tree, relies on the per-key diff (level 1)
+    sampleable = True  # `--sample N` caps this stage to N docs; embeddings/graphs follow via their fps
 
     def inputs(self) -> list[Stage]:
         return []

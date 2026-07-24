@@ -1,4 +1,3 @@
-import logging
 import sys
 import time
 from datetime import datetime, timedelta
@@ -7,8 +6,6 @@ import click
 
 from log_setup import setup_logging
 from pipeline.caches import format_size
-
-logger = logging.getLogger(__name__)
 
 COMMAND_SECTIONS = [
     ("Pipeline", ["build", "status", "clean", "refresh", "export"]),
@@ -81,8 +78,8 @@ def server(host: str | None, port: int | None):
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
               type=int, metavar="N",
-              help=f"Quick run: first embedding model, limited to N texts "
-                   f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
+              help=f"Quick end-to-end run over the first N documents (default {SAMPLE_MAX_TEXTS} "
+                   f"when given bare, e.g. -s 50 for more). Caps the corpus; embeddings/graphs follow.")
 def build(scope, force, sample):
     """Run the pipeline: build everything missing or stale (``--force`` rebuilds all).
 
@@ -90,40 +87,29 @@ def build(scope, force, sample):
     e.g. ``graphs`` or ``embeddings:bge-m3``) — built when stale/missing (a param/algo change
     invalidates them via the fingerprint, no ``--force`` needed); ``--force`` rebuilds them
     regardless. Upstream is not rebuilt, and the downstream cascade is left for a plain
-    ``mytho build``."""
-    if sample is not None:
-        # Quick dev run — the pre-driver per-stage path: first model, first N texts
-        # (corpus + graphs). Sampling by doc count doesn't fit the incremental driver.
-        from model_registry import embedding_variants
-        model = embedding_variants()[0]
-        click.echo(click.style(f"[sample] model={model}, max_texts={sample}", fg="yellow"))
-        steps = [
-            ("Corpus", _build_corpus, {"force": force, "max_texts": sample}),
-            ("Embeddings", _build_embeddings, {"model": model, "force": force}),
-            ("Projections", _build_projections, {"model": model, "force": force}),
-            ("Graphs", _build_graphs, {"force": force, "max_texts": sample}),
-            ("Motifs", _build_motifs, {"force": force}),
-        ]
-        start = time.monotonic()
-        for name, fn, kwargs in steps:
-            _run(name, fn, **kwargs)
-        click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
-        return
+    ``mytho build``.
 
+    ``--sample N`` caps the corpus to N documents for a quick end-to-end smoke run; the fan-out
+    stages downstream follow that count automatically (non-destructive — it never deletes the
+    documents it skips)."""
     from pipeline import build as run_pipeline
 
     stages, targets = _scoped_pipeline(scope)
+    if sample is not None:
+        click.echo(click.style(f"[sample] first {sample} document(s)", fg="yellow"))
 
     start = time.monotonic()
     try:
         # Scope restricts WHICH stages build; --force (separate) decides whether to ignore the
         # fingerprint gate. A param/algo change invalidates a stage via its fp, so a scoped
-        # build rebuilds it without --force.
-        plans = run_pipeline(stages, force=force, targets=targets)
+        # build rebuilds it without --force. --sample caps the corpus doc count.
+        plans = run_pipeline(stages, force=force, targets=targets, sample=sample)
     except Exception as e:
         _fail("Build", e)
     for p in plans:
         n = len(p.stage.desired()) if force else len(p.to_build)
+        if sample is not None and p.stage.sampleable:
+            n = min(n, sample)  # the driver capped this stage's build; report what it built
         if n:
             click.echo(f"  {p.stage.name}: {n} built")
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
@@ -155,38 +141,9 @@ def _scoped_pipeline(scope):
     return sorted(keep.values(), key=lambda s: order[id(s)]), targets
 
 
-def _build_corpus(force: bool = False, max_texts: int | None = None):
-    from corpus.builder import build_corpus
-
-    build_corpus(force=force, max_texts=max_texts)
-
-
-def _build_embeddings(model: str | None, force: bool = False):
-    # torch/sentence-transformers now load lazily inside the build — and only when a variant
-    # actually has chunks to encode — so nothing heavy loads here. The model load, when it
-    # happens, is announced by model_manager.
-    from embeddings.build_embeddings import build_embeddings
-
-    build_embeddings(model_name=model, force=force)
-
-
-def _build_projections(model: str | None, force: bool = False):
-    # umap is imported lazily, only when a projection is actually regenerated, so an
-    # up-to-date run never loads it; this import pulls only chromadb (to read the collections).
-    logger.info("Loading chromadb...")
-    from projections.build_projections import build_projections
-
-    build_projections(model_name=model, force=force)
-
-
-def _build_graphs(force: bool = False, max_texts: int | None = None):
-    logger.info("Loading graph libraries...")
-    from graphs.build_graphs import build_graphs
-
-    build_graphs(force=force, max_texts=max_texts)
-
-
 def _build_motifs(force: bool = False):
+    # The one surviving single-stage dispatcher: the motif re-scrape path used by `refresh`
+    # (build/status/clean go through the generic driver; motifs has no cheap per-source diff yet).
     from motifs.build_motifs import build_motifs
 
     build_motifs(force=force)

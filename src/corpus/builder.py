@@ -181,14 +181,15 @@ def _load_existing_metadata() -> dict[str, dict]:
         return {}
 
 
-def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set[str] | None = None):
+def build_corpus(force: bool = False, rebuild: set[str] | None = None):
     """Build the corpus catalog + .txt tree — incrementally.
 
-    The catalog is accumulated state: ``max_texts`` limits which documents are (re)processed
-    this run; every other configured document carries its existing built row, so a partial
-    (``--sample``) build merges into the full catalog rather than truncating it. ``rebuild``
-    (a set of document_ids) forces exactly those to be re-derived; ``force`` re-derives every
-    processed document."""
+    The catalog is accumulated state: whichever documents this run doesn't process carry their
+    existing built row, so a partial build merges into the full catalog rather than truncating
+    it. ``rebuild`` (the driver's key set of document_ids) is authoritative when given — process
+    EXACTLY those ids and nothing else missing (honouring Stage.build's "exactly these keys"
+    contract, which is what lets a scoped or ``--sample`` build touch only its keys); ``None``
+    makes every configured document eligible. ``force`` re-derives every processed document."""
     ensure_dir(settings.corpus_dir)
 
     download_list = load_download_list()  # the FULL desired set — always
@@ -203,8 +204,15 @@ def build_corpus(force: bool = False, max_texts: int | None = None, rebuild: set
     # tree at serve time (B1). `traditions.json` is no longer generated (config is served, §2.9).
     trad_region = flat_traditions(tree)
 
-    # `max_texts` limits only which documents are (re)processed this run; the rest carry through.
-    process_titles = {item["title"] for item in (download_list if max_texts is None else download_list[:max_texts])}
+    # Which documents this run (re)processes; every other configured document carries its
+    # existing built row, so a partial build merges into the full catalog rather than truncating.
+    # `rebuild` (the driver's key set) is authoritative — process EXACTLY those document_ids,
+    # honouring Stage.build's "exactly these keys" contract, so a scoped/sampled build touches
+    # only its keys instead of every missing document; otherwise everything is eligible.
+    if rebuild is not None:
+        process_titles = {item["title"] for item in download_list if document_id(item.get("url", "")) in rebuild}
+    else:
+        process_titles = {item["title"] for item in download_list}
     existing = _load_existing_metadata()  # always, so unprocessed documents carry their built row
 
     to_download = []

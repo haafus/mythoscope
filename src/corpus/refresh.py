@@ -60,7 +60,7 @@ def _invalidate_output(url: str, corpus_dir: Path) -> None:
             return
 
 
-def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> RefreshResult:
+def refresh_corpus(*, apply: bool = False) -> RefreshResult:
     """Re-fetch the web corpus sources and reconcile against the pinned raw archive.
 
     Never overwrites blindly: a transport failure or 404 keeps the pinned copy and is
@@ -73,8 +73,6 @@ def refresh_corpus(*, apply: bool = False, max_texts: int | None = None) -> Refr
     corpus_dir = Path(settings.corpus_dir)
     raw_dir = corpus_dir / "raw"
     items = load_download_list()
-    if max_texts is not None:
-        items = items[:max_texts]
 
     for item in items:
         url = item.get("url", "")
