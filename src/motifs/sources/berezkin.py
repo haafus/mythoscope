@@ -367,7 +367,7 @@ def parse_index(html: str) -> tuple[list[dict], dict[str, str]]:
     """Parse the nav page into (motifs, chapter-titles-by-letter)."""
     from bs4 import BeautifulSoup
 
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, "html.parser")
 
     # Chapter headers are inconsistently marked up: "A." sits in a <p>, the rest
     # ("C. КАТАСТРОФЫ" …) in <b>. Scan both.
@@ -394,7 +394,7 @@ def parse_definition(html: str) -> str:
     """Extract a motif's short definition (first ``NormalLis`` paragraph)."""
     from bs4 import BeautifulSoup
 
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, "html.parser")
     node = soup.find("p", class_="NormalLis")
     return " ".join(node.get_text(" ", strip=True).split()) if node else ""
 

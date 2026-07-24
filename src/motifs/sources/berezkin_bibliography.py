@@ -81,7 +81,7 @@ def parse_bibliography(html: str) -> dict[str, dict]:
     """
     from bs4 import BeautifulSoup
 
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, "html.parser")
     out: dict[str, dict] = {}
     author = ""
     for p in soup.find_all("p"):
@@ -234,7 +234,7 @@ def parse_attestations(html: str, area_index: dict[str, tuple[str, str]]) -> lis
     """
     from bs4 import BeautifulSoup
 
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, "html.parser")
     regions: list[dict] = []
     for p in soup.find_all("p", class_="NormalMai"):
         block = cleanup(p.get_text(" ", strip=True))

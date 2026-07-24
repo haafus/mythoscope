@@ -40,7 +40,6 @@ analysis = [
 corpus = [
     "requests>=2.31.0",
     "beautifulsoup4>=4.12.0",
-    "lxml>=5.0.0",  # fast C HTML parser — the motif scrapers parse thousands of pages
     "fake-useragent>=1.4.0",
     "trafilatura>=1.6.0",
     "PyMuPDF>=1.23.0",

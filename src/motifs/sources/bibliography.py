@@ -164,7 +164,7 @@ def parse_entries(html: str) -> list[dict]:
     from bs4 import BeautifulSoup
 
     paras = [" ".join(p.get_text(" ", strip=True).split())
-             for p in BeautifulSoup(html, "lxml").find_all("p")]
+             for p in BeautifulSoup(html, "html.parser").find_all("p")]
     paras = [p for p in paras if p]
 
     is_url = re.compile(r"^https?://")
