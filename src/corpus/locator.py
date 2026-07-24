@@ -68,6 +68,6 @@ def document_id(url: str) -> str:
 
 def corpus_raw_path(raw_dir: str | Path, url: str) -> Path:
     """The corpus raw-archive path for a locator: ``<raw_dir>/<document_id>``. The archive is
-    keyed by ``document_id = blake2b(locator)`` (D1) — one value for identity + archive key.
-    The old ``sha1(url)`` key is retired by the one-off ``scripts/rekey_raw.py`` re-key (§6)."""
+    keyed by ``document_id = blake2b(locator)`` (D1) — one value for identity + archive key
+    (it retired the old ``sha1(url)`` key, §6)."""
     return Path(raw_dir) / document_id(url)
