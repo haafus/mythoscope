@@ -101,10 +101,8 @@ function buildPopupHtml(item) {
            }).join("")}</ul>`
         : "";
     return `
-        <div class="popup-title">
-            <span>${escapeHtml(item.name)}</span>
-            <span class="popup-region">${escapeHtml(item.region)}</span>
-        </div>
+        <div class="popup-title"><span>${escapeHtml(item.name)}</span></div>
+        <div class="popup-region">${escapeHtml(item.region)}</div>
         ${item.description ? `<div class="popup-description">${escapeHtml(item.description)}</div>` : ""}
         ${booksHtml}
     `;
