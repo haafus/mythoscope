@@ -31,3 +31,12 @@ built motif DB (`mytho motifs`) present.
   refactor's one intended fp-init). Manifest defaults to `outputs/.golden/manifest.json`
   (gitignored). Run from a built + region-migrated tree.
   → `python scripts/golden_diff.py snapshot` … refactor … `python scripts/golden_diff.py assert`
+
+  A `reset` mode forces the **regeneration** path (not just the no-op steady state):
+  it deletes the derived outputs + fp sidecars for the deterministic stages
+  (`corpus`, `projections`, `graphs`, `motifs`) while **physically refusing** to touch
+  the pinned caches (`raw/`, graphs' `extraction_cache.jsonl`), Chroma, or
+  `preprocessed/`. A plain rebuild (no `--force`) then re-derives from those caches —
+  no re-fetch, no re-LLM, and, because the embeddings fp gate still matches, **no
+  re-embed**. Dry-run by default; `--apply` deletes. Scope with `--stages`.
+  → `golden_diff snapshot` → `golden_diff reset --apply` → `mytho build` → `golden_diff assert`

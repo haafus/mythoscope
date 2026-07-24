@@ -56,6 +56,30 @@ _FP_SUFFIXES = (".fp", ".input-fp")
 
 DEFAULT_MANIFEST = ROOT / settings.corpus_dir.parent / ".golden" / "manifest.json"
 
+# ---------------------------------------------------------------------------
+# reset — delete DERIVED outputs + fp sidecars for the deterministic stages so a
+# plain rebuild (no --force) exercises the regeneration path. Caches are kept, so
+# the rebuild re-derives from pinned inputs: no re-fetch, no re-LLM, no re-embed.
+#   * corpus      — corpus.json + .txt tree; raw/ kept → re-extract from raw
+#   * projections — plot .json + .input-fp; Chroma untouched → refit UMAP (seed 42)
+#   * graphs      — graph .json + .fp; extraction_cache.jsonl kept → reassemble from cache
+#   * motifs      — output .json; raw/ kept → re-parse cached pages
+# embeddings (Chroma) and preprocessed/ are NEVER in the deletable set — the fp
+# gate then makes `mytho embeddings` a no-op, so nothing is re-embedded.
+_RESET_STAGES = {
+    "corpus": dict(root=ROOT / settings.corpus_dir, protected={"raw"},
+                   delete=lambda p: p.name == "corpus.json" or p.suffix == ".txt"),
+    "projections": dict(root=ROOT / settings.projections_dir, protected=set(),
+                        delete=lambda p: p.suffix == ".json" or p.name == ".input-fp"),
+    "graphs": dict(root=ROOT / settings.graphs_dir, protected=set(),
+                   delete=lambda p: p.suffix == ".json" or p.name == ".fp"),
+    "motifs": dict(root=ROOT / settings.motifs_dir, protected={"raw"},
+                   delete=lambda p: p.suffix == ".json"),
+}
+# Hard guards: nothing under these, no raw/ cache, no LLM response cache — ever.
+_NEVER_TOUCH = [ROOT / settings.embeddings_dir, ROOT / settings.preprocessed_dir]
+_NEVER_DELETE_NAMES = {"extraction_cache.jsonl"}
+
 
 def _hash_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -162,6 +186,68 @@ def cmd_assert(args) -> int:
     return 0
 
 
+def _reset_targets(stage_keys: list[str]) -> list[tuple[str, Path]]:
+    targets: list[tuple[str, Path]] = []
+    for key in stage_keys:
+        spec = _RESET_STAGES[key]
+        root: Path = spec["root"]
+        if not root.exists():
+            continue
+        for p in sorted(root.rglob("*")):
+            if not p.is_file():
+                continue
+            if spec["protected"].intersection(p.relative_to(root).parts):
+                continue
+            if spec["delete"](p):
+                targets.append((key, p))
+    return targets
+
+
+def _assert_reset_safe(targets: list[tuple[str, Path]]) -> None:
+    # Defence in depth: even if a spec were mis-edited, never delete a cache or store.
+    for _key, p in targets:
+        for banned in _NEVER_TOUCH:
+            if _under(p, banned):
+                raise SystemExit(f"refusing to delete protected store: {p}")
+        parts = p.relative_to(ROOT).parts
+        if "raw" in parts or p.name in _NEVER_DELETE_NAMES:
+            raise SystemExit(f"refusing to delete cache: {p}")
+
+
+def cmd_reset(args) -> int:
+    stage_keys = [s.strip() for s in args.stages.split(",") if s.strip()]
+    unknown = [s for s in stage_keys if s not in _RESET_STAGES]
+    if unknown:
+        print(f"error: unknown stage(s): {', '.join(unknown)}. valid: {', '.join(_RESET_STAGES)}", file=sys.stderr)
+        return 2
+
+    targets = _reset_targets(stage_keys)
+    _assert_reset_safe(targets)
+
+    by_stage: dict[str, list[Path]] = {}
+    for key, p in targets:
+        by_stage.setdefault(key, []).append(p)
+    for key in stage_keys:
+        files = by_stage.get(key, [])
+        print(f"{key}: {len(files)} derived file(s)")
+        for p in files[:4]:
+            print(f"    {p.relative_to(ROOT)}")
+        if len(files) > 4:
+            print(f"    … +{len(files) - 4} more")
+
+    print(f"\nPRESERVED (never touched): raw/ caches, graphs' extraction_cache.jsonl, "
+          f"Chroma ({settings.embeddings_dir}), preprocessed ({settings.preprocessed_dir}).")
+
+    if not args.apply:
+        print(f"\nDRY RUN — {len(targets)} file(s) would be deleted. Re-run with --apply to delete.")
+        return 0
+
+    for _key, p in targets:
+        p.unlink()
+    print(f"\nDeleted {len(targets)} derived file(s). Now rebuild WITHOUT --force, then `golden_diff assert`.")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Golden-diff guard for the stage-protocol refactor.")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -174,6 +260,12 @@ def main() -> int:
     p_assert.add_argument("--before", default=str(DEFAULT_MANIFEST), help=f"baseline manifest (default: {DEFAULT_MANIFEST})")
     p_assert.add_argument("--allow-added", action="store_true", help="permit any new file, not just fp sidecars")
     p_assert.set_defaults(func=cmd_assert)
+
+    p_reset = sub.add_parser("reset", help="delete derived outputs + fp sidecars (keep caches) to force a deterministic rebuild")
+    p_reset.add_argument("--stages", default=",".join(_RESET_STAGES),
+                         help=f"comma-separated stages to reset (default: {','.join(_RESET_STAGES)})")
+    p_reset.add_argument("--apply", action="store_true", help="actually delete (default: dry run)")
+    p_reset.set_defaults(func=cmd_reset)
 
     args = parser.parse_args()
     return args.func(args)
