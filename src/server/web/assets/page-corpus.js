@@ -125,8 +125,8 @@ function renderFacetInfo(name, color, fields) {
     readerContent.innerHTML = `
         <div class="facet-info">
             <div class="facet-title">
-                <span>${escapeHtml(name)}</span>
                 <span class="facet-dot" style="--facet-color:${escapeHtml(color)}"></span>
+                <span>${escapeHtml(name)}</span>
             </div>
             ${fields}
         </div>
