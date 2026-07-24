@@ -114,17 +114,18 @@ def server(host: str | None, port: int | None):
 
 
 @mytho.command()
+@click.argument("scope", nargs=-1)
 @click.option("--model", "-m", default=None, help="Embedding model (default from config).")
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
-@click.option("--only", multiple=True, metavar="STAGE",
-              help="Build only stages matching STAGE (exact or name-prefix, e.g. 'embeddings' "
-                   "or 'graphs') plus their upstream dependencies. Repeatable.")
 @click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
               type=int, metavar="N",
               help=f"Quick run: first embedding model, limited to N texts "
                    f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
-def build(model, force, only, sample):
-    """Run the full pipeline: build everything missing or stale (``--force`` rebuilds all)."""
+def build(scope, model, force, sample):
+    """Run the pipeline: build everything missing or stale (``--force`` rebuilds all).
+
+    SCOPE (optional, repeatable) restricts to stages matching a name/prefix (e.g. ``graphs``,
+    ``embeddings:bge-m3``) plus their upstream dependencies."""
     if sample is not None:
         # Quick dev run — the pre-driver per-stage path: first model, first N texts
         # (corpus + graphs). Sampling by doc count doesn't fit the incremental driver.
@@ -146,7 +147,7 @@ def build(model, force, only, sample):
 
     from pipeline import build as run_pipeline
 
-    stages = _scoped_pipeline(only)
+    stages = _scoped_pipeline(scope)
     if model:
         stages = _scope_to_model(stages, model)
 
@@ -162,17 +163,17 @@ def build(model, force, only, sample):
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 
-def _scoped_pipeline(only):
-    """The full pipeline, or — when ``only`` names stages (exact or name-prefix) — just those
+def _scoped_pipeline(scope):
+    """The full pipeline, or — when ``scope`` names stages (exact or name-prefix) — just those
     plus every upstream dependency, so the sub-pipeline stays self-consistent (topological)."""
     from pipeline import build_pipeline
 
     stages = build_pipeline()
-    if not only:
+    if not scope:
         return stages
-    matched = [s for s in stages if any(s.name == o or s.name.startswith(o) for o in only)]
+    matched = [s for s in stages if any(s.name == o or s.name.startswith(o) for o in scope)]
     if not matched:
-        _fail("Scope", ValueError(f"no stage matches {list(only)} — see `mytho status`"))
+        _fail("Scope", ValueError(f"no stage matches {list(scope)} — see `mytho status`"))
     keep = {id(s): s for s in matched}
     frontier = list(matched)
     while frontier:
@@ -293,14 +294,15 @@ def _refresh_motifs(apply: bool):
 
 
 @mytho.command()
-@click.option("--only", multiple=True, metavar="STAGE",
-              help="Show only stages matching STAGE (exact or name-prefix) plus their upstream. Repeatable.")
-def status(only):
-    """Show what each stage would build, rebuild, or reap — the driver's desired/actual diff."""
+@click.argument("scope", nargs=-1)
+def status(scope):
+    """Show what each stage would build, rebuild, or reap — the driver's desired/actual diff.
+
+    SCOPE (optional) restricts to stages matching a name/prefix plus their upstream."""
     from pipeline import status as pipeline_status
 
     dirty = 0
-    for p in pipeline_status(_scoped_pipeline(only)):
+    for p in pipeline_status(_scoped_pipeline(scope)):
         if p.clean:
             click.echo(click.style(f"  {p.stage.name:<28} up to date", fg="green"))
             continue
@@ -321,31 +323,33 @@ def status(only):
 
 
 @mytho.command()
+@click.argument("scope", nargs=-1)
 @click.option("--apply", is_flag=True, help="Actually delete files (default is dry run).")
 @click.option("--caches", is_flag=True, help="Also remove resumable caches (extraction/preprocessing); needs --apply to delete.")
-def clean(apply: bool, caches: bool):
-    """Find and remove orphan files (and, with --caches, resumable caches)."""
+def clean(scope, apply: bool, caches: bool):
+    """Find and remove orphan files (and, with --caches, resumable caches).
+
+    SCOPE (optional) restricts the orphan scan to stages matching a name/prefix plus upstream."""
     try:
-        _clean(apply, caches)
+        _clean(scope, apply, caches)
     except Exception as e:
         _fail("Clean", e)
 
 
-def _clean(apply: bool, caches: bool):
+def _clean(scope, apply: bool, caches: bool):
     import shutil
 
-    from pipeline import build_pipeline
     from pipeline import clean as driver_clean
     from pipeline.caches import cache_files, format_size, motifs_raw_cache
     from settings import settings
 
     total_items = 0
 
-    # Orphans — the driver's two-level reap over the whole pipeline: level-1 orphan keys inside
-    # a surviving stage (a document removed from config → its .txt / chunks / graph), level-2
-    # whole artifacts a dropped stage left in a shared store (a removed model's collection or
-    # projection dir). With --apply it deletes as it walks; otherwise it is a dry run.
-    report = driver_clean(build_pipeline(), apply=apply)
+    # Orphans — the driver's two-level reap: level-1 orphan keys inside a surviving stage (a
+    # document removed from config → its .txt / chunks / graph), level-2 whole artifacts a
+    # dropped stage left in a shared store (a removed model's collection or projection dir).
+    # With --apply it deletes as it walks; otherwise it is a dry run.
+    report = driver_clean(_scoped_pipeline(scope), apply=apply)
     for stage, keys in report.level1.items():
         click.echo(f"{stage}: {len(keys)} orphan document(s)")
         for k in sorted(keys):
