@@ -53,7 +53,7 @@ def parse_motifs_full(html: str) -> dict[str, dict]:
     from bs4 import BeautifulSoup
 
     out: dict[str, dict] = {}
-    for node in BeautifulSoup(html, "html.parser").find_all(
+    for node in BeautifulSoup(html, "lxml").find_all(
             "div", class_=lambda c: c and "node-motif" in c):
         h2, a = node.find("h2"), node.find("a", href=True)
         if not h2:
@@ -70,7 +70,7 @@ def parse_motif_node(html: str) -> dict:
     """Type/group, ATU & Thompson ids, and attesting-tradition areal ids."""
     from bs4 import BeautifulSoup
 
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, "lxml")
     group = _field(soup, "field-motif-group")
     traditions: list[str] = []
     table = soup.find("table")
@@ -101,7 +101,7 @@ def parse_traditions_full(html: str) -> dict[str, dict]:
     from bs4 import BeautifulSoup
 
     out: dict[str, dict] = {}
-    view = BeautifulSoup(html, "html.parser").find("div", class_="view-content")
+    view = BeautifulSoup(html, "lxml").find("div", class_="view-content")
     for r in view.find_all("div", class_=lambda c: c and "views-row" in c) if view else []:
         aid_el = r.find("div", class_="field-name-field-areal-id")
         aid = aid_el.find("div", class_="field-item").get_text(strip=True) if aid_el else ""
