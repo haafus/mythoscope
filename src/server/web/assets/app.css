@@ -745,20 +745,31 @@ body.has-main-navbar {
 }
 .atlas-dot.hi { transform: scale(1.5); }
 
-/* Tooltip: mockup 62 dark tip (rise/fade-in); rich card content, links stay clickable. */
-.geo-tip {
+/* One shared dark-tooltip skin: atlas (.geo-tip), similarity (.plot-hover-tooltip),
+   graphs (.graph-edge-tooltip). Each block below adds only its own positioning,
+   sizing, z-index and show/hide behaviour. */
+.geo-tip,
+.analysis-page .plot-hover-tooltip,
+.graph-edge-tooltip {
     position: absolute;
-    z-index: 500;
-    width: min(320px, 72vw);
     padding: 16px 18px;
     background: #111827;
     color: #f1f3f5;
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
+    font-size: 12px;
+    line-height: 1.45;
+    pointer-events: none;
+}
+
+/* Tooltip: mockup 62 dark tip (rise/fade-in); rich card content, links stay clickable. */
+.geo-tip {
+    z-index: 500;
+    width: min(320px, 72vw);
     opacity: 0;
     transform: translateY(3px);
     transition: opacity 0.16s ease, transform 0.16s ease;
-    pointer-events: none;
 }
 .geo-tip.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .geo-tip .popup-title { color: #fff; font-size: 15px; margin-bottom: 2px; gap: 8px; }
@@ -881,20 +892,10 @@ body.has-main-navbar {
 }
 
 .analysis-page .plot-hover-tooltip {
-    position: absolute;
     z-index: 25;
     display: none;
     width: max-content;
     max-width: min(360px, calc(100% - 20px));
-    padding: 16px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    background: #111827;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
-    color: #f1f3f5;
-    font-size: 12px;
-    line-height: 1.45;
-    pointer-events: none;
     overflow-wrap: anywhere;
 }
 
@@ -1299,15 +1300,6 @@ body.has-main-navbar {
 .graph-info-value { color: #2c3e50; line-height: 1.45; }
 
 .graph-edge-tooltip {
-    position: absolute;
-    background: #111827;
-    color: #f1f3f5;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 16px 18px;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
-    font-size: 12px;
-    pointer-events: none;
     z-index: 1000;
     display: none;
 }
