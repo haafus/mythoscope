@@ -137,6 +137,15 @@ def test_force_rebuilds_every_desired_key():
     assert s.built == [{"a", "b"}]
 
 
+def test_targets_build_only_named_not_stale_upstream():
+    # Literal scope: corpus is missing but not a target → not built; only graphs is.
+    corpus = FakeStage("corpus", {"d": "1"}, {})
+    graphs = FakeStage("graphs", {"d": "1"}, {}, deps=[corpus])
+    build([corpus, graphs], targets={"graphs"})
+    assert corpus.built == []          # upstream present only to wire/order — not rebuilt
+    assert graphs.built == [{"d"}]
+
+
 def test_build_runs_in_topological_order():
     calls = []
     corpus = FakeStage("corpus", {"d": "1"}, {})

@@ -75,14 +75,21 @@ def status(stages: list[Stage]) -> list[StagePlan]:
     return [plan(s) for s in topo_order(stages)]
 
 
-def build(stages: list[Stage], *, force: bool = False) -> list[StagePlan]:
+def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None = None) -> list[StagePlan]:
     """Build ``missing``/``stale`` per stage in topological order (``force`` → rebuild every
     ``desired()`` key, ignoring the fingerprint gate). Returns the plan acted on per stage.
 
-    ``build`` is offline: a stage acquires missing inputs from its own pinned cache, never
-    the network — re-fetching is the separate ``refresh`` path."""
+    ``targets`` (a set of stage names) restricts building to exactly those stages — the scope
+    is literal: an upstream dependency present only for wiring/ordering is **not** rebuilt, even
+    if stale (a scoped ``build X`` does X and nothing else; a full ``build`` cascades). ``None``
+    builds every stage.
+
+    ``build`` is offline: a stage acquires missing inputs from its own pinned cache, never the
+    network — re-fetching is the separate ``refresh`` path."""
     acted: list[StagePlan] = []
     for stage in topo_order(stages):
+        if targets is not None and stage.name not in targets:
+            continue  # in the list only to wire/order the targets — not itself requested
         p = plan(stage)
         todo = set(stage.desired()) if force else p.to_build
         if todo:
@@ -103,31 +110,48 @@ class CleanReport:
         return not any(self.level1.values()) and not any(self.level2.values())
 
 
-def clean(stages: list[Stage], *, apply: bool = False) -> CleanReport:
+def clean(stages: list[Stage], *, apply: bool = False, targets: set[str] | None = None) -> CleanReport:
     """Reap orphans at two levels:
 
     * **level 1** — orphan *keys* inside a surviving stage (a removed document): ``a − d``.
     * **level 2** — a whole *stage* removed from the pipeline leaves its shared-store artifact
       unowned; it never enters the per-key diff, so we ask each store which ids it holds and
       subtract the ids still claimed by a live stage.
+
+    ``targets`` (stage names) restricts *what is reaped* to those stages (and the stores they
+    own); every stage still contributes to each store's claimed-id set, so a scoped clean never
+    mistakes a non-target stage's live artifact for an orphan. ``None`` reaps across all stages.
     """
     ordered = topo_order(stages)
+
+    def wanted(stage: Stage) -> bool:
+        return targets is None or stage.name in targets
+
     level1: dict[str, set[str]] = {}
     for stage in ordered:
+        if not wanted(stage):
+            continue
         orphans = plan(stage).orphans
         if orphans:
             level1[stage.name] = orphans
             if apply:
                 stage.delete(orphans)
 
-    # Group live stages by their shared store; a store's ids minus the claimed ids are orphans.
+    # Group ALL stages by their shared store (for a correct claimed set), but reap only the
+    # stores that a target stage owns.
     stores: dict[int, tuple[object, set[str]]] = {}
+    target_stores: set[int] = set()
     for stage in ordered:
         if stage.store is not None:
-            store, claimed = stores.setdefault(id(stage.store), (stage.store, set()))
+            sid = id(stage.store)
+            store, claimed = stores.setdefault(sid, (stage.store, set()))
             claimed.add(stage.id)
+            if wanted(stage):
+                target_stores.add(sid)
     level2: dict[str, set[str]] = {}
-    for store, claimed in stores.values():
+    for sid, (store, claimed) in stores.items():
+        if sid not in target_stores:
+            continue
         orphan_ids = store.ids() - claimed
         if orphan_ids:
             level2[type(store).__name__] = orphan_ids

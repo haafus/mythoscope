@@ -124,8 +124,9 @@ def server(host: str | None, port: int | None):
 def build(scope, model, force, sample):
     """Run the pipeline: build everything missing or stale (``--force`` rebuilds all).
 
-    SCOPE (optional, repeatable) restricts to stages matching a name/prefix (e.g. ``graphs``,
-    ``embeddings:bge-m3``) plus their upstream dependencies."""
+    SCOPE (optional, repeatable) **force-rebuilds** exactly the named stages (name/prefix, e.g.
+    ``graphs`` or ``embeddings:bge-m3``) — a stage-debug tool: upstream is not rebuilt, and the
+    downstream cascade is left for a plain ``mytho build``."""
     if sample is not None:
         # Quick dev run — the pre-driver per-stage path: first model, first N texts
         # (corpus + graphs). Sampling by doc count doesn't fit the incremental driver.
@@ -147,13 +148,14 @@ def build(scope, model, force, sample):
 
     from pipeline import build as run_pipeline
 
-    stages = _scoped_pipeline(scope)
+    stages, targets = _scoped_pipeline(scope)
     if model:
         stages = _scope_to_model(stages, model)
 
     start = time.monotonic()
     try:
-        plans = run_pipeline(stages, force=force)
+        # A scope means "force-rebuild these stages" — no separate --force needed.
+        plans = run_pipeline(stages, force=force or bool(scope), targets=targets)
     except Exception as e:
         _fail("Build", e)
     for p in plans:
@@ -164,16 +166,20 @@ def build(scope, model, force, sample):
 
 
 def _scoped_pipeline(scope):
-    """The full pipeline, or — when ``scope`` names stages (exact or name-prefix) — just those
-    plus every upstream dependency, so the sub-pipeline stays self-consistent (topological)."""
+    """Return ``(stages, targets)``. Without a scope: the full pipeline, ``targets=None`` (act on
+    all). With a scope: the matched stages (name/prefix) PLUS their upstream dependencies — the
+    deps are in the list only to wire and topologically order the targets, not to be acted on —
+    and ``targets`` = just the matched stage names, so the scope is literal (``build X`` does X,
+    not its stale upstream; a full ``build`` is how you cascade)."""
     from pipeline import build_pipeline
 
     stages = build_pipeline()
     if not scope:
-        return stages
+        return stages, None
     matched = [s for s in stages if any(s.name == o or s.name.startswith(o) for o in scope)]
     if not matched:
         _fail("Scope", ValueError(f"no stage matches {list(scope)} — see `mytho status`"))
+    targets = {s.name for s in matched}
     keep = {id(s): s for s in matched}
     frontier = list(matched)
     while frontier:
@@ -182,7 +188,7 @@ def _scoped_pipeline(scope):
                 keep[id(inp)] = inp
                 frontier.append(inp)
     order = {id(s): i for i, s in enumerate(stages)}
-    return sorted(keep.values(), key=lambda s: order[id(s)])
+    return sorted(keep.values(), key=lambda s: order[id(s)]), targets
 
 
 def _scope_to_model(stages, model):
@@ -301,8 +307,11 @@ def status(scope):
     SCOPE (optional) restricts to stages matching a name/prefix plus their upstream."""
     from pipeline import status as pipeline_status
 
+    stages, targets = _scoped_pipeline(scope)
     dirty = 0
-    for p in pipeline_status(_scoped_pipeline(scope)):
+    for p in pipeline_status(stages):
+        if targets is not None and p.stage.name not in targets:
+            continue  # upstream is present only to compute the targets' plans — don't list it
         if p.clean:
             click.echo(click.style(f"  {p.stage.name:<28} up to date", fg="green"))
             continue
@@ -349,7 +358,8 @@ def _clean(scope, apply: bool, caches: bool):
     # document removed from config → its .txt / chunks / graph), level-2 whole artifacts a
     # dropped stage left in a shared store (a removed model's collection or projection dir).
     # With --apply it deletes as it walks; otherwise it is a dry run.
-    report = driver_clean(_scoped_pipeline(scope), apply=apply)
+    scoped_stages, targets = _scoped_pipeline(scope)
+    report = driver_clean(scoped_stages, apply=apply, targets=targets)
     for stage, keys in report.level1.items():
         click.echo(f"{stage}: {len(keys)} orphan document(s)")
         for k in sorted(keys):
