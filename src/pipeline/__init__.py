@@ -9,9 +9,10 @@ See ``docs/proposals/pipeline-and-incrementality.md`` §2.
 """
 
 from .driver import CleanReport, StagePlan, build, clean, plan, status, topo_order
+from .pipeline import build_pipeline
 from .stage import Stage, Store
 
 __all__ = [
     "Stage", "Store", "StagePlan", "CleanReport",
-    "plan", "status", "build", "clean", "topo_order",
+    "plan", "status", "build", "clean", "topo_order", "build_pipeline",
 ]
