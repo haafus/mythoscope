@@ -121,29 +121,55 @@ def server(host: str | None, port: int | None):
               help=f"Quick run: first embedding model, limited to N texts "
                    f"(default {SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
 def build(model, force, sample):
-    """Run the full analysis pipeline end-to-end."""
+    """Run the full pipeline: build everything missing or stale (``--force`` rebuilds all)."""
     if sample is not None:
+        # Quick dev run — the pre-driver per-stage path: first model, first N texts
+        # (corpus + graphs). Sampling by doc count doesn't fit the incremental driver.
         from model_registry import embedding_variants
         model = model or embedding_variants()[0]
-        max_texts = sample  # limits corpus + graphs only; motifs always build in full
-        click.echo(click.style(f"[sample] model={model}, max_texts={max_texts}", fg="yellow"))
-    else:
-        max_texts = None
+        click.echo(click.style(f"[sample] model={model}, max_texts={sample}", fg="yellow"))
+        steps = [
+            ("Corpus", _build_corpus, {"force": force, "max_texts": sample}),
+            ("Embeddings", _build_embeddings, {"model": model, "force": force}),
+            ("Projections", _build_projections, {"model": model, "force": force}),
+            ("Graphs", _build_graphs, {"force": force, "max_texts": sample}),
+            ("Motifs", _build_motifs, {"force": force}),
+        ]
+        start = time.monotonic()
+        for name, fn, kwargs in steps:
+            _run(name, fn, **kwargs)
+        click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
+        return
 
-    steps = [
-        ("Corpus", _build_corpus, {"force": force, "max_texts": max_texts}),
-        ("Embeddings", _build_embeddings, {"model": model, "force": force}),
-        ("Projections", _build_projections, {"model": model, "force": force}),
-        ("Graphs", _build_graphs, {"force": force, "max_texts": max_texts}),
-        ("Motifs", _build_motifs, {"force": force}),
+    from pipeline import build as run_pipeline
+    from pipeline import build_pipeline
+
+    stages = build_pipeline()
+    if model:
+        stages = _scope_to_model(stages, model)
+
+    start = time.monotonic()
+    try:
+        plans = run_pipeline(stages, force=force)
+    except Exception as e:
+        _fail("Build", e)
+    for p in plans:
+        n = len(p.stage.desired()) if force else len(p.to_build)
+        if n:
+            click.echo(f"  {p.stage.name}: {n} built")
+    click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
+
+
+def _scope_to_model(stages, model):
+    """Keep the whole pipeline but only the given model's embeddings/projections (corpus,
+    graphs and motifs always run) — the ``--model`` scope, pre-item-4."""
+    from model_registry import embedding_config
+
+    key = embedding_config(model)["key"]
+    return [
+        s for s in stages
+        if not (s.name.startswith(("embeddings:", "projections:")) and s.name.split(":", 1)[1] != key)
     ]
-
-    start_all = time.monotonic()
-    for name, fn, kwargs in steps:
-        _run(name, fn, **kwargs)
-
-    total = time.monotonic() - start_all
-    click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(total)})")
 
 
 def _build_corpus(force: bool = False, max_texts: int | None = None):
