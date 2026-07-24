@@ -18,6 +18,7 @@ from json_utils import save_json
 from settings import settings
 
 from . import crosswalk, parallels, reasoned_parallels, store
+from .fingerprint import motifs_fingerprint
 from .sources import (
     ashliman,
     atu_wikidata,
@@ -98,6 +99,15 @@ def build_motifs(*, force: bool = False) -> None:
     """
     config = _load_config()
     store.motifs_dir().mkdir(parents=True, exist_ok=True)
+
+    # Coarse fp gate: skip the whole re-parse/re-derive when the raw cache + config are
+    # unchanged (the offline staleness key). force still re-fetches and rebuilds.
+    current_fp = motifs_fingerprint()
+    fp_path = store.motifs_dir() / ".fp"
+    if (not force and store.is_built()
+            and fp_path.exists() and fp_path.read_text(encoding="utf-8").strip() == current_fp):
+        logger.info("Motif database up to date (inputs unchanged) — skipping rebuild")
+        return
 
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
@@ -318,6 +328,7 @@ def build_motifs(*, force: bool = False) -> None:
     if meta["flags"]:
         logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
+    fp_path.write_text(current_fp, encoding="utf-8")  # stamp after a complete build → next run skips
     store.clear_cache()
 
     _log_summary(counts, links, par_counts)
