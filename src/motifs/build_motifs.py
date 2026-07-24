@@ -11,6 +11,7 @@ from __future__ import annotations
 import itertools
 import json
 import logging
+import time
 from datetime import datetime, timezone
 
 from json_utils import save_json
@@ -80,6 +81,15 @@ def _degradation_check(metrics: dict[str, int], enrichment: dict, prior: dict,
     return highwater, flags, fetch_outcomes
 
 
+def _timed(label: str, fn, *args, **kwargs):
+    """Run fn, logging its wall time — so the per-step pauses (even when everything is
+    cached, the parse/derive still runs) are visible and attributable."""
+    t = time.monotonic()
+    result = fn(*args, **kwargs)
+    logger.info("      ⏱ %s: %.1fs", label, time.monotonic() - t)
+    return result
+
+
 def build_motifs(*, force: bool = False) -> None:
     """Build the motif database, always re-parsing/regenerating from the raw cache.
 
@@ -105,8 +115,8 @@ def build_motifs(*, force: bool = False) -> None:
         # mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
         # traditions) — part of building the Berezkin index, so downloaded under
         # this step; credential-gated, a no-op skips the enrichment.
-        mm = enrichment["mapsofmyths"] = mapsofmyths.refresh(force=force)
-        berezkin_data = berezkin.build(bz_cfg, force=force)
+        mm = enrichment["mapsofmyths"] = _timed("mapsofmyths.refresh", mapsofmyths.refresh, force=force)
+        berezkin_data = _timed("berezkin.build (parse)", berezkin.build, bz_cfg, force=force)
         save_json(store.index_path("berezkin"), berezkin_data)
         berezkin_motifs = berezkin_data["motifs"]
         counts["berezkin"] = len(berezkin_motifs)
@@ -137,7 +147,7 @@ def build_motifs(*, force: bool = False) -> None:
 
         # Bibliography (areasofmyths.com biblio.html) + citation → region/ethnos
         # linkage, resolved from the already-cached detail pages.
-        enrichment["berezkin_bibliography"] = berezkin_bibliography.refresh(berezkin_motifs, force=force)
+        enrichment["berezkin_bibliography"] = _timed("berezkin_bibliography.refresh", berezkin_bibliography.refresh, berezkin_motifs, force=force)
         bb = enrichment["berezkin_bibliography"]
         if bb.get("skipped"):
             logger.info("      + bibliography (areasofmyths.com) SKIPPED (%s)", bb["skipped"])
@@ -170,8 +180,8 @@ def build_motifs(*, force: bool = False) -> None:
                     tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
         mel_cfg = config.get("mellmann", {})
         mel_on = mel_cfg.get("enabled", False)
-        tmi_index = trilogy.build_tmi(tr_cfg, force=force,
-                                      divisions_config=mel_cfg if mel_on else None)
+        tmi_index = _timed("trilogy.build_tmi (parse)", trilogy.build_tmi, tr_cfg, force=force,
+                            divisions_config=mel_cfg if mel_on else None)
         if mel_on:
             sources["mellmann"] = {"homepage": mel_cfg.get("homepage", ""),
                                    "attribution": mel_cfg.get("attribution", "")}
@@ -193,7 +203,7 @@ def build_motifs(*, force: bool = False) -> None:
                     _applied(tmi_motifs, lambda m: m.get("atu_inline")))
         # TMI citation-key (folkmasa bibliography + curated), annotated with the
         # per-source usage counts from the just-built TMI notes.
-        enrichment["bibliography"] = bibliography.refresh(tmi_motifs, force=force)
+        enrichment["bibliography"] = _timed("bibliography.refresh", bibliography.refresh, tmi_motifs, force=force)
         bib = enrichment["bibliography"]
         logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
                     "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
@@ -203,11 +213,11 @@ def build_motifs(*, force: bool = False) -> None:
                     tr_cfg.get("homepage", "trilogy"))
         logger.info("      files: %s",
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
-        atu_index, atu_seq = trilogy.build_atu(tr_cfg, force=force)
+        atu_index, atu_seq = _timed("trilogy.build_atu (parse)", trilogy.build_atu, tr_cfg, force=force)
         # Multilingual names + Wikipedia links from Wikidata (open, best-effort).
-        enrichment["atu_wikidata"] = atu_wikidata.refresh(atu_index["types"], force=force)
+        enrichment["atu_wikidata"] = _timed("atu_wikidata.refresh", atu_wikidata.refresh, atu_index["types"], force=force)
         # Example tales sourced straight from Ashliman's Folktexts (best-effort).
-        enrichment["ashliman"] = ashliman.refresh(atu_index["types"], force=force)
+        enrichment["ashliman"] = _timed("ashliman.refresh", ashliman.refresh, atu_index["types"], force=force)
         save_json(store.index_path("atu"), atu_index)
         atu_types = atu_index["types"]
         counts["atu"] = len(atu_types)
@@ -239,8 +249,8 @@ def build_motifs(*, force: bool = False) -> None:
     # --- [4/5] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
     logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
-    links = crosswalk.build(atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining,
-                            atu_aliases, tmi_notes, aath_to_atu, atu_summaries, tmi_aliases)
+    links = _timed("crosswalk.build", crosswalk.build, atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining,
+                   atu_aliases, tmi_notes, aath_to_atu, atu_summaries, tmi_aliases)
     save_json(store.crosswalk_path(), links)
     logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI; %d TMI motifs reachable from a tale type)",
                 len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
@@ -260,7 +270,7 @@ def build_motifs(*, force: bool = False) -> None:
     #     description matching) surfacing look-alike motifs with *no* recorded
     #     cross-walk link — hints for review, kept apart from the curated links. ---
     logger.info("[5/5] Textual parallels — lexical look-alikes with no recorded link")
-    par = parallels.build(berezkin_motifs, tmi_motifs, atu_types, links)
+    par = _timed("parallels.build (TF-IDF + NN)", parallels.build, berezkin_motifs, tmi_motifs, atu_types, links)
     if par is None:
         logger.info("      SKIPPED (no TMI/ATU, or scikit-learn unavailable)")
         par_counts = {}
