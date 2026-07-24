@@ -244,19 +244,28 @@ def _build_motifs(force: bool = False):
     build_motifs(force=force)
 
 
+_REFRESHABLE = {"documents": "corpus", "corpus": "corpus", "motifs": "motifs"}
+
+
 @mytho.command()
-@click.argument("target", type=click.Choice(["documents", "motifs"]), default="documents")
+@click.argument("scope", nargs=-1)
 @click.option("--apply", is_flag=True, help="Adopt upstream changes (default previews and keeps the pinned copy).")
-def refresh(target: str, apply: bool):
+def refresh(scope, apply: bool):
     """Re-fetch upstream into the pinned raw archive (networked; preview then --apply).
 
-    Unlike `build` (which never re-fetches present raw) and `--force` (which rebuilds
-    derived from that raw), `refresh` is the deliberate, human-gated re-check of upstream.
+    Unlike `build` (which never re-fetches present raw) and `--force` (which rebuilds derived
+    from that raw), `refresh` is the deliberate, human-gated re-check of upstream. SCOPE selects
+    which upstream-capable stages to re-check — ``corpus`` (aka ``documents``) and/or ``motifs``;
+    with no SCOPE it refreshes all of them (stages with no network source are skipped).
     """
+    unknown = [s for s in scope if s not in _REFRESHABLE]
+    if unknown:
+        _fail("Refresh", ValueError(f"not a refreshable stage: {unknown} — choose corpus|documents|motifs"))
+    selected = {_REFRESHABLE[s] for s in scope} if scope else {"corpus", "motifs"}
     try:
-        if target == "documents":
+        if "corpus" in selected:
             _refresh_documents(apply)
-        else:
+        if "motifs" in selected:
             _refresh_motifs(apply)
     except Exception as e:
         _fail("Refresh", e)
