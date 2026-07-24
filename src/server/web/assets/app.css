@@ -602,6 +602,8 @@ body.has-main-navbar {
     text-transform: uppercase;
 }
 .corpus-page .facet-field-value { color: #374151; }
+.corpus-page .facet-field-list { margin: 0; padding-left: 18px; color: #374151; }
+.corpus-page .facet-field-list li { margin-bottom: 3px; }
 
 .corpus-page a.original-url-link {
     display: block;

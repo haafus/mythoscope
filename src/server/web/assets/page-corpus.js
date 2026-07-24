@@ -98,6 +98,16 @@ function facetField(label, value) {
     </div>`;
 }
 
+// Semicolon-separated strings (subdivision, strata) rendered as a bullet list.
+function facetListField(label, value) {
+    const items = (value || "").split(";").map((s) => s.trim()).filter(Boolean);
+    if (!items.length) return "";
+    return `<div class="facet-field">
+        <div class="facet-field-label">${escapeHtml(label)}</div>
+        <ul class="facet-field-list">${items.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+    </div>`;
+}
+
 function renderFacetInfo(color, kind, name, fields) {
     const readerContent = document.getElementById("readerContent");
     if (!readerContent) return;
@@ -119,8 +129,8 @@ function showRegionInfo(region) {
     if (!node) return;
     const lead = node.description ? `<div class="facet-lead">${escapeHtml(node.description)}</div>` : "";
     const fields = lead
-        + facetField("Subdivision", node.subdivision)
-        + facetField("Strata", node.strata);
+        + facetListField("Subdivision", node.subdivision)
+        + facetListField("Strata", node.strata);
     renderFacetInfo(node.color || "#8a8a8a", "Region", region, fields);
 }
 
