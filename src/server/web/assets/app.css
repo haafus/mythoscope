@@ -754,6 +754,7 @@ body.has-main-navbar {
     background: #111827;
     color: #f1f3f5;
     border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
     opacity: 0;
     transform: translateY(3px);
     transition: opacity 0.16s ease, transform 0.16s ease;
@@ -889,6 +890,7 @@ body.has-main-navbar {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     background: #111827;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
     color: #f1f3f5;
     font-size: 12px;
     line-height: 1.45;
@@ -1303,6 +1305,7 @@ body.has-main-navbar {
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 16px 18px;
     border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
     font-size: 12px;
     pointer-events: none;
     z-index: 1000;
