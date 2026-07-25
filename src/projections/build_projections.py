@@ -10,15 +10,24 @@ from .visualization import CHART_GENERATORS, SCATTER_TRANSFORMS
 logger = logging.getLogger(__name__)
 
 
+# Bump when a projection method's params/algorithm change **in place** (same output filenames) —
+# content-hashing the chunk metadata alone cannot see that (mirrors EMBED_ALGO_VERSION). The method
+# key set is folded too, so adding/removing a method also moves the fp (not only actual()'s file check).
+PROJECTION_ALGO_VERSION = 1
+
+
 def _fingerprint_from_metas(metas: list[dict]) -> str:
-    """Identity of the projection input, from chunk metadata alone (no vectors) — folds in
-    each chunk's embeddings fingerprint (the upstream per-chunk fp: hash(doc_fp, model,
-    transform_v)). Added/removed texts (id set) and edits (fp) both change it."""
+    """Identity of the projection input, from chunk metadata alone (no vectors) — folds in each
+    chunk's embeddings fingerprint (the upstream per-chunk fp: hash(doc_fp, model, transform_v))
+    plus the projection algo version + method set. Added/removed texts (id set), edits (fp), and
+    an algo/method change all move it."""
+    method_keys = ",".join(sorted(m["key"] for m in PROJECTION_METHODS))
+    head = f"algo={PROJECTION_ALGO_VERSION}|methods={method_keys}"
     parts = sorted(
         f"{(m or {}).get('document_id', '')}:{(m or {}).get('chunk_index', '')}:{(m or {}).get('fingerprint', '')}"
         for m in metas
     )
-    return content_fingerprint("\n".join(parts).encode("utf-8"))
+    return content_fingerprint((head + "\n" + "\n".join(parts)).encode("utf-8"))
 
 
 def _up_to_date(output_dir, current_fp: str) -> bool:

@@ -45,8 +45,8 @@ def source_fingerprint(source: str) -> str:
     for pattern in _SOURCE_RAW.get(source, []):
         base = raw / pattern
         members = [base] if base.is_file() else (base.rglob("*") if base.exists() else [])
-        for f in sorted(p for p in members if p.is_file()):
-            h.update(f"|{f.relative_to(raw)}=".encode())
+        for f in sorted(p for p in members if p.is_file() and not p.name.endswith(".partial")):
+            h.update(f"|{f.relative_to(raw)}=".encode())   # skip crashed staging files
             h.update(f.read_bytes())
     return h.hexdigest()
 

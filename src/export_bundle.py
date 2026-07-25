@@ -51,7 +51,11 @@ def _components(scope=None) -> list[tuple[str, Path, str]]:
         ("sources", Path(settings.sources_dir), "sources"),
     ]
     if scope:
+        valid = {c[0] for c in comps}
         families = {s.split(":", 1)[0] for s in scope}
+        unknown = families - valid
+        if unknown:   # a typo → error cleanly, like build/clean, not a silent empty bundle
+            raise ValueError(f"not an exportable component: {sorted(unknown)} — choose {sorted(valid)}")
         comps = [c for c in comps if c[0] in families]
     return comps
 

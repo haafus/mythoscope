@@ -188,7 +188,7 @@ def fetchables(config: dict, kind: str) -> list[Fetchable]:
     tr, files = config["trilogy"], config["trilogy"]["files"]
     out = [_csv_fetchable("trilogy", tr["base_url"], files[k]) for k in _KIND_FILES[kind]]
     mel = config.get("mellmann", {})
-    if kind == "tmi" and mel.get("base_url"):
+    if kind == "tmi" and mel.get("enabled", False) and mel.get("base_url"):   # gate on enabled, as build does
         out.append(_csv_fetchable("mellmann", mel["base_url"], mel.get("files", {}).get("tmi", "tmi.csv")))
     return out
 

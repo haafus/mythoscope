@@ -47,6 +47,13 @@ def _fp_path(name: str):
     return store.motifs_dir() / f".fp.{name}"
 
 
+def _drop(*paths) -> None:
+    """Level-1 clean: remove a stage's artifact(s) + fp sidecar so a driver `clean --apply` on an
+    orphaned motifs stage (e.g. a source disabled in config) actually reaps it, not a silent no-op."""
+    for p in paths:
+        p.unlink(missing_ok=True)
+
+
 class SourceStage(Stage):
     """Base for the three source index stages (``berezkin`` / ``tmi`` / ``atu``): parse this source's
     raw + fold its enrichment, write ``<source>.json`` + the enrichment sidecar. Offline build
@@ -97,7 +104,8 @@ class SourceStage(Stage):
         return refresh_fetchables(self.fetchables(), apply=apply)
 
     def delete(self, keys: set[str]) -> None:
-        pass
+        _drop(store.index_path(self.source), _fp_path(f"source.{self.source}"),
+              store.enrichment_path(self.source), store.discovered_path(self.source))
 
 
 class BerezkinSource(SourceStage):
@@ -164,7 +172,7 @@ class CrosswalkStage(Stage):
         _fp_path("crosswalk").write_text(self._fp(), encoding="utf-8")
 
     def delete(self, keys: set[str]) -> None:
-        pass
+        _drop(store.crosswalk_path(), _fp_path("crosswalk"))
 
 
 class ParallelsStage(Stage):
@@ -194,10 +202,13 @@ class ParallelsStage(Stage):
 
     def build(self, keys: set[str]) -> None:
         _build_parallels(load_json_optional(store.crosswalk_path()) or {})
-        _fp_path("parallels").write_text(self._fp(), encoding="utf-8")
+        # sklearn absent / no TMI+ATU → _build_parallels writes no parallels.json; don't stamp the
+        # fp over a missing artifact (actual() would stay {} → the stage would never reconcile).
+        if store.parallels_path().exists():
+            _fp_path("parallels").write_text(self._fp(), encoding="utf-8")
 
     def delete(self, keys: set[str]) -> None:
-        pass
+        _drop(store.parallels_path(), _fp_path("parallels"))
 
 
 class SemanticStage(Stage):
@@ -227,7 +238,7 @@ class SemanticStage(Stage):
             _fp_path("semantic").write_text(fp, encoding="utf-8")
 
     def delete(self, keys: set[str]) -> None:
-        pass
+        _drop(store.semantic_parallels_path(), _fp_path("semantic"))
 
 
 class MetaStage(Stage):
@@ -265,7 +276,7 @@ class MetaStage(Stage):
         _fp_path("meta").write_text(self._fp(), encoding="utf-8")
 
     def delete(self, keys: set[str]) -> None:
-        pass
+        _drop(store.meta_path(), _fp_path("meta"))
 
 
 def motifs_stages() -> list[Stage]:

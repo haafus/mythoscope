@@ -13,7 +13,7 @@ CONFIG = {
     "trilogy": {"enabled": True, "base_url": "https://tr.example/data",
                 "files": {"tmi": "tmi.csv", "atu_df": "atu_df.csv", "atu_seq": "atu_seq.csv",
                           "atu_combos": "atu_combos.csv"}},
-    "mellmann": {"base_url": "https://mel.example", "files": {"tmi": "tmi.csv"}},
+    "mellmann": {"enabled": True, "base_url": "https://mel.example", "files": {"tmi": "tmi.csv"}},
 }
 
 

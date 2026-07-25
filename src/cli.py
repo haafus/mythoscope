@@ -259,9 +259,13 @@ def status(scope):
     SCOPE (optional) restricts to stages matching a name/prefix plus their upstream."""
     from pipeline import status as pipeline_status
 
-    stages, targets = _scoped_pipeline(scope)
+    try:
+        stages, targets = _scoped_pipeline(scope)
+        plans = pipeline_status(stages)   # topo_order can raise on a cycle / malformed pipeline
+    except Exception as e:
+        _fail("Status", e)                # no bare traceback, like build/clean/refresh
     dirty = 0
-    for p in pipeline_status(stages):
+    for p in plans:
         if targets is not None and p.stage.name not in targets:
             continue  # upstream is present only to compute the targets' plans — don't list it
         if p.clean:
@@ -345,7 +349,11 @@ def _clean(scope, apply: bool, caches: bool):
             except ValueError:
                 label = str(motifs_cache[0])
             click.echo(f"  {label + '/':<50} {format_size(motifs_cache[1]):>8}")
-        if caches:
+        if caches and scope:
+            # The caches are global (graph extraction / chunk preprocess / motif raw), not
+            # per-stage — a scoped clean must not silently reap another stage's cache.
+            click.echo(click.style("  --caches is global — run `mytho clean --caches` without a SCOPE to remove", fg="yellow"))
+        elif caches:
             total_items += len(cache_list) + (1 if motifs_cache else 0)
             if apply:
                 for path, _ in cache_list:

@@ -73,8 +73,8 @@ def walk_fetchables(subdir: str, base: str, *, exclude: set[str] = frozenset(),
         return []
     out = []
     for f in sorted(p for p in root.iterdir() if p.is_file()):
-        if f.name in exclude or f.name.endswith(".absent"):
-            continue
+        if f.name in exclude or f.name.endswith((".absent", ".partial")):
+            continue   # .absent = known-404 marker; .partial = a crashed staging file, not a resource
         url, _ = locator(subdir, base, f.name)   # same scheme the build-time fetch uses
         out.append(Fetchable(f"{subdir}/{f.name}", url, f, auth=auth, validate=validate))
     return out

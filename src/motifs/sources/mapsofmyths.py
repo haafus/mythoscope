@@ -171,19 +171,28 @@ def _write(name: str, payload: dict) -> None:
 
 
 def _post_markers(node: str, cache_dir: Path, auth: tuple[str, str], *, force: bool = False) -> str:
-    """POST the ``/gmap-markers-tradition`` endpoint for one node, cached like a
-    fetch (a non-empty cached reply short-circuits unless ``force``)."""
+    """POST the ``/gmap-markers-tradition`` endpoint for one node, cached like a fetch (a non-empty
+    cached reply short-circuits unless ``force``). Honours ``MYTHO_OFFLINE`` — serve pinned only,
+    never POST or mutate the cache — since it is the one build-time reader that does not route
+    through ``fetch_to_cache``; and commits atomically (``.partial`` + rename), like every other
+    cache writer, storing the raw bytes so refresh's byte diff matches."""
+    from fetch_cache import FetchRejected, commit_bytes, offline
+
     cache_file = cache_dir / f"markers_{node}.json"
-    if not force and cache_file.exists() and cache_file.stat().st_size > 0:
+    have = cache_file.exists() and cache_file.stat().st_size > 0
+    if have and not force:
         return cache_file.read_text(encoding="utf-8")
+    if offline():
+        if have:
+            return cache_file.read_text(encoding="utf-8")
+        raise FetchRejected(f"offline (MYTHO_OFFLINE): markers for node {node} not pinned")
     import requests  # lazy: the HTTP dep lives in the corpus extra
 
     resp = requests.post(f"{BASE}/gmap-markers-tradition", data={"tradition": node},
                          auth=auth, timeout=60)
     resp.raise_for_status()
-    cache_file.parent.mkdir(parents=True, exist_ok=True)
-    cache_file.write_text(resp.text, encoding="utf-8")
-    return resp.text
+    commit_bytes(cache_file, resp.content)
+    return resp.content.decode("utf-8", errors="replace")
 
 
 def _marker_fetch(node: str, auth: tuple[str, str] | None):
