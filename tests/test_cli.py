@@ -69,7 +69,7 @@ class TestRefreshCommand:
 
         monkeypatch.setattr("corpus.refresh.refresh_corpus",
                             lambda **kw: RefreshResult(unchanged=2, changed=["A"]))
-        result = runner.invoke(mytho, ["refresh", "documents"])
+        result = runner.invoke(mytho, ["refresh", "corpus"])
         assert result.exit_code == 0
         assert "changed" in result.output
         assert "--apply" in result.output
@@ -80,7 +80,7 @@ class TestRefreshCommand:
 
         monkeypatch.setattr("corpus.refresh.refresh_corpus",
                             lambda **kw: RefreshResult(degraded=[("A", "empty-body")]))
-        result = runner.invoke(mytho, ["refresh", "documents", "--apply"])
+        result = runner.invoke(mytho, ["refresh", "corpus", "--apply"])
         assert result.exit_code == 0
         assert "kept pinned" in result.output
         assert "everything current" not in result.output

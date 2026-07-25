@@ -1,4 +1,4 @@
-"""`mytho refresh documents` — re-check pinned corpus raw against upstream.
+"""`mytho refresh corpus` — re-check pinned corpus raw against upstream.
 
 The fetch/build boundary (pipeline §5, fetch-and-refresh §2): ``build`` acquires missing
 raw and never re-fetches; ``refresh`` is the separate, human-gated, networked re-check. It

@@ -145,9 +145,6 @@ def _build_motifs(force: bool = False):
     build_motifs(force=force)
 
 
-_REFRESHABLE = {"documents": "corpus", "corpus": "corpus", "motifs": "motifs"}
-
-
 @mytho.command()
 @click.argument("scope", nargs=-1)
 @click.option("--apply", is_flag=True, help="Adopt upstream changes (default previews and keeps the pinned copy).")
@@ -156,18 +153,15 @@ def refresh(scope, apply: bool):
 
     Unlike `build` (which never re-fetches present raw) and `--force` (which rebuilds derived
     from that raw), `refresh` is the deliberate, human-gated re-check of upstream. SCOPE selects
-    which upstream-capable stages to re-check — ``corpus`` (aka ``documents``) and/or ``motifs``;
-    with no SCOPE it refreshes all of them (stages with no network source are skipped).
+    which upstream-capable stages to re-check (``corpus`` and/or ``motifs``); with no SCOPE it
+    refreshes all of them.
     """
-    unknown = [s for s in scope if s not in _REFRESHABLE]
+    unknown = [s for s in scope if s not in _REFRESHERS]
     if unknown:
-        _fail("Refresh", ValueError(f"not a refreshable stage: {unknown} — choose corpus|documents|motifs"))
-    selected = {_REFRESHABLE[s] for s in scope} if scope else {"corpus", "motifs"}
+        _fail("Refresh", ValueError(f"not a refreshable stage: {unknown} — choose {'|'.join(_REFRESHERS)}"))
     try:
-        if "corpus" in selected:
-            _refresh_documents(apply)
-        if "motifs" in selected:
-            _refresh_motifs(apply)
+        for name in scope or _REFRESHERS:
+            _REFRESHERS[name](apply)
     except Exception as e:
         _fail("Refresh", e)
 
@@ -211,6 +205,10 @@ def _refresh_motifs(apply: bool):
         click.echo(click.style("Preview only. Re-run with --apply to re-fetch.", fg="yellow"))
         return
     _run("Refresh motifs", _build_motifs, force=True)
+
+
+# The refreshable stages: token → handler. Single source for validation, the default set, and dispatch.
+_REFRESHERS = {"corpus": _refresh_documents, "motifs": _refresh_motifs}
 
 
 @mytho.command()
