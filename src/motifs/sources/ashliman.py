@@ -201,7 +201,8 @@ def build_enrichment(atu_types: list[dict], *, force: bool = False) -> dict:
     logger.info("Ashliman: %d types carry %d tale variants (from %d pages; %d orphan site types dropped)",
                 n_types, n_variants, pages_read, orphans)
     return {"types_with_tales": n_types, "variants": n_variants,
-            "pages": pages_read, "orphans_dropped": orphans}
+            "pages": pages_read, "orphans_dropped": orphans,
+            "discovered": sorted(site["all"])}   # site-coverage set → meta discovery-shrank watch
 
 
 # ---------------------------------------------------------------------------

@@ -69,6 +69,20 @@ def enrichment_path(source: str) -> Path:
     return motifs_dir() / f"{source}.enrichment.json"
 
 
+def discovered_path(root: str) -> Path:
+    """This build's discovered link set for a parse-root source (``berezkin`` index / ``ashliman``
+    site walk / ``mapsofmyths`` ``motifs_full``) — the ephemeral input the ``meta`` discovery-shrank
+    check reads. Absent when the source was skipped (a skip is not a shrink)."""
+    return motifs_dir() / f".discovered.{root}.json"
+
+
+def discovery_union_path() -> Path:
+    """The accumulated all-time union of every link each parse-root ever listed — the mark
+    ``discovery-shrank`` compares the live root against. Kept out of ``meta.json`` (it is large and
+    machinery, not a manifest field), beside it like the fp sidecars."""
+    return motifs_dir() / ".discovery.json"
+
+
 # ---------------------------------------------------------------------------
 # Read side (server) — cached per process
 # ---------------------------------------------------------------------------

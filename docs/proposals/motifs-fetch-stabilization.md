@@ -129,10 +129,15 @@ staging/validator added here is exactly what that flow's `commit`/`reject`/`vali
 > **Implementation split (build-time vs refresh-time).** The **build path** cannot detect `changed` / `gone` /
 > `degraded` per-payload — those need an **upstream diff**, and `build` only acquires-or-uses-cache. So the
 > **aggregate, build-time** guard ships in Stage I: `yield-drop`, `highwater`, `meta.flags` (durable, self-clearing),
-> and per-source `fetch_outcomes` — **✅ DONE** (`build_motifs._degradation_check`, items 5–7, 10–13, minus the
-> discovery-union). The **per-payload flags** (`changed`/`gone`/`degraded`/`no-parse`) are inherently
-> **refresh-time** and land with `refresh` (Part 2/3). The **root-discovery union** (item 8) needs the fetch/parse
-> split (§ open items) and lands in **Part 3**. This is principled, not a shortcut: build can't diff upstream.
+> and per-source `fetch_outcomes` — **✅ DONE** (`build_motifs._degradation_check`, items 5–7, 10–13). The
+> **per-payload flags** (`changed`/`gone`/`degraded`/`no-parse`) are inherently **refresh-time**; they landed
+> with the staged `refresh` as **ephemeral** status rows (fetch-and-refresh §9 — the durable per-payload flag was
+> superseded by the ephemeral-refresh decision, so no `meta.flags` entry). The **root-discovery union** (item 8)
+> — **✅ DONE** (`build_motifs._discovery_check`): each parse-root (berezkin index / ashliman site walk /
+> mapsofmyths `motifs_full`) writes its discovered set (`.discovered.<root>.json`), and meta raises a durable
+> **`discovery-shrank`** flag when the live root drops links it used to list (`current ⊊ accumulated`) even though
+> the build stays full off the pinned copies; the accumulated union lives in `.discovery.json` (large — kept out
+> of meta), a skipped root is carried not flagged, and it self-clears on recovery.
 
 5. Before `save_json(store.meta_path(), meta)` (`build_motifs.py:266`), **load the previous `meta.json`** if
    present and capture prior `counts` + `enrichment`.

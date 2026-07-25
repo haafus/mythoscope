@@ -333,6 +333,8 @@ def build_enrichment(*, force: bool = False, auth: tuple[str, str] | None = None
         "with_traditions": sum(1 for r in nodes.values() if r.get("traditions")),
         "traditions": len(traditions),
         "traditions_with_coords": with_coords,
+        # node ids the /motifs_full listing yielded → meta discovery-shrank watch
+        "discovered": sorted({h.rstrip("/").rsplit("/", 1)[-1] for _, h in targets}),
     }
     logger.info("mapsofmyths: refreshed — motifs:%d type/group:%d tmi:%d atu:%d "
                 "traditions-sets:%d; tradition catalogue:%d",

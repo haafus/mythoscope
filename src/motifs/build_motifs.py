@@ -119,6 +119,54 @@ def _persist_enrichment(source: str, enrichment: dict) -> None:
     save_json(store.enrichment_path(source), {k: enrichment[k] for k in keys if k in enrichment})
 
 
+# Parse-root sources — an index/listing page whose parse yields the sub-page links a source builds
+# over. Their discovered link set is watched for shrink (Stage I Phase 3 item 8).
+_PARSE_ROOTS = ("berezkin", "mapsofmyths", "ashliman")
+
+
+def _persist_discovered(root: str, keys: list | None) -> None:
+    """Record this build's discovered link set for a parse-root, or **clear** it (``keys is None``)
+    when the source was skipped — so ``meta`` reads a skip as 'not checked', never a total shrink."""
+    path = store.discovered_path(root)
+    if keys is None:
+        path.unlink(missing_ok=True)
+    else:
+        save_json(path, keys)
+
+
+def _discovery_check(prior_meta: dict, built_at: str) -> list[dict]:
+    """Raise a durable **``discovery-shrank``** flag when a parse-root's live parse drops links it
+    used to list (``current ⊊ accumulated``) — even though the build stays full off the pinned
+    copies, so the union masks the rot; this un-masks a quietly-dying source early. Growth just
+    extends the mark; a skipped root (no ``.discovered`` sidecar) is carried, not flagged; the flag
+    auto-clears when the root re-lists what it dropped. The accumulated union lives beside meta in
+    ``.discovery.json`` (large, machinery — not a manifest field); only the flag lands in meta."""
+    prior_union = load_json_optional(store.discovery_union_path()) or {}
+    prior_flags = {(f["kind"], f["key"]): f for f in prior_meta.get("flags", [])}
+    union: dict[str, list] = {}
+    flags: list[dict] = []
+    for root in _PARSE_ROOTS:
+        accumulated = set(prior_union.get(root, []))
+        path = store.discovered_path(root)
+        current = set(load_json_optional(path) or []) if path.exists() else None
+        if current is None:                       # skipped / not built this run → carry, do not flag
+            if accumulated:
+                union[root] = sorted(accumulated)
+            continue
+        union[root] = sorted(accumulated | current)   # union only grows — dropped links stay in it
+        dropped = accumulated - current
+        if dropped:
+            first_seen = prior_flags.get(("discovery-shrank", root), {}).get("first_seen", built_at)
+            flags.append({"source": root, "key": root, "kind": "discovery-shrank",
+                          "detail": f"{len(dropped)} link(s) no longer listed by the live root "
+                                    f"(union {len(union[root])}); pinned copies still served",
+                          "auto_action": "kept-pinned", "first_seen": first_seen})
+            logger.warning("REGRESSION [discovery-shrank]: %s dropped %d link(s) from its live root",
+                           root, len(dropped))
+    save_json(store.discovery_union_path(), union)
+    return flags
+
+
 def _build_berezkin(config: dict, *, force: bool) -> dict:
     """Build ``berezkin.json`` (+ its enrichment sidecar) from the areal catalogue + mapsofmyths.
     Returns ``{counts, sources}`` for the meta aggregation. The future ``motifs:source:berezkin``."""
@@ -165,6 +213,8 @@ def _build_berezkin(config: dict, *, force: bool) -> dict:
                     bb["works"], bb["resolved"], bb["citations"],
                     round(100 * bb["resolved"] / bb["citations"]) if bb["citations"] else 0,
                     bb["ambiguous"])
+    _persist_discovered("berezkin", sorted(m["page"] for m in berezkin_motifs))
+    _persist_discovered("mapsofmyths", mm.pop("discovered", None))   # None when creds-skipped → cleared
     _persist_enrichment("berezkin", enrichment)
     return {"counts": {"berezkin": len(berezkin_motifs)},
             "sources": {"berezkin": {"homepage": home, "attribution": bz_cfg.get("attribution", "")}}}
@@ -235,6 +285,7 @@ def _build_atu(config: dict, *, force: bool) -> dict:
     else:
         logger.info("      + Ashliman: %d types carry %d tale variants (from %d pages, %d orphan site types dropped)",
                     ash["types_with_tales"], ash["variants"], ash["pages"], ash["orphans_dropped"])
+    _persist_discovered("ashliman", enrichment["ashliman"].pop("discovered", None))
     _persist_enrichment("atu", enrichment)
     return {"counts": {"atu": len(atu_types)}, "sources": {}}
 
@@ -342,12 +393,15 @@ def _build_meta(config: dict) -> tuple[dict, dict, dict]:
         "parallels": par_counts,  # heuristic look-alikes with no recorded link
         "sources": sources,
     }
-    # Degradation guard: load the prior meta, carry forward the high-water marks + flags, and flag any
-    # metric now below its mark. Written into meta so it is durable and self-clearing across builds.
+    # Degradation guard: load the prior meta once, carry forward the high-water / discovery marks +
+    # flags, and flag any metric below its mark (yield-drop) or any parse-root that shrank
+    # (discovery-shrank). Durable + self-clearing across builds.
+    prior_meta = store.load_meta()
     meta["highwater"], meta["flags"], meta["fetch_outcomes"] = _degradation_check(
-        _flat_metrics(counts, meta["crosswalk"]), enrichment_agg, store.load_meta(), meta["built_at"])
+        _flat_metrics(counts, meta["crosswalk"]), enrichment_agg, prior_meta, meta["built_at"])
+    meta["flags"] += _discovery_check(prior_meta, meta["built_at"])
     if meta["flags"]:
-        logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
+        logger.warning("motif build: %d degradation flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
     return counts, links, par_counts
 
