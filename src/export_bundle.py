@@ -68,9 +68,11 @@ def _is_staging(rel: Path) -> bool:
 
 
 def _is_cache(component: str, rel: Path) -> bool:
-    # outputs/motifs/raw/** is the scrape cache; the jsonl files are resumable caches. Both are the
-    # "raw/cache tier" — shipped only with --caches. (Staging debris is handled by _is_staging.)
-    in_raw_dir = component == "motifs" and bool(rel.parts) and rel.parts[0] == _RAW_DIR_NAME
+    # The pinned raw scrape caches — corpus web downloads (outputs/corpus/raw/**) and the motif
+    # sources (outputs/motifs/raw/**) — plus the resumable jsonl caches, are the "raw/cache tier":
+    # shipped only with --caches. (`sources/` local file: originals ship always — re-ingest needs
+    # them; staging debris is handled by _is_staging.)
+    in_raw_dir = component in ("corpus", "motifs") and bool(rel.parts) and rel.parts[0] == _RAW_DIR_NAME
     return rel.name in _CACHE_FILENAMES or in_raw_dir
 
 

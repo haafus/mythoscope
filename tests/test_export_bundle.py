@@ -81,11 +81,13 @@ class TestExport:
         result = eb.export_outputs(out_dir=built_outputs, timestamp="20260629-120000", include_caches=True)
         assert result.path.name == "mythoscope-caches-20260629-120000.zip"
 
-    def test_staging_debris_never_ships(self):
+    def test_raw_tier_and_staging_gates(self):
         from pathlib import Path
-        # .partial/.tmp are crash debris — staging, not a shippable tier (excluded even with --caches)
+        # corpus + motifs raw are both the cache/raw tier (shipped only with --caches)
+        assert eb._is_cache("corpus", Path("raw/page.html")) and eb._is_cache("motifs", Path("raw/x.html"))
+        # .partial/.tmp are crash debris — staging, excluded even with --caches (separate gate)
         assert eb._is_staging(Path("raw/abc.partial")) and eb._is_staging(Path("x.tmp"))
-        assert not eb._is_cache("corpus", Path("raw/abc.partial"))   # not the raw/cache tier
+        # a built product is neither
         assert not eb._is_staging(Path("Region/Trad/Book.txt"))
         assert not eb._is_cache("corpus", Path("Region/Trad/Book.txt"))
 
