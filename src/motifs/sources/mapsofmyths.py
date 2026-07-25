@@ -188,16 +188,18 @@ def _post_markers(node: str, cache_dir: Path, auth: tuple[str, str], *, force: b
 def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict:
     """Fetch + parse mapsofmyths into ``outputs/motifs/``. Returns a count dict.
 
-    No-op (returns ``{"skipped": ...}``) when credentials are absent — the Berezkin
-    catalogue is then built without the enrichment. ``auth`` overrides settings.
+    Credentials gate the **network**, not the step: a populated raw cache re-derives offline
+    (``fetch_to_cache`` short-circuits on a cache hit and never uses ``auth``). So this is a no-op
+    only when it would actually have to fetch — a forced re-scrape, or no cached root page — and
+    no credentials are present. ``auth`` overrides settings.
     """
     auth = auth or _auth()
-    if not auth:
-        logger.warning("mapsofmyths: no credentials (MAPSOFMYTHS_AUTH=user:pass in .env) — "
-                       "skipping English/taxonomy/TMI/traditions enrichment")
-        return {"skipped": "no-credentials"}
-
     cache = data_dir() / "raw" / "mapsofmyths"
+    if not auth and (force or not (cache / "motifs_full.html").exists()):
+        logger.warning("mapsofmyths: no credentials (MAPSOFMYTHS_AUTH=user:pass) and %s — "
+                       "skipping English/taxonomy/TMI/traditions enrichment",
+                       "--force re-scrape requested" if force else "no raw cache")
+        return {"skipped": "no-credentials"}
 
     def get(path: str, cache_name: str) -> str:
         return fetch_text(f"{BASE}{path}", cache / cache_name, force=force, auth=auth)

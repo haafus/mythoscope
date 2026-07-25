@@ -16,6 +16,11 @@ Rebuild goes through the driver scoped to motifs (``build(..., force=True)``), s
 works before the split (one ``motifs`` stage) and after (the ``motifs:*`` stages). Requires a
 populated ``outputs/motifs/raw/`` — run ``scripts/fetch_motifs_raw.py`` first.
 
+No credentials needed: the core files carry enrichment (``berezkin.json``: ``name_rus`` /
+``tmi_refs`` / ``motif_group`` / ``traditions``), and with a populated raw cache the enrichment
+re-derives offline (mapsofmyths gates creds on the network, not the step), so the rebuild is a
+clean function of (code + raw).
+
 The baseline lives at ``outputs/motifs/.golden-core.json`` (gitignored, beside the store).
 """
 
@@ -34,15 +39,19 @@ def _baseline_path():
 
 
 def _rebuild_from_cache() -> None:
-    """Rebuild only the motifs stage(s) from the raw cache, ignoring the fp gate. Offline: the
-    driver never re-fetches on build, so this is deterministic. Prefix-scoped, so it spans both
-    the monolith (``motifs``) and the atomised stages (``motifs:*``)."""
+    """Rebuild the motifs stage(s) from the raw cache. Deletes the ``.fp`` gate first: both the
+    driver's ``actual()`` and ``build_motifs``'s own internal fp check short-circuit on a matching
+    fp, so without this the "rebuild" is a silent no-op. With the gate gone the build re-derives
+    from the cache — offline (``force=False`` never re-fetches), hence deterministic. Prefix-scoped,
+    so it spans the monolith (``motifs``) and the future atomised stages (``motifs:*``)."""
+    from motifs import store
     from pipeline import build, build_pipeline
 
+    (store.motifs_dir() / ".fp").unlink(missing_ok=True)  # drop the gate → force an actual rebuild
     motifs = [s for s in build_pipeline() if s.name == "motifs" or s.name.startswith("motifs")]
     if not motifs:
         raise SystemExit("no motifs stage in the pipeline")
-    build(motifs, force=True, targets={s.name for s in motifs})
+    build(motifs, targets={s.name for s in motifs})
 
 
 def _hash_core() -> dict[str, str]:
