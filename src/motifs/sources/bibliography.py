@@ -237,7 +237,7 @@ def fetchables() -> list[Fetchable]:
                       raw_dir() / "folkmasa_bibliography.html", validate=valid_html)]
 
 
-def refresh(tmi_records: list[dict], *, force: bool = False) -> dict:
+def build_enrichment(tmi_records: list[dict], *, force: bool = False) -> dict:
     """Pipeline step: fetch folkmasa, build the key, write it to outputs/motifs/."""
     cache = Path(settings.motifs_dir) / "raw" / "folkmasa_bibliography.html"
     html = fetch_text(SOURCE_URL, cache, encoding="windows-1255", force=force)

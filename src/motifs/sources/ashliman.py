@@ -141,7 +141,7 @@ def fetchables() -> list[Fetchable]:
     return walk_fetchables("ashliman", BASE, validate=valid_html)
 
 
-def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
+def build_enrichment(atu_types: list[dict], *, force: bool = False) -> dict:
     """Source each type's example tales straight from Ashliman's site — no aft
     dataset. Crawl the site (``discover_site_types``); for every site ATU type
     that maps to a catalogue type (itself, or a parent/family via

@@ -248,7 +248,7 @@ def fetchables() -> list[Fetchable]:
     return out
 
 
-def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict:
+def build_enrichment(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict:
     """Fetch + parse mapsofmyths into ``outputs/motifs/``. Returns a count dict.
 
     Credentials gate the **network**, not the step: a populated raw cache re-derives offline

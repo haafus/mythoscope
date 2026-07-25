@@ -315,9 +315,13 @@ This architecture is the **target form** — converged and validated, not yet a 
    motifs); excluded from export by default; shipped **only with `--caches`**, in all cases. No selective /
    motif-specific rule. (Consequence: the region migration re-keys raw **in place** — `sha1→blake2b` rename, no
    re-fetch, no committed fallback — see `region-implementation.md` §6.)
-4. **fetch/parse split** — mechanically move parse out of the sources' current `refresh()` functions into the
-   index stages' `build` (today they conflate fetch + parse). *Still open (deferred — low near-term value; the
-   staged refresh diffs raw bytes and needs no parse).*
+4. **fetch/parse split** — ✅ the URL-scheme duplication is closed: one `locator` per source
+   (`sources.fetch.locator` for flat sources, `mapsofmyths._locator`) is the single source of truth
+   used by *both* the build-time fetch and refresh's `fetchables()`. The build-time enrichment
+   functions were renamed `refresh()` → `build_enrichment()` so the name no longer collides with the
+   staged `SourceStage.refresh`. *Remaining (deferred, low value):* fully separating parse from fetch
+   into a `SourceUnit.acquire`/`parse` pair — the staged refresh diffs raw bytes and needs no parse,
+   so this is pure structural cleanup.
 5. **Edges not yet walked** — ✅ mostly done: parse-root discovery (berezkin/ashliman page trees, mapsofmyths
    node pages via parsing the pinned `motifs_full`) is how each source's `fetchables()` enumerates; the
    `mapsofmyths` POST endpoint rides a per-resource `Fetchable.fetch` override; per-source auth gates

@@ -265,7 +265,7 @@ def fetchables() -> list[Fetchable]:
     return [Fetchable("berezkin/biblio.html", url, cache, validate=valid_html)]
 
 
-def refresh(motifs: list[dict], *, force: bool = False) -> dict:
+def build_enrichment(motifs: list[dict], *, force: bool = False) -> dict:
     """Fetch + parse the Berezkin bibliography, link it to regions/ethnos.
 
     Reads the already-cached motif detail pages (only ``biblio.html`` is fetched).

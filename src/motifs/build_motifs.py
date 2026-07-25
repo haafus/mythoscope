@@ -131,7 +131,7 @@ def _build_berezkin(config: dict, *, force: bool) -> dict:
                 home, bz_cfg.get("index_page", "index page"))
     # mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids, traditions) — part of
     # building the Berezkin index, so downloaded under this step; credential-gated, a no-op skips it.
-    mm = enrichment["mapsofmyths"] = _timed("mapsofmyths.refresh", mapsofmyths.refresh, force=force)
+    mm = enrichment["mapsofmyths"] = _timed("mapsofmyths.build_enrichment", mapsofmyths.build_enrichment, force=force)
     berezkin_data = _timed("berezkin.build (parse)", berezkin.build, bz_cfg, force=force)
     save_json(store.index_path("berezkin"), berezkin_data)
     berezkin_motifs = berezkin_data["motifs"]
@@ -155,7 +155,7 @@ def _build_berezkin(config: dict, *, force: bool) -> dict:
         logger.info("          + tradition catalogue: %d areal codes → people name, region & language",
                     len(berezkin_data.get("traditions", {})))
 
-    enrichment["berezkin_bibliography"] = _timed("berezkin_bibliography.refresh", berezkin_bibliography.refresh, berezkin_motifs, force=force)
+    enrichment["berezkin_bibliography"] = _timed("berezkin_bibliography.build_enrichment", berezkin_bibliography.build_enrichment, berezkin_motifs, force=force)
     bb = enrichment["berezkin_bibliography"]
     if bb.get("skipped"):
         logger.info("      + bibliography (areasofmyths.com) SKIPPED (%s)", bb["skipped"])
@@ -199,7 +199,7 @@ def _build_tmi(config: dict, *, force: bool) -> dict:
                 _applied(tmi_motifs, lambda m: m.get("definition")),
                 _applied(tmi_motifs, lambda m: m.get("cultures")),
                 _applied(tmi_motifs, lambda m: m.get("atu_inline")))
-    enrichment["bibliography"] = _timed("bibliography.refresh", bibliography.refresh, tmi_motifs, force=force)
+    enrichment["bibliography"] = _timed("bibliography.build_enrichment", bibliography.build_enrichment, tmi_motifs, force=force)
     bib = enrichment["bibliography"]
     logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
                 "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
@@ -218,8 +218,8 @@ def _build_atu(config: dict, *, force: bool) -> dict:
     logger.info("[3/5] Aarne-Thompson-Uther (ATU) tale types — source: %s", tr_cfg.get("homepage", "trilogy"))
     logger.info("      files: %s", ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
     atu_index, _ = _timed("trilogy.build_atu (parse)", trilogy.build_atu, tr_cfg, force=force)
-    enrichment["atu_wikidata"] = _timed("atu_wikidata.refresh", atu_wikidata.refresh, atu_index["types"], force=force)
-    enrichment["ashliman"] = _timed("ashliman.refresh", ashliman.refresh, atu_index["types"], force=force)
+    enrichment["atu_wikidata"] = _timed("atu_wikidata.build_enrichment", atu_wikidata.build_enrichment, atu_index["types"], force=force)
+    enrichment["ashliman"] = _timed("ashliman.build_enrichment", ashliman.build_enrichment, atu_index["types"], force=force)
     save_json(store.index_path("atu"), atu_index)
     atu_types = atu_index["types"]
     logger.info("      %d tale types", len(atu_types))

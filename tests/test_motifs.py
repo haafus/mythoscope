@@ -410,7 +410,7 @@ class TestAtuWikidataPhase0:
             raise exc
 
         monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
-        result = atu_wikidata.refresh([{"id": "1"}], force=True)
+        result = atu_wikidata.build_enrichment([{"id": "1"}], force=True)
         assert result == {"skipped": "http-429"}
         assert cache.exists()                                # pinned copy kept, not unlinked
 
@@ -429,7 +429,7 @@ class TestAtuWikidataPhase0:
             raise atu_wikidata.FetchRejected(url)            # downloaded but unhealthy — cache NOT overwritten
 
         monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
-        result = atu_wikidata.refresh([], force=True)
+        result = atu_wikidata.build_enrichment([], force=True)
         assert "skipped" not in result                      # served the pinned copy, enrichment ran
         assert cache.read_text() == pinned                  # pinned copy untouched
 
@@ -442,7 +442,7 @@ class TestAtuWikidataPhase0:
             raise atu_wikidata.FetchRejected(url)
 
         monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
-        result = atu_wikidata.refresh([], force=True)
+        result = atu_wikidata.build_enrichment([], force=True)
         assert result == {"skipped": "degraded-or-unparseable"}
 
     def test_rejected_pinned_unparseable_skips_not_crash(self, tmp_path, monkeypatch):
@@ -457,7 +457,7 @@ class TestAtuWikidataPhase0:
             raise atu_wikidata.FetchRejected(url)
 
         monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
-        result = atu_wikidata.refresh([], force=True)          # must NOT raise
+        result = atu_wikidata.build_enrichment([], force=True)          # must NOT raise
         assert result == {"skipped": "cache-unparseable"}
 
     def test_cache_hit_parses_without_validator(self, tmp_path, monkeypatch):
@@ -470,7 +470,7 @@ class TestAtuWikidataPhase0:
             return '{"results": {"bindings": []}}'            # short-circuit: validator not called
 
         monkeypatch.setattr(atu_wikidata, "fetch_text", fake_fetch)
-        result = atu_wikidata.refresh([], force=False)
+        result = atu_wikidata.build_enrichment([], force=False)
         assert "skipped" not in result and result.get("rows") == 0
 
 

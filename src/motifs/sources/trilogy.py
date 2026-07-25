@@ -853,7 +853,7 @@ def _parse_atu(df_rows: list[dict], seq: dict[str, list[str]],
             "motifs": seq.get(atu_id, []),
             "combos": combos.get(atu_id, []),
             # Example folktales are sourced later, straight from Ashliman's site
-            # (ashliman.refresh), not from a dataset.
+            # (ashliman.build_enrichment), not from a dataset.
         })
 
     # Drop See/Cf pointer stubs, recording their redirect. Done *before* the subtype

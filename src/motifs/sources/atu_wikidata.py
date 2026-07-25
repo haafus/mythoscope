@@ -175,7 +175,7 @@ def fetchables() -> list[Fetchable]:
                       validate=lambda c: is_healthy(c, ids))]
 
 
-def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
+def build_enrichment(atu_types: list[dict], *, force: bool = False) -> dict:
     """Fetch Wikidata and attach ``names`` / ``wikipedia`` / ``wikidata`` /
     ``concordances`` to each type, in place. ``{"skipped": ...}`` if the fetch failed."""
     cache = Path(settings.motifs_dir) / OUT
