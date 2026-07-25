@@ -419,7 +419,7 @@ mytho refresh motifs           # предпросмотр: что будет п�
 mytho refresh motifs --apply   # пере-скачать источники из сети
 ```
 
-Тюнинг скрейпа Березкина — через env (см. `.env.example`): `MYTHO_MOTIFS__MAX_WORKERS` (параллельные загрузки детальных страниц), `MYTHO_MOTIFS__BEREZKIN_DETAILS` (тянуть ли определения), `MYTHO_MOTIFS__MAX_MOTIFS` (ограничить число детальных страниц). Мотивы независимы от корпуса, поэтому `build --sample` их **не** затрагивает — для быстрого мотив-прогона задавай `MYTHO_MOTIFS__MAX_MOTIFS` напрямую.
+Тюнинг скрейпа Березкина — через env (см. `.env.example`): `MYTHO_MOTIFS__MAX_WORKERS` (параллельные загрузки детальных страниц), `MYTHO_MOTIFS__BEREZKIN_DETAILS` (тянуть ли определения). Мотивы независимы от корпуса, поэтому `build --sample` их **не** затрагивает.
 
 **Обогащение из mapsofmyths.com** (английские названия/определения, таксономия type/group, прямые Thompson-id, распределение по традициям) — отдельный шаг сборки мотивов, кэшируется в `outputs/motifs/raw/mapsofmyths/`, результат — `outputs/motifs/mapsofmyths_*.json` (не коммитятся). Требует HTTP basic-auth: `MAPSOFMYTHS_AUTH=user:pass`; без кредов шаг пишет предупреждение и пропускается (каталог собирается без обогащения). Библиография Томпсона (folkmasa + курируемый список) — тоже шаг пайплайна, пишет `outputs/motifs/tmi_bibliography.json`. Сколько и каких сущностей дообогащено — видно в `mytho status`.
 
