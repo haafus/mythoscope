@@ -18,6 +18,14 @@ from collections.abc import Callable
 from pathlib import Path
 
 
+def offline() -> bool:
+    """Reproducible-offline mode (``MYTHO_OFFLINE``): the fetch layer serves only the pinned cache
+    and never touches the network or mutates it. Lets a rebuild be a pure function of the pinned
+    raw — the frozen-snapshot guarantee the golden-diff validator relies on (a live discovery walk,
+    e.g. ashliman's, otherwise fetches un-pinned pages and rewrites the "pinned" cache mid-build)."""
+    return os.environ.get("MYTHO_OFFLINE", "").strip().lower() in ("1", "true", "yes", "on")
+
+
 class FetchRejected(Exception):
     """A freshly-downloaded response failed ``validate`` — so it was **not** committed
     to the cache (the live copy, if any, is left untouched). Distinct from a transport
@@ -75,8 +83,16 @@ def fetch_to_cache(url: str, cache_file: str | Path, *, force: bool = False,
     unchanged — it happens before any write, so the live copy is likewise untouched.
     """
     cache_file = Path(cache_file)
-    if not force and cache_file.exists() and cache_file.stat().st_size > 0:
+    have = cache_file.exists() and cache_file.stat().st_size > 0
+    if have and not force:
         return cache_file.read_bytes()
+
+    if offline():
+        # Frozen offline build: never fetch or mutate the cache. Serve the pinned copy (even under
+        # force), else signal a miss the caller skips — so the build only ever reads present raw.
+        if have:
+            return cache_file.read_bytes()
+        raise FetchRejected(f"offline (MYTHO_OFFLINE): {url} is not pinned")
 
     from corpus.downloader import download_file  # lazy: requests lives in the corpus extra
 

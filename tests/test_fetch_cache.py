@@ -55,3 +55,40 @@ class TestValidateBeforeCommit:
         with pytest.raises(RuntimeError):                     # transport error propagates unchanged
             fetch_cache.fetch_to_cache("http://u", cache, force=True, validate=lambda b: True)
         assert cache.read_bytes() == b"pinned good"           # never touched (raised before any write)
+
+
+class TestOfflineMode:
+    """MYTHO_OFFLINE: the fetch layer serves pinned-only, never the network — a frozen rebuild."""
+
+    def _no_network(self, monkeypatch):
+        import corpus.downloader as dl
+        monkeypatch.setattr(dl, "download_file",
+                            lambda *a, **k: pytest.fail("offline mode hit the network"))
+
+    def test_serves_pinned_without_network(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("MYTHO_OFFLINE", "1")
+        self._no_network(monkeypatch)
+        cache = tmp_path / "page"
+        cache.write_bytes(b"pinned")
+        assert fetch_cache.fetch_to_cache("http://u", cache) == b"pinned"
+
+    def test_force_still_serves_pinned_never_refetches(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("MYTHO_OFFLINE", "1")
+        self._no_network(monkeypatch)
+        cache = tmp_path / "page"
+        cache.write_bytes(b"pinned")
+        assert fetch_cache.fetch_to_cache("http://u", cache, force=True) == b"pinned"  # force ignored offline
+
+    def test_miss_raises_and_writes_nothing(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("MYTHO_OFFLINE", "1")
+        self._no_network(monkeypatch)
+        cache = tmp_path / "page"                             # not pinned
+        with pytest.raises(fetch_cache.FetchRejected):
+            fetch_cache.fetch_to_cache("http://u", cache)
+        assert not cache.exists() and not cache.with_name("page.partial").exists()
+
+    def test_disabled_by_default(self, tmp_path, monkeypatch):
+        monkeypatch.delenv("MYTHO_OFFLINE", raising=False)
+        assert not fetch_cache.offline()
+        _patch_download(monkeypatch, b"downloaded")
+        assert fetch_cache.fetch_to_cache("http://u", tmp_path / "p") == b"downloaded"  # network used

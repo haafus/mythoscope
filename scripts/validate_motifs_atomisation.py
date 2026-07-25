@@ -41,12 +41,18 @@ def _baseline_path():
 def _rebuild_from_cache() -> None:
     """Rebuild the motifs stage(s) from the raw cache. Deletes every fp sidecar first: the driver's
     ``actual()`` short-circuits on a matching fp, so without this the "rebuild" is a silent no-op.
-    With the gates gone every stage reads ``missing`` and rebuilds from the cache — offline
-    (``force=False`` never re-fetches), hence deterministic. Prefix-scoped, so it spans the monolith
-    (``motifs``) and the atomised stages (``motifs:*``)."""
+    With the gates gone every stage reads ``missing`` and rebuilds from the cache.
+
+    Forces ``MYTHO_OFFLINE`` so the rebuild is a *pure function of the pinned cache* — otherwise a
+    source with a live discovery walk (ashliman) fetches un-pinned pages and rewrites the cache
+    mid-build, so the deterministic core would drift with network conditions. Prefix-scoped, so it
+    spans the monolith (``motifs``) and the atomised stages (``motifs:*``)."""
+    import os
+
     from motifs import store
     from pipeline import build, build_pipeline
 
+    os.environ["MYTHO_OFFLINE"] = "1"           # frozen: serve pinned only, never fetch or mutate
     for fp in store.motifs_dir().glob(".fp*"):  # coarse .fp + per-stage .fp.<stage> → force a rebuild
         fp.unlink()
     motifs = [s for s in build_pipeline() if s.name == "motifs" or s.name.startswith("motifs")]
