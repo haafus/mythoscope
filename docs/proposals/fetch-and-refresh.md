@@ -322,3 +322,40 @@ This architecture is the **target form** — converged and validated, not yet a 
 
 Near-term work (motifs Phases 0–5, pipeline Part 2) does **not** depend on this — it lands with the Part 3
 stage-protocol refactor.
+
+## 9. Experimental design — `refresh` on the driver (NOT a settled decision, do not build yet)
+
+**Status:** experimental sketch. Not decided, not started. Records a direction discussed while cleaning up the
+CLI; the current shape (CLI functions + the `_REFRESHERS` map in `cli.py`) stays until this is accepted.
+
+**Idea.** Make `refresh` a driver-orchestrated operation, parallel to `build`/`status`/`clean` — but *not* a
+consumer of the `desired()`/`actual()` diff. Its comparison is **fresh-download vs pinned raw** (upstream), a
+different diff than spec-vs-built, so it is a separate driver pass, not another `plan()` reader.
+
+**Shape (as sketched):**
+
+- A capability protocol mirroring the existing `Store` (`@runtime_checkable`):
+  ```python
+  @runtime_checkable
+  class Refreshable(Protocol):
+      def refresh(self, apply: bool) -> None: ...
+  ```
+- `CorpusStage` / `MotifsStage` implement `refresh` (motifs = today's wholesale `build_motifs(force=True)`
+  stopgap until the §7 per-source staged refresh lands). Corpus wraps `refresh_corpus` (which keeps returning
+  `RefreshResult` — tests unchanged).
+- `driver.refresh(stages, *, apply)` topo-traverses and dispatches to `isinstance(s, Refreshable)` stages;
+  non-refreshable stages are skipped. Removes the hand-kept `_REFRESHERS` (the set derives from `build_pipeline()`).
+
+**Two open design calls (why it's experimental):**
+
+1. **Output.** Protocol returns `None`; each stage `print`s its own plain summary (no `click` — `src/pipeline/`
+   must not depend on the CLI framework). Trade accepted for "no colour, just console": the domain does console
+   IO, and its tests capture stdout instead of a return value. The alternative (return structured data, CLI
+   renders) is cleaner layering but needs a shared result type — see below.
+2. **`RefreshResult` does not generalise (today).** Its fields (`unchanged/skipped_local/changed/new/adopted/
+   unreachable/degraded`, per-title, web-vs-local) are corpus's staged-per-document shape. The motifs wholesale
+   stopgap cannot fill them. So `RefreshResult` stays a **corpus-internal** detail (not in the protocol); a truly
+   shared result only becomes possible **after** the §7 motifs atomisation gives motifs the same per-source
+   staged shape. Keeping the protocol `-> None` sidesteps this until then.
+
+Depends on nothing already shipped; supersedes the `_REFRESHERS` map when accepted.
