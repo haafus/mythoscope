@@ -112,6 +112,33 @@ def test_mapsofmyths_skipped_without_credentials(tmp_path, monkeypatch):
     assert not any(f.title.startswith("mapsofmyths/") for f in BerezkinSource().fetchables())
 
 
+def test_mapsofmyths_locator_scheme(tmp_path, monkeypatch):
+    _tree(tmp_path, monkeypatch)
+    from motifs.sources import mapsofmyths as mm
+    url, cache = mm._locator("/motifs_full", "motifs_full.html")
+    assert url == f"{mm.BASE}/motifs_full"
+    assert cache == tmp_path / "motifs" / "raw" / "mapsofmyths" / "motifs_full.html"
+    assert mm._locator("http://x/node/5", "node_5.html")[0] == "http://x/node/5"   # absolute href as-is
+    assert mm._locator("/node/5", "node_5.html")[0] == f"{mm.BASE}/node/5"          # relative → BASE
+
+
+def test_mapsofmyths_nodes_and_markers_via_locator(tmp_path, monkeypatch):
+    _tree(tmp_path, monkeypatch)
+    monkeypatch.setenv("MAPSOFMYTHS_AUTH", "u:p")
+    from motifs.sources import mapsofmyths as mm
+    root = tmp_path / "motifs" / "raw" / "mapsofmyths"
+    root.mkdir(parents=True)
+    (root / "motifs_full.html").write_text("x")                    # presence triggers node discovery
+    monkeypatch.setattr(mm, "parse_motifs_full", lambda h: {"A1": {"href": "/node/5"}})
+    (root / "markers").mkdir()
+    (root / "markers" / "markers_5.json").write_text("[]")
+    fs = {f.title: f for f in mm.fetchables()}
+    # node URL + cache come from the shared _locator (same the build fetch uses)
+    assert fs["mapsofmyths/node_5.html"].url == f"{mm.BASE}/node/5"
+    assert fs["mapsofmyths/node_5.html"].cache_file == root / "node_5.html"
+    assert fs["mapsofmyths/markers/markers_5.json"].fetch is not None   # POST override survives
+
+
 def test_mapsofmyths_enumerated_with_credentials(tmp_path, monkeypatch):
     _tree(tmp_path, monkeypatch)
     monkeypatch.setenv("MAPSOFMYTHS_AUTH", "user:pass")

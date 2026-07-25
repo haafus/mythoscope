@@ -197,6 +197,19 @@ def _marker_fetch(node: str, auth: tuple[str, str] | None):
     return fetch
 
 
+def _locator(path: str, cache_name: str) -> tuple[str, Path]:
+    """One URL↔cache scheme for a mapsofmyths GET resource, shared by build and refresh: an absolute
+    href is used as-is, a relative path hangs off ``BASE``; the cache file is named explicitly (here
+    the url path and the cache name differ, unlike the flat ``fetch.locator``)."""
+    url = path if path.startswith("http") else f"{BASE}{path}"
+    return url, raw_dir() / "mapsofmyths" / cache_name
+
+
+def _get_fetchable(path: str, cache_name: str, auth: tuple[str, str] | None) -> Fetchable:
+    url, cache = _locator(path, cache_name)
+    return Fetchable(f"mapsofmyths/{cache_name}", url, cache, auth=auth, validate=valid_html)
+
+
 def fetchables() -> list[Fetchable]:
     """Everything mapsofmyths has pinned: the two listing pages (GET), each motif's node page
     (parse-discovered from the pinned ``motifs_full`` listing → ``BASE + href``), and the per-node
@@ -212,10 +225,8 @@ def fetchables() -> list[Fetchable]:
                        "pages (set MAPSOFMYTHS_AUTH=user:pass to re-check them)")
         return []
     root = raw_dir() / "mapsofmyths"
-    out = [Fetchable("mapsofmyths/motifs_full.html", f"{BASE}/motifs_full", root / "motifs_full.html",
-                     auth=auth, validate=valid_html),
-           Fetchable("mapsofmyths/traditions_full.html", f"{BASE}/traditions_full",
-                     root / "traditions_full.html", auth=auth, validate=valid_html)]
+    out = [_get_fetchable("/motifs_full", "motifs_full.html", auth),
+           _get_fetchable("/traditions_full", "traditions_full.html", auth)]
     seen: set[str] = set()
     mf = root / "motifs_full.html"
     if mf.exists():
@@ -227,9 +238,7 @@ def fetchables() -> list[Fetchable]:
             if node_id in seen:
                 continue
             seen.add(node_id)
-            url = href if href.startswith("http") else f"{BASE}{href}"
-            out.append(Fetchable(f"mapsofmyths/node_{node_id}.html", url, root / f"node_{node_id}.html",
-                                 auth=auth, validate=valid_html))
+            out.append(_get_fetchable(href, f"node_{node_id}.html", auth))
     markers = root / "markers"
     if markers.exists():
         for m in sorted(markers.glob("markers_*.json")):
@@ -256,7 +265,8 @@ def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict
         return {"skipped": "no-credentials"}
 
     def get(path: str, cache_name: str) -> str:
-        return fetch_text(f"{BASE}{path}", cache / cache_name, force=force, auth=auth)
+        url, cf = _locator(path, cache_name)   # same locator refresh enumerates with
+        return fetch_text(url, cf, force=force, auth=auth)
 
     english = parse_motifs_full(get("/motifs_full", "motifs_full.html"))
     _write(EN_FILE, {
