@@ -25,7 +25,7 @@ from settings import settings
 
 from ..refresh import Fetchable
 from . import mapsofmyths
-from .fetch import fetch_text, valid_html, walk_fetchables
+from .fetch import fetch_text, locator, valid_html, walk_fetchables
 
 logger = logging.getLogger(__name__)
 
@@ -514,16 +514,14 @@ def build(config: dict, *, force: bool = False) -> dict:
     """Scrape and parse the Berezkin catalogue into a store-ready dict."""
     base = config["base_url"].rstrip("/")
     encoding = config.get("encoding", "windows-1251")
-    cache = Path(settings.motifs_dir) / "raw" / "berezkin"
 
-    index_html = fetch_text(
-        f"{base}/{config['index_page']}", cache / config["index_page"], encoding=encoding, force=force
-    )
+    index_url, index_cache = locator("berezkin", base, config["index_page"])
+    index_html = fetch_text(index_url, index_cache, encoding=encoding, force=force)
     motifs, chapters = parse_index(index_html)
     logger.info("Berezkin: parsed %d motifs across %d chapters", len(motifs), len({m["chapter"] for m in motifs}))
 
     if config.get("fetch_details", True) and settings.motifs.berezkin_details:
-        _fetch_details(motifs, base, cache, encoding, force)
+        _fetch_details(motifs, base, encoding, force)
 
     _attach_see_also(motifs)  # from the Russian definition, before English swaps it out
     _attach_english(motifs)
@@ -556,14 +554,14 @@ def _attach_see_also(motifs: list[dict]) -> None:
     logger.info("Berezkin: see-also from definitions — %d motifs reference other motifs", n)
 
 
-def _fetch_details(motifs: list[dict], base: str, cache: Path, encoding: str, force: bool) -> None:
+def _fetch_details(motifs: list[dict], base: str, encoding: str, force: bool) -> None:
     """Fetch detail pages and attach each motif's short definition in place."""
     logger.info("Berezkin: fetching %d detail pages (definitions)...", len(motifs))
 
     def fetch_one(motif: dict) -> tuple[dict, str, str | None]:
-        url = f"{base}/{motif['page']}"
+        url, cache = locator("berezkin", base, motif["page"])
         try:
-            html = fetch_text(url, cache / motif["page"], encoding=encoding, force=force)
+            html = fetch_text(url, cache, encoding=encoding, force=force)
             return motif, parse_definition(html), None
         except Exception as exc:  # a missing/odd page must not abort the whole build
             return motif, "", str(exc)

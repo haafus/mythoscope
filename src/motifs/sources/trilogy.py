@@ -13,14 +13,11 @@ import csv
 import io
 import logging
 import re
-from pathlib import Path
-
-from settings import settings
 
 from ..refresh import Fetchable
 from . import atu_regions
 from .culture_dict import build_legend
-from .fetch import fetch_to_cache, raw_dir, valid_csv
+from .fetch import fetch_to_cache, locator, valid_csv
 from .tmi_notes import parse_notes
 
 logger = logging.getLogger(__name__)
@@ -179,28 +176,26 @@ def _strip_notes_bleed(notes: str) -> str:
 _KIND_FILES = {"tmi": ("tmi",), "atu": ("atu_df", "atu_seq", "atu_combos")}
 
 
+def _csv_fetchable(subdir: str, base: str, name: str) -> Fetchable:
+    url, cache = locator(subdir, base, name)   # same locator _read_csv fetches with
+    return Fetchable(f"{subdir}/{name}", url, cache, validate=valid_csv)
+
+
 def fetchables(config: dict, kind: str) -> list[Fetchable]:
     """The trilogy CSVs one index reads — ``tmi.csv`` for the TMI stage, the ``atu_*`` CSVs for ATU
     (the shared source split at the file level, no overlap). The TMI stage also pulls the Mellmann
     classification-headings CSV (fetched by the same ``_read_csv``, under its own base)."""
-    tr = config["trilogy"]
-    base, files = tr["base_url"].rstrip("/"), tr["files"]
-    out = [Fetchable(f"trilogy/{files[k]}", f"{base}/{files[k]}", raw_dir() / "trilogy" / files[k],
-                     validate=valid_csv)
-           for k in _KIND_FILES[kind]]
+    tr, files = config["trilogy"], config["trilogy"]["files"]
+    out = [_csv_fetchable("trilogy", tr["base_url"], files[k]) for k in _KIND_FILES[kind]]
     mel = config.get("mellmann", {})
     if kind == "tmi" and mel.get("base_url"):
-        fn = mel.get("files", {}).get("tmi", "tmi.csv")
-        out.append(Fetchable(f"mellmann/{fn}", f"{mel['base_url'].rstrip('/')}/{fn}",
-                             raw_dir() / "mellmann" / fn, validate=valid_csv))
+        out.append(_csv_fetchable("mellmann", mel["base_url"], mel.get("files", {}).get("tmi", "tmi.csv")))
     return out
 
 
 def _read_csv(config: dict, key: str, *, force: bool, subdir: str = "trilogy") -> list[dict]:
-    base = config["base_url"].rstrip("/")
-    filename = config["files"][key]
-    cache = Path(settings.motifs_dir) / "raw" / subdir / filename
-    raw = fetch_to_cache(f"{base}/{filename}", cache, force=force)
+    url, cache = locator(subdir, config["base_url"], config["files"][key])
+    raw = fetch_to_cache(url, cache, force=force)
     text = raw.decode("utf-8", errors="replace")
     return list(csv.DictReader(io.StringIO(text)))
 

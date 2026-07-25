@@ -35,7 +35,7 @@ from settings import settings
 
 from ..refresh import Fetchable
 from . import berezkin
-from .fetch import fetch_text, raw_dir, valid_html
+from .fetch import fetch_text, locator, valid_html
 
 logger = logging.getLogger(__name__)
 
@@ -261,8 +261,8 @@ def out_path() -> Path:
 def fetchables() -> list[Fetchable]:
     """The one bibliography page (areasofmyths.com/biblio.html); the citation→region linkage it
     feeds is re-derived from the already-pinned detail pages, so nothing else is fetched here."""
-    return [Fetchable("berezkin/biblio.html", f"{BASE}/biblio.html",
-                      raw_dir() / "berezkin" / "biblio.html", validate=valid_html)]
+    url, cache = locator("berezkin", BASE, "biblio.html")
+    return [Fetchable("berezkin/biblio.html", url, cache, validate=valid_html)]
 
 
 def refresh(motifs: list[dict], *, force: bool = False) -> dict:
@@ -272,10 +272,10 @@ def refresh(motifs: list[dict], *, force: bool = False) -> dict:
     Writes ``outputs/motifs/berezkin_bibliography.json`` and returns a count dict;
     returns ``{"skipped": ...}`` if the bibliography page can't be fetched.
     """
-    cache = Path(settings.motifs_dir) / "raw" / "berezkin"
+    cache = Path(settings.motifs_dir) / "raw" / "berezkin"   # detail pages read from here
+    biblio_url, biblio_cache = locator("berezkin", BASE, "biblio.html")
     try:
-        biblio_html = fetch_text(f"{BASE}/biblio.html", cache / "biblio.html",
-                                 encoding="windows-1251", force=force)
+        biblio_html = fetch_text(biblio_url, biblio_cache, encoding="windows-1251", force=force)
     except Exception as exc:  # bibliography is optional enrichment
         logger.warning("Berezkin bibliography: could not fetch biblio.html (%s) — skipping", exc)
         return {"skipped": "no-bibliography"}

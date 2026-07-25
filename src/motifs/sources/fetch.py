@@ -25,6 +25,13 @@ def raw_dir() -> Path:
     return Path(settings.motifs_dir) / "raw"
 
 
+def locator(subdir: str, base: str, name: str) -> tuple[str, Path]:
+    """The one URL↔cache scheme for a flat scraped source: ``name → (base/name, raw/subdir/name)``.
+    Both ``walk_fetchables`` (refresh enumeration) and a source's build-time fetch call this, so
+    each source's locator lives in exactly **one** place — change a base once and both follow."""
+    return f"{base.rstrip('/')}/{name}", raw_dir() / subdir / name
+
+
 # --- lenient content validators (validate-before-commit, fetch-and-refresh §4) --------------
 # Each gates *adopt*: a fresh reply must pass before it can overwrite the pinned copy. They are
 # deliberately lenient — reject only clearly-broken replies (empty / wrong content-type / a plain
@@ -68,6 +75,6 @@ def walk_fetchables(subdir: str, base: str, *, exclude: set[str] = frozenset(),
     for f in sorted(p for p in root.iterdir() if p.is_file()):
         if f.name in exclude or f.name.endswith(".absent"):
             continue
-        out.append(Fetchable(f"{subdir}/{f.name}", f"{base.rstrip('/')}/{f.name}", f,
-                             auth=auth, validate=validate))
+        url, _ = locator(subdir, base, f.name)   # same scheme the build-time fetch uses
+        out.append(Fetchable(f"{subdir}/{f.name}", url, f, auth=auth, validate=validate))
     return out

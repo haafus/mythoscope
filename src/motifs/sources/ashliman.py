@@ -18,12 +18,9 @@ import concurrent.futures
 import html
 import logging
 import re
-from pathlib import Path
-
-from settings import settings
 
 from ..refresh import Fetchable
-from .fetch import fetch_text, read_pinned, valid_html, walk_fetchables
+from .fetch import fetch_text, locator, read_pinned, valid_html, walk_fetchables
 
 logger = logging.getLogger(__name__)
 
@@ -248,12 +245,12 @@ def _fetch_page(page: str, force: bool) -> str | None:
     all of them. But a page with an **existing pinned copy** that now 404s upstream is **kept and served** — we
     never delete good raw over an upstream disappearance (Phase 0). A *transient* error is not remembered (so it
     retries next time), and ``force`` re-checks everything, clearing the marker once a page is found present."""
-    cache = Path(settings.motifs_dir) / "raw" / "ashliman" / page
+    url, cache = locator("ashliman", BASE, page)   # same scheme walk_fetchables enumerates with
     absent = cache.with_name(page + ".absent")
     if not force and absent.exists():
         return None                              # known-404: skip the network entirely
     try:
-        text = fetch_text(f"{BASE}/{page}", cache, force=force)
+        text = fetch_text(url, cache, force=force)
         absent.unlink(missing_ok=True)           # present now — clear any stale marker
         return text
     except Exception as exc:
