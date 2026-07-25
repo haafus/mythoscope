@@ -164,7 +164,7 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
     # cap each tier separately so a long tier-B tail never crowds out tier A
     for byid in adjacency.values():
         for mid, lst in list(byid.items()):
-            lst.sort(key=lambda e: -e["score"])
+            lst.sort(key=lambda e: (-e["score"], e["index"], e["id"]))  # total order → reproducible
             kept, seen = [], {"A": 0, "B": 0}
             for e in lst:
                 if seen[e["tier"]] < MAX_PER_MOTIF:
@@ -184,7 +184,7 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
         if c["tier"] == "A":
             atu_by_bz.setdefault(b, []).append(a)
     triangles = []
-    for b in set(tmi_by_bz) & set(atu_by_bz):
+    for b in sorted(set(tmi_by_bz) & set(atu_by_bz)):  # sorted: set iteration order is hash-seeded
         for m in tmi_by_bz[b]:
             for a in atu_by_bz[b]:
                 ai, mi = idx_of["atu"][a], idx_of["tmi"][m]
@@ -197,7 +197,7 @@ def build(berezkin_motifs: list[dict], tmi_motifs: list[dict],
                         ("atu-tmi", linked("atu", "tmi", a, m))) if not ln]
                     triangles.append({"berezkin": b, "tmi": m, "atu": a, "missing": missing,
                                       "score": round(max(ts, ds), 3)})
-    triangles.sort(key=lambda t: -t["score"])
+    triangles.sort(key=lambda t: (-t["score"], t["berezkin"], t["tmi"], t["atu"]))  # total order
 
     def tier_count(cs: dict, t: str) -> int:
         return sum(1 for c in cs.values() if c["tier"] == t)
