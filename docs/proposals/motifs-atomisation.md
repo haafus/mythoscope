@@ -83,11 +83,14 @@ So the concrete tasks:
    owns, and `mytho refresh motifs[:source:X]` fans out per-source with the §9 table. Replaces the
    wholesale `build_motifs(force=True)` stopgap.
 
-**All done.** Remaining edge (§8, `fetch-and-refresh.md`): the golden validator's rebuild is not
-fully offline for **ashliman** (its `discover_site_types` fetches discovery pages live and writes
-them into the "pinned" cache, so `atu.json` can drift across network conditions — re-snapshot after
-the cache settles). Fully retiring the `build_motifs` orchestrator waits on making parse-discovered
-fetch fully pinnable so refresh alone can cold-acquire a source.
+**All done.** The **ashliman** offline-determinism edge is resolved: the shared fetch layer has a
+frozen-offline mode (`MYTHO_OFFLINE`, `fetch_cache.offline()`) that serves the pinned cache only —
+never fetching or mutating it — and the golden validator sets it, so the rebuild is a pure function
+of the pinned raw (two offline asserts byte-identical). The staged refresh is validated live
+end-to-end on the `tmi` source (fetch → diff → keep-pinned → adopt-on-`--apply` → atomic commit →
+self-heal). Fully retiring the `build_motifs` orchestrator still waits on making parse-discovered
+fetch fully pinnable so refresh alone can cold-acquire a source (low value — the driver build
+already cold-acquires; the orchestrator is just the one-shot wholesale re-scrape helper).
 
 ## Validation
 
