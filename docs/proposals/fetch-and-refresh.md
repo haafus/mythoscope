@@ -349,6 +349,29 @@ different diff than spec-vs-built, so it is a separate driver pass, not another 
 **Decided:** **no colour** — output is plain text, not `click.style`. (Today's `_refresh_documents` colouring is
 dropped in the refactor.)
 
+**Decided — output is a three-column table**, one row per checked resource (document):
+
+| column | contents |
+|---|---|
+| 1 · resource | the resource name |
+| 2 · status | one exact expression, no parentheses, no explanation: `not changed` \| `changed` \| `degraded` \| `gone` \| `new` |
+| 3 · action | the decision taken: `keep cached` \| `acquire on apply` \| `pinned to manifest` |
+
+Status → action mapping:
+
+- `not changed` / `degraded` / `gone` → **keep cached** (the pinned copy stands; a bad/absent upstream never overwrites it)
+- `new` → **acquire on apply**
+- `changed` → **pinned to manifest** (recorded for human review, not auto-adopted)
+
+Footer, in order:
+
+1. **total** resources checked;
+2. how many were **pinned to the manifest for review**, and **where the manifest is** (its path);
+3. the **`--apply`** line (what re-running with `--apply` will do).
+
+**Open:** the manifest's exact name (`manifest` / `review` / …?) and on-disk path — TBD. `degraded`/`gone` collapse
+the current reason detail (`empty-body`, `gone-404`) into the single status word, as specified (no parentheses).
+
 **Open design calls (why it's experimental):**
 
 1. **Where the summary is produced.** Either each stage `print`s its own plain summary (domain does console IO;
