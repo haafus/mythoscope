@@ -363,8 +363,14 @@ Status → action mapping:
 - `new` → **acquire on apply**
 - `changed` → **flagged for review** (recorded as a §5 flag, not auto-adopted)
 
-The "review record" is the existing **flag** (§5), not a new file: a durable needs-review entry in the stage's own
-metadata (`meta.flags`) — no new path. `degraded`/`gone`/`no-parse` also raise their flag kinds there.
+The "review record" is the **flag** (§5) — a durable needs-review entry in the stage's own metadata (`meta.flags`).
+**Partly real, mostly designed:** only motifs writes `meta.flags`/`fetch_outcomes` (into `outputs/motifs/meta.json`),
+and only the aggregate `yield-drop` is actually raised; the per-resource `changed`/`gone`/`degraded` refresh flags
+this table needs are **not built** (see the `build_motifs.py` comment — they are refresh-time, deferred).
+
+**Open — where corpus flags live.** Corpus has **no** `meta.json` today (its metadata is the per-document
+`corpus.json` catalog), so there is no `meta.flags` home for it. Either give corpus its own
+`outputs/corpus/meta.json` (symmetric to motifs) or fold the flags into `corpus.json`. TBD.
 
 Footer, in order:
 
