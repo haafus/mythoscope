@@ -31,6 +31,15 @@ from .sources import (
 
 logger = logging.getLogger(__name__)
 
+# Which network enrichments belong to each source — for persisting per-source enrichment summaries
+# (skip status + counts) that the future meta aggregator collects. mapsofmyths/berezkin_bibliography
+# enrich the Berezkin build; bibliography the TMI build; wikidata/ashliman the ATU build.
+_SOURCE_ENRICHMENTS = {
+    "berezkin": ["mapsofmyths", "berezkin_bibliography"],
+    "tmi": ["bibliography"],
+    "atu": ["atu_wikidata", "ashliman"],
+}
+
 
 def _load_config() -> dict:
     config_file = settings.config_dir / "motifs.json"
@@ -235,6 +244,13 @@ def build_motifs(*, force: bool = False) -> None:
 
     # --- [4/5] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
+    # Persist each source's enrichment summary (skip status + counts) as a sidecar, so the future
+    # meta aggregator stage collects them per-source instead of the monolith's in-memory dict.
+    for src, keys in _SOURCE_ENRICHMENTS.items():
+        summary = {k: enrichment[k] for k in keys if k in enrichment}
+        if summary:
+            save_json(store.enrichment_path(src), summary)
+
     logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
     # Re-derive the crosswalk/parallels inputs by reloading the saved index JSONs (the exact path
     # the future motifs:crosswalk / :parallels stages take), rather than threading in-memory

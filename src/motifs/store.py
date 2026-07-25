@@ -63,6 +63,12 @@ def meta_path() -> Path:
     return motifs_dir() / META_FILE
 
 
+def enrichment_path(source: str) -> Path:
+    """Per-source enrichment summary sidecar (skip status + counts) — the meta aggregator reads
+    these instead of the monolith's in-memory dict once the sources are separate stages."""
+    return motifs_dir() / f"{source}.enrichment.json"
+
+
 # ---------------------------------------------------------------------------
 # Read side (server) — cached per process
 # ---------------------------------------------------------------------------
