@@ -103,11 +103,8 @@ def build(scope, force, sample):
     except Exception as e:
         _fail("Build", e)
     for p in plans:
-        n = len(p.stage.desired()) if force else len(p.to_build)
-        if sample is not None:
-            n = min(n, sample)
-        if n:
-            click.echo(f"  {p.stage.name}: {n} built")
+        if p.built:   # what was actually built (a silently-failed key is excluded — honest count)
+            click.echo(f"  {p.stage.name}: {len(p.built)} built")
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 

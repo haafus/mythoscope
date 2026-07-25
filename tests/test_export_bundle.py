@@ -81,6 +81,28 @@ class TestExport:
         result = eb.export_outputs(out_dir=built_outputs, timestamp="20260629-120000", include_caches=True)
         assert result.path.name == "mythoscope-caches-20260629-120000.zip"
 
+    def test_orphan_summary_reports_level2_for_scoped_export(self, monkeypatch):
+        import pipeline
+        from pipeline.driver import CleanReport
+
+        class _S:
+            def __init__(self, name):
+                self.name = name
+
+        stages = [_S("embeddings:m1"), _S("projections:m1")]
+        captured = {}
+
+        def fake_clean(sgs, *, apply=False, targets=None):
+            captured["targets"] = targets
+            return CleanReport(level2={"ChromaStore": {"m2"}})   # a disabled model's orphan collection
+
+        monkeypatch.setattr(pipeline, "build_pipeline", lambda: stages)
+        monkeypatch.setattr(pipeline, "clean", fake_clean)
+
+        lines = eb.orphan_summary(("embeddings",))
+        assert captured["targets"] == {"embeddings:m1"}          # scope → driver targets (family match)
+        assert any("ChromaStore" in ln and "m2" in ln for ln in lines)   # level-2 surfaced for a scoped export
+
     def test_raw_tier_and_staging_gates(self):
         from pathlib import Path
         # corpus + motifs raw are both the cache/raw tier (shipped only with --caches)
@@ -123,16 +145,19 @@ class TestOrphanSummary:
     def _stub(self, monkeypatch, level1, level2):
         import pipeline
         from pipeline.driver import CleanReport
+        cap = {}
+
+        def fake_clean(stages, *, apply=False, targets=None):
+            cap["targets"] = targets           # scope is delegated to the driver's targets now
+            return CleanReport(level1=level1, level2=level2)
+
         monkeypatch.setattr(pipeline, "build_pipeline", lambda: [])
-        monkeypatch.setattr(pipeline, "clean", lambda stages, apply=False: CleanReport(level1=level1, level2=level2))
+        monkeypatch.setattr(pipeline, "clean", fake_clean)
+        return cap
 
     def test_reports_level1_and_level2(self, monkeypatch):
-        self._stub(monkeypatch, {"corpus": {"docX"}}, {"ChromaStore": {"dropped_model"}})
+        cap = self._stub(monkeypatch, {"corpus": {"docX"}}, {"ChromaStore": {"dropped_model"}})
         lines = eb.orphan_summary()
         assert "corpus: orphan document docX" in lines
         assert "ChromaStore: orphan artifact dropped_model" in lines
-
-    def test_scope_filters_to_family(self, monkeypatch):
-        self._stub(monkeypatch, {"corpus": {"docX"}, "graphs": {"docY"}}, {"ChromaStore": {"dropped_model"}})
-        lines = eb.orphan_summary(scope=("graphs",))
-        assert lines == ["graphs: orphan document docY"]  # corpus filtered out; L2 only when unscoped
+        assert cap["targets"] is None          # unscoped → no driver targets (both levels, all stages)

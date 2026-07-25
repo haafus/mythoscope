@@ -213,3 +213,33 @@ def test_clean_empty_when_nothing_orphaned():
     store = FakeStore({"m"})
     s = FakeStage("s", {"k": "1"}, {"k": "1"}, store=store, id="m")
     assert clean([s], apply=True).empty
+
+
+def test_build_reports_only_actually_built_keys():
+    """#6: `built` is the post-build actual ∩ todo — a silently-failed key (no fp stamp) drops out,
+    so the reported count is honest, not the attempted count."""
+    s = FakeStage("s", desired={"a": "1", "b": "1", "c": "1"}, actual={})
+
+    def partial(keys):                      # simulate 'c' failing: only a, b become actual
+        s.built.append(set(keys))
+        for k in keys:
+            if k != "c":
+                s._actual[k] = s._desired[k]
+
+    s.build = partial
+    [p] = build([s])
+    assert p.to_build == {"a", "b", "c"}    # all three were attempted
+    assert p.built == {"a", "b"}            # only the two that actually landed are counted
+
+
+def test_clean_level2_keyed_by_store_label_not_class():
+    """#5: two stores are distinguished by their .label, so their orphans never collide in the
+    level-2 report (class-name keying would clobber one)."""
+    st1 = FakeStore(["m1", "orphanA"]); st1.label = "FileStore(projections)"
+    st2 = FakeStore(["m2", "orphanB"]); st2.label = "FileStore(graphs)"
+    a = FakeStage("projections:m1", {"m1": "1"}, {"m1": "1"}, store=st1, id="m1")
+    b = FakeStage("graphs:m2", {"m2": "1"}, {"m2": "1"}, store=st2, id="m2")
+    report = clean([a, b])
+    assert set(report.level2) == {"FileStore(projections)", "FileStore(graphs)"}
+    assert report.level2["FileStore(projections)"] == {"orphanA"}
+    assert report.level2["FileStore(graphs)"] == {"orphanB"}

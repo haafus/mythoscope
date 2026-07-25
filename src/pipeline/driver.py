@@ -8,7 +8,7 @@ stage's ``actual()`` on disk. See ``docs/proposals/pipeline-and-incrementality.m
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from .stage import Stage
 
@@ -21,6 +21,7 @@ class StagePlan:
     missing: set[str] = field(default_factory=set)  # should exist, doesn't → build
     stale: set[str] = field(default_factory=set)    # exists, fp diverged  → rebuild
     orphans: set[str] = field(default_factory=set)   # exists, shouldn't    → clean (level 1)
+    built: set[str] = field(default_factory=set)     # keys actually built this run (post-build actual ∩ todo)
 
     @property
     def to_build(self) -> set[str]:
@@ -99,9 +100,11 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
         todo = set(stage.desired()) if force else p.to_build
         if sample is not None:
             todo = set(sorted(todo)[:sample])
+        built: set[str] = set()
         if todo:
             stage.build(todo)
-        acted.append(p)
+            built = todo & set(stage.actual())   # what is *actually* built now — a per-key failure
+        acted.append(replace(p, built=built))    # (no fp sidecar) drops out, so the count is honest
     return acted
 
 
@@ -128,6 +131,13 @@ def clean(stages: list[Stage], *, apply: bool = False, targets: set[str] | None 
     ``targets`` (stage names) restricts *what is reaped* to those stages (and the stores they
     own); every stage still contributes to each store's claimed-id set, so a scoped clean never
     mistakes a non-target stage's live artifact for an orphan. ``None`` reaps across all stages.
+
+    **Accepted design — a scoped clean reaps *all* orphans in a store a target stage owns, not
+    only the target's own.** Level-2's unit is the whole shared store: ``clean embeddings:modelA``
+    reaps every unclaimed collection in the Chroma store (e.g. a dropped ``modelC``), since a live
+    stage's claim is the only thing that keeps an id. It never deletes a *live* artifact (all
+    stages contribute claims), and a dropped model is an orphan under any scope — so this is safe,
+    just broader than the token suggests. A per-target level-2 filter was judged not worth it.
     """
     ordered = topo_order(stages)
 
@@ -161,7 +171,7 @@ def clean(stages: list[Stage], *, apply: bool = False, targets: set[str] | None 
             continue
         orphan_ids = store.ids() - claimed
         if orphan_ids:
-            level2[type(store).__name__] = orphan_ids
+            level2[getattr(store, "label", type(store).__name__)] = orphan_ids
             if apply:
                 for oid in orphan_ids:
                     store.delete(oid)

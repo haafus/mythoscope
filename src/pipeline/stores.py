@@ -14,6 +14,8 @@ from embeddings import chroma_manager
 class ChromaStore:
     """The Chroma DB: one collection per embeddings variant, named by the variant key."""
 
+    label = "ChromaStore"   # unique level-2-report key (a singleton — only one Chroma)
+
     def ids(self) -> set[str]:
         return set(chroma_manager.get_available_models())
 
@@ -27,6 +29,11 @@ class FileStore:
 
     def __init__(self, root: Path):
         self._root = root
+
+    @property
+    def label(self) -> str:
+        # keyed by dir so two FileStores never collide in the driver's level-2 report
+        return f"FileStore({self._root.name})"
 
     def ids(self) -> set[str]:
         return {d.name for d in self._root.iterdir() if d.is_dir()} if self._root.exists() else set()

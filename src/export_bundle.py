@@ -41,7 +41,14 @@ def _components(scope=None) -> list[tuple[str, Path, str]]:
     ``sources/`` and restore there, so they carry their own archive root.
 
     ``scope`` (stage names, e.g. ``graphs`` or ``embeddings:bge-m3``) keeps only the matching
-    components by family (the part before ``:``) — bundle just the named stage(s)."""
+    components by family (the part before ``:``) — bundle just the named stage(s).
+
+    **Accepted design — export scope is family-granular, coarser than build/clean's stage scope.**
+    A component is one directory (or a whole shared store); there is no cheap way to carve one
+    model's collections out of the Chroma dir, so ``export embeddings:bge-m3`` ships the *whole*
+    ``outputs/embeddings`` store (all variants), and a sub-family token only selects the family. The
+    bundle is a portable snapshot, not a surgical extract; per-variant export was judged not worth
+    the complexity (orphans in the shipped store are surfaced by ``orphan_summary``)."""
     comps = [
         ("corpus", Path(settings.corpus_dir), "outputs/corpus"),
         ("embeddings", Path(settings.embeddings_dir), "outputs/embeddings"),
@@ -96,29 +103,32 @@ def chromadb_version() -> str | None:
 def orphan_summary(scope=None) -> list[str]:
     """Human-readable lines describing orphans that an export would carry along — the driver's
     dry-run reap (same categories as ``mytho clean``). Guarded so a missing optional dependency
-    (e.g. chromadb) or unreadable store never aborts the export. ``scope`` restricts the
-    level-1 report to the named stage families (level-2 store orphans span stages, so they are
-    reported only for an unscoped export)."""
+    (e.g. chromadb) or unreadable store never aborts the export.
+
+    ``scope`` is passed through as the driver's ``targets`` (stages whose family the scope names),
+    so both **level-1** (orphan keys) and **level-2** (whole store artifacts, e.g. a disabled
+    model's collection) are reported for a scoped export too — a scoped bundle ships the whole
+    in-scope store dir, so its orphans must be surfaced, not silently carried along."""
     try:
         from pipeline import build_pipeline
         from pipeline import clean as driver_clean
 
-        report = driver_clean(build_pipeline(), apply=False)
+        stages = build_pipeline()
+        families = {s.split(":", 1)[0] for s in scope} if scope else None
+        targets = (None if families is None
+                   else {st.name for st in stages if st.name.split(":", 1)[0] in families})
+        report = driver_clean(stages, apply=False, targets=targets)
     except Exception as exc:  # never let orphan reporting break the export
         logger.debug("orphan probe failed: %s", exc)
         return []
 
-    families = {s.split(":", 1)[0] for s in scope} if scope else None
     lines: list[str] = []
     for stage, keys in report.level1.items():
-        if families is not None and stage.split(":", 1)[0] not in families:
-            continue
         for key in sorted(keys):
             lines.append(f"{stage}: orphan document {key}")
-    if families is None:
-        for store, ids in report.level2.items():
-            for artifact_id in sorted(ids):
-                lines.append(f"{store}: orphan artifact {artifact_id}")
+    for store, ids in report.level2.items():
+        for artifact_id in sorted(ids):
+            lines.append(f"{store}: orphan artifact {artifact_id}")
     return lines
 
 
@@ -149,8 +159,11 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
                 continue   # crash debris — never ship, even with --caches
             if not include_caches and _is_cache(name, rel):
                 continue
-            size = file.stat().st_size
-            plan.append((file, (Path(arc_root) / rel).as_posix(), size))
+            try:
+                size = file.stat().st_size
+            except OSError:
+                continue   # vanished between rglob and stat (e.g. a live Chroma compaction) — skip it,
+            plan.append((file, (Path(arc_root) / rel).as_posix(), size))   # don't abort the whole bundle
             comp_bytes += size
             comp_files += 1
         if comp_files:
@@ -159,12 +172,17 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
     if not plan:
         return result
 
+    written = 0
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
         for file, arcname, _ in plan:
-            zf.write(file, arcname=arcname)
+            try:
+                zf.write(file, arcname=arcname)
+                written += 1
+            except OSError:
+                logger.warning("export: %s vanished mid-bundle — skipped", arcname)  # don't abort
 
     result.path = archive
-    result.total_files = len(plan)
+    result.total_files = written
     result.total_bytes = sum(size for _, _, size in plan)
     result.chromadb_version = chromadb_version() if "embeddings" in result.components else None
     logger.info("Exported %d files (%d bytes) to %s", result.total_files, result.total_bytes, archive)
