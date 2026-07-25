@@ -112,6 +112,133 @@ def _timed(label: str, fn, *args, **kwargs):
     return result
 
 
+def _persist_enrichment(source: str, enrichment: dict) -> None:
+    """Write a source's enrichment summary sidecar (skip status + counts), the per-source input the
+    meta aggregator reads. Restricted to the keys that belong to this source."""
+    keys = _SOURCE_ENRICHMENTS.get(source, [])
+    save_json(store.enrichment_path(source), {k: enrichment[k] for k in keys if k in enrichment})
+
+
+def _build_berezkin(config: dict, *, force: bool) -> dict:
+    """Build ``berezkin.json`` (+ its enrichment sidecar) from the areal catalogue + mapsofmyths.
+    Returns ``{counts, sources}`` for the meta aggregation. The future ``motifs:source:berezkin``."""
+    bz_cfg = config.get("berezkin", {})
+    if not bz_cfg.get("enabled", True):
+        return {"counts": {}, "sources": {}}
+    enrichment: dict[str, dict] = {}
+    home = bz_cfg.get("homepage", "areasofmyths.com")
+    logger.info("[1/5] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
+                home, bz_cfg.get("index_page", "index page"))
+    # mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids, traditions) — part of
+    # building the Berezkin index, so downloaded under this step; credential-gated, a no-op skips it.
+    mm = enrichment["mapsofmyths"] = _timed("mapsofmyths.refresh", mapsofmyths.refresh, force=force)
+    berezkin_data = _timed("berezkin.build (parse)", berezkin.build, bz_cfg, force=force)
+    save_json(store.index_path("berezkin"), berezkin_data)
+    berezkin_motifs = berezkin_data["motifs"]
+    logger.info("      + base scrape (areasofmyths.com): %d motifs, %d chapters, %d with a definition",
+                len(berezkin_motifs), len(berezkin_data.get("chapters", {})),
+                _applied(berezkin_motifs, lambda m: m.get("definition") or m.get("definition_rus")))
+    if mm.get("skipped"):
+        logger.info("      + mapsofmyths.com enrichment SKIPPED (%s) — Russian names/definitions only", mm["skipped"])
+    else:
+        logger.info("      + mapsofmyths.com enrichment (motifs gaining each field):")
+        logger.info("          English name (Russian kept as subtitle): %d",
+                    _applied(berezkin_motifs, lambda m: m.get("name_rus")))
+        logger.info("          English definition                     : %d",
+                    _applied(berezkin_motifs, lambda m: m.get("definition_rus")))
+        logger.info("          thematic type/group                    : %d",
+                    _applied(berezkin_motifs, lambda m: m.get("motif_type")))
+        logger.info("          direct TMI links                       : %d",
+                    _applied(berezkin_motifs, lambda m: m.get("tmi_refs")))
+        logger.info("          areal tradition sets                   : %d",
+                    _applied(berezkin_motifs, lambda m: m.get("traditions")))
+        logger.info("          + tradition catalogue: %d areal codes → people name, region & language",
+                    len(berezkin_data.get("traditions", {})))
+
+    enrichment["berezkin_bibliography"] = _timed("berezkin_bibliography.refresh", berezkin_bibliography.refresh, berezkin_motifs, force=force)
+    bb = enrichment["berezkin_bibliography"]
+    if bb.get("skipped"):
+        logger.info("      + bibliography (areasofmyths.com) SKIPPED (%s)", bb["skipped"])
+    else:
+        logger.info("      + bibliography (areasofmyths.com): %d works; citations resolved %d/%d (%d%%), "
+                    "ambiguous %d",
+                    bb["works"], bb["resolved"], bb["citations"],
+                    round(100 * bb["resolved"] / bb["citations"]) if bb["citations"] else 0,
+                    bb["ambiguous"])
+    _persist_enrichment("berezkin", enrichment)
+    return {"counts": {"berezkin": len(berezkin_motifs)},
+            "sources": {"berezkin": {"homepage": home, "attribution": bz_cfg.get("attribution", "")}}}
+
+
+def _build_tmi(config: dict, *, force: bool) -> dict:
+    """Build ``tmi.json`` (+ enrichment sidecar) from the trilogy TMI CSV (+ Mellmann headings +
+    folkmasa bibliography). Returns ``{counts, sources}``. The future ``motifs:source:tmi``."""
+    tr_cfg = config.get("trilogy", {})
+    if not tr_cfg.get("enabled", True):
+        return {"counts": {}, "sources": {}}
+    enrichment: dict[str, dict] = {}
+    sources = {"trilogy": {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}}
+    files = tr_cfg.get("files", {})
+    logger.info("[2/5] Thompson Motif-Index (TMI) — source: %s (%s)",
+                tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
+    mel_cfg = config.get("mellmann", {})
+    mel_on = mel_cfg.get("enabled", False)
+    tmi_index = _timed("trilogy.build_tmi (parse)", trilogy.build_tmi, tr_cfg, force=force,
+                       divisions_config=mel_cfg if mel_on else None)
+    if mel_on:
+        sources["mellmann"] = {"homepage": mel_cfg.get("homepage", ""),
+                               "attribution": mel_cfg.get("attribution", "")}
+        logger.info("      classification headings — source: Mellmann TMI_as_CSV")
+        logger.info("      %d divisions, %d sub-divisions, %d sub-sub-divisions, %d sections",
+                    len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])),
+                    len(tmi_index.get("subdivisions3", [])), len(tmi_index.get("sections", [])))
+    save_json(store.index_path("tmi"), tmi_index)
+    tmi_motifs = tmi_index["motifs"]
+    logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
+                len(tmi_motifs),
+                _applied(tmi_motifs, lambda m: m.get("definition")),
+                _applied(tmi_motifs, lambda m: m.get("cultures")),
+                _applied(tmi_motifs, lambda m: m.get("atu_inline")))
+    enrichment["bibliography"] = _timed("bibliography.refresh", bibliography.refresh, tmi_motifs, force=force)
+    bib = enrichment["bibliography"]
+    logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
+                "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
+    _persist_enrichment("tmi", enrichment)
+    return {"counts": {"tmi": len(tmi_motifs)}, "sources": sources}
+
+
+def _build_atu(config: dict, *, force: bool) -> dict:
+    """Build ``atu.json`` (+ enrichment sidecar) from the trilogy ATU CSVs (+ Wikidata + Ashliman).
+    Returns ``{counts, sources}``. The future ``motifs:source:atu``."""
+    tr_cfg = config.get("trilogy", {})
+    if not tr_cfg.get("enabled", True):
+        return {"counts": {}, "sources": {}}
+    enrichment: dict[str, dict] = {}
+    files = tr_cfg.get("files", {})
+    logger.info("[3/5] Aarne-Thompson-Uther (ATU) tale types — source: %s", tr_cfg.get("homepage", "trilogy"))
+    logger.info("      files: %s", ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
+    atu_index, _ = _timed("trilogy.build_atu (parse)", trilogy.build_atu, tr_cfg, force=force)
+    enrichment["atu_wikidata"] = _timed("atu_wikidata.refresh", atu_wikidata.refresh, atu_index["types"], force=force)
+    enrichment["ashliman"] = _timed("ashliman.refresh", ashliman.refresh, atu_index["types"], force=force)
+    save_json(store.index_path("atu"), atu_index)
+    atu_types = atu_index["types"]
+    logger.info("      %d tale types", len(atu_types))
+    wd = enrichment["atu_wikidata"]
+    if wd.get("skipped"):
+        logger.info("      + Wikidata enrichment SKIPPED (%s)", wd["skipped"])
+    else:
+        logger.info("      + Wikidata: %d types with multilingual names, %d with Wikipedia links",
+                    wd["types_with_names"], wd["types_with_wikipedia"])
+    ash = enrichment["ashliman"]
+    if ash.get("skipped"):
+        logger.info("      + Ashliman example tales SKIPPED (%s)", ash["skipped"])
+    else:
+        logger.info("      + Ashliman: %d types carry %d tale variants (from %d pages, %d orphan site types dropped)",
+                    ash["types_with_tales"], ash["variants"], ash["pages"], ash["orphans_dropped"])
+    _persist_enrichment("atu", enrichment)
+    return {"counts": {"atu": len(atu_types)}, "sources": {}}
+
+
 def build_motifs(*, force: bool = False) -> None:
     """Build the motif database, always re-parsing/regenerating from the raw cache.
 
@@ -130,138 +257,14 @@ def build_motifs(*, force: bool = False) -> None:
 
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
-    enrichment: dict[str, dict] = {}
     logger.info("=== Building the motif database: 3 indexes (Berezkin, TMI, ATU) + cross-walk ===")
 
-    # --- [1/3] Berezkin (areal catalogue; folds in the mapsofmyths enrichment) ---
-    berezkin_motifs: list[dict] = []
-    mm: dict = {}
-    bz_cfg = config.get("berezkin", {})
-    if bz_cfg.get("enabled", True):
-        home = bz_cfg.get("homepage", "areasofmyths.com")
-        logger.info("[1/5] Berezkin areal catalogue — source: %s (%s + per-motif detail pages for definitions)",
-                    home, bz_cfg.get("index_page", "index page"))
-        # mapsofmyths enrichment refresh (English text, taxonomy, TMI/ATU ids,
-        # traditions) — part of building the Berezkin index, so downloaded under
-        # this step; credential-gated, a no-op skips the enrichment.
-        mm = enrichment["mapsofmyths"] = _timed("mapsofmyths.refresh", mapsofmyths.refresh, force=force)
-        berezkin_data = _timed("berezkin.build (parse)", berezkin.build, bz_cfg, force=force)
-        save_json(store.index_path("berezkin"), berezkin_data)
-        berezkin_motifs = berezkin_data["motifs"]
-        counts["berezkin"] = len(berezkin_motifs)
-        sources["berezkin"] = {"homepage": home, "attribution": bz_cfg.get("attribution", "")}
-        # Base scrape (areasofmyths.com), before any enrichment. "with a definition"
-        # counts a definition from the detail page whether or not English later
-        # replaced it (the original is kept as definition_rus).
-        logger.info("      + base scrape (areasofmyths.com): %d motifs, %d chapters, %d with a definition",
-                    len(berezkin_motifs), len(berezkin_data.get("chapters", {})),
-                    _applied(berezkin_motifs, lambda m: m.get("definition") or m.get("definition_rus")))
-        if mm.get("skipped"):
-            logger.info("      + mapsofmyths.com enrichment SKIPPED (%s) — Russian names/definitions only", mm["skipped"])
-        else:
-            # Each line = how many of the 3488 motifs gained this from mapsofmyths.
-            logger.info("      + mapsofmyths.com enrichment (motifs gaining each field):")
-            logger.info("          English name (Russian kept as subtitle): %d",
-                        _applied(berezkin_motifs, lambda m: m.get("name_rus")))
-            logger.info("          English definition                     : %d",
-                        _applied(berezkin_motifs, lambda m: m.get("definition_rus")))
-            logger.info("          thematic type/group                    : %d",
-                        _applied(berezkin_motifs, lambda m: m.get("motif_type")))
-            logger.info("          direct TMI links                       : %d",
-                        _applied(berezkin_motifs, lambda m: m.get("tmi_refs")))
-            logger.info("          areal tradition sets                   : %d",
-                        _applied(berezkin_motifs, lambda m: m.get("traditions")))
-            logger.info("          + tradition catalogue: %d areal codes → people name, region & language",
-                        len(berezkin_data.get("traditions", {})))
-
-        # Bibliography (areasofmyths.com biblio.html) + citation → region/ethnos
-        # linkage, resolved from the already-cached detail pages.
-        enrichment["berezkin_bibliography"] = _timed("berezkin_bibliography.refresh", berezkin_bibliography.refresh, berezkin_motifs, force=force)
-        bb = enrichment["berezkin_bibliography"]
-        if bb.get("skipped"):
-            logger.info("      + bibliography (areasofmyths.com) SKIPPED (%s)", bb["skipped"])
-        else:
-            logger.info("      + bibliography (areasofmyths.com): %d works; citations resolved %d/%d (%d%%), "
-                        "ambiguous %d",
-                        bb["works"], bb["resolved"], bb["citations"],
-                        round(100 * bb["resolved"] / bb["citations"]) if bb["citations"] else 0,
-                        bb["ambiguous"])
-
-    # --- [2/3] TMI + [3/3] ATU (from the j-hagedorn/trilogy dataset) ---
-    # The ~10 structures crosswalk/parallels consume are re-derived from the saved index JSONs
-    # (motifs.derive) after this block, not passed in-memory — the source→JSON→downstream boundary
-    # the atomisation splits on. Only the in-memory motif lists needed here (logging/enrichment).
-    tmi_motifs: list[dict] = []
-    atu_types: list[dict] = []
-    tr_cfg = config.get("trilogy", {})
-    if tr_cfg.get("enabled", True):
-        files = tr_cfg.get("files", {})
-        sources["trilogy"] = {"homepage": tr_cfg.get("homepage", ""), "attribution": tr_cfg.get("attribution", "")}
-
-        # --- [2/5] TMI: header first, so its parse warnings sit under it. ---
-        logger.info("[2/5] Thompson Motif-Index (TMI) — source: %s (%s)",
-                    tr_cfg.get("homepage", "trilogy"), files.get("tmi", "tmi.csv"))
-        mel_cfg = config.get("mellmann", {})
-        mel_on = mel_cfg.get("enabled", False)
-        tmi_index = _timed("trilogy.build_tmi (parse)", trilogy.build_tmi, tr_cfg, force=force,
-                            divisions_config=mel_cfg if mel_on else None)
-        if mel_on:
-            sources["mellmann"] = {"homepage": mel_cfg.get("homepage", ""),
-                                   "attribution": mel_cfg.get("attribution", "")}
-            logger.info("      classification headings — source: Mellmann TMI_as_CSV")
-            logger.info("      %d divisions, %d sub-divisions, %d sub-sub-divisions, %d sections",
-                        len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])),
-                        len(tmi_index.get("subdivisions3", [])), len(tmi_index.get("sections", [])))
-        save_json(store.index_path("tmi"), tmi_index)
-        tmi_motifs = tmi_index["motifs"]
-        counts["tmi"] = len(tmi_motifs)
-        logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
-                    len(tmi_motifs),
-                    _applied(tmi_motifs, lambda m: m.get("definition")),
-                    _applied(tmi_motifs, lambda m: m.get("cultures")),
-                    _applied(tmi_motifs, lambda m: m.get("atu_inline")))
-        # TMI citation-key (folkmasa bibliography + curated), annotated with the
-        # per-source usage counts from the just-built TMI notes.
-        enrichment["bibliography"] = _timed("bibliography.refresh", bibliography.refresh, tmi_motifs, force=force)
-        bib = enrichment["bibliography"]
-        logger.info("      citation key — source: %s + curated supplement: %d entries (%d with a book link)",
-                    "folkmasa.org", bib.get("entries", 0), bib.get("linked", 0))
-
-        # --- [3/5] ATU: header before the ATU parse, on par with the other steps. ---
-        logger.info("[3/5] Aarne-Thompson-Uther (ATU) tale types — source: %s",
-                    tr_cfg.get("homepage", "trilogy"))
-        logger.info("      files: %s",
-                    ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
-        atu_index, _ = _timed("trilogy.build_atu (parse)", trilogy.build_atu, tr_cfg, force=force)
-        # Multilingual names + Wikipedia links from Wikidata (open, best-effort).
-        enrichment["atu_wikidata"] = _timed("atu_wikidata.refresh", atu_wikidata.refresh, atu_index["types"], force=force)
-        # Example tales sourced straight from Ashliman's Folktexts (best-effort).
-        enrichment["ashliman"] = _timed("ashliman.refresh", ashliman.refresh, atu_index["types"], force=force)
-        save_json(store.index_path("atu"), atu_index)
-        atu_types = atu_index["types"]
-        counts["atu"] = len(atu_types)
-        logger.info("      %d tale types", len(atu_types))
-        wd = enrichment["atu_wikidata"]
-        if wd.get("skipped"):
-            logger.info("      + Wikidata enrichment SKIPPED (%s)", wd["skipped"])
-        else:
-            logger.info("      + Wikidata: %d types with multilingual names, %d with Wikipedia links",
-                        wd["types_with_names"], wd["types_with_wikipedia"])
-        ash = enrichment["ashliman"]
-        if ash.get("skipped"):
-            logger.info("      + Ashliman example tales SKIPPED (%s)", ash["skipped"])
-        else:
-            logger.info("      + Ashliman: %d types carry %d tale variants (from %d pages, %d orphan site types dropped)",
-                        ash["types_with_tales"], ash["variants"], ash["pages"], ash["orphans_dropped"])
-
-    # --- [4/5] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
-    #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
-    # Persist each source's enrichment summary (skip status + counts) as a sidecar, so the future
-    # meta aggregator stage collects them per-source instead of the monolith's in-memory dict.
-    for src, keys in _SOURCE_ENRICHMENTS.items():
-        summary = {k: enrichment[k] for k in keys if k in enrichment}
-        if summary:
-            save_json(store.enrichment_path(src), summary)
+    # Build the three source indexes — each writes its JSON + enrichment sidecar; crosswalk/parallels
+    # then reload them via motifs.derive. These are the future motifs:source:* stages.
+    for build_source in (_build_berezkin, _build_tmi, _build_atu):
+        r = build_source(config, force=force)
+        counts.update(r["counts"])
+        sources.update(r["sources"])
 
     logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
     # Re-derive the crosswalk/parallels inputs by reloading the saved index JSONs (the exact path
