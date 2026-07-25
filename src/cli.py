@@ -137,12 +137,7 @@ def _scoped_pipeline(scope):
     return sorted(keep.values(), key=lambda s: order[id(s)]), targets
 
 
-def _build_motifs(force: bool = False):
-    # The one surviving single-stage dispatcher: the motif re-scrape path used by `refresh`
-    # (build/status/clean go through the generic driver; motifs has no cheap per-source diff yet).
-    from motifs.build_motifs import build_motifs
-
-    build_motifs(force=force)
+_MOTIF_SOURCES = ("berezkin", "tmi", "atu")
 
 
 @mytho.command()
@@ -152,18 +147,77 @@ def refresh(scope, apply: bool):
     """Re-fetch upstream into the pinned raw archive (networked; preview then --apply).
 
     Unlike `build` (which never re-fetches present raw) and `--force` (which rebuilds derived
-    from that raw), `refresh` is the deliberate, human-gated re-check of upstream. SCOPE selects
-    which upstream-capable stages to re-check (``corpus`` and/or ``motifs``); with no SCOPE it
-    refreshes all of them.
-    """
-    unknown = [s for s in scope if s not in _REFRESHERS]
-    if unknown:
-        _fail("Refresh", ValueError(f"not a refreshable stage: {unknown} — choose {'|'.join(_REFRESHERS)}"))
+    from that raw), `refresh` is the deliberate, human-gated re-check of upstream. SCOPE picks the
+    targets: ``corpus``, ``motifs`` (all three sources), or a single ``motifs:source:<berezkin|tmi|
+    atu>``; with no SCOPE it refreshes everything. Each motif source is re-checked independently
+    (diff vs the pinned copy → keep-pinned by default → adopt on --apply)."""
     try:
-        for name in scope or _REFRESHERS:
-            _REFRESHERS[name](apply)
+        corpus, sources = _resolve_refresh(scope)
+        if corpus:
+            _refresh_documents(apply)
+        if sources:
+            _refresh_motifs(apply, sources)
     except Exception as e:
         _fail("Refresh", e)
+
+
+def _resolve_refresh(scope) -> tuple[bool, list[str] | None]:
+    """Parse SCOPE → ``(refresh_corpus, motif_sources)``. ``motif_sources`` is ``None`` when motifs
+    were not selected, else the ordered source list. No scope → corpus + all sources."""
+    if not scope:
+        return True, list(_MOTIF_SOURCES)
+    corpus, motifs, sel = False, False, set()
+    for tok in scope:
+        if tok == "corpus":
+            corpus = True
+        elif tok in ("motifs", "motifs:source"):
+            motifs = True
+            sel.update(_MOTIF_SOURCES)
+        elif tok.startswith("motifs:source:"):
+            name = tok.split(":", 2)[2]
+            if name not in _MOTIF_SOURCES:
+                raise ValueError(f"unknown motif source {name!r} — choose {', '.join(_MOTIF_SOURCES)}")
+            motifs = True
+            sel.add(name)
+        else:
+            raise ValueError(f"not a refreshable target: {tok!r} — choose "
+                             f"corpus | motifs | motifs:source:<{'|'.join(_MOTIF_SOURCES)}>")
+    return corpus, ([s for s in _MOTIF_SOURCES if s in sel] if motifs else None)
+
+
+def _refresh_motifs(apply: bool, sources: list[str]) -> None:
+    """Fan out to each selected source stage's own ``refresh`` — a source is re-checked, kept
+    pinned, and adopted entirely on its own; nothing central knows its resources."""
+    from pipeline.stages.motifs import AtuSource, BerezkinSource, TmiSource
+
+    stages = {"berezkin": BerezkinSource, "tmi": TmiSource, "atu": AtuSource}
+    for name in sources:
+        click.echo(click.style(f"[start] Refresh motifs:source:{name}"
+                               f" ({'apply' if apply else 'preview'})", fg="cyan", bold=True))
+        _render_refresh_table(stages[name]().refresh(apply=apply), apply)
+
+
+def _render_refresh_table(result, apply: bool) -> None:
+    """The §9 three-column table (resource · status · action), plain text. Only actionable rows are
+    listed (a full re-check is thousands of resources); ``not changed`` collapses into the footer
+    tally, then the kept-pinned count (never 'all clear' while a source is unhealthy), then apply."""
+    from motifs.refresh import CHANGED, NEW, NOT_CHANGED
+
+    rows = sorted((o for o in result.outcomes if o.status != NOT_CHANGED), key=lambda o: (o.status, o.title))
+    if rows:
+        click.echo(f"  {'resource':<48} {'status':<12} action")
+        for o in rows:
+            click.echo(f"  {o.title:<48} {o.status:<12} {o.action}")
+    tally = result.tally()
+    click.echo(f"  {len(result.outcomes)} checked: "
+               + (", ".join(f"{tally[k]} {k}" for k in sorted(tally)) or "nothing pinned"))
+    if result.kept_pinned:
+        click.echo(f"  {result.kept_pinned} kept pinned (degraded/gone — see above)")
+    pending = sum(1 for o in result.outcomes if o.status in (CHANGED, NEW))
+    if apply:
+        click.echo(f"  adopted {len(result.adopted)} — run `mytho build` to re-derive.")
+    elif pending:
+        click.echo(f"  preview only — re-run with --apply to adopt {pending}.")
 
 
 def _refresh_documents(apply: bool):
@@ -195,20 +249,6 @@ def _refresh_documents(apply: bool):
         click.echo(click.style(f"[done]  Refresh — {problems} source(s) kept pinned (see above).", fg="yellow"))
     else:
         click.echo(click.style("[done]  Refresh — everything current.", fg="green"))
-
-
-def _refresh_motifs(apply: bool):
-    # Motif sources re-scrape wholesale (no cheap per-source diff yet — the per-source
-    # staged refresh is the Part 3 source-unit work); --apply re-fetches, else previews.
-    if not apply:
-        click.echo("Would re-scrape all motif sources (Berezkin, TMI, ATU + enrichment).")
-        click.echo(click.style("Preview only. Re-run with --apply to re-fetch.", fg="yellow"))
-        return
-    _run("Refresh motifs", _build_motifs, force=True)
-
-
-# The refreshable stages: token → handler. Single source for validation, the default set, and dispatch.
-_REFRESHERS = {"corpus": _refresh_documents, "motifs": _refresh_motifs}
 
 
 @mytho.command()
