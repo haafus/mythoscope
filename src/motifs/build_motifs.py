@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from json_utils import save_json
 from settings import settings
 
-from . import crosswalk, parallels, reasoned_parallels, store
+from . import crosswalk, derive, parallels, reasoned_parallels, store
 from .fingerprint import motifs_fingerprint
 from .sources import (
     ashliman,
@@ -167,17 +167,11 @@ def build_motifs(*, force: bool = False) -> None:
                         bb["ambiguous"])
 
     # --- [2/3] TMI + [3/3] ATU (from the j-hagedorn/trilogy dataset) ---
-    tmi_ids: set[str] = set()
-    atu_ids: set[str] = set()
+    # The ~10 structures crosswalk/parallels consume are re-derived from the saved index JSONs
+    # (motifs.derive) after this block, not passed in-memory — the source→JSON→downstream boundary
+    # the atomisation splits on. Only the in-memory motif lists needed here (logging/enrichment).
     tmi_motifs: list[dict] = []
     atu_types: list[dict] = []
-    atu_seq: dict[str, list[str]] = {}
-    atu_defining: dict[str, list[str]] = {}
-    atu_aliases: dict[str, str] = {}
-    tmi_aliases: dict[str, str] = {}
-    tmi_notes: dict[str, list[str]] = {}
-    atu_summaries: dict[str, str] = {}
-    aath_to_atu: dict[str, list[str]] = {}
     tr_cfg = config.get("trilogy", {})
     if tr_cfg.get("enabled", True):
         files = tr_cfg.get("files", {})
@@ -200,10 +194,6 @@ def build_motifs(*, force: bool = False) -> None:
         save_json(store.index_path("tmi"), tmi_index)
         tmi_motifs = tmi_index["motifs"]
         counts["tmi"] = len(tmi_motifs)
-        tmi_ids = {m["id"] for m in tmi_motifs}
-        tmi_aliases = tmi_index.get("aliases", {})
-        # Inline "Type N" citations in TMI notes → feed the (inverse) note cross-walk.
-        tmi_notes = {m["id"]: m["atu_inline"] for m in tmi_motifs if m.get("atu_inline")}
         logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
                     len(tmi_motifs),
                     _applied(tmi_motifs, lambda m: m.get("definition")),
@@ -221,7 +211,7 @@ def build_motifs(*, force: bool = False) -> None:
                     tr_cfg.get("homepage", "trilogy"))
         logger.info("      files: %s",
                     ", ".join(v for k, v in files.items() if k != "tmi") or "atu CSVs")
-        atu_index, atu_seq = _timed("trilogy.build_atu (parse)", trilogy.build_atu, tr_cfg, force=force)
+        atu_index, _ = _timed("trilogy.build_atu (parse)", trilogy.build_atu, tr_cfg, force=force)
         # Multilingual names + Wikipedia links from Wikidata (open, best-effort).
         enrichment["atu_wikidata"] = _timed("atu_wikidata.refresh", atu_wikidata.refresh, atu_index["types"], force=force)
         # Example tales sourced straight from Ashliman's Folktexts (best-effort).
@@ -229,17 +219,6 @@ def build_motifs(*, force: bool = False) -> None:
         save_json(store.index_path("atu"), atu_index)
         atu_types = atu_index["types"]
         counts["atu"] = len(atu_types)
-        atu_ids = {t["id"] for t in atu_types}
-        atu_defining = {t["id"]: t["defining_motifs"] for t in atu_types if t.get("defining_motifs")}
-        atu_aliases = atu_index.get("aliases", {})
-        atu_summaries = {t["id"]: t["summary"] for t in atu_types if t.get("summary")}
-        # AaTh tale-type number → ATU 2004 id(s), from the Wikidata concordance each
-        # type carries; resolves the pre-2004 numbers TMI notes cite.
-        for t in atu_types:
-            for code in (t.get("concordances") or {}).get("AaTh", []):
-                aath_to_atu.setdefault(code, [])
-                if t["id"] not in aath_to_atu[code]:
-                    aath_to_atu[code].append(t["id"])
         logger.info("      %d tale types", len(atu_types))
         wd = enrichment["atu_wikidata"]
         if wd.get("skipped"):
@@ -257,8 +236,13 @@ def build_motifs(*, force: bool = False) -> None:
     # --- [4/5] Cross-walk (ATU <-> TMI via tale-type numbers, Berezkin -> ATU via
     #     title refs, Berezkin <-> TMI via curated Thompson ids) ---
     logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
-    links = _timed("crosswalk.build", crosswalk.build, atu_seq, tmi_ids, berezkin_motifs, atu_ids, atu_defining,
-                   atu_aliases, tmi_notes, aath_to_atu, atu_summaries, tmi_aliases)
+    # Re-derive the crosswalk/parallels inputs by reloading the saved index JSONs (the exact path
+    # the future motifs:crosswalk / :parallels stages take), rather than threading in-memory
+    # projections. motifs.derive is deep-equal to the old inline derivation.
+    d = derive.load_indexes()
+    links = _timed("crosswalk.build", crosswalk.build, d["atu_seq"], d["tmi_ids"], d["berezkin_motifs"],
+                   d["atu_ids"], d["atu_defining"], d["atu_aliases"], d["tmi_notes"], d["aath_to_atu"],
+                   d["atu_summaries"], d["tmi_aliases"])
     save_json(store.crosswalk_path(), links)
     logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI; %d TMI motifs reachable from a tale type)",
                 len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
@@ -278,7 +262,8 @@ def build_motifs(*, force: bool = False) -> None:
     #     description matching) surfacing look-alike motifs with *no* recorded
     #     cross-walk link — hints for review, kept apart from the curated links. ---
     logger.info("[5/5] Textual parallels — lexical look-alikes with no recorded link")
-    par = _timed("parallels.build (TF-IDF + NN)", parallels.build, berezkin_motifs, tmi_motifs, atu_types, links)
+    par = _timed("parallels.build (TF-IDF + NN)", parallels.build,
+                 d["berezkin_motifs"], d["tmi_motifs"], d["atu_types"], links)
     if par is None:
         logger.info("      SKIPPED (no TMI/ATU, or scikit-learn unavailable)")
         par_counts = {}
