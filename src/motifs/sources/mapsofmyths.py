@@ -27,7 +27,8 @@ from pathlib import Path
 
 from settings import settings
 
-from .fetch import fetch_text
+from ..refresh import Fetchable
+from .fetch import fetch_text, raw_dir
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,49 @@ def _post_markers(node: str, cache_dir: Path, auth: tuple[str, str], *, force: b
     cache_file.parent.mkdir(parents=True, exist_ok=True)
     cache_file.write_text(resp.text, encoding="utf-8")
     return resp.text
+
+
+def _marker_fetch(node: str, auth: tuple[str, str] | None):
+    """A per-marker POST closure for the staged refresh (the markers endpoint is POST, not GET)."""
+    def fetch() -> bytes:
+        import requests  # lazy: the HTTP dep lives in the corpus extra
+
+        resp = requests.post(f"{BASE}/gmap-markers-tradition", data={"tradition": node}, auth=auth, timeout=60)
+        resp.raise_for_status()
+        return resp.content
+    return fetch
+
+
+def fetchables() -> list[Fetchable]:
+    """Everything mapsofmyths has pinned: the two listing pages (GET), each motif's node page
+    (parse-discovered from the pinned ``motifs_full`` listing → ``BASE + href``), and the per-node
+    marker replies (a POST endpoint, so each carries a ``fetch`` override). Credential-gated: with
+    no auth the GETs 401 and are kept-pinned, exactly as the network-gated build behaves."""
+    auth = _auth()
+    root = raw_dir() / "mapsofmyths"
+    out = [Fetchable("mapsofmyths/motifs_full.html", f"{BASE}/motifs_full", root / "motifs_full.html", auth=auth),
+           Fetchable("mapsofmyths/traditions_full.html", f"{BASE}/traditions_full",
+                     root / "traditions_full.html", auth=auth)]
+    seen: set[str] = set()
+    mf = root / "motifs_full.html"
+    if mf.exists():
+        for v in parse_motifs_full(mf.read_text(encoding="utf-8", errors="replace")).values():
+            href = v.get("href")
+            if not href:
+                continue
+            node_id = href.rstrip("/").rsplit("/", 1)[-1]
+            if node_id in seen:
+                continue
+            seen.add(node_id)
+            url = href if href.startswith("http") else f"{BASE}{href}"
+            out.append(Fetchable(f"mapsofmyths/node_{node_id}.html", url, root / f"node_{node_id}.html", auth=auth))
+    markers = root / "markers"
+    if markers.exists():
+        for m in sorted(markers.glob("markers_*.json")):
+            node = m.name[len("markers_"):-len(".json")]
+            out.append(Fetchable(f"mapsofmyths/markers/{m.name}", f"{BASE}/gmap-markers-tradition#{node}",
+                                 m, auth=auth, fetch=_marker_fetch(node, auth)))
+    return out
 
 
 def refresh(*, force: bool = False, auth: tuple[str, str] | None = None) -> dict:

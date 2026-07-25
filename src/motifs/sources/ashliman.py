@@ -22,7 +22,8 @@ from pathlib import Path
 
 from settings import settings
 
-from .fetch import fetch_text, read_pinned
+from ..refresh import Fetchable
+from .fetch import fetch_text, read_pinned, walk_fetchables
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +135,13 @@ def parse_variants(page_html: str, base_url: str) -> list[dict]:
         seen.add(anchor)
         out.append({"title": title, "url": f"{base_url}#{anchor}"})
     return out
+
+
+def fetchables() -> list[Fetchable]:
+    """The example-tale pages this source has pinned (``sites.pitt.edu/~dash/<page>``). The page set
+    is discovered by walking the site; refresh re-checks whatever is pinned (``.absent`` known-404
+    markers skipped), so it never re-probes the many derived type names that never existed."""
+    return walk_fetchables("ashliman", BASE)
 
 
 def refresh(atu_types: list[dict], *, force: bool = False) -> dict:

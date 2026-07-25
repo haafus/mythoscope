@@ -34,6 +34,16 @@ from motifs.fingerprint import (
     semantic_fingerprint,
     source_fingerprint,
 )
+from motifs.refresh import Fetchable, RefreshResult, refresh_fetchables
+from motifs.sources import (
+    ashliman,
+    atu_wikidata,
+    berezkin,
+    berezkin_bibliography,
+    bibliography,
+    mapsofmyths,
+    trilogy,
+)
 
 from ..stage import Stage
 
@@ -69,28 +79,34 @@ def _fp_path(name: str):
     return store.motifs_dir() / f".fp.{name}"
 
 
-# source → (build fn, config flag gating it). TMI and ATU both live under the trilogy flag.
-_SOURCES = {
-    "berezkin": (_build_berezkin, "berezkin"),
-    "tmi": (_build_tmi, "trilogy"),
-    "atu": (_build_atu, "trilogy"),
-}
-
-
 class SourceStage(Stage):
-    """One source index (``berezkin`` / ``tmi`` / ``atu``): parse its raw + fold its enrichment,
-    write ``<source>.json`` + the enrichment sidecar. Offline — ``force=False`` reuses the pinned
-    cache, never re-fetches. Disabled in config → no desired key (nothing to build)."""
+    """Base for the three source index stages (``berezkin`` / ``tmi`` / ``atu``): parse this source's
+    raw + fold its enrichment, write ``<source>.json`` + the enrichment sidecar. Offline build
+    (``force=False`` reuses the pinned cache, never re-fetches); disabled in config → no desired key.
+
+    Each concrete source is **self-contained**: it names its own build fn, config flag, and — for
+    ``refresh`` — its own ``fetchables()`` composed from the source modules it owns. Drop a source
+    (delete its subclass + modules) and its whole fetch/build/refresh goes with it; nothing central
+    lists it. Shared machinery (the fp gate here, the ``refresh_fetchables`` engine) is the base."""
 
     store = None
+    source: str
+    _flag: str  # config key whose ``enabled`` gates this source (tmi/atu share ``trilogy``)
 
-    def __init__(self, source: str):
-        self.source = source
-        self.name = f"motifs:source:{source}"
-        self._build, self._flag = _SOURCES[source]
+    @property
+    def name(self) -> str:
+        return f"motifs:source:{self.source}"
 
     def inputs(self) -> list[Stage]:
         return []
+
+    def _build_source(self, config: dict) -> None:
+        raise NotImplementedError
+
+    def fetchables(self) -> list[Fetchable]:
+        """The upstream resources this source owns — what ``refresh`` re-checks. Composed here from
+        the source's own modules, so it lives and dies with the source."""
+        raise NotImplementedError
 
     def _enabled(self) -> bool:
         return _load_config().get(self._flag, {}).get("enabled", True)
@@ -105,11 +121,48 @@ class SourceStage(Stage):
         return {}
 
     def build(self, keys: set[str]) -> None:
-        self._build(_load_config(), force=False)
+        self._build_source(_load_config())
         _fp_path(f"source.{self.source}").write_text(source_fingerprint(self.source), encoding="utf-8")
+
+    def refresh(self, *, apply: bool = False) -> RefreshResult:
+        """Re-check this source's upstream against its pinned raw (§9): diff / keep-pinned / adopt."""
+        return refresh_fetchables(self.fetchables(), apply=apply)
 
     def delete(self, keys: set[str]) -> None:
         pass
+
+
+class BerezkinSource(SourceStage):
+    source, _flag = "berezkin", "berezkin"
+
+    def _build_source(self, config: dict) -> None:
+        _build_berezkin(config, force=False)
+
+    def fetchables(self) -> list[Fetchable]:
+        cfg = _load_config()
+        return [*berezkin.fetchables(cfg.get("berezkin", {})),
+                *mapsofmyths.fetchables(), *berezkin_bibliography.fetchables()]
+
+
+class TmiSource(SourceStage):
+    source, _flag = "tmi", "trilogy"
+
+    def _build_source(self, config: dict) -> None:
+        _build_tmi(config, force=False)
+
+    def fetchables(self) -> list[Fetchable]:
+        return [*trilogy.fetchables(_load_config(), "tmi"), *bibliography.fetchables()]
+
+
+class AtuSource(SourceStage):
+    source, _flag = "atu", "trilogy"
+
+    def _build_source(self, config: dict) -> None:
+        _build_atu(config, force=False)
+
+    def fetchables(self) -> list[Fetchable]:
+        return [*trilogy.fetchables(_load_config(), "atu"),
+                *atu_wikidata.fetchables(), *ashliman.fetchables()]
 
 
 class CrosswalkStage(Stage):
@@ -248,7 +301,7 @@ class MetaStage(Stage):
 
 def motifs_stages() -> list[Stage]:
     """The atomised motifs sub-pipeline, in declaration (topological tie-break) order."""
-    sources = [SourceStage("berezkin"), SourceStage("tmi"), SourceStage("atu")]
+    sources = [BerezkinSource(), TmiSource(), AtuSource()]
     crosswalk = CrosswalkStage(sources)
     parallels = ParallelsStage(crosswalk)
     semantic = SemanticStage()

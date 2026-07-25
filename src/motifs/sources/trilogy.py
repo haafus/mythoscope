@@ -17,9 +17,10 @@ from pathlib import Path
 
 from settings import settings
 
+from ..refresh import Fetchable
 from . import atu_regions
 from .culture_dict import build_legend
-from .fetch import fetch_to_cache
+from .fetch import fetch_to_cache, raw_dir
 from .tmi_notes import parse_notes
 
 logger = logging.getLogger(__name__)
@@ -173,6 +174,24 @@ def _clean(value: str | None) -> str:
 def _strip_notes_bleed(notes: str) -> str:
     m = _NOTES_BLEED_RE.search(notes)
     return notes[: m.start()].strip() if m else notes
+
+
+_KIND_FILES = {"tmi": ("tmi",), "atu": ("atu_df", "atu_seq", "atu_combos")}
+
+
+def fetchables(config: dict, kind: str) -> list[Fetchable]:
+    """The trilogy CSVs one index reads — ``tmi.csv`` for the TMI stage, the ``atu_*`` CSVs for ATU
+    (the shared source split at the file level, no overlap). The TMI stage also pulls the Mellmann
+    classification-headings CSV (fetched by the same ``_read_csv``, under its own base)."""
+    tr = config["trilogy"]
+    base, files = tr["base_url"].rstrip("/"), tr["files"]
+    out = [Fetchable(f"trilogy/{files[k]}", f"{base}/{files[k]}", raw_dir() / "trilogy" / files[k])
+           for k in _KIND_FILES[kind]]
+    mel = config.get("mellmann", {})
+    if kind == "tmi" and mel.get("base_url"):
+        fn = mel.get("files", {}).get("tmi", "tmi.csv")
+        out.append(Fetchable(f"mellmann/{fn}", f"{mel['base_url'].rstrip('/')}/{fn}", raw_dir() / "mellmann" / fn))
+    return out
 
 
 def _read_csv(config: dict, key: str, *, force: bool, subdir: str = "trilogy") -> list[dict]:

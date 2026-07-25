@@ -33,8 +33,9 @@ from pathlib import Path
 
 from settings import settings
 
+from ..refresh import Fetchable
 from . import berezkin
-from .fetch import fetch_text
+from .fetch import fetch_text, raw_dir
 
 logger = logging.getLogger(__name__)
 
@@ -255,6 +256,12 @@ def parse_attestations(html: str, area_index: dict[str, tuple[str, str]]) -> lis
 
 def out_path() -> Path:
     return Path(settings.motifs_dir) / OUT_FILE
+
+
+def fetchables() -> list[Fetchable]:
+    """The one bibliography page (areasofmyths.com/biblio.html); the citation→region linkage it
+    feeds is re-derived from the already-pinned detail pages, so nothing else is fetched here."""
+    return [Fetchable("berezkin/biblio.html", f"{BASE}/biblio.html", raw_dir() / "berezkin" / "biblio.html")]
 
 
 def refresh(motifs: list[dict], *, force: bool = False) -> dict:

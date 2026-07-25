@@ -23,7 +23,8 @@ from pathlib import Path
 
 from settings import settings
 
-from .fetch import fetch_text
+from ..refresh import Fetchable
+from .fetch import fetch_text, raw_dir
 
 logger = logging.getLogger(__name__)
 
@@ -228,6 +229,11 @@ def build(html: str, tmi_records: list[dict]) -> dict:
 
 def out_path() -> Path:
     return Path(settings.motifs_dir) / OUT_FILE
+
+
+def fetchables() -> list[Fetchable]:
+    """The one folkmasa bibliography page."""
+    return [Fetchable("folkmasa_bibliography.html", SOURCE_URL, raw_dir() / "folkmasa_bibliography.html")]
 
 
 def refresh(tmi_records: list[dict], *, force: bool = False) -> dict:

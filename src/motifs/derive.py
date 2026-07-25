@@ -15,7 +15,10 @@ from . import store
 
 
 def derived_from_indexes(berezkin_data: dict, tmi_index: dict, atu_index: dict) -> dict:
-    """The exact structures crosswalk/parallels consume, re-derived from the three indexes."""
+    """The exact structures crosswalk/parallels consume, re-derived from the three indexes. A
+    disabled/unbuilt source has no index JSON (``load_index`` → ``None``); it reads as empty
+    structures, exactly as the monolith's in-memory path saw a disabled source (never a crash)."""
+    berezkin_data, tmi_index, atu_index = berezkin_data or {}, tmi_index or {}, atu_index or {}
     tmi_motifs = tmi_index.get("motifs", [])
     atu_types = atu_index.get("types", [])
 

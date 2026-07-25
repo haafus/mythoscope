@@ -23,8 +23,9 @@ from pathlib import Path
 
 from settings import settings
 
+from ..refresh import Fetchable
 from . import mapsofmyths
-from .fetch import fetch_text
+from .fetch import fetch_text, walk_fetchables
 
 logger = logging.getLogger(__name__)
 
@@ -501,6 +502,12 @@ def _attach_nodes(motifs: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 # Fetch orchestration
 # ---------------------------------------------------------------------------
+
+
+def fetchables(config: dict) -> list[Fetchable]:
+    """The areal-catalogue pages this source has pinned: the index + every per-motif detail page,
+    all under one base (``base/<name>``). ``biblio.html`` is berezkin_bibliography's, not ours."""
+    return walk_fetchables("berezkin", config["base_url"], exclude={"biblio.html"})
 
 
 def build(config: dict, *, force: bool = False) -> dict:

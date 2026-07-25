@@ -31,13 +31,16 @@ _ACTION = {NOT_CHANGED: "keep cached", DEGRADED: "keep cached", GONE: "keep cach
 class Fetchable:
     """One refreshable resource: a URL and the pinned cache file it maps to. ``validate`` (optional)
     is the health check run on freshly downloaded bytes before they may be adopted (a degraded 200
-    is kept-pinned, never adopted); ``auth`` carries per-source HTTP basic-auth when needed."""
+    is kept-pinned, never adopted); ``auth`` carries per-source HTTP basic-auth when needed.
+    ``fetch`` overrides the default GET for exotic transports (mapsofmyths' POST markers): a
+    zero-arg callable returning the fresh bytes, used in place of ``download(url, auth)``."""
 
     title: str
     url: str
     cache_file: Path
     auth: tuple[str, str] | None = None
     validate: Callable[[bytes], bool] | None = None
+    fetch: Callable[[], bytes] | None = None
 
 
 @dataclass
@@ -88,7 +91,7 @@ def refresh_fetchables(fetchables: list[Fetchable], *, apply: bool = False,
         pinned = read_pinned(f.cache_file)
         pinned_bytes = f.cache_file.read_bytes() if pinned is not None else None
         try:
-            fresh = download(f.url, auth=f.auth)
+            fresh = f.fetch() if f.fetch is not None else download(f.url, auth=f.auth)
         except Exception as exc:  # transport / 404 — keep pinned, report (§4 F/G)
             result.outcomes.append(Outcome(f.title, _status_for_failure(exc)))
             continue

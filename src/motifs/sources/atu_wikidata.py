@@ -25,6 +25,7 @@ from urllib.parse import unquote, urlencode
 
 from settings import settings
 
+from ..refresh import Fetchable
 from .fetch import FetchRejected, fetch_text, read_pinned
 
 logger = logging.getLogger(__name__)
@@ -151,6 +152,29 @@ def parse_bindings(rows: list[dict], atu_ids: set[str]) -> dict[str, dict]:
     return out
 
 
+def is_healthy(content: bytes, atu_ids: set[str]) -> bool:
+    """A healthy full WDQS reply parses **and**, when substantial, carries some Wikipedia sitelinks.
+    Rows-but-zero-sitelinks is a degraded reply (heavy OPTIONALs timed out while cheap label lookups
+    still return); rejecting it keeps it from overwriting the pinned copy. Any parse/structure error
+    is unhealthy too. Shared by the build-time validator and the refresh-time fetchable."""
+    try:
+        rows = json.loads(content)["results"]["bindings"]
+        mapping = parse_bindings(rows, atu_ids)
+    except Exception:
+        return False
+    return not (len(rows) >= 50 and not any(m["wikipedia"] for m in mapping.values()))
+
+
+def fetchables() -> list[Fetchable]:
+    """The one WDQS query. Its degraded-reply guard (``is_healthy``) rides along so a thin reply is
+    never adopted over the pinned copy; the ATU ids it needs come from the built ATU index."""
+    from .. import store
+
+    ids = {t["id"] for t in (store.load_index("atu") or {}).get("types", [])}
+    return [Fetchable("wikidata/atu.json", query_url(), Path(settings.motifs_dir) / OUT,
+                      validate=lambda c: is_healthy(c, ids))]
+
+
 def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     """Fetch Wikidata and attach ``names`` / ``wikipedia`` / ``wikidata`` /
     ``concordances`` to each type, in place. ``{"skipped": ...}`` if the fetch failed."""
@@ -159,11 +183,8 @@ def refresh(atu_types: list[dict], *, force: bool = False) -> dict:
     parsed: dict = {}   # the validator hands the parsed rows/mapping to the caller — parse once, reuse
 
     def _healthy(content: bytes) -> bool:
-        """Validate-before-commit: a healthy full reply parses **and**, when substantial, carries some
-        Wikipedia sitelinks. Rows-but-zero-sitelinks is a degraded WDQS reply (the heavy OPTIONALs timed
-        out during an outage while cheap ``rdfs:label`` lookups still return); rejecting it here means it
-        never overwrites the pinned copy. Any parse/structure error is unhealthy too — caught here, never
-        raised out of the validator (else it would be mistaken for a transport failure)."""
+        """Validate-before-commit; on the healthy path it also stashes the parse for the caller to
+        reuse (no re-parse). The boolean half is shared with the refresh-time ``is_healthy``."""
         try:
             rows = json.loads(content)["results"]["bindings"]
             mapping = parse_bindings(rows, ids)
