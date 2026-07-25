@@ -355,22 +355,25 @@ dropped in the refactor.)
 |---|---|
 | 1 · resource | the resource name |
 | 2 · status | one exact expression, no parentheses, no explanation: `not changed` \| `changed` \| `degraded` \| `gone` \| `new` |
-| 3 · action | the decision taken: `keep cached` \| `acquire on apply` \| `pinned to manifest` |
+| 3 · action | the decision taken: `keep cached` \| `acquire on apply` \| `flagged for review` |
 
 Status → action mapping:
 
 - `not changed` / `degraded` / `gone` → **keep cached** (the pinned copy stands; a bad/absent upstream never overwrites it)
 - `new` → **acquire on apply**
-- `changed` → **pinned to manifest** (recorded for human review, not auto-adopted)
+- `changed` → **flagged for review** (recorded as a §5 flag, not auto-adopted)
+
+The "review record" is the existing **flag** (§5), not a new file: a durable needs-review entry in the stage's own
+metadata (`meta.flags`) — no new path. `degraded`/`gone`/`no-parse` also raise their flag kinds there.
 
 Footer, in order:
 
 1. **total** resources checked;
-2. how many were **pinned to the manifest for review**, and **where the manifest is** (its path);
+2. how many were **flagged for review** and where the flags live (the stage's `meta.flags`, §5);
 3. the **`--apply`** line (what re-running with `--apply` will do).
 
-**Open:** the manifest's exact name (`manifest` / `review` / …?) and on-disk path — TBD. `degraded`/`gone` collapse
-the current reason detail (`empty-body`, `gone-404`) into the single status word, as specified (no parentheses).
+`degraded`/`gone` collapse the current reason detail (`empty-body`, `gone-404`) into the single status word, as
+specified (no parentheses).
 
 **Open design calls (why it's experimental):**
 
