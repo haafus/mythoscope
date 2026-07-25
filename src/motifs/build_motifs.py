@@ -100,14 +100,12 @@ def build_motifs(*, force: bool = False) -> None:
     config = _load_config()
     store.motifs_dir().mkdir(parents=True, exist_ok=True)
 
-    # Coarse fp gate: skip the whole re-parse/re-derive when the raw cache + config are
-    # unchanged (the offline staleness key). force still re-fetches and rebuilds.
+    # The MotifsStage driver gate (its desired/actual over this fp) decides whether to build — when
+    # it calls in, we build. No internal skip: re-checking the fp here would defeat `build --force`
+    # (the driver forces the rebuild, a matching fp would silently short-circuit it). The fp is
+    # still stamped at the end so the driver sees the stage clean next run.
     current_fp = motifs_fingerprint()
     fp_path = store.motifs_dir() / ".fp"
-    if (not force and store.is_built()
-            and fp_path.exists() and fp_path.read_text(encoding="utf-8").strip() == current_fp):
-        logger.info("Motif database up to date (inputs unchanged) — skipping rebuild")
-        return
 
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
