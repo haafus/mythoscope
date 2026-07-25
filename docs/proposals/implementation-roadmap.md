@@ -37,7 +37,7 @@ is `git revert` or a recompute.
 
 ## The order — by the reversibility ladder
 
-### Stage I — Motifs stabilization *(isolated · code + additive data · nothing irreversible)*
+### Stage I — Motifs stabilization *(isolated · code + additive data · nothing irreversible)* — ✅ DONE
 
 The confidence starter: motifs are **independent of the corpus data**, so the whole `fetch-and-refresh` model is
 proven on low-stakes territory first.
@@ -112,14 +112,15 @@ tree, every region ∈ the 14 canon, name-uniqueness across region/tradition, `d
 **Review:** deep — `/code-review` the re-key script + `validate_migration.py` **before running step 12** (a bug wastes a full rebuild).
 **Dead code:** `ruff` + `vulture` sweep after the step-6 removals (`_update_traditions`, `bookTitleFromId`, generated file); confirm dynamic refs before deleting.
 
-### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)*
+### Stage IV — Part 3 stage-protocol refactor *(code-only · no data)* — ✅ DONE
 
 Consumes Part 2's fp base; presupposes Part 1. Reverts via `git`.
 
 13. Part 3 **items 1–2** — atomise stages + generic driver + retire `pipeline_inspect` / `cli._clean`
-    *(done: corpus/embeddings/graphs/projections on the driver; motifs on a coarse input-fp
-    adapter — its granular per-source split is planned in [`motifs-atomisation.md`](motifs-atomisation.md),
-    deferred until a raw-cache snapshot makes it validatable)*
+    *(✅ done: corpus/embeddings/graphs/projections **and motifs** on the driver — the motifs granular
+    per-source split ([`motifs-atomisation.md`](motifs-atomisation.md)) shipped: 7 `motifs:*` stages
+    with per-source fps, staged per-source `refresh`, the coarse `MotifsStage`/`motifs_fingerprint`
+    and the `build_motifs` orchestrator retired, golden-diff byte-identical)*
 14. Part 3 **item 5** — rewire `export_bundle` onto the driver *(done: `orphan_summary` on the driver; `mytho export [scope]`)*
 15. Part 3 **item 4** — scope (stage / variant) *(done: positional `scope` on build/status/clean/export — force-rebuilds exactly the named stage)*
 16. Part 3 **item 3** — DVC/Dagster re-eval *(done: **keep build-your-own** — [`pipeline-engine-comparison.md`](pipeline-engine-comparison.md) § Post-Part-3 decision)*

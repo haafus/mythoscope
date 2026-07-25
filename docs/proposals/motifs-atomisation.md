@@ -1,18 +1,20 @@
-# Motifs atomisation — the granular per-source split (deferred)
+# Motifs atomisation — the granular per-source split (✅ SHIPPED)
 
-Stage IV atomised corpus / embeddings / graphs / projections onto the driver. **Motifs is
-still a monolith** (`build_motifs`), fronted by a coarse input-fp gate (`motifs:` singleton,
-`motifs_fingerprint` = raw cache + config + `MOTIFS_ALGO_VERSION`, stamped to
-`outputs/motifs/.fp`). That already stops it rebuilding every run. This document is the plan
-for the full granular split into the stages the pipeline spec (§2.2) describes.
+**Status: done.** Motifs is now atomised onto the driver as **7 stages** — `motifs:source:{berezkin,
+tmi,atu}` → `motifs:crosswalk` → `motifs:parallels` / `motifs:semantic` → `motifs:meta` — each
+gating on its own fp sidecar (`.fp.<stage>`). The coarse `MotifsStage` + `motifs_fingerprint` gate
+and the monolithic `build_motifs` orchestrator are **retired** (only the `_build_*` stage helpers
+remain); each source has a staged per-source `refresh` (`mytho refresh motifs[:source:X]`). Every
+step was validated **golden-diff byte-identical** (`scripts/validate_motifs_atomisation.py`).
 
-## Why it is deferred
+The sections below are the original plan, kept as the design record; task statuses are marked inline.
 
-The split cannot be **validated** in a network-less / raw-cache-less environment: `build_motifs`
-needs either the network or a populated `outputs/motifs/raw/` scrape cache. With that cache
-present it builds offline and the core artifacts (`berezkin/tmi/atu/crosswalk/parallels.json`)
-are deterministic and golden-diffable (excluding `meta.json`'s `built_at` + the network
-best-effort enrichment fields). **Prerequisite: a raw-cache snapshot in the build environment.**
+## Why it was deferred (historical)
+
+The split could not be **validated** in a network-less / raw-cache-less environment: it needs either
+the network or a populated `outputs/motifs/raw/` scrape cache. With that cache present it builds
+offline and the core artifacts (`berezkin/tmi/atu/crosswalk/parallels.json`) are deterministic and
+golden-diffable. That prerequisite (a raw-cache snapshot) was met, and the split then landed.
 
 ## Target stages + DAG
 
