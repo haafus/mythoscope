@@ -9,8 +9,9 @@ Each stage wraps one ``build_motifs`` build function and gates on its own fp sid
 (``outputs/motifs/.fp.<stage>``): sources on their per-source raw fp (isolated, so one
 source's raw change never rebuilds another), the derived stages on a fold of their inputs'
 fps. Build stays offline — the source builds fold enrichment from the pinned raw cache and
-never re-fetch (that is ``refresh``). ``MotifsStage`` (the coarse monolith adapter) is kept
-for now and retired once these subsume it.
+never re-fetch (that is ``refresh``). These stages fully replace the old coarse ``MotifsStage``
+adapter; the ``build_motifs`` orchestrator survives only as the wholesale re-fetch helper
+(``scripts/fetch_motifs_raw.py``), not a pipeline node.
 """
 
 from __future__ import annotations
@@ -26,14 +27,8 @@ from motifs.build_motifs import (
     _build_semantic,
     _build_tmi,
     _load_config,
-    build_motifs,
 )
-from motifs.fingerprint import (
-    combine_fingerprints,
-    motifs_fingerprint,
-    semantic_fingerprint,
-    source_fingerprint,
-)
+from motifs.fingerprint import combine_fingerprints, semantic_fingerprint, source_fingerprint
 from motifs.refresh import Fetchable, RefreshResult, refresh_fetchables
 from motifs.sources import (
     ashliman,
@@ -47,33 +42,6 @@ from motifs.sources import (
 
 from ..stage import Stage
 
-_KEY = "motifs"
-
-
-class MotifsStage(Stage):
-    name = "motifs"
-    store = None  # singleton — never orphaned within the pipeline
-
-    def inputs(self) -> list[Stage]:
-        return []  # its sources are external scrapes, not the corpus
-
-    def desired(self) -> dict[str, str]:
-        return {_KEY: motifs_fingerprint()}
-
-    def actual(self) -> dict[str, str]:
-        fp_path = store.motifs_dir() / ".fp"
-        if store.is_built() and fp_path.exists():
-            return {_KEY: fp_path.read_text(encoding="utf-8").strip()}
-        return {}
-
-    def build(self, keys: set[str]) -> None:
-        build_motifs()
-
-    def delete(self, keys: set[str]) -> None:
-        pass  # singleton; never an orphan key
-
-
-# --- atomised stages ---------------------------------------------------------------------
 
 def _fp_path(name: str):
     return store.motifs_dir() / f".fp.{name}"

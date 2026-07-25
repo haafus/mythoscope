@@ -18,7 +18,6 @@ from json_utils import load_json_optional, save_json
 from settings import settings
 
 from . import crosswalk, derive, parallels, reasoned_parallels, store
-from .fingerprint import motifs_fingerprint
 from .sources import (
     ashliman,
     atu_wikidata,
@@ -351,20 +350,15 @@ def _build_meta(config: dict) -> None:
 
 
 def build_motifs(*, force: bool = False) -> None:
-    """Build the motif database, always re-parsing/regenerating from the raw cache.
+    """Build the whole motif database in one pass, re-parsing/regenerating from the raw cache —
+    the wholesale re-fetch helper behind ``scripts/fetch_motifs_raw.py``. The incremental pipeline
+    path is the atomised ``motifs:*`` stages (which call the same ``_build_*`` helpers per-stage);
+    this is the one-shot equivalent, not a driver node, so it stamps no fp gate.
 
-    Missing raw files are fetched on demand; ``force`` additionally re-fetches
-    everything that is already cached.
+    Missing raw files are fetched on demand; ``force`` additionally re-fetches everything cached.
     """
     config = _load_config()
     store.motifs_dir().mkdir(parents=True, exist_ok=True)
-
-    # The MotifsStage driver gate (its desired/actual over this fp) decides whether to build — when
-    # it calls in, we build. No internal skip: re-checking the fp here would defeat `build --force`
-    # (the driver forces the rebuild, a matching fp would silently short-circuit it). The fp is
-    # still stamped at the end so the driver sees the stage clean next run.
-    current_fp = motifs_fingerprint()
-    fp_path = store.motifs_dir() / ".fp"
 
     sources: dict[str, dict] = {}
     counts: dict[str, int] = {}
@@ -381,7 +375,6 @@ def build_motifs(*, force: bool = False) -> None:
     par_counts = _build_parallels(links)
     _build_semantic()
     _build_meta(config)
-    fp_path.write_text(current_fp, encoding="utf-8")  # stamp after a complete build → next run skips
     store.clear_cache()
 
     _log_summary(counts, links, par_counts)
