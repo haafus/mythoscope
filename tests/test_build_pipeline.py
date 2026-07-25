@@ -15,7 +15,16 @@ def test_pipeline_topo_orders_by_the_historical_sequence():
 
     ranks = [rank(n) for n in order]
     assert ranks == sorted(ranks)                 # every family in sequence
-    assert order[0] == "corpus" and order[-1] == "motifs"
+    # motifs is now the atomised sub-pipeline; meta aggregates everything, so it comes last.
+    assert order[0] == "corpus" and order[-1] == "motifs:meta"
+
+
+def test_motifs_subpipeline_orders_sources_before_crosswalk_before_meta():
+    order = [s.name for s in topo_order(build_pipeline())]
+    for src in ("berezkin", "tmi", "atu"):
+        assert order.index(f"motifs:source:{src}") < order.index("motifs:crosswalk")
+    assert order.index("motifs:crosswalk") < order.index("motifs:parallels")
+    assert order.index("motifs:parallels") < order.index("motifs:meta")
 
 
 def test_every_projection_follows_its_own_model_embeddings():

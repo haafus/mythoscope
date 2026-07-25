@@ -66,3 +66,27 @@ def source_fingerprint(source: str) -> str:
             h.update(f"|{f.relative_to(raw)}=".encode())
             h.update(f.read_bytes())
     return h.hexdigest()
+
+
+def combine_fingerprints(label: str, *fps: str) -> str:
+    """Derive a downstream stage's fp from its inputs' fps — crosswalk ⊕ its three sources,
+    parallels ⊕ crosswalk, meta ⊕ everything. Positional: pass fps in a fixed order so the
+    result is stable (callers sort when the input set is unordered)."""
+    h = hashlib.blake2b(digest_size=16)
+    h.update(f"algo={MOTIFS_ALGO_VERSION}|{label}".encode())
+    for fp in fps:
+        h.update(f"|{fp}".encode())
+    return h.hexdigest()
+
+
+def semantic_fingerprint() -> str | None:
+    """Staleness key for the semantic-parallels copy-in stage: a hash of the committed source
+    file, so the stage rebuilds when that file changes. ``None`` when it is absent (nothing to
+    copy → the stage has no desired key)."""
+    src = store.DATA_DIR / store.SEMANTIC_PARALLELS_FILE
+    if not src.exists():
+        return None
+    h = hashlib.blake2b(digest_size=16)
+    h.update(f"algo={MOTIFS_ALGO_VERSION}|semantic".encode())
+    h.update(src.read_bytes())
+    return h.hexdigest()

@@ -4,7 +4,8 @@ protocol over the existing builders. Wired together by ``build_pipeline()``."""
 from .corpus import CorpusStage
 from .embeddings import EmbeddingsStage
 from .graphs import GraphsStage
-from .motifs import MotifsStage
+from .motifs import MotifsStage, motifs_stages
 from .projections import ProjectionsStage
 
-__all__ = ["CorpusStage", "EmbeddingsStage", "GraphsStage", "MotifsStage", "ProjectionsStage"]
+__all__ = ["CorpusStage", "EmbeddingsStage", "GraphsStage", "MotifsStage", "ProjectionsStage",
+           "motifs_stages"]

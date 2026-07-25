@@ -39,15 +39,16 @@ def _baseline_path():
 
 
 def _rebuild_from_cache() -> None:
-    """Rebuild the motifs stage(s) from the raw cache. Deletes the ``.fp`` gate first: both the
-    driver's ``actual()`` and ``build_motifs``'s own internal fp check short-circuit on a matching
-    fp, so without this the "rebuild" is a silent no-op. With the gate gone the build re-derives
-    from the cache — offline (``force=False`` never re-fetches), hence deterministic. Prefix-scoped,
-    so it spans the monolith (``motifs``) and the future atomised stages (``motifs:*``)."""
+    """Rebuild the motifs stage(s) from the raw cache. Deletes every fp sidecar first: the driver's
+    ``actual()`` short-circuits on a matching fp, so without this the "rebuild" is a silent no-op.
+    With the gates gone every stage reads ``missing`` and rebuilds from the cache — offline
+    (``force=False`` never re-fetches), hence deterministic. Prefix-scoped, so it spans the monolith
+    (``motifs``) and the atomised stages (``motifs:*``)."""
     from motifs import store
     from pipeline import build, build_pipeline
 
-    (store.motifs_dir() / ".fp").unlink(missing_ok=True)  # drop the gate → force an actual rebuild
+    for fp in store.motifs_dir().glob(".fp*"):  # coarse .fp + per-stage .fp.<stage> → force a rebuild
+        fp.unlink()
     motifs = [s for s in build_pipeline() if s.name == "motifs" or s.name.startswith("motifs")]
     if not motifs:
         raise SystemExit("no motifs stage in the pipeline")

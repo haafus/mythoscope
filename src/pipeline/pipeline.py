@@ -12,7 +12,7 @@ from model_registry import embedding_variants
 from settings import settings
 
 from .stage import Stage
-from .stages import CorpusStage, EmbeddingsStage, GraphsStage, MotifsStage, ProjectionsStage
+from .stages import CorpusStage, EmbeddingsStage, GraphsStage, ProjectionsStage, motifs_stages
 from .stores import ChromaStore, FileStore
 
 
@@ -26,5 +26,5 @@ def build_pipeline() -> list[Stage]:
     # Declaration order is the topological tie-break, so it must mirror the historical order.
     stages: list[Stage] = [corpus, *emb.values()]
     stages += [ProjectionsStage(model, emb[model], proj_store) for model in emb]
-    stages += [GraphsStage(corpus), MotifsStage()]
+    stages += [GraphsStage(corpus), *motifs_stages()]
     return stages
