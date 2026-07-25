@@ -316,9 +316,14 @@ This architecture is the **target form** — converged and validated, not yet a 
    motif-specific rule. (Consequence: the region migration re-keys raw **in place** — `sha1→blake2b` rename, no
    re-fetch, no committed fallback — see `region-implementation.md` §6.)
 4. **fetch/parse split** — mechanically move parse out of the sources' current `refresh()` functions into the
-   index stages' `build` (today they conflate fetch + parse).
-5. **Edges not yet walked** — parse-root discovery (berezkin detail pages found by parsing the index) under the
-   fetch/parse split; the `mapsofmyths` POST endpoint; per-source auth; per-source validators.
+   index stages' `build` (today they conflate fetch + parse). *Still open (deferred — low near-term value; the
+   staged refresh diffs raw bytes and needs no parse).*
+5. **Edges not yet walked** — ✅ mostly done: parse-root discovery (berezkin/ashliman page trees, mapsofmyths
+   node pages via parsing the pinned `motifs_full`) is how each source's `fetchables()` enumerates; the
+   `mapsofmyths` POST endpoint rides a per-resource `Fetchable.fetch` override; per-source auth gates
+   mapsofmyths (skipped without `MAPSOFMYTHS_AUTH`); per-source validators (`valid_csv`/`valid_html`/`valid_json`
+   + wikidata's `is_healthy`) gate adopt. *Remaining:* the structured-HTML-200-error case still needs a
+   per-source structural parser (the current validators are lenient type checks).
 
 Near-term work (motifs Phases 0–5, pipeline Part 2) does **not** depend on this — it lands with the Part 3
 stage-protocol refactor.
