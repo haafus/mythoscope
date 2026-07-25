@@ -346,12 +346,14 @@ different diff than spec-vs-built, so it is a separate driver pass, not another 
 - `driver.refresh(stages, *, apply)` topo-traverses and dispatches to `isinstance(s, Refreshable)` stages;
   non-refreshable stages are skipped. Removes the hand-kept `_REFRESHERS` (the set derives from `build_pipeline()`).
 
-**Two open design calls (why it's experimental):**
+**Decided:** **no colour** — output is plain text, not `click.style`. (Today's `_refresh_documents` colouring is
+dropped in the refactor.)
 
-1. **Output.** Protocol returns `None`; each stage `print`s its own plain summary (no `click` — `src/pipeline/`
-   must not depend on the CLI framework). Trade accepted for "no colour, just console": the domain does console
-   IO, and its tests capture stdout instead of a return value. The alternative (return structured data, CLI
-   renders) is cleaner layering but needs a shared result type — see below.
+**Open design calls (why it's experimental):**
+
+1. **Where the summary is produced.** Either each stage `print`s its own plain summary (domain does console IO;
+   tests capture stdout — no `click`, so `src/pipeline/` stays CLI-framework-free), or the stage returns plain
+   lines and the CLI prints them (cleaner layering, needs a shared shape — see below). Colour is out either way.
 2. **`RefreshResult` does not generalise (today).** Its fields (`unchanged/skipped_local/changed/new/adopted/
    unreachable/degraded`, per-title, web-vs-local) are corpus's staged-per-document shape. The motifs wholesale
    stopgap cannot fill them. So `RefreshResult` stays a **corpus-internal** detail (not in the protocol); a truly
