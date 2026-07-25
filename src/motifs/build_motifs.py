@@ -41,6 +41,18 @@ _SOURCE_ENRICHMENTS = {
 }
 
 
+def _aggregate_enrichment() -> dict:
+    """Merge the per-source enrichment sidecars (task 3) into the single summary the degradation
+    guard + meta consume — the aggregation the future meta stage runs. Source/key order matches
+    the monolith's in-memory build order, so the merged dict is identical."""
+    out: dict = {}
+    for src in _SOURCE_ENRICHMENTS:
+        path = store.enrichment_path(src)
+        if path.exists():
+            out.update(json.loads(path.read_text(encoding="utf-8")))
+    return out
+
+
 def _load_config() -> dict:
     config_file = settings.config_dir / "motifs.json"
     if not config_file.exists():
@@ -304,10 +316,13 @@ def build_motifs(*, force: bool = False) -> None:
     else:
         logger.info("      + semantic parallels (BGE-M3): none (run scripts/build_semantic_parallels.py)")
 
+    # Aggregate the per-source enrichment sidecars (task 3) — what the future meta stage reads,
+    # instead of the monolith's in-memory dict. Round-trips to the same summary.
+    enrichment_agg = _aggregate_enrichment()
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "counts": counts,
-        "enrichment": enrichment,  # per-source enrichment counts (what was added)
+        "enrichment": enrichment_agg,  # per-source enrichment counts (what was added)
         "crosswalk": {
             "atu_to_tmi": len(links["atu_to_tmi"]),
             "tmi_to_atu": len(links["tmi_to_atu"]),
@@ -323,7 +338,7 @@ def build_motifs(*, force: bool = False) -> None:
     # Degradation guard: load the prior meta, carry forward the high-water marks + flags, and flag any
     # metric now below its mark. Written into meta so it is durable and self-clearing across builds.
     meta["highwater"], meta["flags"], meta["fetch_outcomes"] = _degradation_check(
-        _flat_metrics(counts, meta["crosswalk"]), enrichment, store.load_meta(), meta["built_at"])
+        _flat_metrics(counts, meta["crosswalk"]), enrichment_agg, store.load_meta(), meta["built_at"])
     if meta["flags"]:
         logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
