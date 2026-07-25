@@ -239,6 +239,91 @@ def _build_atu(config: dict, *, force: bool) -> dict:
     return {"counts": {"atu": len(atu_types)}, "sources": {}}
 
 
+def _build_crosswalk() -> dict:
+    """Build ``crosswalk.json`` from the three source indexes (reloaded + re-derived via
+    motifs.derive). Returns the links map. The future ``motifs:crosswalk`` stage."""
+    logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
+    d = derive.load_indexes()
+    links = _timed("crosswalk.build", crosswalk.build, d["atu_seq"], d["tmi_ids"], d["berezkin_motifs"],
+                   d["atu_ids"], d["atu_defining"], d["atu_aliases"], d["tmi_notes"], d["aath_to_atu"],
+                   d["atu_summaries"], d["tmi_aliases"])
+    save_json(store.crosswalk_path(), links)
+    logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI; %d TMI motifs reachable from a tale type)",
+                len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
+                len(links["atu_to_tmi_defining"]), len(links["tmi_to_atu_defining"]),
+                links["linked_tmi_count"])
+    logger.info("      Berezkin<->ATU %d/%d", len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]))
+    logger.info("      Berezkin<->TMI (direct) %d/%d", len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]))
+    logger.info("      + inline relations (each stored both ways): TMI notes → %d ATU types, "
+                "ATU summaries → %d TMI motifs", len(links["atu_to_tmi_note"]), len(links["tmi_to_atu_summary"]))
+    logger.info("      + inferred (transitive closure via low-fan-out pivots): %d edges",
+                links.get("inferred_count", 0))
+    return links
+
+
+def _build_parallels(links: dict) -> dict:
+    """Build ``parallels.json`` (heuristic look-alikes with no recorded cross-walk link) from the
+    source indexes + the cross-walk. Returns the per-tier counts. The future ``motifs:parallels``."""
+    logger.info("[5/5] Textual parallels — lexical look-alikes with no recorded link")
+    d = derive.load_indexes()
+    par = _timed("parallels.build (TF-IDF + NN)", parallels.build,
+                 d["berezkin_motifs"], d["tmi_motifs"], d["atu_types"], links)
+    if par is None:
+        logger.info("      SKIPPED (no TMI/ATU, or scikit-learn unavailable)")
+        return {}
+    save_json(store.parallels_path(), par)
+    par_counts = par["counts"]
+    logger.info("      candidates (unlinked look-alikes) — tier A / tier B; near-identical is the "
+                "strongest subset of tier A:")
+    for key, name in (("atu_tmi", "ATU~TMI     "), ("berezkin_tmi", "Berezkin~TMI"),
+                      ("berezkin_atu", "Berezkin~ATU")):
+        logger.info("        %s  %d / %d  (%d near-identical)", name,
+                    par_counts.get(f"{key}_A", 0), par_counts.get(f"{key}_B", 0),
+                    par_counts.get(f"{key}_near", 0))
+    logger.info("        three-way parallels: %d", par_counts.get("triangles", 0))
+    return par_counts
+
+
+def _build_semantic() -> None:
+    """Copy the committed, precomputed BGE-M3 semantic-parallels file into outputs. The future
+    ``motifs:semantic`` stage (copy-in mode)."""
+    sem = store.copy_semantic_parallels()
+    if sem is not None:
+        logger.info("      + semantic parallels (BGE-M3): %d pairs — precomputed, committed file copied into outputs",
+                    sem.get("counts", {}).get("pairs", 0))
+    else:
+        logger.info("      + semantic parallels (BGE-M3): none (run scripts/build_semantic_parallels.py)")
+
+
+def _build_meta(counts: dict, sources: dict, links: dict, par_counts: dict) -> None:
+    """Assemble ``meta.json``: counts, per-source enrichment (from the sidecars), cross-walk +
+    parallels tallies, provenance, and the degradation guard. The future ``motifs:meta`` stage."""
+    enrichment_agg = _aggregate_enrichment()
+    meta = {
+        "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "counts": counts,
+        "enrichment": enrichment_agg,  # per-source enrichment counts (what was added)
+        "crosswalk": {
+            "atu_to_tmi": len(links["atu_to_tmi"]),
+            "tmi_to_atu": len(links["tmi_to_atu"]),
+            "berezkin_to_atu": len(links["berezkin_to_atu"]),
+            "atu_to_berezkin": len(links["atu_to_berezkin"]),
+            "berezkin_to_tmi": len(links["berezkin_to_tmi"]),
+            "tmi_to_berezkin": len(links["tmi_to_berezkin"]),
+            "linked_tmi_count": links["linked_tmi_count"],
+        },
+        "parallels": par_counts,  # heuristic look-alikes with no recorded link
+        "sources": sources,
+    }
+    # Degradation guard: load the prior meta, carry forward the high-water marks + flags, and flag any
+    # metric now below its mark. Written into meta so it is durable and self-clearing across builds.
+    meta["highwater"], meta["flags"], meta["fetch_outcomes"] = _degradation_check(
+        _flat_metrics(counts, meta["crosswalk"]), enrichment_agg, store.load_meta(), meta["built_at"])
+    if meta["flags"]:
+        logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
+    save_json(store.meta_path(), meta)
+
+
 def build_motifs(*, force: bool = False) -> None:
     """Build the motif database, always re-parsing/regenerating from the raw cache.
 
@@ -266,85 +351,10 @@ def build_motifs(*, force: bool = False) -> None:
         counts.update(r["counts"])
         sources.update(r["sources"])
 
-    logger.info("[4/5] Cross-walk — deriving id links across the three indexes")
-    # Re-derive the crosswalk/parallels inputs by reloading the saved index JSONs (the exact path
-    # the future motifs:crosswalk / :parallels stages take), rather than threading in-memory
-    # projections. motifs.derive is deep-equal to the old inline derivation.
-    d = derive.load_indexes()
-    links = _timed("crosswalk.build", crosswalk.build, d["atu_seq"], d["tmi_ids"], d["berezkin_motifs"],
-                   d["atu_ids"], d["atu_defining"], d["atu_aliases"], d["tmi_notes"], d["aath_to_atu"],
-                   d["atu_summaries"], d["tmi_aliases"])
-    save_json(store.crosswalk_path(), links)
-    logger.info("      ATU<->TMI %d/%d (+%d defining motifs → %d TMI; %d TMI motifs reachable from a tale type)",
-                len(links["atu_to_tmi"]), len(links["tmi_to_atu"]),
-                len(links["atu_to_tmi_defining"]), len(links["tmi_to_atu_defining"]),
-                links["linked_tmi_count"])
-    logger.info("      Berezkin<->ATU %d/%d",
-                len(links["berezkin_to_atu"]), len(links["atu_to_berezkin"]))
-    logger.info("      Berezkin<->TMI (direct) %d/%d",
-                len(links["berezkin_to_tmi"]), len(links["tmi_to_berezkin"]))
-    logger.info("      + inline relations (each stored both ways): TMI notes → %d ATU types, "
-                "ATU summaries → %d TMI motifs",
-                len(links["atu_to_tmi_note"]), len(links["tmi_to_atu_summary"]))
-    logger.info("      + inferred (transitive closure via low-fan-out pivots): %d edges",
-                links.get("inferred_count", 0))
-
-    # --- [5/5] Textual parallels: a heuristic suggestion layer (lexical title +
-    #     description matching) surfacing look-alike motifs with *no* recorded
-    #     cross-walk link — hints for review, kept apart from the curated links. ---
-    logger.info("[5/5] Textual parallels — lexical look-alikes with no recorded link")
-    par = _timed("parallels.build (TF-IDF + NN)", parallels.build,
-                 d["berezkin_motifs"], d["tmi_motifs"], d["atu_types"], links)
-    if par is None:
-        logger.info("      SKIPPED (no TMI/ATU, or scikit-learn unavailable)")
-        par_counts = {}
-    else:
-        save_json(store.parallels_path(), par)
-        par_counts = par["counts"]
-        logger.info("      candidates (unlinked look-alikes) — tier A / tier B; near-identical is the "
-                    "strongest subset of tier A:")
-        for key, name in (("atu_tmi", "ATU~TMI     "), ("berezkin_tmi", "Berezkin~TMI"),
-                          ("berezkin_atu", "Berezkin~ATU")):
-            logger.info("        %s  %d / %d  (%d near-identical)", name,
-                        par_counts.get(f"{key}_A", 0), par_counts.get(f"{key}_B", 0),
-                        par_counts.get(f"{key}_near", 0))
-        logger.info("        three-way parallels: %d", par_counts.get("triangles", 0))
-
-    # Semantic parallels (BGE-M3) are precomputed offline (scripts/build_semantic_parallels.py)
-    # and shipped as a committed file; copy it into outputs so this build serves it.
-    sem = store.copy_semantic_parallels()
-    if sem is not None:
-        logger.info("      + semantic parallels (BGE-M3): %d pairs — precomputed, committed file copied into outputs",
-                    sem.get("counts", {}).get("pairs", 0))
-    else:
-        logger.info("      + semantic parallels (BGE-M3): none (run scripts/build_semantic_parallels.py)")
-
-    # Aggregate the per-source enrichment sidecars (task 3) — what the future meta stage reads,
-    # instead of the monolith's in-memory dict. Round-trips to the same summary.
-    enrichment_agg = _aggregate_enrichment()
-    meta = {
-        "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "counts": counts,
-        "enrichment": enrichment_agg,  # per-source enrichment counts (what was added)
-        "crosswalk": {
-            "atu_to_tmi": len(links["atu_to_tmi"]),
-            "tmi_to_atu": len(links["tmi_to_atu"]),
-            "berezkin_to_atu": len(links["berezkin_to_atu"]),
-            "atu_to_berezkin": len(links["atu_to_berezkin"]),
-            "berezkin_to_tmi": len(links["berezkin_to_tmi"]),
-            "tmi_to_berezkin": len(links["tmi_to_berezkin"]),
-            "linked_tmi_count": links["linked_tmi_count"],
-        },
-        "parallels": par_counts,  # heuristic look-alikes with no recorded link
-        "sources": sources,
-    }
-    # Degradation guard: load the prior meta, carry forward the high-water marks + flags, and flag any
-    # metric now below its mark. Written into meta so it is durable and self-clearing across builds.
-    meta["highwater"], meta["flags"], meta["fetch_outcomes"] = _degradation_check(
-        _flat_metrics(counts, meta["crosswalk"]), enrichment_agg, store.load_meta(), meta["built_at"])
-    if meta["flags"]:
-        logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
-    save_json(store.meta_path(), meta)
+    links = _build_crosswalk()
+    par_counts = _build_parallels(links)
+    _build_semantic()
+    _build_meta(counts, sources, links, par_counts)
     fp_path.write_text(current_fp, encoding="utf-8")  # stamp after a complete build → next run skips
     store.clear_cache()
 
