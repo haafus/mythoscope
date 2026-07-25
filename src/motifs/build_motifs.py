@@ -14,7 +14,7 @@ import logging
 import time
 from datetime import datetime, timezone
 
-from json_utils import save_json
+from json_utils import load_json_optional, save_json
 from settings import settings
 
 from . import crosswalk, derive, parallels, reasoned_parallels, store
@@ -295,9 +295,35 @@ def _build_semantic() -> None:
         logger.info("      + semantic parallels (BGE-M3): none (run scripts/build_semantic_parallels.py)")
 
 
-def _build_meta(counts: dict, sources: dict, links: dict, par_counts: dict) -> None:
+def _meta_counts_sources(config: dict) -> tuple[dict, dict]:
+    """Re-derive meta's ``counts`` (index sizes) and ``sources`` (provenance) from the stored
+    indexes + config, in the monolith's build order — so the meta aggregator needs no in-memory
+    handoff from the source builds. Only enabled sources contribute, matching ``_build_*``."""
+    counts: dict[str, int] = {}
+    sources: dict[str, dict] = {}
+    bz = config.get("berezkin", {})
+    if bz.get("enabled", True):
+        counts["berezkin"] = len((store.load_index("berezkin") or {}).get("motifs", []))
+        sources["berezkin"] = {"homepage": bz.get("homepage", "areasofmyths.com"),
+                               "attribution": bz.get("attribution", "")}
+    tr = config.get("trilogy", {})
+    if tr.get("enabled", True):
+        counts["tmi"] = len((store.load_index("tmi") or {}).get("motifs", []))
+        sources["trilogy"] = {"homepage": tr.get("homepage", ""), "attribution": tr.get("attribution", "")}
+        mel = config.get("mellmann", {})
+        if mel.get("enabled", False):
+            sources["mellmann"] = {"homepage": mel.get("homepage", ""), "attribution": mel.get("attribution", "")}
+        counts["atu"] = len((store.load_index("atu") or {}).get("types", []))
+    return counts, sources
+
+
+def _build_meta(config: dict) -> None:
     """Assemble ``meta.json``: counts, per-source enrichment (from the sidecars), cross-walk +
-    parallels tallies, provenance, and the degradation guard. The future ``motifs:meta`` stage."""
+    parallels tallies, provenance, and the degradation guard. The future ``motifs:meta`` stage —
+    reads everything it aggregates from disk (indexes, sidecars, crosswalk/parallels JSON)."""
+    counts, sources = _meta_counts_sources(config)
+    links = load_json_optional(store.crosswalk_path()) or {}
+    par_counts = (load_json_optional(store.parallels_path()) or {}).get("counts", {})
     enrichment_agg = _aggregate_enrichment()
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -354,7 +380,7 @@ def build_motifs(*, force: bool = False) -> None:
     links = _build_crosswalk()
     par_counts = _build_parallels(links)
     _build_semantic()
-    _build_meta(counts, sources, links, par_counts)
+    _build_meta(config)
     fp_path.write_text(current_fp, encoding="utf-8")  # stamp after a complete build → next run skips
     store.clear_cache()
 
