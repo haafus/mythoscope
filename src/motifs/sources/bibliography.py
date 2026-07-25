@@ -24,7 +24,7 @@ from pathlib import Path
 from settings import settings
 
 from ..refresh import Fetchable
-from .fetch import fetch_text, raw_dir
+from .fetch import fetch_text, raw_dir, valid_html
 
 logger = logging.getLogger(__name__)
 
@@ -233,7 +233,8 @@ def out_path() -> Path:
 
 def fetchables() -> list[Fetchable]:
     """The one folkmasa bibliography page."""
-    return [Fetchable("folkmasa_bibliography.html", SOURCE_URL, raw_dir() / "folkmasa_bibliography.html")]
+    return [Fetchable("folkmasa_bibliography.html", SOURCE_URL,
+                      raw_dir() / "folkmasa_bibliography.html", validate=valid_html)]
 
 
 def refresh(tmi_records: list[dict], *, force: bool = False) -> dict:

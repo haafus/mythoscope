@@ -35,7 +35,7 @@ from settings import settings
 
 from ..refresh import Fetchable
 from . import berezkin
-from .fetch import fetch_text, raw_dir
+from .fetch import fetch_text, raw_dir, valid_html
 
 logger = logging.getLogger(__name__)
 
@@ -261,7 +261,8 @@ def out_path() -> Path:
 def fetchables() -> list[Fetchable]:
     """The one bibliography page (areasofmyths.com/biblio.html); the citation→region linkage it
     feeds is re-derived from the already-pinned detail pages, so nothing else is fetched here."""
-    return [Fetchable("berezkin/biblio.html", f"{BASE}/biblio.html", raw_dir() / "berezkin" / "biblio.html")]
+    return [Fetchable("berezkin/biblio.html", f"{BASE}/biblio.html",
+                      raw_dir() / "berezkin" / "biblio.html", validate=valid_html)]
 
 
 def refresh(motifs: list[dict], *, force: bool = False) -> dict:

@@ -41,6 +41,7 @@ def _urls(fetchables):
 
 def test_berezkin_owns_areal_pages_plus_mapsofmyths_and_bibliography(tmp_path, monkeypatch):
     _tree(tmp_path, monkeypatch)
+    monkeypatch.setenv("MAPSOFMYTHS_AUTH", "user:pass")    # mapsofmyths folds in only under credentials
     urls = _urls(BerezkinSource().fetchables())
     assert urls["berezkin/index-left.html"] == "http://areasofmyths.com/index-left.html"
     assert urls["berezkin/k103.html"] == "http://areasofmyths.com/k103.html"
@@ -76,3 +77,48 @@ def test_every_pinned_file_is_covered_once_across_sources(tmp_path, monkeypatch)
     enumerated_pinned = [c for c in enumerated if c in pinned]
     assert set(enumerated_pinned) == pinned
     assert len(enumerated_pinned) == len(pinned)           # no double-claim
+
+
+# --- #3 validators + #4 mapsofmyths credential gate ------------------------------------------
+
+def test_content_validators():
+    from motifs.sources.fetch import valid_csv, valid_html, valid_json
+
+    assert valid_html(b"<html><body>x</body></html>")
+    assert not valid_html(b"") and not valid_html(b"not found: plain error, no markup")
+
+    assert valid_csv(b"a,b,c\n1,2,3\n")
+    assert not valid_csv(b"<!DOCTYPE html><html>error</html>")   # CSV url returned HTML
+    assert not valid_csv(b"a,b,c\n") and not valid_csv(b"")      # header only / empty
+
+    assert valid_json(b'{"markers": []}')
+    assert not valid_json(b"<html>oops</html>")
+
+
+def test_fetchables_carry_typed_validators(tmp_path, monkeypatch):
+    _tree(tmp_path, monkeypatch)
+    from motifs.sources.fetch import valid_csv, valid_html
+    tmi = {f.title: f.validate for f in TmiSource().fetchables()}
+    assert tmi["trilogy/tmi.csv"] is valid_csv and tmi["mellmann/tmi.csv"] is valid_csv
+    assert tmi["folkmasa_bibliography.html"] is valid_html
+    berezkin = {f.title: f.validate for f in BerezkinSource().fetchables()}
+    assert berezkin["berezkin/k103.html"] is valid_html
+
+
+def test_mapsofmyths_skipped_without_credentials(tmp_path, monkeypatch):
+    _tree(tmp_path, monkeypatch)
+    monkeypatch.delenv("MAPSOFMYTHS_AUTH", raising=False)
+    # its enrichment is credential-gated → no fetchables enter berezkin's refresh (no false degradeds)
+    assert not any(f.title.startswith("mapsofmyths/") for f in BerezkinSource().fetchables())
+
+
+def test_mapsofmyths_enumerated_with_credentials(tmp_path, monkeypatch):
+    _tree(tmp_path, monkeypatch)
+    monkeypatch.setenv("MAPSOFMYTHS_AUTH", "user:pass")
+    from motifs.sources import mapsofmyths
+    from motifs.sources.fetch import valid_html
+    fs = mapsofmyths.fetchables()                          # listing pages always enumerated under auth
+    titles = {f.title for f in fs}
+    assert "mapsofmyths/motifs_full.html" in titles and "mapsofmyths/traditions_full.html" in titles
+    assert all(f.auth == ("user", "pass") for f in fs)
+    assert next(f for f in fs if f.title.endswith("motifs_full.html")).validate is valid_html

@@ -28,7 +28,7 @@ from pathlib import Path
 from settings import settings
 
 from ..refresh import Fetchable
-from .fetch import fetch_text, raw_dir
+from .fetch import fetch_text, raw_dir, valid_html, valid_json
 
 logger = logging.getLogger(__name__)
 
@@ -200,13 +200,22 @@ def _marker_fetch(node: str, auth: tuple[str, str] | None):
 def fetchables() -> list[Fetchable]:
     """Everything mapsofmyths has pinned: the two listing pages (GET), each motif's node page
     (parse-discovered from the pinned ``motifs_full`` listing → ``BASE + href``), and the per-node
-    marker replies (a POST endpoint, so each carries a ``fetch`` override). Credential-gated: with
-    no auth the GETs 401 and are kept-pinned, exactly as the network-gated build behaves."""
+    marker replies (a POST endpoint, so each carries a ``fetch`` override).
+
+    Credential-gated: every endpoint needs ``MAPSOFMYTHS_AUTH``. Without it the whole source is
+    **skipped** (return nothing) rather than enumerated — else refresh would report thousands of
+    false ``degraded`` rows for 401s it could never have avoided, drowning the real signal. This
+    mirrors the build side (``refresh`` → ``skipped-no-credentials``)."""
     auth = _auth()
+    if not auth:
+        logger.warning("mapsofmyths: no MAPSOFMYTHS_AUTH — skipping refresh of its credential-gated "
+                       "pages (set MAPSOFMYTHS_AUTH=user:pass to re-check them)")
+        return []
     root = raw_dir() / "mapsofmyths"
-    out = [Fetchable("mapsofmyths/motifs_full.html", f"{BASE}/motifs_full", root / "motifs_full.html", auth=auth),
+    out = [Fetchable("mapsofmyths/motifs_full.html", f"{BASE}/motifs_full", root / "motifs_full.html",
+                     auth=auth, validate=valid_html),
            Fetchable("mapsofmyths/traditions_full.html", f"{BASE}/traditions_full",
-                     root / "traditions_full.html", auth=auth)]
+                     root / "traditions_full.html", auth=auth, validate=valid_html)]
     seen: set[str] = set()
     mf = root / "motifs_full.html"
     if mf.exists():
@@ -219,13 +228,14 @@ def fetchables() -> list[Fetchable]:
                 continue
             seen.add(node_id)
             url = href if href.startswith("http") else f"{BASE}{href}"
-            out.append(Fetchable(f"mapsofmyths/node_{node_id}.html", url, root / f"node_{node_id}.html", auth=auth))
+            out.append(Fetchable(f"mapsofmyths/node_{node_id}.html", url, root / f"node_{node_id}.html",
+                                 auth=auth, validate=valid_html))
     markers = root / "markers"
     if markers.exists():
         for m in sorted(markers.glob("markers_*.json")):
             node = m.name[len("markers_"):-len(".json")]
             out.append(Fetchable(f"mapsofmyths/markers/{m.name}", f"{BASE}/gmap-markers-tradition#{node}",
-                                 m, auth=auth, fetch=_marker_fetch(node, auth)))
+                                 m, auth=auth, fetch=_marker_fetch(node, auth), validate=valid_json))
     return out
 
 

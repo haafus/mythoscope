@@ -20,7 +20,7 @@ from settings import settings
 from ..refresh import Fetchable
 from . import atu_regions
 from .culture_dict import build_legend
-from .fetch import fetch_to_cache, raw_dir
+from .fetch import fetch_to_cache, raw_dir, valid_csv
 from .tmi_notes import parse_notes
 
 logger = logging.getLogger(__name__)
@@ -185,12 +185,14 @@ def fetchables(config: dict, kind: str) -> list[Fetchable]:
     classification-headings CSV (fetched by the same ``_read_csv``, under its own base)."""
     tr = config["trilogy"]
     base, files = tr["base_url"].rstrip("/"), tr["files"]
-    out = [Fetchable(f"trilogy/{files[k]}", f"{base}/{files[k]}", raw_dir() / "trilogy" / files[k])
+    out = [Fetchable(f"trilogy/{files[k]}", f"{base}/{files[k]}", raw_dir() / "trilogy" / files[k],
+                     validate=valid_csv)
            for k in _KIND_FILES[kind]]
     mel = config.get("mellmann", {})
     if kind == "tmi" and mel.get("base_url"):
         fn = mel.get("files", {}).get("tmi", "tmi.csv")
-        out.append(Fetchable(f"mellmann/{fn}", f"{mel['base_url'].rstrip('/')}/{fn}", raw_dir() / "mellmann" / fn))
+        out.append(Fetchable(f"mellmann/{fn}", f"{mel['base_url'].rstrip('/')}/{fn}",
+                             raw_dir() / "mellmann" / fn, validate=valid_csv))
     return out
 
 
