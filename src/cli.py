@@ -78,8 +78,8 @@ def server(host: str | None, port: int | None):
 @click.option("--force", "-f", is_flag=True, help="Force regeneration of all steps.")
 @click.option("--sample", "-s", is_flag=False, flag_value=str(SAMPLE_MAX_TEXTS), default=None,
               type=int, metavar="N",
-              help=f"Quick end-to-end run over the first N documents (default {SAMPLE_MAX_TEXTS} "
-                   f"when given bare, e.g. -s 50 for more). Caps the corpus; embeddings/graphs follow.")
+              help=f"Quick smoke run: cap EVERY stage's build to at most N elements (default "
+                   f"{SAMPLE_MAX_TEXTS} when given bare, e.g. -s 50 for more).")
 def build(scope, force, sample):
     """Run the pipeline: build everything missing or stale (``--force`` rebuilds all).
 
@@ -89,27 +89,23 @@ def build(scope, force, sample):
     regardless. Upstream is not rebuilt, and the downstream cascade is left for a plain
     ``mytho build``.
 
-    ``--sample N`` caps the corpus to N documents for a quick end-to-end smoke run; the fan-out
-    stages downstream follow that count automatically (non-destructive — it never deletes the
-    documents it skips)."""
+    ``--sample N`` caps every stage's per-run build to at most N elements (quick smoke run;
+    non-destructive)."""
     from pipeline import build as run_pipeline
 
     stages, targets = _scoped_pipeline(scope)
     if sample is not None:
-        click.echo(click.style(f"[sample] first {sample} document(s)", fg="yellow"))
+        click.echo(click.style(f"[sample] at most {sample} element(s) per stage", fg="yellow"))
 
     start = time.monotonic()
     try:
-        # Scope restricts WHICH stages build; --force (separate) decides whether to ignore the
-        # fingerprint gate. A param/algo change invalidates a stage via its fp, so a scoped
-        # build rebuilds it without --force. --sample caps the corpus doc count.
         plans = run_pipeline(stages, force=force, targets=targets, sample=sample)
     except Exception as e:
         _fail("Build", e)
     for p in plans:
         n = len(p.stage.desired()) if force else len(p.to_build)
-        if sample is not None and p.stage.sampleable:
-            n = min(n, sample)  # the driver capped this stage's build; report what it built
+        if sample is not None:
+            n = min(n, sample)
         if n:
             click.echo(f"  {p.stage.name}: {n} built")
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")

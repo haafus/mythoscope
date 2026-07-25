@@ -85,13 +85,9 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
     if stale (a scoped ``build X`` does X and nothing else; a full ``build`` cascades). ``None``
     builds every stage.
 
-    ``sample`` (a doc-count smoke throttle) caps the per-run build of the ``sampleable`` stage
-    (the corpus root) to at most N keys — a quick end-to-end run over N documents. It limits
-    *throughput*, not the spec: ``desired()`` is untouched, so the unbuilt keys stay ``missing``
-    (not orphan) and a later full ``build`` simply completes them — no re-fetch, no churn. Plans
-    are computed per stage after its upstream builds, so the fan-out stages downstream of the
-    capped corpus see only N documents and follow automatically; ``sample`` is applied to the
-    root alone.
+    ``sample`` caps every stage's per-run build to at most N keys. Throughput only: ``desired()``
+    is untouched, so skipped keys stay ``missing`` (not orphan) and a later full ``build``
+    completes them. Single-key stages (projections/motifs) are unaffected (``[:N≥1]`` is a no-op).
 
     ``build`` is offline: a stage acquires missing inputs from its own pinned cache, never the
     network — re-fetching is the separate ``refresh`` path."""
@@ -101,8 +97,8 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
             continue  # in the list only to wire/order the targets — not itself requested
         p = plan(stage)
         todo = set(stage.desired()) if force else p.to_build
-        if sample is not None and stage.sampleable:
-            todo = set(sorted(todo)[:sample])  # cap the root; downstream follows via its fps
+        if sample is not None:
+            todo = set(sorted(todo)[:sample])
         if todo:
             stage.build(todo)
         acted.append(p)
