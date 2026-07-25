@@ -355,27 +355,30 @@ dropped in the refactor.)
 |---|---|
 | 1 · resource | the resource name |
 | 2 · status | one exact expression, no parentheses, no explanation: `not changed` \| `changed` \| `degraded` \| `gone` \| `new` |
-| 3 · action | the decision taken: `keep cached` \| `acquire on apply` \| `flagged for review` |
+| 3 · action | the decision taken: `keep cached` \| `acquire on apply` \| `adopt on apply` |
 
 Status → action mapping:
 
 - `not changed` / `degraded` / `gone` → **keep cached** (the pinned copy stands; a bad/absent upstream never overwrites it)
 - `new` → **acquire on apply**
-- `changed` → **flagged for review** (recorded as a §5 flag, not auto-adopted)
+- `changed` → **adopt on apply** (review the diff, then `--apply` promotes the new bytes to pinned raw)
 
-The "review record" is the **flag** (§5) — a durable needs-review entry in the stage's own metadata (`meta.flags`).
-**Partly real, mostly designed:** only motifs writes `meta.flags`/`fetch_outcomes` (into `outputs/motifs/meta.json`),
-and only the aggregate `yield-drop` is actually raised; the per-resource `changed`/`gone`/`degraded` refresh flags
-this table needs are **not built** (see the `build_motifs.py` comment — they are refresh-time, deferred).
+**Decided — refresh is ephemeral, no durable needs-review record (no flag/manifest).** `refresh` is synchronous and
+human-initiated (you read the table now and decide), and its state is recomputable — re-running re-derives the diff
+from upstream vs pinned raw, so a pending `changed` simply re-appears each run. Persisting it would only cache a
+derivable fact. So there is **no** per-resource refresh flag and **no** corpus `meta.json` — corpus needs neither
+(it has no silent-yield degradation; a shortfall shows as `missing` in `status`).
 
-**Open — where corpus flags live.** Corpus has **no** `meta.json` today (its metadata is the per-document
-`corpus.json` catalog), so there is no `meta.flags` home for it. Either give corpus its own
-`outputs/corpus/meta.json` (symmetric to motifs) or fold the flags into `corpus.json`. TBD.
+Durable **flags stay scoped to build-time silent degradation only** — `yield-drop` / `discovery-shrank`, which fire
+during a normal `build` when no human is watching and the console scrolls away. That is the one case persistence
+earns its keep, and it already exists in `outputs/motifs/meta.json` (§5). The refresh-time `changed`/`gone`/`degraded`
+flag kinds sketched in §5 are **dropped** — superseded by this ephemeral-refresh decision.
 
 Footer, in order:
 
-1. **total** resources checked;
-2. how many were **flagged for review** and where the flags live (the stage's `meta.flags`, §5);
+1. **total** resources checked (with the per-status tally);
+2. how many were **kept pinned** (degraded/gone that need attention), so a run is never summarised as "all clear"
+   when a source is unhealthy;
 3. the **`--apply`** line (what re-running with `--apply` will do).
 
 `degraded`/`gone` collapse the current reason detail (`empty-body`, `gone-404`) into the single status word, as
