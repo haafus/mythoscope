@@ -323,10 +323,17 @@ This architecture is the **target form** — converged and validated, not yet a 
 Near-term work (motifs Phases 0–5, pipeline Part 2) does **not** depend on this — it lands with the Part 3
 stage-protocol refactor.
 
-## 9. Experimental design — `refresh` on the driver (NOT a settled decision, do not build yet)
+## 9. Per-source staged refresh for motifs — IMPLEMENTED
 
-**Status:** experimental sketch. Not decided, not started. Records a direction discussed while cleaning up the
-CLI; the current shape (CLI functions + the `_REFRESHERS` map in `cli.py`) stays until this is accepted.
+**Status:** shipped for the motif sources (the output format below), on the atomised `motifs:source:*`
+stages rather than the `Refreshable`-on-driver sketch. `motifs/refresh.py` is the staged engine
+(diff fresh-vs-pinned → §9 status → keep-pinned → adopt on `--apply`); each source module owns its
+own `fetchables()`, each `SourceStage.refresh()` composes them, and `mytho refresh motifs[:source:X]`
+fans out per-source (`cli._refresh_motifs` / `_render_refresh_table`). Corpus refresh is unchanged
+(`corpus/refresh.py`). The `Refreshable` protocol / driver-pass framing below was **not** adopted —
+per-source stage methods + a CLI dispatcher proved simpler; the table format and ephemerality *were*.
+
+**Original sketch (framing not adopted, kept for context):**
 
 **Idea.** Make `refresh` a driver-orchestrated operation, parallel to `build`/`status`/`clean` — but *not* a
 consumer of the `desired()`/`actual()` diff. Its comparison is **fresh-download vs pinned raw** (upstream), a

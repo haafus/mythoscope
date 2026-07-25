@@ -62,32 +62,37 @@ So the concrete tasks:
    stored JSONs. ✅ **DONE** — `motifs.derive` (`derived_from_indexes` / `load_indexes`),
    validated **deep-equal** to the monolith's inline derivation on the real indexes. Not yet
    wired into `build_motifs` (that happens with the split, so it can be rebuild-validated).
-3. **Persist enrichment summaries** per source (skip status + counts) so the `meta` stage can
-   aggregate them and the degradation guard's `trusted`/`fetch_outcomes` survive the split —
-   today they live only in `meta.json`, written by the monolith. *(Deferred to the split: it
-   changes each source's output format, so it needs a rebuild to validate.)*
-4. **Partition the raw cache by source** for the per-source fps (each source knows its own
-   file patterns under `outputs/motifs/raw/`).
-5. **`meta` as a final aggregator stage** — reads each stage's output for counts + the
-   degradation guard (which already reads the prior meta from disk — `store.load_meta()` — so
-   the "read past state from disk" shape fits).
-6. Retire the monolith `build_motifs` (and the coarse `motifs_fingerprint` gate) once the
-   per-stage fps subsume it; the `MotifsStage` adapter is replaced by the stages above and the
-   driver wiring in `build_pipeline()` does not otherwise change.
-7. **Per-source staged `refresh`** — give each `motifs:source:*` stage an `acquire`/`refresh`
-   (the `upstream` capability, `fetch-and-refresh.md` §7) so `mytho refresh motifs` becomes a
-   per-source diff/preview/adopt with keep-pinned, exactly like `refresh documents` today —
-   replacing the crude wholesale re-scrape (`build_motifs(force=True)`) the current
-   `_refresh_motifs` stopgap runs. Belongs here because there is no source *unit* to
-   stage-refresh until the sources are stages; building it earlier would duplicate that
-   structure.
+3. **Persist enrichment summaries** per source (skip status + counts). ✅ **DONE** — each source
+   writes a `<source>.enrichment.json` sidecar; `_aggregate_enrichment` merges them for the meta
+   degradation guard (`trusted`/`fetch_outcomes`).
+4. **Partition the raw cache by source** for the per-source fps. ✅ **DONE** — `fingerprint._SOURCE_RAW`
+   + `source_fingerprint(source)` hash only that source's raw slice + config + algo; isolated so
+   one source's change never moves another's.
+5. **`meta` as a final aggregator stage**. ✅ **DONE** — `_build_meta` recomputes counts/sources from
+   the indexes + config and reads crosswalk/parallels tallies from disk; no in-memory handoff.
+6. **Author the stages + retire the coarse gate.** ✅ **DONE** — `SourceStage`×3 (self-contained
+   `BerezkinSource`/`TmiSource`/`AtuSource`) → `CrosswalkStage` → `ParallelsStage`/`SemanticStage`
+   → `MetaStage`, each gating on its own `.fp.<stage>` sidecar, wired via `motifs_stages()`. The
+   coarse `MotifsStage` + `motifs_fingerprint` are removed. **Partial:** the `build_motifs`
+   *orchestrator* survives as the wholesale re-fetch helper (`scripts/fetch_motifs_raw.py`) — fully
+   removing it needs the parse-discovery-on-refresh edge below (§8), since it is the only path that
+   fetches parse-discovered pages (berezkin details, ashliman/mapsofmyths nodes) in one pass.
+7. **Per-source staged `refresh`**. ✅ **DONE** — `motifs/refresh.py` (staged diff/keep-pinned/adopt
+   over `Fetchable` descriptors), each source module owns its own `fetchables()` (decentralised, so
+   a module can be dropped and forgotten), each `SourceStage.refresh()` composes only the modules it
+   owns, and `mytho refresh motifs[:source:X]` fans out per-source with the §9 table. Replaces the
+   wholesale `build_motifs(force=True)` stopgap.
 
-**Prep done now (validatable without a raw cache):** tasks 1 + 2. **Remaining (need the raw
-cache to rebuild + golden-diff):** 3–7.
+**All done.** Remaining edge (§8, `fetch-and-refresh.md`): the golden validator's rebuild is not
+fully offline for **ashliman** (its `discover_site_types` fetches discovery pages live and writes
+them into the "pinned" cache, so `atu.json` can drift across network conditions — re-snapshot after
+the cache settles). Fully retiring the `build_motifs` orchestrator waits on making parse-discovered
+fetch fully pinnable so refresh alone can cold-acquire a source.
 
 ## Validation
 
 With a raw cache present: `golden_diff snapshot` → refactor → `golden_diff assert`, dropping
 `meta.json`'s `built_at` and the network best-effort enrichment fields (as the corpus catalog
 drops `date_downloaded` / `source_fp`). The deterministic core (`berezkin/tmi/atu/crosswalk/
-parallels.json`) must be byte-identical.
+parallels.json`) must be byte-identical — validated byte-identical through every step above
+(`scripts/validate_motifs_atomisation.py`).
