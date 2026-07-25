@@ -60,12 +60,18 @@ def _components(scope=None) -> list[tuple[str, Path, str]]:
     return comps
 
 
+def _is_staging(rel: Path) -> bool:
+    """Validate-before-commit staging files (``.partial``/``.tmp``) — normally consumed by
+    ``os.replace``, but a crash mid-write can leave one behind. Crash debris, never a product:
+    excluded from EVERY bundle, including ``--caches`` (unlike the raw/cache tiers)."""
+    return rel.suffix in (".partial", ".tmp")
+
+
 def _is_cache(component: str, rel: Path) -> bool:
-    # outputs/motifs/raw/** is the scrape cache; the jsonl files are resumable caches;
-    # *.partial are validate-before-commit staging files (normally consumed by os.replace,
-    # but a crash mid-write can leave one behind — never ship staging as a product).
+    # outputs/motifs/raw/** is the scrape cache; the jsonl files are resumable caches. Both are the
+    # "raw/cache tier" — shipped only with --caches. (Staging debris is handled by _is_staging.)
     in_raw_dir = component == "motifs" and bool(rel.parts) and rel.parts[0] == _RAW_DIR_NAME
-    return rel.name in _CACHE_FILENAMES or in_raw_dir or rel.suffix in (".partial", ".tmp")
+    return rel.name in _CACHE_FILENAMES or in_raw_dir
 
 
 @dataclass
@@ -137,6 +143,8 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
             if not file.is_file():
                 continue
             rel = file.relative_to(src)
+            if _is_staging(rel):
+                continue   # crash debris — never ship, even with --caches
             if not include_caches and _is_cache(name, rel):
                 continue
             size = file.stat().st_size
