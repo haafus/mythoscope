@@ -1,9 +1,10 @@
-"""Orchestrate the motif-database build step.
+"""The per-stage build helpers for the motif database.
 
-Reads ``config/motifs.json``, scrapes/downloads each enabled source into the
-resumable raw cache, parses them into per-index JSON, derives the cross-walk and
-writes a manifest. Re-parses and regenerates every time it runs, reusing the raw
-cache (downloading only what's missing); ``force`` re-fetches every raw source.
+Each ``_build_*`` reads ``config/motifs.json``, parses one source (or derives the cross-walk /
+parallels / meta) from the resumable raw cache — acquiring only what's missing — and writes its
+JSON. The atomised ``motifs:*`` pipeline stages (``pipeline.stages.motifs``) wrap these one-to-one;
+there is no longer a monolithic orchestrator (the driver sequences the stages instead). ``_log_summary``
+renders the final cross-index rollup the ``motifs:meta`` stage logs.
 """
 
 from __future__ import annotations
@@ -316,10 +317,11 @@ def _meta_counts_sources(config: dict) -> tuple[dict, dict]:
     return counts, sources
 
 
-def _build_meta(config: dict) -> None:
+def _build_meta(config: dict) -> tuple[dict, dict, dict]:
     """Assemble ``meta.json``: counts, per-source enrichment (from the sidecars), cross-walk +
-    parallels tallies, provenance, and the degradation guard. The future ``motifs:meta`` stage —
-    reads everything it aggregates from disk (indexes, sidecars, crosswalk/parallels JSON)."""
+    parallels tallies, provenance, and the degradation guard. The ``motifs:meta`` stage — reads
+    everything it aggregates from disk (indexes, sidecars, crosswalk/parallels JSON). Returns
+    ``(counts, links, par_counts)`` so the stage can log the final cross-index summary."""
     counts, sources = _meta_counts_sources(config)
     links = load_json_optional(store.crosswalk_path()) or {}
     par_counts = (load_json_optional(store.parallels_path()) or {}).get("counts", {})
@@ -347,37 +349,7 @@ def _build_meta(config: dict) -> None:
     if meta["flags"]:
         logger.warning("motif build: %d yield-drop flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
-
-
-def build_motifs(*, force: bool = False) -> None:
-    """Build the whole motif database in one pass, re-parsing/regenerating from the raw cache —
-    the wholesale re-fetch helper behind ``scripts/fetch_motifs_raw.py``. The incremental pipeline
-    path is the atomised ``motifs:*`` stages (which call the same ``_build_*`` helpers per-stage);
-    this is the one-shot equivalent, not a driver node, so it stamps no fp gate.
-
-    Missing raw files are fetched on demand; ``force`` additionally re-fetches everything cached.
-    """
-    config = _load_config()
-    store.motifs_dir().mkdir(parents=True, exist_ok=True)
-
-    sources: dict[str, dict] = {}
-    counts: dict[str, int] = {}
-    logger.info("=== Building the motif database: 3 indexes (Berezkin, TMI, ATU) + cross-walk ===")
-
-    # Build the three source indexes — each writes its JSON + enrichment sidecar; crosswalk/parallels
-    # then reload them via motifs.derive. These are the future motifs:source:* stages.
-    for build_source in (_build_berezkin, _build_tmi, _build_atu):
-        r = build_source(config, force=force)
-        counts.update(r["counts"])
-        sources.update(r["sources"])
-
-    links = _build_crosswalk()
-    par_counts = _build_parallels(links)
-    _build_semantic()
-    _build_meta(config)
-    store.clear_cache()
-
-    _log_summary(counts, links, par_counts)
+    return counts, links, par_counts
 
 
 def _edge_set(fwd: dict) -> set:

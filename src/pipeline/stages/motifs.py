@@ -5,13 +5,12 @@
     source:atu      ┘        │                  ├─► meta
            └─────────────────┴─► semantic ──────┘
 
-Each stage wraps one ``build_motifs`` build function and gates on its own fp sidecar
-(``outputs/motifs/.fp.<stage>``): sources on their per-source raw fp (isolated, so one
-source's raw change never rebuilds another), the derived stages on a fold of their inputs'
-fps. Build stays offline — the source builds fold enrichment from the pinned raw cache and
-never re-fetch (that is ``refresh``). These stages fully replace the old coarse ``MotifsStage``
-adapter; the ``build_motifs`` orchestrator survives only as the wholesale re-fetch helper
-(``scripts/fetch_motifs_raw.py``), not a pipeline node.
+Each stage wraps one ``_build_*`` helper (in ``motifs.build_motifs``) and gates on its own fp
+sidecar (``outputs/motifs/.fp.<stage>``): sources on their per-source raw fp (isolated, so one
+source's raw change never rebuilds another), the derived stages on a fold of their inputs' fps.
+Build stays offline — the source builds fold enrichment from the pinned raw cache and never
+re-fetch (that is ``refresh``). These stages, sequenced by the driver, ARE the motifs build now:
+the monolithic ``build_motifs`` orchestrator and the coarse ``MotifsStage`` are both retired.
 """
 
 from __future__ import annotations
@@ -27,6 +26,7 @@ from motifs.build_motifs import (
     _build_semantic,
     _build_tmi,
     _load_config,
+    _log_summary,
 )
 from motifs.fingerprint import combine_fingerprints, semantic_fingerprint, source_fingerprint
 from motifs.refresh import Fetchable, RefreshResult, refresh_fetchables
@@ -260,7 +260,8 @@ class MetaStage(Stage):
         return {}
 
     def build(self, keys: set[str]) -> None:
-        _build_meta(_load_config())
+        counts, links, par_counts = _build_meta(_load_config())
+        _log_summary(counts, links, par_counts)   # final cross-index rollup (was the monolith's tail)
         _fp_path("meta").write_text(self._fp(), encoding="utf-8")
 
     def delete(self, keys: set[str]) -> None:

@@ -1555,37 +1555,33 @@ def tiny_db(tmp_path, monkeypatch):
     store.clear_cache()
 
 
-class TestBuildMotifsModes:
+class TestSourceStageBuildOffline:
+    """A source stage's build parses from the pinned cache — it never re-fetches (``force=False``);
+    the network re-check is the separate ``refresh`` path. (Replaces the retired ``build_motifs``
+    orchestrator's force-semantics test — build is now the atomised ``motifs:*`` stages.)"""
+
     def _setup(self, tmp_path, monkeypatch):
         from settings import settings
         config_dir = tmp_path / "config"
         config_dir.mkdir()
-        (config_dir / "motifs.json").write_text(json.dumps(
-            {"berezkin": {"enabled": False}, "trilogy": {"enabled": True}}))
+        (config_dir / "motifs.json").write_text(json.dumps({"trilogy": {"enabled": True}}))
         monkeypatch.setattr(settings, "config_dir", config_dir)
         monkeypatch.setattr(settings, "motifs_dir", tmp_path / "out")
         store.clear_cache()
 
-    def test_default_rebuilds_from_cache_force_only_refetches(self, tmp_path, monkeypatch):
+    def test_stage_build_never_refetches(self, tmp_path, monkeypatch):
+        from pipeline.stages import motifs as m
         self._setup(tmp_path, monkeypatch)
-        fetched = []  # records the `force` (re-fetch) flag passed to the source
+        seen = {}
 
-        def fake_tmi(cfg, *, force=False, divisions_config=None):
-            fetched.append(force)
-            return {"motifs": []}
+        def fake_build_tmi(config, *, force):
+            seen["force"] = force
+            (tmp_path / "out").mkdir(parents=True, exist_ok=True)   # a real build writes tmi.json here
 
-        def fake_atu(cfg, *, force=False):
-            return {"types": []}, {}
-
-        monkeypatch.setattr(bm.trilogy, "build_tmi", fake_tmi)
-        monkeypatch.setattr(bm.trilogy, "build_atu", fake_atu)
-
-        bm.build_motifs()            # rebuild from cache (no re-fetch)
-        assert fetched == [False]
-        bm.build_motifs()            # rebuilds again — no skip-if-built
-        assert fetched == [False, False]
-        bm.build_motifs(force=True)  # re-fetch
-        assert fetched == [False, False, True]
+        monkeypatch.setattr(m, "_build_tmi", fake_build_tmi)
+        m.TmiSource().build({"tmi"})
+        assert seen["force"] is False                       # offline: build reuses raw, never re-fetches
+        assert (tmp_path / "out" / ".fp.source.tmi").exists()   # stamped clean for the driver gate
 
 
 class TestService:

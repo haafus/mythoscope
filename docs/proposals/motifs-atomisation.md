@@ -88,9 +88,11 @@ frozen-offline mode (`MYTHO_OFFLINE`, `fetch_cache.offline()`) that serves the p
 never fetching or mutating it — and the golden validator sets it, so the rebuild is a pure function
 of the pinned raw (two offline asserts byte-identical). The staged refresh is validated live
 end-to-end on the `tmi` source (fetch → diff → keep-pinned → adopt-on-`--apply` → atomic commit →
-self-heal). Fully retiring the `build_motifs` orchestrator still waits on making parse-discovered
-fetch fully pinnable so refresh alone can cold-acquire a source (low value — the driver build
-already cold-acquires; the orchestrator is just the one-shot wholesale re-scrape helper).
+self-heal). The `build_motifs` **orchestrator is now retired**: the driver-sequenced `motifs:*`
+stages *are* the build, `scripts/fetch_motifs_raw.py` drives them (cold cache → each stage
+acquires on miss), and the final cross-index summary moved into `motifs:meta`. Only the `_build_*`
+stage helpers remain in `motifs.build_motifs`. A forced re-fetch of an already-pinned cache is
+`mytho refresh motifs --apply` (the networked re-check path), not a build flag.
 
 ## Validation
 
