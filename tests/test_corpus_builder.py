@@ -34,7 +34,7 @@ class TestBuildMetadata:
     def test_date_downloaded_is_timezone_aware(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 2, "sentence_count": 1}
         item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
         parsed = datetime.fromisoformat(meta["date_downloaded"])
         assert parsed.tzinfo is not None
 
@@ -43,19 +43,19 @@ class TestBuildMetadataFields:
     def test_word_count(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 500, "sentence_count": 40}
         item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
         assert meta["word_count"] == 500
 
     def test_description_from_item(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
         item = {**_BASE_ITEM, "title": "Iliad", "description": "An epic poem"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
         assert meta["description"] == "An epic poem"
 
     def test_empty_description(self):
         stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
         item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats)
+        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
         assert meta["description"] == ""
 
 
@@ -257,16 +257,16 @@ class TestDocumentIdInCatalog:
         from corpus.locator import document_id
 
         item = {**_BASE_ITEM, "title": "Iliad", "url": "http://example.com/iliad"}
-        meta = _build_metadata(item, path="x.txt", stats={"fingerprint": "f"})
+        meta = _build_metadata(item, path="x.txt", stats={"fingerprint": "f"}, source_fp="sf")
         assert meta["document_id"] == document_id("http://example.com/iliad")
 
     def test_rename_keeps_document_id_stable(self):
         # document_id anchors on the locator, so a title/tradition change must not move it.
         from corpus.builder import _build_metadata
 
-        a = _build_metadata({**_BASE_ITEM, "title": "Iliad", "url": "http://x/i"}, path="a", stats={})
+        a = _build_metadata({**_BASE_ITEM, "title": "Iliad", "url": "http://x/i"}, path="a", stats={}, source_fp="sf")
         b = _build_metadata({**_BASE_ITEM, "title": "The Iliad", "tradition": "Roman", "url": "http://x/i"},
-                            path="b", stats={})
+                            path="b", stats={}, source_fp="sf")
         assert a["document_id"] == b["document_id"]
 
 

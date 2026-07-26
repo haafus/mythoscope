@@ -85,9 +85,20 @@ class TestRefreshCommand:
         assert "kept pinned" in result.output
         assert "everything current" not in result.output
 
-    def test_motifs_preview_does_not_refetch(self, monkeypatch):
-        called = []
-        monkeypatch.setattr("cli._build_motifs", lambda **kw: called.append(kw))
+    def test_motifs_preview_refreshes_without_adopting(self, monkeypatch):
+        # Staged refresh fetches each source to diff, but a preview (no --apply) adopts nothing:
+        # every source stage is refreshed with apply=False. (Replaces the retired _build_motifs path.)
+        from motifs.refresh import RefreshResult
+        from pipeline.stages import motifs as m
+
+        seen = []
+
+        def fake_refresh(self, *, apply):
+            seen.append(apply)
+            return RefreshResult()
+
+        for cls in (m.AtuSource, m.BerezkinSource, m.TmiSource):
+            monkeypatch.setattr(cls, "refresh", fake_refresh)
         result = runner.invoke(mytho, ["refresh", "motifs"])
-        assert result.exit_code == 0
-        assert called == []  # preview only, no re-scrape
+        assert result.exit_code == 0, result.output
+        assert seen and all(a is False for a in seen)  # preview → every source refreshed, none adopted
