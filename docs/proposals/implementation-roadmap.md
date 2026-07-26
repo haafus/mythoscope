@@ -8,13 +8,14 @@
 >    **partially-embedded document as clean**. Fix: store `n_chunks` per chunk; a doc is built iff
 >    `count(fp) == n_chunks`; backward-compat fallback ⇒ **no rebuild**. Reasoning + checklist:
 >    [`embeddings-completeness.md`](embeddings-completeness.md).
-> 2. **Discovery-on-refresh** (narrow). New **base motifs** (TMI/ATU/Berezkin index) *are* caught by
->    `refresh --apply` + `build` (each index is a single pinned file) — no `--force`. The real gap:
->    new **enrichment** pages on self-index-crawling sources (a new ashliman type page, a mapsofmyths
->    node) for an unchanged base entry lag until a forced re-crawl — only the secondary annotation,
->    not the motif. Fix: recursive `expand: bytes -> [Fetchable]` descriptor so the engine owns
->    enrichment discovery (also retires `MYTHO_OFFLINE`'s load-bearing role). Audit + mechanism:
->    [`motifs-atomisation.md`](motifs-atomisation.md) ("Guarantees & gaps", §8).
+> 2. **Enrichment discovery** (very narrow — verified). New base motifs **and** new *linked*
+>    enrichment pages/nodes are caught by `refresh --apply` + `build` (every source's index is pinned
+>    and refreshed — mapsofmyths lists both listing pages explicitly, ashliman's index is in the
+>    pinned walk). Only two residuals: ashliman numbered pages **not linked** anywhere (behind the
+>    frozen `_TYPE_PAGES` probe — needs a manual re-probe), and no orphan detection for de-linked-but-200
+>    pages. Optional fix: `expand: bytes -> [Fetchable]` descriptor makes `refresh` self-sufficient +
+>    adds orphan detection (does not fix the probe case). Audit: [`motifs-atomisation.md`](motifs-atomisation.md)
+>    ("Guarantees & gaps", §8).
 > 3. **No `fsync` in the raw write path**. `commit_bytes` is atomic (`os.replace`) but not
 >    power-loss durable. Fix (if wanted): `fsync` temp + parent dir before/after replace.
 > 4. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned

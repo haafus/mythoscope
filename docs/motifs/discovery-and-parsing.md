@@ -162,20 +162,24 @@ page.
 traditions (areal_id → name/path/language), motifs}` → `berezkin.json`. Also `berezkin_bibliography`
 (single `biblio.html` fetch + reuse of pinned detail pages) → standalone `berezkin_bibliography.json`.
 
-### 2.4 How the enrichment sets are discovered (the refresh gap)
+### 2.4 How the enrichment sets are discovered (and why refresh mostly covers them)
 
-The base sets above are single files. The **enrichment** page/node sets on ashliman and mapsofmyths
-are discovered by crawling/parsing an index, and that discovery lives only in `build`:
+The enrichment page/node sets on ashliman and mapsofmyths are discovered by crawling/parsing an
+index. Crucially, **those index files are themselves pinned and enumerated for refresh**, so a
+changed index is caught and the following `build` re-parses it + cache-miss-fetches the new
+children:
 
-| source | build discovery | refresh (`fetchables`) enumeration |
+| source | build discovery | refresh (`fetchables`) — includes the index? |
 |---|---|---|
-| **ashliman** | LIVE: `discover_site_types` (ashliman.py:280) fetches `folktexts.html`/`folktexts2.html`, harvests `type\d+.html` slugs + walks themed pages reading `types NNN` declarations, UNION the frozen `_TYPE_PAGES` constant. `_page` uses `.absent` markers to skip known-404 derived names. | `walk_fetchables("ashliman", …)` — **pinned files only**; no index fetch, no themed walk. |
-| **mapsofmyths** | Parse-discovered: `parse_motifs_full(get("/motifs_full"))` → node hrefs; `/traditions_full` → node ids → POST `gmap-markers-tradition` (`_post_markers`, honours `MYTHO_OFFLINE`). Credential-gated. | node set = parse of **pinned** `motifs_full.html`; markers = **pinned** `markers_*.json`. |
+| **ashliman** | `discover_site_types` (ashliman.py:280) fetches `folktexts.html`/`folktexts2.html`, harvests `type\d+.html` slugs + walks themed pages reading `types NNN` declarations, UNION the frozen `_TYPE_PAGES` constant. `.absent` markers skip known-404 names. | `walk_fetchables("ashliman", …)` enumerates **all pinned files** — which includes the pinned `folktexts*.html` + themed pages. So linked pages are re-checked. |
+| **mapsofmyths** | `parse_motifs_full(get("/motifs_full"))` → node hrefs; `/traditions_full` → node ids → POST `gmap-markers-tradition` (`_post_markers`, honours `MYTHO_OFFLINE`). Credential-gated. | `fetchables()` lists **both listing pages explicitly** (`mapsofmyths.py:237-238`) + the pinned node pages + pinned markers. So a changed listing is caught. |
 
-So on refresh the enumerated set = the pinned set, never a freshly-crawled index → a newly-added
-site page/node is invisible until a `build` (or forced re-scrape) re-crawls. The motif itself is
-unaffected (it comes from the base index); only the secondary annotation lags. See
-[`../known-issues.md`](../known-issues.md) and the `expand`-descriptor fix in the atomisation doc.
+So `refresh --apply` + a normal `build` propagates new base motifs **and** new *linked* enrichment
+pages/nodes — no `--force`. Two narrow residuals: (1) ashliman numbered pages that exist but aren't
+linked from any index (behind the frozen `_TYPE_PAGES` probe, regenerated only by a manual
+`probe=True` run); (2) a page de-linked from an index but still 200 (no orphan detection). Both
+touch only secondary annotations. See [`../known-issues.md`](../known-issues.md) and the `expand`
+design (which makes refresh self-sufficient + adds orphan detection) in the atomisation doc.
 
 ---
 

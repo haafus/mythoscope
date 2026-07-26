@@ -6,37 +6,43 @@ Append new entries at the top.
 
 ---
 
-## `refresh` doesn't re-discover crawl-enumerated enrichment pages
+## Enrichment discovery: `refresh` self-sufficiency + two narrow residuals
 
-**Status:** flagged — the discovery-on-refresh edge; design settled (`expand` descriptor), not
-implemented. Full audit: [`proposals/motifs-atomisation.md`](proposals/motifs-atomisation.md)
-("Guarantees & gaps"); mechanism in the same doc (§8) and the `expand` sketch.
+**Status:** flagged — much narrower than first written; verified against the source. Full audit:
+[`proposals/motifs-atomisation.md`](proposals/motifs-atomisation.md) ("Guarantees & gaps"); the
+`expand` design in the same doc (§8).
 
-**Not what it sounds like — base motifs are covered.** The motif *set* of every base index lives in
-a **single pinned file**: TMI in `tmi.csv`, ATU in the trilogy `atu_*` CSVs (+ the one Wikidata
-`atu.json`), Berezkin in its one index page (`parse_index(index_html)`; detail pages only attach a
-per-motif *definition*). Those files are in each source's `fetchables()`, so a **new motif** = a
-changed pinned file → `refresh --apply` adopts it → a normal `build` re-parses it (and, for
-Berezkin, fetches the new motif's detail page on cache-miss). **No `--force` / full rebuild.** The
-only reason a plain `build` alone misses it is that build reads pinned raw and won't re-fetch the
-index — which is exactly what `refresh` is for.
+**The alarm ("new motifs / enrichments are invisible without `--force`") is essentially false.**
+The set-revealing index of *every* source is a pinned file that `refresh` re-checks, and after
+`refresh --apply` a normal `build` re-parses it and fetches the new children on cache-miss:
 
-What `refresh` genuinely misses: **newly-appearing enrichment pages on sources that crawl their
-own index** — a new ashliman type page (ashliman starts covering a type), a new mapsofmyths node —
-*when the motif's base-index entry itself did not change*. `refresh`'s resource set is whatever is
-already pinned (`walk_fetchables`), so a never-pinned enrichment page is invisible, and a plain
-build's discovery (`discover_site_types(force=False)`) reads the pinned enrichment-index and finds
-the same set. The motif is still present and correct from its base index; only the **secondary
-annotation** (ashliman coverage flag, geo node) lags until a discovery re-crawl (currently
-`--force` / `scripts/fetch_motifs_raw.py`, the non-hermetic path `MYTHO_OFFLINE` neutralises). A
-page **de-linked from an enrichment index but still 200** is likewise not noticed (re-checks as
-`not changed`).
+- **Base motifs** live in one file each — TMI `tmi.csv`, ATU trilogy `atu_*` CSVs (+ the one
+  Wikidata `atu.json`), Berezkin its index page. A new motif = a changed pinned file → `refresh
+  --apply` + `build`. No `--force`.
+- **mapsofmyths** — both listing pages (`motifs_full.html`, `traditions_full.html`) are **explicit
+  `fetchables()`** (`mapsofmyths.py:237-238`). A new node/marker changes a listing → `refresh`
+  flags it → `build` re-parses the adopted listing and fetches the new `node_*.html` / POST markers
+  on cache-miss. No gap.
+- **ashliman** — the index pages (`folktexts.html`/`folktexts2.html`) and themed pages are pinned,
+  and `fetchables()=walk_fetchables("ashliman",…)` enumerates them, so `refresh` re-checks them too.
+  A newly **linked** type page (referenced from an index or declared on a themed page) flows through
+  `refresh --apply` + `build`.
 
-Fix (designed): give the refresh engine discovery via a recursive `expand: bytes -> [Fetchable]`
-callback on the descriptor (parsing stays in the source; the engine keeps the fetch/keep/adopt
-discipline), so an index is just a fetchable that expands into children. Closing it lets `refresh`
-own enrichment discovery and retires both the forced re-scrape and `MYTHO_OFFLINE`'s load-bearing
-role.
+Two genuine but narrow residuals remain:
+
+1. **ashliman numbered pages behind a frozen probe constant.** `discover_site_types` takes its
+   `numbered` set from the hardcoded `_TYPE_PAGES` frozenset (`ashliman.py:326`), regenerated only
+   by a manual brute-force run (`probe=True`). A type page that *exists but is not linked* from any
+   index/themed page — findable only by probing the `typeNNNN.html` numbering — is invisible until
+   the probe is re-run. (Only the secondary "example tales" annotation on an already-present ATU
+   type; never a missing motif.)
+2. **No orphan detection for a de-linked-but-live page.** A page dropped from an enrichment index
+   yet still returning 200 is re-checked as `not changed`; nothing notices it left the index.
+
+Fix (designed, optional): the recursive `expand: bytes -> [Fetchable]` descriptor (§8) would make
+`refresh` **self-sufficient** (discover children itself, without needing a following `build`) and,
+with a scope-diff, add the orphan detection of (2). It does **not** address (1) — that needs a
+periodic re-probe of the numbering, not index parsing.
 
 ---
 

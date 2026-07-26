@@ -147,34 +147,32 @@ all upstream changes" question.
 
 ### Will the user see all network updates?
 
-Mostly yes — with one narrow exception, and **not** the one it first looks like. Coverage by
-change type:
+**Essentially yes** — the set-revealing index of every source is a pinned file `refresh`
+re-checks, and after `refresh --apply` a normal `build` re-parses it and fetches the new children
+on cache-miss. Coverage by change type:
 
 | upstream change | caught? |
 |---|---|
 | content of an **already-pinned** page changed | ✅ `refresh --apply` (`changed`) |
 | a page **404s** | ✅ `refresh` (`gone`, pinned kept) |
 | a **new base motif** (TMI/ATU row, Berezkin index entry) | ✅ `refresh --apply` + `build` |
-| a **new enrichment page** on a self-index-crawling source (ashliman type page, mapsofmyths node) for an *unchanged* base entry | ❌ needs a discovery re-crawl (`--force`) |
-| a page **de-linked from an enrichment index but still 200** | ❌ re-checks as `not changed` |
+| a **new mapsofmyths node/marker** (its listings are explicit `fetchables()`) | ✅ `refresh --apply` + `build` |
+| a **new ashliman type page linked** from an index/themed page (both pinned + refreshed) | ✅ `refresh --apply` + `build` |
+| a **new ashliman numbered page NOT linked** anywhere (behind the frozen `_TYPE_PAGES` probe) | ❌ needs a manual re-probe |
+| a page **de-linked from an index but still 200** | ❌ re-checks as `not changed` (no orphan detect) |
 
-**Base motifs are covered — this is the key correction.** The motif *set* of each base index is a
-**single pinned file**: TMI = `tmi.csv`, ATU = the trilogy `atu_*` CSVs (+ the one Wikidata
-`atu.json`), Berezkin = its one index page (`parse_index(index_html)`; detail pages only attach a
-per-motif *definition*). Those files are in each source's `fetchables()`, so a new motif is a
-*changed pinned file* → `refresh --apply` adopts it → a normal `build` re-parses it (and, for
-Berezkin, fetches the new motif's detail page on cache-miss). No `--force`. A plain `build` alone
-misses it only because build reads pinned raw and won't re-fetch the index — which is what
-`refresh` is for.
+**Why the earlier "membership growth is invisible" claim was wrong.** Each source's index *is*
+pinned and *is* enumerated for refresh: base indexes are single files in `fetchables()`;
+mapsofmyths lists `motifs_full.html` + `traditions_full.html` explicitly (`mapsofmyths.py:237-238`);
+ashliman's index + themed pages are pinned so `walk_fetchables` includes them. So a changed index
+is caught by `refresh`, and the following `build` re-parses it and cache-miss-fetches the new
+children. No `--force`.
 
-The genuine gap is narrower: an **enrichment** page discovered by crawling an enrichment source's
-*own* index — ashliman starting to cover a type (a new `typeNNNN.html`), a new mapsofmyths node —
-for a motif whose base-index entry did not itself change. `refresh`'s resource set is whatever is
-already pinned (`walk_fetchables`), and a plain build's discovery reads the *pinned* enrichment
-index (`discover_site_types(force=False)`), so neither surfaces the new page; only a forced
-re-crawl (`force=True` → `scripts/fetch_motifs_raw.py`) does. The motif is already present from its
-base index — only the **secondary annotation** (ashliman coverage flag, geo node) lags.
+Two narrow residuals remain: **(1)** ashliman numbered pages that exist but aren't *linked* from
+any index — found only by the frozen `_TYPE_PAGES` brute-force set (`ashliman.py:326`), regenerated
+by a manual `probe=True` run; **(2)** no orphan detection for a page de-linked from an index but
+still 200. Both touch only secondary annotations, never a motif's presence.
 
-This is the discovery-on-refresh edge (§8): closing it (the `expand`-descriptor design) would let
-`refresh` own enrichment discovery, at which point the forced re-scrape — and `MYTHO_OFFLINE`'s
-load-bearing role — both retire.
+The `expand`-descriptor design (§8) would make `refresh` **self-sufficient** (discover children
+without a following `build`) and, with a scope-diff, add the orphan detection of (2). It does not
+address (1), which needs a periodic re-probe of the numbering rather than index parsing.
