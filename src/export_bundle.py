@@ -173,17 +173,19 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
         return result
 
     written = 0
+    written_bytes = 0
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
-        for file, arcname, _ in plan:
+        for file, arcname, size in plan:
             try:
                 zf.write(file, arcname=arcname)
                 written += 1
+                written_bytes += size   # count only what actually made it in (a vanished file is skipped)
             except OSError:
                 logger.warning("export: %s vanished mid-bundle — skipped", arcname)  # don't abort
 
     result.path = archive
     result.total_files = written
-    result.total_bytes = sum(size for _, _, size in plan)
+    result.total_bytes = written_bytes
     result.chromadb_version = chromadb_version() if "embeddings" in result.components else None
     logger.info("Exported %d files (%d bytes) to %s", result.total_files, result.total_bytes, archive)
     return result

@@ -305,34 +305,44 @@ def build_enrichment(*, force: bool = False, auth: tuple[str, str] | None = None
     _write(NODES_FILE, {
         "source": "mapsofmyths.com", "license": _LICENSE, "attribution": _ATTRIB, "motifs": nodes})
 
-    traditions = parse_traditions_full(get("/traditions_full", "traditions_full.html"))
-
-    # Real per-tradition coordinates: each catalogue row carries a Drupal node id
-    # whose map markers give the tradition's actual location(s). Fetch them (cached,
-    # concurrent) and attach the marker centroid as ``coordinates`` = [lat, lon].
-    marker_cache = cache / "markers"
-
-    def coord(item):
-        aid, rec = item
-        node = rec.get("node")
-        if not node:
-            return aid, None
-        try:
-            return aid, parse_tradition_markers(_post_markers(node, marker_cache, auth, force=force))
-        except Exception as exc:  # a missing/odd marker reply must not abort the build
-            logger.debug("mapsofmyths: marker fetch failed for node %s: %s", node, exc)
-            return aid, None
-
+    # The /motifs_full guard above cannot vouch for traditions_full — a partial cache (motifs_full
+    # pinned, traditions_full not) with no creds would 401 here (or FetchRejected under
+    # MYTHO_OFFLINE) and, unguarded, crash the whole berezkin stage. Degrade instead: English +
+    # node data are already written; skip the tradition layer and keep any prior traditions file.
+    traditions: dict = {}
     with_coords = 0
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        for aid, coords in pool.map(coord, traditions.items()):
-            if coords:
-                traditions[aid]["coordinates"] = coords
-                with_coords += 1
+    try:
+        traditions = parse_traditions_full(get("/traditions_full", "traditions_full.html"))
 
-    _write(TRADITIONS_FILE, {
-        "source": "mapsofmyths.com", "license": _LICENSE, "attribution": _ATTRIB,
-        "traditions": traditions})
+        # Real per-tradition coordinates: each catalogue row carries a Drupal node id
+        # whose map markers give the tradition's actual location(s). Fetch them (cached,
+        # concurrent) and attach the marker centroid as ``coordinates`` = [lat, lon].
+        marker_cache = cache / "markers"
+
+        def coord(item):
+            aid, rec = item
+            node = rec.get("node")
+            if not node:
+                return aid, None
+            try:
+                return aid, parse_tradition_markers(_post_markers(node, marker_cache, auth, force=force))
+            except Exception as exc:  # a missing/odd marker reply must not abort the build
+                logger.debug("mapsofmyths: marker fetch failed for node %s: %s", node, exc)
+                return aid, None
+
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for aid, coords in pool.map(coord, traditions.items()):
+                if coords:
+                    traditions[aid]["coordinates"] = coords
+                    with_coords += 1
+
+        _write(TRADITIONS_FILE, {
+            "source": "mapsofmyths.com", "license": _LICENSE, "attribution": _ATTRIB,
+            "traditions": traditions})
+    except Exception as exc:
+        traditions, with_coords = {}, 0
+        logger.warning("mapsofmyths: traditions_full unavailable (%s) — keeping any prior "
+                       "traditions file; English/node enrichment already written", exc)
 
     counts = {
         "motifs": len(english),

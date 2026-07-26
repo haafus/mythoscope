@@ -52,5 +52,43 @@ def test_export_rejects_unknown_scope():
     assert len(_components()) == 6                      # no scope → all components
 
 
+_DISABLED = {"berezkin": {"enabled": False}, "trilogy": {"enabled": False}}
+
+
+def test_build_meta_survives_missing_crosswalk(tmp_path, monkeypatch):
+    from motifs.build_motifs import _build_meta
+
+    _motifs_dir(tmp_path, monkeypatch)
+    # no crosswalk.json on disk → links == {} inside _build_meta; the read must degrade to zeros,
+    # not KeyError (regression: scoped `build motifs:meta` without a built crosswalk stage).
+    _build_meta(_DISABLED)
+    cw = store.load_meta()["crosswalk"]
+    assert cw["atu_to_tmi"] == 0 and cw["linked_tmi_count"] == 0
+
+
+def test_build_meta_clears_readside_cache(tmp_path, monkeypatch):
+    from motifs.build_motifs import _build_meta
+
+    _motifs_dir(tmp_path, monkeypatch)
+    store._cache["stale"] = {"old": 1}          # a pre-build memoized read
+    _build_meta(_DISABLED)
+    assert store._cache == {}                   # terminal stage drops the memoize (in-process build+read)
+
+
+def test_disabled_source_clears_discovered_sidecar(tmp_path, monkeypatch):
+    from motifs.build_motifs import _build_atu, _build_berezkin
+
+    _motifs_dir(tmp_path, monkeypatch)
+    for root in ("berezkin", "mapsofmyths", "ashliman"):   # stale sets left by a prior enabled build
+        save_json(store.discovered_path(root), ["X"])
+    _build_berezkin({"berezkin": {"enabled": False}}, force=False)
+    _build_atu({"trilogy": {"enabled": False}}, force=False)
+    # a disabled source must clear the sidecars it owns → _discovery_check reads 'not checked',
+    # never a stale set frozen at disable time (which would raise a perpetual false discovery-shrank).
+    assert not store.discovered_path("berezkin").exists()
+    assert not store.discovered_path("mapsofmyths").exists()
+    assert not store.discovered_path("ashliman").exists()
+
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))

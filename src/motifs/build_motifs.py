@@ -172,6 +172,10 @@ def _build_berezkin(config: dict, *, force: bool) -> dict:
     Returns ``{counts, sources}`` for the meta aggregation. The future ``motifs:source:berezkin``."""
     bz_cfg = config.get("berezkin", {})
     if not bz_cfg.get("enabled", True):
+        # Disabled → clear the parse-root sidecars this build owns (berezkin + its mapsofmyths
+        # enrichment) so `_discovery_check` reads 'not checked', not a stale set frozen at disable time.
+        _persist_discovered("berezkin", None)
+        _persist_discovered("mapsofmyths", None)
         return {"counts": {}, "sources": {}}
     enrichment: dict[str, dict] = {}
     home = bz_cfg.get("homepage", "areasofmyths.com")
@@ -262,6 +266,9 @@ def _build_atu(config: dict, *, force: bool) -> dict:
     Returns ``{counts, sources}``. The future ``motifs:source:atu``."""
     tr_cfg = config.get("trilogy", {})
     if not tr_cfg.get("enabled", True):
+        # Disabled → clear the ashliman sidecar this build owns (its ATU enrichment) so
+        # `_discovery_check` reads 'not checked', not a stale set frozen at disable time.
+        _persist_discovered("ashliman", None)
         return {"counts": {}, "sources": {}}
     enrichment: dict[str, dict] = {}
     files = tr_cfg.get("files", {})
@@ -382,13 +389,15 @@ def _build_meta(config: dict) -> tuple[dict, dict, dict]:
         "counts": counts,
         "enrichment": enrichment_agg,  # per-source enrichment counts (what was added)
         "crosswalk": {
-            "atu_to_tmi": len(links["atu_to_tmi"]),
-            "tmi_to_atu": len(links["tmi_to_atu"]),
-            "berezkin_to_atu": len(links["berezkin_to_atu"]),
-            "atu_to_berezkin": len(links["atu_to_berezkin"]),
-            "berezkin_to_tmi": len(links["berezkin_to_tmi"]),
-            "tmi_to_berezkin": len(links["tmi_to_berezkin"]),
-            "linked_tmi_count": links["linked_tmi_count"],
+            # crosswalk.json may be absent (scoped `build motifs:meta`, or after a clean of the
+            # crosswalk stage) → links == {}; read defensively so meta degrades to zeros, never KeyError.
+            "atu_to_tmi": len(links.get("atu_to_tmi", {})),
+            "tmi_to_atu": len(links.get("tmi_to_atu", {})),
+            "berezkin_to_atu": len(links.get("berezkin_to_atu", {})),
+            "atu_to_berezkin": len(links.get("atu_to_berezkin", {})),
+            "berezkin_to_tmi": len(links.get("berezkin_to_tmi", {})),
+            "tmi_to_berezkin": len(links.get("tmi_to_berezkin", {})),
+            "linked_tmi_count": links.get("linked_tmi_count", 0),
         },
         "parallels": par_counts,  # heuristic look-alikes with no recorded link
         "sources": sources,
@@ -403,6 +412,9 @@ def _build_meta(config: dict) -> tuple[dict, dict, dict]:
     if meta["flags"]:
         logger.warning("motif build: %d degradation flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
+    # meta is the terminal stage: drop the read-side memoize so an in-process build-then-read
+    # (server build+serve, tests) sees the freshly-written indexes/meta, not the pre-build cache.
+    store.clear_cache()
     return counts, links, par_counts
 
 
