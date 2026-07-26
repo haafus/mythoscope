@@ -6,6 +6,68 @@ Append new entries at the top.
 
 ---
 
+## `refresh` is blind to new/de-linked pages on parse-discovered sources
+
+**Status:** flagged — the discovery-on-refresh edge; design settled (`expand` descriptor), not
+implemented. Full audit: [`proposals/motifs-atomisation.md`](proposals/motifs-atomisation.md)
+("Guarantees & gaps"); mechanism in the same doc (§8) and the `expand` sketch.
+
+`refresh`'s resource set is whatever is already pinned (`walk_fetchables` enumerates the pinned
+dir); it has no discovery. So it fully catches changes *within* the known set — a pinned page's
+content changed (`changed`), or a page 404'd (`gone`) — but is blind to **set-membership** changes
+on parse-discovered sources (ashliman, berezkin details, mapsofmyths nodes): a brand-new page that
+was never pinned, and a page de-linked from the index but still returning 200.
+
+Where it bites: run `mytho refresh motifs` after upstream adds a new ATU type and it reports
+all-clear — the new page is invisible. New members surface only under a **forced wholesale
+re-scrape** (`force=True` → `scripts/fetch_motifs_raw.py`), which re-fetches and re-parses the
+index — and that is the non-hermetic path `MYTHO_OFFLINE` exists to neutralise.
+
+Fix (designed): give the refresh engine discovery via a recursive `expand: bytes -> [Fetchable]`
+callback on the descriptor (parsing stays in the source; the engine keeps the fetch/keep/adopt
+discipline), so an index is just a fetchable that expands into children. Closing it lets `refresh`
+own discovery and retires both the forced re-scrape and `MYTHO_OFFLINE`'s load-bearing role.
+
+---
+
+## Raw write path has no `fsync` — atomic but not power-loss durable
+
+**Status:** flagged — accepted trade-off, documented; no `fsync` in the write path.
+
+`commit_bytes` (`src/fetch_cache.py`) stages to a unique `.partial` then `os.replace` — atomic, so
+a crash never leaves a torn/half-written live file. But it calls no `fsync` on the file or its
+parent directory. `os.replace` guarantees *atomicity* (which of the two versions you see), not
+*durability* (that the new version survived to disk).
+
+Where it bites: a power cut or kernel panic between the write and the OS's physical flush can lose
+a just-adopted byte-set, falling back to the old pinned copy. No corruption — you never get a
+half-file — but a fresh `refresh --apply` adoption is not guaranteed to have landed.
+
+Options: accept (current — rare, and the fallback is the last-good copy, not garbage); or `fsync`
+the temp file + parent dir in `commit_bytes` before/after `os.replace` for true durability, at a
+per-write I/O cost.
+
+---
+
+## Lenient validators can adopt a structured 200-error over good pinned data
+
+**Status:** flagged — deferred; needs a per-source semantic parser.
+
+The adopt gate validators (`src/motifs/sources/fetch.py`: `valid_html`/`valid_csv`/`valid_json`)
+are deliberately lenient — non-empty + carries markup / parses as CSV/JSON — so a genuine payload
+is never falsely kept-pinned. But a **well-formed HTML error page served with 200**, or a
+plausibly-structured-but-wrong payload, passes the check and *can* be adopted over a good pinned
+copy on `refresh --apply`.
+
+Where it bites: an anti-bot interstitial or a "service unavailable" page rendered as valid HTML
+with a 200 status overwrites the last-good raw when the user applies a refresh.
+
+Options: accept (current — the common empty/wrong-content-type failures are already caught); or add
+a per-source **semantic** validator (does the parse yield the expected records?) as the adopt gate,
+beyond the structural check.
+
+---
+
 ## `EmbeddingsStage.actual()` reports a partially-embedded document as clean
 
 **Status:** flagged (HIGH, data-integrity) — design settled, **not yet implemented**. Full

@@ -103,3 +103,69 @@ With a raw cache present: `golden_diff snapshot` → refactor → `golden_diff a
 drops `date_downloaded` / `source_fp`). The deterministic core (`berezkin/tmi/atu/crosswalk/
 parallels.json`) must be byte-identical — validated byte-identical through every step above
 (`scripts/validate_motifs_atomisation.py`).
+
+## Guarantees & gaps (fetch/refresh audit)
+
+An audit of what the fetch/refresh/build layer does and does not guarantee about corruption,
+data loss, and network-update completeness. Ground truth for the "is my raw safe / am I seeing
+all upstream changes" question.
+
+### Guaranteed
+
+- **Atomic single-file writes.** Every raw write goes through `commit_bytes` (`fetch_cache.py`):
+  stage to a **unique** `.partial` (`mkstemp`) → `os.replace`. A crash mid-write leaves an inert
+  `.partial`, never a half-written live file. Build-fetch and refresh-adopt share this one path,
+  so a torn file is impossible.
+- **Validate-before-commit.** A fresh reply must pass `validate()` + a non-empty check *before*
+  it may overwrite the pinned copy (`fetch_to_cache`, `refresh_fetchables`). Empty body / HTML
+  error stub / bad CSV/JSON → `FetchRejected`/`DEGRADED`, pinned copy untouched.
+- **Keep-pinned-on-failure.** Transport error / 404 / degraded → the last-good pinned copy is
+  kept and served; good raw is never deleted over an upstream disappearance (Phase 0). A 404 on a
+  never-cached page is remembered in a `.absent` marker (not re-probed); a 404 on a *pinned* page
+  keeps + serves it.
+- **Build never overwrites raw.** `fetch_to_cache(..., force=False)` is hardcoded in the builder;
+  `--force` only re-derives from pinned raw. A build cannot clobber raw with a bad network reply —
+  it reads raw, it does not refresh it.
+- **Refresh never blind-overwrites.** Keep-pinned by default; adopt only on `--apply`, via the
+  same atomic `commit_bytes`. Ephemeral: a pending `changed` re-derives from upstream-vs-pinned.
+- **Reproducible rebuild.** `MYTHO_OFFLINE` serves pinned only; the golden-diff validator asserts
+  the deterministic core rebuilds byte-identical from pinned raw.
+
+### Not guaranteed
+
+- **Durability against power loss (no `fsync`).** `os.replace` gives atomicity (no torn file) but
+  the write path calls no `fsync` on the file or its directory. A power cut between write and
+  physical flush can lose a just-adopted byte-set (falling back to the old pinned copy — still not
+  corrupt). No *corruption*, but *durability* of a fresh adoption is not guaranteed.
+- **Cross-file transactionality.** Each file is atomic; there is no whole-set snapshot. An
+  interrupted run leaves a mix of old + new files. Fine for independent idempotent sources, but
+  not all-or-nothing.
+- **Structural 200-error detection.** Validators are deliberately lenient (non-empty + has markup
+  / parses as CSV/JSON). A well-formed HTML error page served with 200, or a plausibly-structured-
+  but-wrong payload, passes `validate` and *can* be adopted over good pinned data on `--apply`.
+  Catching it needs a per-source semantic parser (deferred).
+
+### Will the user see all network updates?
+
+Through `refresh` alone — **no**. Coverage by change type:
+
+| upstream change | caught by `refresh`? |
+|---|---|
+| content of an **already-pinned** page changed | ✅ yes (`changed` → adopt on `--apply`) |
+| a page **404s** | ✅ yes (`gone`, pinned kept) |
+| a **new** page on a parse-discovered source (new ATU type, berezkin detail, mapsofmyths node) | ❌ no |
+| a page **de-linked from the index but still 200** | ❌ no (re-checks as `not changed`) |
+
+The refresh resource set = whatever is already pinned (`walk_fetchables`); refresh has no
+discovery. A never-pinned new page is invisible to it. New pages are found only by re-crawling the
+index — which lives in build, and a plain build reads the *pinned* index (`force=False`) so it
+surfaces the same old set. New members appear only under a **forced wholesale re-scrape**
+(`force=True` → `scripts/fetch_motifs_raw.py`), which re-fetches and re-parses the index. So:
+
+- changes **within the known set** (content edits, disappearances) — refresh covers fully;
+- changes to **set membership** on discovery sources (new pages, de-links) — no routine path
+  covers them; only a forced re-scrape does.
+
+This is exactly the discovery-on-refresh edge (§8): closing it (the `expand`-descriptor design)
+would let `refresh` own discovery, at which point the forced re-scrape — and `MYTHO_OFFLINE`'s
+load-bearing role — both retire.
