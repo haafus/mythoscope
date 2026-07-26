@@ -9,6 +9,16 @@ The bug that started this: a HIGH data-integrity finding from the Stage IV code 
 *some* of its chunks embedded is reported as fully built ("clean"), and the driver never
 re-embeds the missing chunks.
 
+**Origin — pre-existing, not a refactor regression.** The Part 3 stage-protocol refactor
+neither introduced nor fixed this; it carried the same blind spot forward. The retired
+pre-refactor inspector (`pipeline_inspect.py`, last at `47de423`) checked embeddings only via
+collection totals (`col.count()`) and orphan chunks/collections — it had **no** per-document
+chunk-completeness check either, so a partial document was equally invisible before. The build
+resume logic (`embed_plan`, per-doc `try/except`) is unchanged across the refactor, so partial
+embeds were always possible and never detected at `status` time. What the refactor *did* add is
+`actual()` returning per-document keys — the natural hook this fix plugs into, which is why the
+fix now lands cheaply there.
+
 ---
 
 ## 1. The chunk data model (what the fix hinges on)
