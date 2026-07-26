@@ -81,6 +81,20 @@ class TestExport:
         result = eb.export_outputs(out_dir=built_outputs, timestamp="20260629-120000", include_caches=True)
         assert result.path.name == "mythoscope-caches-20260629-120000.zip"
 
+    def test_component_bytes_reconcile_with_total_when_a_file_vanishes(self, built_outputs, monkeypatch):
+        # a file skipped mid-bundle (OSError) must drop out of BOTH total_bytes and its component tally
+        orig_write = zipfile.ZipFile.write
+
+        def flaky(self, filename, arcname=None, **kw):
+            if arcname and arcname.endswith("beings.json"):
+                raise OSError("vanished mid-bundle")
+            return orig_write(self, filename, arcname=arcname, **kw)
+
+        monkeypatch.setattr(zipfile.ZipFile, "write", flaky)
+        result = eb.export_outputs(out_dir=built_outputs, timestamp="T")
+        assert not any(n.endswith("beings.json") for n in _names(result))     # skipped, not aborted
+        assert sum(result.components.values()) == result.total_bytes          # per-component == written total
+
     def test_orphan_summary_reports_level2_for_scoped_export(self, monkeypatch):
         import pipeline
         from pipeline.driver import CleanReport

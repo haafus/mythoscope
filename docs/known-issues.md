@@ -248,8 +248,9 @@ Options:
 
 Every external download is cached under `outputs/motifs/raw/**` (areasofmyths /
 mapsofmyths HTML, the folkmasa bibliography, Wikidata SPARQL responses). This
-cache is **gitignored and never exported** (`mytho export` skips `raw/**`)
-because it isn't reproducible:
+cache is **gitignored** and, by default, **not exported** (`mytho export` skips
+`raw/**`; `mytho export --caches` deliberately includes it) because it isn't
+reproducible:
 
 - The upstream sites are live and change over time — pages get edited, motifs
   added or renumbered, a site can move or go down. A fresh `mytho refresh motifs
@@ -265,7 +266,7 @@ Consequences and handling:
 - Only **code** is committed; the built indexes (`outputs/motifs/*.json`) and the
   raw cache are regenerated, not tracked. To hand a working dataset to someone
   without credentials or network, ship the built `*.json` via `mytho export`
-  (which excludes `raw/**`), not the cache.
+  (raw excluded by default; add `--caches` to also ship the raw scrape).
 - Refresh from upstream with `mytho refresh motifs --apply` (re-downloads); a plain
   `mytho build motifs` re-parses the existing cache without touching the network.
 

@@ -146,11 +146,10 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
     archive = out_dir / f"mythoscope{tag}-{timestamp}.zip"
 
     # Gather files first so we can skip writing an empty archive.
-    plan: list[tuple[Path, str, int]] = []  # (file, arcname, size)
+    plan: list[tuple[Path, str, int, str]] = []  # (file, arcname, size, component)
     for name, src, arc_root in _components(scope):
         if not src.exists():
             continue
-        comp_bytes = comp_files = 0
         for file in sorted(src.rglob("*")):
             if not file.is_file():
                 continue
@@ -163,27 +162,26 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
                 size = file.stat().st_size
             except OSError:
                 continue   # vanished between rglob and stat (e.g. a live Chroma compaction) — skip it,
-            plan.append((file, (Path(arc_root) / rel).as_posix(), size))   # don't abort the whole bundle
-            comp_bytes += size
-            comp_files += 1
-        if comp_files:
-            result.components[name] = comp_bytes
+            plan.append((file, (Path(arc_root) / rel).as_posix(), size, name))   # don't abort the whole bundle
 
     if not plan:
         return result
 
     written = 0
     written_bytes = 0
+    comp_written: dict[str, int] = {}   # per-component bytes, counted from what actually made it in
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
-        for file, arcname, size in plan:
+        for file, arcname, size, name in plan:
             try:
                 zf.write(file, arcname=arcname)
                 written += 1
                 written_bytes += size   # count only what actually made it in (a vanished file is skipped)
+                comp_written[name] = comp_written.get(name, 0) + size
             except OSError:
                 logger.warning("export: %s vanished mid-bundle — skipped", arcname)  # don't abort
 
     result.path = archive
+    result.components = comp_written        # per-component totals reconcile with total_bytes (both written-only)
     result.total_files = written
     result.total_bytes = written_bytes
     result.chromadb_version = chromadb_version() if "embeddings" in result.components else None

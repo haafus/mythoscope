@@ -90,5 +90,24 @@ def test_disabled_source_clears_discovered_sidecar(tmp_path, monkeypatch):
     assert not store.discovered_path("ashliman").exists()
 
 
+def test_mapsofmyths_empty_traditions_degrades_without_clobbering(tmp_path, monkeypatch):
+    from motifs.sources import mapsofmyths as mm
+
+    monkeypatch.setattr(settings_mod.settings, "motifs_dir", tmp_path / "motifs")
+    (tmp_path / "motifs").mkdir(parents=True)
+    monkeypatch.setattr(mm, "fetch_text", lambda *a, **k: "dummy")
+    monkeypatch.setattr(mm, "parse_motifs_full",
+                        lambda html: {"M1": {"name_eng": "n", "definition_eng": "d", "href": ""}})
+    monkeypatch.setattr(mm, "parse_traditions_full", lambda html: {})   # empty parse (upstream shape drift)
+    prior = mm.data_dir() / mm.TRADITIONS_FILE
+    prior.write_text('{"traditions": {"keep": 1}}', encoding="utf-8")    # a good prior pinned file
+
+    counts = mm.build_enrichment(auth=("u", "p"))                        # creds pass the guard; traditions empty
+    # an empty parse must NOT overwrite the prior traditions file, and must mark the build degraded
+    # (else _degradation_check treats a half-built source as trusted and advances the high-water)
+    assert counts["skipped"] == "traditions-degraded"
+    assert prior.read_text(encoding="utf-8") == '{"traditions": {"keep": 1}}'
+
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))

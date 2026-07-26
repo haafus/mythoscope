@@ -186,6 +186,7 @@ def _build_berezkin(config: dict, *, force: bool) -> dict:
     mm = enrichment["mapsofmyths"] = _timed("mapsofmyths.build_enrichment", mapsofmyths.build_enrichment, force=force)
     berezkin_data = _timed("berezkin.build (parse)", berezkin.build, bz_cfg, force=force)
     save_json(store.index_path("berezkin"), berezkin_data)
+    store.clear_cache()   # invalidate the read-side memoize so downstream derive/meta read the fresh index
     berezkin_motifs = berezkin_data["motifs"]
     logger.info("      + base scrape (areasofmyths.com): %d motifs, %d chapters, %d with a definition",
                 len(berezkin_motifs), len(berezkin_data.get("chapters", {})),
@@ -247,6 +248,7 @@ def _build_tmi(config: dict, *, force: bool) -> dict:
                     len(tmi_index.get("divisions", [])), len(tmi_index.get("subdivisions", [])),
                     len(tmi_index.get("subdivisions3", [])), len(tmi_index.get("sections", [])))
     save_json(store.index_path("tmi"), tmi_index)
+    store.clear_cache()   # invalidate the read-side memoize so downstream derive/meta read the fresh index
     tmi_motifs = tmi_index["motifs"]
     logger.info("      %d motifs; notes parsed → definition ×%d, cultures ×%d, ATU refs ×%d",
                 len(tmi_motifs),
@@ -278,6 +280,7 @@ def _build_atu(config: dict, *, force: bool) -> dict:
     enrichment["atu_wikidata"] = _timed("atu_wikidata.build_enrichment", atu_wikidata.build_enrichment, atu_index["types"], force=force)
     enrichment["ashliman"] = _timed("ashliman.build_enrichment", ashliman.build_enrichment, atu_index["types"], force=force)
     save_json(store.index_path("atu"), atu_index)
+    store.clear_cache()   # invalidate the read-side memoize so downstream derive/meta read the fresh index
     atu_types = atu_index["types"]
     logger.info("      %d tale types", len(atu_types))
     wd = enrichment["atu_wikidata"]
@@ -412,8 +415,9 @@ def _build_meta(config: dict) -> tuple[dict, dict, dict]:
     if meta["flags"]:
         logger.warning("motif build: %d degradation flag(s) raised — see meta.flags", len(meta["flags"]))
     save_json(store.meta_path(), meta)
-    # meta is the terminal stage: drop the read-side memoize so an in-process build-then-read
-    # (server build+serve, tests) sees the freshly-written indexes/meta, not the pre-build cache.
+    # Read-side memoize is invalidated at each index write (source stages), so derive/meta already
+    # read fresh data during the build; one more clear here keeps a warm process's post-build reads
+    # (server build+serve) off the pre-build cache too.
     store.clear_cache()
     return counts, links, par_counts
 

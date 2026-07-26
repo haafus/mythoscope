@@ -307,13 +307,21 @@ def build_enrichment(*, force: bool = False, auth: tuple[str, str] | None = None
 
     # The /motifs_full guard above cannot vouch for traditions_full — a partial cache (motifs_full
     # pinned, traditions_full not) with no creds would 401 here (or FetchRejected under
-    # MYTHO_OFFLINE) and, unguarded, crash the whole berezkin stage. Degrade instead: English +
-    # node data are already written; skip the tradition layer and keep any prior traditions file.
+    # MYTHO_OFFLINE). Narrow the try to the fetch+parse only: that degrades the tradition layer
+    # (English + nodes are already written) instead of crashing the berezkin stage, while a marker-
+    # pool or _write failure below stays visible rather than mislabelled as "unavailable".
     traditions: dict = {}
-    with_coords = 0
     try:
         traditions = parse_traditions_full(get("/traditions_full", "traditions_full.html"))
+    except Exception as exc:
+        logger.warning("mapsofmyths: traditions_full unavailable (%s) — keeping any prior traditions file", exc)
 
+    # A fetch failure OR an empty parse (upstream shape drift returning 0 rows) counts as degraded:
+    # skip the write so the prior pinned traditions file survives, and mark the source so the
+    # degradation guard treats this build as untrusted (else it advances the high-water on partial data).
+    traditions_degraded = not traditions
+    with_coords = 0
+    if traditions:
         # Real per-tradition coordinates: each catalogue row carries a Drupal node id
         # whose map markers give the tradition's actual location(s). Fetch them (cached,
         # concurrent) and attach the marker centroid as ``coordinates`` = [lat, lon].
@@ -339,10 +347,6 @@ def build_enrichment(*, force: bool = False, auth: tuple[str, str] | None = None
         _write(TRADITIONS_FILE, {
             "source": "mapsofmyths.com", "license": _LICENSE, "attribution": _ATTRIB,
             "traditions": traditions})
-    except Exception as exc:
-        traditions, with_coords = {}, 0
-        logger.warning("mapsofmyths: traditions_full unavailable (%s) — keeping any prior "
-                       "traditions file; English/node enrichment already written", exc)
 
     counts = {
         "motifs": len(english),
@@ -355,6 +359,8 @@ def build_enrichment(*, force: bool = False, auth: tuple[str, str] | None = None
         # node ids the /motifs_full listing yielded → meta discovery-shrank watch
         "discovered": sorted({h.rstrip("/").rsplit("/", 1)[-1] for _, h in targets}),
     }
+    if traditions_degraded:
+        counts["skipped"] = "traditions-degraded"   # untrusted build → guard won't advance high-water
     logger.info("mapsofmyths: refreshed — motifs:%d type/group:%d tmi:%d atu:%d "
                 "traditions-sets:%d; tradition catalogue:%d",
                 counts["motifs"], counts["with_type"], counts["with_tmi"],
