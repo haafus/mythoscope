@@ -147,25 +147,34 @@ all upstream changes" question.
 
 ### Will the user see all network updates?
 
-Through `refresh` alone — **no**. Coverage by change type:
+Mostly yes — with one narrow exception, and **not** the one it first looks like. Coverage by
+change type:
 
-| upstream change | caught by `refresh`? |
+| upstream change | caught? |
 |---|---|
-| content of an **already-pinned** page changed | ✅ yes (`changed` → adopt on `--apply`) |
-| a page **404s** | ✅ yes (`gone`, pinned kept) |
-| a **new** page on a parse-discovered source (new ATU type, berezkin detail, mapsofmyths node) | ❌ no |
-| a page **de-linked from the index but still 200** | ❌ no (re-checks as `not changed`) |
+| content of an **already-pinned** page changed | ✅ `refresh --apply` (`changed`) |
+| a page **404s** | ✅ `refresh` (`gone`, pinned kept) |
+| a **new base motif** (TMI/ATU row, Berezkin index entry) | ✅ `refresh --apply` + `build` |
+| a **new enrichment page** on a self-index-crawling source (ashliman type page, mapsofmyths node) for an *unchanged* base entry | ❌ needs a discovery re-crawl (`--force`) |
+| a page **de-linked from an enrichment index but still 200** | ❌ re-checks as `not changed` |
 
-The refresh resource set = whatever is already pinned (`walk_fetchables`); refresh has no
-discovery. A never-pinned new page is invisible to it. New pages are found only by re-crawling the
-index — which lives in build, and a plain build reads the *pinned* index (`force=False`) so it
-surfaces the same old set. New members appear only under a **forced wholesale re-scrape**
-(`force=True` → `scripts/fetch_motifs_raw.py`), which re-fetches and re-parses the index. So:
+**Base motifs are covered — this is the key correction.** The motif *set* of each base index is a
+**single pinned file**: TMI = `tmi.csv`, ATU = the trilogy `atu_*` CSVs (+ the one Wikidata
+`atu.json`), Berezkin = its one index page (`parse_index(index_html)`; detail pages only attach a
+per-motif *definition*). Those files are in each source's `fetchables()`, so a new motif is a
+*changed pinned file* → `refresh --apply` adopts it → a normal `build` re-parses it (and, for
+Berezkin, fetches the new motif's detail page on cache-miss). No `--force`. A plain `build` alone
+misses it only because build reads pinned raw and won't re-fetch the index — which is what
+`refresh` is for.
 
-- changes **within the known set** (content edits, disappearances) — refresh covers fully;
-- changes to **set membership** on discovery sources (new pages, de-links) — no routine path
-  covers them; only a forced re-scrape does.
+The genuine gap is narrower: an **enrichment** page discovered by crawling an enrichment source's
+*own* index — ashliman starting to cover a type (a new `typeNNNN.html`), a new mapsofmyths node —
+for a motif whose base-index entry did not itself change. `refresh`'s resource set is whatever is
+already pinned (`walk_fetchables`), and a plain build's discovery reads the *pinned* enrichment
+index (`discover_site_types(force=False)`), so neither surfaces the new page; only a forced
+re-crawl (`force=True` → `scripts/fetch_motifs_raw.py`) does. The motif is already present from its
+base index — only the **secondary annotation** (ashliman coverage flag, geo node) lags.
 
-This is exactly the discovery-on-refresh edge (§8): closing it (the `expand`-descriptor design)
-would let `refresh` own discovery, at which point the forced re-scrape — and `MYTHO_OFFLINE`'s
+This is the discovery-on-refresh edge (§8): closing it (the `expand`-descriptor design) would let
+`refresh` own enrichment discovery, at which point the forced re-scrape — and `MYTHO_OFFLINE`'s
 load-bearing role — both retire.

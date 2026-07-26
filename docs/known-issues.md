@@ -6,27 +6,37 @@ Append new entries at the top.
 
 ---
 
-## `refresh` is blind to new/de-linked pages on parse-discovered sources
+## `refresh` doesn't re-discover crawl-enumerated enrichment pages
 
 **Status:** flagged — the discovery-on-refresh edge; design settled (`expand` descriptor), not
 implemented. Full audit: [`proposals/motifs-atomisation.md`](proposals/motifs-atomisation.md)
 ("Guarantees & gaps"); mechanism in the same doc (§8) and the `expand` sketch.
 
-`refresh`'s resource set is whatever is already pinned (`walk_fetchables` enumerates the pinned
-dir); it has no discovery. So it fully catches changes *within* the known set — a pinned page's
-content changed (`changed`), or a page 404'd (`gone`) — but is blind to **set-membership** changes
-on parse-discovered sources (ashliman, berezkin details, mapsofmyths nodes): a brand-new page that
-was never pinned, and a page de-linked from the index but still returning 200.
+**Not what it sounds like — base motifs are covered.** The motif *set* of every base index lives in
+a **single pinned file**: TMI in `tmi.csv`, ATU in the trilogy `atu_*` CSVs (+ the one Wikidata
+`atu.json`), Berezkin in its one index page (`parse_index(index_html)`; detail pages only attach a
+per-motif *definition*). Those files are in each source's `fetchables()`, so a **new motif** = a
+changed pinned file → `refresh --apply` adopts it → a normal `build` re-parses it (and, for
+Berezkin, fetches the new motif's detail page on cache-miss). **No `--force` / full rebuild.** The
+only reason a plain `build` alone misses it is that build reads pinned raw and won't re-fetch the
+index — which is exactly what `refresh` is for.
 
-Where it bites: run `mytho refresh motifs` after upstream adds a new ATU type and it reports
-all-clear — the new page is invisible. New members surface only under a **forced wholesale
-re-scrape** (`force=True` → `scripts/fetch_motifs_raw.py`), which re-fetches and re-parses the
-index — and that is the non-hermetic path `MYTHO_OFFLINE` exists to neutralise.
+What `refresh` genuinely misses: **newly-appearing enrichment pages on sources that crawl their
+own index** — a new ashliman type page (ashliman starts covering a type), a new mapsofmyths node —
+*when the motif's base-index entry itself did not change*. `refresh`'s resource set is whatever is
+already pinned (`walk_fetchables`), so a never-pinned enrichment page is invisible, and a plain
+build's discovery (`discover_site_types(force=False)`) reads the pinned enrichment-index and finds
+the same set. The motif is still present and correct from its base index; only the **secondary
+annotation** (ashliman coverage flag, geo node) lags until a discovery re-crawl (currently
+`--force` / `scripts/fetch_motifs_raw.py`, the non-hermetic path `MYTHO_OFFLINE` neutralises). A
+page **de-linked from an enrichment index but still 200** is likewise not noticed (re-checks as
+`not changed`).
 
 Fix (designed): give the refresh engine discovery via a recursive `expand: bytes -> [Fetchable]`
 callback on the descriptor (parsing stays in the source; the engine keeps the fetch/keep/adopt
 discipline), so an index is just a fetchable that expands into children. Closing it lets `refresh`
-own discovery and retires both the forced re-scrape and `MYTHO_OFFLINE`'s load-bearing role.
+own enrichment discovery and retires both the forced re-scrape and `MYTHO_OFFLINE`'s load-bearing
+role.
 
 ---
 
