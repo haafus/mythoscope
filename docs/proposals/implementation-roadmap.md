@@ -1,11 +1,25 @@
 # Implementation roadmap — order across the five proposals
 
-> ### ⚠️ OPEN FOLLOW-UP — embeddings completeness (do not forget)
-> `EmbeddingsStage.actual()` reports a **partially-embedded document as clean** (HIGH,
-> data-integrity — from the Stage IV code review). Design settled, **not yet implemented**:
-> store `n_chunks` per chunk; `actual()` reports a doc built iff `count(fp) == n_chunks`; a
-> backward-compat fallback means **no rebuild**. Full reasoning + checklist:
-> [`embeddings-completeness.md`](embeddings-completeness.md). **Return to this and implement.**
+> ### ⚠️ OPEN FOLLOW-UPS — still to fix (do not forget)
+> Flagged items with a settled design but **not yet implemented**. Full write-ups linked; the
+> register is [`known-issues.md`](../known-issues.md).
+>
+> 1. **Embeddings completeness** (HIGH, data-integrity). `EmbeddingsStage.actual()` reports a
+>    **partially-embedded document as clean**. Fix: store `n_chunks` per chunk; a doc is built iff
+>    `count(fp) == n_chunks`; backward-compat fallback ⇒ **no rebuild**. Reasoning + checklist:
+>    [`embeddings-completeness.md`](embeddings-completeness.md).
+> 2. **Discovery-on-refresh**. `refresh` is **blind to new / de-linked pages** on parse-discovered
+>    sources (ashliman, berezkin details, mapsofmyths nodes) — the user won't see those upstream
+>    changes without a forced re-scrape. Fix: recursive `expand: bytes -> [Fetchable]` descriptor so
+>    the engine owns discovery. Closing it also retires `MYTHO_OFFLINE`'s load-bearing role.
+>    Audit + mechanism: [`motifs-atomisation.md`](motifs-atomisation.md) ("Guarantees & gaps", §8).
+> 3. **No `fsync` in the raw write path**. `commit_bytes` is atomic (`os.replace`) but not
+>    power-loss durable. Fix (if wanted): `fsync` temp + parent dir before/after replace.
+> 4. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
+>    data** on `refresh --apply`. Fix: per-source semantic validator as the adopt gate.
+>
+> Items 2–4 are detailed in [`known-issues.md`](../known-issues.md); item 2 is the headline
+> "won't see all updates" gap.
 
 The consolidated build order for the pipeline/data/fetch redesign. It sequences every phase of every proposal
 by the **reversibility ladder**: code and additive data first (freely revertible), the heaviest step (the Part 1
