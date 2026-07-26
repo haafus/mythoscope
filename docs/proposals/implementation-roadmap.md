@@ -1,5 +1,12 @@
 # Implementation roadmap — order across the five proposals
 
+> ### ⚠️ OPEN FOLLOW-UP — embeddings completeness (do not forget)
+> `EmbeddingsStage.actual()` reports a **partially-embedded document as clean** (HIGH,
+> data-integrity — from the Stage IV code review). Design settled, **not yet implemented**:
+> store `n_chunks` per chunk; `actual()` reports a doc built iff `count(fp) == n_chunks`; a
+> backward-compat fallback means **no rebuild**. Full reasoning + checklist:
+> [`embeddings-completeness.md`](embeddings-completeness.md). **Return to this and implement.**
+
 The consolidated build order for the pipeline/data/fetch redesign. It sequences every phase of every proposal
 by the **reversibility ladder**: code and additive data first (freely revertible), the heaviest step (the Part 1
 §6 rebuild) as late as possible and only once the code around it is proven. Source of truth for *what* each phase
