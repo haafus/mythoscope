@@ -12,7 +12,7 @@ import {
     runSemanticSearch,
     sourceAttr, wireSourceIcons, hideSourceTip, destroySourceTip,
 } from "./search-utils.js";
-import { renderTraditionList } from "./tree-traditions.js?v=5";
+import { renderTraditionList } from "./tree-traditions.js?v=6";
 
 function getColorMap(traditions) {
     const map = {};

@@ -3,7 +3,7 @@ import {
     buildCorpusApiUrl, escapeHtml, formatNumber,
     regionOf, traditionColor,
 } from "./core.js";
-import { renderLibraryTree, setActiveNode } from "./tree-sources.js?v=9";
+import { renderLibraryTree, setActiveNode } from "./tree-sources.js?v=10";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `
@@ -42,7 +42,6 @@ export async function renderCorpus(params = new URLSearchParams()) {
         if (region) {
             state.corpusOpenMajor = region;
             state.corpusOpenTradition = corpusTraditionKey(region, wantedTradition);
-            state.corpusTreeInitialized = true;   // keep our choice; don't let initTreeOpen override
         }
     }
 

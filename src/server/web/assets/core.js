@@ -22,7 +22,6 @@ export const state = {
     selectedNode: null,           // the ONE active tree item: {kind:'region'|'tradition'|'book', …}
     corpusOpenMajor: null,        // accordion: the one open region (expansion, separate from active)
     corpusOpenTradition: null,    // accordion: the one open tradition key
-    corpusTreeInitialized: false,
     traditionTree: null,       // region -> { color, description, subdivision, strata, traditions }
     treeIndex: null,           // tradition -> { region, regionColor, coordinates, index, count, … }
     analysisSearchRequestId: 0,

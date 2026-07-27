@@ -1,28 +1,13 @@
-import { state, groupDocuments, corpusTraditionKey, escapeHtml, traditionColor } from "./core.js";
-import { renderMajorTree } from "./tree-scaffold.js?v=2";
+import { state, corpusTraditionKey, escapeHtml, traditionColor } from "./core.js";
+import { renderMajorTree } from "./tree-scaffold.js?v=3";
 
 export async function renderLibraryTree(container) {
     await renderMajorTree(container, {
         emptyMessage: "No literature found.",
-        prepare: (documents) => {
-            initTreeOpen(documents);
-            return { documents, docIndex: new Map(documents.map((doc, i) => [doc, i])) };
-        },
+        prepare: (documents) => ({ documents, docIndex: new Map(documents.map((doc, i) => [doc, i])) }),
         renderBody: (traditions, major, ctx) => renderTraditionGroups(traditions, major, ctx.docIndex),
         bindLeaves: (container, ctx) => bindTreeLeaves(container, ctx.documents),
     });
-}
-
-function initTreeOpen(documents) {
-    if (state.corpusTreeInitialized) return;
-    const grouped = groupDocuments(documents);
-    const firstMajor = grouped.keys().next().value;
-    if (firstMajor != null) {
-        state.corpusOpenMajor = firstMajor;
-        const firstTradition = grouped.get(firstMajor).keys().next().value;
-        if (firstTradition != null) state.corpusOpenTradition = corpusTraditionKey(firstMajor, firstTradition);
-    }
-    state.corpusTreeInitialized = true;
 }
 
 function renderTraditionGroups(traditions, major, docIndex) {

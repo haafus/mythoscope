@@ -15,7 +15,8 @@ export async function renderMajorTree(container, { emptyMessage, prepare, render
 
         const ctx = prepare ? prepare(documents) : {};
         const grouped = groupDocuments(documents);
-        if (state.corpusOpenMajor === null) state.corpusOpenMajor = grouped.keys().next().value ?? null;
+        // No default-open: the tree starts fully collapsed until the user opens a section (or a
+        // deep link / prior selection opens one).
 
         let html = "";
         grouped.forEach((traditions, major) => {
