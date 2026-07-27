@@ -71,6 +71,12 @@ not as live work.
   extracted from the Figma `MythoSemantic` mockup (vision, the `-scope` name essay, the full
   "Join the Collaboration" page, a sitemap, a resources list). Raw source for the public-docs
   plan §14; some blocks are internal RU strategy memos. *Reference.*
+- [`go-to-market.md`](go-to-market.md) — the **acquisition & retention architecture**: the
+  credibility→citation→word-of-mouth flywheel for a research-infrastructure project, channels
+  by leverage (owned SEO magnets, preprint/DOIs, academic Bluesky/Mastodon, Humanist &
+  scholarly lists, conferences, awesome-list, Wikipedia), the retention spine (Buttondown +
+  living tool + contribution loop), a phased GTM sequence, and metrics/anti-metrics. Companion
+  to `public-docs-plan.md`. *Strategy; not started.*
 
 ## Archived
 
