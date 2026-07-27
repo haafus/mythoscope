@@ -667,6 +667,9 @@ reader-first README.
 - [ ] **Fill placeholders:** `OWNER` (GitHub owner) in `CITATION.cff` / `pyproject` URLs, the
       real author name(s)/ORCID and copyright holder in `LICENSE`/`CITATION.cff`, and the
       `security@mythoscope.io` mailbox.
-- [ ] **GitHub repo settings** (from the web, can't be scripted here): description, topics
+- [ ] **GitHub repo settings** (from the web / About ⚙ — cannot be set via the available
+      tooling): **Website = `https://mythoscope.io`** (shown prominently in the About box),
+      a one-line **description** (e.g. "Computational framework for comparative mythology —
+      semantic space + LLM graphs + a TMI↔ATU↔Berezkin motif crosswalk"), **topics**
       (`computational-folkloristics`, `comparative-mythology`, `digital-humanities`, `nlp`,
-      `folklore`), social-preview image, enable Discussions.
+      `folklore`), a social-preview image, and enable Discussions.
