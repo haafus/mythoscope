@@ -824,6 +824,13 @@ body.has-main-navbar {
    Embeddings / Analysis Page
    ========================================================================== */
 
+/* Fill the column before the tree renders, so the controls sit at the bottom from
+   the first paint instead of hugging the "Loading…" line and dropping later. */
+.analysis-page #tree-container {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 .analysis-page .sidebar-controls {
     flex: 0 0 auto;
     border-top: 1px solid var(--border);
