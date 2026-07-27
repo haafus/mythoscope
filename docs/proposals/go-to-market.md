@@ -186,7 +186,11 @@ as a distinct channel, not a docs appendix.
 
 **Promotion playbook:**
 1. **Standalone repo** `awesome-computational-mythology` (not buried in mythoscope) so stars,
-   forks, topics, and citations accrue to *it*.
+   forks, topics, and citations accrue to *it*. Host it under a **personal account**, not a
+   `mythoscope` org — a personal-account list reads as neutral community curation (convention
+   for awesome lists; helps trust and index acceptance), whereas an org repo reads as a company
+   asset/ad. Transferable to an org later without losing stars or breaking links. Keep a named
+   maintainer line + one tasteful backlink to Mythoscope.
 2. **Get into the canonical `sindresorhus/awesome` index** — the single biggest discovery
    driver. It requires meeting the Awesome manifesto (structure, badge, TOC, contribution
    guidelines, license, per-item descriptions, maturity, passes `awesome-lint`). Build the repo
