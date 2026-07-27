@@ -34,10 +34,10 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
    it, added later. Domain is **mythoscope.io** (not `.org`). (§10, §14.3)
 9. **Generated HTML in git (E): committed.** The server just serves files; deploy needs no CI
    rebuild; fits the ephemeral-container model (clone → already serves). (§12.2)
+10. **Nav-hub label (D): "Research ▾"** — the word on the docs entry in the top nav (replaces
+    the bare "i"), opening the tiered TOC. (§9)
 
-**Open — need the user's call:**
-- **D. Nav-hub label** — the word printed on the docs entry in the top nav. Recommended
-  **"Research ▾"** over "About"/"Docs"; confirm the word. (§9)
+**Open:** none — all forks resolved. Ready to start Phase 1.
 
 ## 0. Starting picture
 
@@ -251,9 +251,9 @@ Recommended combination (not a single trick):
   crosswalk page, Atlas → "14 regions", Similarity → methodology. Distributes discovery to
   where curiosity strikes and doubles as the §4 internal linking.
 
-Naming: do **not** label it all "About." Split a tiny **"About"** (vision/project) from a
-prominent **"Research"/"Docs"** (surveys + crosswalk) — for an academic audience these are
-different promises.
+Naming (decided D): the hub is labelled **"Research ▾"** — not "About"/"Docs"; for an academic
+audience "Research" signals substance. A tiny separate **"About"** (vision/project, = page A5)
+stays distinct from the Research hub (surveys + crosswalk) — different promises.
 
 The deeper fix behind the "it feels hidden" feeling: the root route is `/corpus`, so a cold
 visitor lands **straight in a data table with no framing**. The site has no front door at
