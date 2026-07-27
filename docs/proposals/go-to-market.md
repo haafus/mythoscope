@@ -84,16 +84,22 @@ Ordered by fit for this audience (highest first). Owned > earned > rented; we le
 2. **The living tool as a reason to return.** New data drops, new views, a recurring **"motif
    of the month"** deep-dive linking a case study to the live Atlas/Motifs, saved/shareable
    queries. A paper is read once; a tool with fresh data is revisited.
-3. **Community, low-friction.** **GitHub Discussions** as the primary (owned, indexable,
-   dev-adjacent) + a light **Discord** for real-time (the Figma copy already lists it) +
-   **quarterly community calls** (open, recorded). For academics a mailing list/forum often
-   beats chat — keep chat light, keep the list/Discussions canonical.
+3. **Community, async-first.** For academics real-time chat is *secondary* to async, so
+   **GitHub Discussions** is the primary (owned, indexable, dev-adjacent) + newsletter +
+   **quarterly community calls** (open, recorded). **Real-time chat is deferred** — an empty
+   server signals worse than none. When there is a community to sustain it, add **Zulip**
+   (threaded, topic-organized, open-source, free for open communities — best for the research
+   register) or **Discord** (lower friction, more reach if the audience skews students/
+   contributors); Matrix/Element if open-source sovereignty is a priority. Chat is a retention
+   amplifier, not an acquisition channel.
 4. **The contribution loop (the real moat).** Contributors of corpus, annotations, or code
    become invested through **attribution, co-authorship, and citations**. They return, and
    they evangelise. The Contribute page (C1, from the Figma "Join the Collaboration" backbone)
    is the on-ramp; CARE/Open-Science principles keep it trusted.
 5. **The citation loop.** Once cited, the citing work drives durable traffic and third-party
-   legitimacy — the compounding end-state of the flywheel.
+   legitimacy — the compounding end-state of the flywheel. The prerequisite is *citable
+   objects* — DOIs, `CITATION.cff`, a preprint — and a written *credit & authorship* policy;
+   both are specified in `public-docs-plan.md` §15 (Publications page C3, Credit page C5).
 
 ## 4. Channel roster — role, ownership, cadence, effort
 
@@ -127,6 +133,12 @@ Sustainable for a small team — **substance over frequency**, no daily social t
 - **Per milestone (burst):** preprint, conference demo, major data drop → the full channel
   set + direct scholar outreach.
 - **Evergreen:** the docs and awesome-list, kept current.
+
+**Publishing home:** the canonical home for "motif of the month" / "mockup of the month" and
+own-publication announcements is the on-site **Updates/Notes** blog (plan C4) — owned + SEO —
+fed to the **newsletter** and cross-posted to Bluesky/Mastodon. Papers/preprints live on the
+**Publications** page (C3) with "How to cite" blocks; deposit copies on Zenodo/CORE and list on
+Google Scholar / Humanities Commons / ORCID.
 
 Formats that travel: the case-study vignettes (swan-maiden, sun-and-moon, fished-up earth),
 stat-tile pull-quotes, interactive-map screenshots/GIFs, and the honest "here's what we

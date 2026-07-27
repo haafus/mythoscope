@@ -77,6 +77,11 @@ not as live work.
   scholarly lists, conferences, awesome-list, Wikipedia), the retention spine (Buttondown +
   living tool + contribution loop), a phased GTM sequence, and metrics/anti-metrics. Companion
   to `public-docs-plan.md`. *Strategy; not started.*
+- [`../awesome-computational-mythology.md`](../awesome-computational-mythology.md) — a curated
+  field resource list (indexes, corpora, datasets, methods, tools, ontologies, papers,
+  scholars, venues, text libraries) assembled from the research/motifs surveys. Both a
+  community asset and an acquisition magnet (GTM §2.6). *Draft — verify links before publishing;
+  to be spun into its own repo.*
 
 ## Archived
 

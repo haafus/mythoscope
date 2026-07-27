@@ -36,8 +36,30 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
    rebuild; fits the ephemeral-container model (clone → already serves). (§12.2)
 10. **Nav-hub label (D): "Research ▾"** — the word on the docs entry in the top nav (replaces
     the bare "i"), opening the tiered TOC. (§9)
+11. **API: no product API now.** The server's auto-generated OpenAPI (`/docs`, `/redoc`,
+    `/openapi.json`) is exposed read-only and linked from Resources as *experimental — no
+    stability guarantees*; investment goes to **bulk data downloads + DOIs**, not an API. (§15)
+12. **Citability: create citable objects.** Zenodo DOIs (repo release, the crosswalk dataset,
+    each survey), a `CITATION.cff`, a preprint (arXiv cs.CL / SocArXiv / HCommons CORE). Nothing
+    is formally citable until these exist. (§15)
+13. **Credit & authorship: written policy.** An attribution ladder (acknowledgement → data/tool
+    citation → co-authorship, with CRediT roles + criteria; CARE for Indigenous data), a
+    `CONTRIBUTORS.md` + `CITATION.cff`, and a public **Credit** page. (§15, C5)
+14. **New pages:** **Publications** (C3, the citation hub), **Updates/Notes** (C4, the light
+    blog — home of "motif/mockup of the month"), **Credit & authorship** (C5). "Learn"/tutorials
+    stay deferred. (§2)
+15. **Community/chat: async-first.** GitHub Discussions (owned, indexable) + newsletter +
+    quarterly calls are primary; real-time chat is deferred and, when added, **Zulip** (research
+    register) or **Discord** (reach) — never an empty server. (GTM §3)
 
-**Open:** none — all forks resolved. Ready to start Phase 1.
+**Name (recommended, pending confirm):** canonical spelling **`Mythoscope`** (single capital,
+matching the microscope/telescope instrument lineage the name's meaning rests on); "MYTHOSCOPE"
+only as a logotype. Normalise repo-wide once confirmed.
+
+**Open:** none blocking — Phase 1 can start; the name spelling awaits a one-word confirm.
+
+**Companion:** the acquisition/retention strategy lives in [`go-to-market.md`](go-to-market.md);
+the field resource list in [`../awesome-computational-mythology.md`](../awesome-computational-mythology.md).
 
 ## 0. Starting picture
 
@@ -57,7 +79,7 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
 ## 1. Composition principles ("vivid, but not excessive")
 
 1. **One canonical public layer.** We do not mirror all of `docs/` onto the site. Publish
-   ~13 pages; everything reasoning-flavoured (proposals, reviews, known-issues,
+   ~16 pages; everything reasoning-flavoured (proposals, reviews, known-issues,
    archive, parsing logs) stays in the repo for whoever reaches GitHub.
 2. **Specialist-first, with a human entry point.** Top of funnel: a vivid thesis and case
    studies. Depth below: references and surveys that people search for by name.
@@ -72,7 +94,7 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
    "what we found" page sits a "go turn the knobs yourself" button (Atlas / Similarity /
    Motifs). That is dwell time and retention.
 
-## 2. Proposed composition — 3 tiers, ~13 pages
+## 2. Proposed composition — 3 tiers, ~16 pages
 
 ### Tier A — The argument (human entry, narrative)
 
@@ -101,12 +123,15 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
 
 | Page | What | Source | Readiness |
 |---|---|---|---|
-| C1 | **Contribute.** How to help: corpus, code, data, community; the **awesome-computational-mythology** idea; the "just view the data" path (export bundle, no torch). Backbone = the Figma "Join the Collaboration" page (15 collaboration types), trimmed to real offerings. | Figma (§14) + README roadmap + how-to | trim/adapt |
-| C2 | **Resources.** Data (export bundles), the live **API `/docs` (OpenAPI)**, GitHub, preprints + bibliography, licences; digital text-library list from Figma (dedupe vs B4). | Figma (§14) + how-to | to write |
+| C1 | **Contribute.** How to help: corpus, code, data, community; the **awesome-computational-mythology** list; the "just view the data" path (export bundle, no torch). Backbone = the Figma "Join the Collaboration" page (15 collaboration types), trimmed to real offerings. | Figma (§14) + README roadmap + how-to | trim/adapt |
+| C2 | **Resources.** Data downloads + DOIs, the read-only **OpenAPI** (`/docs`, marked experimental — §15), GitHub, the awesome-list, licences; digital text-library list from Figma (dedupe vs B4). | Figma (§14) + how-to | to write |
+| C3 | **Publications.** The citation hub: papers, preprints, DOIs, each with a "How to cite" block; links to Scholar / HCommons / ORCID. Maps to the Figma sitemap's Research→Publications. | §15 + release-plan | to write |
+| C4 | **Updates / Notes.** A light blog — home of "**motif of the month**" and "**mockup of the month**"; fed to the newsletter and cross-posted (GTM). The return-visit hook. | net-new + mockups + Element | to write |
+| C5 | **Credit & authorship.** The attribution ladder (acknowledgement → data/tool citation → co-authorship), CRediT roles + criteria, CARE for Indigenous data; mirrors `CONTRIBUTORS.md`/`CITATION.cff`. | §15 | to write |
 
-**Out of initial scope (from the Figma sitemap, kept lean):** *Learn* (tutorials/workshops) and
-*News & Events* are deferred — net-new content, not needed for the specialist/SEO launch; add
-later if the community warrants it. *Team / Partners* pages wait until they are real (§14.3).
+**Out of initial scope (kept lean):** *Learn* (tutorials/workshops) is deferred — net-new,
+not needed for the specialist/SEO launch. *Team / Partners* pages wait until they are real
+(§14.3). (The Figma sitemap's "News & Events" is covered by C4 Updates/Notes.)
 
 ## 3. Where it lives (decided in §8 — hybrid)
 
@@ -474,3 +499,46 @@ sample data, not copy.
 Extraction was one-off via the Figma REST API (`GET /v1/files/:key`, `X-Figma-Token`); the
 token was used only at request time and never stored in the repo. The raw dump lives outside
 the repo (scratchpad). Rotate/revoke the token now that it has been shared in plaintext.
+
+## 15. Citation, credit & API (operational)
+
+The engine in `go-to-market.md` runs on *citability* and *credited contribution*; both need
+concrete artifacts, not just pages.
+
+### 15.1 Citability — make citable objects
+
+Nothing is formally citable today (no DOI, no `CITATION.cff`, no versioned release). Create
+persistent-identifier objects, most-citable first:
+- **The crosswalk dataset** — a versioned, DOI'd data release (Zenodo). The single most novel,
+  citable artifact; ship it as CSV/JSON + a datasheet.
+- **A `CITATION.cff`** in the repo → GitHub's "Cite this repository" button.
+- **A software/release DOI** via the GitHub→Zenodo integration (a DOI per tagged release, plus
+  a concept-DOI for "all versions").
+- **A preprint** (arXiv cs.CL / SocArXiv / Humanities Commons CORE) for the methods/findings —
+  the object cited in prose; from `docs/papers/`.
+- **Per-survey DOIs** (Zenodo deposits) so the B3–B5 "How to cite" blocks resolve.
+- **Versioning:** semantic versions + "cite the version you used" guidance.
+- **Where surfaced:** the **Publications** page (C3) + **Resources** (C2) "How to cite" blocks;
+  register profiles (Google Scholar, Humanities Commons, ORCID) that point back.
+
+### 15.2 Credit & authorship — make contribution trustworthy
+
+Academics weigh authorship heavily, so the policy must be written and visible (page C5 +
+repo files):
+- **The attribution ladder:** acknowledgement (listed contributor) → **data/tool citation**
+  (the contributor's dataset/annotation gets its own citable DOI) → **co-authorship** when the
+  contribution is substantial (curating a tradition's corpus, a methods contribution).
+- **Roles:** the **CRediT** taxonomy (14 contributor roles) for transparent, granular credit.
+- **Criteria:** ICMJE-style authorship thresholds, adapted; **CARE principles** + consent/
+  co-governance for Indigenous materials (already in the Figma copy).
+- **Repo mirror:** `CONTRIBUTORS.md` (everyone credited) + `CITATION.cff` (how to cite the
+  software/data). Per-dataset provenance travels with the data.
+
+### 15.3 API — minimal now
+
+No product API at this stage: a supported, versioned public API is a premature maintenance and
+stability commitment for a small audience, and researchers reuse **data dumps**, not API
+clients. But the server's **OpenAPI is generated for free** (`/docs`, `/redoc`,
+`/openapi.json`) — expose it read-only and link it from Resources as *experimental, no
+stability guarantees*. Priority is bulk downloads + DOIs (§15.1). A real API is Phase-3+,
+demand-driven.
