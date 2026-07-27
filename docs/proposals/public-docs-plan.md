@@ -155,7 +155,7 @@ in the request path), and it is the only path that yields the §13 payoffs (rich
 low TTFB, CDN cacheability). The renderer work is *identical* to SSR — the same md→template→
 HTML step — it just runs at build time instead of per request, so precompiling is "the same
 code, run earlier," not more code. The one real cost is **build discipline**: a content edit
-requires a rebuild (`mytho build-docs`, ideally wired to CI so a push regenerates the site),
+requires a rebuild (`scripts/build_docs.py`, ideally wired to CI so a push regenerates the site),
 and any live figure (e.g. crosswalk edge counts) must be **injected at build time** from
 `outputs/`, not rendered at runtime — an acceptable snapshot for these pages. On-request SSR
 is kept only as an optional local `--watch` authoring preview, never in production.
@@ -318,15 +318,23 @@ it does not touch the API or the app's behaviour.
   footer (§10), the theme CSS, and the per-page `<head>` (title/meta/OG/canonical from
   front-matter). The shell is extracted once so the SPA `index.html` and the doc template
   render an identical header/footer.
-- **Serving — precompiled static (primary):** a **`mytho build-docs`** step runs the
-  renderer over the whole `content/` tree and writes finished `.html` (+ `sitemap.xml`) to a
-  `site/` dir; the server mounts that dir as static files (the same pattern as `/assets`), or
-  it is handed to a CDN / static host entirely. No renderer or template engine in the request
-  path. This is what unlocks the §13 payoffs. The build is decoupled from the app and can be
-  hosted independently if desired.
-  - **Optional dev preview (not production):** a `--watch` mode re-renders on file change for
-    local authoring, so edits are visible without a manual rebuild. Same renderer; never on
-    the production request path.
+- **Build script (not a CLI subcommand):** a standalone **`scripts/build_docs.py`**, in the
+  same family as the existing offline scripts (`build_semantic_parallels.py`,
+  `build_tmi_bibliography.py`, …) — outside the `mytho` pipeline, so it never touches the
+  data-build CLI. It runs the renderer over the whole `content/` tree and writes finished
+  `.html` (+ `sitemap.xml`).
+- **Output location — under the web root, not `outputs/`:** the generated pages go into the
+  static-serving web tree (`src/server/web/`, alongside the existing static-assets folder) —
+  e.g. a dedicated `src/server/web/site/` subtree — **not** into `outputs/` (which is for
+  pipeline artifacts). CSS/JS/OG images reuse the existing `src/server/web/assets/` served at
+  `/assets`.
+- **Serving — precompiled static:** the server mounts the generated subtree as static files
+  (the same `StaticFiles` pattern as `/assets`), or it is handed to a CDN / static host
+  entirely. No renderer or template engine in the request path — this is what unlocks the §13
+  payoffs. The build is decoupled from the app and can be hosted independently if desired.
+  - **Optional dev preview (not production):** a `--watch` flag on the script re-renders on
+    file change for local authoring, so edits are visible without a manual rebuild. Same
+    renderer; never on the production request path.
 
 ### 12.3 Head, OG, and discovery
 
@@ -349,15 +357,15 @@ it does not touch the API or the app's behaviour.
 
 ### 12.5 Phasing (supersedes the phase note in §7 for the delivery mechanics)
 
-1. **Bootstrap:** shell template + the `mytho build-docs` SSG step + `content/` with A1 and
-   B4 (both ready, English) + generated `sitemap.xml`/`robots.txt`; mount `site/` as static.
-   Move the SPA to `/app`. Static from day one — the §13 payoffs (OG cards, low TTFB) are
-   already in place at this phase.
+1. **Bootstrap:** shell template + the `scripts/build_docs.py` SSG script + `content/` with
+   A1 and B4 (both ready, English) + generated `sitemap.xml`/`robots.txt` written under the
+   web root (`src/server/web/site/`); mount that subtree as static. Move the SPA to `/app`.
+   Static from day one — the §13 payoffs (OG cards, low TTFB) are already in place here.
 2. **Fill:** the rest of Tier A and the Tier-B magnets (translate B1); wire the hub and
-   contextual links; per-page front-matter (title/description/OG). Wire `build-docs` into CI
-   so a content push regenerates the site.
-3. **Optimise (optional):** put `site/` behind a CDN; add custom OG images (Atlas screenshot,
-   stat/quote graphics) for the magnets.
+   contextual links; per-page front-matter (title/description/OG). Wire `build_docs.py` into
+   CI so a content push regenerates the site.
+3. **Optimise (optional):** put the generated subtree behind a CDN; add custom OG images
+   (Atlas screenshot, stat/quote graphics) for the magnets.
 
 ## 13. Glossary — the Phase-3 payoffs (why precompile to static)
 
