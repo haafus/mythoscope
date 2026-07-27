@@ -323,15 +323,18 @@ it does not touch the API or the app's behaviour.
   `build_tmi_bibliography.py`, …) — outside the `mytho` pipeline, so it never touches the
   data-build CLI. It runs the renderer over the whole `content/` tree and writes finished
   `.html` (+ `sitemap.xml`).
-- **Output location — under the web root, not `outputs/`:** the generated pages go into the
-  static-serving web tree (`src/server/web/`, alongside the existing static-assets folder) —
-  e.g. a dedicated `src/server/web/site/` subtree — **not** into `outputs/` (which is for
-  pipeline artifacts). CSS/JS/OG images reuse the existing `src/server/web/assets/` served at
-  `/assets`.
-- **Serving — precompiled static:** the server mounts the generated subtree as static files
-  (the same `StaticFiles` pattern as `/assets`), or it is handed to a CDN / static host
-  entirely. No renderer or template engine in the request path — this is what unlocks the §13
-  payoffs. The build is decoupled from the app and can be hosted independently if desired.
+- **Output location — the web root itself, not `outputs/`:** `src/server/web/` is already the
+  web root (`settings.web_root`) and is already served. The generated pages go **directly
+  there**, next to `index.html` and `assets/`, in URL-matching subdirs (`research/`,
+  `indexes/`, `cases/`) — no wrapper folder. **Not** `outputs/` (that is for pipeline
+  artifacts). CSS/JS/OG images reuse the existing `assets/` served at `/assets`. (Generated
+  `.html` can be gitignored and rebuilt in CI, or committed — a small separate call.)
+- **Serving — precompiled static:** wired at server startup in `create_app` — the same place
+  the current `/assets` `StaticFiles` mount and the `index.html` response are set up — just
+  extended to serve the web-root doc files (or mount the web root as static). The doc pages
+  are plain files under the root; no renderer or template engine in the request path, and no
+  new runtime machinery — this is what unlocks the §13 payoffs. The tree can equally be handed
+  to a CDN / static host; the build is decoupled from the app.
   - **Optional dev preview (not production):** a `--watch` flag on the script re-renders on
     file change for local authoring, so edits are visible without a manual rebuild. Same
     renderer; never on the production request path.
@@ -358,9 +361,10 @@ it does not touch the API or the app's behaviour.
 ### 12.5 Phasing (supersedes the phase note in §7 for the delivery mechanics)
 
 1. **Bootstrap:** shell template + the `scripts/build_docs.py` SSG script + `content/` with
-   A1 and B4 (both ready, English) + generated `sitemap.xml`/`robots.txt` written under the
-   web root (`src/server/web/site/`); mount that subtree as static. Move the SPA to `/app`.
-   Static from day one — the §13 payoffs (OG cards, low TTFB) are already in place here.
+   A1 and B4 (both ready, English) + generated `sitemap.xml`/`robots.txt` written directly
+   under the web root (`src/server/web/`); extend the startup mount in `create_app` to serve
+   them. Move the SPA to `/app`. Static from day one — the §13 payoffs (OG cards, low TTFB)
+   are already in place here.
 2. **Fill:** the rest of Tier A and the Tier-B magnets (translate B1); wire the hub and
    contextual links; per-page front-matter (title/description/OG). Wire `build_docs.py` into
    CI so a content push regenerates the site.
