@@ -60,16 +60,16 @@
   },
   "embedding": {
     "models": {
-      "bge-m3": "BAAI/bge-m3",
+      "bge-m3": "BAAI/bge-m3"
+    },
+    "inactive": {
       "labse": "sentence-transformers/LaBSE",
       "e5-large": {
         "model": "intfloat/e5-large-v2",
         "query_prefix": "query: ",
         "document_prefix": "query: "
       },
-      "qwen-06b": "Qwen/Qwen3-Embedding-0.6B"
-    },
-    "inactive": {
+      "qwen-06b": "Qwen/Qwen3-Embedding-0.6B",
       "qwen-4b": {
         "model": "Qwen/Qwen3-Embedding-4B",
         "dtype": "auto",
