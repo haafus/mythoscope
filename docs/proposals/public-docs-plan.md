@@ -81,8 +81,8 @@ entries.
 
 Alternative, if maximum SEO/citability is the priority: publish the surveys (B3–B5) and the
 crosswalk (B1) as **standalone static URLs** with clean paths and full `<title>`/`<meta>`
-— crawlers handle these better than SPA hash routing. This is the one real fork to settle
-before starting (see §7).
+— crawlers handle these better than SPA hash routing. This fork is worked through and
+resolved (hybrid) in §8.
 
 ## 4. SEO layer
 
@@ -135,5 +135,131 @@ drafts are not published separately — they are already distilled into the Elem
 are in Russian; the public layer ships in English (Element and the surveys are already
 English).
 
-Open fork to settle before starting: **the surveys/crosswalk inside the SPA vs. as
-standalone static URLs for SEO** (§3). The public-layer language is decided: English.
+The public-layer language is decided: English. The SPA-vs-static-URL fork raised in §3 is
+resolved in §8 (hybrid). Navigation/entry, chrome (footer/social/newsletter/contact), and
+copy-sourcing from Figma are worked out in §9–§11.
+
+## 8. Delivery: SPA vs. standalone static URLs (fork from §3, resolved)
+
+The current site is an SPA with **hash routing** (`#/corpus`, `#/about`). To a crawler,
+everything after `#` is one page — no per-URL `<title>`/`<meta>`, no separate index entry.
+For the *app* (interactive views) that is fine; they need not be indexed. For the *docs* it
+is fatal: the surveys and the crosswalk — the whole reason for the SEO effort — would be
+invisible.
+
+What each option buys:
+
+| Axis | Inside the SPA (as today) | Standalone static URLs (SSR/prerender) |
+|---|---|---|
+| **Indexing / SEO** | Poor: hash content is barely crawled; even History-API routing needs server HTML per URL | **Good**: real HTML, own `<title>/<meta>/OG` per page |
+| **Citability / links** | Ugly, fragile `#/…` URLs — bad in a footnote | **Stable clean paths** (`/crosswalk`, `/research/…`); OG cards |
+| **Build cost** | Cheap: fill tabs, reuse styling | Moderate: markdown→HTML render + template + `sitemap.xml`. But docs are *already* markdown and FastAPI *already* serves static — an addition, not a rewrite |
+| **Content upkeep** | Awkward: prose as HTML in JS template strings (see `page-about.js`) | **Easy**: edit `.md`, server renders |
+| **UX / unity** | One shell, instant transitions, live views at hand | Pages must inherit the same header/CSS or feel like a different site (solved with a shared template) |
+
+**Resolution — hybrid.** Draw the line by the nature of the content, not by convenience:
+
+- **The app stays an SPA.** Sources / Similarity / Ages / Realms / Beings / Atlas / Motifs
+  are a tool; they need no indexing. Untouched.
+- **Public docs (Tiers A and B) become server-rendered static pages at clean paths**,
+  rendered by FastAPI from the existing markdown, with a shared template (same
+  header/nav/CSS/theme) so it reads as one site. Per page: `<title>`,
+  `<meta name="description">`, OG tags; plus `sitemap.xml` and canonical links.
+
+Why not "all SPA" (magnets B1/B3–B5 would be unindexed — §4 collapses) and not a separate
+docs engine (docusaurus/mkdocs is the "excess" we are avoiding; markdown and the server
+already exist). Cost is small and one-off: one markdown→HTML route, one wrapper template,
+a generated `sitemap.xml`; after that, adding a page = drop a `.md` file. A later
+build-time precompile of those `.md` to static `.html` (richer OG, faster TTFB, CDN cache)
+is an optimisation, not a blocker.
+
+## 9. Navigation and the entry point
+
+The lone unlabelled **"i"** at the end of the nav is the weakest possible door to the
+section the whole specialist/SEO bet rests on: no label (low affordance), "info/about"
+semantics rather than "read/research", and a tail position that reads as a footer
+afterthought. But the main row is already dense (7 tool tabs), so the goal is **not an 8th
+equal button** — it is to separate two different layers: *tools* (app) and *reading*
+(docs).
+
+Recommended combination (not a single trick):
+
+- **A labelled hub with a dropdown as the primary entry.** Replace "i" with **"Research ▾"**
+  (or "Docs ▾") that expands the tiered TOC (Argument / Reference & Surveys / Participate).
+  The main row gains only one labelled slot; the whole section lives behind it. The section
+  already has internal tabs (Vision|Methodology|Contribute|Resources), so a second nav level
+  is natural.
+- **Two visual zones.** Tools left, "Research" as a separate right-aligned group (divider or
+  different weight): "turn the data on the left, read on the right."
+- **Logo → home/overview (almost free, do regardless).** Clicking the logo lands on the
+  overview page — a standard convention that makes the docs entry the largest element on the
+  page without adding a nav item.
+- **Contextual "learn more" from the views (complement, not replacement).** Motifs → the
+  crosswalk page, Atlas → "14 regions", Similarity → methodology. Distributes discovery to
+  where curiosity strikes and doubles as the §4 internal linking.
+
+Naming: do **not** label it all "About." Split a tiny **"About"** (vision/project) from a
+prominent **"Research"/"Docs"** (surveys + crosswalk) — for an academic audience these are
+different promises.
+
+The deeper fix behind the "it feels hidden" feeling: the root route is `/corpus`, so a cold
+visitor lands **straight in a data table with no framing**. The site has no front door at
+all. Making the overview landing the root (tools behind an "Explore" CTA) inverts the
+funnel — docs become the door, not a back alley — and matches the static-landing choice in
+§8.
+
+## 10. Chrome: footer, social, newsletter, contact, copyright
+
+The site currently has **no footer** (in `index.html`, `#app` follows `<nav>` directly).
+Introduce one; it absorbs most of this. Principle — **three zones, each with one job** — so
+nothing here bloats the main nav:
+
+- **Header** stays minimal: nav + a single **GitHub icon** (a live "Star on GitHub" CTA for
+  an open-source research tool) + the Research entry. Nothing else.
+- **Footer** is the home for everything administrative/contact: copyright + licence, socials,
+  contact email, a compact newsletter field. In the SPA it lives **outside `#app`** (static
+  in `index.html`), so it persists across routes, never re-renders, and gives crawlers a
+  stable site-wide link block (an SEO plus).
+- **Resources / Contribute page** holds the "rich" versions: the full newsletter form, a
+  cite block, the complete contact + social set, data/API links.
+
+Placement per element:
+
+| Element | Primary place | Reinforcement |
+|---|---|---|
+| **Copyright + licence** | Footer, one line: `© 2026 MythoScope · CC-BY-SA` (+ data-licence link) | — |
+| **GitHub** | **Header icon** (live CTA) | Again in the footer social set |
+| **Other socials** | Footer (icon set) | Resources page |
+| **Contact email** | Footer (`mailto:`, prefer a role address — `research@`/`contact@`) | Contribute/Resources — where collaborators look |
+| **Newsletter** | **Compact field in the footer** ("Get updates on new findings — email → Subscribe") | Full block on Resources + a soft CTA at the end of warm pages (What we found / case studies) |
+
+Two caveats:
+- **Full-bleed views.** Atlas/Similarity are full-height flex workspaces; a full footer
+  fights the app feel. Use a thin one-line footer on document pages and hide it (or keep it
+  ultra-slim) on the interactive views — footer split by route nature, like the docs
+  themselves.
+- **Newsletter is not just UI.** A working subscription needs a backend/provider
+  (Buttondown, Substack, Mailchimp, self-hosted listmonk); the form posts to their API. For
+  this audience avoid pop-up modals (specialists find them abrasive) — an unobtrusive footer
+  field plus a warm end-of-page CTA. Pick the provider before building the form; its markup
+  depends on the choice.
+
+## 11. Sourcing copy from a Figma mockup (operational note)
+
+If public copy is drafted in Figma, the reliable extraction path is the **Figma REST API**
+(no Figma tool is connected to the working environment; a private file cannot be read from a
+public link — it returns an empty JS shell, the same SPA effect as §8). Needed inputs:
+
+1. **File key** — from the URL: `figma.com/design/<FILE_KEY>/…`.
+2. **Personal access token** — Figma → Settings → Security → Personal access tokens, scope
+   **`file_content:read`** (read-only). A secret: pass it out-of-band so it never lands in a
+   commit; used only at request time, never stored or pushed.
+
+Then `GET https://api.figma.com/v1/files/<FILE_KEY>` with header `X-Figma-Token`, walk the
+document tree, and collect every `type == "TEXT"` node's `characters` field — verbatim text
+with the frame/page hierarchy preserved (exportable to markdown/JSON keyed by frame name).
+For a specific frame, pass its `node-id` (from `?node-id=…`) to
+`GET /v1/files/<key>/nodes?ids=…`. Outbound HTTPS goes through the proxy — `api.figma.com`
+should pass. Avoid screenshots+OCR: it drops diacritics (Ténèze/Polívka), which this corpus
+is full of. Alternative to a manual token: connect a Figma connector/MCP (OAuth) to the
+session.
