@@ -418,6 +418,13 @@ level 1 (key):    live_stage.actual().keys() − live_stage.desired().keys()   #
 level 2 (store):  store.list() − {id of every live stage on that store}      # removed model / plot / source (a whole store)
 ```
 
+Level 2 is **family-granular under a scope**: an orphan (a dropped model's collection) has no live
+stage, so it can be attributed to its store's *family* (`embeddings`) but not to a single member.
+A scoped `clean` therefore reaps a store's orphans only when the scope covers the store's **whole
+family** (`clean embeddings`) or is unscoped — a single-member scope (`clean embeddings:bge-m3`)
+leaves sibling orphans untouched. (`export`'s orphan probe expands a scope to its family first, so
+it always reports at family granularity.)
+
 **The store abstraction (level 2).** There are exactly **two storage backends** — files on disk and Chroma
 collections — so the mechanics live in two small `*Store` objects that stages hold by **composition** (a stage
 *has-a* store; it is not a subclass of one). Each `*Store` knows how to **enumerate** its scope and **delete by

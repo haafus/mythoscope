@@ -6,6 +6,29 @@ Append new entries at the top.
 
 ---
 
+## Deactivating an embedding model does not protect its collection from `clean`
+
+**Status:** by design — GC reachability is keyed on live (active) stages, not on config presence.
+
+Moving a model from `models.json` `models` to `inactive` drops its pipeline stage, but its Chroma
+collection stays on disk. `mytho build` never touches it (build only builds active stages, and
+never reaps). But it is now a **level-2 orphan** — no live stage claims it — so:
+
+- `mytho clean` (unscoped) or `mytho clean embeddings` (whole family) **will delete it** on `--apply`.
+- `mytho clean embeddings:<other-active>` (single member) will **not** — level-2 is family-granular
+  (`driver.clean`; `pipeline-and-incrementality.md` §2.7).
+- `mytho status` / `mytho clean` (dry-run) surface it as an orphan first.
+
+Where it bites: parking a model by deactivating it, then running a family/full `clean --apply`,
+silently discards its (expensive) embeddings. (This differs from the pre-Part-3 inspector, which
+spared inactive collections via `include_inactive=True`.)
+
+Handling: to **park** a model, deactivate it and simply don't run a family/full `clean` — build
+ignores it, and re-activating it reuses the collection (the fp gate skips unchanged docs). Run a
+family/full `clean --apply` only when you actually want the disk back.
+
+---
+
 ## Enrichment discovery: `refresh` self-sufficiency + two narrow residuals
 
 **Status:** flagged — much narrower than first written; verified against the source. Full audit:
