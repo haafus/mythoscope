@@ -3,7 +3,7 @@ import {
     buildCorpusApiUrl, escapeHtml, formatNumber,
     regionOf, traditionColor,
 } from "./core.js";
-import { renderLibraryTree, setActiveNode } from "./tree-sources.js?v=8";
+import { renderLibraryTree, setActiveNode } from "./tree-sources.js?v=9";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `

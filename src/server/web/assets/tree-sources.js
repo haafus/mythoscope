@@ -1,5 +1,5 @@
 import { state, groupDocuments, corpusTraditionKey, escapeHtml, traditionColor } from "./core.js";
-import { renderMajorTree } from "./tree-scaffold.js?v=1";
+import { renderMajorTree } from "./tree-scaffold.js?v=2";
 
 export async function renderLibraryTree(container) {
     await renderMajorTree(container, {
@@ -71,13 +71,11 @@ function bindTreeLeaves(container, documents) {
                 const toggle = g.querySelector(".tradition-toggle");
                 if (toggle) toggle.textContent = open ? "▾" : "▸";
             });
-            // Only a click that OPENS a tradition selects it (shows its page); collapsing must not
-            // repaint the reader with the just-closed tradition's info.
-            if (opened)
-                container.dispatchEvent(new CustomEvent("tradition-select", {
-                    detail: { tradition: group.dataset.tradition, region: section?.dataset.major },
-                    bubbles: true,
-                }));
+            // Any click selects the tradition (the one active node + its page), even a collapsing one.
+            container.dispatchEvent(new CustomEvent("tradition-select", {
+                detail: { tradition: group.dataset.tradition, region: section?.dataset.major },
+                bubbles: true,
+            }));
         });
     });
 

@@ -42,10 +42,9 @@ function bindMajorToggles(container) {
             state.corpusOpenMajor = opened ? major : null;    // opening one closes the rest
             container.querySelectorAll(".major-section").forEach((s) =>
                 s.classList.toggle("collapsed", (s.dataset.major || "Other") !== state.corpusOpenMajor));
-            // Only a click that OPENS a region selects it (shows its page); collapsing must not
-            // repaint the reader with the just-closed region's info.
-            if (opened)
-                container.dispatchEvent(new CustomEvent("region-select", { detail: { region: major }, bubbles: true }));
+            // Any click selects the region (makes it the one active node + shows its page), even a
+            // collapsing one — expansion and active are independent.
+            container.dispatchEvent(new CustomEvent("region-select", { detail: { region: major }, bubbles: true }));
         });
     });
 }
