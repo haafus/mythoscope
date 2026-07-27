@@ -1,4 +1,4 @@
-# The Thompson Motif-Index in MythoScope
+# The Thompson Motif-Index in Mythoscope
 
 How the Thompson Motif-Index of Folk-Literature (TMI) is sourced, parsed,
 interpreted, and enriched in this project. Companion file:

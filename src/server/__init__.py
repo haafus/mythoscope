@@ -1,1 +1,1 @@
-"""FastAPI UI server for MythoScope."""
+"""FastAPI UI server for Mythoscope."""

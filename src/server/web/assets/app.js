@@ -47,7 +47,7 @@ function render() {
         return;
     }
 
-    document.title = `MythoScope - ${route.title}`;
+    document.title = `Mythoscope - ${route.title}`;
     setActiveNav(path);
     route.render(params);
 }

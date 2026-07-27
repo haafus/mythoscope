@@ -1,6 +1,6 @@
 # Papers — *Computational Comparative Mythology* (a four-paper series)
 
-Working drafts for the MythoScope research programme, written as one coherent series under the
+Working drafts for the Mythoscope research programme, written as one coherent series under the
 umbrella title **Computational Comparative Mythology**. Each paper stands alone but the four are
 designed to read in order and to compose into a monograph (see
 [`monograph-outline.md`](monograph-outline.md)). These are **evolving drafts**, not submissions;

@@ -1,6 +1,6 @@
 # Motif-index documentation
 
-This folder explains how MythoScope builds its **motif database**: how it sources,
+This folder explains how Mythoscope builds its **motif database**: how it sources,
 parses, enriches and cross-links the three traditional indexes —
 **Thompson (TMI)**, **Aarne–Thompson–Uther (ATU)**, and the **Berezkin & Duvakin**
 areal catalogue. It's the reference behind the `mytho build motifs` pipeline.

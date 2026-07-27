@@ -1,4 +1,4 @@
-# The Berezkin Areal Motif Catalogue in MythoScope
+# The Berezkin Areal Motif Catalogue in Mythoscope
 
 How the Berezkin & Duvakin catalogue (*Тематическая классификация и
 распределение фольклорно-мифологических мотивов по ареалам*) is sourced, parsed,

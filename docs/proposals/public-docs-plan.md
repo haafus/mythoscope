@@ -52,11 +52,12 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
     quarterly calls are primary; real-time chat is deferred and, when added, **Zulip** (research
     register) or **Discord** (reach) — never an empty server. (GTM §3)
 
-**Name (recommended, pending confirm):** canonical spelling **`Mythoscope`** (single capital,
-matching the microscope/telescope instrument lineage the name's meaning rests on); "MYTHOSCOPE"
-only as a logotype. Normalise repo-wide once confirmed.
+16. **Name spelling: `Mythoscope`** (single capital — matches the microscope/telescope
+    instrument lineage the name's meaning rests on; reads as a coined scholarly term, not a
+    software brand). "MYTHOSCOPE" only as a logotype; `mythoscope.io` lowercase. **Normalised
+    repo-wide** (production + docs; frozen mockups left as-is). (§9)
 
-**Open:** none blocking — Phase 1 can start; the name spelling awaits a one-word confirm.
+**Open:** none — all forks resolved. Execution sequence in §16.
 
 **Companion:** the acquisition/retention strategy lives in [`go-to-market.md`](go-to-market.md);
 the field resource list in [`../awesome-computational-mythology.md`](../awesome-computational-mythology.md).
@@ -100,7 +101,7 @@ the field resource list in [`../awesome-computational-mythology.md`](../awesome-
 
 | Page | What | Source | Readiness |
 |---|---|---|---|
-| A1 | **Overview (landing, `/`).** H1 = the thesis: *"The geography of a myth is written in where it is attested, not in what it says."* What MythoScope is (tool + programme), one screen, CTA into the live views. | README + Element 01 + Figma vision pitch | near-ready |
+| A1 | **Overview (landing, `/`).** H1 = the thesis: *"The geography of a myth is written in where it is attested, not in what it says."* What Mythoscope is (tool + programme), one screen, CTA into the live views. | README + Element 01 + Figma vision pitch | near-ready |
 | A2 | **What we found.** Distilled results: areal diffusion dominates (2,311/2,775 motifs), a datable ~1% "fairy-tale core" ≈5,500 BP, a small deep substrate (320/480), the irreducibility limit. Stat tiles + the honest framing. | Element 06/10, 4-findings | light edit |
 | A3 | **Three motifs through the machine.** Case studies: the swan-maiden, sun-and-moon-as-kin, the fished-up earth. Vivid, shareable vignettes. | Element 09 | near-ready |
 | A4 | **How it works.** The pipeline corpus→embeddings→projections→graphs + the motif crosswalk; the natural-history framing; honest scope (induction is built but not yet validated at scale). | Element 03 + how-to + proposals | assembly |
@@ -286,6 +287,29 @@ all. Making the overview landing the root (tools behind an "Explore" CTA) invert
 funnel — docs become the door, not a back alley — and matches the static-landing choice in
 §8.
 
+**Final nav structure (decided):**
+
+```
+Header (left → right):
+  [logo → /]   Explore ▾            Research ▾              About    ⭐GitHub
+               ├ Sources (/app)     ├ Overview (/)          (/about, A5)
+               ├ Similarity         ├ What we found (A2)
+               ├ Ages/Realms/Beings ├ Case studies (A3)
+               ├ Atlas              ├ How it works (A4)
+               └ Motifs             ├ ── Reference & surveys ──
+                                    │  Crosswalk · Indexes · Field survey ·
+                                    │  Corpus atlas · Encyclopedias · 14 regions (B1–B6)
+                                    └ ── Participate ──
+                                       Contribute · Publications · Updates · Resources (C1–C5)
+```
+
+- **Two hubs, one row:** **Explore ▾** = the live SPA views (the tool); **Research ▾** = the
+  static docs TOC (Tiers A–C). Plus a small **About** and a **GitHub** star icon. The seven
+  tool tabs collapse into the one Explore dropdown, freeing the row.
+- **Landing `/`** is Overview (A1); the logo returns there.
+- **Contextual links** from the views into the docs (Motifs→Crosswalk, Atlas→14 regions,
+  Similarity→How it works) close the loop.
+
 ## 10. Chrome: footer, social, newsletter, contact, copyright
 
 The site currently has **no footer** (in `index.html`, `#app` follows `<nav>` directly).
@@ -305,7 +329,7 @@ Placement per element:
 
 | Element | Primary place | Reinforcement |
 |---|---|---|
-| **Copyright + licence** | Footer, one line: `© 2026 MythoScope · CC-BY-SA` (+ data-licence link) | — |
+| **Copyright + licence** | Footer, one line: `© 2026 Mythoscope · CC-BY-SA` (+ data-licence link) | — |
 | **GitHub** | **Header icon** (live CTA) | Again in the footer social set |
 | **Other socials** | Footer (icon set) | Resources page |
 | **Contact email** | Footer (`mailto:hello@mythoscope.io`) — one public inbox; topical aliases (`research@`, `corpora@`…) forward to it, added later | Contribute/Resources — where collaborators look |
@@ -319,6 +343,17 @@ Two caveats:
 - **Newsletter is not just UI.** A working subscription needs a backend/provider — **decided:
   Buttondown** (the form posts to its API). For this audience avoid pop-up modals (specialists
   find them abrasive) — an unobtrusive footer field plus a warm end-of-page CTA.
+
+**Final footer contents (decided):** three compact columns + a bottom line.
+- **Explore / Read:** Overview · What we found · Crosswalk · Surveys · Contribute · Publications
+  (quick links into the docs).
+- **Connect (socials, from the Figma set):** GitHub · Bluesky · Mastodon · YouTube · Substack ·
+  Discord *(when live)* · `hello@mythoscope.io`. *(X optional; Discord only once the community
+  exists — §GTM.)*
+- **Get updates:** the compact **Buttondown** newsletter field.
+- **Bottom line:** `© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT` · **Cite**
+  (→ Publications) · **API** (`/docs`, experimental) · **awesome-computational-mythology**.
+- Thin/one-line on `/app` views; full on document pages (persistent, outside `#app`).
 
 ## 11. Sourcing copy from a Figma mockup (operational note)
 
@@ -542,3 +577,57 @@ clients. But the server's **OpenAPI is generated for free** (`/docs`, `/redoc`,
 `/openapi.json`) — expose it read-only and link it from Resources as *experimental, no
 stability guarantees*. Priority is bulk downloads + DOIs (§15.1). A real API is Phase-3+,
 demand-driven.
+
+## 16. Execution sequence (the ordered action plan)
+
+The single ordered to-do, consolidating the phasing in §7 / §12.5 and `go-to-market.md` §6.
+Each step is independently shippable; earlier steps unblock later ones.
+
+### Step 0 — Groundwork (done / mechanical)
+- [x] Decisions settled (register above); name normalised to **Mythoscope**.
+- [ ] Reserve handles: GitHub org, Bluesky, Mastodon, YouTube, Substack, `mythoscope.io` email
+      (`hello@`), Zenodo + ORCID + Humanities Commons + Google Scholar profiles. (Do early —
+      names get taken.)
+
+### Step 1 — Static docs skeleton (the delivery spine, §12)
+- [ ] Extract the shared **shell template** (header with Explore ▾ / Research ▾ / About /
+      GitHub, thin footer §10) from `index.html`.
+- [ ] Write **`scripts/build_docs.py`** (markdown + front-matter → HTML via the shell;
+      `--watch` dev mode; emits `sitemap.xml` + `robots.txt`).
+- [ ] Create the curated **`content/`** tree (English). Move the SPA to **`/app`**; wire the
+      startup mount in `create_app` to serve the generated web-root pages.
+- [ ] Ship **A1 Overview** (`/`) + **B4 Corpus atlas** (ready) as the first two pages.
+
+### Step 2 — Fill the tiers (content, §2)
+- [ ] Tier A: A2 What-we-found, A3 Case studies, A4 How-it-works, **A5 About/Vision**
+      (manifesto + `-scope` story from Figma, register per §14.1).
+- [ ] Tier B magnets: **B1 Crosswalk** (translate), B2 Indexes, B3 Field survey, B5
+      Encyclopedias, B6 14 regions.
+- [ ] Tier C: **C1 Contribute** (Figma backbone, trim placeholders), C2 Resources, **C3
+      Publications**, **C4 Updates/Notes**, **C5 Credit** (+ `CONTRIBUTORS.md`, `CITATION.cff`).
+- [ ] Footer + nav hubs live; contextual view→doc links; internal cross-links (§4).
+
+### Step 3 — Citability & credit (§15)
+- [ ] `CITATION.cff` in the repo; GitHub→**Zenodo** integration (release DOI).
+- [ ] DOI the **crosswalk dataset** (CSV/JSON + datasheet) and each survey.
+- [ ] A **preprint** (arXiv cs.CL / SocArXiv / HCommons CORE) from `docs/papers/`.
+- [ ] "How to cite" blocks on Publications + Resources.
+
+### Step 4 — Retention plumbing
+- [ ] **Buttondown** account + footer field + confirm flow.
+- [ ] **GitHub Discussions** on; a `CONTRIBUTING.md`.
+- [ ] The **awesome-computational-mythology** list — verify links, spin into its own repo,
+      submit to the awesome index.
+
+### Step 5 — Go to market (GTM §6, phased)
+- [ ] **Phase 0** — be findable: docs indexed, DOIs, newsletter, profiles, OG images.
+- [ ] **Phase 1** — seed communities: Humanist + folklore/corpora lists; academic Bluesky/
+      Mastodon; Wikipedia references; Show HN / r/DigitalHumanities.
+- [ ] **Phase 2** — earn endorsement: preprint out; a conference demo/poster (CHR / DH / ISFNR);
+      direct outreach to named scholars.
+- [ ] **Phase 3** — compound: monthly "motif/mockup of the month"; quarterly heavy release;
+      grow community (add Zulip/Discord only when there's demand).
+
+### Ongoing
+- [ ] Cadence: monthly light (Updates → newsletter → socials), quarterly heavy (survey/release
+      + DOI). Track north-star metrics (GTM §7); ignore vanity metrics.

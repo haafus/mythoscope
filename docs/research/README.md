@@ -1,6 +1,6 @@
 # Research context
 
-Background surveys of the field MythoScope sits inside — the computational study
+Background surveys of the field Mythoscope sits inside — the computational study
 of folk narrative and myth. These are *landscape and method* docs, distinct from
 the source-pipeline documentation under [`../motifs/`](../motifs/).
 

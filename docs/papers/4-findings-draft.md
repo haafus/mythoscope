@@ -4,7 +4,7 @@
 
 ### A computational re-analysis of a cross-indexed mythological motif corpus
 
-*Working draft — synthesises the MythoScope analysis arc (prototype series `mockups/15–44` and
+*Working draft — synthesises the Mythoscope analysis arc (prototype series `mockups/15–44` and
 the `docs/proposals/` design notes). Numbers are from self-contained research prototypes
 built on the assembled corpus; each carries the documented limits restated in §8.*
 

@@ -28,7 +28,7 @@ Back matter
 
 - **Part I · The Field** — the survey, lightly trimmed: it motivates the book by showing the field's
   two eras and its honest verdict (motif detection unsolved; embeddings as retrieval). Its "where
-  MythoScope sits" section becomes the bridge into Part II.
+  Mythoscope sits" section becomes the bridge into Part II.
 - **Part II · The Program** — the position/method paper, verbatim as the book's thesis: the
   natural-history arc, the given/inferred rule, the three-entity model, the explicit assumptions.
 - **Part III · The Machine** — the infrastructure paper: the `corpus → embeddings → projections →

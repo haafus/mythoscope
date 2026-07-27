@@ -1,4 +1,4 @@
-# The Aarne-Thompson-Uther Tale-Type Index in MythoScope
+# The Aarne-Thompson-Uther Tale-Type Index in Mythoscope
 
 How the Aarne-Thompson-Uther (ATU) tale-type index is sourced, parsed,
 interpreted, enriched, and cross-walked in this project. Overview and licensing:

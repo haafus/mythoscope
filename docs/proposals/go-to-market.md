@@ -1,12 +1,12 @@
 # Go-to-market — acquisition & retention architecture
 
-How MythoScope reaches and keeps its audience. Companion to
+How Mythoscope reaches and keeps its audience. Companion to
 [`public-docs-plan.md`](public-docs-plan.md): that plan builds the public surface; this one
 says which channels turn it into a growing community.
 
 ## 0. The core principle
 
-MythoScope is **research infrastructure**, not a consumer app. Its growth engine is **not
+Mythoscope is **research infrastructure**, not a consumer app. Its growth engine is **not
 virality** — it is **credibility → citation/reference → word-of-mouth in scholarly networks →
 collaboration**. The audience (computational folklorists, comparative-mythology and DH
 scholars, adjacent NLP/ML people) is small, international, sceptical of hype, and moved by
@@ -68,7 +68,7 @@ Ordered by fit for this audience (highest first). Owned > earned > rented; we le
    feedback/collaboration — their endorsement is worth more than any ad.
 6. **GitHub + the awesome-list.** The repo itself (open source = discovery in the CL/DH dev
    community) and a curated **`awesome-computational-mythology`** list — a genuine star/link
-   magnet that positions MythoScope as the hub of its niche.
+   magnet that positions Mythoscope as the hub of its niche.
 7. **Reference/authority sites.** Add the crosswalk & surveys as **references/external links on
    Wikipedia** (ATU, Thompson Motif-Index, comparative mythology, computational folkloristics)
    — done properly, not spammily. Durable referral + authority signal.

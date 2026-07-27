@@ -4,9 +4,9 @@
 > myth, folklore, and traditional narrative — indexes, corpora, datasets, methods, tools,
 > ontologies, key papers, scholars, venues, and text libraries.
 
-Maintained alongside [MythoScope](https://mythoscope.io). Contributions welcome.
+Maintained alongside [Mythoscope](https://mythoscope.io). Contributions welcome.
 
-**⚠ Draft.** Assembled from the MythoScope research surveys (`docs/research/`, `docs/motifs/`)
+**⚠ Draft.** Assembled from the Mythoscope research surveys (`docs/research/`, `docs/motifs/`)
 and source lists. **Links must be verified before this is published as a public list.** Papers
 are given by author / venue / year (resolve via Google Scholar / Semantic Scholar / DOI).
 
@@ -148,7 +148,7 @@ are given by author / venue / year (resolve via Google Scholar / Semantic Schola
 - **Gephi**, **igraph/NetworkX**, **mfinder / FANMOD** — networks.
 - **Story Workbench / ProppLearner**, **MIME**, **GOLEM** tooling — narrative annotation.
 - **`uhhlt/story-emb`** — story-similarity embedding model (Hatzel & Biemann).
-- **MythoScope** — this project: corpus → embeddings → motif crosswalk → interactive views.
+- **Mythoscope** — this project: corpus → embeddings → motif crosswalk → interactive views.
 
 ## Landmark papers
 
@@ -187,11 +187,11 @@ Vladimir Propp, Alan Dundes, Claude Lévi-Strauss.)
 
 ## Projects
 
-- **MythoScope** — mythoscope.io — comparative-mythology framework: semantic space + LLM
+- **Mythoscope** — mythoscope.io — comparative-mythology framework: semantic space + LLM
   graphs + a TMI↔ATU↔Berezkin motif crosswalk.
 - **GOLEM**, **MIME**, **GLOS**, **MANTO**, **DRH** — see above.
 
 ---
 
 *Contributions:* open a PR. Each entry should be a real, reachable resource with a one-line
-description. See MythoScope's [contribution & credit policy](https://mythoscope.io/credit).
+description. See Mythoscope's [contribution & credit policy](https://mythoscope.io/credit).

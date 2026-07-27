@@ -9,7 +9,7 @@ class TestMythoTopLevel:
     def test_help(self):
         result = runner.invoke(mytho, ["--help"])
         assert result.exit_code == 0
-        assert "MythoScope" in result.output
+        assert "Mythoscope" in result.output
 
     def test_lists_all_commands(self):
         result = runner.invoke(mytho, ["--help"])

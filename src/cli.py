@@ -34,9 +34,9 @@ class OrderedGroup(click.Group):
 
 
 @click.group(cls=OrderedGroup)
-@click.version_option(package_name="mythoscope", prog_name="MythoScope")
+@click.version_option(package_name="mythoscope", prog_name="Mythoscope")
 def mytho():
-    """MythoScope — computational framework for comparative mythology."""
+    """Mythoscope — computational framework for comparative mythology."""
     setup_logging()
 
 

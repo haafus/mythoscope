@@ -107,7 +107,7 @@ of what it must cover and include, what it needs, and when.
 - **Needs:** the dataset and code snapshots from the findings paper (shared, not duplicated).
 - **When:** about a month out.
 
-### 4. The software paper — *MythoScope: an open tool for comparative-mythology corpus analysis*
+### 4. The software paper — *Mythoscope: an open tool for comparative-mythology corpus analysis*
 
 - **Where:** the *Journal of Open Source Software* — a peer-reviewed journal for research software.
 - **Goal:** make the **communal tool itself** citable and peer-reviewed.

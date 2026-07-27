@@ -1,6 +1,6 @@
 # Toward a Computational Framework for Comparative Mythology
 
-**MythoScope** is a computational framework for comparative mythology. It builds a
+**Mythoscope** is a computational framework for comparative mythology. It builds a
 corpus of myth and folklore texts, embeds them, and turns the result into an
 explorable **semantic space** — with character / place / time **graphs** extracted
 per text by LLMs, a **geographic** view, and full-text **search by meaning**.

@@ -12,7 +12,7 @@ Legend: **✓** yes / first-class · **~** partial, opt-in, or needs user code �
 
 | tool | one-line | lang / stage |
 |---|---|---|
-| **MythoScope** (ours) | the §2.2 stage protocol + stateless fp driver | Python, in-process |
+| **Mythoscope** (ours) | the §2.2 stage protocol + stateless fp driver | Python, in-process |
 | **doit** | make-in-Python, md5 file signatures | Python, in-process |
 | **redun** (insitro) | Nix-model task memoization, content-addressed | Python, in-process |
 | **targets** (← drake) | dependency-graph-skips-unchanged, reproducible | R, in-process |
@@ -31,7 +31,7 @@ Legend: **✓** yes / first-class · **~** partial, opt-in, or needs user code �
 
 | tool | change signal | cache key contents | catches **code/logic** change | catches **param** change | downstream cascade |
 |---|---|---|---|---|---|
-| **MythoScope** | content hash (blake2b) | input fps + `transform_version` + output-affecting params | ~ manual `algo_version` | ✓ param-hash | ✓ fp composition |
+| **Mythoscope** | content hash (blake2b) | input fps + `transform_version` + output-affecting params | ~ manual `algo_version` | ✓ param-hash | ✓ fp composition |
 | **doit** | md5 of `file_dep` (+ custom `uptodate`) | file signatures + your `uptodate` | ✗ unless you code it | ~ `config_changed` | ✓ task deps |
 | **redun** | hash of **task source** + input hashes | task source code + args | ✓ auto source-hash | ✓ args | ✓ graph reduction |
 | **targets** | hash of code + data + upstream | command + dep objects | ✓ hashes the R code | ✓ | ✓ |
@@ -58,7 +58,7 @@ Luigi/Airflow/Make don't do content-caching at all.
 
 | tool | state model | artifact store | remote store | orphan/stale **GC** | lineage / audit |
 |---|---|---|---|---|---|
-| **MythoScope** | **stateless — per-artifact sidecars, no central DB** | own stores (Chroma / files / catalog) | ✗ (raw can be committed) | ✓ **two-level: key + whole-store** (§2.7) | ~ `status` only, no history |
+| **Mythoscope** | **stateless — per-artifact sidecars, no central DB** | own stores (Chroma / files / catalog) | ✗ (raw can be committed) | ✓ **two-level: key + whole-store** (§2.7) | ~ `status` only, no history |
 | **doit** | `.doit.db` (dbm signatures) | your files | ✗ | ~ manual `clean` actions, no auto-orphan | ✗ |
 | **redun** | **SQLite/Postgres CallGraph DB** | own value store (+ S3) | ✓ | ~ cache in DB (prunable) | ✓ full call-graph provenance |
 | **targets** | `_targets/` metadata store | own object store | ~ cloud opt-in | ✓ `tar_prune` / `tar_delete` (reachability) | ✓ metadata + `tar_visnetwork` |
@@ -92,7 +92,7 @@ two-level scheme is what statelessness costs, not what it wins.
 
 | tool | dynamic fan-out | parallel / distributed | scheduling | weight | sweet spot |
 |---|---|---|---|---|---|
-| **MythoScope** | ✓ factory loop over config | ~ GPU-batch inside a stage | ✗ manual / CLI | **~few hundred LOC** | *this* app, ~27 docs |
+| **Mythoscope** | ✓ factory loop over config | ~ GPU-batch inside a stage | ✗ manual / CLI | **~few hundred LOC** | *this* app, ~27 docs |
 | **doit** | ✓ task-creators | ✓ multiprocess | ✗ | light | Python build automation |
 | **redun** | ✓ | ✓ executors (local / AWS Batch / k8s) | ~ | light-med | scientific pipelines, cloud |
 | **targets** | ✓ branching | ✓ `crew` / `clustermq` | ~ | medium | R reproducible research |
@@ -118,7 +118,7 @@ tool for — with its distinctive strength and its notable limitation. Ours is o
 
 | engine | signature design decision | distinctive strength | notable limitation |
 |---|---|---|---|
-| **MythoScope** | **provenance-addressed identity** (`hash(locator)`, not content) + **stateless** sidecars, no central DB | id survives a content edit *and* a filesystem rename; state can never drift (re-read from disk each run) | no remote store, no lineage/history, no distributed exec; identity-hash split is bespoke code |
+| **Mythoscope** | **provenance-addressed identity** (`hash(locator)`, not content) + **stateless** sidecars, no central DB | id survives a content edit *and* a filesystem rename; state can never drift (re-read from disk each run) | no remote store, no lineage/history, no distributed exec; identity-hash split is bespoke code |
 | **doit** | **`uptodate` — arbitrary Python predicates decide staleness** (not just file times/hashes) | staleness is *programmable*: any callable, `config_changed`, `result_dep` | file-oriented; no code-change detection unless you write it; no orphan GC |
 | **redun** | **expression graph + graph reduction**; a task's own **source code** is part of its content hash | "code *and* data reactivity" — edit the function, it re-runs; full call-graph provenance | over-invalidates on any source edit; requires a SQL backend DB |
 | **targets** (← drake) | **targets as first-class objects** with a reproducibility *proof* — "all up to date" is evidence results match code+data | strongest reproducibility guarantee; dynamic branching; visual dep graph | R-only; single `_targets/` metadata store |

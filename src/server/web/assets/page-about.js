@@ -4,7 +4,7 @@ export function renderAbout() {
     app.innerHTML = `
         <main class="about-page">
             <div class="header-container">
-                <img src="/assets/logo.jpg" alt="MythoScope Logo" class="logo-image">
+                <img src="/assets/logo.jpg" alt="Mythoscope Logo" class="logo-image">
 
                 <nav class="nav-menu">
                     <button class="nav-item active" type="button" data-tab="vision">Vision</button>

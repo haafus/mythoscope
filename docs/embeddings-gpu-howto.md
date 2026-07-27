@@ -8,7 +8,7 @@ either service** and no prior experience with them.
 
 ## Final recommendation (the configuration to use)
 
-For MythoScope, use this configuration:
+For Mythoscope, use this configuration:
 
 - **Service:** **RunPod, Community Cloud** (its cheaper marketplace tier — first-party reliability, but
   community-hosted prices).

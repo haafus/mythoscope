@@ -2,7 +2,7 @@
 
 *Computational Comparative Mythology — Paper **I of IV · The Field**. Companions: II The Program · III The Machine · IV The Findings — see [README](README.md).*
 
-*Working survey draft, assembled from the MythoScope research notes
+*Working survey draft, assembled from the Mythoscope research notes
 (`docs/research/computational-folkloristics-survey.md`, `…-landscape.md`,
 `motif-induction-review.md`, `motif-induction-survey.md`). It reviews others' work; claims that
 could not be independently verified in the source notes are flagged as such, and unresolved caveats

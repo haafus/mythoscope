@@ -9,7 +9,7 @@ from settings import settings
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="MythoScope UI Server")
+    app = FastAPI(title="Mythoscope UI Server")
 
     srv = settings.server
     app.add_middleware(GZipMiddleware, minimum_size=srv.gzip_minimum_size)
