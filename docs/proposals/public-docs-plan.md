@@ -139,7 +139,13 @@ The public-layer language is decided: English. The SPA-vs-static-URL fork raised
 resolved in §8 (hybrid). Navigation/entry, chrome (footer/social/newsletter/contact), and
 copy-sourcing from Figma are worked out in §9–§11.
 
-## 8. Delivery: SPA vs. standalone static URLs (fork from §3, resolved)
+## 8. Delivery: SPA vs. standalone static URLs — **DECIDED: hybrid**
+
+**Decision (accepted).** The hybrid is adopted: the interactive app stays an SPA; the
+public documentation (Tiers A/B) and the overview landing are **server-rendered static
+pages at clean URLs**, English, generated from a curated markdown tree through one shared
+shell template. Implementation is specified in §12. The rest of this section is the
+reasoning behind the choice.
 
 The current site is an SPA with **hash routing** (`#/corpus`, `#/about`). To a crawler,
 everything after `#` is one page — no per-URL `<title>`/`<meta>`, no separate index entry.
@@ -263,3 +269,91 @@ For a specific frame, pass its `node-id` (from `?node-id=…`) to
 should pass. Avoid screenshots+OCR: it drops diacritics (Ténèze/Polívka), which this corpus
 is full of. Alternative to a manual token: connect a Figma connector/MCP (OAuth) to the
 session.
+
+## 12. Implementation plan for the hybrid (the accepted delivery)
+
+The current server (`src/server/run_server.py`) mounts `/assets` as static, registers the
+API routers, and serves `index.html` (the SPA) at `/`. Hash routes (`#/corpus`, …) live
+inside that one HTML entry and **never collide** with real path routes (`/crosswalk`), so
+both layers coexist on one origin. The plan adds a documentation layer alongside the SPA;
+it does not touch the API or the app's behaviour.
+
+### 12.1 URL map
+
+- **App (SPA, unchanged):** served at **`/app`** (`/app#/corpus`, `/app#/embeddings`, …).
+  One HTML entry, hash routing inside. The in-nav links move from `#/corpus` to
+  `/app#/corpus`; a one-time find/replace in `index.html`.
+- **Landing (static):** **`/`** → the overview page (A1). Inverts the funnel (§9): a cold
+  visitor gets framing, not a raw data table, with an "Explore the live data" CTA into
+  `/app`.
+- **Tier A (static):** `/what-we-found` (A2), `/cases/{swan-maiden,sun-and-moon,fished-up-earth}`
+  (A3), `/how-it-works` (A4).
+- **Tier B (static, the magnets):** `/crosswalk` (B1); `/indexes/{tmi,atu,berezkin}` (B2);
+  `/research/computational-folkloristics` + `/research/landscape` (B3);
+  `/research/corpus-sourcing` (B4); `/research/encyclopedias` (B5); `/regions` (B6).
+- **Tier C (static):** `/contribute` (C1), `/resources` (C2).
+- **Machinery:** `/sitemap.xml`, `/robots.txt`.
+
+### 12.2 Rendering pipeline
+
+- **Content source of truth:** a curated `content/` tree of **English** markdown, each file
+  with YAML front-matter (`title`, `description`, `keywords`, `og_image`, `canonical`).
+  This is a *curated* surface, separate from the internal `docs/` — we select and translate
+  into it, we do not mirror `docs/` (keeps the §6 keep-internal discipline intact).
+- **Renderer:** markdown → HTML via a Python renderer (e.g. `markdown-it-py` or `mistune`),
+  injected into **one Jinja2 shell template** that supplies the shared header/nav, the thin
+  footer (§10), the theme CSS, and the per-page `<head>` (title/meta/OG/canonical from
+  front-matter). The shell is extracted once so the SPA `index.html` and the doc template
+  render an identical header/footer.
+- **Serving, two interchangeable modes behind the same renderer:**
+  - **Phase 1 — SSR on request:** a FastAPI route maps a clean path → `content/<page>.md`,
+    renders, returns HTML; unknown path → 404. Simplest; ships now.
+  - **Phase 2 — precompile to static:** a `mytho build-docs` step writes the rendered
+    `.html` to a `site/` dir that a static mount (or a CDN) serves directly. Same renderer,
+    same output; this is what unlocks rich OG / low TTFB / CDN cache (§13). Optional, later.
+
+### 12.3 Head, OG, and discovery
+
+- Per page from front-matter: `<title>`, `<meta name="description">`, `<link rel="canonical">`,
+  `og:title/description/image/url/type`, and Twitter Card tags — all in the **initial HTML**
+  (the reason for static/SSR: social scrapers do not run JS, §13).
+- **OG images:** one default site card + custom images for the magnets (an Atlas screenshot;
+  a stat/quote graphic). Can be added incrementally.
+- `sitemap.xml` lists every static doc URL; `robots.txt` points to it. The `/app` SPA is
+  left out of the sitemap (it need not be indexed, §8).
+
+### 12.4 Shared shell wiring (nav, footer, entry point)
+
+- Extract the header (nav + GitHub icon + "Research ▾" hub) and the thin footer (§10) into
+  the shared template; the SPA `index.html` includes the same partial so both layers match.
+- "Research ▾" links point at the static doc URLs; the app's contextual "learn more" links
+  (§9) point from `/app` views into `/crosswalk`, `/regions`, `/how-it-works`.
+- Footer lives outside the SPA `#app` (persistent, no re-render); thin/one-line on `/app`
+  views, full on document pages.
+
+### 12.5 Phasing (supersedes the phase note in §7 for the delivery mechanics)
+
+1. **Bootstrap:** shell template + one SSR markdown route + `content/` with A1 and B4
+   (both ready, English) + `sitemap.xml`/`robots.txt`. Move the SPA to `/app`.
+2. **Fill:** the rest of Tier A and the Tier-B magnets (translate B1); wire the hub and
+   contextual links.
+3. **Optimise (optional):** `build-docs` precompile → static `site/` behind a CDN; add
+   custom OG images. This is where §13's payoffs land.
+
+## 13. Glossary — the Phase-3 payoffs (why precompile to static)
+
+- **Rich OG (Open Graph) previews.** `<head>` meta tags (`og:title/description/image/url`,
+  Twitter Card) that Slack/Telegram/Bluesky/X/LinkedIn read to render a **link card** with
+  title, description, and image instead of a bare URL. Social scrapers **do not execute JS**,
+  so they only see the initial HTML — an SPA that fills these tags after load loses the card.
+  Static/SSR HTML is what makes shareable cards work; "rich" = a real preview image (Atlas
+  screenshot, a stat/quote graphic), not just text.
+- **Low TTFB (Time To First Byte).** Time from the browser's request to the first response
+  byte. SSR includes per-request server work (render markdown→HTML); a prebuilt `.html` is
+  just a file read (or a CDN hit) → near-minimal TTFB. Lower TTFB = faster perceived load and
+  a minor ranking factor (Core Web Vitals adjacent).
+- **CDN cache.** A network of edge servers near users (Cloudflare/Fastly/…). Static files
+  cache at the edge, so a reader in Tokyo is served from a nearby node, not our origin —
+  lower latency, less origin load. Static is trivially cacheable (stable, identical for all);
+  dynamic SSR is harder to cache safely. Precompiled static docs = cheap global speed, and it
+  matters most for the SEO/citation magnets (crosswalk, surveys).

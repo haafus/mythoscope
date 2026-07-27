@@ -65,7 +65,8 @@ not as live work.
   cleaner Thompson provenance. *Partially implemented — additive-first phase shipped; full source swap not done.*
 - [`public-docs-plan.md`](public-docs-plan.md) — the composition of the site's **public documentation**
   section. **Goal:** a clear, specialist-engaging, SEO-aware public layer (~12 pages, 3 tiers) built from
-  existing docs, with an explicit internal/keep-out list. *Plan; not started.*
+  existing docs, with an explicit internal/keep-out list. **Delivery decided: SPA app + static
+  server-rendered doc URLs (hybrid).** *Plan; not started.*
 
 ## Archived
 
