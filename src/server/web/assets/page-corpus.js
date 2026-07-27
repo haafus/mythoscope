@@ -3,7 +3,7 @@ import {
     buildCorpusApiUrl, escapeHtml, formatNumber,
     regionOf, traditionColor,
 } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=6";
+import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=7";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `
@@ -122,6 +122,11 @@ function facetListField(label, items) {
 function renderFacetInfo(name, color, fields) {
     const readerContent = document.getElementById("readerContent");
     if (!readerContent) return;
+    // A facet (region/tradition) is the active item now — drop any book selection so the tree
+    // highlight and the info panel stop pointing at a previously-opened book.
+    const libraryTree = document.getElementById("libraryTree");
+    if (libraryTree) setActiveBook(libraryTree, null);
+    renderBookInfo(null);
     readerContent.innerHTML = `
         <div class="facet-info">
             <div class="facet-title">

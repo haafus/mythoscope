@@ -1,5 +1,5 @@
 import { escapeHtml, traditionColor } from "./core.js";
-import { renderMajorTree } from "./tree-scaffold.js";
+import { renderMajorTree } from "./tree-scaffold.js?v=1";
 
 // Tradition leaves (no books); emits "tradition-select" with the tradition, or
 // null when the active one is toggled off.

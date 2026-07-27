@@ -292,6 +292,10 @@ body.has-main-navbar {
     content: "\25b8"; /* ▸ */
 }
 
+.library-tree .major-section:not(.collapsed) > .major-title {
+    background: #e2edf0;   /* the open region is the active/selected one */
+}
+
 .library-tree .major-body {
     padding-top: 6px;
 }
@@ -325,6 +329,7 @@ body.has-main-navbar {
 
 .library-tree .tradition-group.open > .tradition-title {
     color: #111;
+    background: #e2edf0;   /* active/selected — same idiom as similarity's .tradition-pick.active */
 }
 
 .library-tree .tradition-pick {

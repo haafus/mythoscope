@@ -1,5 +1,5 @@
 import { state, groupDocuments, corpusTraditionKey, escapeHtml, traditionColor } from "./core.js";
-import { renderMajorTree } from "./tree-scaffold.js";
+import { renderMajorTree } from "./tree-scaffold.js?v=1";
 
 export async function renderLibraryTree(container) {
     await renderMajorTree(container, {
@@ -62,7 +62,8 @@ function bindTreeLeaves(container, documents) {
             const group = button.closest(".tradition-group");
             const section = button.closest(".major-section");
             const key = corpusTraditionKey(section?.dataset.major, group.dataset.tradition);
-            state.corpusOpenTradition = state.corpusOpenTradition === key ? null : key;  // opening one closes the rest
+            const opened = state.corpusOpenTradition !== key;   // was closed → this click opens it
+            state.corpusOpenTradition = opened ? key : null;    // opening one closes the rest
             container.querySelectorAll(".tradition-group").forEach((g) => {
                 const s = g.closest(".major-section");
                 const open = corpusTraditionKey(s?.dataset.major, g.dataset.tradition) === state.corpusOpenTradition;
@@ -70,10 +71,13 @@ function bindTreeLeaves(container, documents) {
                 const toggle = g.querySelector(".tradition-toggle");
                 if (toggle) toggle.textContent = open ? "▾" : "▸";
             });
-            container.dispatchEvent(new CustomEvent("tradition-select", {
-                detail: { tradition: group.dataset.tradition, region: section?.dataset.major },
-                bubbles: true,
-            }));
+            // Only a click that OPENS a tradition selects it (shows its page); collapsing must not
+            // repaint the reader with the just-closed tradition's info.
+            if (opened)
+                container.dispatchEvent(new CustomEvent("tradition-select", {
+                    detail: { tradition: group.dataset.tradition, region: section?.dataset.major },
+                    bubbles: true,
+                }));
         });
     });
 

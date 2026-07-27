@@ -38,10 +38,14 @@ function bindMajorToggles(container) {
     container.querySelectorAll(".major-title").forEach((button) => {
         button.addEventListener("click", () => {
             const major = button.closest(".major-section").dataset.major || "Other";
-            state.corpusOpenMajor = state.corpusOpenMajor === major ? null : major;  // opening one closes the rest
+            const opened = state.corpusOpenMajor !== major;   // was collapsed → this click opens it
+            state.corpusOpenMajor = opened ? major : null;    // opening one closes the rest
             container.querySelectorAll(".major-section").forEach((s) =>
                 s.classList.toggle("collapsed", (s.dataset.major || "Other") !== state.corpusOpenMajor));
-            container.dispatchEvent(new CustomEvent("region-select", { detail: { region: major }, bubbles: true }));
+            // Only a click that OPENS a region selects it (shows its page); collapsing must not
+            // repaint the reader with the just-closed region's info.
+            if (opened)
+                container.dispatchEvent(new CustomEvent("region-select", { detail: { region: major }, bubbles: true }));
         });
     });
 }
