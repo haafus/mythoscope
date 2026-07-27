@@ -31,11 +31,11 @@ apparatus like TMI/ATU). This is a **neutral community list**.
 
 - **Thompson Motif-Index (TMI)** — Stith Thompson, *Motif-Index of Folk-Literature*, rev. ed.
   1955–58. ~46,000 narrative motifs, place-value taxonomy (A–Z). Digital editions: the
-  *Trilogy* CSVs, Katja Mellmann's `TMI_as_CSV`, `fbkarsdorp/tmi`, folkmasa.org.
+  *Trilogy* CSVs, Katja Mellmann's `TMI_as_CSV`, [`fbkarsdorp/tmi`](https://github.com/fbkarsdorp/tmi), folkmasa.org.
 - **Aarne–Thompson–Uther (ATU)** — Hans-Jörg Uther, *The Types of International Folktales*,
   FFC 284–286 (Helsinki, 2004). 2,247 tale types. Successor to Aarne–Thompson (AaTh/AT).
 - **Berezkin & Duvakin — Analytical Catalogue of World Mythology and Folklore** — ~3,500 areal
-  motifs across ~65 world macro-regions (areasofmyths.com / mapsofmyths.com).
+  motifs across ~65 world macro-regions ([areasofmyths.com](https://www.areasofmyths.com) / mapsofmyths.com).
 - **El-Shamy — *Motif Index of the Thousand and One Nights*** and *Folk Traditions of the Arab
   World*.
 - **Christiansen — *The Migratory Legends* (ML)** — the migratory-legend type index.
@@ -44,18 +44,18 @@ apparatus like TMI/ATU). This is a **neutral community list**.
 
 ## Corpora & annotated datasets
 
-- **GOLEM** (Yarlott et al., LREC-COLING 2024) — gold-standard motif corpus (26k candidates,
+- **[GOLEM](https://aclanthology.org/2024.lrec-main.689/)** (Yarlott et al., LREC-COLING 2024) — gold-standard motif corpus (26k candidates,
   34 motif types); a hard benchmark (LLMs ~41% accuracy).
-- **Annotated Folktales / "Trilogy"** (Hagedorn & Darányi, 2022) — open ATU-annotated corpus
+- **[Annotated Folktales / "Trilogy"](https://github.com/j-hagedorn/trilogy)** (Hagedorn & Darányi, 2022) — open ATU-annotated corpus
   (CC-BY-SA); SVM baselines reach F1 0.8–1.0.
-- **MOMFER** — the Meertens Motif Finder over the Dutch Folktale Database.
-- **Dutch Folktale Database (Verhalenbank)** — the Meertens Institute folktale collection.
-- **ISEBEL** — cross-archive search over multiple European folk-narrative databases.
-- **FairytaleQA** — question-answering dataset over fairy tales.
+- **[MOMFER](https://momfer.meertens.knaw.nl/)** — the Meertens Motif Finder over the Dutch Folktale Database.
+- **[Dutch Folktale Database (Verhalenbank)](https://www.verhalenbank.nl)** — the Meertens Institute folktale collection.
+- **[ISEBEL](https://isebel.eu/)** — cross-archive search over multiple European folk-narrative databases.
+- **[FairytaleQA](https://github.com/neuhai/FairytaleQA_Dataset)** — question-answering dataset over fairy tales.
 - **Multilingual Folk Tale Database (MFTD)** — [mftd.org](http://www.mftd.org).
-- **Ashliman's Folktexts** — D. L. Ashliman's ATU-organized folklore archive.
-- **ProppLearner** — Proppian-function-annotated Russian folktales (Finlayson).
-- **Kestemont et al. "Forgotten Books"** (Science, 2022) — survival estimation of medieval
+- **[Ashliman's Folktexts](https://sites.pitt.edu/~dash/folktexts.html)** — D. L. Ashliman's ATU-organized folklore archive.
+- **[ProppLearner](https://academic.oup.com/dsh/article/32/2/284/2957394)** — Proppian-function-annotated Russian folktales (Finlayson).
+- **[Kestemont et al. "Forgotten Books"](https://doi.org/10.1126/science.abl7655)** (Science, 2022) — survival estimation of medieval
   narrative.
 
 ## Cross-cultural & areal databases
@@ -103,7 +103,7 @@ apparatus like TMI/ATU). This is a **neutral community list**.
 - **DFKI Linked Data for Folktales** (Declerck et al.) — OWL/RDF/SKOS + lemon modelling of
   ATU/TMI.
 - **Ontology of Greek Mythology (OGM)**.
-- **GLOS — Geographic Lens on Stories** (Grossner et al.).
+- **[GLOS — Geographic Lens on Stories](https://kgeographer.org/glos/)** (Grossner et al.).
 - Vocabularies: **SKOS**, **lemon**, **CIDOC-CRM**; **Wikidata** property P2540 (ATU tale-type ID).
 
 ## Methods & techniques
@@ -126,26 +126,26 @@ apparatus like TMI/ATU). This is a **neutral community list**.
 
 ## Tools & software
 
-- **MOMFER** — motif finder over the Dutch Folktale Database.
+- **[MOMFER](https://momfer.meertens.knaw.nl/)** — motif finder over the Dutch Folktale Database.
 - **[Sentence-Transformers](https://www.sbert.net)** — embedding infrastructure.
 - **[BERTopic](https://maartengr.github.io/BERTopic/)** — topic modeling.
 - **[SplitsTree](https://software-ab.cs.uni-tuebingen.de/download/splitstree6/)** /
   **[BEAST2](https://www.beast2.org)** / **[MrBayes](https://nbisweden.github.io/MrBayes/)** —
   phylogenetics.
 - **[Gephi](https://gephi.org)** / **FANMOD** — network analysis / network motifs.
-- **`uhhlt/story-emb`** — story-similarity embedding model (Hatzel & Biemann).
+- **[`uhhlt/story-emb`](https://huggingface.co/uhhlt/story-emb)** — story-similarity embedding model (Hatzel & Biemann).
 
 ## Landmark papers
 
-- Mac Carron & Kenna — *Universal Properties of Mythological Networks* (EPL, 2012).
-- Abello, Broadwell & Tangherlini — *Computational Folkloristics* (CACM, 2012).
-- da Silva & Tehrani — *Comparative phylogenetic analyses uncover the ancient roots of
-  Indo-European folktales* (R. Soc. Open Sci., 2016).
-- Tehrani — *The Phylogeny of Little Red Riding Hood* (PLoS ONE, 2013).
+- Mac Carron & Kenna — [*Universal Properties of Mythological Networks*](https://doi.org/10.1209/0295-5075/99/28002) (EPL, 2012).
+- Abello, Broadwell & Tangherlini — [*Computational Folkloristics*](https://doi.org/10.1145/2209249.2209267) (CACM, 2012).
+- da Silva & Tehrani — [*Comparative phylogenetic analyses uncover the ancient roots of
+  Indo-European folktales*](https://doi.org/10.1098/rsos.150645) (R. Soc. Open Sci., 2016).
+- Tehrani — [*The Phylogeny of Little Red Riding Hood*](https://doi.org/10.1371/journal.pone.0078871) (PLoS ONE, 2013).
 - d'Huy — *Cosmic Hunt* / phylogenetic mythology (2013–).
-- Hatzel & Biemann — *Story Embeddings* (EMNLP 2024).
-- Yarlott et al. — *GOLEM* (LREC-COLING 2024).
-- Lauer — *A Very Brief History of Computational Folkloristics* (Fabula, 2023).
+- Hatzel & Biemann — [*Story Embeddings*](https://aclanthology.org/2024.emnlp-main.339/) (EMNLP 2024).
+- Yarlott et al. — [*GOLEM*](https://aclanthology.org/2024.lrec-main.689/) (LREC-COLING 2024).
+- Lauer — [*A Very Brief History of Computational Folkloristics*](https://doi.org/10.1515/fabula-2023-0001) (Fabula, 2023).
 
 ## Scholars & labs
 

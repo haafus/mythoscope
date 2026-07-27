@@ -1,93 +1,84 @@
-# Toward a Computational Framework for Comparative Mythology
+# Mythoscope
+
+> Toward a computational framework for comparative mythology.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Docs: CC BY-SA 4.0](https://img.shields.io/badge/Docs-CC%20BY--SA%204.0-lightgrey.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-purple.svg)](CODE_OF_CONDUCT.md)
 
-**Mythoscope** is a computational framework for comparative mythology. It builds a
-corpus of myth and folklore texts, embeds them, and turns the result into an
-explorable **semantic space** — with character / place / time **graphs** extracted
-per text by LLMs, a **geographic** view, and full-text **search by meaning**.
-Alongside this unsupervised layer it assembles a **motif database** that integrates
-the three traditional folklore indexes — Thompson (TMI), Aarne–Thompson–Uther (ATU)
-and Berezkin's areal catalogue — into one cross-linked, browsable whole, with an
-automatic **cross-walk** between them and lexical/semantic **parallel-finding** on
-top. Everything is served through one web UI; the long-term aim is to relate what
-the embeddings surface to the traditional indexes and expose cross-cultural motif
-parallels at scale.
+**Mythoscope** is a computational framework for comparative mythology. It builds a corpus of
+myth and folklore texts, embeds them, and turns the result into an explorable **semantic
+space** — with character / place / time **graphs** extracted per text by LLMs, a
+**geographic** view, and full-text **search by meaning**. Alongside this unsupervised layer it
+assembles a **motif database** that integrates the three traditional folklore indexes —
+Thompson (TMI), Aarne–Thompson–Uther (ATU) and Berezkin's areal catalogue — into one
+cross-linked, browsable whole, with an automatic **cross-walk** between them and
+lexical/semantic **parallel-finding** on top. Everything is served through one web UI.
 
-### Documentation
+**[Live demo](https://mythoscope.io)** · **[Documentation](docs/how-to.md)** · **[Roadmap](docs/ROADMAP.md)**
+
+<!-- TODO: add screenshots / a short demo GIF of Atlas, Similarity, and Motifs here. -->
+
+## Features
+
+- **Semantic space** — whole-corpus embeddings projected (UMAP) into an interactive, coloured
+  scatter you can explore by tradition and region.
+- **Search by meaning** — full-text semantic search and nearest-neighbour "similar fragments"
+  across traditions.
+- **Knowledge graphs** — per-text character/relation, place, and time graphs (Ages / Realms /
+  Beings), extracted by LLMs.
+- **Atlas** — a geographic view of the traditions in the corpus.
+- **Motif crosswalk** — a browsable catalogue integrating TMI, ATU, and Berezkin with a
+  cross-index crosswalk and lexical/semantic parallels.
+- **One UI + API** — a single web app plus a REST/OpenAPI service; export bundles let you
+  browse prebuilt data with no heavy dependencies.
+
+## Quickstart
+
+```sh
+git clone https://github.com/OWNER/mythoscope
+cd mythoscope
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[viewer]"   # lightweight: browse prebuilt data. Use ".[all]" for the full pipeline.
+mytho --help
+mytho server                 # serve the web UI + API at http://localhost:8000
+```
+
+Install profiles (viewer / search / all), environment setup, and the end-to-end pipeline are
+documented in **[docs/how-to.md](docs/how-to.md)**.
+
+## How it works
+
+The pipeline is linear, idempotent, and resumable:
+
+```
+corpus → embeddings → { projections, graphs } → server
+motifs (independent of the corpus) → server
+```
+
+- **corpus** — download & clean source texts (Project Gutenberg + local files), write cleaned
+  `.txt` + a catalog.
+- **embeddings** — chunk, optionally LLM-preprocess, encode (e.g. `bge-m3`), store in ChromaDB.
+- **projections** — reduce vectors with UMAP into the semantic-space views.
+- **graphs** — LLM-extract characters/relations, places, and a narrative timeline per text.
+- **motifs** — scrape and cross-link the TMI, ATU, and Berezkin indexes into one catalogue.
+- **server** — a FastAPI app reads `outputs/` and serves the SPA + REST/OpenAPI API.
+
+## Documentation
 
 - **[How to](docs/how-to.md)** — setup, CLI, and the end-to-end pipeline. Start here.
-- **[Research context](docs/research/)** — surveys of the field this sits in (computational folkloristics, motif induction).
+- **[Research context](docs/research/)** — surveys of the field (computational folkloristics, motif induction).
 - **[Motif indexes](docs/motifs/)** — how TMI, ATU and Berezkin are sourced, parsed and cross-linked.
 - **[Papers](docs/papers/)** — the working paper drafts and bibliography.
+- **[Proposals](docs/proposals/)** — design notes, the public-docs plan, and go-to-market.
 - **[Mockups](mockups/)** — standalone feature prototypes over the motif data.
+- **[Awesome Computational Mythology](docs/awesome-computational-mythology.md)** — a curated field resource list.
 
-### Basic Pipeline
+## Project status & roadmap
 
-1. Download and clean text corpora
-2. Build sentence and chunk embeddings
-3. Build vector index and retrieval
-4. Reduce embeddings dimensions with autoencoder and/or UMAP
-5. Display colored semantic space
-6. Extract ontology with Wikontic
-
-### Experiments / Roadmap / Backlog
-
-1. Relate unsupervised results to traditional motif indexes
-2. Query index by traditional motives and freeform text
-3. Research traditional motives operationalization
-4. Research traditions proximity / compound metrics and tools
-5. Build exploratory UI with clusters visualization, adaptable threshold and freeform proximity / parallels query
-6. Make the research UI publicly available online
-7. Integrate traditional indexes (ATU, Berezkin?) for interactive research and scaling?
-8. Initiate worldwide community corpora & computational methods project?
-9. Create and maintain **awesome-computational-mythology**?
-10. Try AE / VAE / SAE?
-11. Try hierarchical chunking / embeddings?
-12. Research narrative and network extraction methods?
-13. Benchmark narrative-similarity embedders on our tasks — take the top systems from **SemEval-2026 Task 4 (Narrative Story Similarity)**, **Qwen3-Embedding** with story-similarity instruction variants, and **`uhhlt/story-emb`**; build embeddings and measure whether they work better for our motif/tradition tasks than the current general embedders
-14. Try hierarchical aggregation of chunks — summaries and graphs of characters, epochs and locations — so large texts that don't fit in context still yield an overview-level result (~50–100 key entities, not every entity): extract per chunk (map), then consolidate globally with either an LLM dedup/reduce pass over the candidate list (merge aliases, pick the central ones) or ranking by graph degree centrality
-15. Try graph extraction over large context-filling chunks (instead of the current small ~4k-char chunks) — fewer, longer chunks give the model more global salience per call and cut the alias/duplication inflation from over-segmentation; compare quality and cost against the per-chunk approach
-16. Try ABTT (All-But-The-Top) embedding post-processing — subtract the common mean and top principal component(s), then renormalize. Our embeddings are strongly anisotropic (measured common-component ‖μ‖ ≈ 0.62–0.89; random-pair cosine 0.39–0.79, e5-large near-degenerate), so a large constant offset inflates every similarity. Expect it to de-hub neighbor lists and, most concretely, make absolute cosine thresholds (e.g. the motif semantic-parallels gate) meaningful; fit μ/PCs once per collection and apply the same transform to stored vectors and queries. Build it as a sibling collection so the raw variant stays for A/B
-17. ...
-
-### Potential Data Sources
-
-1. [Internet Sacred Text Archive](https://sacred-texts.com/index.htm)
-2. [The Database of Religious History](https://religiondatabase.org/landing) (including corpora)
-3. [Seshat Global History Databank](https://seshatdatabank.info/)
-4. [Motif Indexes](https://ctsf.ru/ukazateli)
-5. [Re3Data, Ancient Cultures](https://www.re3data.org/search?query=&subjects%5B%5D=111)
-6. [eHRAF World Cultures](https://ehrafworldcultures.yale.edu) (proprietary)
-7. [Multilingual Folk Tale Database](http://www.mftd.org)
-8. [Theoi Project](https://www.theoi.com/Library.html)
-
-### Potential Future Colabs & Benchmarks
-
-1. [DeepMind, Aeneas / Ithaca](https://predictingthepast.com)
-2. [Max Planck Evo Anthro](https://www.eva.mpg.de/linguistic-and-cultural-evolution/index/)
-3. [Oxford - Institute of Cognitive & Evolutionary Anthropology](https://www.anthro.ox.ac.uk/cognitive-evolutionary-anthropology-0) (Harvey Whitehouse)
-4. Cambridge - DH / CST bridge: [CDH](https://www.cdh.cam.ac.uk), [CST](https://www.cst.cam.ac.uk)
-5. [Durham University - Cultural evolution & folklore tradition](https://www.durham.ac.uk/research/institutes-and-centres/cultural-evolution/) (Jamshid Tehrani)
-6. [Stanford - Literary Lab](https://litlab.stanford.edu) (Franco Moretti)
-7. [Ecole Normale Superieure / CNRS - Structural mythology tradition](https://college-de-france.academia.edu/JuliendHuy) (Julien d'Huy)
-8. [IACM](https://www.compmyth.org) (Michael Witzel - Harvard, Natalya Yanchevskaya - Princeton, Steve Farmer)
-9. [Лаборатория Ненужных Вещей](https://7seminarov.com) (Брагинская, Александрова, Чегодаев, Березкин и др.)
-
-### Potential Submission Targets
-
-1. Journal/Conference: [Computational Humanities Research (CHR)](https://computational-humanities-research.org/)
-2. Journal: [Digital Scholarship in the Humanities (DSH)](https://academic.oup.com/dsh)
-3. Journal: [Cultural Analytics (CA)](https://culturalanalytics.org/)
-4. Journal/Conference: [Computational Literary Studies (JCLS)](https://jcls.io)
-5. Journal/Conference: [International Association for Comparative Mythology (IACM)](https://www.compmyth.org/conferences/)
-6. Journal: [Digital Humanities Quarterly (DHQ)](https://dhq.digitalhumanities.org)
-7. Workshop: [ACL Natural Language Processing for Digital Humanities (NLP4DH)](https://www.nlp4dh.com)
-8. Workshop: [ACL SIG on Humanities (SIGHUM)](https://sighum.wordpress.com)
-9. Workshop: [Digital Methods For Mythological Research (dm4myth)](https://dm4myth.github.io)
+Early research software (v0.1). Experiments, candidate data sources, potential collaborations,
+and submission targets are tracked in **[docs/ROADMAP.md](docs/ROADMAP.md)**.
 
 ## Contributing
 
