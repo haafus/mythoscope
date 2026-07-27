@@ -209,6 +209,28 @@ def test_clean_level2_reaps_unowned_store_artifacts():
     assert store.deleted == ["dropped_model"]
 
 
+def test_clean_level2_scoped_to_member_spares_sibling_orphans():
+    # family-granular level-2: a single-member scope must NOT sweep a sibling's dropped collection;
+    # the whole-family scope and an unscoped clean still reap it.
+    def fresh():
+        store = FakeStore({"model_a", "model_b", "dropped_model"})
+        a = FakeStage("emb:a", {}, {}, store=store, id="model_a")
+        b = FakeStage("emb:b", {}, {}, store=store, id="model_b")
+        return store, [a, b]
+
+    store, stages = fresh()
+    clean(stages, apply=True, targets={"emb:a"})            # single member → spare siblings
+    assert store.deleted == []
+
+    store, stages = fresh()
+    clean(stages, apply=True, targets={"emb:a", "emb:b"})   # whole family → reap
+    assert store.deleted == ["dropped_model"]
+
+    store, stages = fresh()
+    clean(stages, apply=True)                                # unscoped → reap
+    assert store.deleted == ["dropped_model"]
+
+
 def test_clean_empty_when_nothing_orphaned():
     store = FakeStore({"m"})
     s = FakeStage("s", {"k": "1"}, {"k": "1"}, store=store, id="m")

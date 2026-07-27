@@ -132,12 +132,13 @@ def clean(stages: list[Stage], *, apply: bool = False, targets: set[str] | None 
     own); every stage still contributes to each store's claimed-id set, so a scoped clean never
     mistakes a non-target stage's live artifact for an orphan. ``None`` reaps across all stages.
 
-    **Accepted design — a scoped clean reaps *all* orphans in a store a target stage owns, not
-    only the target's own.** Level-2's unit is the whole shared store: ``clean embeddings:modelA``
-    reaps every unclaimed collection in the Chroma store (e.g. a dropped ``modelC``), since a live
-    stage's claim is the only thing that keeps an id. It never deletes a *live* artifact (all
-    stages contribute claims), and a dropped model is an orphan under any scope — so this is safe,
-    just broader than the token suggests. A per-target level-2 filter was judged not worth it.
+    **Level-2 is family-granular.** An orphan (a dropped model's collection) has no live stage, so
+    it can be attributed to its store's *family* (``embeddings``) but not to a single member. A
+    scoped clean therefore reaps a store's orphans only when the scope covers the store's **whole
+    family** (all its live stages) — ``clean embeddings`` or an unscoped ``clean`` — and leaves them
+    untouched under a single-member scope (``clean embeddings:modelA`` no longer sweeps a dropped
+    ``modelC``). A live artifact is never reaped (all stages contribute claims); a dropped model is
+    still cleaned via the family scope or a full ``clean``.
     """
     ordered = topo_order(stages)
 
@@ -154,21 +155,24 @@ def clean(stages: list[Stage], *, apply: bool = False, targets: set[str] | None 
             if apply:
                 stage.delete(orphans)
 
-    # Group ALL stages by their shared store (for a correct claimed set), but reap only the
-    # stores that a target stage owns.
-    stores: dict[int, tuple[object, set[str]]] = {}
+    # Group ALL stages by their shared store (for a correct claimed set + the store's full family),
+    # but reap only the stores a target stage owns, and only at family granularity (see docstring).
+    stores: dict[int, tuple[object, set[str], set[str]]] = {}   # sid → (store, claimed ids, stage names)
     target_stores: set[int] = set()
     for stage in ordered:
         if stage.store is not None:
             sid = id(stage.store)
-            store, claimed = stores.setdefault(sid, (stage.store, set()))
+            store, claimed, names = stores.setdefault(sid, (stage.store, set(), set()))
             claimed.add(stage.id)
+            names.add(stage.name)
             if wanted(stage):
                 target_stores.add(sid)
     level2: dict[str, set[str]] = {}
-    for sid, (store, claimed) in stores.items():
+    for sid, (store, claimed, names) in stores.items():
         if sid not in target_stores:
             continue
+        if targets is not None and not names <= targets:
+            continue   # single-member scope → don't touch sibling orphans (family granularity only)
         orphan_ids = store.ids() - claimed
         if orphan_ids:
             level2[getattr(store, "label", type(store).__name__)] = orphan_ids
