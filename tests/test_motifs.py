@@ -1512,15 +1512,20 @@ def tiny_db(tmp_path, monkeypatch):
     }, ensure_ascii=False), encoding="utf-8")
     # Run the raw rows through the real build-time repair so the stored data
     # mirrors production (corrected parent/level, disambiguated duplicates).
-    def _tmi(id, name, level, parent, chapter="S"):
+    def _tmi(id, name, level, parent, chapter="S", notes=""):
         return {"id": id, "chapter": chapter, "chapter_name": "Cruelty",
-                "name": name, "notes": "", "level": level, "parent": parent}
+                "name": name, "notes": notes, "level": level, "parent": parent}
 
     tmi_motifs = trilogy._finalize_tmi([
         _tmi("S0", "Cruelty", 0, ""),
         _tmi("S30", "Cruel relatives", 1, "S0"),
         _tmi("S31", "Cruel stepmother", 2, "S30"),
-        _tmi("S31.1", "Stepmother kills", 3, "S31"),
+        # A substantive leaf (>=150 notes bytes) so the tier/subtree filters have a
+        # real target and S0..S31 become subtree-relevant ancestors.
+        _tmi("S31.1", "Stepmother kills", 3, "S31",
+             notes="The cruel stepmother orders the stepchild slain; a servant spares the child "
+                   "and brings back a token of the supposed death to deceive her. "
+                   "India: Thompson-Balys; Ireland: Cross; Africa: Klipple."),
         # Orphan: empty parent though the id clearly nests under S31 (id-trim).
         _tmi("S31.0.1", "Orphan detail", 0, ""),
         # Duplicate code reused for two distinct motifs.
@@ -1660,7 +1665,7 @@ class TestService:
         # S31 has a substantive descendant chain; its L0 root S0 is subtree-relevant
         # even though S0 itself isn't substantive.
         relevant = svc._tier_relevant("sub")
-        assert "S0" in relevant or not any(svc._substantive(r) for r in svc._records("tmi"))
+        assert "S0" in relevant  # ancestor of the substantive leaf S31.1
 
     def test_list_motifs_tier_filter(self, tiny_db):
         base = svc.list_motifs("tmi")["total"]

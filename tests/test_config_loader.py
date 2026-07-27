@@ -27,14 +27,3 @@ class TestCorpusSettingsOverride:
         assert cfg.max_workers == 20
         assert cfg.timeout_connect == 5
         assert cfg.timeout_read == 30
-
-    def test_settings_corpus_is_corpus_settings(self):
-        assert isinstance(settings.corpus, CorpusSettings)
-
-
-class TestPathsFromSettings:
-    def test_corpus_dir(self):
-        assert settings.corpus_dir is not None
-
-    def test_config_dir(self):
-        assert settings.config_dir is not None

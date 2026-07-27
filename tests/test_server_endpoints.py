@@ -128,7 +128,10 @@ class TestSimilarityEndpoints:
         # Same contract as search: missing torch -> 503, not 500.
         from unittest.mock import patch
 
-        with patch("server.api.similarity._available_models", return_value=["m"]), \
+        # Force past the text-search-available gate and the collection check so we
+        # exercise the warmup ImportError -> 503 path itself (not the graceful skip).
+        with patch("server.api.similarity._text_search_available", return_value=True), \
+             patch("server.api.similarity._available_models", return_value=["m"]), \
              patch(
                  "server.api.similarity.similarity_service.warmup",
                  side_effect=ModuleNotFoundError("No module named 'torch'"),

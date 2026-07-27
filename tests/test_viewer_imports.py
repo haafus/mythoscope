@@ -37,10 +37,11 @@ for _path in ("/api/corpus/documents", "/api/corpus/traditions"):
     _status = client.get(_path).status_code
     assert _status == 200, (_path, _status)
 
-# warmup must not pull torch at the route boundary; unknown model -> 404,
-# a real one would -> 503, never an import at module load.
+# warmup must not pull torch at the route boundary. In a viewer build (no torch)
+# text search is unavailable, so warmup returns 200 "skipped"; with the stack it
+# would 404 (unknown model) / 503 (import) — never an import at module load / 500.
 _warm = client.post("/api/similarity/warmup", json={{"model": "nonexistent"}}).status_code
-assert _warm in (404, 503), _warm
+assert _warm in (200, 404, 503), _warm
 
 _leaked = [n for n in {blocked!r} if sys.modules.get(n) is not None]
 assert not _leaked, "server pulled heavy deps at import time: " + ", ".join(_leaked)

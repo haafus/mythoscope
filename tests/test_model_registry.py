@@ -13,9 +13,6 @@ class TestResolveEmbeddingModel:
     def test_resolves_alias(self):
         assert resolve_embedding_model("bge-m3") == "BAAI/bge-m3"
 
-    def test_resolves_labse(self):
-        assert resolve_embedding_model("labse") == "sentence-transformers/LaBSE"
-
     def test_passes_through_full_name(self):
         assert resolve_embedding_model("BAAI/bge-m3") == "BAAI/bge-m3"
 
@@ -47,15 +44,16 @@ class TestListFunctions:
 
     def test_list_embedding_aliases(self):
         aliases = list_embedding_aliases()
+        # Only bge-m3 is active (config/models.json); labse et al. are inactive.
         assert aliases["bge-m3"] == "BAAI/bge-m3"
-        assert "labse" in aliases
+        assert "labse" not in aliases
 
     def test_active_embedding_models(self):
         models = active_embedding_models()
-        assert len(models) == 4
-        assert models[0] == "BAAI/bge-m3"
-        assert "Qwen/Qwen3-Embedding-4B" not in models
+        assert models == ["BAAI/bge-m3"]
 
     def test_inactive_embedding_passes_through(self):
+        # Inactive aliases are not resolved — they pass through unchanged.
+        assert resolve_embedding_model("labse") == "labse"
         assert resolve_embedding_model("qwen-4b") == "qwen-4b"
         assert resolve_embedding_model("story-emb") == "story-emb"

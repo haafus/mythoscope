@@ -1,7 +1,5 @@
 import json
 
-import pytest
-
 from server.services.corpus import (
     document_ids_for_tradition,
     get_document_text,
@@ -103,9 +101,3 @@ class TestTraditionResolution:
         _catalog(tmp_path, monkeypatch, [{"document_id": "a", "tradition": "Greek"}])
         assert tradition_of_document("a") == "Greek"
         assert tradition_of_document("zzz") is None
-
-
-@pytest.fixture(autouse=True)
-def _isolate(monkeypatch):
-    # keep settings mutations from leaking between tests
-    yield

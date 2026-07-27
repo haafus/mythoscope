@@ -79,12 +79,6 @@ class TestMd5:
     def test_empty_bytes(self):
         assert md5(b"") == "d41d8cd98f00b204e9800998ecf8427e"
 
-    def test_deterministic(self):
-        assert md5(b"test") == md5(b"test")
-
-    def test_different_inputs_differ(self):
-        assert md5(b"a") != md5(b"b")
-
 
 class TestNormalizeText:
     def test_strips_whitespace(self):
@@ -118,16 +112,16 @@ class TestCountWords:
 
 class TestCountSentences:
     def test_single_sentence(self):
-        assert count_sentences("Hello world.") >= 1
+        assert count_sentences("Hello world.") == 1
 
     def test_multiple_sentences(self):
-        assert count_sentences("First. Second. Third.") >= 2
+        assert count_sentences("First. Second. Third.") == 3
 
     def test_empty_string(self):
         assert count_sentences("") == 0
 
     def test_exclamation_and_question(self):
-        assert count_sentences("Hello! How are you? Fine.") >= 2
+        assert count_sentences("Hello! How are you? Fine.") == 3
 
 
 class TestEnsureDir:

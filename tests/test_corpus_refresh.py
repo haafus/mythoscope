@@ -71,7 +71,8 @@ class TestRefreshCorpus:
         r = refresh_corpus(apply=True)
         assert r.adopted == ["A"]
         assert raw.read_bytes() == b"new"  # adopted via os.replace
-        assert not raw.with_name(raw.name + ".partial").exists()
+        # staging uses a random-infix "<name>.<rand>.partial" — no leftover of any name.
+        assert not list(raw.parent.glob("*.partial"))
 
     def test_new_source_acquired_only_on_apply(self, env, monkeypatch):
         url = "https://x/new"

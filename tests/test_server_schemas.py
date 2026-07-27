@@ -48,9 +48,10 @@ class TestSearchResult:
 
     def test_no_tradition_or_colour_on_hit(self):
         # tradition/region/url/colour are resolved on the front, never on the hit.
-        r = SearchResult(document_id="d1", tradition="Greek", color="#f00", similarity_score=0.5)
-        assert not hasattr(r, "tradition") or getattr(r, "tradition", None) is None
-        assert not hasattr(r, "color") or getattr(r, "color", None) is None
+        assert "tradition" not in SearchResult.model_fields
+        assert "color" not in SearchResult.model_fields
+        # unknown kwargs are ignored (extra="ignore"), not stored, and don't error:
+        SearchResult(document_id="d1", tradition="Greek", color="#f00", similarity_score=0.5)
 
 
 class TestCorpusDocument:
@@ -58,7 +59,7 @@ class TestCorpusDocument:
         doc = CorpusDocument(title="test")
         assert doc.document_id == ""
         assert doc.word_count == 0
-        assert not hasattr(doc, "major_tradition") or doc.major_tradition == ""
+        assert "major_tradition" not in CorpusDocument.model_fields
 
     def test_reference_fields(self):
         doc = CorpusDocument(document_id="d1", title="Iliad", tradition="Greek",
@@ -66,8 +67,8 @@ class TestCorpusDocument:
         assert doc.tradition == "Greek" and doc.dating == "~8th c. BCE"
 
     def test_no_colour_field(self):
-        doc = CorpusDocument(title="x", color="#f00")  # color ignored (resolved on front)
-        assert not hasattr(doc, "color") or getattr(doc, "color", None) is None
+        assert "color" not in CorpusDocument.model_fields
+        CorpusDocument(title="x", color="#f00")  # color ignored (resolved on front), no error
 
 
 class TestDocumentsResponse:

@@ -1,9 +1,12 @@
 """Integration smoke test: downloads and loads every registered embedding model.
 
-Heavy (gigabytes of model weights) — auto-skipped when ML dependencies are absent.
-Run explicitly: pytest tests/test_embedding_models_integration.py
+Heavy (gigabytes of model weights, network) — skipped by default even when the ML
+deps are installed. Run explicitly:
+
+    MYTHO_RUN_MODEL_DOWNLOADS=1 pytest tests/test_embedding_models_integration.py
 """
 
+import os
 import time
 import unittest
 
@@ -11,6 +14,13 @@ import numpy as np
 import pytest
 
 from model_registry import active_embedding_models
+
+# importorskip only guards the *absence* of the package; the env flag guards the
+# expensive network download when it IS installed (e.g. CI/local dev machines).
+pytestmark = pytest.mark.skipif(
+    os.environ.get("MYTHO_RUN_MODEL_DOWNLOADS") != "1",
+    reason="downloads gigabytes of model weights; set MYTHO_RUN_MODEL_DOWNLOADS=1 to run",
+)
 
 SentenceTransformer = pytest.importorskip("sentence_transformers").SentenceTransformer
 

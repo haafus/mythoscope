@@ -51,7 +51,7 @@ class TestChunkText:
         text = "Word " * 100
         no_overlap = chunk_text(text, chunk_size=100, chunk_overlap=0)
         with_overlap = chunk_text(text, chunk_size=100, chunk_overlap=30)
-        assert len(with_overlap) >= len(no_overlap)
+        assert len(with_overlap) > len(no_overlap)  # overlap re-emits tail words -> strictly more chunks
 
     def test_overlap_preserved_after_recursive_split(self):
         short_a = "A" * 50

@@ -29,19 +29,5 @@ def test_env_override_embeddings_dir(monkeypatch):
 
     s = Settings()
     assert s.embeddings_dir == Path("/data/embeddings")
-
-
-def test_default_embedding_settings():
-    from settings import Settings
-
-    s = Settings()
-    assert s.embedding.chunk_size == 1024
-    assert s.embedding.chunk_overlap == 128
-
-
-def test_active_embedding_models():
-    from model_registry import active_embedding_models
-
-    models = active_embedding_models()
-    assert len(models) == 4
-    assert models[0] == "BAAI/bge-m3"
+# (embedding-default and active-model assertions live authoritatively in
+# test_config_manager.py and test_model_registry.py — not duplicated here.)

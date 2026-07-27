@@ -1,8 +1,9 @@
+import dataclasses
 import json
 
 import pytest
 
-from corpus.iterator import CorpusFileInfo, iter_files
+from corpus.iterator import iter_files
 from corpus.utils import normalize_catalog_id
 
 
@@ -70,14 +71,8 @@ class TestIterCorpusFiles:
         assert info.text_id == "mytext"
         assert info.document_id == "abc123"
         assert info.fingerprint == "deadbeef"
-        assert not hasattr(info, "major_tradition")  # B1: dropped from CorpusFileInfo
-
-    def test_returns_corpus_file_info(self, tmp_path):
-        corpus = self._create_corpus(tmp_path, [
-            {"title": "a", "tradition": "t", "major_tradition": "m", "path": "m/t/a/a.txt"},
-        ])
-        results = list(iter_files(corpus))
-        assert isinstance(results[0], CorpusFileInfo)
+        # B1: major_tradition is not a field of CorpusFileInfo (guards re-adding it).
+        assert "major_tradition" not in {f.name for f in dataclasses.fields(info)}
 
     def test_read_text(self, tmp_path):
         corpus = self._create_corpus(tmp_path, [

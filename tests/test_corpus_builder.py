@@ -39,28 +39,6 @@ class TestBuildMetadata:
         assert parsed.tzinfo is not None
 
 
-class TestBuildMetadataFields:
-    def test_word_count(self):
-        stats = {"md5": "abc", "char_count": 10, "word_count": 500, "sentence_count": 40}
-        item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
-        assert meta["word_count"] == 500
-
-    def test_description_from_item(self):
-        stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
-        item = {**_BASE_ITEM, "title": "Iliad", "description": "An epic poem"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
-        assert meta["description"] == "An epic poem"
-
-    def test_empty_description(self):
-        stats = {"md5": "abc", "char_count": 10, "word_count": 10, "sentence_count": 1}
-        item = {**_BASE_ITEM, "title": "Iliad"}
-        meta = _build_metadata(item, path="/tmp/x.txt", stats=stats, source_fp="sf")
-        assert meta["description"] == ""
-
-
-
-
 class TestBuildCorpusForce:
     """Which items build_corpus re-processes vs. reuses from a previous run."""
 

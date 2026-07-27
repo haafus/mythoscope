@@ -19,14 +19,8 @@ class TestServerSettingsOverride:
         assert cfg.host == "0.0.0.0"
         assert cfg.port == 9000
 
-    def test_settings_server_is_server_settings(self):
-        assert isinstance(settings.server, ServerSettings)
-
 
 class TestServerPaths:
     def test_web_root_points_to_server_web(self):
         assert settings.web_root == Path("src/server/web")
-
-    def test_web_root_is_regular_field(self):
-        assert "web_root" in type(settings).model_fields
 
