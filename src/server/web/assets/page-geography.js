@@ -43,9 +43,14 @@ function normalizeCoordinates(value) {
 async function fetchTraditions() {
     await ensureCorpusData();
 
+    // Only plot traditions that actually have a text in the corpus — the tradition tree also
+    // carries traditions with no document, which shouldn't appear on the atlas.
+    const inCorpus = new Set((state.corpusDocuments || []).map((doc) => doc.tradition));
+
     const points = [];
     for (const [region, node] of Object.entries(state.traditionTree || {})) {
         for (const [name, info] of Object.entries(node.traditions || {})) {
+            if (!inCorpus.has(name)) continue;
             const coordinates = normalizeCoordinates(info && info.coordinates);
             if (!coordinates) continue;
             points.push({
