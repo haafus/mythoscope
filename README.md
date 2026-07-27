@@ -1,5 +1,10 @@
 # Toward a Computational Framework for Comparative Mythology
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Docs: CC BY-SA 4.0](https://img.shields.io/badge/Docs-CC%20BY--SA%204.0-lightgrey.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-purple.svg)](CODE_OF_CONDUCT.md)
+
 **Mythoscope** is a computational framework for comparative mythology. It builds a
 corpus of myth and folklore texts, embeds them, and turns the result into an
 explorable **semantic space** — with character / place / time **graphs** extracted
@@ -83,3 +88,22 @@ parallels at scale.
 7. Workshop: [ACL Natural Language Processing for Digital Humanities (NLP4DH)](https://www.nlp4dh.com)
 8. Workshop: [ACL SIG on Humanities (SIGHUM)](https://sighum.wordpress.com)
 9. Workshop: [Digital Methods For Mythological Research (dm4myth)](https://dm4myth.github.io)
+
+## Contributing
+
+Contributions of code, corpus, annotations, and docs are welcome — see
+**[CONTRIBUTING.md](CONTRIBUTING.md)** and the **[Code of Conduct](CODE_OF_CONDUCT.md)**.
+Start with **[docs/how-to.md](docs/how-to.md)** for setup and the pipeline. Security issues:
+see **[SECURITY.md](SECURITY.md)**.
+
+## Citation
+
+If you use Mythoscope in academic work, please cite it — see **[CITATION.cff](CITATION.cff)**
+(a DOI will be added on the first archived release). GitHub renders a "Cite this repository"
+button from that file.
+
+## License
+
+Source code is under the **[MIT license](LICENSE)**. Documentation and prose are under
+**CC BY-SA 4.0**, and derived datasets (e.g. the motif crosswalk) under **CC BY 4.0**; see
+[`LICENSE`](LICENSE) for details. Third-party source texts and indexes retain their own terms.

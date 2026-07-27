@@ -633,3 +633,40 @@ Each step is independently shippable; earlier steps unblock later ones.
 ### Ongoing
 - [ ] Cadence: monthly light (Updates → newsletter → socials), quarterly heavy (survey/release
       + DOI). Track north-star metrics (GTM §7); ignore vanity metrics.
+
+## 17. Repository hygiene for a public academic project
+
+An audit of the repo's own presentation (separate from the docs *site*). A public academic
+open-source project needs the standard "community health" files, a license, CI, and a
+reader-first README.
+
+**Added now (this pass):**
+- **`LICENSE`** — MIT for code (matches `pyproject`; previously the metadata claimed MIT but
+  *no license file existed* — legally all-rights-reserved). Notes docs = CC BY-SA 4.0, derived
+  data = CC BY 4.0.
+- **`CITATION.cff`** — enables GitHub's "Cite this repository"; DOI/author placeholders to fill.
+- **`CONTRIBUTING.md`**, **`CODE_OF_CONDUCT.md`** (Contributor Covenant 2.1), **`SECURITY.md`**.
+- **`.github/`** — `ci.yml` (ruff + `npm test`), PR template, bug/feature issue templates.
+- **`.editorconfig`**; `pyproject` gained `authors` + `[project.urls]`.
+- **README** — license/python/CoC badges + Contributing / Citation / License sections.
+
+**Remaining (do later / needs a decision or an external step):**
+- [ ] **README restructure for the public.** It currently leads with an internal
+      roadmap/backlog + "Potential colabs / submission targets". Lead instead with
+      what-it-is + a screenshot/demo GIF + quickstart + docs links; move the roadmap/backlog and
+      colab/submission lists into `docs/ROADMAP.md` (internal). (Editorial — the roadmap content
+      is the maintainer's to move.)
+- [ ] **Full Python test CI** (`python -m pytest`) — needs the install-profile decision (a
+      lightweight test extra) since the full deps pull torch/chromadb/umap; the CI stub has a
+      TODO. Add coverage once wired.
+- [ ] **Zenodo DOI** — connect the repo to Zenodo, cut a release, add the DOI to `CITATION.cff`
+      + a badge (see §15.1).
+- [ ] **Screenshots / a short demo GIF** of Atlas/Similarity/Motifs in the README.
+- [ ] **`.github/FUNDING.yml`** (only if a funding channel exists), **`dependabot.yml`**,
+      optional `CHANGELOG.md`.
+- [ ] **Fill placeholders:** `OWNER` (GitHub owner) in `CITATION.cff` / `pyproject` URLs, the
+      real author name(s)/ORCID and copyright holder in `LICENSE`/`CITATION.cff`, and the
+      `security@mythoscope.io` mailbox.
+- [ ] **GitHub repo settings** (from the web, can't be scripted here): description, topics
+      (`computational-folkloristics`, `comparative-mythology`, `digital-humanities`, `nlp`,
+      `folklore`), social-preview image, enable Discussions.

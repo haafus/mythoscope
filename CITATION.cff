@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use Mythoscope, please cite it."
+title: "Mythoscope: a computational framework for comparative mythology"
+abstract: >-
+  Mythoscope builds a corpus of myth and folklore texts, embeds them into an
+  explorable semantic space, extracts character/place/time graphs, and assembles
+  a cross-linked motif database integrating the Thompson (TMI), Aarne–Thompson–Uther
+  (ATU), and Berezkin indexes.
+type: software
+license: MIT
+version: "0.1.0"
+url: "https://mythoscope.io"
+repository-code: "https://github.com/OWNER/mythoscope"
+keywords:
+  - computational folkloristics
+  - comparative mythology
+  - digital humanities
+  - motif index
+  - cultural evolution
+authors:
+  - given-names: "FIRST"
+    family-names: "LAST"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+# TODO: fill OWNER, author name(s)/ORCID, and add a Zenodo DOI once minted:
+# doi: "10.5281/zenodo.XXXXXXX"
