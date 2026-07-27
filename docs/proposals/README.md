@@ -67,6 +67,10 @@ not as live work.
   section. **Goal:** a clear, specialist-engaging, SEO-aware public layer (~12 pages, 3 tiers) built from
   existing docs, with an explicit internal/keep-out list. **Delivery decided: SPA app +
   statically pre-rendered (SSG) doc URLs (hybrid).** *Plan; not started.*
+- [`figma-mythosemantic-copy.md`](figma-mythosemantic-copy.md) — verbatim public-site copy
+  extracted from the Figma `MythoSemantic` mockup (vision, the `-scope` name essay, the full
+  "Join the Collaboration" page, a sitemap, a resources list). Raw source for the public-docs
+  plan §14; some blocks are internal RU strategy memos. *Reference.*
 
 ## Archived
 

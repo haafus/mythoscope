@@ -6,6 +6,36 @@ mythologists, digital-humanities researchers), SEO-aware — but deliberately *n
 bloated. The public layer is **English** (Element and the surveys are already
 English; the Russian source docs are flagged for translation below).
 
+Extracted public-site copy from the Figma mockup is preserved verbatim in
+[`figma-mythosemantic-copy.md`](figma-mythosemantic-copy.md) and mapped onto sections in §14.
+
+## Decisions & open questions (register)
+
+**Decided:**
+1. **Public-layer language: English.** (§1, §7)
+2. **Delivery: hybrid** — the interactive app stays an SPA; public docs (Tiers A/B) + the
+   landing are static pages at clean URLs. (§8)
+3. **Static precompile (SSG) is primary, not on-request SSR.** SSR only as an optional
+   `--watch` dev preview. (§8, §12.2)
+4. **Build via `scripts/build_docs.py`** (a standalone offline script, not a `mytho` CLI
+   subcommand). (§12.2)
+5. **Output directly under the web root** `src/server/web/` (next to `index.html`/`assets/`),
+   **not** `outputs/` and **no `site/` wrapper**; served by extending the existing startup
+   mount in `create_app`. (§12.2, §12.5)
+
+**Open — need the user's call:**
+- **A. Positioning register** — reconcile the Figma "discovery, not verification / we don't
+  know" manifesto with the Element's results-first honesty. Recommended: Vision carries the
+  manifesto, "What we found" carries results, soften "we don't know what structures exist" to
+  "map the space of deep structures". (§14.1)
+- **B. Newsletter provider** — Buttondown / Substack / Mailchimp / self-hosted listmonk; the
+  form markup depends on the choice. (§10)
+- **C. Real contact email(s)** to replace the placeholder `*@mythoscope.org` addresses in the
+  Figma copy. (§10, §14.3)
+- **D. Nav-hub label** — recommended **"Research ▾"** over "About"/"Docs"; confirm. (§9)
+- **E. Generated HTML in git** — commit the built `.html`, or gitignore it and rebuild in CI?
+  (§12.2)
+
 ## 0. Starting picture
 
 - **The site** is a FastAPI-served single-page app. Public nav: Sources · Similarity ·
