@@ -54,7 +54,7 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
 ## 1. Composition principles ("vivid, but not excessive")
 
 1. **One canonical public layer.** We do not mirror all of `docs/` onto the site. Publish
-   ~10–12 pages; everything reasoning-flavoured (proposals, reviews, known-issues,
+   ~13 pages; everything reasoning-flavoured (proposals, reviews, known-issues,
    archive, parsing logs) stays in the repo for whoever reaches GitHub.
 2. **Specialist-first, with a human entry point.** Top of funnel: a vivid thesis and case
    studies. Depth below: references and surveys that people search for by name.
@@ -69,16 +69,17 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
    "what we found" page sits a "go turn the knobs yourself" button (Atlas / Similarity /
    Motifs). That is dwell time and retention.
 
-## 2. Proposed composition — 3 tiers, ~12 pages
+## 2. Proposed composition — 3 tiers, ~13 pages
 
 ### Tier A — The argument (human entry, narrative)
 
 | Page | What | Source | Readiness |
 |---|---|---|---|
-| A1 | **Overview — "A Natural History of the Motif."** H1 = the thesis: *"The geography of a myth is written in where it is attested, not in what it says."* What MythoScope is (tool + programme), one screen, CTA into the live views. | README + Element 01 | near-ready |
+| A1 | **Overview (landing, `/`).** H1 = the thesis: *"The geography of a myth is written in where it is attested, not in what it says."* What MythoScope is (tool + programme), one screen, CTA into the live views. | README + Element 01 + Figma vision pitch | near-ready |
 | A2 | **What we found.** Distilled results: areal diffusion dominates (2,311/2,775 motifs), a datable ~1% "fairy-tale core" ≈5,500 BP, a small deep substrate (320/480), the irreducibility limit. Stat tiles + the honest framing. | Element 06/10, 4-findings | light edit |
 | A3 | **Three motifs through the machine.** Case studies: the swan-maiden, sun-and-moon-as-kin, the fished-up earth. Vivid, shareable vignettes. | Element 09 | near-ready |
 | A4 | **How it works.** The pipeline corpus→embeddings→projections→graphs + the motif crosswalk; the natural-history framing; honest scope (induction is built but not yet validated at scale). | Element 03 + how-to + proposals | assembly |
+| A5 | **About / Vision.** "Collaborative Semantic Archaeology"; the *why* — the "Why collaborative infrastructure for theory discovery" manifesto (scale/algorithms/collaboration/open-infra, deductive→inductive); the `-scope` name story (telescope/microscope → new lens). Absorbs the current About tabs. Reconcile register per §14.1. | Figma (§14) + Element 01 | assembly + **translate** |
 
 ### Tier B — Reference & surveys (SEO and citation magnets — the specialist draw)
 
@@ -97,22 +98,22 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
 
 | Page | What | Source | Readiness |
 |---|---|---|---|
-| C1 | **Contribute.** How to help: corpus, code, data, community; the **awesome-computational-mythology** idea; the "just view the data" path (export bundle, no torch). | net-new + README roadmap + how-to | to write |
-| C2 | **Resources.** Data (export bundles), the live **API `/docs` (OpenAPI)**, GitHub, preprints + bibliography, licences. | net-new + how-to | to write |
+| C1 | **Contribute.** How to help: corpus, code, data, community; the **awesome-computational-mythology** idea; the "just view the data" path (export bundle, no torch). Backbone = the Figma "Join the Collaboration" page (15 collaboration types), trimmed to real offerings. | Figma (§14) + README roadmap + how-to | trim/adapt |
+| C2 | **Resources.** Data (export bundles), the live **API `/docs` (OpenAPI)**, GitHub, preprints + bibliography, licences; digital text-library list from Figma (dedupe vs B4). | Figma (§14) + how-to | to write |
 
-## 3. Where it lives
+**Out of initial scope (from the Figma sitemap, kept lean):** *Learn* (tutorials/workshops) and
+*News & Events* are deferred — net-new content, not needed for the specialist/SEO launch; add
+later if the community warrants it. *Team / Partners* pages wait until they are real (§14.3).
 
-Recommendation: **do not stand up a separate docs engine** (mkdocs / docusaurus is itself
-the "excess"). Extend the existing scaffold instead — promote `/about` into a full **"Docs"**
-hub inside the same SPA, with a left table of contents over the three tiers (A/B/C) and
-content as server-rendered markdown pages. Tier A maps straight onto the current About tabs
-(Vision→A1, Methodology→A4), Contribute→C1, Resources→C2; the Tier-B pages are added as hub
-entries.
+## 3. Where it lives (decided in §8 — hybrid)
 
-Alternative, if maximum SEO/citability is the priority: publish the surveys (B3–B5) and the
-crosswalk (B1) as **standalone static URLs** with clean paths and full `<title>`/`<meta>`
-— crawlers handle these better than SPA hash routing. This fork is worked through and
-resolved (hybrid) in §8.
+**No separate docs engine** (mkdocs / docusaurus is itself the "excess"). The delivery was
+worked through and **decided in §8**: the interactive app stays an SPA (moved to `/app`), and
+the public docs (Tiers A/B/C) + the landing are **statically pre-rendered pages at clean
+URLs**, built from a curated markdown tree through one shared shell template and served as
+plain files (§12). The three-tier table of contents is reached from a **"Research ▾"** nav hub
+(§9); the current About-tab copy (Vision, Methodology, Contribute, Resources) is absorbed into
+Tier A/C pages. Full URL map, rendering pipeline, and phasing are in §12; navigation in §9.
 
 ## 4. SEO layer
 
@@ -330,7 +331,7 @@ it does not touch the API or the app's behaviour.
   visitor gets framing, not a raw data table, with an "Explore the live data" CTA into
   `/app`.
 - **Tier A (static):** `/what-we-found` (A2), `/cases/{swan-maiden,sun-and-moon,fished-up-earth}`
-  (A3), `/how-it-works` (A4).
+  (A3), `/how-it-works` (A4), `/about` (A5 — vision/manifesto/name story).
 - **Tier B (static, the magnets):** `/crosswalk` (B1); `/indexes/{tmi,atu,berezkin}` (B2);
   `/research/computational-folkloristics` + `/research/landscape` (B3);
   `/research/corpus-sourcing` (B4); `/research/encyclopedias` (B5); `/regions` (B6).
