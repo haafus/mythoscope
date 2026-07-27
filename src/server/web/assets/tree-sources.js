@@ -129,3 +129,32 @@ export function setActiveBook(container, doc) {
     const btn = container.querySelector(`.document-button[data-doc-index="${index}"]`);
     if (btn) btn.classList.add("active");
 }
+
+// The ONE active tree item — region, tradition, or book (exactly one at a time). Clears every
+// kind's `.active`, then marks the single matching header/button. Expansion (`open`/`collapsed`)
+// is a separate concern, so a book can be active while its tradition stays open-but-not-active.
+export function setActiveNode(container, node) {
+    container.querySelectorAll(".major-title.active, .tradition-title.active, .document-button.active")
+        .forEach((el) => el.classList.remove("active"));
+    if (!node) return;
+    if (node.kind === "book") {
+        const index = state.corpusDocuments.indexOf(node.doc);
+        if (index !== -1)
+            container.querySelector(`.document-button[data-doc-index="${index}"]`)?.classList.add("active");
+    } else if (node.kind === "region") {
+        for (const s of container.querySelectorAll(".major-section")) {
+            if ((s.dataset.major || "Other") === node.key) {
+                s.querySelector(".major-title")?.classList.add("active");
+                break;
+            }
+        }
+    } else if (node.kind === "tradition") {
+        for (const g of container.querySelectorAll(".tradition-group")) {
+            const s = g.closest(".major-section");
+            if (corpusTraditionKey(s?.dataset.major, g.dataset.tradition) === node.key) {
+                g.querySelector(".tradition-title")?.classList.add("active");
+                break;
+            }
+        }
+    }
+}

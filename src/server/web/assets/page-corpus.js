@@ -3,7 +3,7 @@ import {
     buildCorpusApiUrl, escapeHtml, formatNumber,
     regionOf, traditionColor,
 } from "./core.js";
-import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=7";
+import { renderLibraryTree, setActiveNode } from "./tree-sources.js?v=8";
 
 export async function renderCorpus(params = new URLSearchParams()) {
     app.innerHTML = `
@@ -57,9 +57,17 @@ export async function renderCorpus(params = new URLSearchParams()) {
         openCorpusDocument(target);
     } else if (wantedTradition) {
         showTraditionInfo(wantedTradition, regionOf(wantedTradition));
-    } else if (state.selectedCorpusDoc) {
-        setActiveBook(libraryTree, state.selectedCorpusDoc);
+    } else if (state.selectedNode) {
+        setActiveNode(libraryTree, state.selectedNode);   // restore the one active item (region/tradition/book)
     }
+}
+
+// The single source of truth for "what is selected": set the one active node and reflect it in
+// the tree. Region/tradition/book all route through here, so exactly one is ever highlighted.
+function selectNode(node) {
+    state.selectedNode = node;
+    const tree = document.getElementById("libraryTree");
+    if (tree) setActiveNode(tree, node);
 }
 
 function renderBookInfo(doc) {
@@ -122,11 +130,7 @@ function facetListField(label, items) {
 function renderFacetInfo(name, color, fields) {
     const readerContent = document.getElementById("readerContent");
     if (!readerContent) return;
-    // A facet (region/tradition) is the active item now — drop any book selection so the tree
-    // highlight and the info panel stop pointing at a previously-opened book.
-    const libraryTree = document.getElementById("libraryTree");
-    if (libraryTree) setActiveBook(libraryTree, null);
-    renderBookInfo(null);
+    renderBookInfo(null);   // a facet has no book panel; the tree highlight is set by the caller (selectNode)
     readerContent.innerHTML = `
         <div class="facet-info">
             <div class="facet-title">
@@ -142,6 +146,7 @@ function renderFacetInfo(name, color, fields) {
 function showRegionInfo(region) {
     const node = (state.traditionTree || {})[region];
     if (!node) return;
+    selectNode({ kind: "region", key: region });
     const lead = node.description ? `<div class="facet-lead">${escapeHtml(node.description)}</div>` : "";
     const fields = lead
         + facetListField("Subdivision", node.subdivision)
@@ -152,6 +157,7 @@ function showRegionInfo(region) {
 function showTraditionInfo(tradition, region) {
     const info = ((state.traditionTree || {})[region] || {}).traditions?.[tradition];
     if (!info) return;
+    selectNode({ kind: "tradition", key: corpusTraditionKey(region, tradition) });
     const lead = info.description ? `<div class="facet-lead">${escapeHtml(info.description)}</div>` : "";
     const fields = lead
         + facetField("Region", region)
@@ -161,8 +167,7 @@ function showTraditionInfo(tradition, region) {
 
 async function openCorpusDocument(doc) {
     state.selectedCorpusDoc = doc;
-    const libraryTree = document.getElementById("libraryTree");
-    if (libraryTree) setActiveBook(libraryTree, doc);
+    selectNode({ kind: "book", doc });   // the book is the one active item; clears any region/tradition
     renderBookInfo(doc);
 
     const readerContent = document.getElementById("readerContent");

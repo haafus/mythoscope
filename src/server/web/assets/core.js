@@ -19,7 +19,8 @@ export const state = {
     corpusDocuments: [],
     docIndex: null,            // document_id -> document (built with the documents)
     selectedCorpusDoc: null,
-    corpusOpenMajor: null,        // accordion: the one open region
+    selectedNode: null,           // the ONE active tree item: {kind:'region'|'tradition'|'book', …}
+    corpusOpenMajor: null,        // accordion: the one open region (expansion, separate from active)
     corpusOpenTradition: null,    // accordion: the one open tradition key
     corpusTreeInitialized: false,
     traditionTree: null,       // region -> { color, description, subdivision, strata, traditions }

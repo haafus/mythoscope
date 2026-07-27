@@ -292,8 +292,15 @@ body.has-main-navbar {
     content: "\25b8"; /* ▸ */
 }
 
-.library-tree .major-section:not(.collapsed) > .major-title {
-    background: #e2edf0;   /* the open region is the active/selected one */
+.library-tree .major-title:hover {
+    background: #eef3f4;
+    color: #111;
+}
+
+/* Active = the ONE selected node (region/tradition/book), independent of expansion. */
+.library-tree .major-title.active {
+    background: #e2edf0;
+    color: #111;
 }
 
 .library-tree .major-body {
@@ -329,7 +336,11 @@ body.has-main-navbar {
 
 .library-tree .tradition-group.open > .tradition-title {
     color: #111;
-    background: #e2edf0;   /* active/selected — same idiom as similarity's .tradition-pick.active */
+}
+
+.library-tree .tradition-title.active {
+    background: #e2edf0;
+    color: #111;
 }
 
 .library-tree .tradition-pick {
