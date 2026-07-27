@@ -23,18 +23,21 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
    **not** `outputs/` and **no `site/` wrapper**; served by extending the existing startup
    mount in `create_app`. (§12.2, §12.5)
 
+6. **Positioning register (A):** Vision/About carries the manifesto; "What we found" carries
+   results; soften "we don't know what structures exist" to "map the space of deep
+   structures" so it doesn't undercut the Element's honesty. (§14.1)
+7. **Newsletter provider (B): Buttondown** — privacy-respecting, embeddable, cheap, developer-
+   ergonomic; matches the audience. (Substack only if a public publication presence is wanted.)
+   (§10)
+8. **Contact (C): a visible role email, not a form.** One public inbox at launch —
+   **`hello@mythoscope.io`** — with topical aliases (`research@`, `corpora@`, …) forwarding to
+   it, added later. Domain is **mythoscope.io** (not `.org`). (§10, §14.3)
+9. **Generated HTML in git (E): committed.** The server just serves files; deploy needs no CI
+   rebuild; fits the ephemeral-container model (clone → already serves). (§12.2)
+
 **Open — need the user's call:**
-- **A. Positioning register** — reconcile the Figma "discovery, not verification / we don't
-  know" manifesto with the Element's results-first honesty. Recommended: Vision carries the
-  manifesto, "What we found" carries results, soften "we don't know what structures exist" to
-  "map the space of deep structures". (§14.1)
-- **B. Newsletter provider** — Buttondown / Substack / Mailchimp / self-hosted listmonk; the
-  form markup depends on the choice. (§10)
-- **C. Real contact email(s)** to replace the placeholder `*@mythoscope.org` addresses in the
-  Figma copy. (§10, §14.3)
-- **D. Nav-hub label** — recommended **"Research ▾"** over "About"/"Docs"; confirm. (§9)
-- **E. Generated HTML in git** — commit the built `.html`, or gitignore it and rebuild in CI?
-  (§12.2)
+- **D. Nav-hub label** — the word printed on the docs entry in the top nav. Recommended
+  **"Research ▾"** over "About"/"Docs"; confirm the word. (§9)
 
 ## 0. Starting picture
 
@@ -280,19 +283,17 @@ Placement per element:
 | **Copyright + licence** | Footer, one line: `© 2026 MythoScope · CC-BY-SA` (+ data-licence link) | — |
 | **GitHub** | **Header icon** (live CTA) | Again in the footer social set |
 | **Other socials** | Footer (icon set) | Resources page |
-| **Contact email** | Footer (`mailto:`, prefer a role address — `research@`/`contact@`) | Contribute/Resources — where collaborators look |
-| **Newsletter** | **Compact field in the footer** ("Get updates on new findings — email → Subscribe") | Full block on Resources + a soft CTA at the end of warm pages (What we found / case studies) |
+| **Contact email** | Footer (`mailto:hello@mythoscope.io`) — one public inbox; topical aliases (`research@`, `corpora@`…) forward to it, added later | Contribute/Resources — where collaborators look |
+| **Newsletter** | **Compact field in the footer** ("Get updates on new findings — email → Subscribe"), posting to **Buttondown** | Full block on Resources + a soft CTA at the end of warm pages (What we found / case studies) |
 
 Two caveats:
 - **Full-bleed views.** Atlas/Similarity are full-height flex workspaces; a full footer
   fights the app feel. Use a thin one-line footer on document pages and hide it (or keep it
   ultra-slim) on the interactive views — footer split by route nature, like the docs
   themselves.
-- **Newsletter is not just UI.** A working subscription needs a backend/provider
-  (Buttondown, Substack, Mailchimp, self-hosted listmonk); the form posts to their API. For
-  this audience avoid pop-up modals (specialists find them abrasive) — an unobtrusive footer
-  field plus a warm end-of-page CTA. Pick the provider before building the form; its markup
-  depends on the choice.
+- **Newsletter is not just UI.** A working subscription needs a backend/provider — **decided:
+  Buttondown** (the form posts to its API). For this audience avoid pop-up modals (specialists
+  find them abrasive) — an unobtrusive footer field plus a warm end-of-page CTA.
 
 ## 11. Sourcing copy from a Figma mockup (operational note)
 
@@ -358,8 +359,9 @@ it does not touch the API or the app's behaviour.
   web root (`settings.web_root`) and is already served. The generated pages go **directly
   there**, next to `index.html` and `assets/`, in URL-matching subdirs (`research/`,
   `indexes/`, `cases/`) — no wrapper folder. **Not** `outputs/` (that is for pipeline
-  artifacts). CSS/JS/OG images reuse the existing `assets/` served at `/assets`. (Generated
-  `.html` can be gitignored and rebuilt in CI, or committed — a small separate call.)
+  artifacts). CSS/JS/OG images reuse the existing `assets/` served at `/assets`. The generated
+  `.html` is **committed** (decision E): the server just serves files, deploy needs no CI
+  rebuild, and it fits the ephemeral-container model (clone → already serves).
 - **Serving — precompiled static:** wired at server startup in `create_app` — the same place
   the current `/assets` `StaticFiles` mount and the `index.html` response are set up — just
   extended to serve the web-root doc files (or mount the web root as static). The doc pages
@@ -461,9 +463,10 @@ off before writing Tier A.
 ### 14.3 Keep internal / do not publish as-is
 
 The Russian strategic memos (the positioning note, the name essay — addressed to "ты", i.e.
-notes to the founder, not public copy); placeholder `*@mythoscope.org` addresses until those
-mailboxes exist; unfunded promises (postdoc fellowships, naming opportunities) and Team/
-Partners pages until real. The Gita excerpt and the tradition JSON in the file are mockup
+notes to the founder, not public copy); the Figma placeholder `*@mythoscope.org` addresses —
+the real domain is **mythoscope.io** and launch uses one inbox `hello@mythoscope.io` (aliases
+forward to it, decision C); unfunded promises (postdoc fellowships, naming opportunities) and
+Team/Partners pages until real. The Gita excerpt and the tradition JSON in the file are mockup
 sample data, not copy.
 
 ### 14.4 Provenance note
