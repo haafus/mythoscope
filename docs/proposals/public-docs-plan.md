@@ -657,3 +657,9 @@ reader-first README.
       semantic space + LLM graphs + a TMI↔ATU↔Berezkin motif crosswalk"), **topics**
       (`computational-folkloristics`, `comparative-mythology`, `digital-humanities`, `nlp`,
       `folklore`), a social-preview image, and enable Discussions.
+- [ ] **Branch protection on `main`** (Settings → Branches / Rulesets) — this is what turns the
+      CI from advisory into a gate: require the `ci` checks to pass (and, optionally, a PR +
+      review) before merging, so a red PR can't reach `main`. The `.github/workflows/ci.yml`
+      already runs on `pull_request` (the pre-merge check) + `push` to `main` (a backstop);
+      branch protection adds the enforcement. Optional for a solo project; worthwhile once there
+      are external contributors.
