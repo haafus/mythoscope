@@ -287,21 +287,9 @@ all. Making the overview landing the root (tools behind an "Explore" CTA) invert
 funnel — docs become the door, not a back alley — and matches the static-landing choice in
 §8.
 
-**Final nav structure (decided):**
-
-```
-Header (left → right):
-  [logo → /]   Explore ▾            Research ▾              About    ⭐GitHub
-               ├ Sources (/app)     ├ Overview (/)          (/about, A5)
-               ├ Similarity         ├ What we found (A2)
-               ├ Ages/Realms/Beings ├ Case studies (A3)
-               ├ Atlas              ├ How it works (A4)
-               └ Motifs             ├ ── Reference & surveys ──
-                                    │  Crosswalk · Indexes · Field survey ·
-                                    │  Corpus atlas · Encyclopedias · 14 regions (B1–B6)
-                                    └ ── Participate ──
-                                       Contribute · Publications · Updates · Resources (C1–C5)
-```
+**Final nav structure (decided):** the concrete header/nav diagram lives in the canonical map
+[`public-docs-structure.md`](public-docs-structure.md) (kept single-source to avoid drift). In
+short:
 
 - **Two hubs, one row:** **Explore ▾** = the live SPA views (the tool); **Research ▾** = the
   static docs TOC (Tiers A–C). Plus a small **About** and a **GitHub** star icon. The seven
@@ -391,12 +379,8 @@ it does not touch the API or the app's behaviour.
 - **Landing (static):** **`/`** → the overview page (A1). Inverts the funnel (§9): a cold
   visitor gets framing, not a raw data table, with an "Explore the live data" CTA into
   `/app`.
-- **Tier A (static):** `/what-we-found` (A2), `/cases/{swan-maiden,sun-and-moon,fished-up-earth}`
-  (A3), `/how-it-works` (A4), `/about` (A5 — vision/manifesto/name story).
-- **Tier B (static, the magnets):** `/crosswalk` (B1); `/indexes/{tmi,atu,berezkin}` (B2);
-  `/research/computational-folkloristics` + `/research/landscape` (B3);
-  `/research/corpus-sourcing` (B4); `/research/encyclopedias` (B5); `/regions` (B6).
-- **Tier C (static):** `/contribute` (C1), `/resources` (C2).
+- **Tier A/B/C (static):** the full per-page URL list is the canonical map in
+  [`public-docs-structure.md`](public-docs-structure.md) (single-source, to avoid drift).
 - **Machinery:** `/sitemap.xml`, `/robots.txt`.
 
 ### 12.2 Rendering pipeline
