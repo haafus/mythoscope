@@ -2,10 +2,14 @@
 
 > Toward a computational framework for comparative mythology.
 
+[![CI](https://github.com/haafus/mythoscope/actions/workflows/ci.yml/badge.svg)](https://github.com/haafus/mythoscope/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Docs: CC BY-SA 4.0](https://img.shields.io/badge/Docs-CC%20BY--SA%204.0-lightgrey.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-purple.svg)](CODE_OF_CONDUCT.md)
+[![GitHub stars](https://img.shields.io/github/stars/haafus/mythoscope?style=flat&logo=github)](https://github.com/haafus/mythoscope/stargazers)
+<!-- Add on first archived release: a Zenodo DOI badge (citability) and a latest-release badge. See docs/proposals/public-docs-plan.md §15/§17. -->
+<!-- Badge owner is haafus/mythoscope; if the repo moves to an org, update the owner in these URLs too (§17 placeholder-fill). -->
 
 **Mythoscope** is a computational framework for comparative mythology. It builds a corpus of
 myth and folklore texts, embeds them, and turns the result into an explorable **semantic
