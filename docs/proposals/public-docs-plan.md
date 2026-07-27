@@ -388,3 +388,55 @@ it does not touch the API or the app's behaviour.
   lower latency, less origin load. Static is trivially cacheable (stable, identical for all);
   dynamic SSR is harder to cache safely. Precompiled static docs = cheap global speed, and it
   matters most for the SEO/citation magnets (crosswalk, surveys).
+
+## 14. Copy from the Figma mockup (`MythoSemantic`) — what to fold in and where
+
+The Figma file `MythoSemantic` (extracted via the REST API) is, in effect, a **design of the
+public-site copy**: vision pitches, a "name story" essay, a full "Join the Collaboration"
+page, a proposed sitemap, and a resources list. It is a second, independent draft of the same
+public layer this plan covers — a rich source, but to be folded in *selectively*, not adopted
+whole.
+
+### 14.1 The positioning tension (needs a call)
+
+The Figma copy positions the project **differently** from the repo's Element monograph:
+- **Figma:** an aspirational *movement/manifesto* — "we don't know what deep structures exist;
+  let's build the instrument to discover them," "infrastructure for **discovery, not
+  verification**," inductive-not-deductive.
+- **Element:** *results-first and candid* — areal diffusion dominates, the datable ~1% descent
+  core, the irreducibility limit; findings already in hand, negative results included.
+
+They are compatible but can jar if placed side by side ("we don't know" vs "we established").
+**Resolution (recommended):** Vision/About carries the aspiration/manifesto; "What we found"
+(A2) carries the results; soften "we don't know what structures exist" to "map the space of
+deep structures" so it does not undercut the Element's honesty. This is the one item to sign
+off before writing Tier A.
+
+### 14.2 Mapping — Figma block → plan section → treatment
+
+| Figma content | → Section | Treatment |
+|---|---|---|
+| Vision pitch, three-layer model (conceptual/methodological/infrastructural), "Semantic Archaeology" tagline | A1 / About | Adopt (English parts ready); "Collaborative Semantic Archaeology" is a strong brand line |
+| Manifesto "Why collaborative infrastructure for theory discovery" (scale / algorithms / collaboration / open-infra) + the deductive→inductive diagram | A1, a "Why" sub-block | Adopt — strongest manifesto copy; reconcile "discovery not verification" with A2 per §14.1 |
+| The name essay (`-scope` as epistemic lens: telescope/microscope/spectroscope; Foucault/Latour/STS) — Russian | About / name | **Translate to English**; great narrative hook; currently an internal RU memo |
+| Embeddings as "interpretive operators" (Proppian/Lévi-Straussian/Jungian lenses); 3-level similarity (lexical/imagistic/structural); narrative function — Russian/mixed | A4 Methodology | Adapt; **mark aspirational vs. implemented** (much is roadmap, not built) |
+| Scalable-reading / computational-hermeneutics notes; the "big questions" — Russian | A4 / B3 | Adapt selectively; conceptual framing only |
+| "JOIN THE COLLABORATION" full page (15 collaboration types, each with need/gain/ideal-for/contact) | C1 Contribute | **Adopt as the backbone**; trim to real offerings; replace placeholder `*@mythoscope.org` emails; drop unfunded promises |
+| Proposed sitemap (Home/About/Explore/Research/Contribute/Learn/News) | §9 Navigation | Reconcile with our IA — their "Explore" = our SPA app, their "Learn" = tutorials (net-new) |
+| Digital text-library list (Perseus, Sacred Texts, ETCSL, GRETIL, Chinese Text Project, …) | C2 Resources / B4 | Adopt into Resources; dedupe against the corpus-sourcing atlas |
+| Related-work list (GOLEM, Arabian Nights, Cinderella, Story-emb, …) — Russian | B3 | Already covered by the research surveys; merge/dedupe |
+| Footer social set: X, Substack, YouTube, Discord, GitHub, Email | §10 | Confirms and concretises the §10 footer/social set |
+
+### 14.3 Keep internal / do not publish as-is
+
+The Russian strategic memos (the positioning note, the name essay — addressed to "ты", i.e.
+notes to the founder, not public copy); placeholder `*@mythoscope.org` addresses until those
+mailboxes exist; unfunded promises (postdoc fellowships, naming opportunities) and Team/
+Partners pages until real. The Gita excerpt and the tradition JSON in the file are mockup
+sample data, not copy.
+
+### 14.4 Provenance note
+
+Extraction was one-off via the Figma REST API (`GET /v1/files/:key`, `X-Figma-Token`); the
+token was used only at request time and never stored in the repo. The raw dump lives outside
+the repo (scratchpad). Rotate/revoke the token now that it has been shared in plaintext.
