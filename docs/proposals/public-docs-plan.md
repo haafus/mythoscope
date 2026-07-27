@@ -142,10 +142,23 @@ copy-sourcing from Figma are worked out in §9–§11.
 ## 8. Delivery: SPA vs. standalone static URLs — **DECIDED: hybrid**
 
 **Decision (accepted).** The hybrid is adopted: the interactive app stays an SPA; the
-public documentation (Tiers A/B) and the overview landing are **server-rendered static
-pages at clean URLs**, English, generated from a curated markdown tree through one shared
-shell template. Implementation is specified in §12. The rest of this section is the
-reasoning behind the choice.
+public documentation (Tiers A/B) and the overview landing are **statically pre-rendered
+(SSG) pages at clean URLs**, English, generated at build time from a curated markdown tree
+through one shared shell template, and served as plain files. Implementation is specified
+in §12. The rest of this section is the reasoning behind the choice.
+
+**Why precompile rather than render-on-request.** For documentation — content that changes
+rarely, is identical for every visitor, and does not depend on live data — static
+generation is the right default, not a later optimisation. It makes the *runtime simpler*
+(serve files via the existing `StaticFiles` mount; no markdown renderer or template engine
+in the request path), and it is the only path that yields the §13 payoffs (rich OG cards,
+low TTFB, CDN cacheability). The renderer work is *identical* to SSR — the same md→template→
+HTML step — it just runs at build time instead of per request, so precompiling is "the same
+code, run earlier," not more code. The one real cost is **build discipline**: a content edit
+requires a rebuild (`mytho build-docs`, ideally wired to CI so a push regenerates the site),
+and any live figure (e.g. crosswalk edge counts) must be **injected at build time** from
+`outputs/`, not rendered at runtime — an acceptable snapshot for these pages. On-request SSR
+is kept only as an optional local `--watch` authoring preview, never in production.
 
 The current site is an SPA with **hash routing** (`#/corpus`, `#/about`). To a crawler,
 everything after `#` is one page — no per-URL `<title>`/`<meta>`, no separate index entry.
@@ -305,12 +318,15 @@ it does not touch the API or the app's behaviour.
   footer (§10), the theme CSS, and the per-page `<head>` (title/meta/OG/canonical from
   front-matter). The shell is extracted once so the SPA `index.html` and the doc template
   render an identical header/footer.
-- **Serving, two interchangeable modes behind the same renderer:**
-  - **Phase 1 — SSR on request:** a FastAPI route maps a clean path → `content/<page>.md`,
-    renders, returns HTML; unknown path → 404. Simplest; ships now.
-  - **Phase 2 — precompile to static:** a `mytho build-docs` step writes the rendered
-    `.html` to a `site/` dir that a static mount (or a CDN) serves directly. Same renderer,
-    same output; this is what unlocks rich OG / low TTFB / CDN cache (§13). Optional, later.
+- **Serving — precompiled static (primary):** a **`mytho build-docs`** step runs the
+  renderer over the whole `content/` tree and writes finished `.html` (+ `sitemap.xml`) to a
+  `site/` dir; the server mounts that dir as static files (the same pattern as `/assets`), or
+  it is handed to a CDN / static host entirely. No renderer or template engine in the request
+  path. This is what unlocks the §13 payoffs. The build is decoupled from the app and can be
+  hosted independently if desired.
+  - **Optional dev preview (not production):** a `--watch` mode re-renders on file change for
+    local authoring, so edits are visible without a manual rebuild. Same renderer; never on
+    the production request path.
 
 ### 12.3 Head, OG, and discovery
 
@@ -333,12 +349,15 @@ it does not touch the API or the app's behaviour.
 
 ### 12.5 Phasing (supersedes the phase note in §7 for the delivery mechanics)
 
-1. **Bootstrap:** shell template + one SSR markdown route + `content/` with A1 and B4
-   (both ready, English) + `sitemap.xml`/`robots.txt`. Move the SPA to `/app`.
+1. **Bootstrap:** shell template + the `mytho build-docs` SSG step + `content/` with A1 and
+   B4 (both ready, English) + generated `sitemap.xml`/`robots.txt`; mount `site/` as static.
+   Move the SPA to `/app`. Static from day one — the §13 payoffs (OG cards, low TTFB) are
+   already in place at this phase.
 2. **Fill:** the rest of Tier A and the Tier-B magnets (translate B1); wire the hub and
-   contextual links.
-3. **Optimise (optional):** `build-docs` precompile → static `site/` behind a CDN; add
-   custom OG images. This is where §13's payoffs land.
+   contextual links; per-page front-matter (title/description/OG). Wire `build-docs` into CI
+   so a content push regenerates the site.
+3. **Optimise (optional):** put `site/` behind a CDN; add custom OG images (Atlas screenshot,
+   stat/quote graphics) for the magnets.
 
 ## 13. Glossary — the Phase-3 payoffs (why precompile to static)
 
