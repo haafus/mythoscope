@@ -178,6 +178,43 @@ For this audience they mislead.
 - **No gated content.** Open access is both the ethos and the SEO/citation engine.
 - **No consumer-funnel dark patterns** (pop-ups, countdowns). Specialists find them abrasive.
 
+## 8a. Growing the awesome-computational-mythology list
+
+An awesome list is a self-propelled acquisition + community asset with its own well-understood
+growth mechanics; it doubles as a **citable object** and a **contribution on-ramp**. Treat it
+as a distinct channel, not a docs appendix.
+
+**Promotion playbook:**
+1. **Standalone repo** `awesome-computational-mythology` (not buried in mythoscope) so stars,
+   forks, topics, and citations accrue to *it*.
+2. **Get into the canonical `sindresorhus/awesome` index** — the single biggest discovery
+   driver. It requires meeting the Awesome manifesto (structure, badge, TOC, contribution
+   guidelines, license, per-item descriptions, maturity, passes `awesome-lint`). Build the repo
+   to that bar from day one so it is submittable.
+3. **GitHub discovery:** topics (`awesome`, `awesome-list`, `computational-folkloristics`,
+   `digital-humanities`, `folklore`, `mythology`, `nlp`), a crisp repo description, a
+   social-preview image.
+4. **Seed stars** through the Mythoscope channels (Bluesky, Humanist, r/DigitalHumanities, HN);
+   trending + search rank compound from there.
+5. **Backlinks:** reciprocal links with related lists (awesome-nlp, awesome-digital-humanities)
+   and DH resource pages; cite it from the surveys and the preprint; add to relevant Wikipedia
+   "External links".
+6. **Neutral curation (credibility guard):** a *community* resource, **not** a Mythoscope ad —
+   Mythoscope appears as one project among many. A thinly-veiled ad gets distrusted and rejected
+   from the index.
+7. **Announce on awesome aggregators** (r/coolgithubprojects, libhunt, awesome newsletters).
+
+**Build into the list so it can grow and stay alive** (see the repo-setup checklist in
+`../awesome-computational-mythology.md`): Awesome badge + passes `awesome-lint`; a consistent
+entry format; `contributing.md` + `code-of-conduct.md` + PR & "Suggest a resource" templates;
+**CC0** content license; CI dead-link check (`lychee`/`awesome_bot`) + `awesome-lint` on PRs;
+a scope statement, a "See also", and a "Recently added" changelog; **`CITATION.cff` + a Zenodo
+DOI** (rare for an awesome list — lets scholars cite it, feeding the citation loop); a tasteful
+single backlink to Mythoscope; a named, responsive maintainer (dead lists get delisted).
+
+**Metrics:** stars, forks, **contributors**, acceptance into `sindresorhus/awesome`, backlinks,
+and referral traffic to Mythoscope.
+
 ## 9. How it plugs into the docs plan
 
 - The **public docs** (plan Tiers A/B) are the top of funnel — the acquisition assets here.

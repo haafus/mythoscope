@@ -80,8 +80,9 @@ not as live work.
 - [`../awesome-computational-mythology.md`](../awesome-computational-mythology.md) — a curated
   field resource list (indexes, corpora, datasets, methods, tools, ontologies, papers,
   scholars, venues, text libraries) assembled from the research/motifs surveys. Both a
-  community asset and an acquisition magnet (GTM §2.6). *Draft — verify links before publishing;
-  to be spun into its own repo.*
+  community asset and an acquisition magnet (GTM §2.6); its own growth channel with a promotion
+  playbook (`go-to-market.md` §8a) and an in-file repo-setup checklist. *Draft — verify links
+  before publishing; to be spun into its own repo.*
 
 ## Archived
 

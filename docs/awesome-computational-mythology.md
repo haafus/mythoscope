@@ -6,6 +6,13 @@
 
 Maintained alongside [Mythoscope](https://mythoscope.io). Contributions welcome.
 
+**Scope.** Resources for studying myth/folklore/traditional narrative *computationally,
+comparatively, or quantitatively*. **In:** indexes, corpora, datasets, methods, tools,
+ontologies, quantitative/DH studies, text libraries. **Out:** general mythology retellings,
+single-tradition popularizations, and non-computational reference works (unless a standard
+apparatus like TMI/ATU). This is a **neutral community list** — Mythoscope is listed as one
+project among many, not featured.
+
 **⚠ Draft.** Assembled from the Mythoscope research surveys (`docs/research/`, `docs/motifs/`)
 and source lists. **Links must be verified before this is published as a public list.** Papers
 are given by author / venue / year (resolve via Google Scholar / Semantic Scholar / DOI).
@@ -193,5 +200,34 @@ Vladimir Propp, Alan Dundes, Claude Lévi-Strauss.)
 
 ---
 
-*Contributions:* open a PR. Each entry should be a real, reachable resource with a one-line
-description. See Mythoscope's [contribution & credit policy](https://mythoscope.io/credit).
+## See also
+
+Related curated lists to cross-link with (reciprocal links aid discovery): *awesome-nlp*,
+*awesome-digital-humanities*, *awesome-computational-social-science*,
+*awesome-network-analysis*, *awesome-cultural-evolution* (where they exist). Suggest more via PR.
+
+## Recently added
+
+_Newest entries first — a liveliness signal. (Populate on each merge.)_
+
+## Contributing
+
+PRs welcome. **Entry format:** `**Name** — one-line description — link` (papers:
+`Author(s) — Title (venue, year)`). **Criteria:** the resource must be real, reachable, in
+scope (above), and not a duplicate; keep descriptions neutral and one line. See
+[`contributing.md`](contributing.md) and the "Suggest a resource" issue template. By
+contributing you agree to the [code of conduct](code-of-conduct.md).
+
+## License & citation
+
+Content released under **CC0** (public domain) — reuse freely. Cite this list via its
+[`CITATION.cff`](CITATION.cff) / Zenodo DOI.
+
+---
+
+**Repo setup checklist** (when spun into its own `awesome-computational-mythology` repo, per
+`proposals/go-to-market.md`): Awesome badge + pass `awesome-lint`; GitHub topics (`awesome`,
+`awesome-list`, `computational-folkloristics`, `digital-humanities`, `folklore`, `mythology`,
+`nlp`); repo description + social-preview image; `contributing.md`, `code-of-conduct.md`, PR +
+"Suggest a resource" issue templates; CI dead-link check (`lychee`/`awesome_bot`) + `awesome-lint`;
+`CITATION.cff` + Zenodo DOI; then submit to `sindresorhus/awesome`.

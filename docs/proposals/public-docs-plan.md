@@ -616,8 +616,10 @@ Each step is independently shippable; earlier steps unblock later ones.
 ### Step 4 — Retention plumbing
 - [ ] **Buttondown** account + footer field + confirm flow.
 - [ ] **GitHub Discussions** on; a `CONTRIBUTING.md`.
-- [ ] The **awesome-computational-mythology** list — verify links, spin into its own repo,
-      submit to the awesome index.
+- [ ] The **awesome-computational-mythology** list — verify links, spin into its own repo with
+      the full setup (badge, `awesome-lint` CI, link-checker, `contributing.md`, CC0,
+      `CITATION.cff`+DOI, templates), then submit to `sindresorhus/awesome`. Growth playbook in
+      `go-to-market.md` §8a; repo-setup checklist in the list file itself.
 
 ### Step 5 — Go to market (GTM §6, phased)
 - [ ] **Phase 0** — be findable: docs indexed, DOIs, newsletter, profiles, OG images.
