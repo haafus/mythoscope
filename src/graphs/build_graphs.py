@@ -95,10 +95,11 @@ def build_graphs(
 
     logger.info(f"Building graphs (force={force})...")
 
-    files = iter_files(settings.corpus_dir)
+    files = list(iter_files(settings.corpus_dir))
+    total = len(files)
 
     stopped = False
-    for file_info in files:
+    for idx, file_info in enumerate(files, start=1):
         text_id = file_info.text_id  # readable label for logs only
 
         # Graphs are keyed by the stable document_id (D1) — invariant under a title/tradition
@@ -120,7 +121,7 @@ def build_graphs(
 
         text = file_info.read_text()
 
-        logger.info(f"--- Processing: {text_id} ---")
+        logger.info(f"--- Processing: {text_id} ({idx}/{total}) ---")
 
         chunks = chunk_text(text, chunk_size=graphs_cfg.chunk_size, chunk_overlap=graphs_cfg.chunk_overlap)
         logger.info(f"Text split into {len(chunks)} chunks.")
