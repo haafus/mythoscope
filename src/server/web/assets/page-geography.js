@@ -1,5 +1,5 @@
 import { app, escapeHtml, ensureCorpusData, state, traditionColor, onCleanup } from "./core.js";
-import { LAND, REGION_PATHS } from "./atlas-geo.js";
+import { LAND, REGION_PATHS } from "./atlas-geo.js?v=1";
 
 // Antarctica lifted from the shared coastline (its far-south subpaths, lat <= -58 → y >= 149):
 // filling those exact subpaths white shares one geometry with the coastline — no seam.

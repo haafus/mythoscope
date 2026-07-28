@@ -23,7 +23,7 @@ CANON_REGIONS: tuple[str, ...] = (
     "Mainland Southeast Asia",
     "East Asia",
     "Austronesia",
-    "Papua & Aboriginal Australia",
+    "Papua & Australia",
     "Circumpolar North",
     "Native North America",
     "Mesoamerica & the Andes",
