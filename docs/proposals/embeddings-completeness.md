@@ -1,8 +1,10 @@
 # Embeddings completeness — `EmbeddingsStage.actual()` reports partial documents as clean
 
-**Status: DESIGNED, NOT IMPLEMENTED.** Reasoning captured; fix pending. See the marker in
-[`implementation-roadmap.md`](implementation-roadmap.md) and the entry in
-[`known-issues.md`](../known-issues.md).
+**Status: IMPLEMENTED.** Design F below shipped — `n_chunks` stored per chunk
+(`_build_chroma_entries`, `build_embeddings.py`) and the completeness gate in
+`EmbeddingsStage.actual()` (`pipeline/stages/embeddings.py`) with the legacy fallback; covered
+by `tests/test_embeddings_stage.py` (complete / plain-hole / preprocess-hole-then-fills /
+mid-edit fp mix / legacy-fallback). The reasoning below is retained.
 
 The bug that started this: a HIGH data-integrity finding from the Stage IV code review —
 `EmbeddingsStage.actual()` has no per-document completeness check, so a book that only got
@@ -126,15 +128,17 @@ vectors under an unchanged fp), covered by the "bump the algo version or `--forc
 
 ---
 
-## 5. Implementation checklist (when we return)
+## 5. Implementation checklist (done)
 
-- [ ] `_build_chroma_entries`: add `"n_chunks": len(chunks)` to each chunk's metadata.
-- [ ] `EmbeddingsStage.actual()`: group by `document_id`; report a doc at fp `F` iff it has
+- [x] `_build_chroma_entries`: add `"n_chunks": len(chunks)` to each chunk's metadata.
+- [x] `EmbeddingsStage.actual()`: group by `document_id`; report a doc at fp `F` iff it has
       `n_chunks` chunks all at `F`; **fallback**: if a doc's chunks lack `n_chunks`, keep the
       old any-chunk-with-fp behavior.
-- [ ] Tests:
+- [x] Tests (`tests/test_embeddings_stage.py`):
   1. plain — a document with a written prefix but no tail chunk → **not** reported clean;
   2. preprocess — a hole in the middle with the last chunk present → **not** clean; after the
      hole fills → clean;
-  3. legacy — chunks without `n_chunks` → reported clean (fallback, no rebuild).
-- [ ] Sanity: adding the field triggers **no** re-embed on an existing collection.
+  3. legacy — chunks without `n_chunks` → reported clean (fallback, no rebuild);
+  4. mid-edit fp mix → **not** clean.
+- [x] Sanity: adding the field is not a fingerprint input → **no** re-embed on an existing
+      collection (the legacy fallback reports existing chunks clean).

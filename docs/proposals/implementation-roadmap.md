@@ -4,10 +4,10 @@
 > Flagged items with a settled design but **not yet implemented**. Full write-ups linked; the
 > register is [`known-issues.md`](../known-issues.md).
 >
-> 1. **Embeddings completeness** (HIGH, data-integrity). `EmbeddingsStage.actual()` reports a
->    **partially-embedded document as clean**. Fix: store `n_chunks` per chunk; a doc is built iff
->    `count(fp) == n_chunks`; backward-compat fallback ⇒ **no rebuild**. Reasoning + checklist:
->    [`embeddings-completeness.md`](embeddings-completeness.md).
+> 1. ~~**Embeddings completeness** (HIGH, data-integrity)~~ — ✅ **DONE**. `n_chunks` stored per
+>    chunk; `EmbeddingsStage.actual()` reports a doc built iff `count(fp) == n_chunks` (legacy
+>    fallback ⇒ no rebuild). [`embeddings-completeness.md`](embeddings-completeness.md);
+>    tests `tests/test_embeddings_stage.py`.
 > 2. **Enrichment discovery** (very narrow — verified). New base motifs **and** new *linked*
 >    enrichment pages/nodes are caught by `refresh --apply` + `build` (every source's index is pinned
 >    and refreshed — mapsofmyths lists both listing pages explicitly, ashliman's index is in the

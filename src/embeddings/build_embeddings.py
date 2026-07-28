@@ -245,11 +245,16 @@ def _build_chroma_entries(
 ) -> tuple[list[str], list[dict[str, Any]]]:
     # B1: a chunk carries exactly one document reference `{document_id, chunk_index}` plus
     # its staleness `fingerprint` (the hash of the doc fp + transform version, compared by
-    # the next build's gate). tradition/region/url/colour are resolved from document_id at
-    # query time (data-model §2.13) — never denormalized onto the chunk.
-    ids = [chunk_id(info.document_id, i) for i in range(len(chunks))]
+    # the next build's gate). `n_chunks` is the document's full non-empty chunk count, stored
+    # identically on every chunk so `actual()` can tell a partially-embedded document (a hole
+    # from an interrupted/errored/preprocess-deferred build) from a complete one — a bare
+    # fp match on any one chunk otherwise reports 1-of-N as clean (embeddings-completeness §3).
+    # tradition/region/url/colour are resolved from document_id at query time (data-model
+    # §2.13) — never denormalized onto the chunk.
+    n = len(chunks)
+    ids = [chunk_id(info.document_id, i) for i in range(n)]
     metadatas = [
-        {"document_id": info.document_id, "chunk_index": i, "fingerprint": fingerprint}
-        for i in range(len(chunks))
+        {"document_id": info.document_id, "chunk_index": i, "fingerprint": fingerprint, "n_chunks": n}
+        for i in range(n)
     ]
     return ids, metadatas

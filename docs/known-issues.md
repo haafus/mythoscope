@@ -109,9 +109,11 @@ beyond the structural check.
 
 ## `EmbeddingsStage.actual()` reports a partially-embedded document as clean
 
-**Status:** flagged (HIGH, data-integrity) — design settled, **not yet implemented**. Full
-reasoning and fix checklist: [`proposals/embeddings-completeness.md`](proposals/embeddings-completeness.md);
-marked in [`proposals/implementation-roadmap.md`](proposals/implementation-roadmap.md).
+**Status:** ✅ **RESOLVED** — `n_chunks` is stored per chunk and `EmbeddingsStage.actual()` now
+reports a document built only when it has `n_chunks` chunks all at one fingerprint (legacy
+fallback for pre-`n_chunks` chunks; no rebuild on migration). Full reasoning + design F:
+[`proposals/embeddings-completeness.md`](proposals/embeddings-completeness.md); tests in
+`tests/test_embeddings_stage.py`.
 
 `actual()` reads the fingerprint off *any* chunk carrying `(document_id, fingerprint)`, so a book
 that got only *some* of its chunks embedded is reported as fully built and the driver never

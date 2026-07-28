@@ -36,15 +36,18 @@ class FakeCorpus:
 
 
 class FakeCollection:
-    def __init__(self, rows):  # rows: (chunk_id, document_id, fingerprint)
+    def __init__(self, rows):  # rows: (chunk_id, document_id, fingerprint[, n_chunks])
         self._rows = rows
         self.deleted = []
 
     def get(self, include=None):
-        return {
-            "ids": [r[0] for r in self._rows],
-            "metadatas": [{"document_id": r[1], "fingerprint": r[2]} for r in self._rows],
-        }
+        metas = []
+        for r in self._rows:
+            m = {"document_id": r[1], "fingerprint": r[2]}
+            if len(r) > 3 and r[3] is not None:  # legacy rows omit n_chunks
+                m["n_chunks"] = r[3]
+            metas.append(m)
+        return {"ids": [r[0] for r in self._rows], "metadatas": metas}
 
     def delete(self, ids):
         self.deleted.extend(ids)
@@ -95,3 +98,42 @@ def test_delete_drops_the_documents_chunks(monkeypatch):
     stage = _stage(monkeypatch, {"a": "cfA", "b": "cfB"}, col)
     stage.delete({"a"})
     assert set(col.deleted) == {"a::0", "a::1"}
+
+
+# --- completeness gate (n_chunks): a partially-embedded document is not "clean" ---
+
+def test_complete_document_is_clean_with_n_chunks(monkeypatch):
+    col = FakeCollection([("a::0", "a", _fp("cfA"), 2), ("a::1", "a", _fp("cfA"), 2)])
+    stage = _stage(monkeypatch, {"a": "cfA"}, col)
+    assert plan(stage).clean
+
+
+def test_plain_hole_missing_tail_chunk_is_not_clean(monkeypatch):
+    # Prefix written (0), tail (1) never embedded — n_chunks=2 but only 1 chunk present.
+    col = FakeCollection([("a::0", "a", _fp("cfA"), 2)])
+    stage = _stage(monkeypatch, {"a": "cfA"}, col)
+    assert plan(stage).missing == {"a"}
+
+
+def test_preprocess_hole_in_middle_is_not_clean_then_fills(monkeypatch):
+    # Middle chunk (index 1) deferred (empty LLM transform); last present. count 2 != 3.
+    holed = FakeCollection([("a::0", "a", _fp("cfA"), 3), ("a::2", "a", _fp("cfA"), 3)])
+    assert plan(_stage(monkeypatch, {"a": "cfA"}, holed)).missing == {"a"}
+    # Once the hole fills → all 3 present → clean.
+    filled = FakeCollection([("a::0", "a", _fp("cfA"), 3), ("a::1", "a", _fp("cfA"), 3),
+                             ("a::2", "a", _fp("cfA"), 3)])
+    assert plan(_stage(monkeypatch, {"a": "cfA"}, filled)).clean
+
+
+def test_mid_edit_fingerprint_mix_is_not_clean(monkeypatch):
+    # One chunk re-embedded at the new fp, the other still old — never report a single fp.
+    col = FakeCollection([("a::0", "a", _fp("NEW"), 2), ("a::1", "a", _fp("OLD"), 2)])
+    stage = _stage(monkeypatch, {"a": "NEW"}, col)
+    assert "a" in (plan(stage).missing | plan(stage).stale)
+
+
+def test_legacy_chunks_without_n_chunks_stay_clean(monkeypatch):
+    # Migration: pre-n_chunks rows fall back to any-chunk-with-fp — no rebuild, no loop.
+    col = FakeCollection([("a::0", "a", _fp("cfA"))])  # no n_chunks element
+    stage = _stage(monkeypatch, {"a": "cfA"}, col)
+    assert plan(stage).clean
