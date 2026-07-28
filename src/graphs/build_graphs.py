@@ -96,12 +96,12 @@ def build_graphs(
     logger.info(f"Building graphs (force={force})...")
 
     files = list(iter_files(settings.corpus_dir))
-    total = len(files)
 
-    stopped = False
-    for idx, file_info in enumerate(files, start=1):
-        text_id = file_info.text_id  # readable label for logs only
-
+    # Partition up-front so the progress counter below reads N-of-to-build, not N-of-all-files:
+    # a skipped (up-to-date) book is never part of an "(idx/total)". The fingerprint cost is
+    # unchanged — it was already computed per file to make the skip decision.
+    pending: list[tuple] = []  # (file_info, book_out_dir, fp, fp_path) for the books that will build
+    for file_info in files:
         # Graphs are keyed by the stable document_id (D1) — invariant under a title/tradition
         # rename, so a rename never orphans a graph dir (unify build/serve, data-model §5 step 6).
         book_out_dir = graph_dir(file_info.document_id)
@@ -116,8 +116,15 @@ def build_graphs(
         if (not force and not scoped_out and fp_path.exists()
                 and fp_path.read_text(encoding="utf-8").strip() == fp
                 and all(o.exists() for o in outputs)):
-            logger.info(f"--- {text_id}: up to date, skipping ---")
+            logger.info(f"--- {file_info.text_id}: up to date, skipping ---")
             continue
+        pending.append((file_info, book_out_dir, fp, fp_path))
+
+    total = len(pending)  # the denominator: how many books this run will build, not the corpus size
+
+    stopped = False
+    for idx, (file_info, book_out_dir, fp, fp_path) in enumerate(pending, start=1):
+        text_id = file_info.text_id  # readable label for logs only
 
         text = file_info.read_text()
 
