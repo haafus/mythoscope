@@ -766,6 +766,7 @@ body.has-main-navbar {
    sizing, z-index and show/hide behaviour. */
 .geo-tip,
 .analysis-page .plot-hover-tooltip,
+.graph-node-tooltip,
 .graph-edge-tooltip {
     position: absolute;
     padding: 16px 18px;
@@ -1319,6 +1320,20 @@ body.has-main-navbar {
 .graph-edge-tooltip {
     z-index: 1000;
     display: none;
+}
+
+.graph-node-tooltip {
+    z-index: 1000;
+    display: none;
+    max-width: 260px;
+    padding: 10px 12px;
+    white-space: normal;
+}
+
+.graph-node-tooltip-desc {
+    margin-top: 4px;
+    color: rgba(241, 243, 245, 0.78);
+    font-size: 11.5px;
 }
 
 /* ==========================================================================

@@ -289,6 +289,30 @@ function renderCytoscapeGraph(container, data, graphType) {
         tooltipDiv.style.display = "none";
     });
 
+    // Node tooltip: the node name + a truncated description (same idea as the similarity preview).
+    const nodeTip = document.createElement("div");
+    nodeTip.className = "graph-node-tooltip";
+    container.appendChild(nodeTip);
+    const NODE_TIP_MAX = 200;
+    const placeNodeTip = (evt) => {
+        nodeTip.style.left = (evt.originalEvent.clientX - cachedRect.left + 12) + "px";
+        nodeTip.style.top = (evt.originalEvent.clientY - cachedRect.top + 12) + "px";
+    };
+    cy.on("mouseover", "node", (evt) => {
+        cachedRect = container.getBoundingClientRect();
+        const node = evt.target;
+        const name = node.data("display_name") || node.data("Name") || node.data("id") || "";
+        let desc = graphFieldText(node.data("Description"));
+        if (desc.length > NODE_TIP_MAX) desc = desc.slice(0, NODE_TIP_MAX).trimEnd() + "…";
+        nodeTip.innerHTML = `<strong>${escapeHtml(name)}</strong>${desc ? `<div class="graph-node-tooltip-desc">${escapeHtml(desc)}</div>` : ""}`;
+        placeNodeTip(evt);
+        nodeTip.style.display = "block";
+    });
+    cy.on("mousemove", "node", placeNodeTip);
+    cy.on("mouseout", "node", () => {
+        nodeTip.style.display = "none";
+    });
+
     const infoContent = document.getElementById("graphInfoContent");
     const infoPlaceholder = '<div class="graph-info-empty">Select a node to see its details.</div>';
     if (infoContent) infoContent.innerHTML = infoPlaceholder;
