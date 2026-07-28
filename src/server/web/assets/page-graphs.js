@@ -46,10 +46,19 @@ function stripDictFragments(s) {
 // Render a raw field value to a trimmed display string, or "" when it carries no
 // content — an empty object/array, a blank or "nan" string — so the caller can
 // skip the field instead of printing "{}", "[]" or "nan".
+
+// The LLM often returns a multi-item attribute as one string with the items run
+// together by ". " ("God of thunder. Son of Odin. Trickster"). Read those as an
+// enumeration: turn an inner ". " into ", " and drop a trailing period. (A rare
+// abbreviation like "Mt. Ida" gets a stray comma — acceptable for these labels.)
+function tidyEnum(s) {
+    return s.replace(/\.\s+(?=\S)/g, ", ").replace(/\s*\.\s*$/, "").trim();
+}
+
 function graphFieldText(raw) {
     if (raw === undefined || raw === null) return "";
     if (typeof raw === "number") return String(raw);
-    const clean = (v) => String(v).trim();
+    const clean = (v) => tidyEnum(String(v).trim());
     const kept = (v) => v && v.toLowerCase() !== "nan";
     if (Array.isArray(raw)) return raw.map(clean).filter(kept).join(", ");
     if (typeof raw === "object") {
@@ -59,7 +68,7 @@ function graphFieldText(raw) {
             .map(([k, v]) => `${k}: ${v}`)
             .join(", ");
     }
-    const s = stripDictFragments(clean(raw));
+    const s = tidyEnum(stripDictFragments(String(raw).trim()));
     return s.toLowerCase() === "nan" ? "" : s;
 }
 
