@@ -26,14 +26,17 @@ export function resizeChart(el) {
 }
 
 // null/"" resets. Traces map to el._traditions order.
-export function highlightTradition(el, tradition) {
+// `selection`: null/"" → all lit; a tradition string → that one; a Set of names → those
+// (used for a whole region — dim every tradition not in the region). Same dimming either way.
+export function highlightTradition(el, selection) {
     if (!window.Plotly || el.dataset.plotly !== "1") return;
     const traditions = el._traditions || [];
     const colors = el._traditionColors || [];
     if (!traditions.length) return;
-    const selected = (t) => !tradition || t === tradition;
-    const color = traditions.map((t, i) => (selected(t) ? colors[i] : dimColor(colors[i])));
-    const opacity = traditions.map((t) => (selected(t) ? 0.74 : 0.45));
+    const inSel = selection instanceof Set ? (t) => selection.has(t) : (t) => t === selection;
+    const lit = (t) => !selection || inSel(t);
+    const color = traditions.map((t, i) => (lit(t) ? colors[i] : dimColor(colors[i])));
+    const opacity = traditions.map((t) => (lit(t) ? 0.74 : 0.45));
     Plotly.restyle(el, { "marker.color": color, "marker.opacity": opacity });
 }
 

@@ -2,10 +2,10 @@ import {
     api, app, state,
     ensureModels, onCleanup,
     escapeHtml, reflowHtml,
-    ensureCorpusData, traditionColor,
+    ensureCorpusData, traditionColor, regionOf,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
-import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js";
+import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js?v=1";
 import {
     attributionLine,
     fetchPointWithNeighbors, renderSearchResultItem,
@@ -198,9 +198,9 @@ async function loadVisualization() {
     scatterPlot.style.minHeight = "";
     destroyChart(scatterPlot);
 
-    // The fresh chart renders at full opacity; clear any active tradition so
+    // The fresh chart renders at full opacity; clear any active tradition/region so
     // the list and the plot stay in sync.
-    document.querySelectorAll("#tree-container .tradition-pick.active")
+    document.querySelectorAll("#tree-container .tradition-pick.active, #tree-container .major-title.active")
         .forEach((button) => button.classList.remove("active"));
 
     try {
@@ -293,9 +293,33 @@ async function initializeAnalysisLibrary() {
     const container = document.getElementById("tree-container");
     if (!container) return;
 
+    // Region and tradition are ONE active item at a time (same `.active` class as sources):
+    // picking one clears the other, and the scatter dims everything outside the selection.
     container.addEventListener("tradition-select", (event) => {
+        container.querySelectorAll(".major-title.active").forEach((b) => b.classList.remove("active"));
         const scatter = document.getElementById("scatter-plot");
-        if (scatter) highlightTradition(scatter, event.detail.tradition);
+        if (scatter) highlightTradition(scatter, event.detail.tradition || null);
+    });
+
+    container.addEventListener("region-select", (event) => {
+        const region = event.detail.region;
+        let header = null;
+        for (const s of container.querySelectorAll(".major-section")) {
+            if ((s.dataset.major || "") === region) { header = s.querySelector(".major-title"); break; }
+        }
+        const wasActive = header?.classList.contains("active");
+        container.querySelectorAll(".major-title.active, .tradition-pick.active")
+            .forEach((b) => b.classList.remove("active"));
+        const active = wasActive ? null : region;   // click the active region again → clear (like a tradition)
+        if (active && header) header.classList.add("active");
+
+        const scatter = document.getElementById("scatter-plot");
+        if (scatter) {
+            const set = active
+                ? new Set((scatter._traditions || []).filter((t) => regionOf(t) === active))
+                : null;
+            highlightTradition(scatter, set);
+        }
     });
     await renderTraditionList(container);
 }
