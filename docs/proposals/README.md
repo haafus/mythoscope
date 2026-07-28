@@ -56,6 +56,12 @@ not as live work.
   pinned copy + flag instead of unlinking, and a durable regression/degradation flag guard. The motifs application
   of the canonical [`fetch-and-refresh.md`](fetch-and-refresh.md) model, shippable now.
   **Goal:** fetch failures never uncover good data or silently shrink the indexes. *Proposal; not started.*
+- [`dated-raw-snapshot.md`](dated-raw-snapshot.md) — make the scraped motif inputs a **reproducible,
+  citable dataset-of-record**: per-source capture provenance (fetched_at + sha256), a dated snapshot
+  manifest + id stamped into the built indexes, and durable archival (Zenodo DOI / Release / LFS) so
+  a build can be reproduced byte-for-byte (`MYTHO_OFFLINE`). Closes the "counts are version-dependent"
+  gap; feeds `public-docs-plan.md` §15 citability. **Goal:** reproducible + citable motif data.
+  *Proposal; not started.*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
   (curated `content_start/end` + exclude) **done**; Layer 2 (cue-strip on interleaved notes) pending.*
