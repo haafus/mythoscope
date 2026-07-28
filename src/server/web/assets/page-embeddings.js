@@ -340,11 +340,16 @@ function markAnalysisActive(container) {
 
 // Selecting a tradition on similarity makes its first book the current book (so the graph
 // page opens on a concrete book of that tradition), while the active tree item stays the
-// TRADITION — so sources restores the tradition, not a book inside it.
+// TRADITION — so sources restores the tradition, not a book inside it. Also move the
+// accordion (open region + open tradition) so sources expands the right branch, not a stale one.
 function setCurrentBookToFirstOfTradition(tradition) {
+    const region = regionOf(tradition);
+    const key = corpusTraditionKey(region, tradition);
     const first = state.corpusDocuments.find((d) => d.tradition === tradition);
     if (first) state.selectedCorpusDoc = first;
-    state.selectedNode = { kind: "tradition", key: corpusTraditionKey(regionOf(tradition), tradition) };
+    state.selectedNode = { kind: "tradition", key };
+    state.corpusOpenMajor = region;
+    state.corpusOpenTradition = key;
 }
 
 async function initializeAnalysisLibrary() {
@@ -376,7 +381,11 @@ async function initializeAnalysisLibrary() {
             .forEach((b) => b.classList.remove("active"));
         const active = wasActive ? null : region;   // click the active region again → clear (like a tradition)
         if (active && header) header.classList.add("active");
-        if (active) state.selectedNode = { kind: "region", key: region };
+        if (active) {
+            state.selectedNode = { kind: "region", key: region };
+            state.corpusOpenMajor = region;      // sources opens this region…
+            state.corpusOpenTradition = null;    // …with no stale tradition group expanded
+        }
         analysisSel = active ? { kind: "region", name: region } : null;
         applyAnalysisDim();
     });

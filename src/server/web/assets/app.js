@@ -1,6 +1,6 @@
 import { cleanupRoute } from "./core.js";
 import { renderCorpus } from "./page-corpus.js?v=22";
-import { renderEmbeddings } from "./page-embeddings.js?v=11";
+import { renderEmbeddings } from "./page-embeddings.js?v=12";
 import { renderGraphPage } from "./page-graphs.js?v=36";
 import { renderGeography } from "./page-geography.js?v=78";
 import { renderMotifs } from "./page-motifs.js?v=99";
