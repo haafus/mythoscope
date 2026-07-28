@@ -49,10 +49,19 @@ function stripDictFragments(s) {
 
 // The LLM often returns a multi-item attribute as one string with the items run
 // together by ". " ("God of thunder. Son of Odin. Trickster"). Read those as an
-// enumeration: turn an inner ". " into ", " and drop a trailing period. (A rare
-// abbreviation like "Mt. Ida" gets a stray comma — acceptable for these labels.)
+// enumeration: turn an inner ". " into ", " and drop a trailing period — but NOT
+// after an abbreviation ("Mt. Ida", "St. George") or an initial ("J. R."), and not
+// inside a decimal (no space after the dot, so it never matches).
+const ENUM_ABBR = new Set([
+    "mt", "st", "dr", "mr", "mrs", "ms", "jr", "sr", "vs", "no", "cf", "ca",
+    "fig", "vol", "ch", "op", "pp", "p", "al", "etc", "e.g", "i.e", "viz", "ibid",
+]);
 function tidyEnum(s) {
-    return s.replace(/\.\s+(?=\S)/g, ", ").replace(/\s*\.\s*$/, "").trim();
+    return s
+        .replace(/(\S+)\.\s+(?=\S)/g, (m, w) =>
+            (/^[A-Z]$/.test(w) || ENUM_ABBR.has(w.toLowerCase())) ? m : `${w}, `)
+        .replace(/\s*\.\s*$/, "")
+        .trim();
 }
 
 function graphFieldText(raw) {
