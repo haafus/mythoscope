@@ -275,9 +275,9 @@ body.has-main-navbar {
     color: #2f343b;
     cursor: pointer;
     font: inherit;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
-    padding: 7px 4px 6px;
+    padding: 2px 4px 6px;
     text-align: left;
 }
 
