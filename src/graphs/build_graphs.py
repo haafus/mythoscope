@@ -104,28 +104,43 @@ def build_graphs(
 
     files = list(iter_files(settings.corpus_dir))
 
-    # Partition up-front so the progress counter below reads N-of-to-build, not N-of-all-files:
-    # a skipped (up-to-date) book is never part of an "(idx/total)". The fingerprint cost is
-    # unchanged — it was already computed per file to make the skip decision.
-    pending: list[tuple] = []  # (file_info, book_out_dir, fp, fp_path) for the books that will build
-    for file_info in files:
-        # Graphs are keyed by the stable document_id (D1) — invariant under a title/tradition
-        # rename, so a rename never orphans a graph dir (unify build/serve, data-model §5 step 6).
-        book_out_dir = graph_dir(file_info.document_id)
-        book_out_dir.mkdir(parents=True, exist_ok=True)
-
-        # Skip a book whose inputs/params are unchanged and whose graphs are all present —
-        # the extraction cache already spares the LLM; this spares the CPU regeneration too.
-        fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
-        fp_path = book_out_dir / ".fp"
-        outputs = [book_out_dir / f"{name}.json" for name in ("beings", "realms", "ages")]
-        scoped_out = rebuild is not None and file_info.document_id in rebuild
-        if (not force and not scoped_out and fp_path.exists()
-                and fp_path.read_text(encoding="utf-8").strip() == fp
-                and all(o.exists() for o in outputs)):
-            logger.info(f"--- {file_info.text_id}: up to date, skipping ---")
-            continue
-        pending.append((file_info, book_out_dir, fp, fp_path))
+    # Each pending entry: (file_info, book_out_dir, fp, fp_path) for a book that WILL build.
+    # `document_id` keys the graph dir (D1) — invariant under a title/tradition rename, so a
+    # rename never orphans a graph dir (unify build/serve, data-model §5 step 6).
+    pending: list[tuple] = []
+    if rebuild is not None:
+        # Driver path: `rebuild` IS the authoritative work-list — the driver's desired/actual
+        # diff already decided (via the same `_graph_fingerprint`) exactly which books are
+        # missing/stale. So build precisely those, unconditionally; do NOT re-walk the corpus or
+        # re-check fingerprints (that would rehash every book's text and spam "up to date, skipping"
+        # for work the driver already ruled out). Honours Stage.build's "exactly these keys".
+        by_id = {fi.document_id: fi for fi in files}
+        for did in rebuild:
+            file_info = by_id.get(did)
+            if file_info is None:
+                logger.warning("graphs: requested document_id %s is not in the corpus — skipping", did)
+                continue
+            book_out_dir = graph_dir(did)
+            book_out_dir.mkdir(parents=True, exist_ok=True)
+            fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
+            pending.append((file_info, book_out_dir, fp, book_out_dir / ".fp"))
+    else:
+        # Standalone path: no authoritative work-list, so self-decide via the fp skip. Partition
+        # up front so the progress counter reads N-of-to-build, not N-of-all-files.
+        for file_info in files:
+            book_out_dir = graph_dir(file_info.document_id)
+            book_out_dir.mkdir(parents=True, exist_ok=True)
+            # Skip a book whose inputs/params are unchanged and whose graphs are all present —
+            # the extraction cache already spares the LLM; this spares the CPU regeneration too.
+            fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
+            fp_path = book_out_dir / ".fp"
+            outputs = [book_out_dir / f"{name}.json" for name in ("beings", "realms", "ages")]
+            if (not force and fp_path.exists()
+                    and fp_path.read_text(encoding="utf-8").strip() == fp
+                    and all(o.exists() for o in outputs)):
+                logger.info(f"--- {file_info.text_id}: up to date, skipping ---")
+                continue
+            pending.append((file_info, book_out_dir, fp, fp_path))
 
     total = len(pending)  # the denominator: how many books this run will build, not the corpus size
 
