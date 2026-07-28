@@ -40,3 +40,13 @@ built motif DB (`mytho build motifs`) present.
   no re-fetch, no re-LLM, and, because the embeddings fp gate still matches, **no
   re-embed**. Dry-run by default; `--apply` deletes. Scope with `--stages`.
   → `golden_diff snapshot` → `golden_diff reset --apply` → `mytho build` → `golden_diff assert`
+
+- **`validate_chroma.py`** — integrity check for the embeddings (Chroma) collections.
+  Catches the class of bug where a scatter click on one chunk surfaced a *different*
+  one ("Popol Vuh #76" showed "Ramayan #1709"): every id must equal
+  `chunk_id(meta.document_id, meta.chunk_index)`, no `document_id` may be orphaned from
+  the corpus catalog, per-doc `n_chunks` + index contiguity must hold, and (optional
+  `--self-query N`) a chunk's own embedding must rank itself first. Focused mode
+  reproduces a single report; full sweep exits non-zero on any inconsistency.
+  → `python scripts/validate_chroma.py bge-m3 --title "The Popol Vuh" --chunk 76`
+  → `python scripts/validate_chroma.py` (all collections) · `--self-query 200` to sample vectors
