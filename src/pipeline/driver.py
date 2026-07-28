@@ -22,7 +22,7 @@ class StagePlan:
     stale: set[str] = field(default_factory=set)    # exists, fp diverged  → rebuild
     orphans: set[str] = field(default_factory=set)   # exists, shouldn't    → clean (level 1)
     built: set[str] = field(default_factory=set)     # keys actually built this run (post-build actual ∩ todo)
-    desired_count: int = 0                            # |desired()| — the stage total (denominator for "N/total")
+    planned_count: int = 0                            # keys this run set out to build (todo: missing+stale, or all on --force, capped by --sample) — the denominator for "built N/planned"
 
     @property
     def to_build(self) -> set[str]:
@@ -69,7 +69,7 @@ def plan(stage: Stage) -> StagePlan:
     d, a = stage.desired(), stage.actual()
     dk, ak = set(d), set(a)
     stale = {k for k in dk & ak if d[k] != a[k]}
-    return StagePlan(stage=stage, missing=dk - ak, stale=stale, orphans=ak - dk, desired_count=len(dk))
+    return StagePlan(stage=stage, missing=dk - ak, stale=stale, orphans=ak - dk)
 
 
 def status(stages: list[Stage]) -> list[StagePlan]:
@@ -105,7 +105,7 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
         if todo:
             stage.build(todo)
             built = todo & set(stage.actual())   # what is *actually* built now — a per-key failure
-        acted.append(replace(p, built=built))    # (no fp sidecar) drops out, so the count is honest
+        acted.append(replace(p, built=built, planned_count=len(todo)))  # (no fp sidecar) drops out, so N/planned is honest
     return acted
 
 

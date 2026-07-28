@@ -123,7 +123,7 @@ def test_build_only_touches_missing_and_stale():
     s = FakeStage("s", {"keep": "1", "new": "2", "edit": "3new"}, {"keep": "1", "edit": "3old"})
     [p] = build([s])
     assert s.built == [{"new", "edit"}]   # keep (up-to-date) is untouched
-    assert p.built == {"new", "edit"} and p.desired_count == 3   # "2/3 built" — denominator is the stage total
+    assert p.built == {"new", "edit"} and p.planned_count == 2   # "2/2 built" — denominator is what this run set out to build (missing+stale, not the stage total)
 
 
 def test_build_noop_when_current():

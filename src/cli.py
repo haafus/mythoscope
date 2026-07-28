@@ -104,7 +104,7 @@ def build(scope, force, sample):
         _fail("Build", e)
     for p in plans:
         if p.built:   # what was actually built (a silently-failed key is excluded — honest count)
-            click.echo(f"  {p.stage.name}: {len(p.built)}/{p.desired_count} built")
+            click.echo(f"  {p.stage.name}: {len(p.built)}/{p.planned_count} built")
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 
