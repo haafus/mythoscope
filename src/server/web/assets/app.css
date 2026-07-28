@@ -260,7 +260,7 @@ body.has-main-navbar {
 }
 
 .library-tree .major-section {
-    margin-bottom: 12px;
+    margin-bottom: 0;
 }
 
 .library-tree .major-title {
