@@ -35,31 +35,18 @@ class SimilarityService:
         if not point["ids"]:
             return []
         embedding = point["embeddings"][0]
-        # Always pin the CLICKED chunk as the head — never trust the ANN query to rank self
-        # first. A duplicate/degenerate embedding (a short heading, a separator, mostly
-        # punctuation) can tie or outrank self, which made a click on one point show a
-        # different chunk (e.g. Popol Vuh #76 → Ramayan #1709). The head is the exact chunk
-        # fetched by id above; the query only supplies the neighbours.
+        if not cross_tradition:
+            return self._query(collection, embedding, top_k)
+        # Keep the clicked chunk as the head; pull neighbors only from other traditions so
+        # the list surfaces cross-cultural parallels. With no tradition on the chunk (B1),
+        # resolve it from document_id and exclude that tradition's documents by id (§5 step 4).
+        from server.services.corpus import document_ids_for_tradition, tradition_of_document
+
         head = _hit(dict(point["metadatas"][0]), point["documents"][0], 1.0)
-
-        where = None
-        if cross_tradition:
-            # Pull neighbors only from OTHER traditions (cross-cultural parallels). With no
-            # tradition on the chunk (B1), resolve it from document_id and exclude that
-            # tradition's documents by id (§5 step 4).
-            from server.services.corpus import document_ids_for_tradition, tradition_of_document
-
-            tradition = tradition_of_document(document_id)
-            exclude = sorted(document_ids_for_tradition(tradition)) if tradition else []
-            where = {"document_id": {"$nin": exclude}} if exclude else None
-
-        # Query one extra so that after dropping the clicked chunk itself we still return top_k
-        # neighbours (in the cross case its whole tradition is already excluded, so no self to drop).
-        neighbors = [
-            h for h in self._query(collection, embedding, top_k + 1, where=where)
-            if not (h["document_id"] == document_id and h["chunk_index"] == chunk_index)
-        ][:top_k]
-        return [head, *neighbors]
+        tradition = tradition_of_document(document_id)
+        exclude = sorted(document_ids_for_tradition(tradition)) if tradition else []
+        where = {"document_id": {"$nin": exclude}} if exclude else None
+        return [head, *self._query(collection, embedding, top_k, where=where)]
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         collection = self._get_collection(model_key)
