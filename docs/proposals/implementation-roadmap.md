@@ -14,17 +14,20 @@
 >    ("Guarantees & gaps", §8).
 > 2. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
 >    data** on `refresh --apply`. Fix: per-source semantic validator as the adopt gate.
-> 3. **Thin builders (Part 3 stage-protocol refactor)**. The `build_*` helpers predate the generic
->    driver and each still carries its **own** incrementality (walk every doc + fp-skip), so the
->    driver's authoritative key set is applied *on top of* a redundant self-decision. `build_graphs`
->    and `build_embeddings` now **honour `rebuild` as the exact work-list** (no full-corpus re-walk),
->    but the deeper cleanup remains: (a) the `rebuild is None` self-deciding path is **dead in prod**
->    (every builder is only ever called by its stage with `rebuild` set) — remove it or keep one real
->    standalone entry; (b) move embeddings' in-`build` orphan-GC to `driver.clean` (it duplicates the
->    reap path); (c) audit `build_corpus`/`build_projections` for the same pattern (corpus's full walk
->    is a *necessary* aggregate-catalog assembly, not redundant — projections is single-key). End
->    state: builders are dumb executors of exactly `keys`; incrementality lives only in the driver.
->    Part 3 in [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md).
+> 3. **Thin builders — residual polish (NOT a new stage; Part 3 / Stage IV is ✅ DONE).** The
+>    stage-protocol refactor shipped: generic driver, atomised stages, `pipeline_inspect`/`cli._clean`
+>    retired, scope + export on the driver. This item is *leftover tech debt inside* that finished
+>    work, not an unstarted phase. Each `build_*` helper still carries its **own** incrementality
+>    (walk every doc + fp-skip) on top of the driver's authoritative key set. `build_graphs` and
+>    `build_embeddings` now **honour `rebuild` as the exact work-list** (the perf win — no full-corpus
+>    re-walk). Optional remaining tidy-up (low value, risk > value — see the complexity note): (a) the
+>    `rebuild is None` self-deciding path is **dead in prod** but still exercised by the gate tests —
+>    removing it means migrating those tests to assert the gate at `Stage.desired()/actual()`;
+>    (b) moving embeddings' in-`build` orphan-GC to `driver.clean` **changes reaping semantics**
+>    (orphans would persist until a manual `mytho clean`) — needs a deliberate decision first;
+>    (c) `build_corpus`/`build_projections` are fine as-is (corpus's full walk is a *necessary*
+>    aggregate-catalog assembly; projections is single-key). Not required for anything; do only if/when
+>    Part 3 is revisited holistically.
 >
 > Items 1–3 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
 > "won't see all updates" gap. (The former "no `fsync`" item is **decided — not doing it**: the
