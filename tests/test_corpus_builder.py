@@ -164,6 +164,50 @@ class TestBuildCorpusForce:
         assert processed == ["Local"]
 
 
+class TestValidateContentMarkers:
+    """Up-front warning for a content marker that no longer matches its text (silent no-op)."""
+
+    def _write_raw(self, tmp_path, monkeypatch, url, body: bytes):
+        from corpus.locator import corpus_raw_path
+        from settings import settings
+        monkeypatch.setattr(settings, "corpus_dir", tmp_path / "corpus")
+        raw = corpus_raw_path(tmp_path / "corpus" / "raw", url)
+        raw.parent.mkdir(parents=True, exist_ok=True)
+        raw.write_bytes(body)
+
+    def test_missing_marker_warns(self, tmp_path, monkeypatch, caplog):
+        from corpus.builder import _validate_content_markers
+        url = "file:book.txt"
+        self._write_raw(tmp_path, monkeypatch, url, b"the body begins here and runs on for a while")
+        items = [{"title": "Book", "url": url,
+                  "content_start": "the body begins here",   # present -> no warning
+                  "content_end": "PRONOUNCING INDEX"}]        # absent  -> warning
+        with caplog.at_level("WARNING", logger="corpus.builder"):
+            _validate_content_markers(items)
+        assert "content marker NOT FOUND" in caplog.text
+        assert "content_end='PRONOUNCING INDEX'" in caplog.text
+        assert "content_start" not in caplog.text  # the matching marker is silent
+
+    def test_all_markers_present_is_silent(self, tmp_path, monkeypatch, caplog):
+        from corpus.builder import _validate_content_markers
+        url = "file:book.txt"
+        self._write_raw(tmp_path, monkeypatch, url, b"alpha middle omega END OF BOOK trailing")
+        items = [{"title": "Book", "url": url, "content_start": "alpha", "content_end": "END OF BOOK"}]
+        with caplog.at_level("WARNING", logger="corpus.builder"):
+            _validate_content_markers(items)
+        assert "NOT FOUND" not in caplog.text
+
+    def test_uncached_raw_is_skipped(self, tmp_path, monkeypatch, caplog):
+        # No raw snapshot yet -> nothing to check here; trim_to_content warns at first build.
+        from corpus.builder import _validate_content_markers
+        from settings import settings
+        monkeypatch.setattr(settings, "corpus_dir", tmp_path / "corpus")
+        items = [{"title": "Book", "url": "file:missing.txt", "content_end": "WHATEVER"}]
+        with caplog.at_level("WARNING", logger="corpus.builder"):
+            _validate_content_markers(items)
+        assert caplog.text == ""
+
+
 class TestFileSourceDispatch:
     """The real _download_and_process reads a local file: source end to end."""
 

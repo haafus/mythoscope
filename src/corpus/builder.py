@@ -10,7 +10,7 @@ from fetch_cache import fetch_to_cache
 from json_utils import save_json
 from settings import settings
 
-from .clean_gutenberg import clean_gutenberg_in_builder, trim_to_content
+from .clean_gutenberg import _content_marker_regex, clean_gutenberg_in_builder, trim_to_content
 from .downloader import load_download_list
 from .extraction import _decode_bytes, html_to_text, pdf_to_text
 from .fingerprint import source_fingerprint
@@ -181,6 +181,38 @@ def _load_existing_metadata() -> dict[str, dict]:
         return {}
 
 
+def _validate_content_markers(download_list: list[dict]) -> None:
+    """Warn — every build, not just when a doc rebuilds — for any configured
+    ``content_start``/``content_end`` that does not match its book's text. A non-matching
+    marker is a **silent no-op** in ``trim_to_content`` (the editorial front/back is kept,
+    which can bloat extraction — e.g. the Poetic Edda proper-name index that ran the graph
+    LLM into repeated timeouts). Runs up front against the pinned raw so a latent broken
+    marker surfaces even when the document itself is up-to-date and skipped. Books whose raw
+    is not cached yet are left to ``trim_to_content`` to warn about when they first build."""
+    raw_dir = Path(settings.corpus_dir) / "raw"
+    misses = 0
+    for item in download_list:
+        markers = {k: item[k] for k in ("content_start", "content_end") if item.get(k)}
+        if not markers:
+            continue
+        raw = corpus_raw_path(raw_dir, item["url"])
+        if not raw.exists():
+            continue
+        try:
+            text = clean_gutenberg_in_builder(
+                _extract_text(raw.read_bytes(), item["url"], item["title"]), item["url"], item["title"])
+        except Exception:
+            continue  # a real extract failure will surface in the actual build below
+        for field, marker in markers.items():
+            if not _content_marker_regex(marker).search(text):
+                misses += 1
+                logger.warning(
+                    "content marker NOT FOUND: %s %s=%r — editorial matter is NOT being trimmed; "
+                    "fix the marker in config/corpus.json", item["title"], field, marker)
+    if misses:
+        logger.warning("%d content marker(s) did not match their text (see warnings above)", misses)
+
+
 def build_corpus(force: bool = False, rebuild: set[str] | None = None):
     """Build the corpus catalog + .txt tree — incrementally.
 
@@ -198,6 +230,7 @@ def build_corpus(force: bool = False, rebuild: set[str] | None = None):
     # build, not silently degrade to "" / a grey default (§2.12).
     tree = load_traditions_tree(settings.config_dir)
     validate_traditions(tree, download_list)
+    _validate_content_markers(download_list)  # warn on any content_start/end that no longer matches
 
     # Region groups the file layout (corpus/<Region>/<Tradition>/<Title>.txt, §6) but is
     # NOT stored on the row — books carry `tradition` only; region/colour resolve from the
