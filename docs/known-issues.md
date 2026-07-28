@@ -107,31 +107,6 @@ beyond the structural check.
 
 ---
 
-## `EmbeddingsStage.actual()` reports a partially-embedded document as clean
-
-**Status:** ✅ **RESOLVED** — `n_chunks` is stored per chunk and `EmbeddingsStage.actual()` now
-reports a document built only when it has `n_chunks` chunks all at one fingerprint (legacy
-fallback for pre-`n_chunks` chunks; no rebuild on migration). Full reasoning + design F:
-[`proposals/embeddings-completeness.md`](proposals/embeddings-completeness.md); tests in
-`tests/test_embeddings_stage.py`.
-
-`actual()` reads the fingerprint off *any* chunk carrying `(document_id, fingerprint)`, so a book
-that got only *some* of its chunks embedded is reported as fully built and the driver never
-re-embeds the rest. Nothing stores a per-document chunk count — the fp is per-document (shared by
-all its chunks), so a 1-of-N document is indistinguishable from a complete one.
-
-Where it bites: a build interrupted mid-document (crash, rate limit, or — for preprocess variants
-— a chunk whose LLM transform is not yet ready) leaves a permanently-incomplete document that
-`status` calls clean.
-
-Fix (designed): store `n_chunks` in each chunk's metadata; a document is built iff it has
-`n_chunks` chunks all sharing the expected fp. Uniform for plain and preprocess variants (holes
-give `count < n_chunks`); keeps `actual()` a pure Chroma read; adds no fingerprint input so it
-forces no rebuild; a fallback for legacy chunks lacking the field avoids a non-converging
-rebuild loop. Details and test plan in the proposal.
-
----
-
 ## LLM concurrency is one global constant, but the right value is per-provider
 
 **Status:** flagged — single hand-tuned constant; per-provider derivation not implemented.
