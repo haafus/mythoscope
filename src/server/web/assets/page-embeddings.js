@@ -2,7 +2,7 @@ import {
     api, app, state,
     ensureModels, onCleanup,
     escapeHtml, reflowHtml,
-    ensureCorpusData, traditionColor, regionOf, UNASSIGNED,
+    ensureCorpusData, traditionColor, regionOf, UNASSIGNED, corpusTraditionKey,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js?v=1";
@@ -338,14 +338,13 @@ function markAnalysisActive(container) {
     }
 }
 
-// Selecting a tradition on similarity makes its first book the current book (so the graph /
-// sources pages open on a concrete book of that tradition).
+// Selecting a tradition on similarity makes its first book the current book (so the graph
+// page opens on a concrete book of that tradition), while the active tree item stays the
+// TRADITION — so sources restores the tradition, not a book inside it.
 function setCurrentBookToFirstOfTradition(tradition) {
     const first = state.corpusDocuments.find((d) => d.tradition === tradition);
-    if (first) {
-        state.selectedCorpusDoc = first;
-        state.selectedNode = { kind: "book", doc: first };
-    }
+    if (first) state.selectedCorpusDoc = first;
+    state.selectedNode = { kind: "tradition", key: corpusTraditionKey(regionOf(tradition), tradition) };
 }
 
 async function initializeAnalysisLibrary() {
