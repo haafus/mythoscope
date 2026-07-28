@@ -1014,11 +1014,6 @@ body.has-main-navbar {
     margin-bottom: 4px;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.16s ease;
-}
-
-.analysis-page .neighbor-item:hover {
-    background: #f8f9fa;
 }
 
 .analysis-page .neighbor-item .fragment-text {
