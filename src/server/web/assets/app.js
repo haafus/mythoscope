@@ -1,7 +1,7 @@
 import { cleanupRoute } from "./core.js";
-import { renderCorpus } from "./page-corpus.js?v=20";
+import { renderCorpus } from "./page-corpus.js?v=21";
 import { renderEmbeddings } from "./page-embeddings.js?v=8";
-import { renderGraphPage } from "./page-graphs.js?v=31";
+import { renderGraphPage } from "./page-graphs.js?v=32";
 import { renderGeography } from "./page-geography.js?v=76";
 import { renderMotifs } from "./page-motifs.js?v=99";
 import { renderAbout } from "./page-about.js";

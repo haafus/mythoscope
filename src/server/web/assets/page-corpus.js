@@ -56,8 +56,10 @@ export async function renderCorpus(params = new URLSearchParams()) {
         openCorpusDocument(target);
     } else if (wantedTradition) {
         showTraditionInfo(wantedTradition, regionOf(wantedTradition));
+    } else if (state.selectedNode && state.selectedNode.kind === "book" && state.selectedNode.doc) {
+        openCorpusDocument(state.selectedNode.doc);   // a book (picked here or on a graph page) → fully reopen: reader + info + highlight
     } else if (state.selectedNode) {
-        setActiveNode(libraryTree, state.selectedNode);   // restore the one active item (region/tradition/book)
+        setActiveNode(libraryTree, state.selectedNode);   // restore the one active item (region/tradition)
     }
 }
 

@@ -116,6 +116,7 @@ export async function renderGraphPage(graphType) {
     const bookList = document.getElementById("graphBookList");
     bookList.addEventListener("book-select", (e) => {
         state.selectedCorpusDoc = e.detail.doc;   // shared across sources + all graph pages
+        state.selectedNode = { kind: "book", doc: e.detail.doc };  // keep the global "active item" in sync so sources restores it
         setActiveBook(bookList, e.detail.doc);
         loadGraphData(e.detail.doc.document_id, graphType);  // graphs keyed by document_id (D1)
     });
