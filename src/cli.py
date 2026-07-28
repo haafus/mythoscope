@@ -103,8 +103,10 @@ def build(scope, force, sample):
     except Exception as e:
         _fail("Build", e)
     for p in plans:
-        if p.built:   # what was actually built (a silently-failed key is excluded — honest count)
+        if p.planned_count:   # this stage had work to do — report landed/planned (0/N surfaces a total failure)
             click.echo(f"  {p.stage.name}: {len(p.built)}/{p.planned_count} built")
+        else:                 # nothing to build — say so rather than skip silently
+            click.echo(click.style(f"  {p.stage.name}: up to date", dim=True))
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 
