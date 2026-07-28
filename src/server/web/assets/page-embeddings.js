@@ -2,7 +2,7 @@ import {
     api, app, state,
     ensureModels, onCleanup,
     escapeHtml, reflowHtml,
-    ensureCorpusData, traditionColor, regionOf,
+    ensureCorpusData, traditionColor, regionOf, UNASSIGNED,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js?v=1";
@@ -198,11 +198,6 @@ async function loadVisualization() {
     scatterPlot.style.minHeight = "";
     destroyChart(scatterPlot);
 
-    // The fresh chart renders at full opacity; clear any active tradition/region so
-    // the list and the plot stay in sync.
-    document.querySelectorAll("#tree-container .tradition-pick.active, #tree-container .major-title.active")
-        .forEach((button) => button.classList.remove("active"));
-
     try {
         const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
 
@@ -210,6 +205,9 @@ async function loadVisualization() {
         const chartType = (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
         await CHART_RENDERERS[chartType](scatterPlot, data);
 
+        // The fresh chart renders at full opacity; re-apply the current region/tradition
+        // selection so the plot's dimming stays in sync with the tree across method/model changes.
+        applyAnalysisDim();
         loadingPlaceholder.style.display = "none";
     } catch (error) {
         loadingPlaceholder.innerHTML = `Error: ${escapeHtml(error.message)}`;
@@ -287,18 +285,85 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
     }
 }
 
+// The current similarity dim selection: {kind:'region'|'tradition', name} or null (all lit).
+let analysisSel = null;
+
+// The Set of traditions to keep lit for the current selection (null = all lit).
+function analysisDimSet(scatter) {
+    if (!analysisSel) return null;
+    if (analysisSel.kind === "tradition") return new Set([analysisSel.name]);
+    return new Set((scatter._traditions || []).filter((t) => regionOf(t) === analysisSel.name));
+}
+
+function applyAnalysisDim() {
+    const scatter = document.getElementById("scatter-plot");
+    if (scatter) highlightTradition(scatter, analysisDimSet(scatter));
+}
+
+// Derive the region/tradition to open on from the global selection (a book opens on its
+// tradition). Also expands that item's region in the tree. Returns the selection or null.
+function restoreAnalysisSelection() {
+    const node = state.selectedNode;
+    let region = null;
+    let tradition = null;
+    if (node && node.kind === "region") region = node.key;
+    else if (node && node.kind === "tradition") tradition = (node.key || "").split("|")[1];
+    else if (node && node.kind === "book" && node.doc) tradition = node.doc.tradition;
+    else if (state.selectedCorpusDoc) tradition = state.selectedCorpusDoc.tradition;
+
+    if (region) { state.corpusOpenMajor = region; return { kind: "region", name: region }; }
+    if (tradition && tradition !== UNASSIGNED) {
+        state.corpusOpenMajor = regionOf(tradition) || state.corpusOpenMajor;
+        return { kind: "tradition", name: tradition };
+    }
+    return null;
+}
+
+// Reflect `analysisSel` as the one `.active` item in the tree (same class as sources).
+function markAnalysisActive(container) {
+    container.querySelectorAll(".tradition-pick.active, .major-title.active")
+        .forEach((b) => b.classList.remove("active"));
+    if (!analysisSel) return;
+    if (analysisSel.kind === "tradition") {
+        for (const b of container.querySelectorAll(".tradition-pick")) {
+            if (b.dataset.tradition === analysisSel.name) { b.classList.add("active"); break; }
+        }
+    } else {
+        for (const s of container.querySelectorAll(".major-section")) {
+            if ((s.dataset.major || "") === analysisSel.name) {
+                s.querySelector(".major-title")?.classList.add("active");
+                break;
+            }
+        }
+    }
+}
+
+// Selecting a tradition on similarity makes its first book the current book (so the graph /
+// sources pages open on a concrete book of that tradition).
+function setCurrentBookToFirstOfTradition(tradition) {
+    const first = state.corpusDocuments.find((d) => d.tradition === tradition);
+    if (first) {
+        state.selectedCorpusDoc = first;
+        state.selectedNode = { kind: "book", doc: first };
+    }
+}
+
 async function initializeAnalysisLibrary() {
     await ensureCorpusData();
 
     const container = document.getElementById("tree-container");
     if (!container) return;
 
+    analysisSel = restoreAnalysisSelection();   // open on the current region/tradition (or a book's tradition)
+
     // Region and tradition are ONE active item at a time (same `.active` class as sources):
     // picking one clears the other, and the scatter dims everything outside the selection.
     container.addEventListener("tradition-select", (event) => {
+        const tradition = event.detail.tradition || null;
         container.querySelectorAll(".major-title.active").forEach((b) => b.classList.remove("active"));
-        const scatter = document.getElementById("scatter-plot");
-        if (scatter) highlightTradition(scatter, event.detail.tradition || null);
+        analysisSel = tradition ? { kind: "tradition", name: tradition } : null;
+        if (tradition) setCurrentBookToFirstOfTradition(tradition);
+        applyAnalysisDim();
     });
 
     container.addEventListener("region-select", (event) => {
@@ -312,16 +377,14 @@ async function initializeAnalysisLibrary() {
             .forEach((b) => b.classList.remove("active"));
         const active = wasActive ? null : region;   // click the active region again → clear (like a tradition)
         if (active && header) header.classList.add("active");
-
-        const scatter = document.getElementById("scatter-plot");
-        if (scatter) {
-            const set = active
-                ? new Set((scatter._traditions || []).filter((t) => regionOf(t) === active))
-                : null;
-            highlightTradition(scatter, set);
-        }
+        if (active) state.selectedNode = { kind: "region", key: region };
+        analysisSel = active ? { kind: "region", name: region } : null;
+        applyAnalysisDim();
     });
+
     await renderTraditionList(container);
+    markAnalysisActive(container);   // reflect the restored selection in the freshly-rendered tree
+    applyAnalysisDim();              // and dim the scatter (if it is already rendered)
 }
 
 async function performAnalysisSearch() {
