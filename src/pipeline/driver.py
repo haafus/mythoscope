@@ -22,6 +22,7 @@ class StagePlan:
     stale: set[str] = field(default_factory=set)    # exists, fp diverged  → rebuild
     orphans: set[str] = field(default_factory=set)   # exists, shouldn't    → clean (level 1)
     built: set[str] = field(default_factory=set)     # keys actually built this run (post-build actual ∩ todo)
+    desired_count: int = 0                            # |desired()| — the stage total (denominator for "N/total")
 
     @property
     def to_build(self) -> set[str]:
@@ -68,7 +69,7 @@ def plan(stage: Stage) -> StagePlan:
     d, a = stage.desired(), stage.actual()
     dk, ak = set(d), set(a)
     stale = {k for k in dk & ak if d[k] != a[k]}
-    return StagePlan(stage=stage, missing=dk - ak, stale=stale, orphans=ak - dk)
+    return StagePlan(stage=stage, missing=dk - ak, stale=stale, orphans=ak - dk, desired_count=len(dk))
 
 
 def status(stages: list[Stage]) -> list[StagePlan]:
