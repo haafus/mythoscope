@@ -425,6 +425,12 @@ family** (`clean embeddings`) or is unscoped — a single-member scope (`clean e
 leaves sibling orphans untouched. (`export`'s orphan probe expands a scope to its family first, so
 it always reports at family granularity.)
 
+This is by design and is exactly how you **remove an unneeded model**: deactivate it (move it out
+of `models.json` `models`) so it has no live stage, then a family/unscoped `clean --apply` reclaims
+its collection's disk. `build` never reaps, and the single-member family-granularity above means
+cleaning one active variant never touches an unrelated deactivated sibling — so removal is
+intentional (a family/full `clean`), never a side effect of building or cleaning something else.
+
 **The store abstraction (level 2).** There are exactly **two storage backends** — files on disk and Chroma
 collections — so the mechanics live in two small `*Store` objects that stages hold by **composition** (a stage
 *has-a* store; it is not a subclass of one). Each `*Store` knows how to **enumerate** its scope and **delete by
