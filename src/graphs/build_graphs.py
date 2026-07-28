@@ -20,6 +20,12 @@ from .store import graph_dir
 
 logger = logging.getLogger(__name__)
 
+# Bump when the graph JSON *assembly* (graph_generator) changes but the extraction does not,
+# so every book's `.fp` goes stale and a plain `mytho build graphs` regenerates the JSON from
+# the pinned extraction cache — no LLM, no `--force` (which would clear the cache and re-extract).
+# v2: strip trailing periods from attribute values.
+GRAPH_ALGO_VERSION = "2"
+
 
 def _extract_chunks(
     processor, uncached, chunk_prompts, cache, cache_path, max_concurrent, total_chunks, cached
@@ -64,6 +70,7 @@ def _graph_fingerprint(doc_fp: str, prompts: dict, graphs_cfg) -> str:
     A book whose .fp matches (and whose three JSONs exist) needs no regeneration."""
     parts = [
         doc_fp,
+        GRAPH_ALGO_VERSION,
         str(graphs_cfg.llm),
         str(graphs_cfg.max_entities),
         str(graphs_cfg.chunk_size),

@@ -32,6 +32,16 @@ class TestBeingsGraph:
         assert nodes["Moses"]["Category"] == "Character"
         assert nodes["pharaoh"]["Category"] == "Other"  # not an extracted being
 
+    def test_trailing_period_stripped_from_values_and_list_items(self, tmp_path):
+        beings = [
+            {"Name": "Thor", "Description": "God of thunder.",
+             "Roles": ["Son of Odin.", "Protector of mankind."]},
+        ]
+        generate_beings_graph(beings, [], tmp_path)
+        node = {n["id"]: n for n in _load(tmp_path / "beings.json")["nodes"]}["Thor"]
+        assert node["Description"] == "God of thunder"                 # scalar: trailing dot gone
+        assert node["Roles"] == "Son of Odin, Protector of mankind"    # list: per-item, no stray dots
+
     def test_edge_carries_relation(self, tmp_path):
         generate_beings_graph(
             [{"Name": "A"}, {"Name": "B"}],

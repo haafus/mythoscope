@@ -38,6 +38,14 @@ def _split_multi(value) -> list[str]:
     return []
 
 
+def _rstrip_dot(s) -> str:
+    """Drop a single trailing period so an attribute value — or each item of a joined
+    list — doesn't read as 'God of thunder., Son of Odin.'. The LLM ends most values
+    with a full stop; here they are short labels, not sentences."""
+    s = str(s).rstrip()
+    return s[:-1].rstrip() if s.endswith(".") else s
+
+
 def _flatten_scalars(value) -> list[str]:
     """Flatten a metadata value to a list of scalar strings. A dict contributes
     its values (its keys are attribute categories, e.g. {'Power': 'Strong hand'});
@@ -73,11 +81,11 @@ def _entity_index(entities: list[dict]) -> tuple[dict[str, str], dict[str, dict]
             if label in meta:
                 continue
             if isinstance(value, (list, tuple, dict)):
-                joined = ", ".join(_flatten_scalars(value))
+                joined = ", ".join(_rstrip_dot(s) for s in _flatten_scalars(value))
                 if joined:
                     meta[label] = joined
             else:
-                meta[label] = value
+                meta[label] = _rstrip_dot(value) if isinstance(value, str) else value
     return display, metadata
 
 
