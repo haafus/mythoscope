@@ -77,18 +77,17 @@ def _graph_fingerprint(doc_fp: str, prompts: dict, graphs_cfg) -> str:
 
 
 def build_graphs(
+    rebuild: set[str],
     force: bool = False,
-    rebuild: set[str] | None = None,
 ) -> None:
-    """Extract entities and (re)build graphs from the cached extraction.
+    """(Re)build graphs for exactly the books in ``rebuild`` (a set of document_ids).
 
-    A book is skipped when its ``.fp`` (doc fingerprint + prompts + LLM + limits)
-    matches and its three graphs are present. Otherwise the LLM is invoked only for
-    chunks not yet in ``extraction_cache.jsonl`` (and is constructed lazily, so a
-    rebuild from a complete cache needs no API key), then the graphs are regenerated.
-    ``force`` clears each book's cache first, forcing a full re-extraction.
-    ``rebuild`` (a set of document_ids) regenerates exactly those books (bypassing the
-    ``.fp`` skip, reusing the cache) — the key-scoped entry ``GraphsStage.build`` calls.
+    ``rebuild`` IS the authoritative work-list: the driver's desired/actual diff already
+    decided which books are missing/stale (via the same ``_graph_fingerprint``), so the builder
+    just executes it — it does **not** re-derive freshness. The LLM is invoked only for chunks not
+    yet in ``extraction_cache.jsonl`` (constructed lazily, so a rebuild from a complete cache needs
+    no API key), then the graphs are regenerated. ``force`` clears each book's cache first, forcing
+    a full re-extraction. Freshness/skip decisions live only in the driver (see ``GraphsStage``).
     """
     prompts_path = settings.config_dir / "prompts.json"
     try:
@@ -103,44 +102,22 @@ def build_graphs(
     logger.info(f"Building graphs (force={force})...")
 
     files = list(iter_files(settings.corpus_dir))
+    by_id = {fi.document_id: fi for fi in files}
 
-    # Each pending entry: (file_info, book_out_dir, fp, fp_path) for a book that WILL build.
-    # `document_id` keys the graph dir (D1) — invariant under a title/tradition rename, so a
-    # rename never orphans a graph dir (unify build/serve, data-model §5 step 6).
-    pending: list[tuple] = []
-    if rebuild is not None:
-        # Driver path: `rebuild` IS the authoritative work-list — the driver's desired/actual
-        # diff already decided (via the same `_graph_fingerprint`) exactly which books are
-        # missing/stale. So build precisely those, unconditionally; do NOT re-walk the corpus or
-        # re-check fingerprints (that would rehash every book's text and spam "up to date, skipping"
-        # for work the driver already ruled out). Honours Stage.build's "exactly these keys".
-        by_id = {fi.document_id: fi for fi in files}
-        for did in rebuild:
-            file_info = by_id.get(did)
-            if file_info is None:
-                logger.warning("graphs: requested document_id %s is not in the corpus — skipping", did)
-                continue
-            book_out_dir = graph_dir(did)
-            book_out_dir.mkdir(parents=True, exist_ok=True)
-            fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
-            pending.append((file_info, book_out_dir, fp, book_out_dir / ".fp"))
-    else:
-        # Standalone path: no authoritative work-list, so self-decide via the fp skip. Partition
-        # up front so the progress counter reads N-of-to-build, not N-of-all-files.
-        for file_info in files:
-            book_out_dir = graph_dir(file_info.document_id)
-            book_out_dir.mkdir(parents=True, exist_ok=True)
-            # Skip a book whose inputs/params are unchanged and whose graphs are all present —
-            # the extraction cache already spares the LLM; this spares the CPU regeneration too.
-            fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
-            fp_path = book_out_dir / ".fp"
-            outputs = [book_out_dir / f"{name}.json" for name in ("beings", "realms", "ages")]
-            if (not force and fp_path.exists()
-                    and fp_path.read_text(encoding="utf-8").strip() == fp
-                    and all(o.exists() for o in outputs)):
-                logger.info(f"--- {file_info.text_id}: up to date, skipping ---")
-                continue
-            pending.append((file_info, book_out_dir, fp, fp_path))
+    # `rebuild` IS the authoritative work-list — the driver's desired/actual diff already decided
+    # (via the same `_graph_fingerprint`) which books are missing/stale. Build precisely those,
+    # unconditionally: the builder does not re-derive freshness (that lives only in the driver).
+    # `document_id` keys the graph dir (D1) — rename-invariant, so a rename never orphans a dir.
+    pending: list[tuple] = []  # (file_info, book_out_dir, fp, fp_path) per book that WILL build
+    for did in rebuild:
+        file_info = by_id.get(did)
+        if file_info is None:
+            logger.warning("graphs: requested document_id %s is not in the corpus — skipping", did)
+            continue
+        book_out_dir = graph_dir(did)
+        book_out_dir.mkdir(parents=True, exist_ok=True)
+        fp = _graph_fingerprint(file_info.content_fingerprint(), prompts, graphs_cfg)
+        pending.append((file_info, book_out_dir, fp, book_out_dir / ".fp"))
 
     total = len(pending)  # the denominator: how many books this run will build, not the corpus size
 

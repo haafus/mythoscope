@@ -25,7 +25,8 @@ def build_embeddings(
     model_name: str | None = None,
     models: list | None = None,
     force: bool = False,
-    rebuild: set[str] | None = None,
+    *,
+    rebuild: set[str],
 ) -> None:
     if model_name:
         keys = [embedding_config(model_name)["key"]]
@@ -49,12 +50,14 @@ def build_embeddings(
     logger.info("All embeddings saved to Chroma.")
 
 
-def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
-    """Sync one variant's collection. Returns the encoder (loading it lazily the first time
-    a variant needs encoding); returns it unchanged when the collection is already current.
+def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str]):
+    """Sync one variant's collection for exactly the documents in ``rebuild`` (a set of
+    document_ids — the authoritative work-list from the driver). Returns the encoder (loaded
+    lazily the first time a variant needs encoding); unchanged when nothing needs encoding.
 
-    ``rebuild`` (a set of document_ids) forces those documents to re-embed regardless of the
-    fingerprint gate — the key-scoped entry the stage driver calls as ``EmbeddingsStage.build``."""
+    The builder does not self-decide freshness: the driver's desired/actual diff already chose
+    ``rebuild``. Orphan pruning (chunks of documents that left the corpus) still runs on the full
+    id set below — that is independent of the work-list."""
     cfg = embedding_config(key)
     preprocess_prompt = cfg["preprocess_prompt"]
     document_prefix = cfg["document_prefix"]
@@ -97,23 +100,17 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
             existing_fp.pop(cid, None)
         logger.info(f"Pruned {len(orphan_ids)} orphaned chunk(s) from documents no longer in the corpus")
 
-    if rebuild:
-        # Key-scoped rebuild: forget these documents' stored fps so embed_plan re-embeds all
-        # their chunks regardless of the fingerprint gate (both the pre-pass and the encode
-        # pass share existing_fp, so one drop covers both).
-        for cid in [c for c in existing_fp if c.rpartition("::")[0] in rebuild]:
-            existing_fp.pop(cid, None)
-        # Honour rebuild as the authoritative work-list: only these documents can need encoding
-        # (every other doc still matches its stored fp). Orphan GC above already scanned the full
-        # corpus by id; the expensive read+chunk work below is confined to the requested set
-        # instead of re-reading and re-chunking every book only to conclude "nothing to do".
-        missing_ids = rebuild - current_ids
-        if missing_ids:
-            logger.warning("embeddings: %d requested document_id(s) not in the corpus — skipping: %s",
-                           len(missing_ids), sorted(missing_ids))
-        process_info = [fi for fi in files_info if fi.document_id in rebuild]
-    else:
-        process_info = files_info
+    # `rebuild` is the authoritative work-list: forget its documents' stored fps so embed_plan
+    # re-embeds all their chunks, and confine the expensive read+chunk work to exactly those docs
+    # (every other doc still matches its stored fp — no need to re-read the whole corpus). The
+    # orphan GC above already scanned the full id set, so this narrowing never strands orphans.
+    for cid in [c for c in existing_fp if c.rpartition("::")[0] in rebuild]:
+        existing_fp.pop(cid, None)
+    missing_ids = rebuild - current_ids
+    if missing_ids:
+        logger.warning("embeddings: %d requested document_id(s) not in the corpus — skipping: %s",
+                       len(missing_ids), sorted(missing_ids))
+    process_info = [fi for fi in files_info if fi.document_id in rebuild]
 
     added_total = 0
     skipped_total = 0

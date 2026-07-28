@@ -41,7 +41,7 @@ def test_default_rebuilds_from_cache_without_llm(tmp_path, monkeypatch):
 
     from graphs.build_graphs import build_graphs
 
-    build_graphs()  # cache complete -> no LLM constructed, no network
+    build_graphs(rebuild={doc_id})  # cache complete -> no LLM constructed, no network
 
     for fname in ("beings.json", "realms.json", "ages.json"):
         assert (book_dir / fname).exists()

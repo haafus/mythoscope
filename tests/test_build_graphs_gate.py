@@ -1,5 +1,7 @@
-"""A book whose inputs/params are unchanged and whose graphs are present is skipped —
-the .fp gate spares the CPU regeneration (the LLM extraction is already cache-gated)."""
+"""build_graphs executes exactly the `rebuild` work-list handed to it — it generates the three
+graphs and stamps the .fp for each requested book, and touches nothing outside the list. The
+freshness/skip DECISION (unchanged -> skip, changed -> rebuild) now lives only in the driver and
+is covered by test_graphs_stage.py (plan().clean / .missing / .stale) + test_pipeline_driver.py."""
 
 from graphs import build_graphs as bg
 
@@ -39,30 +41,23 @@ def _wire(monkeypatch, tmp_path, files, calls):
     return graph_dir
 
 
-def test_graph_gate_skips_when_unchanged(tmp_path, monkeypatch):
+def test_build_generates_all_graphs_and_stamps_fp(tmp_path, monkeypatch):
     calls = []
     graph_dir = _wire(monkeypatch, tmp_path, [_FakeFile("a", "fp1")], calls)
 
-    bg.build_graphs()
-    assert sorted(calls) == ["ages", "beings", "realms"]   # first build generates all three
+    bg.build_graphs(rebuild={"a"})
+    assert sorted(calls) == ["ages", "beings", "realms"]   # the requested book generates all three
     assert (graph_dir / ".fp").exists()                    # and stamps the fp
 
-    calls.clear()
-    bg.build_graphs()
-    assert calls == []                                     # unchanged → skipped
 
-
-def test_graph_gate_rebuilds_on_changed_input(tmp_path, monkeypatch):
+def test_build_touches_only_the_work_list(tmp_path, monkeypatch):
+    # The builder executes exactly `rebuild` — an empty work-list builds nothing (and, given a
+    # subset, only that subset), leaving freshness/skip decisions entirely to the driver.
     calls = []
-    _wire(monkeypatch, tmp_path, [_FakeFile("a", "fp1")], calls)
-    bg.build_graphs()
+    _wire(monkeypatch, tmp_path, [_FakeFile("a", "fp1"), _FakeFile("b", "fp2")], calls)
 
-    calls.clear()
-    # same document_id (same dir), new content fingerprint → regenerate
-    monkeypatch.setattr(bg, "iter_files", lambda _dir: [_FakeFile("a", "fp2")])
-    bg.build_graphs()
-    assert sorted(calls) == ["ages", "beings", "realms"]
+    bg.build_graphs(rebuild=set())
+    assert calls == []                                     # nothing requested → nothing built
 
-    calls.clear()
-    bg.build_graphs()                                      # fp2 now stamped → skip again
-    assert calls == []
+    bg.build_graphs(rebuild={"b"})
+    assert sorted(calls) == ["ages", "beings", "realms"]   # only book "b" built

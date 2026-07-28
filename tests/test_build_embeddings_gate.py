@@ -50,7 +50,7 @@ def test_no_encode_no_model_load(monkeypatch):
     _wire(monkeypatch, coll, ([], []))          # nothing to embed, nothing stale
 
     # encoder=None in, and returned unchanged → the model was never constructed/loaded.
-    assert be._save_corpus_to_chroma(key, None) is None
+    assert be._save_corpus_to_chroma(key, None, rebuild={"a", "b"}) is None
     assert coll.modified is not None            # metadata still stamped
 
 
@@ -59,5 +59,5 @@ def test_stale_pruned_without_model(monkeypatch):
     coll = _FakeCollection()
     _wire(monkeypatch, coll, ([], ["a:9"]))     # only stale to delete, still nothing to encode
 
-    assert be._save_corpus_to_chroma(key, None) is None   # no model loaded
+    assert be._save_corpus_to_chroma(key, None, rebuild={"a", "b"}) is None   # no model loaded
     assert "a:9" in coll.deleted                          # but stale was pruned

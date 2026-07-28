@@ -17,17 +17,16 @@
 > 3. **Thin builders — residual polish (NOT a new stage; Part 3 / Stage IV is ✅ DONE).** The
 >    stage-protocol refactor shipped: generic driver, atomised stages, `pipeline_inspect`/`cli._clean`
 >    retired, scope + export on the driver. This item is *leftover tech debt inside* that finished
->    work, not an unstarted phase. Each `build_*` helper still carries its **own** incrementality
->    (walk every doc + fp-skip) on top of the driver's authoritative key set. `build_graphs` and
->    `build_embeddings` now **honour `rebuild` as the exact work-list** (the perf win — no full-corpus
->    re-walk). Optional remaining tidy-up (low value, risk > value — see the complexity note): (a) the
->    `rebuild is None` self-deciding path is **dead in prod** but still exercised by the gate tests —
->    removing it means migrating those tests to assert the gate at `Stage.desired()/actual()`;
->    (b) moving embeddings' in-`build` orphan-GC to `driver.clean` **changes reaping semantics**
->    (orphans would persist until a manual `mytho clean`) — needs a deliberate decision first;
->    (c) `build_corpus`/`build_projections` are fine as-is (corpus's full walk is a *necessary*
->    aggregate-catalog assembly; projections is single-key). Not required for anything; do only if/when
->    Part 3 is revisited holistically.
+>    work, not an unstarted phase. `build_graphs` and `build_embeddings` now **honour `rebuild` as the
+>    exact work-list** (the perf win — no full-corpus re-walk) **and `rebuild` is now required — the
+>    self-deciding `rebuild is None` fp-walk is removed; the gate tests migrated to assert the freshness
+>    decision at the driver level (`test_graphs_stage.py`/`test_embeddings_stage.py` + `test_pipeline_driver.py`)** ✅.
+>    One item remains, and it is **not** a dedup — it's a semantics choice: (b) embeddings still prunes
+>    orphaned chunks **in `build`** (graphs does not — it defers to `clean`). Moving embeddings' orphan-GC
+>    to `driver.clean` would make the two stages consistent but **changes reaping semantics** (orphans
+>    persist until a manual `mytho clean`) — needs a deliberate decision (does `build` cascade `clean`?)
+>    before touching it. `build_corpus`/`build_projections` are fine as-is (corpus's full walk is a
+>    *necessary* aggregate-catalog assembly; projections is single-key).
 >
 > Items 1–3 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
 > "won't see all updates" gap. (The former "no `fsync`" item is **decided — not doing it**: the
