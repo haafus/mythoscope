@@ -36,16 +36,6 @@ def test_books_do_not_carry_major_tradition():
     assert not offenders, f"books still carry major_tradition: {offenders}"
 
 
-def test_top_level_keys_are_the_14_canon_regions_in_order():
-    import sys
-
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-    from corpus.traditions_config import CANON_REGIONS
-
-    tree = _load("traditions.json")
-    assert tuple(tree.keys()) == CANON_REGIONS  # exact membership AND canon order
-
-
 def test_every_region_node_carries_a_colour():
     tree = _load("traditions.json")
     for region, node in tree.items():

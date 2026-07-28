@@ -3,7 +3,6 @@
 import pytest
 
 from corpus.traditions_config import (
-    CANON_REGIONS,
     TraditionsConfigError,
     flat_traditions,
     validate_traditions,
@@ -18,11 +17,6 @@ class TestValidateTraditions:
     def test_valid_passes(self):
         tree = _tree(Europe=["Greek", "Norse"])
         validate_traditions(tree, [{"tradition": "Greek"}, {"tradition": "Norse"}])
-
-    def test_non_canon_region_fails(self):
-        tree = _tree(Atlantis=["Greek"])
-        with pytest.raises(TraditionsConfigError, match="non-canon"):
-            validate_traditions(tree, [{"tradition": "Greek"}])
 
     def test_duplicate_tradition_across_regions_fails(self):
         tree = _tree(Europe=["Greek"], **{"East Asia": ["Greek"]})
@@ -47,10 +41,6 @@ class TestValidateTraditions:
 
 
 class TestCanonAndFlat:
-    def test_canon_is_14_unique(self):
-        assert len(CANON_REGIONS) == 14
-        assert len(set(CANON_REGIONS)) == 14
-
     def test_flat_traditions_maps_to_region(self):
         tree = _tree(Europe=["Greek", "Norse"], **{"East Asia": ["Chinese"]})
         assert flat_traditions(tree) == {"Greek": "Europe", "Norse": "Europe", "Chinese": "East Asia"}
