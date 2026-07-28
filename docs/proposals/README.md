@@ -62,6 +62,11 @@ not as live work.
   a build can be reproduced byte-for-byte (`MYTHO_OFFLINE`). Closes the "counts are version-dependent"
   gap; feeds `public-docs-plan.md` §15 citability. **Goal:** reproducible + citable motif data.
   *Proposal; not started.*
+- [`prune-clean-model.md`](prune-clean-model.md) — **who deletes what, when, and why**: the full
+  prune/clean inventory across stages + driver, the stale-vs-orphan split, and the decision that
+  in-`build` orphan pruning (embeddings/corpus) is a deliberate exception to "`build` is
+  non-destructive" — warranted where an orphan is user-visible + cheap; uniform reap-in-`build`
+  rejected. **Goal:** settle the "should orphan-GC move to clean" question. *Decision (by design).*
 - [`corpus-editorial-filtering.md`](corpus-editorial-filtering.md) — strip modern editorial prose from the
   embedding corpus. **Goal:** embed tradition text, not translators' 19th–20th-c. framing. *Layer 1
   (curated `content_start/end` + exclude) **done**; Layer 2 (cue-strip on interleaved notes) pending.*

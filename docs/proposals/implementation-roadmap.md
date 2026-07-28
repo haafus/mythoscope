@@ -17,18 +17,17 @@
 > 3. **Thin builders — residual polish (NOT a new stage; Part 3 / Stage IV is ✅ DONE).** The
 >    stage-protocol refactor shipped: generic driver, atomised stages, `pipeline_inspect`/`cli._clean`
 >    retired, scope + export on the driver. This item is *leftover tech debt inside* that finished
->    work, not an unstarted phase. `build_graphs` and `build_embeddings` now **honour `rebuild` as the
->    exact work-list** (the perf win — no full-corpus re-walk) **and `rebuild` is now required — the
->    self-deciding `rebuild is None` fp-walk is removed; the gate tests migrated to assert the freshness
->    decision at the driver level (`test_graphs_stage.py`/`test_embeddings_stage.py` + `test_pipeline_driver.py`)** ✅.
->    One item remains, and it is **not** a dedup — it's a semantics choice: (b) embeddings still prunes
->    orphaned chunks **in `build`** (graphs does not — it defers to `clean`). Moving embeddings' orphan-GC
->    to `driver.clean` would make the two stages consistent but **changes reaping semantics** (orphans
->    persist until a manual `mytho clean`) — needs a deliberate decision (does `build` cascade `clean`?)
->    before touching it. `build_corpus`/`build_projections` are fine as-is (corpus's full walk is a
->    *necessary* aggregate-catalog assembly; projections is single-key).
+>    work, not an unstarted phase. **DONE:** `build_graphs`/`build_embeddings` honour `rebuild` as the
+>    exact work-list (no full-corpus re-walk), `rebuild` is now required, the self-deciding
+>    `rebuild is None` fp-walk is removed, and the gate tests assert the freshness decision at the driver
+>    level. **The earlier "(b) move embeddings orphan-GC to clean" is decided — NOT doing it (by design):**
+>    the audit in [`prune-clean-model.md`](prune-clean-model.md) shows in-`build` orphan pruning is a
+>    deliberate, narrow exception to "`build` is non-destructive", warranted exactly where an orphan is
+>    user-visible + cheap (embeddings chunks surface in search; corpus `.txt`), while graphs/projections/
+>    motifs orphans are invisible and correctly wait for `clean`. Uniform reap-in-`build` is rejected
+>    (a transiently-empty `desired()` would self-destruct a routine build). Nothing left to do here.
 >
-> Items 1–3 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
+> Items 1–2 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
 > "won't see all updates" gap. (The former "no `fsync`" item is **decided — not doing it**: the
 > raw cache is regenerable and the write is human-gated, so `os.replace` atomicity suffices; see
 > the reasoning in [`known-issues.md`](../known-issues.md).)
