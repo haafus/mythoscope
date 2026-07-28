@@ -140,8 +140,8 @@ def _self_query_check(coll, ids: list[str], sample: int) -> int:
     bad = []
     for cid in picks:
         one = coll.get(ids=[cid], include=["embeddings"])
-        embs = one.get("embeddings") or []
-        if not embs:
+        embs = one.get("embeddings")
+        if embs is None or len(embs) == 0:
             continue
         res = coll.query(query_embeddings=[embs[0]], n_results=1, include=["metadatas"])
         top = (res.get("ids") or [[None]])[0][0]
@@ -183,8 +183,8 @@ def focus(coll, catalog: dict[str, dict], document_id: str, chunk_index: int) ->
     else:
         print("  ✓ id matches its metadata.")
 
-    embs = got.get("embeddings") or []
-    if embs:
+    embs = got.get("embeddings")
+    if embs is not None and len(embs):
         res = coll.query(query_embeddings=[embs[0]], n_results=3, include=["metadatas"])
         print("  self-query (this chunk's own embedding), nearest 3:")
         for rid, rmeta in zip((res.get("ids") or [[]])[0], (res.get("metadatas") or [[]])[0], strict=False):
