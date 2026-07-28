@@ -136,7 +136,10 @@ all upstream changes" question.
 - **Durability against power loss (no `fsync`).** `os.replace` gives atomicity (no torn file) but
   the write path calls no `fsync` on the file or its directory. A power cut between write and
   physical flush can lose a just-adopted byte-set (falling back to the old pinned copy — still not
-  corrupt). No *corruption*, but *durability* of a fresh adoption is not guaranteed.
+  corrupt). No *corruption*, but *durability* of a fresh adoption is not guaranteed. **Decided:
+  intentionally not adding `fsync`** — the cache is regenerable and the write is human-gated, so the
+  cost (a blocking disk barrier per file, times hundreds of URLs) buys nothing here; rationale in
+  [`../known-issues.md`](../known-issues.md).
 - **Cross-file transactionality.** Each file is atomic; there is no whole-set snapshot. An
   interrupted run leaves a mix of old + new files. Fine for independent idempotent sources, but
   not all-or-nothing.

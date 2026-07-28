@@ -46,22 +46,37 @@ periodic re-probe of the numbering, not index parsing.
 
 ---
 
-## Raw write path has no `fsync` — atomic but not power-loss durable
+## Raw write path has no `fsync` — atomic, not power-loss durable (by design)
 
-**Status:** flagged — accepted trade-off, documented; no `fsync` in the write path.
+**Status:** decided — **intentionally not adding `fsync`.** `os.replace` atomicity is enough for
+this path; the entry stays as the reasoning trail, not a to-do.
 
 `commit_bytes` (`src/fetch_cache.py`) stages to a unique `.partial` then `os.replace` — atomic, so
-a crash never leaves a torn/half-written live file. But it calls no `fsync` on the file or its
-parent directory. `os.replace` guarantees *atomicity* (which of the two versions you see), not
-*durability* (that the new version survived to disk).
+a crash never leaves a torn/half-written live file. It calls no `fsync` on the file or its parent
+directory. `os.replace` guarantees *atomicity* (which of the two versions you see), not
+*durability* (that the new version survived to disk): a power cut or kernel panic in the small
+window between the write and the OS's physical flush could lose a just-adopted byte-set. No
+corruption — you never get a half-file — but a fresh `refresh --apply` adoption is not guaranteed
+to have landed.
 
-Where it bites: a power cut or kernel panic between the write and the OS's physical flush can lose
-a just-adopted byte-set, falling back to the old pinned copy. No corruption — you never get a
-half-file — but a fresh `refresh --apply` adoption is not guaranteed to have landed.
+**Why we accept it rather than fix it.** The gap is real but not worth closing *on this path*:
 
-Options: accept (current — rare, and the fallback is the last-good copy, not garbage); or `fsync`
-the temp file + parent dir in `commit_bytes` before/after `os.replace` for true durability, at a
-per-write I/O cost.
+- **The cache is regenerable.** `raw/**` is gitignored and rebuilt by a human-gated `refresh`. What
+  power-loss durability buys here is "you don't have to re-run `refresh`" — not protection of
+  irreplaceable data. `os.replace` already covers the realistic failure (process crash / exception);
+  `fsync` only adds cover for power-loss/kernel-panic in a microsecond window, on data you can just
+  re-scrape.
+- **The cost is real and permanent.** `refresh --apply` writes one cache file per URL — hundreds to
+  thousands. Each `fsync` is a blocking disk barrier (tens of ms) plus a second barrier to `fsync`
+  the parent directory (the rename lives in the directory entry); `os.replace` without it is nearly
+  free (page cache, lazily batched). A per-file barrier can also flush unrelated dirty pages.
+- **The environments make it worse, not better.** In an ephemeral container the disk is overlay/tmpfs
+  where `fsync` is a no-op or meaningless; on network/cloud disks its latency is far higher; the
+  directory `fsync` is not portable (`os.fsync(dir_fd)` fails on Windows, needing a platform guard).
+
+**When to revisit:** only if `commit_bytes` is ever used to write *irreplaceable* data — e.g. the
+durable dataset-of-record in [`proposals/dated-raw-snapshot.md`](proposals/dated-raw-snapshot.md).
+There `fsync` earns its cost; here it does not.
 
 ---
 

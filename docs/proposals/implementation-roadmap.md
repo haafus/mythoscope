@@ -12,13 +12,13 @@
 >    pages. Optional fix: `expand: bytes -> [Fetchable]` descriptor makes `refresh` self-sufficient +
 >    adds orphan detection (does not fix the probe case). Audit: [`motifs-atomisation.md`](motifs-atomisation.md)
 >    ("Guarantees & gaps", §8).
-> 2. **No `fsync` in the raw write path**. `commit_bytes` is atomic (`os.replace`) but not
->    power-loss durable. Fix (if wanted): `fsync` temp + parent dir before/after replace.
-> 3. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
+> 2. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
 >    data** on `refresh --apply`. Fix: per-source semantic validator as the adopt gate.
 >
-> Items 1–3 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
-> "won't see all updates" gap.
+> Items 1–2 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
+> "won't see all updates" gap. (The former "no `fsync`" item is **decided — not doing it**: the
+> raw cache is regenerable and the write is human-gated, so `os.replace` atomicity suffices; see
+> the reasoning in [`known-issues.md`](../known-issues.md).)
 
 The consolidated build order for the pipeline/data/fetch redesign. It sequences every phase of every proposal
 by the **reversibility ladder**: code and additive data first (freely revertible), the heaviest step (the Part 1
