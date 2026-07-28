@@ -304,7 +304,7 @@ body.has-main-navbar {
 }
 
 .library-tree .major-body {
-    padding-top: 6px;
+    padding-top: 0;
 }
 
 .library-tree .major-section.collapsed .major-body {
