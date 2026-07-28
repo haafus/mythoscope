@@ -378,6 +378,21 @@ def _meta_counts_sources(config: dict) -> tuple[dict, dict]:
     return counts, sources
 
 
+def _raw_fetched_at() -> str | None:
+    """Newest mtime across the raw scrape cache — an approximate "data fetched from upstream"
+    time, distinct from ``built_at`` (when this JSON was reassembled from that cache; a plain
+    ``build motifs`` re-parses the cache without re-fetching, so the two can differ widely).
+    ``None`` if nothing is cached. Filesystem mtime, so an export→restore of the cache resets
+    it; for a durable, content-addressed scrape timestamp see ``dated-raw-snapshot.md``."""
+    raw = store.raw_dir()
+    if not raw.exists():
+        return None
+    mtimes = [p.stat().st_mtime for p in raw.rglob("*") if p.is_file()]
+    if not mtimes:
+        return None
+    return datetime.fromtimestamp(max(mtimes), tz=timezone.utc).isoformat(timespec="seconds")
+
+
 def _build_meta(config: dict) -> tuple[dict, dict, dict]:
     """Assemble ``meta.json``: counts, per-source enrichment (from the sidecars), cross-walk +
     parallels tallies, provenance, and the degradation guard. The ``motifs:meta`` stage — reads
@@ -389,6 +404,7 @@ def _build_meta(config: dict) -> tuple[dict, dict, dict]:
     enrichment_agg = _aggregate_enrichment()
     meta = {
         "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "raw_fetched_at": _raw_fetched_at(),  # when the raw scrape cache was last written (≈ last refresh)
         "counts": counts,
         "enrichment": enrichment_agg,  # per-source enrichment counts (what was added)
         "crosswalk": {
