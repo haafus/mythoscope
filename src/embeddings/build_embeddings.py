@@ -103,10 +103,20 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
         # pass share existing_fp, so one drop covers both).
         for cid in [c for c in existing_fp if c.rpartition("::")[0] in rebuild]:
             existing_fp.pop(cid, None)
+        # Honour rebuild as the authoritative work-list: only these documents can need encoding
+        # (every other doc still matches its stored fp). Orphan GC above already scanned the full
+        # corpus by id; the expensive read+chunk work below is confined to the requested set
+        # instead of re-reading and re-chunking every book only to conclude "nothing to do".
+        missing_ids = rebuild - current_ids
+        if missing_ids:
+            logger.warning("embeddings: %d requested document_id(s) not in the corpus — skipping: %s",
+                           len(missing_ids), sorted(missing_ids))
+        process_info = [fi for fi in files_info if fi.document_id in rebuild]
+    else:
+        process_info = files_info
 
     added_total = 0
     skipped_total = 0
-    total_chunks = 0
     stale_removed = len(orphan_ids)
     encode_seconds = 0.0
 
@@ -114,7 +124,7 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
     # (deletion needs no model). If nothing needs encoding, return before loading the ML stack.
     total = 0
     to_embed_total = 0
-    for fi in files_info:
+    for fi in process_info:
         chunks = [c for c in chunk_text(fi.read_text(), emb.chunk_size, emb.chunk_overlap) if c.strip()]
         expected = chunk_fingerprint(fi.content_fingerprint(), transform_v)
         to_embed, stale = embed_plan(fi.document_id, len(chunks), expected, existing_fp)
@@ -128,12 +138,13 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
     initial = total - to_embed_total
 
     if to_embed_total == 0:
+        collection_total = collection.count()  # true collection size (scoped pre-pass no longer sums all docs)
         collection.modify(metadata={
             "key": key, "model": cfg["model"], "chunk_size": emb.chunk_size,
-            "total_chunks": total, "transform_version": transform_v,
+            "total_chunks": collection_total, "transform_version": transform_v,
         })
         removed = f", {stale_removed} stale removed" if stale_removed else ""
-        logger.info(f"'{collection.name}' already current — {total} chunks, model not loaded{removed}")
+        logger.info(f"'{collection.name}' already current — {collection_total} chunks, model not loaded{removed}")
         return encoder
 
     if encoder is None:
@@ -141,11 +152,11 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
         encoder = EmbeddingEncoder()
     encoder.load(key)
     logger.info(f"   Variant: {key} (model {encoder.model_name})")
-    logger.info(f"Embedding {len(files_info)} files to collection '{collection.name}'")
+    logger.info(f"Embedding {len(process_info)} file(s) to collection '{collection.name}'")
 
     t0 = time.monotonic()
     with tqdm(total=total, initial=initial, desc="Embedding", unit="chunk") as pbar:
-        for file_info in files_info:
+        for file_info in process_info:
             content = file_info.read_text()
             chunks = [c for c in chunk_text(content, emb.chunk_size, emb.chunk_overlap) if c.strip()]
             n_chunks = len(chunks)
@@ -161,7 +172,6 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
                     stale_removed += len(stale)
                 if not chunks:
                     continue
-                total_chunks += n_chunks
 
                 ids, metadatas = _build_chroma_entries(chunks, file_info, expected)
                 missing = [(i, chunks[i]) for i in to_embed]
@@ -223,17 +233,18 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str] | None = None):
 
             encoder.release_cache()
 
+    collection_total = collection.count()  # true collection size — the scoped pass only touched `rebuild` docs
     collection.modify(metadata={
         "key": key,
         "model": cfg["model"],
         "chunk_size": emb.chunk_size,
-        "total_chunks": total_chunks,
+        "total_chunks": collection_total,
         "transform_version": transform_v,
     })
 
     elapsed = time.monotonic() - t0
     removed = f", {stale_removed} stale removed" if stale_removed else ""
-    logger.info(f"Done: {added_total} added, {skipped_total} skipped{removed}, {total_chunks} total in '{collection.name}' ({elapsed:.1f}s)")
+    logger.info(f"Done: {added_total} added, {skipped_total} skipped{removed}, {collection_total} total in '{collection.name}' ({elapsed:.1f}s)")
     if encode_seconds > 0 and added_total > 0:
         speed = added_total / encode_seconds
         logger.info(f"Encode speed: {speed:,.1f} chunks/sec ({added_total} chunks in {encode_seconds:.1f}s)")

@@ -15,6 +15,9 @@ class _FakeCollection:
     def get(self, include=None):
         return {"ids": [], "metadatas": []}
 
+    def count(self):
+        return len(self.get()["ids"])
+
     def delete(self, ids):
         self.deleted.extend(ids)
 

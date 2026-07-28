@@ -14,8 +14,19 @@
 >    ("Guarantees & gaps", §8).
 > 2. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
 >    data** on `refresh --apply`. Fix: per-source semantic validator as the adopt gate.
+> 3. **Thin builders (Part 3 stage-protocol refactor)**. The `build_*` helpers predate the generic
+>    driver and each still carries its **own** incrementality (walk every doc + fp-skip), so the
+>    driver's authoritative key set is applied *on top of* a redundant self-decision. `build_graphs`
+>    and `build_embeddings` now **honour `rebuild` as the exact work-list** (no full-corpus re-walk),
+>    but the deeper cleanup remains: (a) the `rebuild is None` self-deciding path is **dead in prod**
+>    (every builder is only ever called by its stage with `rebuild` set) — remove it or keep one real
+>    standalone entry; (b) move embeddings' in-`build` orphan-GC to `driver.clean` (it duplicates the
+>    reap path); (c) audit `build_corpus`/`build_projections` for the same pattern (corpus's full walk
+>    is a *necessary* aggregate-catalog assembly, not redundant — projections is single-key). End
+>    state: builders are dumb executors of exactly `keys`; incrementality lives only in the driver.
+>    Part 3 in [`pipeline-and-incrementality.md`](pipeline-and-incrementality.md).
 >
-> Items 1–2 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
+> Items 1–3 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
 > "won't see all updates" gap. (The former "no `fsync`" item is **decided — not doing it**: the
 > raw cache is regenerable and the write is human-gated, so `os.replace` atomicity suffices; see
 > the reasoning in [`known-issues.md`](../known-issues.md).)
