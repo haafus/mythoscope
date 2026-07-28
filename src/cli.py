@@ -99,14 +99,9 @@ def build(scope, force, sample):
 
     start = time.monotonic()
     try:
-        plans = run_pipeline(stages, force=force, targets=targets, sample=sample)
+        run_pipeline(stages, force=force, targets=targets, sample=sample)  # logs per-stage progress (check/build) as it goes
     except Exception as e:
         _fail("Build", e)
-    for p in plans:
-        if p.planned_count:   # this stage had work to do — report landed/planned (0/N surfaces a total failure)
-            click.echo(f"  {p.stage.name}: {len(p.built)}/{p.planned_count} built")
-        else:                 # nothing to build — say so rather than skip silently
-            click.echo(f"  {p.stage.name}: up to date")
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 

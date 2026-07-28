@@ -8,9 +8,12 @@ stage's ``actual()`` on disk. See ``docs/proposals/pipeline-and-incrementality.m
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field, replace
 
 from .stage import Stage
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -22,6 +25,7 @@ class StagePlan:
     stale: set[str] = field(default_factory=set)    # exists, fp diverged  → rebuild
     orphans: set[str] = field(default_factory=set)   # exists, shouldn't    → clean (level 1)
     built: set[str] = field(default_factory=set)     # keys actually built this run (post-build actual ∩ todo)
+    desired_count: int = 0                            # |desired()| — total elements the stage should hold (the check total)
     planned_count: int = 0                            # keys this run set out to build (todo: missing+stale, or all on --force, capped by --sample) — the denominator for "built N/planned"
 
     @property
@@ -69,7 +73,7 @@ def plan(stage: Stage) -> StagePlan:
     d, a = stage.desired(), stage.actual()
     dk, ak = set(d), set(a)
     stale = {k for k in dk & ak if d[k] != a[k]}
-    return StagePlan(stage=stage, missing=dk - ak, stale=stale, orphans=ak - dk)
+    return StagePlan(stage=stage, missing=dk - ak, stale=stale, orphans=ak - dk, desired_count=len(dk))
 
 
 def status(stages: list[Stage]) -> list[StagePlan]:
@@ -97,14 +101,23 @@ def build(stages: list[Stage], *, force: bool = False, targets: set[str] | None 
     for stage in topo_order(stages):
         if targets is not None and stage.name not in targets:
             continue  # in the list only to wire/order the targets — not itself requested
+        # Header BEFORE plan() — the check itself (desired()/actual(): reading Chroma, loading a
+        # model, walking the corpus) can be the slow part, so this attributes that pause to a stage.
+        logger.info("=== %s ===", stage.name)
         p = plan(stage)
         todo = set(stage.desired()) if force else p.to_build
         if sample is not None:
             todo = set(sorted(todo)[:sample])
+        logger.info("  check: %d total, %d missing, %d stale%s -> %d to build",
+                    p.desired_count, len(p.missing), len(p.stale),
+                    " (force)" if force else "", len(todo))
         built: set[str] = set()
         if todo:
             stage.build(todo)
             built = todo & set(stage.actual())   # what is *actually* built now — a per-key failure
+            logger.info("  build: %d/%d built", len(built), len(todo))
+        else:
+            logger.info("  build: up to date")
         acted.append(replace(p, built=built, planned_count=len(todo)))  # (no fp sidecar) drops out, so N/planned is honest
     return acted
 

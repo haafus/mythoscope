@@ -119,11 +119,15 @@ def test_status_returns_plans_in_topo_order():
 
 # --- build ---------------------------------------------------------------------------------
 
-def test_build_only_touches_missing_and_stale():
+def test_build_only_touches_missing_and_stale(caplog):
     s = FakeStage("s", {"keep": "1", "new": "2", "edit": "3new"}, {"keep": "1", "edit": "3old"})
-    [p] = build([s])
+    with caplog.at_level("INFO", logger="pipeline.driver"):
+        [p] = build([s])
     assert s.built == [{"new", "edit"}]   # keep (up-to-date) is untouched
     assert p.built == {"new", "edit"} and p.planned_count == 2   # "2/2 built" — denominator is what this run set out to build (missing+stale, not the stage total)
+    assert p.desired_count == 3           # total the stage holds (keep + new + edit), reported on the check line
+    text = caplog.text
+    assert "=== s ===" in text and "3 total, 1 missing, 1 stale -> 2 to build" in text and "2/2 built" in text
 
 
 def test_build_noop_when_current():
