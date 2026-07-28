@@ -1,8 +1,32 @@
 import json
+import logging
+import time
 
+from chunk_cache import chunk_hash
 from llm import LLMProcessor
 
 from .normalize import is_empty, norm_name
+
+logger = logging.getLogger(__name__)
+
+
+def _ask(llm: LLMProcessor, name: str, prompt: str, content: str, chunk_id: str):
+    """Diagnostic wrapper around one extraction call: attributes latency and a null/empty
+    outcome to a specific (chunk, prompt) so a single pathological call is identifiable.
+    ``ask_json`` already includes the client's internal retries, so a large ``elapsed`` here
+    means that prompt burned the whole retry budget (each attempt independently billable)."""
+    t0 = time.monotonic()
+    result = llm.ask_json(prompt, content)
+    elapsed = time.monotonic() - t0
+    n = len(result) if isinstance(result, list) else -1
+    if result is None or elapsed > 45:
+        logger.warning("extract prompt=%s chunk=%s in=%d chars -> %s after %.1fs",
+                       name, chunk_id, len(content),
+                       "FAILED (None)" if result is None else f"{n} items", elapsed)
+    else:
+        logger.debug("extract prompt=%s chunk=%s in=%d chars -> %d items in %.1fs",
+                     name, chunk_id, len(content), n, elapsed)
+    return result
 
 
 def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> tuple[dict[str, list], bool]:
@@ -16,14 +40,15 @@ def extract_from_chunk(llm: LLMProcessor, chunk: str, prompts: dict) -> tuple[di
     None (a failed, non-fatal call) — the caller should skip caching such a chunk
     so it is retried on a later run rather than frozen as an empty result.
     """
-    chars = llm.ask_json(prompts["beings"], chunk)
+    chunk_id = chunk_hash(chunk)  # == the extraction-cache key, so the log id locates the exact chunk
+    chars = _ask(llm, "beings", prompts["beings"], chunk, chunk_id)
     relations_content = (
         f"DOCUMENT 1 (Text):\n{chunk}\n\n"
         f"DOCUMENT 2 (Characters):\n{json.dumps(chars or [], ensure_ascii=False)}"
     )
-    rels = llm.ask_json(prompts["relations"], relations_content)
-    locs = llm.ask_json(prompts["locations"], chunk)
-    times = llm.ask_json(prompts["time"], chunk)
+    rels = _ask(llm, "relations", prompts["relations"], relations_content, chunk_id)
+    locs = _ask(llm, "locations", prompts["locations"], chunk, chunk_id)
+    times = _ask(llm, "time", prompts["time"], chunk, chunk_id)
 
     complete = None not in (chars, rels, locs, times)
     results = {

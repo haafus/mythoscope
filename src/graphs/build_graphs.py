@@ -32,6 +32,13 @@ def _extract_chunks(
     """
     done = 0
 
+    # Name the uncached chunks up front so a run stuck on one chunk shows exactly which
+    # (id == extraction-cache key) and how big it is. Loud when few (the stuck case), quiet
+    # on a big fresh build. Per-prompt latency/failure is logged in extraction._ask.
+    level = logging.INFO if len(uncached) <= 3 else logging.DEBUG
+    for c in uncached:
+        logger.log(level, "  uncached chunk %s: %d chars | %r", chunk_hash(c), len(c), c[:80])
+
     def store(chunk: str, outcome: tuple[dict, bool]) -> None:
         nonlocal done
         done += 1

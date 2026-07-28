@@ -202,9 +202,21 @@ class LLMProcessor:
 
         for attempt in range(self.max_retries + 1):
             self.governor.acquire(est_tokens)  # raises DailyLimitReached if the breaker tripped
+            t0 = time.monotonic()
             try:
                 response = self.client.chat.completions.create(**kwargs)
+                elapsed = time.monotonic() - t0
                 usage = getattr(response, "usage", None)
+                # Diagnostic: real server-side cost + latency. A runaway/looping generation
+                # shows as a huge completion_tokens and an elapsed near the request timeout —
+                # the signature of a call that is billed yet often lost to a client timeout.
+                comp = getattr(usage, "completion_tokens", 0) or 0
+                prompt_tok = getattr(usage, "prompt_tokens", 0) or 0
+                (logger.warning if elapsed > 30 else logger.debug)(
+                    "LLM ok (model=%s) in %.1fs: prompt=%d completion=%d tokens%s",
+                    self.model_name, elapsed, prompt_tok, comp,
+                    "  <- slow/large: possible runaway output" if elapsed > 30 else "",
+                )
                 self.governor.reconcile(est_tokens, getattr(usage, "total_tokens", 0) or 0)
                 self.governor.note_success()
                 # A successful call can still carry null content (refusal / tool-stop /
@@ -214,8 +226,12 @@ class LLMProcessor:
                 content = response.choices[0].message.content
                 return content.strip() if content else ""
             except Exception as e:
-                # This attempt spent no usable tokens; return its pre-charged estimate
+                elapsed = time.monotonic() - t0
+                # This attempt spent no usable tokens *locally*; return its pre-charged estimate
                 # so retries don't compound the TPM charge (reconcile only runs on success).
+                # NB: this refund is our local governor only — a client timeout still lets the
+                # server finish and BILL the generation, so `elapsed` near the request timeout
+                # means this retry likely cost real money for a response we threw away.
                 self.governor.refund(est_tokens)
                 kind = _classify(e)
                 code = getattr(e, "status_code", None) or getattr(e, "code", None)
@@ -227,7 +243,7 @@ class LLMProcessor:
                 if kind == "transient" and attempt < self.max_retries:
                     delay = _retry_delay(e, attempt)
                     logger.warning(
-                        f"LLM call failed (model={self.model_name}, code={code}); "
+                        f"LLM call failed after {elapsed:.1f}s (model={self.model_name}, code={code}); "
                         f"retry {attempt + 1}/{self.max_retries} in {delay:.1f}s: {message}"
                     )
                     time.sleep(delay)
@@ -240,7 +256,10 @@ class LLMProcessor:
                         f"rate limit not recovering (model={self.model_name})"
                     ) from e
 
-                logger.error(f"LLM call failed (model={self.model_name}, code={code}): {message}")
+                logger.error(
+                    f"LLM call failed after {elapsed:.1f}s, giving up "
+                    f"(model={self.model_name}, code={code}): {message}"
+                )
                 return None
         return None
 
