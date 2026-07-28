@@ -219,36 +219,6 @@ Options:
 
 ---
 
-## Raw scrape cache is a snapshot, not a reproducible dataset
-
-**Status:** by design — treat all counts as version-dependent.
-
-Every external download is cached under `outputs/motifs/raw/**` (areasofmyths /
-mapsofmyths HTML, the folkmasa bibliography, Wikidata SPARQL responses). This
-cache is **gitignored** and, by default, **not exported** (`mytho export` skips
-`raw/**`; `mytho export --caches` deliberately includes it) because it isn't
-reproducible:
-
-- The upstream sites are live and change over time — pages get edited, motifs
-  added or renumbered, a site can move or go down. A fresh `mytho refresh motifs
-  --apply` (re-scrape) can therefore return **different counts** than a cache built
-  earlier.
-- The cache is a point-in-time snapshot, not a versioned dataset; two machines
-  scraping on different days may disagree.
-
-Consequences and handling:
-
-- Every motif / type / tradition **count in these docs is an approximate
-  snapshot** of one build — re-verify against a fresh build before quoting it.
-- Only **code** is committed; the built indexes (`outputs/motifs/*.json`) and the
-  raw cache are regenerated, not tracked. To hand a working dataset to someone
-  without credentials or network, ship the built `*.json` via `mytho export`
-  (raw excluded by default; add `--caches` to also ship the raw scrape).
-- Refresh from upstream with `mytho refresh motifs --apply` (re-downloads); a plain
-  `mytho build motifs` re-parses the existing cache without touching the network.
-
----
-
 ## Competing macro-area schemes (six vocabularies)
 
 **Status:** open — needs a decision before touching `_berezkin_region`.

@@ -49,7 +49,19 @@ What that costs:
   already exists — it just needs a dated, durable cache to point at).
 - `mytho export --caches` ⇒ ships the `raw/**` snapshot (excluded by default).
 - `.discovered` sidecars ⇒ shrink detection per parse-root (`build_motifs.py`).
-- Missing: any **timestamp, content hash, snapshot manifest, snapshot id, or durable archive**.
+- `raw_fetched_at` in `outputs/motifs/meta.json` (2026-07) ⇒ an **approximate** "data last
+  refreshed" stamp: the newest filesystem mtime across the raw cache. Cheap and visible, but
+  mtime is reset by an export→restore, so it is not the durable, content-addressed provenance
+  §3.1 provides — it closes the "when roughly?" gap, not the reproducibility one.
+- Missing: any **content hash, snapshot manifest, snapshot id, or durable archive**.
+
+> **Operational caveat (until this lands).** The raw cache is a point-in-time snapshot, not a
+> versioned dataset — a `refresh --apply` can return different counts, and two machines scraping
+> on different days may disagree. So **every motif / type / tradition count in the docs is an
+> approximate snapshot of one build**; re-verify against a fresh build before quoting it. Only
+> code is committed — the built indexes and the raw cache are regenerated, not tracked (ship a
+> working dataset with `mytho export`, adding `--caches` for the raw scrape). This is *by design*,
+> not a bug: it is the gap this proposal closes.
 
 ## 3. Design — five pieces
 
