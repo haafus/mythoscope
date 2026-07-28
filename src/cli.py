@@ -106,7 +106,7 @@ def build(scope, force, sample):
         if p.planned_count:   # this stage had work to do — report landed/planned (0/N surfaces a total failure)
             click.echo(f"  {p.stage.name}: {len(p.built)}/{p.planned_count} built")
         else:                 # nothing to build — say so rather than skip silently
-            click.echo(click.style(f"  {p.stage.name}: up to date", dim=True))
+            click.echo(f"  {p.stage.name}: up to date")
     click.echo(click.style("\nBuild finished.", fg="green", bold=True) + f" ({_fmt_elapsed(time.monotonic() - start)})")
 
 
