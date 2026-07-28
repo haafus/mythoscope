@@ -4,11 +4,7 @@
 > Flagged items with a settled design but **not yet implemented**. Full write-ups linked; the
 > register is [`known-issues.md`](../known-issues.md).
 >
-> 1. ~~**Embeddings completeness** (HIGH, data-integrity)~~ — ✅ **DONE**. `n_chunks` stored per
->    chunk; `EmbeddingsStage.actual()` reports a doc built iff `count(fp) == n_chunks` (legacy
->    fallback ⇒ no rebuild). [`embeddings-completeness.md`](embeddings-completeness.md);
->    tests `tests/test_embeddings_stage.py`.
-> 2. **Enrichment discovery** (very narrow — verified). New base motifs **and** new *linked*
+> 1. **Enrichment discovery** (very narrow — verified). New base motifs **and** new *linked*
 >    enrichment pages/nodes are caught by `refresh --apply` + `build` (every source's index is pinned
 >    and refreshed — mapsofmyths lists both listing pages explicitly, ashliman's index is in the
 >    pinned walk). Only two residuals: ashliman numbered pages **not linked** anywhere (behind the
@@ -16,12 +12,12 @@
 >    pages. Optional fix: `expand: bytes -> [Fetchable]` descriptor makes `refresh` self-sufficient +
 >    adds orphan detection (does not fix the probe case). Audit: [`motifs-atomisation.md`](motifs-atomisation.md)
 >    ("Guarantees & gaps", §8).
-> 3. **No `fsync` in the raw write path**. `commit_bytes` is atomic (`os.replace`) but not
+> 2. **No `fsync` in the raw write path**. `commit_bytes` is atomic (`os.replace`) but not
 >    power-loss durable. Fix (if wanted): `fsync` temp + parent dir before/after replace.
-> 4. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
+> 3. **Lenient validators**. A structured HTML/`200` error page can be **adopted over good pinned
 >    data** on `refresh --apply`. Fix: per-source semantic validator as the adopt gate.
 >
-> Items 2–4 are detailed in [`known-issues.md`](../known-issues.md); item 2 is the headline
+> Items 1–3 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
 > "won't see all updates" gap.
 
 The consolidated build order for the pipeline/data/fetch redesign. It sequences every phase of every proposal
