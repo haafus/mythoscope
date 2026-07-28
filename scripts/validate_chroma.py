@@ -12,9 +12,11 @@ another document's row. This script checks every collection for:
     renamed book left behind; surfaces in search with an unresolvable id).
   * **n_chunks / contiguity** — per document, the stored ``n_chunks`` matches the real
     chunk count and the chunk indices are a contiguous 0..N-1 (no holes/dupes).
-  * **self-query** (optional, ``--self-query N``) — a chunk's own embedding must rank the
-    chunk itself first. If not, the stored id/vector are out of sync (an HNSW-vs-store
-    drift), which is what made the click return a neighbour instead of the point.
+  * **self-query** (sampled by default, ``--self-query N``; ``0`` disables) — a chunk's own
+    embedding must rank the chunk itself first. If not, the stored id/vector are out of sync
+    (an HNSW-vs-store drift), which is what made the click return a neighbour instead of the
+    point. This is the *only* check that catches that drift — id<->metadata stays consistent
+    while the vector is foreign — so it runs even in the headline sweep.
 
 Focused mode reproduces one report directly:
     python scripts/validate_chroma.py bge-m3 --title "The Popol Vuh" --chunk 76
@@ -208,8 +210,10 @@ def main() -> int:
     ap.add_argument("--title", help="Focused mode: resolve this book title to a document_id (needs the catalog).")
     ap.add_argument("--doc", help="Focused mode: check this document_id directly.")
     ap.add_argument("--chunk", type=int, help="Focused mode: the chunk_index to inspect (with --title/--doc).")
-    ap.add_argument("--self-query", type=int, default=0, metavar="N",
-                    help="Also self-query N random chunks per collection (0 = skip; heavier, loads embeddings).")
+    ap.add_argument("--self-query", type=int, default=64, metavar="N",
+                    help="Self-query N random chunks per collection to catch id<->vector drift "
+                         "(the row's own vector must rank the row first). Default 64; 0 disables. "
+                         "Heavier (loads embeddings); raise for fuller coverage of large collections.")
     ap.add_argument("--limit", type=int, default=10, help="Max example issues to print per check.")
     args = ap.parse_args()
 
