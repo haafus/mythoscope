@@ -36,7 +36,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -191,6 +191,7 @@ def _self_query_check(coll, ids: list[str], sample: int, catalog: dict[str, dict
             print(_line(cid, top))
         if len(desync) > 20:
             print(f"        … and {len(desync) - 20} more")
+        _desync_pattern(desync, catalog)
     else:
         print(f"  OK   no id<->vector desync — every sampled chunk retrieves itself within top-{k} ({len(picks)} sampled)")
 
@@ -205,6 +206,34 @@ def _self_query_check(coll, ids: list[str], sample: int, catalog: dict[str, dict
         print(f"  OK   no near-duplicate ties ({len(picks)} sampled)")
 
     return len(desync)   # only real desync counts toward PROBLEMS FOUND; ties are informational
+
+
+def _desync_pattern(desync: list[tuple[str, str]], catalog: dict[str, dict]) -> None:
+    """Aggregate the desync set into a pattern: which books the broken chunks come FROM, which
+    books their vectors resolve TO, and the from->to book pairs. A few large books dominating the
+    'to' column (attractors) points at an index-level label drift rather than random corruption."""
+    def _doc(cid: str) -> str:
+        return _label(catalog, (cid or "").rpartition("::")[0])
+
+    src = Counter(_doc(cid) for cid, _ in desync)
+    tgt = Counter(_doc(top) for _, top in desync)
+    same = sum(1 for cid, top in desync if cid.rpartition("::")[0] == (top or "").rpartition("::")[0])
+    pairs = Counter(
+        f"{_doc(cid)}  →  {_doc(top)}"
+        for cid, top in desync
+        if cid.rpartition("::")[0] != (top or "").rpartition("::")[0]
+    )
+
+    def _block(title: str, counter: Counter) -> None:
+        print(f"    {title}:")
+        for name, n in counter.most_common(15):
+            print(f"        {n:5d}  {name}")
+
+    print(f"  — desync pattern ({len(desync)} chunks; {len(desync) - same} cross-book, {same} same-book) —")
+    _block("FROM (source book)", src)
+    _block("TO (vector resolves to)", tgt)
+    if pairs:
+        _block("cross-book pairs", pairs)
 
 
 # --------------------------------------------------------------------------- focused mode
