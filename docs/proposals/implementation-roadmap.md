@@ -27,6 +27,13 @@
 >    motifs orphans are invisible and correctly wait for `clean`. Uniform reap-in-`build` is rejected
 >    (a transiently-empty `desired()` would self-destruct a routine build). Nothing left to do here.
 >
+> 4. **Chroma HNSW index integrity.** Similarity search can desync from the store under update/delete
+>    churn (record store correct, HNSW search graph stale → a click surfaces a foreign fragment).
+>    Shipped: `scripts/validate_chroma.py` + the tail-reap fix. Proposed: raise `hnsw:search_ef`, build the
+>    similarity click head from `get`-by-id, a one-time `--force` rebuild, and (structural) rebuild-on-
+>    structural-change + a self-query guardrail. Full write-up + refactor assessment:
+>    [`chroma-hnsw-index-integrity.md`](chroma-hnsw-index-integrity.md).
+>
 > Items 1–2 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline
 > "won't see all updates" gap. (The former "no `fsync`" item is **decided — not doing it**: the
 > raw cache is regenerable and the write is human-gated, so `os.replace` atomicity suffices; see

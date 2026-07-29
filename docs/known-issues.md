@@ -234,6 +234,30 @@ Options:
 
 ---
 
+## HNSW index integrity: search can desync from the store under update/delete churn
+
+**Status:** partially fixed (tooling + tail-reap bug); mitigations proposed. Full write-up +
+recommendations: [`proposals/chroma-hnsw-index-integrity.md`](proposals/chroma-hnsw-index-integrity.md).
+
+The similarity **record store** is always correct (`get(ids=[cid])` returns the right vector/text/
+metadata), but the **HNSW search graph** can drift out of sync: a chunk's own stored vector no longer
+retrieves the chunk within top-k, so a scatter click surfaces a foreign fragment (*Popol Vuh* #76 →
+*Ramayan* #1709). Scope on `bge-m3`: ~0.03% of chunks, stable across runs.
+
+Root cause is mutating the live graph: our positional ids (`doc::index`) + the fingerprint gate mean
+labels are repeatedly `upsert`-updated in place (hnswlib `updatePoint`) and, on a shrink, deleted —
+which creates "unreachable points" in the graph. This is a property of HNSW (every HNSW store has it,
+hidden behind automatic compaction), not a bug in our write path. Our Chroma is **1.5.9**; the old
+delete→re-add-same-id bug (#2062) is already fixed there, but compaction-sync issues persist.
+
+Diagnose with `scripts/validate_chroma.py <variant> --self-query N` (self-query is on by default; it
+reports id↔vector desync and benign overlap ties separately, decoded to book titles). Immediate
+mitigations: raise `hnsw:search_ef` (default 10), build the similarity click head from `get`-by-id, and
+a one-time `mytho build embeddings:<variant> --force`. Structural fix (rebuild-on-structural-change) and
+a self-query guardrail are in the proposal.
+
+---
+
 ## Competing macro-area schemes (six vocabularies)
 
 **Status:** open — needs a decision before touching `_berezkin_region`.
