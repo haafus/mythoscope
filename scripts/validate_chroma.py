@@ -13,10 +13,15 @@ another document's row. This script checks every collection for:
   * **n_chunks / contiguity** — per document, the stored ``n_chunks`` matches the real
     chunk count and the chunk indices are a contiguous 0..N-1 (no holes/dupes).
   * **self-query** (sampled by default, ``--self-query N``; ``0`` disables) — a chunk's own
-    embedding must rank the chunk itself first. If not, the stored id/vector are out of sync
-    (an HNSW-vs-store drift), which is what made the click return a neighbour instead of the
-    point. This is the *only* check that catches that drift — id<->metadata stays consistent
-    while the vector is foreign — so it runs even in the headline sweep.
+    embedding must retrieve the chunk itself within top-k. This surfaces two independent
+    conditions, reported and counted **separately**:
+      - **id<->vector desync** (FAIL, counted) — the chunk is absent from its own top-k: its
+        stored vector belongs to another row (the click-shows-wrong-chunk bug). id<->metadata
+        stays consistent while the vector is foreign, so this is the only check that catches it.
+      - **near-duplicate ties** (WARN, not counted) — the chunk *is* in its top-k but an
+        overlapping same-document neighbour (a ``chunk_overlap`` near-duplicate) out-ranks it.
+        Benign, and being a tie it flaps between runs; listed so it is visible, not conflated
+        with real desync.
 
 Focused mode reproduces one report directly:
     python scripts/validate_chroma.py bge-m3 --title "The Popol Vuh" --chunk 76
@@ -146,8 +151,8 @@ def _self_query_check(coll, ids: list[str], sample: int, catalog: dict[str, dict
     import random  # local: not needed for the main sweep
 
     picks = ids if sample >= len(ids) else random.sample(ids, sample)
-    desync: list[tuple[str, str]] = []   # (cid, nearest) — self not in its own top-k
-    ties = 0                             # self present but out-ranked by an overlapping neighbour
+    desync: list[tuple[str, str]] = []   # self absent from its own top-k — id<->vector cross-wired
+    ties: list[tuple[str, str]] = []     # self in top-k but out-ranked by an overlapping neighbour
     for cid in picks:
         one = coll.get(ids=[cid], include=["embeddings"])
         embs = one.get("embeddings")
@@ -157,24 +162,40 @@ def _self_query_check(coll, ids: list[str], sample: int, catalog: dict[str, dict
         top_ids = (res.get("ids") or [[]])[0]
         if not top_ids:
             continue
-        if cid in top_ids:
-            ties += top_ids[0] != cid
-        else:
+        if cid not in top_ids:
             desync.append((cid, top_ids[0]))
+        elif top_ids[0] != cid:
+            ties.append((cid, top_ids[0]))
 
-    if ties:
-        print(f"  note {ties} near-duplicate tie(s): self in top-{k} but out-ranked by an "
-              f"overlapping chunk — benign (chunk_overlap), not counted")
-    if not desync:
-        print(f"  OK   every sampled chunk retrieves itself within top-{k} ({len(picks)} sampled)")
-        return 0
-    print(f"  FAIL id<->vector desync — chunk's own vector does not retrieve it within top-{k} "
-          f"({len(picks)} sampled): {len(desync)}")
-    for cid, top in desync[:20]:
+    def _line(cid: str, top: str) -> str:
         did, top_did = cid.rpartition("::")[0], (top or "").rpartition("::")[0]
         where = "same document" if top_did == did else f"-> {_label(catalog, top_did)}"
-        print(f"        - {cid!r} nearest {top!r} ({where})")
-    return len(desync)
+        return f"        - {cid!r} nearest {top!r} ({where})"
+
+    # Two independent failure classes, reported separately.
+    #   (1) desync — the chunk's stored vector belongs to another row (real corruption).
+    #   (2) ties   — near-duplicate overlapping chunk out-ranks the chunk (benign; flaps between runs).
+    if desync:
+        print(f"  FAIL id<->vector desync — chunk's own vector does not retrieve it within top-{k} "
+              f"({len(picks)} sampled): {len(desync)}")
+        for cid, top in desync[:20]:
+            print(_line(cid, top))
+        if len(desync) > 20:
+            print(f"        … and {len(desync) - 20} more")
+    else:
+        print(f"  OK   no id<->vector desync — every sampled chunk retrieves itself within top-{k} ({len(picks)} sampled)")
+
+    if ties:
+        print(f"  WARN near-duplicate ties — self in top-{k} but out-ranked by an overlapping chunk "
+              f"(benign, chunk_overlap; not counted): {len(ties)}")
+        for cid, top in ties[:20]:
+            print(_line(cid, top))
+        if len(ties) > 20:
+            print(f"        … and {len(ties) - 20} more")
+    else:
+        print(f"  OK   no near-duplicate ties ({len(picks)} sampled)")
+
+    return len(desync)   # only real desync counts toward PROBLEMS FOUND; ties are informational
 
 
 # --------------------------------------------------------------------------- focused mode
