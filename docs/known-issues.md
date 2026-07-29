@@ -251,10 +251,11 @@ hidden behind automatic compaction), not a bug in our write path. Our Chroma is 
 delete→re-add-same-id bug (#2062) is already fixed there, but compaction-sync issues persist.
 
 Diagnose with `scripts/validate_chroma.py <variant> --self-query N` (self-query is on by default; it
-reports id↔vector desync and benign overlap ties separately, decoded to book titles). Immediate
-mitigations: raise `hnsw:search_ef` (default 10), build the similarity click head from `get`-by-id, and
-a one-time `mytho build embeddings:<variant> --force`. Structural fix (rebuild-on-structural-change) and
-a self-query guardrail are in the proposal.
+reports id↔vector desync and benign overlap ties separately, decoded to book titles). Shipped: the
+similarity click head now comes from `get`-by-id (deterministic, independent of graph health). Remaining:
+a one-time `mytho build embeddings:<variant> --force` to clear the existing degradation, plus (structural)
+rebuild-on-structural-change + a self-query guardrail — in the proposal. Raising `hnsw:search_ef` was
+**rejected** (2–3× latency; it papers over recall, not the graph degradation that is the real cause).
 
 ---
 

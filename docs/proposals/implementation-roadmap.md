@@ -29,9 +29,10 @@
 >
 > 4. **Chroma HNSW index integrity.** Similarity search can desync from the store under update/delete
 >    churn (record store correct, HNSW search graph stale → a click surfaces a foreign fragment).
->    Shipped: `scripts/validate_chroma.py` + the tail-reap fix. Proposed: raise `hnsw:search_ef`, build the
->    similarity click head from `get`-by-id, a one-time `--force` rebuild, and (structural) rebuild-on-
->    structural-change + a self-query guardrail. Full write-up + refactor assessment:
+>    Shipped: `scripts/validate_chroma.py`, the tail-reap fix, and the similarity click head now from
+>    `get`-by-id (deterministic). Proposed: a one-time `--force` rebuild, and (structural) rebuild-on-
+>    structural-change + a self-query guardrail. `hnsw:search_ef` was **rejected** (2–3× latency; papers
+>    over recall, not the graph degradation that is the root cause). Full write-up + refactor assessment:
 >    [`chroma-hnsw-index-integrity.md`](chroma-hnsw-index-integrity.md).
 >
 > Items 1–2 are detailed in [`known-issues.md`](../known-issues.md); item 1 is the headline

@@ -51,20 +51,19 @@ reindex; industry norm is to reindex when the deletion ratio exceeds ~10–15%.
   now **keeps the chunk-id key**, so `embed_plan`'s tail-`stale` detection can still delete the shrunk
   tail. This was the "1035 rows but n_chunks=986" inconsistency. Regression test added
   (`tests/test_build_embeddings_gate.py`) exercising the real `embed_plan`.
+- **Similarity click head from `get`-by-id** (`services/similarity.py::get_point`): the head is now
+  always the clicked chunk fetched by id, never `query[0]`; `_query` is used only for neighbours (the
+  clicked chunk is dropped from them by id, not by rank). This closes the *Popol Vuh → Ramayan* symptom
+  at the app layer regardless of graph health, at zero extra cost (the `get`-by-id call already happened).
 
 ## Recommendations (prioritized)
 
 ### Immediate — low risk, direct effect
-1. **`hnsw:search_ef` ≈ 100** on collection creation (default is **10**). Runtime param, no rebuild;
-   recall → ~99%, so a point reliably finds itself. `build_embeddings.py:76` currently sets no `search_ef`.
-   — [Chroma — Configure Collections](https://docs.trychroma.com/docs/collections/configure).
-2. **Similarity click: build the head from `get`-by-id, not from the ANN query.** The API already
-   fetches the point by id (`get_point`, `services/similarity.py:34`), but the default (non-cross-tradition)
-   branch returns `query[0]` as the head — so a desynced/approximate graph shows a foreign fragment. The
-   **cross-tradition branch already does it right** (`head = _hit(point…)`). Fix: make the default branch
-   prepend the same get-by-id head and use `_query` only for neighbours. One–two lines; no frontend change.
-   (Graph node hover is unaffected — it reads `node.data` from the already-loaded graph JSON, no Chroma call.)
-3. **One-time clean rebuild** of the affected collection: `mytho build embeddings:bge-m3 --force`
+1. ✅ **Similarity click: head from `get`-by-id, not the ANN query** — **shipped** (see "Already shipped").
+   The head is always the clicked chunk fetched by id; `_query` supplies only neighbours. Closes the
+   foreign-fragment symptom at the app layer regardless of graph health, at zero extra cost.
+   (Graph node hover was never affected — it reads `node.data` from the already-loaded graph JSON.)
+2. **One-time clean rebuild** of the affected collection: `mytho build embeddings:bge-m3 --force`
    (drop + re-encode into a fresh graph), then `validate_chroma bge-m3 --self-query 22711` to confirm
    `desync = 0` (only `WARN` ties remain). Use `--force` (re-encode) for the *first* cleanup rather than
    trusting possibly-degraded cached vectors.
@@ -89,6 +88,14 @@ reindex; industry norm is to reindex when the deletion ratio exceeds ~10–15%.
    `collection.modify()` only tweaks runtime params (`ef_search`, `num_threads`, `batch_size`,
    `sync_threshold`, `resize_factor`); `space`/`ef_construction`/`max_neighbors` are immutable → the only
    supported "recompute the graph" is recreating the collection.
+
+### Rejected
+- **Raising `hnsw:search_ef` (≈100).** *Declined.* It costs **2–3× query latency** and treats the wrong
+  problem: search_ef only widens the beam to recover *approximate misses* and *ties* — it does not repair
+  a **degraded graph**, and truly unreachable nodes (no incoming edges) are not found at any `ef`. The root
+  cause here is **graph degradation from in-place update/delete churn**, not query instability, so the fix
+  belongs at build time (rebuild-on-structural-change), not at query time. The click-head fix already makes
+  the clicked fragment deterministic without touching recall.
 
 ## Refactor assessment (item 4)
 

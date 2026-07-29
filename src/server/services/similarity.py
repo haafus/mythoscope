@@ -35,18 +35,31 @@ class SimilarityService:
         if not point["ids"]:
             return []
         embedding = point["embeddings"][0]
-        if not cross_tradition:
-            return self._query(collection, embedding, top_k)
-        # Keep the clicked chunk as the head; pull neighbors only from other traditions so
-        # the list surfaces cross-cultural parallels. With no tradition on the chunk (B1),
-        # resolve it from document_id and exclude that tradition's documents by id (§5 step 4).
-        from server.services.corpus import document_ids_for_tradition, tradition_of_document
 
+        # The head is ALWAYS the clicked chunk, fetched here by id — never `query[0]`. The HNSW
+        # search graph is approximate and can drift from the store (a degraded graph may not even
+        # return a chunk for its own vector), so trusting the top query hit to be the clicked point
+        # is the bug that showed a foreign fragment. `get`-by-id is deterministic; `_query` is used
+        # only to find neighbours (see docs/proposals/chroma-hnsw-index-integrity.md).
         head = _hit(dict(point["metadatas"][0]), point["documents"][0], 1.0)
-        tradition = tradition_of_document(document_id)
-        exclude = sorted(document_ids_for_tradition(tradition)) if tradition else []
-        where = {"document_id": {"$nin": exclude}} if exclude else None
-        return [head, *self._query(collection, embedding, top_k, where=where)]
+
+        # Cross-tradition: pull neighbours only from OTHER traditions so the list surfaces
+        # cross-cultural parallels. With no tradition on the chunk (B1), resolve it from
+        # document_id and exclude that tradition's documents by id (§5 step 4).
+        where = None
+        if cross_tradition:
+            from server.services.corpus import document_ids_for_tradition, tradition_of_document
+            tradition = tradition_of_document(document_id)
+            exclude = sorted(document_ids_for_tradition(tradition)) if tradition else []
+            where = {"document_id": {"$nin": exclude}} if exclude else None
+
+        # Over-fetch by one, then drop the clicked chunk itself by id (not by rank — a degraded
+        # graph may not rank it first, or at all), so it never appears twice.
+        neighbors = [
+            n for n in self._query(collection, embedding, top_k + 1, where=where)
+            if not (n["document_id"] == document_id and n["chunk_index"] == chunk_index)
+        ]
+        return [head, *neighbors[:top_k]]
 
     def search(self, model_key: str, query: str, top_k: int = 20) -> list[dict]:
         collection = self._get_collection(model_key)
