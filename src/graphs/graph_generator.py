@@ -20,19 +20,6 @@ def _norm_key(key) -> str:
     return str(key).strip().lower().replace(" ", "").replace("_", "")
 
 
-# Placeholder names the LLM emits for a missing entity/endpoint. They are non-empty strings, so the
-# plain `.strip()` guards let them through and they become a spurious node (e.g. a relation with
-# Object="N/A" spawns an "N/A" node). Treat them as null at every NAME entry point — metadata values
-# are left alone (a value like "Unknown" can be legitimate content, a node named "Unknown" is not).
-_NULL_NAMES = {"n/a", "na", "none", "null", "nan", "unknown", "?", "-", "--", "—"}
-
-
-def _is_null_name(value) -> bool:
-    if value is None:
-        return True
-    return str(value).strip().lower() in _NULL_NAMES or not str(value).strip()
-
-
 def _field(d: dict, *aliases):
     """First value whose key matches an alias (case/space/underscore-insensitive)."""
     targets = {_norm_key(a) for a in aliases}
@@ -82,7 +69,7 @@ def _entity_index(entities: list[dict]) -> tuple[dict[str, str], dict[str, dict]
     metadata: dict[str, dict] = {}
     for ent in entities:
         name = _field(ent, "name")
-        if _is_null_name(name):
+        if is_empty(name):
             continue
         norm = norm_name(name)
         display.setdefault(norm, str(name).strip())
@@ -111,7 +98,7 @@ def _resolver(display: dict[str, str]):
     canon = dict(display)
 
     def resolve(name) -> str | None:
-        if _is_null_name(name):
+        if is_empty(name):   # empty or an LLM null-placeholder (N/A, none, …) → not a node
             return None
         text = str(name).strip()
         return canon.setdefault(norm_name(text), text)
@@ -131,7 +118,7 @@ def top_mentioned_names(unique: list[dict], raw: list[dict], n: int | None) -> s
     counts: Counter = Counter()
     for ent in raw:
         name = _field(ent, "name")
-        if not _is_null_name(name):
+        if not is_empty(name):
             counts[norm_name(name)] += 1
     ranked = sorted(unique, key=lambda e: counts.get(_entity_name(e), 0), reverse=True)
     return {_entity_name(e) for e in ranked[:n]}
