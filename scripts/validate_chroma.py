@@ -130,32 +130,51 @@ def validate_collection(coll, catalog: dict[str, dict], *, self_query: int, limi
     problems += _report("stored n_chunks matches actual", n_chunks_bad, lambda s: s)
 
     if self_query:
-        problems += _self_query_check(coll, ids, min(self_query, len(ids)))
+        problems += _self_query_check(coll, ids, min(self_query, len(ids)), catalog)
     return problems
 
 
-def _self_query_check(coll, ids: list[str], sample: int) -> int:
-    """For a sample of chunks: the chunk's own embedding must rank the chunk itself first."""
+def _self_query_check(coll, ids: list[str], sample: int, catalog: dict[str, dict], *, k: int = 10) -> int:
+    """A chunk's own vector must retrieve the chunk itself — but only *within top-k*, not at rank 1.
+
+    Rank 1 is the wrong bar: with ``chunk_overlap`` neighbouring chunks of the same document are
+    near-duplicates, so their vectors are almost identical and an approximate index returns a tied
+    same-document neighbour first. That tie is benign and, being a tie, flaps between runs. The real
+    defect is an id<->vector desync: the row's stored vector belongs to *another* row, so the chunk
+    is absent from its own top-k entirely (this is the Popol Vuh #76 -> Ramayan #1709 case). We fail
+    only on that, which makes the result deterministic."""
     import random  # local: not needed for the main sweep
 
     picks = ids if sample >= len(ids) else random.sample(ids, sample)
-    bad = []
+    desync: list[tuple[str, str]] = []   # (cid, nearest) — self not in its own top-k
+    ties = 0                             # self present but out-ranked by an overlapping neighbour
     for cid in picks:
         one = coll.get(ids=[cid], include=["embeddings"])
         embs = one.get("embeddings")
         if embs is None or len(embs) == 0:
             continue
-        res = coll.query(query_embeddings=[embs[0]], n_results=1, include=["metadatas"])
-        top = (res.get("ids") or [[None]])[0][0]
-        if top != cid:
-            bad.append((cid, top))
-    if not bad:
-        print(f"  OK   self-query returns self first ({len(picks)} sampled)")
+        res = coll.query(query_embeddings=[embs[0]], n_results=k, include=[])
+        top_ids = (res.get("ids") or [[]])[0]
+        if not top_ids:
+            continue
+        if cid in top_ids:
+            ties += top_ids[0] != cid
+        else:
+            desync.append((cid, top_ids[0]))
+
+    if ties:
+        print(f"  note {ties} near-duplicate tie(s): self in top-{k} but out-ranked by an "
+              f"overlapping chunk — benign (chunk_overlap), not counted")
+    if not desync:
+        print(f"  OK   every sampled chunk retrieves itself within top-{k} ({len(picks)} sampled)")
         return 0
-    print(f"  FAIL self-query returns a different chunk first ({len(picks)} sampled): {len(bad)}")
-    for cid, top in bad[:10]:
-        print(f"        - {cid!r} -> nearest is {top!r} (not itself)")
-    return len(bad)
+    print(f"  FAIL id<->vector desync — chunk's own vector does not retrieve it within top-{k} "
+          f"({len(picks)} sampled): {len(desync)}")
+    for cid, top in desync[:20]:
+        did, top_did = cid.rpartition("::")[0], (top or "").rpartition("::")[0]
+        where = "same document" if top_did == did else f"-> {_label(catalog, top_did)}"
+        print(f"        - {cid!r} nearest {top!r} ({where})")
+    return len(desync)
 
 
 # --------------------------------------------------------------------------- focused mode
@@ -187,15 +206,20 @@ def focus(coll, catalog: dict[str, dict], document_id: str, chunk_index: int) ->
 
     embs = got.get("embeddings")
     if embs is not None and len(embs):
-        res = coll.query(query_embeddings=[embs[0]], n_results=3, include=["metadatas"])
-        print("  self-query (this chunk's own embedding), nearest 3:")
-        for rid, rmeta in zip((res.get("ids") or [[]])[0], (res.get("metadatas") or [[]])[0], strict=False):
+        k = 10
+        res = coll.query(query_embeddings=[embs[0]], n_results=k, include=["metadatas"])
+        res_ids = (res.get("ids") or [[]])[0]
+        print(f"  self-query (this chunk's own embedding), nearest {min(k, len(res_ids))}:")
+        for rid, rmeta in zip(res_ids[:5], (res.get("metadatas") or [[]])[0], strict=False):
             rmeta = rmeta or {}
             print(f"        {rid!r}  -> {_label(catalog, rmeta.get('document_id'))} chunk {rmeta.get('chunk_index')}")
-        top = (res.get("ids") or [[None]])[0][0]
-        if top != cid:
-            print("  ✗ self-query does NOT return this chunk first — stored id/vector are out of sync.")
+        # Pass on top-k membership, not rank 1: an overlapping same-doc neighbour can tie for
+        # first (benign); only a chunk absent from its own top-k is a real id<->vector desync.
+        if cid not in res_ids:
+            print(f"  ✗ self-query does NOT return this chunk within top-{k} — stored id/vector are out of sync.")
             problems += 1
+        elif res_ids[0] != cid:
+            print("  ~ self is in top-k but out-ranked by a near-duplicate (chunk_overlap) — benign tie.")
         else:
             print("  ✓ self-query returns this chunk first.")
     return problems
