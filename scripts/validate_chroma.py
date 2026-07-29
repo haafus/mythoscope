@@ -74,6 +74,12 @@ def _label(catalog: dict[str, dict], document_id: str) -> str:
     return f"{row['title']} ({row['tradition']})" if row else f"<not in corpus: {document_id}>"
 
 
+def _chunk_label(catalog: dict[str, dict], cid: str) -> str:
+    """Decode a chunk id ``<document_id>::<index>`` into ``Title (tradition) #index``."""
+    did, _, idx = (cid or "").rpartition("::")
+    return f"{_label(catalog, did)} #{idx}" if idx else _label(catalog, cid)
+
+
 # --------------------------------------------------------------------------- full sweep
 
 
@@ -169,8 +175,11 @@ def _self_query_check(coll, ids: list[str], sample: int, catalog: dict[str, dict
 
     def _line(cid: str, top: str) -> str:
         did, top_did = cid.rpartition("::")[0], (top or "").rpartition("::")[0]
-        where = "same document" if top_did == did else f"-> {_label(catalog, top_did)}"
-        return f"        - {cid!r} nearest {top!r} ({where})"
+        if top_did == did:
+            nearest = f"#{(top or '').rpartition('::')[2]} (same book)"
+        else:
+            nearest = _chunk_label(catalog, top)
+        return f"        - {_chunk_label(catalog, cid)}  →  {nearest}"
 
     # Two independent failure classes, reported separately.
     #   (1) desync — the chunk's stored vector belongs to another row (real corruption).
