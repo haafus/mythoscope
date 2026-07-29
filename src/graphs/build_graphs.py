@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 # so every book's `.fp` goes stale and a plain `mytho build graphs` regenerates the JSON from
 # the pinned extraction cache — no LLM, no `--force` (which would clear the cache and re-extract).
 # v2: strip trailing periods from attribute values.
-GRAPH_ALGO_VERSION = "2"
+# v3: drop LLM null-placeholder names (N/A, none, unknown, …) so they never become nodes.
+GRAPH_ALGO_VERSION = "3"
 
 
 def _extract_chunks(

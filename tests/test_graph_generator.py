@@ -42,6 +42,20 @@ class TestBeingsGraph:
         assert node["Description"] == "God of thunder"                 # scalar: trailing dot gone
         assert node["Roles"] == "Son of Odin, Protector of mankind"    # list: per-item, no stray dots
 
+    def test_na_placeholder_names_dropped(self, tmp_path):
+        # LLM null-placeholders must not become nodes: neither as an entity name nor as a
+        # relation endpoint (a relation with Object="N/A" otherwise spawns an "N/A" node).
+        beings = [{"Name": "Thor"}, {"Name": "N/A"}, {"Name": "Unknown"}]
+        relations = [
+            {"Subject": "Thor", "Object": "N/A", "Relation": "fights"},
+            {"Subject": "none", "Object": "Thor", "Relation": "knows"},
+        ]
+        generate_beings_graph(beings, relations, tmp_path)
+        data = _load(tmp_path / "beings.json")
+        ids = {n["id"] for n in data["nodes"]}
+        assert ids == {"Thor"}                      # N/A / Unknown / none never materialise
+        assert data["edges"] == []                  # both edges had a null endpoint → dropped
+
     def test_edge_carries_relation(self, tmp_path):
         generate_beings_graph(
             [{"Name": "A"}, {"Name": "B"}],
