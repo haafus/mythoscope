@@ -104,8 +104,12 @@ def _save_corpus_to_chroma(key: str, encoder, rebuild: set[str]):
     # re-embeds all their chunks, and confine the expensive read+chunk work to exactly those docs
     # (every other doc still matches its stored fp — no need to re-read the whole corpus). The
     # orphan GC above already scanned the full id set, so this narrowing never strands orphans.
-    for cid in [c for c in existing_fp if c.rpartition("::")[0] in rebuild]:
-        existing_fp.pop(cid, None)
+    # NB: null the fp but KEEP the chunk-id key — embed_plan derives the tail to delete (`stale`)
+    # by scanning existing_fp for indices >= the new n_chunks, so popping the keys would blind it
+    # and strand the old tail of a now-shorter document (the rows-exceed-n_chunks leftover).
+    for cid in existing_fp:
+        if cid.rpartition("::")[0] in rebuild:
+            existing_fp[cid] = None
     missing_ids = rebuild - current_ids
     if missing_ids:
         logger.warning("embeddings: %d requested document_id(s) not in the corpus — skipping: %s",
