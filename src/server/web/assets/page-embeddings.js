@@ -183,6 +183,12 @@ function warmupModel(model) {
     }).catch(() => {});
 }
 
+// Projection payloads are static per build (a precomputed multi-MB JSON), but the page is an SPA
+// that tears its DOM down on every visit — so the chart must be re-rendered each time, yet the DATA
+// need only be fetched once. Cache it for the session, keyed by model|method (module-level → survives
+// navigations; a hard refresh clears it, which is also when a rebuild would change the payload).
+const projectionCache = new Map();
+
 async function loadVisualization() {
     if (!state.selectedModel) return;
 
@@ -199,7 +205,12 @@ async function loadVisualization() {
     destroyChart(scatterPlot);
 
     try {
-        const data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
+        const cacheKey = `${state.selectedModel}|${method}`;
+        let data = projectionCache.get(cacheKey);
+        if (!data) {
+            data = await api(`/api/similarity/projections/${encodeURIComponent(state.selectedModel)}/${encodeURIComponent(method)}`);
+            projectionCache.set(cacheKey, data);
+        }
 
         await ensureCorpusData();
         const chartType = (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
