@@ -109,7 +109,7 @@ Read                    Connect                          Get updates
 
 - **Deferred:** Learn (tutorials/workshops); Team / Partners (until real).
 - **Stays in the repo, not on the site:** `docs/proposals/*`, `docs/reviews/*`,
-  `known-issues.md`, `docs/ROADMAP.md`, the `papers/1–5` drafts, parsing logs — the internal
+  `known-issues.md`, `docs/roadmap.md`, the `papers/1–5` drafts, parsing logs — the internal
   reasoning layer.
 
 *Execution order: see [`public-docs-plan.md`](public-docs-plan.md) §16.*

@@ -20,7 +20,7 @@ Thompson (TMI), Aarne–Thompson–Uther (ATU) and Berezkin's areal catalogue �
 cross-linked, browsable whole, with an automatic **cross-walk** between them and
 lexical/semantic **parallel-finding** on top. Everything is served through one web UI.
 
-**[Live demo](https://mythoscope.io)** · **[Documentation](docs/how-to.md)** · **[Roadmap](docs/ROADMAP.md)**
+**[Live demo](https://mythoscope.io)** · **[Documentation](docs/how-to.md)** · **[Roadmap](docs/roadmap.md)**
 
 <!-- TODO: add screenshots / a short demo GIF of Atlas, Similarity, and Motifs here. -->
 
@@ -82,7 +82,7 @@ motifs (independent of the corpus) → server
 ## Project status & roadmap
 
 Early research software (v0.1). Experiments, candidate data sources, potential collaborations,
-and submission targets are tracked in **[docs/ROADMAP.md](docs/ROADMAP.md)**.
+and submission targets are tracked in **[docs/roadmap.md](docs/roadmap.md)**.
 
 ## Contributing
 

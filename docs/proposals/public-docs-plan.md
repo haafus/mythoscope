@@ -638,7 +638,7 @@ reader-first README.
 - [ ] **README restructure for the public.** It currently leads with an internal
       roadmap/backlog + "Potential colabs / submission targets". Lead instead with
       what-it-is + a screenshot/demo GIF + quickstart + docs links; move the roadmap/backlog and
-      colab/submission lists into `docs/ROADMAP.md` (internal). (Editorial — the roadmap content
+      colab/submission lists into `docs/roadmap.md` (internal). (Editorial — the roadmap content
       is the maintainer's to move.)
 - [ ] **Full Python test CI** (`python -m pytest`) — needs the install-profile decision (a
       lightweight test extra) since the full deps pull torch/chromadb/umap; the CI stub has a
