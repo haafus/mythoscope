@@ -1,8 +1,8 @@
 # Awesome release steps — creating & shipping `awesome-computational-mythology`
 
 The end-to-end steps to stand up, lint, cite, and promote the standalone
-`awesome-computational-mythology` repository. The list content lives in
-[`../awesome-computational-mythology.md`](../awesome-computational-mythology.md); the repo
+`awesome-computational-mythology` repository. The list content lives in that standalone repo (its
+`README.md` is the list); the repo
 scaffold (README, `contributing.md`, `code-of-conduct.md`, `LICENSE`, `CITATION.cff`,
 `.github/` templates + CI) was staged under `staging/` in this repo and has since been moved
 out into its own standalone repository. This doc is the release runbook.

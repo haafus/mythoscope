@@ -77,7 +77,7 @@ motifs (independent of the corpus) → server
 - **[Papers](docs/papers/)** — the working paper drafts and bibliography.
 - **[Proposals](docs/proposals/)** — design notes, the public-docs plan, and go-to-market.
 - **[Mockups](mockups/)** — standalone feature prototypes over the motif data.
-- **[Awesome Computational Mythology](docs/awesome-computational-mythology.md)** — a curated field resource list.
+- **Awesome Computational Mythology** — a curated field resource list, maintained as its own standalone repository.
 
 ## Project status & roadmap
 

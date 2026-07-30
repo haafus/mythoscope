@@ -60,7 +60,7 @@ Extracted public-site copy from the Figma mockup is preserved verbatim in
 **Open:** none — all forks resolved. Execution sequence in §16.
 
 **Companion:** the acquisition/retention strategy lives in [`go-to-market.md`](go-to-market.md);
-the field resource list in [`../awesome-computational-mythology.md`](../awesome-computational-mythology.md).
+the field resource list is maintained as its own standalone `awesome-computational-mythology` repository.
 
 ## 0. Starting picture
 
@@ -177,7 +177,7 @@ Tier A/C pages. Full URL map, rendering pipeline, and phasing are in §12; navig
 ## 6. What we deliberately do **not** publish (the "not excessive" discipline)
 
 Stays internal, in the repo: all `docs/proposals/*` and `archive/*` (ADRs/roadmaps),
-`docs/reviews/*`, `known-issues.md`, `stage-iv-validation.md`, `embeddings-gpu-howto.md`,
+`docs/reviews/*`, `known-issues.md`, `embeddings-gpu-howto.md`,
 `docs/motifs/discovery-and-parsing.md`, `docs/motifs/crosswalk/berezkin-unresolved-citations.md`,
 `link-accounting.md`/`parallels_report.md`, `release-plan.md`, `monograph-outline.md`, and
 the internal "tails" of the surveys (the "Implications for mythoscope…" sections, mockup

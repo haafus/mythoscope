@@ -91,12 +91,11 @@ not as live work.
   scholarly lists, conferences, awesome-list, Wikipedia), the retention spine (Buttondown +
   living tool + contribution loop), a phased GTM sequence, and metrics/anti-metrics. Companion
   to `public-docs-plan.md`. *Strategy; not started.*
-- [`../awesome-computational-mythology.md`](../awesome-computational-mythology.md) — a curated
-  field resource list (indexes, corpora, datasets, methods, tools, ontologies, papers,
-  scholars, venues, text libraries) assembled from the research/motifs surveys. Both a
-  community asset and an acquisition magnet (GTM §2.6); its own growth channel with a promotion
-  playbook (`go-to-market.md` §8a) and an in-file repo-setup checklist. *Draft — verify links
-  before publishing; to be spun into its own repo.*
+- [`awesome-release-steps.md`](awesome-release-steps.md) — the release runbook for the standalone
+  `awesome-computational-mythology` repository (create, lint, cite, promote). The curated field
+  resource list itself now lives in that repo; it is both a community asset and an acquisition
+  magnet (GTM §2.6), with a promotion playbook (`go-to-market.md` §8a). *Draft — verify links
+  before publishing.*
 
 ## Archived
 

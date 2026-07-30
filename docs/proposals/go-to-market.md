@@ -209,7 +209,7 @@ as a distinct channel, not a docs appendix.
 7. **Announce on awesome aggregators** (r/coolgithubprojects, libhunt, awesome newsletters).
 
 **Build into the list so it can grow and stay alive** (see the repo-setup checklist in
-`../awesome-computational-mythology.md`): Awesome badge + passes `awesome-lint`; a consistent
+[`awesome-release-steps.md`](awesome-release-steps.md)): Awesome badge + passes `awesome-lint`; a consistent
 entry format; `contributing.md` + `code-of-conduct.md` + PR & "Suggest a resource" templates;
 **CC0** content license; CI dead-link check (`lychee`/`awesome_bot`) + `awesome-lint` on PRs;
 a scope statement, a "See also", and a "Recently added" changelog; **`CITATION.cff` + a Zenodo
