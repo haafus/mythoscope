@@ -145,11 +145,16 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
     tag = "-caches" if include_caches else ""
     archive = out_dir / f"mythoscope{tag}-{timestamp}.zip"
 
-    # Gather files first so we can skip writing an empty archive.
+    # Gather files first so we can skip writing an empty archive. Each component is logged as it
+    # is scanned (rglob over a big dir like the Chroma store is the first place an export can look
+    # like it hung), and the write loop logs per component + a percent heartbeat.
     plan: list[tuple[Path, str, int, str]] = []  # (file, arcname, size, component)
     for name, src, arc_root in _components(scope):
         if not src.exists():
             continue
+        logger.info("export: scanning %s…", name)
+        before = len(plan)
+        comp_bytes = 0
         for file in sorted(src.rglob("*")):
             if not file.is_file():
                 continue
@@ -163,15 +168,26 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
             except OSError:
                 continue   # vanished between rglob and stat (e.g. a live Chroma compaction) — skip it,
             plan.append((file, (Path(arc_root) / rel).as_posix(), size, name))   # don't abort the whole bundle
+            comp_bytes += size
+        logger.info("export: %s — %d file(s), %.1f MB", name, len(plan) - before, comp_bytes / 1e6)
 
     if not plan:
         return result
 
+    total_planned = len(plan)
+    step = max(1, total_planned // 10)   # ~10 heartbeats over the write
+    logger.info("export: packing %d file(s), %.1f MB → %s",
+                total_planned, sum(p[2] for p in plan) / 1e6, archive.name)
+
     written = 0
     written_bytes = 0
     comp_written: dict[str, int] = {}   # per-component bytes, counted from what actually made it in
+    current = None
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
-        for file, arcname, size, name in plan:
+        for i, (file, arcname, size, name) in enumerate(plan, 1):
+            if name != current:
+                current = name
+                logger.info("export: writing %s…", name)
             try:
                 zf.write(file, arcname=arcname)
                 written += 1
@@ -179,6 +195,8 @@ def export_outputs(*, scope=None, include_caches: bool = False, out_dir: Path | 
                 comp_written[name] = comp_written.get(name, 0) + size
             except OSError:
                 logger.warning("export: %s vanished mid-bundle — skipped", arcname)  # don't abort
+            if total_planned >= 500 and i % step == 0:
+                logger.info("export: %d/%d files (%d%%)", i, total_planned, i * 100 // total_planned)
 
     result.path = archive
     result.components = comp_written        # per-component totals reconcile with total_bytes (both written-only)
