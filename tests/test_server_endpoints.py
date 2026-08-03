@@ -1,8 +1,32 @@
+import json
+
+import pytest
 from fastapi.testclient import TestClient
 
 from server.run_server import create_app
+from server.services.projections import _build
+from settings import settings
 
 client = TestClient(create_app())
+
+
+@pytest.fixture
+def projection_file(tmp_path, monkeypatch):
+    """A real projection on disk, with the payload cache cleared around it.
+
+    The route serves cached bytes, so these tests point settings at a temp dir
+    and drop the cache rather than mocking the service out — the cache and the
+    gzip passthrough are the parts worth covering.
+    """
+    model_dir = tmp_path / "m"
+    model_dir.mkdir()
+    path = model_dir / "umap.json"
+    path.write_text(json.dumps({"points": [{"x": 1, "y": 2}], "labels": ["a"]}))
+
+    monkeypatch.setattr(settings, "projections_dir", tmp_path)
+    _build.cache_clear()
+    yield path
+    _build.cache_clear()
 
 
 class TestSPA:
@@ -98,19 +122,50 @@ class TestSimilarityEndpoints:
         methods = response.json()
         assert methods and all({"key", "label", "chart_type"} <= set(m) for m in methods)
 
-    def test_projection_response_keeps_chart_specific_fields(self):
+    def test_projection_response_keeps_chart_specific_fields(self, projection_file):
         # The ProjectionData schema is extra="allow"; the chart-specific payload
-        # (here `points`) must survive response_model serialization, not be dropped.
-        from unittest.mock import patch
-
-        payload = {"method": "umap", "points": [{"x": 1, "y": 2}], "labels": ["a"]}
-        with patch("server.api.similarity.get_projection_data", return_value=payload):
-            response = client.get("/api/similarity/projections/m/umap")
+        # (here `points`) must survive, not be dropped. The route now returns
+        # pre-encoded bytes, so this goes through the real cache rather than a
+        # mocked service.
+        response = client.get("/api/similarity/projections/m/umap")
         assert response.status_code == 200
         data = response.json()
         assert data["method"] == "umap"
         assert data["points"] == [{"x": 1, "y": 2}]
         assert data["labels"] == ["a"]
+
+    def test_projection_serves_gzip_without_double_compressing(self, projection_file):
+        # The body is cached pre-compressed; GZipMiddleware must pass it through
+        # rather than gzip it a second time (which httpx would fail to decode).
+        response = client.get(
+            "/api/similarity/projections/m/umap", headers={"accept-encoding": "gzip"}
+        )
+        assert response.status_code == 200
+        assert response.headers["content-encoding"] == "gzip"
+        assert response.json()["points"] == [{"x": 1, "y": 2}]
+
+    def test_projection_revalidates_with_etag(self, projection_file):
+        first = client.get("/api/similarity/projections/m/umap")
+        etag = first.headers["etag"]
+        assert etag
+
+        again = client.get(
+            "/api/similarity/projections/m/umap", headers={"if-none-match": etag}
+        )
+        assert again.status_code == 304
+        assert not again.content
+
+    def test_projection_cache_follows_the_file(self, projection_file):
+        before = client.get("/api/similarity/projections/m/umap").json()
+        assert before["labels"] == ["a"]
+
+        # A `push-outputs` swap replaces the file; the cache key is mtime+size,
+        # so the next request must reflect the new contents.
+        projection_file.write_text(
+            json.dumps({"points": [{"x": 1, "y": 2}], "labels": ["a", "b"]})
+        )
+        after = client.get("/api/similarity/projections/m/umap").json()
+        assert after["labels"] == ["a", "b"]
 
     def test_search_without_embedding_models_returns_503(self):
         # collection exists, but text encoding (torch) is missing -> 503, not 500.

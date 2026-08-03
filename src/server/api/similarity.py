@@ -1,6 +1,6 @@
 import importlib.util
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 
 from embeddings import chroma_manager
 from projections import PROJECTION_METHODS
@@ -13,7 +13,7 @@ from server.schemas import (
     WarmupRequest,
     WarmupResponse,
 )
-from server.services.projections import get_projection_data
+from server.services.projections import load_projection
 from server.services.similarity import similarity_service
 
 router = APIRouter(prefix="/api/similarity", tags=["similarity"])
@@ -104,8 +104,31 @@ def methods() -> list[dict]:
 
 
 @router.get("/projections/{model}/{method}", response_model=ProjectionData)
-def projection(model: str, method: str) -> dict:
-    data = get_projection_data(model, method)
-    if not data:
+def projection(model: str, method: str, request: Request) -> Response:
+    """Serve the cached payload verbatim.
+
+    Returning a Response bypasses response_model serialization on purpose — the
+    body is already encoded, and re-validating an 8MB passthrough schema
+    (ProjectionData is extra="allow" with one fixed field) would only re-do the
+    work the cache exists to avoid. The declared response_model still documents
+    the shape in OpenAPI.
+    """
+    payload = load_projection(model, method)
+    if payload is None:
         raise HTTPException(status_code=404, detail="Projection data not found")
-    return data
+
+    # The payload changes only when the file does, so a revalidating client can
+    # skip the transfer entirely.
+    headers = {"ETag": payload.etag, "Cache-Control": "no-cache", "Vary": "Accept-Encoding"}
+    if request.headers.get("if-none-match") == payload.etag:
+        return Response(status_code=304, headers=headers)
+
+    # GZipMiddleware passes a response through untouched once Content-Encoding
+    # is set, so this pre-compressed body is not compressed a second time.
+    if "gzip" in request.headers.get("accept-encoding", ""):
+        return Response(
+            content=payload.gzipped,
+            media_type="application/json",
+            headers={**headers, "Content-Encoding": "gzip"},
+        )
+    return Response(content=payload.body, media_type="application/json", headers=headers)
