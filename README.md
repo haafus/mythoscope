@@ -72,6 +72,7 @@ motifs (independent of the corpus) → server
 ## Documentation
 
 - **[How to](docs/how-to.md)** — setup, CLI, and the end-to-end pipeline. Start here.
+- **[Deployment](docs/deployment.md)** — how the live site runs, the fabric tasks, and server performance.
 - **[Research context](docs/research/)** — surveys of the field (computational folkloristics, motif induction).
 - **[Motif indexes](docs/motifs/)** — how TMI, ATU and Berezkin are sourced, parsed and cross-linked.
 - **[Papers](docs/papers/)** — the working paper drafts and bibliography.
