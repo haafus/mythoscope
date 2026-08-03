@@ -56,6 +56,11 @@ dev = [
     "ruff>=0.4.0",
     "mypy>=1.10.0",
 ]
+# deploy: local-only tooling for fabfile.py — never installed on the server
+# (the server's `uv sync` passes --no-dev and only the runtime extras).
+deploy = [
+    "fabric>=3.2",
+]
 # --- use-case bundles ---
 # viewer: lightweight read-only server (browse data + point-neighbor search), no torch
 viewer = [

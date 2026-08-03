@@ -1,0 +1,48 @@
+[Unit]
+Description=Mythoscope viewer server
+Documentation=https://mythoscope.io
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=mythoscope
+Group=mythoscope
+
+# Load-bearing: settings.py resolves config/, outputs/* and src/server/web
+# relative to the working directory, not to the package. Starting the server
+# anywhere else yields a 404 index and empty API responses.
+WorkingDirectory=/srv/mythoscope/app
+
+# Host/port and any future secrets. Not in the repo, not touched by rsync.
+EnvironmentFile=/etc/mythoscope/env
+
+# The venv lives outside the rsync target so `rsync --delete` can never eat it.
+# uv is a deploy-time tool only; nothing invokes it at runtime.
+ExecStart=/srv/mythoscope/venv/bin/mytho server
+
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+
+# Anything the service creates under outputs/ — log files, SQLite journals, a
+# directory Chroma decides to make — must stay group-writable, or the deploy
+# user cannot manage (or delete) its own store afterwards. systemd's default
+# 0022 would produce group-read-only files and 2755 directories.
+UMask=0002
+
+# --- hardening ---
+# The process only ever reads outputs/ and writes outputs/logs.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/mythoscope
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

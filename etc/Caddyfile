@@ -1,0 +1,28 @@
+# Installed to /etc/caddy/Caddyfile by `fab bootstrap`.
+# $${DOMAIN} and $${PORT} are substituted at upload time from MYTHO_DEPLOY_DOMAIN
+# and APP_PORT (see fabfile.py). The port must match MYTHO_SERVER__PORT in
+# /etc/mythoscope/env; `fab smoke` refuses to pass if they diverge.
+#
+# Caddy provisions and renews the TLS certificate itself; there is nothing to
+# configure for HTTPS beyond a domain whose A record points here.
+
+${DOMAIN} {
+	encode zstd gzip
+
+	# The app binds 127.0.0.1 (settings.ServerSettings.host), so this proxy is
+	# the only route in — uvicorn is not reachable from outside the box.
+	reverse_proxy 127.0.0.1:${PORT}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/mythoscope.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}
