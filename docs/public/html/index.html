@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout mockups — Mythoscope</title>
+<link rel="stylesheet" href="mockups.css">
+<style>
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px}
+  h1{font-family:var(--serif);font-size:32px}
+  .card{display:block;border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:14px 0;background:#fff;color:var(--ink)}
+  .card:hover{text-decoration:none;box-shadow:0 6px 20px rgba(20,30,50,.08)}
+  .card b{font-size:17px}.card p{margin:.4em 0 0;color:var(--muted);font-size:14px}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--blue);border-radius:20px;padding:3px 10px;margin-left:8px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mythoscope — layout mockups</h1>
+  <p style="color:var(--muted)">Standalone HTML (no build). Real generated copy inside. Two modes — <b>app</b> and <b>document</b> — with both footers and every menu style.</p>
+
+  <a class="card" href="app.html"><b>A · App layout</b><span class="tag">flat tabs · thin footer</span>
+    <p>The tool: flat, always-visible view tabs (Sources · Similarity · Ages · Realms · Beings · Atlas · Motifs), viewport-locked shell with inner-scrolling rails, and the <b>thin app footer</b>. Shown on the Similarity view.</p></a>
+
+  <a class="card" href="app-structure.html"><b>B · App — “Structure” grouping</b><span class="tag">merged tab</span>
+    <p>Ages / Realms / Beings collapsed into a single <b>Structure</b> tab; the choice among the three moves into the section's left rail (segmented control). Fewer top-level tabs, same reach.</p></a>
+
+  <a class="card" href="document-dropdown.html"><b>C · Document — Research ▾ nav</b><span class="tag">dropdown · full footer</span>
+    <p>Docs as normal long-scroll pages: shared header with a <b>Research ▾</b> dropdown TOC, breadcrumbs, a reading column with a right-rail on-page TOC, and the <b>full footer</b>. Content: the 14 regions.</p></a>
+
+  <a class="card" href="document-sidebar.html"><b>D · Document — side-column nav</b><span class="tag">sidebar · full footer</span>
+    <p>Same document page, but the A/B/C tree is a <b>persistent left sidebar</b> instead of a dropdown. Constant “you are here”, at the cost of a narrower reading column.</p></a>
+
+  <p style="color:var(--muted-soft);font-size:12.5px;margin-top:24px">Design tokens (warm #faf9f5, Georgia headings, uppercase blue-grey nav) taken from the live app. Placeholder scatter/graph are static; real views render live.</p>
+</div>
+</body>
+</html>

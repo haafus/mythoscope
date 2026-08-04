@@ -1,0 +1,157 @@
+/* Mythoscope — layout mockups. Shared design system, extracted from the live app tokens
+   (bg #faf9f5, Georgia headings, uppercase blue-grey nav, blue-grey accents). Standalone:
+   these pages render straight from disk, no build. */
+
+:root{
+  --bg:#faf9f5; --panel:#ffffff; --ink:#212529; --muted:#6c757d; --muted-soft:#9299a1;
+  --border:#dee2e6; --border-soft:#e8e6df; --accent:#2f6fed; --accent-strong:#1b4fd1;
+  --blue:#4f7096; --blue-soft:#eef3f4; --blue-line:#dbe4ec;
+  --nav-ink:#7c828b; --serif:Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --content-max:1280px; --read:760px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85em}
+
+/* ---------- header (shared shell) ---------- */
+.site-header{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+  gap:16px 28px;padding:10px 22px;background:rgba(250,249,245,.92);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:19px;color:var(--ink)}
+.brand .glyph{display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;
+  align-items:center;justify-content:center;font-size:16px}
+.nav{display:flex;align-items:center;gap:4px 6px;flex-wrap:wrap}
+.nav a,.nav .navitem{color:var(--nav-ink);font-size:12.5px;font-weight:400;letter-spacing:.11em;
+  text-transform:uppercase;padding:6px 9px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.nav a:hover,.nav .navitem:hover{color:var(--ink);background:var(--blue-soft);text-decoration:none}
+.nav a.active{color:var(--ink);background:#e2edf0}
+.nav .info{font-family:var(--serif);text-transform:none;letter-spacing:0;border:1px solid var(--border);
+  width:28px;height:26px;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.nav .star{color:#b8860b}
+.sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+
+/* dropdown (Research v) */
+.has-menu{position:relative}
+.has-menu>.navitem::after{content:" ▾";letter-spacing:0}
+.menu{position:absolute;right:0;top:calc(100% + 6px);min-width:340px;background:var(--panel);
+  border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 34px rgba(20,30,50,.14);
+  padding:10px;display:none}
+.has-menu:hover .menu,.has-menu:focus-within .menu{display:block}
+.menu h4{margin:8px 8px 4px;font:600 10.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft)}
+.menu a{display:block;padding:6px 8px;border-radius:6px;color:var(--ink);font-size:13.5px;letter-spacing:0;text-transform:none}
+.menu a:hover{background:var(--blue-soft);text-decoration:none}
+.menu .flag{color:var(--muted-soft);font-size:11px;margin-left:6px}
+
+/* ---------- APP SHELL (viewport-locked tool, inner scroll) ---------- */
+.app{height:calc(100vh - 55px);display:grid;grid-template-columns:250px 1fr 320px;gap:0;overflow:hidden}
+.app.two{grid-template-columns:250px 1fr}
+.rail{border-right:1px solid var(--border);background:#fcfbf8;overflow:auto;padding:14px 12px}
+.rail.right{border-right:none;border-left:1px solid var(--border);background:var(--panel)}
+.main{overflow:auto;padding:18px 20px;background:var(--bg);position:relative}
+.rail h3{font:600 10.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);margin:6px 6px 10px}
+.tree a,.tree .leaf{display:block;padding:5px 8px;border-radius:6px;color:#3f4650;font-size:13.5px}
+.tree .grp{font-weight:600;color:var(--ink);margin-top:8px}
+.tree .leaf{padding-left:20px;color:#4a525c}
+.tree a:hover{background:var(--blue-soft);text-decoration:none}
+.tree a.active{background:#e2edf0;color:#111}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+
+/* segmented control for the Structure sub-choice */
+.seg{display:flex;gap:4px;background:#eceae3;border-radius:9px;padding:4px;margin:2px 4px 12px}
+.seg button{flex:1;border:0;background:transparent;font:600 12.5px/1 var(--sans);color:#5a616b;
+  padding:7px 6px;border-radius:6px;cursor:pointer}
+.seg button.on{background:#fff;color:#111;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+/* faux plot / graph canvas */
+.canvas{height:100%;min-height:420px;border:1px solid var(--border);border-radius:12px;background:
+  radial-gradient(circle at 30% 40%,#fff, #f6f4ee);position:relative;overflow:hidden}
+.pt{position:absolute;width:11px;height:11px;border-radius:50%;opacity:.85}
+.node{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:10px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.edge{position:absolute;height:2px;background:#c7ccd3;transform-origin:left center}
+.infocard{border:1px solid var(--border);border-radius:10px;background:#fff;padding:12px 13px;margin-bottom:12px}
+.infocard .k{font:600 10px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-soft)}
+.frag{font-size:13.5px;color:#333;line-height:1.55;margin-top:6px}
+
+/* ---------- DOCUMENT LAYOUT (normal page scroll) ---------- */
+.doc-wrap{max-width:var(--content-max);margin:0 auto;padding:0 22px}
+.doc-grid{display:grid;grid-template-columns:1fr;gap:34px;padding:26px 0 40px}
+.doc-grid.with-sidebar{grid-template-columns:250px minmax(0,1fr)}
+.doc-grid.with-toc{grid-template-columns:minmax(0,1fr) 220px}
+.doc-grid.with-sidebar.with-toc{grid-template-columns:250px minmax(0,1fr) 200px}
+
+.crumbs{color:var(--muted);font-size:12.5px;letter-spacing:.02em;margin:16px 0 -8px;padding:0 22px;max-width:var(--content-max)}
+.crumbs a{color:var(--muted)}
+.crumbs .sep{display:inline;width:auto;height:auto;background:none;margin:0 6px;color:var(--muted-soft)}
+
+/* doc sidebar (the alternative nav) */
+.docnav{position:sticky;top:70px;align-self:start;font-size:13.5px;border-right:1px solid var(--border-soft);padding-right:14px}
+.docnav h4{font:600 10.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);margin:16px 0 6px}
+.docnav h4:first-child{margin-top:0}
+.docnav a{display:block;padding:4px 8px;border-radius:6px;color:#48505a}
+.docnav a:hover{background:var(--blue-soft);text-decoration:none}
+.docnav a.active{background:#e2edf0;color:#111;font-weight:600}
+
+/* right-rail TOC */
+.toc{position:sticky;top:70px;align-self:start;font-size:12.5px;color:var(--muted)}
+.toc h4{font:600 10px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);margin:0 0 8px}
+.toc a{display:block;padding:3px 0;color:#5a616b}
+.toc a.sub{padding-left:12px;color:#8a919b}
+
+/* article prose */
+.article{min-width:0}
+.prose{max-width:var(--read)}
+.prose h1{font-family:var(--serif);font-size:33px;line-height:1.15;margin:.2em 0 .5em}
+.prose h2{font-family:var(--serif);font-size:22px;margin:1.6em 0 .5em;padding-top:.2em}
+.prose h3{font-size:15px;letter-spacing:.02em;margin:1.4em 0 .4em}
+.prose p,.prose li{color:#2b3138}
+.prose .lead{font-size:17px;color:#3a414a;line-height:1.6}
+.prose ul,.prose ol{padding-left:22px}
+.prose li{margin:.3em 0}
+.tablewrap{overflow-x:auto;margin:1.2em 0;border:1px solid var(--border);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
+th,td{border-bottom:1px solid var(--border);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#f3f1ea;font-weight:600;color:#2c3440;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:none}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:1.2em 0}
+.tile{border:1px solid var(--border);border-radius:12px;background:#fff;padding:14px}
+.tile .n{font-family:var(--serif);font-size:26px;color:var(--blue)}
+.tile .l{font-size:12px;color:var(--muted);margin-top:2px}
+.pull{border-left:3px solid var(--blue);padding:6px 0 6px 16px;margin:1.3em 0;font-family:var(--serif);
+  font-size:19px;color:#3a414a;font-style:italic}
+.cta{display:inline-block;margin-top:8px;background:var(--blue);color:#fff;padding:10px 16px;border-radius:9px;
+  font-size:13.5px;font-weight:600}
+.cta:hover{background:#3f5c7d;text-decoration:none}
+
+/* ---------- FOOTERS ---------- */
+/* thin — app */
+.footer-thin{border-top:1px solid var(--border);background:rgba(250,249,245,.9);font-size:12px;color:var(--muted);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 22px}
+.footer-thin a{color:var(--muted);letter-spacing:.04em}
+.footer-thin .r{display:flex;gap:16px}
+/* full — documents */
+.footer-full{border-top:1px solid var(--border);background:#f4f2ec;margin-top:40px}
+.footer-full .cols{max-width:var(--content-max);margin:0 auto;padding:34px 22px 10px;display:grid;
+  grid-template-columns:repeat(3,1fr);gap:26px}
+.footer-full h5{font:600 10.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);margin:0 0 12px}
+.footer-full a{display:block;color:#4a525c;font-size:13.5px;padding:3px 0}
+.footer-full .sub{display:flex;gap:8px;margin-top:6px}
+.footer-full .sub input{flex:1;border:1px solid var(--border);border-radius:7px;padding:8px 10px;font:inherit;font-size:13px;background:#fff}
+.footer-full .sub button{border:0;background:var(--blue);color:#fff;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer}
+.footer-full .base{max-width:var(--content-max);margin:0 auto;padding:12px 22px 26px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px}
+.footer-full .base .r{display:flex;gap:16px}
+
+/* mockup caption banner */
+.banner{background:#20242c;color:#e9edf2;font-size:12.5px;padding:8px 22px;display:flex;justify-content:space-between;gap:12px}
+.banner b{color:#fff}
+.banner a{color:#9dc0ff}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}.rail,.rail.right{display:none}
+  .doc-grid.with-sidebar,.doc-grid.with-toc,.doc-grid.with-sidebar.with-toc{grid-template-columns:1fr}
+  .docnav,.toc{position:static}.footer-full .cols{grid-template-columns:1fr}
+}
