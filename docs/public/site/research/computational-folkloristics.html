@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Computational folkloristics: a field survey · Mythoscope</title>
+<meta name="description" content="A specialist survey of computational folkloristics and computational mythology — the two eras of the field, its core methods, and the landmark work behind each.">
+<meta property="og:title" content="Computational folkloristics: a field survey">
+<meta property="og:description" content="A specialist survey of computational folkloristics and computational mythology — the two eras of the field, its core methods, and the landmark work behind each.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://mythoscope.io/research/computational-folkloristics">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand"><span class="glyph">M</span> <a href="../index.html" style="color:inherit">Mythoscope</a></div>
+  <nav class="nav">
+    <a href="../../html/app.html">Explore</a>
+    <div class="has-menu"><span class="navitem">Research</span><div class="menu"><h4>A · The argument</h4>
+<a class="menu-link" href="../index.html">Mythoscope — a new lens on the world's myths</a>
+<a class="menu-link" href="../what-we-found.html">What we found</a>
+<a class="menu-link" href="../cases/swan-maiden.html">The Swan-Maiden: A Motif Too Broad to Date</a>
+<a class="menu-link" href="../cases/sun-and-moon.html">Sun and Moon as Kin: The Deep Substrate, and the Wall</a>
+<a class="menu-link" href="../cases/fished-up-earth.html">The Fished-Up Earth: The Motif the Machine Cracks</a>
+<a class="menu-link" href="../how-it-works.html">How Mythoscope works</a>
+<a class="menu-link" href="../about.html">About Mythoscope — Collaborative Semantic Archaeology</a>
+<h4>B · Reference & surveys</h4>
+<a class="menu-link" href="../crosswalk.html">The Motif Crosswalk: TMI ↔ ATU ↔ Berezkin</a>
+<a class="menu-link" href="../indexes/tmi.html">The Thompson Motif-Index (TMI)</a>
+<a class="menu-link" href="../indexes/atu.html">The Aarne–Thompson–Uther Index (ATU)</a>
+<a class="menu-link" href="../indexes/berezkin.html">The Berezkin Areal Motif Catalogue</a>
+<a class="menu-link active" href="../research/computational-folkloristics.html">Computational folkloristics: a field survey</a>
+<a class="menu-link" href="../research/landscape.html">The computational folkloristics landscape: people, labs, journals, conferences</a>
+<a class="menu-link" href="../research/corpus-sourcing.html">Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence</a>
+<a class="menu-link" href="../research/encyclopedias.html">How the great encyclopedias carve the world: a survey of world-mythology reference works</a>
+<a class="menu-link" href="../regions.html">The 14 regions</a>
+<h4>C · Participate</h4>
+<a class="menu-link" href="../contribute.html">Contribute to Mythoscope</a>
+<a class="menu-link" href="../resources.html">Resources</a>
+<a class="menu-link" href="../publications.html">Publications & how to cite</a>
+<a class="menu-link" href="../updates.html">Updates & Notes</a>
+<a class="menu-link" href="../credit.html">Credit & authorship</a></div></div>
+    <a href="../about.html">About</a>
+    <span class="sep"></span><a class="star" href="https://github.com/haafus/mythoscope">★ GitHub</a>
+  </nav>
+</header>
+<div class="crumbs"><a href="../index.html">Research</a><span class="sep">›</span><span>Reference & surveys</span><span class="sep">›</span>Computational folkloristics: a field survey</div>
+<div class="doc-wrap"><div class="doc-grid with-toc">
+  <article class="article"><div class="prose">
+<h1 id="computational-folkloristics-the-two-eras-of-a-quiet-field">Computational folkloristics: the two eras of a quiet field</h1>
+<p>Computational folkloristics is the quantitative and computational study of folk
+narrative — tale types, motifs, archives, variation, and the geography of their spread.
+The term was popularised by Timothy Tangherlini, and the programme was set out most
+sharply in Abello, Broadwell &amp; Tangherlini's 2012 <em>Communications of the ACM</em> paper of the
+same name: folklore treated as data, at the scale of whole archives rather than single
+texts. Alongside it runs a second, partly overlapping tradition — <strong>computational or
+statistical mythology</strong> — which treats myths as evolving lineages of "mythemes" and
+reconstructs their ancestry and diffusion with tools borrowed from evolutionary biology.</p>
+<p>This page surveys both. It is organised around the field's own periodisation into two eras,
+then walks through the methods that define it and the landmark work behind each. A
+companion page maps <a href="landscape.html">the people, labs, journals, and conferences</a> that carry
+the work; two further pages cover <a href="corpus-sourcing.html">where the corpora come from</a> and
+<a href="encyclopedias.html">how the great encyclopedias carve the world</a>. For how these ideas are
+assembled into a working tool, see <a href="../how-it-works.html">How it works</a>.</p>
+<h2 id="two-eras">Two eras</h2>
+<p>The field splits cleanly into two periods.</p>
+<p>The <strong>classical era (roughly 2008–2018)</strong> was built on digitising and formalising the two
+great mid-twentieth-century reference works — the Aarne–Thompson–Uther tale-type index
+(ATU) and the Thompson <em>Motif-Index of Folk-Literature</em> (TMI) — and on a first generation
+of quantitative methods layered over them: topic-model motif detection (Karsdorp, Meder),
+geo-semantic exploration of archives (Tangherlini's WitchHunter), phylogenetics of tales
+and myths (Tehrani, d'Huy, Berezkin), and character-network analysis (Mac Carron &amp; Kenna).</p>
+<p>The <strong>modern era (2018–2026)</strong> is dominated by transformer embeddings, BERTopic, and
+LLM-based motif and type annotation. The methods changed; the substrate did not. Almost all
+of the modern work still scaffolds itself on ATU and TMI, and the honest state of the art is
+that automatic motif detection remains an open problem — a point returned to at the close.</p>
+<h2 id="the-indices-are-the-substrate">The indices are the substrate</h2>
+<p>Nearly all of computational folkloristics rests on two reference works, plus a third
+oriented toward mythology.</p>
+<p>The <strong>ATU tale-type index</strong> — Hans-Jörg Uther, <em>The Types of International Folktales</em>
+(2004, FF Communications 284–286, three volumes) — is the third iteration and fifth
+revision of the type index first published by Antti Aarne in 1910. Uther added more than two
+hundred and fifty new types over the 1961 Aarne–Thompson index; da Silva &amp; Tehrani describe
+it as indexing over 2,000 fairy tales distributed among more than 200 societies.</p>
+<p>Stith Thompson's <strong>Motif-Index of Folk-Literature</strong> (1955–58) codes tens of thousands of
+narrative elements alphanumerically across classes A–Z. Its unit — the <em>motif</em> — is
+smaller and more portable than the tale type, and correspondingly harder to pin down.</p>
+<p><strong>Yuri Berezkin's <em>Analytical Catalogue of World Mythology and Folklore</em></strong> is a third,
+mythology-oriented scheme with a different (episode/image) definition of "motif" and a
+strong areal, distributional emphasis.</p>
+<p>These indices give a stable, expert-curated label space and a dense web of cross-cultural
+cross-references. They are also widely criticised — as Eurocentric (Dundes 1997; Jason
+2006), coarse, and <em>formally fluid</em>: motifs overlap, resist crisp boundaries, and, in
+Dundes's sharp phrasing, more than half of tale types are effectively a single motif.
+Berezkin's incompatible definition of "motif" makes cross-scheme alignment non-trivial. The
+carving problem is treated at length in <a href="encyclopedias.html">how the encyclopedias carve the world</a>.</p>
+<h3 id="ontologies-over-the-indices">Ontologies over the indices</h3>
+<p>A sustained line of work has tried to turn these flat indices into interoperable knowledge.</p>
+<ul>
+<li><strong>MOMFER</strong> (Karsdorp, van der Meulen, Meder &amp; van den Bosch, <em>Folklore</em> 126:1, 2015) is a
+  search engine over the TMI that adds <strong>WordNet-based semantic query expansion</strong> — a query
+  like <code>wn:monster</code> retrieves motifs for dragons, serpents, griffins, werewolves,
+  chimeras, and unicorns scattered across TMI subheadings, and extracts each motif's
+  attested geographical locations. It is the clearest early precedent for semantic, rather
+  than string-based, search over a motif index.</li>
+<li><strong>Thierry Declerck's ontologies</strong> (DFKI/Saarland) convert TMI and ATU into OWL/RDF(S)/SKOS
+  with multilingual labels via the <em>lemon</em> model, plus a Proppian-function ontology
+  (Declerck &amp; Lendvai 2011; Koleva, Declerck &amp; Krieger 2012; Declerck et al. 2017). The ATU
+  ontology comprised 2,802 classes across seven main subclasses matching Uther's hierarchy.
+  A caveat for reusers: despite the extensive publication record, no publicly downloadable
+  RDF/OWL file or SPARQL endpoint for these ontologies could be verified.</li>
+<li><strong>The Ontology of Greek Mythology (OGM)</strong> (Pastor-Sánchez et al., <em>Semantic Web Journal</em>,
+  2021) was built from 5,377 Wikidata items using 34 selected properties, and explicitly
+  represents <em>contradictions</em> between statements alongside a SPARQL retrieval tool. The
+  <strong>Digital LIMC</strong> RDF knowledge graph is a complementary resource (~3,000 figures on
+  ~56,000 objects, 40,500 images, 21.6M triples), with FactGrid/Roscher's Lexikon LOD
+  project an emerging CC-0 mythology hub.</li>
+</ul>
+<h2 id="core-methods">Core methods</h2>
+<h3 id="supervised-classification-of-types-and-motifs">Supervised classification of types and motifs</h3>
+<p>The first practical task is assigning tales to ATU types. Meder, Karsdorp, Nguyen, Theune,
+Trieschnigg &amp; Muiser (2016) applied learning-to-rank to story-type classification in the
+Dutch Folktale Database. Eklund, Hagedorn &amp; Darányi (2023, <em>Fabula</em> 64:1–2) trained an SVM
+with TF-IDF over the ten best-populated classes of the Annotated Folktales collection
+(1,518 texts, 182 ATU types), reporting F-scores around 0.8–1.0 (no baseline given). Meaney,
+Alex &amp; Lamb (2024, NLP4DH) tackled ATU classification and narrator-gender prediction for
+Irish and Scottish Gaelic, pitting mBERT/XLM-R/gaBERT against an SVM baseline that remained
+competitive.</p>
+<p>The recurring finding is consequential: on small, stylistically homogeneous folktale
+corpora, non-contextual baselines (SVM + TF-IDF) repeatedly rival or beat neural and LLM
+approaches. Lô, de Boer &amp; van Aart (2020), working on a corpus of 742 West African and
+Western European tales, likewise found a bag-of-words MLP beating an LSTM. Small-data
+caution is a structural feature of the field, not an incidental result.</p>
+<h3 id="topic-modelling-lda-to-bertopic">Topic modelling: LDA to BERTopic</h3>
+<p>Karsdorp &amp; van den Bosch (2013, "Identifying Motifs in Folktales Using Topic Models") set
+the pattern of treating motifs as latent topics. That approach has now been largely
+superseded by <strong>BERTopic</strong> — embeddings, UMAP dimensionality reduction, HDBSCAN clustering,
+and class-based TF-IDF for cluster labelling. Tangherlini &amp; Chen (2024, "Travels with
+BERT," <em>Orbis Litterarum</em> 79:519–562) applied it with a fine-tuned nineteenth-century
+Danish embedding model, plus KeyBERT labelling and outlier reduction, to map intertextuality
+across Hans Christian Andersen's fairy tales and travel writing — a strong template for
+interpretable motif-cluster pipelines.</p>
+<h3 id="embedding-and-similarity-retrieval">Embedding and similarity retrieval</h3>
+<p>The modern era's signature is dense retrieval. Arčon, Robnik-Šikonja &amp; Tratnik (2025, "Large
+language models for folktale type automation based on motifs: Cinderella case study")
+combined GPT-4.5 zero-shot motif-presence judgements over ATU 510A with <strong>LaBSE embeddings +
+HDBSCAN</strong> for cross-lingual (English + Slovene) semantic similarity across Cinderella
+variants. Karsdorp &amp; Fonteyn (2019, "Cultural entrenchment of folktales is encoded in
+language," <em>Palgrave Communications</em>) and Karsdorp et al. (2015, "Animacy Detection in
+Stories") showed that even word2vec/skip-gram embeddings achieve near-optimal animacy
+detection and produce interpretable semantic maps of characters, including a distinct
+"Supernatural" cluster.</p>
+<p>The ceiling is real, however. Yarlott et al. (2021, "Finding Trolls Under Bridges") built a
+dedicated motif <em>detector</em> whose best off-the-shelf feature reached only F1 ≈ 0.35 on
+motifs and a macro-average F1 ≈ 0.21 across four categories — a sobering measure of how hard
+open motif detection remains. Hatzel &amp; Biemann (2024, "Story Embeddings") argue that genuine
+narrative similarity requires modelling structure beyond keyword or sentence overlap,
+setting an upper bound on what similarity search alone can recover.</p>
+<h3 id="phylogenetic-and-evolutionary-methods">Phylogenetic and evolutionary methods</h3>
+<p>The statistical-mythology strand codes presence/absence of tale types or motifs across
+cultures and runs Bayesian or parsimony phylogenetics over the resulting matrices.</p>
+<ul>
+<li><strong>da Silva &amp; Tehrani (2016)</strong>, "Comparative phylogenetic analyses uncover the ancient
+  roots of Indo-European folktales" (<em>Royal Society Open Science</em> 3:150645), coded the
+  presence/absence of 275 Magic Tale types across 50 Indo-European-speaking populations.
+  After two horizontal-transmission tests, 199 tales were discarded, 100 patterned by
+  linguistic relatedness, and only ATU 330, "The Smith and the Devil," reconstructed
+  robustly to Proto-Indo-European.</li>
+<li><strong>d'Huy</strong> produced phylogenetic reconstructions of the Cosmic Hunt and of Polyphemus (ATU
+  1137), using BEAST, MrBayes, and NeighborNet.</li>
+<li><strong>Thuillard, d'Huy, Le Quellec &amp; Berezkin (2018)</strong>, "A Large-Scale Study of World Myths"
+  (<em>Trames</em> 22(4)), ran phylogenetic networks over Berezkin's roughly 2,264 motifs across
+  934 peoples.</li>
+<li><strong>Sakamoto Martini, Kendal &amp; Tehrani (2023)</strong> carried out a phylomemetic Cinderella study
+  (ATU 510/511) over 266 versions, with Bayesian inference and NeighborNet.</li>
+<li><strong>Kestemont, Karsdorp et al. (2022)</strong>, "Forgotten books" (<em>Science</em> 375(6582):765–769),
+  imported unseen-species (ecology) estimators to model lost medieval narrative diversity —
+  a striking cross-disciplinary transfer.</li>
+</ul>
+<p>The binding constraint across this strand is that the methods require pre-coded
+presence/absence matrices; the coding itself is the bottleneck, and results can be sensitive
+to it (as the survival of only ATU 330 through da Silva &amp; Tehrani's controls illustrates).</p>
+<h3 id="network-analysis">Network analysis</h3>
+<p>Network methods operate at two scales. <em>Within</em> a narrative, character-interaction networks
+are compared against real and fictional social networks: Mac Carron &amp; Kenna (2012,
+"Universal Properties of Mythological Networks," <em>EPL</em> 99:28002) analysed the Iliad,
+Beowulf, and Táin Bó Cúailnge against controls including <em>Les Misérables</em>, <em>Richard III</em>,
+and <em>The Fellowship of the Ring</em>. The Iliad's network was most similar to a real social
+network; Beowulf sat between reality and fiction (small-world but disassortative, becoming
+assortative once the protagonist is removed); and the Táin was "most fictitious," its
+artificiality traceable to six highly-connected characters hypothesised to be amalgams.
+Follow-ons include the Odyssey network (<em>PLoS ONE</em> 2018), the Kyiv <em>bylyny</em> cycle, and
+Icelandic sagas.</p>
+<p><em>Across</em> a corpus, motif and tale-type networks map the relations among stories themselves —
+Abello, Broadwell &amp; Tangherlini's "folklore hairball" work over the 30,000-plus story Evald
+Tang Kristensen Danish corpus ("Computational Folkloristics," 2012; "Disentangling the
+Folklore Hairball," 2023).</p>
+<h3 id="narrative-structure-and-propp-functions">Narrative structure and Propp functions</h3>
+<p>Extracting Propp's morphological functions is the hardest structural task in the field. Mark
+Finlayson's Analogical Story Merging (2009/2012 MIT thesis; <em>Journal of American Folklore</em>
+2016) used Bayesian model-merging over fifteen deeply annotated Proppian tales to recover
+functions including villainy/lack, struggle/victory, and reward with high accuracy, backed
+by the <strong>ProppLearner</strong> corpus and the Story Workbench. Pannach's ProppOntology (2019)
+extended an ontology-driven Proppian system to southern African tales. Notably, a 2024
+attempt to tag Propp functions with LLMs ("Tagging Narrative with Propp's Character
+Functions Using LLMs," CEUR Vol-3671) reported explicitly <em>negative</em> results — LLMs do not
+yet reliably label Propp functions zero- or few-shot.</p>
+<h3 id="llm-annotation-frontiers">LLM annotation frontiers</h3>
+<p>LLM zero-shot motif-presence detection works for well-defined motif checklists against a
+<em>known</em> type (Arčon et al. 2025) but has not been validated for open-vocabulary motif
+discovery. A cross-cutting caution attends the whole strand: narrative "flattening" — the
+post-training compression of thematic, affective, and stylistic variation — is a documented
+risk when aligned LLM embeddings are used on fiction.</p>
+<h2 id="open-datasets-and-resources">Open datasets and resources</h2>
+<p>The field's reusable corpora are few and their licences matter.</p>
+<ul>
+<li><strong>FairytaleQA</strong> — 278 Project Gutenberg stories, 10,580 QA pairs across seven
+  narrative-element types (character, setting, action, feeling, causal relationship, outcome
+  resolution, prediction). Apache-2.0 (per the Hugging Face tag; verify the GitHub LICENSE
+  for raw CSVs). Xu et al., ACL 2022.</li>
+<li><strong>Annotated Folktales (aft) / the "trilogy" corpus</strong> — 1,518 tales, 182 ATU types, seeded
+  from Ashliman's <em>Folktexts</em>; includes <code>tmi</code>, <code>atu</code>, and <code>aft</code> dataframes plus an
+  ontologies folder. CC-BY-SA 4.0. Hagedorn &amp; Darányi, <em>JOHD</em> 8:16, 2022.</li>
+<li><strong>Dutch Folktale Database (Verhalenbank)</strong> — ~48,000+ narratives (Meertens Instituut);
+  research access.</li>
+<li><strong>MOMFER</strong> — semantic search over the TMI with WordNet expansion.</li>
+<li><strong>ISEBEL</strong> — over 70,000 belief legends (Dutch, Frisian, Danish, German, plus ~6,000
+  Icelandic) with English-language unified search and geovisualisation over a property-graph
+  backend, aggregating the Dutch Folktale DB, the Evald Tang Kristensen collection, and
+  WossiDia.</li>
+<li><strong>Multilingual Folk Tale Database (MFTD)</strong> — ATU-tagged multilingual tales as XML, with no
+  published schema and no official API or bulk download.</li>
+<li><strong>Berezkin's Analytical Catalogue</strong> — Russian full text (roughly 2,564 motifs / 958
+  societies in recent snapshots), with a machine-readable query engine
+  (<code>macleginn/mythology-queries</code>). Counts are version-dependent.</li>
+<li><strong>da Silva &amp; Tehrani (2016) matrix</strong> — the supplementary Excel presence/absence table (275
+  tale types × 50 populations) released with the RSOS paper.</li>
+<li><strong>Ashliman Folktexts</strong> — a curated, ATU-annotated English tale collection (source for aft).</li>
+</ul>
+<p>Licensing is uneven and consequential: FairytaleQA (Apache-2.0) and aft (CC-BY-SA) are safe
+to build on; some aggregators explicitly forbid scraping and AI training; MFTD carries no
+licence or API. Where counts vary across sources — Berezkin motif totals, corpus sizes —
+figures are version-dependent snapshots and should be re-verified against the live source.</p>
+<h2 id="the-honest-state-of-the-art">The honest state of the art</h2>
+<p>Three caveats define the field's real frontier, and they should be read together.</p>
+<p><strong>Motif detection is unsolved.</strong> Motifs are formally fluid; there is no large gold-standard
+motif-annotated corpus; the reported successes are on narrow, single-type checklists; and
+the best dedicated detector (Yarlott et al.) reached only macro-F1 ≈ 0.21. Embeddings are
+best understood as a <em>retrieval and candidate-generation</em> layer over a curated index, not a
+reliable end-to-end motif classifier.</p>
+<p><strong>Small data dominates.</strong> Folktale corpora are small and stylistically homogeneous.
+Overfitting and baseline-beating are recurring problems, and a simple TF-IDF/SVM baseline
+is the appropriate control for any neural or LLM claim.</p>
+<p><strong>The index is a lens, not ground truth.</strong> ATU and TMI are Eurocentric and coarse; Berezkin
+uses an incompatible motif definition; cross-scheme alignment is genuinely hard. Several
+high-profile results (Eklund's baseline-free F-scores; phylogenetic reconstructions
+sensitive to coding choices) warrant caution, and a number of tools and datasets — Declerck's
+ontologies, some LLM-paper code, ProppLearner distributions — have no verified public
+download.</p>
+<hr />
+<p><em>Related reading:</em> <a href="landscape.html">The field landscape — people, labs, journals,
+conferences</a> · <a href="corpus-sourcing.html">Where the corpora come from</a> · <a href="encyclopedias.html">How the
+encyclopedias carve the world</a> · <a href="../how-it-works.html">How it works</a></p>
+  </div></article>
+  <nav class="toc"><h4>On this page</h4><a href="#computational-folkloristics-the-two-eras-of-a-quiet-field">Computational folkloristics: the two eras of a quiet field</a>
+<a class="sub" href="#two-eras">Two eras</a>
+<a class="sub" href="#the-indices-are-the-substrate">The indices are the substrate</a>
+<a class="sub" href="#core-methods">Core methods</a>
+<a class="sub" href="#open-datasets-and-resources">Open datasets and resources</a>
+<a class="sub" href="#the-honest-state-of-the-art">The honest state of the art</a></nav>
+</div></div>
+<footer class="footer-full">
+  <div class="cols">
+    <div><h5>Read</h5><a href="../index.html">Overview</a><a href="../what-we-found.html">What we found</a><a href="../crosswalk.html">The motif crosswalk</a><a href="../research/computational-folkloristics.html">Surveys</a><a href="../contribute.html">Contribute</a><a href="../publications.html">Publications</a></div>
+    <div><h5>Connect</h5><a href="https://github.com/haafus/mythoscope">★ GitHub</a><a href="#">Bluesky</a><a href="#">Mastodon</a><a href="mailto:hello@mythoscope.io">hello@mythoscope.io</a></div>
+    <div><h5>Get updates</h5><div class="sub"><input placeholder="you@example.com"><button>Subscribe</button></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Occasional notes — motif &amp; mockup of the month.</div></div>
+  </div>
+  <div class="base"><span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
+    <span class="r"><a href="../publications.html">Cite</a><a href="#">awesome-list</a></span></div>
+</footer>
+</body></html>

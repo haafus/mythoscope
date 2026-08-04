@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Aarne–Thompson–Uther Index (ATU) · Mythoscope</title>
+<meta name="description" content="A reference to the Aarne–Thompson–Uther tale-type index — its four-level hierarchy, composition, provenance in Uther 2004, and integration into Mythoscope.">
+<meta property="og:title" content="The Aarne–Thompson–Uther Index (ATU)">
+<meta property="og:description" content="A reference to the Aarne–Thompson–Uther tale-type index — its four-level hierarchy, composition, provenance in Uther 2004, and integration into Mythoscope.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://mythoscope.io/indexes/atu">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand"><span class="glyph">M</span> <a href="../index.html" style="color:inherit">Mythoscope</a></div>
+  <nav class="nav">
+    <a href="../../html/app.html">Explore</a>
+    <div class="has-menu"><span class="navitem">Research</span><div class="menu"><h4>A · The argument</h4>
+<a class="menu-link" href="../index.html">Mythoscope — a new lens on the world's myths</a>
+<a class="menu-link" href="../what-we-found.html">What we found</a>
+<a class="menu-link" href="../cases/swan-maiden.html">The Swan-Maiden: A Motif Too Broad to Date</a>
+<a class="menu-link" href="../cases/sun-and-moon.html">Sun and Moon as Kin: The Deep Substrate, and the Wall</a>
+<a class="menu-link" href="../cases/fished-up-earth.html">The Fished-Up Earth: The Motif the Machine Cracks</a>
+<a class="menu-link" href="../how-it-works.html">How Mythoscope works</a>
+<a class="menu-link" href="../about.html">About Mythoscope — Collaborative Semantic Archaeology</a>
+<h4>B · Reference & surveys</h4>
+<a class="menu-link" href="../crosswalk.html">The Motif Crosswalk: TMI ↔ ATU ↔ Berezkin</a>
+<a class="menu-link" href="../indexes/tmi.html">The Thompson Motif-Index (TMI)</a>
+<a class="menu-link active" href="../indexes/atu.html">The Aarne–Thompson–Uther Index (ATU)</a>
+<a class="menu-link" href="../indexes/berezkin.html">The Berezkin Areal Motif Catalogue</a>
+<a class="menu-link" href="../research/computational-folkloristics.html">Computational folkloristics: a field survey</a>
+<a class="menu-link" href="../research/landscape.html">The computational folkloristics landscape: people, labs, journals, conferences</a>
+<a class="menu-link" href="../research/corpus-sourcing.html">Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence</a>
+<a class="menu-link" href="../research/encyclopedias.html">How the great encyclopedias carve the world: a survey of world-mythology reference works</a>
+<a class="menu-link" href="../regions.html">The 14 regions</a>
+<h4>C · Participate</h4>
+<a class="menu-link" href="../contribute.html">Contribute to Mythoscope</a>
+<a class="menu-link" href="../resources.html">Resources</a>
+<a class="menu-link" href="../publications.html">Publications & how to cite</a>
+<a class="menu-link" href="../updates.html">Updates & Notes</a>
+<a class="menu-link" href="../credit.html">Credit & authorship</a></div></div>
+    <a href="../about.html">About</a>
+    <span class="sep"></span><a class="star" href="https://github.com/haafus/mythoscope">★ GitHub</a>
+  </nav>
+</header>
+<div class="crumbs"><a href="../index.html">Research</a><span class="sep">›</span><span>Reference & surveys</span><span class="sep">›</span>The Aarne–Thompson–Uther Index (ATU)</div>
+<div class="doc-wrap"><div class="doc-grid with-toc">
+  <article class="article"><div class="prose">
+<h1 id="the-aarnethompsonuther-index-atu">The Aarne–Thompson–Uther Index (ATU)</h1>
+<p>The <strong>Aarne–Thompson–Uther index</strong> is the standard catalogue of international
+folktale <em>types</em> — complete, recurring plots such as <em>The Dragon-Slayer</em> or <em>The
+Kind and the Unkind Girls</em>, each identified by a number and documented with a
+plot summary, a record of where it is attested, and its key scholarly
+literature. Where the <a href="tmi.html">Thompson Motif-Index</a> classifies the <em>elements</em> of
+narrative, ATU classifies whole <em>stories</em>: a tale type is, in effect, an ordered
+assembly of motifs.</p>
+<p>This page describes the index as a reference object and how Mythoscope sources,
+structures, and enriches it. See also the <a href="berezkin.html">Berezkin areal catalogue</a>
+and <a href="../crosswalk.html">the crosswalk</a> linking all three catalogues.</p>
+<hr />
+<h2 id="1-structure-a-four-level-hierarchy">1. Structure: a four-level hierarchy</h2>
+<p>An ATU identifier is a <strong>number</strong>, with optional <strong>letter suffix(es)</strong> and an
+optional <strong><code>*</code></strong>: <code>313</code>, <code>313A</code>, <code>1861*</code>, <code>1525A*</code>. The star marks a
+regional or supplementary type (667 of the ids, about 30%). Ids sort by number
+then suffix, so <code>313 &lt; 313A &lt; 313A* &lt; 1861</code>.</p>
+<p>The catalogue nests four levels — <strong>chapter → division → sub-division → type</strong>:</p>
+<ul>
+<li><strong>chapter</strong> — 7 canonical top-level classes (Animal Tales; Tales of Magic;
+  Religious Tales; Realistic Tales; Tales of the Stupid Ogre; Anecdotes and
+  Jokes; Formula Tales), plus an Unclassified bucket;</li>
+<li><strong>division</strong> — 43 named number ranges (<code>Supernatural Adversaries 300–399</code>);</li>
+<li><strong>sub-division</strong> — an optional finer level (24 groups);</li>
+<li><strong>subtype families</strong> — a lettered subtype (<code>313A</code>) hangs off its base type
+  (<code>313</code>) where the base exists (970 types have a parent; 412 head a family).</li>
+</ul>
+<p>Uther's <strong>plot summaries</strong> are rendered as structured text: TMI motif codes and
+cross-type references become links, motif ranges are expanded to link both
+endpoints, and a tale's variant forms — which Uther lists inline as
+<code>(1)…(N)</code> — are rendered as proper ordered lists without losing any of the prose.</p>
+<hr />
+<h2 id="2-composition">2. Composition</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tale types</td>
+<td>2,247</td>
+</tr>
+<tr>
+<td>Starred (<code>*</code>) types</td>
+<td>667</td>
+</tr>
+<tr>
+<td>Chapters</td>
+<td>7 (+ Unclassified)</td>
+</tr>
+<tr>
+<td>Divisions / sub-divisions</td>
+<td>43 / 24</td>
+</tr>
+<tr>
+<td>Subtype families (base types)</td>
+<td>412</td>
+</tr>
+<tr>
+<td>With a plot summary</td>
+<td>2,242</td>
+</tr>
+<tr>
+<td>With key literature</td>
+<td>1,773</td>
+</tr>
+<tr>
+<td>With attestations</td>
+<td>2,220</td>
+</tr>
+<tr>
+<td>With remarks</td>
+<td>923</td>
+</tr>
+<tr>
+<td>With constituent TMI motifs</td>
+<td>1,642 types / 4,573 links</td>
+</tr>
+<tr>
+<td>With combinations</td>
+<td>729 types / 4,696 links</td>
+</tr>
+<tr>
+<td>With Wikidata names / Wikipedia</td>
+<td>481 / 265</td>
+</tr>
+<tr>
+<td>With catalogue concordances</td>
+<td>328</td>
+</tr>
+<tr>
+<td>With example tales</td>
+<td>~172 types / ~1,457 variants</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-what-a-type-record-holds">3. What a type record holds</h2>
+<p>Each stored type carries its id and number; its chapter, division, and
+sub-division; its subtype-family links; and Uther's <strong>name</strong> and <strong>plot
+summary</strong>. Alongside these sit the fields of his scholarly apparatus and the
+enrichments Mythoscope adds:</p>
+<ul>
+<li><strong>defining motifs</strong> — the defining TMI motif(s) Uther names at the label;</li>
+<li><strong>references</strong> — Uther's key literature;</li>
+<li><strong>attestations</strong> — the traditions and languages attesting the type, also
+  parsed into peoples and macro-regions;</li>
+<li><strong>remarks</strong> — historical and textual notes;</li>
+<li><strong>motifs</strong> — the constituent TMI motif codes;</li>
+<li><strong>combos</strong> — frequently combined type ids;</li>
+<li><strong>former name / former ids</strong> — the pre-2004 name and old numbers this type was
+  renumbered from or absorbed;</li>
+<li><strong>tales</strong> — example tales (title and link);</li>
+<li><strong>Wikidata fields</strong> — multilingual names, Wikipedia and Wikisource links,
+  and concordances to other catalogues.</li>
+</ul>
+<hr />
+<h2 id="4-provenance-uther-2004">4. Provenance: Uther 2004</h2>
+<p>Mythoscope builds ATU from the <strong>Trilogy dataset</strong>
+(<a href="https://github.com/j-hagedorn/trilogy">j-hagedorn/trilogy</a>, CC-BY-SA), whose
+tale-type material derives from a plain-text extraction of the printed catalogue:</p>
+<blockquote>
+<p>Hans-Jörg Uther, <em>The Types of International Folktales</em> (Helsinki: Academia
+Scientiarum Fennica, 2004), <strong>FF Communications 284–286</strong>.</p>
+</blockquote>
+<p>The tale names, plot summaries, and the entire scholarly apparatus (literature,
+attestations, remarks) are therefore <strong>verbatim Uther</strong>. There is no open,
+machine-readable clean release of these fields — only the copyrighted book — so a
+number of source artifacts trace to that text extraction rather than to the
+catalogue itself, and are repaired at build time. The chapter of each type is
+derived from its number against Uther's canonical ranges (the extraction's own
+chapter column is unreliable); omitted division headers are filled from the range
+containing the type; and the title/description boundary, which the extraction
+sometimes split inside a title, is rejoined and re-split on a single boundary
+rule. Characters lost in the extraction (surfacing as a recurring mojibake
+sequence) are healed against a curated dictionary of the folklore-scholar names
+and journals they corrupt, restoring about 94% of occurrences; the residue is
+marked rather than guessed.</p>
+<p><strong>AaTh and ATU numbering.</strong> The catalogue superseded the earlier
+Aarne–Thompson (AaTh) numbering, and much older material — including the <code>Type N</code>
+references inside TMI notes — still cites AaTh numbers. Uther split many types
+into letter variants (<code>650 → 650A/B/C</code>) or renumbered and merged others; an
+alias map built from each type's recorded former ids redirects an old number to
+its current type, and an AaTh→ATU concordance (from Wikidata) remaps the rest
+where an equivalent exists. Numbers Uther deleted with no concordance are left
+unresolved rather than guessed.</p>
+<hr />
+<h2 id="5-enrichment-layers">5. Enrichment layers</h2>
+<p>On top of the verbatim apparatus, Mythoscope adds:</p>
+<ul>
+<li><strong>Wikidata.</strong> By the ATU-number property, each type is enriched with
+  multilingual tale-type names, Wikipedia articles, <strong>Wikisource</strong> links (the
+  full primary text of tales of the type, kept distinct from encyclopedic
+  summaries), and <strong>concordances</strong> to other catalogues (Grimm/KHM, AaTh, Aesop's
+  Perry numbers, Child ballads). Current coverage is roughly 481 names, 265
+  Wikipedia, 223 Wikisource, and 328 concordances.</li>
+<li><strong>Apparatus decoding.</strong> ATU has no author-year key, so individual citations are
+  shown as-is, but recurring reference-work, journal, and catalogue
+  abbreviations, and famous named collections, are decoded into tooltips with the
+  full name and, where one exists, a link to the work (full text preferred).</li>
+<li><strong>Attestations by people and region.</strong> Uther's attestation prose is parsed into
+  <code>(people, citation)</code> entries, each people label canonicalised and mapped to a
+  macro-region; roughly 260 curated labels cover essentially all of the ~45,000
+  people-mentions. Every count is parsed from Uther's own apparatus.</li>
+<li><strong>Example tales.</strong> Tales are sourced live from D. L. Ashliman's <em>Folktexts</em>
+  site as lists of links to each variant's text — about 172 types and 1,457
+  variants.</li>
+</ul>
+<hr />
+<h2 id="6-how-mythoscope-integrates-atu">6. How Mythoscope integrates ATU</h2>
+<p>The index is browsable by its four-level hierarchy through a chapter → division →
+sub-division tree, and each type page renders the linkified summary, the decoded
+apparatus, the attestation accordion grouped by region, and the enrichment links.
+An overview dashboard aggregates the catalogue into geographic, thematic, and
+diagnostic charts, with the <strong>people</strong> as its organizing carrier.</p>
+<p>ATU is the <strong>hub of the crosswalk</strong>: the constituent-motif sequences that define
+each type are the bridge that links the Thompson Motif-Index to the Berezkin
+areal catalogue. A type page surfaces its constituent and defining TMI motifs,
+the motifs whose notes cite it, and the Berezkin motifs that reference it. The
+full cross-catalogue machinery — all six confirmed relations, the broken-link
+repair, and the four hypothesis layers — is documented in
+<a href="../crosswalk.html">the crosswalk</a>.</p>
+<hr />
+<h2 id="7-known-limitations">7. Known limitations</h2>
+<ul>
+<li>The scholarly apparatus is only partly decoded: series abbreviations and famous
+  works get names and links, but individual author-year citations cannot be
+  expanded without Uther's full (copyrighted) bibliography.</li>
+<li>Character healing is about 94%; a residual marker stands for a genuinely lost
+  diacritic, and a few ambiguous names are left marked rather than guessed.</li>
+<li>The AaTh→ATU remap resolves only the orphaned TMI-note references for which a
+  Wikidata concordance exists; the rest are types ATU deleted or renumbered.</li>
+<li>Example tales are titles and deep links (no full text), covering 182 of 2,247
+  types.</li>
+<li>All repairs and enrichments are interpretive layers on top of the source; the
+  raw fields remain the source of truth.</li>
+</ul>
+  </div></article>
+  <nav class="toc"><h4>On this page</h4><a href="#the-aarnethompsonuther-index-atu">The Aarne–Thompson–Uther Index (ATU)</a>
+<a class="sub" href="#1-structure-a-four-level-hierarchy">1. Structure: a four-level hierarchy</a>
+<a class="sub" href="#2-composition">2. Composition</a>
+<a class="sub" href="#3-what-a-type-record-holds">3. What a type record holds</a>
+<a class="sub" href="#4-provenance-uther-2004">4. Provenance: Uther 2004</a>
+<a class="sub" href="#5-enrichment-layers">5. Enrichment layers</a>
+<a class="sub" href="#6-how-mythoscope-integrates-atu">6. How Mythoscope integrates ATU</a>
+<a class="sub" href="#7-known-limitations">7. Known limitations</a></nav>
+</div></div>
+<footer class="footer-full">
+  <div class="cols">
+    <div><h5>Read</h5><a href="../index.html">Overview</a><a href="../what-we-found.html">What we found</a><a href="../crosswalk.html">The motif crosswalk</a><a href="../research/computational-folkloristics.html">Surveys</a><a href="../contribute.html">Contribute</a><a href="../publications.html">Publications</a></div>
+    <div><h5>Connect</h5><a href="https://github.com/haafus/mythoscope">★ GitHub</a><a href="#">Bluesky</a><a href="#">Mastodon</a><a href="mailto:hello@mythoscope.io">hello@mythoscope.io</a></div>
+    <div><h5>Get updates</h5><div class="sub"><input placeholder="you@example.com"><button>Subscribe</button></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Occasional notes — motif &amp; mockup of the month.</div></div>
+  </div>
+  <div class="base"><span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
+    <span class="r"><a href="../publications.html">Cite</a><a href="#">awesome-list</a></span></div>
+</footer>
+</body></html>

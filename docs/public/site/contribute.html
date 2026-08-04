@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contribute to Mythoscope · Mythoscope</title>
+<meta name="description" content="How to help build Mythoscope — corpus, code, data, and community — plus the awesome-computational-mythology list and a no-GPU path to just browse the data.">
+<meta property="og:title" content="Contribute to Mythoscope">
+<meta property="og:description" content="How to help build Mythoscope — corpus, code, data, and community — plus the awesome-computational-mythology list and a no-GPU path to just browse the data.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://mythoscope.io/contribute">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand"><span class="glyph">M</span> <a href="index.html" style="color:inherit">Mythoscope</a></div>
+  <nav class="nav">
+    <a href="../html/app.html">Explore</a>
+    <div class="has-menu"><span class="navitem">Research</span><div class="menu"><h4>A · The argument</h4>
+<a class="menu-link" href="index.html">Mythoscope — a new lens on the world's myths</a>
+<a class="menu-link" href="what-we-found.html">What we found</a>
+<a class="menu-link" href="cases/swan-maiden.html">The Swan-Maiden: A Motif Too Broad to Date</a>
+<a class="menu-link" href="cases/sun-and-moon.html">Sun and Moon as Kin: The Deep Substrate, and the Wall</a>
+<a class="menu-link" href="cases/fished-up-earth.html">The Fished-Up Earth: The Motif the Machine Cracks</a>
+<a class="menu-link" href="how-it-works.html">How Mythoscope works</a>
+<a class="menu-link" href="about.html">About Mythoscope — Collaborative Semantic Archaeology</a>
+<h4>B · Reference & surveys</h4>
+<a class="menu-link" href="crosswalk.html">The Motif Crosswalk: TMI ↔ ATU ↔ Berezkin</a>
+<a class="menu-link" href="indexes/tmi.html">The Thompson Motif-Index (TMI)</a>
+<a class="menu-link" href="indexes/atu.html">The Aarne–Thompson–Uther Index (ATU)</a>
+<a class="menu-link" href="indexes/berezkin.html">The Berezkin Areal Motif Catalogue</a>
+<a class="menu-link" href="research/computational-folkloristics.html">Computational folkloristics: a field survey</a>
+<a class="menu-link" href="research/landscape.html">The computational folkloristics landscape: people, labs, journals, conferences</a>
+<a class="menu-link" href="research/corpus-sourcing.html">Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence</a>
+<a class="menu-link" href="research/encyclopedias.html">How the great encyclopedias carve the world: a survey of world-mythology reference works</a>
+<a class="menu-link" href="regions.html">The 14 regions</a>
+<h4>C · Participate</h4>
+<a class="menu-link active" href="contribute.html">Contribute to Mythoscope</a>
+<a class="menu-link" href="resources.html">Resources</a>
+<a class="menu-link" href="publications.html">Publications & how to cite</a>
+<a class="menu-link" href="updates.html">Updates & Notes</a>
+<a class="menu-link" href="credit.html">Credit & authorship</a></div></div>
+    <a href="about.html">About</a>
+    <span class="sep"></span><a class="star" href="https://github.com/haafus/mythoscope">★ GitHub</a>
+  </nav>
+</header>
+<div class="crumbs"><a href="index.html">Research</a><span class="sep">›</span><span>Participate</span><span class="sep">›</span>Contribute to Mythoscope</div>
+<div class="doc-wrap"><div class="doc-grid with-toc">
+  <article class="article"><div class="prose">
+<h1 id="contribute">Contribute</h1>
+<p>Mythoscope is open research infrastructure, and it is built to be built <em>with</em> people
+rather than for them. The corpus, the code, the motif crosswalk, and the surrounding
+reference material are all meant to be extended, corrected, and reused. This page sets out
+the concrete ways to help — from adding a single cleaned text to co-authoring a finding —
+and the one path that asks nothing of you but curiosity: just download the data and look.</p>
+<p>Contributions are welcome under the project's <a href="https://github.com/haafus/mythoscope/blob/main/CODE_OF_CONDUCT.md">Code of
+Conduct</a>, and everything
+you add is credited. How credit works — from acknowledgement through data citation to
+co-authorship — is written down in <a href="credit.html">Credit &amp; authorship</a>; it is not left to
+discretion.</p>
+<h2 id="just-view-the-data-no-gpu-no-torch">Just view the data — no GPU, no torch</h2>
+<p>You do not have to run the full machine to explore what it produces. Mythoscope ships an
+<strong>export bundle</strong>: a portable archive of the built outputs — the cleaned corpus, the
+character/place/time graphs, the semantic-space projections, and the motif database — that
+you can unpack and browse with a lightweight <em>viewer</em> install. The viewer has no
+heavyweight machine-learning dependencies (no <code>torch</code>, no embedding models, no scrapers);
+it is a few hundred megabytes rather than several gigabytes, and it runs on a laptop with
+no GPU.</p>
+<pre><code class="language-sh">git clone https://github.com/haafus/mythoscope
+cd mythoscope
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -e &quot;.[viewer]&quot;            # lightweight: browse prebuilt data, no torch
+
+# unpack an export bundle produced by the pipeline, then:
+mytho server                          # serve the web UI at http://localhost:8000
+</code></pre>
+<p>In the viewer build you get the reader, the graphs, the semantic-space plots,
+nearest-neighbour search over points, the geographic Atlas, and the full motif crosswalk.
+The one thing that needs the heavier install is <em>semantic search by free-text query</em>, which
+requires the embedding-model weights; the interface simply hides that one search box when
+the weights are not present. Everything else works offline. Full install profiles and the
+end-to-end pipeline are in <a href="how-it-works.html">How it works</a> and the project's setup guide.</p>
+<p>Exploring the data and reporting what looks wrong — a mis-linked motif, a badly cleaned
+text, a tradition placed on the wrong coordinates — is itself a contribution. Open an issue
+on <a href="https://github.com/haafus/mythoscope">GitHub</a>.</p>
+<h2 id="ways-to-help">Ways to help</h2>
+<p>Mythoscope needs several different kinds of expertise, and they rarely live in one person.
+The offerings below are the ones we can honestly support today. (Some things discussed in
+early planning — funded fellowships, formal institutional partnerships, a staffed press
+operation — are not yet real, and are deliberately left off this list until they are.)</p>
+<h3 id="contribute-corpora-and-texts">Contribute corpora and texts</h3>
+<p>The corpus is the foundation, and it is thin outside the well-combed European material. We
+are looking for mythological and folklore texts from <strong>any tradition</strong>, especially:</p>
+<ul>
+<li>vetted translations and critical editions;</li>
+<li>rare and under-documented traditions, regional variants, and oral material;</li>
+<li>sacred narratives where sharing is permitted.</li>
+</ul>
+<p><em>Ideal for:</em> philologists, folklorists, anthropologists, religious-studies scholars,
+curators, librarians, and knowledge-keepers. Texts enter the pipeline through a simple
+catalogue entry (a title, a tradition, and a source URL or local file); public-domain web
+sources such as Project Gutenberg are cleaned automatically. See <a href="resources.html">Resources</a>
+for a list of digital text libraries to draw from, and note the licensing point below.</p>
+<h3 id="provide-metadata-and-annotations">Provide metadata and annotations</h3>
+<p>Structured metadata and expert annotation make the corpus usable: motif, theme, and
+character tags; cultural and historical context; linguistic markup; variant tracking; and
+corrections to the tradition taxonomy and its coordinates.</p>
+<p><em>Ideal for:</em> area-studies specialists, linguists, cultural historians, and graduate
+students.</p>
+<h3 id="contribute-non-textual-datasets">Contribute non-textual datasets</h3>
+<p>Distributional questions need more than text. Geographic data (origins and transmission
+routes), temporal data (dating), archaeological correlates, iconographic databases, audio
+recordings of oral traditions, and network data on contact and trade all sharpen the
+analysis and help close the <em>convergence residual</em> the research programme is organised
+around.</p>
+<p><em>Ideal for:</em> archaeologists, art historians, ethnomusicologists, geographers, and digital
+archivists.</p>
+<h3 id="develop-and-refine-methods">Develop and refine methods</h3>
+<p>The computational layer is under active development. There is real work in NLP for ancient
+and low-resource languages, clustering and network analysis, multilingual embeddings,
+visualisation, and — the principal open problem — <strong>evaluation metrics for motif induction
+from raw text</strong>. The infrastructure for inducing motifs directly from text is built; what
+is missing is validated output at scale, checked against a gold standard and against the
+field's stubborn simple baselines. This is where a methods contributor can have the most
+leverage.</p>
+<p><em>Ideal for:</em> computer scientists, computational linguists, data scientists, and DH
+methodologists.</p>
+<h3 id="contribute-code-and-infrastructure">Contribute code and infrastructure</h3>
+<p>Mythoscope is a Python pipeline (FastAPI server, a vanilla-JS single-page app, ChromaDB,
+UMAP) with no framework lock-in. Contributions to the platform, the
+visualisations, developer tooling, and documentation are all welcome. Start with the setup
+guide and the pipeline overview in <a href="how-it-works.html">How it works</a>; the codebase, issues,
+and pull-request workflow live on
+<a href="https://github.com/haafus/mythoscope">GitHub</a>, with a
+<a href="https://github.com/haafus/mythoscope/blob/main/CONTRIBUTING.md">CONTRIBUTING guide</a>.</p>
+<p><em>Ideal for:</em> software engineers, web developers, and computer-science students.</p>
+<h3 id="validate-findings-and-co-author">Validate findings and co-author</h3>
+<p>The computational layer proposes; human judgement disposes. Expert interpretation of the
+machine's output — cultural context, critical evaluation, alternative explanations,
+theory-building — is where a distributional pattern becomes a finding. Substantial work of
+this kind is a route to co-authorship, on the terms set out in <a href="credit.html">Credit &amp;
+authorship</a>.</p>
+<p><em>Ideal for:</em> senior scholars, theorists, and comparative-literature specialists.</p>
+<h3 id="curate-the-awesome-computational-mythology-list">Curate the awesome-computational-mythology list</h3>
+<p>A standalone, curated field resource — <strong>awesome-computational-mythology</strong> — collects the
+tools, datasets, corpora, papers, and reference works of computational folkloristics and
+comparative mythology in one place. It is maintained as its own repository, following the
+<code>awesome</code> conventions (link-checking, a contributing guide, an open licence). Adding a
+resource, fixing a dead link, or proposing a new section is a low-friction first
+contribution that helps the whole field, not just this project. The list is linked from
+<a href="resources.html">Resources</a>.</p>
+<h3 id="indigenous-knowledge-and-community-partnerships">Indigenous knowledge and community partnerships</h3>
+<p>Some of the material this project touches belongs to living communities, and it is handled
+on their terms. We work with cultural protocols and prior, informed consent, following the
+<strong>CARE principles</strong> for Indigenous data governance: community control over how a tradition
+is represented, the right to review interpretations, proper attribution, benefit-sharing,
+and the right to have material removed. The governance detail is in <a href="credit.html">Credit &amp;
+authorship</a>.</p>
+<p><em>Ideal for:</em> community-nominated representatives and knowledge-keepers, working with the
+project on a co-governance basis.</p>
+<h3 id="join-the-conversation">Join the conversation</h3>
+<p>Methodology is argued out in the open. Discussion, disagreement about frameworks, and
+suggestions for directions happen on GitHub Discussions, on the newsletter, and in periodic
+community calls. Real-time chat is deferred until there is a community to fill it — we would
+rather point you to an active thread than an empty server.</p>
+<h2 id="how-contributions-are-handled">How contributions are handled</h2>
+<p>A few principles govern everything above:</p>
+<ul>
+<li><strong>Open by default.</strong> Contributions are credited, and outputs are released under open
+  licences (see <a href="resources.html">Resources</a> for the specifics — code MIT, prose CC BY-SA,
+  derived datasets CC BY).</li>
+<li><strong>Attribution is the rule, not a favour.</strong> Every contribution is recorded; see <a href="credit.html">Credit &amp;
+  authorship</a>.</li>
+<li><strong>Provenance travels with the data.</strong> Third-party texts and indexes keep their own terms,
+  and per-dataset provenance is preserved.</li>
+<li><strong>Licensing your texts is on you.</strong> The public web corpus is public-domain (Gutenberg),
+  but many source files are not. Local source files are kept out of version control by
+  default; if you contribute texts, make sure you have the right to share them.</li>
+</ul>
+<h2 id="get-started">Get started</h2>
+<ol>
+<li><strong>Explore</strong> the live data — install the viewer above, or open the app and look around.</li>
+<li><strong>Read</strong> how it works: <a href="how-it-works.html">How it works</a> and <a href="crosswalk.html">The crosswalk</a>.</li>
+<li><strong>Pick a lane</strong> from the list above.</li>
+<li><strong>Reach out</strong> at <strong><a href="mailto:hello@mythoscope.io">hello@mythoscope.io</a></strong>, or open an issue
+   or discussion on <a href="https://github.com/haafus/mythoscope">GitHub</a>.</li>
+</ol>
+<hr />
+<p><strong>See also:</strong> <a href="resources.html">Resources</a> for external text libraries, tools, and licences ·
+<a href="publications.html">Publications</a> for how to cite the project · <a href="credit.html">Credit &amp;
+authorship</a> for the attribution policy.</p>
+  </div></article>
+  <nav class="toc"><h4>On this page</h4><a href="#contribute">Contribute</a>
+<a class="sub" href="#just-view-the-data-no-gpu-no-torch">Just view the data — no GPU, no torch</a>
+<a class="sub" href="#ways-to-help">Ways to help</a>
+<a class="sub" href="#how-contributions-are-handled">How contributions are handled</a>
+<a class="sub" href="#get-started">Get started</a></nav>
+</div></div>
+<footer class="footer-full">
+  <div class="cols">
+    <div><h5>Read</h5><a href="index.html">Overview</a><a href="what-we-found.html">What we found</a><a href="crosswalk.html">The motif crosswalk</a><a href="research/computational-folkloristics.html">Surveys</a><a href="contribute.html">Contribute</a><a href="publications.html">Publications</a></div>
+    <div><h5>Connect</h5><a href="https://github.com/haafus/mythoscope">★ GitHub</a><a href="#">Bluesky</a><a href="#">Mastodon</a><a href="mailto:hello@mythoscope.io">hello@mythoscope.io</a></div>
+    <div><h5>Get updates</h5><div class="sub"><input placeholder="you@example.com"><button>Subscribe</button></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Occasional notes — motif &amp; mockup of the month.</div></div>
+  </div>
+  <div class="base"><span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
+    <span class="r"><a href="publications.html">Cite</a><a href="#">awesome-list</a></span></div>
+</footer>
+</body></html>

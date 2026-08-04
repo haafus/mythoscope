@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence · Mythoscope</title>
+<meta name="description" content="A tradition-by-tradition reference on where the primary texts of ~40 mythological traditions can actually be obtained at scale, in machine-readable form, with EASY/MODERATE/HARD verdicts and licences.">
+<meta property="og:title" content="Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence">
+<meta property="og:description" content="A tradition-by-tradition reference on where the primary texts of ~40 mythological traditions can actually be obtained at scale, in machine-readable form, with EASY/MODERATE/HARD verdicts and licences.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://mythoscope.io/research/corpus-sourcing">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand"><span class="glyph">M</span> <a href="../index.html" style="color:inherit">Mythoscope</a></div>
+  <nav class="nav">
+    <a href="../../html/app.html">Explore</a>
+    <div class="has-menu"><span class="navitem">Research</span><div class="menu"><h4>A · The argument</h4>
+<a class="menu-link" href="../index.html">Mythoscope — a new lens on the world's myths</a>
+<a class="menu-link" href="../what-we-found.html">What we found</a>
+<a class="menu-link" href="../cases/swan-maiden.html">The Swan-Maiden: A Motif Too Broad to Date</a>
+<a class="menu-link" href="../cases/sun-and-moon.html">Sun and Moon as Kin: The Deep Substrate, and the Wall</a>
+<a class="menu-link" href="../cases/fished-up-earth.html">The Fished-Up Earth: The Motif the Machine Cracks</a>
+<a class="menu-link" href="../how-it-works.html">How Mythoscope works</a>
+<a class="menu-link" href="../about.html">About Mythoscope — Collaborative Semantic Archaeology</a>
+<h4>B · Reference & surveys</h4>
+<a class="menu-link" href="../crosswalk.html">The Motif Crosswalk: TMI ↔ ATU ↔ Berezkin</a>
+<a class="menu-link" href="../indexes/tmi.html">The Thompson Motif-Index (TMI)</a>
+<a class="menu-link" href="../indexes/atu.html">The Aarne–Thompson–Uther Index (ATU)</a>
+<a class="menu-link" href="../indexes/berezkin.html">The Berezkin Areal Motif Catalogue</a>
+<a class="menu-link" href="../research/computational-folkloristics.html">Computational folkloristics: a field survey</a>
+<a class="menu-link" href="../research/landscape.html">The computational folkloristics landscape: people, labs, journals, conferences</a>
+<a class="menu-link active" href="../research/corpus-sourcing.html">Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence</a>
+<a class="menu-link" href="../research/encyclopedias.html">How the great encyclopedias carve the world: a survey of world-mythology reference works</a>
+<a class="menu-link" href="../regions.html">The 14 regions</a>
+<h4>C · Participate</h4>
+<a class="menu-link" href="../contribute.html">Contribute to Mythoscope</a>
+<a class="menu-link" href="../resources.html">Resources</a>
+<a class="menu-link" href="../publications.html">Publications & how to cite</a>
+<a class="menu-link" href="../updates.html">Updates & Notes</a>
+<a class="menu-link" href="../credit.html">Credit & authorship</a></div></div>
+    <a href="../about.html">About</a>
+    <span class="sep"></span><a class="star" href="https://github.com/haafus/mythoscope">★ GitHub</a>
+  </nav>
+</header>
+<div class="crumbs"><a href="../index.html">Research</a><span class="sep">›</span><span>Reference & surveys</span><span class="sep">›</span>Corpus-sourcing atlas: where to obtain full-text world mythology, and under what licence</div>
+<div class="doc-wrap"><div class="doc-grid with-toc">
+  <article class="article"><div class="prose">
+<h1 id="corpus-sourcing-atlas-where-the-texts-actually-are">Corpus-sourcing atlas: where the texts actually are</h1>
+<p>Comparative mythology at scale runs on a prosaic prerequisite: you have to get the texts.
+Not a bibliography, not a reading list — the <strong>primary texts</strong> (myth, epic, scripture,
+ritual, chronicle) for each documented tradition, at scale, in machine-readable form, and
+under a licence that lets you use them. This page is the reference we wished existed when we
+started: for roughly forty textually-documented traditions, <em>where do I get corpus X, in
+what format, and what does the licence permit?</em></p>
+<p>Each tradition carries a headline verdict — <strong>EASY</strong>, <strong>MODERATE</strong>, or <strong>HARD</strong> — defined
+in the <a href="#obtainability-ranking">ranking table</a> below. The verdict is about <em>machine-obtainability
+under a usable licence</em>, not about the richness of the mythology.</p>
+<h2 id="the-one-fact-that-drives-almost-every-hard-verdict">The one fact that drives almost every HARD verdict</h2>
+<p>A single structural asymmetry runs through the whole survey:</p>
+<blockquote>
+<p><strong>The original-language critical editions and transliterations are increasingly open, but
+the readable modern English or European translations are usually still in copyright.</strong></p>
+</blockquote>
+<p>For <strong>dead-language</strong> traditions the open asset is a transliteration or the original script;
+the readable translation is the copyrighted part. For <strong>oral</strong> traditions the only asset is a
+translation, and it is often locked — either in copyright or surviving only as an un-OCR'd
+public-domain scan. Budget accordingly: TEI/JSON ingestion for the EASY tier, OCR pipelines
+for the ethnographic and hagiographic tier, and licensing or commissioned translation for the
+copyright-blocked tier.</p>
+<p><strong>How to read the per-tradition entries.</strong> Each records: source(s); contents and scale;
+language(s) and translations; format; licence/access; and machine-obtainability (bulk
+download / API / scrape-only / not obtainable).</p>
+<hr />
+<h2 id="1-classical-mediterranean">1. Classical Mediterranean</h2>
+<h3 id="greek-easy">Greek — EASY</h3>
+<ul>
+<li><strong>Perseus Digital Library / <code>canonical-greekLit</code></strong> — TEI XML source of record. Homer,
+  Hesiod, the tragedians, Apollodorus, Pausanias, the Hymns, with facing public-domain
+  translations. <strong>CC-BY-SA 4.0</strong>; bulk-cloneable git repo. (<code>github.com/PerseusDL/canonical-greekLit</code>)</li>
+<li><strong>First1KGreek / Open Greek and Latin</strong> — aims at one edition of every Greek work from
+  Homer to 250 CE not already in Perseus; ~1,000+ works, TEI XML, <strong>CC-BY-SA 4.0</strong>, bulk git
+  clone.</li>
+<li><strong>Scaife Viewer</strong> — the modern reading interface over these repos (CTS API), not a separate
+  corpus.</li>
+<li><strong>Theoi Project</strong> — the best <em>thematically organized</em> mythology site, but the compilation is
+  © Aaron Atsma with no open licence and no bulk export → <strong>scrape-only; use as an index and
+  source the texts from Perseus.</strong></li>
+<li><strong>TLG (Thesaurus Linguae Graecae)</strong> — the most complete Greek corpus (Homer→1453), but
+  subscription-paywalled with redistribution forbidden → <strong>not obtainable for corpus-building.</strong></li>
+<li><strong>Verdict:</strong> Greek myth's core is fully open and git-cloneable in TEI, original + PD English.
+  The gold-standard case.</li>
+</ul>
+<h3 id="roman-latin-easy">Roman / Latin — EASY</h3>
+<ul>
+<li><strong>Perseus / <code>canonical-latinLit</code></strong> — Ovid (<em>Metamorphoses</em>, <em>Fasti</em>), Virgil, Hyginus, etc.,
+  TEI XML, <strong>CC-BY-SA 4.0</strong>, bulk git.</li>
+<li><strong>The Latin Library</strong> — large plain-text PD collection; convenient but not critical editions
+  and with no explicit licence (effectively PD source texts). Cleaned mirror at
+  <code>cltk/lat_text_latin_library</code>.</li>
+<li><strong>PHI Latin Texts (Packard)</strong> — nearly all literary Latin to AD 200; free to read but no bulk
+  download and no reuse licence → <strong>scrape-only.</strong></li>
+<li><strong>Verdict:</strong> Original-language Latin myth (Ovid etc.) is fully open TEI; readable translations
+  vary (Perseus carries PD ones).</li>
+</ul>
+<hr />
+<h2 id="2-ancient-near-east">2. Ancient Near East</h2>
+<h3 id="ancient-egyptian-moderate">Ancient Egyptian — MODERATE</h3>
+<ul>
+<li><strong>Thesaurus Linguae Aegyptiae (TLA)</strong> — the largest lemmatized Egyptian corpus
+  (hieroglyphic/hieratic/Demotic transliteration + German/English): Pyramid Texts, Coffin
+  Texts, Book of the Dead, literary and religious texts. Web + API. Licence is <strong>mixed</strong>: small
+  extracts free; <strong>full sub-corpora released progressively under free licences</strong>, with datasets
+  on <strong>Hugging Face under CC-BY-SA 4.0</strong> and backend code + data on GitHub. → <strong>Partially
+  bulk-obtainable now (HF datasets), growing.</strong></li>
+<li><strong>Obstacle:</strong> the transliteration/translation is the deliverable; a full free-licensed dump is
+  still being rolled out version by version. Older PD English (Budge) gives a readable but dated
+  layer via sacred-texts.</li>
+</ul>
+<h3 id="mesopotamian-sumerian-akkadian-easy-original-moderate-translations">Mesopotamian — Sumerian &amp; Akkadian — EASY (original) / MODERATE (translations)</h3>
+<ul>
+<li><strong>ETCSL (Oxford)</strong> — ~400 Sumerian literary works (Gilgamesh cycle, Inanna, Enki, etc.):
+  Sumerian transliteration + English prose, TEI XML. <strong>CC-BY-NC-SA 3.0.</strong> Frozen but fully
+  downloadable → <strong>bulk download.</strong></li>
+<li><strong>ORACC</strong> — actively maintained cuneiform corpora (SAAo, RINAP, literary projects). <strong>Open
+  data as JSON</strong> (ATF transliteration, lemmatization, English) with per-project zips; licensing
+  <strong>CC0 / CC-BY-SA</strong> depending on project → <strong>bulk download + documented JSON.</strong></li>
+<li><strong>SEAL (Sources of Early Akkadian Literature)</strong> — ~900+ early Akkadian/bilingual compositions;
+  open-access, but per-record/scrape rather than a single dump.</li>
+<li><strong>Verdict:</strong> Sumerian/Akkadian <em>original + scholarly English</em> is one of the best-served ancient
+  traditions for open machine-readable data (ETCSL + ORACC).</li>
+</ul>
+<h3 id="hittite-anatolian-moderate">Hittite / Anatolian — MODERATE</h3>
+<ul>
+<li><strong>Hethitologie-Portal Mainz (HPM)</strong> — critical editions, catalogues, bibliography. Portal
+  content <strong>CC-BY-SA 4.0</strong>; the <strong>TLHdig XML dataset released on Zenodo</strong> → bulk-obtainable
+  transliterations. Translations mostly German.</li>
+<li><strong>Obstacle:</strong> transliteration-centric; English myth translations (Hoffner's <em>Hittite Myths</em>)
+  are in copyright.</li>
+</ul>
+<h3 id="ugaritic-canaanite-hard">Ugaritic / Canaanite — HARD</h3>
+<ul>
+<li>Core myths (Baal Cycle, Kirta, Aqhat) survive as the <strong>KTU corpus</strong>; the standard edition is
+  <strong>copyrighted (De Gruyter)</strong> with no open TEI corpus. Transliterations circulate in scattered
+  PDFs; KTU on the Internet Archive is scan-only.</li>
+<li><strong>Obstacle:</strong> the authoritative transliteration and every modern translation are in copyright;
+  building requires assembling from older PD editions or licensing.</li>
+</ul>
+<hr />
+<h2 id="3-northern-western-europe">3. Northern &amp; Western Europe</h2>
+<h3 id="norse-easy">Norse — EASY</h3>
+<ul>
+<li><strong>Icelandic Saga Database (sagadb.org)</strong> — all extant Íslendingasögur in modernized Icelandic
+  plus PD English/other translations where they exist; EPUB/PDF/HTML/plain text; <strong>stated public
+  domain</strong> → bulk download.</li>
+<li><strong>heimskringla.no</strong> — large Old Norse archive (Eddas, sagas, skaldic); free to read but
+  scrape-oriented, effectively PD source texts.</li>
+<li><strong>Poetic &amp; Prose Edda</strong> — PD translations (Bellows, Thorpe, Brodeur) on sacred-texts,
+  Wikisource, Gutenberg; Old Norse originals on Wikisource/heimskringla → bulk via
+  Gutenberg/Wikisource.</li>
+<li><strong>Verdict:</strong> Original Old Norse is open; readable modern English (Larrington, Faulkes) is in
+  copyright, but solid PD translations exist.</li>
+</ul>
+<h3 id="celtic-moderate">Celtic — MODERATE</h3>
+<ul>
+<li><strong>CELT (Corpus of Electronic Texts, UCC Cork)</strong> — 1,600+ documents / 18M+ words of Irish +
+  Hiberno-Latin + English, TEI XML + HTML: <em>Táin</em>, the mythological cycle, <em>Lebor Gabála</em>. Free,
+  <strong>but per-text copyright varies</strong> (some reusable, some restricted) → <strong>mixed-licence
+  scrape/download; check each header.</strong></li>
+<li><strong>Mabinogion</strong> — Lady Charlotte Guest's PD translation; Welsh originals partly on Wikisource →
+  bulk via Gutenberg/Wikisource.</li>
+</ul>
+<h3 id="finnish-baltic-slavic-moderate">Finnish / Baltic / Slavic — MODERATE</h3>
+<ul>
+<li><strong>Kalevala</strong> — Crawford (1888) and Kirby (1907) English translations are <strong>PD on Project
+  Gutenberg</strong>; Finnish original also on Gutenberg/Wikisource → clean bulk.</li>
+<li><strong>Slavic / Baltic</strong> — no single canonical myth corpus (paganism poorly attested textually).
+  Byliny, the <em>Primary Chronicle</em>, Baltic folklore survive as scattered PD translations →
+  scrape/assemble, translation-only.</li>
+</ul>
+<hr />
+<h2 id="4-south-asia">4. South Asia</h2>
+<h3 id="vedic-hindu-sanskrit-easy-original-moderate-translations">Vedic / Hindu Sanskrit — EASY (original) / MODERATE (translations)</h3>
+<ul>
+<li><strong>GRETIL (Göttingen)</strong> — the largest machine-readable Sanskrit/Indic register: Vedas, epics
+  (<em>Mahābhārata</em>, <em>Rāmāyaṇa</em>), Purāṇas, and much more. Plain text (multiple encodings),
+  converting toward TEI; cumulative ZIP downloads via DARIAH-DE. Licence is <strong>heterogeneous /
+  per-text</strong> (no blanket licence) but freely downloadable → <strong>bulk download, check each header.</strong></li>
+<li><strong>SARIT</strong> — TEI-XML śāstric + literary texts; <strong>all texts under a Creative Commons licence</strong>,
+  downloadable as XML/EPUB/PDF → clean bulk.</li>
+<li><strong>Digital Corpus of Sanskrit (DCS)</strong> — lemmatized, POS-tagged, NLP-oriented → bulk.</li>
+<li><strong>Muktabodha</strong> — large plain-text library incl. manuscript transcriptions; tantra-heavy →
+  mostly scrape.</li>
+<li><strong>sacred-texts.com</strong> — PD English (Griffith, Ganguli, Müller's SBE) → bulk.</li>
+<li><strong>Verdict:</strong> Sanskrit <em>originals</em> are extremely well-served and openly downloadable
+  (GRETIL/SARIT/DCS). Modern scholarly translations are in copyright, but comprehensive PD
+  English exists.</li>
+</ul>
+<h3 id="buddhist-easy-chinesepali-moderate-tibetan-translations">Buddhist — EASY (Chinese/Pali) / MODERATE (Tibetan translations)</h3>
+<ul>
+<li><strong>CBETA</strong> — Chinese Buddhist canon (Taishō 1–55, 85 + Zokuzōkyō 1–90), TEI P5 XML. Taishō
+  1–55 <strong>Creative Commons, non-profit</strong>; XML on GitHub (<code>cbeta-org/xml-p5</code>) → bulk download.</li>
+<li><strong>SAT Daizōkyō (U. Tokyo)</strong> — full Taishō online, some features login-gated; overlaps CBETA →
+  use CBETA for bulk.</li>
+<li><strong>SuttaCentral / bilara-data</strong> — Pāli Tipiṭaka (Mahāsaṅgīti root text) plus modern
+  translations, <strong>all CC0</strong>, segment-aligned JSON on GitHub → clean bulk, best-in-class licence.</li>
+<li><strong>Tipitaka.org (VRI)</strong> — Chaṭṭha Saṅgāyana Pāli in many scripts; scrape-oriented.</li>
+<li><strong>Tibetan Kangyur/Tengyur:</strong> <strong>84000</strong> — English Kangyur translations (~25%+ done), but text
+  is <strong>CC-BY-NC-ND</strong> (NoDerivatives blocks re-segmentation); metadata/glossary CC-BY 4.0; API by
+  written agreement only → <strong>readable but ND-locked.</strong> <strong>BDRC</strong> — vast scanned + some etext
+  Tibetan, images + OCR, API/partnerships.</li>
+<li><strong>Verdict:</strong> Pāli (SuttaCentral, CC0) and Chinese (CBETA, CC) are ideal. Tibetan <em>translations</em>
+  are the weak point — 84000 is free-to-read but ND-locked.</li>
+</ul>
+<h3 id="jain-hard">Jain — HARD</h3>
+<ul>
+<li><strong>JAINpedia</strong> — Śvetāmbara Āgama manuscript images, themes, e-library; <strong>manuscript-image and
+  curated content, not a clean text corpus.</strong> Āgama texts (Ardhamāgadhī Prakrit) exist as
+  scattered editions; some transliterations at GRETIL and jainelibrary.org (free-to-read, no open
+  licence); PD English (Jacobi in SBE) on sacred-texts.</li>
+<li><strong>Obstacle:</strong> no unified machine-readable Āgama corpus; digitization is manuscript-image-centric.</li>
+</ul>
+<hr />
+<h2 id="5-iran-the-zoroastrian-world">5. Iran &amp; the Zoroastrian world</h2>
+<h3 id="zoroastrian-iranian-moderate">Zoroastrian / Iranian — MODERATE</h3>
+<ul>
+<li><strong>Avesta.org</strong> — complete extant Avesta + many Middle Persian (Pahlavi) scriptures, in
+  transliteration + PD English (Darmesteter, Mills, West). HTML; effectively PD content but
+  scrape-oriented (no bulk dump / explicit licence).</li>
+<li><strong>TITUS (Frankfurt)</strong> — scholarly Avestan/Old Iranian database; free to consult, no open
+  licence, not bulk-downloadable → scrape.</li>
+<li><strong>Avestan Digital Archive (ADA)</strong> — ~200 manuscript images (not text).</li>
+<li><strong>Shahnameh</strong> — Firdawsī: Persian on Wikisource/Ganjoor; PD English (Warner &amp; Warner,
+  Atkinson) on Gutenberg/sacred-texts → bulk via Gutenberg/Ganjoor.</li>
+<li><strong>Verdict:</strong> Original + PD translation obtainable by scraping Avesta.org/TITUS; no packaged
+  open corpus.</li>
+</ul>
+<hr />
+<h2 id="6-jewish-christian">6. Jewish &amp; Christian</h2>
+<h3 id="jewish-easy">Jewish — EASY</h3>
+<ul>
+<li><strong>Sefaria</strong> — Tanakh, Mishnah, Talmud, Midrash, halakha, kabbalah with Hebrew/Aramaic +
+  English. <strong>Full data dump (~26 GB, ~85k files, JSON + TXT) on Google Cloud Storage, no auth</strong>;
+  public REST API. Licences per-text (PD, CC0, CC-BY, some CC-BY-NC), nearly all reusable →
+  <strong>best-in-class: bulk download AND API.</strong></li>
+<li><strong>Verdict:</strong> the model example — machine-readable, documented, mostly openly licensed, both
+  bulk and API.</li>
+</ul>
+<h3 id="christian-easy-bible-moderate-apocrypha-hard-hagiography">Christian — EASY (Bible) / MODERATE (apocrypha) / HARD (hagiography)</h3>
+<ul>
+<li><strong>Bible</strong> — enormous open supply: original languages (SBLGNT, open Hebrew MT via
+  Sefaria/STEP; Vulgate on Perseus/Latin sources) and PD English (KJV, ASV, Douay) everywhere
+  (Gutenberg, Sefaria, ebible.org) → clean bulk. Modern translations (NRSV/NIV) are copyright.</li>
+<li><strong>Apocrypha / Pseudepigrapha</strong> — <strong>Online Critical Pseudepigrapha (OCP)</strong>: free-access critical
+  editions (mostly original-language); check reuse terms. PD English (Charles's 1913 <em>APOT</em>) on
+  sacred-texts/archive.org.</li>
+<li><strong>Hagiography — Acta Sanctorum</strong> — the Bollandist Lives of the Saints. The digital database is
+  <strong>ProQuest, subscription-paywalled → not obtainable</strong>; the original 68-volume Latin print is PD
+  and <strong>scanned on Internet Archive (image PDF, needs OCR).</strong></li>
+<li><strong>Obstacle (hagiography):</strong> the searchable full text is proprietary; the free version is
+  un-OCR'd Latin page-scans.</li>
+</ul>
+<hr />
+<h2 id="7-islamic">7. Islamic</h2>
+<h3 id="islamic-easy-quran-moderate-hadith">Islamic — EASY (Quran) / MODERATE (Hadith)</h3>
+<ul>
+<li><strong>Tanzil</strong> — verified Uthmani/simple Quran text in XML/plain UTF-8; verbatim redistribution
+  permitted with attribution (<strong>no modification of text</strong>) → bulk download.</li>
+<li><strong>Quranic Arabic Corpus</strong> — morphological/syntactic annotation on Tanzil text; morphology
+  under GNU licence, email-gated download.</li>
+<li><strong>Translations</strong> — PD English (Yusuf Ali, Pickthall, Rodwell) widely available.</li>
+<li><strong>Hadith — Sunnah.com</strong> — the major English hadith site (Bukhari, Muslim, the Nine Books,
+  Arabic + English). <strong>API exists but key-gated; offline dump "not available yet"; no explicit
+  open-data licence</strong> → effectively scrape or gated API. Community mirrors exist
+  (<code>AhmedBaset/hadith-json</code>, MIT re-hosts).</li>
+<li><strong>Verdict:</strong> Quran is trivially obtainable; hadith's friction is licence/dump availability.</li>
+</ul>
+<hr />
+<h2 id="8-east-asia-china-japan-korea">8. East Asia (China, Japan, Korea)</h2>
+<h3 id="chinese-moderate">Chinese — MODERATE</h3>
+<ul>
+<li><strong>Chinese Text Project (ctext.org)</strong> — the largest pre-modern Chinese corpus: <em>Shanhaijing</em>,
+  <em>Shujing</em>, <em>Chuci</em>, Daoist &amp; Confucian classics, dynastic texts. Read free; <strong>API/whole-text
+  download restricted to academic keys</strong>; Linked-Open-Data/RDF under <strong>CC-BY-NC-SA 3.0</strong>. Python
+  wrapper (<code>ctext</code>, MIT) → <strong>gated API + partial LOD; not a single open bulk dump.</strong></li>
+<li><strong>Daozang (Taoist canon)</strong> — no single open full-text corpus. <strong>Kanseki Repository (Kanripo)</strong>
+  hosts much classical Chinese incl. Daoist texts as git-backed text → Kanripo git for texts.</li>
+<li><strong>Shanhaijing</strong> — original on ctext/Wikisource; older partial English translations PD (Birrell
+  is copyright).</li>
+<li><strong>Verdict:</strong> Originals broadly obtainable (ctext gated-API, Kanripo git, Wikisource); friction
+  is licensing and the absence of a clean bulk dump.</li>
+</ul>
+<h3 id="japanese-moderate">Japanese — MODERATE</h3>
+<ul>
+<li><strong>Kojiki / Nihon Shoki</strong> — Chamberlain's <em>Kojiki</em> (1882) and Aston's <em>Nihongi</em> (1896) are
+  <strong>PD</strong> (sacred-texts, Gutenberg, archive.org) → bulk.</li>
+<li><strong>Japanese Text Initiative (U. Virginia)</strong> — classical Japanese in original + translation,
+  HTML/some TEI; scrape-oriented.</li>
+<li><strong>Original classical Japanese</strong> also via J-TEXTS and <strong>Aozora Bunko</strong> (PD, bulk-downloadable)
+  for later material.</li>
+<li><strong>Verdict:</strong> Foundational myth texts (Kojiki/Nihongi) obtainable in PD English + originals; no
+  single packaged corpus.</li>
+</ul>
+<h3 id="korean-hard">Korean — HARD</h3>
+<ul>
+<li><strong>Samguk Yusa</strong> (Iryeon) — the myth-bearing source (Dangun, Three Kingdoms legends). Written in
+  <strong>Classical Chinese (hanmun)</strong>; original available via Korean digital classics portals
+  (db.itkc.or.kr / krpia — free-to-read, scrape). <strong>Every full English translation (Ha &amp; Mintz
+  1972; recent annotated) is in copyright → HARD.</strong></li>
+<li><strong>Obstacle:</strong> no PD English; the original is hanmun requiring specialist handling.</li>
+</ul>
+<hr />
+<h2 id="9-caucasus-africa-and-the-wider-textual-world">9. Caucasus, Africa, and the wider textual world</h2>
+<h3 id="armenian-georgian-moderatehard">Armenian / Georgian — MODERATE/HARD</h3>
+<ul>
+<li><strong>Armenian</strong> — Moses of Khorene's <em>History</em> and epic material; partial PD English + originals
+  on <strong>TITUS</strong> and Wikisource; scholarly translations copyright → scrape/assemble.</li>
+<li><strong>Georgian</strong> — <em>Knight in the Panther's Skin</em> (Rustaveli) PD translations on archive.org;
+  myth/folklore sparse → assemble.</li>
+</ul>
+<h3 id="ethiopian-moderate">Ethiopian — MODERATE</h3>
+<ul>
+<li><strong>Kebra Nagast</strong> — Budge's 1922 English is <strong>PD</strong>, full text on sacred-texts + archive.org;
+  Gəʿəz original in scholarly (copyright) editions. <em>Book of Enoch</em> (Ethiopic) via Charles PD →
+  bulk via sacred-texts.</li>
+</ul>
+<h3 id="yoruba-ifa-hard">Yoruba (Ifá) — HARD</h3>
+<ul>
+<li>Ifá corpus (odù) — <strong>no authoritative open full-text corpus</strong>; material scattered across
+  ethnographies (Bascom, Abimbola — copyright), with some PD colonial-era collections on
+  archive.org. Oral/performance tradition → assemble, mostly copyright-locked.</li>
+</ul>
+<h3 id="mesoamerican-moderatehard">Mesoamerican — MODERATE/HARD</h3>
+<ul>
+<li><strong>Maya — Popol Vuh:</strong> original K'iche' + Spanish transcription openly available (World Digital
+  Library / OMNIKA facsimile); PD English (Goetz–Morley, 1950) borderline; recent translations
+  (Christenson, Tedlock) copyright → original obtainable, readable modern English mostly copyright.</li>
+<li><strong>Chilam Balam</strong> — Yucatec Maya colonial books; Roys's <em>Chumayel</em> (1933) older (archive.org),
+  status varies → assemble.</li>
+<li><strong>Aztec/Nahua — Florentine Codex:</strong> <strong>Getty Digital Florentine Codex</strong> — full Nahuatl + Spanish
+  transcriptions, English + Spanish translations, images. Landmark resource; <strong>check Getty reuse
+  terms; no single bulk text dump advertised.</strong></li>
+<li><strong>Cantares Mexicanos</strong> — Nahuatl source via <strong>UNAM under CC-BY-NC-ND 4.0</strong> (ND blocks
+  derivatives); Bierhorst's English is copyright.</li>
+<li><strong>Obstacle:</strong> originals increasingly digitized, but ND licensing and copyrighted modern
+  translations limit reuse.</li>
+</ul>
+<h3 id="andean-hard">Andean — HARD</h3>
+<ul>
+<li><strong>Huarochirí Manuscript</strong> — the great Quechua myth text; original Quechua + Spanish in scholarly
+  editions; <strong>standard English (Salomon &amp; Urioste 1991) is copyright</strong> → assemble/partial.</li>
+<li>Colonial chronicles (Guamán Poma) — the <strong>Guaman Poma Website (Royal Library, Copenhagen)</strong>
+  offers full facsimile + transcription, free.</li>
+</ul>
+<h3 id="polynesian-moderate">Polynesian — MODERATE</h3>
+<ul>
+<li>PD ethnographic translations abundant on <strong>sacred-texts.com Pacific section</strong> (Grey, Fornander,
+  Malo, Beckwith) + archive.org. Translation-only, dated, but bulk-downloadable.</li>
+</ul>
+<hr />
+<h2 id="10-the-oral-ethnographic-world-hard">10. The oral / ethnographic world — HARD</h2>
+<p>Sub-Saharan Africa, Native North America, Amazonia, Siberia, Aboriginal Australia, Melanesia:
+there is <strong>no native "canon."</strong> The texts exist only as recorded/translated performances scattered
+across ethnographies. Where to find them:</p>
+<ul>
+<li><strong>Bureau of American Ethnology (BAE) Annual Reports &amp; Bulletins</strong> — the single richest PD trove
+  for Native North America: Mooney's <em>Myths of the Cherokee</em>, Boas's <em>Tsimshian Mythology</em>,
+  Stevenson's <em>Zuñi</em>. <strong>All PD (US government pre-1929)</strong>, scanned on Internet Archive /
+  Smithsonian / Biodiversity Heritage Library → <strong>bulk-downloadable but image-PDF needing OCR</strong>
+  (some have OCR/djvu.txt layers).</li>
+<li><strong>sacred-texts.com regional sections</strong> — Africa, Native America, Australia, Pacific: curated PD
+  ethnographic translations already as HTML text → bulk via download package.</li>
+<li><strong>Internet Archive ethnographies</strong> — vast PD anthropology (Frazer, Rattray, Callaway, Radin,
+  Curtin); mixed OCR quality.</li>
+<li><strong>Folklore journals</strong> — <em>Journal of American Folklore</em>, <em>Folk-Lore</em> — older volumes PD.</li>
+<li><strong>Siberia/Central Asia</strong> — Radloff, Chadwick collections PD; modern epic recordings (Manas etc.)
+  mostly copyright.</li>
+<li><strong>Aboriginal Australia / Melanesia</strong> — Spencer &amp; Gillen, Strehlow, Malinowski — much is
+  copyright and/or <strong>culturally restricted</strong> (AIATSIS and communities place access controls;
+  not free-to-redistribute even when digitized).</li>
+</ul>
+<p><strong>Reality:</strong> translation-only, dated, scattered across thousands of PDFs, requiring <strong>OCR + heavy
+curation</strong>, and some carrying ethical/access restrictions independent of copyright.</p>
+<hr />
+<h2 id="the-big-aggregators">The big aggregators</h2>
+<table>
+<thead>
+<tr>
+<th>Aggregator</th>
+<th>Holds</th>
+<th>Licence</th>
+<th>Obtainability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>sacred-texts.com</strong></td>
+<td>Broad, dated PD translations across <em>every</em> tradition</td>
+<td>PD content; site "package" freely copyable</td>
+<td><strong>Bulk download</strong> + scrape</td>
+</tr>
+<tr>
+<td><strong>Project Gutenberg</strong></td>
+<td>PD translations (Kalevala, Eddas, Quran, Kojiki, Mahabharata)</td>
+<td>PD (US)</td>
+<td><strong>Bulk</strong> (per-book + mirrors)</td>
+</tr>
+<tr>
+<td><strong>Internet Archive</strong></td>
+<td>Scanned ethnographies, BAE reports, old critical editions</td>
+<td>PD (varies); some in-copyright lending</td>
+<td><strong>Bulk</strong> (PD items); many need OCR</td>
+</tr>
+<tr>
+<td><strong>Wikisource</strong></td>
+<td>PD source texts + translations, lightly TEI-ish</td>
+<td>CC-BY-SA / PD</td>
+<td><strong>Bulk</strong> (dumps + API)</td>
+</tr>
+<tr>
+<td><strong>HathiTrust</strong></td>
+<td>Massive scanned corpus</td>
+<td>Mostly in-copyright, gated; PD subset downloadable</td>
+<td>PD subset only; else <strong>restricted</strong></td>
+</tr>
+<tr>
+<td><strong>Perseus / Scaife</strong></td>
+<td>Greek/Latin TEI + PD translations</td>
+<td>CC-BY-SA</td>
+<td><strong>Bulk git</strong></td>
+</tr>
+<tr>
+<td><strong>GRETIL</strong></td>
+<td>Indic-language texts (originals)</td>
+<td>Per-text/mixed, freely downloadable</td>
+<td><strong>Bulk ZIP</strong> (check headers)</td>
+</tr>
+<tr>
+<td><strong>ctext.org</strong></td>
+<td>Pre-modern Chinese</td>
+<td>Read free; API gated; RDF CC-BY-NC-SA</td>
+<td><strong>Gated API / partial</strong></td>
+</tr>
+<tr>
+<td><strong>Sefaria</strong></td>
+<td>Jewish canon</td>
+<td>PD/CC0/CC-BY/CC-BY-NC</td>
+<td><strong>Bulk dump + API</strong></td>
+</tr>
+<tr>
+<td><strong>SuttaCentral</strong></td>
+<td>Pāli + translations</td>
+<td><strong>CC0</strong></td>
+<td><strong>Bulk git</strong></td>
+</tr>
+<tr>
+<td><strong>CBETA</strong></td>
+<td>Chinese Buddhist canon</td>
+<td>CC (non-profit)</td>
+<td><strong>Bulk git (XML)</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="obtainability-ranking">Obtainability ranking</h2>
+<p>The consolidated verdict per tradition, with the best open source, format, licence, and how to
+get it.</p>
+<table>
+<thead>
+<tr>
+<th>Tradition</th>
+<th>Verdict</th>
+<th>Best open source</th>
+<th>Format</th>
+<th>Licence</th>
+<th>How to get</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Greek</td>
+<td><strong>EASY</strong></td>
+<td>Perseus + First1KGreek</td>
+<td>TEI XML</td>
+<td>CC-BY-SA 4.0</td>
+<td>git clone</td>
+</tr>
+<tr>
+<td>Latin/Roman</td>
+<td><strong>EASY</strong></td>
+<td>Perseus canonical-latinLit</td>
+<td>TEI XML</td>
+<td>CC-BY-SA 4.0</td>
+<td>git clone</td>
+</tr>
+<tr>
+<td>Jewish</td>
+<td><strong>EASY</strong></td>
+<td>Sefaria-Export</td>
+<td>JSON/TXT</td>
+<td>PD/CC0/CC-BY(-NC)</td>
+<td>GCS dump + API</td>
+</tr>
+<tr>
+<td>Buddhist – Pāli</td>
+<td><strong>EASY</strong></td>
+<td>SuttaCentral bilara-data</td>
+<td>JSON</td>
+<td>CC0</td>
+<td>git clone</td>
+</tr>
+<tr>
+<td>Buddhist – Chinese</td>
+<td><strong>EASY</strong></td>
+<td>CBETA xml-p5</td>
+<td>TEI P5 XML</td>
+<td>CC (non-profit)</td>
+<td>git clone</td>
+</tr>
+<tr>
+<td>Christian – Bible</td>
+<td><strong>EASY</strong></td>
+<td>SBLGNT/Sefaria/ebible/Gutenberg</td>
+<td>XML/USFM/TXT</td>
+<td>PD/CC-BY</td>
+<td>bulk</td>
+</tr>
+<tr>
+<td>Islamic – Quran</td>
+<td><strong>EASY</strong></td>
+<td>Tanzil</td>
+<td>XML/TXT</td>
+<td>free w/ attribution</td>
+<td>bulk download</td>
+</tr>
+<tr>
+<td>Sumerian/Akkadian</td>
+<td><strong>EASY</strong></td>
+<td>ETCSL + ORACC</td>
+<td>TEI XML / JSON</td>
+<td>CC-BY-NC-SA / CC0</td>
+<td>bulk download</td>
+</tr>
+<tr>
+<td>Hindu/Sanskrit (orig.)</td>
+<td><strong>EASY→MOD</strong></td>
+<td>GRETIL / SARIT / DCS</td>
+<td>TXT / TEI</td>
+<td>mixed / CC</td>
+<td>bulk ZIP (check headers)</td>
+</tr>
+<tr>
+<td>Norse</td>
+<td><strong>EASY→MOD</strong></td>
+<td>sagadb.org + Gutenberg/Wikisource</td>
+<td>TXT/EPUB/XML</td>
+<td>PD</td>
+<td>bulk</td>
+</tr>
+<tr>
+<td>Finnish (Kalevala)</td>
+<td><strong>EASY</strong></td>
+<td>Project Gutenberg</td>
+<td>TXT</td>
+<td>PD</td>
+<td>bulk</td>
+</tr>
+<tr>
+<td>Ancient Egyptian</td>
+<td><strong>MODERATE</strong></td>
+<td>TLA (HF datasets)</td>
+<td>JSON/TSV</td>
+<td>CC-BY-SA (rolling)</td>
+<td>HF bulk (partial)</td>
+</tr>
+<tr>
+<td>Hittite</td>
+<td><strong>MODERATE</strong></td>
+<td>HPM / TLHdig</td>
+<td>XML</td>
+<td>CC-BY-SA 4.0</td>
+<td>Zenodo bulk</td>
+</tr>
+<tr>
+<td>Celtic</td>
+<td><strong>MODERATE</strong></td>
+<td>CELT</td>
+<td>TEI XML</td>
+<td>per-text mixed</td>
+<td>download (check each)</td>
+</tr>
+<tr>
+<td>Zoroastrian</td>
+<td><strong>MODERATE</strong></td>
+<td>Avesta.org / TITUS</td>
+<td>HTML</td>
+<td>PD content / no licence</td>
+<td>scrape</td>
+</tr>
+<tr>
+<td>Chinese</td>
+<td><strong>MODERATE</strong></td>
+<td>ctext.org / Kanripo</td>
+<td>HTML/RDF/git</td>
+<td>gated / CC-BY-NC-SA</td>
+<td>gated API / git</td>
+</tr>
+<tr>
+<td>Japanese</td>
+<td><strong>MODERATE</strong></td>
+<td>sacred-texts + JTI/Aozora</td>
+<td>HTML/TXT</td>
+<td>PD</td>
+<td>bulk</td>
+</tr>
+<tr>
+<td>Islamic – Hadith</td>
+<td><strong>MODERATE</strong></td>
+<td>Sunnah.com (+ mirrors)</td>
+<td>JSON/HTML</td>
+<td>gated / unclear</td>
+<td>gated API / scrape</td>
+</tr>
+<tr>
+<td>Christian – Pseudepigrapha</td>
+<td><strong>MODERATE</strong></td>
+<td>OCP + Charles (PD)</td>
+<td>HTML/TXT</td>
+<td>free / PD</td>
+<td>scrape/assemble</td>
+</tr>
+<tr>
+<td>Polynesian</td>
+<td><strong>MODERATE</strong></td>
+<td>sacred-texts Pacific</td>
+<td>HTML</td>
+<td>PD</td>
+<td>bulk</td>
+</tr>
+<tr>
+<td>Ethiopian (Kebra Nagast)</td>
+<td><strong>MODERATE</strong></td>
+<td>sacred-texts (Budge)</td>
+<td>HTML</td>
+<td>PD</td>
+<td>bulk</td>
+</tr>
+<tr>
+<td>Mesoamerican (Nahua/Maya)</td>
+<td><strong>MOD→HARD</strong></td>
+<td>Getty Florentine Codex; UNAM Cantares</td>
+<td>HTML/images</td>
+<td>ND-restricted / CC-BY-NC-ND</td>
+<td>web / partial</td>
+</tr>
+<tr>
+<td>Buddhist – Tibetan</td>
+<td><strong>HARD</strong></td>
+<td>84000</td>
+<td>HTML/PDF</td>
+<td>CC-BY-NC-<strong>ND</strong></td>
+<td>read-only (ND blocks reuse)</td>
+</tr>
+<tr>
+<td>Jain</td>
+<td><strong>HARD</strong></td>
+<td>JAINpedia + GRETIL scraps</td>
+<td>images/TXT</td>
+<td>mixed/none</td>
+<td>assemble</td>
+</tr>
+<tr>
+<td>Ugaritic</td>
+<td><strong>HARD</strong></td>
+<td>KTU (no open corpus)</td>
+<td>print/scan</td>
+<td>copyright</td>
+<td>OCR/license</td>
+</tr>
+<tr>
+<td>Korean (Samguk Yusa)</td>
+<td><strong>HARD</strong></td>
+<td>hanmun originals only</td>
+<td>text</td>
+<td>translations copyright</td>
+<td>assemble original</td>
+</tr>
+<tr>
+<td>Andean (Huarochirí)</td>
+<td><strong>HARD</strong></td>
+<td>scholarly eds.</td>
+<td>text</td>
+<td>copyright</td>
+<td>assemble</td>
+</tr>
+<tr>
+<td>Christian – Hagiography</td>
+<td><strong>HARD</strong></td>
+<td>Acta Sanctorum (ProQuest)</td>
+<td>DB / image scan</td>
+<td>paywalled / PD-scan</td>
+<td>subscription or OCR</td>
+</tr>
+<tr>
+<td>Yoruba (Ifá)</td>
+<td><strong>HARD</strong></td>
+<td>ethnographies</td>
+<td>scans</td>
+<td>copyright/PD mix</td>
+<td>OCR/assemble</td>
+</tr>
+<tr>
+<td>Oral world (Africa, N. America, Amazonia, Siberia, Australia, Melanesia)</td>
+<td><strong>HARD</strong></td>
+<td>BAE reports, sacred-texts, IA</td>
+<td>HTML/image-PDF</td>
+<td>PD (much) but scattered</td>
+<td>bulk PD but needs OCR/curation; some culturally restricted</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="build-ready-today-vs-needs-work">Build-ready today vs. needs work</h2>
+<p><strong>Clean, openly-licensed, machine-readable right now (drop-in):</strong> Greek, Latin, Jewish (Sefaria),
+Pāli Buddhist (SuttaCentral CC0), Chinese Buddhist (CBETA), Sumerian/Akkadian (ETCSL + ORACC),
+Quran (Tanzil), Kalevala, and the PD-translation layer of Norse. Sanskrit originals via SARIT
+(clean CC) and GRETIL (bulk, header-check).</p>
+<p><strong>Available but needs scraping / licence-checking / mixed formats:</strong> Chinese classics (ctext
+gated API + Kanripo), Celtic (CELT per-text), Zoroastrian (scrape Avesta/TITUS), Japanese
+(assemble sacred-texts + JTI/Aozora), Hadith (gated API/mirrors), Egyptian (HF datasets, rolling),
+Hittite (Zenodo), Pseudepigrapha (OCP + PD Charles), Polynesian/Ethiopian (sacred-texts PD).</p>
+<p><strong>Needs OCR:</strong> Acta Sanctorum (PD Latin page-scans), the entire BAE/ethnographic oral-world
+corpus (PD but image-PDF), Ugaritic and older ANE editions, many Mesoamerican/Andean colonial
+sources.</p>
+<p><strong>Needs licensing or fresh translation (copyright-blocked):</strong> Tibetan Kangyur translations (84000
+ND), Korean Samguk Yusa, Andean Huarochirí, Yoruba Ifá, modern Maya/Nahua translations, Ugaritic
+KTU, and every tradition's <em>modern scholarly English</em> (Larrington, Faulkner, Christenson, Tedlock,
+Hoffner, Bierhorst, Salomon). For these you either license, use dated PD translations, or commission
+translation.</p>
+<h2 id="the-single-biggest-obstacle-per-hard-case">The single biggest obstacle per HARD case</h2>
+<ul>
+<li><strong>Tibetan Buddhist:</strong> 84000's translations are free-to-read but <strong>CC-BY-NC-ND</strong> — NoDerivatives
+  forbids the segmentation/reformatting a corpus requires. (Metadata is CC-BY; the text is not
+  usable as data.)</li>
+<li><strong>Jain:</strong> <strong>no unified machine-readable Āgama corpus exists</strong> — digitization is
+  manuscript-image-centric.</li>
+<li><strong>Ugaritic/Canaanite:</strong> the <strong>authoritative transliteration (KTU) and all modern translations
+  are in copyright</strong>; no open TEI corpus.</li>
+<li><strong>Korean (Samguk Yusa):</strong> <strong>every English translation is in copyright</strong>; only the
+  Classical-Chinese original is free.</li>
+<li><strong>Andean (Huarochirí):</strong> the <strong>standard English (Salomon &amp; Urioste) is in copyright</strong>; original
+  Quechua only in scholarly editions.</li>
+<li><strong>Christian hagiography (Acta Sanctorum):</strong> the <strong>searchable full text is a ProQuest paywall</strong>;
+  the free version is un-OCR'd Latin page-scans.</li>
+<li><strong>Yoruba (Ifá):</strong> an <strong>oral corpus never systematically transcribed into an open text edition</strong>;
+  key collections (Bascom, Abimbola) are copyright.</li>
+<li><strong>Mesoamerican:</strong> originals are digitized but <strong>ND licensing (Getty/UNAM) and copyrighted modern
+  translations</strong> block reuse.</li>
+<li><strong>Oral world at large:</strong> the material was <strong>never systematically digitized as text</strong> — it
+  survives as thousands of PD but un-OCR'd ethnography pages, and some is <strong>culturally
+  access-restricted</strong> independent of copyright.</li>
+</ul>
+<p><strong>The pattern to design around:</strong> for <em>dead-language</em> traditions the open asset is the
+<strong>original-language transliteration/text</strong>; the readable translation is usually copyright. For
+<em>oral</em> traditions the only asset is a <strong>translation</strong>, and it is usually either copyright or an
+un-OCR'd PD scan.</p>
+<hr />
+<h2 id="read-on">Read on</h2>
+<ul>
+<li><a href="computational-folkloristics.html">Field survey: computational folkloristics</a> — the methods and
+  literature this corpus feeds.</li>
+<li><a href="landscape.html">Field landscape</a> — the projects and tools mapped against each other.</li>
+<li><a href="encyclopedias.html">How the great encyclopedias carve the world</a> — the reference-work counterpart
+  to this atlas, and the literate/oral bias it shares.</li>
+<li><a href="../how-it-works.html">How it works</a> — the Mythoscope pipeline from corpus to embeddings to motifs.</li>
+<li><a href="../regions.html">The 14 regions</a> — the regional scheme these traditions map onto.</li>
+</ul>
+  </div></article>
+  <nav class="toc"><h4>On this page</h4><a href="#corpus-sourcing-atlas-where-the-texts-actually-are">Corpus-sourcing atlas: where the texts actually are</a>
+<a class="sub" href="#the-one-fact-that-drives-almost-every-hard-verdict">The one fact that drives almost every HARD verdict</a>
+<a class="sub" href="#1-classical-mediterranean">1. Classical Mediterranean</a>
+<a class="sub" href="#2-ancient-near-east">2. Ancient Near East</a>
+<a class="sub" href="#3-northern-western-europe">3. Northern &amp; Western Europe</a>
+<a class="sub" href="#4-south-asia">4. South Asia</a>
+<a class="sub" href="#5-iran-the-zoroastrian-world">5. Iran &amp; the Zoroastrian world</a>
+<a class="sub" href="#6-jewish-christian">6. Jewish &amp; Christian</a>
+<a class="sub" href="#7-islamic">7. Islamic</a>
+<a class="sub" href="#8-east-asia-china-japan-korea">8. East Asia (China, Japan, Korea)</a>
+<a class="sub" href="#9-caucasus-africa-and-the-wider-textual-world">9. Caucasus, Africa, and the wider textual world</a>
+<a class="sub" href="#10-the-oral-ethnographic-world-hard">10. The oral / ethnographic world — HARD</a>
+<a class="sub" href="#the-big-aggregators">The big aggregators</a>
+<a class="sub" href="#obtainability-ranking">Obtainability ranking</a>
+<a class="sub" href="#build-ready-today-vs-needs-work">Build-ready today vs. needs work</a>
+<a class="sub" href="#the-single-biggest-obstacle-per-hard-case">The single biggest obstacle per HARD case</a>
+<a class="sub" href="#read-on">Read on</a></nav>
+</div></div>
+<footer class="footer-full">
+  <div class="cols">
+    <div><h5>Read</h5><a href="../index.html">Overview</a><a href="../what-we-found.html">What we found</a><a href="../crosswalk.html">The motif crosswalk</a><a href="../research/computational-folkloristics.html">Surveys</a><a href="../contribute.html">Contribute</a><a href="../publications.html">Publications</a></div>
+    <div><h5>Connect</h5><a href="https://github.com/haafus/mythoscope">★ GitHub</a><a href="#">Bluesky</a><a href="#">Mastodon</a><a href="mailto:hello@mythoscope.io">hello@mythoscope.io</a></div>
+    <div><h5>Get updates</h5><div class="sub"><input placeholder="you@example.com"><button>Subscribe</button></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Occasional notes — motif &amp; mockup of the month.</div></div>
+  </div>
+  <div class="base"><span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
+    <span class="r"><a href="../publications.html">Cite</a><a href="#">awesome-list</a></span></div>
+</footer>
+</body></html>
