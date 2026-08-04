@@ -36,7 +36,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[viewer]"            # lightweight: browse prebuilt data, no torch
 
 # unpack an export bundle produced by the pipeline, then:
-mytho server                          # serve the web UI + API at http://localhost:8000
+mytho server                          # serve the web UI at http://localhost:8000
 ```
 
 In the viewer build you get the reader, the graphs, the semantic-space plots,
@@ -108,7 +108,7 @@ methodologists.
 ### Contribute code and infrastructure
 
 Mythoscope is a Python pipeline (FastAPI server, a vanilla-JS single-page app, ChromaDB,
-UMAP) with no framework lock-in. Contributions to the platform, the API, the
+UMAP) with no framework lock-in. Contributions to the platform, the
 visualisations, developer tooling, and documentation are all welcome. Start with the setup
 guide and the pipeline overview in [How it works](how-it-works.md); the codebase, issues,
 and pull-request workflow live on
@@ -181,6 +181,6 @@ A few principles govern everything above:
 
 ---
 
-**See also:** [Resources](resources.md) for data downloads, the API, and licences ·
+**See also:** [Resources](resources.md) for external text libraries, tools, and licences ·
 [Publications](publications.md) for how to cite the project · [Credit &
 authorship](credit.md) for the attribution policy.

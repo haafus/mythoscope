@@ -43,7 +43,7 @@ motifs (independent of the corpus) → server
   timeline of ages (*Ages*), linked in order of appearance.
 - **Motifs** — assemble the motif database (below); this runs independently of the corpus.
 - **Server** — a single web application reads the built outputs and serves the interactive
-  views plus a documented REST/OpenAPI service.
+  views.
 
 The whole thing runs through one command-line entry point, and a lightweight *viewer*
 install lets anyone browse prebuilt data — texts, graphs, projections, and

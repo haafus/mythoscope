@@ -1,122 +1,82 @@
 ---
-title: "Resources & downloads"
-description: "Bulk data downloads, DOIs (forthcoming), the experimental read-only API, the repository, the awesome-list, licences, and digital text libraries for comparative mythology."
+title: "Resources"
+description: "External resources for computational comparative mythology: the awesome-computational-mythology list, open digital text libraries, related tools and databases, and licences."
 url: /resources
 tier: C
 ---
 
 # Resources
 
-Everything Mythoscope produces is meant to be taken away and reused: the corpus, the motif
-crosswalk, the graphs, and the projections. This page is the practical index — where to get
-the data, how it is licensed, what the experimental API offers, and which external text
-libraries feed the corpus. For how to *cite* any of it, see [Publications](publications.md).
+A curated set of **external resources** for computational and comparative mythology — where to
+find open texts, related tools, and the wider field. For Mythoscope's own data downloads and
+persistent identifiers, see [Publications](publications.md); to browse the prebuilt data locally
+with the lightweight viewer, see [Contribute](contribute.md#just-view-the-data--no-gpu-no-torch).
 
-## Bulk data downloads
+## The awesome-computational-mythology list
 
-Researchers reuse data dumps, not API clients, so the primary distribution channel is a
-**bulk export bundle**: a portable archive of the built outputs — the cleaned corpus with
-provenance, the character/place/time graphs, the semantic-space projections, and the full
-motif database (the TMI, ATU, and Berezkin indexes plus the derived crosswalk and the
-lexical/semantic parallels). Unpack it and browse it with the lightweight *viewer* install,
-no GPU required; see [Contribute](contribute.md#just-view-the-data--no-gpu-no-torch) for the
-one-command setup.
+The single best starting point is the standalone **awesome-computational-mythology** list — a
+curated, community-maintained index of the tools, datasets, corpora, papers, and reference works
+of the field, following the `awesome` conventions. It is the fastest way to survey what exists,
+and an easy place to make a first contribution (see
+[Contribute](contribute.md#curate-the-awesome-computational-mythology-list)).
 
-The single most novel artifact is the **motif crosswalk dataset** — the machine-readable
-TMI ↔ ATU ↔ Berezkin link structure, released as CSV/JSON with a datasheet. How it is built
-and validated is documented in [The crosswalk](crosswalk.md).
+## Open digital text libraries
 
-### DOIs — forthcoming
+The corpus is assembled from open digital text collections. These are the main external
+repositories where mythological and folklore texts can be sourced for building or extending a
+corpus of your own:
 
-Persistent identifiers are being minted, not invented. **No DOI exists yet.** On the first
-archived release, the following will each receive a citable DOI (via Zenodo) and appear
-here and on [Publications](publications.md):
+- [Project Gutenberg](https://www.gutenberg.org) — public-domain full text, many traditions
+- [Internet Archive](https://archive.org) — scanned books, ethnographic reports, sacred texts
+- [Internet Sacred Text Archive](https://www.sacred-texts.com) — cross-tradition sacred and mythological texts
+- [HathiTrust](https://www.hathitrust.org) — large scanned corpus (public-domain subset downloadable)
+- [Perseus Digital Library](https://www.perseus.tufts.edu) — Greek and Latin
+- [Fordham Internet History Sourcebooks](https://sourcebooks.fordham.edu) — curated primary-source anthologies
+- [Chinese Text Project (ctext.org)](https://ctext.org) — pre-modern Chinese
+- [GRETIL](http://gretil.sub.uni-goettingen.de) — Göttingen Register of Electronic Texts in Indian Languages
+- [TITUS Project](https://titus.uni-frankfurt.de) — Indo-European and Caucasian texts
+- [Open Islamicate Texts Initiative (OpenITI)](https://openiti.org) — Arabic and Islamicate texts
+- [Sefaria](https://www.sefaria.org) — the Jewish canon, with an open data dump
+- [Buddhist Digital Resource Center](https://www.bdrc.io) — Buddhist textual heritage
+- The **Electronic Text Corpus of Sumerian Literature (ETCSL)** — Sumerian literature
+- The **Thesaurus Linguae Aegyptiae** — Egyptian
+- The **Finnish Literature Society (SKS)** folklore archive
+- The **American Folklife Center** (Library of Congress)
+- The **World Oral Literature Project**
 
-- a **software / release DOI** for the repository (with a concept-DOI covering all
-  versions);
-- a **dataset DOI** for the motif crosswalk (CSV/JSON + datasheet);
-- **per-survey DOIs** for the reference surveys, so their "How to cite" blocks resolve.
+Licences, formats, and sourcing difficulty vary widely across these repositories. For a fuller
+treatment — which of roughly forty traditions can be sourced from which repositories, under which
+licences, with EASY / MODERATE / HARD sourcing verdicts — see the
+[corpus-sourcing atlas](research/corpus-sourcing.md), rather than repeating that detail here.
 
-Until those are archived, cite the repository and the specific version you used, following
-[Publications](publications.md). Do not cite a DOI here — there is not one to cite.
+## Related tools, indexes, and databases
 
-## The read-only API — experimental
-
-The Mythoscope server is a FastAPI application, and FastAPI generates interactive API
-documentation for free from the response schemas. It is exposed **read-only** so you can
-inspect and script against the same endpoints the web app uses:
-
-- `/docs` — Swagger UI (interactive endpoint testing);
-- `/redoc` — ReDoc (a readable reference);
-- `/openapi.json` — the OpenAPI schema (for code generation or Postman).
-
-The endpoints cover the corpus catalogue and documents, the traditions, the graphs, the
-motif indexes and crosswalk, and the similarity/projection data.
-
-> **Experimental — no stability guarantees.** This is the server's auto-generated OpenAPI
-> surface, not a supported product API. Endpoints, parameters, and response shapes may
-> change or disappear without notice or versioning. For anything durable, use the **bulk
-> data downloads** above, which are versioned and (soon) DOI'd. A supported public API is
-> not planned for the near term.
-
-## Code, repository, and the awesome-list
-
-- **Repository** — [github.com/haafus/mythoscope](https://github.com/haafus/mythoscope).
-  Source, issues, discussions, and the contribution workflow. Star it to follow along.
-- **awesome-computational-mythology** — a standalone, curated list of the tools, datasets,
-  corpora, papers, and reference works of the field, maintained as its own repository
-  following the `awesome` conventions. It is the fastest way to survey what exists in
-  computational folkloristics and comparative mythology — and an easy place to make a first
-  contribution (see [Contribute](contribute.md#curate-the-awesome-computational-mythology-list)).
+The three traditional folklore indexes Mythoscope integrates — the Thompson Motif-Index, the
+Aarne–Thompson–Uther tale-type catalogue, and Yuri Berezkin's areal catalogue — are described,
+with provenance and links, on their reference pages ([TMI](indexes/tmi.md) · [ATU](indexes/atu.md)
+· [Berezkin](indexes/berezkin.md)) and drawn together in [The crosswalk](crosswalk.md). For the
+broader ecosystem of databases, phylogenetic and cultural-evolution tools, and adjacent projects,
+the [awesome-computational-mythology](#the-awesome-computational-mythology-list) list is the
+maintained catalogue; the [field survey](research/computational-folkloristics.md) and
+[field landscape](research/landscape.md) give the scholarly context.
 
 ## Licences
 
-Mythoscope is licensed by layer, so that each part can be reused on terms appropriate to it:
+Third-party source texts and indexes retain their own terms, which travel with the data. The
+public web corpus is public-domain (Project Gutenberg), but individual source texts and the
+upstream motif indexes carry their own licences and provenance. Mythoscope's own layers are
+licensed as code (MIT), documentation and prose (CC BY-SA 4.0), and derived datasets such as the
+motif crosswalk (CC BY 4.0); full terms are in the repository's
+[`LICENSE`](https://github.com/haafus/mythoscope/blob/main/LICENSE).
 
-| What | Licence |
-|---|---|
-| **Source code** | MIT |
-| **Documentation and prose** | CC BY-SA 4.0 |
-| **Derived datasets** (e.g. the motif crosswalk) | CC BY 4.0 |
-| **Third-party source texts and indexes** | retain their own terms |
+## Repository
 
-The last row matters: the public web corpus is public-domain (Project Gutenberg), but
-individual source texts and the upstream motif indexes carry their own licences and
-provenance, which travel with the data. Berezkin's catalogue and the TMI/ATU data derived
-from the `trilogy` project (CC BY-SA 4.0) are used under their respective terms. Full
-details are in the repository's [`LICENSE`](https://github.com/haafus/mythoscope/blob/main/LICENSE).
-
-## Digital text libraries
-
-The corpus is assembled from open digital text collections. The list below — a starting
-map of where mythological and folklore texts can be sourced — is offered for anyone
-building or extending a corpus of their own:
-
-- **Perseus Digital Library** — Greek and Latin
-- **Internet Sacred Text Archive** — cross-tradition sacred and mythological texts
-- **Electronic Text Corpus of Sumerian Literature (ETCSL)**
-- **Thesaurus Linguae Aegyptiae** — Egyptian
-- **The Sanskrit Library** and **GRETIL** (Göttingen Register of Electronic Texts in Indian
-  Languages)
-- **Chinese Text Project**
-- **National Institute of Japanese Literature** database
-- **Internet Archive**, **Project Gutenberg**, **HathiTrust** — general full-text
-- **Fordham Internet History Sourcebooks**
-- **Open Islamicate Texts Initiative (OpenITI)**
-- **TITUS Project** — Indo-European and Caucasian texts
-- **Finnish Literature Society (SKS)** folklore archive
-- **American Folklife Center** (Library of Congress)
-- **World Oral Literature Project**
-- **Native American Ethnography** database (Alexander Street)
-- **Polynesian Texts Collection** (University of Auckland)
-- **Buddhist Digital Resource Center**
-
-For a fuller treatment — which of roughly forty traditions can be sourced from which
-repositories, under which licences, with EASY/MODERATE/HARD sourcing verdicts — see the
-**corpus-sourcing atlas** in the research surveys, rather than repeating that detail here.
+- [github.com/haafus/mythoscope](https://github.com/haafus/mythoscope) — source, issues,
+  discussions, and the contribution workflow.
 
 ---
 
-**See also:** [Publications](publications.md) for how to cite · [Contribute](contribute.md)
-for how to add to any of the above · [Credit & authorship](credit.md) for the attribution
-policy · [How it works](how-it-works.md) for the pipeline behind the data.
+**See also:** [Publications](publications.md) for how to cite the project ·
+[Contribute](contribute.md) for how to add to any of the above ·
+[Credit & authorship](credit.md) for the attribution policy ·
+[How it works](how-it-works.md) for the pipeline behind the data.
