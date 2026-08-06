@@ -3,34 +3,36 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Layout mockups — Mythoscope</title>
-<link rel="stylesheet" href="mockups.css">
 <style>
-  .wrap{max-width:900px;margin:0 auto;padding:40px 22px}
-  h1{font-family:var(--serif);font-size:32px}
-  .card{display:block;border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:14px 0;background:#fff;color:var(--ink)}
-  .card:hover{text-decoration:none;box-shadow:0 6px 20px rgba(20,30,50,.08)}
-  .card b{font-size:17px}.card p{margin:.4em 0 0;color:var(--muted);font-size:14px}
-  .tag{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--blue);border-radius:20px;padding:3px 10px;margin-left:8px;vertical-align:middle}
+  body{margin:0;background:#faf9f5;color:#212529;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:40px 22px}
+  h1{font-family:Georgia,serif;font-size:30px;margin:0 0 6px}
+  .sub{color:#6c757d;margin:0 0 22px}
+  a.card{display:block;border:1px solid #dee2e6;border-radius:12px;padding:16px 20px;margin:12px 0;background:#fff;color:#212529;text-decoration:none}
+  a.card:hover{box-shadow:0 6px 20px rgba(20,30,50,.08)}
+  .card b{font-size:16px}.card p{margin:.4em 0 0;color:#6c757d;font-size:14px}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#4f7096;border-radius:20px;padding:3px 10px;margin-left:8px}
+  .note{color:#9299a1;font-size:12.5px;margin-top:22px;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Mythoscope — layout mockups</h1>
-  <p style="color:var(--muted)">Standalone HTML (no build). Real generated copy inside. Two modes — <b>app</b> and <b>document</b> — with both footers and every menu style.</p>
+  <p class="sub">Built on the real <code>app.css</code> and the real section markup — an evolution of the live interface, not a copy. Two modes (app · document), both footers, every menu style.</p>
 
-  <a class="card" href="app.html"><b>A · App layout</b><span class="tag">flat tabs · thin footer</span>
-    <p>The tool: flat, always-visible view tabs (Sources · Similarity · Ages · Realms · Beings · Atlas · Motifs), viewport-locked shell with inner-scrolling rails, and the <b>thin app footer</b>. Shown on the Similarity view.</p></a>
+  <a class="card" href="app.html"><b>A · App — Similarity</b><span class="tag">real analysis-page · thin footer</span>
+    <p>The live <code>.workspace</code> grid (library-sidebar · plot · rail), flat view tabs, and a <b>Research ▾</b> dropdown that replaces the old “i”. The thin footer is a flex child of the app shell — it fits the viewport, no scroll.</p></a>
 
-  <a class="card" href="app-structure.html"><b>B · App — “Structure” grouping</b><span class="tag">merged tab</span>
-    <p>Ages / Realms / Beings collapsed into a single <b>Structure</b> tab; the choice among the three moves into the section's left rail (segmented control). Fewer top-level tabs, same reach.</p></a>
+  <a class="card" href="app-structure.html"><b>B · App — “Structure” grouping</b><span class="tag">real graph-page</span>
+    <p>Ages / Realms / Beings collapsed into one <b>Structure</b> tab; the choice among the three moves into the section's left rail (a segmented control above the book list).</p></a>
 
   <a class="card" href="document-dropdown.html"><b>C · Document — Research ▾ nav</b><span class="tag">dropdown · full footer</span>
-    <p>Docs as normal long-scroll pages: shared header with a <b>Research ▾</b> dropdown TOC, breadcrumbs, a reading column with a right-rail on-page TOC, and the <b>full footer</b>. Content: the 14 regions.</p></a>
+    <p>Scrollable doc page in the same chrome: sticky header with the Research dropdown TOC, breadcrumbs, a reading column + right-rail on-page TOC, and the full footer. Content: the 14 regions.</p></a>
 
   <a class="card" href="document-sidebar.html"><b>D · Document — side-column nav</b><span class="tag">sidebar · full footer</span>
-    <p>Same document page, but the A/B/C tree is a <b>persistent left sidebar</b> instead of a dropdown. Constant “you are here”, at the cost of a narrower reading column.</p></a>
+    <p>Same page, but the A/B/C tree is a persistent left sidebar instead of a dropdown (so the header drops both the dropdown and the redundant About).</p></a>
 
-  <p style="color:var(--muted-soft);font-size:12.5px;margin-top:24px">Design tokens (warm #faf9f5, Georgia headings, uppercase blue-grey nav) taken from the live app. Placeholder scatter/graph are static; real views render live.</p>
+  <p class="note">Each page links <code>../../../src/server/web/assets/app.css</code> (the product) plus <code>mockup-additions.css</code> (only the proposed new pieces). Placeholder scatter/graph are static; real views render live.</p>
 </div>
 </body>
 </html>

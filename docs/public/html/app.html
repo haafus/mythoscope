@@ -2,87 +2,101 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mockup · App layout (Similarity) — Mythoscope</title>
-<link rel="stylesheet" href="mockups.css">
+<title>Mythoscope — Similarity</title>
+<link rel="stylesheet" href="../../../src/server/web/assets/app.css">
+<link rel="stylesheet" href="mockup-additions.css">
 </head>
-<body>
-<div class="banner"><span><b>Mockup A · App layout</b> — flat view tabs · inner-scroll shell · <b>thin footer</b></span>
-  <span><a href="index.html">← all mockups</a> · <a href="app-structure.html">Structure variant →</a></span></div>
+<body class="has-main-navbar">
 
-<header class="site-header">
-  <div class="brand"><span class="glyph">M</span> Mythoscope</div>
-  <nav class="nav">
-    <a>Sources</a><a class="active">Similarity</a>
-    <a>Ages</a><a>Realms</a><a>Beings</a><a>Atlas</a><a>Motifs</a>
-    <span class="sep"></span>
-    <div class="has-menu"><span class="navitem">Research</span>
-      <div class="menu">
-        <h4>A · The argument</h4><a>Overview</a><a>What we found</a><a>Case studies</a><a>How it works</a>
+<header class="main-navbar">
+  <div class="nav-logo"><a href="#"><span class="wordmark">Mythoscope</span></a></div>
+  <nav class="nav-links">
+    <a href="#">Sources</a>
+    <a href="#" class="active">Similarity</a>
+    <a href="#">Ages</a><a href="#">Realms</a><a href="#">Beings</a>
+    <a href="#">Atlas</a><a href="#">Motifs</a>
+    <div class="has-menu" tabindex="0"><span class="navtrigger">Research</span>
+      <div class="nav-menu">
+        <h4>A · The argument</h4><a>Overview</a><a>What we found</a><a>Case studies</a><a>How it works</a><a>About</a>
         <h4>B · Reference &amp; surveys</h4><a>The motif crosswalk</a><a>The three indexes</a><a>Field survey</a><a>The 14 regions</a>
         <h4>C · Participate</h4><a>Contribute</a><a>Resources</a><a>Publications</a>
       </div>
     </div>
-    <a class="star">★ GitHub</a><a class="info">i</a>
+    <a href="#" style="color:#b8860b">★ GitHub</a>
   </nav>
 </header>
 
-<main class="app">
-  <!-- left rail: content selection within the view (NOT site nav) -->
-  <aside class="rail">
-    <h3>Traditions</h3>
-    <div class="tree">
-      <span class="grp"><span class="dot" style="background:#E0B45E"></span>Near East &amp; N. Africa</span>
-      <a class="leaf">Sumerian</a><a class="leaf">Egyptian</a><a class="leaf">Jewish</a>
-      <span class="grp"><span class="dot" style="background:#4F7A4E"></span>Europe</span>
-      <a class="leaf">Greek</a><a class="leaf">Norse</a><a class="leaf">Celtic</a>
-      <span class="grp"><span class="dot" style="background:#9E4A6E"></span>Caucasus &amp; Iran</span>
-      <a class="leaf">Persian / Zoroastrian</a><a class="leaf">Armenian</a>
-      <span class="grp"><span class="dot" style="background:#BF6B3A"></span>Mesoamerica &amp; Andes</span>
-      <a class="leaf active">Maya — The Popol Vuh</a><a class="leaf">Aztec / Nahua</a>
-    </div>
-  </aside>
+<div id="app">
+  <main class="analysis-page container">
+    <div class="workspace">
 
-  <!-- main: the tool view -->
-  <section class="main">
-    <div class="canvas">
-      <div class="pt" style="left:22%;top:30%;background:#E0B45E"></div>
-      <div class="pt" style="left:28%;top:44%;background:#E0B45E"></div>
-      <div class="pt" style="left:33%;top:37%;background:#E0B45E"></div>
-      <div class="pt" style="left:58%;top:26%;background:#4F7A4E"></div>
-      <div class="pt" style="left:64%;top:33%;background:#4F7A4E"></div>
-      <div class="pt" style="left:69%;top:22%;background:#4F7A4E"></div>
-      <div class="pt" style="left:61%;top:41%;background:#4F7A4E"></div>
-      <div class="pt" style="left:44%;top:60%;background:#9E4A6E"></div>
-      <div class="pt" style="left:50%;top:66%;background:#9E4A6E"></div>
-      <div class="pt" style="left:38%;top:70%;background:#BF6B3A;width:15px;height:15px;box-shadow:0 0 0 4px rgba(191,107,58,.25)"></div>
-      <div class="pt" style="left:33%;top:76%;background:#BF6B3A"></div>
-      <div class="pt" style="left:46%;top:80%;background:#BF6B3A"></div>
-      <div class="pt" style="left:75%;top:58%;background:#2f6fed"></div>
-      <div class="pt" style="left:80%;top:65%;background:#2f6fed"></div>
-      <div class="pt" style="left:72%;top:71%;background:#2f6fed"></div>
-      <div class="pt" style="left:16%;top:52%;background:#E0B45E"></div>
-      <div class="pt" style="left:55%;top:50%;background:#4F7A4E"></div>
-      <div class="pt" style="left:24%;top:64%;background:#BF6B3A"></div>
-      <div style="position:absolute;left:14px;bottom:12px;font-size:11px;color:#9299a1">bge-m3 · UMAP · colour = region · click a point to explore neighbours</div>
-    </div>
-  </section>
+      <div class="library-sidebar">
+        <div id="tree-container">
+          <div class="mk-tree">
+            <span class="grp"><span class="mk-dot" style="background:#E0B45E"></span>Near East &amp; N. Africa</span>
+            <a href="#">Sumerian</a><a href="#">Egyptian</a><a href="#">Jewish</a>
+            <span class="grp"><span class="mk-dot" style="background:#4F7A4E"></span>Europe</span>
+            <a href="#">Greek</a><a href="#">Norse</a>
+            <span class="grp"><span class="mk-dot" style="background:#9E4A6E"></span>Caucasus &amp; Iran</span>
+            <a href="#">Persian / Zoroastrian</a>
+            <span class="grp"><span class="mk-dot" style="background:#BF6B3A"></span>Mesoamerica &amp; Andes</span>
+            <a href="#" class="active">Maya — The Popol Vuh</a><a href="#">Aztec / Nahua</a>
+          </div>
+        </div>
+        <div class="sidebar-controls">
+          <div class="form-group"><label>Model:</label><select><option>bge-m3</option></select></div>
+          <div class="form-group"><label>Method:</label><select><option>UMAP</option></select></div>
+        </div>
+      </div>
 
-  <!-- right rail: fragment / neighbour info -->
-  <aside class="rail right">
-    <div class="infocard">
-      <div class="k">Fragment · Maya · The Popol Vuh #76</div>
-      <div class="frag">…of a stream bridged by an enormous snake. The dead must pay toll to a dog and a dragon at the nine rivers before entering the underworld of Xibalba…</div>
-    </div>
-    <div class="k" style="font:600 10px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#9299a1;margin:14px 6px 8px">Similar fragments</div>
-    <div class="infocard"><div class="frag"><b>Aztec · 0.81</b> — the road to Mictlan crosses nine rivers, guarded by a yellow dog…</div></div>
-    <div class="infocard"><div class="frag"><b>Norse · 0.74</b> — Hermóðr rides nine nights down dark valleys to the bridge over the river Gjöll…</div></div>
-    <div class="infocard"><div class="frag"><b>Greek · 0.71</b> — the ferryman Charon takes the shade across the Acheron; the hound Cerberus keeps the gate…</div></div>
-  </aside>
-</main>
+      <div class="plot-area">
+        <div class="card plot-container" id="plotContainer">
+          <div class="plot-canvas" id="plotCanvas" style="position:relative">
+            <div class="mk-plot">
+              <div class="mk-pt" style="left:22%;top:30%;background:#E0B45E"></div>
+              <div class="mk-pt" style="left:29%;top:44%;background:#E0B45E"></div>
+              <div class="mk-pt" style="left:34%;top:37%;background:#E0B45E"></div>
+              <div class="mk-pt" style="left:58%;top:26%;background:#4F7A4E"></div>
+              <div class="mk-pt" style="left:65%;top:33%;background:#4F7A4E"></div>
+              <div class="mk-pt" style="left:69%;top:22%;background:#4F7A4E"></div>
+              <div class="mk-pt" style="left:61%;top:41%;background:#4F7A4E"></div>
+              <div class="mk-pt" style="left:44%;top:60%;background:#9E4A6E"></div>
+              <div class="mk-pt" style="left:50%;top:66%;background:#9E4A6E"></div>
+              <div class="mk-pt" style="left:38%;top:70%;background:#BF6B3A;width:15px;height:15px;box-shadow:0 0 0 4px rgba(191,107,58,.25)"></div>
+              <div class="mk-pt" style="left:33%;top:76%;background:#BF6B3A"></div>
+              <div class="mk-pt" style="left:46%;top:80%;background:#BF6B3A"></div>
+              <div class="mk-pt" style="left:75%;top:58%;background:#2f6fed"></div>
+              <div class="mk-pt" style="left:80%;top:65%;background:#2f6fed"></div>
+              <div class="mk-pt" style="left:16%;top:52%;background:#E0B45E"></div>
+              <div class="mk-pt" style="left:55%;top:50%;background:#4F7A4E"></div>
+              <div class="mk-pt" style="left:24%;top:64%;background:#BF6B3A"></div>
+              <div class="mk-cap">bge-m3 · UMAP · colour = region · click a point to explore neighbours</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<footer class="footer-thin">
+      <div class="sidebar rail">
+        <div class="card"><div class="card-body rail-body">
+          <div class="mk-card">
+            <div class="mk-k">Fragment · Maya · The Popol Vuh #76</div>
+            <div class="mk-frag">…of a stream bridged by an enormous snake. The dead must pay toll to a dog and a dragon at the nine rivers before entering the underworld of Xibalba…</div>
+          </div>
+          <div class="mk-k" style="margin:16px 12px 8px">Similar fragments</div>
+          <div class="mk-card"><div class="mk-frag"><b>Aztec · 0.81</b> — the road to Mictlan crosses nine rivers, guarded by a yellow dog…</div></div>
+          <div class="mk-card"><div class="mk-frag"><b>Norse · 0.74</b> — Hermóðr rides nine nights down dark valleys to the bridge over the river Gjöll…</div></div>
+          <div class="mk-card"><div class="mk-frag"><b>Greek · 0.71</b> — the ferryman Charon takes the shade across the Acheron; the hound Cerberus keeps the gate…</div></div>
+        </div></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<footer class="app-footer">
   <span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
-  <span class="r"><a>About</a><a>Research ↗</a><a>★ GitHub</a></span>
+  <span class="r"><a href="#">Research ↗</a><a href="#">★ GitHub</a></span>
 </footer>
+
 </body>
 </html>
