@@ -22,7 +22,6 @@
         <h4>C · Participate</h4><a>Contribute</a><a>Resources</a><a>Publications</a>
       </div>
     </div>
-    <a href="#" style="color:#b8860b">★ GitHub</a>
   </nav>
 </header>
 
@@ -31,17 +30,29 @@
     <div class="workspace">
 
       <div class="library-sidebar">
-        <div id="tree-container">
-          <div class="mk-tree">
-            <span class="grp"><span class="mk-dot" style="background:#E0B45E"></span>Near East &amp; N. Africa</span>
-            <a href="#">Sumerian</a><a href="#">Egyptian</a><a href="#">Jewish</a>
-            <span class="grp"><span class="mk-dot" style="background:#4F7A4E"></span>Europe</span>
-            <a href="#">Greek</a><a href="#">Norse</a>
-            <span class="grp"><span class="mk-dot" style="background:#9E4A6E"></span>Caucasus &amp; Iran</span>
-            <a href="#">Persian / Zoroastrian</a>
-            <span class="grp"><span class="mk-dot" style="background:#BF6B3A"></span>Mesoamerica &amp; Andes</span>
-            <a href="#" class="active">Maya — The Popol Vuh</a><a href="#">Aztec / Nahua</a>
-          </div>
+        <!-- the real Similarity tree: renderTraditionList → major-section / tradition-pick -->
+        <div id="tree-container" class="library-tree">
+          <section class="major-section collapsed" data-major="Near East &amp; N. Africa">
+            <button class="major-title" type="button">Near East &amp; N. Africa</button>
+            <div class="major-body">
+              <button class="tradition-title tradition-pick" type="button" data-tradition="Sumerian" style="--tradition-color:#E0B45E"><span class="tradition-dot"></span><span class="tradition-name">Sumerian</span></button>
+              <button class="tradition-title tradition-pick" type="button" data-tradition="Egyptian" style="--tradition-color:#D9A94C"><span class="tradition-dot"></span><span class="tradition-name">Egyptian</span></button>
+            </div>
+          </section>
+          <section class="major-section collapsed" data-major="Europe">
+            <button class="major-title" type="button">Europe</button>
+            <div class="major-body">
+              <button class="tradition-title tradition-pick" type="button" data-tradition="Greek" style="--tradition-color:#4F7A4E"><span class="tradition-dot"></span><span class="tradition-name">Greek</span></button>
+              <button class="tradition-title tradition-pick" type="button" data-tradition="Norse" style="--tradition-color:#5C8A5B"><span class="tradition-dot"></span><span class="tradition-name">Norse</span></button>
+            </div>
+          </section>
+          <section class="major-section" data-major="Mesoamerica &amp; Andes">
+            <button class="major-title" type="button">Mesoamerica &amp; Andes</button>
+            <div class="major-body">
+              <button class="tradition-title tradition-pick active" type="button" data-tradition="Maya" style="--tradition-color:#BF6B3A"><span class="tradition-dot"></span><span class="tradition-name">Maya</span></button>
+              <button class="tradition-title tradition-pick" type="button" data-tradition="Aztec" style="--tradition-color:#B05E33"><span class="tradition-dot"></span><span class="tradition-name">Aztec / Nahua</span></button>
+            </div>
+          </section>
         </div>
         <div class="sidebar-controls">
           <div class="form-group"><label>Model:</label><select><option>bge-m3</option></select></div>
@@ -78,14 +89,33 @@
 
       <div class="sidebar rail">
         <div class="card"><div class="card-body rail-body">
-          <div class="mk-card">
-            <div class="mk-k">Fragment · Maya · The Popol Vuh #76</div>
-            <div class="mk-frag">…of a stream bridged by an enormous snake. The dead must pay toll to a dog and a dragon at the nine rivers before entering the underworld of Xibalba…</div>
+          <!-- the real Similarity rail: info-content → fragment-detail + fragments-divider + neighbor-item -->
+          <div class="info-content">
+            <div class="fragment-detail">
+              <div class="fragment-text">…of a stream bridged by an enormous snake. The dead must pay toll to a dog and a dragon at the nine rivers before they enter the underworld of Xibalba, where the Lords of Death keep their houses of cold, of jaguars, and of knives.</div>
+              <div class="fragment-attribution">
+                <span class="fragment-tradition">— Maya</span>
+                <span class="fragment-title">The Popol Vuh</span>
+                <span class="fragment-chunk">chunk 76</span>
+              </div>
+            </div>
+            <div class="fragments-divider">
+              <span>Similar fragments</span>
+              <label class="cross-toggle"><input type="checkbox" checked> only other traditions</label>
+            </div>
+            <div class="neighbor-item">
+              <div class="fragment-text">The road to Mictlan crosses nine rivers, and the dead are carried over the last on the back of a small yellow dog kept for that purpose in life.</div>
+              <div class="fragment-attribution"><span class="fragment-tradition">— Aztec</span><span class="fragment-title">Florentine Codex</span><span class="fragment-chunk">chunk 41, score 0.81</span></div>
+            </div>
+            <div class="neighbor-item">
+              <div class="fragment-text">Hermóðr rode nine nights through valleys dark and deep until he came to the river Gjöll and the golden bridge that is roofed over it.</div>
+              <div class="fragment-attribution"><span class="fragment-tradition">— Norse</span><span class="fragment-title">The Prose Edda</span><span class="fragment-chunk">chunk 118, score 0.74</span></div>
+            </div>
+            <div class="neighbor-item">
+              <div class="fragment-text">The ferryman Charon takes the shade across the Acheron; the hound Cerberus fawns on those who enter but suffers none to return.</div>
+              <div class="fragment-attribution"><span class="fragment-tradition">— Greek</span><span class="fragment-title">Bibliotheca</span><span class="fragment-chunk">chunk 9, score 0.71</span></div>
+            </div>
           </div>
-          <div class="mk-k" style="margin:16px 12px 8px">Similar fragments</div>
-          <div class="mk-card"><div class="mk-frag"><b>Aztec · 0.81</b> — the road to Mictlan crosses nine rivers, guarded by a yellow dog…</div></div>
-          <div class="mk-card"><div class="mk-frag"><b>Norse · 0.74</b> — Hermóðr rides nine nights down dark valleys to the bridge over the river Gjöll…</div></div>
-          <div class="mk-card"><div class="mk-frag"><b>Greek · 0.71</b> — the ferryman Charon takes the shade across the Acheron; the hound Cerberus keeps the gate…</div></div>
         </div></div>
       </div>
 
@@ -95,7 +125,7 @@
 
 <footer class="app-footer">
   <span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
-  <span class="r"><a href="#">Research ↗</a><a href="#">★ GitHub</a></span>
+  <span class="r"><a href="#">Research ↗</a></span>
 </footer>
 
 </body>

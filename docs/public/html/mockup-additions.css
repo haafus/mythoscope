@@ -1,23 +1,24 @@
-/* Mockup additions — a PROPOSED EVOLUTION of the live app.css, loaded AFTER it.
-   Every mockup links the real ../../../src/server/web/assets/app.css, so the chrome, the
-   .workspace grid, the rails and cards are the actual product. This file adds only the new
-   pieces on top, using the real design tokens: the navbar Research dropdown (which replaces the
-   standalone "i"), the thin app footer, the Structure sub-selector, and the document mode
-   (scrollable doc pages + full footer). */
+/* Mockup additions — a PROPOSED EVOLUTION of the live app.css, loaded AFTER it. Every mockup
+   links the real ../../../src/server/web/assets/app.css and reproduces the actual section markup
+   (library-tree / tradition-pick / document-list / fragment-detail / graph-info-*), so the side
+   columns and rails are styled by the product itself. This file adds only the new pieces:
+   the navbar Research dropdown, the thin app footer, the Structure sub-selector, the document
+   mode (scrollable doc pages + full footer), and static stand-ins for the plot/graph canvases. */
 
 /* text logo stand-in (the real navbar uses /assets/logo.png, absolute → broken over file://) */
 .nav-logo .wordmark{font-family:Georgia,"Times New Roman",serif;font-size:21px;color:#2c3440;letter-spacing:.01em}
 
-/* ---- Research dropdown in .nav-links (replaces the "i" icon) ---- */
+/* ---- Research dropdown in .nav-links (replaces the "i") ---- */
 .nav-links .has-menu{position:relative;display:inline-flex}
 .nav-links .has-menu>.navtrigger{color:#7c828b;font-size:12.5px;letter-spacing:.11em;text-transform:uppercase;
   padding:7px 13px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.nav-links .has-menu>.navtrigger.active{color:#2c3440;background:#e9eef5}
 .nav-links .has-menu>.navtrigger::after{content:" ▾";letter-spacing:0}
 .nav-links .has-menu:hover>.navtrigger,.nav-links .has-menu:focus-within>.navtrigger{color:#fff;background:#4f7096}
 .nav-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:320px;background:#fff;border:1px solid var(--border);
   border-radius:10px;box-shadow:0 12px 34px rgba(20,30,50,.14);padding:10px;display:none;text-align:left;z-index:1300}
 .has-menu:hover .nav-menu,.has-menu:focus-within .nav-menu{display:block}
-.nav-menu h4{margin:8px 8px 4px;font:600 10px/1 var(--sans,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#9299a1}
+.nav-menu h4{margin:8px 8px 4px;font:600 10px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9299a1}
 .nav-menu a{display:block;padding:6px 8px;border-radius:6px;color:#2c3440;font-size:13.5px;letter-spacing:0;text-transform:none;text-decoration:none}
 .nav-menu a:hover{background:#eef3f4}
 .nav-menu a.active{background:#e9eef5;font-weight:600}
@@ -30,47 +31,34 @@
 .app-footer a:hover{color:#2c3440}
 .app-footer .r{display:flex;gap:16px}
 
-/* ---- Structure sub-selector (Ages/Realms/Beings), lives in the graph sidebar ---- */
-.struct-seg{display:flex;gap:4px;background:#eceae3;border-radius:9px;padding:4px;margin:0 0 12px}
-.struct-seg button{flex:1;border:0;background:transparent;font:600 12.5px/1 var(--sans,sans-serif);color:#5a616b;padding:7px 6px;border-radius:6px;cursor:pointer}
+/* ---- Structure sub-selector, lives in the graph sidebar ---- */
+.rail-label{font:600 10px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:2px 4px 8px}
+.struct-seg{display:flex;gap:4px;background:#eceae3;border-radius:9px;padding:4px;margin:0 0 10px}
+.struct-seg button{flex:1;border:0;background:transparent;font:600 12.5px/1 sans-serif;color:#5a616b;padding:7px 6px;border-radius:6px;cursor:pointer}
 .struct-seg button.on{background:#fff;color:#111;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.rail-label{font:600 10px/1 var(--sans,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:4px 4px 8px}
 
-/* ---- representative sidebar list + placeholders inside the real containers ---- */
-.mk-tree .grp{display:block;padding:6px 8px;font-weight:600;color:#212529;font-size:13.5px;margin-top:6px}
-.mk-tree a{display:block;padding:5px 8px 5px 22px;border-radius:6px;color:#4a525c;font-size:13.5px;text-decoration:none}
-.mk-tree a:hover{background:#eef3f4}.mk-tree a.active{background:#e9eef5;color:#111}
-.mk-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
-.mk-plot{position:absolute;inset:0;background:radial-gradient(circle at 35% 40%,#fff,#f6f4ee)}
+/* ---- static stand-ins for the Plotly scatter / cytoscape graph canvases ---- */
+.plot-canvas,.graph-canvas{position:relative}
+.mk-plot{position:absolute;inset:0;background:radial-gradient(circle at 40% 42%,#fff,#f6f4ee)}
 .mk-pt{position:absolute;width:11px;height:11px;border-radius:50%;opacity:.85}
 .mk-node{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .mk-edge{position:absolute;height:2px;background:#c7ccd3;transform-origin:left center}
 .mk-cap{position:absolute;left:14px;bottom:12px;font-size:11px;color:#9299a1}
-.mk-card{border:1px solid var(--border);border-radius:8px;background:#fff;padding:11px 12px;margin:12px}
-.mk-card:first-child{margin-top:12px}
-.mk-k{font:600 10px/1 var(--sans,sans-serif);letter-spacing:.12em;text-transform:uppercase;color:#9299a1;margin-bottom:6px}
-.mk-frag{font-size:13.5px;color:#333;line-height:1.55}
 
-/* ===================== DOCUMENT MODE (scrollable pages) ===================== */
-.docs-body{overflow:visible}          /* not the app's viewport-lock; normal page scroll */
-.docs-body .main-navbar{position:sticky;top:0;max-width:none;padding-left:0;padding-right:0;
-  background:rgba(250,249,245,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
-.docs-body .main-navbar>*{max-width:var(--content-max);margin:0 auto;width:100%;padding:0 var(--page-gutter);display:flex;align-items:center}
-.docs-body .main-navbar{display:block;padding:8px 0}
-.docs-body .main-navbar .bar{max-width:var(--content-max);margin:0 auto;padding:0 var(--page-gutter);display:flex;align-items:center;justify-content:space-between;gap:16px 28px}
+/* ===================== DOCUMENT MODE (scrollable research pages) ===================== */
+.docs-body{overflow:visible !important;height:auto !important;display:block !important}
+.docs-body .main-navbar{position:sticky;top:0;background:rgba(250,249,245,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);z-index:1200}
+.docs-body .library-sidebar{position:sticky;top:74px;align-self:start;overflow:visible;height:auto}
+/* research nav has no tradition layer — show the doc-list straight under an open major-section */
+.docs-body .library-sidebar .major-section:not(.collapsed) .document-list{display:block}
 .crumbs{max-width:var(--content-max);margin:0 auto;padding:16px var(--page-gutter) 0;color:var(--muted);font-size:12.5px}
 .crumbs a{color:var(--muted);text-decoration:none}.crumbs .s{margin:0 6px;color:#9299a1}
 .doc-wrap{max-width:var(--content-max);margin:0 auto;padding:0 var(--page-gutter)}
 .doc-grid{display:grid;grid-template-columns:1fr;gap:34px;padding:22px 0 44px}
 .doc-grid.with-toc{grid-template-columns:minmax(0,1fr) 210px}
-.doc-grid.with-sidebar{grid-template-columns:240px minmax(0,1fr)}
-.docnav{position:sticky;top:74px;align-self:start;font-size:13.5px;border-right:1px solid #e8e6df;padding-right:14px}
-.docnav h4{font:600 10px/1 var(--sans,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:16px 0 6px}
-.docnav h4:first-child{margin-top:0}
-.docnav a{display:block;padding:4px 8px;border-radius:6px;color:#48505a;text-decoration:none}
-.docnav a:hover{background:#eef3f4}.docnav a.active{background:#e9eef5;color:#111;font-weight:600}
+.doc-grid.with-sidebar{grid-template-columns:250px minmax(0,1fr)}
 .toc{position:sticky;top:74px;align-self:start;font-size:12.5px}
-.toc h4{font:600 10px/1 var(--sans,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:0 0 8px}
+.toc h4{font:600 10px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:0 0 8px}
 .toc a{display:block;padding:3px 0;color:#5a616b;text-decoration:none}.toc a.sub{padding-left:12px;color:#8a919b}
 .prose{max-width:760px;min-width:0}
 .prose h1{font-family:Georgia,serif;font-size:33px;line-height:1.15;margin:.2em 0 .5em}
@@ -88,11 +76,11 @@
 .docs-cta:hover{background:#3f5c7d}
 .footer-full{border-top:1px solid var(--border);background:#f4f2ec;margin-top:20px}
 .footer-full .cols{max-width:var(--content-max);margin:0 auto;padding:34px var(--page-gutter) 10px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
-.footer-full h5{font:600 10px/1 var(--sans,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:0 0 12px}
+.footer-full h5{font:600 10px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9299a1;margin:0 0 12px}
 .footer-full a{display:block;color:#4a525c;font-size:13.5px;padding:3px 0;text-decoration:none}
 .footer-full .sub{display:flex;gap:8px;margin-top:6px}
 .footer-full .sub input{flex:1;border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-size:13px}
 .footer-full .sub button{border:0;background:#4f7096;color:#fff;border-radius:7px;padding:8px 14px;font-weight:600}
 .footer-full .base{max-width:var(--content-max);margin:0 auto;padding:12px var(--page-gutter) 26px;border-top:1px solid var(--border);display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
 .footer-full .base .r{display:flex;gap:16px}
-@media(max-width:900px){.doc-grid.with-toc,.doc-grid.with-sidebar{grid-template-columns:1fr}.footer-full .cols{grid-template-columns:1fr}}
+@media(max-width:900px){.doc-grid.with-toc,.doc-grid.with-sidebar{grid-template-columns:1fr}.footer-full .cols{grid-template-columns:1fr}.docs-body .library-sidebar{position:static}}

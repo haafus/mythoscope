@@ -22,7 +22,6 @@
         <h4>C · Participate</h4><a>Contribute</a><a>Resources</a><a>Publications</a>
       </div>
     </div>
-    <a href="#" style="color:#b8860b">★ GitHub</a>
   </nav>
 </header>
 
@@ -31,16 +30,45 @@
     <div class="workspace">
 
       <aside class="library-sidebar">
-        <!-- the three former top-tabs, now the section's sub-choice -->
+        <!-- Ages / Realms / Beings collapse into one Structure tab; the choice moves into the rail -->
         <div class="rail-label">Structure — graph</div>
         <div class="struct-seg"><button>Ages</button><button>Realms</button><button class="on">Beings</button></div>
-        <div id="graphBookList">
-          <div class="mk-tree">
-            <span class="grp"><span class="mk-dot" style="background:#4F7A4E"></span>Europe</span>
-            <a href="#" class="active">Greek — Theogony</a><a href="#">Norse — Prose Edda</a>
-            <span class="grp"><span class="mk-dot" style="background:#E0B45E"></span>South Asia</span>
-            <a href="#">Hindu — Ramayana</a>
-          </div>
+        <!-- the real graph tree: renderLibraryTree → major-section / tradition-group / document-list -->
+        <div id="graphBookList" class="library-tree">
+          <section class="major-section collapsed" data-major="Near East &amp; N. Africa">
+            <button class="major-title" type="button">Near East &amp; N. Africa</button>
+            <div class="major-body">
+              <div class="tradition-group" data-tradition="Sumerian">
+                <button class="tradition-title" type="button" style="--tradition-color:#E0B45E"><span class="tradition-dot"></span><span class="tradition-name">Sumerian</span><span class="tradition-toggle">▸</span></button>
+                <ul class="document-list"><li><button class="document-button" type="button">Enūma Eliš</button></li></ul>
+              </div>
+            </div>
+          </section>
+          <section class="major-section" data-major="Europe">
+            <button class="major-title" type="button">Europe</button>
+            <div class="major-body">
+              <div class="tradition-group open" data-tradition="Greek">
+                <button class="tradition-title" type="button" style="--tradition-color:#4F7A4E"><span class="tradition-dot"></span><span class="tradition-name">Greek</span><span class="tradition-toggle">▾</span></button>
+                <ul class="document-list">
+                  <li><button class="document-button active" type="button">Theogony</button></li>
+                  <li><button class="document-button" type="button">Bibliotheca</button></li>
+                </ul>
+              </div>
+              <div class="tradition-group" data-tradition="Norse">
+                <button class="tradition-title" type="button" style="--tradition-color:#5C8A5B"><span class="tradition-dot"></span><span class="tradition-name">Norse</span><span class="tradition-toggle">▸</span></button>
+                <ul class="document-list"><li><button class="document-button" type="button">The Prose Edda</button></li></ul>
+              </div>
+            </div>
+          </section>
+          <section class="major-section collapsed" data-major="South Asia">
+            <button class="major-title" type="button">South Asia</button>
+            <div class="major-body">
+              <div class="tradition-group" data-tradition="Hindu">
+                <button class="tradition-title" type="button" style="--tradition-color:#9E4A6E"><span class="tradition-dot"></span><span class="tradition-name">Hindu</span><span class="tradition-toggle">▸</span></button>
+                <ul class="document-list"><li><button class="document-button" type="button">The Rāmāyaṇa</button></li></ul>
+              </div>
+            </div>
+          </section>
         </div>
       </aside>
 
@@ -57,22 +85,25 @@
             <div class="mk-node" style="left:60%;top:26%;width:40px;height:40px;background:#4f7096">Hera</div>
             <div class="mk-node" style="left:66%;top:58%;width:34px;height:34px;background:#4F7A4E">Titans</div>
             <div class="mk-node" style="left:38%;top:66%;width:34px;height:34px;background:#4f7096">Gaia</div>
-            <div class="mk-node" style="left:16%;top:52%;width:30px;height:30px;background:#4F7A4E">Sky</div>
-            <div class="mk-cap">Beings graph · fcose layout · hover a node for its description</div>
+            <div class="mk-node" style="left:16%;top:52%;width:30px;height:30px;background:#4F7A4E">Ouranos</div>
+            <div class="mk-cap">Beings graph · Theogony · fcose layout · hover a node for its description</div>
           </div>
         </div>
       </section>
 
       <aside class="graph-rail rail">
-        <div class="card graph-info-panel">
-          <div class="rail-body">
-            <div class="mk-card">
-              <div class="mk-k">Node · Beings · Greek</div>
-              <div style="font-family:Georgia,serif;font-size:19px;margin:4px 0">Zeus</div>
-              <div class="mk-frag">King of the gods; sky and thunder. Youngest son of Kronos and Rhea; overthrows the Titans and divides the cosmos with Poseidon and Hades.</div>
-            </div>
-            <div class="mk-k" style="margin:16px 12px 8px">Relations</div>
-            <div class="mk-card"><div class="mk-frag">→ <b>overthrows</b> Kronos<br>→ <b>married to</b> Hera<br>→ <b>father of</b> Athena, Apollo, Ares</div></div>
+        <div class="card graph-info-panel" id="graphInfoPanel">
+          <!-- the real graph rail: graphInfoContent → h3 + graph-info-desc + graph-info-field + table -->
+          <div id="graphInfoContent" class="rail-body">
+            <h3>Zeus</h3>
+            <p class="graph-info-desc">Youngest son of Kronos and Rhea; king of the gods of Olympos. He overthrows the Titans, divides the cosmos with Poseidon and Hades, and reigns as god of sky, weather, law, and fate.</p>
+            <div class="graph-info-field"><div class="graph-info-label">Roles</div><div class="graph-info-value">Sky, Thunder, Kingship, Justice</div></div>
+            <div class="graph-info-field"><div class="graph-info-label">Epithets</div><div class="graph-info-value">Cloud-gatherer, Aegis-bearing, Father of gods and men</div></div>
+            <div class="graph-info-field"><div class="graph-info-label">Actions</div><div class="graph-info-value">Overthrows Kronos; swallows Metis; fathers Athena, Apollo, Artemis, Ares</div></div>
+            <table>
+              <tr><th>Degree</th><td>14</td></tr>
+              <tr><th>Betweenness Centrality</th><td>0.187</td></tr>
+            </table>
           </div>
         </div>
       </aside>
@@ -83,7 +114,7 @@
 
 <footer class="app-footer">
   <span>© 2026 Mythoscope · content CC-BY-SA · data CC-BY · code MIT</span>
-  <span class="r"><a href="#">Research ↗</a><a href="#">★ GitHub</a></span>
+  <span class="r"><a href="#">Research ↗</a></span>
 </footer>
 
 </body>

@@ -8,27 +8,54 @@
 </head>
 <body class="docs-body">
 
-<header class="main-navbar"><div class="bar">
+<header class="main-navbar">
   <div class="nav-logo"><a href="#"><span class="wordmark">Mythoscope</span></a></div>
   <nav class="nav-links">
-    <a href="app.html">Explore</a>
-    <a href="#" style="color:#b8860b">★ GitHub</a>
+    <a href="app.html">Sources</a>
+    <a href="app.html">Similarity</a>
+    <a href="app-structure.html">Structure</a>
+    <a href="app.html">Atlas</a><a href="app.html">Motifs</a>
+    <a href="#" class="active">Research</a>
   </nav>
-</div></header>
+</header>
 
 <div class="crumbs"><a href="#">Research</a><span class="s">›</span><a href="#">Reference</a><span class="s">›</span>The 14 regions</div>
 
 <div class="doc-wrap"><div class="doc-grid with-sidebar">
-  <!-- the doc TOC as a persistent left sidebar (carries the Research menu's contents, incl. About) -->
-  <nav class="docnav">
-    <h4>A · The argument</h4>
-    <a>Overview</a><a>What we found</a><a>Case studies</a><a>How it works</a><a>About</a>
-    <h4>B · Reference &amp; surveys</h4>
-    <a>The motif crosswalk</a><a>The three indexes</a><a>Field survey</a><a>Corpus-sourcing atlas</a><a>Encyclopedias</a>
-    <a class="active">The 14 regions</a>
-    <h4>C · Participate</h4>
-    <a>Contribute</a><a>Resources</a><a>Publications</a><a>Credit</a>
-  </nav>
+  <!-- the Research nav as a persistent left column, reusing the real library-sidebar / library-tree
+       / major-section / document-list / document-button markup (same chrome as Sources) -->
+  <aside class="library-sidebar"><div class="library-tree">
+    <section class="major-section" data-major="A · The argument">
+      <button class="major-title" type="button">A · The argument</button>
+      <div class="major-body"><ul class="document-list">
+        <li><button class="document-button" type="button">Overview</button></li>
+        <li><button class="document-button" type="button">What we found</button></li>
+        <li><button class="document-button" type="button">Case studies</button></li>
+        <li><button class="document-button" type="button">How it works</button></li>
+        <li><button class="document-button" type="button">About</button></li>
+      </ul></div>
+    </section>
+    <section class="major-section" data-major="B · Reference &amp; surveys">
+      <button class="major-title" type="button">B · Reference &amp; surveys</button>
+      <div class="major-body"><ul class="document-list">
+        <li><button class="document-button" type="button">The motif crosswalk</button></li>
+        <li><button class="document-button" type="button">The three indexes</button></li>
+        <li><button class="document-button" type="button">Field survey</button></li>
+        <li><button class="document-button" type="button">Corpus-sourcing atlas</button></li>
+        <li><button class="document-button" type="button">Encyclopedias</button></li>
+        <li><button class="document-button active" type="button">The 14 regions</button></li>
+      </ul></div>
+    </section>
+    <section class="major-section" data-major="C · Participate">
+      <button class="major-title" type="button">C · Participate</button>
+      <div class="major-body"><ul class="document-list">
+        <li><button class="document-button" type="button">Contribute</button></li>
+        <li><button class="document-button" type="button">Resources</button></li>
+        <li><button class="document-button" type="button">Publications</button></li>
+        <li><button class="document-button" type="button">Credit</button></li>
+      </ul></div>
+    </section>
+  </div></aside>
 
   <article class="prose">
     <h1>The 14 regions — a corpus-first map of the world's mythologies</h1>
@@ -83,7 +110,7 @@
 <footer class="footer-full">
   <div class="cols">
     <div><h5>Read</h5><a>Overview</a><a>What we found</a><a>The motif crosswalk</a><a>Surveys</a><a>Contribute</a><a>Publications</a></div>
-    <div><h5>Connect</h5><a>★ GitHub</a><a>Bluesky</a><a>Mastodon</a><a>hello@mythoscope.io</a></div>
+    <div><h5>Connect</h5><a>GitHub</a><a>Bluesky</a><a>Mastodon</a><a>hello@mythoscope.io</a></div>
     <div><h5>Get updates</h5><div class="sub"><input placeholder="you@example.com"><button>Subscribe</button></div>
       <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Occasional notes — motif &amp; mockup of the month.</div></div>
   </div>
