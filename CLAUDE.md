@@ -1,8 +1,8 @@
-# Правила работы
+# Working rules
 
 ## Git
-- Не создавать ветки самостоятельно — работать на `main`, ветку заводить только по явной просьбе.
-- Пушить только в `main`.
+- Do not create branches on your own — work on `main`; only create a branch on explicit request.
+- Push only to `main`.
 
-## Код
-- Комментарии минимальные и только неочевидные: пояснять «почему», а не дублировать то, что видно из кода.
+## Code
+- Keep comments minimal and only for non-obvious things: explain "why", do not duplicate what the code already shows.
