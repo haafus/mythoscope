@@ -3,6 +3,7 @@ from typing import Any
 
 import chromadb
 import numpy as np
+from chromadb.config import Settings as ChromaSettings
 
 from settings import settings
 
@@ -14,7 +15,12 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        _client = chromadb.PersistentClient(path=str(settings.embeddings_dir))
+        # Chroma's telemetry defaults to on and posts to posthog; the viewer runs
+        # on a public box and has no business phoning home.
+        _client = chromadb.PersistentClient(
+            path=str(settings.embeddings_dir),
+            settings=ChromaSettings(anonymized_telemetry=False),
+        )
     return _client
 
 
