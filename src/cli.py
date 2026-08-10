@@ -1,3 +1,13 @@
+"""Command-line entry point.
+
+Command bodies import their own dependencies locally, and that is load-bearing:
+the deployed viewer installs the `viewer` extra alone, so anything reaching
+`pipeline`, `corpus`, `graphs` or `embeddings` at module scope makes `mytho
+server` unimportable on the server. `pipeline/__init__` alone pulls every stage,
+hence pymupdf, trafilatura, openai and torch. Keep this module's imports to
+click, stdlib and settings.
+"""
+
 import sys
 import time
 from datetime import datetime, timedelta
@@ -5,7 +15,6 @@ from datetime import datetime, timedelta
 import click
 
 from log_setup import setup_logging
-from pipeline.caches import format_size
 
 COMMAND_SECTIONS = [
     ("Pipeline", ["build", "status", "clean", "refresh", "export"]),
@@ -377,6 +386,7 @@ def export(scope, caches: bool):
 
     SCOPE (optional) bundles only the named stage(s)' outputs (e.g. ``graphs``, ``motifs``)."""
     from export_bundle import export_outputs, orphan_summary
+    from pipeline.caches import format_size
 
     try:
         orphans = orphan_summary(scope)
