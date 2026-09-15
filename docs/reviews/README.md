@@ -3,6 +3,7 @@
 Point-in-time audits of the codebase — each records findings against a specific
 commit and does **not** itself change code.
 
+- [`2026-09-ui-review.md`](2026-09-ui-review.md) — ревью фронтенда: навигация и уровни разделов, содержание экранов, единообразие механики и видимый в интерфейсе техдолг; общая модель «фокус / линза / срез» и порядок работ
 - [`2026-07-repo-review.md`](2026-07-repo-review.md) — full repository review across four zones (data pipeline, motifs, server + frontend, tests/infra): refactorings, ranked bug clusters (P0–P2) and proposed features
 
 ## Archived
