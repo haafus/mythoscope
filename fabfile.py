@@ -63,7 +63,12 @@ UV_PYTHON_DIR = "/opt/mythoscope-python"
 # The account every task except `bootstrap` connects as; `bootstrap` creates it
 # if the image ships root only (Hetzner, DigitalOcean et al.).
 DEPLOY_USER = os.environ.get("MYTHO_DEPLOY_USER", "ubuntu")
+DEPLOY_HOME = f"/home/{DEPLOY_USER}"
 DOMAIN = os.environ.get("MYTHO_DEPLOY_DOMAIN", "mythoscope.io")
+
+# Hand-managed static apps, served by Caddy under /apps. Outside ROOT and never
+# an rsync target: `bootstrap` creates it empty and no task writes into it after.
+APPS_DIR = f"{DEPLOY_HOME}/www-apps"
 
 # The loopback port is a contract between two files: the app binds what the
 # server's env file says, Caddy proxies what this substitutes into the
@@ -262,7 +267,7 @@ def bootstrap(c):
                 "/root/.ssh/authorized_keys is missing or empty — there is no key to "
                 f"copy, and {DEPLOY_USER} would be created with no way to log in."
             )
-        home = f"/home/{DEPLOY_USER}"
+        home = DEPLOY_HOME
         c.run(f"useradd --create-home --shell /bin/bash {DEPLOY_USER}")
         c.run(f"install -d -m 700 -o {DEPLOY_USER} -g {DEPLOY_USER} {home}/.ssh")
         c.run(
@@ -339,9 +344,21 @@ def bootstrap(c):
     c.run("systemctl daemon-reload")
     c.run(f"systemctl enable {SERVICE_NAME}")
 
+    print("== static apps dir ==")
+    if c.run(f"test -d {APPS_DIR}", warn=True, hide=True).ok:
+        print(f"  {APPS_DIR} exists — left alone, contents included")
+    else:
+        c.run(f"install -d -m 0755 -o {DEPLOY_USER} -g {DEPLOY_USER} {APPS_DIR}")
+        print(f"  created {APPS_DIR}")
+    # Caddy serves it as the `caddy` user, so it must walk the deploy user's
+    # home to get there — and useradd builds homes 0750 (HOME_MODE in
+    # login.defs), which makes every /apps request a 403. o+x grants the walk
+    # and nothing else: 0751 still cannot list the home.
+    c.run(f"chmod o+x {DEPLOY_HOME}")
+
     print("== caddy site ==")
     caddyfile = string.Template((LOCAL_ROOT / "etc/Caddyfile").read_text()).safe_substitute(
-        DOMAIN=DOMAIN, PORT=APP_PORT
+        DOMAIN=DOMAIN, PORT=APP_PORT, APPS_ROOT=APPS_DIR
     )
     _put_file(c, caddyfile, "/etc/caddy/Caddyfile", owner="root:caddy", mode="0644")
     if not c.run("caddy validate --config /etc/caddy/Caddyfile", warn=True).ok:
@@ -361,7 +378,9 @@ def bootstrap(c):
         f"  3. fab -H {DEPLOY_USER}@{c.host} deploy && "
         f"fab -H {DEPLOY_USER}@{c.host} push-outputs\n"
         f"  Everything from here on connects as {DEPLOY_USER}, not root.\n"
-        f"  The service is enabled but not started — it has no code yet."
+        f"  The service is enabled but not started — it has no code yet.\n"
+        f"  Static apps: drop world-readable files in {APPS_DIR} to serve them at "
+        f"https://{DOMAIN}/apps/ — no deploy task touches that directory."
     )
 
 

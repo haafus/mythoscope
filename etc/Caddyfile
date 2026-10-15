@@ -1,7 +1,8 @@
 # Installed to /etc/caddy/Caddyfile by `fab bootstrap`.
-# $${DOMAIN} and $${PORT} are substituted at upload time from MYTHO_DEPLOY_DOMAIN
-# and APP_PORT (see fabfile.py). The port must match MYTHO_SERVER__PORT in
-# /etc/mythoscope/env; `fab smoke` refuses to pass if they diverge.
+# $${DOMAIN}, $${PORT} and $${APPS_ROOT} are substituted at upload time from
+# MYTHO_DEPLOY_DOMAIN, APP_PORT and APPS_DIR (see fabfile.py). The port must
+# match MYTHO_SERVER__PORT in /etc/mythoscope/env; `fab smoke` refuses to pass
+# if they diverge.
 #
 # Caddy provisions and renews the TLS certificate itself; there is nothing to
 # configure for HTTPS beyond a domain whose A record points here.
@@ -9,9 +10,23 @@
 ${DOMAIN} {
 	encode zstd gzip
 
+	# Hand-managed static apps. handle_path strips the prefix, so /apps/foo/
+	# resolves to ${APPS_ROOT}/foo/. The directory is outside the deployment
+	# tree and no fabric task writes to it; `redir` is needed because /apps
+	# without the slash matches no path pattern below.
+	redir /apps /apps/
+	handle_path /apps/* {
+		root * ${APPS_ROOT}
+		file_server
+	}
+
 	# The app binds 127.0.0.1 (settings.ServerSettings.host), so this proxy is
-	# the only route in — uvicorn is not reachable from outside the box.
-	reverse_proxy 127.0.0.1:${PORT}
+	# the only route in — uvicorn is not reachable from outside the box. In a
+	# `handle` so it is mutually exclusive with the block above rather than
+	# relying on file_server terminating the chain first.
+	handle {
+		reverse_proxy 127.0.0.1:${PORT}
+	}
 
 	header {
 		X-Content-Type-Options nosniff

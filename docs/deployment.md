@@ -15,9 +15,12 @@ no CI/CD, no registry, no object storage.
 ```
         :443                    :8000 (loopback only)
   ──────────────►  Caddy  ─────────────────────►  mytho server (uvicorn, 1 worker)
-   TLS, ACME,      │                               │
-   compression     │                               ├─ reads  /srv/mythoscope/outputs/
-                   └─ /etc/caddy/Caddyfile         └─ writes /srv/mythoscope/outputs/logs/
+   TLS, ACME,      │        everything but       │
+   compression     │        /apps/*              ├─ reads  /srv/mythoscope/outputs/
+                   │                             └─ writes /srv/mythoscope/outputs/logs/
+                   ├─ /etc/caddy/Caddyfile
+                   │
+                   └─ /apps/*  ───────────────►  /home/ubuntu/www-apps/  (static, off-deploy)
 ```
 
 Server layout — code, data and environment are **siblings, never nested**, so
@@ -34,10 +37,10 @@ venv:
 /etc/mythoscope/env             service env (root:mythoscope 0640, never rsynced)
 /etc/systemd/system/mythoscope.service
 /etc/caddy/Caddyfile
+/home/ubuntu/www-apps/          static apps served at /apps — not a deploy target
 ```
 
-Templates for the last three live in [`etc/`](../etc/) in the repo and are
-installed by `fab bootstrap`.
+Templates for the three files under `/etc` live in [`etc/`](../etc/) in the repo and are installed by `fab bootstrap`.
 
 ### Accounts
 
@@ -123,6 +126,26 @@ pydantic-settings ranks real environment variables above `env_file`, so systemd'
 `EnvironmentFile` wins. No `.env` reaches the server regardless — it is
 gitignored, and rsync filters on `.gitignore`.
 
+### Static apps at /apps
+
+Auxiliary HTML apps are served straight off disk, by Caddy, with the prefix stripped: `/apps/foo/bar.html` is `~/www-apps/foo/bar.html`. Publishing one means copying files into that directory yourself — there is no task for it, and that is the point.
+
+| property     | value                                                                                     |
+|--------------|-------------------------------------------------------------------------------------------|
+| served by    | Caddy `file_server`, never the app                                                        |
+| root         | `/home/ubuntu/www-apps` — `APPS_DIR` in `fabfile.py`                                      |
+| created by   | `bootstrap`, and only when missing: an existing directory is left alone, contents and all |
+| written by   | nothing — no task rsyncs, chowns, chmods or deletes inside it                             |
+| index        | `index.html`; no directory listing                                                        |
+| missing file | 404 from Caddy, never a fallthrough to the app                                            |
+
+Two things make it work, and both are easy to break by accident.
+
+- **The deploy user's home must be traversable.** Caddy runs as `caddy`, so it walks `/home/ubuntu` to get there, and `useradd` builds homes `0750` (`HOME_MODE` in `/etc/login.defs`) — which makes every `/apps` request a 403. `bootstrap` does `chmod o+x /home/ubuntu`, granting the walk and nothing else: `0751` is traversable but still not listable. Verified both ways against Caddy running as a non-owner uid: `0750` → 403, `0751` → 200.
+- **What you copy there must be world-readable** (`0644`), since `caddy` is neither the owner nor in the group. The regroup passes above cover `/srv/mythoscope` only; nothing normalises modes in this tree.
+
+Caddy's packaged unit has no `ProtectHome`, which is the only reason `/home` is visible to it at all. Adding one to a Caddy override would break `/apps` and nothing else.
+
 ---
 
 ## 2. Commands
@@ -164,6 +187,8 @@ cloudsmith repo), and `uv` system-wide to `/usr/local/bin`; creates the
 `mythoscope` system account; creates the directory tree; installs the env file,
 systemd unit and Caddyfile; validates the Caddyfile before reloading Caddy.
 Runs entirely as root, so it never prompts.
+
+It also creates `~ubuntu/www-apps` if it is absent and makes the home traversable for Caddy, as described under [Static apps at /apps](#static-apps-at-apps). Both steps skip an existing directory rather than touching what is in it.
 
 Running as root is also why it re-chowns `/var/log/caddy` to `caddy:caddy` right
 after validating. `caddy validate` provisions the config rather than just parsing
