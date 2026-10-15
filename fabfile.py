@@ -53,6 +53,8 @@ SERVICE_NAME = "mythoscope"
 ENV_FILE = "/etc/mythoscope/env"
 UV_BIN = "/usr/local/bin/uv"
 SUDOERS_FILE = "/etc/sudoers.d/mythoscope-deploy"
+# A drop-in: the packaged caddy.service is apt's and returns on every upgrade.
+CADDY_DROPIN = "/etc/systemd/system/caddy.service.d/override.conf"
 
 # uv installs managed interpreters under $HOME, and a venv's bin/python is a
 # symlink to one — which `ProtectHome=true` hides from the service, so the unit
@@ -355,6 +357,12 @@ def bootstrap(c):
     # login.defs), which makes every /apps request a 403. o+x grants the walk
     # and nothing else: 0751 still cannot list the home.
     c.run(f"chmod o+x {DEPLOY_HOME}")
+
+    print("== caddy restart policy ==")
+    # The packaged unit has no Restart=, so a crashed Caddy stays down.
+    c.run(f"install -d -m 0755 -o root -g root {Path(CADDY_DROPIN).parent}")
+    _put_file(c, (LOCAL_ROOT / "etc/caddy-override.conf").read_text(), CADDY_DROPIN)
+    c.run("systemctl daemon-reload")
 
     print("== caddy site ==")
     caddyfile = string.Template((LOCAL_ROOT / "etc/Caddyfile").read_text()).safe_substitute(

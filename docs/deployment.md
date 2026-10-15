@@ -144,7 +144,17 @@ Two things make it work, and both are easy to break by accident.
 - **The deploy user's home must be traversable.** Caddy runs as `caddy`, so it walks `/home/ubuntu` to get there, and `useradd` builds homes `0750` (`HOME_MODE` in `/etc/login.defs`) — which makes every `/apps` request a 403. `bootstrap` does `chmod o+x /home/ubuntu`, granting the walk and nothing else: `0751` is traversable but still not listable. Verified both ways against Caddy running as a non-owner uid: `0750` → 403, `0751` → 200.
 - **What you copy there must be world-readable** (`0644`), since `caddy` is neither the owner nor in the group. The regroup passes above cover `/srv/mythoscope` only; nothing normalises modes in this tree.
 
-Caddy's packaged unit has no `ProtectHome`, which is the only reason `/home` is visible to it at all. Adding one to a Caddy override would break `/apps` and nothing else.
+Caddy's packaged unit has no `ProtectHome`, which is the only reason `/home` is visible to it at all. Adding one to the drop-in described below would break `/apps` and nothing else.
+
+### Restart policy
+
+The packaged `caddy.service` sets no `Restart=` at all, so Caddy stayed down after an OOM kill and took the whole site with it, `/apps` included. [`etc/caddy-override.conf`](../etc/caddy-override.conf) fixes that as a *drop-in* installed to `/etc/systemd/system/caddy.service.d/override.conf`, because the unit itself belongs to the apt package and returns on every upgrade.
+
+- **`Restart=always`, `RestartSec=5s`** for Caddy; **`Restart=on-failure`, `RestartSec=3`** for the app. Both stay clear of systemd's default start limiter (5 starts per 10s), so a service that keeps dying keeps being restarted instead of being given up on.
+- **`OOMPolicy=continue`, on both units.** This is the half that looks redundant and is not: `DefaultOOMPolicy` is `stop`, under which systemd terminates the unit *itself* on an OOM kill — and a unit systemd stopped is never restarted, whatever `Restart=` says.
+- **`OOMScoreAdjust=-500` on Caddy only.** The app is already the natural victim at ~375MB against Caddy's tens of MB, so this just makes the ordering deliberate rather than incidental: killing the app costs ~2s of API downtime, killing Caddy costs everything. The kernel OOM killer reads it; `systemd-oomd` does not, but oomd manages `user.slice` rather than `system.slice` by default, so the kernel is what chooses here.
+
+`Restart=` and `OOMPolicy=` take effect on `daemon-reload`. `OOMScoreAdjust=` is applied when the process starts, so Caddy needs one real restart — a reload will not do it.
 
 ---
 
@@ -189,6 +199,8 @@ systemd unit and Caddyfile; validates the Caddyfile before reloading Caddy.
 Runs entirely as root, so it never prompts.
 
 It also creates `~ubuntu/www-apps` if it is absent and makes the home traversable for Caddy, as described under [Static apps at /apps](#static-apps-at-apps). Both steps skip an existing directory rather than touching what is in it.
+
+It installs the Caddy drop-in from [Restart policy](#restart-policy) and runs `daemon-reload`, but only ever *reloads* Caddy — so a pass that changes `OOMScoreAdjust=` leaves the running process on the old value until something restarts it.
 
 Running as root is also why it re-chowns `/var/log/caddy` to `caddy:caddy` right
 after validating. `caddy validate` provisions the config rather than just parsing

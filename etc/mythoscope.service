@@ -25,6 +25,11 @@ Restart=on-failure
 RestartSec=3
 TimeoutStopSec=20
 
+# Without this, Restart= above does not cover an OOM kill: the default
+# OOMPolicy=stop makes systemd stop the unit itself, and a unit systemd stopped
+# is never restarted. `continue` leaves the death to the normal restart path.
+OOMPolicy=continue
+
 # Anything the service creates under outputs/ — log files, SQLite journals, a
 # directory Chroma decides to make — must stay group-writable, or the deploy
 # user cannot manage (or delete) its own store afterwards. systemd's default
