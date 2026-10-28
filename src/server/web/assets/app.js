@@ -4,7 +4,7 @@ import { renderEmbeddings } from "./page-embeddings.js?v=13";
 import { renderGraphPage } from "./page-graphs.js?v=36";
 import { renderGeography } from "./page-geography.js?v=78";
 import { renderMotifs } from "./page-motifs.js?v=99";
-import { renderAbout } from "./page-about.js";
+import { renderAbout } from "./page-about.js?v=2";
 
 const DEFAULT_ROUTE = "/corpus";
 
