@@ -79,9 +79,10 @@ Recall@k on the confirmed crosswalk validates these against a lexical (LSA) base
 **External joins.** Subsistence from D-PLACE / the Ethnographic Atlas (Murdock 1967; Kirby et al.
 2016), nearest-society within 600 km; language family and expansion dates from Glottolog (Hammarström
 et al. 2023) via a name-first join; pre-colonial political boundaries from historical-basemaps for the
-empire-corridor test. Traditions lack coordinates in the source data and are resolved to areal-
-subregion centroids — a coarse approximation used only to place points, and a limit on all spatial
-results.
+empire-corridor test. Tradition coordinates come from the Berezkin catalogue itself: per-tradition
+map markers published on mapsofmyths.com, hand-placed by the cataloguers, covering all 1,046
+traditions. A tradition spanning several markers is represented by their centroid, and the areal-
+subregion centroid survives only as a fallback that the present coverage never invokes.
 
 ## 3. Methods
 
@@ -320,8 +321,9 @@ the downstream comparisons. The full method for each figure is in the correspond
 
 ## 8. Limitations
 
-(i) Traditions are placed at areal-subregion centroids, not true coordinates, bounding all spatial
-results. (ii) "Depth" is a breadth/disjunction proxy that conflates ancient descent with wide
+(i) Tradition locations are the catalogue's own hand-placed map points, not survey-grade coordinates,
+and a tradition spread over several markers is reduced to their centroid — so a tradition's extent is
+lost and its point carries the cataloguer's judgement. (ii) "Depth" is a breadth/disjunction proxy that conflates ancient descent with wide
 diffusion; only the ~13% descent minority is calendar-dated, at family (not node) resolution. (iii) The
 crosswalk is partly automated and under-counts links (the swan-maiden's ATU 400 was missed), so
 cross-index corroboration is a lower bound and berezkin-only an upper bound on coding dependence. (iv)

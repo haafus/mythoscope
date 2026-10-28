@@ -133,11 +133,11 @@ oracle about a motif's age or origin, a circularity the programme's axioms expli
 Three further pieces complete the infrastructure.
 
 The **spatial layer** places each tradition on the globe so that distributions can be measured
-geographically. The source data does not give true coordinates for the traditions, so a tradition is
-resolved to the centroid of its areal subregion where a finer point is unavailable — a coarse
-approximation that is used only to place points and that is named, here and wherever it matters, as a
-bound on every spatial result. It is better to state the coarseness once and carry it forward than to
-present centroid-based maps as if they were survey-grade.
+geographically. The coordinates are the catalogue's own: every one of its traditions carries map
+markers placed by the cataloguers, and those are what the analyses use, with the centroid taken only
+where a tradition spans several markers. They are hand-placed rather than surveyed, and a point
+cannot express a tradition's extent — so the maps are as good as the catalogue's own geography and no
+better, which is worth stating once and carrying forward rather than implying survey-grade precision.
 
 The **coverage layer** is the one Chapter 3 insisted could never be forgotten. The number of motifs
 recorded for a tradition ranges from one to more than seven hundred, with a median near seventy-five

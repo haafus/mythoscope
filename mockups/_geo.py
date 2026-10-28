@@ -1,11 +1,11 @@
-"""Approximate coordinates for the map mockups. No lat/long exists in the source
-data, so we resolve a tradition label to a point two ways:
+"""Coordinates for the map mockups, resolved per label:
 
-  * Berezkin traditions -> the centroid of their areal subregion (areal_path L2);
+  * Berezkin traditions -> their real map points from ``tradition-coords.json``
+    (``berezkin_coords()``), with the areal-subregion centroid below as a fallback;
   * TMI / ATU culture labels -> a small country/people gazetteer.
 
-Coordinates are rough centroids meant only to place a dot in the right part of the
-world for a prototype — not authoritative locations. (lon, lat).
+The subregion and gazetteer tables are rough centroids meant only to place a dot in
+the right part of the world; the Berezkin snapshot is the catalogue's own. (lon, lat).
 """
 
 # Berezkin areal-scheme L2 subregion -> centroid.
