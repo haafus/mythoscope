@@ -250,7 +250,10 @@ body.has-main-navbar {
 }
 
 .about-page .tab-content p { margin: 0 0 12px; }
-.about-page .tab-content a { color: var(--accent); }
+.about-page .tab-content a,
+.about-page .about-contact a { color: #3a5e86; text-decoration: none; }
+.about-page .tab-content a:hover,
+.about-page .about-contact a:hover { text-decoration: underline; }
 
 .about-page .about-lead {
     font-size: 17px;
@@ -267,32 +270,13 @@ body.has-main-navbar {
 .about-page .about-points li,
 .about-page .about-list li { margin-bottom: 8px; }
 
-.about-page .about-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin: 24px 0 8px;
-}
-
-.about-page .about-stats[hidden] { display: none; }
-
-.about-page .about-stats div {
-    padding: 14px 16px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-}
-
-.about-page .about-stats dt {
-    font-size: 22px;
-    font-weight: 600;
-    color: #222;
-}
-
-.about-page .about-stats dd {
-    margin: 2px 0 0;
+.about-page .about-figures {
+    margin-top: -4px;
     font-size: 13px;
     color: var(--muted);
 }
+
+.about-page .about-figures[hidden] { display: none; }
 
 .about-page .about-pipeline {
     display: grid;
@@ -335,8 +319,6 @@ body.has-main-navbar {
     font-size: 14px;
     color: #555;
 }
-
-.about-page .about-contact a { color: var(--accent); }
 
 .about-page .about-contact-label {
     margin-right: 8px;

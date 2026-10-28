@@ -27,8 +27,6 @@ export function renderAbout() {
                     <p class="about-lead">An open, collaborative infrastructure for the comparative study of mythology, religion and ancient literature, integrating established interpretive methods with artificial intelligence.</p>
                     <p>Mythoscope is an interdisciplinary research initiative and open analytical platform. It combines unsupervised (bottom-up, continuous) and supervised (top-down, discrete) methods so that scholars can explore semantic structure across traditions, trace cultural patterns and test them reproducibly, at a scale no single reader can reach.</p>
 
-                    <dl class="about-stats" hidden></dl>
-
                     <h3>Why</h3>
                     <ol class="about-points">
                         <li><strong>Reading has limits.</strong> No scholar can read and compare thousands of texts, and a hand-picked sample, shaped by one perspective, can't be redrawn or tested.</li>
@@ -43,6 +41,7 @@ export function renderAbout() {
 
                     <h3>Status</h3>
                     <p>Mythoscope is early-stage, actively developed research software. The application is live and its code is open on <a href="${REPO}" target="_blank" rel="noopener">GitHub</a>; results so far are exploratory and are documented together with their data, method and limitations.</p>
+                    <p class="about-figures" hidden></p>
                 </div>
 
                 <div id="methodology" class="tab-content">
@@ -137,7 +136,6 @@ export function renderAbout() {
             </div>
 
             <footer class="about-contact">
-                <div><span class="about-contact-label">Author</span>Pavel Lebedev, independent researcher</div>
                 <div><span class="about-contact-label">Contact</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
                 <div><span class="about-contact-label">Code</span><a href="${REPO}" target="_blank" rel="noopener">github.com/haafus/mythoscope</a></div>
                 <div><span class="about-contact-label">Preprint</span><a href="${PREPRINT}" target="_blank" rel="noopener">arXiv:2610.28452</a></div>
@@ -155,7 +153,7 @@ export function renderAbout() {
         });
     });
 
-    renderStats(app.querySelector(".about-stats"));
+    renderStats(app.querySelector(".about-figures"));
 }
 
 // Counts come from the live API so the page never carries stale numbers; any
@@ -177,8 +175,8 @@ async function renderStats(container) {
         }
     }
     if (!container.isConnected || !items.length) return;
-    container.innerHTML = items
-        .map(([value, label]) => `<div><dt>${formatNumber(value)}</dt><dd>${label}</dd></div>`)
-        .join("");
+    container.textContent = `Current build: ${items
+        .map(([value, label]) => `${formatNumber(value)} ${label}`)
+        .join(" · ")}.`;
     container.hidden = false;
 }
