@@ -50,11 +50,14 @@ catalogue — and parallel efforts by Declerck and colleagues converted the indi
 ontologies, with a dedicated Ontology of Greek Mythology following for a single tradition.
 
 On this substrate the era built four lines of method. **Supervised classification** learned to assign
-tale types to texts: Meder and colleagues on the Dutch Folktale Database, and a recurring
-finding — across Eklund's support-vector classifier on the best-populated tale-type classes, Meaney's
-comparison of multilingual transformers against a support-vector baseline for Gaelic, and a West-African
-study where a bag-of-words model beat a recurrent network — that **non-contextual baselines repeatedly
-rival or beat neural systems** on the small corpora folklore actually provides. **Topic-model induction**
+tale types to texts: Meder and colleagues on the Dutch Folktale Database, and Eklund's support-vector
+classifier on the best-populated tale-type classes, which reports F ≈ 0.8–1.0 but no neural baseline.
+The one published head-to-head is Meaney's comparison of domain-adapted transformers against a
+support-vector baseline for Irish and Scottish Gaelic, where the neural gains come out, in the
+authors' own words, tempered by the impressive performance of that baseline. With a West-African
+study where a bag-of-words model beat a recurrent network — on corpus of origin rather than tale
+type — the defensible version of the lesson is that **a non-contextual baseline stays competitive**
+on the small corpora folklore actually provides, not that it routinely wins. **Topic-model induction**
 began with treating motifs as latent word distributions and matured into the now-standard recipe of
 embeddings, dimensionality reduction, density clustering, and keyword labelling, applied for instance to
 map intertextuality across Andersen's tales. **Phylogenetic mythology** coded the presence and absence of
@@ -83,13 +86,14 @@ The modern resources sharpened the task even as the methods advanced. The GOLEM 
 thousands of motif candidates for their *use*-type at respectable inter-annotator agreement, yet few-shot
 classification of that use-type peaked at only about 41% — labelling how a motif is *used* is itself
 hard. A study of implicit motif meaning concluded that explicit information from culture-bearers is
-critical, not optional. On the large-language-model frontier, one system ran zero-shot motif-presence
-checks on Cinderella cross-lingually, and the best published narrative-motif detector to date is a
-fine-tuned model reaching roughly 0.85 F1 on the *Arabian Nights*. The honest state of the art is
-narrower than the promise: large language models work well for **presence checks against a known
-checklist** but are not validated for open-vocabulary motif *discovery*, and they remain prone to
-hallucinated exemplars — inventing plausible motifs that are not there — and vary from run to run
-(Figure 2.1).
+critical, not optional. On the large-language-model frontier two preprints set the current bar. One
+ran zero-shot motif-presence checks over Cinderella variants cross-lingually, reporting 98% accuracy
+against thirteen hand-annotated variants — and concluded that the motif typology itself is too rigid
+for the variation it found. The other built the first motif-indexing corpus for a single work, the
+*Arabian Nights*, and reports a fine-tuned model at roughly 0.85 F1 on held-out motifs. The honest
+state of the art is narrower than the promise: large language models work for **presence checks
+against a known checklist** but are not validated for open-vocabulary motif *discovery*; neither
+result is peer-reviewed or replicated on a second corpus (Figure 2.1).
 
 ## 2.4 Toolkits transferred from adjacent disciplines
 
@@ -138,10 +142,12 @@ discrete motifs is assuming away the object's defining property. The second is t
 annotation is scarce and culturally contingent** — reliable labelled data is expensive, exists for few
 traditions, and encodes the annotator's cultural frame, so supervised methods are perpetually
 data-starved and skewed toward the well-documented, largely European corpora. The third is that **simple
-baselines are stubborn** — non-contextual word-frequency classifiers rival or beat transformers and
-language models on small folklore corpora again and again, so a study that does not ship and beat a
-baseline has shown nothing. The fourth is that **large language models hallucinate and destabilise** —
-they generate phantom exemplars, vary run to run, and fail on structural tasks. To these the field adds
+baselines are stubborn** — on small folklore corpora a non-contextual word-frequency classifier stays
+competitive with transformers and language models, demonstrated head-to-head for Gaelic, so a study
+that does not ship and beat a baseline has shown nothing. The fourth is that **language models are
+validated for checking, not for discovery** — presence checks against a known index entry work, while
+open-vocabulary discovery is unvalidated and use-type labelling peaks near 41%; the phantom exemplars
+and run-to-run drift practitioners report are a design caution rather than, so far, a measured result. To these the field adds
 two structural cautions: **Eurocentrism** in the indices propagates into every downstream analysis, and
 **the coding bottleneck** — the presence/absence matrix that phylogenetic methods require — is exactly
 where induction meets phylogenetics, and exactly what remains unautomated.

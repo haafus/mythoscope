@@ -71,8 +71,9 @@ signal from coverage. These are the tools the findings actually stand on.
 
 **MOMFER** (Karsdorp, van der Meulen, Meder & van den Bosch, *Folklore* 126:1, 2015) — WordNet-semantic
 search over the TMI; the direct precedent for semantic (not string) motif search.
-**Tangherlini & Chen** — "Travels with BERT" (*Orbis Litterarum* 79, 2024) — the embeddings→UMAP→HDBSCAN
-clustering template. **GOLEM** (Yarlott et al., LREC-COLING 2024) and Yarlott & Finlayson (2016) — the
+**Tangherlini & Chen** — "Travels with BERT" (*Orbis Litterarum* 79(6), 2024) — BERTopic over Andersen's
+travel writing and fairy tales; an intertextuality study, not motif detection, but the
+embeddings→UMAP→HDBSCAN template we reuse. **GOLEM** (Yarlott et al., LREC-COLING 2024) and Yarlott & Finlayson (2016) — the
 motif-detection frontier and how hard it is (the honest baseline for Track 2, induction from text).
 **Declerck & Lendvai** (2011→) — TMI/ATU as Linked Open Data. Karsdorp & van den Bosch (2013) — motifs
 as topics, the induction origin point.

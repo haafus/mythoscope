@@ -287,10 +287,13 @@ semantic search over the Motif-Index (MOMFER: Karsdorp et al. 2015) and interope
 ontologies (Declerck & Lendvai 2011), ran phylogenetics of tales and myths (da Silva & Tehrani 2016;
 d'Huy 2013; Thuillard, d'Huy, Le Quellec & Berezkin 2018), and analysed character and motif networks
 (Mac Carron & Kenna 2012; Abello, Broadwell & Tangherlini 2012). The **modern era** (2018–2026) is
-dominated by transformer embeddings and BERTopic-style clustering (Tangherlini & Chen 2024) and by
-LLM motif/type annotation (Arčon et al. 2025) — which is repeatedly matched by simple TF-IDF/SVM
-baselines (Eklund et al. 2023; Meaney et al. 2024), so motif *detection* from raw text remains
-unsolved and is best treated as candidate generation over a curated index.
+dominated by transformer embeddings and BERTopic-style clustering (Tangherlini & Chen 2024, on
+intertextuality rather than motifs) and by LLM motif annotation — zero-shot presence checks over
+Cinderella (Arčon et al. 2025) and a fine-tuned detector at 0.85 F1 on the *Arabian Nights* (Alyami &
+Finlayson 2026), both preprints on single corpora. Against them a TF-IDF/SVM baseline stays
+competitive on small corpora (Meaney et al. 2024, head-to-head; Eklund et al. 2023, baseline-free),
+so open-vocabulary motif *induction* from raw text remains unsolved and is best treated as candidate
+generation over a curated index.
 
 Our contribution is orthogonal to that detection problem: we take the **curated index as given** and
 analyse the *shape of its distributions*. Relative to the phylomemetic programme — which codes
@@ -348,7 +351,7 @@ the map of what a finer linguistic, genetic, and historical-corridor calibration
 - Abello, J., Broadwell, P., & Tangherlini, T. R. (2012). Computational folkloristics.
   *Communications of the ACM* 55(7), 60–70.
 - Abrahamsson, H. (1951). *The Origin of Death: Studies in African Mythology*. Uppsala.
-- Arčon, I., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
+- Arčon, T., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
   automation based on motifs: a Cinderella case study. *arXiv:2510.18561* (*Fabula*).
 - Berezkin, Yu. E. (2015). Folklore and mythology catalogue: its lay-out and potential for research.
   *Retrospective Methods Network Newsletter* 10, 56–70.
@@ -382,8 +385,10 @@ the map of what a finer linguistic, genetic, and historical-corridor calibration
   *Cancer Research* 27, 209–220.
 - McInnes, L., Healy, J., & Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection.
   *arXiv:1802.03426*.
-- Meaney, C., Alex, B., & Lamb, W. (2024). Classification of tale types and narrator gender in Gaelic
-  folktales. *NLP4DH*.
+- Alyami, I. H., & Finlayson, M. A. (2026). Automated motif indexing on the *Arabian Nights*.
+  *arXiv:2603.19283* — preprint.
+- Meaney, J. A., Alex, B., & Lamb, W. (2024). Testing and adapting the representational abilities of
+  large language models on folktales in low-resource languages. *NLP4DH*, 319–324.
 - Murdock, G. P. (1967). *Ethnographic Atlas*. University of Pittsburgh Press.
 - Naroll, R. (1961). Two solutions to Galton's problem. *Philosophy of Science* 28(1), 15–39.
 - Pagel, M. (1994). Detecting correlated evolution on phylogenies: a general method for the comparative
@@ -392,8 +397,8 @@ the map of what a finer linguistic, genetic, and historical-corridor calibration
 - Radin, P. (1956). *The Trickster: A Study in American Indian Mythology*. Philosophical Library.
 - Sakamoto Martini, S., Kendal, J., & Tehrani, J. J. (2023). A phylomemetic analysis of Cinderella
   (ATU 510/511). (Bayesian inference + NeighborNet, 266 versions).
-- Tangherlini, T. R., & Chen, J. (2024). Travels with BERT: mapping intertextuality in Andersen.
-  *Orbis Litterarum* 79, 519–562.
+- Tangherlini, T. R., & Chen, R. (2024). Travels with BERT: surfacing the intertextuality in Hans
+  Christian Andersen's travel writing and fairy tales. *Orbis Litterarum* 79(6), 519–562.
 - Tehrani, J. J. (2013). The phylogeny of Little Red Riding Hood. *PLoS ONE* 8(11), e78871.
 - Thompson, S. (1955–58). *Motif-Index of Folk-Literature* (6 vols). Indiana University Press.
 - Thuillard, M., d'Huy, J., Le Quellec, J.-L., & Berezkin, Yu. E. (2018). A large-scale study of world

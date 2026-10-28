@@ -101,11 +101,13 @@ Alex & Lamb (2024, NLP4DH) tackled ATU classification and narrator-gender predic
 Irish and Scottish Gaelic, pitting mBERT/XLM-R/gaBERT against an SVM baseline that remained
 competitive.
 
-The recurring finding is consequential: on small, stylistically homogeneous folktale
-corpora, non-contextual baselines (SVM + TF-IDF) repeatedly rival or beat neural and LLM
-approaches. Lô, de Boer & van Aart (2020), working on a corpus of 742 West African and
-Western European tales, likewise found a bag-of-words MLP beating an LSTM. Small-data
-caution is a structural feature of the field, not an incidental result.
+The finding is consequential, and worth stating at its real strength: on small,
+stylistically homogeneous folktale corpora a non-contextual baseline (SVM + TF-IDF) stays
+competitive with neural and LLM approaches. Meaney et al. is the head-to-head that shows it;
+Eklund et al. report strong SVM scores without a neural comparison. Lô, de Boer & van Aart
+(2020), on 742 West African and Western European tales, likewise found a bag-of-words MLP
+beating an LSTM — though on corpus of origin, not tale type. Small-data caution is a
+structural feature of the field, not an incidental result.
 
 ### Topic modelling: LDA to BERTopic
 

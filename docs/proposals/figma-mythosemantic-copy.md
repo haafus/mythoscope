@@ -276,9 +276,10 @@ Polynesian Texts Collection (Univ. of Auckland) · Buddhist Digital Resource Cen
 
 - **GOLEM** (Yarlott et al., LREC-COLING 2024) — gold-standard motif corpus (26k candidates, 34
   motif types); LLMs reach only 41% accuracy → very hard task.
-- **Automated Motif Indexing on Arabian Nights** (Alyami & Finlayson, 2026) — auto TMI tagging
-  via embedding + re-ranking.
-- **Cinderella Case Study** (Arcon et al., 2025) — LLM motif detection across Cinderella
+- **Automated Motif Indexing on Arabian Nights** (Alyami & Finlayson, 2026, arXiv:2603.19283,
+  preprint) — TMI-style tagging against El-Shamy's index; best system a fine-tuned Llama-3 at
+  0.85 F1 (retrieve-and-rerank was the weakest approach, 0.36).
+- **Cinderella Case Study** (Arčon et al., 2025, arXiv:2510.18561, preprint) — LLM motif detection across Cinderella
   variants + clustering + dimensionality reduction.
 - **Annotated Folktales** (Hagedorn & Daranyi, 2022) — open ATU-annotated corpus; SVM F1 0.8–1.0.
 - **BERT encodes narrative dimensions** (Bei et al., CMN 2026) — linear probe 94% for time,

@@ -28,25 +28,28 @@ of what it must cover and include, what it needs, and when.
      and Thompson indices; topic-model motif induction; word-sense semantic search over the
      Motif-Index; interoperable ontologies; tale and myth phylogenetics; character and motif networks;
   3. the **modern era** (2018–2026): transformer embeddings and clustering; large-language-model motif
-     and tale-type annotation; the repeated finding that simple word-frequency baselines match neural
-     and large-language-model systems on small corpora;
+     and tale-type annotation (Arčon et al. 2025; Alyami & Finlayson 2026 — both preprints, single
+     corpora); the finding that a simple word-frequency baseline stays competitive with neural and
+     large-language-model systems on small corpora, head-to-head in Meaney et al. (2024);
   4. an organisation **by method family**: (a) indices and ontologies; (b) supervised tale-type
      classification; (c) topic models; (d) embeddings, retrieval and motif detection; (e) sequence and
      network mining; (f) evolutionary / phylogenetic mythology; (g) narrative-structure (Propp)
      extraction;
   5. a **catalogue of the open datasets** in the field with their licences;
   6. the field's **hard lessons**: motifs resist crisp boundaries; gold-standard annotation is scarce
-     and culturally contingent; baselines match neural systems; large language models hallucinate
-     exemplars and fail on structural tasks;
+     and culturally contingent; baselines stay competitive with neural systems; language models are
+     validated for presence checks against a known index but not for open-vocabulary discovery;
   7. the **conclusion**: embeddings are best used as a search / candidate-generation layer over a
      curated expert index, not as an end-to-end classifier;
   8. an **open-problems agenda** for the field.
 - **Needs, before release:** expand to full survey length; **written from the field's point of view**
-  — this project appears, if at all, as one example among many, not as the subject; clean the
-  bibliography (remove the citations currently flagged as unverified).
+  — this project appears, if at all, as one example among many, not as the subject. The citation
+  audit is done (see `../reviews/2026-10-citation-audit.md`): authors, titles and venues of the
+  load-bearing modern citations were checked against primary sources in October 2026, and the two
+  preprints are marked as such.
 - **When:** early — the lowest-risk, widest-reach piece (it depends on no unfinished result) and it
-  establishes a presence in the field before the main results land. Out as soon as the expansion and
-  citation cleanup are done.
+  establishes a presence in the field before the main results land. Out as soon as the expansion is
+  done; the citation cleanup already is.
 
 ### 2. The findings paper — *Geography, Descent, and Genre in the Global Distribution of Folklore Motifs*
 

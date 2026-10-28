@@ -79,8 +79,8 @@ stapled papers.
 - **Purpose:** place the book in computational folkloristics; give the reader the field in one sitting.
 - **Covers:** the classical era (index digitisation, topic-model induction, tale phylogenetics,
   narrative networks) and the modern era (transformer embeddings, large-language-model annotation);
-  the hard lessons (motifs resist crisp boundaries, simple baselines match neural systems, models
-  hallucinate); the verdict that embeddings serve best as a **retrieval / candidate-generation layer
+  the hard lessons (motifs resist crisp boundaries, simple baselines stay competitive, language
+  models are validated for checking against an index but not for discovery); the verdict that embeddings serve best as a **retrieval / candidate-generation layer
   over a curated expert index**. Condensed from the standalone survey; the survey ships separately in
   full.
 

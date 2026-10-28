@@ -9,11 +9,13 @@ and in the data-availability note (Appendix D).
 - Abello, J., Broadwell, P., & Tangherlini, T. R. (2012). Computational folkloristics. *Communications
   of the ACM* 55(7), 60–70.
 - Abrahamsson, H. (1951). *The Origin of Death: Studies in African Mythology*. Uppsala.
-- Acharya, A., et al. (2024). MIME: discovering implicit meanings of cultural motifs from text.
-- Alyami, S., & Finlayson, M. A. (2026). Fine-tuned large-language-model narrative-motif detection on
-  the *Arabian Nights* (preprint, per review).
-- Arčon, I., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
-  automation based on motifs: a Cinderella case study. *arXiv:2510.18561* (*Fabula*).
+- Acharya, A., Estrada, D., Dahal, S., Yarlott, W. V. H., Gomez, D., & Finlayson, M. A. (2024).
+  Discovering implicit meanings of cultural motifs from text (the MIME system). *NLP+CSS @ ACL*,
+  46–56. ACL Anthology 2024.nlpcss-1.4.
+- Alyami, I. H., & Finlayson, M. A. (2026). Automated motif indexing on the *Arabian Nights*.
+  *arXiv:2603.19283* — preprint, not peer-reviewed as of October 2026.
+- Arčon, T., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
+  automation based on motifs: Cinderella case study. *arXiv:2510.18561* — preprint.
 - Berezkin, Yu. E. (2015). Folklore and mythology catalogue: its lay-out and potential for research.
   *Retrospective Methods Network Newsletter* 10, 56–70.
 - Berezkin, Yu. E., & Duvakin, E. N. *The Electronic Analytic Catalogue of Folklore Motifs* (Tales of
@@ -71,8 +73,9 @@ and in the data-availability note (Appendix D).
   Research* 27, 209–220.
 - McInnes, L., Healy, J., & Melville, J. (2018). UMAP: Uniform Manifold Approximation and Projection for
   dimension reduction. *arXiv:1802.03426*.
-- Meaney, C., Alex, B., & Lamb, W. (2024). Classification of tale types and narrator gender in Gaelic
-  folktales. *NLP4DH*.
+- Meaney, J. A., Alex, B., & Lamb, W. (2024). Testing and adapting the representational abilities of
+  large language models on folktales in low-resource languages. *NLP4DH*, 319–324. ACL Anthology
+  2024.nlp4dh-1.31.
 - Meder, T., Karsdorp, F., Nguyen, D., Theune, M., Trieschnigg, D., & Muiser, I. (2016). Automatic
   enrichment and classification of folktales in the Dutch Folktale Database. *Journal of American
   Folklore* 129(511), 78–96.
@@ -89,8 +92,9 @@ and in the data-availability note (Appendix D).
 - Radin, P. (1956). *The Trickster: A Study in American Indian Mythology*. Philosophical Library.
 - Sakamoto Martini, S., Kendal, J., & Tehrani, J. J. (2023). A phylomemetic analysis of Cinderella
   (ATU 510/511).
-- Tangherlini, T. R., & Chen, J. (2024). Travels with BERT: mapping intertextuality in Andersen.
-  *Orbis Litterarum* 79, 519–562.
+- Tangherlini, T. R., & Chen, R. (2024). Travels with BERT: surfacing the intertextuality in Hans
+  Christian Andersen's travel writing and fairy tales through the network lens of large language
+  model-based topic modeling. *Orbis Litterarum* 79(6), 519–562.
 - Tehrani, J. J. (2013). The phylogeny of Little Red Riding Hood. *PLoS ONE* 8(11), e78871.
 - Thompson, S. (1955–58). *Motif-Index of Folk-Literature* (6 vols). Indiana University Press.
 - Thuillard, M., d'Huy, J., Le Quellec, J.-L., & Berezkin, Yu. E. (2018). A large-scale study of world

@@ -23,9 +23,9 @@ ontologies; supervised tale-type classification; topic models; embeddings, retri
 detection; sequence and network mining transferred from other disciplines; evolutionary/phylogenetic
 mythology; and narrative-structure (Propp) extraction — catalogue the open datasets and their
 licences, and distil the field's hard lessons: motifs resist crisp boundaries, gold-standard
-annotation is scarce and culturally contingent, simple TF-IDF/SVM baselines repeatedly match neural
-and LLM systems on small corpora, and LLMs remain prone to hallucinated exemplars and to failure on
-structural tasks. We conclude that embeddings are best used as a *retrieval and candidate-generation*
+annotation is scarce and culturally contingent, non-contextual TF-IDF/SVM baselines stay competitive
+with neural and LLM systems on the small corpora folklore provides, and language models are so far
+validated only for presence checks against a known index — not for open-vocabulary motif discovery. We conclude that embeddings are best used as a *retrieval and candidate-generation*
 layer over a curated, expert index rather than as an end-to-end motif classifier.
 
 ## 1. Introduction
@@ -84,11 +84,15 @@ contradictions) and **Digital LIMC** provide RDF knowledge graphs.
 
 Learning-to-rank and classifiers assign ATU types to tales: Meder et al. (2016) on the Dutch Folktale
 Database; Eklund, Hagedorn & Darányi (2023) with an SVM over TF-IDF on the ten best-populated classes
-of the Annotated Folktales collection (F ≈ 0.8–1.0, no baseline reported); Meaney, Alex & Lamb (2024)
-comparing mBERT/XLM-R/gaBERT against an SVM for Gaelic. The **recurring lesson** across Eklund (2023),
-Meaney (2024) and Lô et al. (2020, where a bag-of-words MLP beat an LSTM on West-African tales) is
-that **non-contextual baselines repeatedly rival or beat neural/LLM approaches on small folktale
-corpora** — a warning that shapes any honest evaluation design.
+of the Annotated Folktales collection (F ≈ 0.8–1.0, no neural baseline reported); Meaney, Alex & Lamb
+(2024) comparing domain-adapted transformers against an SVM for Irish and Scottish Gaelic. Only the
+last of these is a head-to-head, and it is the load-bearing evidence: its authors report that the
+gains from longer context and domain-adaptive pre-training are "tempered by the impressive
+performance of a baseline SVM with non-contextual features." Read alongside Lô, de Boer & van Aart
+(2020) — a bag-of-words MLP beating an LSTM, though on corpus-of-origin classification rather than
+tale type — the defensible lesson is narrower than it is usually stated: **on the small corpora
+folklore provides, a non-contextual baseline stays competitive, and we found no study reporting a
+neural system beating one by a wide margin.** Ship the baseline; failing to beat it is signal.
 
 ## 5. Topic models to BERTopic
 
@@ -110,12 +114,18 @@ illustrating how hard the task is. The key modern resource is **GOLEM** (Yarlott
 articles, 26,078 motif candidates over 34 types across three cultural groups, annotated for use-type
 (Fleiss κ > 0.55); few-shot classification of use-type peaked at only 41%. **MIME** (Acharya et al.
 2024) extracts a motif's implicit meaning and concludes that explicit information from culture-bearers
-is critical. On the LLM frontier, **Arčon et al. (2025)** used GPT-4.5 zero-shot motif-presence checks
-on Cinderella (ATU 510A) plus LaBSE + HDBSCAN, cross-lingually; and the best published narrative-motif
-detector to date is a **fine-tuned Llama-3 reaching ≈0.85 F1 on the *Arabian Nights*** (Alyami &
-Finlayson 2026, per the review). The honest state of the art: LLMs work for *presence checks against a
-known checklist* but are not validated for open-vocabulary motif discovery, and remain prone to
-hallucinated exemplars.
+is critical. On the LLM frontier two results set the current bar, and both are preprints. **Arčon,
+Robnik-Šikonja & Tratnik (2025)** ran GPT-4.5 zero-shot motif-presence checks over Cinderella
+(ATU 510A): 98% accuracy against 13 manually annotated English variants, then applied to 110 variants
+with LaBSE + HDBSCAN clustering — and concluded that the *motif typology itself* is too rigid to
+capture the observed variation, arguing for a data-driven taxonomy. **Alyami & Finlayson (2026)**
+built the first motif-indexing corpus for a single work — 2,670 motif expressions over 200 motifs in
+58,450 sentences of the *Arabian Nights* (Cohen κ = 0.72) — compared five approaches, and report a
+**LoRA-fine-tuned Llama-3 at 0.85 F1** (0.90 on simple motifs, 0.73 on complex expressions;
+retrieve-and-rerank worst at 0.36), on a test set of 30 unseen motifs. The honest state of the art:
+detection *against a known index entry* is largely working on a single well-annotated corpus, while
+open-vocabulary motif discovery remains unvalidated; neither result has been peer-reviewed or
+replicated on a second corpus.
 
 ## 7. Sequence and network mining, transferred
 
@@ -177,10 +187,14 @@ engine.
   for structure).
 - **Gold data is scarce and culturally contingent.** Annotation is expensive and, as MIME argues,
   needs culture-bearers; GOLEM's low use-type accuracy shows even labelling motif *use* is hard.
-- **Baselines are stubborn.** TF-IDF/SVM repeatedly match neural/LLM systems on small corpora —
-  always ship a baseline; failure to beat it is signal.
-- **LLMs hallucinate and destabilise.** They generate phantom exemplars and vary run-to-run; they
-  fail on Propp-structure tagging; and aligned models risk "flattening" thematic/affective variation.
+- **Baselines are stubborn.** On small corpora a TF-IDF/SVM baseline stays competitive with neural and
+  LLM systems — demonstrated head-to-head by Meaney et al. (2024) — so always ship one; failure to
+  beat it is signal.
+- **LLMs are validated for checking, not for discovery.** Presence checks against a known index entry
+  work (Arčon et al. 2025; Alyami & Finlayson 2026); open-vocabulary discovery is unvalidated, and
+  few-shot use-type classification peaks at 41% on GOLEM. Reports of phantom exemplars and run-to-run
+  drift are widespread in practice but, as far as we could verify, not yet the subject of a systematic
+  study on folklore material — treat them as a design caution, not an established finding.
 - **Eurocentrism** in the indices propagates into every downstream analysis.
 - **Coding is the phylogenetic bottleneck.** Evolutionary methods need pre-coded matrices; automating
   that coding is where induction meets phylogenetics.
@@ -215,12 +229,13 @@ candidate-generators not classifiers, always with a baseline — is the field's 
 
 - Abello, J., Broadwell, P., & Tangherlini, T. R. (2012). Computational folkloristics.
   *Communications of the ACM* 55(7), 60–70.
-- Acharya, A., et al. (2024). MIME: discovering implicit meanings of cultural motifs from text.
-  *NLP+CSS workshop*, 46–56.
-- Alyami, S., & Finlayson, M. A. (2026, preprint per review). Fine-tuned LLM narrative-motif detection
-  on the *Arabian Nights* (≈0.85 F1).
-- Arčon, I., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
-  automation based on motifs: a Cinderella case study. *arXiv:2510.18561* (*Fabula*).
+- Acharya, A., Estrada, D., Dahal, S., Yarlott, W. V. H., Gomez, D., & Finlayson, M. A. (2024).
+  Discovering implicit meanings of cultural motifs from text (the MIME system). *NLP+CSS @ ACL*,
+  46–56. ACL Anthology 2024.nlpcss-1.4.
+- Alyami, I. H., & Finlayson, M. A. (2026). Automated motif indexing on the *Arabian Nights*.
+  *arXiv:2603.19283* — preprint, not peer-reviewed as of October 2026.
+- Arčon, T., Robnik-Šikonja, M., & Tratnik, P. (2025). Large language models for folktale type
+  automation based on motifs: Cinderella case study. *arXiv:2510.18561* — preprint.
 - Blei, D. M., Ng, A. Y., & Jordan, M. I. (2003). Latent Dirichlet Allocation. *JMLR* 3, 993–1022.
 - da Silva, S. G., & Tehrani, J. J. (2016). Comparative phylogenetic analyses uncover the ancient roots
   of Indo-European folktales. *Royal Society Open Science* 3, 150645.
@@ -257,8 +272,9 @@ candidate-generators not classifiers, always with a baseline — is the field's 
 - Lô, G., de Boer, V., & van Aart, C. J. (2020). Exploring West African folk narrative texts using
   machine learning. *Information* 11(5), 236.
 - Mac Carron, P., & Kenna, R. (2012). Universal properties of mythological networks. *EPL* 99, 28002.
-- Meaney, C., Alex, B., & Lamb, W. (2024). Classification of tale types and narrator gender in Gaelic
-  folktales. *NLP4DH*.
+- Meaney, J. A., Alex, B., & Lamb, W. (2024). Testing and adapting the representational abilities of
+  large language models on folktales in low-resource languages. *NLP4DH*, 319–324. ACL Anthology
+  2024.nlp4dh-1.31.
 - Meder, T., Karsdorp, F., Nguyen, D., Theune, M., Trieschnigg, D., & Muiser, I. (2016). Automatic
   enrichment and classification of folktales in the Dutch Folktale Database. *Journal of American
   Folklore* 129(511), 78–96.
@@ -268,7 +284,8 @@ candidate-generators not classifiers, always with a baseline — is the field's 
 - Pastor-Sánchez, J.-A., Kontopoulos, E., Saorín, T., Bebis, H., & Darányi, S. (2021). Ontology of
   Greek Mythology. *Semantic Web Journal*.
 - Sakamoto Martini, S., Kendal, J., & Tehrani, J. J. (2023). A phylomemetic analysis of Cinderella.
-- Tangherlini, T. R., & Chen, J. (2024). Travels with BERT. *Orbis Litterarum* 79, 519–562.
+- Tangherlini, T. R., & Chen, R. (2024). Travels with BERT: surfacing the intertextuality in Hans
+  Christian Andersen's travel writing and fairy tales. *Orbis Litterarum* 79(6), 519–562.
 - Thompson, S. (1955–58). *Motif-Index of Folk-Literature* (6 vols). Indiana University Press.
 - Thuillard, M., d'Huy, J., Le Quellec, J.-L., & Berezkin, Yu. E. (2018). A large-scale study of world
   myths. *Trames* 22(4), 407–424.
