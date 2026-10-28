@@ -39,7 +39,7 @@ A recurring structural fact drives almost every "HARD" verdict: **the original-l
 - **Verdict:** Sumerian/Akkadian *original + scholarly English translation* is one of the best-served ancient traditions for open machine-readable data (ETCSL + ORACC).
 
 ### Hittite / Anatolian — MODERATE
-- **Hethitologie-Portal Mainz (HPM)** — critical editions of Hittite cuneiform texts, catalogues, bibliography. Open-access; **portal content CC-BY-SA 4.0**, and the **TLHdig XML dataset released on Zenodo** → bulk-obtainable transliterations. Translations are mostly German. https://www.hethport.uni-wuerzburg.de/HPM/
+- **Hethitologie-Portal Mainz (HPM)** — critical editions of Hittite cuneiform texts, catalogues, bibliography. Open-access; **portal content CC-BY-SA 4.0**, and the **TLHdig XML dataset released on Zenodo** → bulk-obtainable transliterations. Translations are mostly German. https://www.hethport.uni-wuerzburg.de/
 - **Obstacle:** transliteration-centric; English myth translations (Hoffner's *Hittite Myths*) are in copyright.
 
 ### Ugaritic / Canaanite — HARD
