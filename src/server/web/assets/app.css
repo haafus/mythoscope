@@ -604,16 +604,16 @@ body.has-main-navbar {
     align-items: center;
     gap: 16px;
     padding: 8px 0;
-    color: #657fa4;
+    color: #4c85b9;
     font-size: 21px;
     font-weight: 300;
     line-height: 1.3;
     text-decoration: none;
 }
 .corpus-page .corpus-explore-link:hover span:last-child { text-decoration: underline; }
-.corpus-page .corpus-explore-icon { flex: none; width: 44px; height: 44px; color: #657fa4; }
+.corpus-page .corpus-explore-icon { flex: none; width: 44px; height: 44px; color: #4c85b9; }
 .corpus-page .corpus-explore-icon svg { width: 100%; height: 100%; }
-.corpus-page .corpus-explore-icon .bg { fill: #e9eff8; stroke: none; }
+.corpus-page .corpus-explore-icon .bg { fill: #e4f0fb; stroke: none; }
 .corpus-page .corpus-explore-icon .acc { fill: currentColor; stroke: none; }
 .corpus-page .corpus-figure + .corpus-share-caption { margin-top: 6px; }
 /* The figures block stands apart from what follows, at every level as on the overview. */
