@@ -262,11 +262,11 @@ function showCorpusOverview() {
         readerContent.innerHTML = `
             <div class="facet-info corpus-overview">
                 <div class="facet-title">Corpus</div>
-                <div class="facet-field-label">Volume by region (words) · ${regions.size}</div>
+                <div class="facet-field-label">Regions by word count · ${regions.size}</div>
                 ${bars([...regions.values()].sort(byWords), (r) => regionColorOf(r.name), (r) => `data-region="${escapeHtml(r.name)}"`)}
-                <div class="facet-field-label">Volume by tradition (words) · ${traditions.size}</div>
+                <div class="facet-field-label">Traditions by word count · ${traditions.size}</div>
                 ${bars([...traditions.values()].sort(byWords), (r) => traditionColor(r.name), (r) => `data-tradition="${escapeHtml(r.name)}"`)}
-                <div class="facet-field-label">Volume by book (words) · ${books.length}</div>
+                <div class="facet-field-label">Books by word count · ${books.length}</div>
                 ${bars(books, (r) => traditionColor(r.doc.tradition), (r) => `data-doc="${escapeHtml(r.doc.document_id)}"`)}
             </div>`;
         readerContent.scrollTop = 0;
@@ -375,7 +375,7 @@ function renderGroupStats({ docs, byTradition = false, color, parentWords = 0, p
 
     if (byTradition && traditions.size) {
         const ranked = [...traditions.values()].sort((a, b) => b.words - a.words);
-        html += `<div class="description-title">Traditions by volume (words) · ${traditions.size}</div>
+        html += `<div class="description-title">Traditions by word count · ${traditions.size}</div>
             <ol class="group-list">${ranked.map((t) => `<li>
                 <button class="group-link" type="button" data-tradition="${escapeHtml(t.name)}" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</button>
                 <span class="group-count">${formatNumber(t.words)}</span>
@@ -384,7 +384,7 @@ function renderGroupStats({ docs, byTradition = false, color, parentWords = 0, p
 
     const books = [...docs].sort((a, b) => (b.word_count || 0) - (a.word_count || 0));
     if (books.length) {
-        html += `<div class="description-title">Books by volume (words) · ${books.length}</div>
+        html += `<div class="description-title">Books by word count · ${books.length}</div>
             <ol class="group-list">${books.map((d) => `<li>
                 <button class="group-link" type="button" data-doc="${escapeHtml(d.document_id)}" title="${escapeHtml(d.title)}">
                     ${escapeHtml(d.title)}
