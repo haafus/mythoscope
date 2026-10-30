@@ -147,13 +147,25 @@ function renderFacetInfo(name, color, fields) {
     readerContent.scrollTop = 0;
 }
 
-// The tree has already toggled when these fire: a click that collapses a region or a
-// tradition clears the selection; one that expands it selects it.
+// The tree has already toggled when these fire.
+// Region: a click on the selected region clears the selection (and leaves it collapsed);
+// any other click selects the region and keeps it open, even if something inside it
+// was selected and the tree just collapsed it.
 function onRegionClick(region) {
-    if (state.corpusOpenMajor !== region) clearSelection();
-    else showRegionInfo(region);
+    const sel = state.selectedNode;
+    if (sel && sel.kind === "region" && sel.key === region) {
+        clearSelection();
+        return;
+    }
+    if (state.corpusOpenMajor !== region) {
+        state.corpusOpenMajor = region;
+        document.querySelectorAll("#libraryTree .major-section").forEach((s) =>
+            s.classList.toggle("collapsed", (s.dataset.major || "Other") !== region));
+    }
+    showRegionInfo(region);
 }
 
+// Tradition: a click that collapses it clears the selection; one that expands it selects it.
 function onTraditionClick(tradition, region) {
     if (state.corpusOpenTradition !== corpusTraditionKey(region, tradition)) clearSelection();
     else showTraditionInfo(tradition, region);
