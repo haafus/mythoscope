@@ -669,7 +669,7 @@ body.has-main-navbar {
 .corpus-page .facet-field-label {
     margin-bottom: 3px;
     color: #6b4a2e;
-    font-size: 11px;
+    font-size: 12px;   /* same as the right panel's labels and the other sections' */
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
