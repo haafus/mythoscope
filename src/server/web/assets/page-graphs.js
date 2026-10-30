@@ -36,8 +36,8 @@ const GRAPH_FIELD_LABELS = {
 };
 
 // The three graphs of a book, in switcher order; Structure opens on the last one used.
-const GRAPH_TYPES = [["ages", "Ages"], ["realms", "Realms"], ["beings", "Beings"]];
-let lastGraphType = "ages";
+const GRAPH_TYPES = [["beings", "Beings"], ["realms", "Realms"], ["ages", "Ages"]];
+let lastGraphType = "beings";
 
 // What one node of each graph is, for the book summary ("42 characters").
 const GRAPH_ENTITY_NOUNS = { beings: "characters", realms: "places", ages: "periods" };
