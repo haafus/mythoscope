@@ -252,7 +252,7 @@ function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLa
         const ranked = [...traditions.values()].sort((a, b) => b.words - a.words);
         html += `<div class="description-title">Traditions by volume (words)</div>
             <ol class="group-list">${ranked.map((t) => `<li>
-                <button class="group-link" type="button" data-tradition="${escapeHtml(t.name)}">${escapeHtml(t.name)}</button>
+                <button class="group-link" type="button" data-tradition="${escapeHtml(t.name)}" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</button>
                 <span class="group-count">${formatNumber(t.words)}</span>
             </li>`).join("")}</ol>`;
     }

@@ -616,6 +616,7 @@ body.has-main-navbar {
     border-bottom: 1px solid #f0f0f0;
 }
 .corpus-page .group-link {
+    flex: 1 1 auto;
     min-width: 0;
     padding: 0;
     border: 0;
@@ -624,7 +625,10 @@ body.has-main-navbar {
     font: inherit;
     text-align: left;
     cursor: pointer;
-    overflow-wrap: anywhere;
+    /* One line per entry; the full name is in the title tooltip. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .corpus-page .group-link:hover { text-decoration: underline; }
 .corpus-page .group-count { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
