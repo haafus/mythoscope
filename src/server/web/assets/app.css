@@ -1406,7 +1406,16 @@ body.has-main-navbar {
     box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.12);
 }
 .graph-book-meta { margin-top: 6px; color: var(--muted); font-size: 13px; }
-.graph-book-label { margin: 18px 0 6px; color: #111; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+/* Section labels in the Structure palette: the muted violet of the motif-page
+   parallels, sized like the Motifs section titles. */
+.graph-book-label {
+    margin: 20px 0 6px;
+    color: #7a6aa0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
 .graph-book-text { color: #4b5563; font-size: 14px; line-height: 1.5; }
 .graph-book-list { margin: 0; padding: 0; list-style: none; font-size: 14px; color: #4b5563; }
 .graph-book-list li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
