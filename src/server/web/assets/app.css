@@ -113,7 +113,7 @@ body.has-main-navbar {
     align-items: center;
     justify-content: center;
     margin-left: 6px;
-    padding: 4px 10px;
+    padding: 5px 10px;
     font-family: Georgia, "Times New Roman", serif;
     font-style: italic;
     font-size: 23px;
@@ -136,10 +136,6 @@ body.has-main-navbar {
 .nav-links > a.nav-info:hover {
     color: #fff;
     background: #4f7096;
-}
-.nav-links > a.nav-info.active {
-    color: #111;
-    background: transparent;
 }
 
 @media (max-width: 760px) {
