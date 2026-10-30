@@ -1380,18 +1380,6 @@ body.has-main-navbar {
     font-size: 14px;
 }
 
-.graph-info-panel table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-.graph-info-panel th, .graph-info-panel td { text-align: left; padding: 6px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
-.graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; padding-right: 8px; }
-.graph-info-panel td { color: #2c3e50; width: 65%; }
-.graph-info-panel h3 { margin: 0 0 10px 0; color: #8a4c38; }
-
-/* Text fields stacked single-column: label heading over its value. Description
-   has no label — it leads straight with the text. */
-.graph-info-desc { margin: 0 0 12px; color: #2c3e50; line-height: 1.5; }
-.graph-info-field { margin-bottom: 10px; }
-.graph-info-label { font-weight: 600; color: #4a4a4a; margin-bottom: 2px; }
-.graph-info-value { color: #2c3e50; line-height: 1.45; }
 
 /* Book summary in the graph rail — the Sources info panel's title, tradition line
    and section labels, with plain lists instead of stat cards. */
@@ -1433,6 +1421,7 @@ body.has-main-navbar {
 }
 .graph-book-node:hover { text-decoration: underline; }
 .graph-book-hint { margin-top: 18px; font-size: 13px; }
+.graph-node-desc { margin-top: 14px; }
 
 .graph-edge-tooltip {
     z-index: 1000;

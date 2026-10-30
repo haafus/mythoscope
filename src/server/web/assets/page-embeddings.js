@@ -6,7 +6,7 @@ import {
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { setHashUrl } from "./url.js?v=1";
-import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js?v=1";
+import { destroyChart, highlightTradition, renderScatter, renderHeatmap, resizeChart } from "./chart.js?v=2";
 import {
     attributionLine,
     fetchPointWithNeighbors, renderSearchResultItem,
@@ -29,10 +29,6 @@ const CHART_RENDERERS = {
         await renderScatter(el, data, { colorMap: getColorMap(traditions), onPointClick: displayPointInfo });
     },
     heatmap: (el, data) => renderHeatmap(el, data),
-    distribution: async (el, data) => {
-        const names = (data.traditions || []).map((t) => t.name);
-        await renderDistribution(el, data, { colorMap: getColorMap(names) });
-    },
 };
 
 // The URL holds the view: model, projection method, the region or tradition picked in the

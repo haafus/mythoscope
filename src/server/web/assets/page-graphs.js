@@ -31,7 +31,7 @@ const GRAPH_INFO_FIELDS = {
 const GRAPH_METRIC_FIELDS = new Set(["Degree", "BetweennessCentrality"]);
 // Display labels for fields whose data key is not presentation-ready.
 const GRAPH_FIELD_LABELS = {
-    BetweennessCentrality: "Betweenness Centrality",
+    BetweennessCentrality: "Betweenness centrality",
     "Adjacent To": "Adjacent to",
     Keyevents: "Key Events",
     Keyactors: "Key Actors",
@@ -192,6 +192,41 @@ export async function renderGraphPage(params = new URLSearchParams(), { samePage
         bookList.querySelector(".document-button.active")?.scrollIntoView({ block: "nearest" });
         loadGraphData(carried, graphType);
     }
+}
+
+const CATEGORY_NOUNS = { Character: "Character", Location: "Place", Epoch: "Period" };
+
+// The rail for a picked node, in the book summary's style: title, a muted line saying what
+// it is and where it comes from, its text fields under section labels, and its network
+// position as a plain two-column list.
+function renderNodeDetails(d, graphType, doc) {
+    const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.beings;
+    const kind = CATEGORY_NOUNS[d.Category];
+    const meta = [kind, doc ? `in ${doc.title}` : ""].filter(Boolean).join(" ");
+
+    let html = `<div class="graph-book-title">${escapeHtml(d.display_name || d.Name || d.id)}</div>`;
+    if (meta) html += `<div class="graph-book-meta">${escapeHtml(meta)}</div>`;
+
+    let metrics = "";
+    fields.forEach((f) => {
+        const value = graphFieldText(d[f]);
+        if (!value) return;  // skip absent/empty fields ({}, [], blank, nan)
+        const label = GRAPH_FIELD_LABELS[f] || f;
+        if (GRAPH_METRIC_FIELDS.has(f)) {
+            // Betweenness is a long float — round to 5 decimals for display.
+            const shown = f === "BetweennessCentrality" && typeof d[f] === "number"
+                ? String(Math.round(d[f] * 1e5) / 1e5)
+                : value;
+            metrics += `<li><span>${escapeHtml(label)}</span><span class="graph-book-count">${escapeHtml(shown)}</span></li>`;
+        } else if (f === "Description") {
+            html += `<div class="graph-book-text graph-node-desc">${escapeHtml(value)}</div>`;
+        } else {
+            html += `<div class="graph-book-label">${escapeHtml(label)}</div>
+                <div class="graph-book-text">${escapeHtml(value)}</div>`;
+        }
+    });
+    if (metrics) html += `<div class="graph-book-label">Network</div><ul class="graph-book-list">${metrics}</ul>`;
+    return html;
 }
 
 // The right rail's default content: what this book is and what its graph holds.
@@ -465,29 +500,7 @@ function renderCytoscapeGraph(container, data, graphType, doc) {
         pinnedNode.addClass("pinned");
         highlightNode(pinnedNode);
 
-        const d = evt.target.data();
-        const fields = GRAPH_INFO_FIELDS[graphType] || GRAPH_INFO_FIELDS.beings;
-        let html = `<h3>${escapeHtml(d.display_name || d.Name || d.id)}</h3>`;
-        let metrics = "";
-        fields.forEach((f) => {
-            const value = graphFieldText(d[f]);
-            if (!value) return;  // skip absent/empty fields ({}, [], blank, nan)
-            const label = GRAPH_FIELD_LABELS[f] || f;
-            if (GRAPH_METRIC_FIELDS.has(f)) {
-                // Betweenness is a long float — round to 5 decimals for display.
-                const shown = f === "BetweennessCentrality" && typeof d[f] === "number"
-                    ? String(Math.round(d[f] * 1e5) / 1e5)
-                    : value;
-                metrics += `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(shown)}</td></tr>`;
-            } else if (f === "Description") {
-                html += `<p class="graph-info-desc">${escapeHtml(value)}</p>`;  // no label, straight to text
-            } else {
-                html += `<div class="graph-info-field"><div class="graph-info-label">${escapeHtml(label)}</div>`
-                      + `<div class="graph-info-value">${escapeHtml(value)}</div></div>`;
-            }
-        });
-        if (metrics) html += `<table>${metrics}</table>`;
-        infoContent.innerHTML = html;
+        infoContent.innerHTML = renderNodeDetails(evt.target.data(), graphType, doc);
     });
 
     // A tap on empty canvas clears the pinned selection.

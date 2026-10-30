@@ -137,40 +137,6 @@ export async function renderHeatmap(el, data) {
     el.dataset.plotly = "1";
 }
 
-export async function renderDistribution(el, data, { colorMap }) {
-    const traditions = data.traditions || [];
-    if (!window.Plotly || !traditions.length) throw new Error("Distribution data is empty.");
-
-    el.style.display = "block";
-
-    const names = traditions.map((t) => t.name);
-    const trace = {
-        type: "bar",
-        x: traditions.map((t) => t.chunks),
-        y: names,
-        orientation: "h",
-        marker: { color: names.map((n) => colorMap[n]) },
-        text: traditions.map((t) => `${t.chunks.toLocaleString()} chunks (${t.percentage}%)`),
-        textposition: "outside",
-        cliponaxis: false,
-        hovertemplate: "<b>%{y}</b><br>Chunks: %{x:,}<br>Source texts: %{customdata}<extra></extra>",
-        customdata: traditions.map((t) => t.doc_count),
-    };
-
-    const layout = {
-        margin: { l: 160, r: 140, t: 40, b: 60 },
-        paper_bgcolor: "#fff",
-        plot_bgcolor: "rgba(248,249,250,0.95)",
-        showlegend: false,
-        height: Math.max(500, 28 * names.length + 120),
-        xaxis: { title: { text: "Number of chunks" }, automargin: true, tickfont: { size: 11 } },
-        yaxis: { autorange: "reversed", tickfont: { size: 11 }, automargin: true },
-    };
-
-    await Plotly.newPlot(el, [trace], layout, { responsive: true, displaylogo: false, displayModeBar: true });
-    el.dataset.plotly = "1";
-}
-
 function bindTooltip(plotEl) {
     const [canvas, tooltip] = getTooltip();
     if (!canvas) return;

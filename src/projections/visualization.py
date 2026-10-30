@@ -166,40 +166,7 @@ def generate_heatmap(
     logger.info(f"Heatmap saved: {output_path}")
 
 
-def generate_distribution(
-    data: list[dict],
-    embeddings: np.ndarray,
-    output_path: Path,
-    model_name: str | None = None,
-    **_kwargs,
-) -> None:
-    tradition_counts: dict[str, int] = {}
-    tradition_docs: dict[str, set] = {}
-    for item in data:
-        trad = item.get("tradition", "unknown")
-        tradition_counts[trad] = tradition_counts.get(trad, 0) + 1
-        tradition_docs.setdefault(trad, set()).add(item.get("id"))
-
-    sorted_traditions = sorted(tradition_counts.items(), key=lambda x: -x[1])
-    total_chunks = sum(c for _, c in sorted_traditions)
-
-    traditions = []
-    for name, count in sorted_traditions:
-        traditions.append({
-            "name": name,
-            "chunks": count,
-            "percentage": round(count / total_chunks * 100, 2) if total_chunks else 0,
-            "doc_count": len(tradition_docs.get(name, set())),
-        })
-
-    result = {"model": model_name or "", "total_chunks": total_chunks, "traditions": traditions}
-
-    output_path.write_text(json.dumps(result), encoding="utf-8")
-    logger.info(f"Distribution saved: {output_path}")
-
-
 CHART_GENERATORS = {
     "scatter": generate_scatter,
     "heatmap": generate_heatmap,
-    "distribution": generate_distribution,
 }

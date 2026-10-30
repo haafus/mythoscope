@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def _attach_tradition(records: list[dict[str, Any]]) -> None:
     """Join each chunk's tradition from the catalog by `document_id` (B1: tradition is no
     longer on the chunk). The projection build reads `item["tradition"]` for its residual /
-    distribution / colour groupings, so it is resolved here once, not stored on the vector."""
+    heatmap / colour groupings, so it is resolved here once, not stored on the vector."""
     catalog = settings.corpus_dir / "corpus.json"
     id_to_tradition: dict[str, str] = {}
     if catalog.exists():

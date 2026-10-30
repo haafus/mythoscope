@@ -130,7 +130,7 @@ class WarmupResponse(BaseModel):
 
 
 class ProjectionData(BaseModel):
-    # Payload shape depends on chart_type (points / matrix / distribution),
+    # Payload shape depends on chart_type (points / matrix),
     # so only the discriminator is fixed; the rest passes through.
     model_config = ConfigDict(extra="allow")
     method: str
