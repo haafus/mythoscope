@@ -604,7 +604,7 @@ body.has-main-navbar {
 }
 
 /* Region / tradition stats in the info panel: plain ranked lists, no stat cards. */
-.corpus-page .group-stat { color: #111; font-size: 15px; font-weight: 600; }
+.corpus-page .group-stat { color: var(--muted); font-size: 13px; }
 .corpus-page .group-stat-sub { margin-top: 3px; color: var(--muted); font-size: 13px; }
 .corpus-page .group-list { margin: 0; padding: 0; list-style: none; font-size: 14px; }
 .corpus-page .group-list li {
