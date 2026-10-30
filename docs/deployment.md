@@ -8,6 +8,34 @@ and pushed here as data, independently of code.
 Everything is driven from `fabfile.py` in the repo root over plain SSH. There is
 no CI/CD, no registry, no object storage.
 
+## Contents
+
+- [1. Topology](#1-topology)
+  - [Accounts](#accounts)
+  - [Configuration](#configuration)
+  - [Static apps at /apps](#static-apps-at-apps)
+  - [Restart policy](#restart-policy)
+- [2. Commands](#2-commands)
+  - [`bootstrap`](#bootstrap)
+  - [`deploy`](#deploy)
+  - [`push-outputs`](#push-outputs)
+  - [The smoke check](#the-smoke-check)
+- [3. Constraints the code imposes](#3-constraints-the-code-imposes)
+  - [Python version](#python-version)
+- [4. Performance](#4-performance)
+  - [Handler model](#handler-model)
+  - [Baseline (all endpoints except projections)](#baseline-all-endpoints-except-projections)
+  - [The projections bottleneck, and the fix](#the-projections-bottleneck-and-the-fix)
+  - [Memory](#memory)
+  - [When to add workers](#when-to-add-workers)
+- [5. ChromaDB](#5-chromadb)
+  - [Telemetry is off](#telemetry-is-off)
+  - [In production the server only reads](#in-production-the-server-only-reads)
+  - [But the store still has to be writable](#but-the-store-still-has-to-be-writable)
+  - [Which does make workers safe](#which-does-make-workers-safe)
+- [6. Why not Docker](#6-why-not-docker)
+- [7. Open items](#7-open-items)
+
 ---
 
 ## 1. Topology
