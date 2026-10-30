@@ -588,33 +588,10 @@ body.has-main-navbar {
     font-size: 13px;
 }
 
-.corpus-page .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin: 18px 0;
-}
-
-.corpus-page .stat-card {
-    border: 1px solid #e1e6eb;
-    border-radius: 6px;
-    background: #fafbfc;
-    padding: 11px 10px;
-}
-
-.corpus-page .stat-value {
-    color: #111;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.corpus-page .stat-label {
-    margin-top: 3px;
+.corpus-page .book-meta {
+    margin-top: 6px;
     color: var(--muted);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-size: 13px;
 }
 
 .corpus-page .description-title {
@@ -700,7 +677,7 @@ body.has-main-navbar {
 .corpus-page a.original-url-link {
     display: block;
     margin-top: 18px;
-    color: var(--accent);
+    color: #3a5e86;
     font-size: 14px;
     overflow-wrap: anywhere;
     text-decoration: none;

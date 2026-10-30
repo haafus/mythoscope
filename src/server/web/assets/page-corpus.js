@@ -90,6 +90,12 @@ function renderBookInfo(doc) {
     const originalUrl = isWebSource
         ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Source</a>`
         : "";
+    // Size and dating as one plain line, the same line the Structure rail shows for a book.
+    const meta = [
+        doc.dating,
+        doc.word_count ? `${formatNumber(doc.word_count)} words` : "",
+        doc.sentence_count ? `${formatNumber(doc.sentence_count)} sentences` : "",
+    ].filter(Boolean).join(" · ");
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
@@ -97,16 +103,7 @@ function renderBookInfo(doc) {
             <span>${escapeHtml(regionOf(doc.tradition) || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">${formatNumber(doc.word_count)}</div>
-                <div class="stat-label">Words</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${formatNumber(doc.sentence_count)}</div>
-                <div class="stat-label">Sentences</div>
-            </div>
-        </div>
+        ${meta ? `<div class="book-meta">${escapeHtml(meta)}</div>` : ""}
 
         <div class="description-title">Description</div>
         <div class="description-text">${escapeHtml(doc.description || "No description available.")}</div>
