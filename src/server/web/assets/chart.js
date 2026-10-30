@@ -19,18 +19,6 @@ export function destroyChart(el) {
     el.dataset.plotly = "";
     el.dataset.heatmap = "";
     el._heatmap = null;
-    el._traditions = null;
-}
-
-// A tree selection lights its rows and columns in the heatmap and fades the rest.
-function highlightHeatmap(el, selection) {
-    const { labels } = el._heatmap || {};
-    if (!labels) return;
-    const inSel = (i) => !selection || (selection instanceof Set ? selection.has(labels[i]) : labels[i] === selection);
-    el.querySelectorAll(".hm-cell").forEach((cell) =>
-        cell.classList.toggle("faded", !(inSel(+cell.dataset.r) || inSel(+cell.dataset.c))));
-    el.querySelectorAll(".hm-label").forEach((l) =>
-        l.classList.toggle("faded", !inSel(+(l.dataset.row ?? l.dataset.col))));
 }
 
 export function resizeChart(el) {
@@ -44,7 +32,7 @@ export function resizeChart(el) {
 // `selection`: null/"" → all lit; a tradition string → that one; a Set of names → those
 // (used for a whole region — dim every tradition not in the region). Same dimming either way.
 export function highlightTradition(el, selection) {
-    if (el.dataset.heatmap === "1") return highlightHeatmap(el, selection);
+    if (el.dataset.heatmap === "1") return;   // the heatmap always shows the whole corpus
     if (!window.Plotly || el.dataset.plotly !== "1") return;
     const traditions = el._traditions || [];
     const colors = el._traditionColors || [];
@@ -145,7 +133,6 @@ export async function renderHeatmap(el, data) {
     maxDev = maxDev || 1;
 
     el._heatmap = { labels, sim, resid, maxDev, order: seriate(dist) };
-    el._traditions = labels;   // the region dimming looks up which traditions are on the chart
     el.dataset.heatmap = "1";
     el.style.display = "block";
     drawHeatmap(el);

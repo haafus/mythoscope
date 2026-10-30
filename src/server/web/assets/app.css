@@ -2243,8 +2243,6 @@ a.csbar-lab.chart-link:hover { color: var(--sec-link-strong, #0f6a60); text-deco
 .analysis-page .hm-label { fill: #4a545c; }
 .analysis-page .hm-hovering .hm-label { fill: #b4bac0; }
 .analysis-page .hm-hovering .hm-label.on { fill: #1f2933; }
-.analysis-page .hm-label.faded { fill: #c3c9cf; }
-.analysis-page .hm-cell.faded { opacity: 0.25; }
 .analysis-page .heatmap-legend { display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; margin-top: 12px; color: var(--muted); font-size: 12.5px; }
 .analysis-page .heatmap-ramp { width: 160px; height: 10px; border-radius: 3px; flex: none; }
 .analysis-page .hm-tip-dev { color: var(--muted); }

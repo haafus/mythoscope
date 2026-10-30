@@ -6,7 +6,7 @@ import {
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { setHashUrl } from "./url.js?v=1";
-import { destroyChart, highlightTradition, renderScatter, renderHeatmap, resizeChart } from "./chart.js?v=4";
+import { destroyChart, highlightTradition, renderScatter, renderHeatmap, resizeChart } from "./chart.js?v=5";
 import {
     attributionLine,
     fetchPointWithNeighbors, renderSearchResultItem,
@@ -232,7 +232,7 @@ const HEATMAP_GUIDE = `<div class="heatmap-guide" id="heatmapGuide" style="displ
     <p>Each cell compares two traditions by the average meaning of their texts in the selected model.</p>
     <p>Colour shows how much <strong>closer</strong> (teal) or <strong>farther</strong> (orange) a pair is than expected: a tradition that resembles everything doesn't light up its whole row.</p>
     <p>Rows are ordered by clustering, so blocks along the diagonal are traditions that read alike.</p>
-    <p>Hover a cell for the raw similarity; pick a region or tradition on the left to highlight it.</p>
+    <p>Hover a cell for the raw similarity.</p>
     <p class="heatmap-guide-note">Within a tradition, longer books weigh more.</p>
 </div>`;
 
