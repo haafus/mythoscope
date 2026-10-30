@@ -28,7 +28,7 @@ export async function renderCorpus(params = new URLSearchParams()) {
 
     const libraryTree = document.getElementById("libraryTree");
     libraryTree.addEventListener("book-select", (e) => openCorpusDocument(e.detail.doc));
-    libraryTree.addEventListener("region-select", (e) => showRegionInfo(e.detail.region));
+    libraryTree.addEventListener("region-select", (e) => onRegionClick(e.detail.region));
     libraryTree.addEventListener("tradition-select", (e) => showTraditionInfo(e.detail.tradition, e.detail.region));
     renderBookInfo(null);
 
@@ -145,6 +145,22 @@ function renderFacetInfo(name, color, fields) {
         </div>
     `;
     readerContent.scrollTop = 0;
+}
+
+// Clicking the active region again collapses it and clears the selection, as on Similarity.
+function onRegionClick(region) {
+    const sel = state.selectedNode;
+    if (sel && sel.kind === "region" && sel.key === region) clearSelection();
+    else showRegionInfo(region);
+}
+
+function clearSelection() {
+    selectNode(null);
+    renderBookInfo(null);
+    const readerContent = document.getElementById("readerContent");
+    if (readerContent) {
+        readerContent.innerHTML = '<div class="reader-placeholder">Choose a title from the literature list.</div>';
+    }
 }
 
 function showRegionInfo(region) {
