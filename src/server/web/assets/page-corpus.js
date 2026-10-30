@@ -222,7 +222,7 @@ function clearSelection() {
 
 const regionColorOf = (region) => ((state.traditionTree || {})[region] || {}).color || "#8a8a8a";
 
-// The empty state: three word-count histograms (macro-areas, traditions, books) in the
+// The empty state: three word-count histograms (regions, traditions, books) in the
 // reader and the corpus totals in the panel. Every bar label selects what it names.
 function showCorpusOverview() {
     const docs = state.corpusDocuments;
@@ -261,7 +261,7 @@ function showCorpusOverview() {
         readerContent.innerHTML = `
             <div class="facet-info corpus-overview">
                 <div class="facet-title">Corpus</div>
-                <div class="facet-field-label">Volume by macro-area (words)</div>
+                <div class="facet-field-label">Volume by region (words)</div>
                 ${bars([...regions.values()].sort(byWords), (r) => regionColorOf(r.name), (r) => `data-region="${escapeHtml(r.name)}"`)}
                 <div class="facet-field-label">Volume by tradition (words)</div>
                 ${bars([...traditions.values()].sort(byWords), (r) => traditionColor(r.name), (r) => `data-tradition="${escapeHtml(r.name)}"`)}
@@ -288,7 +288,7 @@ function showCorpusOverview() {
         bookInfo.innerHTML = figures([
             [counted(words, "word", "words")],
             [counted(sentences, "sentence", "sentences")],
-            [counted(regions.size, "macro-area", "macro-areas"), counted(traditions.size, "tradition", "traditions"),
+            [counted(regions.size, "region", "regions"), counted(traditions.size, "tradition", "traditions"),
                 counted(docs.length, "book", "books")],
             [[formatNumber(Math.round(words / docs.length)), "words per book on average"]],
         ]);
