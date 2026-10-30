@@ -172,22 +172,12 @@ body.has-main-navbar {
     padding-top: 28px;
 }
 
-.about-page .header-container {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
-.about-page .logo-image {
-    max-width: 250px;
-    height: auto;
-    margin-bottom: 22px;
-}
-
 .about-page .nav-menu {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
+    margin-bottom: 20px;
     font-size: 15px;
     color: #333;
 }
@@ -215,9 +205,9 @@ body.has-main-navbar {
 }
 
 .about-page .content-container {
-    max-width: 960px;
+    max-width: 800px;
     width: calc(100% - 32px);
-    padding: 40px;
+    padding: 36px 40px;
     text-align: left;
     background: #ffffff;
     border-radius: 12px;
@@ -236,18 +226,12 @@ body.has-main-navbar {
 }
 
 .about-page .tab-content h3 {
-    margin: 28px 0 10px;
-    font-size: 17px;
+    margin: 30px 0 10px;
+    font-size: 19px;
     color: #222;
 }
 
 .about-page .tab-content > h3:first-child { margin-top: 0; }
-
-.about-page .tab-content h4 {
-    margin: 0 0 4px;
-    font-size: 15px;
-    color: #222;
-}
 
 .about-page .tab-content p { margin: 0 0 12px; }
 .about-page .tab-content a,
@@ -256,8 +240,8 @@ body.has-main-navbar {
 .about-page .about-contact a:hover { text-decoration: underline; }
 
 .about-page .about-lead {
-    font-size: 17px;
-    line-height: 1.55;
+    font-size: 18px;
+    line-height: 1.5;
     color: #333;
 }
 
@@ -278,42 +262,12 @@ body.has-main-navbar {
 
 .about-page .about-figures[hidden] { display: none; }
 
-.about-page .about-pipeline {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin: 4px 0 12px;
-}
-
-.about-page .about-pipeline div {
-    padding: 14px 16px;
-    background: #f6f7f9;
-    border-radius: 8px;
-}
-
-.about-page .about-pipeline p { margin: 0; font-size: 14px; }
-
-.about-page .about-ref {
-    padding-left: 14px;
-    border-left: 3px solid var(--border);
-}
-
-.about-page .about-cite {
-    margin: 0;
-    padding: 14px 16px;
-    overflow-x: auto;
-    background: #f6f7f9;
-    border-radius: 8px;
-    font-size: 12.5px;
-    line-height: 1.5;
-}
-
 .about-page .about-contact {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px 32px;
-    max-width: 960px;
+    max-width: 800px;
     width: calc(100% - 32px);
     margin: 20px 0 32px;
     font-size: 14px;
@@ -333,7 +287,6 @@ body.has-main-navbar {
     .about-page .nav-menu { flex-wrap: wrap; gap: 4px; }
     .about-page .separator { display: none; }
     .about-page .content-container { padding: 24px 20px; }
-    .about-page .about-pipeline { grid-template-columns: 1fr; }
     .about-page .about-contact { justify-content: flex-start; }
 }
 
