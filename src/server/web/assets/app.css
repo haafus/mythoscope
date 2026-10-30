@@ -560,7 +560,9 @@ body.has-main-navbar {
 
 .corpus-page .book-info {
     overflow: auto;
-    padding: 18px;
+    /* The top puts the word count on the reader title's baseline; the sides come closer to the
+       reader's wide margins than the default panel padding. */
+    padding: 30px 28px 28px;
 }
 
 .corpus-page .description-title {
@@ -1516,6 +1518,8 @@ body.has-main-navbar {
         padding: 22px 22px 44px;
         font-size: 16px;
     }
+
+    .corpus-page .book-info { padding: 24px 22px 22px; }
 }
 
 /* ==========================================================================
