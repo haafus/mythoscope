@@ -34,8 +34,10 @@ export function renderAbout(params) {
 
                     <h3>Status</h3>
                     <p>Early-stage, actively developed research software. The application is live, the <a href="${REPO}" target="_blank" rel="noopener">code is open</a>, and the semantic-space baseline is described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint on arXiv</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026). Results so far are exploratory and documented with their data, method and limitations.</p>
-                    <p>Next: a larger and better-balanced corpus, motif induction from the texts themselves, and case studies with specialists in individual traditions.</p>
                     <p class="about-figures" hidden></p>
+
+                    <h3>What's ahead</h3>
+                    <p>A larger and better-balanced corpus, motif induction from the texts themselves, and case studies with specialists in individual traditions.</p>
                 </div>
 
                 <div id="methodology" class="tab-content">
