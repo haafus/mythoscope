@@ -34,7 +34,7 @@ export function renderAbout(params) {
 
                     <h3>Status</h3>
                     <p>Early-stage, actively developed research software. The application is live, the <a href="${REPO}" target="_blank" rel="noopener">code is open</a>, and the semantic-space baseline is described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint on arXiv</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026). Results so far are exploratory and documented with their data, method and limitations.</p>
-                    <p>Next: a larger and better-balanced corpus with sources in original languages, motif induction from the texts themselves, case studies with specialists in individual traditions, and archived releases with DOIs.</p>
+                    <p>Next: a larger and better-balanced corpus, motif induction from the texts themselves, and case studies with specialists in individual traditions.</p>
                     <p class="about-figures" hidden></p>
                 </div>
 
@@ -60,9 +60,9 @@ export function renderAbout(params) {
 
                     <h3>Ways to help</h3>
                     <ul class="about-list">
-                        <li><strong>Texts</strong>: vetted translations and editions, especially from under-represented traditions and in original languages.</li>
-                        <li><strong>Expert review</strong>: corrections to texts, the tradition taxonomy and motif links; reporting what looks wrong already helps.</li>
+                        <li><strong>Texts</strong>: vetted translations and editions, especially from under-represented traditions.</li>
                         <li><strong>Methods</strong>: motif induction from text and its evaluation, the main open problem.</li>
+                        <li><strong>Expert review</strong>: corrections to texts, the tradition taxonomy and motif links; reporting what looks wrong already helps.</li>
                         <li><strong>Code</strong>: a Python pipeline with a plain JavaScript interface; see the <a href="${REPO}/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing guide</a>.</li>
                         <li><strong>Case studies</strong> designed and checked together with specialists in individual traditions.</li>
                     </ul>
