@@ -453,6 +453,10 @@ async function initializeAnalysisLibrary(params = new URLSearchParams(), samePag
             state.selectedNode = { kind: "region", key: region };
             state.corpusOpenMajor = region;      // sources opens this region…
             state.corpusOpenTradition = null;    // …with no stale tradition group expanded
+            // The tree has already toggled: a region that ends up selected stays open, even when
+            // the click collapsed it because one of its traditions was selected (as in Corpus).
+            container.querySelectorAll(".major-section").forEach((s) =>
+                s.classList.toggle("collapsed", (s.dataset.major || "Other") !== region));
         }
         analysisSel = active ? { kind: "region", name: region } : null;
         applyAnalysisDim();
