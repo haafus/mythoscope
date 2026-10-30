@@ -254,14 +254,6 @@ body.has-main-navbar {
 .about-page .about-points li,
 .about-page .about-list li { margin-bottom: 8px; }
 
-.about-page .about-figures {
-    margin-top: -4px;
-    font-size: 13px;
-    color: var(--muted);
-}
-
-.about-page .about-figures[hidden] { display: none; }
-
 .about-page .about-contact {
     display: flex;
     flex-wrap: wrap;

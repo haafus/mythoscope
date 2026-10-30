@@ -1,4 +1,4 @@
-import { api, app, formatNumber } from "./core.js";
+import { app } from "./core.js";
 
 const REPO = "https://github.com/haafus/mythoscope";
 const AWESOME = "https://github.com/haafus/awesome-computational-mythology";
@@ -34,26 +34,17 @@ export function renderAbout(params) {
 
                     <h3>What's done so far</h3>
                     <ul class="about-list">
-                        <li><strong>A corpus of world traditions in one semantic space</strong>, where parallels between mythological and religious texts can be found by meaning; the approach is described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026).</li>
-                        <li><strong>The three major folklore indexes in one motif database</strong>: Thompson, Aarne–Thompson–Uther and Berezkin &amp; Duvakin, cross-linked with each other.</li>
-                        <li><strong>Characters, relations and places</strong> extracted from the texts as graphs.</li>
-                        <li><strong>Exploratory studies</strong>: more than sixty computational experiments on dating motifs, reconstructing ancestral motif repertoires and how repertoires change across regions.</li>
-                        <li><strong>A survey of the field</strong> and an open, curated guide to its resources.</li>
+                        <li><strong>A published baseline</strong>: the semantic-space approach and its lexical controls are described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint on arXiv</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026).</li>
+                        <li><strong>More than sixty exploratory studies</strong> on dating motifs, reconstructing ancestral motif repertoires and how repertoires change across regions, each <a href="${REPO}/tree/main/mockups" target="_blank" rel="noopener">documented</a> with its data, method and limitations.</li>
                     </ul>
-                    <p class="about-figures" hidden></p>
 
                     <h3>What's ahead</h3>
                     <p>A larger and better-balanced corpus, motif induction from the texts themselves, and case studies with specialists in individual traditions.</p>
                 </div>
 
                 <div id="methodology" class="tab-content">
-                    <h3>Two layers of data</h3>
-                    <p><strong>A text corpus.</strong> Primary texts of mythological and religious traditions from open sources, split into fragments and embedded in one semantic space, so that passages can be compared by meaning across traditions. The pipeline is incremental: adding a text rebuilds only what it affects.</p>
-                    <p><strong>Three folklore indexes.</strong> Thompson's <em>Motif-Index of Folk-Literature</em> (TMI), the Aarne–Thompson–Uther tale types (ATU) and the Berezkin &amp; Duvakin catalogue, cross-linked into one motif database. Links stated by the indexes themselves are kept apart from inferred ones, which are marked by source and confidence.</p>
-
                     <h3>Principles</h3>
                     <ul class="about-list">
-                        <li>Results are passages with provenance, not generated explanations.</li>
                         <li>Semantic parallels between motifs are hints for expert review, not established links.</li>
                         <li>Uneven collecting is a known bias, carried into the analyses rather than ignored.</li>
                         <li>Negative results are reported too: for example, a motif's first written attestation does not predict its age as estimated from its distribution, so written dates serve only as lower bounds.</li>
@@ -71,7 +62,7 @@ export function renderAbout(params) {
                         <li><strong>Texts</strong>: vetted translations and editions, especially from under-represented traditions.</li>
                         <li><strong>Methods</strong>: motif induction from text and its evaluation, the main open problem.</li>
                         <li><strong>Expert review</strong>: corrections to texts, the tradition taxonomy and motif links; reporting what looks wrong already helps.</li>
-                        <li><strong>Code</strong>: a Python pipeline with a plain JavaScript interface; see the <a href="${REPO}/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing guide</a>.</li>
+                        <li><strong>Code</strong>: see the <a href="${REPO}/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing guide</a>.</li>
                         <li><strong>Case studies</strong> designed and checked together with specialists in individual traditions.</li>
                     </ul>
 
@@ -93,7 +84,7 @@ export function renderAbout(params) {
                     <ul class="about-list">
                         <li><strong>Berezkin &amp; Duvakin</strong> catalogue (<a href="http://areasofmyths.com" target="_blank" rel="noopener">areasofmyths.com</a>), CC BY-NC-SA 4.0.</li>
                         <li><strong>Thompson and ATU</strong> via <a href="https://github.com/j-hagedorn/trilogy" target="_blank" rel="noopener">j-hagedorn/trilogy</a> (CC BY-SA 4.0) and Katja Mellmann's <a href="https://github.com/KatjaMellmann/TMI_as_CSV" target="_blank" rel="noopener">TMI_as_CSV</a> (CC BY 4.0).</li>
-                        <li><strong>Texts</strong> from open digital libraries such as Project Gutenberg; each source links to the edition used.</li>
+                        <li><strong>Texts</strong> from open digital libraries such as Project Gutenberg.</li>
                         <li><strong>Mythoscope</strong>: code MIT, documentation CC BY-SA 4.0, derived datasets CC BY 4.0 (<a href="${REPO}/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a>).</li>
                     </ul>
 
@@ -122,31 +113,4 @@ export function renderAbout(params) {
             history.replaceState(null, "", `#/about?tab=${button.dataset.tab}`);
         });
     });
-
-    renderStats(app.querySelector(".about-figures"));
-}
-
-// Counts come from the live API so the page never carries stale numbers; any
-// endpoint that is unavailable (e.g. motifs not built) simply drops its figures.
-async function renderStats(container) {
-    const [documents, traditions, indexes] = await Promise.allSettled([
-        api("/api/corpus/documents"),
-        api("/api/corpus/traditions"),
-        api("/api/motifs/indexes"),
-    ]);
-    const items = [];
-    if (documents.status === "fulfilled") items.push([documents.value.total, "texts"]);
-    if (traditions.status === "fulfilled") items.push([traditions.value.total, "traditions"]);
-    if (indexes.status === "fulfilled") {
-        const labels = { tmi: "Thompson motifs", atu: "ATU tale types", berezkin: "Berezkin motifs" };
-        for (const index of ["tmi", "atu", "berezkin"]) {
-            const entry = indexes.value.indexes.find((item) => item.index === index);
-            if (entry) items.push([entry.count, labels[index]]);
-        }
-    }
-    if (!container.isConnected || !items.length) return;
-    container.textContent = `Current build: ${items
-        .map(([value, label]) => `${formatNumber(value)} ${label}`)
-        .join(" · ")}.`;
-    container.hidden = false;
 }
