@@ -1532,6 +1532,13 @@ body.has-main-navbar {
     gap: 10px;
 }
 
+/* Structure's graph tabs have no count line; 6px more padding each side stands in for
+   it (10px count text at line-height 1.2), so they match the Motifs tabs' height. */
+.structure-sidebar .motifs-tab {
+    padding-top: 13px;
+    padding-bottom: 13px;
+}
+
 /* TMI browse dropdown: the lettered chapters are headers over their nested
    division1-3 headings, so weight them bold to stand out from the indented rows. */
 #motifsChapter option.opt-chapter {
