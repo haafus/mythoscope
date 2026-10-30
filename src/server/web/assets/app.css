@@ -621,8 +621,11 @@ body.has-main-navbar {
 .corpus-page .corpus-bar-link:hover { text-decoration: underline; }
 
 /* Region / tradition stats in the info panel: plain ranked lists, no stat cards. */
-.corpus-page .group-stat { color: var(--muted); font-size: 13px; }
-.corpus-page .group-stat-sub { margin-top: 3px; color: var(--muted); font-size: 13px; }
+/* Figures block, at every level: dark number, muted label, one fact per line. */
+.corpus-page .figs { display: flex; flex-direction: column; gap: 5px; margin-top: 14px; color: var(--muted); font-size: 13px; }
+.corpus-page #bookInfo > .figs:first-child { margin-top: 0; }
+.corpus-page .fig b { color: #2a2f36; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.corpus-page .fig-sep { color: #c3c9cf; }
 .corpus-page .group-list { margin: 0; padding: 0; list-style: none; font-size: 14px; }
 .corpus-page .group-list li {
     display: flex;

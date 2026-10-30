@@ -92,12 +92,10 @@ function renderBookInfo(doc) {
     const originalUrl = isWebSource
         ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Source</a>`
         : "";
-    // Size and dating as one plain line, the same line the Structure rail shows for a book.
-    const meta = [
-        doc.dating,
-        doc.word_count ? `${formatNumber(doc.word_count)} words` : "",
-        doc.sentence_count ? `${formatNumber(doc.sentence_count)} sentences` : "",
-    ].filter(Boolean).join(" · ");
+    const sizeLines = [
+        doc.word_count ? [counted(doc.word_count, "word", "words")] : [],
+        doc.sentence_count ? [counted(doc.sentence_count, "sentence", "sentences")] : [],
+    ];
     bookInfo.innerHTML = `
         <div class="book-title">${escapeHtml(doc.title)}</div>
         <div class="book-tradition">
@@ -105,7 +103,8 @@ function renderBookInfo(doc) {
             <span>${escapeHtml(regionOf(doc.tradition) || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
         </div>
 
-        ${meta ? `<div class="book-meta">${escapeHtml(meta)}</div>` : ""}
+        ${doc.dating ? `<div class="book-meta">${escapeHtml(doc.dating)}</div>` : ""}
+        ${figures(sizeLines)}
 
         <div class="description-title">Description</div>
         <div class="description-text">${escapeHtml(doc.description || "No description available.")}</div>
@@ -256,11 +255,13 @@ function showCorpusOverview() {
     if (bookInfo) {
         const words = sumWords(docs);
         const sentences = docs.reduce((n, d) => n + (d.sentence_count || 0), 0);
-        const plural = (n, one, many) => `${formatNumber(n)} ${n === 1 ? one : many}`;
-        bookInfo.innerHTML = `
-            <div class="group-stat">${formatNumber(words)} words · ${formatNumber(sentences)} sentences</div>
-            <div class="group-stat-sub">${plural(regions.size, "macro-area", "macro-areas")} · ${plural(traditions.size, "tradition", "traditions")} · ${plural(docs.length, "book", "books")}</div>
-            <div class="group-stat-sub">${formatNumber(Math.round(words / docs.length))} words per book on average</div>`;
+        bookInfo.innerHTML = figures([
+            [counted(words, "word", "words")],
+            [counted(sentences, "sentence", "sentences")],
+            [counted(regions.size, "macro-area", "macro-areas"), counted(traditions.size, "tradition", "traditions"),
+                counted(docs.length, "book", "books")],
+            [[formatNumber(Math.round(words / docs.length)), "words per book on average"]],
+        ]);
     }
 }
 
@@ -304,6 +305,19 @@ function showTraditionInfo(tradition, region) {
 
 const sumWords = (docs) => docs.reduce((n, d) => n + (d.word_count || 0), 0);
 
+// The figures block at the top of the info panel, the same at every level (corpus,
+// region, tradition, book): one fact per line, the number set off from its label.
+// `lines` is a list of lines; a line is a list of [value, label] pairs joined by " · ".
+function figures(lines) {
+    const fig = ([value, label]) => `<span class="fig"><b>${escapeHtml(value)}</b> ${escapeHtml(label)}</span>`;
+    return `<div class="figs">${lines
+        .filter((line) => line.length)
+        .map((line) => `<div class="fig-line">${line.map(fig).join('<span class="fig-sep"> · </span>')}</div>`)
+        .join("")}</div>`;
+}
+
+const counted = (n, one, many) => [formatNumber(n), n === 1 ? one : many];
+
 function percent(part, whole) {
     if (!whole) return "";
     const p = (100 * part) / whole;
@@ -327,20 +341,17 @@ function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLa
         traditions.set(d.tradition, t);
     });
 
-    const counts = [
-        byTradition ? `${formatNumber(traditions.size)} ${traditions.size === 1 ? "tradition" : "traditions"}` : "",
-        `${formatNumber(docs.length)} ${docs.length === 1 ? "book" : "books"}`,
-    ].filter(Boolean).join(" · ");
-    const shares = [
-        parentWords ? `${percent(words, parentWords)} ${parentLabel}` : "",
-        `${percent(words, corpusWords)} of the corpus`,
-    ].filter(Boolean).join(" · ");
-
     // The name and colour already head the reader pane, so the panel starts with the numbers.
-    let html = `
-        <div class="group-stat">${formatNumber(words)} words · ${formatNumber(sentences)} sentences</div>
-        <div class="group-stat-sub">${escapeHtml(counts)}</div>
-        ${corpusWords ? `<div class="group-stat-sub">${escapeHtml(shares)}</div>` : ""}`;
+    let html = figures([
+        [counted(words, "word", "words")],
+        [counted(sentences, "sentence", "sentences")],
+        [byTradition ? counted(traditions.size, "tradition", "traditions") : null,
+            counted(docs.length, "book", "books")].filter(Boolean),
+        corpusWords
+            ? [parentWords ? [percent(words, parentWords), parentLabel] : null,
+                [percent(words, corpusWords), "of the corpus"]].filter(Boolean)
+            : [],
+    ]);
 
     if (byTradition && traditions.size > 1) {
         const ranked = [...traditions.values()].sort((a, b) => b.words - a.words);
