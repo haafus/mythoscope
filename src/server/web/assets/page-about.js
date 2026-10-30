@@ -32,8 +32,14 @@ export function renderAbout(params) {
                         <li><strong>Computation opens a new scale, but the work is too big for one team.</strong> NLP and AI make it possible to look for patterns across the whole corpus at once; turning that into findings needs specialists from many fields, so the project is open.</li>
                     </ol>
 
-                    <h3>Status</h3>
-                    <p>Early-stage, actively developed research software. The application is live, the <a href="${REPO}" target="_blank" rel="noopener">code is open</a>, and the semantic-space baseline is described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint on arXiv</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026). Results so far are exploratory and documented with their data, method and limitations.</p>
+                    <h3>What's done so far</h3>
+                    <ul class="about-list">
+                        <li><strong>A corpus of world traditions in one semantic space</strong>, where parallels between mythological and religious texts can be found by meaning; the approach is described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026).</li>
+                        <li><strong>The three major folklore indexes in one motif database</strong>: Thompson, Aarne–Thompson–Uther and Berezkin &amp; Duvakin, cross-linked with each other.</li>
+                        <li><strong>Characters, relations and places</strong> extracted from the texts as graphs.</li>
+                        <li><strong>Exploratory studies</strong>: more than sixty computational experiments on dating motifs, reconstructing ancestral motif repertoires and how repertoires change across regions.</li>
+                        <li><strong>A survey of the field</strong> and an open, curated guide to its resources.</li>
+                    </ul>
                     <p class="about-figures" hidden></p>
 
                     <h3>What's ahead</h3>
