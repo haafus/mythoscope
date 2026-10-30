@@ -210,15 +210,15 @@ function clearSelection() {
     showCorpusOverview();
 }
 
-const svg = (body) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
-// The empty state's way into the rest of the site. Icons are two-tone: the outline takes the
-// icon colour, `.acc` shapes and `.acc-line` strokes the accent.
+const svg = (body) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+// The empty state's way into the rest of the site. Icons are duotone: `.bg` is a pale backing
+// shape, the outline and the small `.acc` details take the icon colour.
 const EXPLORE = [
-    ["#/embeddings", svg('<path d="M3 21h18M3 21V3"/><circle class="acc" cx="7" cy="15" r="1.8"/><circle class="acc" cx="10" cy="8.5" r="1.8"/><circle class="acc" cx="14" cy="13.5" r="1.8"/><circle class="acc" cx="17.5" cy="6.5" r="1.8"/><circle class="acc" cx="18" cy="16.5" r="1.8"/>'), "Explore semantic similarity"],
-    ["#/structure", svg('<path d="M8 7l7.9.8M6.5 8.2l1.2 7.6M10.2 18h4.6M17.6 10.2l-.4 5.6M7.6 7.6l8 8.9"/><circle class="acc" cx="6" cy="6" r="2.4"/><circle class="acc" cx="18" cy="8" r="2.4"/><circle class="acc" cx="8" cy="18" r="2.4"/><circle class="acc" cx="17" cy="18" r="2.4"/>'), "Explore structure &amp; relations"],
-    ["#/geography", svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/><circle class="acc" cx="16.6" cy="7.6" r="2.2"/>'), "Explore the geographical atlas"],
-    ["#/motifs", svg('<path d="M12 6.5C10 5 7 4.6 3 5v13.5c4-.4 7 0 9 1.5 2-1.5 5-1.9 9-1.5V5c-4-.4-7 0-9 1.5zM12 6.5V20"/><path class="acc-line" d="M5.8 9.3c1.5-.1 2.9.1 4 .6M5.8 12.3c1.5-.1 2.9.1 4 .6M5.8 15.3c1.5-.1 2.9.1 4 .6M18.2 9.3c-1.5-.1-2.9.1-4 .6M18.2 12.3c-1.5-.1-2.9.1-4 .6M18.2 15.3c-1.5-.1-2.9.1-4 .6"/>'), "Explore motif indexes"],
-    ["#/about", svg('<circle cx="12" cy="12" r="9"/><path class="acc-line" d="M12 11v6" stroke-width="2"/><circle class="acc" cx="12" cy="7.6" r="1.3"/>'), "About the project"],
+    ["#/embeddings", svg('<rect class="bg" x="3" y="3" width="18" height="18" rx="2"/><path d="M3 21h18M3 21V3"/><circle class="acc" cx="7.5" cy="15" r="1.5"/><circle class="acc" cx="10.5" cy="9" r="1.5"/><circle class="acc" cx="14" cy="13.5" r="1.5"/><circle class="acc" cx="17.5" cy="7" r="1.5"/><circle class="acc" cx="17.5" cy="16.5" r="1.5"/>'), "Explore semantic similarity"],
+    ["#/structure", svg('<path class="bg" d="M6 6l12 2-1 10H8z"/><path d="M8 7l7.9.8M6.5 8.2l1.2 7.6M10.2 18h4.6M17.6 10.2l-.4 5.6M7.6 7.6l8 8.9"/><circle class="acc" cx="6" cy="6" r="2.1"/><circle class="acc" cx="18" cy="8" r="2.1"/><circle class="acc" cx="8" cy="18" r="2.1"/><circle class="acc" cx="17" cy="18" r="2.1"/>'), "Explore structure &amp; relations"],
+    ["#/geography", svg('<circle class="bg" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/><circle class="acc" cx="16.6" cy="7.6" r="1.8"/>'), "Explore the geographical atlas"],
+    ["#/motifs", svg('<path class="bg" d="M12 6.5C10 5 7 4.6 3 5v13.5c4-.4 7 0 9 1.5 2-1.5 5-1.9 9-1.5V5c-4-.4-7 0-9 1.5z"/><path d="M12 6.5C10 5 7 4.6 3 5v13.5c4-.4 7 0 9 1.5 2-1.5 5-1.9 9-1.5V5c-4-.4-7 0-9 1.5zM12 6.5V20M5.8 9.3c1.5-.1 2.9.1 4 .6M5.8 12.3c1.5-.1 2.9.1 4 .6M5.8 15.3c1.5-.1 2.9.1 4 .6M18.2 9.3c-1.5-.1-2.9.1-4 .6M18.2 12.3c-1.5-.1-2.9.1-4 .6M18.2 15.3c-1.5-.1-2.9.1-4 .6"/>'), "Explore motif indexes"],
+    ["#/about", svg('<circle class="bg" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 11v6" stroke-width="1.6"/><circle class="acc" cx="12" cy="7.6" r="1.1"/>'), "About the project"],
 ];
 
 const regionColorOf = (region) => ((state.traditionTree || {})[region] || {}).color || "#8a8a8a";
