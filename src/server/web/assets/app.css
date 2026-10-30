@@ -625,6 +625,34 @@ body.has-main-navbar {
     text-transform: uppercase;
 }
 
+/* Region / tradition stats in the info panel: plain ranked lists, no stat cards. */
+.corpus-page .group-first { margin-top: 0; }
+.corpus-page .group-stat { color: #111; font-size: 15px; font-weight: 600; }
+.corpus-page .group-stat-sub { margin-top: 3px; color: var(--muted); font-size: 13px; }
+.corpus-page .group-list { margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.corpus-page .group-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.corpus-page .group-link {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #3a5e86;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+.corpus-page .group-link:hover { text-decoration: underline; }
+.corpus-page .group-note { display: block; color: var(--muted); font-size: 12px; }
+.corpus-page .group-count { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+
 .corpus-page .description-text {
     color: #4b5563;
     font-size: 14px;
