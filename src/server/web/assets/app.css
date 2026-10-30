@@ -1384,7 +1384,7 @@ body.has-main-navbar {
 .graph-info-panel th, .graph-info-panel td { text-align: left; padding: 6px 0; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
 .graph-info-panel th { font-weight: 600; color: #4a4a4a; width: 35%; padding-right: 8px; }
 .graph-info-panel td { color: #2c3e50; width: 65%; }
-.graph-info-panel h3 { margin: 0 0 10px 0; color: #5e4b8b; }
+.graph-info-panel h3 { margin: 0 0 10px 0; color: #8a4c38; }
 
 /* Text fields stacked single-column: label heading over its value. Description
    has no label — it leads straight with the text. */
@@ -1406,11 +1406,11 @@ body.has-main-navbar {
     box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.12);
 }
 .graph-book-meta { margin-top: 6px; color: var(--muted); font-size: 13px; }
-/* Section labels in the Structure palette: the muted violet of the motif-page
-   parallels, sized like the Motifs section titles. */
+/* Section labels in the Structure palette (warm clay, as the character nodes),
+   sized like the Motifs section titles. */
 .graph-book-label {
     margin: 20px 0 6px;
-    color: #7a6aa0;
+    color: #9a5a45;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.04em;

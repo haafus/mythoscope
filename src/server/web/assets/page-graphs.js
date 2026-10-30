@@ -14,7 +14,7 @@ function destroyGraph() {
 }
 
 const GRAPH_CATEGORY_COLORS = {
-    Character: "#dcd0ff",
+    Character: "#f0d5c8",
     Location: "#c8e6c9",
     Epoch: "#fff3cd",
     Other: "#cccccc",
