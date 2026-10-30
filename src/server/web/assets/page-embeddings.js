@@ -103,6 +103,7 @@ export async function renderEmbeddings(params = new URLSearchParams(), { samePag
                         <div class="card-body rail-body">
                             ${searchPanelHtml}
                             <div class="info-content" id="infoContent" style="display:none;"></div>
+                            ${HEATMAP_GUIDE}
                         </div>
                     </div>
                 </div>
@@ -225,6 +226,33 @@ function warmupModel(model) {
 // navigations; a hard refresh clears it, which is also when a rebuild would change the payload).
 const projectionCache = new Map();
 
+// The heatmap has no points to click, so the rail explains how to read it instead.
+const HEATMAP_GUIDE = `<div class="heatmap-guide" id="heatmapGuide" style="display:none;">
+    <div class="heatmap-guide-title">How to read it</div>
+    <p>Each cell compares two traditions by the average meaning of their texts in the selected model.</p>
+    <p>Colour shows how much <strong>closer</strong> (teal) or <strong>farther</strong> (orange) a pair is than expected: a tradition that resembles everything doesn't light up its whole row.</p>
+    <p>Rows are ordered by clustering, so blocks along the diagonal are traditions that read alike.</p>
+    <p>Hover a cell for the raw similarity; pick a region or tradition on the left to highlight it.</p>
+    <p class="heatmap-guide-note">Within a tradition, longer books weigh more.</p>
+</div>`;
+
+const chartTypeOf = (method) => (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
+
+// An open fragment survives a switch to the heatmap (it stays in the URL) and comes back with a scatter.
+function showRailFor(chartType) {
+    const heatmap = chartType === "heatmap";
+    const guide = document.getElementById("heatmapGuide");
+    const searchPanel = document.getElementById("searchPanel");
+    const infoContent = document.getElementById("infoContent");
+    if (guide) guide.style.display = heatmap ? "" : "none";
+    if (!heatmap && currentPoint && !infoContent?.innerHTML.trim()) {
+        displayPointInfo(currentPoint.doc, currentPoint.chunk);
+        return;
+    }
+    if (searchPanel) searchPanel.style.display = heatmap || currentPoint ? "none" : "";
+    if (infoContent) infoContent.style.display = !heatmap && currentPoint ? "" : "none";
+}
+
 async function loadVisualization() {
     if (!state.selectedModel) return;
 
@@ -249,7 +277,8 @@ async function loadVisualization() {
         }
 
         await ensureCorpusData();
-        const chartType = (state.similarityMethods.find((m) => m.key === method) || {}).chart_type || "scatter";
+        const chartType = chartTypeOf(method);
+        showRailFor(chartType);
         await CHART_RENDERERS[chartType](scatterPlot, data);
 
         // The fresh chart renders at full opacity; re-apply the current region/tradition
@@ -287,6 +316,7 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
 
     currentPoint = { doc: pointId, chunk: chunkIndex };
     recordUrl();
+    if (chartTypeOf(document.getElementById("viz-select")?.value) === "heatmap") return;
     if (searchPanel) searchPanel.style.display = "none";
     infoContent.style.display = "";
     infoContent.innerHTML = '<div class="info-loading">Loading...</div>';

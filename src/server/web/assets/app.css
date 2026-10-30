@@ -2235,3 +2235,8 @@ a.csbar-lab.chart-link:hover { color: var(--sec-link-strong, #0f6a60); text-deco
 .analysis-page .heatmap-legend { display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; margin-top: 12px; color: var(--muted); font-size: 12.5px; }
 .analysis-page .heatmap-ramp { width: 160px; height: 10px; border-radius: 3px; flex: none; }
 .analysis-page .hm-tip-dev { color: var(--muted); }
+.analysis-page .heatmap-guide { color: #4b5563; font-size: 13.5px; line-height: 1.55; }
+.analysis-page .heatmap-guide-title { margin-bottom: 10px; color: #6b4a2e; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.analysis-page .heatmap-guide p { margin: 0 0 10px; }
+.analysis-page .heatmap-guide strong { color: #2a2f36; font-weight: 600; }
+.analysis-page .heatmap-guide-note { color: var(--muted); }
