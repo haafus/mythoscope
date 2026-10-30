@@ -1,7 +1,7 @@
 import { cleanupRoute } from "./core.js";
-import { renderCorpus } from "./page-corpus.js?v=23";
+import { renderCorpus } from "./page-corpus.js?v=24";
 import { renderEmbeddings } from "./page-embeddings.js?v=13";
-import { renderGraphPage } from "./page-graphs.js?v=37";
+import { renderGraphPage } from "./page-graphs.js?v=38";
 import { renderGeography } from "./page-geography.js?v=78";
 import { renderMotifs } from "./page-motifs.js?v=99";
 import { renderAbout } from "./page-about.js?v=14";
@@ -11,9 +11,11 @@ const DEFAULT_ROUTE = "/corpus";
 const ROUTES = {
     "/corpus": { title: "Sources", render: renderCorpus },
     "/embeddings": { title: "Similarity", render: renderEmbeddings },
-    "/ages": { title: "Ages", render: () => renderGraphPage("ages") },
-    "/realms": { title: "Realms", render: () => renderGraphPage("realms") },
-    "/beings": { title: "Beings", render: () => renderGraphPage("beings") },
+    "/structure": { title: "Structure", render: renderGraphPage },
+    // Former separate pages; old links land on the matching Structure graph.
+    "/ages": { title: "Structure", render: () => location.replace("#/structure?graph=ages") },
+    "/realms": { title: "Structure", render: () => location.replace("#/structure?graph=realms") },
+    "/beings": { title: "Structure", render: () => location.replace("#/structure?graph=beings") },
     "/geography": { title: "Atlas", render: renderGeography },
     "/motifs": { title: "Motifs", render: renderMotifs },
     "/about": { title: "About", render: renderAbout },

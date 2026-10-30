@@ -29,7 +29,7 @@ export async function renderCorpus(params = new URLSearchParams()) {
     const libraryTree = document.getElementById("libraryTree");
     libraryTree.addEventListener("book-select", (e) => openCorpusDocument(e.detail.doc));
     libraryTree.addEventListener("region-select", (e) => onRegionClick(e.detail.region));
-    libraryTree.addEventListener("tradition-select", (e) => showTraditionInfo(e.detail.tradition, e.detail.region));
+    libraryTree.addEventListener("tradition-select", (e) => onTraditionClick(e.detail.tradition, e.detail.region));
     renderBookInfo(null);
 
     const wantedTitle = params.get("title");
@@ -147,11 +147,16 @@ function renderFacetInfo(name, color, fields) {
     readerContent.scrollTop = 0;
 }
 
-// Clicking the active region again collapses it and clears the selection, as on Similarity.
+// The tree has already toggled when these fire: a click that collapses a region or a
+// tradition clears the selection; one that expands it selects it.
 function onRegionClick(region) {
-    const sel = state.selectedNode;
-    if (sel && sel.kind === "region" && sel.key === region) clearSelection();
+    if (state.corpusOpenMajor !== region) clearSelection();
     else showRegionInfo(region);
+}
+
+function onTraditionClick(tradition, region) {
+    if (state.corpusOpenTradition !== corpusTraditionKey(region, tradition)) clearSelection();
+    else showTraditionInfo(tradition, region);
 }
 
 function clearSelection() {

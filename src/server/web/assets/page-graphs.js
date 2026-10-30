@@ -35,6 +35,10 @@ const GRAPH_FIELD_LABELS = {
     Keyactors: "Key Actors",
 };
 
+// The three graphs of a book, in switcher order; Structure opens on the last one used.
+const GRAPH_TYPES = [["ages", "Ages"], ["realms", "Realms"], ["beings", "Beings"]];
+let lastGraphType = "ages";
+
 // What one node of each graph is, for the book summary ("42 characters").
 const GRAPH_ENTITY_NOUNS = { beings: "characters", realms: "places", ages: "periods" };
 const SUMMARY_TOP_N = 8;
@@ -85,11 +89,20 @@ function runSeededLayout(cy, options, seed) {
     try { cy.layout(options).run(); } finally { Math.random = original; }
 }
 
-export async function renderGraphPage(graphType) {
+export async function renderGraphPage(params = new URLSearchParams()) {
+    const wanted = params.get("graph");
+    let graphType = GRAPH_TYPES.some(([t]) => t === wanted) ? wanted : lastGraphType;
+    lastGraphType = graphType;
+
     app.innerHTML = `
         <main class="graph-page container">
             <div class="workspace">
-                <aside class="library-sidebar">
+                <aside class="library-sidebar structure-sidebar">
+                    <div class="motifs-tabs" id="graphTabs">
+                        ${GRAPH_TYPES.map(([t, label]) => `
+                            <button class="motifs-tab${t === graphType ? " active" : ""}" type="button" data-graph="${t}">${label}</button>
+                        `).join("")}
+                    </div>
                     <div id="graphBookList">Loading...</div>
                 </aside>
                 <section class="graph-area">
@@ -119,6 +132,18 @@ export async function renderGraphPage(graphType) {
     };
     window.addEventListener("resize", onResize);
     onCleanup(() => window.removeEventListener("resize", onResize));
+
+    // Switching graphs keeps the page: only the canvas and the rail reload.
+    const tabs = document.getElementById("graphTabs");
+    tabs.querySelectorAll(".motifs-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            if (btn.dataset.graph === graphType) return;
+            graphType = lastGraphType = btn.dataset.graph;
+            tabs.querySelectorAll(".motifs-tab").forEach((b) => b.classList.toggle("active", b === btn));
+            history.replaceState(null, "", `#/structure?graph=${graphType}`);
+            if (state.selectedCorpusDoc) loadGraphData(state.selectedCorpusDoc, graphType);
+        });
+    });
 
     const bookList = document.getElementById("graphBookList");
     bookList.addEventListener("book-select", (e) => {
@@ -206,7 +231,12 @@ function renderBookSummary(doc, data, graphType) {
     return html;
 }
 
+// Each load supersedes the previous one, so a quick switch of book or graph
+// never lets a slower, older response overwrite the newer one.
+let loadSeq = 0;
+
 async function loadGraphData(doc, graphType) {
+    const seq = ++loadSeq;
     const bookId = doc.document_id;  // graphs keyed by document_id (D1)
     const infoContent = document.getElementById("graphInfoContent");
     if (infoContent) infoContent.innerHTML = renderBookSummary(doc, null, graphType);
@@ -218,9 +248,11 @@ async function loadGraphData(doc, graphType) {
 
     try {
         const data = await api(`/api/graphs/${encodeURIComponent(bookId)}/${encodeURIComponent(graphType)}`);
+        if (seq !== loadSeq) return;
         if (placeholder) placeholder.style.display = "none";
         renderCytoscapeGraph(canvas, data, graphType, doc);
     } catch (error) {
+        if (seq !== loadSeq) return;
         if (placeholder) {
             placeholder.textContent = `Error: ${error.message}`;
             placeholder.style.display = "block";

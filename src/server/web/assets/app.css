@@ -1499,7 +1499,8 @@ body.has-main-navbar {
     grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
 }
 
-.motifs-sidebar {
+.motifs-sidebar,
+.structure-sidebar {
     gap: 10px;
 }
 
