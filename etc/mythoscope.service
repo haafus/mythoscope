@@ -36,6 +36,12 @@ OOMPolicy=continue
 # 0022 would produce group-read-only files and 2755 directories.
 UMask=0002
 
+# src/ is installed editable, so without this the service writes __pycache__
+# into the code tree as `mythoscope` — files the deploy user cannot chgrp, which
+# fails `deploy` at its permissions step.
+CacheDirectory=mythoscope
+Environment=PYTHONPYCACHEPREFIX=%C/mythoscope/pycache
+
 # --- hardening ---
 # The process only ever reads outputs/ and writes outputs/logs.
 NoNewPrivileges=true

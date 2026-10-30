@@ -52,6 +52,7 @@ SERVICE_USER = "mythoscope"
 SERVICE_NAME = "mythoscope"
 ENV_FILE = "/etc/mythoscope/env"
 UV_BIN = "/usr/local/bin/uv"
+UNIT_FILE = f"/etc/systemd/system/{SERVICE_NAME}.service"
 SUDOERS_FILE = "/etc/sudoers.d/mythoscope-deploy"
 # A drop-in: the packaged caddy.service is apt's and returns on every upgrade.
 CADDY_DROPIN = "/etc/systemd/system/caddy.service.d/override.conf"
@@ -138,8 +139,11 @@ def _rsync(c, src: str, dest: str, extra=()) -> None:
     )
 
 
-def _put_file(c, content: str, dest: str, mode: str = "0644", owner: str = "root:root") -> None:
-    """Upload text to `dest` with an explicit owner and mode (bootstrap only).
+def _put_file(c, content: str, dest: str, mode: str = "0644", owner: str = "root:root",
+              sudo: bool = False) -> None:
+    """Upload text to `dest` with an explicit owner and mode.
+
+    `sudo=True` for the deploy account; `bootstrap` is root and needs none.
 
     SFTP cannot set ownership, so land it in /tmp and let `install` place it.
     Encode first: paramiko counts a text stream in characters but compares
@@ -149,7 +153,8 @@ def _put_file(c, content: str, dest: str, mode: str = "0644", owner: str = "root
     tmp = f"/tmp/.mytho-upload-{os.getpid()}-{Path(dest).name}"
     user, group = owner.split(":")
     c.put(io.BytesIO(content.encode()), tmp)
-    c.run(f"install -o {user} -g {group} -m {mode} {tmp} {dest}")
+    run = c.sudo if sudo else c.run
+    run(f"install -o {user} -g {group} -m {mode} {tmp} {dest}")
     c.run(f"rm -f {tmp}")
 
 
@@ -341,8 +346,7 @@ def bootstrap(c):
         )
 
     print("== systemd unit ==")
-    _put_file(c, (LOCAL_ROOT / "etc/mythoscope.service").read_text(),
-              f"/etc/systemd/system/{SERVICE_NAME}.service")
+    _put_file(c, (LOCAL_ROOT / "etc/mythoscope.service").read_text(), UNIT_FILE)
     c.run("systemctl daemon-reload")
     c.run(f"systemctl enable {SERVICE_NAME}")
 
@@ -411,8 +415,12 @@ def deploy(c):
     print(f"== rsync code ({sha}) ==")
     # `:- .gitignore` reuses the repo's own ignore rules, so there is no second
     # list to drift. That already excludes outputs/, .venv/, .env and *.pkl.
+    # --delete-excluded because the server's own copy of .gitignore otherwise
+    # shields matching files from --delete: a zip shipped before *.zip was
+    # ignored, or a __pycache__ left by the service, would never go away.
     _rsync(c, "./", APP_DIR, extra=[
         "--filter=':- .gitignore'",
+        "--delete-excluded",
         "--exclude=.git/",
         "--exclude=mockups/",
         "--exclude=docs/",
@@ -436,6 +444,18 @@ def deploy(c):
     print("== permissions ==")
     # Last, so it covers what `uv sync` and the stamp just wrote too.
     _regroup(c, APP_DIR)
+
+    print("== systemd unit ==")
+    # The unit lives in the repo, so a deploy that skipped it would leave the
+    # server running whatever `bootstrap` last installed.
+    unit = (LOCAL_ROOT / "etc/mythoscope.service").read_text()
+    installed = c.run(f"cat {UNIT_FILE}", warn=True, hide=True)
+    if installed.ok and installed.stdout == unit:
+        print("  unchanged")
+    else:
+        _put_file(c, unit, UNIT_FILE, sudo=True)
+        c.sudo("systemctl daemon-reload")
+        print(f"  installed {UNIT_FILE}")
 
     print("== restart ==")
     _svc(c, "restart")

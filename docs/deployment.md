@@ -204,6 +204,8 @@ a non-default key or port. The account is given on the command line rather than
 in an alias because it differs per task — see Accounts above. Set
 `MYTHO_DEPLOY_DOMAIN` if the site is not `mythoscope.io`.
 
+The [`Makefile`](../Makefile) wraps the same tasks with the accounts filled in: `make deploy`, `make push-outputs ZIP=…`, `make logs N=200`, and so on; plain `make` lists them. `HOST`, `DOMAIN` and `DEPLOY_USER` override the defaults, and the last two are exported as `MYTHO_DEPLOY_DOMAIN` and `MYTHO_DEPLOY_USER`, so the Makefile and `fabfile.py` always agree on which account a task needs.
+
 Fabric is a *tool* here, not a dependency of the project: `fabfile.py` imports
 `fabric`, `invoke` and stdlib, nothing from `src/`. So install it once, outside
 the project, and `fab` works from the repo root with no venv activated:
@@ -249,15 +251,19 @@ certificate on first request.
 ### `deploy`
 
 rsync → symlink data → `uv sync --frozen --no-dev --extra viewer` → regroup
-(§1) → restart → smoke check. Writes the deployed revision to `app/DEPLOYED`.
-The regroup runs last so it covers what `uv sync` and the stamp wrote, not just
-what rsync did.
+(§1) → sync the systemd unit → restart → smoke check. Writes the deployed
+revision to `app/DEPLOYED`. The regroup runs after `uv sync` so it covers what
+`uv sync` and the stamp wrote, not just what rsync did.
+
+The unit step compares `/etc/systemd/system/mythoscope.service` with `etc/mythoscope.service` and, only if they differ, installs the repo's copy with `sudo` and runs `daemon-reload`, so the restart that follows picks it up. A unit change therefore ships with an ordinary `deploy`; `bootstrap` is not needed for it.
 
 rsync reuses the repo's own ignore rules via `--filter=':- .gitignore'`, so
 there is no second ignore list to drift. Verified by dry run: 185 entries ship;
 `outputs/`, `.venv/`, `.env`, `.git/`, `*.pyc` and `*.egg-info` are excluded;
 `config/`, `src/server/web/`, `uv.lock`, `.python-version` and `pyproject.toml`
 are included. `docs/`, `mockups/` and `tests/` are excluded explicitly.
+
+`--delete-excluded` is what makes those exclusions hold on the server too. Without it, the server's own copy of `.gitignore` shields every matching file from `--delete`, so anything excluded after it first shipped (a stray zip from before `*.zip` was ignored) or written there by the service stays forever. The `app/outputs` symlink and `DEPLOYED` are deleted by every sync either way and re-created by the steps after it.
 
 It warns (but does not block) on a dirty working tree or an untracked `uv.lock`
 — rsync will happily ship uncommitted work, which is useful while iterating and
@@ -382,6 +388,7 @@ These are not style choices — each one breaks something if ignored.
   simply by starting the service before the first `push-outputs`. The unit
   therefore sets `UMask=0002`, and the swap removes the previous store with
   `sudo` for trees that predate it.
+- **Bytecode goes to the cache directory, not the code tree.** `src/` is installed editable, so Python writes `__pycache__` next to the sources, and `ReadWritePaths=/srv/mythoscope` lets the service do that inside `app/`. Those files belong to `mythoscope`, the regroup's `chgrp` cannot touch them as `ubuntu`, and `deploy` dies with `chgrp: changing group of '…/__pycache__/….pyc': Operation not permitted`. The unit therefore sets `CacheDirectory=mythoscope` and `PYTHONPYCACHEPREFIX=/var/cache/mythoscope/pycache`, which covers the venv's bytecode as well.
 - **`cli.py` is on the server's import path.** `ExecStart` is `mytho server`, so
   every module-scope import in `src/cli.py` runs before uvicorn does. Importing
   anything from `pipeline` there is fatal on a viewer venv: `pipeline/__init__`
