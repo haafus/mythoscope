@@ -4,7 +4,7 @@ const REPO = "https://github.com/haafus/mythoscope";
 const AWESOME = "https://github.com/haafus/awesome-computational-mythology";
 const PREPRINT = "https://arxiv.org/abs/2610.28452";
 const EMAIL = "hello@mythoscope.io";
-const TABS = ["vision", "methodology", "contribute", "resources"];
+const TABS = ["vision", "contribute", "resources"];
 
 export function renderAbout(params) {
     const initial = TABS.includes(params?.get("tab")) ? params.get("tab") : TABS[0];
@@ -13,8 +13,6 @@ export function renderAbout(params) {
         <main class="about-page">
             <nav class="nav-menu">
                 <button class="nav-item" type="button" data-tab="vision">Vision</button>
-                <span class="separator">|</span>
-                <button class="nav-item" type="button" data-tab="methodology">Methodology</button>
                 <span class="separator">|</span>
                 <button class="nav-item" type="button" data-tab="contribute">Contribute</button>
                 <span class="separator">|</span>
@@ -35,23 +33,11 @@ export function renderAbout(params) {
                     <h3>What's done so far</h3>
                     <ul class="about-list">
                         <li><strong>A published baseline</strong>: the semantic-space approach and its lexical controls are described in a <a href="${PREPRINT}" target="_blank" rel="noopener">preprint on arXiv</a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026).</li>
-                        <li><strong>More than sixty exploratory studies</strong> on dating motifs, reconstructing ancestral motif repertoires and how repertoires change across regions, each <a href="${REPO}/tree/main/mockups" target="_blank" rel="noopener">documented</a> with its data, method and limitations.</li>
+                        <li><strong>Exploratory studies</strong> on dating motifs, reconstructing ancestral motif repertoires and how repertoires change across regions, each <a href="${REPO}/tree/main/mockups" target="_blank" rel="noopener">documented</a> with its data, method and limitations.</li>
                     </ul>
 
                     <h3>What's ahead</h3>
-                    <p>A larger and better-balanced corpus, motif induction from the texts themselves, and case studies with specialists in individual traditions.</p>
-                </div>
-
-                <div id="methodology" class="tab-content">
-                    <h3>Principles</h3>
-                    <ul class="about-list">
-                        <li>Semantic parallels between motifs are hints for expert review, not established links.</li>
-                        <li>Uneven collecting is a known bias, carried into the analyses rather than ignored.</li>
-                        <li>Negative results are reported too: for example, a motif's first written attestation does not predict its age as estimated from its distribution, so written dates serve only as lower bounds.</li>
-                    </ul>
-
-                    <h3>Known limits</h3>
-                    <p>Motif induction from raw text is built but not yet validated at scale, so the analyses run on the curated indexes. The indexes keep their compilers' geographic biases, and tradition locations are the catalogue's hand-placed markers.</p>
+                    <p>A larger and better-balanced corpus and motif induction from the texts themselves.</p>
                 </div>
 
                 <div id="contribute" class="tab-content">
@@ -63,7 +49,6 @@ export function renderAbout(params) {
                         <li><strong>Methods</strong>: motif induction from text and its evaluation, the main open problem.</li>
                         <li><strong>Expert review</strong>: corrections to texts, the tradition taxonomy and motif links; reporting what looks wrong already helps.</li>
                         <li><strong>Code</strong>: see the <a href="${REPO}/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">contributing guide</a>.</li>
-                        <li><strong>Case studies</strong> designed and checked together with specialists in individual traditions.</li>
                     </ul>
 
                     <h3>Credit</h3>
