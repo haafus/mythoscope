@@ -162,10 +162,26 @@ function onRegionClick(region) {
     showRegionInfo(region);
 }
 
-// Tradition: a click that collapses it clears the selection; one that expands it selects it.
+// Tradition: the same rule one level down — a click on the selected tradition clears the
+// selection; a click while one of its books is selected selects the tradition, kept open.
 function onTraditionClick(tradition, region) {
-    if (state.corpusOpenTradition !== corpusTraditionKey(region, tradition)) clearSelection();
-    else showTraditionInfo(tradition, region);
+    const key = corpusTraditionKey(region, tradition);
+    const sel = state.selectedNode;
+    if (sel && sel.kind === "tradition" && sel.key === key) {
+        clearSelection();
+        return;
+    }
+    if (state.corpusOpenTradition !== key) {
+        state.corpusOpenTradition = key;
+        document.querySelectorAll("#libraryTree .tradition-group").forEach((g) => {
+            const s = g.closest(".major-section");
+            const open = corpusTraditionKey(s?.dataset.major, g.dataset.tradition) === key;
+            g.classList.toggle("open", open);
+            const toggle = g.querySelector(".tradition-toggle");
+            if (toggle) toggle.textContent = open ? "▾" : "▸";
+        });
+    }
+    showTraditionInfo(tradition, region);
 }
 
 function clearSelection() {
