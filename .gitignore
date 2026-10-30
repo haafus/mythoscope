@@ -11,6 +11,7 @@ mockups/*/data.js
 # data formats that should not be in git
 *.npy
 *.pkl
+*.zip
 
 # environment
 .env
@@ -27,8 +28,6 @@ venv/
 build/
 dist/
 
-# data export bundles (mytho export)
-mythoscope-export-*.zip
 mockups/*/cosmograph-*.csv
 # chapter-detector prototype: downloaded Gutenberg text cache
 mockups/*/cache/
