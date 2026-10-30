@@ -210,7 +210,7 @@ function clearSelection() {
     showCorpusOverview();
 }
 
-const svg = (body) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+const svg = (body) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 // The empty state's way into the rest of the site. Icons are duotone: `.bg` is a pale backing
 // shape, the outline and the small `.acc` details take the icon colour.
 const EXPLORE = [
