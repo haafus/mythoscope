@@ -31,7 +31,8 @@ export function renderAbout(params) {
                     <ol class="about-list">
                         <li><strong>Reading has limits.</strong> No scholar can read and compare thousands of texts across traditions, and a hand-picked sample can't be redrawn or tested.</li>
                         <li><strong>The indexes and the expertise are fragmented.</strong> Motif indexes are hand-compiled, centred on Europe and Western Asia and detached from the texts; specialists know one tradition deeply, rarely several.</li>
-                        <li><strong>Computation opens a new scale, but the work is too big for one team.</strong> NLP and AI make it possible to look for patterns across the whole corpus at once; turning that into findings needs specialists from many fields, so the project is open.</li>
+                        <li><strong>Computation opens a new scale.</strong> NLP and AI make it possible to look for patterns across the whole corpus at once.</li>
+                        <li><strong>The work is too big for one team.</strong> Turning those patterns into findings needs specialists from many fields, so the project is open.</li>
                     </ol>
                     <h3 class="about-label">What's done so far</h3>
                     <ul class="about-list">
