@@ -192,13 +192,15 @@ function divergingColor(t) {
 function drawHeatmap(el) {
     const { labels, sim, resid, maxDev, order } = el._heatmap;
     const n = labels.length;
-    const cell = 26, lab = 150, head = 118;
-    const width = lab + n * cell + 8, height = head + n * cell + 4;
+    // Column labels hang below the grid, so the map's weight sits at the top of the card.
+    const cell = 26, lab = 150, head = 4, foot = 118;
+    const width = lab + n * cell + 8, height = head + n * cell + foot;
+    const labelY = head + n * cell + 8;
 
     let svg = `<svg class="heatmap-svg" viewBox="0 0 ${width} ${height}" data-w="${width}" data-h="${height}" data-grid-x="${lab}" data-grid-w="${n * cell - 2}">`;
     order.forEach((ci, c) => {
         const x = lab + c * cell + cell / 2;
-        svg += `<text class="hm-label" data-col="${ci}" x="${x}" y="${head - 6}" transform="rotate(-55 ${x} ${head - 6})">${escapeHtml(labels[ci])}</text>`;
+        svg += `<text class="hm-label" data-col="${ci}" x="${x + 4}" y="${labelY}" text-anchor="end" transform="rotate(-55 ${x + 4} ${labelY})">${escapeHtml(labels[ci])}</text>`;
     });
     order.forEach((ri, r) => {
         const y = head + r * cell;

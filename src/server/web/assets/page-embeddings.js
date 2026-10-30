@@ -6,7 +6,7 @@ import {
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
 import { setHashUrl } from "./url.js?v=1";
-import { destroyChart, highlightTradition, renderScatter, renderHeatmap, resizeChart } from "./chart.js?v=3";
+import { destroyChart, highlightTradition, renderScatter, renderHeatmap, resizeChart } from "./chart.js?v=4";
 import {
     attributionLine,
     fetchPointWithNeighbors, renderSearchResultItem,
