@@ -1,7 +1,7 @@
 import {
     app, api, escapeHtml, onCleanup, state, CATEGORY_NONE,
     ensureCorpusData, corpusTraditionKey, formatNumber, regionOf, traditionColor,
-    documentById,
+    documentById, groupDocuments,
 } from "./core.js";
 import { setHashUrl } from "./url.js?v=1";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=10";
@@ -97,7 +97,7 @@ function urlFor(graphType, doc, nodeId = null) {
         + (doc && nodeId ? `&node=${encodeURIComponent(nodeId)}` : "");
 }
 
-export async function renderGraphPage(params = new URLSearchParams(), { samePage = false } = {}) {
+export async function renderGraphPage(params = new URLSearchParams()) {
     const wanted = params.get("graph");
     let graphType = GRAPH_TYPES.some(([t]) => t === wanted) ? wanted : lastGraphType;
     lastGraphType = graphType;
@@ -167,15 +167,17 @@ export async function renderGraphPage(params = new URLSearchParams(), { samePage
         loadGraphData(e.detail.doc, graphType);
     });
 
-    // The book comes from the URL; entered from another section with none, the book the app
-    // already holds is carried over; Back to a URL without one within Structure means none.
+    // The book comes from the URL; without one, a graph is always shown (see defaultBook).
     // The tree opens on it: region and tradition expanded, the row scrolled into view.
     await ensureCorpusData();
     const bookId = params.get("book");
-    const carried = bookId ? documentById(bookId) : samePage ? null : state.selectedCorpusDoc;
-    if (bookId && carried) {
+    const fromUrl = bookId ? documentById(bookId) : null;
+    const carried = fromUrl || defaultBook();
+    if (fromUrl) {
         state.selectedCorpusDoc = carried;
         state.selectedNode = { kind: "book", doc: carried };
+    } else if (carried) {
+        state.selectedCorpusDoc = carried;   // the selected region/tradition stays the active node
     }
     currentDoc = carried;
     const nodeId = carried ? params.get("node") : null;
@@ -194,6 +196,26 @@ export async function renderGraphPage(params = new URLSearchParams(), { samePage
         bookList.querySelector(".document-button.active")?.scrollIntoView({ block: "nearest" });
         loadGraphData(carried, graphType, nodeId);
     }
+}
+
+// With no book in the URL: the selected book, else the current book if it lies within the
+// selected tradition or region (or anywhere, with nothing selected), else the first book of
+// that tradition, region or the whole corpus in tree order.
+function defaultBook() {
+    const node = state.selectedNode;
+    if (node && node.kind === "book" && node.doc) return node.doc;
+    const tradition = node && node.kind === "tradition" ? (node.key || "").split("|")[1] : null;
+    const region = node && node.kind === "region" ? node.key : null;
+    const inScope = (d) => (tradition ? d.tradition === tradition : region ? regionOf(d.tradition) === region : true);
+    if (state.selectedCorpusDoc && inScope(state.selectedCorpusDoc)) return state.selectedCorpusDoc;
+    for (const [major, traditions] of groupDocuments(state.corpusDocuments)) {
+        if (region && major !== region) continue;
+        for (const [name, docs] of traditions) {
+            if (tradition && name !== tradition) continue;
+            if (docs.length) return docs[0];
+        }
+    }
+    return null;
 }
 
 const CATEGORY_NOUNS = { Character: "Character", Location: "Place", Epoch: "Period" };
