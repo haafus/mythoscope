@@ -235,14 +235,13 @@ function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLa
 
     // The name and colour already head the reader pane, so the panel starts with the numbers.
     let html = `
-        <div class="description-title group-first">Corpus</div>
         <div class="group-stat">${formatNumber(words)} words · ${formatNumber(sentences)} sentences</div>
         <div class="group-stat-sub">${escapeHtml(counts)}</div>
         ${corpusWords ? `<div class="group-stat-sub">${escapeHtml(shares)}</div>` : ""}`;
 
     if (byTradition && traditions.size > 1) {
         const ranked = [...traditions.values()].sort((a, b) => b.words - a.words);
-        html += `<div class="description-title">Traditions by volume</div>
+        html += `<div class="description-title">Traditions by volume (words)</div>
             <ol class="group-list">${ranked.map((t) => `<li>
                 <button class="group-link" type="button" data-tradition="${escapeHtml(t.name)}">${escapeHtml(t.name)}</button>
                 <span class="group-count">${formatNumber(t.words)}</span>
@@ -251,14 +250,13 @@ function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLa
 
     const books = [...docs].sort((a, b) => (b.word_count || 0) - (a.word_count || 0));
     if (books.length) {
-        html += `<div class="description-title">Books by volume</div>
+        html += `<div class="description-title">Books by volume (words)</div>
             <ol class="group-list">${books.map((d) => `<li>
                 <button class="group-link" type="button" data-doc="${escapeHtml(d.document_id)}" title="${escapeHtml(d.title)}">
-                    ${escapeHtml(d.title)}${byTradition ? `<span class="group-note">${escapeHtml(d.tradition)}</span>` : ""}
+                    ${escapeHtml(d.title)}
                 </button>
                 <span class="group-count">${formatNumber(d.word_count || 0)}</span>
-            </li>`).join("")}</ol>
-            <div class="group-stat-sub">Volume in words.</div>`;
+            </li>`).join("")}</ol>`;
     }
 
     bookInfo.innerHTML = html;

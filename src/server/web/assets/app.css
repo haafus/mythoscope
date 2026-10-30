@@ -619,14 +619,14 @@ body.has-main-navbar {
 
 .corpus-page .description-title {
     margin: 18px 0 8px;
-    color: #111;
-    font-size: 13px;
+    color: #6b4a2e;   /* the brown of the region/tradition field labels in the reader */
+    font-size: 12px;
     font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
 /* Region / tradition stats in the info panel: plain ranked lists, no stat cards. */
-.corpus-page .group-first { margin-top: 0; }
 .corpus-page .group-stat { color: #111; font-size: 15px; font-weight: 600; }
 .corpus-page .group-stat-sub { margin-top: 3px; color: var(--muted); font-size: 13px; }
 .corpus-page .group-list { margin: 0; padding: 0; list-style: none; font-size: 14px; }
@@ -650,7 +650,6 @@ body.has-main-navbar {
     overflow-wrap: anywhere;
 }
 .corpus-page .group-link:hover { text-decoration: underline; }
-.corpus-page .group-note { display: block; color: var(--muted); font-size: 12px; }
 .corpus-page .group-count { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .corpus-page .description-text {
