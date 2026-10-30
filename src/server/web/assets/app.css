@@ -614,6 +614,8 @@ body.has-main-navbar {
 .corpus-page .corpus-explore-icon .acc { fill: #d9956b; stroke: none; }
 .corpus-page .corpus-explore-icon .acc-line { stroke: #d9956b; }
 .corpus-page .corpus-figure + .corpus-share-caption { margin-top: 6px; }
+/* The figures block stands apart from what follows, at every level as on the overview. */
+.corpus-page .corpus-share-caption + .description-title { margin-top: 32px; }
 
 /* Info panel figures, at every level: the word count, then a thin bar of the share of the
    level above in the tree colour, with the shares as a caption. No stat cards. */
