@@ -63,6 +63,8 @@ export async function renderCorpus(params = new URLSearchParams()) {
     } else if (state.selectedNode && state.selectedNode.kind === "tradition") {
         const [region, tradition] = (state.selectedNode.key || "").split("|");
         showTraditionInfo(tradition, region);   // restore the tradition: highlight AND load its info field
+    } else {
+        showCorpusOverview();   // nothing selected: the whole corpus at a glance
     }
 }
 
@@ -186,11 +188,87 @@ function onTraditionClick(tradition, region) {
 
 function clearSelection() {
     selectNode(null);
-    renderBookInfo(null);
+    showCorpusOverview();
+}
+
+const regionColorOf = (region) => ((state.traditionTree || {})[region] || {}).color || "#8a8a8a";
+
+// The empty state: three word-count histograms (macro-areas, traditions, books) in the
+// reader and the corpus totals in the panel. Every bar label selects what it names.
+function showCorpusOverview() {
+    const docs = state.corpusDocuments;
     const readerContent = document.getElementById("readerContent");
-    if (readerContent) {
-        readerContent.innerHTML = '<div class="reader-placeholder">Choose a title from the literature list.</div>';
+    const bookInfo = document.getElementById("bookInfo");
+    if (!docs.length) {
+        renderBookInfo(null);
+        return;
     }
+
+    const regions = new Map();
+    const traditions = new Map();
+    docs.forEach((d) => {
+        const region = regionOf(d.tradition) || "Other";
+        const r = regions.get(region) || { name: region, words: 0 };
+        r.words += d.word_count || 0;
+        regions.set(region, r);
+        const t = traditions.get(d.tradition) || { name: d.tradition, words: 0 };
+        t.words += d.word_count || 0;
+        traditions.set(d.tradition, t);
+    });
+    const byWords = (a, b) => b.words - a.words;
+    const books = docs.map((d) => ({ name: d.title, words: d.word_count || 0, doc: d })).sort(byWords);
+
+    const bars = (rows, colorOf, attr) => {
+        const max = Math.max(1, ...rows.map((r) => r.words));
+        return `<div class="csbars corpus-bars">${rows.map((r) => `
+            <div class="csbar-row" title="${escapeHtml(r.name)}: ${formatNumber(r.words)} words">
+                <button class="csbar-lab corpus-bar-link" type="button" ${attr(r)}>${escapeHtml(r.name)}</button>
+                <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(1, Math.round((100 * r.words) / max))}%;background:${escapeHtml(colorOf(r))}"></span></span>
+                <span class="csbar-val">${formatNumber(r.words)}</span>
+            </div>`).join("")}</div>`;
+    };
+
+    if (readerContent) {
+        readerContent.innerHTML = `
+            <div class="facet-info corpus-overview">
+                <div class="facet-title">Corpus</div>
+                <div class="facet-field-label">Volume by macro-area (words)</div>
+                ${bars([...regions.values()].sort(byWords), (r) => regionColorOf(r.name), (r) => `data-region="${escapeHtml(r.name)}"`)}
+                <div class="facet-field-label">Volume by tradition (words)</div>
+                ${bars([...traditions.values()].sort(byWords), (r) => traditionColor(r.name), (r) => `data-tradition="${escapeHtml(r.name)}"`)}
+                <div class="facet-field-label">Volume by book (words)</div>
+                ${bars(books, (r) => traditionColor(r.doc.tradition), (r) => `data-doc="${escapeHtml(r.doc.document_id)}"`)}
+            </div>`;
+        readerContent.scrollTop = 0;
+        readerContent.querySelectorAll(".corpus-bar-link").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const { region, tradition, doc } = btn.dataset;
+                if (region) revealRegion(region).then(() => showRegionInfo(region));
+                else if (tradition) revealInTree(tradition).then(() => showTraditionInfo(tradition, regionOf(tradition)));
+                else if (doc) {
+                    const d = docs.find((x) => x.document_id === doc);
+                    if (d) revealInTree(d.tradition).then(() => openCorpusDocument(d));
+                }
+            });
+        });
+    }
+
+    if (bookInfo) {
+        const words = sumWords(docs);
+        const sentences = docs.reduce((n, d) => n + (d.sentence_count || 0), 0);
+        const plural = (n, one, many) => `${formatNumber(n)} ${n === 1 ? one : many}`;
+        bookInfo.innerHTML = `
+            <div class="group-stat">${formatNumber(words)} words · ${formatNumber(sentences)} sentences</div>
+            <div class="group-stat-sub">${plural(regions.size, "macro-area", "macro-areas")} · ${plural(traditions.size, "tradition", "traditions")} · ${plural(docs.length, "book", "books")}</div>
+            <div class="group-stat-sub">${formatNumber(Math.round(words / docs.length))} words per book on average</div>`;
+    }
+}
+
+async function revealRegion(region) {
+    state.corpusOpenMajor = region;
+    state.corpusOpenTradition = null;
+    const tree = document.getElementById("libraryTree");
+    if (tree) await renderLibraryTree(tree);
 }
 
 function showRegionInfo(region) {

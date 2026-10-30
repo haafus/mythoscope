@@ -603,6 +603,23 @@ body.has-main-navbar {
     text-transform: uppercase;
 }
 
+/* Corpus overview (nothing selected): the Motifs overview's CSS bars, sized for the reader. */
+.corpus-page .corpus-overview .facet-field-label { margin-top: 26px; }
+.corpus-page .corpus-overview .facet-title + .facet-field-label { margin-top: 0; }
+.corpus-page .corpus-bars { padding-top: 4px; }
+.corpus-page .corpus-bars .csbar-row { grid-template-columns: minmax(120px, 220px) 1fr 70px; font-size: 13px; }
+.corpus-page .corpus-bar-link {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #3a5e86;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.corpus-page .corpus-bar-link:hover { text-decoration: underline; }
+
 /* Region / tradition stats in the info panel: plain ranked lists, no stat cards. */
 .corpus-page .group-stat { color: var(--muted); font-size: 13px; }
 .corpus-page .group-stat-sub { margin-top: 3px; color: var(--muted); font-size: 13px; }
