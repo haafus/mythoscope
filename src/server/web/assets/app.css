@@ -580,7 +580,7 @@ body.has-main-navbar {
    as a family rather than a rainbow; the hue still matches the tree's dots. */
 .corpus-page .corpus-bars .csbar-fill {
     background: var(--bar);
-    background: color-mix(in oklab, var(--bar) 35%, #cfd8e1);
+    background: color-mix(in oklab, var(--bar) 25%, #cfd8e1);
 }
 .corpus-page .corpus-bars .csbar-row { grid-template-columns: minmax(120px, 220px) 1fr 70px; font-size: 13px; }
 .corpus-page .corpus-bar-link {
@@ -596,19 +596,23 @@ body.has-main-navbar {
 .corpus-page .corpus-bar-link:hover { text-decoration: underline; }
 
 /* Corpus overview panel: links to the other sections, an icon beside each. */
-.corpus-page .corpus-explore { display: flex; flex-direction: column; gap: 4px; margin-top: 30px; }
+.corpus-page .corpus-explore { display: flex; flex-direction: column; gap: 6px; margin-top: 32px; }
 .corpus-page .corpus-explore-link {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
     padding: 8px 0;
     color: #3a5e86;
-    font-size: 14px;
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.3;
     text-decoration: none;
 }
 .corpus-page .corpus-explore-link:hover span:last-child { text-decoration: underline; }
-.corpus-page .corpus-explore-icon { flex: none; width: 32px; height: 32px; color: #7b8794; }
+.corpus-page .corpus-explore-icon { flex: none; width: 44px; height: 44px; color: #2d7a6f; }
 .corpus-page .corpus-explore-icon svg { width: 100%; height: 100%; }
+.corpus-page .corpus-explore-icon .acc { fill: #d9956b; stroke: none; }
+.corpus-page .corpus-explore-icon .acc-line { stroke: #d9956b; }
 .corpus-page .corpus-figure + .corpus-share-caption { margin-top: 6px; }
 
 /* Info panel figures, at every level: the word count, then a thin bar of the share of the
