@@ -595,6 +595,22 @@ body.has-main-navbar {
 }
 .corpus-page .corpus-bar-link:hover { text-decoration: underline; }
 
+/* Corpus overview panel: links to the other sections, an icon beside each. */
+.corpus-page .corpus-explore { display: flex; flex-direction: column; gap: 4px; margin-top: 30px; }
+.corpus-page .corpus-explore-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0;
+    color: #3a5e86;
+    font-size: 14px;
+    text-decoration: none;
+}
+.corpus-page .corpus-explore-link:hover span:last-child { text-decoration: underline; }
+.corpus-page .corpus-explore-icon { flex: none; width: 32px; height: 32px; color: #7b8794; }
+.corpus-page .corpus-explore-icon svg { width: 100%; height: 100%; }
+.corpus-page .corpus-figure + .corpus-share-caption { margin-top: 6px; }
+
 /* Info panel figures, at every level: the word count, then a thin bar of the share of the
    level above in the tree colour, with the shares as a caption. No stat cards. */
 .corpus-page .corpus-figure { color: #2a2f36; font-size: 22px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
