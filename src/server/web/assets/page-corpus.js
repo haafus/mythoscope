@@ -218,7 +218,7 @@ const EXPLORE = [
     ["#/structure", svg('<path class="bg" d="M6 6l12 2-1 10H8z"/><path d="M8 7l7.9.8M6.5 8.2l1.2 7.6M10.2 18h4.6M17.6 10.2l-.4 5.6M7.6 7.6l8 8.9"/><circle class="acc" cx="6" cy="6" r="2.1"/><circle class="acc" cx="18" cy="8" r="2.1"/><circle class="acc" cx="8" cy="18" r="2.1"/><circle class="acc" cx="17" cy="18" r="2.1"/>'), "Structure &amp; relations"],
     ["#/geography", svg('<circle class="bg" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/><circle class="acc" cx="16.6" cy="7.6" r="1.8"/>'), "Geographical atlas"],
     ["#/motifs", svg('<path class="bg" d="M12 6.5C10 5 7 4.6 3 5v13.5c4-.4 7 0 9 1.5 2-1.5 5-1.9 9-1.5V5c-4-.4-7 0-9 1.5z"/><path d="M12 6.5C10 5 7 4.6 3 5v13.5c4-.4 7 0 9 1.5 2-1.5 5-1.9 9-1.5V5c-4-.4-7 0-9 1.5zM12 6.5V20M5.8 9.3c1.5-.1 2.9.1 4 .6M5.8 12.3c1.5-.1 2.9.1 4 .6M5.8 15.3c1.5-.1 2.9.1 4 .6M18.2 9.3c-1.5-.1-2.9.1-4 .6M18.2 12.3c-1.5-.1-2.9.1-4 .6M18.2 15.3c-1.5-.1-2.9.1-4 .6"/>'), "Motif indexes"],
-    ["#/about", svg('<circle class="bg" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 11v6" stroke-width="1.6"/><circle class="acc" cx="12" cy="7.6" r="1.1"/>'), "About the project"],
+    ["#/about", svg('<circle class="bg" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M10.7 10.6H12v6.6M10.4 17.2h3.2"/><circle class="acc" cx="11.9" cy="7.7" r="0.95"/>'), "About the project"],
 ];
 
 const regionColorOf = (region) => ((state.traditionTree || {})[region] || {}).color || "#8a8a8a";
