@@ -594,12 +594,12 @@ body.has-main-navbar {
 .corpus-page .corpus-bar-link:hover { text-decoration: underline; }
 
 /* Corpus overview panel: links to the other sections, an icon beside each. */
-.corpus-page .corpus-explore { display: flex; flex-direction: column; gap: 6px; margin-top: 32px; }
+.corpus-page .corpus-explore { display: flex; flex-direction: column; margin-top: 32px; }
 .corpus-page .corpus-explore-link {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 8px 0;
+    padding: 12px 0;
     color: #5685b1;
     font-size: 21px;
     font-weight: 300;
@@ -607,6 +607,7 @@ body.has-main-navbar {
     text-decoration: none;
 }
 .corpus-page .corpus-explore-link:hover span:last-child { text-decoration: underline; }
+.corpus-page .corpus-explore-link + .corpus-explore-link { border-top: 1px solid #eef1f4; }
 .corpus-page .corpus-explore-icon { flex: none; width: 44px; height: 44px; color: #5685b1; }
 .corpus-page .corpus-explore-icon svg { width: 100%; height: 100%; }
 .corpus-page .corpus-explore-icon .bg { fill: #e8f1fb; stroke: none; }
