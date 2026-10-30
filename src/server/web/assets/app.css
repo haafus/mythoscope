@@ -245,14 +245,7 @@ body.has-main-navbar {
 .about-list strong { color: #2a2f36; font-weight: 600; }
 .about-list a strong { color: inherit; }
 
-.about-card a {
-    color: #306eaf;
-    /* A clear blue and a faint underline, so links stand out from the grey body text. */
-    text-decoration: underline;
-    text-decoration-color: rgba(48, 110, 175, 0.3);
-    text-underline-offset: 3px;
-}
-.about-card a:hover { text-decoration-color: currentColor; }
+.about-card a { color: #5b82b3; text-decoration: none; }   /* the Motifs bibliography link blue */
 
 .about-contacts {
     display: flex;
@@ -266,11 +259,9 @@ body.has-main-navbar {
     align-self: flex-start;
     gap: 14px;
     font-size: 15px;
-    text-decoration: none;
 }
-.about-card a.about-contact:hover { text-decoration: underline; }
 
-.about-contact-icon { flex: none; display: flex; color: #306eaf; }
+.about-contact-icon { flex: none; display: flex; color: #5b82b3; }
 .about-contact-icon svg { width: 24px; height: 24px; }
 
 @media (max-width: 900px) {
