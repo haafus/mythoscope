@@ -252,7 +252,7 @@ function showCorpusOverview() {
         return `<div class="csbars corpus-bars">${rows.map((r) => `
             <div class="csbar-row" title="${escapeHtml(r.name)}: ${formatNumber(r.words)} words">
                 <button class="csbar-lab corpus-bar-link" type="button" ${attr(r)}>${escapeHtml(r.name)}</button>
-                <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(1, Math.round((100 * r.words) / max))}%;background:${escapeHtml(colorOf(r))}"></span></span>
+                <span class="csbar-track"><span class="csbar-fill" style="width:${Math.max(1, Math.round((100 * r.words) / max))}%;--bar:${escapeHtml(colorOf(r))}"></span></span>
                 <span class="csbar-val">${formatNumber(r.words)}</span>
             </div>`).join("")}</div>`;
     };
