@@ -1,10 +1,10 @@
 import { cleanupRoute } from "./core.js";
 import { renderCorpus } from "./page-corpus.js?v=22";
 import { renderEmbeddings } from "./page-embeddings.js?v=13";
-import { renderGraphPage } from "./page-graphs.js?v=36";
+import { renderGraphPage } from "./page-graphs.js?v=37";
 import { renderGeography } from "./page-geography.js?v=78";
 import { renderMotifs } from "./page-motifs.js?v=99";
-import { renderAbout } from "./page-about.js?v=13";
+import { renderAbout } from "./page-about.js?v=14";
 
 const DEFAULT_ROUTE = "/corpus";
 

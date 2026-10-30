@@ -1365,6 +1365,38 @@ body.has-main-navbar {
 .graph-info-label { font-weight: 600; color: #4a4a4a; margin-bottom: 2px; }
 .graph-info-value { color: #2c3e50; line-height: 1.45; }
 
+/* Book summary in the graph rail — the Sources info panel's title, tradition line
+   and section labels, with plain lists instead of stat cards. */
+.graph-book-title { color: #111; font-size: 19px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.graph-book-tradition { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: #58616c; font-size: 13px; }
+.graph-book-dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--book-color, var(--category-none));
+    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.12);
+}
+.graph-book-meta { margin-top: 6px; color: var(--muted); font-size: 13px; }
+.graph-book-label { margin: 18px 0 6px; color: #111; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+.graph-book-text { color: #4b5563; font-size: 14px; line-height: 1.5; }
+.graph-book-list { margin: 0; padding: 0; list-style: none; font-size: 14px; color: #4b5563; }
+.graph-book-list li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+.graph-book-count { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.graph-book-node {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #3a5e86;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+.graph-book-node:hover { text-decoration: underline; }
+.graph-book-hint { margin-top: 18px; font-size: 13px; }
+
 .graph-edge-tooltip {
     z-index: 1000;
     display: none;

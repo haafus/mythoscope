@@ -1,4 +1,7 @@
-import { app, api, escapeHtml, onCleanup, state, CATEGORY_NONE } from "./core.js";
+import {
+    app, api, escapeHtml, onCleanup, state, CATEGORY_NONE,
+    ensureCorpusData, corpusTraditionKey, formatNumber, regionOf, traditionColor,
+} from "./core.js";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=10";
 
 let graphCy = null;
@@ -31,6 +34,10 @@ const GRAPH_FIELD_LABELS = {
     Keyevents: "Key Events",
     Keyactors: "Key Actors",
 };
+
+// What one node of each graph is, for the book summary ("42 characters").
+const GRAPH_ENTITY_NOUNS = { beings: "characters", realms: "places", ages: "periods" };
+const SUMMARY_TOP_N = 8;
 
 // Repair metadata joined before dicts were flattened server-side: replace any
 // leftover Python-style "{'k': 'v', ...}" fragment in a string with its values,
@@ -118,18 +125,91 @@ export async function renderGraphPage(graphType) {
         state.selectedCorpusDoc = e.detail.doc;   // shared across sources + all graph pages
         state.selectedNode = { kind: "book", doc: e.detail.doc };  // keep the global "active item" in sync so sources restores it
         setActiveBook(bookList, e.detail.doc);
-        loadGraphData(e.detail.doc.document_id, graphType);  // graphs keyed by document_id (D1)
+        loadGraphData(e.detail.doc, graphType);
     });
+
+    // A book carried over from another section opens the tree on it: its region and
+    // tradition are expanded before the tree renders, then the row is scrolled into view.
+    const carried = state.selectedCorpusDoc;
+    if (carried) {
+        await ensureCorpusData();
+        const region = regionOf(carried.tradition);
+        if (region) {
+            state.corpusOpenMajor = region;
+            state.corpusOpenTradition = corpusTraditionKey(region, carried.tradition);
+        }
+    }
     await renderLibraryTree(bookList);
 
-    // Restore the selection carried over from another section.
-    if (state.selectedCorpusDoc) {
-        setActiveBook(bookList, state.selectedCorpusDoc);
-        loadGraphData(state.selectedCorpusDoc.document_id, graphType);
+    if (carried) {
+        setActiveBook(bookList, carried);
+        bookList.querySelector(".document-button.active")?.scrollIntoView({ block: "nearest" });
+        loadGraphData(carried, graphType);
     }
 }
 
-async function loadGraphData(bookId, graphType) {
+// The right rail's default content: what this book is and what its graph holds.
+// Shown until a node is picked, and again when the pick is cleared.
+function renderBookSummary(doc, data, graphType) {
+    const nodes = (data && data.nodes) || [];
+    const edges = (data && data.edges) || [];
+    const name = (n) => n.display_name || n.Name || n.id;
+
+    const meta = [
+        doc.dating,
+        doc.word_count ? `${formatNumber(doc.word_count)} words` : "",
+        doc.sentence_count ? `${formatNumber(doc.sentence_count)} sentences` : "",
+    ].filter(Boolean).join(" · ");
+
+    let html = `<div class="graph-book-title">${escapeHtml(doc.title)}</div>
+        <div class="graph-book-tradition">
+            <span class="graph-book-dot" style="--book-color:${escapeHtml(traditionColor(doc.tradition))}"></span>
+            <span>${escapeHtml(regionOf(doc.tradition) || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
+        </div>`;
+    if (meta) html += `<div class="graph-book-meta">${escapeHtml(meta)}</div>`;
+
+    if (data) {
+        const noun = GRAPH_ENTITY_NOUNS[graphType] || "entities";
+        html += `<div class="graph-book-label">This graph</div>
+            <div class="graph-book-text">${formatNumber(nodes.length)} ${noun}, ${formatNumber(edges.length)} links</div>`;
+
+        const top = [...nodes].sort((a, b) => (b.Degree || 0) - (a.Degree || 0)).slice(0, SUMMARY_TOP_N);
+        if (top.length) {
+            html += `<div class="graph-book-label">Most connected</div>
+                <ol class="graph-book-list">${top.map((n) => `<li>
+                    <button class="graph-book-node" type="button" data-node-id="${escapeHtml(n.id)}">${escapeHtml(name(n))}</button>
+                    <span class="graph-book-count">${formatNumber(n.Degree || 0)}</span>
+                </li>`).join("")}</ol>`;
+        }
+
+        if (graphType === "beings") {
+            const counts = new Map();
+            edges.forEach((e) => {
+                const rel = String(e.relation || "").trim().toLowerCase();
+                if (rel) counts.set(rel, (counts.get(rel) || 0) + 1);
+            });
+            const rels = [...counts].sort((a, b) => b[1] - a[1]).slice(0, SUMMARY_TOP_N);
+            if (rels.length) {
+                html += `<div class="graph-book-label">Most frequent relations</div>
+                    <ol class="graph-book-list">${rels.map(([rel, n]) => `<li>
+                        <span>${escapeHtml(rel)}</span><span class="graph-book-count">${formatNumber(n)}</span>
+                    </li>`).join("")}</ol>`;
+            }
+        }
+    }
+
+    if (doc.description) {
+        html += `<div class="graph-book-label">Description</div>
+            <div class="graph-book-text">${escapeHtml(doc.description)}</div>`;
+    }
+    if (data) html += `<div class="graph-info-empty graph-book-hint">Select a node to see its details.</div>`;
+    return html;
+}
+
+async function loadGraphData(doc, graphType) {
+    const bookId = doc.document_id;  // graphs keyed by document_id (D1)
+    const infoContent = document.getElementById("graphInfoContent");
+    if (infoContent) infoContent.innerHTML = renderBookSummary(doc, null, graphType);
     const placeholder = document.getElementById("graphPlaceholder");
     const canvas = document.getElementById("graphCanvas");
     if (placeholder) placeholder.style.display = "none";  // blank while loading — no "Loading graph…" flash
@@ -139,7 +219,7 @@ async function loadGraphData(bookId, graphType) {
     try {
         const data = await api(`/api/graphs/${encodeURIComponent(bookId)}/${encodeURIComponent(graphType)}`);
         if (placeholder) placeholder.style.display = "none";
-        renderCytoscapeGraph(canvas, data, graphType);
+        renderCytoscapeGraph(canvas, data, graphType, doc);
     } catch (error) {
         if (placeholder) {
             placeholder.textContent = `Error: ${error.message}`;
@@ -148,7 +228,7 @@ async function loadGraphData(bookId, graphType) {
     }
 }
 
-function renderCytoscapeGraph(container, data, graphType) {
+function renderCytoscapeGraph(container, data, graphType, doc) {
     if (typeof cytoscape === "undefined") {
         const placeholder = document.getElementById("graphPlaceholder");
         if (placeholder) {
@@ -314,8 +394,15 @@ function renderCytoscapeGraph(container, data, graphType) {
     });
 
     const infoContent = document.getElementById("graphInfoContent");
-    const infoPlaceholder = '<div class="graph-info-empty">Select a node to see its details.</div>';
-    if (infoContent) infoContent.innerHTML = infoPlaceholder;
+    const showSummary = () => {
+        if (!infoContent) return;
+        infoContent.innerHTML = renderBookSummary(doc, data, graphType);
+        // "Most connected" names pick their node, exactly as a click on the canvas would.
+        infoContent.querySelectorAll(".graph-book-node").forEach((btn) => {
+            btn.addEventListener("click", () => cy.getElementById(btn.dataset.nodeId).emit("tap"));
+        });
+    };
+    showSummary();
 
     cy.on("tap", "node", (evt) => {
         // Pin the selection on this node until the next click elsewhere.
@@ -355,6 +442,6 @@ function renderCytoscapeGraph(container, data, graphType) {
         pinnedNode = null;
         cy.nodes().removeClass("pinned");
         if (hoveredNode === null) cy.elements().removeClass("faded hover-highlight");
-        if (infoContent) infoContent.innerHTML = infoPlaceholder;
+        showSummary();
     });
 }
