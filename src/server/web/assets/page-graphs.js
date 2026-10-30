@@ -91,9 +91,10 @@ function runSeededLayout(cy, options, seed) {
     try { cy.layout(options).run(); } finally { Math.random = original; }
 }
 
-// The URL holds the graph and the book: #/structure?graph=beings&book=<document_id>.
-function urlFor(graphType, doc) {
-    return `#/structure?graph=${graphType}` + (doc ? `&book=${encodeURIComponent(doc.document_id)}` : "");
+// The URL holds the graph, the book and the picked node: #/structure?graph=beings&book=<document_id>&node=<id>.
+function urlFor(graphType, doc, nodeId = null) {
+    return `#/structure?graph=${graphType}` + (doc ? `&book=${encodeURIComponent(doc.document_id)}` : "")
+        + (doc && nodeId ? `&node=${encodeURIComponent(nodeId)}` : "");
 }
 
 export async function renderGraphPage(params = new URLSearchParams(), { samePage = false } = {}) {
@@ -177,7 +178,8 @@ export async function renderGraphPage(params = new URLSearchParams(), { samePage
         state.selectedNode = { kind: "book", doc: carried };
     }
     currentDoc = carried;
-    setHashUrl(urlFor(graphType, carried), false);
+    const nodeId = carried ? params.get("node") : null;
+    setHashUrl(urlFor(graphType, carried, nodeId), false);
     if (carried) {
         const region = regionOf(carried.tradition);
         if (region) {
@@ -190,7 +192,7 @@ export async function renderGraphPage(params = new URLSearchParams(), { samePage
     if (carried) {
         setActiveBook(bookList, carried);
         bookList.querySelector(".document-button.active")?.scrollIntoView({ block: "nearest" });
-        loadGraphData(carried, graphType);
+        loadGraphData(carried, graphType, nodeId);
     }
 }
 
@@ -292,7 +294,7 @@ function renderBookSummary(doc, data, graphType) {
 // never lets a slower, older response overwrite the newer one.
 let loadSeq = 0;
 
-async function loadGraphData(doc, graphType) {
+async function loadGraphData(doc, graphType, nodeId = null) {
     const seq = ++loadSeq;
     const bookId = doc.document_id;  // graphs keyed by document_id (D1)
     const infoContent = document.getElementById("graphInfoContent");
@@ -307,7 +309,7 @@ async function loadGraphData(doc, graphType) {
         const data = await api(`/api/graphs/${encodeURIComponent(bookId)}/${encodeURIComponent(graphType)}`);
         if (seq !== loadSeq) return;
         if (placeholder) placeholder.style.display = "none";
-        renderCytoscapeGraph(canvas, data, graphType, doc);
+        renderCytoscapeGraph(canvas, data, graphType, doc, nodeId);
     } catch (error) {
         if (seq !== loadSeq) return;
         if (placeholder) {
@@ -317,7 +319,7 @@ async function loadGraphData(doc, graphType) {
     }
 }
 
-function renderCytoscapeGraph(container, data, graphType, doc) {
+function renderCytoscapeGraph(container, data, graphType, doc, nodeId = null) {
     if (typeof cytoscape === "undefined") {
         const placeholder = document.getElementById("graphPlaceholder");
         if (placeholder) {
@@ -493,15 +495,16 @@ function renderCytoscapeGraph(container, data, graphType, doc) {
     };
     showSummary();
 
-    cy.on("tap", "node", (evt) => {
-        // Pin the selection on this node until the next click elsewhere.
+    // Pin the selection on this node until the next click elsewhere.
+    const pinNode = (node, push = true) => {
         cy.nodes().removeClass("pinned");
-        pinnedNode = evt.target;
+        pinnedNode = node;
         pinnedNode.addClass("pinned");
         highlightNode(pinnedNode);
-
-        infoContent.innerHTML = renderNodeDetails(evt.target.data(), graphType, doc);
-    });
+        infoContent.innerHTML = renderNodeDetails(node.data(), graphType, doc);
+        setHashUrl(urlFor(graphType, doc, node.id()), push);
+    };
+    cy.on("tap", "node", (evt) => pinNode(evt.target));
 
     // A tap on empty canvas clears the pinned selection.
     cy.on("tap", (evt) => {
@@ -510,5 +513,13 @@ function renderCytoscapeGraph(container, data, graphType, doc) {
         cy.nodes().removeClass("pinned");
         if (hoveredNode === null) cy.elements().removeClass("faded hover-highlight");
         showSummary();
+        setHashUrl(urlFor(graphType, doc));
     });
+
+    // A node from the URL (a shared link, or Back) is restored; one this graph lacks is dropped.
+    if (nodeId) {
+        const node = cy.getElementById(nodeId);
+        if (node.nonempty()) pinNode(node, false);
+        else setHashUrl(urlFor(graphType, doc), false);
+    }
 }
