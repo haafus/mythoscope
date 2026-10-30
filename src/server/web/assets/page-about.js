@@ -38,6 +38,7 @@ export function renderAbout(params) {
                     <ul class="about-list">
                         <li><strong>A seed corpus</strong> of primary mythological and religious texts from traditions across the world, drawn from open sources.</li>
                         <li><strong>Basic tools for exploring similarity and structure:</strong> finding parallel passages across traditions by meaning, and mapping characters, places and times within each text.</li>
+                        <li><strong>Three major folklore indexes in one database:</strong> Thompson, Aarne–Thompson–Uther and Berezkin &amp; Duvakin, cross-linked, with a graph of how their motifs and tale types relate.</li>
                         <li><strong>A public interface:</strong> this site, open to anyone without installation.</li>
                         <li><strong>A first preprint:</strong> <a href="${PREPRINT}" ${EXT}><em>MythoSemantic: An Interactive System for Discovering Semantic Parallels Across Mythological and Religious Traditions</em></a> (Ganziuk, Humonen, Makarov &amp; Lebedev, 2026), a write-up of the basic pipeline.</li>
                         <li><strong>Exploratory studies</strong> on dating motifs, reconstructing ancestral motif repertoires and how repertoires change across regions, each <a href="${REPO}/tree/main/mockups" ${EXT}>documented with its data</a>, method and limitations.</li>
