@@ -607,13 +607,12 @@ body.has-main-navbar {
 .corpus-page .corpus-overview .facet-field-label { margin-top: 26px; }
 .corpus-page .corpus-overview .facet-title + .facet-field-label { margin-top: 0; }
 .corpus-page .corpus-bars { padding-top: 4px; }
-/* Region/tradition colours, muted and pulled toward one warm grey so the bars read as a
-   family rather than a rainbow; the hue still matches the tree's dots. */
+/* Region/tradition colours, muted and pulled toward one light cool grey so the bars read
+   as a family rather than a rainbow; the hue still matches the tree's dots. */
 .corpus-page .corpus-bars .csbar-fill {
     background: var(--bar);
-    background: color-mix(in oklab, var(--bar) 45%, #b8ad9b);
+    background: color-mix(in oklab, var(--bar) 45%, #cfd8e1);
 }
-.corpus-page .corpus-bars .csbar-track { background: #f1eee8; }
 .corpus-page .corpus-bars .csbar-row { grid-template-columns: minmax(120px, 220px) 1fr 70px; font-size: 13px; }
 .corpus-page .corpus-bar-link {
     min-width: 0;
