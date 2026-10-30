@@ -192,12 +192,13 @@ function renderBookSummary(doc, data, graphType) {
             <span>${escapeHtml(regionOf(doc.tradition) || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
         </div>`;
     if (meta) html += `<div class="graph-book-meta">${escapeHtml(meta)}</div>`;
+    // Known before the graph loads, so it sits first and stays put while the rest fills in.
+    if (doc.description) {
+        html += `<div class="graph-book-label">Description</div>
+            <div class="graph-book-text">${escapeHtml(doc.description)}</div>`;
+    }
 
     if (data) {
-        const noun = GRAPH_ENTITY_NOUNS[graphType] || "entities";
-        html += `<div class="graph-book-label">This graph</div>
-            <div class="graph-book-text">${formatNumber(nodes.length)} ${noun}, ${formatNumber(edges.length)} links</div>`;
-
         const top = [...nodes].sort((a, b) => (b.Degree || 0) - (a.Degree || 0)).slice(0, SUMMARY_TOP_N);
         if (top.length) {
             html += `<div class="graph-book-label">Most connected</div>
@@ -221,12 +222,12 @@ function renderBookSummary(doc, data, graphType) {
                     </li>`).join("")}</ol>`;
             }
         }
+
+        const noun = GRAPH_ENTITY_NOUNS[graphType] || "entities";
+        html += `<div class="graph-book-label">This graph</div>
+            <div class="graph-book-text">${formatNumber(nodes.length)} ${noun}, ${formatNumber(edges.length)} links</div>`;
     }
 
-    if (doc.description) {
-        html += `<div class="graph-book-label">Description</div>
-            <div class="graph-book-text">${escapeHtml(doc.description)}</div>`;
-    }
     if (data) html += `<div class="graph-info-empty graph-book-hint">Select a node to see its details.</div>`;
     return html;
 }
