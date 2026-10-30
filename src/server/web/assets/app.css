@@ -246,6 +246,7 @@ body.has-main-navbar {
 .about-list a strong { color: inherit; }
 
 .about-card a { color: #5b82b3; text-decoration: none; }   /* the Motifs bibliography link blue */
+.about-card a:hover { text-decoration: underline; }
 
 .about-contacts {
     display: flex;
