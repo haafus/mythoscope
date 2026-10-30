@@ -262,7 +262,7 @@ function initAtlas(container, traditions) {
 
     // ============================================================================
     // Tooltip — dark card anchored above the hovered point (mockup 62 tip styling);
-    // name · region · description. Clicking a point opens it in Sources.
+    // name · region · description. Clicking a point opens it in Corpus.
     // ============================================================================
     const tip = document.createElement("div");
     tip.className = "geo-tip";
@@ -329,7 +329,7 @@ function initAtlas(container, traditions) {
     });
     svg.addEventListener("mouseleave", () => { clearRegionTimer(); hideTip(); });
 
-    // Click a point → open that tradition in Sources (ignore the click that ends a pan).
+    // Click a point → open that tradition in Corpus (ignore the click that ends a pan).
     svg.addEventListener("click", (e) => {
         if (dragMoved) { dragMoved = false; return; }
         const dot = e.target.closest && e.target.closest(".atlas-dot");

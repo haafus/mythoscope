@@ -9,7 +9,7 @@ import { renderAbout } from "./page-about.js?v=15";
 const DEFAULT_ROUTE = "/corpus";
 
 const ROUTES = {
-    "/corpus": { title: "Sources", render: renderCorpus },
+    "/corpus": { title: "Corpus", render: renderCorpus },
     "/embeddings": { title: "Similarity", render: renderEmbeddings },
     "/structure": { title: "Structure", render: renderGraphPage },
     // Former separate pages; old links land on the matching Structure graph.

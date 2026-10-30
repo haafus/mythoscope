@@ -162,7 +162,7 @@ body.has-main-navbar {
    ========================================================================== */
 
 /* Same frame as the workspace pages: a left rail beside a content card, with
-   the Sources tree's row metrics and the Sources reader's margins. */
+   the Corpus tree's row metrics and the Corpus reader's margins. */
 .about-page {
     width: 100%;
     flex: 1 1 auto;
@@ -284,7 +284,7 @@ body.has-main-navbar {
 }
 
 /* ==========================================================================
-   Corpus / Sources Page
+   Corpus Page
    ========================================================================== */
 
 .corpus-page .workspace {
@@ -1387,7 +1387,7 @@ body.has-main-navbar {
 }
 
 
-/* Book summary in the graph rail — the Sources info panel's title, tradition line
+/* Book summary in the graph rail — the Corpus info panel's title, tradition line
    and section labels, with plain lists instead of stat cards. */
 .graph-book-title { color: #111; font-size: 19px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
 .graph-book-tradition { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: #58616c; font-size: 13px; }

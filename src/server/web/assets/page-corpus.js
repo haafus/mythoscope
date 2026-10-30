@@ -20,7 +20,7 @@ function urlFor(node) {
 }
 
 // What the URL asks for, or — when the page is entered from another section with a bare
-// URL — the selection the app already holds. Back to a bare URL within Sources means none.
+// URL — the selection the app already holds. Back to a bare URL within Corpus means none.
 function nodeFromParams(params, samePage) {
     const bookId = params.get("book");
     const title = params.get("title");   // older links: ?title=…&tradition=…
