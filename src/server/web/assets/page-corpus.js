@@ -112,7 +112,7 @@ function renderBookInfo(doc) {
 
     if (!doc) {
         bookInfo.innerHTML = `
-            <div class="empty-state">Select a book to view its words, sentences, and description.</div>
+            <div class="empty-state">Select a book to view its words and description.</div>
         `;
         return;
     }
@@ -122,19 +122,9 @@ function renderBookInfo(doc) {
     const originalUrl = isWebSource
         ? `<a class="original-url-link" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">Source</a>`
         : "";
-    const sizeLines = [
-        doc.word_count ? [counted(doc.word_count, "word", "words")] : [],
-        doc.sentence_count ? [counted(doc.sentence_count, "sentence", "sentences")] : [],
-    ];
+    const tradition = state.corpusDocuments.filter((d) => d.tradition === doc.tradition);
     bookInfo.innerHTML = `
-        <div class="book-title">${escapeHtml(doc.title)}</div>
-        <div class="book-tradition">
-            <span class="info-dot" style="--book-color:${escapeHtml(traditionColor(doc.tradition))}"></span>
-            <span>${escapeHtml(regionOf(doc.tradition) || "Other")} / ${escapeHtml(doc.tradition || "Unknown")}</span>
-        </div>
-
-        ${doc.dating ? `<div class="book-meta">${escapeHtml(doc.dating)}</div>` : ""}
-        ${figures(sizeLines)}
+        ${shareFigures(doc.word_count || 0, traditionColor(doc.tradition), sumWords(tradition), `of ${doc.tradition}`)}
 
         <div class="description-title">Description</div>
         <div class="description-text">${escapeHtml(doc.description || "No description available.")}</div>
@@ -223,7 +213,7 @@ function clearSelection() {
 const regionColorOf = (region) => ((state.traditionTree || {})[region] || {}).color || "#8a8a8a";
 
 // The empty state: three word-count histograms (regions, traditions, books) in the
-// reader and the corpus totals in the panel. Every bar label selects what it names.
+// reader and the corpus word count in the panel. Every bar label selects what it names.
 function showCorpusOverview() {
     const docs = state.corpusDocuments;
     const readerContent = document.getElementById("readerContent");
@@ -261,11 +251,11 @@ function showCorpusOverview() {
         readerContent.innerHTML = `
             <div class="facet-info corpus-overview">
                 <div class="facet-title">Corpus</div>
-                <div class="facet-field-label">Volume by region (words)</div>
+                <div class="facet-field-label count">Volume by region (words)<span>${regions.size}</span></div>
                 ${bars([...regions.values()].sort(byWords), (r) => regionColorOf(r.name), (r) => `data-region="${escapeHtml(r.name)}"`)}
-                <div class="facet-field-label">Volume by tradition (words)</div>
+                <div class="facet-field-label count">Volume by tradition (words)<span>${traditions.size}</span></div>
                 ${bars([...traditions.values()].sort(byWords), (r) => traditionColor(r.name), (r) => `data-tradition="${escapeHtml(r.name)}"`)}
-                <div class="facet-field-label">Volume by book (words)</div>
+                <div class="facet-field-label count">Volume by book (words)<span>${books.length}</span></div>
                 ${bars(books, (r) => traditionColor(r.doc.tradition), (r) => `data-doc="${escapeHtml(r.doc.document_id)}"`)}
             </div>`;
         readerContent.scrollTop = 0;
@@ -282,17 +272,7 @@ function showCorpusOverview() {
         });
     }
 
-    if (bookInfo) {
-        const words = sumWords(docs);
-        const sentences = docs.reduce((n, d) => n + (d.sentence_count || 0), 0);
-        bookInfo.innerHTML = figures([
-            [counted(words, "word", "words")],
-            [counted(sentences, "sentence", "sentences")],
-            [counted(regions.size, "region", "regions"), counted(traditions.size, "tradition", "traditions"),
-                counted(docs.length, "book", "books")],
-            [[formatNumber(Math.round(words / docs.length)), "words per book on average"]],
-        ]);
-    }
+    if (bookInfo) bookInfo.innerHTML = shareFigures(sumWords(docs));
 }
 
 async function revealRegion(region) {
@@ -314,6 +294,10 @@ function showRegionInfo(region) {
     renderGroupStats({
         docs: state.corpusDocuments.filter((d) => regionOf(d.tradition) === region),
         byTradition: true,
+        color: node.color || "#8a8a8a",
+        parentWords: sumWords(state.corpusDocuments),
+        parentLabel: "of the corpus",
+        withCorpus: false,
     });
 }
 
@@ -329,24 +313,25 @@ function showTraditionInfo(tradition, region) {
     renderGroupStats({
         docs: state.corpusDocuments.filter((d) => d.tradition === tradition),
         parentWords: sumWords(state.corpusDocuments.filter((d) => regionOf(d.tradition) === region)),
-        parentLabel: "of the region",
+        parentLabel: `of ${region}`,
+        color: traditionColor(tradition),
     });
 }
 
 const sumWords = (docs) => docs.reduce((n, d) => n + (d.word_count || 0), 0);
 
-// The figures block at the top of the info panel, the same at every level (corpus,
-// region, tradition, book): one fact per line, the number set off from its label.
-// `lines` is a list of lines; a line is a list of [value, label] pairs joined by " · ".
-function figures(lines) {
-    const fig = ([value, label]) => `<span class="fig"><b>${escapeHtml(value)}</b> ${escapeHtml(label)}</span>`;
-    return `<div class="figs">${lines
-        .filter((line) => line.length)
-        .map((line) => `<div class="fig-line">${line.map(fig).join('<span class="fig-sep"> · </span>')}</div>`)
-        .join("")}</div>`;
+// The figures at the top of the info panel, at every level: the word count, then (below the
+// corpus) a bar of its share of the level above in the tree colour, and beside it the share of
+// the whole corpus unless the level above is the corpus itself. Counts head the lists instead.
+function shareFigures(words, color = "", parentWords = 0, parentLabel = "", withCorpus = true) {
+    const html = `<div class="corpus-figure">${formatNumber(words)}<small>${words === 1 ? "word" : "words"}</small></div>`;
+    if (!parentWords) return html;
+    const corpusWords = sumWords(state.corpusDocuments);
+    const width = Math.min(100, (100 * words) / parentWords);
+    return html + `<div class="corpus-share"><i style="width:${width}%;--share-color:${escapeHtml(color)}"></i></div>
+        <div class="corpus-share-caption"><span>${percent(words, parentWords)} ${escapeHtml(parentLabel)}</span>${
+            withCorpus && corpusWords ? `<span>${percent(words, corpusWords)} of the corpus</span>` : ""}</div>`;
 }
-
-const counted = (n, one, many) => [formatNumber(n), n === 1 ? one : many];
 
 function percent(part, whole) {
     if (!whole) return "";
@@ -355,14 +340,11 @@ function percent(part, whole) {
 }
 
 // Right-hand panel for a region or tradition: how much text it holds, its share of
-// the corpus, and its traditions and books ranked by size (each one opens on click).
-function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLabel = "" }) {
+// the level above, and its traditions and books ranked by size (each one opens on click).
+function renderGroupStats({ docs, byTradition = false, color, parentWords = 0, parentLabel = "", withCorpus = true }) {
     const bookInfo = document.getElementById("bookInfo");
     if (!bookInfo) return;
 
-    const words = sumWords(docs);
-    const sentences = docs.reduce((n, d) => n + (d.sentence_count || 0), 0);
-    const corpusWords = sumWords(state.corpusDocuments);
     const traditions = new Map();
     docs.forEach((d) => {
         const t = traditions.get(d.tradition) || { name: d.tradition, words: 0, books: 0 };
@@ -372,20 +354,11 @@ function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLa
     });
 
     // The name and colour already head the reader pane, so the panel starts with the numbers.
-    let html = figures([
-        [counted(words, "word", "words")],
-        [counted(sentences, "sentence", "sentences")],
-        [byTradition ? counted(traditions.size, "tradition", "traditions") : null,
-            counted(docs.length, "book", "books")].filter(Boolean),
-        corpusWords
-            ? [parentWords ? [percent(words, parentWords), parentLabel] : null,
-                [percent(words, corpusWords), "of the corpus"]].filter(Boolean)
-            : [],
-    ]);
+    let html = shareFigures(sumWords(docs), color, parentWords, parentLabel, withCorpus);
 
-    if (byTradition && traditions.size > 1) {
+    if (byTradition && traditions.size) {
         const ranked = [...traditions.values()].sort((a, b) => b.words - a.words);
-        html += `<div class="description-title">Traditions by volume (words)</div>
+        html += `<div class="description-title count">Traditions by volume (words)<span>${traditions.size}</span></div>
             <ol class="group-list">${ranked.map((t) => `<li>
                 <button class="group-link" type="button" data-tradition="${escapeHtml(t.name)}" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</button>
                 <span class="group-count">${formatNumber(t.words)}</span>
@@ -394,7 +367,7 @@ function renderGroupStats({ docs, byTradition = false, parentWords = 0, parentLa
 
     const books = [...docs].sort((a, b) => (b.word_count || 0) - (a.word_count || 0));
     if (books.length) {
-        html += `<div class="description-title">Books by volume (words)</div>
+        html += `<div class="description-title count">Books by volume (words)<span>${books.length}</span></div>
             <ol class="group-list">${books.map((d) => `<li>
                 <button class="group-link" type="button" data-doc="${escapeHtml(d.document_id)}" title="${escapeHtml(d.title)}">
                     ${escapeHtml(d.title)}
@@ -435,13 +408,22 @@ async function openCorpusDocument(doc) {
     const readerContent = document.getElementById("readerContent");
     if (!readerContent) return;
 
-    readerContent.innerHTML = '<div class="reader-placeholder">Loading book text...</div>';
+    // The book's title, tradition and dating head the reader, as a region's or tradition's name does.
+    const meta = [`${regionOf(doc.tradition) || "Other"} / ${doc.tradition || "Unknown"}`, doc.dating].filter(Boolean).join(" · ");
+    const head = `<div class="facet-info book-head"><div class="facet-title">`
+        + `<span class="facet-dot" style="--facet-color:${escapeHtml(traditionColor(doc.tradition))}"></span>`
+        + `<span>${escapeHtml(doc.title)}</span></div><div class="book-head-meta">${escapeHtml(meta)}</div></div>`;
+    readerContent.innerHTML = head + '<div class="reader-placeholder">Loading book text...</div>';
 
     try {
         const text = await api(buildCorpusApiUrl(doc));
-        readerContent.textContent = text;
+        if (state.selectedNode?.doc !== doc) return;
+        readerContent.innerHTML = head;
+        const body = document.createElement("div");
+        body.textContent = text;
+        readerContent.appendChild(body);
         readerContent.scrollTop = 0;
     } catch (error) {
-        readerContent.innerHTML = `<div class="error-state">${escapeHtml(error.message)}</div>`;
+        readerContent.innerHTML = head + `<div class="error-state">${escapeHtml(error.message)}</div>`;
     }
 }

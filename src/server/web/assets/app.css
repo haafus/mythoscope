@@ -530,14 +530,6 @@ body.has-main-navbar {
     overflow-y: auto;
 }
 
-.corpus-page .info-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--book-color, var(--category-none));
-    box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.12);
-}
-
 .corpus-page .reader {
     display: flex;
     flex-direction: column;
@@ -569,29 +561,6 @@ body.has-main-navbar {
 .corpus-page .book-info {
     overflow: auto;
     padding: 18px;
-}
-
-.corpus-page .book-title {
-    color: #111;
-    overflow-wrap: anywhere;
-    font-size: 19px;
-    font-weight: 700;
-    line-height: 1.25;
-}
-
-.corpus-page .book-tradition {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    margin-top: 10px;
-    color: #58616c;
-    font-size: 13px;
-}
-
-.corpus-page .book-meta {
-    margin-top: 6px;
-    color: var(--muted);
-    font-size: 13px;
 }
 
 .corpus-page .description-title {
@@ -626,12 +595,16 @@ body.has-main-navbar {
 }
 .corpus-page .corpus-bar-link:hover { text-decoration: underline; }
 
-/* Region / tradition stats in the info panel: plain ranked lists, no stat cards. */
-/* Figures block, at every level: dark number, muted label, one fact per line. */
-.corpus-page .figs { display: flex; flex-direction: column; gap: 5px; margin-top: 14px; color: var(--muted); font-size: 13px; }
-.corpus-page #bookInfo > .figs:first-child { margin-top: 0; }
-.corpus-page .fig b { color: #2a2f36; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.corpus-page .fig-sep { color: #c3c9cf; }
+/* Info panel figures, at every level: the word count, then a thin bar of the share of the
+   level above in the tree colour, with the shares as a caption. No stat cards. */
+.corpus-page .corpus-figure { color: #2a2f36; font-size: 22px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.corpus-page .corpus-figure small { margin-left: 4px; color: var(--muted); font-size: 13px; font-weight: 400; }
+.corpus-page .corpus-share { position: relative; height: 6px; margin: 10px 0 4px; overflow: hidden; border-radius: 3px; background: #eef1f4; }
+.corpus-page .corpus-share i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--share-color); }
+.corpus-page .corpus-share-caption { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12.5px; }
+/* List and histogram headers carry their item count at the right edge. */
+.corpus-page .count { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.corpus-page .count span { color: var(--muted); font-weight: 400; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 .corpus-page .group-list { margin: 0; padding: 0; list-style: none; font-size: 14px; }
 .corpus-page .group-list li {
     display: flex;
@@ -682,6 +655,9 @@ body.has-main-navbar {
     font-weight: 700;
     line-height: 1.2;
 }
+.corpus-page .book-head { flex: none; margin-bottom: 22px; }
+.corpus-page .book-head .facet-title { margin-bottom: 6px; }
+.corpus-page .book-head-meta { color: var(--muted); font-size: 13px; }
 .corpus-page .facet-dot {
     flex: none;
     width: 13px;
