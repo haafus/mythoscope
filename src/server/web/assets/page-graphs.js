@@ -1,7 +1,9 @@
 import {
     app, api, escapeHtml, onCleanup, state, CATEGORY_NONE,
     ensureCorpusData, corpusTraditionKey, formatNumber, regionOf, traditionColor,
+    documentById,
 } from "./core.js";
+import { setHashUrl } from "./url.js?v=1";
 import { renderLibraryTree, setActiveBook } from "./tree-sources.js?v=10";
 
 let graphCy = null;
@@ -89,7 +91,12 @@ function runSeededLayout(cy, options, seed) {
     try { cy.layout(options).run(); } finally { Math.random = original; }
 }
 
-export async function renderGraphPage(params = new URLSearchParams()) {
+// The URL holds the graph and the book: #/structure?graph=beings&book=<document_id>.
+function urlFor(graphType, doc) {
+    return `#/structure?graph=${graphType}` + (doc ? `&book=${encodeURIComponent(doc.document_id)}` : "");
+}
+
+export async function renderGraphPage(params = new URLSearchParams(), { samePage = false } = {}) {
     const wanted = params.get("graph");
     let graphType = GRAPH_TYPES.some(([t]) => t === wanted) ? wanted : lastGraphType;
     lastGraphType = graphType;
@@ -133,6 +140,10 @@ export async function renderGraphPage(params = new URLSearchParams()) {
     window.addEventListener("resize", onResize);
     onCleanup(() => window.removeEventListener("resize", onResize));
 
+    // The book on screen (null when none) — distinct from the app-wide state.selectedCorpusDoc,
+    // which a bare in-page URL deliberately does not show.
+    let currentDoc = null;
+
     // Switching graphs keeps the page: only the canvas and the rail reload.
     const tabs = document.getElementById("graphTabs");
     tabs.querySelectorAll(".motifs-tab").forEach((btn) => {
@@ -140,8 +151,8 @@ export async function renderGraphPage(params = new URLSearchParams()) {
             if (btn.dataset.graph === graphType) return;
             graphType = lastGraphType = btn.dataset.graph;
             tabs.querySelectorAll(".motifs-tab").forEach((b) => b.classList.toggle("active", b === btn));
-            history.replaceState(null, "", `#/structure?graph=${graphType}`);
-            if (state.selectedCorpusDoc) loadGraphData(state.selectedCorpusDoc, graphType);
+            setHashUrl(urlFor(graphType, currentDoc));
+            if (currentDoc) loadGraphData(currentDoc, graphType);
         });
     });
 
@@ -149,15 +160,25 @@ export async function renderGraphPage(params = new URLSearchParams()) {
     bookList.addEventListener("book-select", (e) => {
         state.selectedCorpusDoc = e.detail.doc;   // shared across sources + all graph pages
         state.selectedNode = { kind: "book", doc: e.detail.doc };  // keep the global "active item" in sync so sources restores it
+        currentDoc = e.detail.doc;
         setActiveBook(bookList, e.detail.doc);
+        setHashUrl(urlFor(graphType, e.detail.doc));
         loadGraphData(e.detail.doc, graphType);
     });
 
-    // A book carried over from another section opens the tree on it: its region and
-    // tradition are expanded before the tree renders, then the row is scrolled into view.
-    const carried = state.selectedCorpusDoc;
+    // The book comes from the URL; entered from another section with none, the book the app
+    // already holds is carried over; Back to a URL without one within Structure means none.
+    // The tree opens on it: region and tradition expanded, the row scrolled into view.
+    await ensureCorpusData();
+    const bookId = params.get("book");
+    const carried = bookId ? documentById(bookId) : samePage ? null : state.selectedCorpusDoc;
+    if (bookId && carried) {
+        state.selectedCorpusDoc = carried;
+        state.selectedNode = { kind: "book", doc: carried };
+    }
+    currentDoc = carried;
+    setHashUrl(urlFor(graphType, carried), false);
     if (carried) {
-        await ensureCorpusData();
         const region = regionOf(carried.tradition);
         if (region) {
             state.corpusOpenMajor = region;

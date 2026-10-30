@@ -1,4 +1,5 @@
 import { app, onCleanup } from "./core.js";
+import { setHashUrl } from "./url.js?v=1";
 
 const REPO = "https://github.com/haafus/mythoscope";
 const AWESOME = "https://github.com/haafus/awesome-computational-mythology";
@@ -114,7 +115,7 @@ export function renderAbout(params) {
         link.addEventListener("click", (event) => {
             event.preventDefault();
             scrollToSection(id);
-            history.replaceState(null, "", `#/about?section=${id}`);
+            setHashUrl(`#/about?section=${id}`);
         });
     });
 

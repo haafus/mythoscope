@@ -1,11 +1,42 @@
 import {
     app, api, state, ensureCorpusData, corpusTraditionKey,
     buildCorpusApiUrl, escapeHtml, formatNumber,
-    regionOf, traditionColor,
+    regionOf, traditionColor, documentById,
 } from "./core.js";
+import { setHashUrl } from "./url.js?v=1";
 import { renderLibraryTree, setActiveNode } from "./tree-sources.js?v=10";
 
-export async function renderCorpus(params = new URLSearchParams()) {
+// The URL holds the selection: #/corpus (nothing), ?region=, ?tradition=, ?book=<document_id>.
+// While a render restores state from it, selections must not push new history entries.
+let restoring = false;
+
+function urlFor(node) {
+    const q = (k, v) => `#/corpus?${k}=${encodeURIComponent(v)}`;
+    if (!node) return "#/corpus";
+    if (node.kind === "region") return q("region", node.key);
+    if (node.kind === "tradition") return q("tradition", (node.key || "").split("|")[1] || "");
+    if (node.kind === "book" && node.doc) return q("book", node.doc.document_id);
+    return "#/corpus";
+}
+
+// What the URL asks for, or — when the page is entered from another section with a bare
+// URL — the selection the app already holds. Back to a bare URL within Sources means none.
+function nodeFromParams(params, samePage) {
+    const bookId = params.get("book");
+    const title = params.get("title");   // older links: ?title=…&tradition=…
+    const tradition = params.get("tradition");
+    const region = params.get("region");
+    const doc = bookId ? documentById(bookId)
+        : title ? state.corpusDocuments.find((d) => d.title === title && (!tradition || d.tradition === tradition))
+        : null;
+    if (doc) return { kind: "book", doc };
+    if (tradition) return { kind: "tradition", key: corpusTraditionKey(regionOf(tradition), tradition) };
+    if (region) return { kind: "region", key: region };
+    if (!samePage && state.selectedNode) return state.selectedNode;
+    return null;
+}
+
+export async function renderCorpus(params = new URLSearchParams(), { samePage = false } = {}) {
     app.innerHTML = `
         <main class="corpus-page container">
             <div class="workspace">
@@ -32,40 +63,38 @@ export async function renderCorpus(params = new URLSearchParams()) {
     libraryTree.addEventListener("tradition-select", (e) => onTraditionClick(e.detail.tradition, e.detail.region));
     renderBookInfo(null);
 
-    const wantedTitle = params.get("title");
-    const wantedTradition = params.get("tradition");
+    await ensureCorpusData();
+    const node = nodeFromParams(params, samePage);
 
-    // Deep link to a tradition (atlas point): pre-open its accordion before the tree renders.
-    if (wantedTradition && !wantedTitle) {
-        await ensureCorpusData();
-        const region = regionOf(wantedTradition);
-        if (region) {
-            state.corpusOpenMajor = region;
-            state.corpusOpenTradition = corpusTraditionKey(region, wantedTradition);
-        }
+    // Open the tree on the selection before it renders.
+    if (node && node.kind === "region") {
+        state.corpusOpenMajor = node.key;
+    } else if (node) {
+        const tradition = node.kind === "book" ? node.doc.tradition : (node.key || "").split("|")[1];
+        const region = regionOf(tradition);
+        state.corpusOpenMajor = region;
+        state.corpusOpenTradition = corpusTraditionKey(region, tradition);
     }
 
     await renderLibraryTree(libraryTree);
 
-    const target = wantedTitle
-        ? state.corpusDocuments.find((doc) =>
-            doc.title === wantedTitle && (!wantedTradition || doc.tradition === wantedTradition))
-        : null;
-
-    if (target) {
-        openCorpusDocument(target);
-    } else if (wantedTradition) {
-        showTraditionInfo(wantedTradition, regionOf(wantedTradition));
-    } else if (state.selectedNode && state.selectedNode.kind === "book" && state.selectedNode.doc) {
-        openCorpusDocument(state.selectedNode.doc);   // a book (picked here or on a graph page) → fully reopen: reader + info + highlight
-    } else if (state.selectedNode && state.selectedNode.kind === "region") {
-        showRegionInfo(state.selectedNode.key);   // restore the region: highlight AND load its info field
-    } else if (state.selectedNode && state.selectedNode.kind === "tradition") {
-        const [region, tradition] = (state.selectedNode.key || "").split("|");
-        showTraditionInfo(tradition, region);   // restore the tradition: highlight AND load its info field
-    } else {
-        showCorpusOverview();   // nothing selected: the whole corpus at a glance
+    restoring = true;
+    try {
+        if (node && node.kind === "book") {
+            openCorpusDocument(node.doc);
+        } else if (node && node.kind === "region") {
+            showRegionInfo(node.key);
+        } else if (node && node.kind === "tradition") {
+            const [region, tradition] = (node.key || "").split("|");
+            showTraditionInfo(tradition, region);
+        } else {
+            selectNode(null);
+            showCorpusOverview();   // nothing selected: the whole corpus at a glance
+        }
+    } finally {
+        restoring = false;
     }
+    setHashUrl(urlFor(state.selectedNode), false);   // e.g. an old ?title= link becomes ?book=
 }
 
 // The single source of truth for "what is selected": set the one active node and reflect it in
@@ -74,6 +103,7 @@ function selectNode(node) {
     state.selectedNode = node;
     const tree = document.getElementById("libraryTree");
     if (tree) setActiveNode(tree, node);
+    if (!restoring) setHashUrl(urlFor(node));
 }
 
 function renderBookInfo(doc) {

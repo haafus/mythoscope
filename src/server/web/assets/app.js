@@ -1,10 +1,10 @@
 import { cleanupRoute } from "./core.js";
-import { renderCorpus } from "./page-corpus.js?v=32";
-import { renderEmbeddings } from "./page-embeddings.js?v=13";
-import { renderGraphPage } from "./page-graphs.js?v=43";
+import { renderCorpus } from "./page-corpus.js?v=33";
+import { renderEmbeddings } from "./page-embeddings.js?v=14";
+import { renderGraphPage } from "./page-graphs.js?v=44";
 import { renderGeography } from "./page-geography.js?v=78";
 import { renderMotifs } from "./page-motifs.js?v=99";
-import { renderAbout } from "./page-about.js?v=14";
+import { renderAbout } from "./page-about.js?v=15";
 
 const DEFAULT_ROUTE = "/corpus";
 
@@ -39,6 +39,11 @@ function setActiveNav(path) {
     });
 }
 
+// The path rendered last. A page told it is re-rendering itself (`samePage`) takes a
+// bare URL literally — e.g. Back to "#/corpus" means "nothing selected" — while a page
+// entered from another section may restore the selection the app already holds.
+let lastPath = null;
+
 function render() {
     cleanupRoute();
 
@@ -49,9 +54,11 @@ function render() {
         return;
     }
 
+    const samePage = path === lastPath;
+    lastPath = path;
     document.title = `Mythoscope - ${route.title}`;
     setActiveNav(path);
-    route.render(params);
+    route.render(params, { samePage });
 }
 
 window.addEventListener("hashchange", render);

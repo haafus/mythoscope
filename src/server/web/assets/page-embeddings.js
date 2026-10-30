@@ -5,6 +5,7 @@ import {
     ensureCorpusData, traditionColor, regionOf, UNASSIGNED, corpusTraditionKey,
     persistSelectedModel, renderModelOptions,
 } from "./core.js";
+import { setHashUrl } from "./url.js?v=1";
 import { destroyChart, highlightTradition, renderScatter, renderHeatmap, renderDistribution, resizeChart } from "./chart.js?v=1";
 import {
     attributionLine,
@@ -34,9 +35,37 @@ const CHART_RENDERERS = {
     },
 };
 
-export async function renderEmbeddings() {
+// The URL holds the view: model, projection method, the region or tradition picked in the
+// tree, and the fragment open in the rail — #/embeddings?model=…&method=…&tradition=…&doc=…&chunk=….
+// While a render restores that state, nothing pushes new history entries.
+let restoring = false;
+let currentPoint = null;     // { doc, chunk } of the fragment shown in the rail, or null
+let lastMethod = "";         // projection method kept across visits, like the model
+
+function similarityUrl() {
+    const p = new URLSearchParams();
+    if (state.selectedModel) p.set("model", state.selectedModel);
+    const method = document.getElementById("viz-select")?.value;
+    if (method) p.set("method", method);
+    if (analysisSel) p.set(analysisSel.kind, analysisSel.name);
+    if (currentPoint) {
+        p.set("doc", currentPoint.doc);
+        if (currentPoint.chunk != null && currentPoint.chunk !== "") p.set("chunk", currentPoint.chunk);
+    }
+    return `#/embeddings?${p.toString()}`;
+}
+
+function recordUrl(push = true) {
+    if (!restoring) setHashUrl(similarityUrl(), push);
+}
+
+export async function renderEmbeddings(params = new URLSearchParams(), { samePage = false } = {}) {
+    restoring = true;
+    currentPoint = null;
     // Load models first so state.textSearch is known before we build the rail.
     try { await ensureModels(); } catch { /* retried in loadModelsIntoSelect */ }
+    const wantedModel = params.get("model");
+    if (wantedModel && state.models.some((m) => m.key === wantedModel)) state.selectedModel = wantedModel;
     const textSearch = state.textSearch;
     const searchPanelHtml = textSearch
         ? `<div class="search-panel" id="searchPanel">
@@ -106,12 +135,16 @@ export async function renderEmbeddings() {
     });
 
     try {
-        await loadSimilarityMethods();
+        await loadSimilarityMethods(params.get("method"));
         await loadModelsIntoSelect();
-        await initializeAnalysisLibrary();
+        await initializeAnalysisLibrary(params, samePage);
+        if (params.get("doc")) displayPointInfo(params.get("doc"), params.get("chunk"));
     } catch (error) {
         console.error(error);
+    } finally {
+        restoring = false;
     }
+    recordUrl(false);   // canonical URL for what is on screen
 }
 
 function bindEmbeddingsControls() {
@@ -120,8 +153,12 @@ function bindEmbeddingsControls() {
     const searchText = document.getElementById("search-text");
     const searchBtn = document.getElementById("search-btn");
 
-    modelSelect.addEventListener("change", triggerModelChange);
-    vizSelect.addEventListener("change", loadVisualization);
+    modelSelect.addEventListener("change", () => { triggerModelChange(); recordUrl(); });
+    vizSelect.addEventListener("change", () => {
+        lastMethod = vizSelect.value;
+        loadVisualization();
+        recordUrl();
+    });
     if (searchText && searchBtn) { // absent when text search is off
         searchText.addEventListener("input", () => {
             searchBtn.disabled = searchText.value.trim().length === 0 || !state.selectedModel;
@@ -132,7 +169,7 @@ function bindEmbeddingsControls() {
     document.getElementById("close-search-modal").addEventListener("click", closeSearchModal);
 }
 
-async function loadSimilarityMethods() {
+async function loadSimilarityMethods(wanted = null) {
     if (!state.similarityMethods.length) {
         state.similarityMethods = await api("/api/similarity/methods");
     }
@@ -141,6 +178,9 @@ async function loadSimilarityMethods() {
         vizSelect.innerHTML = state.similarityMethods
             .map((m) => `<option value="${escapeHtml(m.key)}">${escapeHtml(m.label)}</option>`)
             .join("");
+        const pick = [wanted, lastMethod].find((k) => k && state.similarityMethods.some((m) => m.key === k));
+        if (pick) vizSelect.value = pick;
+        lastMethod = vizSelect.value;
     }
 }
 
@@ -229,6 +269,8 @@ async function loadVisualization() {
 const PENCIL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
 function showSearchPanel() {
+    currentPoint = null;
+    recordUrl(false);
     const searchPanel = document.getElementById("searchPanel");
     const infoContent = document.getElementById("infoContent");
     if (searchPanel) searchPanel.style.display = "";
@@ -247,6 +289,8 @@ export async function displayPointInfo(pointId, chunkIndex = null) {
     const searchPanel = document.getElementById("searchPanel");
     if (!infoContent) return;
 
+    currentPoint = { doc: pointId, chunk: chunkIndex };
+    recordUrl();
     if (searchPanel) searchPanel.style.display = "none";
     infoContent.style.display = "";
     infoContent.innerHTML = '<div class="info-loading">Loading...</div>';
@@ -363,13 +407,29 @@ function setCurrentBookToFirstOfTradition(tradition) {
     state.corpusOpenTradition = key;
 }
 
-async function initializeAnalysisLibrary() {
+// The selection the URL names; with none, a page entered from another section opens on the
+// app's current region/tradition (or a book's tradition), while Back within Similarity means none.
+function selectionFromParams(params, samePage) {
+    const tradition = params.get("tradition");
+    const region = params.get("region");
+    if (tradition) {
+        state.corpusOpenMajor = regionOf(tradition) || state.corpusOpenMajor;
+        return { kind: "tradition", name: tradition };
+    }
+    if (region) {
+        state.corpusOpenMajor = region;
+        return { kind: "region", name: region };
+    }
+    return samePage ? null : restoreAnalysisSelection();
+}
+
+async function initializeAnalysisLibrary(params = new URLSearchParams(), samePage = false) {
     await ensureCorpusData();
 
     const container = document.getElementById("tree-container");
     if (!container) return;
 
-    analysisSel = restoreAnalysisSelection();   // open on the current region/tradition (or a book's tradition)
+    analysisSel = selectionFromParams(params, samePage);
 
     // Region and tradition are ONE active item at a time (same `.active` class as sources):
     // picking one clears the other, and the scatter dims everything outside the selection.
@@ -379,6 +439,7 @@ async function initializeAnalysisLibrary() {
         analysisSel = tradition ? { kind: "tradition", name: tradition } : null;
         if (tradition) setCurrentBookToFirstOfTradition(tradition);
         applyAnalysisDim();
+        recordUrl();
     });
 
     container.addEventListener("region-select", (event) => {
@@ -399,6 +460,7 @@ async function initializeAnalysisLibrary() {
         }
         analysisSel = active ? { kind: "region", name: region } : null;
         applyAnalysisDim();
+        recordUrl();
     });
 
     await renderTraditionList(container);
